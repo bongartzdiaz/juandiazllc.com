@@ -1,26 +1,179 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ══ LIGHT THEME ══ */
+[data-theme="light"] {
+  --bg:       #F4F6F9;
+  --bg2:      #EAECF1;
+  --panel:    #FFFFFF;
+  --panel2:   #F9FAFB;
+  --border:   #E1E5EE;
+  --border2:  #CBD0DC;
+  --txt:      #0E1117;
+  --txt2:     #525C72;
+  --txt3:     #96A0B5;
+  --shadow-sm: 0 1px 3px rgba(14,17,23,0.06), 0 1px 2px rgba(14,17,23,0.03);
+  --shadow:    0 4px 12px rgba(14,17,23,0.08), 0 1px 4px rgba(14,17,23,0.04);
+  --shadow-md: 0 8px 24px rgba(14,17,23,0.10), 0 2px 8px rgba(14,17,23,0.05);
+  --shadow-glow: 0 0 0 1px rgba(22,80,220,0.08), 0 4px 16px rgba(22,80,220,0.06);
+
+  --g: #079455; --g-bg: #ECFDF3; --g-border: #A9EFC5; --g-txt: #067647;
+  --o: #DC4A11; --o-bg: #FEF2EE; --o-border: #FAC5B0; --o-txt: #B93B0D;
+  --y: #B54708; --y-bg: #FFFAEB; --y-border: #FEDF89; --y-txt: #93370D;
+  --r: #C01048; --r-bg: #FFF1F3; --r-border: #FECDD6; --r-txt: #89123E;
+  --b: #1650DC; --b-bg: #EFF4FF; --b-border: #C7D7FD; --b-txt: #1849A9;
+}
+
+/* ══ DARK THEME ══ */
+[data-theme="dark"] {
+  --bg:       #0A0D12;
+  --bg2:      #141921;
+  --panel:    #111620;
+  --panel2:   #171D29;
+  --border:   rgba(255,255,255,0.08);
+  --border2:  rgba(255,255,255,0.14);
+  --txt:      #EAF0FA;
+  --txt2:     #B0C4D8;
+  --txt3:     #7A8DA3;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow:    0 4px 16px rgba(0,0,0,0.45);
+  --shadow-md: 0 8px 28px rgba(0,0,0,0.55);
+  --shadow-glow: 0 0 0 1px rgba(94,170,255,0.1), 0 4px 20px rgba(94,170,255,0.05);
+
+  --g: #22DD80; --g-bg: rgba(34,221,128,0.10); --g-border: rgba(34,221,128,0.25); --g-txt: #50F0A0;
+  --o: #FF7A45; --o-bg: rgba(255,122,69,0.10); --o-border: rgba(255,122,69,0.25); --o-txt: #FF9E78;
+  --y: #F5C040; --y-bg: rgba(245,192,64,0.10); --y-border: rgba(245,192,64,0.25); --y-txt: #F8D36E;
+  --r: #F54060; --r-bg: rgba(245,64,96,0.10);  --r-border: rgba(245,64,96,0.25);  --r-txt: #FA7A92;
+  --b: #5EAAFF; --b-bg: rgba(94,170,255,0.10); --b-border: rgba(94,170,255,0.25); --b-txt: #82C2FF;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-jakarta);
+  --font-mono: var(--font-jet-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ══ BASE ══ */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--txt);
+  font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+  transition: background 200ms ease, color 200ms ease;
+}
+
+/* Subtle texture — light */
+[data-theme="light"] body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Grid texture — dark */
+[data-theme="dark"] body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Mono utility */
+.mono {
+  font-family: var(--font-jet-mono), 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Smooth transitions */
+.sidebar, .topbar, .card, .kpi, .funnel-box, .chip,
+table th, table td, .badge, button {
+  transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+
+/* Card hover lift */
+.card-hover {
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+.card-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+  border-color: var(--border2);
+}
+
+/* Table row hover */
+table tbody tr {
+  transition: background 150ms ease;
+}
+table tbody tr:hover {
+  background: var(--bg2);
+}
+
+/* Button hover effects */
+button {
+  transition: all 150ms ease;
+}
+button:hover {
+  opacity: 0.88;
+}
+button:active {
+  transform: scale(0.98);
+}
+
+/* Focus ring */
+button:focus-visible, input:focus-visible, a:focus-visible {
+  outline: 2px solid var(--b);
+  outline-offset: 2px;
+}
+
+/* ══ ANIMATIONS ══ */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.25; }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg2) 25%, var(--panel2) 50%, var(--bg2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+
+/* Selection */
+::selection {
+  background: var(--b-bg);
+  color: var(--b-txt);
 }

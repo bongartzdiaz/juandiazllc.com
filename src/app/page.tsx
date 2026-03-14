@@ -1,65 +1,136 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { Topbar } from '@/components/layout/Topbar'
+import { KpiCard } from '@/components/ui/KpiCard'
+import { FunnelCard } from '@/components/dashboard/FunnelCard'
+import { AlertsCard } from '@/components/dashboard/AlertsCard'
+import { GoalsCard } from '@/components/dashboard/GoalsCard'
+import { ChartsSection } from '@/components/dashboard/ChartsSection'
+import { CampaignTable } from '@/components/dashboard/CampaignTable'
+import { JourneyBar } from '@/components/dashboard/JourneyBar'
+import { useMetaAds } from '@/hooks/useMetaAds'
+import { useSales } from '@/hooks/useSales'
+import { useChatbot } from '@/hooks/useChatbot'
+
+export default function DashboardPage() {
+  const meta = useMetaAds('NL')
+  const sales = useSales()
+  const chatbot = useChatbot()
+
+  const loading = meta.loading || sales.loading || chatbot.loading
+
+  // Derive KPIs from real data
+  const totalLeads = sales.data?.totals?.leads ?? 0
+  const cplMeta = meta.data?.totals?.avgCpl ?? 0
+  const chatConv = chatbot.data?.totals?.conversieRate ?? 0
+  const afspraken = sales.data?.totals?.afspraken ?? 0
+  const deals = sales.data?.totals?.deals ?? 0
+  const omzet = sales.data?.totals?.omzet ?? 0
+  const convRate = sales.data?.totals?.conversieRate ?? 0
+
+  // Journey steps from GHL pipeline
+  const pipeline = sales.data?.pipeline ?? []
+
+  // Daily data for charts
+  const dailySales = sales.data?.daily ?? []
+  const dailyMeta = meta.data?.daily ?? []
+
+  // Campaigns
+  const campaigns = meta.data?.campaigns ?? []
+
+  const refetchAll = () => {
+    meta.refetch()
+    sales.refetch()
+    chatbot.refetch()
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <Topbar
+        title="Command Center"
+        sub="Lead → Gesprek → Afspraak → Sale"
+        onSync={refetchAll}
+      />
+
+      <div style={{ padding: '18px 22px 40px' }}>
+        {/* Journey Bar — visual overview of entire process */}
+        <JourneyBar pipeline={pipeline} loading={loading} />
+
+        {/* KPI Strip */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)',
+          gap: 10, marginBottom: 16,
+        }}>
+          <KpiCard
+            label="Leads totaal"
+            value={loading ? '—' : totalLeads}
+            delta={`${convRate}% conversie`}
+            deltaDir="up"
+            accentColor="var(--b)"
+            icon="users"
+            delay={80}
+          />
+          <KpiCard
+            label="CPL Meta"
+            value={loading ? '—' : `€${Math.round(cplMeta)}`}
+            delta={cplMeta > 0 && cplMeta < 20 ? 'Onder doel' : cplMeta > 0 ? 'Boven doel' : ''}
+            deltaDir={cplMeta > 0 && cplMeta < 20 ? 'up' : 'down'}
+            goal="Doel < €20"
+            accentColor="var(--o)"
+            icon="trending-down"
+            delay={130}
+          />
+          <KpiCard
+            label="Chatbot conversie"
+            value={loading ? '—' : `${Math.round(chatConv)}%`}
+            delta={chatConv >= 25 ? 'Boven minimum' : chatConv > 0 ? 'Onder minimum' : ''}
+            deltaDir={chatConv >= 25 ? 'up' : 'down'}
+            goal="Min. 25%"
+            icon="message-circle"
+            delay={180}
+          />
+          <KpiCard
+            label="Afspraken"
+            value={loading ? '—' : afspraken}
+            delta={`${afspraken} / 40 doel`}
+            deltaDir={afspraken >= 30 ? 'up' : 'neu'}
+            icon="calendar"
+            delay={230}
+          />
+          <KpiCard
+            label="Omzet"
+            value={loading ? '—' : `€${(omzet / 1000).toFixed(1)}k`}
+            delta={`${deals} deals gesloten`}
+            deltaDir="up"
+            hot={deals >= 10}
+            icon="zap"
+            delay={280}
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+
+        {/* Main Grid: Funnel + Sidebar */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: '1fr 330px',
+          gap: 12, marginBottom: 12,
+        }}>
+          <FunnelCard pipeline={pipeline} loading={loading} />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <AlertsCard
+              meta={meta.data}
+              sales={sales.data}
+              chatbot={chatbot.data}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <GoalsCard sales={sales.data} />
+          </div>
         </div>
-      </main>
-    </div>
-  );
+
+        {/* Charts */}
+        <ChartsSection dailyMeta={dailyMeta} dailySales={dailySales} />
+
+        {/* Campaign Table */}
+        <CampaignTable campaigns={campaigns} />
+      </div>
+    </>
+  )
 }
