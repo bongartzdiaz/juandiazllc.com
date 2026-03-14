@@ -14,7 +14,11 @@ export function useGoogleAds(market: Market = 'NL') {
     setError(null)
     try {
       const result = await fetchGoogleAds(market)
-      setData(result)
+      if (result) {
+        setData(result)
+      } else {
+        setError('Google Ads API niet bereikbaar')
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Fout bij laden Google Ads data')
     } finally {

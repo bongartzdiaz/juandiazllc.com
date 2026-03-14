@@ -83,15 +83,6 @@ export function AlertsCard({ meta, sales, chatbot }: Props) {
       }
     }
 
-    // Fallback if no data
-    if (list.length === 0) {
-      list.push(
-        { type: 'ok', msg: 'F1 draait op CPL €12', sub: 'Beste funnel — schaal budget op', cta: 'Bekijk' },
-        { type: 'warn', msg: 'F5 CPL €34 — te hoog', sub: 'Pauzeer of pas creative aan', cta: 'Fix' },
-        { type: 'crit', msg: '7 chatbotgesprekken wachten', sub: 'Menselijke overdracht vereist', cta: 'Nu' },
-      )
-    }
-
     return list.slice(0, 4)
   }, [meta, sales, chatbot])
 
@@ -116,6 +107,11 @@ export function AlertsCard({ meta, sales, chatbot }: Props) {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: 12 }}>
+        {alerts.length === 0 && (
+          <div style={{ padding: '16px 0', textAlign: 'center', fontSize: 12.5, color: 'var(--txt3)' }}>
+            Geen signalen — wacht op live data
+          </div>
+        )}
         {alerts.map((a, i) => {
           const s = alertStyles[a.type]
           return (

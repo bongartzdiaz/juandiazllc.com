@@ -3,14 +3,6 @@
 import { useEffect, useState } from 'react'
 import type { GhlPipelineStep } from '@/lib/types'
 
-const FALLBACK_STEPS: GhlPipelineStep[] = [
-  { stage: 'website_lead', label: 'Website lead', value: 1247, description: 'Totaal ingevulde formulieren' },
-  { stage: 'chatbot', label: 'Chatbot gesprek', value: 399, description: 'WhatsApp-conversatie gestart' },
-  { stage: 'telefoon', label: 'Telefonische afspraak', value: 178, description: 'Kwalificatiegesprek ingepland' },
-  { stage: 'buitendienst', label: 'Buitendienst afspraak', value: 72, description: 'Fysiek adviesgesprek' },
-  { stage: 'sale', label: 'Sale', value: 36, description: 'Getekende overeenkomst' },
-]
-
 const stepColors = ['var(--b-txt)', 'var(--b-txt)', 'var(--y-txt)', 'var(--o-txt)', 'var(--g-txt)']
 
 const barColor = (pct: number) => pct >= 50 ? 'var(--g)' : pct >= 30 ? 'var(--y)' : 'var(--r)'
@@ -29,7 +21,21 @@ export function FunnelCard({ pipeline, loading }: Props) {
     return () => clearTimeout(t)
   }, [])
 
-  const steps = pipeline && pipeline.length > 0 ? pipeline : FALLBACK_STEPS
+  if (!pipeline || pipeline.length === 0) {
+    return (
+      <div style={{
+        background: 'var(--panel)', border: '1px solid var(--border)',
+        borderRadius: 12, padding: '40px 16px', textAlign: 'center',
+        boxShadow: 'var(--shadow-sm)',
+      }}>
+        <div style={{ fontSize: 13, color: 'var(--txt3)' }}>
+          {loading ? 'Pipeline data laden...' : 'Geen pipeline data beschikbaar'}
+        </div>
+      </div>
+    )
+  }
+
+  const steps = pipeline
 
   const rates = steps.slice(0, -1).map((step, i) => {
     const next = steps[i + 1]

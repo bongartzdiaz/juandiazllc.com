@@ -8,6 +8,7 @@ import { GoalsCard } from '@/components/dashboard/GoalsCard'
 import { ChartsSection } from '@/components/dashboard/ChartsSection'
 import { CampaignTable } from '@/components/dashboard/CampaignTable'
 import { JourneyBar } from '@/components/dashboard/JourneyBar'
+import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner'
 import { useMetaAds } from '@/hooks/useMetaAds'
 import { useSales } from '@/hooks/useSales'
 import { useChatbot } from '@/hooks/useChatbot'
@@ -53,6 +54,8 @@ export default function DashboardPage() {
       />
 
       <div style={{ padding: '18px 22px 40px' }}>
+        <ApiErrorBanner errors={[meta.error, sales.error, chatbot.error].filter((e): e is string => !!e)} />
+
         {/* Journey Bar — visual overview of entire process */}
         <JourneyBar pipeline={pipeline} loading={loading} />
 

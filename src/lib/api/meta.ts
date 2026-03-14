@@ -1,34 +1,23 @@
 import type { MetaAdsData, MetaCampaign, MetaDailyStats, Market } from '../types'
 import { API_BASE } from '../utils'
 
-// ── Mock data (used until Meta API is connected) ──
-
-const MOCK_CAMPAIGNS: MetaCampaign[] = [
-  { id: 'f1', name: 'F1 Thuisbatterij — Interesse NL', funnel: 'F1', status: 'goed', market: 'NL', spend: 1284, impressions: 53400, clicks: 1282, ctr: 2.4, cpl: 12, leads: 107, budget: 2000 },
-  { id: 'f7', name: 'F7 Lookalike — Zonnepanelen', funnel: 'F7', status: 'goed', market: 'NL', spend: 876, impressions: 48700, clicks: 877, ctr: 1.8, cpl: 13, leads: 67, budget: 1500 },
-  { id: 'f4', name: 'F4 Retarget — 30 dagen', funnel: 'F4', status: 'ok', market: 'NL', spend: 654, impressions: 59500, clicks: 655, ctr: 1.1, cpl: 18, leads: 36, budget: 1000 },
-  { id: 'f2', name: 'F2 Zonnepanelen — Breed NL', funnel: 'F2', status: 'goed', market: 'NL', spend: 542, impressions: 31200, clicks: 499, ctr: 1.6, cpl: 15, leads: 36, budget: 800 },
-  { id: 'f3', name: 'F3 Combi Deal — Test', funnel: 'F3', status: 'testfase', market: 'NL', spend: 38, impressions: 4200, clicks: 38, ctr: 0.9, cpl: null, leads: 4, budget: 200 },
-  { id: 'f5', name: 'F5 Koude Traffic — Video', funnel: 'F5', status: 'slecht', market: 'NL', spend: 523, impressions: 174300, clicks: 523, ctr: 0.3, cpl: 34, leads: 15, budget: 600 },
-  { id: 'f6', name: 'F6 Video Testimonial', funnel: 'F6', status: 'testfase', market: 'NL', spend: 95, impressions: 8100, clicks: 73, ctr: 0.9, cpl: 20, leads: 5, budget: 300 },
+// Lead action types in priority order — Meta uses different types depending on pixel setup
+const LEAD_ACTION_TYPES = [
+  'complete_registration',
+  'offsite_conversion.fb_pixel_complete_registration',
+  'lead',
+  'offsite_conversion.fb_pixel_lead',
+  'onsite_conversion.messaging_first_reply',
 ]
 
-const MOCK_DAILY: MetaDailyStats[] = [
-  { date: '2026-03-01', label: '1/3', spend: 95, leads: 8, impressions: 5200, clicks: 130 },
-  { date: '2026-03-02', label: '2/3', spend: 112, leads: 11, impressions: 6100, clicks: 155 },
-  { date: '2026-03-03', label: '3/3', spend: 108, leads: 9, impressions: 5800, clicks: 142 },
-  { date: '2026-03-04', label: '4/3', spend: 134, leads: 14, impressions: 7200, clicks: 178 },
-  { date: '2026-03-05', label: '5/3', spend: 141, leads: 16, impressions: 7600, clicks: 192 },
-  { date: '2026-03-06', label: '6/3', spend: 128, leads: 13, impressions: 6800, clicks: 168 },
-  { date: '2026-03-07', label: '7/3', spend: 155, leads: 18, impressions: 8200, clicks: 210 },
-  { date: '2026-03-08', label: '8/3', spend: 137, leads: 15, impressions: 7300, clicks: 185 },
-  { date: '2026-03-09', label: '9/3', spend: 162, leads: 19, impressions: 8700, clicks: 225 },
-  { date: '2026-03-10', label: '10/3', spend: 148, leads: 17, impressions: 7900, clicks: 205 },
-  { date: '2026-03-11', label: '11/3', spend: 139, leads: 14, impressions: 7400, clicks: 188 },
-  { date: '2026-03-12', label: '12/3', spend: 168, leads: 21, impressions: 9100, clicks: 238 },
-  { date: '2026-03-13', label: '13/3', spend: 152, leads: 18, impressions: 8200, clicks: 212 },
-  { date: '2026-03-14', label: '14/3', spend: 143, leads: 16, impressions: 7700, clicks: 198 },
-]
+function extractLeads(actions: any[]): number {
+  if (!actions || actions.length === 0) return 0
+  for (const type of LEAD_ACTION_TYPES) {
+    const found = actions.find((a: any) => a.action_type === type)
+    if (found) return parseInt(found.value) || 0
+  }
+  return 0
+}
 
 // ── Compute totals for a filtered set ──
 
@@ -47,31 +36,51 @@ function computeTotals(campaigns: MetaCampaign[]) {
   }
 }
 
-// ── Fetch Meta Ads data ──
-// When META_ACCESS_TOKEN is set, this fetches from Meta Marketing API.
-// Otherwise returns mock data.
+// ── Fetch Meta Ads data (client-side) ──
 
-export async function fetchMetaAds(market: Market = 'NL'): Promise<MetaAdsData> {
+export async function fetchMetaAds(market: Market = 'NL'): Promise<MetaAdsData | null> {
   try {
     const res = await fetch(`${API_BASE}/meta?market=${market}`)
     if (res.ok) {
-      return await res.json()
+      const json = await res.json()
+      if (json.error) return null
+      return json
     }
   } catch {
-    // API not available — fall back to mock
+    // API not available
   }
+  return null
+}
 
-  // Mock fallback — filter by market
-  const campaigns = MOCK_CAMPAIGNS.filter(c => c.market === market)
-  return {
-    campaigns,
-    daily: MOCK_DAILY,
-    totals: computeTotals(campaigns),
-  }
+// ── Campaign name mapping ──
+
+const CAMPAIGN_NAMES: Record<string, string> = {
+  'CAM_001_FUNNEL_F1': 'F1 Thuisbatterij — Interesse NL',
+  'CAM_002_FUNNEL_F2': 'F2 Zonnepanelen — Interesse NL',
+  'CAM_003_FUNNEL_F3': 'F3 Combi Deal — Interesse NL',
+  'CAM_004_FUNNEL_F4': 'F4 Retarget — 30 dagen',
+  'CAM_005_FUNNEL_F5': 'F5 Koude Traffic — Video',
+  'CAM_006_FUNNEL_F6': 'F6 Video Testimonial',
+  'CAM_007_FUNNEL_F7': 'F7 Lookalike — Zonnepanelen',
+  'CAM_009_FUNNEL_F1': 'F1 Thuisbatterij — Breed NL',
+  'CAM_010_FUNNEL_F2': 'F2 Zonnepanelen — Breed NL',
+  'CAM_011_FUNNEL_F3': 'F3 Combi Deal — Breed NL',
+  'CAM_012_FUNNEL_F4': 'F4 Retarget — Breed',
+  'CAM_013_FUNNEL_F5': 'F5 Koude Video — Breed',
+  'CAM_014_FUNNEL_F6': 'F6 Video Testimonial — Breed',
+  'CAM_015_FUNNEL_F7': 'F7 Lookalike — Breed',
+  'CAM_014_FUNNEL_F1_I01': 'F1 Thuisbatterij — Interesse NL',
+  'CAM_015_FUNNEL_F2_I01': 'F2 Zonnepanelen — Interesse NL',
+  'CAM_016_FUNNEL_F3_I01': 'F3 Combi — Interesse NL',
+  'CAM_017_FUNNEL_F4_I01': 'F4 Retarget — Interesse',
+  'CAM_018_FUNNEL_F5_I01': 'F5 Koude Traffic — Interesse',
+}
+
+function mapCampaignName(rawName: string): string {
+  return CAMPAIGN_NAMES[rawName] || rawName
 }
 
 // ── Meta API route handler (for use in /api/meta/route.ts) ──
-// Call this from a Next.js API route when META_ACCESS_TOKEN is configured.
 
 export async function fetchFromMetaApi(market: Market): Promise<MetaAdsData | null> {
   const token = process.env.META_ACCESS_TOKEN
@@ -80,54 +89,74 @@ export async function fetchFromMetaApi(market: Market): Promise<MetaAdsData | nu
 
   const baseUrl = `https://graph.facebook.com/v21.0/act_${accountId}`
 
-  // Fetch campaigns with insights
+  // Fetch campaigns list
   const campaignsRes = await fetch(
-    `${baseUrl}/campaigns?fields=name,status,insights.date_preset(this_month){spend,impressions,clicks,ctr,actions,cost_per_action_type}&access_token=${token}`
+    `${baseUrl}/campaigns?fields=name,status&limit=50&access_token=${token}`
   )
   if (!campaignsRes.ok) return null
-
   const campaignsJson = await campaignsRes.json()
 
-  // Fetch daily insights
+  // Filter by market (exclude BE)
+  const filteredCampaigns = (campaignsJson.data || []).filter((c: any) => {
+    const hasBE = c.name?.toUpperCase().includes('_BE') || c.name?.toUpperCase().endsWith(' BE')
+    return market === 'NL' ? !hasBE : hasBE
+  })
+
+  const campaignIds = filteredCampaigns.map((c: any) => c.id)
+  if (campaignIds.length === 0) {
+    return { campaigns: [], daily: [], totals: computeTotals([]) }
+  }
+
+  // Fetch insights per campaign (this_month)
+  const filterParam = encodeURIComponent(
+    JSON.stringify([{ field: 'campaign.id', operator: 'IN', value: campaignIds }])
+  )
+
+  const insightsRes = await fetch(
+    `${baseUrl}/insights?fields=campaign_id,campaign_name,spend,impressions,clicks,ctr,actions&date_preset=this_month&level=campaign&filtering=${filterParam}&limit=50&access_token=${token}`
+  )
+  const insightsJson = insightsRes.ok ? await insightsRes.json() : { data: [] }
+
+  // Build insights lookup by campaign ID
+  const insightsMap = new Map<string, any>()
+  for (const row of (insightsJson.data || [])) {
+    insightsMap.set(row.campaign_id, row)
+  }
+
+  // Build campaigns with insights
+  const campaigns: MetaCampaign[] = filteredCampaigns.map((c: any) => {
+    const ins = insightsMap.get(c.id) || {}
+    const leads = extractLeads(ins.actions)
+    const spend = parseFloat(ins.spend || '0')
+    return {
+      id: c.id,
+      name: mapCampaignName(c.name),
+      funnel: c.name?.match(/F\d+/)?.[0] || '—',
+      status: 'ok' as const,
+      market,
+      spend,
+      budget: 0,
+      impressions: parseInt(ins.impressions || '0'),
+      clicks: parseInt(ins.clicks || '0'),
+      ctr: parseFloat(ins.ctr || '0'),
+      cpl: leads > 0 ? Math.round(spend / leads) : null,
+      leads,
+    }
+  })
+
+  // Fetch daily insights (filtered to NL campaigns)
   const dailyRes = await fetch(
-    `${baseUrl}/insights?fields=spend,impressions,clicks,actions&time_increment=1&date_preset=this_month&access_token=${token}`
+    `${baseUrl}/insights?fields=spend,impressions,clicks,actions&time_increment=1&date_preset=this_month&filtering=${filterParam}&limit=50&access_token=${token}`
   )
   const dailyJson = dailyRes.ok ? await dailyRes.json() : { data: [] }
 
-  // Transform Meta API response to our types
-  const campaigns: MetaCampaign[] = (campaignsJson.data || [])
-    .filter((c: any) => {
-      // Filter by market based on campaign name convention
-      const isNL = c.name?.includes('NL') || !c.name?.includes('BE')
-      return market === 'NL' ? isNL : !isNL
-    })
-    .map((c: any) => {
-      const insights = c.insights?.data?.[0] || {}
-      const leads = (insights.actions || []).find((a: any) => a.action_type === 'lead')?.value || 0
-      const spend = parseFloat(insights.spend || '0')
-      return {
-        id: c.id,
-        name: c.name,
-        funnel: c.name?.match(/F\d+/)?.[0] || '—',
-        status: 'ok' as const, // Determined by CPL logic in the component
-        market,
-        spend,
-        budget: 0, // Not available from this endpoint
-        impressions: parseInt(insights.impressions || '0'),
-        clicks: parseInt(insights.clicks || '0'),
-        ctr: parseFloat(insights.ctr || '0'),
-        cpl: leads > 0 ? Math.round(spend / leads) : null,
-        leads: parseInt(leads),
-      }
-    })
-
   const daily: MetaDailyStats[] = (dailyJson.data || []).map((d: any) => {
-    const leads = (d.actions || []).find((a: any) => a.action_type === 'lead')?.value || 0
+    const leads = extractLeads(d.actions)
     return {
       date: d.date_start,
       label: new Date(d.date_start).toLocaleDateString('nl-NL', { day: 'numeric', month: 'numeric' }),
       spend: parseFloat(d.spend || '0'),
-      leads: parseInt(leads),
+      leads,
       impressions: parseInt(d.impressions || '0'),
       clicks: parseInt(d.clicks || '0'),
     }

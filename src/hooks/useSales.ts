@@ -14,7 +14,11 @@ export function useSales() {
     setError(null)
     try {
       const result = await fetchSalesData()
-      setData(result)
+      if (result) {
+        setData(result)
+      } else {
+        setError('GoHighLevel API niet bereikbaar')
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Fout bij laden sales data')
     } finally {

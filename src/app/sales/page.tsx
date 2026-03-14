@@ -5,6 +5,7 @@ import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useTheme } from '@/hooks/useTheme'
+import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner'
 import { useSales } from '@/hooks/useSales'
 import {
   Users, TrendingUp, BarChart3,
@@ -34,7 +35,7 @@ const stageColorMap: Record<string, string> = {
 
 export default function SalesPage() {
   const { theme } = useTheme()
-  const { data } = useSales()
+  const { data, error } = useSales()
 
   const gridColor = theme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'
   const tickColor = theme === 'dark' ? '#5D6D82' : '#96A0B5'
@@ -47,7 +48,19 @@ export default function SalesPage() {
     [data],
   )
 
-  if (!data) return null
+  if (!data) {
+    return (
+      <>
+        <Topbar title="Sales (GHL)" sub="Pipeline, contacten en omzet" />
+        <div style={{ padding: '18px 22px 40px' }}>
+          {error && <ApiErrorBanner errors={[error]} />}
+          <div style={{ textAlign: 'center', padding: 40, color: 'var(--txt3)', fontSize: 13 }}>
+            Geen data beschikbaar
+          </div>
+        </div>
+      </>
+    )
+  }
 
   const { totals, pipeline, contacts } = data
 

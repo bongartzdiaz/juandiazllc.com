@@ -5,6 +5,7 @@ import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useTheme } from '@/hooks/useTheme'
+import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner'
 import { useMetaAds } from '@/hooks/useMetaAds'
 import { getCplStatus } from '@/lib/utils'
 import {
@@ -45,7 +46,7 @@ const tabConfig: { key: Tab; label: string; icon: React.ReactNode }[] = [
 
 export default function MetaAdsPage() {
   const { theme } = useTheme()
-  const { data, loading } = useMetaAds('NL')
+  const { data, loading, error } = useMetaAds('NL')
   const [tab, setTab] = useState<Tab>('overzicht')
 
   const gridColor = theme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'
@@ -113,6 +114,8 @@ export default function MetaAdsPage() {
       <Topbar title="Meta Ads" sub="Campagne-overzicht en prestaties" />
 
       <div style={{ padding: '18px 22px 40px' }}>
+        {error && <ApiErrorBanner errors={[error]} />}
+
         {/* Tab bar — pill style */}
         <div style={{
           display: 'inline-flex', gap: 4, background: 'var(--bg2)', border: '1px solid var(--border)',

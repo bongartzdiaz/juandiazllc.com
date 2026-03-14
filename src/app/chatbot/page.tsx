@@ -5,6 +5,7 @@ import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useTheme } from '@/hooks/useTheme'
+import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner'
 import { useChatbot } from '@/hooks/useChatbot'
 import type { ChatStatus } from '@/lib/types'
 import {
@@ -42,7 +43,7 @@ const statusIcons: Record<string, React.ComponentType<{ size?: number; style?: R
 
 export default function ChatbotPage() {
   const { theme } = useTheme()
-  const { data } = useChatbot()
+  const { data, error } = useChatbot()
 
   const gridColor = theme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'
   const tickColor = theme === 'dark' ? '#5D6D82' : '#96A0B5'
@@ -60,7 +61,19 @@ export default function ChatbotPage() {
     [data],
   )
 
-  if (!data) return null
+  if (!data) {
+    return (
+      <>
+        <Topbar title="Chatbot" sub="WhatsApp-gesprekken en kwalificatie" />
+        <div style={{ padding: '18px 22px 40px' }}>
+          {error && <ApiErrorBanner errors={[error]} />}
+          <div style={{ textAlign: 'center', padding: 40, color: 'var(--txt3)', fontSize: 13 }}>
+            Geen data beschikbaar
+          </div>
+        </div>
+      </>
+    )
+  }
 
   const { totals, conversations } = data
 

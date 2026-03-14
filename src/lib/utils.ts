@@ -9,8 +9,8 @@ export const formatNum = (n: number) =>
 
 export const formatPct = (n: number) => `${n.toFixed(1)}%`
 
-export const getCplStatus = (cpl: number, spend: number): 'testfase' | 'goed' | 'ok' | 'slecht' => {
-  if (spend < 50) return 'testfase'
+export const getCplStatus = (cpl: number | null, spend: number): 'testfase' | 'goed' | 'ok' | 'slecht' => {
+  if (spend < 50 || cpl === null || cpl === 0) return 'testfase'
   if (cpl < 15) return 'goed'
   if (cpl < 25) return 'ok'
   return 'slecht'
@@ -25,5 +25,6 @@ export const goalTextColor = (pct: number) =>
 export const stagger = (i: number, base = 80, step = 75) =>
   ({ animationDelay: `${base + i * step}ms` })
 
-// API base URL — connects to the HMB backend on the same server
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api'
+// API base URL — uses Next.js basePath automatically
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '/hmb-dashboard'
+export const API_BASE = `${basePath}/api`

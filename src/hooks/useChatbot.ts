@@ -14,7 +14,11 @@ export function useChatbot() {
     setError(null)
     try {
       const result = await fetchChatbot()
-      setData(result)
+      if (result) {
+        setData(result)
+      } else {
+        setError('DM Champ API niet bereikbaar')
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Fout bij laden chatbot data')
     } finally {

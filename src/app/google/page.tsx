@@ -5,6 +5,7 @@ import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useTheme } from '@/hooks/useTheme'
+import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner'
 import { useGoogleAds } from '@/hooks/useGoogleAds'
 import type { Market } from '@/lib/types'
 import {
@@ -30,7 +31,7 @@ export default function GoogleAdsPage() {
   const { theme } = useTheme()
   const [tab, setTab] = useState<'campagnes' | 'zoekwoorden'>('campagnes')
   const [market] = useState<Market>('NL')
-  const { data } = useGoogleAds(market)
+  const { data, error } = useGoogleAds(market)
 
   const gridColor = theme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'
   const tickColor = theme === 'dark' ? '#5D6D82' : '#96A0B5'
@@ -42,7 +43,19 @@ export default function GoogleAdsPage() {
     [data],
   )
 
-  if (!data) return null
+  if (!data) {
+    return (
+      <>
+        <Topbar title="Google Ads" sub="Zoekwoorden, display en Performance Max" />
+        <div style={{ padding: '18px 22px 40px' }}>
+          {error && <ApiErrorBanner errors={[error]} />}
+          <div style={{ textAlign: 'center', padding: 40, color: 'var(--txt3)', fontSize: 13 }}>
+            Geen data beschikbaar
+          </div>
+        </div>
+      </>
+    )
+  }
 
   const { totals, campaigns, keywords } = data
 

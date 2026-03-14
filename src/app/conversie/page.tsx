@@ -5,6 +5,7 @@ import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useTheme } from '@/hooks/useTheme'
+import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner'
 import { useMetaAds } from '@/hooks/useMetaAds'
 import { useGoogleAds } from '@/hooks/useGoogleAds'
 import { useChatbot } from '@/hooks/useChatbot'
@@ -34,10 +35,10 @@ const stageTxtColors = ['var(--b-txt)', 'var(--b-txt)', 'var(--y-txt)', 'var(--o
 
 export default function ConversiePage() {
   const { theme } = useTheme()
-  const { data: metaData } = useMetaAds('NL')
-  const { data: googleData } = useGoogleAds('NL')
-  const { data: chatbotData } = useChatbot()
-  const { data: salesData } = useSales()
+  const { data: metaData, error: metaError } = useMetaAds('NL')
+  const { data: googleData, error: googleError } = useGoogleAds('NL')
+  const { data: chatbotData, error: chatbotError } = useChatbot()
+  const { data: salesData, error: salesError } = useSales()
 
   const gridColor = theme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'
   const tickColor = theme === 'dark' ? '#7A8DA3' : '#96A0B5'
@@ -122,6 +123,8 @@ export default function ConversiePage() {
       <Topbar title="Conversie overzicht" sub="Volledige journey: advertentie → sale" />
 
       <div style={{ padding: '18px 22px 40px' }}>
+        <ApiErrorBanner errors={[metaError, googleError, chatbotError, salesError].filter((e): e is string => !!e)} />
+
         {/* Top KPIs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 16 }}>
           <KpiCard label="Totale ad spend" value={`€${journey.totalSpend.toLocaleString('nl-NL')}`} delta="Meta + Google" deltaDir="neu" accentColor="var(--o)" icon="dollar-sign" delay={80} />
