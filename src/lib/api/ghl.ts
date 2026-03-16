@@ -113,8 +113,9 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
     }
   }
 
-  // ── 4. Fetch opportunities (paginated) ──
+  // ── 4. Fetch opportunities (paginated, deduplicated) ──
   const allOpportunities: any[] = []
+  const seenIds = new Set<string>()
 
   for (const pipeline of targetPipelines) {
     let hasMore = true
@@ -138,9 +139,19 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
 
       const json = await res.json()
       const opps = json.opportunities || []
-      allOpportunities.push(...opps)
 
-      if (opps.length < 100) {
+      // Deduplicate — GHL pagination can return duplicates
+      let newCount = 0
+      for (const opp of opps) {
+        if (!seenIds.has(opp.id)) {
+          seenIds.add(opp.id)
+          allOpportunities.push(opp)
+          newCount++
+        }
+      }
+
+      // Stop if no new records (pagination stuck) or less than full page
+      if (newCount === 0 || opps.length < 100) {
         hasMore = false
       } else {
         startAfterId = opps[opps.length - 1]?.id || ''
