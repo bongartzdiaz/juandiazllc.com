@@ -165,11 +165,13 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
     console.log(`[GHL] ${pipeline.name}: fetched opportunities`)
   }
 
-  // ── Filter: alleen HMB/helpmijbesparen leads (Facebook campagnes + Voltafy) ──
-  const HMB_SOURCES = ['facebook', 'voltafy lead', 'voltafy', 'helpmijbesparen', 'hmb']
+  // ── Filter: alleen HMB/helpmijbesparen leads (Facebook/Meta campagnes via DM Champ) ──
+  // Voltafy lead = D2D sales team, NIET helpmijbesparen
+  const HMB_SOURCES = ['facebook', 'meta', 'helpmijbesparen', 'hmb', 'dm champ', 'dmchamp']
   const hmbOpportunities = allOpportunities.filter(opp => {
     const src = (opp.source || '').toLowerCase()
-    return HMB_SOURCES.some(s => src.includes(s)) || src === ''
+    if (src === '') return false // Skip unknown sources
+    return HMB_SOURCES.some(s => src.includes(s))
   })
 
   console.log(`[GHL] Total fetched: ${allOpportunities.length}, HMB filtered: ${hmbOpportunities.length}`)
