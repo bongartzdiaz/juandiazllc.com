@@ -221,9 +221,27 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
   }
 
   // 2. Add webhook-only contacts (newer than CSV export)
+  // Deduplicate webhook events by phone — keep latest per contact
+  const webhookUniqueByPhone = new Map<string, StoredEvent>()
+  const webhookNoPhone: StoredEvent[] = []
   for (const e of webhookEvents) {
-    if (e.contactPhone && csvPhones.has(e.contactPhone)) continue // Already in CSV
+    // Skip delivery/read/system events — only count actual conversations
+    const evtType = (e.event || '').toLowerCase()
+    if (['read', 'delivered', 'sent', 'failed', 'unknown'].includes(evtType)) continue
+    if (!e.contactPhone && e.contactName === 'Onbekend') continue
 
+    if (e.contactPhone) {
+      if (csvPhones.has(e.contactPhone)) continue // Already in CSV
+      const existing = webhookUniqueByPhone.get(e.contactPhone)
+      if (!existing || new Date(e.timestamp) > new Date(existing.timestamp)) {
+        webhookUniqueByPhone.set(e.contactPhone, e)
+      }
+    } else if (e.contactName && e.contactName !== 'Onbekend') {
+      webhookNoPhone.push(e)
+    }
+  }
+
+  for (const e of [...webhookUniqueByPhone.values(), ...webhookNoPhone]) {
     const status = mapWebhookEventToStatus(e)
     const ts = new Date(e.timestamp)
 
@@ -262,9 +280,8 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
     dailyMap.set(date, entry)
   }
 
-  // From webhooks: add newer events
-  for (const e of webhookEvents) {
-    if (e.contactPhone && csvPhones.has(e.contactPhone)) continue
+  // From webhooks: add only deduplicated new contacts
+  for (const e of [...webhookUniqueByPhone.values(), ...webhookNoPhone]) {
     const date = e.timestamp.slice(0, 10)
     if (!date) continue
     const entry = dailyMap.get(date) || { gesprekken: 0, gekwalificeerd: 0 }
