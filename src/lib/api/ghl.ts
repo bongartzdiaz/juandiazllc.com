@@ -165,7 +165,14 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
     console.log(`[GHL] ${pipeline.name}: fetched opportunities`)
   }
 
-  console.log('[GHL] Total opportunities fetched:', allOpportunities.length)
+  // ── Filter: alleen HMB/helpmijbesparen leads (Facebook campagnes + Voltafy) ──
+  const HMB_SOURCES = ['facebook', 'voltafy lead', 'voltafy', 'helpmijbesparen', 'hmb']
+  const hmbOpportunities = allOpportunities.filter(opp => {
+    const src = (opp.source || '').toLowerCase()
+    return HMB_SOURCES.some(s => src.includes(s)) || src === ''
+  })
+
+  console.log(`[GHL] Total fetched: ${allOpportunities.length}, HMB filtered: ${hmbOpportunities.length}`)
 
   // ── 5. Fetch contacts ──
   const contactsRes = await fetch(
@@ -180,7 +187,7 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
     website_lead: 0, chatbot: 0, telefoon: 0, buitendienst: 0, sale: 0,
   }
 
-  for (const opp of allOpportunities) {
+  for (const opp of hmbOpportunities) {
     const internalStage = stageIdToInternal[opp.pipelineStageId]
     if (!internalStage) continue // Skip unmapped/lost stages
     stageCounts[internalStage]++
@@ -198,7 +205,7 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
 
   // ── 8. Map contacts to stages ──
   const contactStageMap: Record<string, PipelineStage> = {}
-  for (const opp of allOpportunities) {
+  for (const opp of hmbOpportunities) {
     const contactId = opp.contact?.id || opp.contactId
     if (contactId && stageIdToInternal[opp.pipelineStageId]) {
       // Use the furthest-along stage for each contact
@@ -226,7 +233,7 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
   // ── 9. Build daily stats ──
   const dailyMap: Record<string, { leads: number; afspraken: number; deals: number }> = {}
 
-  for (const opp of allOpportunities) {
+  for (const opp of hmbOpportunities) {
     const dateStr = (opp.createdAt || opp.dateAdded || '').substring(0, 10)
     if (!dateStr) continue
     if (!dailyMap[dateStr]) {
@@ -255,7 +262,7 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
   const totalLeads = stageCounts.website_lead + stageCounts.chatbot + stageCounts.telefoon + stageCounts.buitendienst + stageCounts.sale
   const totalAfspraken = stageCounts.telefoon + stageCounts.buitendienst
   const totalDeals = stageCounts.sale
-  const totalOmzet = allOpportunities
+  const totalOmzet = hmbOpportunities
     .filter((o: any) => {
       const stage = stageIdToInternal[o.pipelineStageId]
       return stage === 'sale' || o.status === 'won'
