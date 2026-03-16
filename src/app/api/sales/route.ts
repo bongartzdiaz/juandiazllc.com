@@ -18,13 +18,32 @@ export async function GET() {
       return NextResponse.json({ error: 'GoHighLevel API niet bereikbaar — controleer GHL_API_KEY en GHL_LOCATION_ID' })
     }
 
-    // Pipeline uses GHL cumulative data consistently (no external overrides)
-    // This ensures the funnel is always decreasing and numbers match KPIs
+    // Website leads = Meta + Google (actual ad-generated leads)
+    const metaLeads = metaData?.totals?.leads ?? 0
+    const googleConversions = googleData?.totals?.conversions ?? 0
+    const websiteLeads = metaLeads + googleConversions
+
+    // Override step 1 (website_lead) with Meta+Google leads
+    // Math.max ensures funnel stays decreasing (Meta+Google >= GHL cumulative)
+    const pipeline = ghlData.pipeline.map((step: any) => {
+      if (step.stage === 'website_lead') {
+        return { ...step, value: Math.max(websiteLeads, step.value) }
+      }
+      return step
+    })
+
+    const leadsTotal = Math.max(websiteLeads, ghlData.totals.leads)
+
     const result = {
       ...ghlData,
-      // Pass through Meta/DM Champ data for reference (not mixed into funnel)
-      metaLeads: (metaData?.totals?.leads ?? 0) + (googleData?.totals?.conversions ?? 0),
-      dmChampGesprekken: chatbotData?.totals?.gesprekken ?? 0,
+      pipeline,
+      totals: {
+        ...ghlData.totals,
+        leads: leadsTotal,
+        conversieRate: leadsTotal > 0
+          ? parseFloat(((ghlData.totals.deals / leadsTotal) * 100).toFixed(1))
+          : 0,
+      },
     }
 
     return NextResponse.json(result, {
