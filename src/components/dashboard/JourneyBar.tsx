@@ -32,6 +32,25 @@ export function JourneyBar({ pipeline, loading }: Props) {
 
   const maxVal = Math.max(...steps.map(s => s.value), 1)
 
+  // Summary totals
+  const leads = steps.find(s => s.stage === 'website_lead')?.value ?? 0
+  const gesprekken = steps.find(s => s.stage === 'chatbot')?.value ?? 0
+  const telefoon = steps.find(s => s.stage === 'telefoon')?.value ?? 0
+  const buitendienstVal = steps.find(s => s.stage === 'buitendienst')?.value ?? 0
+  const salesCount = steps.find(s => s.stage === 'sale')?.value ?? 0
+  const totaalAfspraken = telefoon + buitendienstVal
+  const leadToAfspraak = leads > 0 ? Math.round((totaalAfspraken / leads) * 100) : 0
+  const leadToSale = leads > 0 ? Math.round((salesCount / leads) * 100) : 0
+
+  const summaryItems = [
+    { label: 'Totaal leads', value: String(leads), color: 'var(--b-txt)' },
+    { label: 'Gesprekken', value: String(gesprekken), color: 'var(--b-txt)' },
+    { label: 'Afspraken', value: String(totaalAfspraken), color: 'var(--y-txt)' },
+    { label: 'Lead → Afspraak', value: `${leadToAfspraak}%`, color: leadToAfspraak >= 10 ? 'var(--g-txt)' : 'var(--r-txt)' },
+    { label: 'Lead → Sale', value: `${leadToSale}%`, color: leadToSale > 0 ? 'var(--g-txt)' : 'var(--txt3)' },
+    { label: 'Sales', value: String(salesCount), color: 'var(--g-txt)' },
+  ]
+
   return (
     <div style={{
       background: 'var(--panel)', border: '1px solid var(--border)',
@@ -145,6 +164,36 @@ export function JourneyBar({ pipeline, loading }: Props) {
           )
         })}
       </div>
+
+      {/* Summary totals row */}
+      {!loading && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0,
+          marginTop: 14, paddingTop: 12,
+          borderTop: '1px solid var(--border)',
+        }}>
+          {summaryItems.map((item, i) => (
+            <div key={item.label} style={{
+              flex: 1, textAlign: 'center',
+              borderRight: i < summaryItems.length - 1 ? '1px solid var(--border)' : 'none',
+              padding: '0 8px',
+            }}>
+              <div className="mono" style={{
+                fontSize: 14, fontWeight: 700, color: item.color,
+                letterSpacing: '-0.01em',
+              }}>
+                {item.value}
+              </div>
+              <div style={{
+                fontSize: 9.5, fontWeight: 500, color: 'var(--txt3)',
+                marginTop: 1, letterSpacing: '0.01em',
+              }}>
+                {item.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
