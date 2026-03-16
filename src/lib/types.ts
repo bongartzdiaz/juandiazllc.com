@@ -101,6 +101,7 @@ export interface ChatConversation {
   duur: string
   onderwerp: string
   tijdstip: string
+  datum: string // ISO date string for period filtering
 }
 
 export interface ChatDailyStats {

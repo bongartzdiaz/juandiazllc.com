@@ -217,6 +217,7 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
       duur: c.channel === 'whatsapp' ? 'WhatsApp' : c.channel || '—',
       onderwerp: webhook?.summary || c.tags.filter(t => !t.startsWith('Follow_') && !t.startsWith('followup_')).join(', ') || '—',
       tijdstip: ts.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
+      datum: (c.createdAt || c.lastActivityAt || '').slice(0, 10),
     })
   }
 
@@ -253,6 +254,7 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
       duur: '—',
       onderwerp: e.summary || e.message?.substring(0, 40) || e.tag || '—',
       tijdstip: ts.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
+      datum: (e.timestamp || '').slice(0, 10),
     })
   }
 
