@@ -70,15 +70,19 @@ export function FunnelCard({ pipeline, loading }: Props) {
         </div>
       </div>
 
-      <div style={{ padding: '16px 16px 8px' }}>
+      <div style={{ padding: '12px 16px 8px' }}>
         {steps.map((step, i) => {
           const isLast = i === steps.length - 1
           const rate = i < rates.length ? rates[i] : null
           return (
-            <div key={step.stage || i}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0' }}>
+            <div key={step.stage || i} style={{
+              padding: '12px 0',
+              borderBottom: !isLast ? '1px solid var(--border)' : undefined,
+            }}>
+              {/* Step row: number + label + value all on one line */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{
-                  width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                  width: 30, height: 30, borderRadius: 8, flexShrink: 0,
                   background: isLast ? 'var(--g-bg)' : 'var(--bg2)',
                   border: `1px solid ${isLast ? 'var(--g-border)' : 'var(--border)'}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -87,20 +91,19 @@ export function FunnelCard({ pipeline, loading }: Props) {
                   {i + 1}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
-                    <span style={{ fontSize: 12.5, fontWeight: 600 }}>{step.label}</span>
-                    <span className="mono" style={{
-                      fontSize: 16, fontWeight: 600, color: stepColors[i] ?? 'var(--txt2)',
-                      letterSpacing: '-0.02em',
-                    }}>
-                      {step.value.toLocaleString('nl-NL')}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 10.5, color: 'var(--txt3)', marginTop: 1 }}>{step.description}</div>
+                  <div style={{ fontSize: 12.5, fontWeight: 600, lineHeight: 1 }}>{step.label}</div>
+                  <div style={{ fontSize: 10, color: 'var(--txt3)', marginTop: 3 }}>{step.description}</div>
                 </div>
+                <span className="mono" style={{
+                  fontSize: 18, fontWeight: 700, color: stepColors[i] ?? 'var(--txt2)',
+                  letterSpacing: '-0.02em', flexShrink: 0,
+                }}>
+                  {step.value.toLocaleString('nl-NL')}
+                </span>
               </div>
+              {/* Conversion bar below the step */}
               {rate && (
-                <div style={{ marginLeft: 44, padding: '4px 0 6px' }}>
+                <div style={{ marginLeft: 42, marginTop: 10, marginBottom: 2 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ flex: 1, height: 4, background: 'var(--bg2)', borderRadius: 3, overflow: 'hidden' }}>
                       <div style={{
@@ -112,7 +115,7 @@ export function FunnelCard({ pipeline, loading }: Props) {
                     <span className="mono" style={{ fontSize: 11, fontWeight: 600, minWidth: 32, textAlign: 'right', color: barTxtColor(rate.pct) }}>
                       {rate.pct}%
                     </span>
-                    <span className="mono" style={{ fontSize: 10, color: 'var(--txt3)', minWidth: 50, textAlign: 'right' }}>
+                    <span className="mono" style={{ fontSize: 10, color: 'var(--txt3)', minWidth: 40, textAlign: 'right' }}>
                       -{rate.dropOff.toLocaleString('nl-NL')}
                     </span>
                   </div>
