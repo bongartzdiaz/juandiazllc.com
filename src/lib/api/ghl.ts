@@ -35,8 +35,10 @@ function mapMarketingStageName(name: string): PipelineStage | 'lost' | null {
   if (n.startsWith('nieuwe lead')) return 'website_lead'
   // Chatbot / WhatsApp
   if (n.includes('whatsapp') || n === 'contact via whatsapp') return 'chatbot'
-  // Telefonische afspraken
-  if (n.startsWith('bel poging') || n.startsWith('bel afspraak') || n === 'niet opgenomen') return 'telefoon'
+  // Telefonische afspraken — alleen daadwerkelijk ingeplande afspraken
+  if (n.startsWith('bel afspraak')) return 'telefoon'
+  // Belpogingen en niet opgenomen = nog in chatbot/opvolging fase, geen afspraak
+  if (n.startsWith('bel poging') || n === 'niet opgenomen') return 'chatbot'
   // Buitendienst
   if (n.includes('advies gesprek') || n.includes('op locatie') || n === 'optionele lead met offerte') return 'buitendienst'
   // Sale
