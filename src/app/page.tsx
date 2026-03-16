@@ -20,17 +20,19 @@ export default function DashboardPage() {
 
   const loading = meta.loading || sales.loading || chatbot.loading
 
+  // Journey steps from GHL pipeline
+  const pipeline = sales.data?.pipeline ?? []
+
   // Derive KPIs from real data
   const totalLeads = sales.data?.totals?.leads ?? 0
   const cplMeta = meta.data?.totals?.avgCpl ?? 0
-  const chatConv = chatbot.data?.totals?.conversieRate ?? 0
+  const chatbotGesprekken = pipeline.find(s => s.stage === 'chatbot')?.value ?? 0
+  const telefoonAfspraken = pipeline.find(s => s.stage === 'telefoon')?.value ?? 0
+  const chatConv = chatbotGesprekken > 0 ? Math.round((telefoonAfspraken / chatbotGesprekken) * 100) : 0
   const afspraken = sales.data?.totals?.afspraken ?? 0
   const deals = sales.data?.totals?.deals ?? 0
   const omzet = sales.data?.totals?.omzet ?? 0
   const convRate = sales.data?.totals?.conversieRate ?? 0
-
-  // Journey steps from GHL pipeline
-  const pipeline = sales.data?.pipeline ?? []
 
   // Daily data for charts
   const dailySales = sales.data?.daily ?? []
