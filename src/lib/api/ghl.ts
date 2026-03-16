@@ -174,11 +174,23 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
 
   console.log('[GHL] Stage counts:', stageCounts)
 
-  // ── 6. Build pipeline response ──
+  // ── 6. Build pipeline response (cumulative — each step includes all later stages) ──
+  // This ensures the funnel is properly decreasing: leads >= chatbot >= telefoon >= etc.
+  // Example: someone in "sale" has passed through all earlier stages.
+  const cumulativeCounts: Record<PipelineStage, number> = {
+    sale: stageCounts.sale,
+    buitendienst: stageCounts.buitendienst + stageCounts.sale,
+    telefoon: stageCounts.telefoon + stageCounts.buitendienst + stageCounts.sale,
+    chatbot: stageCounts.chatbot + stageCounts.telefoon + stageCounts.buitendienst + stageCounts.sale,
+    website_lead: stageCounts.website_lead + stageCounts.chatbot + stageCounts.telefoon + stageCounts.buitendienst + stageCounts.sale,
+  }
+
+  console.log('[GHL] Cumulative counts:', cumulativeCounts)
+
   const pipeline: GhlPipelineStep[] = INTERNAL_STAGES.map(def => ({
     stage: def.stage,
     label: def.label,
-    value: stageCounts[def.stage],
+    value: cumulativeCounts[def.stage],
     description: def.description,
   }))
 
@@ -243,8 +255,8 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
   })
 
   // ── 10. Totals ──
-  const totalLeads = stageCounts.website_lead + stageCounts.chatbot + stageCounts.telefoon + stageCounts.buitendienst + stageCounts.sale
-  const totalAfspraken = stageCounts.telefoon + stageCounts.buitendienst
+  const totalLeads = cumulativeCounts.website_lead // = all opportunities (matches funnel step 1)
+  const totalAfspraken = stageCounts.telefoon + stageCounts.buitendienst // raw count of current appointments
   const totalDeals = stageCounts.sale
   const totalOmzet = allOpportunities
     .filter((o: any) => {

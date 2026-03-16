@@ -20,10 +20,10 @@ export default function DashboardPage() {
 
   const loading = meta.loading || sales.loading || chatbot.loading
 
-  // Journey steps from GHL pipeline
+  // Journey steps from GHL pipeline (cumulative, properly decreasing)
   const pipeline = sales.data?.pipeline ?? []
 
-  // Derive KPIs from real data
+  // Derive KPIs from same pipeline data as funnel — ensures consistency
   const totalLeads = sales.data?.totals?.leads ?? 0
   const cplMeta = meta.data?.totals?.avgCpl ?? 0
   const chatbotGesprekken = pipeline.find(s => s.stage === 'chatbot')?.value ?? 0

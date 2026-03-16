@@ -18,42 +18,13 @@ export async function GET() {
       return NextResponse.json({ error: 'GoHighLevel API niet bereikbaar — controleer GHL_API_KEY en GHL_LOCATION_ID' })
     }
 
-    // Website leads = Meta leads + Google conversions
-    const metaLeads = metaData?.totals?.leads ?? 0
-    const googleConversions = googleData?.totals?.conversions ?? 0
-    const websiteLeads = metaLeads + googleConversions
-
-    // Override chatbot with DM Champ total conversations
-    const chatbotGesprekken = chatbotData?.totals?.gesprekken ?? 0
-
-    // Telefoon + buitendienst komen uit GHL pipeline (stages: "Telefoon gesprek ingepland", "Advies gesprek op locatie gepland")
-    const pipeline = ghlData.pipeline.map(step => {
-      if (step.stage === 'website_lead') {
-        return { ...step, value: websiteLeads }
-      }
-      if (step.stage === 'chatbot') {
-        return { ...step, value: chatbotGesprekken }
-      }
-      // telefoon, buitendienst, sale → direct uit GHL
-      return step
-    })
-
-    // Recalculate totals — leads = alleen website leads (Meta + Google), NIET chatbot gesprekken
-    const telefoon = ghlData.pipeline.find(s => s.stage === 'telefoon')?.value ?? 0
-    const buitendienst = ghlData.pipeline.find(s => s.stage === 'buitendienst')?.value ?? 0
-    const deals = ghlData.pipeline.find(s => s.stage === 'sale')?.value ?? 0
-    const totalLeads = websiteLeads
-
+    // Pipeline uses GHL cumulative data consistently (no external overrides)
+    // This ensures the funnel is always decreasing and numbers match KPIs
     const result = {
       ...ghlData,
-      pipeline,
-      totals: {
-        ...ghlData.totals,
-        leads: totalLeads,
-        afspraken: telefoon + buitendienst,
-        deals,
-        conversieRate: totalLeads > 0 ? parseFloat(((deals / totalLeads) * 100).toFixed(1)) : 0,
-      },
+      // Pass through Meta/DM Champ data for reference (not mixed into funnel)
+      metaLeads: (metaData?.totals?.leads ?? 0) + (googleData?.totals?.conversions ?? 0),
+      dmChampGesprekken: chatbotData?.totals?.gesprekken ?? 0,
     }
 
     return NextResponse.json(result, {
