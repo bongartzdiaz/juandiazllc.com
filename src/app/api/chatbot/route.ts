@@ -14,6 +14,6 @@ export async function GET() {
   }
 
   return NextResponse.json({
-    error: 'DM Champ API niet bereikbaar — controleer DMCHAMP_API_KEY en webhook configuratie',
+    error: 'DM Champ data niet beschikbaar — controleer CSV bestand en webhook configuratie',
   })
 }
