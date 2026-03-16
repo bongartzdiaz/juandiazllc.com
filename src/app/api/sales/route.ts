@@ -22,10 +22,7 @@ export async function GET() {
     // Override chatbot with DM Champ total conversations
     const chatbotGesprekken = chatbotData?.totals?.gesprekken ?? 0
 
-    // Telefonische afspraken = gekwalificeerde leads uit DM Champ (chatbot → telefoon)
-    const telefoonDmChamp = chatbotData?.totals?.gekwalificeerd ?? 0
-
-    // Update pipeline values: website_lead from Meta, chatbot from DM Champ, telefoon from DM Champ qualified
+    // Telefoon + buitendienst komen uit GHL pipeline (stages: "Telefoon gesprek ingepland", "Advies gesprek op locatie gepland")
     const pipeline = ghlData.pipeline.map(step => {
       if (step.stage === 'website_lead') {
         return { ...step, value: metaLeads }
@@ -33,16 +30,12 @@ export async function GET() {
       if (step.stage === 'chatbot') {
         return { ...step, value: chatbotGesprekken }
       }
-      if (step.stage === 'telefoon') {
-        // Use DM Champ qualified count, fall back to GHL if available
-        const ghlTelefoon = step.value || 0
-        return { ...step, value: telefoonDmChamp || ghlTelefoon }
-      }
+      // telefoon, buitendienst, sale → direct uit GHL
       return step
     })
 
     // Recalculate totals
-    const telefoon = telefoonDmChamp || (ghlData.pipeline.find(s => s.stage === 'telefoon')?.value ?? 0)
+    const telefoon = ghlData.pipeline.find(s => s.stage === 'telefoon')?.value ?? 0
     const buitendienst = ghlData.pipeline.find(s => s.stage === 'buitendienst')?.value ?? 0
     const deals = ghlData.pipeline.find(s => s.stage === 'sale')?.value ?? 0
     const totalLeads = metaLeads + chatbotGesprekken + telefoon + buitendienst + deals
