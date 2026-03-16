@@ -34,12 +34,12 @@ function mapStageName(name: string): PipelineStage | 'lost' | null {
   // Website leads
   if (n.startsWith('nieuwe lead') || n.includes('new lead')) return 'website_lead'
 
-  // Chatbot / WhatsApp contact
+  // Chatbot / WhatsApp contact + belpogingen (nog geen afspraak ingepland)
   if (n.includes('wapp') || n.includes('whatsapp') || n.includes('chatbot') || n === 'contact via whatsapp') return 'chatbot'
+  if (n.startsWith('bel poging') || n.startsWith('gebeld') || n === 'niet opgenomen') return 'chatbot'
 
-  // Telefonische afspraken — ingeplande afspraken + belpogingen (gebeld 1/2/3)
+  // Telefonische afspraken — alleen daadwerkelijk ingeplande telefoonafspraken
   if (n.includes('telefoon gesprek ingepland') || n.startsWith('bel afspraak') || n.includes('telefonisch')) return 'telefoon'
-  if (n.startsWith('bel poging') || n.startsWith('gebeld') || n === 'niet opgenomen') return 'telefoon'
 
   // Buitendienst
   if (n.includes('advies gesprek') || n.includes('op locatie') || n.includes('buitendienst') || n === 'optionele lead met offerte') return 'buitendienst'
