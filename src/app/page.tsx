@@ -59,7 +59,20 @@ export default function DashboardPage() {
         <ApiErrorBanner errors={[meta.error, sales.error, chatbot.error].filter((e): e is string => !!e)} />
 
         {/* Journey Bar — visual overview of entire process */}
-        <JourneyBar pipeline={pipeline} loading={loading} />
+        <JourneyBar
+          pipeline={pipeline}
+          loading={loading}
+          extra={{
+            metaSpend: meta.data?.totals?.spend,
+            metaLeads: meta.data?.totals?.leads,
+            metaCpl: meta.data?.totals?.avgCpl,
+            chatbotGesprekken: chatbot.data?.totals?.gesprekken,
+            chatbotGekwalificeerd: chatbot.data?.totals?.gekwalificeerd,
+            chatbotConversie: chatbot.data?.totals?.conversieRate,
+            omzet: sales.data?.totals?.omzet,
+            deals: sales.data?.totals?.deals,
+          }}
+        />
 
         {/* KPI Strip */}
         <div style={{

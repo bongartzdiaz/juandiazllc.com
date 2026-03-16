@@ -9,12 +9,26 @@ const STEP_COLORS = ['var(--b)', 'var(--b)', 'var(--y)', 'var(--o)', 'var(--g)']
 const STEP_BG = ['var(--b-bg)', 'var(--b-bg)', 'var(--y-bg)', 'var(--o-bg)', 'var(--g-bg)']
 const STEP_BORDER = ['var(--b-border)', 'var(--b-border)', 'var(--y-border)', 'var(--o-border)', 'var(--g-border)']
 
+interface ExtraTotals {
+  metaSpend?: number
+  metaLeads?: number
+  metaCpl?: number
+  chatbotGesprekken?: number
+  chatbotGekwalificeerd?: number
+  chatbotConversie?: number
+  googleConversions?: number
+  googleSpend?: number
+  omzet?: number
+  deals?: number
+}
+
 interface Props {
   pipeline: GhlPipelineStep[]
   loading: boolean
+  extra?: ExtraTotals
 }
 
-export function JourneyBar({ pipeline, loading }: Props) {
+export function JourneyBar({ pipeline, loading, extra }: Props) {
   const [animated, setAnimated] = useState(false)
 
   useEffect(() => {
@@ -32,24 +46,47 @@ export function JourneyBar({ pipeline, loading }: Props) {
 
   const maxVal = Math.max(...steps.map(s => s.value), 1)
 
-  // Summary totals
-  const leads = steps.find(s => s.stage === 'website_lead')?.value ?? 0
-  const gesprekken = steps.find(s => s.stage === 'chatbot')?.value ?? 0
-  const telefoon = steps.find(s => s.stage === 'telefoon')?.value ?? 0
-  const buitendienstVal = steps.find(s => s.stage === 'buitendienst')?.value ?? 0
-  const salesCount = steps.find(s => s.stage === 'sale')?.value ?? 0
-  const totaalAfspraken = telefoon + buitendienstVal
-  const leadToAfspraak = leads > 0 ? Math.round((totaalAfspraken / leads) * 100) : 0
-  const leadToSale = leads > 0 ? Math.round((salesCount / leads) * 100) : 0
+  // Summary totals — combine all data sources
+  const pipelineLeads = steps.find(s => s.stage === 'website_lead')?.value ?? 0
+  const pipelineTelefoon = steps.find(s => s.stage === 'telefoon')?.value ?? 0
+  const pipelineBuitendienst = steps.find(s => s.stage === 'buitendienst')?.value ?? 0
+  const pipelineSales = steps.find(s => s.stage === 'sale')?.value ?? 0
+  const totaalAfspraken = pipelineTelefoon + pipelineBuitendienst
 
-  const summaryItems = [
-    { label: 'Totaal leads', value: String(leads), color: 'var(--b-txt)' },
-    { label: 'Gesprekken', value: String(gesprekken), color: 'var(--b-txt)' },
-    { label: 'Afspraken', value: String(totaalAfspraken), color: 'var(--y-txt)' },
-    { label: 'Lead → Afspraak', value: `${leadToAfspraak}%`, color: leadToAfspraak >= 10 ? 'var(--g-txt)' : 'var(--r-txt)' },
-    { label: 'Lead → Sale', value: `${leadToSale}%`, color: leadToSale > 0 ? 'var(--g-txt)' : 'var(--txt3)' },
-    { label: 'Sales', value: String(salesCount), color: 'var(--g-txt)' },
-  ]
+  const summaryItems: { label: string; value: string; color: string }[] = []
+
+  // Meta Ads totals
+  if (extra?.metaSpend !== undefined) {
+    summaryItems.push({ label: 'Meta spend', value: `€${Math.round(extra.metaSpend)}`, color: 'var(--o-txt)' })
+  }
+  if (extra?.metaLeads !== undefined) {
+    summaryItems.push({ label: 'Meta leads', value: String(extra.metaLeads), color: 'var(--b-txt)' })
+  }
+  if (extra?.metaCpl !== undefined && extra.metaCpl > 0) {
+    summaryItems.push({ label: 'CPL', value: `€${Math.round(extra.metaCpl)}`, color: extra.metaCpl < 20 ? 'var(--g-txt)' : 'var(--o-txt)' })
+  }
+
+  // Chatbot totals
+  if (extra?.chatbotGesprekken !== undefined) {
+    summaryItems.push({ label: 'Chatbot gesprekken', value: String(extra.chatbotGesprekken), color: 'var(--b-txt)' })
+  }
+  if (extra?.chatbotGekwalificeerd !== undefined) {
+    summaryItems.push({ label: 'Gekwalificeerd', value: String(extra.chatbotGekwalificeerd), color: 'var(--g-txt)' })
+  }
+
+  // Google Ads
+  if (extra?.googleConversions !== undefined && extra.googleConversions > 0) {
+    summaryItems.push({ label: 'Google conversies', value: String(extra.googleConversions), color: 'var(--b-txt)' })
+  }
+
+  // Pipeline totals
+  summaryItems.push({ label: 'Afspraken', value: String(totaalAfspraken), color: 'var(--y-txt)' })
+
+  if (extra?.omzet !== undefined && extra.omzet > 0) {
+    summaryItems.push({ label: 'Omzet', value: `€${(extra.omzet / 1000).toFixed(1)}k`, color: 'var(--g-txt)' })
+  }
+
+  summaryItems.push({ label: 'Deals', value: String(extra?.deals ?? pipelineSales), color: 'var(--g-txt)' })
 
   return (
     <div style={{
