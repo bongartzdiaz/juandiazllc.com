@@ -34,11 +34,11 @@ export async function GET() {
       return step
     })
 
-    // Recalculate totals
+    // Recalculate totals — leads = alleen website leads (Meta + Google), NIET chatbot gesprekken
     const telefoon = ghlData.pipeline.find(s => s.stage === 'telefoon')?.value ?? 0
     const buitendienst = ghlData.pipeline.find(s => s.stage === 'buitendienst')?.value ?? 0
     const deals = ghlData.pipeline.find(s => s.stage === 'sale')?.value ?? 0
-    const totalLeads = metaLeads + chatbotGesprekken + telefoon + buitendienst + deals
+    const totalLeads = metaLeads
 
     const result = {
       ...ghlData,
