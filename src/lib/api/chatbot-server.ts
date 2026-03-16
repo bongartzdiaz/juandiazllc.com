@@ -2,7 +2,7 @@ import type { ChatbotData, ChatConversation, ChatDailyStats, ChatResponseTime, C
 import { promises as fs } from 'fs'
 import path from 'path'
 
-// ── Server-side: build ChatbotData from CSV export + webhook events ──
+// ── Server-side: build ChatbotData from CSV + webhook + DM Champ API ──
 
 interface StoredEvent {
   id: string
@@ -34,9 +34,36 @@ interface CsvContact {
   createdAt: string
 }
 
+// DM Champ API contact (enriched via /v1/contacts?phoneNumber=...)
+interface ApiContact {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  channel: string
+  isBotActive: boolean
+  doNotDisturb: boolean
+  doNotDisturbReason: string | null
+  createdAt: string
+  lastActivityAt: string
+  lastIncomingMessageAt: string
+  hasHadActivity: boolean
+  creditsUsed: number
+  botMessageCount: number
+  chatConcluded: boolean
+  tags: string[]
+  campaign: string
+  fetchedAt: string // when we fetched this from API
+}
+
 const DATA_DIR = path.join(process.cwd(), '.data')
 const EVENTS_FILE = path.join(DATA_DIR, 'dmchamp-events.json')
 const CSV_FILE = path.join(DATA_DIR, 'dmchamp-contacts.csv')
+const API_CACHE_FILE = path.join(DATA_DIR, 'dmchamp-api-cache.json')
+
+// Cache: max 5 min old, then refresh from API
+const API_CACHE_MAX_AGE_MS = 5 * 60 * 1000
 
 async function readStoredEvents(): Promise<StoredEvent[]> {
   try {
@@ -45,6 +72,102 @@ async function readStoredEvents(): Promise<StoredEvent[]> {
   } catch {
     return []
   }
+}
+
+// ── API cache read/write ──
+async function readApiCache(): Promise<Map<string, ApiContact>> {
+  try {
+    const raw = await fs.readFile(API_CACHE_FILE, 'utf-8')
+    const arr: ApiContact[] = JSON.parse(raw)
+    const map = new Map<string, ApiContact>()
+    for (const c of arr) {
+      map.set(c.phone, c)
+    }
+    return map
+  } catch {
+    return new Map()
+  }
+}
+
+async function writeApiCache(cache: Map<string, ApiContact>) {
+  await fs.mkdir(DATA_DIR, { recursive: true })
+  await fs.writeFile(API_CACHE_FILE, JSON.stringify([...cache.values()], null, 2))
+}
+
+// ── Fetch single contact from DM Champ API ──
+async function fetchContactFromApi(phone: string): Promise<ApiContact | null> {
+  const apiKey = process.env.DMCHAMP_API_KEY
+  if (!apiKey) return null
+  const baseUrl = process.env.DMCHAMP_BASE_URL || 'https://api.dmchamp.com/v1'
+
+  try {
+    const res = await fetch(`${baseUrl}/contacts?apiKey=${apiKey}&phoneNumber=${encodeURIComponent(phone)}`)
+    if (!res.ok) return null
+    const json = await res.json()
+    if (!json.success || !json.contact) return null
+
+    const c = json.contact
+    return {
+      id: c.id || json.contactId,
+      firstName: c.firstName || '',
+      lastName: c.lastName || '',
+      email: c.email || '',
+      phone: c.phoneNumber || phone,
+      channel: c.channel || 'whatsapp',
+      isBotActive: c.isBotActive ?? false,
+      doNotDisturb: c.doNotDisturb ?? false,
+      doNotDisturbReason: c.doNotDisturbReason || null,
+      createdAt: c.createdAt || '',
+      lastActivityAt: c.lastActivityAt || '',
+      lastIncomingMessageAt: c.lastIncomingMessageAt || '',
+      hasHadActivity: c.hasHadActivity ?? false,
+      creditsUsed: c.creditsUsed || 0,
+      botMessageCount: c.botMessageCount || 0,
+      chatConcluded: c.chatConcluded ?? false,
+      tags: (c.tags || []).map((t: any) => typeof t === 'string' ? t : t.name || ''),
+      campaign: c.currentCampaign?.name || c.campaigns?.[0]?.name || '',
+      fetchedAt: new Date().toISOString(),
+    }
+  } catch {
+    return null
+  }
+}
+
+// ── Batch enrich: for webhook phones not in CSV, fetch from API (with cache) ──
+async function enrichWebhookContacts(phones: string[]): Promise<Map<string, ApiContact>> {
+  const cache = await readApiCache()
+  const now = Date.now()
+  const toFetch: string[] = []
+
+  for (const phone of phones) {
+    const cached = cache.get(phone)
+    if (cached && (now - new Date(cached.fetchedAt).getTime()) < API_CACHE_MAX_AGE_MS) {
+      continue // fresh enough
+    }
+    toFetch.push(phone)
+  }
+
+  // Fetch max 20 per request cycle to avoid rate limits
+  const batchSize = Math.min(toFetch.length, 20)
+  const fetching = toFetch.slice(0, batchSize)
+
+  if (fetching.length > 0) {
+    const results = await Promise.allSettled(
+      fetching.map(phone => fetchContactFromApi(phone))
+    )
+
+    for (let i = 0; i < results.length; i++) {
+      const result = results[i]
+      if (result.status === 'fulfilled' && result.value) {
+        cache.set(fetching[i], result.value)
+      }
+    }
+
+    // Save updated cache
+    await writeApiCache(cache).catch(() => {})
+  }
+
+  return cache
 }
 
 // ── CSV parser ──
@@ -145,6 +268,20 @@ function mapTagsToStatus(tags: string[], doNotDisturb: boolean, markChatClosed: 
   return 'afgerond'
 }
 
+function mapApiContactToStatus(c: ApiContact): ChatStatus {
+  const tags = c.tags.map(t => t.toLowerCase())
+  if (tags.includes('appointment_booked') || tags.includes('lead_qualified')) return 'gekwalificeerd'
+  if (tags.includes('lead_interested') && c.botMessageCount >= 4) return 'gekwalificeerd'
+  if (tags.includes('heeft al een batterij')) return 'afgevallen'
+  if (c.doNotDisturb && c.botMessageCount === 0) return 'afgevallen'
+  if (c.chatConcluded) return 'afgerond'
+  if (tags.includes('lead_interested')) return 'wachtend'
+  if (c.botMessageCount > 0) return 'wachtend'
+  if (tags.includes('lead_new')) return 'wachtend'
+  if (c.doNotDisturb) return 'afgevallen'
+  return 'afgerond'
+}
+
 function contactDisplayName(first: string, last: string): string {
   const f = first && first !== 'Unknown' ? first.trim() : ''
   const l = last && last !== 'Unknown' ? last.trim() : ''
@@ -181,86 +318,109 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
     }
   }
 
-  // ── Build conversations from CSV (baseline) ──
-  // Index webhook events by phone for merging
-  const webhookByPhone = new Map<string, StoredEvent>()
+  // Track which phones came from CSV
+  const csvPhones = new Set<string>()
+  for (const c of csvContacts) {
+    if (c.phone) csvPhones.add(c.phone)
+  }
+
+  // ── Collect unique webhook phones NOT in CSV ──
+  const webhookPhones = new Set<string>()
   for (const e of webhookEvents) {
-    if (e.contactPhone) {
-      webhookByPhone.set(e.contactPhone, e)
+    if (e.contactPhone && e.contactPhone.length > 5 && !csvPhones.has(e.contactPhone)) {
+      webhookPhones.add(e.contactPhone)
     }
   }
 
-  // Track which phones came from CSV
-  const csvPhones = new Set<string>()
+  // ── Enrich webhook contacts via DM Champ API ──
+  const apiCache = await enrichWebhookContacts([...webhookPhones])
 
+  // ── Build conversations ──
   const allConversations: ChatConversation[] = []
+  const processedPhones = new Set<string>()
 
-  // 1. Process CSV contacts (primary source — complete history)
+  // 1. Process CSV contacts (historical baseline)
   for (const c of csvContacts) {
-    csvPhones.add(c.phone)
-
-    // Only include contacts in the campaign (actual leads)
     if (!c.campaign.includes('Thuisbatterijen')) continue
+    if (c.phone) processedPhones.add(c.phone)
 
-    const status = mapTagsToStatus(c.tags, c.doNotDisturb, c.markChatClosed, c.botMessageCount)
-    const naam = contactDisplayName(c.firstName, c.lastName)
-    const ts = new Date(c.lastActivityAt || c.createdAt)
-
-    // Enrich with webhook data if available
-    const webhook = webhookByPhone.get(c.phone)
+    // Check if API has fresher data for this contact
+    const apiData = c.phone ? apiCache.get(c.phone) : null
+    const status = apiData
+      ? mapApiContactToStatus(apiData)
+      : mapTagsToStatus(c.tags, c.doNotDisturb, c.markChatClosed, c.botMessageCount)
+    const naam = apiData
+      ? contactDisplayName(apiData.firstName, apiData.lastName)
+      : contactDisplayName(c.firstName, c.lastName)
+    const lastActivity = apiData?.lastActivityAt || c.lastActivityAt || c.createdAt
+    const ts = new Date(lastActivity)
 
     allConversations.push({
-      id: c.contactId,
+      id: apiData?.id || c.contactId,
       naam,
       status,
-      berichten: c.botMessageCount,
-      duur: c.channel === 'whatsapp' ? 'WhatsApp' : c.channel || '—',
-      onderwerp: webhook?.summary || c.tags.filter(t => !t.startsWith('Follow_') && !t.startsWith('followup_')).join(', ') || '—',
+      berichten: apiData?.botMessageCount ?? c.botMessageCount,
+      duur: (apiData?.channel || c.channel) === 'whatsapp' ? 'WhatsApp' : (apiData?.channel || c.channel || '—'),
+      onderwerp: (apiData?.tags || c.tags).filter(t => !t.startsWith('Follow_') && !t.startsWith('followup_')).join(', ') || '—',
       tijdstip: ts.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
       datum: (c.createdAt || c.lastActivityAt || '').slice(0, 10),
     })
   }
 
-  // 2. Add webhook-only contacts (newer than CSV export)
-  // Deduplicate webhook events by phone — keep latest per contact
-  const webhookUniqueByPhone = new Map<string, StoredEvent>()
-  const webhookNoPhone: StoredEvent[] = []
-  for (const e of webhookEvents) {
-    // Skip delivery/read/system events — only count actual conversations
-    const evtType = (e.event || '').toLowerCase()
-    if (['read', 'delivered', 'sent', 'failed', 'unknown'].includes(evtType)) continue
-    if (!e.contactPhone && e.contactName === 'Onbekend') continue
+  // 2. Add webhook/API contacts NOT in CSV (new leads since CSV export)
+  for (const phone of webhookPhones) {
+    if (processedPhones.has(phone)) continue
+    processedPhones.add(phone)
 
-    if (e.contactPhone) {
-      if (csvPhones.has(e.contactPhone)) continue // Already in CSV
-      const existing = webhookUniqueByPhone.get(e.contactPhone)
-      if (!existing || new Date(e.timestamp) > new Date(existing.timestamp)) {
-        webhookUniqueByPhone.set(e.contactPhone, e)
-      }
-    } else if (e.contactName && e.contactName !== 'Onbekend') {
-      webhookNoPhone.push(e)
+    const apiData = apiCache.get(phone)
+
+    if (apiData) {
+      // We have full API data — use it
+      // Only include if in the right campaign
+      if (apiData.campaign && !apiData.campaign.includes('Thuisbatterij')) continue
+
+      const status = mapApiContactToStatus(apiData)
+      const naam = contactDisplayName(apiData.firstName, apiData.lastName)
+      const ts = new Date(apiData.lastActivityAt || apiData.createdAt)
+
+      allConversations.push({
+        id: apiData.id,
+        naam,
+        status,
+        berichten: apiData.botMessageCount,
+        duur: apiData.channel === 'whatsapp' ? 'WhatsApp' : apiData.channel || '—',
+        onderwerp: apiData.tags.filter(t => !t.startsWith('Follow_') && !t.startsWith('followup_')).join(', ') || '—',
+        tijdstip: ts.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
+        datum: (apiData.createdAt || '').slice(0, 10),
+      })
+    } else {
+      // Fallback: use webhook event data
+      const latestEvent = webhookEvents
+        .filter(e => e.contactPhone === phone)
+        .sort((a, b) => b.timestamp.localeCompare(a.timestamp))[0]
+      if (!latestEvent) continue
+
+      const evtType = (latestEvent.event || '').toLowerCase()
+      if (['read', 'delivered', 'sent', 'failed', 'unknown'].includes(evtType)) continue
+
+      const status = mapWebhookEventToStatus(latestEvent)
+      const ts = new Date(latestEvent.timestamp)
+
+      allConversations.push({
+        id: latestEvent.id,
+        naam: latestEvent.contactName || 'Onbekend',
+        status,
+        berichten: latestEvent.message ? 1 : 0,
+        duur: '—',
+        onderwerp: latestEvent.summary || latestEvent.message?.substring(0, 40) || latestEvent.tag || '—',
+        tijdstip: ts.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
+        datum: (latestEvent.timestamp || '').slice(0, 10),
+      })
     }
-  }
-
-  for (const e of [...webhookUniqueByPhone.values(), ...webhookNoPhone]) {
-    const status = mapWebhookEventToStatus(e)
-    const ts = new Date(e.timestamp)
-
-    allConversations.push({
-      id: e.id,
-      naam: e.contactName,
-      status,
-      berichten: e.message ? 1 : 0,
-      duur: '—',
-      onderwerp: e.summary || e.message?.substring(0, 40) || e.tag || '—',
-      tijdstip: ts.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
-      datum: (e.timestamp || '').slice(0, 10),
-    })
   }
 
   // Sort: most recent activity first
   allConversations.sort((a, b) => {
-    // Prioritize active statuses
     const statusOrder: Record<string, number> = { gekwalificeerd: 0, wachtend: 1, handoff: 2, afgerond: 3, afgevallen: 4 }
     return (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3)
   })
@@ -268,27 +428,13 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
   // ── Build daily stats ──
   const dailyMap = new Map<string, { gesprekken: number; gekwalificeerd: number }>()
 
-  // From CSV: group by created date
-  for (const c of csvContacts) {
-    if (!c.campaign.includes('Thuisbatterijen')) continue
-    const date = (c.createdAt || '').slice(0, 10)
+  // From all conversations (CSV + API enriched)
+  for (const c of allConversations) {
+    const date = c.datum
     if (!date) continue
     const entry = dailyMap.get(date) || { gesprekken: 0, gekwalificeerd: 0 }
     entry.gesprekken++
-    const tags = c.tags.map(t => t.toLowerCase())
-    if (tags.includes('appointment_booked') || tags.includes('lead_qualified')) {
-      entry.gekwalificeerd++
-    }
-    dailyMap.set(date, entry)
-  }
-
-  // From webhooks: add only deduplicated new contacts
-  for (const e of [...webhookUniqueByPhone.values(), ...webhookNoPhone]) {
-    const date = e.timestamp.slice(0, 10)
-    if (!date) continue
-    const entry = dailyMap.get(date) || { gesprekken: 0, gekwalificeerd: 0 }
-    entry.gesprekken++
-    if (e.status === 'qualified' || e.tag === 'qualified' || e.event === 'contact_qualified') {
+    if (c.status === 'gekwalificeerd') {
       entry.gekwalificeerd++
     }
     dailyMap.set(date, entry)
@@ -316,7 +462,7 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
   const wachtend = allConversations.filter(c => c.status === 'wachtend' || c.status === 'handoff').length
 
   return {
-    conversations: allConversations.slice(0, 100),
+    conversations: allConversations,
     daily,
     responseTime,
     totals: {

@@ -44,15 +44,52 @@ const tabConfig: { key: Tab; label: string; icon: React.ReactNode }[] = [
   { key: 'content-analyse', label: 'Content analyse', icon: <Film size={14} /> },
 ]
 
+type Period = 'dag' | 'week' | 'maand'
+const periodLabels: Record<Period, string> = { dag: 'D', week: 'W', maand: 'M' }
+
+function getDateCutoff(period: Period): string {
+  const now = new Date()
+  if (period === 'dag') return now.toISOString().slice(0, 10)
+  if (period === 'week') {
+    const d = new Date(now)
+    d.setDate(d.getDate() - 7)
+    return d.toISOString().slice(0, 10)
+  }
+  return '2000-01-01'
+}
+
 export default function MetaAdsPage() {
   const { theme } = useTheme()
   const { data, loading, error } = useMetaAds('NL')
   const [tab, setTab] = useState<Tab>('overzicht')
+  const [period, setPeriod] = useState<Period>('maand')
 
   const gridColor = theme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'
   const tickColor = theme === 'dark' ? '#5D6D82' : '#96A0B5'
   const oColor = theme === 'dark' ? '#FF7A45' : '#DC4A11'
   const bColor = theme === 'dark' ? '#5EAAFF' : '#1650DC'
+
+  // Filter daily data by period
+  const filteredDaily = useMemo(() => {
+    if (!data) return []
+    if (period === 'maand') return data.daily
+    const cutoff = getDateCutoff(period)
+    return data.daily.filter(d => d.date >= cutoff)
+  }, [data, period])
+
+  // Compute totals from filtered daily data
+  const filteredTotals = useMemo(() => {
+    if (period === 'maand' && data) return data.totals
+    const spend = filteredDaily.reduce((s, d) => s + d.spend, 0)
+    const leads = filteredDaily.reduce((s, d) => s + d.leads, 0)
+    const impressions = filteredDaily.reduce((s, d) => s + d.impressions, 0)
+    const clicks = filteredDaily.reduce((s, d) => s + d.clicks, 0)
+    return {
+      spend, leads, impressions, clicks,
+      avgCpl: leads > 0 ? Math.round(spend / leads) : 0,
+      avgCtr: impressions > 0 ? parseFloat(((clicks / impressions) * 100).toFixed(1)) : 0,
+    }
+  }, [filteredDaily, data, period])
 
   // Compute funnel split from campaign data
   const funnelSplit = useMemo(() => {
@@ -61,7 +98,7 @@ export default function MetaAdsPage() {
       .sort((a, b) => b.spend - a.spend)
       .slice(0, 5)
     const topSpend = topCampaigns.reduce((s, c) => s + c.spend, 0)
-    const overig = data.totals.spend - topSpend
+    const overig = filteredTotals.spend - topSpend
     const entries = topCampaigns.map((c, i) => ({
       name: `${c.funnel} ${c.name.split('—')[0]?.trim() || c.name}`.substring(0, 20),
       value: c.spend,
@@ -69,12 +106,12 @@ export default function MetaAdsPage() {
     }))
     if (overig > 0) entries.push({ name: 'Overig', value: overig, color: '#96A0B5' })
     return entries
-  }, [data])
+  }, [data, filteredTotals])
 
-  // Chart data mapped from daily stats
+  // Chart data mapped from filtered daily stats
   const chartData = useMemo(() =>
-    (data?.daily || []).map(d => ({ d: d.label, spend: d.spend, leads: d.leads })),
-    [data],
+    filteredDaily.map(d => ({ d: d.label, spend: d.spend, leads: d.leads })),
+    [filteredDaily],
   )
 
   // Per-funnel aggregation
@@ -107,7 +144,8 @@ export default function MetaAdsPage() {
 
   if (!data) return null
 
-  const { totals, campaigns } = data
+  const { campaigns } = data
+  const totals = filteredTotals
 
   return (
     <>
@@ -116,28 +154,49 @@ export default function MetaAdsPage() {
       <div style={{ padding: '18px 22px 40px' }}>
         {error && <ApiErrorBanner errors={[error]} />}
 
-        {/* Tab bar — pill style */}
-        <div style={{
-          display: 'inline-flex', gap: 4, background: 'var(--bg2)', border: '1px solid var(--border)',
-          borderRadius: 12, padding: 4, marginBottom: 18,
-        }}>
-          {tabConfig.map(t => {
-            const isActive = tab === t.key
-            return (
-              <button key={t.key} onClick={() => setTab(t.key)} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '7px 18px', borderRadius: 8, fontSize: 12.5, fontWeight: 600,
-                background: isActive ? 'var(--panel)' : 'transparent',
-                color: isActive ? 'var(--txt)' : 'var(--txt3)',
-                boxShadow: isActive ? '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)' : 'none',
-                border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+        {/* Tab bar + period toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+          <div style={{
+            display: 'inline-flex', gap: 4, background: 'var(--bg2)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: 4,
+          }}>
+            {tabConfig.map(t => {
+              const isActive = tab === t.key
+              return (
+                <button key={t.key} onClick={() => setTab(t.key)} style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '7px 18px', borderRadius: 8, fontSize: 12.5, fontWeight: 600,
+                  background: isActive ? 'var(--panel)' : 'transparent',
+                  color: isActive ? 'var(--txt)' : 'var(--txt3)',
+                  boxShadow: isActive ? '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)' : 'none',
+                  border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}>
+                  <span style={{ display: 'flex', opacity: isActive ? 1 : 0.6 }}>{t.icon}</span>
+                  {t.label}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Period toggle */}
+          <div style={{
+            display: 'inline-flex', gap: 2, background: 'var(--bg2)', border: '1px solid var(--border)',
+            borderRadius: 8, padding: 3,
+          }}>
+            {(['maand', 'week', 'dag'] as Period[]).map(p => (
+              <button key={p} onClick={() => setPeriod(p)} style={{
+                padding: '5px 12px', borderRadius: 6, fontSize: 11, fontWeight: 600,
+                background: period === p ? 'var(--b-bg)' : 'transparent',
+                color: period === p ? 'var(--b-txt)' : 'var(--txt3)',
+                border: period === p ? '1px solid var(--b-border)' : '1px solid transparent',
+                cursor: 'pointer', fontFamily: 'inherit',
+                transition: 'all 0.15s ease',
               }}>
-                <span style={{ display: 'flex', opacity: isActive ? 1 : 0.6 }}>{t.icon}</span>
-                {t.label}
+                {periodLabels[p]}
               </button>
-            )
-          })}
+            ))}
+          </div>
         </div>
 
         {/* ─── OVERZICHT TAB ─── */}

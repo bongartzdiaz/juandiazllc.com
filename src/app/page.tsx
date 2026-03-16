@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useMemo } from 'react'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { FunnelCard } from '@/components/dashboard/FunnelCard'
@@ -8,26 +9,50 @@ import { GoalsCard } from '@/components/dashboard/GoalsCard'
 import { ChartsSection } from '@/components/dashboard/ChartsSection'
 import { CampaignTable } from '@/components/dashboard/CampaignTable'
 import { JourneyBar } from '@/components/dashboard/JourneyBar'
+import type { JourneyPeriod } from '@/components/dashboard/JourneyBar'
 import { ApiErrorBanner } from '@/components/ui/ApiErrorBanner'
 import { useMetaAds } from '@/hooks/useMetaAds'
 import { useSales } from '@/hooks/useSales'
 import { useChatbot } from '@/hooks/useChatbot'
 
+function getDateCutoff(period: JourneyPeriod): string {
+  const now = new Date()
+  if (period === 'dag') return now.toISOString().slice(0, 10)
+  if (period === 'week') {
+    const d = new Date(now)
+    d.setDate(d.getDate() - 7)
+    return d.toISOString().slice(0, 10)
+  }
+  return '2000-01-01'
+}
+
 export default function DashboardPage() {
   const meta = useMetaAds('NL')
   const sales = useSales()
   const chatbot = useChatbot()
+  const [journeyPeriod, setJourneyPeriod] = useState<JourneyPeriod>('maand')
 
   const loading = meta.loading || sales.loading || chatbot.loading
 
-  // Journey steps from GHL pipeline (cumulative, properly decreasing)
-  const pipeline = sales.data?.pipeline ?? []
+  // Journey steps: GHL pipeline enriched with DM Champ chatbot data
+  const rawPipeline = sales.data?.pipeline ?? []
+  const dmChampGesprekken = chatbot.data?.totals?.gesprekken ?? 0
+  const pipeline = useMemo(() => {
+    if (rawPipeline.length === 0) return rawPipeline
+    // Override chatbot step with DM Champ data (more accurate than GHL cumulative)
+    return rawPipeline.map(step => {
+      if (step.stage === 'chatbot' && dmChampGesprekken > 0) {
+        return { ...step, value: dmChampGesprekken }
+      }
+      return step
+    })
+  }, [rawPipeline, dmChampGesprekken])
 
-  // Derive KPIs from same pipeline data as funnel — ensures consistency
+  // Derive KPIs — chatbot data from DM Champ, rest from GHL
   const totalLeads = sales.data?.totals?.leads ?? 0
   const cplMeta = meta.data?.totals?.avgCpl ?? 0
-  const chatbotGesprekken = pipeline.find(s => s.stage === 'chatbot')?.value ?? 0
-  const telefoonAfspraken = pipeline.find(s => s.stage === 'telefoon')?.value ?? 0
+  const chatbotGesprekken = dmChampGesprekken
+  const telefoonAfspraken = rawPipeline.find(s => s.stage === 'telefoon')?.value ?? 0
   const chatConv = chatbotGesprekken > 0 ? Math.round((telefoonAfspraken / chatbotGesprekken) * 100) : 0
   const afspraken = sales.data?.totals?.afspraken ?? 0
   const deals = sales.data?.totals?.deals ?? 0
@@ -40,6 +65,48 @@ export default function DashboardPage() {
 
   // Campaigns
   const campaigns = meta.data?.campaigns ?? []
+
+  // Period-filtered extra totals for JourneyBar
+  const journeyExtra = useMemo(() => {
+    if (journeyPeriod === 'maand') {
+      return {
+        metaSpend: meta.data?.totals?.spend,
+        metaLeads: meta.data?.totals?.leads,
+        metaCpl: meta.data?.totals?.avgCpl,
+        chatbotGesprekken: chatbot.data?.totals?.gesprekken,
+        chatbotGekwalificeerd: chatbot.data?.totals?.gekwalificeerd,
+        chatbotConversie: chatbot.data?.totals?.conversieRate,
+        omzet: sales.data?.totals?.omzet,
+        deals: sales.data?.totals?.deals,
+      }
+    }
+    const cutoff = getDateCutoff(journeyPeriod)
+
+    // Filter Meta daily and recompute
+    const filteredMeta = (meta.data?.daily ?? []).filter(d => d.date >= cutoff)
+    const metaSpend = filteredMeta.reduce((s, d) => s + d.spend, 0)
+    const metaLeads = filteredMeta.reduce((s, d) => s + d.leads, 0)
+
+    // Filter Chatbot daily and recompute
+    const filteredChat = (chatbot.data?.daily ?? []).filter(d => d.date >= cutoff)
+    const chatGesprekken = filteredChat.reduce((s, d) => s + d.gesprekken, 0)
+    const chatGekwalificeerd = filteredChat.reduce((s, d) => s + d.gekwalificeerd, 0)
+
+    // Filter Sales daily and recompute
+    const filteredSales = (sales.data?.daily ?? []).filter(d => d.date >= cutoff)
+    const filteredDeals = filteredSales.reduce((s, d) => s + d.deals, 0)
+
+    return {
+      metaSpend: metaSpend > 0 ? metaSpend : undefined,
+      metaLeads: metaLeads > 0 ? metaLeads : undefined,
+      metaCpl: metaLeads > 0 ? Math.round(metaSpend / metaLeads) : undefined,
+      chatbotGesprekken: chatGesprekken > 0 ? chatGesprekken : undefined,
+      chatbotGekwalificeerd: chatGekwalificeerd > 0 ? chatGekwalificeerd : undefined,
+      chatbotConversie: chatGesprekken > 0 ? Math.round((chatGekwalificeerd / chatGesprekken) * 100) : undefined,
+      omzet: undefined, // omzet has no daily breakdown
+      deals: filteredDeals > 0 ? filteredDeals : undefined,
+    }
+  }, [journeyPeriod, meta.data, chatbot.data, sales.data])
 
   const refetchAll = () => {
     meta.refetch()
@@ -62,16 +129,9 @@ export default function DashboardPage() {
         <JourneyBar
           pipeline={pipeline}
           loading={loading}
-          extra={{
-            metaSpend: meta.data?.totals?.spend,
-            metaLeads: meta.data?.totals?.leads,
-            metaCpl: meta.data?.totals?.avgCpl,
-            chatbotGesprekken: chatbot.data?.totals?.gesprekken,
-            chatbotGekwalificeerd: chatbot.data?.totals?.gekwalificeerd,
-            chatbotConversie: chatbot.data?.totals?.conversieRate,
-            omzet: sales.data?.totals?.omzet,
-            deals: sales.data?.totals?.deals,
-          }}
+          extra={journeyExtra}
+          period={journeyPeriod}
+          onPeriodChange={setJourneyPeriod}
         />
 
         {/* KPI Strip */}

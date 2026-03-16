@@ -25,8 +25,34 @@ export async function fetchSalesData(): Promise<SalesData | null> {
   return null
 }
 
+// ── Helpmijbesparen smart tags (identify HMB leads from forms/funnels) ──
+// Source tags: identify where the lead came from
+// Progression tags: identify leads that advanced in the funnel (any source)
+const HMB_LEAD_TAGS = [
+  // Source: helpmijbesparen.nl forms
+  'thuisbatterij-berekenen',
+  'saldering-check',
+  'terugleverkosten check',
+  'terugleverkostencheck',
+  'google saldering-check',
+  'bespaarcheck',
+  'netcongestiecheck',
+  'leadform long',
+  'leadform short',
+  // Source: Voltafy leads
+  'voltafy afspraak',
+  // Progression: buitendienst gepland (any source)
+  'adviesgesprek gepland',
+  'lead naar projectmanager',
+]
+
+function isHmbLead(opp: any): boolean {
+  const tags: string[] = opp.contact?.tags || []
+  const lower = tags.map(t => t.toLowerCase())
+  return HMB_LEAD_TAGS.some(tag => lower.includes(tag.toLowerCase()))
+}
+
 // ── GHL stage name → internal stage mapping ──
-// Based on "Leads campagne facebook" pipeline in HMB location (RLEt6qob2CC2OeOyxhYI)
 
 function mapStageName(name: string): PipelineStage | 'lost' | null {
   const n = (name || '').toLowerCase().trim()
@@ -83,7 +109,9 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
   const pipelinesJson = await pipelinesRes.json()
   const allPipelines = pipelinesJson.pipelines || []
 
-  // ── 2. Find relevant pipelines (exclude D2D) ──
+  // ── 2. Find relevant pipelines ──
+  // Marketing & Pre-sales = main funnel (website_lead → chatbot → telefoon → buitendienst)
+  // Sales = buitendienst + sale tracking
   const targetPipelines = allPipelines.filter(
     (p: any) => {
       const name = p.name?.toLowerCase() || ''
@@ -119,6 +147,7 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
   for (const pipeline of targetPipelines) {
     let hasMore = true
     let startAfterId = ''
+    let startAfter = ''
     let page = 0
 
     while (hasMore && page < 50) {
@@ -129,6 +158,9 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
       if (startAfterId) {
         searchUrl.searchParams.set('startAfterId', startAfterId)
       }
+      if (startAfter) {
+        searchUrl.searchParams.set('startAfter', startAfter)
+      }
 
       const res = await fetch(searchUrl.toString(), { headers })
       if (!res.ok) {
@@ -138,6 +170,7 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
 
       const json = await res.json()
       const opps = json.opportunities || []
+      const meta = json.meta || {}
 
       // Deduplicate — GHL pagination can return duplicates
       let newCount = 0
@@ -149,34 +182,55 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
         }
       }
 
-      // Stop if no new records (pagination stuck) or less than full page
-      if (newCount === 0 || opps.length < 100) {
+      // Use meta pagination info if available (more reliable than ID-only)
+      if (newCount === 0 || opps.length < 100 || !meta.nextPage) {
         hasMore = false
       } else {
-        startAfterId = opps[opps.length - 1]?.id || ''
+        startAfterId = meta.startAfterId || opps[opps.length - 1]?.id || ''
+        startAfter = meta.startAfter ? String(meta.startAfter) : ''
         page++
       }
     }
+
+    console.log(`[GHL] ${pipeline.name}: fetched ${allOpportunities.length} total opps (${page + 1} pages)`)
   }
 
   console.log(`[GHL] ${allOpportunities.length} opportunities from ${targetPipelines.map((p: any) => p.name).join(', ')}`)
 
-  // ── 5. Count stages ──
+  // ── 5. Filter & count stages ──
+  // Only count contacts with helpmijbesparen smart tags
   const stageCounts: Record<PipelineStage, number> = {
     website_lead: 0, chatbot: 0, telefoon: 0, buitendienst: 0, sale: 0,
   }
 
+  const countedContacts = new Map<string, PipelineStage>()
+  const stageOrder: PipelineStage[] = ['website_lead', 'chatbot', 'telefoon', 'buitendienst', 'sale']
+
   for (const opp of allOpportunities) {
     const internalStage = stageIdToInternal[opp.pipelineStageId]
     if (!internalStage) continue
+    if (!isHmbLead(opp)) continue
+
+    const contactId = opp.contact?.id || opp.contactId
+
+    // Deduplicate by contact: keep highest stage across pipelines
+    if (contactId) {
+      const existing = countedContacts.get(contactId)
+      if (existing && stageOrder.indexOf(existing) >= stageOrder.indexOf(internalStage)) {
+        continue
+      }
+      if (existing) {
+        stageCounts[existing]--
+      }
+      countedContacts.set(contactId, internalStage)
+    }
+
     stageCounts[internalStage]++
   }
 
-  console.log('[GHL] Stage counts:', stageCounts)
+  console.log('[GHL] Filtered stage counts (HMB leads only):', stageCounts)
 
-  // ── 6. Build pipeline response (cumulative — each step includes all later stages) ──
-  // This ensures the funnel is properly decreasing: leads >= chatbot >= telefoon >= etc.
-  // Example: someone in "sale" has passed through all earlier stages.
+  // ── 6. Build pipeline response (cumulative) ──
   const cumulativeCounts: Record<PipelineStage, number> = {
     sale: stageCounts.sale,
     buitendienst: stageCounts.buitendienst + stageCounts.sale,
@@ -194,18 +248,18 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
     description: def.description,
   }))
 
-  // ── 7. Build contacts from opportunities (contact data is embedded) ──
+  // ── 7. Build contacts from filtered opportunities ──
   const contactMap = new Map<string, { opp: any; stage: PipelineStage }>()
-  const stageOrder: PipelineStage[] = ['website_lead', 'chatbot', 'telefoon', 'buitendienst', 'sale']
 
   for (const opp of allOpportunities) {
     const contactId = opp.contact?.id || opp.contactId
-    const stage = stageIdToInternal[opp.pipelineStageId]
-    if (!contactId || !stage) continue
+    const internalStage = stageIdToInternal[opp.pipelineStageId]
+    if (!contactId || !internalStage) continue
+    if (!isHmbLead(opp)) continue
 
     const existing = contactMap.get(contactId)
-    if (!existing || stageOrder.indexOf(stage) > stageOrder.indexOf(existing.stage)) {
-      contactMap.set(contactId, { opp, stage })
+    if (!existing || stageOrder.indexOf(internalStage) > stageOrder.indexOf(existing.stage)) {
+      contactMap.set(contactId, { opp, stage: internalStage })
     }
   }
 
@@ -226,23 +280,25 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
       }
     })
 
-  // ── 9. Build daily stats ──
+  // ── 8. Build daily stats ──
   const dailyMap: Record<string, { leads: number; afspraken: number; deals: number }> = {}
 
   for (const opp of allOpportunities) {
+    const internalStage = stageIdToInternal[opp.pipelineStageId]
+    if (!internalStage) continue
+    if (!isHmbLead(opp)) continue
+
     const dateStr = (opp.createdAt || opp.dateAdded || '').substring(0, 10)
     if (!dateStr) continue
     if (!dailyMap[dateStr]) {
       dailyMap[dateStr] = { leads: 0, afspraken: 0, deals: 0 }
     }
-    const stage = stageIdToInternal[opp.pipelineStageId]
-    if (!stage) continue
 
     dailyMap[dateStr].leads++
-    if (stage === 'telefoon' || stage === 'buitendienst') {
+    if (internalStage === 'telefoon' || internalStage === 'buitendienst') {
       dailyMap[dateStr].afspraken++
     }
-    if (stage === 'sale' || opp.status === 'won') {
+    if (internalStage === 'sale' || opp.status === 'won') {
       dailyMap[dateStr].deals++
     }
   }
@@ -254,12 +310,13 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
     return { date, label, ...dailyMap[date] }
   })
 
-  // ── 10. Totals ──
-  const totalLeads = cumulativeCounts.website_lead // = all opportunities (matches funnel step 1)
-  const totalAfspraken = stageCounts.telefoon + stageCounts.buitendienst // raw count of current appointments
+  // ── 9. Totals ──
+  const totalLeads = cumulativeCounts.website_lead
+  const totalAfspraken = stageCounts.telefoon + stageCounts.buitendienst
   const totalDeals = stageCounts.sale
   const totalOmzet = allOpportunities
     .filter((o: any) => {
+      if (!isHmbLead(o)) return false
       const stage = stageIdToInternal[o.pipelineStageId]
       return stage === 'sale' || o.status === 'won'
     })

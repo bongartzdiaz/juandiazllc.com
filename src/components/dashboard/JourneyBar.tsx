@@ -22,13 +22,18 @@ interface ExtraTotals {
   deals?: number
 }
 
+export type JourneyPeriod = 'dag' | 'week' | 'maand'
+const PERIOD_LABELS: Record<JourneyPeriod, string> = { maand: 'M', week: 'W', dag: 'D' }
+
 interface Props {
   pipeline: GhlPipelineStep[]
   loading: boolean
   extra?: ExtraTotals
+  period?: JourneyPeriod
+  onPeriodChange?: (p: JourneyPeriod) => void
 }
 
-export function JourneyBar({ pipeline, loading, extra }: Props) {
+export function JourneyBar({ pipeline, loading, extra, period = 'maand', onPeriodChange }: Props) {
   const [animated, setAnimated] = useState(false)
 
   useEffect(() => {
@@ -110,10 +115,31 @@ export function JourneyBar({ pipeline, loading, extra }: Props) {
           </span>
           Journey overzicht
         </div>
-        <span style={{
-          fontSize: 10.5, fontWeight: 600, padding: '2px 8px', borderRadius: 8,
-          background: 'var(--bg2)', color: 'var(--txt3)', border: '1px solid var(--border)',
-        }}>Realtime</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{
+            fontSize: 10.5, fontWeight: 600, padding: '2px 8px', borderRadius: 8,
+            background: 'var(--bg2)', color: 'var(--txt3)', border: '1px solid var(--border)',
+          }}>Realtime</span>
+          {onPeriodChange && (
+            <div style={{
+              display: 'inline-flex', gap: 2, background: 'var(--bg2)', border: '1px solid var(--border)',
+              borderRadius: 8, padding: 3,
+            }}>
+              {(['maand', 'week', 'dag'] as JourneyPeriod[]).map(p => (
+                <button key={p} onClick={() => onPeriodChange(p)} style={{
+                  padding: '4px 10px', borderRadius: 6, fontSize: 10.5, fontWeight: 600,
+                  background: period === p ? 'var(--b-bg)' : 'transparent',
+                  color: period === p ? 'var(--b-txt)' : 'var(--txt3)',
+                  border: period === p ? '1px solid var(--b-border)' : '1px solid transparent',
+                  cursor: 'pointer', fontFamily: 'inherit',
+                  transition: 'all 0.15s ease',
+                }}>
+                  {PERIOD_LABELS[p]}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Journey steps */}
