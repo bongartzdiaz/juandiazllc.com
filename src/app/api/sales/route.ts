@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server'
 import { fetchFromGhlApi } from '@/lib/api/ghl'
 import { fetchFromMetaApi } from '@/lib/api/meta'
+import { fetchFromGoogleApi } from '@/lib/api/google'
 import { fetchFromDmChampApi } from '@/lib/api/chatbot-server'
 
 export async function GET() {
   try {
-    // Fetch all 3 data sources in parallel
-    const [ghlData, metaData, chatbotData] = await Promise.all([
+    // Fetch all 4 data sources in parallel
+    const [ghlData, metaData, googleData, chatbotData] = await Promise.all([
       fetchFromGhlApi().catch(() => null),
       fetchFromMetaApi('NL').catch(() => null),
+      fetchFromGoogleApi('NL').catch(() => null),
       fetchFromDmChampApi().catch(() => null),
     ])
 
@@ -16,8 +18,10 @@ export async function GET() {
       return NextResponse.json({ error: 'GoHighLevel API niet bereikbaar — controleer GHL_API_KEY en GHL_LOCATION_ID' })
     }
 
-    // Override website_lead with Meta total leads
+    // Website leads = Meta leads + Google conversions
     const metaLeads = metaData?.totals?.leads ?? 0
+    const googleConversions = googleData?.totals?.conversions ?? 0
+    const websiteLeads = metaLeads + googleConversions
 
     // Override chatbot with DM Champ total conversations
     const chatbotGesprekken = chatbotData?.totals?.gesprekken ?? 0
@@ -25,7 +29,7 @@ export async function GET() {
     // Telefoon + buitendienst komen uit GHL pipeline (stages: "Telefoon gesprek ingepland", "Advies gesprek op locatie gepland")
     const pipeline = ghlData.pipeline.map(step => {
       if (step.stage === 'website_lead') {
-        return { ...step, value: metaLeads }
+        return { ...step, value: websiteLeads }
       }
       if (step.stage === 'chatbot') {
         return { ...step, value: chatbotGesprekken }
@@ -38,7 +42,7 @@ export async function GET() {
     const telefoon = ghlData.pipeline.find(s => s.stage === 'telefoon')?.value ?? 0
     const buitendienst = ghlData.pipeline.find(s => s.stage === 'buitendienst')?.value ?? 0
     const deals = ghlData.pipeline.find(s => s.stage === 'sale')?.value ?? 0
-    const totalLeads = metaLeads
+    const totalLeads = websiteLeads
 
     const result = {
       ...ghlData,
