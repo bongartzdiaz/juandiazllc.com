@@ -183,39 +183,37 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
     description: def.description,
   }))
 
-  // ── 7. Fetch contacts ──
-  const contactsRes = await fetch(
-    `${baseUrl}/contacts/?locationId=${locationId}&limit=100&sortBy=dateAdded&order=desc`,
-    { headers }
-  )
-  const contactsJson = contactsRes.ok ? await contactsRes.json() : { contacts: [] }
-  const rawContacts: any[] = contactsJson.contacts || []
+  // ── 7. Build contacts from opportunities (contact data is embedded) ──
+  const contactMap = new Map<string, { opp: any; stage: PipelineStage }>()
+  const stageOrder: PipelineStage[] = ['website_lead', 'chatbot', 'telefoon', 'buitendienst', 'sale']
 
-  // ── 8. Map contacts to stages ──
-  const contactStageMap: Record<string, PipelineStage> = {}
   for (const opp of allOpportunities) {
     const contactId = opp.contact?.id || opp.contactId
-    if (contactId && stageIdToInternal[opp.pipelineStageId]) {
-      const current = contactStageMap[contactId]
-      const newStage = stageIdToInternal[opp.pipelineStageId]
-      const stageOrder: PipelineStage[] = ['website_lead', 'chatbot', 'telefoon', 'buitendienst', 'sale']
-      if (!current || stageOrder.indexOf(newStage) > stageOrder.indexOf(current)) {
-        contactStageMap[contactId] = newStage
-      }
+    const stage = stageIdToInternal[opp.pipelineStageId]
+    if (!contactId || !stage) continue
+
+    const existing = contactMap.get(contactId)
+    if (!existing || stageOrder.indexOf(stage) > stageOrder.indexOf(existing.stage)) {
+      contactMap.set(contactId, { opp, stage })
     }
   }
 
-  const contacts: GhlContact[] = rawContacts.map((c: any) => ({
-    id: c.id,
-    naam: `${c.firstName || ''} ${c.lastName || ''}`.trim() || 'Onbekend',
-    email: c.email || '',
-    telefoon: c.phone || '',
-    bron: c.source || c.tags?.[0] || '—',
-    stage: contactStageMap[c.id] || 'website_lead',
-    waarde: typeof c.monetaryValue === 'number' ? c.monetaryValue : parseFloat(c.monetaryValue) || 0,
-    aangemaakt: c.dateAdded || '',
-    laatsteActiviteit: c.lastActivity || c.dateUpdated || '',
-  }))
+  const contacts: GhlContact[] = Array.from(contactMap.values())
+    .sort((a, b) => stageOrder.indexOf(b.stage) - stageOrder.indexOf(a.stage))
+    .map(({ opp, stage }) => {
+      const c = opp.contact || {}
+      return {
+        id: c.id || opp.contactId || opp.id,
+        naam: c.name || opp.name || 'Onbekend',
+        email: c.email || '',
+        telefoon: c.phone || '',
+        bron: opp.source || c.tags?.[0] || '—',
+        stage,
+        waarde: typeof opp.monetaryValue === 'number' ? opp.monetaryValue : parseFloat(opp.monetaryValue) || 0,
+        aangemaakt: opp.createdAt || '',
+        laatsteActiviteit: opp.lastStatusChangeAt || opp.updatedAt || opp.createdAt || '',
+      }
+    })
 
   // ── 9. Build daily stats ──
   const dailyMap: Record<string, { leads: number; afspraken: number; deals: number }> = {}
