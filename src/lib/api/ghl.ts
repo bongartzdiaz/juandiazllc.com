@@ -36,11 +36,10 @@ function mapStageName(name: string): PipelineStage | 'lost' | null {
 
   // Chatbot / WhatsApp contact
   if (n.includes('wapp') || n.includes('whatsapp') || n.includes('chatbot') || n === 'contact via whatsapp') return 'chatbot'
-  // Belpogingen (gebeld 1/2/3) = nog in opvolging, geen afspraak
-  if (n.startsWith('bel poging') || n.startsWith('gebeld') || n === 'niet opgenomen') return 'chatbot'
 
-  // Telefonische afspraken — alleen daadwerkelijk ingeplande afspraken
+  // Telefonische afspraken — ingeplande afspraken + belpogingen (gebeld 1/2/3)
   if (n.includes('telefoon gesprek ingepland') || n.startsWith('bel afspraak') || n.includes('telefonisch')) return 'telefoon'
+  if (n.startsWith('bel poging') || n.startsWith('gebeld') || n === 'niet opgenomen') return 'telefoon'
 
   // Buitendienst
   if (n.includes('advies gesprek') || n.includes('op locatie') || n.includes('buitendienst') || n === 'optionele lead met offerte') return 'buitendienst'
