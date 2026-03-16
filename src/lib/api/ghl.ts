@@ -25,6 +25,45 @@ export async function fetchSalesData(): Promise<SalesData | null> {
   return null
 }
 
+// ── GHL stage name → internal stage mapping ──
+// Based on actual GHL pipeline stage names (D2D, Marketing & Pre-sales, Sales)
+
+function mapMarketingStageName(name: string): PipelineStage | 'lost' | null {
+  const n = (name || '').toLowerCase().trim()
+
+  // Website leads
+  if (n.startsWith('nieuwe lead')) return 'website_lead'
+  // Chatbot / WhatsApp
+  if (n.includes('whatsapp') || n === 'contact via whatsapp') return 'chatbot'
+  // Telefonische afspraken
+  if (n.startsWith('bel poging') || n.startsWith('bel afspraak') || n === 'niet opgenomen') return 'telefoon'
+  // Buitendienst
+  if (n.includes('advies gesprek') || n.includes('op locatie') || n === 'optionele lead met offerte') return 'buitendienst'
+  // Sale
+  if (n.startsWith('sale')) return 'sale'
+  // Lost
+  if (n === 'geen interesse' || n === 'toekomst' || n === 'te duur' || n === 'geen reactie' || n === 'lost' || n === 'nummer niet geldig') return 'lost'
+
+  return null
+}
+
+function mapSalesPipelineStageName(name: string): PipelineStage | 'lost' | null {
+  const n = (name || '').toLowerCase().trim()
+
+  // VEMS rapport = pre-buitendienst
+  if (n === 'vems rapport gestuurd') return 'buitendienst'
+  // Nieuwe afspraken = buitendienst gepland
+  if (n === 'nieuwe afspraken') return 'buitendienst'
+  // TFU - Afspraak geweest = buitendienst geweest
+  if (n.startsWith('tfu - afspraak geweest')) return 'buitendienst'
+  // Offerte getekend variants = sale!
+  if (n.startsWith('offerte getekend') || n === 'handtekening ontvangen' || n.startsWith('finale akkoord')) return 'sale'
+  // Lost/cancelled
+  if (n === 'geen interesse' || n.includes('toekomst') || n === 'no show/geannuleerd' || n.includes('daadwerkelijk cancel')) return 'lost'
+
+  return null
+}
+
 // ── GoHighLevel API v2 route handler ──
 
 export async function fetchFromGhlApi(): Promise<SalesData | null> {
@@ -40,6 +79,7 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
     'Content-Type': 'application/json',
   }
 
+  // ── 1. Fetch all pipelines ──
   const pipelinesRes = await fetch(
     `${baseUrl}/opportunities/pipelines?locationId=${locationId}`,
     { headers }
@@ -51,58 +91,83 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
   const pipelinesJson = await pipelinesRes.json()
   const allPipelines = pipelinesJson.pipelines || []
 
-  const salesPipeline = allPipelines.find(
-    (p: any) => p.name?.toLowerCase() === (process.env.GHL_PIPELINE_NAME || 'Sales').toLowerCase()
+  // ── 2. Find Marketing & Pre-sales + Sales pipelines (helpmijbesparen only, no D2D) ──
+  const marketingPipeline = allPipelines.find(
+    (p: any) => p.name?.toLowerCase().includes('marketing') || p.name?.toLowerCase().includes('pre-sales')
   )
-  if (!salesPipeline) {
-    console.error(`[GHL] Pipeline "${(process.env.GHL_PIPELINE_NAME || 'Sales')}" not found. Available:`, allPipelines.map((p: any) => p.name))
+  const salesPipeline = allPipelines.find(
+    (p: any) => p.name?.toLowerCase() === 'sales'
+  )
+
+  if (!marketingPipeline && !salesPipeline) {
+    console.error('[GHL] No Marketing & Pre-sales or Sales pipeline found. Available:', allPipelines.map((p: any) => p.name))
     return null
   }
 
-  const pipelineId: string = salesPipeline.id
-  const ghlStages: { id: string; name: string }[] = salesPipeline.stages || []
-
+  // ── 3. Build stage ID → internal stage mappings for each pipeline ──
   const stageIdToInternal: Record<string, PipelineStage> = {}
 
-  for (const ghlStage of ghlStages) {
-    const nameLower = (ghlStage.name || '').toLowerCase().trim()
-
-    let mapped: PipelineStage | undefined
-    if (['website lead', 'website_lead', 'new', 'lead', 'new lead', 'nieuw'].includes(nameLower)) {
-      mapped = 'website_lead'
-    } else if (['chatbot', 'chatbot gesprek', 'whatsapp', 'chat'].includes(nameLower)) {
-      mapped = 'chatbot'
-    } else if (['telefoon', 'telefonische afspraak', 'phone', 'call', 'appointment', 'telefoonafspraak'].includes(nameLower)) {
-      mapped = 'telefoon'
-    } else if (['buitendienst', 'buitendienst afspraak', 'field visit', 'field_visit', 'field', 'bezoek'].includes(nameLower)) {
-      mapped = 'buitendienst'
-    } else if (['sale', 'won', 'closed', 'gewonnen', 'verkocht', 'deal'].includes(nameLower)) {
-      mapped = 'sale'
-    }
-
-    if (mapped) {
-      stageIdToInternal[ghlStage.id] = mapped
+  if (marketingPipeline) {
+    for (const s of (marketingPipeline.stages || [])) {
+      const mapped = mapMarketingStageName(s.name)
+      if (mapped && mapped !== 'lost') {
+        stageIdToInternal[s.id] = mapped
+      }
     }
   }
 
-  if (Object.keys(stageIdToInternal).length === 0 && ghlStages.length > 0) {
-    const internalOrder: PipelineStage[] = ['website_lead', 'chatbot', 'telefoon', 'buitendienst', 'sale']
-    for (let i = 0; i < Math.min(ghlStages.length, internalOrder.length); i++) {
-      stageIdToInternal[ghlStages[i].id] = internalOrder[i]
+  if (salesPipeline) {
+    for (const s of (salesPipeline.stages || [])) {
+      const mapped = mapSalesPipelineStageName(s.name)
+      if (mapped && mapped !== 'lost') {
+        stageIdToInternal[s.id] = mapped
+      }
     }
   }
 
-  const opportunitiesRes = await fetch(
-    `${baseUrl}/opportunities/search?location_id=${locationId}&pipeline_id=${pipelineId}&limit=100`,
-    { headers }
-  )
-  if (!opportunitiesRes.ok) {
-    console.error('[GHL] Failed to fetch opportunities:', opportunitiesRes.status, await opportunitiesRes.text())
-    return null
-  }
-  const opportunitiesJson = await opportunitiesRes.json()
-  const opportunities: any[] = opportunitiesJson.opportunities || []
+  console.log('[GHL] Stage mappings:', Object.keys(stageIdToInternal).length, 'stages mapped')
 
+  // ── 4. Fetch opportunities from Marketing & Sales pipelines (paginated, max 20 pages each) ──
+  const allOpportunities: any[] = []
+
+  for (const pipeline of [marketingPipeline, salesPipeline].filter(Boolean)) {
+    let hasMore = true
+    let startAfterId = ''
+    let page = 0
+
+    while (hasMore && page < 20) {
+      const searchUrl = new URL(`${baseUrl}/opportunities/search`)
+      searchUrl.searchParams.set('location_id', locationId)
+      searchUrl.searchParams.set('pipeline_id', pipeline.id)
+      searchUrl.searchParams.set('limit', '100')
+      if (startAfterId) {
+        searchUrl.searchParams.set('startAfterId', startAfterId)
+      }
+
+      const res = await fetch(searchUrl.toString(), { headers })
+      if (!res.ok) {
+        console.error(`[GHL] Failed to fetch opportunities for ${pipeline.name}:`, res.status)
+        break
+      }
+
+      const json = await res.json()
+      const opps = json.opportunities || []
+      allOpportunities.push(...opps)
+
+      if (opps.length < 100) {
+        hasMore = false
+      } else {
+        startAfterId = opps[opps.length - 1]?.id || ''
+        page++
+      }
+    }
+
+    console.log(`[GHL] ${pipeline.name}: fetched opportunities`)
+  }
+
+  console.log('[GHL] Total opportunities fetched:', allOpportunities.length)
+
+  // ── 5. Fetch contacts ──
   const contactsRes = await fetch(
     `${baseUrl}/contacts/?locationId=${locationId}&limit=100&sortBy=dateAdded&order=desc`,
     { headers }
@@ -110,30 +175,20 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
   const contactsJson = contactsRes.ok ? await contactsRes.json() : { contacts: [] }
   const rawContacts: any[] = contactsJson.contacts || []
 
-  const filteredContacts = rawContacts.filter((c: any) => {
-    if (!c.customFields || !Array.isArray(c.customFields)) return false
-    return c.customFields.some(
-      (cf: any) =>
-        cf.key?.toLowerCase() === (process.env.GHL_CUSTOM_FIELD_NAME || 'Juan').toLowerCase() ||
-        cf.name?.toLowerCase() === (process.env.GHL_CUSTOM_FIELD_NAME || 'Juan').toLowerCase()
-    )
-  })
-
-  const contactsToUse = filteredContacts.length > 0 ? filteredContacts : rawContacts
-
+  // ── 6. Count stages ──
   const stageCounts: Record<PipelineStage, number> = {
     website_lead: 0, chatbot: 0, telefoon: 0, buitendienst: 0, sale: 0,
   }
 
-  for (const opp of opportunities) {
+  for (const opp of allOpportunities) {
     const internalStage = stageIdToInternal[opp.pipelineStageId]
-    if (internalStage) {
-      stageCounts[internalStage]++
-    } else {
-      stageCounts['website_lead']++
-    }
+    if (!internalStage) continue // Skip unmapped/lost stages
+    stageCounts[internalStage]++
   }
 
+  console.log('[GHL] Stage counts:', stageCounts)
+
+  // ── 7. Build pipeline response ──
   const pipeline: GhlPipelineStep[] = INTERNAL_STAGES.map(def => ({
     stage: def.stage,
     label: def.label,
@@ -141,15 +196,22 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
     description: def.description,
   }))
 
+  // ── 8. Map contacts to stages ──
   const contactStageMap: Record<string, PipelineStage> = {}
-  for (const opp of opportunities) {
+  for (const opp of allOpportunities) {
     const contactId = opp.contact?.id || opp.contactId
-    if (contactId) {
-      contactStageMap[contactId] = stageIdToInternal[opp.pipelineStageId] || 'website_lead'
+    if (contactId && stageIdToInternal[opp.pipelineStageId]) {
+      // Use the furthest-along stage for each contact
+      const current = contactStageMap[contactId]
+      const newStage = stageIdToInternal[opp.pipelineStageId]
+      const stageOrder: PipelineStage[] = ['website_lead', 'chatbot', 'telefoon', 'buitendienst', 'sale']
+      if (!current || stageOrder.indexOf(newStage) > stageOrder.indexOf(current)) {
+        contactStageMap[contactId] = newStage
+      }
     }
   }
 
-  const contacts: GhlContact[] = contactsToUse.map((c: any) => ({
+  const contacts: GhlContact[] = rawContacts.map((c: any) => ({
     id: c.id,
     naam: `${c.firstName || ''} ${c.lastName || ''}`.trim() || 'Onbekend',
     email: c.email || '',
@@ -161,16 +223,19 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
     laatsteActiviteit: c.lastActivity || c.dateUpdated || '',
   }))
 
+  // ── 9. Build daily stats ──
   const dailyMap: Record<string, { leads: number; afspraken: number; deals: number }> = {}
 
-  for (const opp of opportunities) {
+  for (const opp of allOpportunities) {
     const dateStr = (opp.createdAt || opp.dateAdded || '').substring(0, 10)
     if (!dateStr) continue
     if (!dailyMap[dateStr]) {
       dailyMap[dateStr] = { leads: 0, afspraken: 0, deals: 0 }
     }
-    dailyMap[dateStr].leads++
     const stage = stageIdToInternal[opp.pipelineStageId]
+    if (!stage) continue
+
+    dailyMap[dateStr].leads++
     if (stage === 'telefoon' || stage === 'buitendienst') {
       dailyMap[dateStr].afspraken++
     }
@@ -186,10 +251,11 @@ export async function fetchFromGhlApi(): Promise<SalesData | null> {
     return { date, label, ...dailyMap[date] }
   })
 
+  // ── 10. Totals ──
   const totalLeads = stageCounts.website_lead + stageCounts.chatbot + stageCounts.telefoon + stageCounts.buitendienst + stageCounts.sale
   const totalAfspraken = stageCounts.telefoon + stageCounts.buitendienst
   const totalDeals = stageCounts.sale
-  const totalOmzet = opportunities
+  const totalOmzet = allOpportunities
     .filter((o: any) => {
       const stage = stageIdToInternal[o.pipelineStageId]
       return stage === 'sale' || o.status === 'won'
