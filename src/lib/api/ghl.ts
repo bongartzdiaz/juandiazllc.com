@@ -4,10 +4,10 @@ import { API_BASE } from '../utils'
 // ── Our internal stage definitions (order matters for the funnel) ──
 
 const INTERNAL_STAGES: { stage: PipelineStage; label: string; description: string }[] = [
-  { stage: 'website_lead', label: 'Website lead', description: 'Totaal ingevulde formulieren' },
-  { stage: 'chatbot', label: 'Chatbot gesprek', description: 'WhatsApp-conversatie gestart' },
-  { stage: 'telefoon', label: 'Telefonische afspraak', description: 'Kwalificatiegesprek ingepland' },
-  { stage: 'buitendienst', label: 'Buitendienst afspraak', description: 'Fysiek adviesgesprek' },
+  { stage: 'website_lead', label: 'Website leads', description: 'Totaal ingevulde formulieren' },
+  { stage: 'chatbot', label: 'Chatbot gesprekken', description: 'WhatsApp-conversatie gestart' },
+  { stage: 'telefoon', label: 'Telefonische afspraken', description: 'Kwalificatiegesprek ingepland' },
+  { stage: 'buitendienst', label: 'Buitendienst afspraken', description: 'Fysiek adviesgesprek' },
   { stage: 'sale', label: 'Sale', description: 'Getekende overeenkomst' },
 ]
 

@@ -23,10 +23,10 @@ export function JourneyBar({ pipeline, loading }: Props) {
   }, [])
 
   const steps = pipeline.length > 0 ? pipeline : [
-    { stage: 'website_lead', label: 'Website lead', value: 0, description: '' },
-    { stage: 'chatbot', label: 'Chatbot', value: 0, description: '' },
-    { stage: 'telefoon', label: 'Telefoon', value: 0, description: '' },
-    { stage: 'buitendienst', label: 'Buitendienst', value: 0, description: '' },
+    { stage: 'website_lead', label: 'Website leads', value: 0, description: '' },
+    { stage: 'chatbot', label: 'Chatbot gesprekken', value: 0, description: '' },
+    { stage: 'telefoon', label: 'Telefonische afspraken', value: 0, description: '' },
+    { stage: 'buitendienst', label: 'Buitendienst afspraken', value: 0, description: '' },
     { stage: 'sale', label: 'Sale', value: 0, description: '' },
   ] as GhlPipelineStep[]
 

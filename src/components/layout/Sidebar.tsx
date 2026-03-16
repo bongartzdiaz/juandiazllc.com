@@ -68,7 +68,7 @@ export function Sidebar() {
         </div>
         <div>
           <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.025em' }}>
-            HMB<em style={{ color: 'var(--g)', fontStyle: 'normal' }}>ops</em>
+            HMB <em style={{ color: 'var(--g)', fontStyle: 'normal' }}>ops</em>
           </div>
           <div style={{ fontSize: 10, color: 'var(--txt3)', letterSpacing: '0.02em' }}>Energy Platform</div>
         </div>
