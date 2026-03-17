@@ -67,8 +67,8 @@ export function JourneyBar({ pipeline, loading, extra, period = 'maand', onPerio
   if (extra?.metaLeads !== undefined) {
     summaryItems.push({ label: 'Meta leads', value: String(extra.metaLeads), color: 'var(--b-txt)' })
   }
-  if (extra?.metaCpl !== undefined && extra.metaCpl > 0) {
-    summaryItems.push({ label: 'CPL', value: `€${Math.round(extra.metaCpl)}`, color: extra.metaCpl < 20 ? 'var(--g-txt)' : 'var(--o-txt)' })
+  if (extra?.metaCpl !== undefined) {
+    summaryItems.push({ label: 'CPL', value: extra.metaCpl > 0 ? `€${Math.round(extra.metaCpl)}` : '€0', color: extra.metaCpl > 0 && extra.metaCpl < 20 ? 'var(--g-txt)' : 'var(--o-txt)' })
   }
 
   // Chatbot totals

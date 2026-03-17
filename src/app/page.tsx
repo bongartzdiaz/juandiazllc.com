@@ -97,14 +97,14 @@ export default function DashboardPage() {
     const filteredDeals = filteredSales.reduce((s, d) => s + d.deals, 0)
 
     return {
-      metaSpend: metaSpend > 0 ? metaSpend : undefined,
-      metaLeads: metaLeads > 0 ? metaLeads : undefined,
-      metaCpl: metaLeads > 0 ? Math.round(metaSpend / metaLeads) : undefined,
-      chatbotGesprekken: chatGesprekken > 0 ? chatGesprekken : undefined,
-      chatbotGekwalificeerd: chatGekwalificeerd > 0 ? chatGekwalificeerd : undefined,
-      chatbotConversie: chatGesprekken > 0 ? Math.round((chatGekwalificeerd / chatGesprekken) * 100) : undefined,
+      metaSpend: metaSpend,
+      metaLeads: metaLeads,
+      metaCpl: metaLeads > 0 ? Math.round(metaSpend / metaLeads) : 0,
+      chatbotGesprekken: chatGesprekken,
+      chatbotGekwalificeerd: chatGekwalificeerd,
+      chatbotConversie: chatGesprekken > 0 ? Math.round((chatGekwalificeerd / chatGesprekken) * 100) : 0,
       omzet: undefined, // omzet has no daily breakdown
-      deals: filteredDeals > 0 ? filteredDeals : undefined,
+      deals: filteredDeals,
     }
   }, [journeyPeriod, meta.data, chatbot.data, sales.data])
 

@@ -335,9 +335,26 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
   // ── Enrich webhook contacts via DM Champ API ──
   const apiCache = await enrichWebhookContacts([...webhookPhones])
 
-  // ── Build conversations ──
+  // ── Build conversations from 3 sources: CSV, webhook events, API cache ──
   const allConversations: ChatConversation[] = []
   const processedPhones = new Set<string>()
+
+  // Helper: create conversation from API contact data
+  function conversationFromApi(apiData: ApiContact): ChatConversation {
+    const status = mapApiContactToStatus(apiData)
+    const naam = contactDisplayName(apiData.firstName, apiData.lastName)
+    const ts = new Date(apiData.lastActivityAt || apiData.createdAt)
+    return {
+      id: apiData.id,
+      naam,
+      status,
+      berichten: apiData.botMessageCount,
+      duur: apiData.channel === 'whatsapp' ? 'WhatsApp' : apiData.channel || '—',
+      onderwerp: apiData.tags.filter(t => !t.startsWith('Follow_') && !t.startsWith('followup_')).join(', ') || '—',
+      tijdstip: ts.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
+      datum: (apiData.createdAt || '').slice(0, 10),
+    }
+  }
 
   // 1. Process CSV contacts (historical baseline)
   for (const c of csvContacts) {
@@ -346,25 +363,25 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
 
     // Check if API has fresher data for this contact
     const apiData = c.phone ? apiCache.get(c.phone) : null
-    const status = apiData
-      ? mapApiContactToStatus(apiData)
-      : mapTagsToStatus(c.tags, c.doNotDisturb, c.markChatClosed, c.botMessageCount)
-    const naam = apiData
-      ? contactDisplayName(apiData.firstName, apiData.lastName)
-      : contactDisplayName(c.firstName, c.lastName)
-    const lastActivity = apiData?.lastActivityAt || c.lastActivityAt || c.createdAt
-    const ts = new Date(lastActivity)
+    if (apiData) {
+      allConversations.push(conversationFromApi(apiData))
+    } else {
+      const status = mapTagsToStatus(c.tags, c.doNotDisturb, c.markChatClosed, c.botMessageCount)
+      const naam = contactDisplayName(c.firstName, c.lastName)
+      const lastActivity = c.lastActivityAt || c.createdAt
+      const ts = new Date(lastActivity)
 
-    allConversations.push({
-      id: apiData?.id || c.contactId,
-      naam,
-      status,
-      berichten: apiData?.botMessageCount ?? c.botMessageCount,
-      duur: (apiData?.channel || c.channel) === 'whatsapp' ? 'WhatsApp' : (apiData?.channel || c.channel || '—'),
-      onderwerp: (apiData?.tags || c.tags).filter(t => !t.startsWith('Follow_') && !t.startsWith('followup_')).join(', ') || '—',
-      tijdstip: ts.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
-      datum: (c.createdAt || c.lastActivityAt || '').slice(0, 10),
-    })
+      allConversations.push({
+        id: c.contactId,
+        naam,
+        status,
+        berichten: c.botMessageCount,
+        duur: c.channel === 'whatsapp' ? 'WhatsApp' : c.channel || '—',
+        onderwerp: c.tags.filter(t => !t.startsWith('Follow_') && !t.startsWith('followup_')).join(', ') || '—',
+        tijdstip: ts.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
+        datum: (c.createdAt || c.lastActivityAt || '').slice(0, 10),
+      })
+    }
   }
 
   // 2. Add webhook/API contacts NOT in CSV (new leads since CSV export)
@@ -375,24 +392,8 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
     const apiData = apiCache.get(phone)
 
     if (apiData) {
-      // We have full API data — use it
-      // Only include if in the right campaign
       if (apiData.campaign && !apiData.campaign.includes('Thuisbatterij')) continue
-
-      const status = mapApiContactToStatus(apiData)
-      const naam = contactDisplayName(apiData.firstName, apiData.lastName)
-      const ts = new Date(apiData.lastActivityAt || apiData.createdAt)
-
-      allConversations.push({
-        id: apiData.id,
-        naam,
-        status,
-        berichten: apiData.botMessageCount,
-        duur: apiData.channel === 'whatsapp' ? 'WhatsApp' : apiData.channel || '—',
-        onderwerp: apiData.tags.filter(t => !t.startsWith('Follow_') && !t.startsWith('followup_')).join(', ') || '—',
-        tijdstip: ts.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
-        datum: (apiData.createdAt || '').slice(0, 10),
-      })
+      allConversations.push(conversationFromApi(apiData))
     } else {
       // Fallback: use webhook event data
       const latestEvent = webhookEvents
@@ -417,6 +418,17 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
         datum: (latestEvent.timestamp || '').slice(0, 10),
       })
     }
+  }
+
+  // 3. Add API cache contacts not yet processed (enriched but no CSV/webhook source)
+  for (const [phone, apiData] of apiCache.entries()) {
+    if (processedPhones.has(phone)) continue
+    processedPhones.add(phone)
+
+    // Only include Thuisbatterij campaign contacts
+    if (apiData.campaign && !apiData.campaign.includes('Thuisbatterij')) continue
+
+    allConversations.push(conversationFromApi(apiData))
   }
 
   // Sort: most recent activity first
