@@ -211,16 +211,22 @@ async function readCsvContacts(): Promise<CsvContact[]> {
     const lines = raw.split('\n').filter(l => l.trim())
     if (lines.length < 2) return []
 
-    // Skip header
+    // Parse header to build column index map (handles schema changes)
+    const headerFields = parseCsvLine(lines[0])
+    const col: Record<string, number> = {}
+    for (let i = 0; i < headerFields.length; i++) {
+      col[headerFields[i].trim()] = i
+    }
+
     const contacts: CsvContact[] = []
     for (let i = 1; i < lines.length; i++) {
       const fields = parseCsvLine(lines[i])
-      if (fields.length < 19) continue
+      if (fields.length < 10) continue
 
-      const firstName = fields[1] || ''
-      const lastName = fields[2] || ''
-      const email = fields[3] || ''
-      const phone = fields[4] || ''
+      const firstName = fields[col['First Name']] || ''
+      const lastName = fields[col['Last Name']] || ''
+      const email = fields[col['Email']] || ''
+      const phone = fields[col['Phone Number']] || ''
 
       // Skip test/dummy contacts
       if (email.includes('test@') || email.includes('@f01.nl') || email.includes('@f02.nl') || email.includes('@f03.nl')) continue
@@ -228,21 +234,21 @@ async function readCsvContacts(): Promise<CsvContact[]> {
       if (phone === '' && email === '') continue
 
       contacts.push({
-        contactId: fields[0],
+        contactId: fields[col['Contact ID']] || '',
         firstName,
         lastName,
         email,
         phone,
-        botMessageCount: parseInt(fields[5]) || 0,
-        channel: fields[6] || '',
-        creditsUsed: parseFloat(fields[7]) || 0,
-        campaign: fields[8] || '',
-        doNotDisturb: fields[9] === 'true',
-        isBotActive: fields[12] === 'true',
-        lastActivityAt: fields[13] || '',
-        markChatClosed: fields[14] === 'true',
-        tags: (fields[17] || '').split(';').map(t => t.trim()).filter(Boolean),
-        createdAt: fields[18] || '',
+        botMessageCount: parseInt(fields[col['Bot Message Count']]) || 0,
+        channel: fields[col['Channel']] || '',
+        creditsUsed: parseFloat(fields[col['Credits Used']]) || 0,
+        campaign: fields[col['Current Campaign']] || '',
+        doNotDisturb: fields[col['Do Not Disturb']] === 'true',
+        isBotActive: fields[col['Is Bot Active']] === 'true',
+        lastActivityAt: fields[col['Last Activity At']] || '',
+        markChatClosed: fields[col['Mark Chat Closed']] === 'true',
+        tags: (fields[col['Tags']] || '').split(';').map(t => t.trim()).filter(Boolean),
+        createdAt: fields[col['Created At']] || '',
       })
     }
     return contacts
