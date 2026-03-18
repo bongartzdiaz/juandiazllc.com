@@ -133,33 +133,37 @@ async function fetchContactFromApi(phone: string): Promise<ApiContact | null> {
   }
 }
 
-// ── Batch enrich: for webhook phones not in CSV, fetch from API (with cache) ──
-async function enrichWebhookContacts(phones: string[]): Promise<Map<string, ApiContact>> {
+// ── Batch enrich: fetch all phones from API (with cache) ──
+async function enrichAllContacts(phones: string[]): Promise<Map<string, ApiContact>> {
   const cache = await readApiCache()
   const now = Date.now()
   const toFetch: string[] = []
 
+  // Cache TTL: 30 min for existing, fetch all missing immediately
+  const CACHE_TTL = 30 * 60 * 1000
+
   for (const phone of phones) {
     const cached = cache.get(phone)
-    if (cached && (now - new Date(cached.fetchedAt).getTime()) < API_CACHE_MAX_AGE_MS) {
+    if (cached && (now - new Date(cached.fetchedAt).getTime()) < CACHE_TTL) {
       continue // fresh enough
     }
     toFetch.push(phone)
   }
 
-  // Fetch max 20 per request cycle to avoid rate limits
-  const batchSize = Math.min(toFetch.length, 20)
-  const fetching = toFetch.slice(0, batchSize)
+  if (toFetch.length > 0) {
+    // Process in batches of 10 (concurrent) to avoid rate limits
+    const BATCH_SIZE = 10
+    for (let i = 0; i < toFetch.length; i += BATCH_SIZE) {
+      const batch = toFetch.slice(i, i + BATCH_SIZE)
+      const results = await Promise.allSettled(
+        batch.map(phone => fetchContactFromApi(phone))
+      )
 
-  if (fetching.length > 0) {
-    const results = await Promise.allSettled(
-      fetching.map(phone => fetchContactFromApi(phone))
-    )
-
-    for (let i = 0; i < results.length; i++) {
-      const result = results[i]
-      if (result.status === 'fulfilled' && result.value) {
-        cache.set(fetching[i], result.value)
+      for (let j = 0; j < results.length; j++) {
+        const result = results[j]
+        if (result.status === 'fulfilled' && result.value) {
+          cache.set(batch[j], result.value)
+        }
       }
     }
 
@@ -318,22 +322,28 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
     }
   }
 
-  // Track which phones came from CSV
+  // ── Collect ALL unique phones from both sources ──
+  const allPhones = new Set<string>()
   const csvPhones = new Set<string>()
   for (const c of csvContacts) {
-    if (c.phone) csvPhones.add(c.phone)
-  }
-
-  // ── Collect unique webhook phones NOT in CSV ──
-  const webhookPhones = new Set<string>()
-  for (const e of webhookEvents) {
-    if (e.contactPhone && e.contactPhone.length > 5 && !csvPhones.has(e.contactPhone)) {
-      webhookPhones.add(e.contactPhone)
+    if (c.phone) {
+      csvPhones.add(c.phone)
+      allPhones.add(c.phone)
     }
   }
 
-  // ── Enrich webhook contacts via DM Champ API ──
-  const apiCache = await enrichWebhookContacts([...webhookPhones])
+  const webhookOnlyPhones = new Set<string>()
+  for (const e of webhookEvents) {
+    if (e.contactPhone && e.contactPhone.length > 5) {
+      allPhones.add(e.contactPhone)
+      if (!csvPhones.has(e.contactPhone)) {
+        webhookOnlyPhones.add(e.contactPhone)
+      }
+    }
+  }
+
+  // ── Enrich ALL known phones via DM Champ API (with 30-min cache) ──
+  const apiCache = await enrichAllContacts([...allPhones])
 
   // ── Build conversations from 3 sources: CSV, webhook events, API cache ──
   const allConversations: ChatConversation[] = []
@@ -356,9 +366,8 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
     }
   }
 
-  // 1. Process CSV contacts (historical baseline)
+  // 1. Process CSV contacts (all contacts in DM Champ account are HMB leads)
   for (const c of csvContacts) {
-    if (!c.campaign.includes('Thuisbatterijen')) continue
     if (c.phone) processedPhones.add(c.phone)
 
     // Check if API has fresher data for this contact
@@ -385,14 +394,14 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
   }
 
   // 2. Add webhook/API contacts NOT in CSV (new leads since CSV export)
-  for (const phone of webhookPhones) {
+  for (const phone of webhookOnlyPhones) {
     if (processedPhones.has(phone)) continue
     processedPhones.add(phone)
 
     const apiData = apiCache.get(phone)
 
     if (apiData) {
-      if (apiData.campaign && !apiData.campaign.includes('Thuisbatterij')) continue
+      // All DM Champ contacts are HMB leads (no campaign filter needed)
       allConversations.push(conversationFromApi(apiData))
     } else {
       // Fallback: use webhook event data
@@ -425,8 +434,7 @@ export async function fetchFromDmChampApi(): Promise<ChatbotData | null> {
     if (processedPhones.has(phone)) continue
     processedPhones.add(phone)
 
-    // Only include Thuisbatterij campaign contacts
-    if (apiData.campaign && !apiData.campaign.includes('Thuisbatterij')) continue
+    // All DM Champ contacts are HMB leads (no campaign filter needed)
 
     allConversations.push(conversationFromApi(apiData))
   }
