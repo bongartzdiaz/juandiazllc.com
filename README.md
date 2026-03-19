@@ -1,96 +1,96 @@
 # HMB Energy Ops Dashboard
 
-Marketing operations dashboard voor HMB Energy. Toont real-time data van Meta Ads, Google Ads, GoHighLevel (CRM) en DM Champ (chatbot).
+> Complete marketing operations dashboard — Meta Ads → WhatsApp Bot → GHL Sales Pipeline → Deals.
 
-**Live:** [skalo-ai.com/hmb-dashboard](http://skalo-ai.com/hmb-dashboard)
+## 📦 What's in this repo
 
-## Quick start
+### 🖥 Standalone Dashboards (open direct in browser)
 
+| File | Description |
+|------|-------------|
+| `hmb-dashboard-pro.html` | ⭐ **Main dashboard** — responsive, drag & drop, dual-theme, demo data |
+| `hmb-dashboard-v3.html` | Dual-theme preview (light/dark toggle) |
+| `hmb-dashboard-wow.html` | Original dark neon version |
+| `energie-website-agent-workflow.html` | Full agent workflow overview (energy website) |
+
+### ⚡ Next.js App (`src/`)
+
+Full Next.js 14 App Router project with:
+- Dashboard, Meta Ads, Google Ads, Chatbot, Sales, Agenda pages
+- Supabase integration, GHL API hooks, Meta/Google API connectors
+- Dual-theme design system (DM Sans + DM Mono)
+- TypeScript + Tailwind CSS
+
+### 🤖 Claude Code Sessies (`claude-code-sessies/`)
+
+6 ready-to-paste Claude Code prompts to build the full Next.js dashboard:
+
+| Sessie | Onderwerp |
+|--------|-----------|
+| Sessie 1 | Design systeem + CSS tokens + Sidebar + KPI componenten |
+| Sessie 2 | GHL Edge Functions + Supabase hooks |
+| Sessie 3 | Dashboard hoofdpagina volledig |
+| Sessie 4 | Meta Ads pagina |
+| Sessie 5 | Sales Kanban + Agenda buitendienst |
+| Sessie 6 | Animaties + performance + dual-theme audit |
+
+### 🛠 Agents & Skills (`agents-en-skills/`)
+
+| File | For |
+|------|-----|
+| `AGENT-NL.md` | Claude Code subagent — NL versie |
+| `AGENT-EN.md` | Claude Code subagent — EN version |
+| `SKILL-NL.md` | Claude.ai custom skill — NL |
+| `SKILL-EN.md` | Claude.ai custom skill — EN |
+
+### 📋 Claude Code Context
+
+| File | Description |
+|------|-------------|
+| `CLAUDE.md` | Master context — credentials, design tokens, DB schema, business logic |
+| `START-HIER.md` | Step-by-step guide to start building in Claude Code |
+
+## 🚀 Quick Start
+
+### Option A — Open standalone HTML
 ```bash
-# 1. Clone
-git clone https://github.com/bongartzdiaz/hmb-dashboard.git
-cd hmb-dashboard
+open hmb-dashboard-pro.html
+# Press E to enter edit mode, drag widgets, click titles to rename
+```
 
-# 2. Installeer dependencies
+### Option B — Run Next.js app
+```bash
 npm install
-
-# 3. Kopieer env en vul je API keys in
 cp .env.example .env.local
-
-# 4. Start dev server
+# Fill in your Supabase + API keys in .env.local
 npm run dev
 ```
 
-Open [http://localhost:3100/hmb-dashboard](http://localhost:3100/hmb-dashboard)
+## 🎨 Design System
 
-## Pagina's
+- **Light/Dark** dual-theme via `data-theme` attribute
+- **Fonts:** DM Sans (UI) + DM Mono (all numbers)
+- **Accents:** Green (success) · Orange (spend) · Amber (warning) · Red (error) · Blue (info)
+- All colors via CSS variables — never hardcoded
 
-| Route | Beschrijving |
-|-------|-------------|
-| `/` | Command Center — KPI's, journey, signalen, charts |
-| `/meta` | Meta Ads — campagnes, spend, CPL, budgetverdeling |
-| `/google` | Google Ads — zoekwoorden, conversies, CPA |
-| `/chatbot` | Chatbot — gesprekken, kwalificatie, reactietijd |
-| `/sales` | Sales (GHL) — pipeline, deals, omzet |
-| `/conversie` | Funnel — volledige journey, knelpunten, bronvergelijking |
-| `/agenda` | Agenda — weekoverzicht buitendienstafspraken |
+## 🔑 Tech Stack
 
-## Tech stack
+- **Frontend:** Next.js 14 App Router · TypeScript · Tailwind CSS
+- **Database:** Supabase (PostgreSQL)
+- **CRM:** GoHighLevel (GHL)
+- **WhatsApp Bot:** DM Champ
+- **Ads:** Meta Ads API · Google Ads API
+- **Hosting:** Digital Ocean App Platform
+- **Charts:** Recharts (Next.js) / Chart.js (standalone HTML)
 
-- **Next.js 16** (App Router, TypeScript)
-- **Recharts** voor grafieken
-- **Lucide React** voor iconen
-- CSS custom properties voor light/dark theme
-- Plus Jakarta Sans + JetBrains Mono fonts
+## 📊 Connected Systems
 
-## API integraties
+- GHL pipeline sync (leads, stages, agenda)
+- DM Champ WhatsApp webhook (conversations, analyses)
+- Meta Ads performance sync
+- Supabase SEO agents (articles, agent logs)
+- Daily Slack updates
 
-| Service | Env variabelen | Docs |
-|---------|---------------|------|
-| Meta Marketing API | `META_ACCESS_TOKEN`, `META_AD_ACCOUNT_ID` | [Meta API](https://developers.facebook.com/docs/marketing-apis/) |
-| Google Ads API | `GOOGLE_ADS_*` | [Google Ads API](https://developers.google.com/google-ads/api/) |
-| GoHighLevel | `GHL_API_KEY`, `GHL_LOCATION_ID` | [GHL API](https://highlevel.stoplight.io/) |
-| DM Champ | `DMCHAMP_API_KEY` | Interne API |
+---
 
-## Deployment (Digital Ocean)
-
-De app draait op een Digital Ocean droplet met PM2 + nginx.
-
-```bash
-# Build
-npm run build
-
-# Upload naar server
-scp -r .next package.json package-lock.json next.config.ts root@skalo-ai.com:/var/www/hmb-nextjs/
-
-# Op de server
-cd /var/www/hmb-nextjs
-npm install --production
-pm2 restart hmb-dashboard
-```
-
-Nginx proxied `/hmb-dashboard` naar `localhost:3100`.
-
-## Structuur
-
-```
-src/
-├── app/                  # Next.js pagina's en API routes
-│   ├── api/              # Backend API endpoints (meta, sales, chatbot, google)
-│   ├── meta/             # Meta Ads pagina
-│   ├── google/           # Google Ads pagina
-│   ├── chatbot/          # Chatbot pagina
-│   ├── sales/            # Sales pagina
-│   ├── conversie/        # Funnel pagina
-│   ├── agenda/           # Agenda pagina
-│   └── page.tsx          # Dashboard homepage
-├── components/
-│   ├── dashboard/        # Dashboard-specifieke componenten
-│   ├── layout/           # Sidebar, Topbar
-│   └── ui/               # Herbruikbare UI componenten (KpiCard, etc.)
-├── hooks/                # React hooks (useMetaAds, useSales, etc.)
-└── lib/
-    ├── api/              # API client functies
-    ├── types.ts          # TypeScript types
-    └── utils.ts          # Utility functies
-```
+*Private repo — HMB Energy Ops · 2026*

@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HMB Energy Ops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════ */
+:root {
+  --void:      #050607;
+  --deep:      #080B0D;
+  --surface:   #0D1117;
+  --raised:    #131920;
+  --elevated:  #192027;
+  --rim:       rgba(255,255,255,0.055);
+  --rim2:      rgba(255,255,255,0.10);
+  --fg:        #DDE4EC;
+  --fg2:       #8B99A8;
+  --muted:     #4A5568;
+
+  /* Neon palette */
+  --g:         #00FF88;   /* neon green primary */
+  --g2:        #00E676;
+  --g3:        #00C853;
+  --g-glow:    rgba(0,255,136,0.18);
+  --g-glow2:   rgba(0,255,136,0.06);
+
+  --o:         #FF6D2D;   /* solar orange */
+  --o2:        #FF8C42;
+  --o-glow:    rgba(255,109,45,0.18);
+  --o-glow2:   rgba(255,109,45,0.06);
+
+  --y:         #FFD23F;   /* amber / warning */
+  --r:         #FF3B4E;   /* red / danger */
+  --b:         #38BDF8;   /* info blue accent */
+
+  --sans:      'Space Grotesk', system-ui, sans-serif;
+  --mono:      'JetBrains Mono', 'Courier New', monospace;
+}
+
+/* ═══════════════════════════════════════════
+   RESET + BASE
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--void);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.55;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════
+   ATMOSPHERE LAYER
+═══════════════════════════════════════════ */
+
+/* Radial "energy field" behind everything */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 800px 500px at 15% 30%, rgba(0,255,136,0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 600px 400px at 85% 70%, rgba(255,109,45,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Micro-grid */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,255,136,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,136,0.022) 1px, transparent 1px);
+  background-size: 52px 52px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ═══════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════ */
+.layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════ */
+.sidebar {
+  width: 228px;
+  flex-shrink: 0;
+  background: rgba(13,17,23,0.92);
+  border-right: 1px solid var(--rim);
+  backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 20;
+  animation: slideInLeft 0.4s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-20px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+/* Logo */
+.logo-area {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--rim);
+  position: relative;
+  overflow: hidden;
+}
+.logo-area::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--g), transparent);
+  opacity: 0.5;
+}
+.logo-hex {
+  width: 34px; height: 34px;
+  position: relative;
+  flex-shrink: 0;
+}
+.logo-hex svg {
+  width: 34px; height: 34px;
+  filter: drop-shadow(0 0 8px var(--g));
+}
+.logo-name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.logo-name span { color: var(--g); }
+.logo-tag {
+  font-size: 9px;
+  font-family: var(--mono);
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: block;
+  margin-top: 2px;
+}
+
+/* Nav */
+.nav-scroll { flex: 1; overflow-y: auto; padding: 10px 10px 16px; }
+.nav-scroll::-webkit-scrollbar { display: none; }
+
+.nav-section { margin-bottom: 4px; }
+.nav-group-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  padding: 10px 10px 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--fg2);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 140ms ease;
+  position: relative;
+  margin-bottom: 1px;
+}
+.nav-item:hover {
+  background: var(--raised);
+  color: var(--fg);
+}
+.nav-item.active {
+  background: linear-gradient(135deg, rgba(0,255,136,0.08) 0%, rgba(0,255,136,0.03) 100%);
+  color: var(--fg);
+  border: 1px solid rgba(0,255,136,0.18);
+}
+.nav-item.active .ni { color: var(--g); filter: drop-shadow(0 0 4px var(--g)); }
+.ni {
+  font-size: 15px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.nav-badge {
+  margin-left: auto;
+  background: var(--r);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--mono);
+  padding: 1px 5px;
+  border-radius: 9px;
+  box-shadow: 0 0 8px rgba(255,59,78,0.4);
+}
+.nav-badge-g {
+  margin-left: auto;
+  background: var(--g-glow);
+  color: var(--g);
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--mono);
+  padding: 1px 6px;
+  border-radius: 9px;
+  border: 1px solid rgba(0,255,136,0.25);
+}
+
+.nav-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rim2), transparent);
+  margin: 8px 10px;
+}
+
+/* Sidebar footer */
+.sidebar-footer {
+  padding: 14px 16px;
+  border-top: 1px solid var(--rim);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--g3), var(--o));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #080B0D;
+  flex-shrink: 0;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 12px; font-weight: 600; }
+.user-role { font-size: 10px; color: var(--muted); }
+
+/* ═══════════════════════════════════════════
+   MAIN
+═══════════════════════════════════════════ */
+.main { margin-left: 228px; flex: 1; }
+
+/* Topbar */
+.topbar {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: rgba(8,11,13,0.80);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--rim);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  animation: fadeDown 0.3s ease 0.1s both;
+}
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-info h1 {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+.page-info p {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+.page-info p span { color: var(--g); }
+
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.live-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--g-glow2);
+  border: 1px solid rgba(0,255,136,0.2);
+  border-radius: 20px;
+  padding: 5px 11px;
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--g);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.pulse {
+  width: 6px; height: 6px;
+  background: var(--g);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--g);
+  animation: blink 1.4s ease-in-out infinite;
+}
+@keyframes blink {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.3; transform: scale(0.7); }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--sans);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 140ms;
+}
+.btn-outline {
+  background: transparent;
+  color: var(--fg2);
+  border: 1px solid var(--rim2);
+}
+.btn-outline:hover { background: var(--raised); color: var(--fg); }
+
+.btn-green {
+  background: var(--g);
+  color: #050607;
+  box-shadow: 0 0 20px rgba(0,255,136,0.25);
+}
+.btn-green:hover {
+  background: #33FF9E;
+  box-shadow: 0 0 30px rgba(0,255,136,0.4);
+  transform: translateY(-1px);
+}
+
+/* ═══════════════════════════════════════════
+   CONTENT
+═══════════════════════════════════════════ */
+.content { padding: 22px 24px 40px; }
+
+/* ═══════════════════════════════════════════
+   KPI STRIP
+═══════════════════════════════════════════ */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--rim);
+  border-radius: 12px;
+  padding: 17px 18px;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: border-color 200ms, transform 160ms, box-shadow 200ms;
+  animation: riseIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
+.kpi:nth-child(1) { animation-delay: 0.1s; }
+.kpi:nth-child(2) { animation-delay: 0.15s; }
+.kpi:nth-child(3) { animation-delay: 0.2s; }
+.kpi:nth-child(4) { animation-delay: 0.25s; }
+.kpi:nth-child(5) { animation-delay: 0.3s; }
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.kpi:hover {
+  transform: translateY(-2px);
+  border-color: var(--rim2);
+}
+.kpi.hot {
+  border-color: rgba(0,255,136,0.25);
+  box-shadow: 0 0 30px rgba(0,255,136,0.07), inset 0 0 30px rgba(0,255,136,0.02);
+}
+.kpi.hot::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--g), transparent);
+  opacity: 0.8;
+}
+.kpi.warn {
+  border-color: rgba(255,109,45,0.25);
+  box-shadow: 0 0 20px rgba(255,109,45,0.06);
+}
+
+.kpi-icon {
+  font-size: 18px;
+  margin-bottom: 10px;
+  display: block;
+}
+.kpi-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.kpi-val {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.kpi.hot .kpi-val {
+  color: var(--g);
+  text-shadow: 0 0 28px rgba(0,255,136,0.45);
+}
+.kpi.warn .kpi-val { color: var(--o); }
+
+.kpi-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-family: var(--mono);
+}
+.up   { color: var(--g); }
+.down { color: var(--r); }
+.neu  { color: var(--muted); }
+.kpi-goal {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 3px;
+  font-family: var(--mono);
+}
+
+/* ═══════════════════════════════════════════
+   MAIN GRID
+═══════════════════════════════════════════ */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.right-col { display: flex; flex-direction: column; gap: 16px; }
+
+/* ═══════════════════════════════════════════
+   CARD BASE
+═══════════════════════════════════════════ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--rim);
+  border-radius: 12px;
+  overflow: hidden;
+  animation: riseIn 0.5s cubic-bezier(0.16,1,0.3,1) 0.3s both;
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--rim);
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+}
+.dot-g { background: var(--g); box-shadow: 0 0 8px var(--g); }
+.dot-o { background: var(--o); box-shadow: 0 0 8px var(--o); }
+.dot-r { background: var(--r); box-shadow: 0 0 8px var(--r); }
+.dot-b { background: var(--b); box-shadow: 0 0 8px var(--b); }
+.card-body { padding: 18px; }
+
+/* ═══════════════════════════════════════════
+   FUNNEL FLOW
+═══════════════════════════════════════════ */
+.funnel-wrap { padding: 20px 18px 8px; }
+
+.funnel-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.funnel-box {
+  flex: 1;
+  background: var(--raised);
+  border: 1px solid var(--rim);
+  border-radius: 9px;
+  padding: 12px 14px;
+  text-align: center;
+  transition: all 200ms;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+.funnel-box::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+}
+.funnel-box.f-top::before  { background: var(--b);  }
+.funnel-box.f-mid::before  { background: var(--y);  }
+.funnel-box.f-end::before  { background: var(--g);
+  box-shadow: 0 0 12px var(--g); }
+.funnel-box:hover { border-color: var(--rim2); transform: translateY(-1px); }
+
+.funnel-n {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.funnel-lbl { font-size: 10px; color: var(--fg2); }
+
+.arrow-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 2px;
+}
+.arrow-pct {
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+.arrow-svg { color: var(--muted); font-size: 14px; }
+
+/* funnel bar chart below */
+.funnel-bars { padding: 0 18px 18px; display: flex; flex-direction: column; gap: 6px; }
+.fbar-row { display: flex; align-items: center; gap: 10px; }
+.fbar-label { font-size: 11px; color: var(--fg2); min-width: 110px; }
+.fbar-track { flex: 1; height: 6px; background: var(--raised); border-radius: 3px; overflow: hidden; }
+.fbar-fill  { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(0.16,1,0.3,1); }
+.fbar-fill.g { background: linear-gradient(90deg, var(--g3), var(--g)); box-shadow: 0 0 8px rgba(0,255,136,0.35); }
+.fbar-fill.o { background: linear-gradient(90deg, #e05500, var(--o)); box-shadow: 0 0 8px rgba(255,109,45,0.35); }
+.fbar-fill.y { background: linear-gradient(90deg, #c88b00, var(--y)); }
+.fbar-fill.r { background: linear-gradient(90deg, #cc1122, var(--r)); }
+.fbar-val { font-family: var(--mono); font-size: 11px; font-weight: 700; min-width: 28px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ═══════════════════════════════════════════
+   ALERTS
+═══════════════════════════════════════════ */
+.alert-list { display: flex; flex-direction: column; gap: 8px; padding: 14px; }
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 13px;
+  border-radius: 8px;
+  border-left: 3px solid;
+  position: relative;
+  overflow: hidden;
+}
+.alert-crit  { background: rgba(255,59,78,0.06); border-color: var(--r); animation: glow-red 2.5s ease-in-out infinite; }
+.alert-warn  { background: rgba(255,109,45,0.06); border-color: var(--o); }
+.alert-ok    { background: rgba(0,255,136,0.05); border-color: var(--g); }
+
+@keyframes glow-red {
+  0%,100% { box-shadow: none; }
+  50%      { box-shadow: 0 0 12px rgba(255,59,78,0.15); }
+}
+
+.alert-em { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.alert-body { flex: 1; }
+.alert-msg { font-size: 12px; font-weight: 700; }
+.alert-sub { font-size: 11px; color: var(--fg2); margin-top: 1px; }
+.alert-cta {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  border: 1px solid var(--rim2);
+  padding: 3px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  align-self: center;
+  transition: all 120ms;
+}
+.alert-cta:hover { color: var(--fg); border-color: var(--fg2); }
+
+/* ═══════════════════════════════════════════
+   GOALS
+═══════════════════════════════════════════ */
+.goals-list { padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+.goal {}
+.goal-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.goal-name { font-size: 12px; font-weight: 600; }
+.goal-frac { font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; }
+.goal-track { height: 5px; background: var(--raised); border-radius: 3px; overflow: hidden; margin-bottom: 3px; }
+.goal-fill { height: 100%; border-radius: 3px; transition: width 1.2s cubic-bezier(0.16,1,0.3,1); }
+.goal-fill.gf { background: linear-gradient(90deg, var(--g3), var(--g)); box-shadow: 0 0 10px rgba(0,255,136,0.4); }
+.goal-fill.of { background: linear-gradient(90deg, #c04400, var(--o)); }
+.goal-fill.yf { background: linear-gradient(90deg, #b07800, var(--y)); }
+.goal-fill.rf { background: var(--r); }
+.goal-note { font-size: 10px; color: var(--muted); }
+
+/* ═══════════════════════════════════════════
+   BOTTOM GRID
+═══════════════════════════════════════════ */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* ═══════════════════════════════════════════
+   CHART AREA
+═══════════════════════════════════════════ */
+.chart-wrap { padding: 18px; height: 210px; position: relative; }
+
+/* ═══════════════════════════════════════════
+   ADS TABLE
+═══════════════════════════════════════════ */
+.tabs-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--raised);
+  border-radius: 8px;
+  padding: 3px;
+}
+.tab-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--muted);
+  transition: all 120ms;
+  border: none;
+  background: transparent;
+  font-family: var(--sans);
+}
+.tab-btn.on {
+  background: var(--surface);
+  color: var(--fg);
+}
+
+.tbl { width: 100%; border-collapse: collapse; }
+.tbl th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--rim);
+}
+.tbl td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--rim);
+  font-size: 12px;
+  vertical-align: middle;
+}
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: var(--raised); }
+
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.fg-g { color: var(--g); }
+.fg-o { color: var(--o); }
+.fg-y { color: var(--y); }
+.fg-r { color: var(--r); }
+.fg-m { color: var(--muted); }
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+.bg-green  { background: rgba(0,255,136,0.1); color: var(--g); border: 1px solid rgba(0,255,136,0.2); }
+.bg-orange { background: rgba(255,109,45,0.1); color: var(--o); border: 1px solid rgba(255,109,45,0.2); }
+.bg-amber  { background: rgba(255,210,63,0.1); color: var(--y); border: 1px solid rgba(255,210,63,0.2); }
+.bg-red    { background: rgba(255,59,78,0.1); color: var(--r); border: 1px solid rgba(255,59,78,0.2); }
+.bg-muted  { background: var(--raised); color: var(--muted); border: 1px solid var(--rim); }
+
+/* Sparkline bars */
+.spark { display: flex; align-items: flex-end; gap: 2px; height: 24px; }
+.spark-b {
+  width: 5px;
+  border-radius: 2px;
+  transition: height 0.4s;
+}
+
+/* ═══════════════════════════════════════════
+   FUNNEL CHIPS ROW
+═══════════════════════════════════════════ */
+.funnel-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 18px 16px; }
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--raised);
+  border: 1px solid var(--rim);
+  border-radius: 7px;
+  padding: 6px 11px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 140ms;
+}
+.chip:hover { border-color: var(--rim2); transform: translateY(-1px); }
+.chip-name { font-weight: 600; color: var(--fg2); }
+.chip-cpl  { font-family: var(--mono); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ═══════════════════════════════════════════
+   SECTION LABEL
+═══════════════════════════════════════════ */
+.section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::after {
+  content: '';
+  display: block;
+  height: 1px;
+  width: 36px;
+  background: linear-gradient(90deg, var(--rim2), transparent);
+}
+
+/* ═══════════════════════════════════════════
+   SCROLLBAR GLOBAL
+═══════════════════════════════════════════ */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--raised); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar">
+  <div class="logo-area">
+    <div class="logo-hex">
+      <svg viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="17,2 31,9.5 31,24.5 17,32 3,24.5 3,9.5" fill="rgba(0,255,136,0.08)" stroke="#00FF88" stroke-width="1.2"/>
+        <text x="17" y="22" text-anchor="middle" fill="#00FF88" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700">H</text>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-name">HMB<span>ops</span></div>
+      <span class="logo-tag">Energy Platform</span>
+    </div>
+  </div>
+
+  <nav class="nav-scroll">
+    <div class="nav-section">
+      <div class="nav-group-label">Primair</div>
+      <div class="nav-item active">
+        <span class="ni">⬡</span> Dashboard
+      </div>
+      <div class="nav-item">
+        <span class="ni">◈</span> Meta Ads
+        <span class="nav-badge">3</span>
+      </div>
+      <div class="nav-item">
+        <span class="ni">◉</span> Google Ads
+      </div>
+      <div class="nav-item">
+        <span class="ni">⬡</span> Chatbot
+        <span class="nav-badge">7</span>
+      </div>
+      <div class="nav-item">
+        <span class="ni">◈</span> Sales (GHL)
+      </div>
+    </div>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-section">
+      <div class="nav-group-label">Analyse</div>
+      <div class="nav-item">
+        <span class="ni">◉</span> Funnel
+      </div>
+      <div class="nav-item">
+        <span class="ni">◈</span> Rapporten
+      </div>
+      <div class="nav-item">
+        <span class="ni">⬡</span> Content
+      </div>
+    </div>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-section">
+      <div class="nav-group-label">Systeem</div>
+      <div class="nav-item">
+        <span class="ni">◉</span> Agents
+      </div>
+      <div class="nav-item">
+        <span class="ni">◈</span> SEO
+      </div>
+      <div class="nav-item">
+        <span class="ni">⬡</span> Agenda
+        <span class="nav-badge-g">Nieuw</span>
+      </div>
+      <div class="nav-item">
+        <span class="ni">◉</span> Instellingen
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="avatar">JV</div>
+    <div class="user-info">
+      <div class="user-name">Juan</div>
+      <div class="user-role">Admin · HMB</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══════════ MAIN ══════════ -->
+<main class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="page-info">
+      <h1>Command Center</h1>
+      <p>Ad → Lead → Afspraak → Deal <span>// Alle funnels</span></p>
+    </div>
+    <div class="topbar-right">
+      <div class="live-chip">
+        <div class="pulse"></div>
+        LIVE · 2 min
+      </div>
+      <button class="btn btn-outline">↺ Sync GHL</button>
+      <button class="btn btn-green">+ Lead</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── KPI STRIP ── -->
+    <div class="kpi-strip">
+
+      <div class="kpi">
+        <span class="kpi-icon">⚡</span>
+        <div class="kpi-label">Leads vandaag</div>
+        <div class="kpi-val" id="kv1">47</div>
+        <div class="kpi-meta up">↑ +12% vs gisteren</div>
+      </div>
+
+      <div class="kpi warn">
+        <span class="kpi-icon">💰</span>
+        <div class="kpi-label">CPL Meta</div>
+        <div class="kpi-val">€14</div>
+        <div class="kpi-meta up">↓ -18% vs vorige week</div>
+        <div class="kpi-goal">Doel &lt; €20</div>
+      </div>
+
+      <div class="kpi">
+        <span class="kpi-icon">🤖</span>
+        <div class="kpi-label">Bot conversie</div>
+        <div class="kpi-val">16%</div>
+        <div class="kpi-meta up">↑ +3% verbeterd</div>
+        <div class="kpi-goal">Min. 10%</div>
+      </div>
+
+      <div class="kpi">
+        <span class="kpi-icon">📅</span>
+        <div class="kpi-label">Afspraken week</div>
+        <div class="kpi-val">24</div>
+        <div class="kpi-meta neu">24 / 40 doel</div>
+      </div>
+
+      <div class="kpi hot">
+        <span class="kpi-icon">🔥</span>
+        <div class="kpi-label">Deals maand</div>
+        <div class="kpi-val">14</div>
+        <div class="kpi-meta up">14 / 15 — bijna!</div>
+        <div class="kpi-goal">93% van doel</div>
+      </div>
+
+    </div><!-- /kpi-strip -->
+
+    <!-- ── MAIN GRID ── -->
+    <div class="main-grid">
+
+      <!-- Left: Funnel -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">
+            <span class="dot dot-b"></span>
+            Journey — Meta klik tot Deal
+          </div>
+          <span class="badge bg-muted">Laatste 30 dagen</span>
+        </div>
+
+        <!-- Flow -->
+        <div class="funnel-wrap">
+          <div class="funnel-row">
+            <div class="funnel-box f-top">
+              <div class="funnel-n" style="color:var(--b)">1.247</div>
+              <div class="funnel-lbl">Meta klik</div>
+            </div>
+            <div class="arrow-block">
+              <div class="arrow-pct fg-y">32%</div>
+              <div class="arrow-svg">→</div>
+            </div>
+            <div class="funnel-box f-top">
+              <div class="funnel-n" style="color:var(--b)">399</div>
+              <div class="funnel-lbl">WhatsApp</div>
+            </div>
+            <div class="arrow-block">
+              <div class="arrow-pct fg-g">45%</div>
+              <div class="arrow-svg">→</div>
+            </div>
+            <div class="funnel-box f-mid">
+              <div class="funnel-n" style="color:var(--y)">178</div>
+              <div class="funnel-lbl">Gekwalif.</div>
+            </div>
+            <div class="arrow-block">
+              <div class="arrow-pct fg-y">40%</div>
+              <div class="arrow-svg">→</div>
+            </div>
+            <div class="funnel-box f-mid">
+              <div class="funnel-n" style="color:var(--o)">72</div>
+              <div class="funnel-lbl">Afspraak</div>
+            </div>
+            <div class="arrow-block">
+              <div class="arrow-pct fg-g">50%</div>
+              <div class="arrow-svg">→</div>
+            </div>
+            <div class="funnel-box f-end">
+              <div class="funnel-n" style="color:var(--g);text-shadow:0 0 18px rgba(0,255,136,0.5)">36</div>
+              <div class="funnel-lbl">Deal ✓</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Funnel bars per stap -->
+        <div class="funnel-bars">
+          <div class="fbar-row">
+            <span class="fbar-label">Meta → WhatsApp</span>
+            <div class="fbar-track"><div class="fbar-fill y" id="fb1" style="width:0%"></div></div>
+            <span class="fbar-val fg-y">32%</span>
+          </div>
+          <div class="fbar-row">
+            <span class="fbar-label">WA → Gekwalif.</span>
+            <div class="fbar-track"><div class="fbar-fill g" id="fb2" style="width:0%"></div></div>
+            <span class="fbar-val fg-g">45%</span>
+          </div>
+          <div class="fbar-row">
+            <span class="fbar-label">Gekwalif. → Afspr.</span>
+            <div class="fbar-track"><div class="fbar-fill y" id="fb3" style="width:0%"></div></div>
+            <span class="fbar-val fg-y">40%</span>
+          </div>
+          <div class="fbar-row">
+            <span class="fbar-label">Afspraak → Deal</span>
+            <div class="fbar-track"><div class="fbar-fill g" id="fb4" style="width:0%"></div></div>
+            <span class="fbar-val fg-g">50%</span>
+          </div>
+        </div>
+
+        <!-- 7 Funnels -->
+        <div class="card-head" style="border-top:1px solid var(--rim); border-bottom:none; padding: 12px 18px;">
+          <div class="card-title" style="font-size:11px;color:var(--muted)">7 ACTIEVE FUNNELS</div>
+        </div>
+        <div class="funnel-chips">
+          <div class="chip">
+            <span class="chip-name">F1 · Batterij</span>
+            <span class="chip-cpl fg-g">€12</span>
+            <span class="badge bg-green" style="font-size:9px;padding:1px 5px">goed</span>
+          </div>
+          <div class="chip">
+            <span class="chip-name">F2 · Solar</span>
+            <span class="chip-cpl fg-g">€15</span>
+            <span class="badge bg-green" style="font-size:9px;padding:1px 5px">goed</span>
+          </div>
+          <div class="chip">
+            <span class="chip-name">F3 · Combi</span>
+            <span class="chip-cpl fg-y">€22</span>
+            <span class="badge bg-amber" style="font-size:9px;padding:1px 5px">test</span>
+          </div>
+          <div class="chip">
+            <span class="chip-name">F4 · Retarget</span>
+            <span class="chip-cpl fg-o">€18</span>
+            <span class="badge bg-orange" style="font-size:9px;padding:1px 5px">ok</span>
+          </div>
+          <div class="chip">
+            <span class="chip-name">F5 · Koude</span>
+            <span class="chip-cpl fg-r">€34</span>
+            <span class="badge bg-red" style="font-size:9px;padding:1px 5px">slecht</span>
+          </div>
+          <div class="chip">
+            <span class="chip-name">F6 · Video</span>
+            <span class="chip-cpl fg-y">€20</span>
+            <span class="badge bg-amber" style="font-size:9px;padding:1px 5px">test</span>
+          </div>
+          <div class="chip">
+            <span class="chip-name">F7 · Lookalike</span>
+            <span class="chip-cpl fg-g">€13</span>
+            <span class="badge bg-green" style="font-size:9px;padding:1px 5px">goed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right col -->
+      <div class="right-col">
+
+        <!-- Alerts -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title"><span class="dot dot-r"></span>Signalen</div>
+            <span class="badge bg-muted">3 actief</span>
+          </div>
+          <div class="alert-list">
+            <div class="alert alert-ok">
+              <span class="alert-em">🔥</span>
+              <div class="alert-body">
+                <div class="alert-msg" style="color:var(--g)">F1 draait op CPL €12</div>
+                <div class="alert-sub">Beste funnel — scaal budget</div>
+              </div>
+              <div class="alert-cta">Bekijk</div>
+            </div>
+            <div class="alert alert-warn">
+              <span class="alert-em">⚠️</span>
+              <div class="alert-body">
+                <div class="alert-msg" style="color:var(--o)">F5 CPL €34 — te hoog</div>
+                <div class="alert-sub">Pauzeer of pas creative aan</div>
+              </div>
+              <div class="alert-cta">Fix</div>
+            </div>
+            <div class="alert alert-crit">
+              <span class="alert-em">🚨</span>
+              <div class="alert-body">
+                <div class="alert-msg" style="color:var(--r)">7 chatbot chats wachten</div>
+                <div class="alert-sub">Human handoff vereist</div>
+              </div>
+              <div class="alert-cta">Nu</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Goals -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title"><span class="dot dot-g"></span>Maanddoelen</div>
+            <span class="badge bg-muted" style="font-family:var(--mono);font-size:9px">18d over</span>
+          </div>
+          <div class="goals-list">
+            <div class="goal">
+              <div class="goal-head">
+                <span class="goal-name">Leads</span>
+                <span class="goal-frac fg-y">87 / 120</span>
+              </div>
+              <div class="goal-track"><div class="goal-fill yf" id="gf1" style="width:0%"></div></div>
+              <div class="goal-note">73% — op schema</div>
+            </div>
+            <div class="goal">
+              <div class="goal-head">
+                <span class="goal-name">Afspraken</span>
+                <span class="goal-frac fg-o">24 / 40</span>
+              </div>
+              <div class="goal-track"><div class="goal-fill of" id="gf2" style="width:0%"></div></div>
+              <div class="goal-note" style="color:var(--r)">⚠ Achter op schema</div>
+            </div>
+            <div class="goal">
+              <div class="goal-head">
+                <span class="goal-name">Deals</span>
+                <span class="goal-frac fg-g">14 / 15</span>
+              </div>
+              <div class="goal-track"><div class="goal-fill gf" id="gf3" style="width:0%"></div></div>
+              <div class="goal-note" style="color:var(--g)">🔥 93% — bijna doel!</div>
+            </div>
+            <div class="goal">
+              <div class="goal-head">
+                <span class="goal-name">Omzet</span>
+                <span class="goal-frac fg-o">€28K / €45K</span>
+              </div>
+              <div class="goal-track"><div class="goal-fill of" id="gf4" style="width:0%"></div></div>
+              <div class="goal-note">€17K nog te gaan</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /right-col -->
+    </div><!-- /main-grid -->
+
+    <!-- ── BOTTOM GRID: Chart + Table ── -->
+    <div class="bottom-grid">
+
+      <!-- CPL Trend Chart -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><span class="dot dot-o"></span>CPL Trend — Laatste 14 dagen</div>
+          <div class="tabs-row">
+            <button class="tab-btn on">Meta</button>
+            <button class="tab-btn">Google</button>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="cplChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Leads per dag Chart -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><span class="dot dot-g"></span>Leads per dag</div>
+          <span class="badge bg-green">+23% vs vorige week</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="leadsChart"></canvas>
+        </div>
+      </div>
+
+    </div><!-- /bottom-grid -->
+
+    <!-- ── ADS TABLE ── -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title"><span class="dot dot-o"></span>Meta Ads — Top campagnes</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="tabs-row">
+            <button class="tab-btn on">NL</button>
+            <button class="tab-btn">BE (archief)</button>
+          </div>
+          <button class="btn btn-outline" style="font-size:11px;">Alle campagnes →</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Campagne</th>
+              <th>Funnel</th>
+              <th>Status</th>
+              <th>Spend</th>
+              <th>CTR</th>
+              <th>CPL</th>
+              <th>Leads</th>
+              <th>Trend (7d)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>F1 Thuisbatterij — Interesse NL</td>
+              <td><span class="badge bg-muted">F1</span></td>
+              <td><span class="badge bg-green">● Goed</span></td>
+              <td class="mono fg-o">€1.284</td>
+              <td class="mono fg-g">2.4%</td>
+              <td class="mono fg-g">€12</td>
+              <td class="mono">107</td>
+              <td>
+                <div class="spark">
+                  <div class="spark-b" style="height:40%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:55%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:50%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:70%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:65%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:85%;background:var(--g3)"></div>
+                  <div class="spark-b" style="height:100%;background:var(--g);box-shadow:0 0 6px rgba(0,255,136,0.4)"></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>F7 Lookalike — Zonnepanelen</td>
+              <td><span class="badge bg-muted">F7</span></td>
+              <td><span class="badge bg-green">● Goed</span></td>
+              <td class="mono fg-o">€876</td>
+              <td class="mono fg-g">1.8%</td>
+              <td class="mono fg-g">€13</td>
+              <td class="mono">67</td>
+              <td>
+                <div class="spark">
+                  <div class="spark-b" style="height:50%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:45%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:65%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:70%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:80%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:75%;background:var(--g3)"></div>
+                  <div class="spark-b" style="height:88%;background:var(--g)"></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>F4 Retarget — 30 dagen</td>
+              <td><span class="badge bg-muted">F4</span></td>
+              <td><span class="badge bg-orange">● OK</span></td>
+              <td class="mono fg-o">€654</td>
+              <td class="mono fg-y">1.1%</td>
+              <td class="mono fg-o">€18</td>
+              <td class="mono">36</td>
+              <td>
+                <div class="spark">
+                  <div class="spark-b" style="height:60%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:65%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:55%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:70%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:60%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:68%;background:var(--o)"></div>
+                  <div class="spark-b" style="height:72%;background:var(--o)"></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>F3 Combi Deal — Test</td>
+              <td><span class="badge bg-muted">F3</span></td>
+              <td><span class="badge bg-amber">● Testfase</span></td>
+              <td class="mono fg-m">€38</td>
+              <td class="mono fg-m">0.9%</td>
+              <td class="mono fg-m">—</td>
+              <td class="mono">4</td>
+              <td>
+                <div class="spark">
+                  <div class="spark-b" style="height:30%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:40%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:35%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:50%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:45%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:55%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:60%;background:var(--raised)"></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>F5 Koude Traffic — Video</td>
+              <td><span class="badge bg-muted">F5</span></td>
+              <td><span class="badge bg-red">● Slecht</span></td>
+              <td class="mono fg-o">€523</td>
+              <td class="mono fg-r">0.3%</td>
+              <td class="mono fg-r">€34</td>
+              <td class="mono">15</td>
+              <td>
+                <div class="spark">
+                  <div class="spark-b" style="height:80%;background:var(--r)"></div>
+                  <div class="spark-b" style="height:65%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:55%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:50%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:45%;background:var(--raised)"></div>
+                  <div class="spark-b" style="height:35%;background:var(--r)"></div>
+                  <div class="spark-b" style="height:25%;background:var(--r)"></div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /ads table card -->
+
+  </div><!-- /content -->
+</main>
+
+</div><!-- /layout -->
+
+<script>
+/* ═══════════════════════════════════════════
+   ANIMATIONS ON LOAD
+═══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+
+  // Animate funnel bars
+  const fbarData = [
+    { id: 'fb1', pct: 32 },
+    { id: 'fb2', pct: 45 },
+    { id: 'fb3', pct: 40 },
+    { id: 'fb4', pct: 50 },
+  ];
+  fbarData.forEach((d, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(d.id);
+      if (el) el.style.width = d.pct + '%';
+    }, 400 + i * 120);
+  });
+
+  // Animate goal bars
+  const goalData = [
+    { id: 'gf1', pct: 72.5 },
+    { id: 'gf2', pct: 60 },
+    { id: 'gf3', pct: 93 },
+    { id: 'gf4', pct: 62 },
+  ];
+  goalData.forEach((d, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(d.id);
+      if (el) el.style.width = d.pct + '%';
+    }, 500 + i * 100);
+  });
+
+  /* ── CPL Chart ── */
+  const cplCtx = document.getElementById('cplChart').getContext('2d');
+  const days = ['1/3','2/3','3/3','4/3','5/3','6/3','7/3','8/3','9/3','10/3','11/3','12/3','13/3','14/3'];
+  const cplData = [28,25,22,26,20,19,18,21,17,16,18,15,14,14];
+
+  const gradG = cplCtx.createLinearGradient(0, 0, 0, 180);
+  gradG.addColorStop(0, 'rgba(255,109,45,0.25)');
+  gradG.addColorStop(1, 'rgba(255,109,45,0)');
+
+  new Chart(cplCtx, {
+    type: 'line',
+    data: {
+      labels: days,
+      datasets: [{
+        data: cplData,
+        borderColor: '#FF6D2D',
+        borderWidth: 2,
+        fill: true,
+        backgroundColor: gradG,
+        tension: 0.4,
+        pointRadius: 3,
+        pointBackgroundColor: '#FF6D2D',
+        pointBorderColor: '#050607',
+        pointBorderWidth: 2,
+        pointHoverRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#131920',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          titleColor: '#8B99A8',
+          bodyColor: '#FF6D2D',
+          padding: 10,
+          callbacks: {
+            label: ctx => `  CPL: €${ctx.parsed.y}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false },
+          ticks: { color: '#4A5568', font: { family: "'JetBrains Mono'", size: 10 } }
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+          ticks: {
+            color: '#4A5568',
+            font: { family: "'JetBrains Mono'", size: 10 },
+            callback: v => '€' + v
+          },
+          min: 10,
+          suggestedMax: 35,
+        }
+      },
+      animation: { duration: 1200, easing: 'easeOutQuart' }
+    }
+  });
+
+  // Reference line: €25 doel (manual annotation via dataset)
+  // Drawn as second dataset
+  cplCtx.canvas.parentElement.style.position = 'relative';
+
+  /* ── Leads Chart ── */
+  const leadsCtx = document.getElementById('leadsChart').getContext('2d');
+  const leadsData = [22, 31, 28, 35, 41, 38, 44, 39, 48, 52, 47, 56, 51, 47];
+
+  const gradL = leadsCtx.createLinearGradient(0, 0, 0, 180);
+  gradL.addColorStop(0, 'rgba(0,255,136,0.3)');
+  gradL.addColorStop(1, 'rgba(0,255,136,0)');
+
+  new Chart(leadsCtx, {
+    type: 'bar',
+    data: {
+      labels: days,
+      datasets: [{
+        data: leadsData,
+        backgroundColor: leadsData.map((v, i) =>
+          i === leadsData.length - 1 ? '#00FF88' : 'rgba(0,200,83,0.45)'
+        ),
+        borderRadius: 4,
+        borderSkipped: false,
+        hoverBackgroundColor: '#00FF88',
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#131920',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          titleColor: '#8B99A8',
+          bodyColor: '#00FF88',
+          padding: 10,
+          callbacks: {
+            label: ctx => `  Leads: ${ctx.parsed.y}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: '#4A5568', font: { family: "'JetBrains Mono'", size: 10 } }
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+          ticks: { color: '#4A5568', font: { family: "'JetBrains Mono'", size: 10 } }
+        }
+      },
+      animation: {
+        duration: 1000,
+        easing: 'easeOutQuart',
+        delay: ctx => ctx.dataIndex * 40
+      }
+    }
+  });
+
+});
+</script>
+</body>
+</html>
