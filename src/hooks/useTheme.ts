@@ -7,14 +7,14 @@ export function useTheme() {
   const [theme, setTheme] = useState<Theme>('light')
 
   useEffect(() => {
-    const saved = (localStorage.getItem('hmb-theme') as Theme) ?? 'light'
+    const saved = (localStorage.getItem('pai-theme') as Theme) ?? 'light'
     apply(saved)
   }, [])
 
   const apply = (t: Theme) => {
     setTheme(t)
     document.documentElement.setAttribute('data-theme', t)
-    localStorage.setItem('hmb-theme', t)
+    localStorage.setItem('pai-theme', t)
   }
 
   const toggle = useCallback(() => {
