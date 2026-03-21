@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { Search, Grid3X3, List, ArrowUpDown } from 'lucide-react'
+import { useIndustry } from '@/hooks/useIndustry'
 
 const DEMO_PROJECTS = [
   { id: '1', title: 'Urban Reforestation Amsterdam', status: 'active', category: 'Environment', budget: 120000, spent: 86400, startDate: '2025-09-01', sdgs: [11, 13, 15], milestones: 8, completedMilestones: 6, contacts: 5 },
@@ -12,6 +13,15 @@ const DEMO_PROJECTS = [
   { id: '4', title: 'Renewable Energy Transition', status: 'planned', category: 'Energy', budget: 500000, spent: 75000, startDate: '2026-04-01', sdgs: [7, 13], milestones: 15, completedMilestones: 2, contacts: 3 },
   { id: '5', title: 'Food Bank Partnership', status: 'completed', category: 'Hunger', budget: 45000, spent: 43200, startDate: '2025-03-01', sdgs: [1, 2], milestones: 6, completedMilestones: 6, contacts: 4 },
   { id: '6', title: 'Ocean Plastic Cleanup', status: 'active', category: 'Environment', budget: 180000, spent: 54000, startDate: '2026-01-15', sdgs: [14, 13], milestones: 10, completedMilestones: 3, contacts: 6 },
+]
+
+const RE_PROJECTS = [
+  { id: '1', title: 'Penthouse Suite — Zuidas', status: 'active', category: 'Residential', budget: 1250000, spent: 0, startDate: '2026-01-15', sdgs: [] as number[], milestones: 4, completedMilestones: 2, contacts: 3 },
+  { id: '2', title: 'Family Home — Amstelveen', status: 'active', category: 'Residential', budget: 685000, spent: 0, startDate: '2025-11-01', sdgs: [] as number[], milestones: 6, completedMilestones: 4, contacts: 5 },
+  { id: '3', title: 'Studio — De Pijp', status: 'pending', category: 'Rental', budget: 22200, spent: 0, startDate: '2026-03-01', sdgs: [] as number[], milestones: 3, completedMilestones: 1, contacts: 2 },
+  { id: '4', title: 'Commercial Office — Centrum', status: 'active', category: 'Commercial', budget: 4500000, spent: 0, startDate: '2025-09-01', sdgs: [] as number[], milestones: 8, completedMilestones: 3, contacts: 4 },
+  { id: '5', title: 'Townhouse — Jordaan', status: 'sold', category: 'Residential', budget: 920000, spent: 920000, startDate: '2025-06-01', sdgs: [] as number[], milestones: 5, completedMilestones: 5, contacts: 6 },
+  { id: '6', title: 'Warehouse Loft — NDSM', status: 'active', category: 'Mixed-Use', budget: 550000, spent: 0, startDate: '2026-02-01', sdgs: [] as number[], milestones: 4, completedMilestones: 1, contacts: 2 },
 ]
 
 const SDG_COLORS: Record<number, string> = {
@@ -26,34 +36,66 @@ const statusColors: Record<string, { bg: string; txt: string; border: string }> 
   completed: { bg: 'var(--accent-bg)', txt: 'var(--accent-txt)', border: 'var(--accent-border)' },
   planned: { bg: 'var(--bg2)', txt: 'var(--txt3)', border: 'var(--border)' },
   paused: { bg: 'var(--y-bg)', txt: 'var(--y-txt)', border: 'var(--y-border)' },
+  pending: { bg: 'var(--y-bg)', txt: 'var(--y-txt)', border: 'var(--y-border)' },
+  sold: { bg: 'var(--g-bg)', txt: 'var(--g-txt)', border: 'var(--g-border)' },
 }
 
 export default function ProjectsPage() {
+  const { industry } = useIndustry()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [view, setView] = useState<'grid' | 'list'>('grid')
 
-  const filtered = DEMO_PROJECTS.filter(p => {
+  const isRE = industry === 'realestate'
+  const projects = isRE ? RE_PROJECTS : DEMO_PROJECTS
+  const statusOptions = isRE
+    ? ['all', 'active', 'pending', 'sold']
+    : ['all', 'active', 'planned', 'completed', 'paused']
+
+  const filtered = projects.filter(p => {
     if (statusFilter !== 'all' && p.status !== statusFilter) return false
     if (search && !p.title.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
 
-  const activeCount = DEMO_PROJECTS.filter(p => p.status === 'active').length
-  const totalBudget = DEMO_PROJECTS.reduce((s, p) => s + p.budget, 0)
-  const totalSpent = DEMO_PROJECTS.reduce((s, p) => s + p.spent, 0)
+  const activeCount = projects.filter(p => p.status === 'active').length
+  const totalBudget = projects.reduce((s, p) => s + p.budget, 0)
+  const totalSpent = projects.reduce((s, p) => s + p.spent, 0)
+  const avgPrice = Math.round(totalBudget / projects.length)
+
+  const budgetLabel = isRE ? 'Price' : 'Budget'
+
+  const formatCurrency = (v: number) => {
+    if (v >= 1000000) return `$${(v / 1000000).toFixed(1)}M`
+    return `$${(v / 1000).toFixed(0)}K`
+  }
 
   return (
     <>
-      <Topbar title="Projects" sub="Manage your CSR initiatives" addLabel="New Project" />
+      <Topbar
+        title={isRE ? 'Properties' : 'Projects'}
+        sub={isRE ? 'Manage your portfolio' : 'Manage your CSR initiatives'}
+        addLabel={isRE ? 'New Property' : 'New Project'}
+      />
 
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPIs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 18 }}>
-          <KpiCard label="Total Projects" value={DEMO_PROJECTS.length} icon="folder" accentColor="var(--accent)" delay={80} />
-          <KpiCard label="Active" value={activeCount} delta={`${Math.round((activeCount / DEMO_PROJECTS.length) * 100)}% of total`} deltaDir="up" icon="zap" accentColor="var(--g)" delay={130} />
-          <KpiCard label="Total Budget" value={`$${(totalBudget / 1000).toFixed(0)}K`} icon="dollar-sign" accentColor="var(--accent)" delay={180} />
-          <KpiCard label="Budget Used" value={`${Math.round((totalSpent / totalBudget) * 100)}%`} delta={`$${(totalSpent / 1000).toFixed(0)}K spent`} deltaDir="neu" icon="chart" accentColor="var(--y)" delay={230} />
+          {isRE ? (
+            <>
+              <KpiCard label="Total Properties" value={projects.length} icon="folder" accentColor="var(--accent)" delay={80} />
+              <KpiCard label="Active Listings" value={activeCount} delta={`${Math.round((activeCount / projects.length) * 100)}% of total`} deltaDir="up" icon="zap" accentColor="var(--g)" delay={130} />
+              <KpiCard label="Portfolio Value" value={formatCurrency(totalBudget)} icon="dollar-sign" accentColor="var(--accent)" delay={180} />
+              <KpiCard label="Avg Price" value={formatCurrency(avgPrice)} icon="chart" accentColor="var(--y)" delay={230} />
+            </>
+          ) : (
+            <>
+              <KpiCard label="Total Projects" value={projects.length} icon="folder" accentColor="var(--accent)" delay={80} />
+              <KpiCard label="Active" value={activeCount} delta={`${Math.round((activeCount / projects.length) * 100)}% of total`} deltaDir="up" icon="zap" accentColor="var(--g)" delay={130} />
+              <KpiCard label="Total Budget" value={`$${(totalBudget / 1000).toFixed(0)}K`} icon="dollar-sign" accentColor="var(--accent)" delay={180} />
+              <KpiCard label="Budget Used" value={`${Math.round((totalSpent / totalBudget) * 100)}%`} delta={`$${(totalSpent / 1000).toFixed(0)}K spent`} deltaDir="neu" icon="chart" accentColor="var(--y)" delay={230} />
+            </>
+          )}
         </div>
 
         {/* Toolbar */}
@@ -67,11 +109,11 @@ export default function ProjectsPage() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search projects..."
+              placeholder={isRE ? 'Search properties...' : 'Search projects...'}
               style={{ border: 'none', background: 'none', flex: 1, fontSize: 13, padding: 0 }}
             />
           </div>
-          {['all', 'active', 'planned', 'completed', 'paused'].map(s => (
+          {statusOptions.map(s => (
             <button key={s} onClick={() => setStatusFilter(s)} style={{
               padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
               background: statusFilter === s ? 'var(--txt)' : 'var(--bg2)',
@@ -111,15 +153,17 @@ export default function ProjectsPage() {
                       background: sc.bg, color: sc.txt, border: `1px solid ${sc.border}`,
                       textTransform: 'capitalize',
                     }}>{p.status}</span>
-                    <div style={{ display: 'flex', gap: 3 }}>
-                      {p.sdgs.map(s => (
-                        <div key={s} style={{
-                          width: 18, height: 18, borderRadius: 4, background: SDG_COLORS[s],
-                          fontSize: 9, fontWeight: 700, color: '#fff',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>{s}</div>
-                      ))}
-                    </div>
+                    {!isRE && (
+                      <div style={{ display: 'flex', gap: 3 }}>
+                        {p.sdgs.map(s => (
+                          <div key={s} style={{
+                            width: 18, height: 18, borderRadius: 4, background: SDG_COLORS[s],
+                            fontSize: 9, fontWeight: 700, color: '#fff',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}>{s}</div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{p.title}</div>
                   <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 12 }}>{p.category}</div>
@@ -138,11 +182,14 @@ export default function ProjectsPage() {
                     </div>
                   </div>
 
-                  {/* Budget */}
+                  {/* Budget / Price */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
-                    <span style={{ color: 'var(--txt3)' }}>Budget</span>
+                    <span style={{ color: 'var(--txt3)' }}>{budgetLabel}</span>
                     <span className="mono" style={{ fontWeight: 600 }}>
-                      ${(p.spent / 1000).toFixed(0)}K / ${(p.budget / 1000).toFixed(0)}K
+                      {isRE
+                        ? formatCurrency(p.budget)
+                        : `$${(p.spent / 1000).toFixed(0)}K / $${(p.budget / 1000).toFixed(0)}K`
+                      }
                     </span>
                   </div>
                 </div>
@@ -157,7 +204,10 @@ export default function ProjectsPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {['Project', 'Status', 'Category', 'Budget', 'Progress', 'SDGs'].map(h => (
+                  {(isRE
+                    ? ['Property', 'Status', 'Category', 'Price', 'Progress']
+                    : ['Project', 'Status', 'Category', 'Budget', 'Progress', 'SDGs']
+                  ).map(h => (
                     <th key={h} style={{
                       padding: '10px 14px', textAlign: 'left', fontSize: 10.5,
                       fontWeight: 600, textTransform: 'uppercase', color: 'var(--txt3)',
@@ -181,7 +231,9 @@ export default function ProjectsPage() {
                         }}>{p.status}</span>
                       </td>
                       <td style={{ padding: '12px 14px', fontSize: 12, color: 'var(--txt2)' }}>{p.category}</td>
-                      <td className="mono" style={{ padding: '12px 14px', fontSize: 12 }}>${(p.budget / 1000).toFixed(0)}K</td>
+                      <td className="mono" style={{ padding: '12px 14px', fontSize: 12 }}>
+                        {isRE ? formatCurrency(p.budget) : `$${(p.budget / 1000).toFixed(0)}K`}
+                      </td>
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <div style={{ width: 50, height: 4, borderRadius: 2, background: 'var(--bg2)', overflow: 'hidden' }}>
@@ -194,17 +246,19 @@ export default function ProjectsPage() {
                           <span className="mono" style={{ fontSize: 11, fontWeight: 600 }}>{progress}%</span>
                         </div>
                       </td>
-                      <td style={{ padding: '12px 14px' }}>
-                        <div style={{ display: 'flex', gap: 3 }}>
-                          {p.sdgs.map(s => (
-                            <div key={s} style={{
-                              width: 16, height: 16, borderRadius: 4, background: SDG_COLORS[s],
-                              fontSize: 8, fontWeight: 700, color: '#fff',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}>{s}</div>
-                          ))}
-                        </div>
-                      </td>
+                      {!isRE && (
+                        <td style={{ padding: '12px 14px' }}>
+                          <div style={{ display: 'flex', gap: 3 }}>
+                            {p.sdgs.map(s => (
+                              <div key={s} style={{
+                                width: 16, height: 16, borderRadius: 4, background: SDG_COLORS[s],
+                                fontSize: 8, fontWeight: 700, color: '#fff',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              }}>{s}</div>
+                            ))}
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   )
                 })}

@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { Search, Mail, Phone, FolderKanban } from 'lucide-react'
+import { useIndustry } from '@/hooks/useIndustry'
 
 interface Contact {
   id: string
   firstName: string
   lastName: string
   company: string
-  type: 'partner' | 'donor' | 'stakeholder' | 'beneficiary'
+  type: string
   email: string
   phone: string
   projects: number
@@ -29,11 +30,28 @@ const DEMO_CONTACTS: Contact[] = [
   { id: '10', firstName: 'Robert', lastName: 'Kim', company: 'Pacific Green Alliance', type: 'donor', email: 'r.kim@pacificgreen.org', phone: '+1 415 555 0199', projects: 4 },
 ]
 
+const RE_CONTACTS: Contact[] = [
+  { id: '1', firstName: 'Willem', lastName: 'de Vries', company: 'De Vries Family Office', type: 'buyer', email: 'w.devries@devries-fo.nl', phone: '+31 6 1122 3344', projects: 2 },
+  { id: '2', firstName: 'Sophie', lastName: 'Bakker', company: 'Bakker Real Estate Group', type: 'seller', email: 's.bakker@bakker-re.nl', phone: '+31 6 2233 4455', projects: 3 },
+  { id: '3', firstName: 'Thomas', lastName: 'Jansen', company: 'Jansen Capital Partners', type: 'investor', email: 't.jansen@jansencap.com', phone: '+31 6 3344 5566', projects: 5 },
+  { id: '4', firstName: 'Eva', lastName: 'Mulder', company: 'Expat Housing Amsterdam', type: 'tenant', email: 'e.mulder@expathousing.nl', phone: '+31 6 4455 6677', projects: 1 },
+  { id: '5', firstName: 'Lars', lastName: 'Hendriks', company: 'Hendriks Development BV', type: 'seller', email: 'l.hendriks@hendriks-dev.nl', phone: '+31 6 5566 7788', projects: 4 },
+  { id: '6', firstName: 'Anna', lastName: 'Visser', company: 'Visser & Partners Law', type: 'buyer', email: 'a.visser@visserlaw.nl', phone: '+31 6 6677 8899', projects: 2 },
+  { id: '7', firstName: 'Pieter', lastName: 'Smit', company: 'Smit Pension Fund', type: 'investor', email: 'p.smit@smitpension.nl', phone: '+31 6 7788 9900', projects: 6 },
+  { id: '8', firstName: 'Marta', lastName: 'Koster', company: 'Zuidas Relocation Services', type: 'tenant', email: 'm.koster@zuidasreloc.nl', phone: '+31 6 8899 0011', projects: 1 },
+  { id: '9', firstName: 'Jan', lastName: 'van der Berg', company: 'Van der Berg Vastgoed', type: 'seller', email: 'j.vdberg@vdbergvastgoed.nl', phone: '+31 6 9900 1122', projects: 3 },
+  { id: '10', firstName: 'Claudia', lastName: 'Brouwer', company: 'Brouwer Investments AG', type: 'investor', email: 'c.brouwer@brouwer-inv.ch', phone: '+41 79 123 4567', projects: 4 },
+]
+
 const typeColors: Record<string, { bg: string; txt: string; border: string }> = {
   partner: { bg: 'var(--accent-bg)', txt: 'var(--accent-txt)', border: 'var(--accent-border)' },
   donor: { bg: 'var(--g-bg)', txt: 'var(--g-txt)', border: 'var(--g-border)' },
   stakeholder: { bg: 'var(--p-bg)', txt: 'var(--p-txt)', border: 'var(--p-border)' },
   beneficiary: { bg: 'var(--o-bg)', txt: 'var(--o-txt)', border: 'var(--o-border)' },
+  buyer: { bg: 'var(--accent-bg)', txt: 'var(--accent-txt)', border: 'var(--accent-border)' },
+  seller: { bg: 'var(--g-bg)', txt: 'var(--g-txt)', border: 'var(--g-border)' },
+  tenant: { bg: 'var(--o-bg)', txt: 'var(--o-txt)', border: 'var(--o-border)' },
+  investor: { bg: 'var(--p-bg)', txt: 'var(--p-txt)', border: 'var(--p-border)' },
 }
 
 const avatarColors: Record<string, string> = {
@@ -41,13 +59,24 @@ const avatarColors: Record<string, string> = {
   donor: 'var(--g)',
   stakeholder: 'var(--p)',
   beneficiary: 'var(--o)',
+  buyer: 'var(--accent)',
+  seller: 'var(--g)',
+  tenant: 'var(--o)',
+  investor: 'var(--p)',
 }
 
 export default function ContactsPage() {
+  const { industry } = useIndustry()
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<string>('all')
 
-  const filtered = DEMO_CONTACTS.filter(c => {
+  const isRE = industry === 'realestate'
+  const contacts = isRE ? RE_CONTACTS : DEMO_CONTACTS
+  const filterOptions = isRE
+    ? ['all', 'buyer', 'seller', 'tenant', 'investor']
+    : ['all', 'partner', 'beneficiary', 'stakeholder', 'donor']
+
+  const filtered = contacts.filter(c => {
     if (typeFilter !== 'all' && c.type !== typeFilter) return false
     if (search) {
       const q = search.toLowerCase()
@@ -61,21 +90,34 @@ export default function ContactsPage() {
     return true
   })
 
-  const partnerCount = DEMO_CONTACTS.filter(c => c.type === 'partner').length
-  const donorCount = DEMO_CONTACTS.filter(c => c.type === 'donor').length
-  const stakeholderCount = DEMO_CONTACTS.filter(c => c.type === 'stakeholder').length
+  const countByType = (type: string) => contacts.filter(c => c.type === type).length
 
   return (
     <>
-      <Topbar title="Contacts" sub="Partners, donors & stakeholders" addLabel="New Contact" />
+      <Topbar
+        title="Contacts"
+        sub={isRE ? 'Buyers, sellers & investors' : 'Partners, donors & stakeholders'}
+        addLabel="New Contact"
+      />
 
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPIs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 18 }}>
-          <KpiCard label="Total Contacts" value={DEMO_CONTACTS.length} icon="users" accentColor="var(--accent)" delay={80} />
-          <KpiCard label="Partners" value={partnerCount} delta={`${Math.round((partnerCount / DEMO_CONTACTS.length) * 100)}% of total`} deltaDir="neu" icon="heart" accentColor="var(--accent)" delay={130} />
-          <KpiCard label="Donors" value={donorCount} delta={`${Math.round((donorCount / DEMO_CONTACTS.length) * 100)}% of total`} deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={180} />
-          <KpiCard label="Stakeholders" value={stakeholderCount} icon="globe" accentColor="var(--p)" delay={230} />
+          {isRE ? (
+            <>
+              <KpiCard label="Total Contacts" value={contacts.length} icon="users" accentColor="var(--accent)" delay={80} />
+              <KpiCard label="Buyers" value={countByType('buyer')} delta={`${Math.round((countByType('buyer') / contacts.length) * 100)}% of total`} deltaDir="neu" icon="heart" accentColor="var(--accent)" delay={130} />
+              <KpiCard label="Sellers" value={countByType('seller')} delta={`${Math.round((countByType('seller') / contacts.length) * 100)}% of total`} deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={180} />
+              <KpiCard label="Investors" value={countByType('investor')} icon="globe" accentColor="var(--p)" delay={230} />
+            </>
+          ) : (
+            <>
+              <KpiCard label="Total Contacts" value={contacts.length} icon="users" accentColor="var(--accent)" delay={80} />
+              <KpiCard label="Partners" value={countByType('partner')} delta={`${Math.round((countByType('partner') / contacts.length) * 100)}% of total`} deltaDir="neu" icon="heart" accentColor="var(--accent)" delay={130} />
+              <KpiCard label="Donors" value={countByType('donor')} delta={`${Math.round((countByType('donor') / contacts.length) * 100)}% of total`} deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={180} />
+              <KpiCard label="Stakeholders" value={countByType('stakeholder')} icon="globe" accentColor="var(--p)" delay={230} />
+            </>
+          )}
         </div>
 
         {/* Toolbar */}
@@ -93,7 +135,7 @@ export default function ContactsPage() {
               style={{ border: 'none', background: 'none', flex: 1, fontSize: 13, padding: 0 }}
             />
           </div>
-          {['all', 'partner', 'beneficiary', 'stakeholder', 'donor'].map(s => (
+          {filterOptions.map(s => (
             <button key={s} onClick={() => setTypeFilter(s)} style={{
               padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
               background: typeFilter === s ? 'var(--txt)' : 'var(--bg2)',
@@ -106,7 +148,7 @@ export default function ContactsPage() {
         {/* Contact cards grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
           {filtered.map(c => {
-            const tc = typeColors[c.type]
+            const tc = typeColors[c.type] || typeColors.partner
             const initials = c.firstName[0] + c.lastName[0]
             return (
               <div key={c.id} className="card-hover" style={{
@@ -118,7 +160,7 @@ export default function ContactsPage() {
                   {/* Avatar */}
                   <div style={{
                     width: 40, height: 40, borderRadius: 20,
-                    background: avatarColors[c.type],
+                    background: avatarColors[c.type] || 'var(--accent)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 14, fontWeight: 700, color: '#fff',
                     flexShrink: 0,
@@ -147,7 +189,7 @@ export default function ContactsPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--txt2)' }}>
                     <FolderKanban size={12} color="var(--txt3)" />
                     <span className="mono" style={{ fontWeight: 600 }}>{c.projects}</span>
-                    <span>connected project{c.projects !== 1 ? 's' : ''}</span>
+                    <span>connected {isRE ? 'propert' : 'project'}{c.projects !== 1 ? (isRE ? 'ies' : 's') : (isRE ? 'y' : '')}</span>
                   </div>
                 </div>
               </div>

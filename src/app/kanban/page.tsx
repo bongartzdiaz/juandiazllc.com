@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Topbar } from '@/components/layout/Topbar'
 import { GripVertical, Calendar, Plus } from 'lucide-react'
+import { useIndustry } from '@/hooks/useIndustry'
 
 const SDG_COLORS: Record<number, string> = {
   1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21',
@@ -72,19 +73,72 @@ const DEMO_COLUMNS: KanbanColumn[] = [
   },
 ]
 
+const RE_COLUMNS: KanbanColumn[] = [
+  {
+    id: 'prospecting',
+    title: 'Prospecting',
+    cards: [
+      { id: 'rp1', title: 'Van Dijk Family — Amstelveen Home', description: 'Family looking for 4-bedroom home near international school, budget 700K', priority: 'medium', sdgs: [], assignee: 'WV', dueDate: '2026-04-10' },
+      { id: 'rp2', title: 'Brouwer Group — NDSM Loft', description: 'Investment group interested in warehouse conversion, mixed-use potential', priority: 'low', sdgs: [], assignee: 'SB', dueDate: '2026-04-18' },
+    ],
+  },
+  {
+    id: 'showing',
+    title: 'Showing',
+    cards: [
+      { id: 'rs1', title: 'Tech Corp — Centrum Office Lease', description: 'Series B startup needs 400sqm office space, 3-year lease preferred', priority: 'high', sdgs: [], assignee: 'TJ', dueDate: '2026-03-28' },
+      { id: 'rs2', title: 'Jansen Family — Jordaan Townhouse', description: 'Second viewing scheduled, very interested in garden and canal view', priority: 'urgent', sdgs: [], assignee: 'WV', dueDate: '2026-03-25' },
+    ],
+  },
+  {
+    id: 'offer',
+    title: 'Offer Made',
+    cards: [
+      { id: 'ro1', title: 'Visser Partners — Zuidas Penthouse', description: 'Offer at 1.2M, seller countered at 1.25M, awaiting buyer response', priority: 'urgent', sdgs: [], assignee: 'SB', dueDate: '2026-03-24' },
+      { id: 'ro2', title: 'Mulder Expats — De Pijp Studio', description: 'Rental application submitted, credit check in progress', priority: 'medium', sdgs: [], assignee: 'TJ', dueDate: '2026-03-30' },
+    ],
+  },
+  {
+    id: 'contract',
+    title: 'Under Contract',
+    cards: [
+      { id: 'rc1', title: 'Smit Fund — Commercial Portfolio', description: 'Due diligence phase, building inspection scheduled for next week', priority: 'high', sdgs: [], assignee: 'WV', dueDate: '2026-04-05' },
+    ],
+  },
+  {
+    id: 'closed',
+    title: 'Closed',
+    cards: [
+      { id: 'rd1', title: 'Hendriks Dev — Jordaan Townhouse', description: 'Sale completed at 920K, keys handed over, commission received', priority: 'low', sdgs: [], assignee: 'SB', dueDate: '2026-03-15' },
+      { id: 'rd2', title: 'Koster Relocation — Zuidas Rental', description: '12-month lease signed, tenant moved in, first month collected', priority: 'low', sdgs: [], assignee: 'TJ', dueDate: '2026-03-10' },
+    ],
+  },
+]
+
 const columnAccents: Record<string, string> = {
   backlog: 'var(--txt3)',
   'in-progress': 'var(--b)',
   review: 'var(--o)',
   done: 'var(--g)',
+  prospecting: 'var(--txt3)',
+  showing: 'var(--b)',
+  offer: 'var(--o)',
+  contract: 'var(--p)',
+  closed: 'var(--g)',
 }
 
 export default function KanbanPage() {
-  const [columns] = useState(DEMO_COLUMNS)
+  const { industry } = useIndustry()
+  const isRE = industry === 'realestate'
+  const [columns] = useState(isRE ? RE_COLUMNS : DEMO_COLUMNS)
 
   return (
     <>
-      <Topbar title="Kanban" sub="Visual project management" addLabel="New Board" />
+      <Topbar
+        title={isRE ? 'Deals' : 'Kanban'}
+        sub={isRE ? 'Track your transactions' : 'Visual project management'}
+        addLabel={isRE ? 'New Deal' : 'New Board'}
+      />
 
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Board */}
@@ -95,7 +149,7 @@ export default function KanbanPage() {
         }}>
           {columns.map(col => (
             <div key={col.id} style={{
-              minWidth: 290, maxWidth: 320, flex: '0 0 290px',
+              minWidth: 270, maxWidth: 300, flex: '0 0 270px',
               display: 'flex', flexDirection: 'column',
             }}>
               {/* Column header */}
@@ -146,15 +200,17 @@ export default function KanbanPage() {
                           background: ps.bg, color: ps.txt, border: `1px solid ${ps.border}`,
                           textTransform: 'capitalize',
                         }}>{card.priority}</span>
-                        <div style={{ display: 'flex', gap: 3 }}>
-                          {card.sdgs.map(s => (
-                            <div key={s} style={{
-                              width: 16, height: 16, borderRadius: 4, background: SDG_COLORS[s],
-                              fontSize: 8, fontWeight: 700, color: '#fff',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}>{s}</div>
-                          ))}
-                        </div>
+                        {!isRE && card.sdgs.length > 0 && (
+                          <div style={{ display: 'flex', gap: 3 }}>
+                            {card.sdgs.map(s => (
+                              <div key={s} style={{
+                                width: 16, height: 16, borderRadius: 4, background: SDG_COLORS[s],
+                                fontSize: 8, fontWeight: 700, color: '#fff',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              }}>{s}</div>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
                       {/* Title */}

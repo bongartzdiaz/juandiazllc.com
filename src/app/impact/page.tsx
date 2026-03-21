@@ -4,6 +4,9 @@ import { useState } from 'react'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { useIndustry } from '@/hooks/useIndustry'
+
+/* ── Philanthropy data ── */
 
 const SDG_GOALS: { id: number; name: string; color: string }[] = [
   { id: 1, name: 'No Poverty', color: '#E5243B' },
@@ -59,7 +62,174 @@ const TREND_DATA = [
   { month: 'Aug', co2: 4500, people: 1100, trees: 2340 },
 ]
 
+/* ── Real Estate data ── */
+
+const RE_PROPERTY_TYPES = [
+  { type: 'Residential', count: 14, pct: 45, color: 'var(--accent)' },
+  { type: 'Commercial', count: 8, pct: 26, color: 'var(--b)' },
+  { type: 'Rental', count: 6, pct: 19, color: 'var(--o)' },
+  { type: 'Mixed-Use', count: 3, pct: 10, color: 'var(--p)' },
+]
+
+const RE_MARKET_DATA = [
+  { area: 'Zuidas', avgPrice: '$6,800/sqm', volume: '$2.4M', dom: 14, trend: 'up' },
+  { area: 'Jordaan', avgPrice: '$5,200/sqm', volume: '$1.8M', dom: 18, trend: 'up' },
+  { area: 'De Pijp', avgPrice: '$4,600/sqm', volume: '$1.2M', dom: 22, trend: 'stable' },
+  { area: 'Amstelveen', avgPrice: '$3,400/sqm', volume: '$1.6M', dom: 28, trend: 'up' },
+  { area: 'NDSM', avgPrice: '$3,100/sqm', volume: '$0.8M', dom: 32, trend: 'down' },
+  { area: 'Centrum', avgPrice: '$5,900/sqm', volume: '$0.4M', dom: 16, trend: 'stable' },
+]
+
+const RE_PRICE_TREND = [
+  { month: 'Sep', price: 3800, volume: 5200 },
+  { month: 'Oct', price: 3850, volume: 4800 },
+  { month: 'Nov', price: 3920, volume: 5600 },
+  { month: 'Dec', price: 3900, volume: 4100 },
+  { month: 'Jan', price: 4000, volume: 6200 },
+  { month: 'Feb', price: 4050, volume: 7100 },
+  { month: 'Mar', price: 4100, volume: 6800 },
+  { month: 'Apr', price: 4150, volume: 7400 },
+  { month: 'May', price: 4200, volume: 8200 },
+  { month: 'Jun', price: 4180, volume: 7600 },
+  { month: 'Jul', price: 4220, volume: 7900 },
+  { month: 'Aug', price: 4280, volume: 8100 },
+]
+
+const trendIcons: Record<string, { symbol: string; color: string }> = {
+  up: { symbol: '+', color: 'var(--g)' },
+  down: { symbol: '-', color: 'var(--r, #E5243B)' },
+  stable: { symbol: '~', color: 'var(--txt3)' },
+}
+
+/* ── Component ── */
+
 export default function ImpactPage() {
+  const { industry } = useIndustry()
+  const isRE = industry === 'realestate'
+
+  if (isRE) {
+    return (
+      <>
+        <Topbar title="Market" sub="Market analytics & performance" />
+
+        <div style={{ padding: '18px 24px 40px' }}>
+          {/* KPIs */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
+            <KpiCard label="Avg Price/sqm" value="$4,200" delta="+8% vs last quarter" deltaDir="up" icon="dollar-sign" accentColor="var(--accent)" delay={80} />
+            <KpiCard label="Total Volume" value="$8.2M" delta="+1.4M this month" deltaDir="up" icon="chart" accentColor="var(--g)" delay={130} />
+            <KpiCard label="Days on Market" value="22" delta="-3 vs avg" deltaDir="up" icon="calendar" accentColor="var(--b)" delay={180} />
+            <KpiCard label="Listings Active" value="18" delta="+4 new this week" deltaDir="up" icon="folder" accentColor="var(--o)" delay={230} />
+            <KpiCard label="Conversion Rate" value="26.5%" delta="+2.1pp vs Q4" deltaDir="up" icon="zap" accentColor="var(--p)" delay={280} />
+          </div>
+
+          {/* Property Type Breakdown */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px', marginBottom: 14,
+            boxShadow: 'var(--shadow-sm)',
+          }}>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Property Type Breakdown</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {RE_PROPERTY_TYPES.map(pt => (
+                <div key={pt.type}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600 }}>{pt.type}</span>
+                    <span className="mono" style={{ fontSize: 12, color: 'var(--txt2)' }}>{pt.count} properties ({pt.pct}%)</span>
+                  </div>
+                  <div style={{ height: 8, borderRadius: 4, background: 'var(--bg2)', overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%', borderRadius: 4, width: `${pt.pct}%`,
+                      background: pt.color,
+                      transition: 'width 0.6s ease',
+                    }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Market Comparison + Price Trend side by side */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {/* Market Comparison Table */}
+            <div style={{
+              background: 'var(--panel)', border: '1px solid var(--border)',
+              borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
+            }}>
+              <div style={{ padding: '14px 16px 0', fontSize: 13, fontWeight: 600 }}>Market Comparison</div>
+              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 8 }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    {['Area', 'Avg Price', 'Volume', 'DOM', 'Trend'].map(h => (
+                      <th key={h} style={{
+                        padding: '8px 14px', textAlign: h === 'Area' ? 'left' : 'right',
+                        fontSize: 10.5, fontWeight: 600, textTransform: 'uppercase',
+                        color: 'var(--txt3)', letterSpacing: '0.05em',
+                      }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {RE_MARKET_DATA.map(row => {
+                    const ti = trendIcons[row.trend]
+                    return (
+                      <tr key={row.area} style={{ borderBottom: '1px solid var(--border)' }}>
+                        <td style={{ padding: '10px 14px', fontSize: 12, fontWeight: 600 }}>{row.area}</td>
+                        <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right' }}>{row.avgPrice}</td>
+                        <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right' }}>{row.volume}</td>
+                        <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right' }}>{row.dom}d</td>
+                        <td style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700, color: ti.color }}>
+                          {ti.symbol}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Price Trend Chart */}
+            <div style={{
+              background: 'var(--panel)', border: '1px solid var(--border)',
+              borderRadius: 12, padding: '16px', boxShadow: 'var(--shadow-sm)',
+              display: 'flex', flexDirection: 'column',
+            }}>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Price Trend (12 months)</div>
+              <div style={{ flex: 1, minHeight: 260 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={RE_PRICE_TREND} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="gradPrice" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#0D7377" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#0D7377" stopOpacity={0.02} />
+                      </linearGradient>
+                      <linearGradient id="gradVolume" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#059669" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#059669" stopOpacity={0.02} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--panel)', border: '1px solid var(--border)',
+                        borderRadius: 8, fontSize: 12, boxShadow: 'var(--shadow)',
+                      }}
+                    />
+                    <Area type="monotone" dataKey="price" name="Avg $/sqm" stroke="#0D7377" fill="url(#gradPrice)" strokeWidth={2} />
+                    <Area type="monotone" dataKey="volume" name="Volume ($K)" stroke="#059669" fill="url(#gradVolume)" strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  /* ── Philanthropy version (default) ── */
+
   const totals = PROJECT_IMPACT.reduce(
     (acc, p) => ({
       co2Kg: acc.co2Kg + p.co2Kg,
