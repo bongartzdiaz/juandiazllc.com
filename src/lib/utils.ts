@@ -1,8 +1,8 @@
 // Format currency with locale awareness
-export const formatCurrency = (cents: number, locale = 'en-US', currency = 'USD') =>
+export const formatCurrency = (cents: number, locale = 'en-US', currency = 'EUR') =>
   new Intl.NumberFormat(locale, { style: 'currency', currency, maximumFractionDigits: 0 }).format(cents / 100)
 
-export const formatCurrencyDecimal = (cents: number, locale = 'en-US', currency = 'USD') =>
+export const formatCurrencyDecimal = (cents: number, locale = 'en-US', currency = 'EUR') =>
   new Intl.NumberFormat(locale, { style: 'currency', currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cents / 100)
 
 export const formatNum = (n: number, locale = 'en-US') =>

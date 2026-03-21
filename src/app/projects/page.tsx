@@ -66,8 +66,8 @@ export default function ProjectsPage() {
   const budgetLabel = isRE ? 'Price' : 'Budget'
 
   const formatCurrency = (v: number) => {
-    if (v >= 1000000) return `$${(v / 1000000).toFixed(1)}M`
-    return `$${(v / 1000).toFixed(0)}K`
+    if (v >= 1000000) return `€${(v / 1000000).toFixed(1)}M`
+    return `€${(v / 1000).toFixed(0)}K`
   }
 
   return (
@@ -92,8 +92,8 @@ export default function ProjectsPage() {
             <>
               <KpiCard label="Total Projects" value={projects.length} icon="folder" accentColor="var(--accent)" delay={80} />
               <KpiCard label="Active" value={activeCount} delta={`${Math.round((activeCount / projects.length) * 100)}% of total`} deltaDir="up" icon="zap" accentColor="var(--g)" delay={130} />
-              <KpiCard label="Total Budget" value={`$${(totalBudget / 1000).toFixed(0)}K`} icon="dollar-sign" accentColor="var(--accent)" delay={180} />
-              <KpiCard label="Budget Used" value={`${Math.round((totalSpent / totalBudget) * 100)}%`} delta={`$${(totalSpent / 1000).toFixed(0)}K spent`} deltaDir="neu" icon="chart" accentColor="var(--y)" delay={230} />
+              <KpiCard label="Total Budget" value={`€${(totalBudget / 1000).toFixed(0)}K`} icon="dollar-sign" accentColor="var(--accent)" delay={180} />
+              <KpiCard label="Budget Used" value={`${Math.round((totalSpent / totalBudget) * 100)}%`} delta={`€${(totalSpent / 1000).toFixed(0)}K spent`} deltaDir="neu" icon="chart" accentColor="var(--y)" delay={230} />
             </>
           )}
         </div>
@@ -188,7 +188,7 @@ export default function ProjectsPage() {
                     <span className="mono" style={{ fontWeight: 600 }}>
                       {isRE
                         ? formatCurrency(p.budget)
-                        : `$${(p.spent / 1000).toFixed(0)}K / $${(p.budget / 1000).toFixed(0)}K`
+                        : `€${(p.spent / 1000).toFixed(0)}K / €${(p.budget / 1000).toFixed(0)}K`
                       }
                     </span>
                   </div>
@@ -232,7 +232,7 @@ export default function ProjectsPage() {
                       </td>
                       <td style={{ padding: '12px 14px', fontSize: 12, color: 'var(--txt2)' }}>{p.category}</td>
                       <td className="mono" style={{ padding: '12px 14px', fontSize: 12 }}>
-                        {isRE ? formatCurrency(p.budget) : `$${(p.budget / 1000).toFixed(0)}K`}
+                        {isRE ? formatCurrency(p.budget) : `€${(p.budget / 1000).toFixed(0)}K`}
                       </td>
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

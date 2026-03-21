@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
   LayoutDashboard, FolderKanban, Users2, BarChart3,
-  FileText, Columns3, FileStack, Settings,
+  FileText, Columns3, FileStack, Settings, CalendarDays,
   Leaf, Building2, Hotel, ChevronDown,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -44,7 +44,7 @@ export function Sidebar() {
   const NAV_TOOLS: NavItemDef[] = [
     { icon: FileText, label: 'Reports', href: '/reports' },
     { icon: Columns3, label: industry === 'realestate' ? 'Deals' : 'Kanban', href: '/kanban' },
-    { icon: FileStack, label: 'Pages', href: '/pages' },
+    { icon: CalendarDays, label: 'Calendar', href: '/calendar' },
   ]
 
   const NAV_SYSTEM: NavItemDef[] = [

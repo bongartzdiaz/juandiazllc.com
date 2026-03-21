@@ -58,10 +58,10 @@ const RE_PROPERTIES = [
 ]
 
 const RE_ACTIVITY = [
-  { text: 'New offer received: Penthouse Suite — $1.2M', time: '1h ago' },
+  { text: 'New offer received: Penthouse Suite — €1.2M', time: '1h ago' },
   { text: 'Viewing scheduled: Family Home — Tomorrow 14:00', time: '3h ago' },
   { text: 'Contract signed: Townhouse — Jordaan', time: '1d ago' },
-  { text: 'Price adjustment: Studio De Pijp — $1,850/mo', time: '1d ago' },
+  { text: 'Price adjustment: Studio De Pijp — €1,850/mo', time: '1d ago' },
   { text: 'New listing added: Commercial Office — Centrum', time: '2d ago' },
 ]
 
@@ -113,7 +113,7 @@ function RealEstateDashboard({ config }: { config: { dashboardTitle: string; das
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
           <KpiCard label="Active Listings" value={activeListings} delta="+3 this month" deltaDir="up" icon="folder" accentColor="var(--b)" delay={80} />
           <KpiCard label="Deals Closed" value={totalClosed} delta="YTD total" deltaDir="up" icon="target" accentColor="var(--g)" delay={130} />
-          <KpiCard label="Commission" value={`$${(totalRevenue / 1000).toFixed(0)}K`} delta="+15.8% vs last quarter" deltaDir="up" icon="dollar-sign" hot delay={180} />
+          <KpiCard label="Commission" value={`€${(totalRevenue / 1000).toFixed(0)}K`} delta="+15.8% vs last quarter" deltaDir="up" icon="dollar-sign" hot delay={180} />
           <KpiCard label="Avg Days on Market" value={avgDaysOnMarket} delta={avgDaysOnMarket < 30 ? 'Below average' : 'Above average'} deltaDir={avgDaysOnMarket < 30 ? 'up' : 'down'} icon="calendar" accentColor="var(--y)" delay={230} />
           <KpiCard label="Total Viewings" value="82" delta="+24% this month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={280} />
         </div>
@@ -190,7 +190,7 @@ function RealEstateDashboard({ config }: { config: { dashboardTitle: string; das
                       background: 'var(--panel)', border: '1px solid var(--border)',
                       borderRadius: 8, fontSize: 12, boxShadow: 'var(--shadow)',
                     }}
-                    formatter={(v) => [`$${(Number(v) / 1000).toFixed(0)}K`, 'Revenue']}
+                    formatter={(v) => [`€${(Number(v) / 1000).toFixed(0)}K`, 'Revenue']}
                   />
                   <Bar dataKey="revenue" fill="var(--accent)" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -253,7 +253,7 @@ function RealEstateDashboard({ config }: { config: { dashboardTitle: string; das
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <div className="mono" style={{ fontSize: 14, fontWeight: 600 }}>
-                        {p.price >= 10000 ? `$${(p.price / 1000).toFixed(0)}K` : `$${p.price.toLocaleString()}/mo`}
+                        {p.price >= 10000 ? `€${(p.price / 1000).toFixed(0)}K` : `€${p.price.toLocaleString()}/mo`}
                       </div>
                       {p.daysOnMarket > 0 && (
                         <div className="mono" style={{ fontSize: 10, color: 'var(--txt3)' }}>{p.daysOnMarket}d on market</div>
@@ -300,7 +300,7 @@ function RealEstateDashboard({ config }: { config: { dashboardTitle: string; das
             }}>
               <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt3)', marginBottom: 8 }}>QUICK STATS</div>
               {[
-                { label: 'Avg Commission', value: '$11.2K', icon: DollarSign },
+                { label: 'Avg Commission', value: '€11.2K', icon: DollarSign },
                 { label: 'Showings This Week', value: '14', icon: Calendar },
                 { label: 'Hot Leads', value: '8', icon: Users },
               ].map(stat => (
@@ -337,7 +337,7 @@ function CSRDashboard({ config }: { config: { dashboardTitle: string; dashboardS
           <KpiCard label="People Helped" value="1,100" delta="+19.6% vs last month" deltaDir="up" icon="heart" accentColor="var(--p)" delay={130} />
           <KpiCard label="CO2 Reduced" value="4.5t" delta="+18.4% vs last month" deltaDir="up" icon="leaf" accentColor="var(--g)" delay={180} />
           <KpiCard label="Trees Planted" value="2,340" delta="Target: 5,000" deltaDir="neu" icon="tree" accentColor="var(--g)" delay={230} />
-          <KpiCard label="Total Donated" value="$48K" delta="12 donors active" deltaDir="up" icon="dollar-sign" hot delay={280} />
+          <KpiCard label="Total Donated" value="€48K" delta="12 donors active" deltaDir="up" icon="dollar-sign" hot delay={280} />
         </div>
 
         {/* Charts + Activity */}
@@ -470,7 +470,7 @@ function CSRDashboard({ config }: { config: { dashboardTitle: string; dashboardS
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={CSR_MONTHLY}>
                     <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} />
-                    <Tooltip contentStyle={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 11 }} formatter={(v) => [`$${(Number(v) / 1000).toFixed(1)}K`, 'Donated']} />
+                    <Tooltip contentStyle={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 11 }} formatter={(v) => [`€${(Number(v) / 1000).toFixed(1)}K`, 'Donated']} />
                     <Bar dataKey="donated" fill="var(--accent)" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>

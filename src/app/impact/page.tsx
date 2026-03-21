@@ -72,12 +72,12 @@ const RE_PROPERTY_TYPES = [
 ]
 
 const RE_MARKET_DATA = [
-  { area: 'Zuidas', avgPrice: '$6,800/sqm', volume: '$2.4M', dom: 14, trend: 'up' },
-  { area: 'Jordaan', avgPrice: '$5,200/sqm', volume: '$1.8M', dom: 18, trend: 'up' },
-  { area: 'De Pijp', avgPrice: '$4,600/sqm', volume: '$1.2M', dom: 22, trend: 'stable' },
-  { area: 'Amstelveen', avgPrice: '$3,400/sqm', volume: '$1.6M', dom: 28, trend: 'up' },
-  { area: 'NDSM', avgPrice: '$3,100/sqm', volume: '$0.8M', dom: 32, trend: 'down' },
-  { area: 'Centrum', avgPrice: '$5,900/sqm', volume: '$0.4M', dom: 16, trend: 'stable' },
+  { area: 'Zuidas', avgPrice: '€6,800/sqm', volume: '€2.4M', dom: 14, trend: 'up' },
+  { area: 'Jordaan', avgPrice: '€5,200/sqm', volume: '€1.8M', dom: 18, trend: 'up' },
+  { area: 'De Pijp', avgPrice: '€4,600/sqm', volume: '€1.2M', dom: 22, trend: 'stable' },
+  { area: 'Amstelveen', avgPrice: '€3,400/sqm', volume: '€1.6M', dom: 28, trend: 'up' },
+  { area: 'NDSM', avgPrice: '€3,100/sqm', volume: '€0.8M', dom: 32, trend: 'down' },
+  { area: 'Centrum', avgPrice: '€5,900/sqm', volume: '€0.4M', dom: 16, trend: 'stable' },
 ]
 
 const RE_PRICE_TREND = [
@@ -115,8 +115,8 @@ export default function ImpactPage() {
         <div style={{ padding: '18px 24px 40px' }}>
           {/* KPIs */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
-            <KpiCard label="Avg Price/sqm" value="$4,200" delta="+8% vs last quarter" deltaDir="up" icon="dollar-sign" accentColor="var(--accent)" delay={80} />
-            <KpiCard label="Total Volume" value="$8.2M" delta="+1.4M this month" deltaDir="up" icon="chart" accentColor="var(--g)" delay={130} />
+            <KpiCard label="Avg Price/sqm" value="€4,200" delta="+8% vs last quarter" deltaDir="up" icon="dollar-sign" accentColor="var(--accent)" delay={80} />
+            <KpiCard label="Total Volume" value="€8.2M" delta="+1.4M this month" deltaDir="up" icon="chart" accentColor="var(--g)" delay={130} />
             <KpiCard label="Days on Market" value="22" delta="-3 vs avg" deltaDir="up" icon="calendar" accentColor="var(--b)" delay={180} />
             <KpiCard label="Listings Active" value="18" delta="+4 new this week" deltaDir="up" icon="folder" accentColor="var(--o)" delay={230} />
             <KpiCard label="Conversion Rate" value="26.5%" delta="+2.1pp vs Q4" deltaDir="up" icon="zap" accentColor="var(--p)" delay={280} />
@@ -216,8 +216,8 @@ export default function ImpactPage() {
                         borderRadius: 8, fontSize: 12, boxShadow: 'var(--shadow)',
                       }}
                     />
-                    <Area type="monotone" dataKey="price" name="Avg $/sqm" stroke="#0D7377" fill="url(#gradPrice)" strokeWidth={2} />
-                    <Area type="monotone" dataKey="volume" name="Volume ($K)" stroke="#059669" fill="url(#gradVolume)" strokeWidth={2} />
+                    <Area type="monotone" dataKey="price" name="Avg €/sqm" stroke="#0D7377" fill="url(#gradPrice)" strokeWidth={2} />
+                    <Area type="monotone" dataKey="volume" name="Volume (€K)" stroke="#059669" fill="url(#gradVolume)" strokeWidth={2} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -314,7 +314,7 @@ export default function ImpactPage() {
                     <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right' }}>{p.co2Kg.toLocaleString()}</td>
                     <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right' }}>{p.peopleHelped.toLocaleString()}</td>
                     <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right' }}>{p.trees.toLocaleString()}</td>
-                    <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right' }}>${(p.donated / 1000).toFixed(1)}K</td>
+                    <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right' }}>€{(p.donated / 1000).toFixed(1)}K</td>
                   </tr>
                 ))}
                 {/* Totals row */}
