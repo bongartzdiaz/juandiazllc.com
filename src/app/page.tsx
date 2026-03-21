@@ -3,6 +3,7 @@
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { useIndustry } from '@/hooks/useIndustry'
+import { useKpiStore } from '@/hooks/useKpiStore'
 import {
   FolderKanban, Leaf, Globe2, ArrowRight, Clock,
   Building2, DollarSign, TrendingUp, Home, Key, Calendar,
@@ -132,16 +133,19 @@ const statusColors: Record<string, { bg: string; txt: string; border: string }> 
 
 export default function DashboardPage() {
   const { industry, config } = useIndustry()
+  const kpiStore = useKpiStore(industry)
 
-  if (industry === 'hospitality') return <HospitalityDashboard config={config} />
-  if (industry === 'realestate') return <RealEstateDashboard config={config} />
-  return <CSRDashboard config={config} />
+  if (industry === 'hospitality') return <HospitalityDashboard config={config} kpi={kpiStore} />
+  if (industry === 'realestate') return <RealEstateDashboard config={config} kpi={kpiStore} />
+  return <CSRDashboard config={config} kpi={kpiStore} />
 }
+
+type KpiStore = ReturnType<typeof useKpiStore>
 
 // ══════════════════════════════════════════
 // HOSPITALITY DASHBOARD
 // ══════════════════════════════════════════
-function HospitalityDashboard({ config }: { config: { dashboardTitle: string; dashboardSub: string } }) {
+function HospitalityDashboard({ config, kpi }: { config: { dashboardTitle: string; dashboardSub: string }; kpi: KpiStore }) {
   const totalRevenue = HOS_MONTHLY.reduce((s, m) => s + m.roomRevenue + m.fnbRevenue, 0)
 
   return (
@@ -150,11 +154,11 @@ function HospitalityDashboard({ config }: { config: { dashboardTitle: string; da
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPIs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
-          <KpiCard label="Occupancy Rate" value="78%" delta="+4% vs last month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={80} />
-          <KpiCard label="RevPAR" value="€142" delta="+€12 vs avg" deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={130} />
-          <KpiCard label="ADR" value="€185" delta="Avg Daily Rate" deltaDir="neu" icon="chart" accentColor="var(--b)" delay={180} />
-          <KpiCard label="Guest Satisfaction" value="4.6/5" delta="Based on 189 reviews" deltaDir="up" icon="heart" accentColor="var(--y)" delay={230} />
-          <KpiCard label="Total Bookings" value="234" delta="+18 this week" deltaDir="up" icon="calendar" hot delay={280} />
+          <KpiCard label="Occupancy Rate" value={kpi.getKpiValue('occupancy', '78%')} delta="+4% vs last month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={80} editable onValueChange={v => kpi.setKpiValue('occupancy', v)} goalCurrent={78} goalTarget={kpi.getGoal('occupancy_rate')?.target ?? 85} />
+          <KpiCard label="RevPAR" value={kpi.getKpiValue('revpar', '€142')} delta="+€12 vs avg" deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('revpar', v)} goalCurrent={95} goalTarget={kpi.getGoal('revpar_target')?.target ?? 120} />
+          <KpiCard label="ADR" value={kpi.getKpiValue('adr', '€185')} delta="Avg Daily Rate" deltaDir="neu" icon="chart" accentColor="var(--b)" delay={180} editable onValueChange={v => kpi.setKpiValue('adr', v)} />
+          <KpiCard label="Guest Satisfaction" value={kpi.getKpiValue('satisfaction', '4.6/5')} delta="Based on 189 reviews" deltaDir="up" icon="heart" accentColor="var(--y)" delay={230} editable onValueChange={v => kpi.setKpiValue('satisfaction', v)} goalCurrent={4.2} goalTarget={kpi.getGoal('guest_satisfaction')?.target ?? 4.5} />
+          <KpiCard label="Total Bookings" value={kpi.getKpiValue('bookings', '234')} delta="+18 this week" deltaDir="up" icon="calendar" hot delay={280} editable onValueChange={v => kpi.setKpiValue('bookings', v)} goalCurrent={148} goalTarget={kpi.getGoal('bookings')?.target ?? 200} />
         </div>
 
         {/* Pipeline + Revenue Chart */}
@@ -366,7 +370,7 @@ function HospitalityDashboard({ config }: { config: { dashboardTitle: string; da
 // ══════════════════════════════════════════
 // REAL ESTATE DASHBOARD
 // ══════════════════════════════════════════
-function RealEstateDashboard({ config }: { config: { dashboardTitle: string; dashboardSub: string } }) {
+function RealEstateDashboard({ config, kpi }: { config: { dashboardTitle: string; dashboardSub: string }; kpi: KpiStore }) {
   const totalRevenue = RE_MONTHLY.reduce((s, m) => s + m.revenue, 0)
   const totalClosed = RE_MONTHLY.reduce((s, m) => s + m.closed, 0)
   const activeListings = RE_PROPERTIES.filter(p => p.status === 'active').length
@@ -378,11 +382,11 @@ function RealEstateDashboard({ config }: { config: { dashboardTitle: string; das
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPIs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
-          <KpiCard label="Active Listings" value={activeListings} delta="+3 this month" deltaDir="up" icon="folder" accentColor="var(--b)" delay={80} />
-          <KpiCard label="Deals Closed" value={totalClosed} delta="YTD total" deltaDir="up" icon="target" accentColor="var(--g)" delay={130} />
-          <KpiCard label="Commission" value={`€${(totalRevenue / 1000).toFixed(0)}K`} delta="+15.8% vs last quarter" deltaDir="up" icon="dollar-sign" hot delay={180} />
-          <KpiCard label="Avg Days on Market" value={avgDaysOnMarket} delta={avgDaysOnMarket < 30 ? 'Below average' : 'Above average'} deltaDir={avgDaysOnMarket < 30 ? 'up' : 'down'} icon="calendar" accentColor="var(--y)" delay={230} />
-          <KpiCard label="Total Viewings" value="82" delta="+24% this month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={280} />
+          <KpiCard label="Active Listings" value={kpi.getKpiValue('listings', activeListings)} delta="+3 this month" deltaDir="up" icon="folder" accentColor="var(--b)" delay={80} editable onValueChange={v => kpi.setKpiValue('listings', v)} goalCurrent={activeListings} goalTarget={kpi.getGoal('listings_added')?.target ?? 10} />
+          <KpiCard label="Deals Closed" value={kpi.getKpiValue('closed', totalClosed)} delta="YTD total" deltaDir="up" icon="target" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('closed', v)} goalCurrent={totalClosed} goalTarget={kpi.getGoal('deals_closed')?.target ?? 50} />
+          <KpiCard label="Commission" value={kpi.getKpiValue('commission', `€${(totalRevenue / 1000).toFixed(0)}K`)} delta="+15.8% vs last quarter" deltaDir="up" icon="dollar-sign" hot delay={180} editable onValueChange={v => kpi.setKpiValue('commission', v)} />
+          <KpiCard label="Avg Days on Market" value={kpi.getKpiValue('dom', avgDaysOnMarket)} delta={avgDaysOnMarket < 30 ? 'Below average' : 'Above average'} deltaDir={avgDaysOnMarket < 30 ? 'up' : 'down'} icon="calendar" accentColor="var(--y)" delay={230} editable onValueChange={v => kpi.setKpiValue('dom', v)} />
+          <KpiCard label="Total Viewings" value={kpi.getKpiValue('viewings', '82')} delta="+24% this month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={280} editable onValueChange={v => kpi.setKpiValue('viewings', v)} goalCurrent={82} goalTarget={kpi.getGoal('viewings_booked')?.target ?? 100} />
         </div>
 
         {/* Pipeline + Revenue Chart */}
@@ -593,18 +597,18 @@ function RealEstateDashboard({ config }: { config: { dashboardTitle: string; das
 // ══════════════════════════════════════════
 // CSR / PHILANTHROPY DASHBOARD (original)
 // ══════════════════════════════════════════
-function CSRDashboard({ config }: { config: { dashboardTitle: string; dashboardSub: string } }) {
+function CSRDashboard({ config, kpi }: { config: { dashboardTitle: string; dashboardSub: string }; kpi: KpiStore }) {
   return (
     <>
       <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Project" />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPI Strip */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
-          <KpiCard label="Active Projects" value="4" delta="+1 this month" deltaDir="up" icon="folder" accentColor="var(--accent)" delay={80} />
-          <KpiCard label="People Helped" value="1,100" delta="+19.6% vs last month" deltaDir="up" icon="heart" accentColor="var(--p)" delay={130} />
-          <KpiCard label="CO2 Reduced" value="4.5t" delta="+18.4% vs last month" deltaDir="up" icon="leaf" accentColor="var(--g)" delay={180} />
-          <KpiCard label="Trees Planted" value="2,340" delta="Target: 5,000" deltaDir="neu" icon="tree" accentColor="var(--g)" delay={230} />
-          <KpiCard label="Total Donated" value="€48K" delta="12 donors active" deltaDir="up" icon="dollar-sign" hot delay={280} />
+          <KpiCard label="Active Projects" value={kpi.getKpiValue('projects', '4')} delta="+1 this month" deltaDir="up" icon="folder" accentColor="var(--accent)" delay={80} editable onValueChange={v => kpi.setKpiValue('projects', v)} goalCurrent={4} goalTarget={kpi.getGoal('projects_completed')?.target ?? 6} />
+          <KpiCard label="People Helped" value={kpi.getKpiValue('people', '1,100')} delta="+19.6% vs last month" deltaDir="up" icon="heart" accentColor="var(--p)" delay={130} editable onValueChange={v => kpi.setKpiValue('people', v)} goalCurrent={1100} goalTarget={kpi.getGoal('people_helped')?.target ?? 2000} />
+          <KpiCard label="CO2 Reduced" value={kpi.getKpiValue('co2', '4.5t')} delta="+18.4% vs last month" deltaDir="up" icon="leaf" accentColor="var(--g)" delay={180} editable onValueChange={v => kpi.setKpiValue('co2', v)} goalCurrent={4500} goalTarget={kpi.getGoal('co2_reduced')?.target ?? 10000} />
+          <KpiCard label="Trees Planted" value={kpi.getKpiValue('trees', '2,340')} delta="Target: 5,000" deltaDir="neu" icon="tree" accentColor="var(--g)" delay={230} editable onValueChange={v => kpi.setKpiValue('trees', v)} />
+          <KpiCard label="Total Donated" value={kpi.getKpiValue('donated', '€48K')} delta="12 donors active" deltaDir="up" icon="dollar-sign" hot delay={280} editable onValueChange={v => kpi.setKpiValue('donated', v)} goalCurrent={48000} goalTarget={kpi.getGoal('donations_raised')?.target ?? 100000} />
         </div>
 
         {/* Charts + Activity */}
