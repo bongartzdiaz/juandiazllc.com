@@ -43,6 +43,19 @@ const RE_CONTACTS: Contact[] = [
   { id: '10', firstName: 'Claudia', lastName: 'Brouwer', company: 'Brouwer Investments AG', type: 'investor', email: 'c.brouwer@brouwer-inv.ch', phone: '+41 79 123 4567', projects: 4 },
 ]
 
+const HOS_CONTACTS: Contact[] = [
+  { id: '1', firstName: 'Hans', lastName: 'Müller', company: 'Business Traveler', type: 'guest', email: 'h.muller@corp.de', phone: '+49 170 123 4567', projects: 4 },
+  { id: '2', firstName: 'Elena', lastName: 'Rossi', company: 'Rossi Family (IT)', type: 'guest', email: 'e.rossi@gmail.com', phone: '+39 333 456 7890', projects: 2 },
+  { id: '3', firstName: 'Fresh Foods BV', lastName: '', company: 'Fresh Foods BV', type: 'vendor', email: 'orders@freshfoods.nl', phone: '+31 20 555 0201', projects: 1 },
+  { id: '4', firstName: 'SparkleClean', lastName: 'Services', company: 'SparkleClean Services', type: 'partner', email: 'info@sparkleclean.nl', phone: '+31 20 555 0302', projects: 3 },
+  { id: '5', firstName: 'Maria', lastName: 'Santos', company: 'Santos Wedding Party', type: 'guest', email: 'm.santos@outlook.com', phone: '+31 6 9876 5432', projects: 1 },
+  { id: '6', firstName: 'Peter', lastName: 'de Groot', company: 'Hotel Staff — Front Desk', type: 'staff', email: 'p.degroot@hotel.nl', phone: '+31 6 1111 2222', projects: 0 },
+  { id: '7', firstName: 'Wine & Dine', lastName: 'Distributors', company: 'Wine & Dine Distributors', type: 'vendor', email: 'sales@winedine.nl', phone: '+31 20 555 0403', projects: 2 },
+  { id: '8', firstName: 'James', lastName: 'Wilson', company: 'TechCorp Events', type: 'guest', email: 'j.wilson@techcorp.com', phone: '+1 415 555 0199', projects: 3 },
+  { id: '9', firstName: 'Anna', lastName: 'Bakker', company: 'Hotel Staff — Housekeeping', type: 'staff', email: 'a.bakker@hotel.nl', phone: '+31 6 3333 4444', projects: 0 },
+  { id: '10', firstName: 'Linen & More', lastName: 'BV', company: 'Linen & More BV', type: 'partner', email: 'service@linenmore.nl', phone: '+31 20 555 0504', projects: 2 },
+]
+
 const typeColors: Record<string, { bg: string; txt: string; border: string }> = {
   partner: { bg: 'var(--accent-bg)', txt: 'var(--accent-txt)', border: 'var(--accent-border)' },
   donor: { bg: 'var(--g-bg)', txt: 'var(--g-txt)', border: 'var(--g-border)' },
@@ -52,6 +65,9 @@ const typeColors: Record<string, { bg: string; txt: string; border: string }> = 
   seller: { bg: 'var(--g-bg)', txt: 'var(--g-txt)', border: 'var(--g-border)' },
   tenant: { bg: 'var(--o-bg)', txt: 'var(--o-txt)', border: 'var(--o-border)' },
   investor: { bg: 'var(--p-bg)', txt: 'var(--p-txt)', border: 'var(--p-border)' },
+  guest: { bg: 'var(--accent-bg)', txt: 'var(--accent-txt)', border: 'var(--accent-border)' },
+  vendor: { bg: 'var(--o-bg)', txt: 'var(--o-txt)', border: 'var(--o-border)' },
+  staff: { bg: 'var(--y-bg)', txt: 'var(--y-txt)', border: 'var(--y-border)' },
 }
 
 const avatarColors: Record<string, string> = {
@@ -63,6 +79,9 @@ const avatarColors: Record<string, string> = {
   seller: 'var(--g)',
   tenant: 'var(--o)',
   investor: 'var(--p)',
+  guest: 'var(--accent)',
+  vendor: 'var(--o)',
+  staff: 'var(--y)',
 }
 
 export default function ContactsPage() {
@@ -71,8 +90,11 @@ export default function ContactsPage() {
   const [typeFilter, setTypeFilter] = useState<string>('all')
 
   const isRE = industry === 'realestate'
-  const contacts = isRE ? RE_CONTACTS : DEMO_CONTACTS
-  const filterOptions = isRE
+  const isHOS = industry === 'hospitality'
+  const contacts = isHOS ? HOS_CONTACTS : isRE ? RE_CONTACTS : DEMO_CONTACTS
+  const filterOptions = isHOS
+    ? ['all', 'guest', 'vendor', 'partner', 'staff']
+    : isRE
     ? ['all', 'buyer', 'seller', 'tenant', 'investor']
     : ['all', 'partner', 'beneficiary', 'stakeholder', 'donor']
 
@@ -96,14 +118,21 @@ export default function ContactsPage() {
     <>
       <Topbar
         title="Contacts"
-        sub={isRE ? 'Buyers, sellers & investors' : 'Partners, donors & stakeholders'}
+        sub={isHOS ? 'Guests, vendors & partners' : isRE ? 'Buyers, sellers & investors' : 'Partners, donors & stakeholders'}
         addLabel="New Contact"
       />
 
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPIs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 18 }}>
-          {isRE ? (
+          {isHOS ? (
+            <>
+              <KpiCard label="Total Contacts" value={contacts.length} icon="users" accentColor="var(--accent)" delay={80} />
+              <KpiCard label="Guests" value={countByType('guest')} delta={`${Math.round((countByType('guest') / contacts.length) * 100)}% of total`} deltaDir="neu" icon="heart" accentColor="var(--accent)" delay={130} />
+              <KpiCard label="Vendors" value={countByType('vendor')} delta={`${Math.round((countByType('vendor') / contacts.length) * 100)}% of total`} deltaDir="up" icon="dollar-sign" accentColor="var(--o)" delay={180} />
+              <KpiCard label="Staff" value={countByType('staff')} icon="globe" accentColor="var(--y)" delay={230} />
+            </>
+          ) : isRE ? (
             <>
               <KpiCard label="Total Contacts" value={contacts.length} icon="users" accentColor="var(--accent)" delay={80} />
               <KpiCard label="Buyers" value={countByType('buyer')} delta={`${Math.round((countByType('buyer') / contacts.length) * 100)}% of total`} deltaDir="neu" icon="heart" accentColor="var(--accent)" delay={130} />
@@ -189,7 +218,7 @@ export default function ContactsPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--txt2)' }}>
                     <FolderKanban size={12} color="var(--txt3)" />
                     <span className="mono" style={{ fontWeight: 600 }}>{c.projects}</span>
-                    <span>connected {isRE ? 'propert' : 'project'}{c.projects !== 1 ? (isRE ? 'ies' : 's') : (isRE ? 'y' : '')}</span>
+                    <span>connected {isHOS ? 'reservation' : isRE ? 'propert' : 'project'}{c.projects !== 1 ? (isHOS ? 's' : isRE ? 'ies' : 's') : (isRE ? 'y' : '')}</span>
                   </div>
                 </div>
               </div>

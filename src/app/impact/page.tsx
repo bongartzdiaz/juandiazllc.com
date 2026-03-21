@@ -101,11 +101,163 @@ const trendIcons: Record<string, { symbol: string; color: string }> = {
   stable: { symbol: '~', color: 'var(--txt3)' },
 }
 
+/* ── Hospitality data ── */
+
+const HOS_ROOM_TYPES = [
+  { type: 'Suite', occupancy: 92, adr: 480, revenue: 52800, reviews: 48 },
+  { type: 'Deluxe', occupancy: 85, adr: 225, revenue: 38250, reviews: 72 },
+  { type: 'Standard', occupancy: 74, adr: 135, revenue: 29970, reviews: 95 },
+  { type: 'Economy', occupancy: 68, adr: 95, revenue: 19380, reviews: 61 },
+]
+
+const HOS_TREND_DATA = [
+  { month: 'Sep', occupancy: 65, revenue: 42000 },
+  { month: 'Oct', occupancy: 70, revenue: 48000 },
+  { month: 'Nov', occupancy: 72, revenue: 52000 },
+  { month: 'Dec', occupancy: 82, revenue: 64000 },
+  { month: 'Jan', occupancy: 68, revenue: 46000 },
+  { month: 'Feb', occupancy: 74, revenue: 54000 },
+  { month: 'Mar', occupancy: 78, revenue: 58000 },
+  { month: 'Apr', occupancy: 80, revenue: 62000 },
+  { month: 'May', occupancy: 84, revenue: 68000 },
+  { month: 'Jun', occupancy: 88, revenue: 72000 },
+  { month: 'Jul', occupancy: 91, revenue: 78000 },
+  { month: 'Aug', occupancy: 86, revenue: 74000 },
+]
+
 /* ── Component ── */
 
 export default function ImpactPage() {
   const { industry } = useIndustry()
   const isRE = industry === 'realestate'
+  const isHOS = industry === 'hospitality'
+
+  if (isHOS) {
+    return (
+      <>
+        <Topbar title="Analytics" sub="Performance & guest insights" />
+
+        <div style={{ padding: '18px 24px 40px' }}>
+          {/* KPIs */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
+            <KpiCard label="Occupancy Rate" value="78%" delta="+4% vs last month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={80} />
+            <KpiCard label="RevPAR" value="€142" delta="+€12 vs avg" deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={130} />
+            <KpiCard label="ADR" value="€185" delta="Avg Daily Rate" deltaDir="neu" icon="chart" accentColor="var(--b)" delay={180} />
+            <KpiCard label="Avg Review" value="4.6/5" delta="189 reviews total" deltaDir="up" icon="heart" accentColor="var(--o)" delay={230} />
+            <KpiCard label="F&B Revenue" value="€18K" delta="+8% this month" deltaDir="up" icon="zap" accentColor="var(--p)" delay={280} />
+          </div>
+
+          {/* Room Type Performance */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px', marginBottom: 14,
+            boxShadow: 'var(--shadow-sm)',
+          }}>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Room Type Performance</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {HOS_ROOM_TYPES.map(rt => (
+                <div key={rt.type}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600 }}>{rt.type}</span>
+                    <span className="mono" style={{ fontSize: 12, color: 'var(--txt2)' }}>{rt.occupancy}% occupancy — €{rt.adr} ADR</span>
+                  </div>
+                  <div style={{ height: 8, borderRadius: 4, background: 'var(--bg2)', overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%', borderRadius: 4, width: `${rt.occupancy}%`,
+                      background: rt.occupancy >= 85 ? 'var(--g)' : rt.occupancy >= 70 ? 'var(--accent)' : 'var(--y)',
+                      transition: 'width 0.6s ease',
+                    }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Table + Trend Chart */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {/* Room Type Table */}
+            <div style={{
+              background: 'var(--panel)', border: '1px solid var(--border)',
+              borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
+            }}>
+              <div style={{ padding: '14px 16px 0', fontSize: 13, fontWeight: 600 }}>Revenue by Room Type</div>
+              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 8 }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    {['Room Type', 'Occupancy %', 'ADR', 'Revenue', 'Reviews'].map(h => (
+                      <th key={h} style={{
+                        padding: '8px 14px', textAlign: h === 'Room Type' ? 'left' : 'right',
+                        fontSize: 10.5, fontWeight: 600, textTransform: 'uppercase',
+                        color: 'var(--txt3)', letterSpacing: '0.05em',
+                      }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {HOS_ROOM_TYPES.map(rt => (
+                    <tr key={rt.type} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '10px 14px', fontSize: 12, fontWeight: 600 }}>{rt.type}</td>
+                      <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right' }}>{rt.occupancy}%</td>
+                      <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right' }}>€{rt.adr}</td>
+                      <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right' }}>€{(rt.revenue / 1000).toFixed(1)}K</td>
+                      <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right' }}>{rt.reviews}</td>
+                    </tr>
+                  ))}
+                  <tr style={{ background: 'var(--bg2)' }}>
+                    <td style={{ padding: '10px 14px', fontSize: 12, fontWeight: 700 }}>Total</td>
+                    <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>{Math.round(HOS_ROOM_TYPES.reduce((s, r) => s + r.occupancy, 0) / HOS_ROOM_TYPES.length)}%</td>
+                    <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>€{Math.round(HOS_ROOM_TYPES.reduce((s, r) => s + r.adr, 0) / HOS_ROOM_TYPES.length)}</td>
+                    <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>€{(HOS_ROOM_TYPES.reduce((s, r) => s + r.revenue, 0) / 1000).toFixed(1)}K</td>
+                    <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>{HOS_ROOM_TYPES.reduce((s, r) => s + r.reviews, 0)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Occupancy + Revenue Trend */}
+            <div style={{
+              background: 'var(--panel)', border: '1px solid var(--border)',
+              borderRadius: 12, padding: '16px', boxShadow: 'var(--shadow-sm)',
+              display: 'flex', flexDirection: 'column',
+            }}>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Occupancy & Revenue Trend (12 months)</div>
+              <div style={{ flex: 1, minHeight: 260 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={HOS_TREND_DATA} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="gradOcc" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#0D7377" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#0D7377" stopOpacity={0.02} />
+                      </linearGradient>
+                      <linearGradient id="gradRev" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#059669" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#059669" stopOpacity={0.02} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--panel)', border: '1px solid var(--border)',
+                        borderRadius: 8, fontSize: 12, boxShadow: 'var(--shadow)',
+                      }}
+                      formatter={(v, name) => [
+                        name === 'occupancy' ? `${v}%` : `€${(Number(v) / 1000).toFixed(0)}K`,
+                        name === 'occupancy' ? 'Occupancy' : 'Revenue',
+                      ]}
+                    />
+                    <Area type="monotone" dataKey="occupancy" name="occupancy" stroke="#0D7377" fill="url(#gradOcc)" strokeWidth={2} />
+                    <Area type="monotone" dataKey="revenue" name="revenue" stroke="#059669" fill="url(#gradRev)" strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
 
   if (isRE) {
     return (

@@ -115,6 +115,49 @@ const RE_COLUMNS: KanbanColumn[] = [
   },
 ]
 
+const HOS_COLUMNS: KanbanColumn[] = [
+  {
+    id: 'inquiry',
+    title: 'Inquiry',
+    cards: [
+      { id: 'hi1', title: 'Tanaka Family — Deluxe King', description: 'Family of 4, requesting adjoining rooms, arriving Apr 5 for 5 nights', priority: 'medium', sdgs: [], assignee: 'PG', dueDate: '2026-04-05' },
+      { id: 'hi2', title: 'Corporate Group — Conference Hall', description: 'TechCorp requesting full-day conference for 80 pax with catering', priority: 'high', sdgs: [], assignee: 'AB', dueDate: '2026-04-12' },
+    ],
+  },
+  {
+    id: 'confirmed',
+    title: 'Confirmed',
+    cards: [
+      { id: 'hc1', title: 'Mr. & Mrs. Jansen — Royal Suite', description: 'Anniversary celebration, 4 nights, champagne & flowers requested', priority: 'high', sdgs: [], assignee: 'PG', dueDate: '2026-03-28' },
+      { id: 'hc2', title: 'Wilson Party — Garden Pavilion', description: 'Wedding reception for 120 guests, full F&B package confirmed', priority: 'urgent', sdgs: [], assignee: 'AB', dueDate: '2026-04-02' },
+      { id: 'hc3', title: 'Santos Group — 3x Standard', description: 'Business travelers, 2 nights each, early check-in requested', priority: 'low', sdgs: [], assignee: 'PG', dueDate: '2026-03-30' },
+    ],
+  },
+  {
+    id: 'arriving',
+    title: 'Arriving Today',
+    cards: [
+      { id: 'ha1', title: 'Dr. Rossi — Penthouse Suite', description: 'VIP guest, 3 nights, airport transfer arranged, dietary restrictions noted', priority: 'urgent', sdgs: [], assignee: 'PG', dueDate: '2026-03-21' },
+      { id: 'ha2', title: 'Chen Family — Deluxe King 305', description: 'Family of 3, 2 nights, crib requested for infant', priority: 'high', sdgs: [], assignee: 'AB', dueDate: '2026-03-21' },
+    ],
+  },
+  {
+    id: 'inhouse',
+    title: 'In-House',
+    cards: [
+      { id: 'hh1', title: 'T. Nakamura — Deluxe King 305', description: 'Business stay, 2 of 4 nights completed, laundry service requested', priority: 'medium', sdgs: [], assignee: 'AB', dueDate: '2026-03-23' },
+      { id: 'hh2', title: 'Müller Group — 2x Standard', description: 'Corporate stay, minibar restocked, late checkout requested for Friday', priority: 'low', sdgs: [], assignee: 'PG', dueDate: '2026-03-22' },
+    ],
+  },
+  {
+    id: 'departing',
+    title: 'Departing',
+    cards: [
+      { id: 'hd1', title: 'Smith Family — Standard 201', description: 'Checkout today, feedback form sent, minibar charges pending', priority: 'medium', sdgs: [], assignee: 'PG', dueDate: '2026-03-21' },
+    ],
+  },
+]
+
 const columnAccents: Record<string, string> = {
   backlog: 'var(--txt3)',
   'in-progress': 'var(--b)',
@@ -125,19 +168,25 @@ const columnAccents: Record<string, string> = {
   offer: 'var(--o)',
   contract: 'var(--p)',
   closed: 'var(--g)',
+  inquiry: 'var(--txt3)',
+  confirmed: 'var(--b)',
+  arriving: 'var(--o)',
+  inhouse: 'var(--p)',
+  departing: 'var(--g)',
 }
 
 export default function KanbanPage() {
   const { industry } = useIndustry()
   const isRE = industry === 'realestate'
-  const [columns] = useState(isRE ? RE_COLUMNS : DEMO_COLUMNS)
+  const isHOS = industry === 'hospitality'
+  const [columns] = useState(isHOS ? HOS_COLUMNS : isRE ? RE_COLUMNS : DEMO_COLUMNS)
 
   return (
     <>
       <Topbar
-        title={isRE ? 'Deals' : 'Kanban'}
-        sub={isRE ? 'Track your transactions' : 'Visual project management'}
-        addLabel={isRE ? 'New Deal' : 'New Board'}
+        title={isHOS ? 'Reservations' : isRE ? 'Deals' : 'Kanban'}
+        sub={isHOS ? 'Manage bookings' : isRE ? 'Track your transactions' : 'Visual project management'}
+        addLabel={isHOS ? 'New Booking' : isRE ? 'New Deal' : 'New Board'}
       />
 
       <div style={{ padding: '18px 24px 40px' }}>
@@ -200,7 +249,7 @@ export default function KanbanPage() {
                           background: ps.bg, color: ps.txt, border: `1px solid ${ps.border}`,
                           textTransform: 'capitalize',
                         }}>{card.priority}</span>
-                        {!isRE && card.sdgs.length > 0 && (
+                        {!isRE && !isHOS && card.sdgs.length > 0 && (
                           <div style={{ display: 'flex', gap: 3 }}>
                             {card.sdgs.map(s => (
                               <div key={s} style={{

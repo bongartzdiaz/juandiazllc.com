@@ -6,7 +6,7 @@ import { useIndustry } from '@/hooks/useIndustry'
 import {
   FolderKanban, Leaf, Globe2, ArrowRight, Clock,
   Building2, DollarSign, TrendingUp, Home, Key, Calendar,
-  Users, MapPin, Star,
+  Users, MapPin, Star, BedDouble, UtensilsCrossed, Coffee,
 } from 'lucide-react'
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -73,6 +73,47 @@ const RE_PIPELINE = [
   { stage: 'Closed', value: 9, color: 'var(--g)' },
 ]
 
+// ── Hospitality Demo Data ──
+const HOS_MONTHLY = [
+  { month: 'Oct', roomRevenue: 38000, fnbRevenue: 12000 },
+  { month: 'Nov', roomRevenue: 44000, fnbRevenue: 14000 },
+  { month: 'Dec', roomRevenue: 52000, fnbRevenue: 18000 },
+  { month: 'Jan', roomRevenue: 41000, fnbRevenue: 13000 },
+  { month: 'Feb', roomRevenue: 46000, fnbRevenue: 15000 },
+  { month: 'Mar', roomRevenue: 48000, fnbRevenue: 16000 },
+]
+
+const HOS_ROOMS = [
+  { id: '1', title: 'Royal Suite — Floor 4', status: 'occupied', type: 'Suite', rate: 450, guests: 'Mr. & Mrs. Jansen', nights: 4 },
+  { id: '2', title: 'Standard Double 201', status: 'available', type: 'Standard', rate: 135, guests: '', nights: 0 },
+  { id: '3', title: 'Deluxe King 305', status: 'occupied', type: 'Deluxe', rate: 225, guests: 'T. Nakamura', nights: 2 },
+  { id: '4', title: 'Restaurant — La Terrazza', status: 'available', type: 'F&B Venue', rate: 0, guests: '', nights: 0 },
+  { id: '5', title: 'Conference Hall A', status: 'reserved', type: 'Event Space', rate: 800, guests: 'TechCorp Summit', nights: 1 },
+]
+
+const HOS_ACTIVITY = [
+  { text: 'New booking: Suite 401 — 3 nights', time: '45m ago' },
+  { text: 'Guest checkout: Room 205 — rated 5 stars', time: '2h ago' },
+  { text: 'Review received: 5 stars — "Excellent service"', time: '3h ago' },
+  { text: 'Maintenance completed: Room 108 — AC repair', time: '5h ago' },
+  { text: 'F&B order: La Terrazza — private dinner for 12', time: '1d ago' },
+]
+
+const HOS_PIPELINE = [
+  { stage: 'Inquiry', value: 42, color: 'var(--txt3)' },
+  { stage: 'Confirmed', value: 28, color: 'var(--b)' },
+  { stage: 'Checked-In', value: 18, color: 'var(--o)' },
+  { stage: 'Checked-Out', value: 12, color: 'var(--p)' },
+  { stage: 'Reviewed', value: 9, color: 'var(--g)' },
+]
+
+const hosStatusColors: Record<string, { bg: string; txt: string; border: string }> = {
+  available: { bg: 'var(--g-bg)', txt: 'var(--g-txt)', border: 'var(--g-border)' },
+  occupied: { bg: 'var(--accent-bg)', txt: 'var(--accent-txt)', border: 'var(--accent-border)' },
+  reserved: { bg: 'var(--y-bg)', txt: 'var(--y-txt)', border: 'var(--y-border)' },
+  maintenance: { bg: 'var(--o-bg)', txt: 'var(--o-txt)', border: 'var(--o-border)' },
+}
+
 const SDG_COLORS: Record<number, string> = {
   1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21',
   6: '#26BDE2', 7: '#FCC30B', 8: '#A21942', 9: '#FD6925', 10: '#DD1367',
@@ -92,8 +133,234 @@ const statusColors: Record<string, { bg: string; txt: string; border: string }> 
 export default function DashboardPage() {
   const { industry, config } = useIndustry()
 
+  if (industry === 'hospitality') return <HospitalityDashboard config={config} />
   if (industry === 'realestate') return <RealEstateDashboard config={config} />
   return <CSRDashboard config={config} />
+}
+
+// ══════════════════════════════════════════
+// HOSPITALITY DASHBOARD
+// ══════════════════════════════════════════
+function HospitalityDashboard({ config }: { config: { dashboardTitle: string; dashboardSub: string } }) {
+  const totalRevenue = HOS_MONTHLY.reduce((s, m) => s + m.roomRevenue + m.fnbRevenue, 0)
+
+  return (
+    <>
+      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Booking" />
+      <div style={{ padding: '18px 24px 40px' }}>
+        {/* KPIs */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
+          <KpiCard label="Occupancy Rate" value="78%" delta="+4% vs last month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={80} />
+          <KpiCard label="RevPAR" value="€142" delta="+€12 vs avg" deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={130} />
+          <KpiCard label="ADR" value="€185" delta="Avg Daily Rate" deltaDir="neu" icon="chart" accentColor="var(--b)" delay={180} />
+          <KpiCard label="Guest Satisfaction" value="4.6/5" delta="Based on 189 reviews" deltaDir="up" icon="heart" accentColor="var(--y)" delay={230} />
+          <KpiCard label="Total Bookings" value="234" delta="+18 this week" deltaDir="up" icon="calendar" hot delay={280} />
+        </div>
+
+        {/* Pipeline + Revenue Chart */}
+        <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: 14, marginBottom: 14 }}>
+          {/* Booking Pipeline */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <TrendingUp size={14} color="var(--accent)" />
+              </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>Booking Pipeline</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Guest journey overview</div>
+              </div>
+            </div>
+            {HOS_PIPELINE.map((stage, i) => (
+              <div key={stage.stage} style={{ marginBottom: i < HOS_PIPELINE.length - 1 ? 12 : 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, color: 'var(--txt2)' }}>{stage.stage}</span>
+                  <span className="mono" style={{ fontSize: 12, fontWeight: 600 }}>{stage.value}</span>
+                </div>
+                <div style={{ height: 6, borderRadius: 3, background: 'var(--bg2)', overflow: 'hidden' }}>
+                  <div style={{
+                    height: '100%', borderRadius: 3,
+                    width: `${(stage.value / 42) * 100}%`,
+                    background: stage.color,
+                    transition: 'width 0.8s ease',
+                  }} />
+                </div>
+              </div>
+            ))}
+            <div style={{
+              marginTop: 16, padding: '10px 12px', borderRadius: 8,
+              background: 'var(--g-bg)', border: '1px solid var(--g-border)',
+            }}>
+              <div style={{ fontSize: 11, color: 'var(--g-txt)', fontWeight: 600 }}>Review Rate</div>
+              <div className="mono" style={{ fontSize: 20, fontWeight: 600, color: 'var(--g-txt)' }}>75%</div>
+              <div style={{ fontSize: 10, color: 'var(--g-txt)', opacity: 0.8 }}>Checkout to Review</div>
+            </div>
+          </div>
+
+          {/* Revenue Chart */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <DollarSign size={14} color="var(--accent)" />
+              </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>Revenue Breakdown</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Room + F&B revenue monthly</div>
+              </div>
+            </div>
+            <div style={{ height: 250 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={HOS_MONTHLY}>
+                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} width={50} />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'var(--panel)', border: '1px solid var(--border)',
+                      borderRadius: 8, fontSize: 12, boxShadow: 'var(--shadow)',
+                    }}
+                    formatter={(v, name) => [
+                      `€${(Number(v) / 1000).toFixed(0)}K`,
+                      name === 'roomRevenue' ? 'Room Revenue' : 'F&B Revenue',
+                    ]}
+                  />
+                  <Bar dataKey="roomRevenue" fill="var(--accent)" radius={[4, 4, 0, 0]} stackId="rev" />
+                  <Bar dataKey="fnbRevenue" fill="var(--g)" radius={[4, 4, 0, 0]} stackId="rev" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Rooms + Activity */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 14 }}>
+          {/* Rooms/Venues */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{
+                  width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <BedDouble size={14} color="var(--accent)" />
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>Rooms & Venues</div>
+              </div>
+              <button style={{
+                fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none',
+                cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4,
+              }}>
+                View All <ArrowRight size={12} />
+              </button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {HOS_ROOMS.map(p => {
+                const sc = hosStatusColors[p.status] || hosStatusColors.available
+                return (
+                  <div key={p.id} className="card-hover" style={{
+                    padding: '12px 14px', borderRadius: 10,
+                    border: '1px solid var(--border)', background: 'var(--panel2)',
+                    display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
+                  }}>
+                    <div style={{
+                      width: 40, height: 40, borderRadius: 8, background: 'var(--bg2)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {p.type === 'F&B Venue' ? <UtensilsCrossed size={18} color="var(--txt3)" /> :
+                       p.type === 'Event Space' ? <Calendar size={18} color="var(--txt3)" /> :
+                       <BedDouble size={18} color="var(--txt3)" />}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 3 }}>{p.title}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{
+                          fontSize: 10, fontWeight: 600, padding: '1px 7px', borderRadius: 6,
+                          background: sc.bg, color: sc.txt, border: `1px solid ${sc.border}`,
+                          textTransform: 'capitalize',
+                        }}>{p.status}</span>
+                        <span style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{p.type}</span>
+                        {p.guests && <span style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{p.guests}</span>}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      {p.rate > 0 && (
+                        <div className="mono" style={{ fontSize: 14, fontWeight: 600 }}>€{p.rate}/night</div>
+                      )}
+                      {p.nights > 0 && (
+                        <div className="mono" style={{ fontSize: 10, color: 'var(--txt3)' }}>{p.nights} nights</div>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Activity */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 8, background: 'var(--bg2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Clock size={14} color="var(--txt3)" />
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>Recent Activity</div>
+            </div>
+            {HOS_ACTIVITY.map((a, i) => (
+              <div key={i} style={{
+                padding: '10px 0',
+                borderBottom: i < HOS_ACTIVITY.length - 1 ? '1px solid var(--border)' : 'none',
+              }}>
+                <div style={{ fontSize: 12.5, lineHeight: 1.4 }}>{a.text}</div>
+                <div className="mono" style={{ fontSize: 10.5, color: 'var(--txt3)', marginTop: 2 }}>{a.time}</div>
+              </div>
+            ))}
+
+            {/* Quick Stats */}
+            <div style={{
+              marginTop: 14, padding: '12px', borderRadius: 8,
+              background: 'var(--bg2)', border: '1px solid var(--border)',
+            }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt3)', marginBottom: 8 }}>QUICK STATS</div>
+              {[
+                { label: 'Avg Stay', value: '2.8 nights', icon: Calendar },
+                { label: 'Repeat Guests', value: '34%', icon: Users },
+                { label: 'Revenue This Month', value: '€48K', icon: DollarSign },
+              ].map(stat => (
+                <div key={stat.label} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '6px 0',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <stat.icon size={12} color="var(--txt3)" />
+                    <span style={{ fontSize: 11.5, color: 'var(--txt2)' }}>{stat.label}</span>
+                  </div>
+                  <span className="mono" style={{ fontSize: 12, fontWeight: 600 }}>{stat.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  )
 }
 
 // ══════════════════════════════════════════

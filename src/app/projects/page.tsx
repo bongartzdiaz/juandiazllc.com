@@ -24,6 +24,17 @@ const RE_PROJECTS = [
   { id: '6', title: 'Warehouse Loft — NDSM', status: 'active', category: 'Mixed-Use', budget: 550000, spent: 0, startDate: '2026-02-01', sdgs: [] as number[], milestones: 4, completedMilestones: 1, contacts: 2 },
 ]
 
+const HOS_PROJECTS = [
+  { id: '1', title: 'Royal Suite — Floor 4', status: 'active', category: 'Suite', budget: 450, spent: 0, startDate: '2025-01-01', sdgs: [] as number[], milestones: 4, completedMilestones: 4, contacts: 2 },
+  { id: '2', title: 'Standard Double 201', status: 'active', category: 'Standard', budget: 135, spent: 0, startDate: '2025-01-01', sdgs: [] as number[], milestones: 4, completedMilestones: 4, contacts: 1 },
+  { id: '3', title: 'Restaurant — La Terrazza', status: 'active', category: 'F&B Venue', budget: 0, spent: 0, startDate: '2024-06-01', sdgs: [] as number[], milestones: 6, completedMilestones: 6, contacts: 4 },
+  { id: '4', title: 'Conference Hall A', status: 'active', category: 'Event Space', budget: 800, spent: 0, startDate: '2024-09-01', sdgs: [] as number[], milestones: 5, completedMilestones: 5, contacts: 3 },
+  { id: '5', title: 'Penthouse Suite', status: 'maintenance', category: 'Suite', budget: 650, spent: 0, startDate: '2025-01-01', sdgs: [] as number[], milestones: 4, completedMilestones: 2, contacts: 0 },
+  { id: '6', title: 'Garden Pavilion', status: 'active', category: 'Event Space', budget: 1200, spent: 0, startDate: '2024-03-01', sdgs: [] as number[], milestones: 3, completedMilestones: 3, contacts: 5 },
+  { id: '7', title: 'Deluxe King 305', status: 'reserved', category: 'Deluxe', budget: 225, spent: 0, startDate: '2025-02-01', sdgs: [] as number[], milestones: 4, completedMilestones: 4, contacts: 1 },
+  { id: '8', title: 'Economy Twin 102', status: 'active', category: 'Economy', budget: 95, spent: 0, startDate: '2025-01-01', sdgs: [] as number[], milestones: 4, completedMilestones: 3, contacts: 1 },
+]
+
 const SDG_COLORS: Record<number, string> = {
   1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21',
   6: '#26BDE2', 7: '#FCC30B', 8: '#A21942', 9: '#FD6925', 10: '#DD1367',
@@ -38,6 +49,8 @@ const statusColors: Record<string, { bg: string; txt: string; border: string }> 
   paused: { bg: 'var(--y-bg)', txt: 'var(--y-txt)', border: 'var(--y-border)' },
   pending: { bg: 'var(--y-bg)', txt: 'var(--y-txt)', border: 'var(--y-border)' },
   sold: { bg: 'var(--g-bg)', txt: 'var(--g-txt)', border: 'var(--g-border)' },
+  maintenance: { bg: 'var(--o-bg)', txt: 'var(--o-txt)', border: 'var(--o-border)' },
+  reserved: { bg: 'var(--p-bg)', txt: 'var(--p-txt)', border: 'var(--p-border)' },
 }
 
 export default function ProjectsPage() {
@@ -47,8 +60,11 @@ export default function ProjectsPage() {
   const [view, setView] = useState<'grid' | 'list'>('grid')
 
   const isRE = industry === 'realestate'
-  const projects = isRE ? RE_PROJECTS : DEMO_PROJECTS
-  const statusOptions = isRE
+  const isHOS = industry === 'hospitality'
+  const projects = isHOS ? HOS_PROJECTS : isRE ? RE_PROJECTS : DEMO_PROJECTS
+  const statusOptions = isHOS
+    ? ['all', 'active', 'maintenance', 'reserved']
+    : isRE
     ? ['all', 'active', 'pending', 'sold']
     : ['all', 'active', 'planned', 'completed', 'paused']
 
@@ -63,7 +79,7 @@ export default function ProjectsPage() {
   const totalSpent = projects.reduce((s, p) => s + p.spent, 0)
   const avgPrice = Math.round(totalBudget / projects.length)
 
-  const budgetLabel = isRE ? 'Price' : 'Budget'
+  const budgetLabel = isHOS ? 'Nightly Rate' : isRE ? 'Price' : 'Budget'
 
   const formatCurrency = (v: number) => {
     if (v >= 1000000) return `€${(v / 1000000).toFixed(1)}M`
@@ -73,15 +89,22 @@ export default function ProjectsPage() {
   return (
     <>
       <Topbar
-        title={isRE ? 'Properties' : 'Projects'}
-        sub={isRE ? 'Manage your portfolio' : 'Manage your CSR initiatives'}
-        addLabel={isRE ? 'New Property' : 'New Project'}
+        title={isHOS ? 'Venues & Rooms' : isRE ? 'Properties' : 'Projects'}
+        sub={isHOS ? 'Manage your properties' : isRE ? 'Manage your portfolio' : 'Manage your CSR initiatives'}
+        addLabel={isHOS ? 'New Room' : isRE ? 'New Property' : 'New Project'}
       />
 
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPIs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 18 }}>
-          {isRE ? (
+          {isHOS ? (
+            <>
+              <KpiCard label="Total Venues" value={projects.length} icon="folder" accentColor="var(--accent)" delay={80} />
+              <KpiCard label="Available" value={projects.filter(p => p.status === 'active').length} delta={`${Math.round((activeCount / projects.length) * 100)}% of total`} deltaDir="up" icon="zap" accentColor="var(--g)" delay={130} />
+              <KpiCard label="Avg Nightly Rate" value={`€${Math.round(projects.filter(p => p.budget > 0).reduce((s, p) => s + p.budget, 0) / projects.filter(p => p.budget > 0).length)}`} icon="dollar-sign" accentColor="var(--accent)" delay={180} />
+              <KpiCard label="Occupancy" value="78%" delta="Current month" deltaDir="up" icon="chart" accentColor="var(--y)" delay={230} />
+            </>
+          ) : isRE ? (
             <>
               <KpiCard label="Total Properties" value={projects.length} icon="folder" accentColor="var(--accent)" delay={80} />
               <KpiCard label="Active Listings" value={activeCount} delta={`${Math.round((activeCount / projects.length) * 100)}% of total`} deltaDir="up" icon="zap" accentColor="var(--g)" delay={130} />
@@ -109,7 +132,7 @@ export default function ProjectsPage() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder={isRE ? 'Search properties...' : 'Search projects...'}
+              placeholder={isHOS ? 'Search rooms & venues...' : isRE ? 'Search properties...' : 'Search projects...'}
               style={{ border: 'none', background: 'none', flex: 1, fontSize: 13, padding: 0 }}
             />
           </div>
@@ -153,7 +176,7 @@ export default function ProjectsPage() {
                       background: sc.bg, color: sc.txt, border: `1px solid ${sc.border}`,
                       textTransform: 'capitalize',
                     }}>{p.status}</span>
-                    {!isRE && (
+                    {!isRE && !isHOS && (
                       <div style={{ display: 'flex', gap: 3 }}>
                         {p.sdgs.map(s => (
                           <div key={s} style={{
@@ -186,7 +209,9 @@ export default function ProjectsPage() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
                     <span style={{ color: 'var(--txt3)' }}>{budgetLabel}</span>
                     <span className="mono" style={{ fontWeight: 600 }}>
-                      {isRE
+                      {isHOS
+                        ? (p.budget > 0 ? `€${p.budget}/night` : '—')
+                        : isRE
                         ? formatCurrency(p.budget)
                         : `€${(p.spent / 1000).toFixed(0)}K / €${(p.budget / 1000).toFixed(0)}K`
                       }
@@ -204,7 +229,9 @@ export default function ProjectsPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {(isRE
+                  {(isHOS
+                    ? ['Room / Venue', 'Status', 'Category', 'Nightly Rate', 'Progress']
+                    : isRE
                     ? ['Property', 'Status', 'Category', 'Price', 'Progress']
                     : ['Project', 'Status', 'Category', 'Budget', 'Progress', 'SDGs']
                   ).map(h => (
@@ -232,7 +259,7 @@ export default function ProjectsPage() {
                       </td>
                       <td style={{ padding: '12px 14px', fontSize: 12, color: 'var(--txt2)' }}>{p.category}</td>
                       <td className="mono" style={{ padding: '12px 14px', fontSize: 12 }}>
-                        {isRE ? formatCurrency(p.budget) : `€${(p.budget / 1000).toFixed(0)}K`}
+                        {isHOS ? (p.budget > 0 ? `€${p.budget}/night` : '—') : isRE ? formatCurrency(p.budget) : `€${(p.budget / 1000).toFixed(0)}K`}
                       </td>
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -246,7 +273,7 @@ export default function ProjectsPage() {
                           <span className="mono" style={{ fontSize: 11, fontWeight: 600 }}>{progress}%</span>
                         </div>
                       </td>
-                      {!isRE && (
+                      {!isRE && !isHOS && (
                         <td style={{ padding: '12px 14px' }}>
                           <div style={{ display: 'flex', gap: 3 }}>
                             {p.sdgs.map(s => (
