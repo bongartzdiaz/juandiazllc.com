@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: philanthropyai
+      POSTGRES_USER: philanthropyai
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://philanthropyai:${DB_PASSWORD:-changeme}@db:5432/philanthropyai
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-generate-a-secret-here}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

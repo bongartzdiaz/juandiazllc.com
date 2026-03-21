@@ -1,96 +1,94 @@
-# HMB Energy Ops Dashboard
+# PhilanthropyAI — Business Platform
 
-> Complete marketing operations dashboard — Meta Ads → WhatsApp Bot → GHL Sales Pipeline → Deals.
+CRM and operations platform for impact-driven businesses. Track projects, contacts, impact metrics, and manage workflows with a modern dashboard.
 
-## 📦 What's in this repo
+## Quick Start
 
-### 🖥 Standalone Dashboards (open direct in browser)
-
-| File | Description |
-|------|-------------|
-| `hmb-dashboard-pro.html` | ⭐ **Main dashboard** — responsive, drag & drop, dual-theme, demo data |
-| `hmb-dashboard-v3.html` | Dual-theme preview (light/dark toggle) |
-| `hmb-dashboard-wow.html` | Original dark neon version |
-| `energie-website-agent-workflow.html` | Full agent workflow overview (energy website) |
-
-### ⚡ Next.js App (`src/`)
-
-Full Next.js 14 App Router project with:
-- Dashboard, Meta Ads, Google Ads, Chatbot, Sales, Agenda pages
-- Supabase integration, GHL API hooks, Meta/Google API connectors
-- Dual-theme design system (DM Sans + DM Mono)
-- TypeScript + Tailwind CSS
-
-### 🤖 Claude Code Sessies (`claude-code-sessies/`)
-
-6 ready-to-paste Claude Code prompts to build the full Next.js dashboard:
-
-| Sessie | Onderwerp |
-|--------|-----------|
-| Sessie 1 | Design systeem + CSS tokens + Sidebar + KPI componenten |
-| Sessie 2 | GHL Edge Functions + Supabase hooks |
-| Sessie 3 | Dashboard hoofdpagina volledig |
-| Sessie 4 | Meta Ads pagina |
-| Sessie 5 | Sales Kanban + Agenda buitendienst |
-| Sessie 6 | Animaties + performance + dual-theme audit |
-
-### 🛠 Agents & Skills (`agents-en-skills/`)
-
-| File | For |
-|------|-----|
-| `AGENT-NL.md` | Claude Code subagent — NL versie |
-| `AGENT-EN.md` | Claude Code subagent — EN version |
-| `SKILL-NL.md` | Claude.ai custom skill — NL |
-| `SKILL-EN.md` | Claude.ai custom skill — EN |
-
-### 📋 Claude Code Context
-
-| File | Description |
-|------|-------------|
-| `CLAUDE.md` | Master context — credentials, design tokens, DB schema, business logic |
-| `START-HIER.md` | Step-by-step guide to start building in Claude Code |
-
-## 🚀 Quick Start
-
-### Option A — Open standalone HTML
 ```bash
-open hmb-dashboard-pro.html
-# Press E to enter edit mode, drag widgets, click titles to rename
-```
-
-### Option B — Run Next.js app
-```bash
+git clone https://github.com/bongartzdiaz/Phily.git
+cd Phily
 npm install
 cp .env.example .env.local
-# Fill in your Supabase + API keys in .env.local
+# Edit .env.local with your database credentials
 npm run dev
 ```
 
-## 🎨 Design System
+Open http://localhost:3100
 
-- **Light/Dark** dual-theme via `data-theme` attribute
-- **Fonts:** DM Sans (UI) + DM Mono (all numbers)
-- **Accents:** Green (success) · Orange (spend) · Amber (warning) · Red (error) · Blue (info)
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router, TypeScript)
+- **Charts:** Recharts
+- **Icons:** Lucide React
+- **Styling:** CSS custom properties (dual-theme light/dark)
+- **Fonts:** Plus Jakarta Sans + JetBrains Mono
+- **Database:** PostgreSQL via Prisma ORM
+- **Auth:** NextAuth v5
+- **i18n:** next-intl (English + Dutch)
+- **Drag & Drop:** @dnd-kit
+
+## Pages
+
+| Route | Description |
+|-------|-------------|
+| `/` | Dashboard — KPIs, impact chart, projects overview, SDG coverage |
+| `/projects` | Project management — grid/list view, search, filters |
+| `/contacts` | CRM contacts — partners, donors, stakeholders, beneficiaries |
+| `/impact` | Impact metrics — SDG alignment, trends, per-project breakdown |
+| `/kanban` | Kanban board — drag-and-drop project management |
+| `/reports` | Report generation — templates and recent reports |
+| `/settings` | Platform settings — profile, organization, preferences |
+
+## Deployment
+
+### Option A: Docker (recommended)
+
+```bash
+docker-compose up -d
+```
+
+### Option B: Manual
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Configure environment
+cp .env.example .env.local
+# Set DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL
+
+# 3. Setup database
+npx prisma generate
+npx prisma db push
+npx prisma db seed  # optional: loads demo data
+
+# 4. Build and start
+npm run build
+npm start
+```
+
+### Option C: PM2 (production server)
+
+```bash
+npm run build
+pm2 start npm --name "philanthropyai" -- start
+```
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `NEXTAUTH_SECRET` | Random secret for auth sessions |
+| `NEXTAUTH_URL` | Public URL of the app |
+
+## Design System
+
+- Light and dark theme via `data-theme` attribute on `<html>`
 - All colors via CSS variables — never hardcoded
+- Teal/emerald primary palette for sustainability branding
+- Theme preference stored in localStorage
 
-## 🔑 Tech Stack
+## License
 
-- **Frontend:** Next.js 14 App Router · TypeScript · Tailwind CSS
-- **Database:** Supabase (PostgreSQL)
-- **CRM:** GoHighLevel (GHL)
-- **WhatsApp Bot:** DM Champ
-- **Ads:** Meta Ads API · Google Ads API
-- **Hosting:** Digital Ocean App Platform
-- **Charts:** Recharts (Next.js) / Chart.js (standalone HTML)
-
-## 📊 Connected Systems
-
-- GHL pipeline sync (leads, stages, agenda)
-- DM Champ WhatsApp webhook (conversations, analyses)
-- Meta Ads performance sync
-- Supabase SEO agents (articles, agent logs)
-- Daily Slack updates
-
----
-
-*Private repo — HMB Energy Ops · 2026*
+Private repository.
