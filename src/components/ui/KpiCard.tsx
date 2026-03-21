@@ -1,7 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Users, TrendingDown, TrendingUp, MessageCircle, Calendar, Zap, DollarSign, Target } from 'lucide-react'
+import {
+  Users, TrendingDown, TrendingUp, MessageCircle, Calendar,
+  Zap, DollarSign, Target, Leaf, Globe2, HeartHandshake,
+  TreePine, Droplets, BarChart3, FolderKanban, Award,
+} from 'lucide-react'
 
 const iconMap: Record<string, React.ComponentType<{ size?: number; color?: string }>> = {
   'users': Users,
@@ -12,6 +16,14 @@ const iconMap: Record<string, React.ComponentType<{ size?: number; color?: strin
   'zap': Zap,
   'dollar-sign': DollarSign,
   'target': Target,
+  'leaf': Leaf,
+  'globe': Globe2,
+  'heart': HeartHandshake,
+  'tree': TreePine,
+  'water': Droplets,
+  'chart': BarChart3,
+  'folder': FolderKanban,
+  'award': Award,
 }
 
 interface KpiCardProps {
@@ -26,7 +38,7 @@ interface KpiCardProps {
   delay?: number
 }
 
-export function KpiCard({ label, value, delta, deltaDir = 'neu', goal, hot, accentColor = 'var(--b)', icon, delay = 0 }: KpiCardProps) {
+export function KpiCard({ label, value, delta, deltaDir = 'neu', goal, hot, accentColor = 'var(--accent)', icon, delay = 0 }: KpiCardProps) {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {

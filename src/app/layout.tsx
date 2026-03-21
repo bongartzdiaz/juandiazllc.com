@@ -7,17 +7,17 @@ const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], weight: ['300', '400', '
 const jetMono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-jet-mono' })
 
 export const metadata: Metadata = {
-  title: 'HMB Energy Ops',
-  description: 'Marketing operations dashboard',
+  title: 'PhilanthropyAI — Business Platform',
+  description: 'CRM and operations platform for impact-driven businesses',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="nl" data-theme="light" className={`${jakarta.variable} ${jetMono.variable}`}>
+    <html lang="en" data-theme="light" className={`${jakarta.variable} ${jetMono.variable}`}>
       <body>
         <div style={{ display: 'flex', minHeight: '100vh', position: 'relative', zIndex: 1 }}>
           <Sidebar />
-          <main style={{ marginLeft: 230, flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <main style={{ marginLeft: 240, flex: 1, display: 'flex', flexDirection: 'column' }}>
             {children}
           </main>
         </div>

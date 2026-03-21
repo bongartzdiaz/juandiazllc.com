@@ -1,49 +1,61 @@
 @import "tailwindcss";
 
-/* ══ LIGHT THEME ══ */
+/* ══ LIGHT THEME — PhilanthropyAI ══ */
 [data-theme="light"] {
-  --bg:       #F4F6F9;
-  --bg2:      #EAECF1;
+  --bg:       #F7F8FA;
+  --bg2:      #EDEEF2;
   --panel:    #FFFFFF;
   --panel2:   #F9FAFB;
-  --border:   #E1E5EE;
-  --border2:  #CBD0DC;
-  --txt:      #0E1117;
-  --txt2:     #525C72;
-  --txt3:     #96A0B5;
-  --shadow-sm: 0 1px 3px rgba(14,17,23,0.06), 0 1px 2px rgba(14,17,23,0.03);
-  --shadow:    0 4px 12px rgba(14,17,23,0.08), 0 1px 4px rgba(14,17,23,0.04);
-  --shadow-md: 0 8px 24px rgba(14,17,23,0.10), 0 2px 8px rgba(14,17,23,0.05);
-  --shadow-glow: 0 0 0 1px rgba(22,80,220,0.08), 0 4px 16px rgba(22,80,220,0.06);
+  --border:   #E2E5EC;
+  --border2:  #CDD2DC;
+  --txt:      #111318;
+  --txt2:     #4A5568;
+  --txt3:     #94A3B8;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow:    0 4px 12px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.09), 0 2px 8px rgba(0,0,0,0.05);
+  --shadow-glow: 0 0 0 1px rgba(13,115,119,0.10), 0 4px 16px rgba(13,115,119,0.06);
 
-  --g: #079455; --g-bg: #ECFDF3; --g-border: #A9EFC5; --g-txt: #067647;
-  --o: #DC4A11; --o-bg: #FEF2EE; --o-border: #FAC5B0; --o-txt: #B93B0D;
-  --y: #B54708; --y-bg: #FFFAEB; --y-border: #FEDF89; --y-txt: #93370D;
-  --r: #C01048; --r-bg: #FFF1F3; --r-border: #FECDD6; --r-txt: #89123E;
-  --b: #1650DC; --b-bg: #EFF4FF; --b-border: #C7D7FD; --b-txt: #1849A9;
+  --accent: #0D7377;
+  --accent-bg: #ECFCFC;
+  --accent-border: #A8E8EA;
+  --accent-txt: #0A5C5F;
+
+  --g: #059669; --g-bg: #ECFDF5; --g-border: #A7F3D0; --g-txt: #047857;
+  --o: #D97706; --o-bg: #FFFBEB; --o-border: #FDE68A; --o-txt: #B45309;
+  --y: #CA8A04; --y-bg: #FEFCE8; --y-border: #FEF08A; --y-txt: #A16207;
+  --r: #DC2626; --r-bg: #FEF2F2; --r-border: #FECACA; --r-txt: #B91C1C;
+  --b: #0D7377; --b-bg: #ECFCFC; --b-border: #A8E8EA; --b-txt: #0A5C5F;
+  --p: #7C3AED; --p-bg: #F5F3FF; --p-border: #C4B5FD; --p-txt: #6D28D9;
 }
 
-/* ══ DARK THEME ══ */
+/* ══ DARK THEME — PhilanthropyAI ══ */
 [data-theme="dark"] {
-  --bg:       #0A0D12;
-  --bg2:      #141921;
+  --bg:       #0B0E13;
+  --bg2:      #141820;
   --panel:    #111620;
-  --panel2:   #171D29;
+  --panel2:   #1A1F2B;
   --border:   rgba(255,255,255,0.08);
   --border2:  rgba(255,255,255,0.14);
-  --txt:      #EAF0FA;
-  --txt2:     #B0C4D8;
-  --txt3:     #7A8DA3;
+  --txt:      #EDF2F7;
+  --txt2:     #A0AEC0;
+  --txt3:     #718096;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
   --shadow:    0 4px 16px rgba(0,0,0,0.45);
   --shadow-md: 0 8px 28px rgba(0,0,0,0.55);
-  --shadow-glow: 0 0 0 1px rgba(94,170,255,0.1), 0 4px 20px rgba(94,170,255,0.05);
+  --shadow-glow: 0 0 0 1px rgba(45,212,191,0.10), 0 4px 20px rgba(45,212,191,0.05);
 
-  --g: #22DD80; --g-bg: rgba(34,221,128,0.10); --g-border: rgba(34,221,128,0.25); --g-txt: #50F0A0;
-  --o: #FF7A45; --o-bg: rgba(255,122,69,0.10); --o-border: rgba(255,122,69,0.25); --o-txt: #FF9E78;
-  --y: #F5C040; --y-bg: rgba(245,192,64,0.10); --y-border: rgba(245,192,64,0.25); --y-txt: #F8D36E;
-  --r: #F54060; --r-bg: rgba(245,64,96,0.10);  --r-border: rgba(245,64,96,0.25);  --r-txt: #FA7A92;
-  --b: #5EAAFF; --b-bg: rgba(94,170,255,0.10); --b-border: rgba(94,170,255,0.25); --b-txt: #82C2FF;
+  --accent: #2DD4BF;
+  --accent-bg: rgba(45,212,191,0.10);
+  --accent-border: rgba(45,212,191,0.25);
+  --accent-txt: #5EEAD4;
+
+  --g: #34D399; --g-bg: rgba(52,211,153,0.10); --g-border: rgba(52,211,153,0.25); --g-txt: #6EE7B7;
+  --o: #FBBF24; --o-bg: rgba(251,191,36,0.10); --o-border: rgba(251,191,36,0.25); --o-txt: #FCD34D;
+  --y: #EAB308; --y-bg: rgba(234,179,8,0.10); --y-border: rgba(234,179,8,0.25); --y-txt: #FACC15;
+  --r: #F87171; --r-bg: rgba(248,113,113,0.10); --r-border: rgba(248,113,113,0.25); --r-txt: #FCA5A5;
+  --b: #2DD4BF; --b-bg: rgba(45,212,191,0.10); --b-border: rgba(45,212,191,0.25); --b-txt: #5EEAD4;
+  --p: #A78BFA; --p-bg: rgba(167,139,250,0.10); --p-border: rgba(167,139,250,0.25); --p-txt: #C4B5FD;
 }
 
 @theme inline {
@@ -65,10 +77,10 @@ body {
   transition: background 200ms ease, color 200ms ease;
 }
 
-/* Subtle texture — light */
+/* Subtle dot texture — light */
 [data-theme="light"] body::after {
   content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background-image: radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(0,0,0,0.025) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -76,8 +88,8 @@ body {
 [data-theme="dark"] body::after {
   content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
@@ -123,8 +135,8 @@ button:active {
 }
 
 /* Focus ring */
-button:focus-visible, input:focus-visible, a:focus-visible {
-  outline: 2px solid var(--b);
+button:focus-visible, input:focus-visible, a:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -174,6 +186,26 @@ button:focus-visible, input:focus-visible, a:focus-visible {
 
 /* Selection */
 ::selection {
-  background: var(--b-bg);
-  color: var(--b-txt);
+  background: var(--accent-bg);
+  color: var(--accent-txt);
+}
+
+/* Input styles */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--txt);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+  outline: none;
+}
+input::placeholder, textarea::placeholder {
+  color: var(--txt3);
 }

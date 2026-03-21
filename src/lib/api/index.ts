@@ -1,4 +1,0 @@
-export { fetchMetaAds, fetchFromMetaApi } from './meta'
-export { fetchGoogleAds, fetchFromGoogleApi } from './google'
-export { fetchChatbot } from './chatbot'
-export { fetchSalesData, fetchFromGhlApi } from './ghl'

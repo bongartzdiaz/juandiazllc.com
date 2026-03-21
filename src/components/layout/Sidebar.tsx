@@ -3,9 +3,9 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
-  LayoutDashboard, Megaphone, Globe, MessageSquare, Users,
-  GitBranch, Calendar, Settings, Filter, FileText, Film,
-  Bot, Search,
+  LayoutDashboard, FolderKanban, Users2, BarChart3,
+  FileText, Columns3, FileStack, Settings,
+  Leaf,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -19,32 +19,30 @@ interface NavItemDef {
 
 const NAV_PRIMARY: NavItemDef[] = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/' },
-  { icon: Megaphone, label: 'Meta Ads', href: '/meta', badge: '3' },
-  { icon: Globe, label: 'Google Ads', href: '/google' },
-  { icon: MessageSquare, label: 'Chatbot', href: '/chatbot', badge: '7' },
-  { icon: Users, label: 'Sales (GHL)', href: '/sales' },
+  { icon: FolderKanban, label: 'Projects', href: '/projects' },
+  { icon: Users2, label: 'Contacts', href: '/contacts' },
+  { icon: BarChart3, label: 'Impact', href: '/impact' },
 ]
 
-const NAV_ANALYSE: NavItemDef[] = [
-  { icon: Filter, label: 'Funnel', href: '/conversie' },
-  { icon: FileText, label: 'Rapporten', href: '/rapporten' },
-  { icon: Film, label: 'Content', href: '/content' },
+const NAV_TOOLS: NavItemDef[] = [
+  { icon: FileText, label: 'Reports', href: '/reports' },
+  { icon: Columns3, label: 'Kanban', href: '/kanban' },
+  { icon: FileStack, label: 'Pages', href: '/pages' },
 ]
 
-const NAV_SYSTEEM: NavItemDef[] = [
-  { icon: Bot, label: 'Agents', href: '/agents' },
-  { icon: Search, label: 'SEO', href: '/seo' },
-  { icon: Calendar, label: 'Agenda', href: '/agenda', badgeNew: true },
-  { icon: Settings, label: 'Instellingen', href: '/settings' },
+const NAV_SYSTEM: NavItemDef[] = [
+  { icon: Settings, label: 'Settings', href: '/settings' },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
+  // Strip locale prefix for active matching
+  const path = pathname.replace(/^\/(en|nl)/, '') || '/'
 
   return (
     <aside
       style={{
-        width: 230, flexShrink: 0,
+        width: 240, flexShrink: 0,
         background: 'var(--panel)',
         borderRight: '1px solid var(--border)',
         display: 'flex', flexDirection: 'column',
@@ -55,62 +53,62 @@ export function Sidebar() {
     >
       {/* Logo */}
       <div style={{
-        height: 56, display: 'flex', alignItems: 'center', gap: 10,
-        padding: '0 18px', borderBottom: '1px solid var(--border)', flexShrink: 0,
+        height: 58, display: 'flex', alignItems: 'center', gap: 11,
+        padding: '0 20px', borderBottom: '1px solid var(--border)', flexShrink: 0,
       }}>
         <div style={{
-          width: 32, height: 32, borderRadius: 9,
-          background: 'linear-gradient(135deg, var(--txt) 0%, var(--txt2) 100%)',
+          width: 34, height: 34, borderRadius: 10,
+          background: 'linear-gradient(135deg, var(--accent) 0%, #059669 100%)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          boxShadow: '0 2px 8px rgba(13,115,119,0.25)',
         }}>
-          <span style={{ color: 'var(--panel)', fontSize: 14, fontWeight: 800, letterSpacing: '-0.03em' }}>H</span>
+          <Leaf size={17} color="#fff" strokeWidth={2.5} />
         </div>
         <div>
-          <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.025em' }}>
-            HMB <em style={{ color: 'var(--g)', fontStyle: 'normal' }}>ops</em>
+          <div style={{ fontSize: 15.5, fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--txt)' }}>
+            Philanthropy<span style={{ color: 'var(--accent)' }}>AI</span>
           </div>
-          <div style={{ fontSize: 10, color: 'var(--txt3)', letterSpacing: '0.02em' }}>Energy Platform</div>
+          <div style={{ fontSize: 10, color: 'var(--txt3)', letterSpacing: '0.02em' }}>Business Platform</div>
         </div>
       </div>
 
       {/* Nav */}
       <nav style={{ flex: 1, overflowY: 'auto', padding: '10px 10px 14px' }}>
-        <NavLabel>Primair</NavLabel>
+        <NavLabel>Core</NavLabel>
         {NAV_PRIMARY.map(item => (
-          <NavItem key={item.href} active={pathname === item.href} {...item} />
+          <NavItem key={item.href} active={path === item.href || (item.href !== '/' && path.startsWith(item.href))} {...item} />
         ))}
 
         <div style={{ height: 1, background: 'var(--border)', margin: '8px 10px' }} />
 
-        <NavLabel>Analyse</NavLabel>
-        {NAV_ANALYSE.map(item => (
-          <NavItem key={item.href} active={pathname === item.href} {...item} />
+        <NavLabel>Tools</NavLabel>
+        {NAV_TOOLS.map(item => (
+          <NavItem key={item.href} active={path === item.href || path.startsWith(item.href)} {...item} />
         ))}
 
         <div style={{ height: 1, background: 'var(--border)', margin: '8px 10px' }} />
 
-        <NavLabel>Systeem</NavLabel>
-        {NAV_SYSTEEM.map(item => (
-          <NavItem key={item.href} active={pathname === item.href} {...item} />
+        <NavLabel>System</NavLabel>
+        {NAV_SYSTEM.map(item => (
+          <NavItem key={item.href} active={path === item.href || path.startsWith(item.href)} {...item} />
         ))}
       </nav>
 
       {/* Footer */}
       <div style={{
-        padding: '14px 16px', borderTop: '1px solid var(--border)',
+        padding: '14px 18px', borderTop: '1px solid var(--border)',
         display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
       }}>
         <div style={{
-          width: 30, height: 30, borderRadius: '50%',
-          background: 'linear-gradient(135deg, var(--b) 0%, var(--g) 100%)',
+          width: 32, height: 32, borderRadius: '50%',
+          background: 'linear-gradient(135deg, var(--accent) 0%, var(--g) 100%)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 10, fontWeight: 700, color: '#fff',
+          fontSize: 11, fontWeight: 700, color: '#fff',
           boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-        }}>JV</div>
+        }}>PA</div>
         <div>
-          <div style={{ fontSize: 12.5, fontWeight: 600 }}>Juan</div>
-          <div style={{ fontSize: 10, color: 'var(--txt3)' }}>Admin · HMB</div>
+          <div style={{ fontSize: 12.5, fontWeight: 600 }}>Demo User</div>
+          <div style={{ fontSize: 10, color: 'var(--txt3)' }}>Admin</div>
         </div>
       </div>
     </aside>
@@ -135,7 +133,7 @@ function NavItem({ icon: Icon, label, href, active, badge, badgeNew }: NavItemDe
       href={href}
       style={{
         display: 'flex', alignItems: 'center', gap: 10,
-        padding: '8px 11px', borderRadius: 8, cursor: 'pointer',
+        padding: '8px 12px', borderRadius: 8, cursor: 'pointer',
         color: active ? 'var(--panel)' : 'var(--txt2)',
         background: active ? 'var(--txt)' : 'transparent',
         fontSize: 13, fontWeight: active ? 600 : 500, marginBottom: 2,
@@ -147,7 +145,7 @@ function NavItem({ icon: Icon, label, href, active, badge, badgeNew }: NavItemDe
       {label}
       {badge && (
         <span style={{
-          marginLeft: 'auto', background: 'var(--r)', color: 'white',
+          marginLeft: 'auto', background: 'var(--accent)', color: 'white',
           fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 8,
           fontFamily: 'var(--font-jet-mono), monospace',
         }}>{badge}</span>
@@ -157,7 +155,7 @@ function NavItem({ icon: Icon, label, href, active, badge, badgeNew }: NavItemDe
           marginLeft: 'auto', background: 'var(--g-bg)', color: 'var(--g-txt)',
           fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 8,
           border: '1px solid var(--g-border)',
-        }}>Nieuw</span>
+        }}>New</span>
       )}
     </Link>
   )

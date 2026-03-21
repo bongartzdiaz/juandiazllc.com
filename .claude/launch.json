@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "hmbdash",
+      "name": "philanthropyai",
       "runtimeExecutable": "node",
       "runtimeArgs": ["node_modules/.bin/next", "dev", "--port", "3100"],
       "port": 3100
