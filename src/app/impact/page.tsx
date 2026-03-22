@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Fragment } from 'react'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
@@ -94,6 +94,11 @@ const RE_PRICE_TREND = [
   { month: 'Jul', price: 4220, volume: 7900 },
   { month: 'Aug', price: 4280, volume: 8100 },
 ]
+
+const RE_DEAL_BREAKDOWN = {
+  sales: { count: 33, volume: '\u20AC8.1M', avgDays: 28, commission: '\u20AC243K' },
+  rentals: { count: 14, volume: '\u20AC29.4K/mo', avgDays: 12, commission: '\u20AC14.7K' },
+}
 
 const trendIcons: Record<string, { symbol: string; color: string }> = {
   up: { symbol: '+', color: 'var(--g)' },
@@ -266,12 +271,13 @@ export default function ImpactPage() {
 
         <div style={{ padding: '18px 24px 40px' }}>
           {/* KPIs */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10, marginBottom: 18 }}>
             <KpiCard label="Avg Price/sqm" value="€4,200" delta="+8% vs last quarter" deltaDir="up" icon="dollar-sign" accentColor="var(--accent)" delay={80} />
             <KpiCard label="Total Volume" value="€8.2M" delta="+1.4M this month" deltaDir="up" icon="chart" accentColor="var(--g)" delay={130} />
             <KpiCard label="Days on Market" value="22" delta="-3 vs avg" deltaDir="up" icon="calendar" accentColor="var(--b)" delay={180} />
             <KpiCard label="Listings Active" value="18" delta="+4 new this week" deltaDir="up" icon="folder" accentColor="var(--o)" delay={230} />
             <KpiCard label="Conversion Rate" value="26.5%" delta="+2.1pp vs Q4" deltaDir="up" icon="zap" accentColor="var(--p)" delay={280} />
+            <KpiCard label="Commission Earned" value="€258K" delta="+22% YTD" deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={330} />
           </div>
 
           {/* Property Type Breakdown */}
@@ -296,6 +302,51 @@ export default function ImpactPage() {
                     }} />
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Sales vs Rentals */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px', marginBottom: 14,
+            boxShadow: 'var(--shadow-sm)',
+          }}>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Sales vs Rentals</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr 1fr', gap: 0 }}>
+              {/* Header row */}
+              <div style={{ padding: '8px 0', borderBottom: '1px solid var(--border)' }} />
+              <div style={{
+                padding: '8px 14px', textAlign: 'right', fontSize: 11, fontWeight: 700,
+                textTransform: 'uppercase', letterSpacing: '0.05em',
+                color: 'var(--accent)', borderBottom: '1px solid var(--border)',
+              }}>Sales</div>
+              <div style={{
+                padding: '8px 14px', textAlign: 'right', fontSize: 11, fontWeight: 700,
+                textTransform: 'uppercase', letterSpacing: '0.05em',
+                color: 'var(--p)', borderBottom: '1px solid var(--border)',
+              }}>Rentals</div>
+              {/* Data rows */}
+              {([
+                ['Deals', String(RE_DEAL_BREAKDOWN.sales.count), String(RE_DEAL_BREAKDOWN.rentals.count)],
+                ['Volume', RE_DEAL_BREAKDOWN.sales.volume, RE_DEAL_BREAKDOWN.rentals.volume],
+                ['Avg Days', String(RE_DEAL_BREAKDOWN.sales.avgDays), String(RE_DEAL_BREAKDOWN.rentals.avgDays)],
+                ['Commission', RE_DEAL_BREAKDOWN.sales.commission, RE_DEAL_BREAKDOWN.rentals.commission],
+              ] as const).map(([label, sVal, rVal]) => (
+                <Fragment key={label}>
+                  <div style={{
+                    padding: '10px 0', fontSize: 12, fontWeight: 600,
+                    borderBottom: '1px solid var(--border)',
+                  }}>{label}</div>
+                  <div className="mono" style={{
+                    padding: '10px 14px', fontSize: 12, textAlign: 'right',
+                    borderBottom: '1px solid var(--border)',
+                  }}>{sVal}</div>
+                  <div className="mono" style={{
+                    padding: '10px 14px', fontSize: 12, textAlign: 'right',
+                    borderBottom: '1px solid var(--border)',
+                  }}>{rVal}</div>
+                </Fragment>
               ))}
             </div>
           </div>

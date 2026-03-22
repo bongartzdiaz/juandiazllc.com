@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { useIndustry } from '@/hooks/useIndustry'
@@ -61,17 +62,30 @@ const RE_PROPERTIES = [
 const RE_ACTIVITY = [
   { text: 'New offer received: Penthouse Suite — €1.2M', time: '1h ago' },
   { text: 'Viewing scheduled: Family Home — Tomorrow 14:00', time: '3h ago' },
+  { text: 'Rental agreement signed: Zuidas Office — €8,500/mo', time: '6h ago' },
   { text: 'Contract signed: Townhouse — Jordaan', time: '1d ago' },
-  { text: 'Price adjustment: Studio De Pijp — €1,850/mo', time: '1d ago' },
-  { text: 'New listing added: Commercial Office — Centrum', time: '2d ago' },
+  { text: 'Tenant payment received: De Pijp Studio — €1,850', time: '1d ago' },
+  { text: 'New listing: Commercial Office — Centrum', time: '2d ago' },
 ]
 
-const RE_PIPELINE = [
-  { stage: 'New Leads', value: 34, color: 'var(--txt3)' },
-  { stage: 'Viewings', value: 18, color: 'var(--b)' },
-  { stage: 'Offers', value: 8, color: 'var(--y)' },
-  { stage: 'Under Contract', value: 5, color: 'var(--o)' },
-  { stage: 'Closed', value: 9, color: 'var(--g)' },
+const RE_SALES_PIPELINE = [
+  { stage: 'Enquiry', value: 12, color: 'var(--txt3)' },
+  { stage: 'Viewing', value: 8, color: 'var(--b)' },
+  { stage: 'Reservation', value: 5, color: 'var(--accent)' },
+  { stage: 'Searches', value: 4, color: 'var(--y)' },
+  { stage: 'Results', value: 3, color: 'var(--o)' },
+  { stage: 'Sales Agreement', value: 3, color: 'var(--p)' },
+  { stage: 'Bill of Sale', value: 2, color: 'var(--b)' },
+  { stage: 'Transfer', value: 2, color: 'var(--g)' },
+  { stage: 'Commission', value: 9, color: 'var(--g)' },
+]
+
+const RE_RENTAL_PIPELINE = [
+  { stage: 'Enquiry', value: 18, color: 'var(--txt3)' },
+  { stage: 'Viewing', value: 11, color: 'var(--b)' },
+  { stage: 'Rental Agreement', value: 6, color: 'var(--accent)' },
+  { stage: 'Payment', value: 4, color: 'var(--o)' },
+  { stage: 'Active Lease', value: 14, color: 'var(--g)' },
 ]
 
 // ── Hospitality Demo Data ──
@@ -371,6 +385,9 @@ function HospitalityDashboard({ config, kpi }: { config: { dashboardTitle: strin
 // REAL ESTATE DASHBOARD
 // ══════════════════════════════════════════
 function RealEstateDashboard({ config, kpi }: { config: { dashboardTitle: string; dashboardSub: string }; kpi: KpiStore }) {
+  const [pipelineMode, setPipelineMode] = useState<'sales' | 'rental'>('sales')
+  const currentPipeline = pipelineMode === 'sales' ? RE_SALES_PIPELINE : RE_RENTAL_PIPELINE
+  const maxPipelineValue = Math.max(...currentPipeline.map(s => s.value))
   const totalRevenue = RE_MONTHLY.reduce((s, m) => s + m.revenue, 0)
   const totalClosed = RE_MONTHLY.reduce((s, m) => s + m.closed, 0)
   const activeListings = RE_PROPERTIES.filter(p => p.status === 'active').length
@@ -381,12 +398,13 @@ function RealEstateDashboard({ config, kpi }: { config: { dashboardTitle: string
       <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Listing" />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPIs */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10, marginBottom: 18 }}>
           <KpiCard label="Active Listings" value={kpi.getKpiValue('listings', activeListings)} delta="+3 this month" deltaDir="up" icon="folder" accentColor="var(--b)" delay={80} editable onValueChange={v => kpi.setKpiValue('listings', v)} goalCurrent={activeListings} goalTarget={kpi.getGoal('listings_added')?.target ?? 10} />
           <KpiCard label="Deals Closed" value={kpi.getKpiValue('closed', totalClosed)} delta="YTD total" deltaDir="up" icon="target" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('closed', v)} goalCurrent={totalClosed} goalTarget={kpi.getGoal('deals_closed')?.target ?? 50} />
           <KpiCard label="Commission" value={kpi.getKpiValue('commission', `€${(totalRevenue / 1000).toFixed(0)}K`)} delta="+15.8% vs last quarter" deltaDir="up" icon="dollar-sign" hot delay={180} editable onValueChange={v => kpi.setKpiValue('commission', v)} />
           <KpiCard label="Avg Days on Market" value={kpi.getKpiValue('dom', avgDaysOnMarket)} delta={avgDaysOnMarket < 30 ? 'Below average' : 'Above average'} deltaDir={avgDaysOnMarket < 30 ? 'up' : 'down'} icon="calendar" accentColor="var(--y)" delay={230} editable onValueChange={v => kpi.setKpiValue('dom', v)} />
           <KpiCard label="Total Viewings" value={kpi.getKpiValue('viewings', '82')} delta="+24% this month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={280} editable onValueChange={v => kpi.setKpiValue('viewings', v)} goalCurrent={82} goalTarget={kpi.getGoal('viewings_booked')?.target ?? 100} />
+          <KpiCard label="Active Rentals" value={kpi.getKpiValue('rentals', '14')} delta="Ongoing leases" deltaDir="neu" icon="home" accentColor="var(--p)" delay={330} editable onValueChange={v => kpi.setKpiValue('rentals', v)} />
         </div>
 
         {/* Pipeline + Revenue Chart */}
@@ -405,11 +423,24 @@ function RealEstateDashboard({ config, kpi }: { config: { dashboardTitle: string
               </div>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>Deal Pipeline</div>
-                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Lead to close overview</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{pipelineMode === 'sales' ? 'Sales stages overview' : 'Rental stages overview'}</div>
               </div>
             </div>
-            {RE_PIPELINE.map((stage, i) => (
-              <div key={stage.stage} style={{ marginBottom: i < RE_PIPELINE.length - 1 ? 12 : 0 }}>
+            <div style={{ display: 'flex', gap: 4, background: 'var(--bg2)', borderRadius: 8, padding: 3, marginBottom: 14, width: 'fit-content' }}>
+              {(['sales', 'rental'] as const).map(m => (
+                <button key={m} onClick={() => setPipelineMode(m)} style={{
+                  padding: '5px 14px', borderRadius: 6, fontSize: 11, fontWeight: 600,
+                  border: 'none', cursor: 'pointer',
+                  background: pipelineMode === m ? 'var(--panel)' : 'transparent',
+                  color: pipelineMode === m ? 'var(--txt)' : 'var(--txt3)',
+                  boxShadow: pipelineMode === m ? 'var(--shadow-sm)' : 'none',
+                }}>
+                  {m === 'sales' ? 'Sales' : 'Rentals'}
+                </button>
+              ))}
+            </div>
+            {currentPipeline.map((stage, i) => (
+              <div key={stage.stage} style={{ marginBottom: i < currentPipeline.length - 1 ? 12 : 0 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                   <span style={{ fontSize: 12, color: 'var(--txt2)' }}>{stage.stage}</span>
                   <span className="mono" style={{ fontSize: 12, fontWeight: 600 }}>{stage.value}</span>
@@ -417,7 +448,7 @@ function RealEstateDashboard({ config, kpi }: { config: { dashboardTitle: string
                 <div style={{ height: 6, borderRadius: 3, background: 'var(--bg2)', overflow: 'hidden' }}>
                   <div style={{
                     height: '100%', borderRadius: 3,
-                    width: `${(stage.value / 34) * 100}%`,
+                    width: `${(stage.value / maxPipelineValue) * 100}%`,
                     background: stage.color,
                     transition: 'width 0.8s ease',
                   }} />
@@ -429,8 +460,8 @@ function RealEstateDashboard({ config, kpi }: { config: { dashboardTitle: string
               background: 'var(--g-bg)', border: '1px solid var(--g-border)',
             }}>
               <div style={{ fontSize: 11, color: 'var(--g-txt)', fontWeight: 600 }}>Conversion Rate</div>
-              <div className="mono" style={{ fontSize: 20, fontWeight: 600, color: 'var(--g-txt)' }}>26.5%</div>
-              <div style={{ fontSize: 10, color: 'var(--g-txt)', opacity: 0.8 }}>Lead to Close</div>
+              <div className="mono" style={{ fontSize: 20, fontWeight: 600, color: 'var(--g-txt)' }}>{pipelineMode === 'sales' ? '26.5%' : '77.8%'}</div>
+              <div style={{ fontSize: 10, color: 'var(--g-txt)', opacity: 0.8 }}>{pipelineMode === 'sales' ? 'Enquiry to Commission' : 'Enquiry to Active Lease'}</div>
             </div>
           </div>
 

@@ -43,7 +43,7 @@ export function Sidebar() {
 
   const NAV_TOOLS: NavItemDef[] = [
     { icon: FileText, label: 'Reports', href: '/reports' },
-    { icon: Columns3, label: industry === 'realestate' ? 'Deals' : 'Kanban', href: '/kanban' },
+    { icon: Columns3, label: industry === 'realestate' ? 'Deals' : industry === 'hospitality' ? 'Reservations' : 'Board', href: '/kanban' },
     { icon: CalendarDays, label: 'Calendar', href: '/calendar' },
   ]
 

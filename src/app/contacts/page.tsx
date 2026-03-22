@@ -41,6 +41,8 @@ const RE_CONTACTS: Contact[] = [
   { id: '8', firstName: 'Marta', lastName: 'Koster', company: 'Zuidas Relocation Services', type: 'tenant', email: 'm.koster@zuidasreloc.nl', phone: '+31 6 8899 0011', projects: 1 },
   { id: '9', firstName: 'Jan', lastName: 'van der Berg', company: 'Van der Berg Vastgoed', type: 'seller', email: 'j.vdberg@vdbergvastgoed.nl', phone: '+31 6 9900 1122', projects: 3 },
   { id: '10', firstName: 'Claudia', lastName: 'Brouwer', company: 'Brouwer Investments AG', type: 'investor', email: 'c.brouwer@brouwer-inv.ch', phone: '+41 79 123 4567', projects: 4 },
+  { id: '11', firstName: 'Pieter', lastName: 'van der Berg', company: 'Van der Berg Vastgoed', type: 'landlord', email: 'p.vanderberg@vdbvastgoed.nl', phone: '+31 6 8899 0011', projects: 4 },
+  { id: '12', firstName: 'Saskia', lastName: 'Huisman', company: 'Huisman Properties B.V.', type: 'landlord', email: 's.huisman@huismanprop.nl', phone: '+31 6 7788 9900', projects: 2 },
 ]
 
 const HOS_CONTACTS: Contact[] = [
@@ -65,6 +67,7 @@ const typeColors: Record<string, { bg: string; txt: string; border: string }> = 
   seller: { bg: 'var(--g-bg)', txt: 'var(--g-txt)', border: 'var(--g-border)' },
   tenant: { bg: 'var(--o-bg)', txt: 'var(--o-txt)', border: 'var(--o-border)' },
   investor: { bg: 'var(--p-bg)', txt: 'var(--p-txt)', border: 'var(--p-border)' },
+  landlord: { bg: 'var(--y-bg)', txt: 'var(--y-txt)', border: 'var(--y-border)' },
   guest: { bg: 'var(--accent-bg)', txt: 'var(--accent-txt)', border: 'var(--accent-border)' },
   vendor: { bg: 'var(--o-bg)', txt: 'var(--o-txt)', border: 'var(--o-border)' },
   staff: { bg: 'var(--y-bg)', txt: 'var(--y-txt)', border: 'var(--y-border)' },
@@ -79,6 +82,7 @@ const avatarColors: Record<string, string> = {
   seller: 'var(--g)',
   tenant: 'var(--o)',
   investor: 'var(--p)',
+  landlord: 'var(--y)',
   guest: 'var(--accent)',
   vendor: 'var(--o)',
   staff: 'var(--y)',
@@ -95,7 +99,7 @@ export default function ContactsPage() {
   const filterOptions = isHOS
     ? ['all', 'guest', 'vendor', 'partner', 'staff']
     : isRE
-    ? ['all', 'buyer', 'seller', 'tenant', 'investor']
+    ? ['all', 'buyer', 'seller', 'tenant', 'investor', 'landlord']
     : ['all', 'partner', 'beneficiary', 'stakeholder', 'donor']
 
   const filtered = contacts.filter(c => {
