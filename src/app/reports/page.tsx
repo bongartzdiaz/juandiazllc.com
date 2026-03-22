@@ -1,7 +1,7 @@
 'use client'
 
 import { Topbar } from '@/components/layout/Topbar'
-import { BarChart3, Target, DollarSign, Users, Download, FileText } from 'lucide-react'
+import { BarChart3, Target, DollarSign, Users, Download, FileText, TrendingUp, Globe } from 'lucide-react'
 
 const REPORT_TEMPLATES = [
   {
@@ -40,6 +40,24 @@ const REPORT_TEMPLATES = [
     colorBg: 'var(--b-bg)',
     colorBorder: 'var(--b-border)',
   },
+  {
+    id: 'performance',
+    title: 'Performance Trends',
+    description: 'Year-over-year performance analysis with growth metrics, trend identification, and forecasting.',
+    icon: TrendingUp,
+    color: 'var(--p)',
+    colorBg: 'var(--p-bg)',
+    colorBorder: 'var(--p-border)',
+  },
+  {
+    id: 'regional',
+    title: 'Regional Breakdown',
+    description: 'Geographic distribution of projects, regional impact scores, and cross-border collaboration insights.',
+    icon: Globe,
+    color: 'var(--y)',
+    colorBg: 'var(--y-bg)',
+    colorBorder: 'var(--y-border)',
+  },
 ]
 
 const statusStyles: Record<string, { bg: string; txt: string; border: string }> = {
@@ -53,6 +71,9 @@ const RECENT_REPORTS = [
   { id: '3', name: 'Q1 2026 Financial Summary', type: 'Financial Overview', generated: '2026-03-18', status: 'draft' },
   { id: '4', name: 'Board Presentation March 2026', type: 'Stakeholder Summary', generated: '2026-03-15', status: 'published' },
   { id: '5', name: 'Clean Water Project Update', type: 'Quarterly Impact', generated: '2026-03-20', status: 'draft' },
+  { id: '6', name: 'Regional Impact Analysis APAC', type: 'Regional Breakdown', generated: '2026-03-12', status: 'published' },
+  { id: '7', name: 'YoY Performance Trends 2024-2025', type: 'Performance Trends', generated: '2026-02-28', status: 'published' },
+  { id: '8', name: 'Education Fund Allocation Report', type: 'Financial Overview', generated: '2026-03-08', status: 'published' },
 ]
 
 export default function ReportsPage() {
@@ -64,7 +85,7 @@ export default function ReportsPage() {
         {/* Report template cards */}
         <div style={{ marginBottom: 24 }}>
           <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>Report Templates</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
             {REPORT_TEMPLATES.map(tmpl => {
               const Icon = tmpl.icon
               return (

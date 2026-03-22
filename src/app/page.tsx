@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  BarChart, Bar,
+  BarChart, Bar, PieChart, Pie, Cell, Line,
 } from 'recharts'
 
 // ── CSR Demo Data ──
@@ -122,6 +122,56 @@ const HOS_PIPELINE = [
   { stage: 'Reviewed', value: 9, color: 'var(--g)' },
 ]
 
+// ── Revenue by Type (RE Donut) ──
+const RE_REVENUE_BY_TYPE = [
+  { name: 'Residential', value: 4200000, color: 'var(--accent)' },
+  { name: 'Commercial', value: 2100000, color: 'var(--b)' },
+  { name: 'Rental Income', value: 840000, color: 'var(--o)' },
+  { name: 'Mixed-Use', value: 960000, color: 'var(--p)' },
+]
+
+// ── RE Forecast ──
+const RE_FORECAST = [
+  { month: 'Jan', actual: 42000, forecast: null },
+  { month: 'Feb', actual: 58000, forecast: null },
+  { month: 'Mar', actual: 48000, forecast: 48000 },
+  { month: 'Apr', actual: null, forecast: 52000 },
+  { month: 'May', actual: null, forecast: 58000 },
+  { month: 'Jun', actual: null, forecast: 65000 },
+]
+
+// ── Hospitality Gauge & Reviews ──
+const HOS_OCCUPANCY_GAUGE = [
+  { value: 78, color: 'var(--accent)' },
+  { value: 22, color: 'var(--bg2)' },
+]
+
+const HOS_REVIEWS = [
+  { stars: '5 stars', count: 89, pct: 47, color: '#4C9F38' },
+  { stars: '4 stars', count: 62, pct: 33, color: 'var(--accent)' },
+  { stars: '3 stars', count: 24, pct: 13, color: '#FCC30B' },
+  { stars: '2 stars', count: 10, pct: 5, color: '#FD6925' },
+  { stars: '1 star', count: 4, pct: 2, color: '#E5243B' },
+]
+
+// ── CSR SDG Distribution & Forecast ──
+const CSR_SDG_DISTRIBUTION = [
+  { name: 'Environment', value: 35, color: '#4C9F38' },
+  { name: 'Education', value: 25, color: '#C5192D' },
+  { name: 'Health', value: 20, color: '#26BDE2' },
+  { name: 'Water', value: 12, color: '#0A97D9' },
+  { name: 'Other', value: 8, color: '#FCC30B' },
+]
+
+const CSR_FORECAST = [
+  { month: 'Jan', actual: 650, forecast: null },
+  { month: 'Feb', actual: 810, forecast: null },
+  { month: 'Mar', actual: 1100, forecast: 1100 },
+  { month: 'Apr', actual: null, forecast: 1350 },
+  { month: 'May', actual: null, forecast: 1650 },
+  { month: 'Jun', actual: null, forecast: 2000 },
+]
+
 const hosStatusColors: Record<string, { bg: string; txt: string; border: string }> = {
   available: { bg: 'var(--g-bg)', txt: 'var(--g-txt)', border: 'var(--g-border)' },
   occupied: { bg: 'var(--accent-bg)', txt: 'var(--accent-txt)', border: 'var(--accent-border)' },
@@ -168,11 +218,11 @@ function HospitalityDashboard({ config, kpi }: { config: { dashboardTitle: strin
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPIs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
-          <KpiCard label="Occupancy Rate" value={kpi.getKpiValue('occupancy', '78%')} delta="+4% vs last month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={80} editable onValueChange={v => kpi.setKpiValue('occupancy', v)} goalCurrent={78} goalTarget={kpi.getGoal('occupancy_rate')?.target ?? 85} />
-          <KpiCard label="RevPAR" value={kpi.getKpiValue('revpar', '€142')} delta="+€12 vs avg" deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('revpar', v)} goalCurrent={95} goalTarget={kpi.getGoal('revpar_target')?.target ?? 120} />
-          <KpiCard label="ADR" value={kpi.getKpiValue('adr', '€185')} delta="Avg Daily Rate" deltaDir="neu" icon="chart" accentColor="var(--b)" delay={180} editable onValueChange={v => kpi.setKpiValue('adr', v)} />
-          <KpiCard label="Guest Satisfaction" value={kpi.getKpiValue('satisfaction', '4.6/5')} delta="Based on 189 reviews" deltaDir="up" icon="heart" accentColor="var(--y)" delay={230} editable onValueChange={v => kpi.setKpiValue('satisfaction', v)} goalCurrent={4.2} goalTarget={kpi.getGoal('guest_satisfaction')?.target ?? 4.5} />
-          <KpiCard label="Total Bookings" value={kpi.getKpiValue('bookings', '234')} delta="+18 this week" deltaDir="up" icon="calendar" hot delay={280} editable onValueChange={v => kpi.setKpiValue('bookings', v)} goalCurrent={148} goalTarget={kpi.getGoal('bookings')?.target ?? 200} />
+          <KpiCard label="Occupancy Rate" value={kpi.getKpiValue('occupancy', '78%')} delta="+4% vs last month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={80} editable onValueChange={v => kpi.setKpiValue('occupancy', v)} goalCurrent={78} goalTarget={kpi.getGoal('occupancy_rate')?.target ?? 85} sparkData={[72, 74, 78, 75, 80, 77, 78]} />
+          <KpiCard label="RevPAR" value={kpi.getKpiValue('revpar', '€142')} delta="+€12 vs avg" deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('revpar', v)} goalCurrent={95} goalTarget={kpi.getGoal('revpar_target')?.target ?? 120} sparkData={[128, 135, 142, 138, 145, 140, 142]} />
+          <KpiCard label="ADR" value={kpi.getKpiValue('adr', '€185')} delta="Avg Daily Rate" deltaDir="neu" icon="chart" accentColor="var(--b)" delay={180} editable onValueChange={v => kpi.setKpiValue('adr', v)} sparkData={[175, 180, 182, 185, 183, 186, 185]} />
+          <KpiCard label="Guest Satisfaction" value={kpi.getKpiValue('satisfaction', '4.6/5')} delta="Based on 189 reviews" deltaDir="up" icon="heart" accentColor="var(--y)" delay={230} editable onValueChange={v => kpi.setKpiValue('satisfaction', v)} goalCurrent={4.2} goalTarget={kpi.getGoal('guest_satisfaction')?.target ?? 4.5} sparkData={[4.2, 4.3, 4.5, 4.4, 4.6, 4.5, 4.6]} />
+          <KpiCard label="Total Bookings" value={kpi.getKpiValue('bookings', '234')} delta="+18 this week" deltaDir="up" icon="calendar" hot delay={280} editable onValueChange={v => kpi.setKpiValue('bookings', v)} goalCurrent={148} goalTarget={kpi.getGoal('bookings')?.target ?? 200} sparkData={[195, 210, 218, 225, 230, 228, 234]} />
         </div>
 
         {/* Pipeline + Revenue Chart */}
@@ -376,6 +426,94 @@ function HospitalityDashboard({ config, kpi }: { config: { dashboardTitle: strin
             </div>
           </div>
         </div>
+
+        {/* Occupancy Gauge + Guest Reviews */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
+          {/* Occupancy Gauge */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Users size={14} color="var(--accent)" />
+              </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>Occupancy Gauge</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Current occupancy rate</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ position: 'relative', width: 200, height: 110 }}>
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie
+                      data={HOS_OCCUPANCY_GAUGE}
+                      cx="50%"
+                      cy="100%"
+                      startAngle={180}
+                      endAngle={0}
+                      innerRadius={60}
+                      outerRadius={80}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {HOS_OCCUPANCY_GAUGE.map((entry, index) => (
+                        <Cell key={`hos-gauge-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div style={{
+                  position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)',
+                  textAlign: 'center',
+                }}>
+                  <div className="mono" style={{ fontSize: 28, fontWeight: 700, color: 'var(--txt)' }}>78%</div>
+                </div>
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--txt3)', marginTop: 8 }}>Target: 85%</div>
+            </div>
+          </div>
+
+          {/* Guest Review Breakdown */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Star size={14} color="var(--accent)" />
+              </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>Guest Review Breakdown</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>189 total reviews</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {HOS_REVIEWS.map(r => (
+                <div key={r.stars} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 11, color: 'var(--txt2)', width: 50, flexShrink: 0 }}>{r.stars}</span>
+                  <div style={{ flex: 1, height: 8, borderRadius: 4, background: 'var(--bg2)', overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%', borderRadius: 4,
+                      width: `${r.pct}%`,
+                      background: r.color,
+                      transition: 'width 0.8s ease',
+                    }} />
+                  </div>
+                  <span className="mono" style={{ fontSize: 11, color: 'var(--txt3)', width: 30, textAlign: 'right' }}>{r.count}</span>
+                  <span className="mono" style={{ fontSize: 10, color: 'var(--txt3)', width: 30, textAlign: 'right' }}>{r.pct}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </>
   )
@@ -399,12 +537,12 @@ function RealEstateDashboard({ config, kpi }: { config: { dashboardTitle: string
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPIs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10, marginBottom: 18 }}>
-          <KpiCard label="Active Listings" value={kpi.getKpiValue('listings', activeListings)} delta="+3 this month" deltaDir="up" icon="folder" accentColor="var(--b)" delay={80} editable onValueChange={v => kpi.setKpiValue('listings', v)} goalCurrent={activeListings} goalTarget={kpi.getGoal('listings_added')?.target ?? 10} />
-          <KpiCard label="Deals Closed" value={kpi.getKpiValue('closed', totalClosed)} delta="YTD total" deltaDir="up" icon="target" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('closed', v)} goalCurrent={totalClosed} goalTarget={kpi.getGoal('deals_closed')?.target ?? 50} />
-          <KpiCard label="Commission" value={kpi.getKpiValue('commission', `€${(totalRevenue / 1000).toFixed(0)}K`)} delta="+15.8% vs last quarter" deltaDir="up" icon="dollar-sign" hot delay={180} editable onValueChange={v => kpi.setKpiValue('commission', v)} />
-          <KpiCard label="Avg Days on Market" value={kpi.getKpiValue('dom', avgDaysOnMarket)} delta={avgDaysOnMarket < 30 ? 'Below average' : 'Above average'} deltaDir={avgDaysOnMarket < 30 ? 'up' : 'down'} icon="calendar" accentColor="var(--y)" delay={230} editable onValueChange={v => kpi.setKpiValue('dom', v)} />
-          <KpiCard label="Total Viewings" value={kpi.getKpiValue('viewings', '82')} delta="+24% this month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={280} editable onValueChange={v => kpi.setKpiValue('viewings', v)} goalCurrent={82} goalTarget={kpi.getGoal('viewings_booked')?.target ?? 100} />
-          <KpiCard label="Active Rentals" value={kpi.getKpiValue('rentals', '14')} delta="Ongoing leases" deltaDir="neu" icon="home" accentColor="var(--p)" delay={330} editable onValueChange={v => kpi.setKpiValue('rentals', v)} />
+          <KpiCard label="Active Listings" value={kpi.getKpiValue('listings', activeListings)} delta="+3 this month" deltaDir="up" icon="folder" accentColor="var(--b)" delay={80} editable onValueChange={v => kpi.setKpiValue('listings', v)} goalCurrent={activeListings} goalTarget={kpi.getGoal('listings_added')?.target ?? 10} sparkData={[5, 4, 6, 5, 7, 4, 3]} />
+          <KpiCard label="Deals Closed" value={kpi.getKpiValue('closed', totalClosed)} delta="YTD total" deltaDir="up" icon="target" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('closed', v)} goalCurrent={totalClosed} goalTarget={kpi.getGoal('deals_closed')?.target ?? 50} sparkData={[3, 5, 4, 6, 5, 7, 6]} />
+          <KpiCard label="Commission" value={kpi.getKpiValue('commission', `€${(totalRevenue / 1000).toFixed(0)}K`)} delta="+15.8% vs last quarter" deltaDir="up" icon="dollar-sign" hot delay={180} editable onValueChange={v => kpi.setKpiValue('commission', v)} sparkData={[28, 35, 42, 38, 52, 48, 55]} />
+          <KpiCard label="Avg Days on Market" value={kpi.getKpiValue('dom', avgDaysOnMarket)} delta={avgDaysOnMarket < 30 ? 'Below average' : 'Above average'} deltaDir={avgDaysOnMarket < 30 ? 'up' : 'down'} icon="calendar" accentColor="var(--y)" delay={230} editable onValueChange={v => kpi.setKpiValue('dom', v)} sparkData={[32, 28, 25, 30, 22, 26, 23]} />
+          <KpiCard label="Total Viewings" value={kpi.getKpiValue('viewings', '82')} delta="+24% this month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={280} editable onValueChange={v => kpi.setKpiValue('viewings', v)} goalCurrent={82} goalTarget={kpi.getGoal('viewings_booked')?.target ?? 100} sparkData={[12, 18, 15, 22, 19, 25, 20]} />
+          <KpiCard label="Active Rentals" value={kpi.getKpiValue('rentals', '14')} delta="Ongoing leases" deltaDir="neu" icon="home" accentColor="var(--p)" delay={330} editable onValueChange={v => kpi.setKpiValue('rentals', v)} sparkData={[10, 11, 12, 11, 13, 14, 14]} />
         </div>
 
         {/* Pipeline + Revenue Chart */}
@@ -620,6 +758,138 @@ function RealEstateDashboard({ config, kpi }: { config: { dashboardTitle: string
             </div>
           </div>
         </div>
+
+        {/* Revenue by Type Donut + Forecast Chart */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
+          {/* Revenue by Type (Donut) */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <DollarSign size={14} color="var(--accent)" />
+              </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>Revenue by Type</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Breakdown by property type</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ position: 'relative', width: 200, height: 200 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={RE_REVENUE_BY_TYPE}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={85}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {RE_REVENUE_BY_TYPE.map((entry, index) => (
+                        <Cell key={`re-donut-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--panel)', border: '1px solid var(--border)',
+                        borderRadius: 8, fontSize: 12, boxShadow: 'var(--shadow)',
+                      }}
+                      formatter={(v) => [`€${(Number(v) / 1000000).toFixed(1)}M`]}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div style={{
+                  position: 'absolute', top: '50%', left: '50%',
+                  transform: 'translate(-50%, -50%)', textAlign: 'center',
+                }}>
+                  <div className="mono" style={{ fontSize: 20, fontWeight: 700, color: 'var(--txt)' }}>€8.1M</div>
+                  <div style={{ fontSize: 10, color: 'var(--txt3)' }}>Total</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginTop: 12 }}>
+                {RE_REVENUE_BY_TYPE.map(item => (
+                  <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: item.color }} />
+                    <span style={{ fontSize: 11, color: 'var(--txt2)' }}>{item.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Forecast Chart */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <TrendingUp size={14} color="var(--accent)" />
+              </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>Revenue Forecast</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Actual vs projected revenue</div>
+              </div>
+            </div>
+            <div style={{ height: 220 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={RE_FORECAST}>
+                  <defs>
+                    <linearGradient id="gradReForecast" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.1} />
+                      <stop offset="95%" stopColor="var(--accent)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} width={50} />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'var(--panel)', border: '1px solid var(--border)',
+                      borderRadius: 8, fontSize: 12, boxShadow: 'var(--shadow)',
+                    }}
+                    formatter={(v, name) => [`€${(Number(v) / 1000).toFixed(0)}K`, name === 'actual' ? 'Actual' : 'Forecast']}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="forecast"
+                    stroke="var(--accent)"
+                    fill="url(#gradReForecast)"
+                    strokeWidth={2}
+                    strokeDasharray="6 3"
+                    connectNulls={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="actual"
+                    stroke="var(--g)"
+                    strokeWidth={2.5}
+                    dot={{ r: 4, fill: 'var(--g)', stroke: 'var(--panel)', strokeWidth: 2 }}
+                    connectNulls={false}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <div style={{ width: 16, height: 2, background: 'var(--g)', borderRadius: 1 }} />
+                <span style={{ fontSize: 11, color: 'var(--txt2)' }}>Actual</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <div style={{ width: 16, height: 2, background: 'var(--accent)', borderRadius: 1, borderTop: '1px dashed var(--accent)' }} />
+                <span style={{ fontSize: 11, color: 'var(--txt2)' }}>Forecast</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   )
@@ -635,11 +905,11 @@ function CSRDashboard({ config, kpi }: { config: { dashboardTitle: string; dashb
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPI Strip */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
-          <KpiCard label="Active Projects" value={kpi.getKpiValue('projects', '4')} delta="+1 this month" deltaDir="up" icon="folder" accentColor="var(--accent)" delay={80} editable onValueChange={v => kpi.setKpiValue('projects', v)} goalCurrent={4} goalTarget={kpi.getGoal('projects_completed')?.target ?? 6} />
-          <KpiCard label="People Helped" value={kpi.getKpiValue('people', '1,100')} delta="+19.6% vs last month" deltaDir="up" icon="heart" accentColor="var(--p)" delay={130} editable onValueChange={v => kpi.setKpiValue('people', v)} goalCurrent={1100} goalTarget={kpi.getGoal('people_helped')?.target ?? 2000} />
-          <KpiCard label="CO2 Reduced" value={kpi.getKpiValue('co2', '4.5t')} delta="+18.4% vs last month" deltaDir="up" icon="leaf" accentColor="var(--g)" delay={180} editable onValueChange={v => kpi.setKpiValue('co2', v)} goalCurrent={4500} goalTarget={kpi.getGoal('co2_reduced')?.target ?? 10000} />
-          <KpiCard label="Trees Planted" value={kpi.getKpiValue('trees', '2,340')} delta="Target: 5,000" deltaDir="neu" icon="tree" accentColor="var(--g)" delay={230} editable onValueChange={v => kpi.setKpiValue('trees', v)} />
-          <KpiCard label="Total Donated" value={kpi.getKpiValue('donated', '€48K')} delta="12 donors active" deltaDir="up" icon="dollar-sign" hot delay={280} editable onValueChange={v => kpi.setKpiValue('donated', v)} goalCurrent={48000} goalTarget={kpi.getGoal('donations_raised')?.target ?? 100000} />
+          <KpiCard label="Active Projects" value={kpi.getKpiValue('projects', '4')} delta="+1 this month" deltaDir="up" icon="folder" accentColor="var(--accent)" delay={80} editable onValueChange={v => kpi.setKpiValue('projects', v)} goalCurrent={4} goalTarget={kpi.getGoal('projects_completed')?.target ?? 6} sparkData={[2, 3, 3, 3, 4, 3, 4]} />
+          <KpiCard label="People Helped" value={kpi.getKpiValue('people', '1,100')} delta="+19.6% vs last month" deltaDir="up" icon="heart" accentColor="var(--p)" delay={130} editable onValueChange={v => kpi.setKpiValue('people', v)} goalCurrent={1100} goalTarget={kpi.getGoal('people_helped')?.target ?? 2000} sparkData={[650, 720, 810, 880, 950, 1020, 1100]} />
+          <KpiCard label="CO2 Reduced" value={kpi.getKpiValue('co2', '4.5t')} delta="+18.4% vs last month" deltaDir="up" icon="leaf" accentColor="var(--g)" delay={180} editable onValueChange={v => kpi.setKpiValue('co2', v)} goalCurrent={4500} goalTarget={kpi.getGoal('co2_reduced')?.target ?? 10000} sparkData={[2.1, 2.5, 2.9, 3.2, 3.6, 4.0, 4.5]} />
+          <KpiCard label="Trees Planted" value={kpi.getKpiValue('trees', '2,340')} delta="Target: 5,000" deltaDir="neu" icon="tree" accentColor="var(--g)" delay={230} editable onValueChange={v => kpi.setKpiValue('trees', v)} sparkData={[800, 1050, 1300, 1550, 1800, 2050, 2340]} />
+          <KpiCard label="Total Donated" value={kpi.getKpiValue('donated', '€48K')} delta="12 donors active" deltaDir="up" icon="dollar-sign" hot delay={280} editable onValueChange={v => kpi.setKpiValue('donated', v)} goalCurrent={48000} goalTarget={kpi.getGoal('donations_raised')?.target ?? 100000} sparkData={[22, 28, 32, 36, 40, 44, 48]} />
         </div>
 
         {/* Charts + Activity */}
@@ -776,6 +1046,138 @@ function CSRDashboard({ config, kpi }: { config: { dashboardTitle: string; dashb
                     <Bar dataKey="donated" fill="var(--accent)" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* SDG Distribution Donut + Impact Forecast */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
+          {/* SDG Distribution (Donut) */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Globe2 size={14} color="var(--accent)" />
+              </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>SDG Distribution</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Impact allocation by focus area</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ position: 'relative', width: 200, height: 200 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={CSR_SDG_DISTRIBUTION}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={85}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {CSR_SDG_DISTRIBUTION.map((entry, index) => (
+                        <Cell key={`csr-donut-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--panel)', border: '1px solid var(--border)',
+                        borderRadius: 8, fontSize: 12, boxShadow: 'var(--shadow)',
+                      }}
+                      formatter={(v) => [`${v}%`]}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div style={{
+                  position: 'absolute', top: '50%', left: '50%',
+                  transform: 'translate(-50%, -50%)', textAlign: 'center',
+                }}>
+                  <div className="mono" style={{ fontSize: 20, fontWeight: 700, color: 'var(--txt)' }}>100%</div>
+                  <div style={{ fontSize: 10, color: 'var(--txt3)' }}>Allocated</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginTop: 12 }}>
+                {CSR_SDG_DISTRIBUTION.map(item => (
+                  <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: item.color }} />
+                    <span style={{ fontSize: 11, color: 'var(--txt2)' }}>{item.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Impact Forecast */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <TrendingUp size={14} color="var(--accent)" />
+              </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>Impact Forecast</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>People helped - actual vs projected</div>
+              </div>
+            </div>
+            <div style={{ height: 220 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={CSR_FORECAST}>
+                  <defs>
+                    <linearGradient id="gradCsrForecast" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.1} />
+                      <stop offset="95%" stopColor="var(--accent)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} width={50} />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'var(--panel)', border: '1px solid var(--border)',
+                      borderRadius: 8, fontSize: 12, boxShadow: 'var(--shadow)',
+                    }}
+                    formatter={(v, name) => [Number(v).toLocaleString(), name === 'actual' ? 'Actual' : 'Forecast']}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="forecast"
+                    stroke="var(--accent)"
+                    fill="url(#gradCsrForecast)"
+                    strokeWidth={2}
+                    strokeDasharray="6 3"
+                    connectNulls={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="actual"
+                    stroke="var(--g)"
+                    strokeWidth={2.5}
+                    dot={{ r: 4, fill: 'var(--g)', stroke: 'var(--panel)', strokeWidth: 2 }}
+                    connectNulls={false}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <div style={{ width: 16, height: 2, background: 'var(--g)', borderRadius: 1 }} />
+                <span style={{ fontSize: 11, color: 'var(--txt2)' }}>Actual</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <div style={{ width: 16, height: 2, background: 'var(--accent)', borderRadius: 1, borderTop: '1px dashed var(--accent)' }} />
+                <span style={{ fontSize: 11, color: 'var(--txt2)' }}>Forecast</span>
               </div>
             </div>
           </div>

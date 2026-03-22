@@ -22,6 +22,13 @@ const CSR_EVENTS: CalendarEvent[] = [
   { id: '5', title: 'Board presentation', date: '2026-03-31', time: '11:00', type: 'meeting', color: 'var(--accent)' },
   { id: '6', title: 'Donor meeting', date: '2026-04-02', time: '13:00', type: 'meeting', color: 'var(--accent)' },
   { id: '7', title: 'Water project check-in', date: '2026-04-07', time: '10:00', type: 'call', color: 'var(--p)' },
+  { id: '8', title: 'Grant committee review', date: '2026-03-25', time: '09:30', type: 'meeting', color: 'var(--accent)' },
+  { id: '9', title: 'Reforestation milestone', date: '2026-03-27', time: '11:00', type: 'milestone', color: 'var(--g)' },
+  { id: '10', title: 'Partner call: EduFund', date: '2026-03-29', time: '15:00', type: 'call', color: 'var(--p)' },
+  { id: '11', title: 'Quarterly donor update', date: '2026-03-30', time: '10:00', type: 'meeting', color: 'var(--accent)' },
+  { id: '12', title: 'Impact metrics deadline', date: '2026-04-04', time: '17:00', type: 'deadline', color: 'var(--r)' },
+  { id: '13', title: 'Community outreach plan', date: '2026-04-05', time: '14:00', type: 'meeting', color: 'var(--accent)' },
+  { id: '14', title: 'Solar project kickoff', date: '2026-04-09', time: '09:00', type: 'milestone', color: 'var(--g)' },
 ]
 
 const RE_EVENTS: CalendarEvent[] = [
@@ -33,6 +40,13 @@ const RE_EVENTS: CalendarEvent[] = [
   { id: '6', title: 'Open house: NDSM Loft', date: '2026-03-29', time: '12:00', type: 'viewing', color: 'var(--accent)' },
   { id: '7', title: 'Contract signing', date: '2026-04-01', time: '10:00', type: 'milestone', color: 'var(--g)' },
   { id: '8', title: 'Viewing: Centrum Office', date: '2026-04-03', time: '09:00', type: 'viewing', color: 'var(--accent)' },
+  { id: '9', title: 'Appraisal: Oud-Zuid flat', date: '2026-03-25', time: '14:00', type: 'viewing', color: 'var(--accent)' },
+  { id: '10', title: 'Mortgage deadline: Jansen', date: '2026-03-28', time: '17:00', type: 'deadline', color: 'var(--r)' },
+  { id: '11', title: 'Notary meeting: Peters', date: '2026-03-30', time: '10:00', type: 'meeting', color: 'var(--accent)' },
+  { id: '12', title: 'Open house: De Pijp', date: '2026-03-31', time: '13:00', type: 'viewing', color: 'var(--accent)' },
+  { id: '13', title: 'Client call: Brouwer', date: '2026-04-02', time: '11:00', type: 'call', color: 'var(--p)' },
+  { id: '14', title: 'Closing: Zuidas Penthouse', date: '2026-04-04', time: '15:00', type: 'milestone', color: 'var(--g)' },
+  { id: '15', title: 'Inspection: NDSM Loft', date: '2026-04-07', time: '10:00', type: 'viewing', color: 'var(--accent)' },
 ]
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']

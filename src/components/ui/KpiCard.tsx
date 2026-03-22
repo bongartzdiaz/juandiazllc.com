@@ -7,6 +7,7 @@ import {
   TreePine, Droplets, BarChart3, FolderKanban, Award,
   Pencil, Check, X,
 } from 'lucide-react'
+import { LineChart, Line, ResponsiveContainer } from 'recharts'
 
 const iconMap: Record<string, React.ComponentType<{ size?: number; color?: string }>> = {
   'users': Users,
@@ -41,12 +42,13 @@ interface KpiCardProps {
   delay?: number
   editable?: boolean
   onValueChange?: (newValue: string) => void
+  sparkData?: number[]
 }
 
 export function KpiCard({
   label, value, delta, deltaDir = 'neu', goal, goalCurrent, goalTarget,
   hot, accentColor = 'var(--accent)', icon, delay = 0,
-  editable = false, onValueChange,
+  editable = false, onValueChange, sparkData,
 }: KpiCardProps) {
   const [visible, setVisible] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -201,6 +203,17 @@ export function KpiCard({
               transition: 'width 0.8s ease',
             }} />
           </div>
+        </div>
+      )}
+
+      {/* Sparkline mini-chart */}
+      {sparkData && sparkData.length > 0 && (
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 30, opacity: 0.6, borderRadius: '0 0 12px 12px', overflow: 'hidden' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={sparkData.map((v, i) => ({ v, i }))}>
+              <Line type="monotone" dataKey="v" stroke={accentColor || 'var(--accent)'} strokeWidth={1.5} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       )}
     </div>
