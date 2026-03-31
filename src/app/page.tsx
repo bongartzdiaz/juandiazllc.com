@@ -5,6 +5,14 @@ import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { useIndustry } from '@/hooks/useIndustry'
 import { useKpiStore } from '@/hooks/useKpiStore'
+import { useTheme } from '@/hooks/useTheme'
+// Mobile menu is handled automatically by Topbar via context
+import {
+  JourneyBar,
+  CSR_JOURNEY, CSR_SUMMARY,
+  RE_SALES_JOURNEY, RE_RENTAL_JOURNEY, RE_SUMMARY,
+  HOS_JOURNEY, HOS_SUMMARY,
+} from '@/components/dashboard/JourneyBar'
 import {
   FolderKanban, Leaf, Globe2, ArrowRight, Clock,
   Building2, DollarSign, TrendingUp, Home, Key, Calendar,
@@ -68,25 +76,7 @@ const RE_ACTIVITY = [
   { text: 'New listing: Commercial Office — Centrum', time: '2d ago' },
 ]
 
-const RE_SALES_PIPELINE = [
-  { stage: 'Enquiry', value: 12, color: 'var(--txt3)' },
-  { stage: 'Viewing', value: 8, color: 'var(--b)' },
-  { stage: 'Reservation', value: 5, color: 'var(--accent)' },
-  { stage: 'Searches', value: 4, color: 'var(--y)' },
-  { stage: 'Results', value: 3, color: 'var(--o)' },
-  { stage: 'Sales Agreement', value: 3, color: 'var(--p)' },
-  { stage: 'Bill of Sale', value: 2, color: 'var(--b)' },
-  { stage: 'Transfer', value: 2, color: 'var(--g)' },
-  { stage: 'Commission', value: 9, color: 'var(--g)' },
-]
-
-const RE_RENTAL_PIPELINE = [
-  { stage: 'Enquiry', value: 18, color: 'var(--txt3)' },
-  { stage: 'Viewing', value: 11, color: 'var(--b)' },
-  { stage: 'Rental Agreement', value: 6, color: 'var(--accent)' },
-  { stage: 'Payment', value: 4, color: 'var(--o)' },
-  { stage: 'Active Lease', value: 14, color: 'var(--g)' },
-]
+// Pipeline data now in JourneyBar component configs
 
 // ── Hospitality Demo Data ──
 const HOS_MONTHLY = [
@@ -114,13 +104,7 @@ const HOS_ACTIVITY = [
   { text: 'F&B order: La Terrazza — private dinner for 12', time: '1d ago' },
 ]
 
-const HOS_PIPELINE = [
-  { stage: 'Inquiry', value: 42, color: 'var(--txt3)' },
-  { stage: 'Confirmed', value: 28, color: 'var(--b)' },
-  { stage: 'Checked-In', value: 18, color: 'var(--o)' },
-  { stage: 'Checked-Out', value: 12, color: 'var(--p)' },
-  { stage: 'Reviewed', value: 9, color: 'var(--g)' },
-]
+// Pipeline data now in JourneyBar component configs
 
 // ── Revenue by Type (RE Donut) ──
 const RE_REVENUE_BY_TYPE = [
@@ -198,26 +182,36 @@ const statusColors: Record<string, { bg: string; txt: string; border: string }> 
 export default function DashboardPage() {
   const { industry, config } = useIndustry()
   const kpiStore = useKpiStore(industry)
+  const { theme } = useTheme()
 
-  if (industry === 'hospitality') return <HospitalityDashboard config={config} kpi={kpiStore} />
-  if (industry === 'realestate') return <RealEstateDashboard config={config} kpi={kpiStore} />
-  return <CSRDashboard config={config} kpi={kpiStore} />
+  if (industry === 'hospitality') return <HospitalityDashboard config={config} kpi={kpiStore} themeKey={theme} />
+  if (industry === 'realestate') return <RealEstateDashboard config={config} kpi={kpiStore} themeKey={theme} />
+  return <CSRDashboard config={config} kpi={kpiStore} themeKey={theme} />
 }
 
-type KpiStore = ReturnType<typeof useKpiStore>
+type DashboardProps = { config: { dashboardTitle: string; dashboardSub: string }; kpi: KpiStore; themeKey: string }
 
+type KpiStore = ReturnType<typeof useKpiStore>
 // ══════════════════════════════════════════
 // HOSPITALITY DASHBOARD
 // ══════════════════════════════════════════
-function HospitalityDashboard({ config, kpi }: { config: { dashboardTitle: string; dashboardSub: string }; kpi: KpiStore }) {
+function HospitalityDashboard({ config, kpi, themeKey }: DashboardProps) {
   const totalRevenue = HOS_MONTHLY.reduce((s, m) => s + m.roomRevenue + m.fnbRevenue, 0)
 
   return (
     <>
-      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Booking" />
+      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Booking"  />
       <div style={{ padding: '18px 24px 40px' }}>
+        {/* Journey Bar */}
+        <JourneyBar
+          steps={HOS_JOURNEY}
+          summaryItems={HOS_SUMMARY}
+          title="Guest Journey"
+          subtitle="Current period overview"
+        />
+
         {/* KPIs */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
+        <div className="kpi-grid-5" style={{ marginBottom: 18 }}>
           <KpiCard label="Occupancy Rate" value={kpi.getKpiValue('occupancy', '78%')} delta="+4% vs last month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={80} editable onValueChange={v => kpi.setKpiValue('occupancy', v)} goalCurrent={78} goalTarget={kpi.getGoal('occupancy_rate')?.target ?? 85} sparkData={[72, 74, 78, 75, 80, 77, 78]} />
           <KpiCard label="RevPAR" value={kpi.getKpiValue('revpar', '€142')} delta="+€12 vs avg" deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('revpar', v)} goalCurrent={95} goalTarget={kpi.getGoal('revpar_target')?.target ?? 120} sparkData={[128, 135, 142, 138, 145, 140, 142]} />
           <KpiCard label="ADR" value={kpi.getKpiValue('adr', '€185')} delta="Avg Daily Rate" deltaDir="neu" icon="chart" accentColor="var(--b)" delay={180} editable onValueChange={v => kpi.setKpiValue('adr', v)} sparkData={[175, 180, 182, 185, 183, 186, 185]} />
@@ -225,51 +219,8 @@ function HospitalityDashboard({ config, kpi }: { config: { dashboardTitle: strin
           <KpiCard label="Total Bookings" value={kpi.getKpiValue('bookings', '234')} delta="+18 this week" deltaDir="up" icon="calendar" hot delay={280} editable onValueChange={v => kpi.setKpiValue('bookings', v)} goalCurrent={148} goalTarget={kpi.getGoal('bookings')?.target ?? 200} sparkData={[195, 210, 218, 225, 230, 228, 234]} />
         </div>
 
-        {/* Pipeline + Revenue Chart */}
-        <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: 14, marginBottom: 14 }}>
-          {/* Booking Pipeline */}
-          <div style={{
-            background: 'var(--panel)', border: '1px solid var(--border)',
-            borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-              <div style={{
-                width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <TrendingUp size={14} color="var(--accent)" />
-              </div>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Booking Pipeline</div>
-                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Guest journey overview</div>
-              </div>
-            </div>
-            {HOS_PIPELINE.map((stage, i) => (
-              <div key={stage.stage} style={{ marginBottom: i < HOS_PIPELINE.length - 1 ? 12 : 0 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 12, color: 'var(--txt2)' }}>{stage.stage}</span>
-                  <span className="mono" style={{ fontSize: 12, fontWeight: 600 }}>{stage.value}</span>
-                </div>
-                <div style={{ height: 6, borderRadius: 3, background: 'var(--bg2)', overflow: 'hidden' }}>
-                  <div style={{
-                    height: '100%', borderRadius: 3,
-                    width: `${(stage.value / 42) * 100}%`,
-                    background: stage.color,
-                    transition: 'width 0.8s ease',
-                  }} />
-                </div>
-              </div>
-            ))}
-            <div style={{
-              marginTop: 16, padding: '10px 12px', borderRadius: 8,
-              background: 'var(--g-bg)', border: '1px solid var(--g-border)',
-            }}>
-              <div style={{ fontSize: 11, color: 'var(--g-txt)', fontWeight: 600 }}>Review Rate</div>
-              <div className="mono" style={{ fontSize: 20, fontWeight: 600, color: 'var(--g-txt)' }}>75%</div>
-              <div style={{ fontSize: 10, color: 'var(--g-txt)', opacity: 0.8 }}>Checkout to Review</div>
-            </div>
-          </div>
-
+        {/* Revenue Chart (full width now that pipeline is in JourneyBar) */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
           {/* Revenue Chart */}
           <div style={{
             background: 'var(--panel)', border: '1px solid var(--border)',
@@ -305,6 +256,48 @@ function HospitalityDashboard({ config, kpi }: { config: { dashboardTitle: strin
                   <Bar dataKey="roomRevenue" fill="var(--accent)" radius={[4, 4, 0, 0]} stackId="rev" />
                   <Bar dataKey="fnbRevenue" fill="var(--g)" radius={[4, 4, 0, 0]} stackId="rev" />
                 </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Occupancy Trend Chart */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Users size={14} color="var(--accent)" />
+              </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>Occupancy Trend</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Monthly occupancy rate</div>
+              </div>
+            </div>
+            <div style={{ height: 250 }}>
+              <ResponsiveContainer key={`hos-occ-${themeKey}`} width="100%" height="100%">
+                <AreaChart data={[
+                  { month: 'Oct', occ: 68 }, { month: 'Nov', occ: 72 },
+                  { month: 'Dec', occ: 82 }, { month: 'Jan', occ: 71 },
+                  { month: 'Feb', occ: 75 }, { month: 'Mar', occ: 78 },
+                ]}>
+                  <defs>
+                    <linearGradient id="gradHosOcc" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="var(--accent)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} />
+                  <YAxis domain={[50, 100]} tick={{ fontSize: 11, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} width={35} />
+                  <Tooltip
+                    contentStyle={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12, boxShadow: 'var(--shadow)' }}
+                    formatter={(v) => [`${v}%`, 'Occupancy']}
+                  />
+                  <Area type="monotone" dataKey="occ" stroke="var(--accent)" fill="url(#gradHosOcc)" strokeWidth={2.5} dot={{ r: 4, fill: 'var(--accent)', stroke: 'var(--panel)', strokeWidth: 2 }} />
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
@@ -522,10 +515,8 @@ function HospitalityDashboard({ config, kpi }: { config: { dashboardTitle: strin
 // ══════════════════════════════════════════
 // REAL ESTATE DASHBOARD
 // ══════════════════════════════════════════
-function RealEstateDashboard({ config, kpi }: { config: { dashboardTitle: string; dashboardSub: string }; kpi: KpiStore }) {
+function RealEstateDashboard({ config, kpi, themeKey }: DashboardProps) {
   const [pipelineMode, setPipelineMode] = useState<'sales' | 'rental'>('sales')
-  const currentPipeline = pipelineMode === 'sales' ? RE_SALES_PIPELINE : RE_RENTAL_PIPELINE
-  const maxPipelineValue = Math.max(...currentPipeline.map(s => s.value))
   const totalRevenue = RE_MONTHLY.reduce((s, m) => s + m.revenue, 0)
   const totalClosed = RE_MONTHLY.reduce((s, m) => s + m.closed, 0)
   const activeListings = RE_PROPERTIES.filter(p => p.status === 'active').length
@@ -533,10 +524,34 @@ function RealEstateDashboard({ config, kpi }: { config: { dashboardTitle: string
 
   return (
     <>
-      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Listing" />
+      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Listing"  />
       <div style={{ padding: '18px 24px 40px' }}>
+        {/* Journey Bar with pipeline mode toggle */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: 'flex', gap: 4, background: 'var(--bg2)', borderRadius: 8, padding: 3, marginBottom: 8, width: 'fit-content' }}>
+            {(['sales', 'rental'] as const).map(m => (
+              <button key={m} onClick={() => setPipelineMode(m)} style={{
+                padding: '5px 14px', borderRadius: 6, fontSize: 11, fontWeight: 600,
+                border: 'none', cursor: 'pointer',
+                background: pipelineMode === m ? 'var(--panel)' : 'transparent',
+                color: pipelineMode === m ? 'var(--txt)' : 'var(--txt3)',
+                boxShadow: pipelineMode === m ? 'var(--shadow-sm)' : 'none',
+                fontFamily: 'inherit',
+              }}>
+                {m === 'sales' ? 'Sales Pipeline' : 'Rental Pipeline'}
+              </button>
+            ))}
+          </div>
+          <JourneyBar
+            steps={pipelineMode === 'sales' ? RE_SALES_JOURNEY : RE_RENTAL_JOURNEY}
+            summaryItems={RE_SUMMARY}
+            title={pipelineMode === 'sales' ? 'Sales Pipeline' : 'Rental Pipeline'}
+            subtitle={pipelineMode === 'sales' ? '9-stage deal flow' : '5-stage rental flow'}
+          />
+        </div>
+
         {/* KPIs */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10, marginBottom: 18 }}>
+        <div className="kpi-grid-6" style={{ marginBottom: 18 }}>
           <KpiCard label="Active Listings" value={kpi.getKpiValue('listings', activeListings)} delta="+3 this month" deltaDir="up" icon="folder" accentColor="var(--b)" delay={80} editable onValueChange={v => kpi.setKpiValue('listings', v)} goalCurrent={activeListings} goalTarget={kpi.getGoal('listings_added')?.target ?? 10} sparkData={[5, 4, 6, 5, 7, 4, 3]} />
           <KpiCard label="Deals Closed" value={kpi.getKpiValue('closed', totalClosed)} delta="YTD total" deltaDir="up" icon="target" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('closed', v)} goalCurrent={totalClosed} goalTarget={kpi.getGoal('deals_closed')?.target ?? 50} sparkData={[3, 5, 4, 6, 5, 7, 6]} />
           <KpiCard label="Commission" value={kpi.getKpiValue('commission', `€${(totalRevenue / 1000).toFixed(0)}K`)} delta="+15.8% vs last quarter" deltaDir="up" icon="dollar-sign" hot delay={180} editable onValueChange={v => kpi.setKpiValue('commission', v)} sparkData={[28, 35, 42, 38, 52, 48, 55]} />
@@ -545,68 +560,13 @@ function RealEstateDashboard({ config, kpi }: { config: { dashboardTitle: string
           <KpiCard label="Active Rentals" value={kpi.getKpiValue('rentals', '14')} delta="Ongoing leases" deltaDir="neu" icon="home" accentColor="var(--p)" delay={330} editable onValueChange={v => kpi.setKpiValue('rentals', v)} sparkData={[10, 11, 12, 11, 13, 14, 14]} />
         </div>
 
-        {/* Pipeline + Revenue Chart */}
-        <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: 14, marginBottom: 14 }}>
-          {/* Deal Pipeline */}
-          <div style={{
-            background: 'var(--panel)', border: '1px solid var(--border)',
-            borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-              <div style={{
-                width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <TrendingUp size={14} color="var(--accent)" />
-              </div>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Deal Pipeline</div>
-                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{pipelineMode === 'sales' ? 'Sales stages overview' : 'Rental stages overview'}</div>
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: 4, background: 'var(--bg2)', borderRadius: 8, padding: 3, marginBottom: 14, width: 'fit-content' }}>
-              {(['sales', 'rental'] as const).map(m => (
-                <button key={m} onClick={() => setPipelineMode(m)} style={{
-                  padding: '5px 14px', borderRadius: 6, fontSize: 11, fontWeight: 600,
-                  border: 'none', cursor: 'pointer',
-                  background: pipelineMode === m ? 'var(--panel)' : 'transparent',
-                  color: pipelineMode === m ? 'var(--txt)' : 'var(--txt3)',
-                  boxShadow: pipelineMode === m ? 'var(--shadow-sm)' : 'none',
-                }}>
-                  {m === 'sales' ? 'Sales' : 'Rentals'}
-                </button>
-              ))}
-            </div>
-            {currentPipeline.map((stage, i) => (
-              <div key={stage.stage} style={{ marginBottom: i < currentPipeline.length - 1 ? 12 : 0 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 12, color: 'var(--txt2)' }}>{stage.stage}</span>
-                  <span className="mono" style={{ fontSize: 12, fontWeight: 600 }}>{stage.value}</span>
-                </div>
-                <div style={{ height: 6, borderRadius: 3, background: 'var(--bg2)', overflow: 'hidden' }}>
-                  <div style={{
-                    height: '100%', borderRadius: 3,
-                    width: `${(stage.value / maxPipelineValue) * 100}%`,
-                    background: stage.color,
-                    transition: 'width 0.8s ease',
-                  }} />
-                </div>
-              </div>
-            ))}
-            <div style={{
-              marginTop: 16, padding: '10px 12px', borderRadius: 8,
-              background: 'var(--g-bg)', border: '1px solid var(--g-border)',
-            }}>
-              <div style={{ fontSize: 11, color: 'var(--g-txt)', fontWeight: 600 }}>Conversion Rate</div>
-              <div className="mono" style={{ fontSize: 20, fontWeight: 600, color: 'var(--g-txt)' }}>{pipelineMode === 'sales' ? '26.5%' : '77.8%'}</div>
-              <div style={{ fontSize: 10, color: 'var(--g-txt)', opacity: 0.8 }}>{pipelineMode === 'sales' ? 'Enquiry to Commission' : 'Enquiry to Active Lease'}</div>
-            </div>
-          </div>
-
+        {/* Revenue + Listings Chart */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
           {/* Revenue Chart */}
           <div style={{
             background: 'var(--panel)', border: '1px solid var(--border)',
             borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
+            animation: 'riseIn 0.45s cubic-bezier(0.16,1,0.3,1) 0.3s both',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
               <div style={{
@@ -621,7 +581,7 @@ function RealEstateDashboard({ config, kpi }: { config: { dashboardTitle: string
               </div>
             </div>
             <div style={{ height: 250 }}>
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer key={`re-rev-${themeKey}`} width="100%" height="100%">
                 <BarChart data={RE_MONTHLY}>
                   <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} width={50} />
@@ -630,10 +590,49 @@ function RealEstateDashboard({ config, kpi }: { config: { dashboardTitle: string
                       background: 'var(--panel)', border: '1px solid var(--border)',
                       borderRadius: 8, fontSize: 12, boxShadow: 'var(--shadow)',
                     }}
-                    formatter={(v) => [`€${(Number(v) / 1000).toFixed(0)}K`, 'Revenue']}
+                    formatter={(v) => [`\u20AC${(Number(v) / 1000).toFixed(0)}K`, 'Revenue']}
                   />
                   <Bar dataKey="revenue" fill="var(--accent)" radius={[4, 4, 0, 0]} />
                 </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Listings Trend */}
+          <div style={{
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '16px 18px', boxShadow: 'var(--shadow-sm)',
+            animation: 'riseIn 0.45s cubic-bezier(0.16,1,0.3,1) 0.35s both',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 8, background: 'var(--b-bg)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Building2 size={14} color="var(--b)" />
+              </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>Listings vs Closings</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Monthly market activity</div>
+              </div>
+            </div>
+            <div style={{ height: 250 }}>
+              <ResponsiveContainer key={`re-list-${themeKey}`} width="100%" height="100%">
+                <AreaChart data={RE_MONTHLY}>
+                  <defs>
+                    <linearGradient id="gradListings" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--b)" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="var(--b)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} width={35} />
+                  <Tooltip
+                    contentStyle={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12, boxShadow: 'var(--shadow)' }}
+                  />
+                  <Area type="monotone" dataKey="listings" stroke="var(--b)" fill="url(#gradListings)" strokeWidth={2} name="Listings" />
+                  <Line type="monotone" dataKey="closed" stroke="var(--g)" strokeWidth={2.5} dot={{ r: 4, fill: 'var(--g)', stroke: 'var(--panel)', strokeWidth: 2 }} name="Closed" />
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
@@ -898,13 +897,21 @@ function RealEstateDashboard({ config, kpi }: { config: { dashboardTitle: string
 // ══════════════════════════════════════════
 // CSR / PHILANTHROPY DASHBOARD (original)
 // ══════════════════════════════════════════
-function CSRDashboard({ config, kpi }: { config: { dashboardTitle: string; dashboardSub: string }; kpi: KpiStore }) {
+function CSRDashboard({ config, kpi, themeKey }: DashboardProps) {
   return (
     <>
-      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Project" />
+      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Project"  />
       <div style={{ padding: '18px 24px 40px' }}>
+        {/* Journey Bar */}
+        <JourneyBar
+          steps={CSR_JOURNEY}
+          summaryItems={CSR_SUMMARY}
+          title="Impact Journey"
+          subtitle="Project lifecycle overview"
+        />
+
         {/* KPI Strip */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
+        <div className="kpi-grid-5" style={{ marginBottom: 18 }}>
           <KpiCard label="Active Projects" value={kpi.getKpiValue('projects', '4')} delta="+1 this month" deltaDir="up" icon="folder" accentColor="var(--accent)" delay={80} editable onValueChange={v => kpi.setKpiValue('projects', v)} goalCurrent={4} goalTarget={kpi.getGoal('projects_completed')?.target ?? 6} sparkData={[2, 3, 3, 3, 4, 3, 4]} />
           <KpiCard label="People Helped" value={kpi.getKpiValue('people', '1,100')} delta="+19.6% vs last month" deltaDir="up" icon="heart" accentColor="var(--p)" delay={130} editable onValueChange={v => kpi.setKpiValue('people', v)} goalCurrent={1100} goalTarget={kpi.getGoal('people_helped')?.target ?? 2000} sparkData={[650, 720, 810, 880, 950, 1020, 1100]} />
           <KpiCard label="CO2 Reduced" value={kpi.getKpiValue('co2', '4.5t')} delta="+18.4% vs last month" deltaDir="up" icon="leaf" accentColor="var(--g)" delay={180} editable onValueChange={v => kpi.setKpiValue('co2', v)} goalCurrent={4500} goalTarget={kpi.getGoal('co2_reduced')?.target ?? 10000} sparkData={[2.1, 2.5, 2.9, 3.2, 3.6, 4.0, 4.5]} />

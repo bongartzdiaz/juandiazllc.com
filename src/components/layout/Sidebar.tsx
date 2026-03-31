@@ -26,7 +26,7 @@ const INDUSTRY_ICONS: Record<Industry, LucideIcon> = {
   hospitality: Hotel,
 }
 
-export function Sidebar() {
+export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
   const pathname = usePathname()
   const path = pathname.replace(/^\/(en|nl)/, '') || '/'
   const { industry, config, setIndustry } = useIndustry()
@@ -153,21 +153,21 @@ export function Sidebar() {
       <nav style={{ flex: 1, overflowY: 'auto', padding: '10px 10px 14px' }}>
         <NavLabel>Core</NavLabel>
         {NAV_PRIMARY.map(item => (
-          <NavItem key={item.href} active={path === item.href || (item.href !== '/' && path.startsWith(item.href))} {...item} />
+          <NavItem key={item.href} active={path === item.href || (item.href !== '/' && path.startsWith(item.href))} {...item} onClick={onNavigate} />
         ))}
 
         <div style={{ height: 1, background: 'var(--border)', margin: '8px 10px' }} />
 
         <NavLabel>Tools</NavLabel>
         {NAV_TOOLS.map(item => (
-          <NavItem key={item.href} active={path === item.href || path.startsWith(item.href)} {...item} />
+          <NavItem key={item.href} active={path === item.href || path.startsWith(item.href)} {...item} onClick={onNavigate} />
         ))}
 
         <div style={{ height: 1, background: 'var(--border)', margin: '8px 10px' }} />
 
         <NavLabel>System</NavLabel>
         {NAV_SYSTEM.map(item => (
-          <NavItem key={item.href} active={path === item.href || path.startsWith(item.href)} {...item} />
+          <NavItem key={item.href} active={path === item.href || path.startsWith(item.href)} {...item} onClick={onNavigate} />
         ))}
       </nav>
 
@@ -204,10 +204,11 @@ function NavLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
-function NavItem({ icon: Icon, label, href, active, badge, badgeNew }: NavItemDef & { active: boolean }) {
+function NavItem({ icon: Icon, label, href, active, badge, badgeNew, onClick }: NavItemDef & { active: boolean; onClick?: () => void }) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       style={{
         display: 'flex', alignItems: 'center', gap: 10,
         padding: '8px 12px', borderRadius: 8, cursor: 'pointer',

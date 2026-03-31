@@ -1,16 +1,20 @@
 'use client'
 
 import { useTheme } from '@/hooks/useTheme'
-import { Moon, Sun, RefreshCw, Plus, Globe } from 'lucide-react'
+import { useMobileMenu } from '@/components/layout/ClientLayout'
+import { Moon, Sun, RefreshCw, Plus, Globe, Menu } from 'lucide-react'
 
-export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New' }: {
+export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuToggle }: {
   title: string
   sub: string
   onSync?: () => void
   onAdd?: () => void
   addLabel?: string
+  onMenuToggle?: () => void
 }) {
   const { theme, toggle } = useTheme()
+  const mobileMenu = useMobileMenu()
+  const handleMenu = onMenuToggle || mobileMenu.toggle
 
   return (
     <div style={{
@@ -20,12 +24,40 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New' }: {
       position: 'sticky', top: 0, zIndex: 10,
       animation: 'fadeDown 0.3s ease 0.08s both',
     }}>
-      <div>
-        <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: '-0.02em' }}>{title}</div>
-        <div className="mono" style={{ fontSize: 11.5, color: 'var(--txt3)' }}>{sub}</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        {/* Hamburger for mobile */}
+        <button
+          className="hamburger-btn"
+          onClick={handleMenu}
+          style={{
+            width: 36, height: 36, borderRadius: 8,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'var(--bg2)', border: '1px solid var(--border)',
+            cursor: 'pointer', color: 'var(--txt2)',
+          }}
+        >
+          <Menu size={16} />
+        </button>
+        <div>
+          <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: '-0.02em' }}>{title}</div>
+          <div className="mono" style={{ fontSize: 11.5, color: 'var(--txt3)' }}>{sub}</div>
+        </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* LIVE badge */}
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', gap: 5,
+          fontSize: 10.5, fontWeight: 600, padding: '3px 9px', borderRadius: 8,
+          background: 'var(--g-bg)', color: 'var(--g-txt)', border: '1px solid var(--g-border)',
+        }}>
+          <span style={{
+            width: 6, height: 6, borderRadius: '50%', background: 'var(--g)',
+            animation: 'blink 1.5s ease-in-out infinite',
+          }} />
+          LIVE
+        </span>
+
         {/* Language toggle */}
         <button
           style={{
