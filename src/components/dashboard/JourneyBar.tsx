@@ -26,12 +26,16 @@ interface SummaryItem {
   color: string
 }
 
+export type JourneyPeriod = 'day' | 'week' | 'month'
+
 interface JourneyBarProps {
   steps: PipelineStep[]
   summaryItems?: SummaryItem[]
   title: string
   subtitle: string
   loading?: boolean
+  period?: JourneyPeriod
+  onPeriodChange?: (p: JourneyPeriod) => void
 }
 
 // ── Pre-built pipeline configs per industry ──
@@ -97,7 +101,9 @@ export const HOS_SUMMARY: SummaryItem[] = [
 
 // ── Component ──
 
-export function JourneyBar({ steps, summaryItems, title, subtitle, loading = false }: JourneyBarProps) {
+const PERIOD_LABELS: Record<JourneyPeriod, string> = { month: 'M', week: 'W', day: 'D' }
+
+export function JourneyBar({ steps, summaryItems, title, subtitle, loading = false, period = 'month', onPeriodChange }: JourneyBarProps) {
   const [animated, setAnimated] = useState(false)
 
   useEffect(() => {
@@ -141,6 +147,26 @@ export function JourneyBar({ steps, summaryItems, title, subtitle, loading = fal
             }} />
             LIVE
           </span>
+          {/* Period selector */}
+          {onPeriodChange && (
+            <div style={{
+              display: 'inline-flex', gap: 2, background: 'var(--bg2)',
+              border: '1px solid var(--border)', borderRadius: 8, padding: 3,
+            }}>
+              {(['month', 'week', 'day'] as JourneyPeriod[]).map(p => (
+                <button key={p} onClick={() => onPeriodChange(p)} style={{
+                  padding: '4px 10px', borderRadius: 6, fontSize: 10.5, fontWeight: 600,
+                  background: period === p ? 'var(--b-bg)' : 'transparent',
+                  color: period === p ? 'var(--b-txt)' : 'var(--txt3)',
+                  border: period === p ? '1px solid var(--b-border)' : '1px solid transparent',
+                  cursor: 'pointer', fontFamily: 'inherit',
+                  transition: 'all 0.15s ease',
+                }}>
+                  {PERIOD_LABELS[p]}
+                </button>
+              ))}
+            </div>
+          )}
           <span style={{
             fontSize: 10.5, color: 'var(--txt3)', fontWeight: 500,
           }}>{subtitle}</span>

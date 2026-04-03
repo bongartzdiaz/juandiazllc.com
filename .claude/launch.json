@@ -4,8 +4,8 @@
     {
       "name": "philanthropyai",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/.bin/next", "dev", "--port", "3100"],
-      "port": 3100
+      "runtimeArgs": ["node_modules/.bin/next", "dev", "--port", "3300"],
+      "port": 3300
     }
   ]
 }

@@ -2,17 +2,22 @@
 
 import { useTheme } from '@/hooks/useTheme'
 import { useMobileMenu } from '@/components/layout/ClientLayout'
-import { Moon, Sun, RefreshCw, Plus, Globe, Menu } from 'lucide-react'
+import { Moon, Sun, RefreshCw, Plus, Globe, Menu, GripVertical } from 'lucide-react'
+import { NotificationBell } from '@/components/dashboard/NotificationBell'
+import { useIndustry } from '@/hooks/useIndustry'
 
-export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuToggle }: {
+export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuToggle, editMode, onToggleEdit }: {
   title: string
   sub: string
   onSync?: () => void
   onAdd?: () => void
   addLabel?: string
   onMenuToggle?: () => void
+  editMode?: boolean
+  onToggleEdit?: () => void
 }) {
   const { theme, toggle } = useTheme()
+  const { industry } = useIndustry()
   const mobileMenu = useMobileMenu()
   const handleMenu = onMenuToggle || mobileMenu.toggle
 
@@ -45,6 +50,28 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* Notification Bell */}
+        <NotificationBell industry={industry} />
+
+        {/* Edit layout toggle */}
+        {onToggleEdit && (
+          <button
+            onClick={onToggleEdit}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 5,
+              background: editMode ? 'var(--accent-bg)' : 'var(--bg2)',
+              color: editMode ? 'var(--accent-txt)' : 'var(--txt2)',
+              border: editMode ? '1px solid var(--accent-border)' : '1px solid var(--border)',
+              borderRadius: 8, padding: '5px 10px',
+              fontSize: 11, fontWeight: 600, cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            <GripVertical size={12} />
+            {editMode ? 'Done' : 'Edit'}
+          </button>
+        )}
+
         {/* LIVE badge */}
         <span style={{
           display: 'inline-flex', alignItems: 'center', gap: 5,

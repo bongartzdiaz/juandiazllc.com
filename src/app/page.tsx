@@ -1,18 +1,22 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { useIndustry } from '@/hooks/useIndustry'
 import { useKpiStore } from '@/hooks/useKpiStore'
 import { useTheme } from '@/hooks/useTheme'
-// Mobile menu is handled automatically by Topbar via context
+import { useDashboardLayout } from '@/hooks/useDashboardLayout'
+import { CSR_WIDGETS, RE_WIDGETS, HOS_WIDGETS } from '@/lib/dashboard-layout'
+import type { WidgetId } from '@/lib/dashboard-layout'
+import { KpiDetailDrawer } from '@/components/dashboard/KpiDetailDrawer'
 import {
   JourneyBar,
   CSR_JOURNEY, CSR_SUMMARY,
   RE_SALES_JOURNEY, RE_RENTAL_JOURNEY, RE_SUMMARY,
   HOS_JOURNEY, HOS_SUMMARY,
 } from '@/components/dashboard/JourneyBar'
+import type { JourneyPeriod } from '@/components/dashboard/JourneyBar'
 import {
   FolderKanban, Leaf, Globe2, ArrowRight, Clock,
   Building2, DollarSign, TrendingUp, Home, Key, Calendar,
@@ -183,24 +187,49 @@ export default function DashboardPage() {
   const { industry, config } = useIndustry()
   const kpiStore = useKpiStore(industry)
   const { theme } = useTheme()
+  const [kpiDetail, setKpiDetail] = useState<Parameters<typeof KpiDetailDrawer>[0]['detail']>(null)
+  const [journeyPeriod, setJourneyPeriod] = useState<JourneyPeriod>('month')
 
-  if (industry === 'hospitality') return <HospitalityDashboard config={config} kpi={kpiStore} themeKey={theme} />
-  if (industry === 'realestate') return <RealEstateDashboard config={config} kpi={kpiStore} themeKey={theme} />
-  return <CSRDashboard config={config} kpi={kpiStore} themeKey={theme} />
+  const defaults = industry === 'hospitality' ? HOS_WIDGETS : industry === 'realestate' ? RE_WIDGETS : CSR_WIDGETS
+  const layout = useDashboardLayout(industry, defaults)
+
+  const openKpiDetail = useCallback((detail: Parameters<typeof KpiDetailDrawer>[0]['detail']) => {
+    setKpiDetail(detail)
+  }, [])
+
+  const shared = { config, kpi: kpiStore, themeKey: theme, layout, openKpiDetail, journeyPeriod, setJourneyPeriod }
+
+  return (
+    <>
+      {industry === 'hospitality' ? <HospitalityDashboard {...shared} /> :
+       industry === 'realestate' ? <RealEstateDashboard {...shared} /> :
+       <CSRDashboard {...shared} />}
+      <KpiDetailDrawer detail={kpiDetail} onClose={() => setKpiDetail(null)} />
+    </>
+  )
 }
 
-type DashboardProps = { config: { dashboardTitle: string; dashboardSub: string }; kpi: KpiStore; themeKey: string }
+type LayoutReturn = ReturnType<typeof useDashboardLayout>
+type DashboardProps = {
+  config: { dashboardTitle: string; dashboardSub: string }
+  kpi: KpiStore
+  themeKey: string
+  layout: LayoutReturn
+  openKpiDetail: (d: Parameters<typeof KpiDetailDrawer>[0]['detail']) => void
+  journeyPeriod: JourneyPeriod
+  setJourneyPeriod: (p: JourneyPeriod) => void
+}
 
 type KpiStore = ReturnType<typeof useKpiStore>
 // ══════════════════════════════════════════
 // HOSPITALITY DASHBOARD
 // ══════════════════════════════════════════
-function HospitalityDashboard({ config, kpi, themeKey }: DashboardProps) {
+function HospitalityDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod }: DashboardProps) {
   const totalRevenue = HOS_MONTHLY.reduce((s, m) => s + m.roomRevenue + m.fnbRevenue, 0)
 
   return (
     <>
-      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Booking"  />
+      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Booking" editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Journey Bar */}
         <JourneyBar
@@ -208,6 +237,8 @@ function HospitalityDashboard({ config, kpi, themeKey }: DashboardProps) {
           summaryItems={HOS_SUMMARY}
           title="Guest Journey"
           subtitle="Current period overview"
+          period={journeyPeriod}
+          onPeriodChange={setJourneyPeriod}
         />
 
         {/* KPIs */}
@@ -515,7 +546,7 @@ function HospitalityDashboard({ config, kpi, themeKey }: DashboardProps) {
 // ══════════════════════════════════════════
 // REAL ESTATE DASHBOARD
 // ══════════════════════════════════════════
-function RealEstateDashboard({ config, kpi, themeKey }: DashboardProps) {
+function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod }: DashboardProps) {
   const [pipelineMode, setPipelineMode] = useState<'sales' | 'rental'>('sales')
   const totalRevenue = RE_MONTHLY.reduce((s, m) => s + m.revenue, 0)
   const totalClosed = RE_MONTHLY.reduce((s, m) => s + m.closed, 0)
@@ -524,7 +555,7 @@ function RealEstateDashboard({ config, kpi, themeKey }: DashboardProps) {
 
   return (
     <>
-      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Listing"  />
+      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Listing" editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Journey Bar with pipeline mode toggle */}
         <div style={{ marginBottom: 16 }}>
@@ -546,7 +577,9 @@ function RealEstateDashboard({ config, kpi, themeKey }: DashboardProps) {
             steps={pipelineMode === 'sales' ? RE_SALES_JOURNEY : RE_RENTAL_JOURNEY}
             summaryItems={RE_SUMMARY}
             title={pipelineMode === 'sales' ? 'Sales Pipeline' : 'Rental Pipeline'}
-            subtitle={pipelineMode === 'sales' ? '9-stage deal flow' : '5-stage rental flow'}
+            subtitle={pipelineMode === 'sales' ? '7-stage deal flow' : '5-stage rental flow'}
+            period={journeyPeriod}
+            onPeriodChange={setJourneyPeriod}
           />
         </div>
 
@@ -897,10 +930,10 @@ function RealEstateDashboard({ config, kpi, themeKey }: DashboardProps) {
 // ══════════════════════════════════════════
 // CSR / PHILANTHROPY DASHBOARD (original)
 // ══════════════════════════════════════════
-function CSRDashboard({ config, kpi, themeKey }: DashboardProps) {
+function CSRDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod }: DashboardProps) {
   return (
     <>
-      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Project"  />
+      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Project" editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Journey Bar */}
         <JourneyBar
@@ -908,6 +941,8 @@ function CSRDashboard({ config, kpi, themeKey }: DashboardProps) {
           summaryItems={CSR_SUMMARY}
           title="Impact Journey"
           subtitle="Project lifecycle overview"
+          period={journeyPeriod}
+          onPeriodChange={setJourneyPeriod}
         />
 
         {/* KPI Strip */}
