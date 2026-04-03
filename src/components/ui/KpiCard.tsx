@@ -153,7 +153,7 @@ export function KpiCard({
             onChange={e => setEditValue(e.target.value)}
             onKeyDown={handleKeyDown}
             style={{
-              fontSize: 22, fontWeight: 500, fontFamily: 'var(--font-jet-mono), monospace',
+              fontSize: 22, fontWeight: 500, fontFamily: "var(--font-red-hat-mono), 'Red Hat Mono', monospace",
               background: 'var(--bg2)', border: '1px solid var(--accent)',
               borderRadius: 6, padding: '2px 8px', width: '100%',
               color: 'var(--txt)', outline: 'none',

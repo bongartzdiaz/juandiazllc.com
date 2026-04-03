@@ -60,7 +60,7 @@
 
 @theme inline {
   --font-sans: var(--font-jakarta);
-  --font-mono: var(--font-jet-mono);
+  --font-mono: var(--font-red-hat-mono);
 }
 
 /* ══ BASE ══ */
@@ -95,7 +95,7 @@ body {
 
 /* Mono utility */
 .mono {
-  font-family: var(--font-jet-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-red-hat-mono), 'Red Hat Mono', monospace;
   font-variant-numeric: tabular-nums;
 }
 

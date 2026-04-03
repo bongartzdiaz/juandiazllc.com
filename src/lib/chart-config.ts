@@ -29,7 +29,7 @@ export function tickProps(tickColor?: string) {
   return {
     fill: tickColor || 'var(--txt3)',
     fontSize: 11,
-    fontFamily: "var(--font-jet-mono), 'JetBrains Mono', monospace",
+    fontFamily: "var(--font-red-hat-mono), 'Red Hat Mono', monospace",
   }
 }
 

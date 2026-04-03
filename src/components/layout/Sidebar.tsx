@@ -225,7 +225,7 @@ function NavItem({ icon: Icon, label, href, active, badge, badgeNew, onClick }: 
         <span style={{
           marginLeft: 'auto', background: 'var(--accent)', color: 'white',
           fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 8,
-          fontFamily: 'var(--font-jet-mono), monospace',
+          fontFamily: "var(--font-red-hat-mono), 'Red Hat Mono', monospace",
         }}>{badge}</span>
       )}
       {badgeNew && (
