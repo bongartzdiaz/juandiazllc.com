@@ -2,16 +2,23 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:16-alpine
+    image: mysql:8.4
     restart: always
     environment:
-      POSTGRES_DB: philanthropyai
-      POSTGRES_USER: philanthropyai
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      MYSQL_DATABASE: phily
+      MYSQL_USER: phily
+      MYSQL_PASSWORD: ${DB_PASSWORD:-changeme}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-changeme_root}
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - mysqldata:/var/lib/mysql
     ports:
-      - "5432:5432"
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   app:
     build: .
@@ -19,11 +26,12 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://philanthropyai:${DB_PASSWORD:-changeme}@db:5432/philanthropyai
+      DATABASE_URL: mysql://phily:${DB_PASSWORD:-changeme}@db:3306/phily
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-generate-a-secret-here}
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
-  pgdata:
+  mysqldata:
