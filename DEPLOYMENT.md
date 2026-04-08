@@ -1,33 +1,27 @@
-# PhilanthropyAI — Deployment Guide
+# Philly Dashboard — Deployment Guide
 
 ## What You Need
 
 - A VPS server (Digital Ocean, Hetzner, AWS, etc.) with Ubuntu 22.04+
-- A domain name (e.g., philanthropyai.eu) pointed to your server IP
-- SSH access to the server (root or sudo user)
-- Node.js 20+ installed on the server
+- A domain name pointed to your server IP
+- SSH access (root or sudo user)
+- Node.js 20+ on the server
+- MariaDB 10.11+ (or MySQL 8) — local on the box, or hosted
 
 ---
 
 ## Step 1: Point Your Domain to the Server
 
-Go to your domain registrar (Cloudflare, Namecheap, GoDaddy, etc.) and create:
+In your DNS provider (Cloudflare, Namecheap, etc.):
 
 ```
 Type: A
-Name: @ (or your subdomain like "app")
+Name: @ (or a subdomain like "dashboard")
 Value: YOUR_SERVER_IP
 TTL: Auto
 ```
 
-If you want `www` too:
-```
-Type: CNAME
-Name: www
-Value: philanthropyai.eu
-```
-
-Wait 5-30 minutes for DNS propagation.
+Wait 5–30 minutes for DNS propagation.
 
 ---
 
@@ -39,106 +33,120 @@ ssh root@YOUR_SERVER_IP
 
 ---
 
-## Step 3: Install Dependencies on the Server
+## Step 3: Install Dependencies
 
 ```bash
-# Update system
 apt update && apt upgrade -y
 
-# Install Node.js 20
+# Node.js 20
 curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt install -y nodejs
 
-# Install PM2 (process manager)
+# MariaDB
+apt install -y mariadb-server
+systemctl enable --now mariadb
+mysql_secure_installation
+
+# PM2, Nginx, Certbot
 npm install -g pm2
+apt install -y nginx certbot python3-certbot-nginx
 
-# Install Nginx (reverse proxy)
-apt install -y nginx
-
-# Install Certbot (free SSL)
-apt install -y certbot python3-certbot-nginx
-
-# Verify installations
-node -v    # Should show v20.x
-npm -v     # Should show 10.x
-pm2 -v     # Should show 5.x
-nginx -v   # Should show nginx/1.x
+# Verify
+node -v   # v20.x
+pm2 -v
+nginx -v
+mariadb --version
 ```
 
 ---
 
-## Step 4: Clone and Build the Project
+## Step 4: Create the Database
 
 ```bash
-# Create app directory
+mariadb -u root -p
+```
+
+```sql
+CREATE DATABASE phily CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'phily'@'localhost' IDENTIFIED BY 'CHANGEME_STRONG_PASSWORD';
+GRANT ALL PRIVILEGES ON phily.* TO 'phily'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+---
+
+## Step 5: Clone and Configure
+
+```bash
 mkdir -p /var/www
 cd /var/www
+git clone https://github.com/bongartzdiaz/philly-dashboard.git
+cd philly-dashboard
 
-# Clone the repository
-git clone https://github.com/bongartzdiaz/Phily.git philanthropyai
-cd philanthropyai
-
-# Install dependencies
 npm install
 
-# Create environment file
 cp .env.example .env.local
 nano .env.local
 ```
 
-Edit `.env.local` with your values:
+Set in `.env.local`:
+
 ```
-DATABASE_URL=postgresql://user:password@localhost:5432/philanthropyai
-NEXTAUTH_SECRET=run-this-command-openssl-rand-base64-32
-NEXTAUTH_URL=https://philanthropyai.eu
+DATABASE_URL=mysql://phily:CHANGEME_STRONG_PASSWORD@localhost:3306/phily
+NEXTAUTH_SECRET=PASTE_OUTPUT_OF_OPENSSL_RAND_BASE64_32
+NEXTAUTH_URL=https://dashboard.example.com
+SEED_ADMIN_EMAIL=you@example.com
+SEED_ADMIN_PASSWORD=PICK_A_STRONG_ONE
 ```
 
-Generate a secret:
+Generate the secret:
+
 ```bash
 openssl rand -base64 32
-# Copy the output and paste it as NEXTAUTH_SECRET
 ```
 
-Build the project:
+---
+
+## Step 6: Migrate, Seed, Build
+
 ```bash
+npm run db:generate
+npm run db:push          # creates the schema in MariaDB
+npm run seed             # creates the first admin user + sample org
 npm run build
 ```
 
 ---
 
-## Step 5: Start the App with PM2
+## Step 7: Start with PM2
 
 ```bash
-# Start the app on port 3000
-pm2 start npm --name "philanthropyai" -- start
-
-# Save PM2 config (auto-restart on server reboot)
+pm2 start npm --name "philly-dashboard" -- start
 pm2 save
 pm2 startup
-# Run the command it outputs
-
-# Verify it's running
+# Run the command pm2 startup prints
 pm2 status
-curl http://localhost:3000
+curl http://localhost:3100
 ```
+
+The app listens on **port 3100** by default (set in `package.json`).
 
 ---
 
-## Step 6: Configure Nginx (Reverse Proxy)
+## Step 8: Nginx Reverse Proxy
 
 ```bash
-nano /etc/nginx/sites-available/philanthropyai
+nano /etc/nginx/sites-available/philly-dashboard
 ```
-
-Paste this configuration (replace `philanthropyai.eu` with your domain):
 
 ```nginx
 server {
     listen 80;
-    server_name philanthropyai.eu www.philanthropyai.eu;
+    server_name dashboard.example.com;
 
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:3100;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -151,67 +159,50 @@ server {
 }
 ```
 
-Enable the site:
 ```bash
-ln -s /etc/nginx/sites-available/philanthropyai /etc/nginx/sites-enabled/
-rm /etc/nginx/sites-enabled/default  # Remove default site
-nginx -t                              # Test config
+ln -s /etc/nginx/sites-available/philly-dashboard /etc/nginx/sites-enabled/
+rm /etc/nginx/sites-enabled/default
+nginx -t
 systemctl restart nginx
 ```
 
-Visit `http://philanthropyai.eu` — you should see the dashboard.
-
 ---
 
-## Step 7: Enable HTTPS (Free SSL with Let's Encrypt)
+## Step 9: Enable HTTPS
 
 ```bash
-certbot --nginx -d philanthropyai.eu -d www.philanthropyai.eu
+certbot --nginx -d dashboard.example.com
 ```
 
-Follow the prompts:
-1. Enter your email
-2. Agree to terms
-3. Choose "redirect HTTP to HTTPS" when asked
+Follow the prompts. Certbot auto-renews.
 
-Certbot auto-renews. Verify with:
 ```bash
 certbot renew --dry-run
 ```
 
-Visit `https://philanthropyai.eu` — your site is now live with SSL.
-
 ---
 
-## Step 8: Set Up Auto-Deploy (Optional)
-
-Create a deploy script on the server:
+## Step 10: Auto-deploy (Optional)
 
 ```bash
-nano /var/www/philanthropyai/deploy.sh
+nano /var/www/philly-dashboard/deploy.sh
 ```
 
 ```bash
 #!/bin/bash
-cd /var/www/philanthropyai
+set -e
+cd /var/www/philly-dashboard
 git pull origin master
 npm install
+npm run db:generate
+npm run db:push
 npm run build
-pm2 restart philanthropyai
-echo "Deploy complete!"
+pm2 restart philly-dashboard
+echo "Deploy complete."
 ```
 
 ```bash
-chmod +x /var/www/philanthropyai/deploy.sh
-```
-
-To deploy updates:
-```bash
-# On the server:
-/var/www/philanthropyai/deploy.sh
-
-# Or from your local machine:
-ssh root@YOUR_SERVER_IP "/var/www/philanthropyai/deploy.sh"
+chmod +x /var/www/philly-dashboard/deploy.sh
 ```
 
 ---
@@ -219,14 +210,13 @@ ssh root@YOUR_SERVER_IP "/var/www/philanthropyai/deploy.sh"
 ## Quick Reference
 
 | Command | Description |
-|---------|-------------|
+|---|---|
 | `pm2 status` | Check if app is running |
-| `pm2 logs philanthropyai` | View app logs |
-| `pm2 restart philanthropyai` | Restart the app |
-| `pm2 stop philanthropyai` | Stop the app |
-| `nginx -t` | Test nginx config |
-| `systemctl restart nginx` | Restart nginx |
-| `certbot renew` | Renew SSL certificate |
+| `pm2 logs philly-dashboard` | Tail app logs |
+| `pm2 restart philly-dashboard` | Restart app |
+| `nginx -t && systemctl reload nginx` | Reload nginx config |
+| `npm run db:push` | Sync schema to DB |
+| `npm run seed` | Re-run seed (idempotent) |
 
 ---
 
@@ -234,27 +224,22 @@ ssh root@YOUR_SERVER_IP "/var/www/philanthropyai/deploy.sh"
 
 **App not loading?**
 ```bash
-pm2 logs philanthropyai --lines 50  # Check for errors
-curl http://localhost:3000           # Test if app responds
+pm2 logs philly-dashboard --lines 100
+curl http://localhost:3100
 ```
 
-**Nginx errors?**
+**Database connection refused?**
 ```bash
-nginx -t                    # Check config syntax
-tail -f /var/log/nginx/error.log
+systemctl status mariadb
+mariadb -u phily -p phily   # try logging in
 ```
+
+**Login returns 500?**
+- Make sure `NEXTAUTH_SECRET` is set in production.
+- Make sure the schema is migrated (`npm run db:push`) and at least one user exists (`npm run seed`).
 
 **Port already in use?**
 ```bash
-lsof -i :3000              # Find what's using port 3000
-pm2 delete all && pm2 start npm --name "philanthropyai" -- start
-```
-
-**Update the app?**
-```bash
-cd /var/www/philanthropyai
-git pull origin master
-npm install
-npm run build
-pm2 restart philanthropyai
+lsof -i :3100
+pm2 delete all && pm2 start npm --name "philly-dashboard" -- start
 ```
