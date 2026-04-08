@@ -10,6 +10,12 @@ import { useDashboardLayout } from '@/hooks/useDashboardLayout'
 import { CSR_WIDGETS, RE_WIDGETS, HOS_WIDGETS } from '@/lib/dashboard-layout'
 import type { WidgetId } from '@/lib/dashboard-layout'
 import { KpiDetailDrawer } from '@/components/dashboard/KpiDetailDrawer'
+import { AlertsCard } from '@/components/dashboard/AlertsCard'
+import { FunnelCard } from '@/components/dashboard/FunnelCard'
+import { GoalsCard } from '@/components/dashboard/GoalsCard'
+import { ForecastCard } from '@/components/dashboard/ForecastCard'
+import { LeadSourceCard } from '@/components/dashboard/LeadSourceCard'
+import { AddLeadModal } from '@/components/dashboard/AddLeadModal'
 import {
   JourneyBar,
   CSR_JOURNEY, CSR_SUMMARY,
@@ -19,7 +25,7 @@ import {
 import type { JourneyPeriod } from '@/components/dashboard/JourneyBar'
 import {
   FolderKanban, Leaf, Globe2, ArrowRight, Clock,
-  Building2, DollarSign, TrendingUp, Home, Key, Calendar,
+  Building2, Euro, TrendingUp, Home, Key, Calendar,
   Users, MapPin, Star, BedDouble, UtensilsCrossed, Coffee,
 } from 'lucide-react'
 import {
@@ -189,6 +195,7 @@ export default function DashboardPage() {
   const { theme } = useTheme()
   const [kpiDetail, setKpiDetail] = useState<Parameters<typeof KpiDetailDrawer>[0]['detail']>(null)
   const [journeyPeriod, setJourneyPeriod] = useState<JourneyPeriod>('month')
+  const [addLeadOpen, setAddLeadOpen] = useState(false)
 
   const defaults = industry === 'hospitality' ? HOS_WIDGETS : industry === 'realestate' ? RE_WIDGETS : CSR_WIDGETS
   const layout = useDashboardLayout(industry, defaults)
@@ -197,7 +204,9 @@ export default function DashboardPage() {
     setKpiDetail(detail)
   }, [])
 
-  const shared = { config, kpi: kpiStore, themeKey: theme, layout, openKpiDetail, journeyPeriod, setJourneyPeriod }
+  const onAddLead = useCallback(() => setAddLeadOpen(true), [])
+
+  const shared = { config, kpi: kpiStore, themeKey: theme, layout, openKpiDetail, journeyPeriod, setJourneyPeriod, industry, onAddLead }
 
   return (
     <>
@@ -205,6 +214,7 @@ export default function DashboardPage() {
        industry === 'realestate' ? <RealEstateDashboard {...shared} /> :
        <CSRDashboard {...shared} />}
       <KpiDetailDrawer detail={kpiDetail} onClose={() => setKpiDetail(null)} />
+      <AddLeadModal open={addLeadOpen} onClose={() => setAddLeadOpen(false)} industry={industry} />
     </>
   )
 }
@@ -218,18 +228,20 @@ type DashboardProps = {
   openKpiDetail: (d: Parameters<typeof KpiDetailDrawer>[0]['detail']) => void
   journeyPeriod: JourneyPeriod
   setJourneyPeriod: (p: JourneyPeriod) => void
+  industry: string
+  onAddLead: () => void
 }
 
 type KpiStore = ReturnType<typeof useKpiStore>
 // ══════════════════════════════════════════
 // HOSPITALITY DASHBOARD
 // ══════════════════════════════════════════
-function HospitalityDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod }: DashboardProps) {
+function HospitalityDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
   const totalRevenue = HOS_MONTHLY.reduce((s, m) => s + m.roomRevenue + m.fnbRevenue, 0)
 
   return (
     <>
-      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Booking" editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
+      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Booking" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Journey Bar */}
         <JourneyBar
@@ -262,7 +274,7 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, openKpiDetail, jo
                 width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <DollarSign size={14} color="var(--accent)" />
+                <Euro size={14} color="var(--accent)" />
               </div>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>Revenue Breakdown</div>
@@ -434,7 +446,7 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, openKpiDetail, jo
               {[
                 { label: 'Avg Stay', value: '2.8 nights', icon: Calendar },
                 { label: 'Repeat Guests', value: '34%', icon: Users },
-                { label: 'Revenue This Month', value: '€48K', icon: DollarSign },
+                { label: 'Revenue This Month', value: '€48K', icon: Euro },
               ].map(stat => (
                 <div key={stat.label} style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -538,6 +550,19 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, openKpiDetail, jo
             </div>
           </div>
         </div>
+
+        {/* Alerts + Funnel + Goals row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginTop: 14 }}>
+          <AlertsCard industry={industry} />
+          <FunnelCard industry={industry} />
+          <GoalsCard industry={industry} />
+        </div>
+
+        {/* Forecast + Lead Source row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
+          <ForecastCard industry={industry} themeKey={themeKey} />
+          <LeadSourceCard industry={industry} themeKey={themeKey} />
+        </div>
       </div>
     </>
   )
@@ -546,7 +571,7 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, openKpiDetail, jo
 // ══════════════════════════════════════════
 // REAL ESTATE DASHBOARD
 // ══════════════════════════════════════════
-function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod }: DashboardProps) {
+function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
   const [pipelineMode, setPipelineMode] = useState<'sales' | 'rental'>('sales')
   const totalRevenue = RE_MONTHLY.reduce((s, m) => s + m.revenue, 0)
   const totalClosed = RE_MONTHLY.reduce((s, m) => s + m.closed, 0)
@@ -555,7 +580,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
 
   return (
     <>
-      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Listing" editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
+      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Lead" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Journey Bar with pipeline mode toggle */}
         <div style={{ marginBottom: 16 }}>
@@ -606,7 +631,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
                 width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <DollarSign size={14} color="var(--accent)" />
+                <Euro size={14} color="var(--accent)" />
               </div>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>Revenue & Closings</div>
@@ -772,7 +797,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
             }}>
               <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt3)', marginBottom: 8 }}>QUICK STATS</div>
               {[
-                { label: 'Avg Commission', value: '€11.2K', icon: DollarSign },
+                { label: 'Avg Commission', value: '€11.2K', icon: Euro },
                 { label: 'Showings This Week', value: '14', icon: Calendar },
                 { label: 'Hot Leads', value: '8', icon: Users },
               ].map(stat => (
@@ -803,7 +828,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
                 width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <DollarSign size={14} color="var(--accent)" />
+                <Euro size={14} color="var(--accent)" />
               </div>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>Revenue by Type</div>
@@ -922,6 +947,18 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
             </div>
           </div>
         </div>
+
+        {/* Alerts + Funnel + Goals row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginTop: 14 }}>
+          <AlertsCard industry={industry} />
+          <FunnelCard industry={industry} />
+          <GoalsCard industry={industry} />
+        </div>
+
+        {/* Lead Source row (RE already has ForecastCard above as Revenue Forecast) */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 14, marginTop: 14 }}>
+          <LeadSourceCard industry={industry} themeKey={themeKey} />
+        </div>
       </div>
     </>
   )
@@ -930,10 +967,10 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
 // ══════════════════════════════════════════
 // CSR / PHILANTHROPY DASHBOARD (original)
 // ══════════════════════════════════════════
-function CSRDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod }: DashboardProps) {
+function CSRDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
   return (
     <>
-      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Project" editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
+      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Contact" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Journey Bar */}
         <JourneyBar
@@ -1223,6 +1260,18 @@ function CSRDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPer
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Alerts + Funnel + Goals row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginTop: 14 }}>
+          <AlertsCard industry={industry} />
+          <FunnelCard industry={industry} />
+          <GoalsCard industry={industry} />
+        </div>
+
+        {/* Lead Source row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 14, marginTop: 14 }}>
+          <LeadSourceCard industry={industry} themeKey={themeKey} />
         </div>
       </div>
     </>

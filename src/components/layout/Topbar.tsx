@@ -5,6 +5,7 @@ import { useMobileMenu } from '@/components/layout/ClientLayout'
 import { Moon, Sun, RefreshCw, Plus, Globe, Menu, GripVertical } from 'lucide-react'
 import { NotificationBell } from '@/components/dashboard/NotificationBell'
 import { useIndustry } from '@/hooks/useIndustry'
+import { useSync } from '@/hooks/useSync'
 
 export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuToggle, editMode, onToggleEdit }: {
   title: string
@@ -19,7 +20,9 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
   const { theme, toggle } = useTheme()
   const { industry } = useIndustry()
   const mobileMenu = useMobileMenu()
+  const { syncAll, syncing } = useSync()
   const handleMenu = onMenuToggle || mobileMenu.toggle
+  const handleSync = onSync || (() => { void syncAll() })
 
   return (
     <div style={{
@@ -117,21 +120,20 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
         </button>
 
         {/* Sync */}
-        {onSync && (
-          <button
-            onClick={onSync}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 5,
-              padding: '6px 13px', borderRadius: 8,
-              fontSize: 12, fontWeight: 600, cursor: 'pointer',
-              background: 'transparent', color: 'var(--txt2)',
-              border: '1px solid var(--border)',
-              fontFamily: 'inherit',
-            }}
-          >
-            <RefreshCw size={12} /> Sync
-          </button>
-        )}
+        <button
+          onClick={handleSync}
+          disabled={syncing}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            padding: '6px 13px', borderRadius: 8,
+            fontSize: 12, fontWeight: 600, cursor: syncing ? 'default' : 'pointer',
+            background: 'transparent', color: 'var(--txt2)',
+            border: '1px solid var(--border)',
+            fontFamily: 'inherit', opacity: syncing ? 0.6 : 1,
+          }}
+        >
+          <RefreshCw size={12} style={{ animation: syncing ? 'spin 1s linear infinite' : 'none' }} /> {syncing ? 'Syncing...' : 'Sync'}
+        </button>
 
         {/* Add action */}
         {onAdd && (

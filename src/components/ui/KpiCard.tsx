@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import {
   Users, TrendingDown, TrendingUp, MessageCircle, Calendar,
-  Zap, DollarSign, Target, Leaf, Globe2, HeartHandshake,
+  Zap, Euro, Target, Leaf, Globe2, HeartHandshake,
   TreePine, Droplets, BarChart3, FolderKanban, Award,
   Pencil, Check, X,
 } from 'lucide-react'
@@ -16,7 +16,8 @@ const iconMap: Record<string, React.ComponentType<{ size?: number; color?: strin
   'message-circle': MessageCircle,
   'calendar': Calendar,
   'zap': Zap,
-  'dollar-sign': DollarSign,
+  'dollar-sign': Euro,
+  'euro': Euro,
   'target': Target,
   'leaf': Leaf,
   'globe': Globe2,

@@ -173,6 +173,10 @@ button:focus-visible, input:focus-visible, a:focus-visible, select:focus-visible
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
 
 /* Loading skeleton */
 .skeleton {
