@@ -70,7 +70,7 @@ html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
 body {
   background: var(--bg);
   color: var(--txt);
-  font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: var(--font-red-hat-mono), 'Red Hat Mono', monospace;
   font-size: 13.5px;
   line-height: 1.6;
   letter-spacing: -0.005em;

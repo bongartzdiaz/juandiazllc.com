@@ -5,6 +5,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
+import { validateBody } from '@/lib/validation'
+import { updateProjectSchema } from '@/lib/validation/schemas'
+import { logAudit, diffChanges } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -36,57 +39,33 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
   const { id } = await ctx.params
 
-  let body: unknown
-  try {
-    body = await req.json()
-  } catch {
-    return jsonError('Invalid JSON body', 400)
-  }
+  const parsed = await validateBody(req, updateProjectSchema)
+  if (!parsed.success) return parsed.response
 
-  const input = body as Partial<{
-    title: string
-    description: string
-    status: string
-    category: string
-    startDate: string
-    endDate: string | null
-    budgetCents: number
-    spentCents: number
-    sdgGoals: number[]
-  }>
-
-  // Verify the project belongs to the user's org before mutating
+  const input = parsed.data
   const prisma = getAuthPrisma()
+
   const existing = await prisma.project.findFirst({
     where: { id, organizationId: scope.organizationId },
-    select: { id: true },
   })
   if (!existing) return jsonError('Project not found', 404)
 
   const data: Record<string, unknown> = {}
-  if (input.title !== undefined) data.title = input.title.trim()
+  if (input.title !== undefined) data.title = input.title
   if (input.description !== undefined) data.description = input.description
   if (input.status !== undefined) data.status = input.status
   if (input.category !== undefined) data.category = input.category
-  if (input.startDate !== undefined) {
-    const d = new Date(input.startDate)
-    if (isNaN(d.getTime())) return jsonError('startDate must be a valid date', 400)
-    data.startDate = d
-  }
-  if (input.endDate !== undefined) {
-    if (input.endDate === null) {
-      data.endDate = null
-    } else {
-      const d = new Date(input.endDate)
-      if (isNaN(d.getTime())) return jsonError('endDate must be a valid date', 400)
-      data.endDate = d
-    }
-  }
-  if (input.budgetCents !== undefined) data.budgetCents = Math.max(0, Math.floor(input.budgetCents))
-  if (input.spentCents !== undefined) data.spentCents = Math.max(0, Math.floor(input.spentCents))
+  if (input.startDate !== undefined) data.startDate = new Date(input.startDate)
+  if (input.endDate !== undefined) data.endDate = input.endDate ? new Date(input.endDate) : null
+  if (input.budgetCents !== undefined) data.budgetCents = input.budgetCents
+  if (input.spentCents !== undefined) data.spentCents = input.spentCents
   if (input.sdgGoals !== undefined) data.sdgGoals = input.sdgGoals
 
   const project = await prisma.project.update({ where: { id }, data })
+
+  const changes = diffChanges(existing as unknown as Record<string, unknown>, input as Record<string, unknown>)
+  await logAudit({ scope, action: 'update', entity: 'project', entityId: id, changes })
+
   return NextResponse.json({ data: project })
 }
 
@@ -99,10 +78,12 @@ export async function DELETE(_req: NextRequest, ctx: RouteCtx) {
 
   const existing = await prisma.project.findFirst({
     where: { id, organizationId: scope.organizationId },
-    select: { id: true },
+    select: { id: true, title: true },
   })
   if (!existing) return jsonError('Project not found', 404)
 
   await prisma.project.delete({ where: { id } })
+  await logAudit({ scope, action: 'delete', entity: 'project', entityId: id })
+
   return new NextResponse(null, { status: 204 })
 }

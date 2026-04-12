@@ -14,11 +14,26 @@ model Organization {
   industry  String   @default("general")
   createdAt DateTime @default(now())
 
-  users        User[]
-  projects     Project[]
-  contacts     Contact[]
-  kanbanBoards KanbanBoard[]
-  customPages  CustomPage[]
+  users          User[]
+  projects       Project[]
+  contacts       Contact[]
+  kanbanBoards   KanbanBoard[]
+  customPages    CustomPage[]
+  auditLogs      AuditLog[]
+  savedViews     SavedView[]
+  pipelines      Pipeline[]
+  calendarEvents CalendarEvent[]
+  notifications  Notification[]
+  automations    AutomationRule[]
+  webhooks       Webhook[]
+  apiKeys        ApiKey[]
+  templates      Template[]
+  documents      Document[]
+  properties     Property[]
+  rooms          Room[]
+  grants         Grant[]
+  donorProfiles  DonorProfile[]
+  volunteers     Volunteer[]
 }
 
 model User {
@@ -40,6 +55,15 @@ model User {
   customPages     CustomPage[]
   accounts        Account[]
   sessions        Session[]
+  auditLogs       AuditLog[]
+  contactNotes    ContactNote[]
+  activities      Activity[]
+  savedViews      SavedView[]
+  notifications   Notification[]
+  automationLogs  AutomationLog[]
+  eventAttendees  EventAttendee[]
+  reports         Report[]
+  deals           Deal[]          @relation("dealOwner")
 }
 
 // ── NextAuth tables (PrismaAdapter compatible) ──
@@ -100,6 +124,7 @@ model Project {
   impactMetrics   ImpactMetric[]
   contactProjects ContactProject[]
   kanbanCards     KanbanCard[]
+  deals           Deal[]
 }
 
 model ProjectMilestone {
@@ -111,6 +136,8 @@ model ProjectMilestone {
   status      String    @default("pending") // pending, completed, overdue
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
 }
 
 model Contact {
@@ -118,15 +145,41 @@ model Contact {
   name           String
   email          String   @default("")
   phone          String   @default("")
-  type           String   @default("stakeholder") // partner, beneficiary, stakeholder, donor
+  type           String   @default("stakeholder") // partner, beneficiary, stakeholder, donor, buyer, seller, tenant, landlord
   company        String   @default("")
   notes          String   @default("") @db.Text
   avatarUrl      String?
   organizationId String
   createdAt      DateTime @default(now())
 
+  // RE Lead fields
+  leadScore       Int      @default(0)    // 0-100 behavioral score
+  leadSource      String   @default("")   // website, zillow, realtor_com, referral, open_house, facebook, google, cold_call, sphere
+  leadStatus      String   @default("new") // new, contacted, qualified, nurture, hot, under_contract, closed, lost
+  preferredMethod String   @default("email") // email, phone, text, whatsapp
+  preApproved     Boolean  @default(false)
+  preApprovalAmt  Int      @default(0)    // cents
+  buyerPriceMin   Int?     // cents
+  buyerPriceMax   Int?     // cents
+  buyerBeds       Int?
+  buyerBaths      Int?
+  buyerAreas      String   @default("") // comma-separated zip codes or neighborhoods
+  lastContactedAt DateTime?
+  nextFollowUpAt  DateTime?
+  assignedToId    String?
+
   organization    Organization     @relation(fields: [organizationId], references: [id])
   contactProjects ContactProject[]
+  contactNotes    ContactNote[]
+  activities      Activity[]
+  deals           Deal[]
+  offers          Offer[]
+  openHouseVisits OpenHouseVisit[]
+
+  @@index([organizationId, createdAt])
+  @@index([organizationId, leadScore])
+  @@index([organizationId, leadStatus])
+  @@index([assignedToId])
 }
 
 model ContactProject {
@@ -151,6 +204,8 @@ model ImpactMetric {
   notes      String   @default("") @db.Text
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
 }
 
 model KanbanBoard {
@@ -188,6 +243,10 @@ model KanbanCard {
   column   KanbanColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
   project  Project?     @relation(fields: [projectId], references: [id])
   assignee User?        @relation("assignee", fields: [assigneeId], references: [id])
+
+  @@index([columnId])
+  @@index([projectId])
+  @@index([assigneeId])
 }
 
 model DashboardLayout {
@@ -223,4 +282,721 @@ model PageBlock {
   position Int
 
   page CustomPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+}
+
+// ── Phase 1: Audit & Data Integrity ──
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+  action         String   // create, update, delete
+  entity         String   // project, contact, kanbanCard, etc.
+  entityId       String?
+  changes        String   @default("{}") @db.LongText // JSON diff {field: {old, new}}
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@index([organizationId, createdAt])
+  @@index([entity, entityId])
+}
+
+// ── Phase 2A: Contact 360 ──
+
+model ContactNote {
+  id        String   @id @default(cuid())
+  contactId String
+  userId    String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@index([contactId, createdAt])
+  @@index([userId])
+}
+
+model Activity {
+  id             String   @id @default(cuid())
+  organizationId String?
+  contactId      String?
+  userId         String?
+  type           String   // note, email, call, meeting, task, deal_update, status_change
+  title          String
+  description    String   @default("") @db.Text
+  metadata       String   @default("{}") @db.LongText // JSON extra data
+  createdAt      DateTime @default(now())
+
+  contact Contact? @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  user    User?    @relation(fields: [userId], references: [id])
+
+  @@index([contactId, createdAt])
+  @@index([userId, createdAt])
+}
+
+// ── Phase 2B: Saved Views ──
+
+model SavedView {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String?
+  entity         String   // contacts, projects, deals
+  name           String
+  filtersJson    String   @default("[]") @db.LongText  // JSON filter rules
+  columnsJson    String   @default("[]") @db.LongText  // visible columns
+  sortJson       String   @default("{}") @db.LongText  // sort config
+  isDefault      Boolean  @default(false)
+  isShared       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User?        @relation(fields: [userId], references: [id])
+
+  @@index([organizationId, entity])
+}
+
+// ── Phase 2C: Pipeline & Deals ──
+
+model Pipeline {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  industry       String   @default("general") // philanthropy, realestate, hospitality
+  createdAt      DateTime @default(now())
+
+  organization Organization    @relation(fields: [organizationId], references: [id])
+  stages       PipelineStage[]
+  deals        Deal[]
+
+  @@index([organizationId])
+}
+
+model PipelineStage {
+  id         String @id @default(cuid())
+  pipelineId String
+  name       String
+  position   Int
+  color      String @default("#94A3B8")
+
+  pipeline Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  deals    Deal[]
+
+  @@index([pipelineId])
+}
+
+model Deal {
+  id          String    @id @default(cuid())
+  pipelineId  String
+  stageId     String
+  contactId   String?
+  projectId   String?
+  propertyId  String?
+  ownerId     String?
+  title       String
+  valueCents  Int       @default(0)
+  currency    String    @default("USD")
+  probability Int       @default(50) // 0-100
+  status      String    @default("open") // open, won, lost
+  dealType    String    @default("buy") // buy, sell, rent, lease, dual
+  expectedClose DateTime?
+  actualClose   DateTime?
+  notes       String    @default("") @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Commission tracking
+  commissionPct     Float  @default(3.0)   // agent commission %
+  commissionCents   Int    @default(0)     // calculated commission
+  brokerSplitPct    Float  @default(30.0)  // brokerage split %
+  teamSplitPct      Float  @default(0)     // team lead split %
+  referralFeePct    Float  @default(0)     // referral fee %
+  netCommissionCents Int   @default(0)     // after all splits
+  earnestMoneyCents Int    @default(0)
+
+  // Transaction management
+  inspectionDate     DateTime?
+  appraisalDate      DateTime?
+  titleDate          DateTime?
+  finalWalkDate      DateTime?
+  closingDate        DateTime?
+  contingenciesJson  String  @default("[]") @db.LongText // JSON array of {name, status, dueDate}
+  closingChecklistJson String @default("[]") @db.LongText // JSON array of {task, done, dueDate}
+
+  // Source tracking
+  leadSource  String @default("")
+
+  pipeline Pipeline      @relation(fields: [pipelineId], references: [id])
+  stage    PipelineStage @relation(fields: [stageId], references: [id])
+  contact  Contact?      @relation(fields: [contactId], references: [id])
+  project  Project?      @relation(fields: [projectId], references: [id])
+  property Property?     @relation(fields: [propertyId], references: [id])
+  owner    User?         @relation("dealOwner", fields: [ownerId], references: [id])
+  offers   Offer[]
+
+  @@index([pipelineId, stageId])
+  @@index([contactId])
+  @@index([propertyId])
+  @@index([status])
+}
+
+// ── Phase 2D: Calendar Events ──
+
+model CalendarEvent {
+  id             String    @id @default(cuid())
+  organizationId String
+  title          String
+  description    String    @default("") @db.Text
+  startTime      DateTime
+  endTime        DateTime
+  allDay         Boolean   @default(false)
+  location       String    @default("")
+  color          String    @default("#3B82F6")
+  recurrence     String?   // RRULE string or null
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization    @relation(fields: [organizationId], references: [id])
+  attendees    EventAttendee[]
+
+  @@index([organizationId, startTime])
+}
+
+model EventAttendee {
+  id       String @id @default(cuid())
+  eventId  String
+  userId   String?
+  email    String @default("")
+  status   String @default("pending") // pending, accepted, declined
+
+  event CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User?         @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+}
+
+// ── Phase 2E: Reports ──
+
+model Report {
+  id             String   @id @default(cuid())
+  organizationId String?
+  userId         String
+  title          String
+  type           String   // quarterly, financial, sdg, impact, custom
+  status         String   @default("generating") // generating, ready, failed
+  configJson     String   @default("{}") @db.LongText
+  resultHtml     String?  @db.LongText
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+}
+
+// ── Phase 2F: Notifications ──
+
+model Notification {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+  type           String   // info, warning, success, error
+  title          String
+  message        String   @default("") @db.Text
+  link           String?
+  read           Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@index([userId, read, createdAt])
+  @@index([organizationId, createdAt])
+}
+
+// ── Phase 3: Automation ──
+
+model AutomationRule {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  trigger        String   // onEntityCreate, onFieldChange, onStageChange, onSchedule, onDateApproach
+  triggerConfig  String   @default("{}") @db.LongText
+  actionType     String   // sendEmail, sendSMS, createTask, updateField, moveStage, createNotification, callWebhook
+  actionConfig   String   @default("{}") @db.LongText
+  enabled        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  automationLogs AutomationLog[]
+
+  @@index([organizationId, enabled])
+}
+
+model AutomationLog {
+  id        String   @id @default(cuid())
+  ruleId    String
+  userId    String?
+  status    String   // success, failure
+  input     String   @default("{}") @db.LongText
+  output    String   @default("{}") @db.LongText
+  error     String?  @db.Text
+  createdAt DateTime @default(now())
+
+  rule AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  user User?          @relation(fields: [userId], references: [id])
+
+  @@index([ruleId, createdAt])
+  @@index([userId])
+}
+
+// ── Phase 3: Templates ──
+
+model Template {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  type           String   // email, sms, whatsapp, report
+  subject        String   @default("")
+  body           String   @db.LongText
+  variables      String   @default("[]") @db.LongText // JSON array of merge field names
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, type])
+}
+
+// ── Phase 4: Webhooks ──
+
+model Webhook {
+  id             String   @id @default(cuid())
+  organizationId String
+  url            String
+  events         String   @default("[]") @db.LongText // JSON array of event types
+  secret         String
+  enabled        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  organization Organization     @relation(fields: [organizationId], references: [id])
+  deliveries   WebhookDelivery[]
+
+  @@index([organizationId])
+}
+
+model WebhookDelivery {
+  id         String   @id @default(cuid())
+  webhookId  String
+  event      String
+  payload    String   @db.LongText
+  statusCode Int?
+  response   String?  @db.Text
+  createdAt  DateTime @default(now())
+
+  webhook Webhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@index([webhookId, createdAt])
+}
+
+// ── Phase 4: API Keys ──
+
+model ApiKey {
+  id             String    @id @default(cuid())
+  organizationId String
+  name           String
+  keyHash        String    @unique
+  prefix         String    // first 8 chars for identification
+  permissions    String    @default("read") // read, write, admin
+  lastUsedAt     DateTime?
+  expiresAt      DateTime?
+  createdAt      DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+}
+
+// ── Phase 6A: Real Estate ──
+
+model Property {
+  id             String   @id @default(cuid())
+  organizationId String
+  title          String
+  type           String   @default("residential") // residential, commercial, land, industrial
+  status         String   @default("available") // available, under_contract, sold, rented
+  address        String   @default("")
+  city           String   @default("")
+  state          String   @default("")
+  zipCode        String   @default("")
+  country        String   @default("")
+  lat            Float?
+  lng            Float?
+  priceCents     Int      @default(0)
+  bedrooms       Int?
+  bathrooms      Int?
+  sqft           Int?
+  yearBuilt      Int?
+  description    String   @default("") @db.Text
+  features       String   @default("[]") @db.LongText // JSON array
+  images         String   @default("[]") @db.LongText // JSON array of URLs
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // RE-specific fields
+  listingAgentId  String?
+  listingDate     DateTime?
+  expirationDate  DateTime?
+  daysOnMarket    Int       @default(0)
+  mlsNumber       String    @default("")
+  hoaCents        Int       @default(0)
+  taxCents        Int       @default(0)
+  lotSqft         Int?
+  parkingSpaces   Int?
+  stories         Int?
+  propertyStyle   String    @default("") // colonial, ranch, contemporary, etc.
+  virtualTourUrl  String    @default("")
+  listPriceCents  Int       @default(0)  // original list price (priceCents = current)
+  pricePerSqft    Int       @default(0)  // cents
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  viewings     Viewing[]
+  deals        Deal[]
+  offers       Offer[]
+  openHouses   OpenHouse[]
+  showings     Showing[]
+
+  @@index([organizationId, status])
+  @@index([organizationId, mlsNumber])
+}
+
+model Showing {
+  id          String    @id @default(cuid())
+  propertyId  String
+  agentId     String?
+  contactId   String?
+  date        DateTime
+  duration    Int       @default(30) // minutes
+  status      String    @default("scheduled") // scheduled, confirmed, completed, cancelled, no_show
+  feedback    String    @default("") @db.Text
+  rating      Int?      // 1-5 buyer interest level
+  notes       String    @default("") @db.Text
+  createdAt   DateTime  @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, date])
+  @@index([agentId])
+  @@index([contactId])
+}
+
+model Viewing {
+  id         String   @id @default(cuid())
+  propertyId String
+  contactId  String?
+  date       DateTime
+  status     String   @default("scheduled") // scheduled, completed, cancelled, no_show
+  notes      String   @default("") @db.Text
+  createdAt  DateTime @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, date])
+  @@index([contactId])
+}
+
+// ── Phase 6B: Hospitality ──
+
+model Room {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  type           String   @default("standard") // standard, deluxe, suite, villa
+  status         String   @default("available") // available, occupied, maintenance, blocked
+  floor          Int      @default(1)
+  capacity       Int      @default(2)
+  priceCentsNight Int     @default(0)
+  amenities      String   @default("[]") @db.LongText // JSON array
+  images         String   @default("[]") @db.LongText
+  createdAt      DateTime @default(now())
+
+  organization Organization  @relation(fields: [organizationId], references: [id])
+  reservations Reservation[]
+  housekeeping HousekeepingTask[]
+
+  @@index([organizationId, status])
+}
+
+model Reservation {
+  id          String   @id @default(cuid())
+  roomId      String
+  guestName   String
+  guestEmail  String   @default("")
+  guestPhone  String   @default("")
+  checkIn     DateTime
+  checkOut    DateTime
+  status      String   @default("confirmed") // inquiry, confirmed, checked_in, checked_out, cancelled
+  totalCents  Int      @default(0)
+  notes       String   @default("") @db.Text
+  createdAt   DateTime @default(now())
+
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([roomId, checkIn])
+}
+
+model HousekeepingTask {
+  id          String    @id @default(cuid())
+  roomId      String
+  type        String    @default("cleaning") // cleaning, inspection, maintenance, turnover
+  status      String    @default("pending") // pending, in_progress, completed
+  priority    String    @default("medium") // low, medium, high, urgent
+  assignedTo  String?
+  notes       String    @default("") @db.Text
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([roomId, status])
+}
+
+// ── Phase 6C: Philanthropy ──
+
+model Grant {
+  id             String    @id @default(cuid())
+  organizationId String
+  title          String
+  funder         String    @default("")
+  amountCents    Int       @default(0)
+  status         String    @default("prospect") // prospect, applied, under_review, approved, active, reporting, closed, rejected
+  appliedDate    DateTime?
+  awardedDate    DateTime?
+  startDate      DateTime?
+  endDate        DateTime?
+  description    String    @default("") @db.Text
+  requirements   String    @default("") @db.Text
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, status])
+}
+
+model DonorProfile {
+  id             String   @id @default(cuid())
+  organizationId String
+  contactId      String?
+  totalGivenCents Int     @default(0)
+  lastGiftDate   DateTime?
+  firstGiftDate  DateTime?
+  giftCount      Int      @default(0)
+  avgGiftCents   Int      @default(0)
+  tier           String   @default("new") // new, recurring, major, lapsed
+  notes          String   @default("") @db.Text
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, tier])
+  @@index([contactId])
+}
+
+model Volunteer {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  email          String   @default("")
+  phone          String   @default("")
+  skills         String   @default("[]") @db.LongText // JSON
+  status         String   @default("active") // active, inactive, onboarding
+  totalHours     Float    @default(0)
+  createdAt      DateTime @default(now())
+
+  organization  Organization   @relation(fields: [organizationId], references: [id])
+  volunteerLogs VolunteerLog[]
+
+  @@index([organizationId, status])
+}
+
+model VolunteerLog {
+  id          String   @id @default(cuid())
+  volunteerId String
+  hours       Float
+  date        DateTime
+  description String   @default("") @db.Text
+  createdAt   DateTime @default(now())
+
+  volunteer Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+
+  @@index([volunteerId, date])
+}
+
+// ── Phase 7: Documents ──
+
+model Document {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  type           String   @default("file") // file, image, pdf, spreadsheet
+  mimeType       String   @default("")
+  sizeBytes      Int      @default(0)
+  url            String
+  entityType     String?  // project, contact, deal, property, room
+  entityId       String?
+  uploadedBy     String?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, entityType, entityId])
+  @@index([uploadedBy])
+}
+
+// ── Real Estate: Offers ──
+
+model Offer {
+  id          String    @id @default(cuid())
+  propertyId  String
+  dealId      String?
+  contactId   String?   // buyer
+  amountCents Int       @default(0)
+  status      String    @default("pending") // pending, countered, accepted, rejected, expired, withdrawn
+  expiresAt   DateTime?
+  counterJson String    @default("[]") @db.LongText // JSON [{amount, date, by}]
+  contingencies String  @default("[]") @db.LongText // JSON [{type, status, dueDate}]
+  earnestCents Int      @default(0)
+  closingCostsCents Int @default(0)
+  inspectionDays Int    @default(10)
+  financingType String  @default("conventional") // conventional, fha, va, cash, other
+  notes       String    @default("") @db.Text
+  submittedAt DateTime  @default(now())
+  respondedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id])
+  deal     Deal?    @relation(fields: [dealId], references: [id])
+  contact  Contact? @relation(fields: [contactId], references: [id])
+
+  @@index([propertyId, status])
+  @@index([dealId])
+  @@index([contactId])
+}
+
+// ── Real Estate: Open Houses ──
+
+model OpenHouse {
+  id          String   @id @default(cuid())
+  propertyId  String
+  hostAgentId String?
+  date        DateTime
+  startTime   String   @default("10:00") // HH:MM
+  endTime     String   @default("14:00")
+  notes       String   @default("") @db.Text
+  status      String   @default("scheduled") // scheduled, active, completed, cancelled
+  createdAt   DateTime @default(now())
+
+  property Property          @relation(fields: [propertyId], references: [id])
+  visitors OpenHouseVisit[]
+
+  @@index([propertyId, date])
+}
+
+model OpenHouseVisit {
+  id          String   @id @default(cuid())
+  openHouseId String
+  contactId   String?
+  name        String   @default("")
+  email       String   @default("")
+  phone       String   @default("")
+  notes       String   @default("") @db.Text
+  interested  Boolean  @default(false)
+  preApproved Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  openHouse OpenHouse @relation(fields: [openHouseId], references: [id], onDelete: Cascade)
+  contact   Contact?  @relation(fields: [contactId], references: [id])
+
+  @@index([openHouseId])
+  @@index([contactId])
+}
+
+// ── Real Estate: Drip Campaigns ──
+
+model DripCampaign {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  type           String   @default("buyer") // buyer, seller, nurture, post_close, sphere, open_house
+  status         String   @default("active") // active, paused, archived
+  stepsJson      String   @default("[]") @db.LongText // JSON [{day, channel, templateId, subject, body}]
+  enrolledCount  Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organizationId, type])
+}
+
+// ── Real Estate: Agent Performance / Commission Tracker ──
+
+model CommissionRecord {
+  id             String   @id @default(cuid())
+  organizationId String
+  agentId        String
+  dealId         String?
+  type           String   @default("closing") // closing, referral, bonus, adjustment
+  grossCents     Int      @default(0)
+  splitPct       Float    @default(100)
+  netCents       Int      @default(0)
+  paidAt         DateTime?
+  status         String   @default("pending") // pending, approved, paid
+  notes          String   @default("") @db.Text
+  createdAt      DateTime @default(now())
+
+  @@index([organizationId, agentId])
+  @@index([agentId, createdAt])
+  @@index([dealId])
+}
+
+model AgentGoal {
+  id             String   @id @default(cuid())
+  organizationId String
+  agentId        String
+  year           Int
+  month          Int
+  dealTarget     Int      @default(0)
+  volumeTarget   Int      @default(0) // cents
+  gciTarget      Int      @default(0) // cents — Gross Commission Income
+  callsTarget    Int      @default(0)
+  showingsTarget Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  @@unique([agentId, year, month])
+  @@index([organizationId, year, month])
+}
+
+// ── Real Estate: Market Analytics / CMA ──
+
+model MarketSnapshot {
+  id             String   @id @default(cuid())
+  organizationId String
+  zipCode        String
+  month          Int
+  year           Int
+  medianPriceCents  Int   @default(0)
+  avgDaysOnMarket   Int   @default(0)
+  activeListings    Int   @default(0)
+  closedSales       Int   @default(0)
+  newListings       Int   @default(0)
+  avgPricePerSqft   Int   @default(0)  // cents
+  inventoryMonths   Float @default(0)
+  createdAt         DateTime @default(now())
+
+  @@unique([organizationId, zipCode, year, month])
+  @@index([organizationId, zipCode])
 }

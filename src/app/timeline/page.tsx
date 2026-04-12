@@ -4,7 +4,10 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { Topbar } from '@/components/layout/Topbar'
 import { useIndustry } from '@/hooks/useIndustry'
 import { useApi } from '@/hooks/useApi'
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Calendar } from 'lucide-react'
+import {
+  ZoomIn, ZoomOut, Calendar, X, CheckCircle2, Circle,
+  Clock, Tag, TrendingUp, BarChart3, Target, Layers,
+} from 'lucide-react'
 
 /* ── Types ─────────────────────────────────────────────── */
 
@@ -27,7 +30,7 @@ interface ApiProject {
   category: string
   startDate: string
   endDate?: string
-  milestones?: Array<{ id: string; status: string }>
+  milestones?: Array<{ id: string; status: string; title?: string }>
   _count?: { milestones: number }
 }
 
@@ -101,6 +104,10 @@ function formatDate(d: Date): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
+function formatDateRange(start: string, end: string): string {
+  return `${formatDate(parseDate(start))} - ${formatDate(parseDate(end))}`
+}
+
 const statusColors: Record<string, { bg: string; bar: string; txt: string; border: string }> = {
   active:      { bg: 'var(--g-bg)', bar: 'var(--g)', txt: 'var(--g-txt)', border: 'var(--g-border)' },
   completed:   { bg: 'var(--accent-bg)', bar: 'var(--accent)', txt: 'var(--accent-txt)', border: 'var(--accent-border)' },
@@ -141,8 +148,10 @@ export default function TimelinePage() {
     ? liveTasks
     : CSR_TASKS
 
-  const [zoom, setZoom] = useState(1)
+  const [zoom, setZoom] = useState(0) // Default to Weeks view for best readability
   const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [hoveredRow, setHoveredRow] = useState<string | null>(null)
+  const [selectedTask, setSelectedTask] = useState<TimelineTask | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const dayWidth = ZOOM_LEVELS[zoom].dayWidth
 
@@ -150,7 +159,19 @@ export default function TimelinePage() {
     ? tasks
     : tasks.filter(t => t.status === statusFilter)
 
-  // Compute timeline bounds — earliest start to latest end + padding
+  // Summary stats
+  const stats = useMemo(() => {
+    const total = filteredTasks.length
+    const active = filteredTasks.filter(t => t.status === 'active').length
+    const completed = filteredTasks.filter(t => ['completed', 'sold'].includes(t.status)).length
+    const avgProgress = total > 0 ? Math.round(filteredTasks.reduce((s, t) => s + t.progress, 0) / total) : 0
+    const onTrack = total > 0 ? Math.round((filteredTasks.filter(t => t.progress >= 50 || t.status === 'completed' || t.status === 'sold').length / total) * 100) : 0
+    const totalMilestones = filteredTasks.reduce((s, t) => s + t.milestones, 0)
+    const doneMilestones = filteredTasks.reduce((s, t) => s + t.completedMilestones, 0)
+    return { total, active, completed, avgProgress, onTrack, totalMilestones, doneMilestones }
+  }, [filteredTasks])
+
+  // Compute timeline bounds
   const { timelineStart, timelineEnd, totalDays, months } = useMemo(() => {
     if (filteredTasks.length === 0) {
       const now = new Date()
@@ -162,12 +183,10 @@ export default function TimelinePage() {
     const ends = filteredTasks.map(t => parseDate(t.endDate))
     const earliest = new Date(Math.min(...starts.map(d => d.getTime())))
     const latest = new Date(Math.max(...ends.map(d => d.getTime())))
-    // Pad 2 weeks on each side
     const start = new Date(earliest.getFullYear(), earliest.getMonth(), 1)
     const end = new Date(latest.getFullYear(), latest.getMonth() + 2, 0)
     const total = diffDays(start, end)
 
-    // Build month columns
     const monthList: { date: Date; offset: number; width: number }[] = []
     const cursor = new Date(start)
     while (cursor <= end) {
@@ -205,9 +224,9 @@ export default function TimelinePage() {
     ? ['all', 'active', 'pending', 'sold']
     : ['all', 'active', 'planned', 'completed', 'paused']
 
-  const ROW_HEIGHT = 48
+  const ROW_HEIGHT = 64
   const HEADER_HEIGHT = 52
-  const TASK_PANEL_WIDTH = 280
+  const TASK_PANEL_WIDTH = 320
 
   return (
     <>
@@ -217,13 +236,47 @@ export default function TimelinePage() {
       />
 
       <div style={{ padding: '18px 24px 40px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {/* Summary Stats Strip */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10,
+        }}>
+          {[
+            { label: 'Total', value: stats.total, icon: Layers, color: 'var(--txt2)' },
+            { label: 'Active', value: stats.active, icon: TrendingUp, color: 'var(--g)' },
+            { label: 'Completed', value: stats.completed, icon: CheckCircle2, color: 'var(--accent)' },
+            { label: 'Avg Progress', value: `${stats.avgProgress}%`, icon: BarChart3, color: 'var(--b, var(--accent))' },
+            { label: 'On Track', value: `${stats.onTrack}%`, icon: Target, color: stats.onTrack >= 60 ? 'var(--g)' : 'var(--o)' },
+            { label: 'Milestones', value: `${stats.doneMilestones}/${stats.totalMilestones}`, icon: CheckCircle2, color: 'var(--p, var(--accent))' },
+          ].map(s => (
+            <div key={s.label} style={{
+              background: 'var(--panel)', border: '1px solid var(--border)',
+              borderRadius: 10, padding: '12px 14px',
+              display: 'flex', alignItems: 'center', gap: 10,
+            }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: 8,
+                background: `color-mix(in srgb, ${s.color} 12%, transparent)`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <s.icon size={15} style={{ color: s.color }} />
+              </div>
+              <div>
+                <div className="mono" style={{ fontSize: 16, fontWeight: 700, color: 'var(--txt)', lineHeight: 1.1 }}>
+                  {s.value}
+                </div>
+                <div style={{ fontSize: 10, color: 'var(--txt3)', fontWeight: 500 }}>{s.label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {/* Toolbar */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 10,
           background: 'var(--panel)', border: '1px solid var(--border)',
           borderRadius: 10, padding: '10px 14px',
         }}>
-          {/* Status filters */}
           {statusOptions.map(s => (
             <button key={s} onClick={() => setStatusFilter(s)} style={{
               padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
@@ -307,43 +360,76 @@ export default function TimelinePage() {
             {/* Header */}
             <div style={{
               height: HEADER_HEIGHT, display: 'flex', alignItems: 'center',
-              padding: '0 14px', borderBottom: '1px solid var(--border)',
+              padding: '0 16px', borderBottom: '1px solid var(--border)',
               fontSize: 10.5, fontWeight: 600, textTransform: 'uppercase',
               color: 'var(--txt3)', letterSpacing: '0.05em',
             }}>
-              {isRE ? 'Properties' : isHOS ? 'Projects' : 'Projects'} ({filteredTasks.length})
+              {isRE ? 'Properties' : 'Projects'} ({filteredTasks.length})
             </div>
 
             {/* Task rows */}
-            {filteredTasks.map(task => {
+            {filteredTasks.map((task, idx) => {
               const sc = statusColors[task.status] || statusColors.planned
               return (
-                <div key={task.id} className="card-hover" style={{
-                  height: ROW_HEIGHT, display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '0 14px', borderBottom: '1px solid var(--border)',
-                  cursor: 'pointer',
-                }}>
+                <div
+                  key={task.id}
+                  onClick={() => setSelectedTask(task)}
+                  onMouseEnter={() => setHoveredRow(task.id)}
+                  onMouseLeave={() => setHoveredRow(null)}
+                  style={{
+                    height: ROW_HEIGHT, display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '0 16px', borderBottom: '1px solid var(--border)',
+                    cursor: 'pointer',
+                    background: hoveredRow === task.id
+                      ? 'var(--bg2)'
+                      : idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent',
+                    transition: 'background 100ms',
+                  }}
+                >
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
                       fontSize: 12.5, fontWeight: 600,
                       whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                      marginBottom: 2,
                     }}>
                       {task.title}
                     </div>
-                    <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{task.category}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontSize: 10, color: 'var(--txt3)' }}>{task.category}</span>
+                      <span style={{ fontSize: 10, color: 'var(--txt3)', opacity: 0.5 }}>|</span>
+                      <span style={{ fontSize: 10, color: 'var(--txt3)' }}>
+                        {formatDateRange(task.startDate, task.endDate)}
+                      </span>
+                    </div>
+                    {/* Progress mini-bar */}
+                    <div style={{
+                      width: '100%', height: 3, borderRadius: 2,
+                      background: 'var(--border)',
+                    }}>
+                      <div style={{
+                        width: `${task.progress}%`, height: '100%', borderRadius: 2,
+                        background: sc.bar,
+                        transition: 'width 300ms ease',
+                      }} />
+                    </div>
                   </div>
-                  <span style={{
-                    fontSize: 9, fontWeight: 600, padding: '2px 6px', borderRadius: 5,
-                    background: sc.bg, color: sc.txt, border: `1px solid ${sc.border}`,
-                    textTransform: 'capitalize', flexShrink: 0,
-                  }}>{task.status}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3, flexShrink: 0 }}>
+                    <span style={{
+                      fontSize: 9, fontWeight: 600, padding: '2px 6px', borderRadius: 5,
+                      background: sc.bg, color: sc.txt, border: `1px solid ${sc.border}`,
+                      textTransform: 'capitalize',
+                    }}>{task.status}</span>
+                    <span className="mono" style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)' }}>
+                      {task.progress}%
+                    </span>
+                  </div>
                 </div>
               )
             })}
 
             {filteredTasks.length === 0 && (
               <div style={{
-                padding: '32px 14px', textAlign: 'center',
+                padding: '40px 16px', textAlign: 'center',
                 color: 'var(--txt3)', fontSize: 12,
               }}>
                 No tasks match the filter
@@ -374,10 +460,10 @@ export default function TimelinePage() {
                   width: m.width * dayWidth,
                   height: '100%',
                   display: 'flex', flexDirection: 'column', justifyContent: 'center',
-                  padding: '0 8px',
+                  padding: '0 10px',
                   borderRight: '1px solid var(--border)',
                 }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)' }}>
+                  <div style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--txt2)' }}>
                     {formatMonth(m.date)}
                   </div>
                   <div style={{ fontSize: 10, color: 'var(--txt3)' }}>
@@ -392,7 +478,7 @@ export default function TimelinePage() {
               {/* Grid lines for months */}
               {months.map((m, i) => (
                 <div key={`grid-${i}`} style={{
-                  position: 'absolute', top: 0, bottom: 0,
+                  position: 'absolute', top: 0,
                   left: m.offset * dayWidth,
                   width: 1, background: 'var(--border)',
                   zIndex: 0,
@@ -403,7 +489,7 @@ export default function TimelinePage() {
               {/* Today line */}
               {showToday && (
                 <div style={{
-                  position: 'absolute', top: -HEADER_HEIGHT, bottom: 0,
+                  position: 'absolute', top: -HEADER_HEIGHT,
                   left: todayOffset * dayWidth,
                   width: 2, background: 'var(--r)',
                   zIndex: 3,
@@ -412,7 +498,7 @@ export default function TimelinePage() {
                   <div style={{
                     position: 'absolute', top: 4, left: -16,
                     fontSize: 9, fontWeight: 700, color: '#fff',
-                    background: 'var(--r)', padding: '1px 5px',
+                    background: 'var(--r)', padding: '2px 6px',
                     borderRadius: 4, whiteSpace: 'nowrap',
                   }}>
                     Today
@@ -428,59 +514,73 @@ export default function TimelinePage() {
                 const startOffset = diffDays(timelineStart, taskStart)
                 const duration = diffDays(taskStart, taskEnd)
                 const barLeft = startOffset * dayWidth
-                const barWidth = Math.max(duration * dayWidth, 20)
+                const barWidth = Math.max(duration * dayWidth, 30)
 
                 return (
-                  <div key={task.id} style={{
-                    height: ROW_HEIGHT,
-                    position: 'relative',
-                    borderBottom: '1px solid var(--border)',
-                  }}>
+                  <div
+                    key={task.id}
+                    onMouseEnter={() => setHoveredRow(task.id)}
+                    onMouseLeave={() => setHoveredRow(null)}
+                    style={{
+                      height: ROW_HEIGHT,
+                      position: 'relative',
+                      borderBottom: '1px solid var(--border)',
+                      background: hoveredRow === task.id
+                        ? 'var(--bg2)'
+                        : idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent',
+                      transition: 'background 100ms',
+                    }}
+                  >
                     {/* Bar */}
                     <div
+                      onClick={() => setSelectedTask(task)}
                       title={`${task.title}\n${formatDate(taskStart)} - ${formatDate(taskEnd)}\nProgress: ${task.progress}%\nMilestones: ${task.completedMilestones}/${task.milestones}`}
                       style={{
                         position: 'absolute',
-                        top: 10, height: ROW_HEIGHT - 20,
+                        top: 12, height: ROW_HEIGHT - 24,
                         left: barLeft, width: barWidth,
-                        borderRadius: 6,
+                        borderRadius: 8,
                         background: sc.bg,
-                        border: `1px solid ${sc.border}`,
+                        border: `1.5px solid ${sc.border}`,
                         overflow: 'hidden',
                         cursor: 'pointer',
                         display: 'flex', alignItems: 'center',
-                        transition: 'box-shadow 150ms',
+                        transition: 'box-shadow 150ms, transform 100ms',
                         zIndex: 1,
+                        boxShadow: hoveredRow === task.id ? 'var(--shadow-md)' : 'none',
                       }}
-                      className="card-hover"
                     >
                       {/* Progress fill */}
                       <div style={{
                         position: 'absolute', top: 0, left: 0, bottom: 0,
                         width: `${task.progress}%`,
                         background: sc.bar,
-                        opacity: 0.25,
-                        borderRadius: '5px 0 0 5px',
+                        opacity: 0.35,
+                        borderRadius: '7px 0 0 7px',
                       }} />
 
                       {/* Bar content */}
                       <div style={{
                         position: 'relative', zIndex: 1,
-                        display: 'flex', alignItems: 'center', gap: 6,
-                        padding: '0 8px', width: '100%',
+                        display: 'flex', alignItems: 'center', gap: 8,
+                        padding: '0 10px', width: '100%',
                         overflow: 'hidden',
                       }}>
-                        {barWidth > 80 && (
+                        {barWidth > 120 && (
                           <span style={{
-                            fontSize: 10.5, fontWeight: 600, color: sc.txt,
+                            fontSize: 11, fontWeight: 600, color: sc.txt,
                             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                           }}>
                             {task.title}
                           </span>
                         )}
                         <span className="mono" style={{
-                          fontSize: 9.5, fontWeight: 700, color: sc.txt,
-                          marginLeft: 'auto', flexShrink: 0, opacity: 0.8,
+                          fontSize: 10, fontWeight: 700,
+                          marginLeft: 'auto', flexShrink: 0,
+                          background: sc.bar,
+                          color: '#fff',
+                          padding: '1px 6px',
+                          borderRadius: 4,
                         }}>
                           {task.progress}%
                         </span>
@@ -492,16 +592,22 @@ export default function TimelinePage() {
                       const msOffset = startOffset + Math.round((duration / (task.milestones + 1)) * (mi + 1))
                       const isDone = mi < task.completedMilestones
                       return (
-                        <div key={mi} style={{
-                          position: 'absolute',
-                          top: ROW_HEIGHT / 2 - 4,
-                          left: msOffset * dayWidth - 4,
-                          width: 8, height: 8,
-                          borderRadius: '50%',
-                          background: isDone ? sc.bar : 'var(--bg2)',
-                          border: `2px solid ${isDone ? sc.bar : 'var(--border)'}`,
-                          zIndex: 2,
-                        }} />
+                        <div
+                          key={mi}
+                          title={`Milestone ${mi + 1}/${task.milestones} — ${isDone ? 'Completed' : 'Pending'}`}
+                          style={{
+                            position: 'absolute',
+                            top: ROW_HEIGHT / 2 - 5,
+                            left: msOffset * dayWidth - 5,
+                            width: 10, height: 10,
+                            borderRadius: '50%',
+                            background: isDone ? sc.bar : 'var(--bg2)',
+                            border: `2px solid ${isDone ? sc.bar : 'var(--txt3)'}`,
+                            zIndex: 2,
+                            cursor: 'pointer',
+                            transition: 'transform 100ms',
+                          }}
+                        />
                       )
                     })}
                   </div>
@@ -513,7 +619,7 @@ export default function TimelinePage() {
 
         {/* Legend */}
         <div style={{
-          display: 'flex', alignItems: 'center', gap: 16, padding: '0 4px',
+          display: 'flex', alignItems: 'center', gap: 16, padding: '0 4px', flexWrap: 'wrap',
         }}>
           <span style={{ fontSize: 10.5, color: 'var(--txt3)', fontWeight: 600 }}>Legend:</span>
           {[
@@ -524,8 +630,8 @@ export default function TimelinePage() {
           ].map(l => (
             <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               <div style={{
-                width: l.label === 'Today' ? 2 : 12, height: l.label === 'Today' ? 12 : 6,
-                borderRadius: l.label === 'Today' ? 1 : 3,
+                width: l.label === 'Today' ? 2 : 14, height: l.label === 'Today' ? 14 : 8,
+                borderRadius: l.label === 'Today' ? 1 : 4,
                 background: l.color,
               }} />
               <span style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{l.label}</span>
@@ -533,20 +639,223 @@ export default function TimelinePage() {
           ))}
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <div style={{
-              width: 8, height: 8, borderRadius: '50%',
+              width: 10, height: 10, borderRadius: '50%',
               background: 'var(--g)', border: '2px solid var(--g)',
             }} />
             <span style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Milestone (done)</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <div style={{
-              width: 8, height: 8, borderRadius: '50%',
-              background: 'var(--bg2)', border: '2px solid var(--border)',
+              width: 10, height: 10, borderRadius: '50%',
+              background: 'var(--bg2)', border: '2px solid var(--txt3)',
             }} />
             <span style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Milestone (pending)</span>
           </div>
         </div>
       </div>
+
+      {/* Task Detail Drawer */}
+      {selectedTask && (
+        <TaskDetailDrawer task={selectedTask} onClose={() => setSelectedTask(null)} />
+      )}
     </>
+  )
+}
+
+/* ── Task Detail Drawer ───────────────────────────────── */
+
+function TaskDetailDrawer({ task, onClose }: { task: TimelineTask; onClose: () => void }) {
+  const sc = statusColors[task.status] || statusColors.planned
+  const taskStart = parseDate(task.startDate)
+  const taskEnd = parseDate(task.endDate)
+  const totalDuration = diffDays(taskStart, taskEnd)
+
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
+  return (
+    <>
+      {/* Overlay */}
+      <div
+        onClick={onClose}
+        style={{
+          position: 'fixed', inset: 0, zIndex: 40,
+          background: 'rgba(0,0,0,0.3)',
+          animation: 'fadeIn 200ms ease both',
+        }}
+      />
+
+      {/* Drawer */}
+      <div style={{
+        position: 'fixed', top: 0, right: 0, bottom: 0,
+        width: 400, maxWidth: '90vw', zIndex: 50,
+        background: 'var(--panel)',
+        borderLeft: '1px solid var(--border)',
+        boxShadow: 'var(--shadow-lg, -8px 0 24px rgba(0,0,0,0.15))',
+        display: 'flex', flexDirection: 'column',
+        animation: 'slideInRight 250ms cubic-bezier(0.16,1,0.3,1) both',
+      }}>
+        {/* Header */}
+        <div style={{
+          padding: '18px 20px', borderBottom: '1px solid var(--border)',
+          display: 'flex', alignItems: 'flex-start', gap: 12,
+        }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.3, marginBottom: 6 }}>
+              {task.title}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{
+                fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 5,
+                background: sc.bg, color: sc.txt, border: `1px solid ${sc.border}`,
+                textTransform: 'capitalize',
+              }}>{task.status}</span>
+              <span style={{ fontSize: 11, color: 'var(--txt3)' }}>{task.category}</span>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              width: 28, height: 28, borderRadius: 6,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'var(--bg2)', border: '1px solid var(--border)',
+              cursor: 'pointer', color: 'var(--txt3)', flexShrink: 0,
+            }}
+          >
+            <X size={14} />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+          {/* Progress Section */}
+          <DrawerSection icon={BarChart3} label="Progress">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              <div style={{
+                flex: 1, height: 8, borderRadius: 4,
+                background: 'var(--border)',
+              }}>
+                <div style={{
+                  width: `${task.progress}%`, height: '100%', borderRadius: 4,
+                  background: sc.bar,
+                  transition: 'width 400ms ease',
+                }} />
+              </div>
+              <span className="mono" style={{ fontSize: 14, fontWeight: 700, color: sc.txt }}>
+                {task.progress}%
+              </span>
+            </div>
+          </DrawerSection>
+
+          {/* Timeline Section */}
+          <DrawerSection icon={Clock} label="Timeline">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <DetailField label="Start Date" value={formatDate(taskStart)} />
+              <DetailField label="End Date" value={formatDate(taskEnd)} />
+              <DetailField label="Duration" value={`${totalDuration} days`} />
+              <DetailField label="Days Left" value={
+                diffDays(new Date(), taskEnd) > 0
+                  ? `${diffDays(new Date(), taskEnd)} days`
+                  : task.status === 'completed' || task.status === 'sold' ? 'Done' : 'Overdue'
+              } />
+            </div>
+          </DrawerSection>
+
+          {/* Milestones Section */}
+          <DrawerSection icon={Target} label={`Milestones (${task.completedMilestones}/${task.milestones})`}>
+            {task.milestones === 0 ? (
+              <div style={{ fontSize: 12, color: 'var(--txt3)', fontStyle: 'italic' }}>
+                No milestones defined
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {Array.from({ length: task.milestones }, (_, i) => {
+                  const isDone = i < task.completedMilestones
+                  return (
+                    <div key={i} style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '6px 10px', borderRadius: 6,
+                      background: isDone ? 'color-mix(in srgb, var(--g) 8%, transparent)' : 'var(--bg2)',
+                      border: `1px solid ${isDone ? 'var(--g-border)' : 'var(--border)'}`,
+                    }}>
+                      {isDone
+                        ? <CheckCircle2 size={14} style={{ color: 'var(--g)', flexShrink: 0 }} />
+                        : <Circle size={14} style={{ color: 'var(--txt3)', flexShrink: 0 }} />
+                      }
+                      <span style={{
+                        fontSize: 12, fontWeight: isDone ? 500 : 400,
+                        color: isDone ? 'var(--txt2)' : 'var(--txt3)',
+                        textDecoration: isDone ? 'line-through' : 'none',
+                        opacity: isDone ? 0.7 : 1,
+                      }}>
+                        Milestone {i + 1}
+                      </span>
+                      {isDone && (
+                        <span style={{
+                          marginLeft: 'auto', fontSize: 9, fontWeight: 600,
+                          color: 'var(--g-txt)', background: 'var(--g-bg)',
+                          padding: '1px 5px', borderRadius: 4,
+                        }}>Done</span>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </DrawerSection>
+
+          {/* Category Section */}
+          <DrawerSection icon={Tag} label="Details">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <DetailField label="Category" value={task.category} />
+              <DetailField label="ID" value={task.id} />
+            </div>
+          </DrawerSection>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
+    </>
+  )
+}
+
+function DrawerSection({ icon: Icon, label, children }: { icon: any; label: string; children: React.ReactNode }) {
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <div style={{
+        fontSize: 10.5, fontWeight: 600, textTransform: 'uppercase',
+        letterSpacing: '0.06em', color: 'var(--txt3)', marginBottom: 10,
+        display: 'flex', alignItems: 'center', gap: 6,
+      }}>
+        <Icon size={12} />
+        {label}
+      </div>
+      {children}
+    </div>
+  )
+}
+
+function DetailField({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{
+      padding: '8px 10px', borderRadius: 6,
+      background: 'var(--bg2)', border: '1px solid var(--border)',
+    }}>
+      <div style={{ fontSize: 9.5, color: 'var(--txt3)', fontWeight: 500, marginBottom: 2 }}>{label}</div>
+      <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--txt)' }}>{value}</div>
+    </div>
   )
 }

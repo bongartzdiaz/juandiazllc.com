@@ -1,0 +1,74 @@
+/* GET  /api/agent-goals — goals for agents (team view)
+   POST /api/agent-goals — set agent goals */
+
+import { NextRequest, NextResponse } from 'next/server'
+import { getAuthPrisma } from '@/lib/auth'
+import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
+
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
+export async function GET(req: NextRequest) {
+  const scope = await requireScope()
+  if (scope instanceof NextResponse) return scope
+
+  const url = new URL(req.url)
+  const year = parseInt(url.searchParams.get('year') ?? String(new Date().getFullYear()))
+  const month = url.searchParams.get('month') ? parseInt(url.searchParams.get('month')!) : undefined
+
+  const prisma = getAuthPrisma()
+  const goals = await prisma.agentGoal.findMany({
+    where: {
+      organizationId: scope.organizationId,
+      year,
+      ...(month !== undefined ? { month } : {}),
+    },
+    orderBy: [{ year: 'desc' }, { month: 'desc' }],
+  })
+
+  return NextResponse.json({ data: goals })
+}
+
+export async function POST(req: NextRequest) {
+  const scope = await requireRole(['admin', 'manager'])
+  if (scope instanceof NextResponse) return scope
+
+  let body: Record<string, any>
+  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+
+  if (!body.agentId) return jsonError('agentId is required', 400)
+  if (!body.year || !body.month) return jsonError('year and month are required', 400)
+
+  const prisma = getAuthPrisma()
+
+  // Verify agent belongs to this organization
+  const agent = await prisma.user.findFirst({
+    where: { id: body.agentId, organizationId: scope.organizationId },
+    select: { id: true },
+  })
+  if (!agent) return jsonError('Agent not found in your organization', 404)
+
+  const goal = await prisma.agentGoal.upsert({
+    where: { agentId_year_month: { agentId: body.agentId, year: body.year, month: body.month } },
+    create: {
+      organizationId: scope.organizationId,
+      agentId: body.agentId,
+      year: body.year,
+      month: body.month,
+      dealTarget: body.dealTarget ?? 0,
+      volumeTarget: body.volumeTarget ?? 0,
+      gciTarget: body.gciTarget ?? 0,
+      callsTarget: body.callsTarget ?? 0,
+      showingsTarget: body.showingsTarget ?? 0,
+    },
+    update: {
+      dealTarget: body.dealTarget,
+      volumeTarget: body.volumeTarget,
+      gciTarget: body.gciTarget,
+      callsTarget: body.callsTarget,
+      showingsTarget: body.showingsTarget,
+    },
+  })
+
+  return NextResponse.json({ data: goal })
+}

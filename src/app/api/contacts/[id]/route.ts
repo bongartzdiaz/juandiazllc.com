@@ -5,6 +5,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
+import { validateBody } from '@/lib/validation'
+import { updateContactSchema } from '@/lib/validation/schemas'
+import { logAudit, diffChanges } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -34,40 +37,31 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
   const { id } = await ctx.params
 
-  let body: unknown
-  try {
-    body = await req.json()
-  } catch {
-    return jsonError('Invalid JSON body', 400)
-  }
+  const parsed = await validateBody(req, updateContactSchema)
+  if (!parsed.success) return parsed.response
 
-  const input = body as Partial<{
-    name: string
-    email: string
-    phone: string
-    type: string
-    company: string
-    notes: string
-    avatarUrl: string | null
-  }>
-
+  const input = parsed.data
   const prisma = getAuthPrisma()
+
   const existing = await prisma.contact.findFirst({
     where: { id, organizationId: scope.organizationId },
-    select: { id: true },
   })
   if (!existing) return jsonError('Contact not found', 404)
 
   const data: Record<string, unknown> = {}
-  if (input.name !== undefined) data.name = input.name.trim()
-  if (input.email !== undefined) data.email = input.email.trim()
-  if (input.phone !== undefined) data.phone = input.phone.trim()
+  if (input.name !== undefined) data.name = input.name
+  if (input.email !== undefined) data.email = input.email
+  if (input.phone !== undefined) data.phone = input.phone
   if (input.type !== undefined) data.type = input.type
-  if (input.company !== undefined) data.company = input.company.trim()
+  if (input.company !== undefined) data.company = input.company
   if (input.notes !== undefined) data.notes = input.notes
   if (input.avatarUrl !== undefined) data.avatarUrl = input.avatarUrl
 
   const contact = await prisma.contact.update({ where: { id }, data })
+
+  const changes = diffChanges(existing as unknown as Record<string, unknown>, input as Record<string, unknown>)
+  await logAudit({ scope, action: 'update', entity: 'contact', entityId: id, changes })
+
   return NextResponse.json({ data: contact })
 }
 
@@ -85,5 +79,7 @@ export async function DELETE(_req: NextRequest, ctx: RouteCtx) {
   if (!existing) return jsonError('Contact not found', 404)
 
   await prisma.contact.delete({ where: { id } })
+  await logAudit({ scope, action: 'delete', entity: 'contact', entityId: id })
+
   return new NextResponse(null, { status: 204 })
 }

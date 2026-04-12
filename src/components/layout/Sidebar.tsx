@@ -5,7 +5,9 @@ import Link from 'next/link'
 import {
   LayoutDashboard, FolderKanban, Users2, BarChart3,
   FileText, Columns3, FileStack, Settings, CalendarDays, GanttChart,
-  Leaf, Building2, Hotel, ChevronDown, LogOut,
+  Leaf, Building2, Hotel, ChevronDown, LogOut, Shield,
+  DollarSign, Bell, Zap, FileArchive, Award, Heart,
+  Home, BedDouble, Eye, HandCoins, Trophy, DoorOpen, Mail, TrendingUp,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -45,12 +47,37 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
 
   const NAV_TOOLS: NavItemDef[] = [
     { icon: FileText, label: 'Reports', href: '/reports' },
-    { icon: Columns3, label: industry === 'realestate' ? 'Deals' : industry === 'hospitality' ? 'Reservations' : 'Board', href: '/kanban' },
+    { icon: Columns3, label: industry === 'realestate' ? 'Deals Board' : industry === 'hospitality' ? 'Reservations' : 'Board', href: '/kanban' },
+    { icon: DollarSign, label: 'Deals', href: '/deals' },
     { icon: CalendarDays, label: 'Calendar', href: '/calendar' },
     { icon: GanttChart, label: 'Timeline', href: '/timeline' },
+    { icon: FileArchive, label: 'Documents', href: '/documents' },
   ]
 
+  // Industry-specific nav items
+  const NAV_INDUSTRY: NavItemDef[] = industry === 'realestate'
+    ? [
+        { icon: Home, label: 'Properties', href: '/properties' },
+        { icon: Eye, label: 'Showings', href: '/showings' },
+        { icon: HandCoins, label: 'Offers', href: '/offers' },
+        { icon: DoorOpen, label: 'Open Houses', href: '/open-houses' },
+        { icon: Trophy, label: 'Commissions', href: '/commissions' },
+        { icon: Mail, label: 'Drip Campaigns', href: '/drip-campaigns' },
+        { icon: TrendingUp, label: 'Market Analytics', href: '/market-analytics' },
+      ]
+    : industry === 'hospitality'
+      ? [
+          { icon: BedDouble, label: 'Rooms', href: '/rooms' },
+        ]
+      : [
+          { icon: Award, label: 'Grants', href: '/grants' },
+          { icon: Heart, label: 'Volunteers', href: '/volunteers' },
+        ]
+
   const NAV_SYSTEM: NavItemDef[] = [
+    { icon: Bell, label: 'Notifications', href: '/notifications' },
+    { icon: Zap, label: 'Automations', href: '/automations' },
+    { icon: Shield, label: 'Audit Log', href: '/audit' },
     { icon: Settings, label: 'Settings', href: '/settings' },
   ]
 
@@ -163,6 +190,13 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
 
         <NavLabel>Tools</NavLabel>
         {NAV_TOOLS.map(item => (
+          <NavItem key={item.href} active={path === item.href || path.startsWith(item.href)} {...item} onClick={onNavigate} />
+        ))}
+
+        <div style={{ height: 1, background: 'var(--border)', margin: '8px 10px' }} />
+
+        <NavLabel>{config.shortLabel}</NavLabel>
+        {NAV_INDUSTRY.map(item => (
           <NavItem key={item.href} active={path === item.href || path.startsWith(item.href)} {...item} onClick={onNavigate} />
         ))}
 
