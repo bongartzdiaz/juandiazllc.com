@@ -1,18 +1,29 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, FormEvent, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 import { LogIn, Eye, EyeOff } from 'lucide-react'
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageInner />
+    </Suspense>
+  )
+}
+
+function LoginPageInner() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams?.get('callbackUrl') || '/'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError('')
 
@@ -22,11 +33,22 @@ export default function LoginPage() {
     }
 
     setLoading(true)
-    // Demo auth -- accept any credentials
-    setTimeout(() => {
-      localStorage.setItem('pai-auth', JSON.stringify({ email: email.trim(), timestamp: Date.now() }))
-      router.push('/')
-    }, 600)
+
+    const res = await signIn('credentials', {
+      email: email.trim(),
+      password,
+      redirect: false,
+      callbackUrl,
+    })
+
+    if (!res || res.error) {
+      setError('Invalid email or password.')
+      setLoading(false)
+      return
+    }
+
+    router.push(res.url || callbackUrl)
+    router.refresh()
   }
 
   const inputStyle: React.CSSProperties = {
@@ -151,14 +173,6 @@ export default function LoginPage() {
           </span>
         </div>
 
-        {/* Demo note */}
-        <div style={{
-          textAlign: 'center', marginTop: 24, paddingTop: 16,
-          borderTop: '1px solid var(--border)',
-          fontSize: 11, color: 'var(--txt3)',
-        }}>
-          Demo mode -- use any credentials
-        </div>
       </div>
 
       {/* Spin keyframe for loader */}
