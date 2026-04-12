@@ -48,14 +48,17 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const toggle = useCallback(() => setMobileOpen(v => !v), [])
 
+  // Auth enforcement — currently bypassed so dashboard works without login.
+  // To re-enable: remove the `false &&` guard below.
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (false && status === 'unauthenticated') {
       const callback = encodeURIComponent(pathname || '/')
       router.replace(`/login?callbackUrl=${callback}`)
     }
   }, [status, router, pathname])
 
-  if (status === 'loading' || status === 'unauthenticated') {
+  // Show spinner only while session is loading (not when unauthenticated)
+  if (status === 'loading') {
     return (
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
