@@ -1,4 +1,4 @@
-// ── PhilanthropyAI CRM Types ──
+// ── Philly Dashboard CRM Types ──
 
 // ── Enums & Literal Types ──
 

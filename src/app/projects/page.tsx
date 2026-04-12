@@ -3,9 +3,13 @@
 import { useMemo, useState } from 'react'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
+import { Modal } from '@/components/ui/Modal'
+import { ProjectForm } from '@/components/forms/ProjectForm'
+import type { ProjectFormData } from '@/components/forms/ProjectForm'
 import { Search, Grid3X3, List, ArrowUpDown } from 'lucide-react'
 import { useIndustry } from '@/hooks/useIndustry'
 import { useApi } from '@/hooks/useApi'
+import { useToast } from '@/hooks/useToast'
 
 /* Shape returned by GET /api/projects */
 interface ApiProject {
@@ -116,9 +120,11 @@ const statusColors: Record<string, { bg: string; txt: string; border: string }> 
 
 export default function ProjectsPage() {
   const { industry } = useIndustry()
+  const { addToast } = useToast()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [view, setView] = useState<'grid' | 'list'>('grid')
+  const [showAdd, setShowAdd] = useState(false)
 
   const isRE = industry === 'realestate'
   const isHOS = industry === 'hospitality'
@@ -133,6 +139,35 @@ export default function ProjectsPage() {
     const rows = apiQuery.data?.data ?? []
     return rows.map(mapApiProject)
   }, [apiQuery.data, isRE, isHOS])
+
+  const handleAddProject = async (data: ProjectFormData) => {
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: data.title,
+          description: data.description,
+          category: data.category,
+          status: data.status,
+          startDate: data.startDate || undefined,
+          endDate: data.endDate || undefined,
+          budgetCents: data.budget ? Math.round(Number(data.budget) * 100) : 0,
+          sdgGoals: data.sdgGoals,
+        }),
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => null)
+        throw new Error(body?.error || `Request failed (${res.status})`)
+      }
+      addToast('Project created successfully', 'success')
+      setShowAdd(false)
+      apiQuery.refetch()
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to create project'
+      addToast(message, 'error')
+    }
+  }
 
   const projects: UiProject[] = isHOS
     ? HOS_PROJECTS
@@ -171,6 +206,7 @@ export default function ProjectsPage() {
         title={isHOS ? 'Venues & Rooms' : isRE ? 'Properties' : 'Projects'}
         sub={isHOS ? 'Manage your properties' : isRE ? 'Manage your portfolio' : 'Manage your CSR initiatives'}
         addLabel={isHOS ? 'New Room' : isRE ? 'New Property' : 'New Project'}
+        onAdd={() => setShowAdd(true)}
       />
 
       <div style={{ padding: '18px 24px 40px' }}>
@@ -373,6 +409,19 @@ export default function ProjectsPage() {
           </div>
         )}
       </div>
+
+      <Modal
+        open={showAdd}
+        onClose={() => setShowAdd(false)}
+        title={isHOS ? 'New Room' : isRE ? 'New Property' : 'New Project'}
+        subtitle={isHOS ? 'Add a new room or venue' : isRE ? 'Add a new property' : 'Create a new CSR project'}
+        size="lg"
+      >
+        <ProjectForm
+          onSubmit={handleAddProject}
+          onCancel={() => setShowAdd(false)}
+        />
+      </Modal>
     </>
   )
 }

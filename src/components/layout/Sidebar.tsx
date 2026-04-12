@@ -87,7 +87,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 15.5, fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--txt)' }}>
-              Philanthropy<span style={{ color: 'var(--accent)' }}>AI</span>
+              Philly<span style={{ color: 'var(--accent)' }}>.</span>
             </div>
             <div style={{ fontSize: 10, color: 'var(--txt3)', letterSpacing: '0.02em' }}>{config.label}</div>
           </div>

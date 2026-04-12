@@ -76,7 +76,7 @@ function LoginPageInner() {
             fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em',
             color: 'var(--accent)',
           }}>
-            PhilanthropyAI
+            Philly
           </div>
           <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--txt3)', marginTop: 4 }}>
             Business Platform

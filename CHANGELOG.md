@@ -1,4 +1,4 @@
-# PhilanthropyAI — Changelog
+# Philly Dashboard — Changelog
 
 ## 2026-03-22
 

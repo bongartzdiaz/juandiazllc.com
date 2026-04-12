@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "philanthropyai",
+      "name": "philly-dashboard",
       "runtimeExecutable": "node",
       "runtimeArgs": ["node_modules/.bin/next", "dev", "--port", "3300"],
       "port": 3300

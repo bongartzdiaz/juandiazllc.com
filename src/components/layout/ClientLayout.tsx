@@ -7,6 +7,7 @@ import { IndustryProvider } from '@/hooks/useIndustry'
 import { ToastProvider } from '@/hooks/useToast'
 import { ToastContainer } from '@/components/ui/Toast'
 import { Sidebar } from './Sidebar'
+import { CommandPalette } from '@/components/ui/CommandPalette'
 
 // Mobile menu context so Topbar can toggle the sidebar
 const MobileMenuCtx = createContext<{ open: boolean; toggle: () => void }>({ open: false, toggle: () => {} })
@@ -93,6 +94,8 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
         <main className="main-content" style={{ marginLeft: 240, flex: 1, display: 'flex', flexDirection: 'column' }}>
           {children}
         </main>
+
+        <CommandPalette />
       </div>
     </MobileMenuCtx.Provider>
   )

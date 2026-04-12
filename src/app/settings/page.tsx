@@ -10,6 +10,7 @@ import {
   KeyRound, Target, Eye, EyeOff,
 } from 'lucide-react'
 import type { Industry } from '@/hooks/useIndustry'
+import { useKpiStore } from '@/hooks/useKpiStore'
 
 /* ── Nav ─────────────────────────────────────────────── */
 
@@ -144,6 +145,7 @@ export default function SettingsPage() {
   const { theme, toggle } = useTheme()
   const { industry } = useIndustry()
   const { addToast } = useToast()
+  const kpi = useKpiStore(industry)
   const [activeSection, setActiveSection] = useState('profile')
   const [lang, setLang] = useState<'en' | 'nl'>('en')
 
@@ -268,7 +270,7 @@ export default function SettingsPage() {
                   </div>
                   <div>
                     <label style={labelStyle}>Email</label>
-                    <input defaultValue="juan@philanthropyai.org" type="email" style={inputStyle} />
+                    <input defaultValue="admin@philly.local" type="email" style={inputStyle} />
                   </div>
                   <div>
                     <label style={labelStyle}>Role</label>
@@ -294,7 +296,7 @@ export default function SettingsPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 400 }}>
                 <div>
                   <label style={labelStyle}>Organization Name</label>
-                  <input defaultValue="PhilanthropyAI Foundation" style={inputStyle} />
+                  <input defaultValue="Philly Foundation" style={inputStyle} />
                 </div>
                 <div>
                   <label style={labelStyle}>Industry</label>
@@ -510,7 +512,8 @@ export default function SettingsPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {goalDefs.map(g => {
                   const target = getTarget(g.key, g.defaultTarget)
-                  const pct = target > 0 ? Math.min((g.demoValue / target) * 100, 100) : 0
+                  const currentValue = Number(kpi.getKpiValue(g.key, g.demoValue))
+                  const pct = target > 0 ? Math.min((currentValue / target) * 100, 100) : 0
 
                   return (
                     <div key={g.key} style={{
@@ -520,7 +523,7 @@ export default function SettingsPage() {
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                         <div style={{ fontSize: 13, fontWeight: 600 }}>{g.label}</div>
                         <div style={{ fontSize: 11, color: 'var(--txt3)' }}>
-                          {g.unit === '\u20AC' && '\u20AC'}{g.demoValue}{g.unit === '%' && '%'}{g.unit === '/5' && '/5'}{g.unit === 'kg' && ' kg'}
+                          {g.unit === '\u20AC' && '\u20AC'}{currentValue}{g.unit === '%' && '%'}{g.unit === '/5' && '/5'}{g.unit === 'kg' && ' kg'}
                           {' / '}
                           {g.unit === '\u20AC' && '\u20AC'}{target}{g.unit === '%' && '%'}{g.unit === '/5' && '/5'}{g.unit === 'kg' && ' kg'}
                         </div>
@@ -544,9 +547,10 @@ export default function SettingsPage() {
                         <div style={{ flex: 1 }}>
                           <label style={{ ...labelStyle, marginBottom: 3 }}>Current</label>
                           <input
-                            readOnly
-                            value={g.demoValue}
-                            style={{ ...inputStyle, color: 'var(--txt3)', cursor: 'default' }}
+                            type="number"
+                            value={currentValue}
+                            onChange={e => kpi.setKpiValue(g.key, Number(e.target.value))}
+                            style={inputStyle}
                           />
                         </div>
                         <div style={{ flex: 1 }}>

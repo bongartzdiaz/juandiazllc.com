@@ -6,9 +6,10 @@ import { useTheme } from '@/hooks/useTheme'
 import { useIndustry, type Industry } from '@/hooks/useIndustry'
 import {
   LayoutDashboard, FolderKanban, Users, BarChart3, FileText,
-  Columns3, Settings, Plus, UserPlus, Download,
+  Columns3, Settings, Plus, UserPlus, Download, Calendar,
   Sun, Moon, Building2, Heart, UtensilsCrossed, Search,
 } from 'lucide-react'
+import { exportToCSV } from '@/lib/export'
 
 interface CommandItem {
   id: string
@@ -83,9 +84,25 @@ export function CommandPalette() {
       action: () => router.push('/contacts'), keywords: ['create', 'add', 'person'],
     },
     {
-      id: 'export-data', label: 'Export Data', description: 'Download data as CSV',
+      id: 'calendar', label: 'Calendar', description: 'View milestones and events',
+      icon: <Calendar size={iconSize} />, category: 'Pages',
+      action: () => router.push('/calendar'), keywords: ['events', 'schedule'],
+    },
+    {
+      id: 'export-data', label: 'Export Data', description: 'Download current data as CSV',
       icon: <Download size={iconSize} />, category: 'Actions',
-      action: () => router.push('/reports'), keywords: ['csv', 'download'],
+      action: () => {
+        // Fetch contacts and projects, then export
+        Promise.all([
+          fetch('/api/contacts').then(r => r.ok ? r.json() : { data: [] }),
+          fetch('/api/projects').then(r => r.ok ? r.json() : { data: [] }),
+        ]).then(([contacts, projects]) => {
+          if (contacts.data?.length) exportToCSV(contacts.data, 'contacts')
+          if (projects.data?.length) exportToCSV(projects.data, 'projects')
+        })
+        setOpen(false)
+      },
+      keywords: ['csv', 'download', 'export'],
     },
     // Settings
     {

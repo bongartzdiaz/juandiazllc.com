@@ -3,9 +3,13 @@
 import { useMemo, useState } from 'react'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
+import { Modal } from '@/components/ui/Modal'
+import { ContactForm } from '@/components/forms/ContactForm'
+import type { ContactFormData } from '@/components/forms/ContactForm'
 import { Search, Mail, Phone, FolderKanban } from 'lucide-react'
 import { useIndustry } from '@/hooks/useIndustry'
 import { useApi } from '@/hooks/useApi'
+import { useToast } from '@/hooks/useToast'
 
 interface Contact {
   id: string
@@ -124,6 +128,8 @@ export default function ContactsPage() {
   const { industry } = useIndustry()
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<string>('all')
+  const [showAdd, setShowAdd] = useState(false)
+  const { addToast } = useToast()
 
   const isRE = industry === 'realestate'
   const isHOS = industry === 'hospitality'
@@ -169,12 +175,33 @@ export default function ContactsPage() {
 
   const countByType = (type: string) => contacts.filter(c => c.type === type).length
 
+  const handleAddContact = async (data: ContactFormData) => {
+    try {
+      const res = await fetch('/api/contacts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Failed to create contact' }))
+        throw new Error(err.error || 'Failed to create contact')
+      }
+      addToast('Contact created successfully', 'success')
+      setShowAdd(false)
+      apiQuery.refetch()
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Something went wrong'
+      addToast(msg, 'error')
+    }
+  }
+
   return (
     <>
       <Topbar
         title="Contacts"
         sub={isHOS ? 'Guests, vendors & partners' : isRE ? 'Buyers, sellers & investors' : 'Partners, donors & stakeholders'}
         addLabel="New Contact"
+        onAdd={() => setShowAdd(true)}
       />
 
       <div style={{ padding: '18px 24px 40px' }}>
@@ -281,6 +308,19 @@ export default function ContactsPage() {
           })}
         </div>
       </div>
+
+      <Modal
+        open={showAdd}
+        onClose={() => setShowAdd(false)}
+        title="New Contact"
+        subtitle="Add a new contact to your directory"
+        size="md"
+      >
+        <ContactForm
+          onSubmit={handleAddContact}
+          onCancel={() => setShowAdd(false)}
+        />
+      </Modal>
     </>
   )
 }

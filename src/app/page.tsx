@@ -214,7 +214,21 @@ export default function DashboardPage() {
        industry === 'realestate' ? <RealEstateDashboard {...shared} /> :
        <CSRDashboard {...shared} />}
       <KpiDetailDrawer detail={kpiDetail} onClose={() => setKpiDetail(null)} />
-      <AddLeadModal open={addLeadOpen} onClose={() => setAddLeadOpen(false)} industry={industry} />
+      <AddLeadModal
+        open={addLeadOpen}
+        onClose={() => setAddLeadOpen(false)}
+        industry={industry}
+        onAdd={async (data) => {
+          if (data.csv) return  // CSV import not yet wired to API
+          try {
+            await fetch('/api/contacts', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data),
+            })
+          } catch { /* handled by modal */ }
+        }}
+      />
     </>
   )
 }
