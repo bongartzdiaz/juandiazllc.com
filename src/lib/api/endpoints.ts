@@ -1,39 +1,30 @@
 /* ---------------------------------------------------------------
    Endpoint Configuration — Philly Dashboard
-   Central registry of every backend path, grouped by integration.
+   Central registry of every backend path. Paths are relative to
+   the API client base URL (`/api`).
    --------------------------------------------------------------- */
 
 export const ENDPOINTS = {
-  crm: {
-    contacts: '/crm/contacts',
-    pipelines: '/crm/pipelines',
-    deals: '/crm/deals',
-    activities: '/crm/activities',
-  },
-  ads: {
-    campaigns: '/ads/campaigns',
-    daily: '/ads/daily',
-    spend: '/ads/spend',
-  },
-  analytics: {
-    kpis: '/analytics/kpis',
-    funnel: '/analytics/funnel',
-    forecast: '/analytics/forecast',
-    sources: '/analytics/sources',
-  },
-  bookings: {
-    rooms: '/bookings/rooms',
-    reservations: '/bookings/reservations',
-    availability: '/bookings/availability',
+  auth: {
+    me: '/me',
   },
   projects: {
     list: '/projects',
-    impact: '/projects/impact',
-    milestones: '/projects/milestones',
+    detail: (id: string) => `/projects/${id}`,
+  },
+  contacts: {
+    list: '/contacts',
+    detail: (id: string) => `/contacts/${id}`,
+  },
+  kanban: {
+    boards: '/kanban/boards',
+    cards: '/kanban/cards',
+    card: (id: string) => `/kanban/cards/${id}`,
+  },
+  impact: {
+    aggregate: '/impact',
   },
 } as const
 
 /* Derived helper types */
 export type EndpointGroup = keyof typeof ENDPOINTS
-export type EndpointPath<G extends EndpointGroup> =
-  (typeof ENDPOINTS)[G][keyof (typeof ENDPOINTS)[G]]

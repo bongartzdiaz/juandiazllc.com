@@ -1,10 +1,71 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { Search, Grid3X3, List, ArrowUpDown } from 'lucide-react'
 import { useIndustry } from '@/hooks/useIndustry'
+import { useApi } from '@/hooks/useApi'
+
+/* Shape returned by GET /api/projects */
+interface ApiProject {
+  id: string
+  title: string
+  status: string
+  category: string
+  startDate: string
+  budgetCents: number
+  spentCents: number
+  sdgGoals: number[] | string
+  milestones?: Array<{ id: string; status: string }>
+  _count?: { milestones: number; contactProjects: number }
+}
+
+interface UiProject {
+  id: string
+  title: string
+  status: string
+  category: string
+  budget: number
+  spent: number
+  startDate: string
+  sdgs: number[]
+  milestones: number
+  completedMilestones: number
+  contacts: number
+}
+
+function mapApiProject(p: ApiProject): UiProject {
+  const sdgs: number[] = Array.isArray(p.sdgGoals)
+    ? p.sdgGoals
+    : typeof p.sdgGoals === 'string'
+    ? (() => {
+        try {
+          const parsed = JSON.parse(p.sdgGoals)
+          return Array.isArray(parsed) ? parsed : []
+        } catch {
+          return []
+        }
+      })()
+    : []
+
+  const totalMs = p._count?.milestones ?? p.milestones?.length ?? 0
+  const doneMs = p.milestones?.filter((m) => m.status === 'completed').length ?? 0
+
+  return {
+    id: p.id,
+    title: p.title,
+    status: p.status,
+    category: p.category,
+    budget: Math.round((p.budgetCents ?? 0) / 100),
+    spent: Math.round((p.spentCents ?? 0) / 100),
+    startDate: p.startDate,
+    sdgs,
+    milestones: totalMs,
+    completedMilestones: doneMs,
+    contacts: p._count?.contactProjects ?? 0,
+  }
+}
 
 const DEMO_PROJECTS = [
   { id: '1', title: 'Urban Reforestation Amsterdam', status: 'active', category: 'Environment', budget: 120000, spent: 86400, startDate: '2025-09-01', sdgs: [11, 13, 15], milestones: 8, completedMilestones: 6, contacts: 5 },
@@ -61,7 +122,25 @@ export default function ProjectsPage() {
 
   const isRE = industry === 'realestate'
   const isHOS = industry === 'hospitality'
-  const projects = isHOS ? HOS_PROJECTS : isRE ? RE_PROJECTS : DEMO_PROJECTS
+
+  /* Live data for the default (philanthropy) view comes from the API.
+     RE and HOS modes keep their hand-curated demo data. */
+  const apiQuery = useApi<{ data: ApiProject[] }>('/projects', {
+    enabled: !isRE && !isHOS,
+  })
+  const liveProjects = useMemo<UiProject[]>(() => {
+    if (isRE || isHOS) return []
+    const rows = apiQuery.data?.data ?? []
+    return rows.map(mapApiProject)
+  }, [apiQuery.data, isRE, isHOS])
+
+  const projects: UiProject[] = isHOS
+    ? HOS_PROJECTS
+    : isRE
+    ? RE_PROJECTS
+    : liveProjects.length > 0
+    ? liveProjects
+    : DEMO_PROJECTS
   const statusOptions = isHOS
     ? ['all', 'active', 'maintenance', 'reserved']
     : isRE

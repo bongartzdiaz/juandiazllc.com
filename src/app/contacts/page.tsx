@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { Search, Mail, Phone, FolderKanban } from 'lucide-react'
 import { useIndustry } from '@/hooks/useIndustry'
+import { useApi } from '@/hooks/useApi'
 
 interface Contact {
   id: string
@@ -15,6 +16,37 @@ interface Contact {
   email: string
   phone: string
   projects: number
+}
+
+/* Shape returned by GET /api/contacts */
+interface ApiContact {
+  id: string
+  name: string
+  email: string
+  phone: string
+  type: string
+  company: string
+  _count?: { contactProjects: number }
+}
+
+function splitName(name: string): { firstName: string; lastName: string } {
+  const parts = name.trim().split(/\s+/)
+  if (parts.length === 1) return { firstName: parts[0], lastName: '' }
+  return { firstName: parts[0], lastName: parts.slice(1).join(' ') }
+}
+
+function mapApiContact(c: ApiContact): Contact {
+  const { firstName, lastName } = splitName(c.name)
+  return {
+    id: c.id,
+    firstName,
+    lastName,
+    company: c.company,
+    type: c.type,
+    email: c.email,
+    phone: c.phone,
+    projects: c._count?.contactProjects ?? 0,
+  }
 }
 
 const DEMO_CONTACTS: Contact[] = [
@@ -95,7 +127,26 @@ export default function ContactsPage() {
 
   const isRE = industry === 'realestate'
   const isHOS = industry === 'hospitality'
-  const contacts = isHOS ? HOS_CONTACTS : isRE ? RE_CONTACTS : DEMO_CONTACTS
+
+  /* Live data for the default (philanthropy) view comes from the API.
+     RE and HOS modes are showcase / demo industries, so they keep their
+     hand-curated demo data. */
+  const apiQuery = useApi<{ data: ApiContact[] }>('/contacts', {
+    enabled: !isRE && !isHOS,
+  })
+  const liveContacts = useMemo<Contact[]>(() => {
+    if (isRE || isHOS) return []
+    const rows = apiQuery.data?.data ?? []
+    return rows.map(mapApiContact)
+  }, [apiQuery.data, isRE, isHOS])
+
+  const contacts: Contact[] = isHOS
+    ? HOS_CONTACTS
+    : isRE
+    ? RE_CONTACTS
+    : liveContacts.length > 0
+    ? liveContacts
+    : DEMO_CONTACTS
   const filterOptions = isHOS
     ? ['all', 'guest', 'vendor', 'partner', 'staff']
     : isRE
