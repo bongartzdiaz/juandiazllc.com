@@ -86,24 +86,68 @@ If all four steps succeed, your backup pipeline is provably working.
 
 ## Schedule the nightly backup + weekly verification
 
-Add two cron entries:
+Preferred: **systemd timers** (journald rotation built in, failure
+notifications wired to the OnFailure hook). One-command install:
 
 ```bash
-sudo crontab -e
+sudo ./deploy/install-systemd.sh
 ```
 
-```cron
-# Nightly dump at 03:00 server time
-0 3 * * *  /usr/local/bin/philly-backup >> /var/log/philly-backup.log 2>&1
+That does everything: copies scripts to `/usr/local/bin/philly-*`,
+installs the four systemd units, enables both timers, and prints the
+next scheduled runs. Idempotent — re-run it after editing any unit file.
 
-# Weekly restore test every Sunday at 04:00 — catches silent rot
+The schedule it installs:
+
+| Timer | When | What |
+|-------|------|------|
+| `philly-backup.timer` | Daily 03:00 (±5 min jitter) | Take a dump |
+| `philly-verify.timer` | Sun 04:00 (±10 min jitter) | Restore newest dump into a scratch DB |
+
+`Persistent=true` means if the VPS was down at the scheduled time, it runs
+as soon as it boots — no silent skipped nights.
+
+### Failure alerts (Slack / email)
+
+Failures trigger `philly-alert@.service` via `OnFailure=` in the unit files.
+Configure in `/etc/default/philly-backup`:
+
+```bash
+ALERT_SLACK_WEBHOOK=https://hooks.slack.com/services/XXX/YYY/ZZZ
+ALERT_EMAIL=ops@example.com    # requires `mail` command (apt install mailutils)
+```
+
+The alert includes the last 30 journal lines from the failing unit so
+you see exactly what broke without SSH'ing in first. If neither channel
+is configured, the alert still lands in journald — run
+`journalctl -u 'philly-alert@*' -n 20` to see what you missed.
+
+### Monitoring commands
+
+```bash
+# Next scheduled runs
+systemctl list-timers 'philly-*'
+
+# Last backup run (did it succeed?)
+systemctl status philly-backup.service
+
+# Full journal for backups
+journalctl -u philly-backup --since '7 days ago'
+
+# Same for verify
+journalctl -u philly-verify --since '30 days ago'
+```
+
+### Alternative: cron (if you really don't want systemd)
+
+```cron
+0 3 * * *  /usr/local/bin/philly-backup >> /var/log/philly-backup.log 2>&1
 0 4 * * 0  /usr/local/bin/philly-verify "$(ls -1t /var/backups/philly/philly-*.sql.gz | head -1)" >> /var/log/philly-verify.log 2>&1
 ```
 
-The weekly verify is important: a dump can become unrestorable if the DB
-schema drifts from what mysqldump wrote (e.g. after a botched migration).
-Catching it on Sunday in a log is far better than finding out when you
-actually need to restore.
+If you go this route you also need a logrotate file for the two log
+paths, and you lose the OnFailure alerting — you'd have to wrap each
+command in a shell that checks exit code and curls Slack yourself.
 
 ## When disaster strikes — full restore procedure
 
