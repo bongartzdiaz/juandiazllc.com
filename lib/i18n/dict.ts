@@ -199,7 +199,7 @@ const nl: Dict = {
 
   "story.label": "◉ 00 — Verhaal",
   "story.lead.a": "De meeste bedrijven hebben geen omzetprobleem.",
-  "story.lead.b": "Ze hebben een bouwtekening-probleem.",
+  "story.lead.b": "Ze hebben een blueprint-probleem.",
 
   "cd.label": "◉ De deadline",
   "cd.title": "Salderingsregeling eindigt",
