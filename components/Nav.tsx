@@ -2,14 +2,23 @@
 
 import Link from "next/link";
 import { useT } from "@/lib/i18n/useT";
+import { Logo } from "./Logo";
 
 export function Nav() {
   const t = useT();
   return (
     <nav className="top" aria-label="Primary">
-      <Link href="/" className="brand" aria-label="Juan Diaz LLC — home">
-        <span className="dot" aria-hidden="true" />
-        <span>Juan Diaz LLC</span>
+      <Link
+        href="/"
+        className="brand"
+        aria-label="Juan Diaz LLC — home"
+        style={{
+          color: "var(--accent)",
+          gap: 12,
+        }}
+      >
+        <Logo size={26} />
+        <span style={{ color: "var(--text)" }}>Juan Diaz LLC</span>
       </Link>
       <div className="nav-right">
         <span id="navTime">—</span>

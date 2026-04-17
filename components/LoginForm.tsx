@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { signInWithPassword, type AuthState } from "@/app/actions/auth";
 import { useT } from "@/lib/i18n/useT";
+import { Logo } from "./Logo";
 
 const initial: AuthState = { status: "idle" };
 
@@ -17,27 +18,9 @@ export function LoginForm() {
 
   return (
     <div className="auth-card glass">
-      {/* Animated monogram mark */}
-      <div className="auth-mark" aria-hidden>
-        <svg viewBox="-50 -50 100 100">
-          <g className="auth-mark-ring">
-            <circle r="44" fill="none" stroke="var(--accent)" strokeWidth="0.6" opacity="0.35" />
-            <circle r="44" fill="none" stroke="var(--accent)" strokeWidth="0.6" opacity="0.7" strokeDasharray="4 6" />
-          </g>
-          <g className="auth-mark-ring-r">
-            <circle r="34" fill="none" stroke="var(--accent-2)" strokeWidth="0.5" opacity="0.35" strokeDasharray="2 4" />
-          </g>
-          <circle r="5" fill="var(--accent)" />
-          <circle r="12" fill="none" stroke="var(--accent)" strokeWidth="0.8" opacity="0.6" />
-          <text
-            x="0" y="3" textAnchor="middle"
-            fontFamily="'JetBrains Mono'" fontSize="8" letterSpacing="1"
-            fill="var(--bg)"
-            fontWeight="600"
-          >
-            JDL
-          </text>
-        </svg>
+      {/* Brand mark — aperture */}
+      <div className="auth-mark" aria-hidden style={{ color: "var(--accent)" }}>
+        <Logo size={64} />
       </div>
 
       <div className="auth-eyebrow">
