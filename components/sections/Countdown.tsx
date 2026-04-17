@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useT } from "@/lib/i18n/useT";
 
 const TARGET = new Date("2027-01-01T00:00:00+01:00").getTime();
 
@@ -10,6 +11,7 @@ function pad(n: number, w = 2) {
 
 export function Countdown() {
   const [t, setT] = useState({ D: "—", H: "—", M: "—", S: "—" });
+  const tr = useT();
 
   useEffect(() => {
     function tick() {
@@ -31,7 +33,7 @@ export function Countdown() {
     <div className="countdown" data-reveal>
       <div className="cd-head">
         <div>
-          <div className="label" style={{ marginBottom: 8 }}>◉ The deadline</div>
+          <div className="label" style={{ marginBottom: 8 }}>{tr("cd.label")}</div>
           <div
             style={{
               fontFamily: "'Inter'",
@@ -42,36 +44,34 @@ export function Countdown() {
               maxWidth: "60ch",
             }}
           >
-            Salderingsregeling ends{" "}
+            {tr("cd.title")}{" "}
             <em style={{ color: "var(--accent)", fontStyle: "italic" }}>
-              January 1, 2027
+              {tr("cd.date")}
             </em>{" "}
-            — and the Dutch energy map changes overnight.
+            {tr("cd.sub")}
           </div>
         </div>
-        <div className="cd-pulse">Live counter</div>
+        <div className="cd-pulse">{tr("cd.live")}</div>
       </div>
       <div className="cd-grid">
         <div className="cd-cell">
           <div className="num"><em>{t.D}</em></div>
-          <div className="unit">Days</div>
+          <div className="unit">{tr("cd.days")}</div>
         </div>
         <div className="cd-cell">
           <div className="num">{t.H}</div>
-          <div className="unit">Hours</div>
+          <div className="unit">{tr("cd.hours")}</div>
         </div>
         <div className="cd-cell">
           <div className="num">{t.M}</div>
-          <div className="unit">Minutes</div>
+          <div className="unit">{tr("cd.minutes")}</div>
         </div>
         <div className="cd-cell">
           <div className="num">{t.S}</div>
-          <div className="unit">Seconds</div>
+          <div className="unit">{tr("cd.seconds")}</div>
         </div>
       </div>
-      <div className="cd-foot">
-        — Ticking live from your browser · <b>target 2027-01-01 00:00 CET</b> · this is the window we're building in.
-      </div>
+      <div className="cd-foot">{tr("cd.foot")}</div>
     </div>
   );
 }

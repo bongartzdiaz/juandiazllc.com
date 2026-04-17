@@ -1,14 +1,24 @@
+"use client";
+
 import { Countdown } from "./Countdown";
+import { useT } from "@/lib/i18n/useT";
 
 export function Story() {
+  const t = useT();
   return (
     <section className="story" id="story">
       <div data-reveal>
-        <div className="label" style={{ marginBottom: 40 }}>◉ 00 — Story</div>
+        <div className="label" style={{ marginBottom: 40 }}>{t("story.label")}</div>
         <h2 className="story-lead">
-          <span className="q">&ldquo;</span>Most businesses don't have revenue
+          <span className="q">&ldquo;</span>{t("story.lead.a")}
           <br />
-          problems. They have <em>blueprint</em> problems.
+          {t("story.lead.b").split("blueprint").map((part, i, arr) =>
+            i < arr.length - 1 ? (
+              <span key={i}>{part}<em>blueprint</em></span>
+            ) : (
+              <span key={i}>{part}</span>
+            )
+          )}
           <span className="q" style={{ marginLeft: ".1em", marginRight: 0 }}>
             &rdquo;
           </span>

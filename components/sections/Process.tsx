@@ -1,29 +1,37 @@
-const STEPS = [
-  { n: "01", name: "Survey", title: <>Walk the <em>site.</em></>, body: "See what's actually going on before touching anything. Find the leaks, the workarounds, the tribal knowledge. Every real plan starts here." },
-  { n: "02", name: "Blueprint", title: <>Draw the <em>plan.</em></>, body: "Sequence the moves. Every phase has a number attached. No vague \"strategy deck\" — a build plan a contractor could read." },
-  { n: "03", name: "Build", title: <>Ship the <em>systems.</em></>, body: "Dashboards, automations, products, whole engines. Built to run at 3am on bad wifi, not just in the demo." },
-  { n: "04", name: "Commission", title: <>Stress-<em>test.</em></>, body: "Verify every number. Run the edges. Nothing gets called \"live\" until the system is honest under load." },
-  { n: "05", name: "Operate", title: <>Stay in the <em>control room.</em></>, body: "Monitor, tune, improve weekly. A revenue engine isn't a project — it's a living system. I stick around." },
-];
+"use client";
+
+import { useT } from "@/lib/i18n/useT";
 
 export function Process() {
+  const t = useT();
+  const steps = [1, 2, 3, 4, 5].map((i) => ({
+    n: `0${i}`,
+    name: t(`process.${i}.name`),
+    titleA: t(`process.${i}.title.a`),
+    titleB: t(`process.${i}.title.b`),
+    body: t(`process.${i}.body`),
+  }));
+
   return (
     <section className="process" id="process">
       <div className="proc-inner">
         <div className="sec-head" data-reveal style={{ marginBottom: 60 }}>
           <div>
-            <div className="label">◉ 02 — How I work</div>
-            <h2>Construction-trained.<br />Every build in <em>five phases.</em></h2>
+            <div className="label">{t("process.label")}</div>
+            <h2>
+              {t("process.title.a")}<br />
+              {t("process.title.b")} <em>{t("process.title.c")}</em>
+            </h2>
           </div>
-          <p>The same discipline that keeps a building on time and on budget is the one I apply to your revenue engine. No phase skipped, no number unverified.</p>
+          <p>{t("process.sub")}</p>
         </div>
 
         <div className="proc-grid" data-reveal>
-          {STEPS.map((s) => (
+          {steps.map((s) => (
             <div key={s.n} className="proc-step">
               <div>
                 <div className="n"><em>{s.n}</em> / {s.name}</div>
-                <h5>{s.title}</h5>
+                <h5>{s.titleA} <em>{s.titleB}</em></h5>
                 <p>{s.body}</p>
               </div>
               <div className="dot" />

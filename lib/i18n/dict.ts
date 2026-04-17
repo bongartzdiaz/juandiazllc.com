@@ -79,6 +79,66 @@ const en: Dict = {
   // Footer / generic
   "footer.version": "v1.0",
   "lang.label": "Lang",
+
+  // Story
+  "story.label": "◉ 00 — Story",
+  "story.lead.a": "Most businesses don't have revenue",
+  "story.lead.b": "problems. They have blueprint problems.",
+
+  // Countdown
+  "cd.label": "◉ The deadline",
+  "cd.title": "Salderingsregeling ends",
+  "cd.date": "January 1, 2027",
+  "cd.sub": "— and the Dutch energy map changes overnight.",
+  "cd.live": "Live counter",
+  "cd.days": "Days",
+  "cd.hours": "Hours",
+  "cd.minutes": "Minutes",
+  "cd.seconds": "Seconds",
+  "cd.foot": "— Ticking live from your browser · target 2027-01-01 00:00 CET · this is the window we're building in.",
+
+  // Sectors
+  "sectors.label": "◉ 01 — Where I work",
+  "sectors.title.a": "Every sector with",
+  "sectors.title.b": "operators",
+  "sectors.title.c": "and a P&L.",
+  "sectors.sub": "Different industries, same leaks. I focus where the operational complexity is highest and the software is weakest — that's where the revenue is hiding.",
+  "sectors.e.title.a": "Energy &",
+  "sectors.e.title.b": "solar",
+  "sectors.e.body": "Solar portfolios, installers, households, grid operators. Post-salderingsregeling software that actually earns its keep.",
+  "sectors.re.title.a": "Real",
+  "sectors.re.title.b": "estate",
+  "sectors.re.body": "Portfolio dashboards, retrofit planning, ESG reporting, tenant ops. Numbers the asset manager can actually trust.",
+  "sectors.h.title.a": "Hospitality &",
+  "sectors.h.title.b": "revenue",
+  "sectors.h.body": "Channel intelligence, revenue ops, staff tooling, guest data. Turn the gut-feel pricing into an honest instrument.",
+  "sectors.adj.title.a": "Anywhere",
+  "sectors.adj.title.b": "else",
+  "sectors.adj.body": "Logistics, retail, field services, frontier industries. If it has operators and bad software, the playbook applies.",
+
+  // Process
+  "process.label": "◉ 02 — How I work",
+  "process.title.a": "Construction-trained.",
+  "process.title.b": "Every build in",
+  "process.title.c": "five phases.",
+  "process.sub": "The same discipline that keeps a building on time and on budget is the one I apply to your revenue engine. No phase skipped, no number unverified.",
+  "process.1.name": "Survey", "process.1.title.a": "Walk the", "process.1.title.b": "site.", "process.1.body": "See what's actually going on before touching anything. Find the leaks, the workarounds, the tribal knowledge. Every real plan starts here.",
+  "process.2.name": "Blueprint", "process.2.title.a": "Draw the", "process.2.title.b": "plan.", "process.2.body": "Sequence the moves. Every phase has a number attached. No vague \"strategy deck\" — a build plan a contractor could read.",
+  "process.3.name": "Build", "process.3.title.a": "Ship the", "process.3.title.b": "systems.", "process.3.body": "Dashboards, automations, products, whole engines. Built to run at 3am on bad wifi, not just in the demo.",
+  "process.4.name": "Commission", "process.4.title.a": "Stress-", "process.4.title.b": "test.", "process.4.body": "Verify every number. Run the edges. Nothing gets called \"live\" until the system is honest under load.",
+  "process.5.name": "Operate", "process.5.title.a": "Stay in the", "process.5.title.b": "control room.", "process.5.body": "Monitor, tune, improve weekly. A revenue engine isn't a project — it's a living system. I stick around.",
+
+  // Ventures section head
+  "ventures.label": "◉ 03 — Ventures",
+  "ventures.title.a": "The playbook,",
+  "ventures.title.b": "in motion.",
+  "ventures.sub": "Live products under the holding — each one the five-phase playbook applied to a real sector. Proof, not pitch. Visit any of them.",
+
+  // Signals section head
+  "signals.label": "◉ 04 — Signals",
+  "signals.title.a": "Field notes,",
+  "signals.title.b": "build logs.",
+  "signals.sub": "Short essays on designing operator tools, shipping dashboards that survive real environments, and running small studios at speed.",
 };
 
 const nl: Dict = {
@@ -136,6 +196,60 @@ const nl: Dict = {
 
   "footer.version": "v1.0",
   "lang.label": "Taal",
+
+  "story.label": "◉ 00 — Verhaal",
+  "story.lead.a": "De meeste bedrijven hebben geen omzetprobleem.",
+  "story.lead.b": "Ze hebben een blueprint-probleem.",
+
+  "cd.label": "◉ De deadline",
+  "cd.title": "Salderingsregeling eindigt",
+  "cd.date": "1 januari 2027",
+  "cd.sub": "— en de Nederlandse energiekaart verandert van de ene op de andere dag.",
+  "cd.live": "Live teller",
+  "cd.days": "Dagen",
+  "cd.hours": "Uren",
+  "cd.minutes": "Minuten",
+  "cd.seconds": "Seconden",
+  "cd.foot": "— Live vanaf je browser · doel 2027-01-01 00:00 CET · dit is het venster waarin we bouwen.",
+
+  "sectors.label": "◉ 01 — Waar ik werk",
+  "sectors.title.a": "Elke sector met",
+  "sectors.title.b": "operators",
+  "sectors.title.c": "en een P&L.",
+  "sectors.sub": "Verschillende sectoren, dezelfde lekken. Ik richt me waar de operationele complexiteit het grootst is en de software het zwakst — daar verstopt zich de omzet.",
+  "sectors.e.title.a": "Energie &",
+  "sectors.e.title.b": "zon",
+  "sectors.e.body": "Zonnepanelenportfolio's, installateurs, huishoudens, netbeheerders. Post-salderingsregeling software die zich echt terugverdient.",
+  "sectors.re.title.a": "Vast-",
+  "sectors.re.title.b": "goed",
+  "sectors.re.body": "Portfolio-dashboards, verduurzamingsplanning, ESG-rapportage, huurdersoperaties. Cijfers waar de assetmanager op kan bouwen.",
+  "sectors.h.title.a": "Hospitality &",
+  "sectors.h.title.b": "omzet",
+  "sectors.h.body": "Channel-intelligence, revenue ops, personeelstooling, gastendata. Van onderbuik-prijzen naar een eerlijk instrument.",
+  "sectors.adj.title.a": "Ergens",
+  "sectors.adj.title.b": "anders",
+  "sectors.adj.body": "Logistiek, retail, field services, frontier-industrieën. Als er operators en slechte software zijn, werkt de aanpak.",
+
+  "process.label": "◉ 02 — Hoe ik werk",
+  "process.title.a": "Geschoold in de bouw.",
+  "process.title.b": "Elke build in",
+  "process.title.c": "vijf fases.",
+  "process.sub": "Dezelfde discipline die een gebouw op tijd en binnen budget houdt, pas ik toe op jouw revenue engine. Geen fase overgeslagen, geen getal onverifieerd.",
+  "process.1.name": "Survey", "process.1.title.a": "Loop over de", "process.1.title.b": "site.", "process.1.body": "Zie wat er echt gebeurt voordat je iets aanraakt. Vind de lekken, de workarounds, de stille kennis. Elk echt plan begint hier.",
+  "process.2.name": "Blueprint", "process.2.title.a": "Teken het", "process.2.title.b": "plan.", "process.2.body": "Volgorde de acties. Elke fase heeft een getal. Geen vage \"strategie-deck\" — een bouwplan dat een aannemer kan lezen.",
+  "process.3.name": "Build", "process.3.title.a": "Lever de", "process.3.title.b": "systemen.", "process.3.body": "Dashboards, automatiseringen, producten, hele motoren. Gebouwd om om 3 uur 's nachts op slechte wifi te werken — niet alleen in de demo.",
+  "process.4.name": "Commission", "process.4.title.a": "Stress-", "process.4.title.b": "test.", "process.4.body": "Verifieer elk getal. Rek de randen op. Niets heet \"live\" totdat het systeem eerlijk is onder druk.",
+  "process.5.name": "Operate", "process.5.title.a": "Blijf in de", "process.5.title.b": "control room.", "process.5.body": "Monitoren, afstellen, wekelijks verbeteren. Een revenue engine is geen project — het is een levend systeem. Ik blijf erbij.",
+
+  "ventures.label": "◉ 03 — Ventures",
+  "ventures.title.a": "Het draaiboek,",
+  "ventures.title.b": "in beweging.",
+  "ventures.sub": "Live producten onder de holding — elk een toepassing van het vijf-fasen draaiboek op een echte sector. Bewijs, geen pitch. Bezoek ze gerust.",
+
+  "signals.label": "◉ 04 — Signalen",
+  "signals.title.a": "Veldnotities,",
+  "signals.title.b": "build-logs.",
+  "signals.sub": "Korte essays over het ontwerpen van operatortools, dashboards die echte omstandigheden overleven en kleine studio's op snelheid.",
 };
 
 const de: Dict = {
@@ -193,6 +307,60 @@ const de: Dict = {
 
   "footer.version": "v1.0",
   "lang.label": "Sprache",
+
+  "story.label": "◉ 00 — Story",
+  "story.lead.a": "Die meisten Unternehmen haben kein Umsatzproblem.",
+  "story.lead.b": "Sie haben ein Blueprint-Problem.",
+
+  "cd.label": "◉ Die Deadline",
+  "cd.title": "Salderingsregeling endet",
+  "cd.date": "1. Januar 2027",
+  "cd.sub": "— und die niederländische Energielandschaft ändert sich über Nacht.",
+  "cd.live": "Live-Zähler",
+  "cd.days": "Tage",
+  "cd.hours": "Stunden",
+  "cd.minutes": "Minuten",
+  "cd.seconds": "Sekunden",
+  "cd.foot": "— Live aus Ihrem Browser · Ziel 2027-01-01 00:00 CET · das ist das Fenster, in dem wir bauen.",
+
+  "sectors.label": "◉ 01 — Wo ich arbeite",
+  "sectors.title.a": "Jede Branche mit",
+  "sectors.title.b": "Operatoren",
+  "sectors.title.c": "und einer GuV.",
+  "sectors.sub": "Unterschiedliche Branchen, dieselben Lecks. Ich konzentriere mich dort, wo die operative Komplexität am höchsten und die Software am schwächsten ist — da versteckt sich der Umsatz.",
+  "sectors.e.title.a": "Energie &",
+  "sectors.e.title.b": "Solar",
+  "sectors.e.body": "Solar-Portfolios, Installateure, Haushalte, Netzbetreiber. Post-Salderingsregeling-Software, die sich wirklich rechnet.",
+  "sectors.re.title.a": "Immo-",
+  "sectors.re.title.b": "bilien",
+  "sectors.re.body": "Portfolio-Dashboards, Sanierungsplanung, ESG-Reporting, Mieter-Operations. Zahlen, denen der Asset-Manager wirklich vertrauen kann.",
+  "sectors.h.title.a": "Hospitality &",
+  "sectors.h.title.b": "Umsatz",
+  "sectors.h.body": "Channel-Intelligence, Revenue Operations, Personal-Tooling, Gästedaten. Vom Bauchgefühl-Preis zum ehrlichen Instrument.",
+  "sectors.adj.title.a": "Überall",
+  "sectors.adj.title.b": "sonst",
+  "sectors.adj.body": "Logistik, Retail, Field Services, Frontier-Branchen. Wenn es Operatoren und schlechte Software gibt, passt das Playbook.",
+
+  "process.label": "◉ 02 — Wie ich arbeite",
+  "process.title.a": "Im Bauwesen ausgebildet.",
+  "process.title.b": "Jeder Build in",
+  "process.title.c": "fünf Phasen.",
+  "process.sub": "Dieselbe Disziplin, die einen Bau termin- und budgettreu hält, wende ich auf Ihre Revenue-Engine an. Keine Phase übersprungen, keine Zahl ungeprüft.",
+  "process.1.name": "Survey", "process.1.title.a": "Die Baustelle", "process.1.title.b": "begehen.", "process.1.body": "Sehen, was wirklich passiert, bevor Sie etwas anfassen. Die Lecks, die Workarounds, das stille Wissen finden. Jeder echte Plan beginnt hier.",
+  "process.2.name": "Blueprint", "process.2.title.a": "Den Plan", "process.2.title.b": "zeichnen.", "process.2.body": "Die Schritte sequenzieren. Jede Phase mit einer Zahl versehen. Kein vages \"Strategie-Deck\" — ein Bauplan, den ein Bauleiter lesen kann.",
+  "process.3.name": "Build", "process.3.title.a": "Die Systeme", "process.3.title.b": "ausliefern.", "process.3.body": "Dashboards, Automatisierungen, Produkte, ganze Engines. Gebaut, um um 3 Uhr morgens bei schlechtem WLAN zu laufen — nicht nur in der Demo.",
+  "process.4.name": "Commission", "process.4.title.a": "Stress-", "process.4.title.b": "test.", "process.4.body": "Jede Zahl verifizieren. Die Ränder austesten. Nichts heißt \"live\", bis das System unter Last ehrlich bleibt.",
+  "process.5.name": "Operate", "process.5.title.a": "Im Kontroll-", "process.5.title.b": "raum bleiben.", "process.5.body": "Überwachen, justieren, wöchentlich verbessern. Eine Revenue-Engine ist kein Projekt — sie ist ein lebendes System. Ich bleibe dabei.",
+
+  "ventures.label": "◉ 03 — Ventures",
+  "ventures.title.a": "Das Playbook,",
+  "ventures.title.b": "in Aktion.",
+  "ventures.sub": "Live-Produkte unter der Holding — jedes davon das Fünf-Phasen-Playbook angewendet auf eine echte Branche. Beweis, kein Pitch. Besuchen Sie sie gerne.",
+
+  "signals.label": "◉ 04 — Signale",
+  "signals.title.a": "Feldnotizen,",
+  "signals.title.b": "Build-Logs.",
+  "signals.sub": "Kurze Essays zum Design von Operator-Tools, zum Versand von Dashboards, die echte Umgebungen überleben, und zum Betrieb kleiner Studios im Tempo.",
 };
 
 const es: Dict = {
@@ -250,6 +418,60 @@ const es: Dict = {
 
   "footer.version": "v1.0",
   "lang.label": "Idioma",
+
+  "story.label": "◉ 00 — Historia",
+  "story.lead.a": "La mayoría de los negocios no tienen un problema de ingresos.",
+  "story.lead.b": "Tienen un problema de blueprint.",
+
+  "cd.label": "◉ La fecha límite",
+  "cd.title": "La salderingsregeling termina",
+  "cd.date": "1 de enero de 2027",
+  "cd.sub": "— y el mapa energético holandés cambia de la noche a la mañana.",
+  "cd.live": "Contador en vivo",
+  "cd.days": "Días",
+  "cd.hours": "Horas",
+  "cd.minutes": "Minutos",
+  "cd.seconds": "Segundos",
+  "cd.foot": "— En vivo desde tu navegador · objetivo 2027-01-01 00:00 CET · esta es la ventana en la que construimos.",
+
+  "sectors.label": "◉ 01 — Dónde trabajo",
+  "sectors.title.a": "Cada sector con",
+  "sectors.title.b": "operadores",
+  "sectors.title.c": "y una cuenta de resultados.",
+  "sectors.sub": "Diferentes industrias, las mismas fugas. Me enfoco donde la complejidad operativa es mayor y el software es más débil — ahí se esconde el ingreso.",
+  "sectors.e.title.a": "Energía &",
+  "sectors.e.title.b": "solar",
+  "sectors.e.body": "Portfolios solares, instaladores, hogares, operadores de red. Software post-salderingsregeling que realmente vale lo que cuesta.",
+  "sectors.re.title.a": "Inmo-",
+  "sectors.re.title.b": "biliario",
+  "sectors.re.body": "Dashboards de portfolio, planificación de rehabilitación, reporting ESG, operaciones con inquilinos. Números en los que el asset manager realmente puede confiar.",
+  "sectors.h.title.a": "Hostelería &",
+  "sectors.h.title.b": "ingresos",
+  "sectors.h.body": "Channel intelligence, revenue ops, herramientas para el equipo, datos de clientes. Del precio por intuición al instrumento honesto.",
+  "sectors.adj.title.a": "Cualquier",
+  "sectors.adj.title.b": "otro sitio",
+  "sectors.adj.body": "Logística, retail, field services, industrias frontier. Si hay operadores y mal software, el método encaja.",
+
+  "process.label": "◉ 02 — Cómo trabajo",
+  "process.title.a": "Formado en construcción.",
+  "process.title.b": "Cada build en",
+  "process.title.c": "cinco fases.",
+  "process.sub": "La misma disciplina que mantiene un edificio dentro del plazo y del presupuesto es la que aplico a tu motor de ingresos. Ninguna fase omitida, ningún número sin verificar.",
+  "process.1.name": "Survey", "process.1.title.a": "Camina la", "process.1.title.b": "obra.", "process.1.body": "Ver lo que realmente está pasando antes de tocar nada. Encontrar las fugas, los parches, el conocimiento tribal. Todo plan real empieza aquí.",
+  "process.2.name": "Blueprint", "process.2.title.a": "Dibuja el", "process.2.title.b": "plan.", "process.2.body": "Secuenciar los movimientos. Cada fase con un número asignado. Ningún vago \"deck estratégico\" — un plan que un contratista pueda leer.",
+  "process.3.name": "Build", "process.3.title.a": "Entrega los", "process.3.title.b": "sistemas.", "process.3.body": "Dashboards, automatizaciones, productos, motores completos. Construidos para funcionar a las 3 de la mañana con mala wifi — no sólo en la demo.",
+  "process.4.name": "Commission", "process.4.title.a": "Prueba de", "process.4.title.b": "estrés.", "process.4.body": "Verificar cada número. Empujar los límites. Nada es \"live\" hasta que el sistema es honesto bajo carga.",
+  "process.5.name": "Operate", "process.5.title.a": "Quédate en la", "process.5.title.b": "sala de control.", "process.5.body": "Monitorizar, afinar, mejorar cada semana. Un motor de ingresos no es un proyecto — es un sistema vivo. Yo me quedo.",
+
+  "ventures.label": "◉ 03 — Proyectos",
+  "ventures.title.a": "El método,",
+  "ventures.title.b": "en marcha.",
+  "ventures.sub": "Productos en vivo bajo el holding — cada uno el método de cinco fases aplicado a un sector real. Prueba, no promesa. Visítalos.",
+
+  "signals.label": "◉ 04 — Señales",
+  "signals.title.a": "Notas de campo,",
+  "signals.title.b": "build logs.",
+  "signals.sub": "Ensayos cortos sobre diseñar herramientas para operadores, enviar dashboards que sobreviven a entornos reales y dirigir estudios pequeños a velocidad.",
 };
 
 export const DICT: Record<Locale, Dict> = { en, nl, de, es };

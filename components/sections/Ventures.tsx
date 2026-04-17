@@ -1,3 +1,7 @@
+"use client";
+
+import { useT } from "@/lib/i18n/useT";
+
 const VENTURES = [
   {
     wide: true,
@@ -45,14 +49,15 @@ const VENTURES = [
 ];
 
 export function Ventures() {
+  const t = useT();
   return (
     <section id="ventures">
       <div className="sec-head" data-reveal>
         <div>
-          <div className="label">◉ 03 — Ventures</div>
-          <h2>The playbook,<br /><em>in motion.</em></h2>
+          <div className="label">{t("ventures.label")}</div>
+          <h2>{t("ventures.title.a")}<br /><em>{t("ventures.title.b")}</em></h2>
         </div>
-        <p>Live products under the holding — each one the five-phase playbook applied to a real sector. Proof, not pitch. Visit any of them.</p>
+        <p>{t("ventures.sub")}</p>
       </div>
       <div className="vg">
         {VENTURES.map((v, i) => (
