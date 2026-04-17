@@ -9,14 +9,14 @@ const initial: AuthState = { status: "idle" };
 
 export function LoginForm() {
   const params = useSearchParams();
-  const next = params.get("next") ?? "/app";
+  const next = params.get("next") ?? "/dashboard";
   const error = params.get("error");
   const [state, formAction, pending] = useActionState(signInWithPassword, initial);
   const t = useT();
 
   return (
     <div className="auth-card">
-      <h1>{t("login.title.a")} <em>{t("login.title.b")}</em></h1>
+      <h1>{t("login.title.a")} <em>Philly.</em></h1>
       <p>{t("login.lede")}</p>
 
       <form className="auth-form" action={formAction}>
