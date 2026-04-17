@@ -53,10 +53,11 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <a href="#main" className="skip">Skip to content</a>
         <Overlays />
         <Preloader />
         <Nav />
-        {children}
+        <main id="main">{children}</main>
         <Footer />
         <FloatCta />
         <Hud />

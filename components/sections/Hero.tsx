@@ -4,6 +4,11 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import Link from "next/link";
 
+function prefersReducedMotion() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 const noiseGLSL = `
 vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
 vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
@@ -55,6 +60,13 @@ export function Hero() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    if (prefersReducedMotion()) return; // respect reduced-motion — keep the hero as a still canvas
+
+    let ctx: WebGLRenderingContext | null = null;
+    try {
+      ctx = canvas.getContext("webgl2") as WebGLRenderingContext | null ?? canvas.getContext("webgl");
+    } catch {}
+    if (!ctx) return; // graceful fallback — CSS gradient still provides atmosphere
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -228,8 +240,8 @@ export function Hero() {
   }, []);
 
   return (
-    <header className="hero">
-      <canvas ref={canvasRef} id="gl" />
+    <header className="hero" aria-label="Hero">
+      <canvas ref={canvasRef} id="gl" aria-hidden="true" />
       <div className="hero-overlay">
         <div className="hero-tag">
           <span className="chip">◉ Available · Amsterdam ↔ Philly</span>

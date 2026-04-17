@@ -2,9 +2,9 @@ import Link from "next/link";
 
 export function Nav() {
   return (
-    <nav className="top">
-      <Link href="/" className="brand">
-        <span className="dot" />
+    <nav className="top" aria-label="Primary">
+      <Link href="/" className="brand" aria-label="Juan Diaz LLC — home">
+        <span className="dot" aria-hidden="true" />
         <span>Juan Diaz LLC</span>
       </Link>
       <div className="nav-right">
