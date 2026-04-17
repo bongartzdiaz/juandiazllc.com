@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import * as THREE from "three";
 import Link from "next/link";
+import { useT } from "@/lib/i18n/useT";
 
 function prefersReducedMotion() {
   if (typeof window === "undefined") return false;
@@ -56,11 +56,12 @@ float snoise(vec3 v){
 
 export function Hero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const t = useT();
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    if (prefersReducedMotion()) return; // respect reduced-motion — keep the hero as a still canvas
+    if (prefersReducedMotion()) return; // respect reduced-motion
 
     let ctx: WebGLRenderingContext | null = null;
     try {
@@ -68,7 +69,13 @@ export function Hero() {
     } catch {}
     if (!ctx) return; // graceful fallback — CSS gradient still provides atmosphere
 
-    const renderer = new THREE.WebGLRenderer({
+    let disposed = false;
+    let cleanup: (() => void) | null = null;
+
+    // Dynamically import three.js so it doesn't block initial JS bundle
+    import("three").then((THREE) => {
+      if (disposed) return;
+      const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
       alpha: true,
@@ -224,18 +231,25 @@ export function Hero() {
     }
     loop();
 
+      cleanup = () => {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("resize", resize);
+        window.removeEventListener("mousemove", onMouse);
+        window.removeEventListener("scroll", onScroll);
+        orbGeom.dispose();
+        orbMat.dispose();
+        wireGeom.dispose();
+        wireMat.dispose();
+        pGeom.dispose();
+        pMat.dispose();
+        renderer.dispose();
+      };
+      if (disposed) cleanup();
+    });
+
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", onMouse);
-      window.removeEventListener("scroll", onScroll);
-      orbGeom.dispose();
-      orbMat.dispose();
-      wireGeom.dispose();
-      wireMat.dispose();
-      pGeom.dispose();
-      pMat.dispose();
-      renderer.dispose();
+      disposed = true;
+      cleanup?.();
     };
   }, []);
 
@@ -244,31 +258,31 @@ export function Hero() {
       <canvas ref={canvasRef} id="gl" aria-hidden="true" />
       <div className="hero-overlay">
         <div className="hero-tag">
-          <span className="chip">◉ Available · Amsterdam ↔ Philly</span>
-          <span className="chip">Energy · Real Estate · Hospitality</span>
+          <span className="chip">{t("hero.chip.status")}</span>
+          <span className="chip">{t("hero.chip.sectors")}</span>
         </div>
         <h1 className="hero-title">
-          <span className="line"><span>I build the systems</span></span>
-          <span className="line"><span>that make operators</span></span>
-          <span className="line"><span><em>more money.</em></span></span>
+          <span className="line"><span>{t("hero.title.1")}</span></span>
+          <span className="line"><span>{t("hero.title.2")}</span></span>
+          <span className="line"><span><em>{t("hero.title.3")}</em></span></span>
         </h1>
         <div className="hero-foot">
           <div style={{ maxWidth: 600 }}>
             <p className="hero-desc">
-              <b>Juan Diaz LLC</b> is the holding I use to ship revenue engines for operators in <b>energy, real estate, hospitality</b> and adjacent industries — as my own products, or as a partner for yours. Construction-trained. Operator-built. One founder, five phases, zero fluff.
+              <b>Juan Diaz LLC</b> {t("hero.desc")}
             </p>
             <div className="hero-ctas">
               <Link className="btn primary btn-mag" href="/contact">
-                Book a blueprint call <span className="arr">→</span>
+                {t("hero.cta.primary")} <span className="arr">→</span>
               </Link>
               <Link className="btn ghost" href="/work">
-                See the work <span className="arr">→</span>
+                {t("hero.cta.secondary")} <span className="arr">→</span>
               </Link>
             </div>
           </div>
           <div className="scroll-hint">
             <i />
-            <span>Scroll</span>
+            <span>{t("hero.scroll")}</span>
           </div>
         </div>
       </div>

@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
-import { signInWithMagicLink, type AuthState } from "@/app/actions/auth";
+import { signInWithPassword, type AuthState } from "@/app/actions/auth";
+import { useT } from "@/lib/i18n/useT";
 
 const initial: AuthState = { status: "idle" };
 
@@ -10,18 +11,16 @@ export function LoginForm() {
   const params = useSearchParams();
   const next = params.get("next") ?? "/app";
   const error = params.get("error");
-  const [state, formAction, pending] = useActionState(signInWithMagicLink, initial);
+  const [state, formAction, pending] = useActionState(signInWithPassword, initial);
+  const t = useT();
 
   return (
     <div className="auth-card">
-      <h1>Step into the <em>control room.</em></h1>
-      <p>
-        One email, one magic link. No passwords to remember, no apps to install. You&apos;ll be in within
-        a minute.
-      </p>
+      <h1>{t("login.title.a")} <em>{t("login.title.b")}</em></h1>
+      <p>{t("login.lede")}</p>
 
       <form className="auth-form" action={formAction}>
-        <label htmlFor="email">Email</label>
+        <label htmlFor="email">{t("login.email")}</label>
         <input
           id="email"
           name="email"
@@ -29,27 +28,34 @@ export function LoginForm() {
           placeholder="you@domain.com"
           required
           autoComplete="email"
-          disabled={state.status === "ok"}
         />
+
+        <label htmlFor="password" style={{ marginTop: 6 }}>{t("login.password")}</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="••••••••"
+          required
+          autoComplete="current-password"
+        />
+
         <input type="hidden" name="next" value={next} />
-        <button type="submit" disabled={pending || state.status === "ok"}>
-          {state.status === "ok" ? "✓ Link sent" : pending ? "Sending..." : "Send magic link"}
+
+        <button type="submit" disabled={pending}>
+          {pending ? t("login.signing_in") : t("login.submit")} <span className="arr">→</span>
         </button>
 
-        {state.status !== "idle" && state.message && (
-          <div className={`auth-msg ${state.status}`}>
-            {state.message}
-          </div>
+        {state.status === "err" && state.message && (
+          <div className="auth-msg err">{state.message}</div>
         )}
         {error && state.status === "idle" && (
-          <div className="auth-msg err">
-            Couldn&apos;t complete the sign-in. Request a new link below.
-          </div>
+          <div className="auth-msg err">{t("login.sso_error")}</div>
         )}
       </form>
 
       <div className="auth-alt">
-        Trouble signing in? <a href="mailto:juan@juandiazllc.com">juan@juandiazllc.com</a>
+        {t("login.footer.a")} <a href="mailto:juan@juandiazllc.com">juan@juandiazllc.com</a>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 const TARGET = new Date("2027-01-01T00:00:00+01:00").getTime();
 
@@ -105,6 +106,9 @@ export function Hud() {
         <span>
           v<b>1.0</b>
         </span>
+        <span>
+          <LanguageSwitcher />
+        </span>
         <span
           className={`hud-audio${audioOn ? " on-state" : ""}`}
           onClick={toggleAudio}
@@ -115,6 +119,15 @@ export function Hud() {
           }}
         >
           {audioOn ? "● Sound on" : "◐ Sound off"}
+        </span>
+        <span
+          className="hud-audio"
+          onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, ctrlKey: true }))}
+          role="button"
+          tabIndex={0}
+          title="Command palette (⌘K)"
+        >
+          ⌘K
         </span>
       </div>
     </div>

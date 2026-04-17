@@ -7,6 +7,9 @@ import { Footer } from "@/components/Footer";
 import { FloatCta } from "@/components/FloatCta";
 import { Hud } from "@/components/Hud";
 import { GlobalEffects } from "@/components/GlobalEffects";
+import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
+import { ScrollProgress } from "@/components/ScrollProgress";
+import { CommandPalette } from "@/components/CommandPalette";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -53,15 +56,19 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <a href="#main" className="skip">Skip to content</a>
-        <Overlays />
-        <Preloader />
-        <Nav />
-        <main id="main">{children}</main>
-        <Footer />
-        <FloatCta />
-        <Hud />
-        <GlobalEffects />
+        <LocaleProvider>
+          <a href="#main" className="skip">Skip to content</a>
+          <ScrollProgress />
+          <Overlays />
+          <Preloader />
+          <Nav />
+          <main id="main">{children}</main>
+          <Footer />
+          <FloatCta />
+          <Hud />
+          <CommandPalette />
+          <GlobalEffects />
+        </LocaleProvider>
       </body>
     </html>
   );

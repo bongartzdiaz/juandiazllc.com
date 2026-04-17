@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { submitLead, type ContactState } from "@/app/actions/contact";
+import { useT } from "@/lib/i18n/useT";
 
 const initial: ContactState = { status: "idle" };
 
@@ -9,31 +10,32 @@ const SECTORS = ["Energy", "Real estate", "Hospitality", "Logistics", "Retail", 
 
 export function ContactForm() {
   const [state, formAction, pending] = useActionState(submitLead, initial);
+  const t = useT();
 
   return (
     <div className="auth-card" style={{ maxWidth: 720, padding: "40px 36px" }}>
-      <h1>Tell me what you&apos;re <em>building.</em></h1>
-      <p>All fields except email + message are optional. Shorter is better. I read every one.</p>
+      <h1>{t("contact.title.a")} <em>{t("contact.title.b")}</em></h1>
+      <p>{t("contact.lede")}</p>
 
       <form className="auth-form" action={formAction}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
-            <label htmlFor="name">Name</label>
-            <input id="name" name="name" type="text" placeholder="Your name" autoComplete="name" />
+            <label htmlFor="name">{t("contact.name")}</label>
+            <input id="name" name="name" type="text" autoComplete="name" />
           </div>
           <div>
-            <label htmlFor="email">Email *</label>
+            <label htmlFor="email">{t("contact.email")} *</label>
             <input id="email" name="email" type="email" placeholder="you@domain.com" required autoComplete="email" />
           </div>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
-            <label htmlFor="company">Company</label>
-            <input id="company" name="company" type="text" placeholder="Your company" autoComplete="organization" />
+            <label htmlFor="company">{t("contact.company")}</label>
+            <input id="company" name="company" type="text" autoComplete="organization" />
           </div>
           <div>
-            <label htmlFor="sector">Sector</label>
+            <label htmlFor="sector">{t("contact.sector")}</label>
             <select
               id="sector"
               name="sector"
@@ -51,7 +53,7 @@ export function ContactForm() {
                 width: "100%",
               }}
             >
-              <option value="" disabled>Pick one</option>
+              <option value="" disabled>{t("contact.sector.pick")}</option>
               {SECTORS.map((s) => (
                 <option key={s} value={s}>{s}</option>
               ))}
@@ -59,12 +61,12 @@ export function ContactForm() {
           </div>
         </div>
 
-        <label htmlFor="message">What are you trying to solve? *</label>
+        <label htmlFor="message">{t("contact.message")} *</label>
         <textarea
           id="message"
           name="message"
           rows={5}
-          placeholder="Two or three sentences is plenty."
+          placeholder={t("contact.message.placeholder")}
           required
           minLength={10}
           style={{
@@ -86,21 +88,19 @@ export function ContactForm() {
 
         <button type="submit" disabled={pending || state.status === "ok"}>
           {state.status === "ok"
-            ? "✓ Sent"
+            ? t("contact.sent")
             : pending
-            ? "Sending..."
-            : "Send it"}
+            ? t("contact.submitting")
+            : t("contact.submit")}
         </button>
 
         {state.status !== "idle" && state.message && (
-          <div className={`auth-msg ${state.status}`}>
-            {state.message}
-          </div>
+          <div className={`auth-msg ${state.status}`}>{state.message}</div>
         )}
       </form>
 
       <div className="auth-alt">
-        Prefer email directly? <a href="mailto:juan@juandiazllc.com">juan@juandiazllc.com</a>
+        {t("contact.alt")} <a href="mailto:juan@juandiazllc.com">juan@juandiazllc.com</a>
       </div>
     </div>
   );

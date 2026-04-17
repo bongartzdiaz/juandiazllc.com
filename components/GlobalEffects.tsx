@@ -62,6 +62,27 @@ export function GlobalEffects() {
       card.addEventListener("mousemove", handler);
     });
 
+    /* 3D tilt on cards */
+    const tiltCards = document.querySelectorAll<HTMLElement>(".v-card, .sec-card");
+    const tiltHandlers = new Map<HTMLElement, { move: (e: MouseEvent) => void; leave: () => void }>();
+    const isCoarse = window.matchMedia("(hover: none)").matches;
+    if (!isCoarse) {
+      tiltCards.forEach((card) => {
+        const move = (e: MouseEvent) => {
+          const r = card.getBoundingClientRect();
+          const nx = (e.clientX - r.left) / r.width - 0.5;
+          const ny = (e.clientY - r.top) / r.height - 0.5;
+          const ry = nx * 6;
+          const rx = -ny * 6;
+          card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
+        };
+        const leave = () => { card.style.transform = ""; };
+        card.addEventListener("mousemove", move);
+        card.addEventListener("mouseleave", leave);
+        tiltHandlers.set(card, { move, leave });
+      });
+    }
+
     /* Magnetic buttons */
     const mags = document.querySelectorAll<HTMLElement>(".btn-mag");
     const magHandlers = new Map<HTMLElement, { move: (e: MouseEvent) => void; leave: () => void }>();
@@ -180,6 +201,13 @@ export function GlobalEffects() {
       cards.forEach((card) => {
         const h = cardHandlers.get(card);
         if (h) card.removeEventListener("mousemove", h);
+      });
+      tiltCards.forEach((card) => {
+        const h = tiltHandlers.get(card);
+        if (h) {
+          card.removeEventListener("mousemove", h.move);
+          card.removeEventListener("mouseleave", h.leave);
+        }
       });
       mags.forEach((b) => {
         const h = magHandlers.get(b);
