@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/layout/Topbar'
 import { Pagination } from '@/components/ui/Pagination'
-import { Shield, Search, Filter, User, Clock, FileText } from 'lucide-react'
+import { Shield, Filter, Clock, FileText } from 'lucide-react'
 import type { AuditLog } from '@/lib/types'
 
 const ACTION_COLORS: Record<string, { bg: string; txt: string }> = {
@@ -13,6 +14,7 @@ const ACTION_COLORS: Record<string, { bg: string; txt: string }> = {
 }
 
 export default function AuditLogPage() {
+  const t = useTranslations('audit')
   const [logs, setLogs] = useState<AuditLog[]>([])
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
@@ -48,7 +50,7 @@ export default function AuditLogPage() {
 
   return (
     <>
-      <Topbar title="Audit Log" sub="Track all changes across your organization" />
+      <Topbar title={t('title')} sub={t('subtitle')} />
 
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Filters */}

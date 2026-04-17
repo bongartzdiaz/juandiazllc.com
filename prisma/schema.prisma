@@ -34,6 +34,24 @@ model Organization {
   grants         Grant[]
   donorProfiles  DonorProfile[]
   volunteers     Volunteer[]
+  mlsFeeds       MlsFeed[]
+  listingAlerts  ListingAlert[]
+  conversations  Conversation[]
+  leadScores       LeadScore[]
+  scoringRules     ScoringRule[]
+  leadRoutingRules LeadRoutingRule[]
+  callLogs         CallLog[]
+  dialerLists      DialerList[]
+  actionPlans      ActionPlan[]
+  transactions     Transaction[]
+  referrals          Referral[]
+  soiCategories      SoiCategory[]
+  cmaReports         CmaReport[]
+  clientPortalAccess ClientPortalAccess[]
+  emailAccounts      EmailAccount[]
+  smsMessages        SmsMessage[]
+  integrations       Integration[]
+  propertyTaxonomy   PropertyTaxonomy?
 }
 
 model User {
@@ -663,6 +681,14 @@ model Property {
   listPriceCents  Int       @default(0)  // original list price (priceCents = current)
   pricePerSqft    Int       @default(0)  // cents
 
+  // DEUS / Cyprus MLS fields
+  listingType   String  @default("sale")    // sale | rent
+  subtype       String  @default("")        // e.g. detached_house, apartment, penthouse, plot, office, ...
+  district      String  @default("")        // paphos | limassol | larnaca | nicosia | famagusta
+  town          String  @default("")        // finer sub-area within district
+  isBankOwned   Boolean @default(false)
+  isResale      Boolean @default(false)
+
   organization Organization @relation(fields: [organizationId], references: [id])
   viewings     Viewing[]
   deals        Deal[]
@@ -672,6 +698,8 @@ model Property {
 
   @@index([organizationId, status])
   @@index([organizationId, mlsNumber])
+  @@index([organizationId, listingType, district])
+  @@index([organizationId, type, subtype])
 }
 
 model Showing {
@@ -999,4 +1027,502 @@ model MarketSnapshot {
 
   @@unique([organizationId, zipCode, year, month])
   @@index([organizationId, zipCode])
+}
+
+// ── Real Estate: MLS/IDX Sync ──
+
+model MlsFeed {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String   // "BRIGHT MLS", "CRMLS", etc.
+  provider       String   @default("rets") // rets, reso_web_api, idx_broker, manual
+  apiUrl         String   @default("")
+  apiKey         String   @default("")
+  lastSyncAt     DateTime?
+  syncInterval   Int      @default(360) // minutes
+  status         String   @default("active") // active, paused, error
+  totalImported  Int      @default(0)
+  errorLog       String   @default("") @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+}
+
+model ListingAlert {
+  id             String   @id @default(cuid())
+  organizationId String
+  contactId      String
+  name           String   // "John's dream home alert"
+  criteria       String   @default("{}") @db.LongText // JSON: { minPrice, maxPrice, beds, baths, zipCodes, types }
+  frequency      String   @default("daily") // instant, daily, weekly
+  channel        String   @default("email") // email, sms, both
+  enabled        Boolean  @default(true)
+  lastSentAt     DateTime?
+  matchCount     Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([contactId])
+}
+
+// ── Inbox / Conversations ──
+
+model Conversation {
+  id             String   @id @default(cuid())
+  organizationId String
+  contactId      String
+  channel        String   @default("email") // email, sms, whatsapp
+  subject        String   @default("")
+  status         String   @default("open") // open, closed, snoozed
+  assignedTo     String?  // userId
+  lastMessageAt  DateTime?
+  unreadCount    Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  messages     Message[]
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, contactId])
+  @@index([organizationId, status])
+  @@index([assignedTo])
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  direction      String   @default("outbound") // inbound, outbound
+  channel        String   @default("email") // email, sms, whatsapp
+  fromAddress    String   @default("")
+  toAddress      String   @default("")
+  subject        String   @default("")
+  body           String   @default("") @db.LongText
+  bodyHtml       String   @default("") @db.LongText
+  status         String   @default("sent") // draft, queued, sent, delivered, failed, received
+  externalId     String   @default("") // provider message ID
+  metadata       String   @default("{}") @db.LongText
+  readAt         DateTime?
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+}
+
+// ── Lead Scoring Engine ──
+
+model LeadScore {
+  id             String   @id @default(cuid())
+  organizationId String
+  contactId      String   @unique
+  score          Int      @default(0) // 0-100
+  grade          String   @default("D") // A, B, C, D, F
+  behaviorScore  Int      @default(0) // engagement-based
+  demographicScore Int    @default(0) // profile completeness
+  lastActivity   DateTime?
+  scoreHistory   String   @default("[]") @db.LongText // JSON array of { date, score, reason }
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, score])
+  @@index([contactId])
+}
+
+model ScoringRule {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  event          String   // page_view, email_open, call_completed, showing_attended, offer_made, etc.
+  points         Int      @default(5)
+  decay          Boolean  @default(false)  // points decay over time
+  decayDays      Int      @default(90)
+  enabled        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+}
+
+// ── Lead Routing / Round-Robin ──
+
+model LeadRoutingRule {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  strategy       String   @default("round_robin") // round_robin, weighted, geographic, score_based
+  criteria       String   @default("{}") @db.LongText // JSON: { leadSource, minScore, maxScore, zipCodes, types }
+  agentPool      String   @default("[]") @db.LongText // JSON array of agent userIds
+  currentIndex   Int      @default(0) // for round-robin
+  enabled        Boolean  @default(true)
+  assignedCount  Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+}
+
+// ── Action Plans (Multi-Channel Branching Sequences) ──
+
+model ActionPlan {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  description    String   @default("") @db.Text
+  triggerEvent   String   @default("manual") // manual, new_lead, stage_change, listing_alert, etc.
+  stepsJson      String   @default("[]") @db.LongText // JSON array of steps
+  status         String   @default("active") // active, paused, archived
+  enrolledCount  Int      @default(0)
+  completedCount Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  enrollments ActionPlanEnrollment[]
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+}
+
+model ActionPlanEnrollment {
+  id           String   @id @default(cuid())
+  planId       String
+  contactId    String
+  currentStep  Int      @default(0)
+  status       String   @default("active") // active, paused, completed, removed
+  startedAt    DateTime @default(now())
+  completedAt  DateTime?
+  nextActionAt DateTime?
+
+  plan ActionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([planId])
+  @@index([contactId])
+}
+
+// ── Transactions & E-Signatures ──
+
+model Transaction {
+  id             String   @id @default(cuid())
+  organizationId String
+  dealId         String?
+  propertyId     String?
+  type           String   @default("purchase") // purchase, sale, lease, rental
+  status         String   @default("pending") // pending, in_progress, completed, cancelled
+  closingDate    DateTime?
+  contractDate   DateTime?
+  escrowNumber   String   @default("")
+  titleCompany   String   @default("")
+  buyerAgentId   String?
+  sellerAgentId  String?
+  buyerContactId String?
+  sellerContactId String?
+  salePrice      Int      @default(0) // cents
+  earnestMoney   Int      @default(0) // cents
+  notes          String   @default("") @db.Text
+  checklistJson  String   @default("[]") @db.LongText // JSON array of checklist items
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  signatures   ESignature[]
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, status])
+  @@index([dealId])
+  @@index([propertyId])
+}
+
+model ESignature {
+  id            String   @id @default(cuid())
+  transactionId String
+  documentName  String
+  signerName    String
+  signerEmail   String
+  status        String   @default("pending") // pending, sent, viewed, signed, declined, expired
+  sentAt        DateTime?
+  viewedAt      DateTime?
+  signedAt      DateTime?
+  externalId    String   @default("") // DocuSign/HelloSign envelope ID
+  provider      String   @default("manual") // manual, docusign, hellosign, pandadoc
+  createdAt     DateTime @default(now())
+
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@index([transactionId])
+}
+
+// ── Power Dialer + Call Tracking ──
+
+model CallLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  agentId        String
+  contactId      String?
+  direction      String   @default("outbound") // inbound, outbound
+  phoneNumber    String   @default("")
+  status         String   @default("completed") // ringing, in_progress, completed, missed, voicemail, failed
+  duration       Int      @default(0) // seconds
+  outcome        String   @default("") // connected, no_answer, busy, voicemail, wrong_number
+  notes          String   @default("") @db.Text
+  recordingUrl   String   @default("")
+  disposition    String   @default("") // follow_up, qualified, not_interested, callback, appointment_set
+  callbackAt     DateTime?
+  startedAt      DateTime @default(now())
+  endedAt        DateTime?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, agentId])
+  @@index([contactId])
+  @@index([organizationId, startedAt])
+}
+
+model DialerList {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  contactIds     String   @default("[]") @db.LongText // JSON array of contact IDs
+  totalContacts  Int      @default(0)
+  dialedCount    Int      @default(0)
+  connectedCount Int      @default(0)
+  status         String   @default("active") // active, paused, completed
+  assignedTo     String?  // agentId
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+}
+
+// ── SOI / Referral Tracking ──
+
+model Referral {
+  id             String   @id @default(cuid())
+  organizationId String
+  referrerId     String   // contact who referred
+  referredId     String   // contact who was referred
+  dealId         String?  // linked deal if any
+  status         String   @default("pending") // pending, contacted, converted, closed, lost
+  commissionPct  Float    @default(0) // referral fee percentage
+  commissionCents Int     @default(0)
+  notes          String   @default("") @db.Text
+  referredAt     DateTime @default(now())
+  convertedAt    DateTime?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([referrerId])
+  @@index([referredId])
+}
+
+model SoiCategory {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String   // A-list, B-list, C-list, Past Client, Vendor, etc.
+  touchFrequency Int      @default(30) // days between touches
+  color          String   @default("#3b82f6")
+  contactCount   Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+}
+
+// ── CMA Report Builder ──
+
+model CmaReport {
+  id             String   @id @default(cuid())
+  organizationId String
+  agentId        String
+  contactId      String?
+  propertyId     String?
+  subjectAddress String   @default("")
+  subjectCity    String   @default("")
+  subjectZip     String   @default("")
+  subjectBeds    Int?
+  subjectBaths   Int?
+  subjectSqft    Int?
+  estimatedValue Int      @default(0) // cents
+  comparablesJson String  @default("[]") @db.LongText // JSON array of comps
+  adjustmentsJson String  @default("{}") @db.LongText // JSON adjustments
+  reportHtml     String   @default("") @db.LongText
+  status         String   @default("draft") // draft, finalized, sent
+  sentAt         DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([agentId])
+  @@index([contactId])
+}
+
+// ── Client Portal ──
+
+model ClientPortalAccess {
+  id             String   @id @default(cuid())
+  organizationId String
+  contactId      String
+  token          String   @unique @default(cuid())
+  permissions    String   @default("{}") @db.LongText // JSON: { viewListings, viewDocuments, viewTimeline, submitFeedback }
+  enabled        Boolean  @default(true)
+  lastLoginAt    DateTime?
+  expiresAt      DateTime?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([contactId])
+  @@index([token])
+}
+
+// ── Email Integration ──
+
+model EmailAccount {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+  provider       String   @default("smtp") // smtp, gmail, outlook
+  email          String
+  displayName    String   @default("")
+  smtpHost       String   @default("")
+  smtpPort       Int      @default(587)
+  imapHost       String   @default("")
+  imapPort       Int      @default(993)
+  username       String   @default("")
+  encryptedPass  String   @default("") @db.Text
+  accessToken    String?  @db.Text
+  refreshToken   String?  @db.Text
+  tokenExpiry    DateTime?
+  syncEnabled    Boolean  @default(true)
+  lastSyncAt     DateTime?
+  status         String   @default("active") // active, error, disconnected
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  emails       Email[]
+
+  @@index([organizationId])
+  @@index([userId])
+}
+
+model Email {
+  id             String   @id @default(cuid())
+  accountId      String
+  contactId      String?
+  messageId      String?  @db.VarChar(512) // RFC Message-ID
+  threadId       String?
+  direction      String   @default("outbound") // inbound, outbound
+  fromAddress    String
+  toAddresses    String   @db.Text // JSON array
+  ccAddresses    String   @default("[]") @db.Text
+  bccAddresses   String   @default("[]") @db.Text
+  subject        String   @default("")
+  bodyHtml       String?  @db.LongText
+  bodyText       String?  @db.LongText
+  status         String   @default("draft") // draft, queued, sent, delivered, bounced, failed
+  openedAt       DateTime?
+  clickedAt      DateTime?
+  bouncedAt      DateTime?
+  sentAt         DateTime?
+  receivedAt     DateTime?
+  createdAt      DateTime @default(now())
+
+  account EmailAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@index([contactId])
+  @@index([threadId])
+  @@index([status])
+}
+
+// ── SMS / WhatsApp ──
+
+model SmsMessage {
+  id             String   @id @default(cuid())
+  organizationId String
+  contactId      String?
+  direction      String   @default("outbound") // inbound, outbound
+  channel        String   @default("sms") // sms, whatsapp
+  fromNumber     String
+  toNumber       String
+  body           String   @db.Text
+  status         String   @default("queued") // queued, sent, delivered, failed, received
+  providerSid    String?  // Twilio SID
+  errorCode      String?
+  errorMessage   String?
+  sentAt         DateTime?
+  deliveredAt    DateTime?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([contactId])
+  @@index([status])
+}
+
+// ── Integration / OAuth ──
+
+model Integration {
+  id             String   @id @default(cuid())
+  organizationId String
+  provider       String   // google, microsoft, slack, stripe, mailchimp, etc.
+  name           String
+  status         String   @default("disconnected") // connected, disconnected, error
+  accessToken    String?  @db.Text
+  refreshToken   String?  @db.Text
+  tokenExpiry    DateTime?
+  scopes         String   @default("[]") @db.Text // JSON array
+  metadata       String   @default("{}") @db.Text // provider-specific config
+  lastSyncAt     DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([organizationId, provider])
+  @@index([organizationId])
+}
+
+/* ---------------- Property Taxonomy (per-organization) ----------------
+   Each org can customize districts, property types, subtypes, and flags.
+   All JSON fields store the same shapes as the Cyprus defaults in
+   src/lib/constants/cyprus-property.ts so the UI can consume either. */
+model PropertyTaxonomy {
+  id             String   @id @default(cuid())
+  organizationId String   @unique
+  // Country context (just metadata for UI — e.g. "Cyprus", "Netherlands")
+  countryLabel   String   @default("Cyprus")
+
+  // All JSON — array<{value,label}> or map<type, array<{value,label}>>
+  districts      String   @default("[]") @db.LongText
+  propertyTypes  String   @default("[]") @db.LongText
+  subtypes       String   @default("{}") @db.LongText // keyed by propertyType value
+  listingTypes   String   @default("[]") @db.LongText
+  flags          String   @default("[]") @db.LongText // array<{key,label}>
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
 }

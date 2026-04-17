@@ -4,16 +4,20 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
   LayoutDashboard, FolderKanban, Users2, BarChart3,
-  FileText, Columns3, FileStack, Settings, CalendarDays, GanttChart,
+  FileText, Columns3, Settings, CalendarDays, GanttChart,
   Leaf, Building2, Hotel, ChevronDown, LogOut, Shield,
   DollarSign, Bell, Zap, FileArchive, Award, Heart,
   Home, BedDouble, Eye, HandCoins, Trophy, DoorOpen, Mail, TrendingUp,
+  Inbox, FileCode, ListChecks, ClipboardList, Target, GitBranch,
+  Phone, UserPlus, Network, BarChart, Globe, PenTool,
+  MessageSquare, Plug, Layers, Sparkles, Webhook,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { useIndustry, INDUSTRY_CONFIGS } from '@/hooks/useIndustry'
 import type { Industry } from '@/hooks/useIndustry'
+import { useTranslations } from 'next-intl'
 
 interface NavItemDef {
   icon: LucideIcon
@@ -35,50 +39,71 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
   const { industry, config, setIndustry } = useIndustry()
   const [showSwitcher, setShowSwitcher] = useState(false)
   const { data: session } = useSession()
+  const t = useTranslations('nav')
+  const tc = useTranslations('common')
 
   const LogoIcon = INDUSTRY_ICONS[industry]
 
   const NAV_PRIMARY: NavItemDef[] = [
-    { icon: LayoutDashboard, label: 'Dashboard', href: '/' },
-    { icon: FolderKanban, label: config.projectsLabel, href: '/projects' },
-    { icon: Users2, label: 'Contacts', href: '/contacts' },
-    { icon: BarChart3, label: industry === 'realestate' ? 'Market' : 'Impact', href: '/impact' },
+    { icon: LayoutDashboard, label: t('dashboard'), href: '/' },
+    { icon: FolderKanban, label: t('projects'), href: '/projects' },
+    { icon: Users2, label: t('contacts'), href: '/contacts' },
+    { icon: BarChart3, label: industry === 'realestate' ? t('market') : t('impact'), href: '/impact' },
   ]
 
   const NAV_TOOLS: NavItemDef[] = [
-    { icon: FileText, label: 'Reports', href: '/reports' },
-    { icon: Columns3, label: industry === 'realestate' ? 'Deals Board' : industry === 'hospitality' ? 'Reservations' : 'Board', href: '/kanban' },
-    { icon: DollarSign, label: 'Deals', href: '/deals' },
-    { icon: CalendarDays, label: 'Calendar', href: '/calendar' },
-    { icon: GanttChart, label: 'Timeline', href: '/timeline' },
-    { icon: FileArchive, label: 'Documents', href: '/documents' },
+    { icon: FileText, label: t('reports'), href: '/reports' },
+    { icon: Columns3, label: industry === 'realestate' ? t('dealsBoard') : industry === 'hospitality' ? t('reservations') : t('board'), href: '/kanban' },
+    { icon: DollarSign, label: t('deals'), href: '/deals' },
+    { icon: CalendarDays, label: t('calendar'), href: '/calendar' },
+    { icon: GanttChart, label: t('timeline'), href: '/timeline' },
+    { icon: FileArchive, label: t('documents'), href: '/documents' },
+    { icon: Inbox, label: t('inbox'), href: '/inbox' },
+    { icon: Mail, label: t('email'), href: '/email' },
+    { icon: MessageSquare, label: t('sms'), href: '/sms' },
+    { icon: FileCode, label: t('templates'), href: '/templates' },
+    { icon: Layers, label: t('pages'), href: '/pages' },
+    { icon: Sparkles, label: t('aiInsights'), href: '/ai', badgeNew: true },
   ]
 
   // Industry-specific nav items
   const NAV_INDUSTRY: NavItemDef[] = industry === 'realestate'
     ? [
-        { icon: Home, label: 'Properties', href: '/properties' },
-        { icon: Eye, label: 'Showings', href: '/showings' },
-        { icon: HandCoins, label: 'Offers', href: '/offers' },
-        { icon: DoorOpen, label: 'Open Houses', href: '/open-houses' },
-        { icon: Trophy, label: 'Commissions', href: '/commissions' },
-        { icon: Mail, label: 'Drip Campaigns', href: '/drip-campaigns' },
-        { icon: TrendingUp, label: 'Market Analytics', href: '/market-analytics' },
+        { icon: Home, label: t('properties'), href: '/properties' },
+        { icon: Eye, label: t('showings'), href: '/showings' },
+        { icon: HandCoins, label: t('offers'), href: '/offers' },
+        { icon: DoorOpen, label: t('openHouses'), href: '/open-houses' },
+        { icon: Trophy, label: t('commissions'), href: '/commissions' },
+        { icon: Mail, label: t('dripCampaigns'), href: '/drip-campaigns' },
+        { icon: TrendingUp, label: t('marketAnalytics'), href: '/market-analytics' },
+        { icon: ClipboardList, label: t('transactions'), href: '/transactions' },
+        { icon: ListChecks, label: t('actionPlans'), href: '/action-plans' },
+        { icon: Target, label: t('leadScores'), href: '/lead-scores' },
+        { icon: GitBranch, label: t('leadRouting'), href: '/lead-routing' },
+        { icon: Phone, label: t('dialer'), href: '/dialer' },
+        { icon: UserPlus, label: t('referrals'), href: '/referrals' },
+        { icon: Network, label: t('soi'), href: '/soi' },
+        { icon: BarChart, label: t('cma'), href: '/cma' },
+        { icon: Globe, label: t('clientPortal'), href: '/client-portal' },
+        { icon: PenTool, label: t('eSignatures'), href: '/e-signatures' },
       ]
     : industry === 'hospitality'
       ? [
-          { icon: BedDouble, label: 'Rooms', href: '/rooms' },
+          { icon: BedDouble, label: t('rooms'), href: '/rooms' },
         ]
       : [
-          { icon: Award, label: 'Grants', href: '/grants' },
-          { icon: Heart, label: 'Volunteers', href: '/volunteers' },
+          { icon: Award, label: t('grants'), href: '/grants' },
+          { icon: HandCoins, label: t('donors'), href: '/philanthropy/donors' },
+          { icon: Heart, label: t('volunteers'), href: '/volunteers' },
         ]
 
   const NAV_SYSTEM: NavItemDef[] = [
-    { icon: Bell, label: 'Notifications', href: '/notifications' },
-    { icon: Zap, label: 'Automations', href: '/automations' },
-    { icon: Shield, label: 'Audit Log', href: '/audit' },
-    { icon: Settings, label: 'Settings', href: '/settings' },
+    { icon: Bell, label: t('notifications'), href: '/notifications' },
+    { icon: Zap, label: t('automations'), href: '/automations' },
+    { icon: Plug, label: t('integrations'), href: '/integrations' },
+    { icon: Webhook, label: t('webhooks'), href: '/settings/webhooks' },
+    { icon: Shield, label: t('auditLog'), href: '/audit' },
+    { icon: Settings, label: t('settings'), href: '/settings' },
   ]
 
   return (
@@ -103,14 +128,17 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
         }}>
           <div style={{
             width: 34, height: 34, borderRadius: 10,
+            // Industry-tinted brandmark: each industry uses its own accent paired
+            // with the universal --accent. Keeps it on-brand without hex literals.
             background: industry === 'realestate'
-              ? 'linear-gradient(135deg, #1a56db 0%, #0D7377 100%)'
+              ? 'linear-gradient(135deg, var(--b) 0%, var(--accent) 100%)'
               : industry === 'hospitality'
-                ? 'linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%)'
-                : 'linear-gradient(135deg, var(--accent) 0%, #059669 100%)',
+                ? 'linear-gradient(135deg, var(--p) 0%, var(--b) 100%)'
+                : 'linear-gradient(135deg, var(--accent) 0%, var(--g) 100%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+            boxShadow: 'var(--shadow-sm)',
           }}>
+            {/* Icon is always white — the gradient is always saturated regardless of theme. */}
             <LogoIcon size={17} color="#fff" strokeWidth={2.5} />
           </div>
           <div style={{ flex: 1 }}>
@@ -181,14 +209,14 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
 
       {/* Nav */}
       <nav style={{ flex: 1, overflowY: 'auto', padding: '10px 10px 14px' }}>
-        <NavLabel>Core</NavLabel>
+        <NavLabel>{t('core')}</NavLabel>
         {NAV_PRIMARY.map(item => (
           <NavItem key={item.href} active={path === item.href || (item.href !== '/' && path.startsWith(item.href))} {...item} onClick={onNavigate} />
         ))}
 
         <div style={{ height: 1, background: 'var(--border)', margin: '8px 10px' }} />
 
-        <NavLabel>Tools</NavLabel>
+        <NavLabel>{t('tools')}</NavLabel>
         {NAV_TOOLS.map(item => (
           <NavItem key={item.href} active={path === item.href || path.startsWith(item.href)} {...item} onClick={onNavigate} />
         ))}
@@ -202,7 +230,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
 
         <div style={{ height: 1, background: 'var(--border)', margin: '8px 10px' }} />
 
-        <NavLabel>System</NavLabel>
+        <NavLabel>{t('system')}</NavLabel>
         {NAV_SYSTEM.map(item => (
           <NavItem key={item.href} active={path === item.href || path.startsWith(item.href)} {...item} onClick={onNavigate} />
         ))}
@@ -234,8 +262,8 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
         <button
           type="button"
           onClick={() => signOut({ callbackUrl: '/login' })}
-          title="Sign out"
-          aria-label="Sign out"
+          title={tc('signOut')}
+          aria-label={tc('signOut')}
           style={{
             background: 'none', border: 'none', cursor: 'pointer',
             color: 'var(--txt3)', padding: 6, borderRadius: 6,

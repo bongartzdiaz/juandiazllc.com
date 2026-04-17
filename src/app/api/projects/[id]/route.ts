@@ -8,6 +8,7 @@ import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
 import { validateBody } from '@/lib/validation'
 import { updateProjectSchema } from '@/lib/validation/schemas'
 import { logAudit, diffChanges } from '@/lib/audit'
+import { publishEntityUpdated, publishEntityDeleted } from '@/lib/realtime/publish'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -65,6 +66,7 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
   const changes = diffChanges(existing as unknown as Record<string, unknown>, input as Record<string, unknown>)
   await logAudit({ scope, action: 'update', entity: 'project', entityId: id, changes })
+  publishEntityUpdated(scope.organizationId, 'project', id, scope.userId)
 
   return NextResponse.json({ data: project })
 }
@@ -84,6 +86,7 @@ export async function DELETE(_req: NextRequest, ctx: RouteCtx) {
 
   await prisma.project.delete({ where: { id } })
   await logAudit({ scope, action: 'delete', entity: 'project', entityId: id })
+  publishEntityDeleted(scope.organizationId, 'project', id, scope.userId)
 
   return new NextResponse(null, { status: 204 })
 }

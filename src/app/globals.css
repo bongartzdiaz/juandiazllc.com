@@ -257,6 +257,11 @@ input::placeholder, textarea::placeholder {
   .sidebar-overlay { display: none !important; }
 }
 
+/* ══ COMMAND PALETTE PILL ══ */
+@media (max-width: 900px) {
+  .cmdk-pill { display: none !important; }
+}
+
 /* ══ POPOVER ANIMATION ══ */
 @keyframes popIn {
   from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }

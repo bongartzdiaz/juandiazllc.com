@@ -4,7 +4,6 @@ import { useMemo } from 'react'
 import { TrendingUp } from 'lucide-react'
 import {
   ResponsiveContainer,
-  LineChart,
   Line,
   XAxis,
   YAxis,
@@ -81,6 +80,10 @@ function formatVal(val: number, prefix: string): string {
 export function ForecastCard({ industry, themeKey }: { industry: string; themeKey: string }) {
   const { data, label, subtitle, prefix } = useMemo(() => getData(industry), [industry])
 
+  // Guard: at least one non-null point in either series. Without this guard,
+  // recharts renders an empty axis grid and the growth % calc divides by 1.
+  const hasData = data.some(d => d.actual !== null || d.forecast !== null)
+
   const projected = data[data.length - 1]?.forecast || 0
   const firstActual = data.find(d => d.actual !== null)?.actual || 1
   const growthPct = ((projected - firstActual) / firstActual * 100).toFixed(0)
@@ -107,6 +110,14 @@ export function ForecastCard({ industry, themeKey }: { industry: string; themeKe
 
       {/* Chart */}
       <div style={{ padding: '12px 12px 0 0', height: 220 }}>
+        {!hasData ? (
+          <div style={{
+            height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'var(--txt3)', fontSize: 12, padding: 20, textAlign: 'center',
+          }}>
+            No forecast data yet
+          </div>
+        ) : (
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 8, right: 12, left: 12, bottom: 4 }}>
             <defs>
@@ -168,6 +179,7 @@ export function ForecastCard({ industry, themeKey }: { industry: string; themeKe
             />
           </AreaChart>
         </ResponsiveContainer>
+        )}
       </div>
 
       {/* Bottom stats */}

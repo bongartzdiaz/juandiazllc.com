@@ -1,4 +1,4 @@
-/* GET  /api/showings — list showings (filterable by property/date)
+﻿/* GET  /api/showings — list showings (filterable by property/date)
    POST /api/showings — schedule a showing */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -6,6 +6,7 @@ import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/pagination'
 import { logAudit } from '@/lib/audit'
+import { publishEntityCreated } from '@/lib/realtime/publish'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -76,6 +77,7 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  await logAudit({ scope, action: 'create', entity: 'calendarEvent' as any, entityId: showing.id })
+  await logAudit({ scope, action: 'create', entity: 'showing', entityId: showing.id })
+  publishEntityCreated(scope.organizationId, 'showing', showing.id, scope.userId)
   return NextResponse.json({ data: showing }, { status: 201 })
 }

@@ -1,37 +1,86 @@
-version: '3.8'
+# Philly Dashboard — production-grade docker-compose
+# ────────────────────────────────────────────────────
+# Required env vars (put them in a .env next to this file, NOT committed):
+#   DB_PASSWORD         MySQL phily user password
+#   DB_ROOT_PASSWORD    MySQL root password
+#   NEXTAUTH_SECRET     openssl rand -base64 32
+#   NEXTAUTH_URL        https://your-domain.example.com
+#
+# Optional: mount a reverse proxy (Caddy/nginx/traefik) in front to terminate TLS.
+#
+# First run:
+#   docker compose up -d db          # wait for healthcheck to pass
+#   docker compose run --rm app npm run db:push
+#   docker compose run --rm app npm run seed
+#   docker compose up -d app
+#
+# Subsequent deploys:
+#   docker compose up -d --build app
 
 services:
   db:
-    image: mysql:8.4
-    restart: always
+    image: mariadb:11.4
+    restart: unless-stopped
     environment:
-      MYSQL_DATABASE: phily
-      MYSQL_USER: phily
-      MYSQL_PASSWORD: ${DB_PASSWORD:-changeme}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-changeme_root}
-    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+      MARIADB_DATABASE: phily
+      MARIADB_USER: phily
+      MARIADB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?set DB_ROOT_PASSWORD in .env}
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --max-connections=200
     volumes:
-      - mysqldata:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
+    # Only bind to localhost so the DB isn't accidentally exposed to the internet
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 20s
 
   app:
     build: .
-    restart: always
-    ports:
-      - "3000:3000"
+    restart: unless-stopped
     environment:
-      DATABASE_URL: mysql://phily:${DB_PASSWORD:-changeme}@db:3306/phily
-      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-generate-a-secret-here}
-      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      DATABASE_URL: mysql://phily:${DB_PASSWORD:?set DB_PASSWORD in .env}@db:3306/phily
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?set NEXTAUTH_SECRET in .env}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:?set NEXTAUTH_URL in .env}
+      NODE_ENV: production
+      # Forward any optional provider env vars through
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-}
+      EMAIL_API_KEY: ${EMAIL_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      SLACK_CLIENT_ID: ${SLACK_CLIENT_ID:-}
+      SLACK_CLIENT_SECRET: ${SLACK_CLIENT_SECRET:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      S3_REGION: ${S3_REGION:-}
+      S3_BUCKET: ${S3_BUCKET:-}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+    ports:
+      - "127.0.0.1:3100:3100"
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--max-time", "3", "http://127.0.0.1:3100/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
 
 volumes:
-  mysqldata:
+  mariadb_data:

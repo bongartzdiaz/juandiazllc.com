@@ -1,4 +1,4 @@
-/* POST /api/contacts/bulk — bulk operations on contacts
+﻿/* POST /api/contacts/bulk — bulk operations on contacts
    Body: { action: 'delete' | 'update' | 'export', ids: string[], data?: {} } */
 
 import { NextRequest, NextResponse } from 'next/server'

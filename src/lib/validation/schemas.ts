@@ -108,3 +108,159 @@ export const updateMilestoneSchema = z.object({
   status: z.enum(['pending', 'completed', 'overdue']).optional(),
   completedAt: optionalIsoDate,
 })
+
+// ── Deals ──
+
+export const createDealSchema = z.object({
+  pipelineId: nonEmpty,
+  stageId: nonEmpty,
+  title: nonEmpty,
+  contactId: z.string().optional().nullable(),
+  valueCents: z.number().int().min(0).optional().default(0),
+  probability: z.number().int().min(0).max(100).optional().default(50),
+  status: z.enum(['open', 'won', 'lost']).optional().default('open'),
+  dealType: z.string().optional(),
+  notes: z.string().optional().default(''),
+  expectedClose: optionalIsoDate.default(null),
+})
+
+export const updateDealSchema = z.object({
+  title: nonEmpty.optional(),
+  stageId: nonEmpty.optional(),
+  contactId: z.string().nullable().optional(),
+  projectId: z.string().nullable().optional(),
+  propertyId: z.string().nullable().optional(),
+  valueCents: z.number().int().min(0).optional(),
+  probability: z.number().int().min(0).max(100).optional(),
+  status: z.enum(['open', 'won', 'lost']).optional(),
+  dealType: z.string().optional(),
+  notes: z.string().optional(),
+  expectedClose: optionalIsoDate,
+  actualClose: optionalIsoDate,
+  commissionPct: z.number().min(0).max(100).optional(),
+  brokerSplitPct: z.number().min(0).max(100).optional(),
+  teamSplitPct: z.number().min(0).max(100).optional(),
+  referralFeePct: z.number().min(0).max(100).optional(),
+  earnestMoneyCents: z.number().int().min(0).optional(),
+}).refine(obj => Object.keys(obj).length > 0, { message: 'At least one field must be provided' })
+
+// ── Templates ──
+
+export const createTemplateSchema = z.object({
+  name: nonEmpty,
+  type: z.enum(['email', 'sms', 'whatsapp', 'report', 'document']).optional().default('email'),
+  subject: z.string().optional().default(''),
+  body: z.string().min(1, 'body is required'),
+  variables: z.array(z.string()).optional().default([]),
+})
+
+export const updateTemplateSchema = z.object({
+  name: nonEmpty.optional(),
+  type: z.enum(['email', 'sms', 'whatsapp', 'report', 'document']).optional(),
+  subject: z.string().optional(),
+  body: z.string().min(1).optional(),
+  variables: z.array(z.string()).optional(),
+}).refine(obj => Object.keys(obj).length > 0, { message: 'At least one field must be provided' })
+
+// ── Automation Rules ──
+
+// Triggers / actions are stored as JSON strings in DB. Accept either a JSON
+// string or a parseable object/array; we serialise to string at write-time.
+const jsonish = z.union([z.string(), z.record(z.string(), z.unknown()), z.array(z.unknown())])
+
+export const createAutomationRuleSchema = z.object({
+  name: nonEmpty,
+  trigger: nonEmpty,
+  triggerConfig: jsonish.optional(),
+  actionType: nonEmpty,
+  actionConfig: jsonish.optional(),
+  enabled: z.boolean().optional().default(true),
+})
+
+export const updateAutomationRuleSchema = z.object({
+  id: z.string().min(1).optional(),
+  name: nonEmpty.optional(),
+  trigger: nonEmpty.optional(),
+  triggerConfig: jsonish.optional(),
+  actionType: nonEmpty.optional(),
+  actionConfig: jsonish.optional(),
+  enabled: z.boolean().optional(),
+}).refine(obj => Object.keys(obj).length > 0, { message: 'At least one field must be provided' })
+
+// ── Grants ──
+
+const grantStatusEnum = z.enum([
+  'prospect', 'applied', 'under_review', 'approved', 'active', 'reporting', 'closed', 'rejected',
+])
+
+export const createGrantSchema = z.object({
+  title: nonEmpty,
+  funder: z.string().optional().default(''),
+  amountCents: z.number().int().min(0).optional().default(0),
+  status: grantStatusEnum.optional().default('prospect'),
+  appliedDate: optionalIsoDate.default(null),
+  awardedDate: optionalIsoDate.default(null),
+  startDate: optionalIsoDate.default(null),
+  endDate: optionalIsoDate.default(null),
+  description: z.string().optional().default(''),
+  requirements: z.string().optional().default(''),
+})
+
+export const updateGrantSchema = z.object({
+  title: nonEmpty.optional(),
+  funder: z.string().optional(),
+  amountCents: z.number().int().min(0).optional(),
+  status: grantStatusEnum.optional(),
+  appliedDate: optionalIsoDate,
+  awardedDate: optionalIsoDate,
+  startDate: optionalIsoDate,
+  endDate: optionalIsoDate,
+  description: z.string().optional(),
+  requirements: z.string().optional(),
+}).refine(obj => Object.keys(obj).length > 0, { message: 'At least one field must be provided' })
+
+// ── Properties ──
+
+export const createPropertySchema = z.object({
+  title: nonEmpty,
+  type: z.enum(['residential', 'commercial', 'land', 'industrial']).optional().default('residential'),
+  status: z.enum(['available', 'under_contract', 'sold', 'rented']).optional().default('available'),
+  listingType: z.enum(['sale', 'rent']).optional().default('sale'),
+  subtype: z.string().optional().default(''),
+  district: z.string().optional().default(''),
+  town: z.string().optional().default(''),
+  isBankOwned: z.boolean().optional().default(false),
+  isResale: z.boolean().optional().default(false),
+  address: z.string().optional().default(''),
+  city: z.string().optional().default(''),
+  state: z.string().optional().default(''),
+  zipCode: z.string().optional().default(''),
+  country: z.string().optional().default(''),
+  lat: z.number().nullable().optional(),
+  lng: z.number().nullable().optional(),
+  priceCents: z.number().int().min(0).optional().default(0),
+  bedrooms: z.number().int().min(0).nullable().optional(),
+  bathrooms: z.number().int().min(0).nullable().optional(),
+  sqft: z.number().int().min(0).nullable().optional(),
+  yearBuilt: z.number().int().min(1800).max(2100).nullable().optional(),
+  description: z.string().optional().default(''),
+  features: z.array(z.string()).optional().default([]),
+  images: z.array(z.string()).optional().default([]),
+})
+
+// ── Calendar Events ──
+
+export const createCalendarEventSchema = z.object({
+  title: nonEmpty,
+  description: z.string().optional().default(''),
+  startTime: isoDate,
+  endTime: isoDate,
+  allDay: z.boolean().optional().default(false),
+  location: z.string().optional().default(''),
+  color: z.string().optional().default('#3B82F6'),
+  attendeeIds: z.array(z.string().min(1)).optional().default([]),
+}).refine(d => new Date(d.endTime) >= new Date(d.startTime), {
+  message: 'endTime must be on or after startTime',
+  path: ['endTime'],
+})
+

@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, Fragment } from 'react'
+import { useState, useEffect, useCallback, Fragment } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/layout/Topbar'
-import { GripVertical, Calendar, Plus, FileText, Check, Clock, X } from 'lucide-react'
+import { Calendar, Plus, FileText, Check, Clock, X, User, Tag, Columns3, Pencil, Trash2 } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
 import { useIndustry } from '@/hooks/useIndustry'
+import { useEntitySubscription } from '@/hooks/useRealtime'
 
 const SDG_COLORS: Record<number, string> = {
   1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21',
@@ -221,12 +223,60 @@ function formatDealValue(value: number, type: 'sale' | 'rental'): string {
   return `€${Math.round(value / 1000)}K`
 }
 
+interface RealBoard {
+  id: string
+  name: string
+  columns: Array<{
+    id: string
+    name: string
+    cards: Array<{
+      id: string
+      title: string
+      description: string | null
+      priority: string
+      dueDate: string | null
+      assignee?: { id: string; name: string | null } | null
+    }>
+  }>
+}
+
 export default function KanbanPage() {
+  const t = useTranslations('kanban')
   const { industry } = useIndustry()
   const isRE = industry === 'realestate'
   const isHOS = industry === 'hospitality'
   const [reMode, setReMode] = useState<'sales' | 'rental'>('sales')
   const [selectedCard, setSelectedCard] = useState<KanbanCard | null>(null)
+  const [showAddCard, setShowAddCard] = useState(false)
+  const [addCardColumn, setAddCardColumn] = useState('')
+  const [addTitle, setAddTitle] = useState('')
+  const [addDesc, setAddDesc] = useState('')
+  const [addPriority, setAddPriority] = useState<'low' | 'medium' | 'high'>('medium')
+  const [addAssignee, setAddAssignee] = useState('')
+  const [addCardLoading, setAddCardLoading] = useState(false)
+  const [addCardError, setAddCardError] = useState<string | null>(null)
+
+  // Fetch real boards from API. If the org has real boards, show them with
+  // live CRUD; otherwise fall back to the industry-specific demo preview.
+  const [realBoards, setRealBoards] = useState<RealBoard[] | null>(null)
+  const fetchBoards = useCallback(async () => {
+    try {
+      const res = await fetch('/api/kanban/boards', { cache: 'no-store' })
+      const j = await res.json().catch(() => ({}))
+      setRealBoards(Array.isArray(j.data) ? j.data : [])
+    } catch {
+      setRealBoards([])
+    }
+  }, [])
+
+  useEffect(() => { fetchBoards() }, [fetchBoards])
+
+  // Live updates when kanban cards/columns/boards change anywhere in the org.
+  useEntitySubscription('kanbanCard', fetchBoards)
+  useEntitySubscription('kanbanColumn', fetchBoards)
+  useEntitySubscription('kanbanBoard', fetchBoards)
+
+  const hasRealBoards = (realBoards?.length ?? 0) > 0
 
   const columns = isHOS
     ? HOS_COLUMNS
@@ -237,12 +287,28 @@ export default function KanbanPage() {
   return (
     <>
       <Topbar
-        title={isHOS ? 'Reservations' : isRE ? 'Deals' : 'Kanban'}
-        sub={isHOS ? 'Manage bookings' : isRE ? 'Track your transactions' : 'Visual project management'}
+        title={isHOS ? 'Reservations' : isRE ? 'Deals' : t('title')}
+        sub={isHOS ? 'Manage bookings' : isRE ? 'Track your transactions' : t('subtitle')}
         addLabel={isHOS ? 'New Booking' : isRE ? 'New Deal' : 'New Board'}
       />
 
       <div style={{ padding: '18px 24px 40px' }}>
+        {/* Demo content notice */}
+        {!hasRealBoards && realBoards !== null && (
+          <div style={{
+            padding: '10px 14px', marginBottom: 14, borderRadius: 8,
+            background: 'var(--y-bg)', border: '1px solid var(--y-border)',
+            color: 'var(--y-txt)', fontSize: 12.5, lineHeight: 1.5,
+          }}>
+            <strong>Preview mode:</strong> the cards shown below are sample data.
+            Your organization has no kanban boards yet — head to
+            {' '}<a href="/deals" style={{ color: 'inherit', textDecoration: 'underline' }}>Deals</a>
+            {' '}or
+            {' '}<a href="/projects" style={{ color: 'inherit', textDecoration: 'underline' }}>Projects</a>
+            {' '}to start tracking real work.
+          </div>
+        )}
+
         {/* RE Pipeline Toggle */}
         {isRE && (
           <div style={{ display: 'flex', gap: 4, background: 'var(--bg2)', borderRadius: 8, padding: 3, marginBottom: 16, width: 'fit-content' }}>
@@ -289,7 +355,9 @@ export default function KanbanPage() {
                       background: 'var(--bg2)', borderRadius: 6, padding: '1px 7px',
                     }}>{col.cards.length}</span>
                   </div>
-                  <button style={{
+                  <button
+                    onClick={() => { setAddCardColumn(col.id); setShowAddCard(true) }}
+                    style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     width: 24, height: 24, borderRadius: 6,
                     background: 'none', border: '1px solid var(--border)',
@@ -311,10 +379,10 @@ export default function KanbanPage() {
                       <div
                         key={card.id}
                         className="card-hover"
-                        onClick={isRE ? () => setSelectedCard(card) : undefined}
+                        onClick={() => setSelectedCard(card)}
                         style={{
                           background: 'var(--panel)', border: '1px solid var(--border)',
-                          borderRadius: 10, padding: '12px 14px', cursor: isRE ? 'pointer' : 'grab',
+                          borderRadius: 10, padding: '12px 14px', cursor: 'pointer',
                           boxShadow: 'var(--shadow-sm)',
                           transition: 'box-shadow 0.15s, border-color 0.15s',
                         }}
@@ -396,9 +464,168 @@ export default function KanbanPage() {
         </div>
       </div>
 
+      {/* Add Card Modal */}
+      {showAddCard && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100,
+          background: 'rgba(0,0,0,0.35)', display: 'flex',
+          alignItems: 'center', justifyContent: 'center',
+        }} onClick={() => { setShowAddCard(false); setAddTitle(''); setAddDesc(''); setAddPriority('medium'); setAddAssignee(''); setAddCardError(null) }}>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="kanban-add-card-title"
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: 'var(--panel)', borderRadius: 16,
+              border: '1px solid var(--border)', boxShadow: 'var(--shadow-lg)',
+              padding: '24px 28px', width: 420, maxHeight: '80vh', overflowY: 'auto',
+            }}
+          >
+            <div id="kanban-add-card-title" style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>Add Card</div>
+            <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>
+              Add a new card to {columns.find(c => c.id === addCardColumn)?.title ?? 'column'}
+            </div>
+            <form onSubmit={async (e) => {
+              e.preventDefault()
+              if (addCardLoading) return
+              if (!addTitle.trim()) {
+                setAddCardError('Title is required')
+                return
+              }
+              setAddCardLoading(true)
+              setAddCardError(null)
+              try {
+                const res = await fetch('/api/kanban/cards', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    columnId: addCardColumn,
+                    title: addTitle.trim(),
+                    description: addDesc.trim(),
+                    priority: addPriority,
+                    assigneeId: addAssignee.trim() || null,
+                  }),
+                })
+                const json = await res.json().catch(() => ({}))
+                if (!res.ok) {
+                  setAddCardError(json?.error ?? json?.message ?? `Failed to create card (${res.status})`)
+                  return
+                }
+                setShowAddCard(false)
+                setAddTitle('')
+                setAddDesc('')
+                setAddPriority('medium')
+                setAddAssignee('')
+                setAddCardError(null)
+                fetchBoards()
+              } catch (err) {
+                setAddCardError(err instanceof Error ? err.message : 'Network error')
+              } finally {
+                setAddCardLoading(false)
+              }
+            }} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Title *</label>
+                <input
+                  value={addTitle}
+                  onChange={e => setAddTitle(e.target.value)}
+                  required
+                  autoFocus
+                  placeholder="Card title"
+                  style={{
+                    width: '100%', padding: '8px 12px', borderRadius: 8,
+                    border: '1px solid var(--border)', background: 'var(--bg2)',
+                    fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Description</label>
+                <textarea
+                  value={addDesc}
+                  onChange={e => setAddDesc(e.target.value)}
+                  rows={3}
+                  placeholder="Optional description"
+                  style={{
+                    width: '100%', padding: '8px 12px', borderRadius: 8,
+                    border: '1px solid var(--border)', background: 'var(--bg2)',
+                    fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
+                    resize: 'vertical',
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Priority</label>
+                <select
+                  value={addPriority}
+                  onChange={e => setAddPriority(e.target.value as 'low' | 'medium' | 'high')}
+                  style={{
+                    width: '100%', padding: '8px 12px', borderRadius: 8,
+                    border: '1px solid var(--border)', background: 'var(--bg2)',
+                    fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
+                  }}
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Assignee</label>
+                <input
+                  value={addAssignee}
+                  onChange={e => setAddAssignee(e.target.value)}
+                  placeholder="Assignee ID or name"
+                  style={{
+                    width: '100%', padding: '8px 12px', borderRadius: 8,
+                    border: '1px solid var(--border)', background: 'var(--bg2)',
+                    fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
+                  }}
+                />
+              </div>
+              {addCardError && (
+                <div role="alert" style={{
+                  padding: '8px 12px', borderRadius: 8,
+                  background: 'var(--r-bg)', border: '1px solid var(--r-border)',
+                  color: 'var(--r-txt)', fontSize: 12, fontWeight: 600,
+                }}>{addCardError}</div>
+              )}
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 6 }}>
+                <button
+                  type="button"
+                  onClick={() => { setShowAddCard(false); setAddTitle(''); setAddDesc(''); setAddPriority('medium'); setAddAssignee(''); setAddCardError(null) }}
+                  style={{
+                    padding: '8px 16px', borderRadius: 8,
+                    border: '1px solid var(--border)', background: 'var(--bg2)',
+                    fontSize: 12, fontWeight: 600, color: 'var(--txt2)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={addCardLoading || !addTitle.trim()}
+                  style={{
+                    padding: '8px 16px', borderRadius: 8,
+                    border: 'none', background: 'var(--accent)',
+                    fontSize: 12, fontWeight: 600, color: '#fff',
+                    cursor: addCardLoading || !addTitle.trim() ? 'not-allowed' : 'pointer',
+                    opacity: addCardLoading || !addTitle.trim() ? 0.5 : 1,
+                  }}
+                >
+                  {addCardLoading ? 'Adding...' : 'Add Card'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* RE Document Modal */}
       <Modal
-        open={selectedCard !== null}
+        open={isRE && selectedCard !== null}
         onClose={() => setSelectedCard(null)}
         title={selectedCard?.title || ''}
         subtitle={selectedCard?.dealType === 'sale' ? 'Sales Deal' : selectedCard?.dealType === 'rental' ? 'Rental Deal' : ''}
@@ -406,11 +633,255 @@ export default function KanbanPage() {
       >
         {selectedCard && <DealModal card={selectedCard} reMode={reMode} isRE={isRE} onClose={() => setSelectedCard(null)} />}
       </Modal>
+
+      {/* Generic Card Detail Drawer (non-RE) */}
+      {!isRE && (
+        <CardDetailDrawer
+          card={selectedCard}
+          columns={columns}
+          onClose={() => setSelectedCard(null)}
+        />
+      )}
     </>
   )
 }
 
-function DealModal({ card: selectedCard, reMode, isRE, onClose }: { card: KanbanCard; reMode: 'sales' | 'rental'; isRE: boolean; onClose: () => void }) {
+/* ── Card Detail Drawer (sliding right panel) ───────────────────── */
+
+function CardDetailDrawer({
+  card,
+  columns,
+  onClose,
+}: {
+  card: KanbanCard | null
+  columns: KanbanColumn[]
+  onClose: () => void
+}) {
+  useEffect(() => {
+    if (!card) return
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [card, onClose])
+
+  if (!card) return null
+
+  const currentColumn = columns.find(col => col.cards.some(c => c.id === card.id))
+  const ps = priorityStyles[card.priority]
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        onClick={onClose}
+        style={{
+          position: 'fixed', inset: 0, zIndex: 40,
+          background: 'rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(2px)',
+          animation: 'fadeIn 200ms ease',
+        }}
+      />
+
+      {/* Drawer */}
+      <div style={{
+        position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 41,
+        width: 380, background: 'var(--panel)',
+        borderLeft: '1px solid var(--border)',
+        boxShadow: 'var(--shadow-md)',
+        display: 'flex', flexDirection: 'column',
+        animation: 'slideInRight 250ms cubic-bezier(0.16,1,0.3,1)',
+        overflow: 'hidden',
+      }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+          padding: '16px 20px', borderBottom: '1px solid var(--border)', flexShrink: 0, gap: 10,
+        }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.3 }}>
+              {card.title}
+            </div>
+            {currentColumn && (
+              <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 3 }}>
+                in {currentColumn.title}
+              </div>
+            )}
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            style={{
+              width: 28, height: 28, borderRadius: 7, flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'var(--bg2)', border: '1px solid var(--border)',
+              cursor: 'pointer', color: 'var(--txt2)',
+            }}
+          >
+            <X size={14} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
+          {/* Priority badge */}
+          <div style={{ marginBottom: 14 }}>
+            <span style={{
+              fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 6,
+              background: ps.bg, color: ps.txt, border: `1px solid ${ps.border}`,
+              textTransform: 'uppercase', letterSpacing: '0.04em',
+            }}>{card.priority}</span>
+          </div>
+
+          {/* Description */}
+          {card.description && (
+            <div style={{ marginBottom: 18 }}>
+              <DrawerLabel>Description</DrawerLabel>
+              <div style={{ fontSize: 12.5, color: 'var(--txt2)', lineHeight: 1.5 }}>
+                {card.description}
+              </div>
+            </div>
+          )}
+
+          {/* Meta grid */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 18 }}>
+            <MetaRow icon={User} label="Assignee" value={card.assignee || 'Unassigned'} />
+            <MetaRow icon={Calendar} label="Due Date" value={card.dueDate} mono />
+            <MetaRow icon={Columns3} label="Status" value={currentColumn?.title ?? '—'} />
+          </div>
+
+          {/* SDGs (philanthropy) */}
+          {card.sdgs.length > 0 && (
+            <div style={{ marginBottom: 18 }}>
+              <DrawerLabel>SDG Tags</DrawerLabel>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {card.sdgs.map(s => (
+                  <span key={s} style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 5,
+                    padding: '3px 8px', borderRadius: 6,
+                    background: 'var(--bg2)', border: '1px solid var(--border)',
+                    fontSize: 11, fontWeight: 600, color: 'var(--txt2)',
+                  }}>
+                    <Tag size={10} /> SDG {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Move to column */}
+          <div style={{ marginBottom: 18 }}>
+            <DrawerLabel>Move to Column</DrawerLabel>
+            <select
+              defaultValue={currentColumn?.id ?? ''}
+              onChange={async (e) => {
+                const newColumnId = e.target.value
+                if (!newColumnId || newColumnId === currentColumn?.id) return
+                try {
+                  const res = await fetch(`/api/kanban/cards/${card.id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ columnId: newColumnId }),
+                  })
+                  if (!res.ok) {
+                    const j = await res.json().catch(() => ({}))
+                    throw new Error(j.error ?? `Move failed (${res.status})`)
+                  }
+                  onClose()
+                } catch (err) {
+                  const msg = err instanceof Error ? err.message : 'Move failed'
+                  alert(msg)
+                }
+              }}
+              style={{
+                width: '100%', padding: '8px 12px', borderRadius: 8,
+                border: '1px solid var(--border)', background: 'var(--bg2)',
+                fontSize: 12.5, color: 'var(--txt)', fontFamily: 'inherit',
+                cursor: 'pointer',
+              }}
+            >
+              {columns.map(col => (
+                <option key={col.id} value={col.id}>{col.title}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Footer actions */}
+        <div style={{
+          padding: '12px 20px', borderTop: '1px solid var(--border)',
+          display: 'flex', gap: 8, flexShrink: 0,
+        }}>
+          <button
+            onClick={() => alert('Edit — hook up to edit flow')}
+            style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              padding: '8px 14px', borderRadius: 8,
+              background: 'var(--bg2)', border: '1px solid var(--border)',
+              fontSize: 12, fontWeight: 600, color: 'var(--txt2)',
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}
+          >
+            <Pencil size={12} /> Edit
+          </button>
+          <button
+            onClick={async () => {
+              if (!confirm('Delete this card?')) return
+              await fetch(`/api/kanban/cards/${card.id}`, { method: 'DELETE' }).catch(() => {})
+              onClose()
+            }}
+            style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              padding: '8px 14px', borderRadius: 8,
+              background: 'var(--r-bg)', border: '1px solid var(--r-border)',
+              fontSize: 12, fontWeight: 600, color: 'var(--r-txt)',
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}
+          >
+            <Trash2 size={12} /> Delete
+          </button>
+        </div>
+      </div>
+    </>
+  )
+}
+
+function DrawerLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{
+      fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase',
+      letterSpacing: '0.05em', color: 'var(--txt3)', marginBottom: 6,
+    }}>
+      {children}
+    </div>
+  )
+}
+
+function MetaRow({
+  icon: Icon, label, value, mono,
+}: {
+  icon: typeof User; label: string; value: string; mono?: boolean
+}) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 10,
+      padding: '8px 12px', borderRadius: 8,
+      background: 'var(--bg2)', border: '1px solid var(--border)',
+    }}>
+      <Icon size={13} style={{ color: 'var(--txt3)', flexShrink: 0 }} />
+      <span style={{ fontSize: 11, color: 'var(--txt3)', fontWeight: 600, minWidth: 70 }}>
+        {label}
+      </span>
+      <span
+        className={mono ? 'mono' : undefined}
+        style={{ fontSize: 12, color: 'var(--txt)', fontWeight: 500, marginLeft: 'auto' }}
+      >
+        {value}
+      </span>
+    </div>
+  )
+}
+
+function DealModal({ card: selectedCard, reMode, isRE }: { card: KanbanCard; reMode: 'sales' | 'rental'; isRE: boolean; onClose: () => void }) {
   const allColumns = reMode === 'sales' ? RE_SALES_COLUMNS : RE_RENTAL_COLUMNS
   const stages = selectedCard.dealType === 'sale' ? SALES_STAGES : RENTAL_STAGES
   const stageMap = selectedCard.dealType === 'sale' ? SALES_STAGE_MAP : RENTAL_STAGE_MAP

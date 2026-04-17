@@ -1,10 +1,14 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/layout/Topbar'
 import { Pagination } from '@/components/ui/Pagination'
 import { KpiCard } from '@/components/ui/KpiCard'
-import { Filter, Trophy, TrendingUp } from 'lucide-react'
+import { Filter, Trophy, Plus, Trash2, CheckCircle2, XCircle } from 'lucide-react'
+import { Modal, FormField } from '@/components/ui/Modal'
+import { useEntitySubscription } from '@/hooks/useRealtime'
+import { useToast } from '@/hooks/useToast'
 
 interface CommissionRecord {
   id: string
@@ -39,6 +43,11 @@ const STATUS_COLORS: Record<string, { bg: string; txt: string }> = {
   voided: { bg: 'var(--r-bg)', txt: 'var(--r-txt)' },
 }
 
+const emptyForm = {
+  agentId: '', dealId: '', type: 'closing',
+  gross: '', splitPct: '100', notes: '',
+}
+
 export default function CommissionsPage() {
   const [tab, setTab] = useState<'commissions' | 'leaderboard'>('leaderboard')
   const [records, setRecords] = useState<CommissionRecord[]>([])
@@ -48,6 +57,64 @@ export default function CommissionsPage() {
   const [totalPages, setTotalPages] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')
   const [loading, setLoading] = useState(true)
+  const t = useTranslations('commissions')
+  const { addToast } = useToast()
+
+  const [showAdd, setShowAdd] = useState(false)
+  const [form, setForm] = useState(emptyForm)
+  const [saving, setSaving] = useState(false)
+
+  async function submitForm() {
+    if (!form.agentId) { addToast('Select an agent', 'error'); return }
+    const grossCents = Math.round((parseFloat(form.gross) || 0) * 100)
+    if (grossCents <= 0) { addToast('Enter a positive gross amount', 'error'); return }
+    const splitPct = parseFloat(form.splitPct) || 100
+    if (splitPct < 0 || splitPct > 100) { addToast('Split must be 0-100', 'error'); return }
+
+    setSaving(true)
+    try {
+      const res = await fetch('/api/commissions', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agentId: form.agentId,
+          dealId: form.dealId || null,
+          type: form.type,
+          grossCents, splitPct,
+          notes: form.notes,
+        }),
+      })
+      const j = await res.json().catch(() => ({}))
+      if (!res.ok) { addToast(j.error ?? 'Save failed', 'error'); return }
+      addToast('Commission added', 'success')
+      setForm(emptyForm)
+      setShowAdd(false)
+      fetchRecords()
+    } catch { addToast('Network error', 'error') }
+    finally { setSaving(false) }
+  }
+
+  async function changeStatus(id: string, status: string) {
+    try {
+      const res = await fetch(`/api/commissions/${id}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      })
+      if (!res.ok) { addToast('Update failed', 'error'); return }
+      addToast(`Marked ${status}`, 'success')
+      fetchRecords()
+    } catch { addToast('Network error', 'error') }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Delete this commission record?')) return
+    try {
+      const res = await fetch(`/api/commissions/${id}`, { method: 'DELETE' })
+      if (res.status === 204 || res.ok) {
+        addToast('Commission deleted', 'success')
+        fetchRecords()
+      } else { addToast('Delete failed', 'error') }
+    } catch { addToast('Network error', 'error') }
+  }
 
   // Fetch leaderboard
   useEffect(() => {
@@ -71,14 +138,15 @@ export default function CommissionsPage() {
 
   useEffect(() => { fetchRecords() }, [fetchRecords])
 
-  const totalGross = records.reduce((s, r) => s + r.grossCents, 0)
+  useEntitySubscription('commissionRecord', fetchRecords)
+
   const totalNet = records.reduce((s, r) => s + r.netCents, 0)
   const pendingCount = records.filter(r => r.status === 'pending').length
   const lbTotalCommission = leaderboard.reduce((s, e) => s + e.ytdCommissionCents, 0)
 
   return (
     <>
-      <Topbar title="Commissions" sub="Commission tracking and team leaderboard" />
+      <Topbar title={t('title')} sub={t('subtitle')} />
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
           <KpiCard icon="dollar-sign" label="YTD Team GCI" value={`$${(lbTotalCommission / 100).toLocaleString()}`} />
@@ -150,20 +218,30 @@ export default function CommissionsPage() {
         ) : (
           <>
             {/* Commission Records */}
-            <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
               <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
                 options={[{ value: '', label: 'All Statuses' }, { value: 'pending', label: 'Pending' }, { value: 'paid', label: 'Paid' }, { value: 'voided', label: 'Voided' }]} />
+              <div style={{ flex: 1 }} />
+              <button onClick={() => setShowAdd(true)} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '8px 14px', borderRadius: 10,
+                background: 'var(--accent)', color: '#fff',
+                border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                fontFamily: 'inherit', boxShadow: 'var(--shadow-sm)',
+              }}>
+                <Plus size={13} /> Add Commission
+              </button>
             </div>
             <div style={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 100px 80px 100px 100px', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
-                <span>Type / Notes</span><span>Gross</span><span>Split %</span><span>Net</span><span>Status</span>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 100px 80px 100px 90px 110px', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
+                <span>Type / Notes</span><span>Gross</span><span>Split %</span><span>Net</span><span>Status</span><span>Actions</span>
               </div>
               {loading ? (
                 <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
               ) : records.length === 0 ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No commission records.</div>
+                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No commission records. Click Add Commission.</div>
               ) : records.map((rec, idx) => (
-                <div key={rec.id} style={{ display: 'grid', gridTemplateColumns: '1fr 100px 80px 100px 100px', gap: 12, padding: '10px 16px', borderBottom: idx < records.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent' }}>
+                <div key={rec.id} style={{ display: 'grid', gridTemplateColumns: '1fr 100px 80px 100px 90px 110px', gap: 12, padding: '10px 16px', borderBottom: idx < records.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent' }}>
                   <div>
                     <div style={{ fontWeight: 600, color: 'var(--txt)', textTransform: 'capitalize' }}>{rec.type}</div>
                     <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{rec.notes || new Date(rec.createdAt).toLocaleDateString()}</div>
@@ -171,7 +249,22 @@ export default function CommissionsPage() {
                   <span style={{ fontWeight: 600, fontFamily: "var(--font-red-hat-mono), monospace" }}>${(rec.grossCents / 100).toLocaleString()}</span>
                   <span style={{ fontFamily: "var(--font-red-hat-mono), monospace" }}>{rec.splitPct}%</span>
                   <span style={{ fontWeight: 700, fontFamily: "var(--font-red-hat-mono), monospace", color: 'var(--g-txt)' }}>${(rec.netCents / 100).toLocaleString()}</span>
-                  <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: STATUS_COLORS[rec.status]?.bg ?? 'var(--bg2)', color: STATUS_COLORS[rec.status]?.txt ?? 'var(--txt2)', display: 'inline-block', maxWidth: 'fit-content' }}>{rec.status}</span>
+                  <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: STATUS_COLORS[rec.status]?.bg ?? 'var(--bg2)', color: STATUS_COLORS[rec.status]?.txt ?? 'var(--txt2)', justifySelf: 'start' }}>{rec.status}</span>
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    {rec.status === 'pending' && (
+                      <>
+                        <button onClick={() => changeStatus(rec.id, 'paid')} title="Mark paid" style={miniBtn('var(--g-txt)')}>
+                          <CheckCircle2 size={11} />
+                        </button>
+                        <button onClick={() => changeStatus(rec.id, 'voided')} title="Void" style={miniBtn('var(--txt3)')}>
+                          <XCircle size={11} />
+                        </button>
+                      </>
+                    )}
+                    <button onClick={() => handleDelete(rec.id)} title="Delete" style={miniBtn('var(--r-txt)')}>
+                      <Trash2 size={11} />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -179,8 +272,92 @@ export default function CommissionsPage() {
           </>
         )}
       </div>
+
+      <Modal
+        open={showAdd}
+        onClose={() => { if (!saving) setShowAdd(false) }}
+        title="Add Commission"
+        subtitle="Record a commission payout"
+        size="md"
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <FormField label="Agent">
+              <select value={form.agentId} onChange={e => setForm({ ...form, agentId: e.target.value })} style={inputStyle}>
+                <option value="">Select agent…</option>
+                {leaderboard.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+              </select>
+            </FormField>
+            <FormField label="Type">
+              <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={inputStyle}>
+                <option value="closing">Closing</option>
+                <option value="referral">Referral</option>
+                <option value="rental">Rental</option>
+                <option value="bonus">Bonus</option>
+                <option value="other">Other</option>
+              </select>
+            </FormField>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
+            <FormField label="Gross Amount ($)">
+              <input type="number" min="0" step="100" value={form.gross} onChange={e => setForm({ ...form, gross: e.target.value })} placeholder="15000" style={inputStyle} />
+            </FormField>
+            <FormField label="Split %">
+              <input type="number" min="0" max="100" value={form.splitPct} onChange={e => setForm({ ...form, splitPct: e.target.value })} style={inputStyle} />
+            </FormField>
+          </div>
+          <FormField label="Deal ID (optional)">
+            <input value={form.dealId} onChange={e => setForm({ ...form, dealId: e.target.value })} placeholder="Link to a deal" style={inputStyle} />
+          </FormField>
+          <FormField label="Notes (optional)">
+            <textarea rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
+              style={{ ...inputStyle, resize: 'vertical' }} />
+          </FormField>
+
+          {form.gross && form.splitPct && (
+            <div style={{
+              padding: 10, borderRadius: 8, background: 'var(--bg2)',
+              fontSize: 12, color: 'var(--txt2)', textAlign: 'center',
+            }}>
+              Net payout: <strong className="mono" style={{ color: 'var(--g-txt)' }}>
+                ${Math.round((parseFloat(form.gross) || 0) * (parseFloat(form.splitPct) || 100) / 100).toLocaleString()}
+              </strong>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', borderTop: '1px solid var(--border)', paddingTop: 14 }}>
+            <button onClick={() => setShowAdd(false)} disabled={saving} style={{
+              padding: '9px 18px', borderRadius: 8,
+              background: 'var(--bg2)', color: 'var(--txt2)',
+              border: '1px solid var(--border)', fontSize: 12, fontWeight: 600,
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}>Cancel</button>
+            <button onClick={submitForm} disabled={saving} style={{
+              padding: '9px 18px', borderRadius: 8,
+              background: 'var(--accent)', color: '#fff', border: 'none',
+              fontSize: 12, fontWeight: 600, cursor: saving ? 'wait' : 'pointer',
+              fontFamily: 'inherit', opacity: saving ? 0.7 : 1,
+            }}>{saving ? 'Saving…' : 'Add Commission'}</button>
+          </div>
+        </div>
+      </Modal>
     </>
   )
+}
+
+const inputStyle: React.CSSProperties = {
+  width: '100%', padding: '9px 12px', borderRadius: 8,
+  border: '1px solid var(--border)', background: 'var(--panel)',
+  fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit', outline: 'none',
+}
+
+function miniBtn(color: string): React.CSSProperties {
+  return {
+    width: 24, height: 24, borderRadius: 6,
+    background: 'transparent', border: '1px solid var(--border)',
+    color, cursor: 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  }
 }
 
 function FilterSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {

@@ -172,7 +172,7 @@ export default function TimelinePage() {
   }, [filteredTasks])
 
   // Compute timeline bounds
-  const { timelineStart, timelineEnd, totalDays, months } = useMemo(() => {
+  const { timelineStart, totalDays, months } = useMemo(() => {
     if (filteredTasks.length === 0) {
       const now = new Date()
       const start = new Date(now.getFullYear(), now.getMonth(), 1)

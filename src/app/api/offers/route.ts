@@ -1,4 +1,4 @@
-/* GET  /api/offers — list offers (filterable by property/deal/status)
+﻿/* GET  /api/offers — list offers (filterable by property/deal/status)
    POST /api/offers — submit an offer */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -6,6 +6,7 @@ import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/pagination'
 import { logAudit } from '@/lib/audit'
+import { publishEntityCreated } from '@/lib/realtime/publish'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
     prisma.offer.findMany({
       where, orderBy: { createdAt: 'desc' }, skip, take: limit,
       include: {
-        property: { select: { id: true, title: true, priceCents: true } },
+        property: { select: { id: true, title: true, address: true, city: true, priceCents: true } },
         contact: { select: { id: true, name: true, email: true } },
         deal: { select: { id: true, title: true } },
       },
@@ -80,6 +81,7 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  await logAudit({ scope, action: 'create', entity: 'deal' as any, entityId: offer.id })
+  await logAudit({ scope, action: 'create', entity: 'offer', entityId: offer.id })
+  publishEntityCreated(scope.organizationId, 'offer', offer.id, scope.userId)
   return NextResponse.json({ data: offer }, { status: 201 })
 }

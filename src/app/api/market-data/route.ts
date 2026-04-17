@@ -1,9 +1,10 @@
-/* GET  /api/market-data — market snapshots by zip code
+﻿/* GET  /api/market-data — market snapshots by zip code
    POST /api/market-data — add market data */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
+import { parsePagination, paginatedResponse } from '@/lib/pagination'
 import { logAudit } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
@@ -17,17 +18,24 @@ export async function GET(req: NextRequest) {
   const zipCode = url.searchParams.get('zipCode') ?? undefined
   const year = url.searchParams.get('year') ? parseInt(url.searchParams.get('year')!) : new Date().getFullYear()
 
+  const { page, limit, skip } = parsePagination(req)
   const prisma = getAuthPrisma()
-  const data = await prisma.marketSnapshot.findMany({
-    where: {
-      organizationId: scope.organizationId,
-      year,
-      ...(zipCode ? { zipCode } : {}),
-    },
-    orderBy: [{ year: 'asc' }, { month: 'asc' }],
-  })
+  const where = {
+    organizationId: scope.organizationId,
+    year,
+    ...(zipCode ? { zipCode } : {}),
+  }
+  const [data, total] = await Promise.all([
+    prisma.marketSnapshot.findMany({
+      where,
+      orderBy: [{ year: 'asc' }, { month: 'asc' }],
+      skip,
+      take: limit,
+    }),
+    prisma.marketSnapshot.count({ where }),
+  ])
 
-  return NextResponse.json({ data })
+  return paginatedResponse(data, total, { page, limit, skip })
 }
 
 export async function POST(req: NextRequest) {

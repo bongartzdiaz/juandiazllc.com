@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main, staging]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Typecheck · Lint · Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      # Dummy values so `next build` doesn't blow up on env.startsWith() etc.
+      # Never use these in a real deploy.
+      DATABASE_URL: mysql://ci:ci@localhost:3306/ci
+      NEXTAUTH_SECRET: ci-secret-placeholder-32-characters-long-xx
+      NEXTAUTH_URL: http://localhost:3100
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: '1'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --omit=optional
+
+      - name: Prisma generate
+        run: npm run db:generate
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: |
+            .next/standalone
+            .next/static
+            public
+          retention-days: 3
+
+  audit:
+    name: npm audit (production)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci --omit=optional
+      # Fail only on high/critical vulnerabilities in prod deps.
+      # Moderate/low are reported but don't block merges.
+      - run: npm audit --omit=dev --audit-level=high

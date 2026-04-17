@@ -1,11 +1,15 @@
 'use client'
 
 import { useTheme } from '@/hooks/useTheme'
+import { useLocale } from '@/hooks/useLocale'
 import { useMobileMenu } from '@/components/layout/ClientLayout'
-import { Moon, Sun, RefreshCw, Plus, Globe, Menu, GripVertical } from 'lucide-react'
+import { Moon, Sun, RefreshCw, Plus, Globe, Menu, GripVertical, Search } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { NotificationBell } from '@/components/dashboard/NotificationBell'
+import { PresenceIndicator } from '@/components/ui/PresenceIndicator'
 import { useIndustry } from '@/hooks/useIndustry'
 import { useSync } from '@/hooks/useSync'
+import { useTranslations } from 'next-intl'
 
 export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuToggle, editMode, onToggleEdit }: {
   title: string
@@ -18,11 +22,25 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
   onToggleEdit?: () => void
 }) {
   const { theme, toggle } = useTheme()
+  const { locale, toggle: toggleLocale } = useLocale()
   const { industry } = useIndustry()
   const mobileMenu = useMobileMenu()
   const { syncAll, syncing } = useSync()
+  const t = useTranslations('common')
   const handleMenu = onMenuToggle || mobileMenu.toggle
   const handleSync = onSync || (() => { void syncAll() })
+
+  // Detect platform for Cmd vs Ctrl hint
+  const [isMac, setIsMac] = useState(false)
+  useEffect(() => {
+    if (typeof navigator !== 'undefined') {
+      setIsMac(/Mac|iPhone|iPad|iPod/.test(navigator.platform))
+    }
+  }, [])
+
+  const openCommandPalette = () => {
+    window.dispatchEvent(new CustomEvent('command-palette:open'))
+  }
 
   return (
     <div style={{
@@ -53,6 +71,35 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* Command palette search pill */}
+        <button
+          type="button"
+          onClick={openCommandPalette}
+          aria-label="Open command palette"
+          className="cmdk-pill"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            padding: '5px 10px 5px 10px', borderRadius: 8,
+            background: 'var(--bg2)', color: 'var(--txt3)',
+            border: '1px solid var(--border)',
+            fontSize: 12, fontWeight: 500, cursor: 'pointer',
+            fontFamily: 'inherit', minWidth: 180,
+          }}
+        >
+          <Search size={13} />
+          <span style={{ flex: 1, textAlign: 'left' }}>Search…</span>
+          <kbd style={{
+            fontSize: 10, padding: '1px 5px', borderRadius: 4,
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            color: 'var(--txt2)', fontFamily: 'inherit',
+          }}>
+            {isMac ? '\u2318' : 'Ctrl'}+K
+          </kbd>
+        </button>
+
+        {/* Presence indicators */}
+        <PresenceIndicator max={4} showCount={false} />
+
         {/* Notification Bell */}
         <NotificationBell industry={industry} />
 
@@ -71,7 +118,7 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
             }}
           >
             <GripVertical size={12} />
-            {editMode ? 'Done' : 'Edit'}
+            {editMode ? t('done') : t('edit')}
           </button>
         )}
 
@@ -85,11 +132,12 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
             width: 6, height: 6, borderRadius: '50%', background: 'var(--g)',
             animation: 'blink 1.5s ease-in-out infinite',
           }} />
-          LIVE
+          {t('live')}
         </span>
 
         {/* Language toggle */}
         <button
+          onClick={toggleLocale}
           style={{
             display: 'flex', alignItems: 'center', gap: 5,
             background: 'var(--bg2)', color: 'var(--txt2)',
@@ -100,7 +148,7 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
           }}
         >
           <Globe size={12} />
-          EN
+          {locale.toUpperCase()}
         </button>
 
         {/* Theme toggle */}
@@ -132,7 +180,7 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
             fontFamily: 'inherit', opacity: syncing ? 0.6 : 1,
           }}
         >
-          <RefreshCw size={12} style={{ animation: syncing ? 'spin 1s linear infinite' : 'none' }} /> {syncing ? 'Syncing...' : 'Sync'}
+          <RefreshCw size={12} style={{ animation: syncing ? 'spin 1s linear infinite' : 'none' }} /> {syncing ? t('syncing') : t('sync')}
         </button>
 
         {/* Add action */}

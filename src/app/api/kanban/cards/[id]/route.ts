@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireRole, jsonError } from '@/lib/auth-helpers'
 import { logAudit, diffChanges } from '@/lib/audit'
+import { publishEntityUpdated, publishEntityDeleted } from '@/lib/realtime/publish'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -80,6 +81,7 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
   const changes = diffChanges(existing as unknown as Record<string, unknown>, input as Record<string, unknown>)
   await logAudit({ scope, action: 'update', entity: 'kanbanCard', entityId: id, changes })
+  publishEntityUpdated(scope.organizationId, 'kanbanCard', id, scope.userId)
 
   return NextResponse.json({ data: card })
 }
@@ -102,6 +104,7 @@ export async function DELETE(_req: NextRequest, ctx: RouteCtx) {
 
   await prisma.kanbanCard.delete({ where: { id } })
   await logAudit({ scope, action: 'delete', entity: 'kanbanCard', entityId: id })
+  publishEntityDeleted(scope.organizationId, 'kanbanCard', id, scope.userId)
 
   return new NextResponse(null, { status: 204 })
 }

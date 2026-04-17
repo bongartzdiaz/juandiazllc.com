@@ -1,10 +1,14 @@
-/* GET  /api/templates — list templates
+﻿/* GET  /api/templates — list templates
    POST /api/templates — create template */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
-import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
+import { requireScope, requireRole } from '@/lib/auth-helpers'
+import { parsePagination, paginatedResponse } from '@/lib/pagination'
 import { logAudit } from '@/lib/audit'
+import { publishEntityCreated } from '@/lib/realtime/publish'
+import { validateBody } from '@/lib/validation'
+import { createTemplateSchema } from '@/lib/validation/schemas'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -16,41 +20,41 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url)
   const type = url.searchParams.get('type') ?? undefined
 
+  const { page, limit, skip } = parsePagination(req)
   const prisma = getAuthPrisma()
-  const templates = await prisma.template.findMany({
-    where: {
-      organizationId: scope.organizationId,
-      ...(type ? { type } : {}),
-    },
-    orderBy: { createdAt: 'desc' },
-  })
+  const where = {
+    organizationId: scope.organizationId,
+    ...(type ? { type } : {}),
+  }
+  const [templates, total] = await Promise.all([
+    prisma.template.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take: limit }),
+    prisma.template.count({ where }),
+  ])
 
-  return NextResponse.json({ data: templates })
+  return paginatedResponse(templates, total, { page, limit, skip })
 }
 
 export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
 
-  let body: { name?: string; type?: string; subject?: string; body?: string; variables?: string[] }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-
-  if (!body.name?.trim()) return jsonError('name is required', 400)
-  if (!body.type) return jsonError('type is required', 400)
-  if (!body.body) return jsonError('body is required', 400)
+  const parsed = await validateBody(req, createTemplateSchema)
+  if (!parsed.success) return parsed.response
+  const body = parsed.data
 
   const prisma = getAuthPrisma()
   const template = await prisma.template.create({
     data: {
       organizationId: scope.organizationId,
-      name: body.name.trim(),
+      name: body.name,
       type: body.type,
-      subject: body.subject ?? '',
+      subject: body.subject,
       body: body.body,
-      variables: JSON.stringify(body.variables ?? []),
+      variables: JSON.stringify(body.variables),
     },
   })
 
   await logAudit({ scope, action: 'create', entity: 'template', entityId: template.id })
+  publishEntityCreated(scope.organizationId, 'template', template.id, scope.userId, template)
   return NextResponse.json({ data: template }, { status: 201 })
 }

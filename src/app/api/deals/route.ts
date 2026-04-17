@@ -1,4 +1,4 @@
-/* GET  /api/deals — list deals (paginated, filterable)
+﻿/* GET  /api/deals — list deals (paginated, filterable)
    POST /api/deals — create a deal */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -6,6 +6,9 @@ import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/pagination'
 import { logAudit } from '@/lib/audit'
+import { publishEntityCreated } from '@/lib/realtime/publish'
+import { validateBody } from '@/lib/validation'
+import { createDealSchema } from '@/lib/validation/schemas'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -14,16 +17,44 @@ export async function GET(req: NextRequest) {
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
 
-  const { page, limit, skip } = parsePagination(req)
   const url = new URL(req.url)
+  const prisma = getAuthPrisma()
+
+  const dealInclude = {
+    stage: { select: { id: true, name: true, color: true } },
+    contact: { select: { id: true, name: true } },
+    owner: { select: { id: true, name: true } },
+    pipeline: { select: { id: true, name: true } },
+    project: { select: { id: true, title: true } },
+  }
+
+  /* Single deal by id: GET /api/deals?id=xxx */
+  const dealId = url.searchParams.get('id')
+  if (dealId) {
+    const deal = await prisma.deal.findFirst({
+      where: { id: dealId, pipeline: { organizationId: scope.organizationId } },
+      include: dealInclude,
+    })
+    if (!deal) return jsonError('Deal not found', 404)
+    return NextResponse.json({ data: deal })
+  }
+
+  const { page, limit, skip } = parsePagination(req)
   const pipelineId = url.searchParams.get('pipelineId') ?? undefined
   const status = url.searchParams.get('status') ?? undefined
+  const contactId = url.searchParams.get('contactId') ?? undefined
+  const ownerId = url.searchParams.get('ownerId') ?? undefined
+  const stageId = url.searchParams.get('stageId') ?? undefined
+  const projectId = url.searchParams.get('projectId') ?? undefined
 
-  const prisma = getAuthPrisma()
   const where = {
     pipeline: { organizationId: scope.organizationId },
     ...(pipelineId ? { pipelineId } : {}),
     ...(status ? { status } : {}),
+    ...(contactId ? { contactId } : {}),
+    ...(ownerId ? { ownerId } : {}),
+    ...(stageId ? { stageId } : {}),
+    ...(projectId ? { projectId } : {}),
   }
 
   const [deals, total] = await Promise.all([
@@ -32,11 +63,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: 'desc' },
       skip,
       take: limit,
-      include: {
-        stage: { select: { id: true, name: true, color: true } },
-        contact: { select: { id: true, name: true } },
-        owner: { select: { id: true, name: true } },
-      },
+      include: dealInclude,
     }),
     prisma.deal.count({ where }),
   ])
@@ -48,16 +75,9 @@ export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
 
-  let body: {
-    pipelineId?: string; stageId?: string; title?: string
-    contactId?: string; projectId?: string; valueCents?: number
-    probability?: number; expectedClose?: string; notes?: string
-  }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-
-  if (!body.pipelineId) return jsonError('pipelineId is required', 400)
-  if (!body.stageId) return jsonError('stageId is required', 400)
-  if (!body.title?.trim()) return jsonError('title is required', 400)
+  const parsed = await validateBody(req, createDealSchema)
+  if (!parsed.success) return parsed.response
+  const body = parsed.data
 
   const prisma = getAuthPrisma()
 
@@ -72,14 +92,15 @@ export async function POST(req: NextRequest) {
     data: {
       pipelineId: body.pipelineId,
       stageId: body.stageId,
-      title: body.title.trim(),
+      title: body.title,
       contactId: body.contactId ?? null,
-      projectId: body.projectId ?? null,
       ownerId: scope.userId,
-      valueCents: body.valueCents ?? 0,
-      probability: Math.min(100, Math.max(0, body.probability ?? 50)),
+      valueCents: body.valueCents,
+      probability: body.probability,
+      status: body.status,
+      dealType: body.dealType,
       expectedClose: body.expectedClose ? new Date(body.expectedClose) : null,
-      notes: body.notes ?? '',
+      notes: body.notes,
     },
     include: {
       stage: { select: { id: true, name: true, color: true } },
@@ -87,6 +108,7 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  await logAudit({ scope, action: 'create', entity: 'kanbanCard', entityId: deal.id })
+  await logAudit({ scope, action: 'create', entity: 'deal', entityId: deal.id })
+  publishEntityCreated(scope.organizationId, 'deal', deal.id, scope.userId)
   return NextResponse.json({ data: deal }, { status: 201 })
 }

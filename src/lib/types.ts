@@ -635,3 +635,279 @@ export interface CustomPage {
   createdAt: string
   updatedAt: string
 }
+
+// ── MLS/IDX ──
+
+export interface MlsFeed {
+  id: string
+  organizationId: string
+  name: string
+  provider: string
+  apiUrl: string
+  lastSyncAt: string | null
+  syncInterval: number
+  status: string
+  totalImported: number
+  errorLog: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ListingAlert {
+  id: string
+  organizationId: string
+  contactId: string
+  name: string
+  criteria: string
+  frequency: string
+  channel: string
+  enabled: boolean
+  lastSentAt: string | null
+  matchCount: number
+  createdAt: string
+  updatedAt: string
+}
+
+// ── Inbox / Conversations ──
+
+export interface Conversation {
+  id: string
+  organizationId: string
+  contactId: string
+  channel: string
+  subject: string
+  status: string
+  assignedTo: string | null
+  lastMessageAt: string | null
+  unreadCount: number
+  createdAt: string
+  messages?: ChatMessage[]
+}
+
+export interface ChatMessage {
+  id: string
+  conversationId: string
+  direction: string
+  channel: string
+  fromAddress: string
+  toAddress: string
+  subject: string
+  body: string
+  bodyHtml: string
+  status: string
+  readAt: string | null
+  createdAt: string
+}
+
+// ── Lead Scoring ──
+
+export interface LeadScore {
+  id: string
+  organizationId: string
+  contactId: string
+  score: number
+  grade: string
+  behaviorScore: number
+  demographicScore: number
+  lastActivity: string | null
+  scoreHistory: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ScoringRule {
+  id: string
+  organizationId: string
+  name: string
+  event: string
+  points: number
+  decay: boolean
+  decayDays: number
+  enabled: boolean
+  createdAt: string
+}
+
+// ── Lead Routing ──
+
+export interface LeadRoutingRule {
+  id: string
+  organizationId: string
+  name: string
+  strategy: string
+  criteria: string
+  agentPool: string
+  currentIndex: number
+  enabled: boolean
+  assignedCount: number
+  createdAt: string
+  updatedAt: string
+}
+
+// ── Call Tracking ──
+
+export interface CallLog {
+  id: string
+  organizationId: string
+  agentId: string
+  contactId: string | null
+  direction: string
+  phoneNumber: string
+  status: string
+  duration: number
+  outcome: string
+  notes: string
+  recordingUrl: string
+  disposition: string
+  callbackAt: string | null
+  startedAt: string
+  endedAt: string | null
+  createdAt: string
+}
+
+export interface DialerList {
+  id: string
+  organizationId: string
+  name: string
+  contactIds: string
+  totalContacts: number
+  dialedCount: number
+  connectedCount: number
+  status: string
+  assignedTo: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+// ── Action Plans ──
+
+export interface ActionPlan {
+  id: string
+  organizationId: string
+  name: string
+  description: string
+  triggerEvent: string
+  stepsJson: string
+  status: string
+  enrolledCount: number
+  completedCount: number
+  createdAt: string
+  updatedAt: string
+  _count?: { enrollments: number }
+}
+
+export interface ActionPlanEnrollment {
+  id: string
+  planId: string
+  contactId: string
+  currentStep: number
+  status: string
+  startedAt: string
+  completedAt: string | null
+  nextActionAt: string | null
+}
+
+// ── Transactions & E-Signatures ──
+
+export interface Transaction {
+  id: string
+  organizationId: string
+  dealId: string | null
+  propertyId: string | null
+  type: string
+  status: string
+  closingDate: string | null
+  contractDate: string | null
+  escrowNumber: string
+  titleCompany: string
+  buyerAgentId: string | null
+  sellerAgentId: string | null
+  buyerContactId: string | null
+  sellerContactId: string | null
+  salePrice: number
+  earnestMoney: number
+  notes: string
+  checklistJson: string
+  createdAt: string
+  updatedAt: string
+  _count?: { signatures: number }
+}
+
+export interface ESignatureRequest {
+  id: string
+  transactionId: string
+  documentName: string
+  signerName: string
+  signerEmail: string
+  status: string
+  sentAt: string | null
+  viewedAt: string | null
+  signedAt: string | null
+  externalId: string
+  provider: string
+  createdAt: string
+}
+
+// ── SOI / Referrals ──
+
+export interface Referral {
+  id: string
+  organizationId: string
+  referrerId: string
+  referredId: string
+  dealId: string | null
+  status: string
+  commissionPct: number
+  commissionCents: number
+  notes: string
+  referredAt: string
+  convertedAt: string | null
+  createdAt: string
+}
+
+export interface SoiCategory {
+  id: string
+  organizationId: string
+  name: string
+  touchFrequency: number
+  color: string
+  contactCount: number
+  createdAt: string
+}
+
+// ── CMA Reports ──
+
+export interface CmaReport {
+  id: string
+  organizationId: string
+  agentId: string
+  contactId: string | null
+  propertyId: string | null
+  subjectAddress: string
+  subjectCity: string
+  subjectZip: string
+  subjectBeds: number | null
+  subjectBaths: number | null
+  subjectSqft: number | null
+  estimatedValue: number
+  comparablesJson: string
+  adjustmentsJson: string
+  reportHtml: string
+  status: string
+  sentAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+// ── Client Portal ──
+
+export interface ClientPortalAccess {
+  id: string
+  organizationId: string
+  contactId: string
+  token: string
+  permissions: string
+  enabled: boolean
+  lastLoginAt: string | null
+  expiresAt: string | null
+  createdAt: string
+}

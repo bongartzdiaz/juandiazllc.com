@@ -1,13 +1,14 @@
-/* GET  /api/projects        — list all projects in the user's org (paginated)
+﻿/* GET  /api/projects        — list all projects in the user's org (paginated)
    POST /api/projects        — create a new project (manager+ only) */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
-import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
+import { requireScope, requireRole } from '@/lib/auth-helpers'
 import { validateBody } from '@/lib/validation'
 import { createProjectSchema } from '@/lib/validation/schemas'
 import { parsePagination, paginatedResponse } from '@/lib/pagination'
 import { logAudit } from '@/lib/audit'
+import { publishEntityCreated } from '@/lib/realtime/publish'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -75,6 +76,7 @@ export async function POST(req: NextRequest) {
   })
 
   await logAudit({ scope, action: 'create', entity: 'project', entityId: project.id })
+  publishEntityCreated(scope.organizationId, 'project', project.id, scope.userId)
 
   return NextResponse.json({ data: project }, { status: 201 })
 }

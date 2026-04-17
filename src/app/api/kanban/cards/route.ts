@@ -1,4 +1,4 @@
-/* POST /api/kanban/cards — create a new card in a column the user owns */
+﻿/* POST /api/kanban/cards — create a new card in a column the user owns */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
@@ -6,6 +6,7 @@ import { requireRole, jsonError } from '@/lib/auth-helpers'
 import { validateBody } from '@/lib/validation'
 import { createKanbanCardSchema } from '@/lib/validation/schemas'
 import { logAudit } from '@/lib/audit'
+import { publishEntityCreated } from '@/lib/realtime/publish'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -44,6 +45,7 @@ export async function POST(req: NextRequest) {
   })
 
   await logAudit({ scope, action: 'create', entity: 'kanbanCard', entityId: card.id })
+  publishEntityCreated(scope.organizationId, 'kanbanCard', card.id, scope.userId)
 
   return NextResponse.json({ data: card }, { status: 201 })
 }

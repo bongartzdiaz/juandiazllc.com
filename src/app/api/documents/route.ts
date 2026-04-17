@@ -1,10 +1,11 @@
-/* GET  /api/documents — list documents (filterable by entity)
+﻿/* GET  /api/documents — list documents (filterable by entity)
    POST /api/documents — upload document metadata */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/pagination'
+import { publishEntityCreated } from '@/lib/realtime/publish'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -61,5 +62,6 @@ export async function POST(req: NextRequest) {
     },
   })
 
+  publishEntityCreated(scope.organizationId, 'document', doc.id, scope.userId)
   return NextResponse.json({ data: doc }, { status: 201 })
 }

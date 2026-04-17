@@ -1,4 +1,4 @@
-/* GET  /api/contacts — list contacts in the user's org (paginated)
+﻿/* GET  /api/contacts — list contacts in the user's org (paginated)
    POST /api/contacts — create a new contact (manager+ only) */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -8,6 +8,7 @@ import { validateBody } from '@/lib/validation'
 import { createContactSchema } from '@/lib/validation/schemas'
 import { parsePagination, paginatedResponse } from '@/lib/pagination'
 import { logAudit } from '@/lib/audit'
+import { publishEntityCreated } from '@/lib/realtime/publish'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -77,6 +78,7 @@ export async function POST(req: NextRequest) {
   })
 
   await logAudit({ scope, action: 'create', entity: 'contact', entityId: contact.id })
+  publishEntityCreated(scope.organizationId, 'contact', contact.id, scope.userId)
 
   return NextResponse.json({ data: contact }, { status: 201 })
 }

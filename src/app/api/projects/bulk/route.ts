@@ -1,4 +1,4 @@
-/* POST /api/projects/bulk — bulk operations on projects */
+﻿/* POST /api/projects/bulk — bulk operations on projects */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'

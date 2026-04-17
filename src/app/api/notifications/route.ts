@@ -1,9 +1,9 @@
-/* GET  /api/notifications — paginated notifications for current user
+﻿/* GET  /api/notifications — paginated notifications for current user
    POST /api/notifications — create a notification (internal use) */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
-import { requireScope, jsonError } from '@/lib/auth-helpers'
+import { requireScope } from '@/lib/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/pagination'
 
 export const dynamic = 'force-dynamic'

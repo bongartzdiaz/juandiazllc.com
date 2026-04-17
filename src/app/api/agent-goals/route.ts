@@ -1,9 +1,10 @@
-/* GET  /api/agent-goals — goals for agents (team view)
+﻿/* GET  /api/agent-goals — goals for agents (team view)
    POST /api/agent-goals — set agent goals */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
+import { parsePagination, paginatedResponse } from '@/lib/pagination'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -16,17 +17,24 @@ export async function GET(req: NextRequest) {
   const year = parseInt(url.searchParams.get('year') ?? String(new Date().getFullYear()))
   const month = url.searchParams.get('month') ? parseInt(url.searchParams.get('month')!) : undefined
 
+  const { page, limit, skip } = parsePagination(req)
   const prisma = getAuthPrisma()
-  const goals = await prisma.agentGoal.findMany({
-    where: {
-      organizationId: scope.organizationId,
-      year,
-      ...(month !== undefined ? { month } : {}),
-    },
-    orderBy: [{ year: 'desc' }, { month: 'desc' }],
-  })
+  const where = {
+    organizationId: scope.organizationId,
+    year,
+    ...(month !== undefined ? { month } : {}),
+  }
+  const [goals, total] = await Promise.all([
+    prisma.agentGoal.findMany({
+      where,
+      orderBy: [{ year: 'desc' }, { month: 'desc' }],
+      skip,
+      take: limit,
+    }),
+    prisma.agentGoal.count({ where }),
+  ])
 
-  return NextResponse.json({ data: goals })
+  return paginatedResponse(goals, total, { page, limit, skip })
 }
 
 export async function POST(req: NextRequest) {

@@ -1,4 +1,4 @@
-/* GET /api/impact — aggregated impact metrics for the org
+﻿/* GET /api/impact — aggregated impact metrics for the org
    POST /api/impact — create a new impact metric
 
    Query params:

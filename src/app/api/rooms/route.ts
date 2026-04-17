@@ -1,10 +1,11 @@
-/* GET  /api/rooms — list rooms
+﻿/* GET  /api/rooms — list rooms
    POST /api/rooms — create room */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/pagination'
+import { publishEntityCreated } from '@/lib/realtime/publish'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -57,5 +58,6 @@ export async function POST(req: NextRequest) {
     },
   })
 
+  publishEntityCreated(scope.organizationId, 'room', room.id, scope.userId)
   return NextResponse.json({ data: room }, { status: 201 })
 }

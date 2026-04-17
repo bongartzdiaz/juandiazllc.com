@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
+import { parsePagination, paginatedResponse } from '@/lib/pagination'
 import { logAudit } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
@@ -11,7 +12,7 @@ export const runtime = 'nodejs'
 
 type Ctx = { params: Promise<{ id: string }> }
 
-export async function GET(_req: NextRequest, ctx: Ctx) {
+export async function GET(req: NextRequest, ctx: Ctx) {
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
 
@@ -24,13 +25,20 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
   })
   if (!contact) return jsonError('Contact not found', 404)
 
-  const notes = await prisma.contactNote.findMany({
-    where: { contactId: id },
-    orderBy: { createdAt: 'desc' },
-    include: { user: { select: { id: true, name: true, avatarUrl: true } } },
-  })
+  const { page, limit, skip } = parsePagination(req)
+  const where = { contactId: id }
+  const [notes, total] = await Promise.all([
+    prisma.contactNote.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+      include: { user: { select: { id: true, name: true, avatarUrl: true } } },
+    }),
+    prisma.contactNote.count({ where }),
+  ])
 
-  return NextResponse.json({ data: notes })
+  return paginatedResponse(notes, total, { page, limit, skip })
 }
 
 export async function POST(req: NextRequest, ctx: Ctx) {

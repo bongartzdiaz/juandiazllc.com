@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
-import { Search, TrendingUp, TrendingDown } from 'lucide-react'
+import { Search } from 'lucide-react'
 
 interface MarketSnapshot {
   id: string
@@ -26,6 +27,7 @@ export default function MarketAnalyticsPage() {
   const [zipCode, setZipCode] = useState('')
   const [year, setYear] = useState(new Date().getFullYear())
   const [loading, setLoading] = useState(true)
+  const t = useTranslations('marketAnalytics')
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -54,12 +56,9 @@ export default function MarketAnalyticsPage() {
     ? (snapshots.reduce((s, sn) => s + sn.inventoryMonths, 0) / snapshots.length).toFixed(1)
     : '0'
 
-  // Unique zip codes
-  const zips = [...new Set(snapshots.map(s => s.zipCode))].sort()
-
   return (
     <>
-      <Topbar title="Market Analytics" sub="Real estate market data and trends" />
+      <Topbar title={t('title')} sub={t('subtitle')} />
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
           <KpiCard icon="dollar-sign" label="Median Price" value={`$${(medianPrice / 100).toLocaleString()}`}

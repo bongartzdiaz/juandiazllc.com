@@ -1,17 +1,62 @@
 {
   "nav": {
+    "core": "Kern",
+    "tools": "Tools",
+    "system": "Systeem",
     "dashboard": "Dashboard",
     "projects": "Projecten",
     "contacts": "Contacten",
     "impact": "Impact",
+    "market": "Markt",
     "reports": "Rapporten",
+    "dealsBoard": "Deal Bord",
+    "deals": "Deals",
+    "calendar": "Kalender",
+    "timeline": "Tijdlijn",
+    "documents": "Documenten",
+    "properties": "Vastgoed",
+    "showings": "Bezichtigingen",
+    "offers": "Biedingen",
+    "openHouses": "Open Huizen",
+    "commissions": "Commissies",
+    "dripCampaigns": "Drip Campagnes",
+    "marketAnalytics": "Markt Analyse",
+    "rooms": "Kamers",
+    "grants": "Subsidies",
+    "volunteers": "Vrijwilligers",
+    "donors": "Donateurs",
+    "webhooks": "Webhooks",
+    "notifications": "Meldingen",
+    "automations": "Automatiseringen",
+    "auditLog": "Audit Log",
+    "settings": "Instellingen",
     "kanban": "Kanban",
     "pages": "Pagina's",
-    "settings": "Instellingen"
+    "aiInsights": "AI Inzichten",
+    "aiScoring": "Lead Scoring",
+    "aiAsk": "Vraag AI",
+    "reservations": "Reserveringen",
+    "board": "Bord",
+    "inbox": "Inbox",
+    "templates": "Sjablonen",
+    "actionPlans": "Actieplannen",
+    "transactions": "Transacties",
+    "leadScores": "Lead Scores",
+    "scoringRules": "Scoringregels",
+    "leadRouting": "Lead Routing",
+    "dialer": "Power Dialer",
+    "referrals": "Verwijzingen",
+    "soi": "Invloedssfeer",
+    "cma": "CMA Rapporten",
+    "clientPortal": "Klantenportaal",
+    "eSignatures": "E-Handtekeningen",
+    "email": "E-mail",
+    "sms": "SMS",
+    "integrations": "Integraties"
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Jouw impact in een oogopslag",
+    "subtitle": "Jouw portfolio in een oogopslag",
     "totalProjects": "Totaal Projecten",
     "activeProjects": "Actieve Projecten",
     "peopleHelped": "Mensen Geholpen",
@@ -25,8 +70,22 @@
   },
   "projects": {
     "title": "Projecten",
+    "titleRE": "Vastgoed",
+    "titleHOS": "Locaties & Kamers",
     "subtitle": "Beheer je MVO-initiatieven",
+    "subtitleRE": "Beheer je portfolio",
+    "subtitleHOS": "Beheer je locaties",
     "newProject": "Nieuw Project",
+    "newProjectRE": "Nieuw Vastgoed",
+    "newProjectHOS": "Nieuwe Kamer",
+    "searchPlaceholder": "Zoek projecten...",
+    "searchPlaceholderRE": "Zoek vastgoed...",
+    "searchPlaceholderHOS": "Zoek kamers & locaties...",
+    "gridView": "Rasterweergave",
+    "listView": "Lijstweergave",
+    "all": "Alle",
+    "createdSuccess": "Project succesvol aangemaakt",
+    "createFailed": "Aanmaken project mislukt",
     "status": {
       "planned": "Gepland",
       "active": "Actief",
@@ -47,12 +106,26 @@
   "contacts": {
     "title": "Contacten",
     "subtitle": "Partners, donoren & stakeholders",
+    "subtitleRE": "Kopers, verkopers & investeerders",
+    "subtitleHOS": "Gasten, leveranciers & partners",
     "newContact": "Nieuw Contact",
+    "searchPlaceholder": "Zoek contacten...",
+    "all": "Alle",
+    "createdSuccess": "Contact succesvol aangemaakt",
+    "createFailed": "Aanmaken contact mislukt",
     "types": {
       "partner": "Partner",
       "beneficiary": "Begunstigde",
       "stakeholder": "Stakeholder",
-      "donor": "Donateur"
+      "donor": "Donateur",
+      "buyer": "Koper",
+      "seller": "Verkoper",
+      "tenant": "Huurder",
+      "landlord": "Verhuurder",
+      "investor": "Investeerder",
+      "guest": "Gast",
+      "vendor": "Leverancier",
+      "staff": "Personeel"
     },
     "fields": {
       "name": "Naam",
@@ -62,6 +135,174 @@
       "type": "Type",
       "notes": "Notities"
     }
+  },
+  "deals": {
+    "title": "Deals",
+    "subtitle": "Beheer je deal pipeline",
+    "totalValue": "Totale Waarde",
+    "openDeals": "Open Deals",
+    "won": "Gewonnen",
+    "avgProbability": "Gem. Kans",
+    "allPipelines": "Alle Pipelines",
+    "allStatuses": "Alle Statussen",
+    "deal": "Deal",
+    "stage": "Fase",
+    "value": "Waarde",
+    "probability": "Kans",
+    "contact": "Contact",
+    "status": "Status",
+    "noneFound": "Geen deals gevonden. Maak eerst een pipeline.",
+    "open": "Open",
+    "lost": "Verloren"
+  },
+  "properties": {
+    "title": "Vastgoed",
+    "subtitle": "Beheer je vastgoed aanbod",
+    "totalProperties": "Totaal Vastgoed",
+    "portfolioValue": "Portfolio Waarde",
+    "available": "Beschikbaar",
+    "totalViewings": "Totaal Bezichtigingen",
+    "searchPlaceholder": "Zoek vastgoed..."
+  },
+  "showings": {
+    "title": "Bezichtigingen",
+    "subtitle": "Plan en volg bezichtigingen",
+    "totalShowings": "Totaal Bezichtigingen",
+    "scheduled": "Gepland",
+    "completed": "Voltooid",
+    "avgRating": "Gem. Beoordeling",
+    "property": "Vastgoed",
+    "dateTime": "Datum/Tijd",
+    "agent": "Makelaar",
+    "contact": "Contact",
+    "rating": "Beoordeling",
+    "status": "Status",
+    "noneYet": "Nog geen bezichtigingen gepland.",
+    "cancelled": "Geannuleerd",
+    "noShow": "Niet Verschenen"
+  },
+  "offers": {
+    "title": "Biedingen",
+    "subtitle": "Beheer biedingen op vastgoed",
+    "totalOfferValue": "Totale Biedingswaarde",
+    "pending": "In Afwachting",
+    "accepted": "Geaccepteerd",
+    "acceptRate": "Acceptatiepercentage",
+    "buyer": "Koper",
+    "amount": "Bedrag",
+    "date": "Datum",
+    "status": "Status",
+    "noneYet": "Nog geen biedingen.",
+    "rejected": "Afgewezen",
+    "countered": "Tegenbod",
+    "withdrawn": "Ingetrokken",
+    "expired": "Verlopen"
+  },
+  "openHouses": {
+    "title": "Open Huizen",
+    "subtitle": "Plan en beheer open huizen evenementen",
+    "totalEvents": "Totaal Evenementen",
+    "upcoming": "Aankomend",
+    "totalVisitors": "Totaal Bezoekers",
+    "avgVisitors": "Gem. Bezoekers",
+    "property": "Vastgoed",
+    "date": "Datum",
+    "time": "Tijd",
+    "host": "Gastheer",
+    "visitors": "Bezoekers",
+    "noneYet": "Geen open huizen gepland."
+  },
+  "commissions": {
+    "title": "Commissies",
+    "subtitle": "Commissie tracking en team ranglijst",
+    "ytdTeamGci": "JTD Team GCI",
+    "totalNet": "Totaal Netto",
+    "pendingPayouts": "Openstaande Uitbetalingen",
+    "teamMembers": "Teamleden",
+    "teamLeaderboard": "Team Ranglijst",
+    "commissionRecords": "Commissie Overzicht",
+    "rank": "#",
+    "agent": "Makelaar",
+    "deals": "Deals",
+    "won": "Gewonnen",
+    "month": "Maand",
+    "volume": "Volume",
+    "ytdGci": "JTD GCI",
+    "convRate": "Conv %",
+    "noTeamData": "Nog geen teamgegevens.",
+    "type": "Type / Notities",
+    "gross": "Bruto",
+    "splitPct": "Split %",
+    "net": "Netto",
+    "status": "Status",
+    "noRecords": "Geen commissie records.",
+    "paid": "Betaald",
+    "voided": "Ongeldig"
+  },
+  "dripCampaigns": {
+    "title": "Drip Campagnes",
+    "subtitle": "Geautomatiseerde e-mail en SMS reeksen",
+    "totalCampaigns": "Totaal Campagnes",
+    "active": "Actief",
+    "totalSteps": "Totaal Stappen",
+    "types": "Types",
+    "allTypes": "Alle Types",
+    "allStatuses": "Alle Statussen",
+    "paused": "Gepauzeerd",
+    "draft": "Concept",
+    "completed": "Voltooid",
+    "noSteps": "Geen stappen geconfigureerd",
+    "noneFound": "Geen campagnes gevonden.",
+    "buyerNurture": "Koper Nurture",
+    "sellerNurture": "Verkoper Nurture",
+    "newListing": "Nieuw Aanbod",
+    "openHouseFollowUp": "Open Huis Follow-up",
+    "homeAnniversary": "Woningjubileum",
+    "referralRequest": "Verwijzingsverzoek",
+    "justSold": "Net Verkocht",
+    "marketUpdate": "Markt Update"
+  },
+  "marketAnalytics": {
+    "title": "Markt Analyse",
+    "subtitle": "Vastgoed marktgegevens en trends",
+    "medianPrice": "Mediane Prijs",
+    "avgDaysOnMarket": "Gem. Dagen op Markt",
+    "ytdClosedSales": "JTD Gesloten Verkopen",
+    "avgInventory": "Gem. Voorraad",
+    "filterByZip": "Filter op postcode...",
+    "zip": "Postcode",
+    "month": "Maand",
+    "dom": "DOM",
+    "active": "Actief",
+    "closed": "Gesloten",
+    "new": "Nieuw",
+    "sqft": "Prijs/m2",
+    "inventory": "Voorraad",
+    "noData": "Geen marktgegevens beschikbaar. Voeg data toe via API.",
+    "hotMarket": "Hete Markt (<3 mnd voorraad)",
+    "balanced": "Gebalanceerd (3-6 mnd)",
+    "coolMarket": "Koele Markt (>6 mnd)"
+  },
+  "notifications": {
+    "title": "Meldingen",
+    "unread": "ongelezen",
+    "markAllRead": "Alles als gelezen markeren",
+    "noneYet": "Nog geen meldingen."
+  },
+  "automations": {
+    "title": "Automatiseringen",
+    "subtitle": "Automatiseer workflows en meldingen",
+    "totalRules": "Totaal Regels",
+    "active": "Actief",
+    "totalRuns": "Totaal Uitvoeringen"
+  },
+  "audit": {
+    "title": "Audit Log",
+    "subtitle": "Volg alle systeemwijzigingen"
+  },
+  "documents": {
+    "title": "Documenten",
+    "subtitle": "Beheer bestanden en documenten"
   },
   "impact": {
     "title": "Impact",
@@ -78,6 +319,88 @@
     "addColumn": "Kolom Toevoegen",
     "addCard": "Kaart Toevoegen"
   },
+  "rooms": {
+    "title": "Kamers",
+    "subtitle": "Beheer hotelkamers en beschikbaarheid"
+  },
+  "grants": {
+    "title": "Subsidies",
+    "subtitle": "Volg subsidieaanvragen en financiering"
+  },
+  "volunteers": {
+    "title": "Vrijwilligers",
+    "subtitle": "Beheer vrijwilligersteam en uren"
+  },
+  "settings": {
+    "title": "Instellingen",
+    "subtitle": "Beheer je account en voorkeuren",
+    "language": "Taal",
+    "theme": "Thema",
+    "profile": "Profiel",
+    "organization": "Organisatie",
+    "preferences": "Voorkeuren",
+    "apiKeys": "API Sleutels",
+    "goals": "Doelen",
+    "integrations": "Integraties",
+    "units": "Eenheden & Valuta",
+    "unitSystem": "Meetsysteem",
+    "metric": "Metrisch (m\u00b2, km, \u00b0C)",
+    "imperial": "Imperiaal (sqft, mi, \u00b0F)",
+    "currency": "Valuta",
+    "currencyDefault": "Standaard valuta voor alle bedragen"
+  },
+  "inbox": {
+    "title": "Inbox",
+    "subtitle": "Gesprekken en berichten"
+  },
+  "templates": {
+    "title": "Sjablonen",
+    "subtitle": "E-mail en SMS sjabloonbibliotheek"
+  },
+  "actionPlans": {
+    "title": "Actieplannen",
+    "subtitle": "Geautomatiseerde actiereeksen"
+  },
+  "transactions": {
+    "title": "Transacties",
+    "subtitle": "Volg vastgoedtransacties"
+  },
+  "leadScores": {
+    "title": "Lead Scores",
+    "subtitle": "Contact scoring dashboard"
+  },
+  "scoringRules": {
+    "title": "Scoringregels",
+    "subtitle": "Configureer lead scoring regels"
+  },
+  "leadRouting": {
+    "title": "Lead Routing",
+    "subtitle": "Leid leads naar makelaars"
+  },
+  "dialer": {
+    "title": "Power Dialer",
+    "subtitle": "Bellogboek en bellijsten"
+  },
+  "referrals": {
+    "title": "Verwijzingen",
+    "subtitle": "Volg verwijzingscommissies"
+  },
+  "soi": {
+    "title": "Invloedssfeer",
+    "subtitle": "Beheer je SOI categorieen"
+  },
+  "cma": {
+    "title": "CMA Rapporten",
+    "subtitle": "Vergelijkende marktanalyse"
+  },
+  "clientPortal": {
+    "title": "Klantenportaal",
+    "subtitle": "Beheer klantenportaal toegang"
+  },
+  "eSignatures": {
+    "title": "E-Handtekeningen",
+    "subtitle": "Volg document handtekeningen"
+  },
   "common": {
     "save": "Opslaan",
     "cancel": "Annuleren",
@@ -89,6 +412,17 @@
     "noResults": "Geen resultaten gevonden",
     "loading": "Laden...",
     "viewAll": "Alles Bekijken",
-    "back": "Terug"
+    "back": "Terug",
+    "allStatuses": "Alle Statussen",
+    "created": "Aangemaakt",
+    "signOut": "Uitloggen",
+    "live": "LIVE",
+    "sync": "Sync",
+    "syncing": "Synchroniseren...",
+    "done": "Klaar",
+    "step": "stap",
+    "steps": "stappen",
+    "unassigned": "Niet toegewezen",
+    "mode": "Modus"
   }
 }

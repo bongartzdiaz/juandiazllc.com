@@ -1,6 +1,8 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { Modal } from '@/components/ui/Modal'
@@ -9,7 +11,10 @@ import type { ContactFormData } from '@/components/forms/ContactForm'
 import { Search, Mail, Phone, FolderKanban } from 'lucide-react'
 import { useIndustry } from '@/hooks/useIndustry'
 import { useApi } from '@/hooks/useApi'
+import { useEntitySubscription } from '@/hooks/useRealtime'
 import { useToast } from '@/hooks/useToast'
+import { useUrlState } from '@/hooks/useUrlState'
+import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 
 interface Contact {
   id: string
@@ -126,8 +131,11 @@ const avatarColors: Record<string, string> = {
 
 export default function ContactsPage() {
   const { industry } = useIndustry()
-  const [search, setSearch] = useState('')
-  const [typeFilter, setTypeFilter] = useState<string>('all')
+  const t = useTranslations('contacts')
+  const [filters, setFilters] = useUrlState({ q: '', type: 'all' })
+  const search = filters.q
+  const typeFilter = filters.type
+  const debouncedSearch = useDebouncedValue(search, 250)
   const [showAdd, setShowAdd] = useState(false)
   const { addToast } = useToast()
 
@@ -140,6 +148,8 @@ export default function ContactsPage() {
   const apiQuery = useApi<{ data: ApiContact[] }>('/contacts', {
     enabled: !isRE && !isHOS,
   })
+  // Live-refresh on any contact mutation in the org
+  useEntitySubscription('contact', apiQuery.refetch)
   const liveContacts = useMemo<Contact[]>(() => {
     if (isRE || isHOS) return []
     const rows = apiQuery.data?.data ?? []
@@ -161,8 +171,8 @@ export default function ContactsPage() {
 
   const filtered = contacts.filter(c => {
     if (typeFilter !== 'all' && c.type !== typeFilter) return false
-    if (search) {
-      const q = search.toLowerCase()
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase()
       return (
         c.firstName.toLowerCase().includes(q) ||
         c.lastName.toLowerCase().includes(q) ||
@@ -186,11 +196,11 @@ export default function ContactsPage() {
         const err = await res.json().catch(() => ({ error: 'Failed to create contact' }))
         throw new Error(err.error || 'Failed to create contact')
       }
-      addToast('Contact created successfully', 'success')
+      addToast(t('createdSuccess'), 'success')
       setShowAdd(false)
       apiQuery.refetch()
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Something went wrong'
+      const msg = e instanceof Error ? e.message : t('createFailed')
       addToast(msg, 'error')
     }
   }
@@ -198,9 +208,9 @@ export default function ContactsPage() {
   return (
     <>
       <Topbar
-        title="Contacts"
-        sub={isHOS ? 'Guests, vendors & partners' : isRE ? 'Buyers, sellers & investors' : 'Partners, donors & stakeholders'}
-        addLabel="New Contact"
+        title={t('title')}
+        sub={isHOS ? t('subtitleHOS') : isRE ? t('subtitleRE') : t('subtitle')}
+        addLabel={t('newContact')}
         onAdd={() => setShowAdd(true)}
       />
 
@@ -238,21 +248,28 @@ export default function ContactsPage() {
           borderRadius: 10, padding: '10px 14px',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, background: 'var(--bg2)', borderRadius: 8, padding: '6px 10px' }}>
-            <Search size={14} color="var(--txt3)" />
+            <Search size={14} color="var(--txt3)" aria-hidden="true" />
             <input
               value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search contacts..."
+              onChange={e => setFilters({ q: e.target.value })}
+              placeholder={t('searchPlaceholder')}
+              aria-label={t('searchPlaceholder')}
               style={{ border: 'none', background: 'none', flex: 1, fontSize: 13, padding: 0 }}
             />
           </div>
           {filterOptions.map(s => (
-            <button key={s} onClick={() => setTypeFilter(s)} style={{
-              padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
-              background: typeFilter === s ? 'var(--txt)' : 'var(--bg2)',
-              color: typeFilter === s ? 'var(--panel)' : 'var(--txt2)',
-              border: 'none', cursor: 'pointer', textTransform: 'capitalize',
-            }}>{s}</button>
+            <button
+              key={s}
+              type="button"
+              onClick={() => setFilters({ type: s })}
+              aria-pressed={typeFilter === s}
+              style={{
+                padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
+                background: typeFilter === s ? 'var(--txt)' : 'var(--bg2)',
+                color: typeFilter === s ? 'var(--panel)' : 'var(--txt2)',
+                border: 'none', cursor: 'pointer', textTransform: 'capitalize',
+              }}
+            >{s === 'all' ? t('all') : t(`types.${s}` as 'types.partner')}</button>
           ))}
         </div>
 
@@ -262,10 +279,11 @@ export default function ContactsPage() {
             const tc = typeColors[c.type] || typeColors.partner
             const initials = c.firstName[0] + c.lastName[0]
             return (
-              <div key={c.id} className="card-hover" style={{
+              <Link key={c.id} href={`/contacts/${c.id}`} className="card-hover" style={{
                 background: 'var(--panel)', border: '1px solid var(--border)',
                 borderRadius: 12, padding: '16px', cursor: 'pointer',
                 boxShadow: 'var(--shadow-sm)',
+                textDecoration: 'none', color: 'inherit', display: 'block',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                   {/* Avatar */}
@@ -303,7 +321,7 @@ export default function ContactsPage() {
                     <span>connected {isHOS ? 'reservation' : isRE ? 'propert' : 'project'}{c.projects !== 1 ? (isHOS ? 's' : isRE ? 'ies' : 's') : (isRE ? 'y' : '')}</span>
                   </div>
                 </div>
-              </div>
+              </Link>
             )
           })}
         </div>

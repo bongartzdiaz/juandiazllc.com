@@ -1,10 +1,13 @@
-/* GET  /api/grants — list grants
+﻿/* GET  /api/grants — list grants
    POST /api/grants — create grant */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
-import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
+import { requireScope, requireRole } from '@/lib/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/pagination'
+import { publishEntityCreated } from '@/lib/realtime/publish'
+import { validateBody } from '@/lib/validation'
+import { createGrantSchema } from '@/lib/validation/schemas'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -35,26 +38,27 @@ export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.title?.trim()) return jsonError('title is required', 400)
+  const parsed = await validateBody(req, createGrantSchema)
+  if (!parsed.success) return parsed.response
+  const body = parsed.data
 
   const prisma = getAuthPrisma()
   const grant = await prisma.grant.create({
     data: {
       organizationId: scope.organizationId,
-      title: body.title.trim(),
-      funder: body.funder ?? '',
-      amountCents: body.amountCents ?? 0,
-      status: body.status ?? 'prospect',
+      title: body.title,
+      funder: body.funder,
+      amountCents: body.amountCents,
+      status: body.status,
       appliedDate: body.appliedDate ? new Date(body.appliedDate) : null,
       awardedDate: body.awardedDate ? new Date(body.awardedDate) : null,
       startDate: body.startDate ? new Date(body.startDate) : null,
       endDate: body.endDate ? new Date(body.endDate) : null,
-      description: body.description ?? '',
-      requirements: body.requirements ?? '',
+      description: body.description,
+      requirements: body.requirements,
     },
   })
 
+  publishEntityCreated(scope.organizationId, 'grant', grant.id, scope.userId)
   return NextResponse.json({ data: grant }, { status: 201 })
 }

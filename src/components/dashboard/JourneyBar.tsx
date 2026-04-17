@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import {
-  Users, MessageCircle, Phone, Briefcase, Trophy, Search,
-  Home, Key, FileText, Building2, BedDouble, Star,
-  Leaf, Globe2, HeartHandshake, TreePine, DollarSign,
+  Briefcase, Trophy, Search,
+  Home, Key, FileText, BedDouble, Star,
+  Leaf, Globe2,
   CalendarCheck, ClipboardCheck, Handshake, Receipt,
-  Stamp, FileCheck, ArrowRightLeft,
+  FileCheck, ArrowRightLeft,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 

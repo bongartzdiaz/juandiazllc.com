@@ -1,29 +1,37 @@
-/* GET  /api/webhooks — list webhooks
+﻿/* GET  /api/webhooks — list webhooks
    POST /api/webhooks — create a webhook */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireRole, jsonError } from '@/lib/auth-helpers'
+import { parsePagination, paginatedResponse } from '@/lib/pagination'
 import { logAudit } from '@/lib/audit'
 import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) return scope
 
+  const { page, limit, skip } = parsePagination(req)
   const prisma = getAuthPrisma()
-  const webhooks = await prisma.webhook.findMany({
-    where: { organizationId: scope.organizationId },
-    orderBy: { createdAt: 'desc' },
-    include: { _count: { select: { deliveries: true } } },
-  })
+  const where = { organizationId: scope.organizationId }
+  const [webhooks, total] = await Promise.all([
+    prisma.webhook.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+      include: { _count: { select: { deliveries: true } } },
+    }),
+    prisma.webhook.count({ where }),
+  ])
 
   // Mask secrets
   const masked = webhooks.map(w => ({ ...w, secret: w.secret.slice(0, 8) + '...' }))
-  return NextResponse.json({ data: masked })
+  return paginatedResponse(masked, total, { page, limit, skip })
 }
 
 export async function POST(req: NextRequest) {

@@ -1,4 +1,4 @@
-/* GET  /api/properties — list properties (paginated)
+﻿/* GET  /api/properties — list properties (paginated)
    POST /api/properties — create property */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -6,6 +6,9 @@ import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/pagination'
 import { logAudit } from '@/lib/audit'
+import { publishEntityCreated } from '@/lib/realtime/publish'
+import { validateBody } from '@/lib/validation'
+import { createPropertySchema } from '@/lib/validation/schemas'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -14,18 +17,46 @@ export async function GET(req: NextRequest) {
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
 
-  const { page, limit, skip } = parsePagination(req)
   const url = new URL(req.url)
+
+  // Single-property fetch via ?id=...
+  const singleId = url.searchParams.get('id')
+  if (singleId) {
+    const prisma = getAuthPrisma()
+    const prop = await prisma.property.findFirst({
+      where: { id: singleId, organizationId: scope.organizationId },
+      include: { _count: { select: { viewings: true } } },
+    })
+    if (!prop) return jsonError('Property not found', 404)
+    return NextResponse.json({ data: prop })
+  }
+
+  const { page, limit, skip } = parsePagination(req)
   const status = url.searchParams.get('status') ?? undefined
   const type = url.searchParams.get('type') ?? undefined
+  const subtype = url.searchParams.get('subtype') ?? undefined
+  const listingType = url.searchParams.get('listingType') ?? undefined
+  const district = url.searchParams.get('district') ?? undefined
+  const bankOwned = url.searchParams.get('bankOwned')
+  const resale = url.searchParams.get('resale')
   const search = url.searchParams.get('q') ?? undefined
 
   const prisma = getAuthPrisma()
-  const where = {
+  const where: any = {
     organizationId: scope.organizationId,
     ...(status ? { status } : {}),
     ...(type ? { type } : {}),
-    ...(search ? { OR: [{ title: { contains: search } }, { address: { contains: search } }, { city: { contains: search } }] } : {}),
+    ...(subtype ? { subtype } : {}),
+    ...(listingType ? { listingType } : {}),
+    ...(district ? { district } : {}),
+    ...(bankOwned === 'true' ? { isBankOwned: true } : {}),
+    ...(resale === 'true' ? { isResale: true } : {}),
+    ...(search ? { OR: [
+      { title: { contains: search } },
+      { address: { contains: search } },
+      { city: { contains: search } },
+      { town: { contains: search } },
+    ] } : {}),
   }
 
   const [properties, total] = await Promise.all([
@@ -43,35 +74,43 @@ export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.title?.trim()) return jsonError('title is required', 400)
+  const parsed = await validateBody(req, createPropertySchema)
+  if (!parsed.success) return parsed.response
+  const body = parsed.data
 
   const prisma = getAuthPrisma()
   const prop = await prisma.property.create({
     data: {
       organizationId: scope.organizationId,
-      title: body.title.trim(),
-      type: body.type ?? 'residential',
-      status: body.status ?? 'available',
-      address: body.address ?? '',
-      city: body.city ?? '',
-      state: body.state ?? '',
-      zipCode: body.zipCode ?? '',
-      country: body.country ?? '',
+      title: body.title,
+      type: body.type,
+      status: body.status,
+      address: body.address,
+      city: body.city,
+      state: body.state,
+      zipCode: body.zipCode,
+      country: body.country,
       lat: body.lat ?? null,
       lng: body.lng ?? null,
-      priceCents: body.priceCents ?? 0,
+      priceCents: body.priceCents,
       bedrooms: body.bedrooms ?? null,
       bathrooms: body.bathrooms ?? null,
       sqft: body.sqft ?? null,
       yearBuilt: body.yearBuilt ?? null,
-      description: body.description ?? '',
-      features: body.features ? JSON.stringify(body.features) : '[]',
-      images: body.images ? JSON.stringify(body.images) : '[]',
+      description: body.description,
+      features: JSON.stringify(body.features),
+      images: JSON.stringify(body.images),
+      // DEUS fields
+      listingType: body.listingType,
+      subtype: body.subtype,
+      district: body.district,
+      town: body.town,
+      isBankOwned: body.isBankOwned,
+      isResale: body.isResale,
     },
   })
 
-  await logAudit({ scope, action: 'create', entity: 'project' as any, entityId: prop.id })
+  await logAudit({ scope, action: 'create', entity: 'property', entityId: prop.id })
+  publishEntityCreated(scope.organizationId, 'property', prop.id, scope.userId)
   return NextResponse.json({ data: prop }, { status: 201 })
 }

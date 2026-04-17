@@ -1,4 +1,4 @@
-/* GET  /api/volunteers — list volunteers
+﻿/* GET  /api/volunteers — list volunteers
    POST /api/volunteers — create volunteer */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -6,6 +6,7 @@ import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/pagination'
 import { logAudit } from '@/lib/audit'
+import { publishEntityCreated } from '@/lib/realtime/publish'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -56,5 +57,6 @@ export async function POST(req: NextRequest) {
   })
 
   await logAudit({ scope, action: 'create', entity: 'volunteer', entityId: volunteer.id })
+  publishEntityCreated(scope.organizationId, 'volunteer', volunteer.id, scope.userId)
   return NextResponse.json({ data: volunteer }, { status: 201 })
 }

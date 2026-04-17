@@ -1,10 +1,12 @@
-/* GET  /api/drip-campaigns — list drip campaigns
+﻿/* GET  /api/drip-campaigns — list drip campaigns
    POST /api/drip-campaigns — create campaign */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
+import { parsePagination, paginatedResponse } from '@/lib/pagination'
 import { logAudit } from '@/lib/audit'
+import { publishEntityCreated } from '@/lib/realtime/publish'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -16,16 +18,18 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url)
   const type = url.searchParams.get('type') ?? undefined
 
+  const { page, limit, skip } = parsePagination(req)
   const prisma = getAuthPrisma()
-  const campaigns = await prisma.dripCampaign.findMany({
-    where: {
-      organizationId: scope.organizationId,
-      ...(type ? { type } : {}),
-    },
-    orderBy: { createdAt: 'desc' },
-  })
+  const where = {
+    organizationId: scope.organizationId,
+    ...(type ? { type } : {}),
+  }
+  const [campaigns, total] = await Promise.all([
+    prisma.dripCampaign.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take: limit }),
+    prisma.dripCampaign.count({ where }),
+  ])
 
-  return NextResponse.json({ data: campaigns })
+  return paginatedResponse(campaigns, total, { page, limit, skip })
 }
 
 export async function POST(req: NextRequest) {
@@ -49,5 +53,6 @@ export async function POST(req: NextRequest) {
   })
 
   await logAudit({ scope, action: 'create', entity: 'dripCampaign', entityId: campaign.id })
+  publishEntityCreated(scope.organizationId, 'dripCampaign', campaign.id, scope.userId, campaign)
   return NextResponse.json({ data: campaign }, { status: 201 })
 }

@@ -1,4 +1,4 @@
-/* GET  /api/reports — list user's reports
+﻿/* GET  /api/reports — list user's reports
    POST /api/reports — generate a new report */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -50,12 +50,12 @@ export async function POST(req: NextRequest) {
   })
 
   // Generate report content asynchronously
-  generateReport(report.id, scope.organizationId, body.type, body.configJson ?? '{}')
+  generateReport(report.id, scope.organizationId, body.type)
 
   return NextResponse.json({ data: report }, { status: 201 })
 }
 
-async function generateReport(reportId: string, orgId: string, type: string, configJson: string) {
+async function generateReport(reportId: string, orgId: string, type: string) {
   try {
     const prisma = getAuthPrisma()
 

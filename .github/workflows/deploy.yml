@@ -1,0 +1,82 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: false
+        default: 'main'
+      skip_migrate:
+        description: 'Skip db:push (code-only hot swap)'
+        required: false
+        default: 'false'
+        type: boolean
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: SSH → deploy.sh on VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_URL }}
+
+    steps:
+      - name: Start SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+      - name: Add VPS host key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Run deploy script on VPS
+        env:
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PATH: ${{ vars.VPS_PATH || '/var/www/philly-dashboard' }}
+          DEPLOY_BRANCH: ${{ inputs.branch || 'main' }}
+          SKIP_MIGRATE: ${{ inputs.skip_migrate && '1' || '0' }}
+        run: |
+          ssh "$VPS_USER@$VPS_HOST" \
+            "cd $VPS_PATH && BRANCH=$DEPLOY_BRANCH SKIP_MIGRATE=$SKIP_MIGRATE ./deploy/deploy.sh"
+
+      - name: Smoke test
+        env:
+          URL: ${{ vars.PRODUCTION_URL }}
+        run: |
+          if [ -z "$URL" ]; then
+            echo "::warning::No PRODUCTION_URL variable set, skipping smoke test"
+            exit 0
+          fi
+          sleep 5
+          for i in 1 2 3 4 5; do
+            if curl -fsS --max-time 10 "$URL/api/health" | grep -q '"status":"ok"'; then
+              echo "✓ Health check passed"
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying in 5s..."
+            sleep 5
+          done
+          echo "::error::Health check failed after 5 attempts"
+          exit 1
+
+      - name: Notify Sentry of release
+        if: env.SENTRY_AUTH_TOKEN != ''
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+        run: |
+          npx --yes @sentry/cli releases new "${{ github.sha }}"
+          npx --yes @sentry/cli releases set-commits --auto "${{ github.sha }}"
+          npx --yes @sentry/cli releases finalize "${{ github.sha }}"

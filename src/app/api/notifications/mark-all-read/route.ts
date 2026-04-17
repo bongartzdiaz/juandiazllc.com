@@ -1,4 +1,4 @@
-/* POST /api/notifications/mark-all-read — mark all as read */
+﻿/* POST /api/notifications/mark-all-read — mark all as read */
 
 import { NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'

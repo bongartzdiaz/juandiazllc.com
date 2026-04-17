@@ -60,12 +60,14 @@ export const ENDPOINTS = {
   },
   webhooks: {
     list: '/webhooks',
+    detail: (id: string) => `/webhooks/${id}`,
   },
   documents: {
     list: '/documents',
   },
   properties: {
     list: '/properties',
+    taxonomy: '/properties/taxonomy',
   },
   rooms: {
     list: '/rooms',
@@ -103,6 +105,86 @@ export const ENDPOINTS = {
   },
   leaderboard: {
     list: '/leaderboard',
+  },
+  mlsFeeds: {
+    list: '/mls-feeds',
+  },
+  listingAlerts: {
+    list: '/listing-alerts',
+  },
+  inbox: {
+    list: '/inbox',
+    messages: (id: string) => `/inbox/${id}/messages`,
+  },
+  leadScores: {
+    list: '/lead-scores',
+  },
+  scoringRules: {
+    list: '/scoring-rules',
+  },
+  leadRouting: {
+    list: '/lead-routing',
+  },
+  calls: {
+    list: '/calls',
+  },
+  dialerLists: {
+    list: '/dialer-lists',
+  },
+  actionPlans: {
+    list: '/action-plans',
+  },
+  transactions: {
+    list: '/transactions',
+  },
+  eSignatures: {
+    list: '/e-signatures',
+  },
+  referrals: {
+    list: '/referrals',
+  },
+  soi: {
+    list: '/soi',
+  },
+  cma: {
+    list: '/cma',
+  },
+  clientPortal: {
+    list: '/client-portal',
+  },
+  email: {
+    accounts: '/email/accounts',
+    send: '/email/send',
+  },
+  sms: {
+    list: '/sms',
+  },
+  integrations: {
+    list: '/integrations',
+  },
+  pages: {
+    list: '/pages',
+    detail: (idOrSlug: string) => `/pages/${idOrSlug}`,
+  },
+  ai: {
+    insights: '/ai/insights',
+    score: '/ai/score',
+    query: '/ai/query',
+  },
+  philanthropy: {
+    donorScores: '/philanthropy/donor-scores',
+  },
+  hospitality: {
+    quote: '/hospitality/quote',
+  },
+  apiKeys: {
+    list: '/api-keys',
+    detail: (id: string) => `/api-keys/${id}`,
+  },
+  integrationsAdvanced: {
+    catalog: '/integrations/catalog',
+    test: (id: string) => `/integrations/${id}/test`,
+    oauth: (provider: string) => `/integrations/oauth/${provider}`,
   },
 } as const
 

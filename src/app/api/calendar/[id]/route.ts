@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
 import { logAudit } from '@/lib/audit'
+import { publishEntityUpdated, publishEntityDeleted } from '@/lib/realtime/publish'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -51,7 +52,8 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (body.color !== undefined) data.color = body.color
 
   const event = await prisma.calendarEvent.update({ where: { id }, data })
-  await logAudit({ scope, action: 'update', entity: 'calendarEvent' as any, entityId: id })
+  await logAudit({ scope, action: 'update', entity: 'calendarEvent', entityId: id })
+  publishEntityUpdated(scope.organizationId, 'calendarEvent', id, scope.userId)
   return NextResponse.json({ data: event })
 }
 
@@ -68,6 +70,7 @@ export async function DELETE(_req: NextRequest, ctx: Ctx) {
   if (!existing) return jsonError('Event not found', 404)
 
   await prisma.calendarEvent.delete({ where: { id } })
-  await logAudit({ scope, action: 'delete', entity: 'calendarEvent' as any, entityId: id })
+  await logAudit({ scope, action: 'delete', entity: 'calendarEvent', entityId: id })
+  publishEntityDeleted(scope.organizationId, 'calendarEvent', id, scope.userId)
   return new NextResponse(null, { status: 204 })
 }

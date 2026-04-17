@@ -1,4 +1,4 @@
-/* GET  /api/pipelines — list pipelines with stages
+﻿/* GET  /api/pipelines — list pipelines with stages
    POST /api/pipelines — create pipeline (admin only) */
 
 import { NextRequest, NextResponse } from 'next/server'

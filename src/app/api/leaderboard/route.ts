@@ -1,4 +1,4 @@
-/* GET /api/leaderboard — team leaderboard with agent stats */
+﻿/* GET /api/leaderboard — team leaderboard with agent stats */
 
 import { NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'

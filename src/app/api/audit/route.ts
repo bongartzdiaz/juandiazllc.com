@@ -1,4 +1,4 @@
-/* GET /api/audit — paginated audit log (admin only) */
+﻿/* GET /api/audit — paginated audit log (admin only) */
 
 import { NextRequest } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'

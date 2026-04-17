@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/layout/Topbar'
 import { Pagination } from '@/components/ui/Pagination'
-import { Bell, Check, CheckCheck, Info, AlertTriangle, CheckCircle2, XCircle, Clock } from 'lucide-react'
+import { useRealtime } from '@/hooks/useRealtime'
+import { Bell, CheckCheck, Info, AlertTriangle, CheckCircle2, XCircle, Clock } from 'lucide-react'
 
 interface Notification {
   id: string
@@ -15,7 +17,8 @@ interface Notification {
   createdAt: string
 }
 
-const TYPE_ICONS: Record<string, any> = { info: Info, warning: AlertTriangle, success: CheckCircle2, error: XCircle }
+type IconComponent = typeof Info
+const TYPE_ICONS: Record<string, IconComponent> = { info: Info, warning: AlertTriangle, success: CheckCircle2, error: XCircle }
 const TYPE_COLORS: Record<string, { bg: string; txt: string }> = {
   info: { bg: 'var(--b-bg)', txt: 'var(--b-txt)' },
   warning: { bg: 'var(--y-bg)', txt: 'var(--y-txt)' },
@@ -29,43 +32,75 @@ export default function NotificationsPage() {
   const [total, setTotal] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const t = useTranslations('notifications')
 
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch(`/api/notifications?page=${page}&limit=20`)
-      const json = await res.json()
-      setNotifications(json.data ?? [])
+      const json = await res.json().catch(() => ({}))
+      setNotifications(Array.isArray(json.data) ? json.data : [])
       setTotal(json.pagination?.total ?? 0)
       setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setNotifications([]) }
-    finally { setLoading(false) }
+    } catch {
+      setNotifications([])
+    } finally {
+      setLoading(false)
+    }
   }, [page])
 
   useEffect(() => { fetchData() }, [fetchData])
 
+  // Live updates: when a new notification arrives via SSE, refetch.
+  useRealtime((msg) => {
+    if (msg.type === 'notification') fetchData()
+  }, [fetchData])
+
   const markRead = async (id: string) => {
+    // optimistic update
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
     try {
-      await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' })
-      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
-    } catch { /* silently handle */ }
+      const res = await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' })
+      if (!res.ok) throw new Error(`Failed to mark as read (${res.status})`)
+    } catch (err) {
+      // revert + surface the error
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: false } : n))
+      setActionError(err instanceof Error ? err.message : 'Failed to mark as read')
+    }
   }
 
   const markAllRead = async () => {
+    const snapshot = notifications
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
     try {
-      await fetch('/api/notifications/mark-all-read', { method: 'POST' })
-      setNotifications(prev => prev.map(n => ({ ...n, read: true })))
-    } catch { /* silently handle */ }
+      const res = await fetch('/api/notifications/mark-all-read', { method: 'POST' })
+      if (!res.ok) throw new Error(`Failed to mark all as read (${res.status})`)
+    } catch (err) {
+      setNotifications(snapshot)
+      setActionError(err instanceof Error ? err.message : 'Failed to mark all as read')
+    }
   }
 
   const unreadCount = notifications.filter(n => !n.read).length
 
   return (
     <>
-      <Topbar title="Notifications" sub={`${unreadCount} unread`} />
+      <Topbar title={t('title')} sub={`${unreadCount} ${t('unread')}`} />
       <div style={{ padding: '18px 24px 40px' }}>
+        {actionError && (
+          <div role="alert" style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+            padding: '8px 12px', borderRadius: 8, marginBottom: 12,
+            background: 'var(--r-bg)', border: '1px solid var(--r-border)',
+            color: 'var(--r-txt)', fontSize: 12, fontWeight: 600,
+          }}>
+            <span>{actionError}</span>
+            <button onClick={() => setActionError(null)} aria-label="Dismiss" style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontWeight: 700 }}>×</button>
+          </div>
+        )}
         {unreadCount > 0 && (
-          <button onClick={markAllRead} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12, fontWeight: 600, color: 'var(--txt2)', cursor: 'pointer', fontFamily: 'inherit', marginBottom: 16 }}>
+          <button onClick={markAllRead} aria-label="Mark all notifications as read" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12, fontWeight: 600, color: 'var(--txt2)', cursor: 'pointer', fontFamily: 'inherit', marginBottom: 16 }}>
             <CheckCheck size={14} /> Mark all as read
           </button>
         )}

@@ -7,7 +7,9 @@ import { IndustryProvider } from '@/hooks/useIndustry'
 import { ToastProvider } from '@/hooks/useToast'
 import { ToastContainer } from '@/components/ui/Toast'
 import { Sidebar } from './Sidebar'
+import { MobileNav } from './MobileNav'
 import { CommandPalette } from '@/components/ui/CommandPalette'
+import { OfflineBanner } from '@/components/ui/OfflineBanner'
 
 // Mobile menu context so Topbar can toggle the sidebar
 const MobileMenuCtx = createContext<{ open: boolean; toggle: () => void }>({ open: false, toggle: () => {} })
@@ -48,14 +50,18 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const toggle = useCallback(() => setMobileOpen(v => !v), [])
 
-  // Auth enforcement — currently bypassed so dashboard works without login.
-  // To re-enable: remove the `false &&` guard below.
+  // Auth enforcement. Dev-only escape hatch: set NEXT_PUBLIC_BYPASS_AUTH=1 in .env.local.
+  // In production this flag has no effect — auth is always enforced.
+  const bypassAuth =
+    process.env.NODE_ENV !== 'production' &&
+    process.env.NEXT_PUBLIC_BYPASS_AUTH === '1'
+
   useEffect(() => {
-    if (false && status === 'unauthenticated') {
+    if (!bypassAuth && status === 'unauthenticated') {
       const callback = encodeURIComponent(pathname || '/')
       router.replace(`/login?callbackUrl=${callback}`)
     }
-  }, [status, router, pathname])
+  }, [bypassAuth, status, router, pathname])
 
   // Show spinner only while session is loading (not when unauthenticated)
   if (status === 'loading') {
@@ -99,6 +105,8 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
         </main>
 
         <CommandPalette />
+        <OfflineBanner />
+        <MobileNav />
       </div>
     </MobileMenuCtx.Provider>
   )

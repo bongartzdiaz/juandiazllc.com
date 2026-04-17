@@ -1,9 +1,10 @@
-/* GET  /api/views — saved views for entity type
+﻿/* GET  /api/views — saved views for entity type
    POST /api/views — create a saved view */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, jsonError } from '@/lib/auth-helpers'
+import { parsePagination, paginatedResponse } from '@/lib/pagination'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -15,17 +16,19 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url)
   const entity = url.searchParams.get('entity') ?? undefined
 
+  const { page, limit, skip } = parsePagination(req)
   const prisma = getAuthPrisma()
-  const views = await prisma.savedView.findMany({
-    where: {
-      organizationId: scope.organizationId,
-      ...(entity ? { entity } : {}),
-      OR: [{ isShared: true }, { userId: scope.userId }],
-    },
-    orderBy: { createdAt: 'asc' },
-  })
+  const where = {
+    organizationId: scope.organizationId,
+    ...(entity ? { entity } : {}),
+    OR: [{ isShared: true }, { userId: scope.userId }],
+  }
+  const [views, total] = await Promise.all([
+    prisma.savedView.findMany({ where, orderBy: { createdAt: 'asc' }, skip, take: limit }),
+    prisma.savedView.count({ where }),
+  ])
 
-  return NextResponse.json({ data: views })
+  return paginatedResponse(views, total, { page, limit, skip })
 }
 
 export async function POST(req: NextRequest) {

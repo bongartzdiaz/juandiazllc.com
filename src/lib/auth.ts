@@ -43,7 +43,6 @@ export function getAuthPrisma(): PrismaClient {
 export function getAuthOptions(): NextAuthOptions {
   return {
     adapter: PrismaAdapter(getAuthPrisma()),
-    session: { strategy: 'jwt' },
     pages: {
       signIn: '/login',
     },
@@ -108,5 +107,13 @@ export function getAuthOptions(): NextAuthOptions {
       },
     },
     secret: process.env.NEXTAUTH_SECRET,
+    // Never spam logs in production
+    debug: process.env.NODE_ENV !== 'production',
+    // 30-day rolling session; token is refreshed on activity
+    session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60 },
+    // Force secure cookies when NEXTAUTH_URL is https — this works behind
+    // a reverse proxy as long as the proxy sets X-Forwarded-Proto: https
+    // (or NEXTAUTH_URL itself is https://).
+    useSecureCookies: (process.env.NEXTAUTH_URL ?? '').startsWith('https://'),
   }
 }

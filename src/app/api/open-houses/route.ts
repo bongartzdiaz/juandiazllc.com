@@ -1,10 +1,12 @@
-/* GET  /api/open-houses — list open houses
+﻿/* GET  /api/open-houses — list open houses
    POST /api/open-houses — create open house */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/pagination'
+import { logAudit } from '@/lib/audit'
+import { publishEntityCreated } from '@/lib/realtime/publish'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -57,7 +59,13 @@ export async function POST(req: NextRequest) {
       endTime: body.endTime ?? '14:00',
       notes: body.notes ?? '',
     },
+    include: {
+      property: { select: { id: true, title: true, address: true, city: true, priceCents: true } },
+      _count: { select: { visitors: true } },
+    },
   })
 
+  await logAudit({ scope, action: 'create', entity: 'openHouse', entityId: oh.id })
+  publishEntityCreated(scope.organizationId, 'openHouse', oh.id, scope.userId)
   return NextResponse.json({ data: oh }, { status: 201 })
 }
