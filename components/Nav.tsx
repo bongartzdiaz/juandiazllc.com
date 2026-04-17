@@ -12,12 +12,9 @@ export function Nav() {
         href="/"
         className="brand"
         aria-label="Juan Diaz LLC — home"
-        style={{
-          color: "var(--accent)",
-          gap: 12,
-        }}
+        style={{ color: "var(--accent)", gap: 12 }}
       >
-        <Logo size={26} />
+        <Logo size={26} animated />
         <span style={{ color: "var(--text)" }}>Juan Diaz LLC</span>
       </Link>
       <div className="nav-right">

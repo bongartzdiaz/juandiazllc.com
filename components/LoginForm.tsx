@@ -18,9 +18,9 @@ export function LoginForm() {
 
   return (
     <div className="auth-card glass">
-      {/* Brand mark — aperture */}
+      {/* Brand mark */}
       <div className="auth-mark" aria-hidden style={{ color: "var(--accent)" }}>
-        <Logo size={64} />
+        <Logo size={70} draw />
       </div>
 
       <div className="auth-eyebrow">
