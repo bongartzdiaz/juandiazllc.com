@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { signInWithPassword, type AuthState } from "@/app/actions/auth";
 import { useT } from "@/lib/i18n/useT";
@@ -13,37 +13,95 @@ export function LoginForm() {
   const error = params.get("error");
   const [state, formAction, pending] = useActionState(signInWithPassword, initial);
   const t = useT();
+  const [showPw, setShowPw] = useState(false);
 
   return (
-    <div className="auth-card">
+    <div className="auth-card glass">
+      {/* Animated monogram mark */}
+      <div className="auth-mark" aria-hidden>
+        <svg viewBox="-50 -50 100 100">
+          <g className="auth-mark-ring">
+            <circle r="44" fill="none" stroke="var(--accent)" strokeWidth="0.6" opacity="0.35" />
+            <circle r="44" fill="none" stroke="var(--accent)" strokeWidth="0.6" opacity="0.7" strokeDasharray="4 6" />
+          </g>
+          <g className="auth-mark-ring-r">
+            <circle r="34" fill="none" stroke="var(--accent-2)" strokeWidth="0.5" opacity="0.35" strokeDasharray="2 4" />
+          </g>
+          <circle r="5" fill="var(--accent)" />
+          <circle r="12" fill="none" stroke="var(--accent)" strokeWidth="0.8" opacity="0.6" />
+          <text
+            x="0" y="3" textAnchor="middle"
+            fontFamily="'JetBrains Mono'" fontSize="8" letterSpacing="1"
+            fill="var(--bg)"
+            fontWeight="600"
+          >
+            JDL
+          </text>
+        </svg>
+      </div>
+
+      <div className="auth-eyebrow">
+        <span className="dot-pulse" aria-hidden />
+        <span>SECURE · PHILLY · OPS</span>
+      </div>
+
       <h1>{t("login.title.a")} <em>{t("login.title.b")}</em></h1>
       <p>{t("login.lede")}</p>
 
       <form className="auth-form" action={formAction}>
-        <label htmlFor="email">{t("login.email")}</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="you@domain.com"
-          required
-          autoComplete="email"
-        />
+        <div className="field">
+          <label htmlFor="email">{t("login.email")}</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="you@domain.com"
+            required
+            autoComplete="email"
+            spellCheck={false}
+          />
+        </div>
 
-        <label htmlFor="password" style={{ marginTop: 6 }}>{t("login.password")}</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          placeholder="••••••••"
-          required
-          autoComplete="current-password"
-        />
+        <div className="field">
+          <label htmlFor="password">{t("login.password")}</label>
+          <div className="pw-wrap">
+            <input
+              id="password"
+              name="password"
+              type={showPw ? "text" : "password"}
+              placeholder="••••••••"
+              required
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              className="pw-toggle"
+              onClick={() => setShowPw((v) => !v)}
+              aria-label={showPw ? "Hide password" : "Show password"}
+              tabIndex={-1}
+            >
+              {showPw ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16">
+                  <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.7 21.7 0 0 1 5.17-6.11" />
+                  <path d="M9.88 4.24A11 11 0 0 1 12 4c7 0 11 8 11 8a21.7 21.7 0 0 1-3.17 4.18" />
+                  <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
 
         <input type="hidden" name="next" value={next} />
 
-        <button type="submit" disabled={pending}>
-          {pending ? t("login.signing_in") : t("login.submit")} <span className="arr">→</span>
+        <button type="submit" className="auth-submit" disabled={pending}>
+          <span>{pending ? t("login.signing_in") : t("login.submit")}</span>
+          <span className="arr">→</span>
         </button>
 
         {state.status === "err" && state.message && (

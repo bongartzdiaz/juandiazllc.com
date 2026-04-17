@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/LoginForm";
+import { LoginScene } from "@/components/LoginScene";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <div className="auth-wrap">
+      <LoginScene />
       <Suspense fallback={null}>
         <LoginForm />
       </Suspense>
