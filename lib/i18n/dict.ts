@@ -153,7 +153,7 @@ const nl: Dict = {
   "hero.title.1": "Ik bouw de systemen",
   "hero.title.2": "die operators meer",
   "hero.title.3": "geld laten verdienen.",
-  "hero.desc": "is de holding waarmee ik revenue engines bouw voor operators in energie, vastgoed, hospitality en aangrenzende industrieën — als eigen producten of als partner voor die van jou. Geschoold in de bouw. Gebouwd door een operator. Eén oprichter, vijf fases, nul ruis.",
+  "hero.desc": "is de holding waarmee ik revenue engines bouw voor operators in energie, vastgoed, hospitality en aanverwante sectoren — als eigen producten of als partner voor die van jou. Opgeleid in de bouw. Gebouwd door een operator. Eén oprichter, vijf fases, nul ruis.",
   "hero.cta.primary": "Plan een blueprint-gesprek",
   "hero.cta.secondary": "Bekijk het werk",
   "hero.scroll": "Scrollen",
@@ -161,7 +161,7 @@ const nl: Dict = {
   "cta.label": "◉ Samenwerken",
   "cta.title.a": "Klaar om de omzet te vinden die je",
   "cta.title.b": "laat liggen?",
-  "cta.lede": "Eén oprichter. Vijf fases. Geen ruis. Het blueprint-gesprek is gratis en eerlijk. Als ik kan helpen, doe ik dat. Zo niet, dan vertel ik je wie dat wel kan.",
+  "cta.lede": "Eén oprichter. Vijf fases. Geen ruis. Het blueprint-gesprek is gratis en eerlijk. Als ik kan helpen, doe ik dat. Zo niet, dan vertel ik je wie dat wel kan — en stuur ik je verder.",
   "cta.primary": "Plan een blueprint-gesprek",
   "cta.secondary": "Bekijk de aanpak",
   "cta.news.placeholder": "— E-mail voor de veldnotities",
@@ -178,7 +178,7 @@ const nl: Dict = {
   "contact.sector": "Sector",
   "contact.sector.pick": "Kies er één",
   "contact.message": "Wat probeer je op te lossen?",
-  "contact.message.placeholder": "Twee of drie zinnen is genoeg.",
+  "contact.message.placeholder": "Twee of drie zinnen zijn genoeg.",
   "contact.submit": "Verzenden",
   "contact.submitting": "Bezig met verzenden...",
   "contact.sent": "✓ Verzonden",
@@ -204,7 +204,7 @@ const nl: Dict = {
   "cd.label": "◉ De deadline",
   "cd.title": "Salderingsregeling eindigt",
   "cd.date": "1 januari 2027",
-  "cd.sub": "— en de Nederlandse energiekaart verandert van de ene op de andere dag.",
+  "cd.sub": "— en het Nederlandse energielandschap verandert van de ene op de andere dag.",
   "cd.live": "Live teller",
   "cd.days": "Dagen",
   "cd.hours": "Uren",
@@ -237,7 +237,7 @@ const nl: Dict = {
   "process.sub": "Dezelfde discipline die een gebouw op tijd en binnen budget houdt, pas ik toe op jouw revenue engine. Geen fase overgeslagen, geen getal onverifieerd.",
   "process.1.name": "Survey", "process.1.title.a": "Loop over de", "process.1.title.b": "site.", "process.1.body": "Zie wat er echt gebeurt voordat je iets aanraakt. Vind de lekken, de workarounds, de stille kennis. Elk echt plan begint hier.",
   "process.2.name": "Blueprint", "process.2.title.a": "Teken het", "process.2.title.b": "plan.", "process.2.body": "Volgorde de acties. Elke fase heeft een getal. Geen vage \"strategie-deck\" — een bouwplan dat een aannemer kan lezen.",
-  "process.3.name": "Build", "process.3.title.a": "Lever de", "process.3.title.b": "systemen.", "process.3.body": "Dashboards, automatiseringen, producten, hele motoren. Gebouwd om om 3 uur 's nachts op slechte wifi te werken — niet alleen in de demo.",
+  "process.3.name": "Build", "process.3.title.a": "Lever de", "process.3.title.b": "systemen.", "process.3.body": "Dashboards, automatiseringen, producten, hele motoren. Gebouwd om te draaien om 3 uur 's nachts op slechte wifi — niet alleen in de demo.",
   "process.4.name": "Commission", "process.4.title.a": "Stress-", "process.4.title.b": "test.", "process.4.body": "Verifieer elk getal. Rek de randen op. Niets heet \"live\" totdat het systeem eerlijk is onder druk.",
   "process.5.name": "Operate", "process.5.title.a": "Blijf in de", "process.5.title.b": "control room.", "process.5.body": "Monitoren, afstellen, wekelijks verbeteren. Een revenue engine is geen project — het is een levend systeem. Ik blijf erbij.",
 
@@ -249,7 +249,7 @@ const nl: Dict = {
   "signals.label": "◉ 04 — Signalen",
   "signals.title.a": "Veldnotities,",
   "signals.title.b": "build-logs.",
-  "signals.sub": "Korte essays over het ontwerpen van operatortools, dashboards die echte omstandigheden overleven en kleine studio's op snelheid.",
+  "signals.sub": "Korte essays over het ontwerpen van operatortools, dashboards die echte omstandigheden overleven, en kleine studio's die op tempo draaien.",
 };
 
 const de: Dict = {
@@ -264,14 +264,14 @@ const de: Dict = {
   "hero.title.1": "Ich baue die Systeme,",
   "hero.title.2": "die Operatoren mehr",
   "hero.title.3": "Umsatz bringen.",
-  "hero.desc": "ist die Holding, unter der ich Revenue-Engines für Operatoren in Energie, Immobilien, Hospitality und angrenzenden Branchen baue — als eigene Produkte oder als Partner für Ihre. Im Bauwesen ausgebildet. Von einem Operator gebaut. Ein Gründer, fünf Phasen, null Geschwätz.",
+  "hero.desc": "ist die Holding, unter der ich Revenue-Engines für Operatoren in Energie, Immobilien, Hospitality und verwandten Branchen baue — als eigene Produkte oder als Partner für Ihre. Im Bauwesen ausgebildet. Von einem Operator gebaut. Ein Gründer, fünf Phasen, null Geschwätz.",
   "hero.cta.primary": "Blueprint-Call buchen",
   "hero.cta.secondary": "Die Arbeit ansehen",
   "hero.scroll": "Scrollen",
 
   "cta.label": "◉ Zusammenarbeiten",
   "cta.title.a": "Bereit, den Umsatz zu finden,",
-  "cta.title.b": "den Sie liegen lassen?",
+  "cta.title.b": "den Sie auf dem Tisch liegen lassen?",
   "cta.lede": "Ein Gründer. Fünf Phasen. Null Geschwätz. Der Blueprint-Call ist kostenlos und direkt. Wenn ich helfen kann, tue ich das. Sonst sage ich Ihnen, wer es kann.",
   "cta.primary": "Blueprint-Call buchen",
   "cta.secondary": "Vorgehen ansehen",
@@ -348,7 +348,7 @@ const de: Dict = {
   "process.sub": "Dieselbe Disziplin, die einen Bau termin- und budgettreu hält, wende ich auf Ihre Revenue-Engine an. Keine Phase übersprungen, keine Zahl ungeprüft.",
   "process.1.name": "Survey", "process.1.title.a": "Die Baustelle", "process.1.title.b": "begehen.", "process.1.body": "Sehen, was wirklich passiert, bevor Sie etwas anfassen. Die Lecks, die Workarounds, das stille Wissen finden. Jeder echte Plan beginnt hier.",
   "process.2.name": "Blueprint", "process.2.title.a": "Den Plan", "process.2.title.b": "zeichnen.", "process.2.body": "Die Schritte sequenzieren. Jede Phase mit einer Zahl versehen. Kein vages \"Strategie-Deck\" — ein Bauplan, den ein Bauleiter lesen kann.",
-  "process.3.name": "Build", "process.3.title.a": "Die Systeme", "process.3.title.b": "ausliefern.", "process.3.body": "Dashboards, Automatisierungen, Produkte, ganze Engines. Gebaut, um um 3 Uhr morgens bei schlechtem WLAN zu laufen — nicht nur in der Demo.",
+  "process.3.name": "Build", "process.3.title.a": "Die Systeme", "process.3.title.b": "ausliefern.", "process.3.body": "Dashboards, Automatisierungen, Produkte, ganze Engines. Gebaut, damit sie um 3 Uhr morgens bei schlechtem WLAN funktionieren — nicht nur in der Demo.",
   "process.4.name": "Commission", "process.4.title.a": "Stress-", "process.4.title.b": "test.", "process.4.body": "Jede Zahl verifizieren. Die Ränder austesten. Nichts heißt \"live\", bis das System unter Last ehrlich bleibt.",
   "process.5.name": "Operate", "process.5.title.a": "Im Kontroll-", "process.5.title.b": "raum bleiben.", "process.5.body": "Überwachen, justieren, wöchentlich verbessern. Eine Revenue-Engine ist kein Projekt — sie ist ein lebendes System. Ich bleibe dabei.",
 
@@ -360,7 +360,7 @@ const de: Dict = {
   "signals.label": "◉ 04 — Signale",
   "signals.title.a": "Feldnotizen,",
   "signals.title.b": "Build-Logs.",
-  "signals.sub": "Kurze Essays zum Design von Operator-Tools, zum Versand von Dashboards, die echte Umgebungen überleben, und zum Betrieb kleiner Studios im Tempo.",
+  "signals.sub": "Kurze Essays zum Design von Operator-Tools, zum Ausliefern von Dashboards, die echte Umgebungen überleben, und zum Betrieb kleiner Studios im hohen Tempo.",
 };
 
 const es: Dict = {
@@ -400,7 +400,7 @@ const es: Dict = {
   "contact.sector": "Sector",
   "contact.sector.pick": "Elige uno",
   "contact.message": "¿Qué intentas resolver?",
-  "contact.message.placeholder": "Dos o tres frases es suficiente.",
+  "contact.message.placeholder": "Dos o tres frases son suficientes.",
   "contact.submit": "Enviar",
   "contact.submitting": "Enviando...",
   "contact.sent": "✓ Enviado",
@@ -458,8 +458,8 @@ const es: Dict = {
   "process.title.c": "cinco fases.",
   "process.sub": "La misma disciplina que mantiene un edificio dentro del plazo y del presupuesto es la que aplico a tu motor de ingresos. Ninguna fase omitida, ningún número sin verificar.",
   "process.1.name": "Survey", "process.1.title.a": "Camina la", "process.1.title.b": "obra.", "process.1.body": "Ver lo que realmente está pasando antes de tocar nada. Encontrar las fugas, los parches, el conocimiento tribal. Todo plan real empieza aquí.",
-  "process.2.name": "Blueprint", "process.2.title.a": "Dibuja el", "process.2.title.b": "plan.", "process.2.body": "Secuenciar los movimientos. Cada fase con un número asignado. Ningún vago \"deck estratégico\" — un plan que un contratista pueda leer.",
-  "process.3.name": "Build", "process.3.title.a": "Entrega los", "process.3.title.b": "sistemas.", "process.3.body": "Dashboards, automatizaciones, productos, motores completos. Construidos para funcionar a las 3 de la mañana con mala wifi — no sólo en la demo.",
+  "process.2.name": "Blueprint", "process.2.title.a": "Dibuja el", "process.2.title.b": "plan.", "process.2.body": "Secuenciar los movimientos. Cada fase con un número asignado. Nada de \"decks estratégicos\" vagos — un plan que un contratista pueda leer.",
+  "process.3.name": "Build", "process.3.title.a": "Entrega los", "process.3.title.b": "sistemas.", "process.3.body": "Dashboards, automatizaciones, productos, motores completos. Construidos para funcionar a las 3 de la mañana con mal wifi — no solo en la demo.",
   "process.4.name": "Commission", "process.4.title.a": "Prueba de", "process.4.title.b": "estrés.", "process.4.body": "Verificar cada número. Empujar los límites. Nada es \"live\" hasta que el sistema es honesto bajo carga.",
   "process.5.name": "Operate", "process.5.title.a": "Quédate en la", "process.5.title.b": "sala de control.", "process.5.body": "Monitorizar, afinar, mejorar cada semana. Un motor de ingresos no es un proyecto — es un sistema vivo. Yo me quedo.",
 
@@ -471,7 +471,7 @@ const es: Dict = {
   "signals.label": "◉ 04 — Señales",
   "signals.title.a": "Notas de campo,",
   "signals.title.b": "build logs.",
-  "signals.sub": "Ensayos cortos sobre diseñar herramientas para operadores, enviar dashboards que sobreviven a entornos reales y dirigir estudios pequeños a velocidad.",
+  "signals.sub": "Ensayos cortos sobre diseñar herramientas para operadores, lanzar dashboards que sobreviven a entornos reales y dirigir estudios pequeños con rapidez.",
 };
 
 export const DICT: Record<Locale, Dict> = { en, nl, de, es };
