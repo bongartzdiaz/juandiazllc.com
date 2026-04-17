@@ -65,6 +65,7 @@ export type AuditEntity =
   | 'pipelineStage'
   | 'user'
   | 'organization'
+  | 'auditLog'
 
 interface LogAuditParams {
   scope: AuthScope

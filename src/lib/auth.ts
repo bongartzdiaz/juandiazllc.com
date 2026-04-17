@@ -14,6 +14,7 @@ import { PrismaClient } from '@prisma/client'
 import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 import bcrypt from 'bcryptjs'
 import { logger } from '@/lib/logger'
+import { decryptSecret } from '@/lib/crypto'
 
 /* ---- Lazy Prisma singleton (server-only) ----
    The client is built on first use, never at module load time.
@@ -59,6 +60,7 @@ export function getAuthOptions(): NextAuthOptions {
         credentials: {
           email: { label: 'Email', type: 'email' },
           password: { label: 'Password', type: 'password' },
+          twoFactorCode: { label: '2FA code', type: 'text' },
         },
         async authorize(credentials, req) {
           if (!credentials?.email || !credentials?.password) {
@@ -84,6 +86,8 @@ export function getAuthOptions(): NextAuthOptions {
               avatarUrl: true,
               failedLoginCount: true,
               lockedUntil: true,
+              twoFactorEnabled: true,
+              twoFactorSecret: true,
             },
           })
 
@@ -129,6 +133,66 @@ export function getAuthOptions(): NextAuthOptions {
               locked: shouldLock,
             })
             return null
+          }
+
+          // 2FA gate — if enabled, require a valid TOTP or recovery code.
+          // We don't want to leak that 2FA is enabled for a given email, but
+          // since the password already verified here, the caller has already
+          // proven account knowledge, so returning a specific "2FA required"
+          // is acceptable — however NextAuth's Credentials flow only surfaces
+          // null/user, so we just reject and the client re-prompts with code.
+          if (user.twoFactorEnabled) {
+            const code = (credentials.twoFactorCode ?? '').trim()
+            if (!code) {
+              logger.warn('login: 2FA code required', { userId: user.id, email, ip })
+              // Signal to the client via a thrown error so the UI can prompt
+              // for the code. NextAuth surfaces the message as ?error=...
+              throw new Error('2FA_REQUIRED')
+            }
+
+            let twoFactorOk = false
+            if (/^\d{6}$/.test(code)) {
+              if (user.twoFactorSecret) {
+                try {
+                  const secret = decryptSecret(user.twoFactorSecret)
+                  if (secret) {
+                    // Lazy import to keep the auth module lightweight at build time
+                    const { verifyTotp } = await import('@/lib/two-factor')
+                    twoFactorOk = verifyTotp(code, secret)
+                  }
+                } catch {
+                  /* fall through to failure */
+                }
+              }
+            } else {
+              // Recovery code path — lazy import to avoid a cycle with two-factor.ts
+              const { consumeRecoveryCode } = await import('@/lib/two-factor')
+              twoFactorOk = await consumeRecoveryCode(user.id, code)
+            }
+
+            if (!twoFactorOk) {
+              const attempts = (user.failedLoginCount ?? 0) + 1
+              const shouldLock = attempts >= MAX_FAILED_LOGINS
+              await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                  failedLoginCount: attempts,
+                  lockedUntil: shouldLock
+                    ? new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1000)
+                    : undefined,
+                },
+              })
+              logger.warn('login: bad 2FA code', {
+                userId: user.id,
+                email,
+                ip,
+                attempts,
+                locked: shouldLock,
+              })
+              throw new Error('2FA_INVALID')
+            }
+
+            logger.info('login: 2FA ok', { userId: user.id, email, ip })
           }
 
           // Success — reset counters, record login

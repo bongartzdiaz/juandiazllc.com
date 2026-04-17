@@ -74,8 +74,13 @@ model User {
   // Security: global session invalidation — any JWT issued before this
   // timestamp is rejected. Bump this to log the user out on all devices.
   tokensInvalidAfter DateTime?
+  // TOTP two-factor auth
+  twoFactorSecret     String?   // encrypted via src/lib/crypto.ts
+  twoFactorEnabled    Boolean   @default(false)
+  twoFactorVerifiedAt DateTime?
 
   organization    Organization     @relation(fields: [organizationId], references: [id])
+  twoFactorRecoveryCodes TwoFactorRecoveryCode[]
   dashboardLayout DashboardLayout?
   kanbanCards     KanbanCard[]     @relation("assignee")
   customPages     CustomPage[]
@@ -90,6 +95,18 @@ model User {
   eventAttendees  EventAttendee[]
   reports         Report[]
   deals           Deal[]          @relation("dealOwner")
+}
+
+model TwoFactorRecoveryCode {
+  id         String    @id @default(cuid())
+  userId     String
+  codeHash   String                      // bcrypt hash of the one-time code
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // ── NextAuth tables (PrismaAdapter compatible) ──

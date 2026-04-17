@@ -60,9 +60,16 @@ if [[ "$SKIP_MIGRATE" != "1" ]]; then
   npm run db:generate
   ok "Prisma client generated"
 
-  log "Syncing schema to database"
-  npm run db:push
-  ok "Schema synced"
+  # Apply pending migrations. On a fresh DB this runs 0_init + any
+  # subsequent migrations in order. On an existing (baselined) DB
+  # this applies only new migrations.
+  #
+  # NOTE: first-time baselining of an existing non-empty DB requires
+  # one-time `prisma migrate resolve --applied 0_init` — see
+  # docs/prisma-migrations.md for the procedure.
+  log "Applying Prisma migrations"
+  npm run db:migrate
+  ok "Migrations applied"
 else
   log "Skipping db migration (SKIP_MIGRATE=1)"
 fi
