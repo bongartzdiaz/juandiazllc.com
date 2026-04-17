@@ -16,7 +16,7 @@ export function LoginForm() {
 
   return (
     <div className="auth-card">
-      <h1>{t("login.title.a")} <em>Philly.</em></h1>
+      <h1>{t("login.title.a")} <em>{t("login.title.b")}</em></h1>
       <p>{t("login.lede")}</p>
 
       <form className="auth-form" action={formAction}>
