@@ -33,12 +33,44 @@ body {
   font-feature-settings: 'ss01', 'cv11';
   padding-bottom: 72px;
 }
-em {
+/* Default italic = Inter italic (consistent with UI type). */
+em { font-style: italic; }
+
+/* Instrument Serif reserved for display emphasis only — big headlines,
+   hero, story lead, CTA block, section H2s, page hero H1, kinetic pass,
+   countdown + stats numerals. Nowhere else. Keeps the typography steady
+   while still giving the money moments an editorial pop. */
+.hero-title em,
+.story-lead em,
+.sec-head h2 em,
+.cta-big h2 em,
+.page-hero h1 em,
+.kinetic .big em,
+.stat .n em,
+.cd-cell .num em,
+.marquee-track em {
   font-family: 'Instrument Serif', 'Cormorant Garamond', Georgia, serif;
   font-style: italic;
   letter-spacing: 0;
   font-weight: 400;
 }
+
+/* Multilingual word-wrap — long compound words in NL/DE/ES no
+   longer overflow narrow containers. */
+h1, h2, h3, h4, h5,
+.hero-title, .story-lead, .sec-head h2, .cta-big h2,
+.page-hero h1, .ch-slide h3, .sig h4, .v-card h3, .sec-card h4,
+.proc-step h5 {
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+.hero-desc, .story-body p, .long p, .sig h4, .v-card p, .sec-card p, .proc-step p {
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+.chip { overflow-wrap: anywhere; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 
@@ -105,9 +137,9 @@ nav.top > * { pointer-events: auto; }
 .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .hero-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 120px 40px 40px; pointer-events: none; background: linear-gradient(180deg, rgba(3,20,15,.55) 0%, rgba(3,20,15,0) 22%, rgba(3,20,15,0) 70%, rgba(3,20,15,.75) 100%); }
 .hero-overlay > * { pointer-events: auto; }
-.hero-tag { display: flex; gap: 16px; align-items: center; }
-.hero-tag .chip { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; font-family: 'JetBrains Mono'; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); background: rgba(3,20,15,.4); backdrop-filter: blur(8px); }
-.hero-title { font-family: 'Inter'; font-weight: 400; font-size: clamp(56px, 11vw, 180px); line-height: .9; letter-spacing: -.045em; max-width: 1600px; text-shadow: 0 2px 40px rgba(3,20,15,.6); }
+.hero-tag { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; max-width: 720px; }
+.hero-tag .chip { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; font-family: 'JetBrains Mono'; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); background: rgba(3,20,15,.4); backdrop-filter: blur(8px); white-space: nowrap; }
+.hero-title { font-family: 'Inter'; font-weight: 400; font-size: clamp(48px, 10vw, 160px); line-height: .94; letter-spacing: -.04em; max-width: 1600px; text-shadow: 0 2px 40px rgba(3,20,15,.6); }
 .hero-title em { font-style: italic; color: var(--accent); font-weight: 300; }
 .hero-title .line { overflow: hidden; display: block; }
 .hero-title .line > span { display: block; transform: translateY(110%); transition: transform 1s var(--ease); }
@@ -133,7 +165,7 @@ nav.top > * { pointer-events: auto; }
 
 /* Story */
 .story { padding: 160px 40px; max-width: var(--max); margin: 0 auto; position: relative; }
-.story-lead { font-family: 'Inter'; font-weight: 300; font-size: clamp(42px, 7vw, 104px); line-height: .98; letter-spacing: -.04em; max-width: 18ch; margin-bottom: 100px; }
+.story-lead { font-family: 'Inter'; font-weight: 300; font-size: clamp(42px, 7vw, 104px); line-height: 1.02; letter-spacing: -.04em; max-width: 24ch; margin-bottom: 100px; }
 .story-lead em { font-style: italic; color: var(--accent); font-weight: 300; }
 .story-lead .q { color: var(--accent); font-family: 'JetBrains Mono'; font-size: .3em; vertical-align: top; margin-right: .3em; opacity: .7; }
 .story-grid { display: grid; grid-template-columns: 280px 1fr; gap: 80px; align-items: start; }
@@ -157,7 +189,7 @@ nav.top > * { pointer-events: auto; }
 /* Sections */
 section { padding: 140px 40px; max-width: var(--max); margin: 0 auto; }
 .sec-head { display: grid; grid-template-columns: 1fr 2fr; gap: 40px; margin-bottom: 80px; align-items: end; }
-.sec-head h2 { font-family: 'Inter'; font-weight: 400; font-size: clamp(40px, 6vw, 88px); line-height: .95; letter-spacing: -.035em; }
+.sec-head h2 { font-family: 'Inter'; font-weight: 400; font-size: clamp(36px, 5.5vw, 80px); line-height: 1; letter-spacing: -.03em; }
 .sec-head h2 em { font-style: italic; color: var(--accent); font-weight: 300; }
 .sec-head p { color: var(--muted); font-size: 17px; max-width: 540px; line-height: 1.6; justify-self: end; }
 @media (max-width: 860px) { .sec-head { grid-template-columns: 1fr; } .sec-head p { justify-self: start; } }
@@ -345,7 +377,7 @@ footer .f-mark { color: var(--text); }
 .cta-big { padding: 180px 40px; max-width: var(--max); margin: 0 auto; text-align: center; position: relative; overflow: hidden; }
 .cta-big::before { content: ''; position: absolute; inset: 0; background: radial-gradient(900px 500px at 50% 50%, rgba(94,255,177,.1), transparent 60%); pointer-events: none; }
 .cta-big .label { position: relative; display: inline-block; margin-bottom: 24px; }
-.cta-big h2 { font-family: 'Inter'; font-weight: 300; font-size: clamp(44px, 7vw, 112px); line-height: .98; letter-spacing: -.04em; max-width: 20ch; margin: 0 auto 28px; position: relative; }
+.cta-big h2 { font-family: 'Inter'; font-weight: 300; font-size: clamp(40px, 6vw, 100px); line-height: 1.02; letter-spacing: -.035em; max-width: 24ch; margin: 0 auto 28px; position: relative; }
 .cta-big h2 em { font-style: italic; color: var(--accent); font-weight: 300; }
 .cta-big .lede { color: var(--text); font-size: 19px; max-width: 58ch; margin: 0 auto 40px; line-height: 1.6; position: relative; }
 .cta-big .lede em { color: var(--accent); font-style: italic; }
@@ -372,7 +404,7 @@ footer .f-mark { color: var(--text); }
 /* Subpage hero */
 .page-hero { padding: 160px 40px 80px; max-width: var(--max); margin: 0 auto; border-bottom: 1px solid var(--line); }
 .page-hero .eyebrow { font-family: 'JetBrains Mono'; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
-.page-hero h1 { font-family: 'Inter'; font-weight: 300; font-size: clamp(56px, 9vw, 140px); line-height: .95; letter-spacing: -.045em; max-width: 18ch; }
+.page-hero h1 { font-family: 'Inter'; font-weight: 300; font-size: clamp(48px, 8vw, 130px); line-height: 1; letter-spacing: -.04em; max-width: 22ch; }
 .page-hero h1 em { font-style: italic; color: var(--accent); }
 .page-hero p { margin-top: 32px; color: var(--muted); font-size: 19px; max-width: 62ch; line-height: 1.6; }
 
