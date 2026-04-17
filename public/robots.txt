@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://juandiazllc.com/sitemap.xml

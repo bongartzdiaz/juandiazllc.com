@@ -1,0 +1,38 @@
+"use server";
+
+import { createClient } from "@/lib/supabase/server";
+
+export type SubscribeState = { status: "idle" | "ok" | "err"; message?: string };
+
+export async function subscribe(
+  _prev: SubscribeState,
+  formData: FormData
+): Promise<SubscribeState> {
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const source = String(formData.get("source") ?? "landing");
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { status: "err", message: "Enter a valid email." };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("subscribers")
+      .insert({ email, source })
+      .select()
+      .single();
+
+    if (error) {
+      // Duplicate → still treat as success for the user
+      if (error.code === "23505") {
+        return { status: "ok", message: "You're already on the list. ✓" };
+      }
+      return { status: "err", message: "Something went wrong. Try again." };
+    }
+
+    return { status: "ok", message: "Subscribed. Welcome aboard. ✓" };
+  } catch {
+    return { status: "err", message: "Network error. Try again." };
+  }
+}
