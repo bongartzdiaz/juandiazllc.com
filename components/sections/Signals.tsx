@@ -2,15 +2,11 @@
 
 import Link from "next/link";
 import { useT } from "@/lib/i18n/useT";
-
-const POSTS = [
-  { date: "— 2026.04 · Essay", title: "Why operator tools should feel like instruments, not SaaS." },
-  { date: "— 2026.03 · Build log", title: "Shipping dual-theme design systems without drifting." },
-  { date: "— 2026.02 · Note", title: "A holding company as a creative container." },
-];
+import { SIGNALS } from "@/lib/signals";
 
 export function Signals() {
   const t = useT();
+  const posts = SIGNALS.slice(0, 3);
   return (
     <section id="signals">
       <div className="sec-head" data-reveal>
@@ -21,9 +17,9 @@ export function Signals() {
         <p>{t("signals.sub")}</p>
       </div>
       <div className="signals">
-        {POSTS.map((p, i) => (
-          <Link key={i} href="/signals" className="sig" data-reveal>
-            <div className="date">{p.date}</div>
+        {posts.map((p) => (
+          <Link key={p.slug} href={`/signals/${p.slug}`} className="sig" data-reveal>
+            <div className="date">— {p.dateLabel}</div>
             <h4>{p.title}</h4>
             <div className="tag">Read →</div>
           </Link>
