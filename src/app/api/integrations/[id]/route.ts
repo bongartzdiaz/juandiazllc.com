@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireRole, jsonError } from '@/lib/auth-helpers'
 import { logAudit } from '@/lib/audit'
+import { decryptIntegration } from '@/lib/integrations/secrets'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -44,10 +45,12 @@ export async function DELETE(_req: NextRequest, ctx: Ctx) {
   })
   if (!existing) return jsonError('Integration not found', 404)
 
-  // Best-effort token revoke with the provider (no-throw)
-  if (existing.accessToken && REVOKE_URLS[existing.provider]) {
+  // Best-effort token revoke with the provider (no-throw).
+  // Decrypt the stored token first — REVOKE_URLS expects plaintext.
+  const decrypted = decryptIntegration(existing)
+  if (decrypted.accessToken && REVOKE_URLS[existing.provider]) {
     try {
-      const r = REVOKE_URLS[existing.provider](existing.accessToken)
+      const r = REVOKE_URLS[existing.provider](decrypted.accessToken)
       await fetch(r.url, r.init).catch(() => {})
     } catch { /* ignore */ }
   }

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireRole, jsonError } from '@/lib/auth-helpers'
 import { getConnector } from '@/lib/integrations/registry'
+import { decryptIntegration } from '@/lib/integrations/secrets'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -25,9 +26,12 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   let metadata: Record<string, unknown> = {}
   try { metadata = JSON.parse(integration.metadata || '{}') } catch {}
 
+  // Decrypt the stored token — connectors need plaintext
+  const decrypted = decryptIntegration(integration)
+
   const result = await conn.test({
-    accessToken: integration.accessToken ?? undefined,
-    apiKey: integration.accessToken ?? undefined, // API-key connectors store the key in accessToken
+    accessToken: decrypted.accessToken ?? undefined,
+    apiKey: decrypted.accessToken ?? undefined, // API-key connectors store the key in accessToken
     metadata,
   })
 

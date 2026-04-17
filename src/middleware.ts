@@ -22,6 +22,7 @@ const CSRF_EXEMPT_PREFIXES = [
   '/api/v1/',
   '/api/auth/',          // NextAuth handles its own CSRF on internal endpoints
   '/api/log-error',      // client-side error sink, unauthenticated, IP-limited
+  '/api/csp-report',     // browsers POST CSP violation reports (no Origin)
   '/api/health',         // uptime probe
 ]
 
@@ -66,6 +67,7 @@ function buildCsp(): string {
     'worker-src': ["'self'", 'blob:'],
     'manifest-src': ["'self'"],
     ...(isDev ? {} : { 'upgrade-insecure-requests': [] }),
+    'report-uri': ['/api/csp-report'],
   }
 
   return Object.entries(directives)

@@ -87,6 +87,22 @@ async function main() {
     }
   }
 
+  /* 1b. INTEGRATION_SECRET — used to encrypt OAuth tokens at rest.
+     Falls back to NEXTAUTH_SECRET when unset (see src/lib/crypto.ts), but in
+     production we want a dedicated key so rotating NEXTAUTH_SECRET
+     (which logs everyone out) doesn't also break every integration. */
+  const integrationSecret = process.env.INTEGRATION_SECRET
+  if (process.env.NODE_ENV === 'production' && !integrationSecret) {
+    warn(
+      'env:INTEGRATION_SECRET',
+      'not set — falling back to NEXTAUTH_SECRET. Set a dedicated key to decouple rotation.',
+    )
+  } else if (integrationSecret && integrationSecret.length < 32) {
+    fail('env:INTEGRATION_SECRET', `too short (${integrationSecret.length} chars; min 32)`)
+  } else if (integrationSecret) {
+    pass('env:INTEGRATION_SECRET', 'set (32+ chars)')
+  }
+
   /* 2. NEXTAUTH_URL (required in production, https enforced) */
   const isProd = process.env.NODE_ENV === 'production'
   const url = process.env.NEXTAUTH_URL

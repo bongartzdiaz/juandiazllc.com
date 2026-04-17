@@ -66,6 +66,14 @@ model User {
   image          String?
   organizationId String
   createdAt      DateTime  @default(now())
+  // Security: brute-force lockout
+  failedLoginCount   Int       @default(0)
+  lockedUntil        DateTime?
+  lastLoginAt        DateTime?
+  lastLoginIp        String?
+  // Security: global session invalidation — any JWT issued before this
+  // timestamp is rejected. Bump this to log the user out on all devices.
+  tokensInvalidAfter DateTime?
 
   organization    Organization     @relation(fields: [organizationId], references: [id])
   dashboardLayout DashboardLayout?
