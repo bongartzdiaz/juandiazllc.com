@@ -85,6 +85,11 @@ export function ContactForm() {
         />
 
         <input type="hidden" name="source" value="contact_page" />
+        {/* Honeypot: hidden from users via .hp-field, bots will fill. */}
+        <div className="hp-field" aria-hidden="true">
+          <label htmlFor="website">Website (leave blank)</label>
+          <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+        </div>
 
         <button type="submit" disabled={pending || state.status === "ok"}>
           {state.status === "ok"
