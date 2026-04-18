@@ -16,17 +16,17 @@ export default async function OG() {
           justifyContent: "space-between",
           padding: 80,
           background:
-            "radial-gradient(800px 600px at 30% 20%, rgba(94,255,177,0.18), transparent 60%), linear-gradient(180deg, #03140F 0%, #06201A 100%)",
-          color: "#EEF7F1",
+            "radial-gradient(800px 600px at 30% 20%, rgba(46,196,137,0.22), transparent 60%), linear-gradient(180deg, #020D0A 0%, #04150F 100%)",
+          color: "#E8F4EC",
           fontFamily: "Inter",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
           <svg width="64" height="64" viewBox="0 0 96 96" fill="none">
-            <line x1="30" y1="8" x2="66" y2="8" stroke="#5EFFB1" strokeWidth="1.6" opacity="0.55" strokeLinecap="round" />
-            <circle cx="48" cy="8" r="3.6" fill="#5EFFB1" />
-            <line x1="48" y1="14" x2="48" y2="50" stroke="#5EFFB1" strokeWidth="1.8" strokeLinecap="round" />
-            <path d="M 48 50 Q 30 50 30 64 L 48 86 L 66 64 Q 66 50 48 50 Z M 51 64 a 3 3 0 1 0 -6 0 a 3 3 0 1 0 6 0 Z" fill="#5EFFB1" fillRule="evenodd" />
+            <line x1="30" y1="8" x2="66" y2="8" stroke="#2EC489" strokeWidth="1.6" opacity="0.55" strokeLinecap="round" />
+            <circle cx="48" cy="8" r="3.6" fill="#2EC489" />
+            <line x1="48" y1="14" x2="48" y2="50" stroke="#2EC489" strokeWidth="1.8" strokeLinecap="round" />
+            <path d="M 48 50 Q 30 50 30 64 L 48 86 L 66 64 Q 66 50 48 50 Z M 51 64 a 3 3 0 1 0 -6 0 a 3 3 0 1 0 6 0 Z" fill="#2EC489" fillRule="evenodd" />
           </svg>
           <div
             style={{
@@ -34,7 +34,7 @@ export default async function OG() {
               fontSize: 22,
               letterSpacing: "0.2em",
               textTransform: "uppercase",
-              color: "#A2BDB0",
+              color: "#9ABAA9",
             }}
           >
             Juan Diaz LLC

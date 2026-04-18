@@ -4,6 +4,8 @@ import { Overlays } from "@/components/Overlays";
 import { Preloader } from "@/components/Preloader";
 import { GlobalEffects } from "@/components/GlobalEffects";
 import { CookieConsent } from "@/components/CookieConsent";
+import { BackToTop } from "@/components/BackToTop";
+import { Analytics } from "@/components/Analytics";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
@@ -161,6 +163,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <GlobalEffects />
           <CookieConsent />
+          <BackToTop />
+          <Analytics />
         </LocaleProvider>
       </body>
     </html>

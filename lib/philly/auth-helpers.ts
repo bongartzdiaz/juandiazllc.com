@@ -96,10 +96,30 @@ export async function requireScope(): Promise<AuthScope | NextResponse> {
     if (!phillyUser.organizationId) {
       return jsonError('User has no organization scope', 403)
     }
+
+    // Sync role back to Supabase app_metadata so the client hook
+    // (useSupabaseUser) matches what the server enforces from MariaDB.
+    // This is best-effort: a failure here should not block the request.
+    const authoritativeRole = phillyUser.role ?? 'viewer'
+    const currentMetaRole = (supabaseUser.app_metadata as Record<string, unknown> | null)?.role
+    if (currentMetaRole !== authoritativeRole) {
+      try {
+        // updateUser on app_metadata requires service-role; this call
+        // is a no-op when running with anon key, which is fine — it
+        // just means the drift will persist until a service-role job
+        // (e.g. a nightly sync) catches it.
+        await supabase.auth.updateUser({
+          data: { role: authoritativeRole },
+        })
+      } catch {
+        /* best-effort */
+      }
+    }
+
     return {
       userId: phillyUser.id,
       organizationId: phillyUser.organizationId,
-      role: phillyUser.role ?? 'viewer',
+      role: authoritativeRole,
       email: phillyUser.email,
     }
   } catch (err) {

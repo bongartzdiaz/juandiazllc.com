@@ -990,3 +990,45 @@ em { color: var(--accent); font-style: italic; font-weight: 300; letter-spacing:
   .cookie-actions { justify-content: stretch; }
   .cookie-btn { flex: 1; text-align: center; justify-content: center; }
 }
+
+/* Back-to-top button — fixed bottom-right, appears after scroll */
+.back-to-top {
+  position: fixed;
+  right: clamp(16px, 2.5vw, 28px);
+  bottom: clamp(88px, 10vh, 120px);
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: rgba(6,29,22,0.85);
+  color: var(--accent);
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 500;
+  backdrop-filter: blur(12px);
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px) scale(0.95);
+  transition: opacity .3s var(--ease), transform .3s var(--ease), border-color .2s, color .2s;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+.back-to-top[data-visible="true"] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+.back-to-top:hover {
+  border-color: var(--accent);
+  color: var(--accent-2);
+  background: rgba(46,196,137,0.1);
+}
+.back-to-top:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+/* Above the cookie banner on mobile */
+@media (max-width: 600px) {
+  .back-to-top { bottom: clamp(160px, 22vh, 200px); }
+}

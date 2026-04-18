@@ -23,6 +23,49 @@ export type InsightBlock =
 
 export const POSTS: Insight[] = [
   {
+    slug: "the-automation-roi-myth",
+    title: "The automation ROI myth, and what actually pays back",
+    summary:
+      "Most automation projects save hours nobody was going to spend anyway. Three rules for picking the ones that actually move the P&L — and one test to apply before you buy another tool.",
+    tag: "Systems",
+    publishedAt: "2026-01-22",
+    readingMinutes: 6,
+    body: [
+      { type: "p", text: "Every operator I meet has a slide deck from some consultant claiming their team will save 400 hours a year. Most of the time that number is arithmetic fiction — hours that would never have been billed, meetings that would never have been booked, work that would never have been done. Real automation ROI is narrower and harsher." },
+      { type: "h2", text: "The three questions that separate real ROI from theatre" },
+      { type: "ul", items: [
+        "Is the work being automated currently being done by a person who is your bottleneck? If no, you are not freeing capacity, you are making the already-idle faster.",
+        "Does the automation remove a decision, or does it just speed up data entry? Removed decisions compound; faster data entry saturates at maybe 20 percent of theoretical savings.",
+        "If it breaks for a week, does anyone notice? If the answer is no, you automated a museum."
+      ]},
+      { type: "h2", text: "The test before you buy" },
+      { type: "p", text: "Write down the three highest-value hours your top performer spends in a typical week. If your candidate automation does not touch those three hours directly, the ROI is theatre. Shelve it. The gains from automating a bottleneck person for five hours a week dwarf automating ten non-bottlenecks for fifty." },
+      { type: "quote", text: "Automation ROI is measured by what gets un-queued, not by what gets done faster." },
+      { type: "p", text: "The operators who grow stop confusing activity with throughput. You want fewer automations, pointed at sharper targets, each paying for itself in weeks not quarters." }
+    ]
+  },
+  {
+    slug: "whatsapp-first-funnel-nl",
+    title: "Why your Dutch lead funnel should start on WhatsApp",
+    summary:
+      "Nederlandse consumenten beantwoorden WhatsApp in 90 seconden en email in een week. Hoe je je funnel inricht zodat het eerste contact altijd WhatsApp is — zonder de lead kwijt te raken in de doorverwijzing.",
+    tag: "Growth",
+    publishedAt: "2025-12-14",
+    readingMinutes: 5,
+    body: [
+      { type: "p", text: "Als je in Nederland B2C verkoopt en je eerste contact is nog steeds email, je verliest de helft van je funnel aan trage response. WhatsApp-response-rates liggen in Nederland rond de 80 procent, tegenover 15-20 procent voor cold email. De vraag is niet of je WhatsApp inzet, maar hoe je het zo inricht dat je schaalt zonder het persoonlijke karakter te verliezen." },
+      { type: "h2", text: "De drie fasen die werken" },
+      { type: "ul", items: [
+        "WhatsApp first touch — een bot kwalificeert in drie vragen: koopintentie, budget-orde-grootte, tijdlijn. Geen prijzen, geen verkoop.",
+        "Telefoongesprek als tweede stap — een mens voert het echte gesprek. De bot verkoopt nooit direct een bezoek. Drie-nee-regel: bij drie afwijzingen sluit het gesprek.",
+        "Buitendienst of offerte pas als fase drie — nooit eerder. Elke stap overslaan verdubbelt je no-show rate."
+      ]},
+      { type: "h2", text: "Wat je niet moet doen" },
+      { type: "p", text: "De bot mag nooit onthullen dat het een AI is. Niet omdat het strikt verboden is, maar omdat de meeste Nederlandse consumenten direct uitstappen zodra ze doorhebben dat ze met een chatbot praten. Als je transparanter wilt zijn, zeg dan eerlijk dat je werkt met een voorgedefinieerd kwalificatie-script — dat is acceptabel en vertrouwenwekkend." },
+      { type: "p", text: "De funnel die zo ingericht staat, draait bij operators die ik begeleid met CPL onder de 12 euro en een conversie van 35 procent van eerste WhatsApp-contact naar telefoongesprek. Dat zijn aantallen die een normale email-funnel nooit haalt, en de reden is simpel: je bent waar de klant al is, en je maakt geen extra stappen in de weg." }
+    ]
+  },
+  {
     slug: "why-operator-crms-fail",
     title: "Why most operator CRMs fail within 90 days",
     summary:
