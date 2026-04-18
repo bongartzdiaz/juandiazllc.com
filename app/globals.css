@@ -116,12 +116,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .preload.done { opacity: 0; visibility: hidden; }
 .preload-top { display: flex; justify-content: space-between; align-items: center; }
 .preload-center { flex: 1; display: flex; align-items: center; }
-.preload-mark { font-family: 'Inter'; font-weight: 500; font-size: clamp(48px, 10vw, 140px); line-height: .9; letter-spacing: -.04em; }
-.preload-mark span { display: inline-block; opacity: 0; transform: translateY(1em); animation: pl .7s var(--ease) forwards; }
-.preload-mark span:nth-child(1) { animation-delay: .05s; }
-.preload-mark span:nth-child(2) { animation-delay: .12s; }
-.preload-mark span:nth-child(3) { animation-delay: .19s; }
-@keyframes pl { to { opacity: 1; transform: translateY(0); } }
 .preload-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
 .preload-bar { flex: 1; height: 1px; background: var(--line); position: relative; overflow: hidden; }
 .preload-bar i { position: absolute; inset: 0; background: var(--accent); transform-origin: 0 50%; transform: scaleX(0); animation: fill 1.8s var(--ease) forwards; }
@@ -134,7 +128,6 @@ nav.top > * { pointer-events: auto; }
 .brand { display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono'; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; transition: color .3s; }
 .brand:hover svg { filter: drop-shadow(0 0 8px var(--accent)); }
 .brand svg { transition: filter .3s; }
-.brand .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); animation: pulse 2.4s infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 .nav-right { display: flex; gap: 28px; align-items: center; font-family: 'JetBrains Mono'; font-size: 12px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
 .nav-right a { position: relative; }
@@ -503,8 +496,6 @@ footer .f-mark { color: var(--text); }
   box-shadow: 0 20px 40px rgba(0,0,0,.6), 0 0 30px rgba(94,255,177,.15);
 }
 .auth-mark svg { width: 100%; height: 100%; display: block; }
-.auth-mark-ring { animation: spin 30s linear infinite; transform-origin: center; }
-.auth-mark-ring-r { animation: spinR 18s linear infinite; transform-origin: center; }
 
 /* Eyebrow */
 .auth-eyebrow {
