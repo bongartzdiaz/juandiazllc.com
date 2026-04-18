@@ -1,4 +1,4 @@
-/* Edge middleware — request hardening.
+/* Edge proxy (Next 16 middleware → proxy rename) — request hardening.
    ───────────────────────────────────────────────────────────────
    Runs on every request. Responsibilities:
      1. Same-origin (CSRF) check for state-changing API requests.
@@ -9,6 +9,7 @@
    Keep this fast — it runs on every single request. */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { updateSession } from '@/lib/supabase/middleware'
 
 /* ── 1. CSRF ──────────────────────────────────────────────────── */
 
@@ -79,7 +80,7 @@ const CSP = buildCsp()
 
 /* ── Middleware ───────────────────────────────────────────────── */
 
-export default function middleware(req: NextRequest) {
+export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
   const proto = req.headers.get('x-forwarded-proto')
 
@@ -127,10 +128,15 @@ export default function middleware(req: NextRequest) {
   const reqHeaders = new Headers(req.headers)
   reqHeaders.set('x-request-id', requestId)
 
-  const res = NextResponse.next({ request: { headers: reqHeaders } })
+  // Supabase auth — refresh session cookie + gate protected routes.
+  // Returns either a redirect (unauthenticated hitting a protected path)
+  // or a pass-through NextResponse carrying refreshed auth cookies.
+  // We use it as the base response so cookies propagate, then stack
+  // security headers on top before returning.
+  const res = await updateSession(req)
+  res.headers.set('x-request-id', requestId)
 
   // Security headers on the way out
-  res.headers.set('x-request-id', requestId)
   res.headers.set('Content-Security-Policy', CSP)
   res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   res.headers.set('X-Content-Type-Options', 'nosniff')

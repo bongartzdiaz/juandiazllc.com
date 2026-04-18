@@ -70,7 +70,7 @@ export default function WebhooksPage() {
 
   const load = useCallback(() => {
     setLoading(true)
-    fetch('/api/webhooks')
+    fetch('/philly/api/webhooks')
       .then(r => r.json())
       .then(json => setRows(json.data ?? []))
       .catch(() => setRows([]))
@@ -83,7 +83,7 @@ export default function WebhooksPage() {
     if (!url.trim()) return
     setCreating(true)
     try {
-      const res = await fetch('/api/webhooks', {
+      const res = await fetch('/philly/api/webhooks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: url.trim(), events: events.length ? events : ['*'], enabled }),
@@ -104,7 +104,7 @@ export default function WebhooksPage() {
 
   const rotate = async (id: string) => {
     if (!confirm('Rotate the signing secret? Existing integrations will break until updated.')) return
-    const res = await fetch(`/api/webhooks/${id}`, {
+    const res = await fetch(`/philly/api/webhooks/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ rotateSecret: true }),
@@ -118,19 +118,19 @@ export default function WebhooksPage() {
 
   const del = async (id: string) => {
     if (!confirm('Delete this webhook? Events will no longer be delivered.')) return
-    await fetch(`/api/webhooks/${id}`, { method: 'DELETE' })
+    await fetch(`/philly/api/webhooks/${id}`, { method: 'DELETE' })
     load()
   }
 
   const loadDetail = useCallback(async (id: string) => {
-    const res = await fetch(`/api/webhooks/${id}`)
+    const res = await fetch(`/philly/api/webhooks/${id}`)
     const json = await res.json()
     if (res.ok) setDetails(prev => ({ ...prev, [id]: json.data }))
   }, [])
 
   const retryDelivery = useCallback(async (webhookId: string, deliveryId: string) => {
     try {
-      const res = await fetch(`/api/webhooks/${webhookId}/deliveries/${deliveryId}/retry`, { method: 'POST' })
+      const res = await fetch(`/philly/api/webhooks/${webhookId}/deliveries/${deliveryId}/retry`, { method: 'POST' })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) { alert(json.error ?? 'Retry failed'); return }
       await loadDetail(webhookId)

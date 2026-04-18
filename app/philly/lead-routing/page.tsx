@@ -72,7 +72,7 @@ export default function LeadRoutingPage() {
     setSaving(true)
     setAddError(null)
     try {
-      const res = await fetch('/api/lead-routing', {
+      const res = await fetch('/philly/api/lead-routing', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -103,7 +103,7 @@ export default function LeadRoutingPage() {
     setLoading(true)
     try {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
-      const res = await fetch(`/api/lead-routing?${params}`)
+      const res = await fetch(`/philly/api/lead-routing?${params}`)
       const json = await res.json()
       setRules(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)
@@ -117,7 +117,7 @@ export default function LeadRoutingPage() {
   const toggleEnabled = async (id: string, enabled: boolean) => {
     setRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !enabled } : r))
     try {
-      await fetch('/api/lead-routing', {
+      await fetch('/philly/api/lead-routing', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, enabled: !enabled }),
@@ -130,7 +130,7 @@ export default function LeadRoutingPage() {
   const deleteRule = async (id: string) => {
     if (!confirm('Delete this routing rule?')) return
     try {
-      const res = await fetch(`/api/lead-routing?id=${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/lead-routing?id=${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) fetchData()
     } catch {}
   }

@@ -153,7 +153,7 @@ export default function DialerPage() {
     try {
       const params = new URLSearchParams({ page: String(callPage), limit: '25' })
       if (outcomeFilter) params.set('outcome', outcomeFilter)
-      const res = await fetch(`/api/calls?${params}`, { cache: 'no-store' })
+      const res = await fetch(`/philly/api/calls?${params}`, { cache: 'no-store' })
       const json = await res.json()
       setCalls(json.data ?? [])
       setCallTotal(json.pagination?.total ?? 0)
@@ -171,7 +171,7 @@ export default function DialerPage() {
     setListsLoading(true)
     try {
       const params = new URLSearchParams({ page: String(listPage), limit: '25' })
-      const res = await fetch(`/api/dialer-lists?${params}`, { cache: 'no-store' })
+      const res = await fetch(`/philly/api/dialer-lists?${params}`, { cache: 'no-store' })
       const json = await res.json()
       setLists(json.data ?? [])
       setListTotal(json.pagination?.total ?? 0)
@@ -220,7 +220,7 @@ export default function DialerPage() {
     setCallModalContact(null)
     setCallPhone('')
     try {
-      const res = await fetch(`/api/contacts/${contactId}`, { cache: 'no-store' })
+      const res = await fetch(`/philly/api/contacts/${contactId}`, { cache: 'no-store' })
       const json = await res.json()
       const c: ContactLite | null = json.data ?? null
       setCallModalContact(c)
@@ -256,7 +256,7 @@ export default function DialerPage() {
     if (!Number.isFinite(dur) || dur < 0) { setCallError('Duration must be a non-negative number'); return }
     setCallSubmitting(true)
     try {
-      const res = await fetch('/api/calls', {
+      const res = await fetch('/philly/api/calls', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -302,7 +302,7 @@ export default function DialerPage() {
     if (!addName.trim()) { setAddError('Name is required'); return }
     setAddSubmitting(true)
     try {
-      const res = await fetch('/api/dialer-lists', {
+      const res = await fetch('/philly/api/dialer-lists', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

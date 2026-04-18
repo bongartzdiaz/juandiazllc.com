@@ -29,7 +29,7 @@ export function NotificationBell() {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    fetch('/api/notifications?limit=5&unread=true')
+    fetch('/philly/api/notifications?limit=5&unread=true')
       .then(r => r.json())
       .then(j => {
         setNotifications(j.data ?? [])
@@ -39,7 +39,7 @@ export function NotificationBell() {
 
     // Poll every 30s
     const interval = setInterval(() => {
-      fetch('/api/notifications?limit=5&unread=true')
+      fetch('/philly/api/notifications?limit=5&unread=true')
         .then(r => r.json())
         .then(j => {
           setNotifications(j.data ?? [])
@@ -61,7 +61,7 @@ export function NotificationBell() {
   }, [])
 
   const markRead = async (id: string) => {
-    await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' })
+    await fetch(`/philly/api/notifications/${id}/read`, { method: 'PATCH' })
     setNotifications(prev => prev.filter(n => n.id !== id))
     setUnread(prev => Math.max(0, prev - 1))
   }

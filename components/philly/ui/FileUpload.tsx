@@ -83,7 +83,7 @@ export function FileUpload({
       if (entityType) form.append('entityType', entityType)
       if (entityId) form.append('entityId', entityId)
 
-      const res = await fetch('/api/documents/upload', { method: 'POST', body: form })
+      const res = await fetch('/philly/api/documents/upload', { method: 'POST', body: form })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error ?? 'Upload failed')
 

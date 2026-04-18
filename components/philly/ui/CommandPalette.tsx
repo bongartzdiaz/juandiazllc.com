@@ -143,8 +143,8 @@ export function CommandPalette() {
         icon: <Download size={iconSize} />, category: 'Actions',
         action: () => {
           Promise.all([
-            fetch('/api/contacts').then(r => r.ok ? r.json() : { data: [] }),
-            fetch('/api/projects').then(r => r.ok ? r.json() : { data: [] }),
+            fetch('/philly/api/contacts').then(r => r.ok ? r.json() : { data: [] }),
+            fetch('/philly/api/projects').then(r => r.ok ? r.json() : { data: [] }),
           ]).then(([contacts, projects]) => {
             if (contacts.data?.length) exportToCSV(contacts.data, 'contacts')
             if (projects.data?.length) exportToCSV(projects.data, 'projects')
@@ -217,10 +217,10 @@ export function CommandPalette() {
     const timer = setTimeout(async () => {
       try {
         const [cRes, pRes] = await Promise.all([
-          fetch(`/api/contacts?q=${encodeURIComponent(trimmed)}&limit=5`, { signal: ctrl.signal })
+          fetch(`/philly/api/contacts?q=${encodeURIComponent(trimmed)}&limit=5`, { signal: ctrl.signal })
             .then(r => r.ok ? r.json() : { data: [] })
             .catch(() => ({ data: [] })),
-          fetch(`/api/projects?q=${encodeURIComponent(trimmed)}&limit=5`, { signal: ctrl.signal })
+          fetch(`/philly/api/projects?q=${encodeURIComponent(trimmed)}&limit=5`, { signal: ctrl.signal })
             .then(r => r.ok ? r.json() : { data: [] })
             .catch(() => ({ data: [] })),
         ])

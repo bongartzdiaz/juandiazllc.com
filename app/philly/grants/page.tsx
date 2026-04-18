@@ -108,11 +108,11 @@ export default function GrantsPage() {
     setSaving(true)
     try {
       const res = editingId
-        ? await fetch(`/api/grants/${editingId}`, {
+        ? await fetch(`/philly/api/grants/${editingId}`, {
             method: 'PATCH', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           })
-        : await fetch('/api/grants', {
+        : await fetch('/philly/api/grants', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           })
@@ -128,7 +128,7 @@ export default function GrantsPage() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this grant?')) return
     try {
-      const res = await fetch(`/api/grants/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/grants/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Grant deleted', 'success')
         setSelected(null)
@@ -142,7 +142,7 @@ export default function GrantsPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '20' })
       if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/grants?${params}`)
+      const res = await fetch(`/philly/api/grants?${params}`)
       const json = await res.json()
       setGrants(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)

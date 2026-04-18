@@ -210,7 +210,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const handleSave = useCallback(async () => {
     try {
       const budgetNum = Number(editBudget)
-      const res = await fetch(`/api/projects/${id}`, {
+      const res = await fetch(`/philly/api/projects/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -244,7 +244,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     if (!newMsTitle.trim() || !newMsDate) return
     setAddingMs(true)
     try {
-      const res = await fetch(`/api/projects/${id}/milestones`, {
+      const res = await fetch(`/philly/api/projects/${id}/milestones`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -270,7 +270,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const handleToggleMilestone = useCallback(async (ms: Milestone) => {
     const next = ms.status === 'completed' ? 'pending' : 'completed'
     try {
-      const res = await fetch(`/api/projects/${id}/milestones/${ms.id}`, {
+      const res = await fetch(`/philly/api/projects/${id}/milestones/${ms.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: next }),
@@ -284,7 +284,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
   const handleDeleteMilestone = useCallback(async (msId: string) => {
     try {
-      const res = await fetch(`/api/projects/${id}/milestones/${msId}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/projects/${id}/milestones/${msId}`, { method: 'DELETE' })
       if (!res.ok && res.status !== 204) throw new Error('Failed to delete milestone')
       addToast('Milestone removed', 'success')
       projectQuery.refetch()
@@ -308,7 +308,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     setAddingMetric(true)
     try {
       const unit = IMPACT_TYPES.find(t => t.key === newMetricType)?.unit ?? ''
-      const res = await fetch(`/api/projects/${id}/metrics`, {
+      const res = await fetch(`/philly/api/projects/${id}/metrics`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

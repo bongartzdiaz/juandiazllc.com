@@ -56,7 +56,7 @@ export default function ScoringRulesPage() {
     setSaving(true)
     setAddError(null)
     try {
-      const res = await fetch('/api/scoring-rules', {
+      const res = await fetch('/philly/api/scoring-rules', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -89,7 +89,7 @@ export default function ScoringRulesPage() {
     setLoading(true)
     try {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
-      const res = await fetch(`/api/scoring-rules?${params}`)
+      const res = await fetch(`/philly/api/scoring-rules?${params}`)
       const json = await res.json()
       setRules(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)
@@ -103,7 +103,7 @@ export default function ScoringRulesPage() {
   const toggleEnabled = async (id: string, enabled: boolean) => {
     setRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !enabled } : r))
     try {
-      await fetch('/api/scoring-rules', {
+      await fetch('/philly/api/scoring-rules', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, enabled: !enabled }),
@@ -116,7 +116,7 @@ export default function ScoringRulesPage() {
   const deleteRule = async (id: string) => {
     if (!confirm('Delete this scoring rule?')) return
     try {
-      const res = await fetch(`/api/scoring-rules?id=${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/scoring-rules?id=${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         fetchData()
       }

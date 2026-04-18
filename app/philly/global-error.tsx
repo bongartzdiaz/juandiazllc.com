@@ -19,7 +19,7 @@ export default function GlobalError({
     // The server-side sentry.ts wrapper is node-only; on the client
     // we post to a lightweight /api/log-error endpoint instead.
     if (typeof window !== 'undefined') {
-      fetch('/api/log-error', {
+      fetch('/philly/api/log-error', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

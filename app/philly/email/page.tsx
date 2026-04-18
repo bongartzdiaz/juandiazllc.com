@@ -65,7 +65,7 @@ export default function EmailPage() {
   const fetchAccounts = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/email/accounts')
+      const res = await fetch('/philly/api/email/accounts')
       const json = await res.json()
       const list: EmailAccount[] = json.data ?? []
       setAccounts(list)
@@ -116,7 +116,7 @@ export default function EmailPage() {
     setAddSubmitting(true)
     setAddError(null)
     try {
-      const res = await fetch('/api/email/accounts', {
+      const res = await fetch('/philly/api/email/accounts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -152,7 +152,7 @@ export default function EmailPage() {
     setCmpSending(true)
     setSendError(null)
     try {
-      const res = await fetch('/api/email/send', {
+      const res = await fetch('/philly/api/email/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

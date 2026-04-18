@@ -34,7 +34,7 @@ export default function MarketAnalyticsPage() {
     try {
       const params = new URLSearchParams({ year: String(year) })
       if (zipCode) params.set('zipCode', zipCode)
-      const res = await fetch(`/api/market-data?${params}`)
+      const res = await fetch(`/philly/api/market-data?${params}`)
       const json = await res.json()
       setSnapshots(json.data ?? [])
     } catch { setSnapshots([]) }

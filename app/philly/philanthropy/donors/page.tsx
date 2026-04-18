@@ -47,7 +47,7 @@ export default function DonorsPage() {
 
   const load = useCallback(() => {
     setLoading(true)
-    fetch('/api/philanthropy/donor-scores')
+    fetch('/philly/api/philanthropy/donor-scores')
       .then(r => r.json())
       .then(json => setReport(json.data ?? null))
       .catch(() => setReport(null))

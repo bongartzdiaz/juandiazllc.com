@@ -50,7 +50,7 @@ export default function PageEdit() {
   useEffect(() => {
     if (!slug) return
     setLoading(true)
-    fetch(`/api/pages/${slug}`)
+    fetch(`/philly/api/pages/${slug}`)
       .then(r => r.json())
       .then(j => {
         if (!j?.data) return
@@ -105,7 +105,7 @@ export default function PageEdit() {
     if (!page) return
     setSaving(true); setErr(null)
     try {
-      const r = await fetch(`/api/pages/${page.id}`, {
+      const r = await fetch(`/philly/api/pages/${page.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

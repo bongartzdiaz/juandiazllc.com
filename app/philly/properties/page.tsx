@@ -117,7 +117,7 @@ export default function PropertiesPage() {
     setSaving(true)
     setAddError(null)
     try {
-      const res = await fetch('/api/properties', {
+      const res = await fetch('/philly/api/properties', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -184,7 +184,7 @@ export default function PropertiesPage() {
   // Fetch taxonomy once on mount
   useEffect(() => {
     let cancelled = false
-    fetch('/api/properties/taxonomy')
+    fetch('/philly/api/properties/taxonomy')
       .then(r => r.json())
       .then(json => { if (!cancelled && json.data) setTaxonomy(json.data) })
       .catch(() => {})
@@ -219,7 +219,7 @@ export default function PropertiesPage() {
       if (bankOwned) params.set('bankOwned', 'true')
       if (resaleOnly) params.set('resale', 'true')
       if (search) params.set('q', search)
-      const res = await fetch(`/api/properties?${params}`)
+      const res = await fetch(`/philly/api/properties?${params}`)
       const json = await res.json()
       setProperties(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)

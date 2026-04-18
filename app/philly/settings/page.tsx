@@ -162,7 +162,7 @@ export default function SettingsPage() {
   useEffect(() => {
     let cancelled = false
     setProfileLoading(true)
-    fetch('/api/me', { cache: 'no-store' })
+    fetch('/philly/api/me', { cache: 'no-store' })
       .then(r => r.json())
       .then(j => {
         if (cancelled) return
@@ -183,7 +183,7 @@ export default function SettingsPage() {
     if (!profileName.trim()) { addToast('Name is required', 'error'); return }
     setProfileSaving(true)
     try {
-      const res = await fetch('/api/me', {
+      const res = await fetch('/philly/api/me', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: profileName.trim(), email: profileEmail.trim() }),
@@ -210,7 +210,7 @@ export default function SettingsPage() {
   useEffect(() => {
     let cancelled = false
     setOrgLoading(true)
-    fetch('/api/organization', { cache: 'no-store' })
+    fetch('/philly/api/organization', { cache: 'no-store' })
       .then(r => r.json())
       .then(j => {
         if (cancelled) return
@@ -230,7 +230,7 @@ export default function SettingsPage() {
     if (!orgName.trim()) { addToast('Organization name is required', 'error'); return }
     setOrgSaving(true)
     try {
-      const res = await fetch('/api/organization', {
+      const res = await fetch('/philly/api/organization', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: orgName.trim(), industry: orgIndustry }),

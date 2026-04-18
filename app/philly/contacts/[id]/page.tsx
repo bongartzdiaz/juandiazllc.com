@@ -190,7 +190,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
 
   const handleSave = useCallback(async () => {
     try {
-      const res = await fetch(`/api/contacts/${id}`, {
+      const res = await fetch(`/philly/api/contacts/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -232,7 +232,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
     if (!noteText.trim()) return
     setSubmittingNote(true)
     try {
-      const res = await fetch(`/api/contacts/${id}/notes`, {
+      const res = await fetch(`/philly/api/contacts/${id}/notes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: noteText.trim() }),

@@ -87,7 +87,7 @@ export default function DocumentsPage() {
 
   const fetchDocs = () => {
     setLoading(true)
-    fetch('/api/documents?limit=200')
+    fetch('/philly/api/documents?limit=200')
       .then(r => r.json())
       .then(j => setDocs(j.data ?? []))
       .catch(() => {})
@@ -111,7 +111,7 @@ export default function DocumentsPage() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this document?')) return
     try {
-      const res = await fetch(`/api/documents/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/documents/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Document deleted', 'success')
         setSelected(s => s.filter(x => x !== id))
@@ -130,7 +130,7 @@ export default function DocumentsPage() {
     let failed = 0
     await Promise.all(ids.map(async (id) => {
       try {
-        const res = await fetch(`/api/documents/${id}`, { method: 'DELETE' })
+        const res = await fetch(`/philly/api/documents/${id}`, { method: 'DELETE' })
         if (res.status === 204 || res.ok) succeeded++
         else failed++
       } catch { failed++ }
@@ -145,7 +145,7 @@ export default function DocumentsPage() {
     if (!upName.trim() || !upUrl.trim()) return
     setUpBusy(true); setUpErr(null)
     try {
-      const r = await fetch('/api/documents', {
+      const r = await fetch('/philly/api/documents', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

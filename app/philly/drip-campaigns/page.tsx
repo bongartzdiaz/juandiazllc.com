@@ -81,7 +81,7 @@ export default function DripCampaignsPage() {
       const params = new URLSearchParams()
       if (typeFilter) params.set('type', typeFilter)
       params.set('limit', '100')
-      const res = await fetch(`/api/drip-campaigns?${params}`)
+      const res = await fetch(`/philly/api/drip-campaigns?${params}`)
       const j = await res.json().catch(() => ({}))
       setCampaigns(Array.isArray(j.data) ? j.data : [])
     } catch {
@@ -144,11 +144,11 @@ export default function DripCampaignsPage() {
         steps: formSteps,
       }
       const res = editingId
-        ? await fetch(`/api/drip-campaigns/${editingId}`, {
+        ? await fetch(`/philly/api/drip-campaigns/${editingId}`, {
             method: 'PATCH', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           })
-        : await fetch('/api/drip-campaigns', {
+        : await fetch('/philly/api/drip-campaigns', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           })
@@ -167,7 +167,7 @@ export default function DripCampaignsPage() {
   async function toggleStatus(c: DripCampaign) {
     const nextStatus = c.status === 'active' ? 'paused' : 'active'
     try {
-      const res = await fetch(`/api/drip-campaigns/${c.id}`, {
+      const res = await fetch(`/philly/api/drip-campaigns/${c.id}`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),
       })
@@ -180,7 +180,7 @@ export default function DripCampaignsPage() {
   async function handleDelete(c: DripCampaign) {
     if (!confirm(`Delete "${c.name}"? This cannot be undone.`)) return
     try {
-      const res = await fetch(`/api/drip-campaigns/${c.id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/drip-campaigns/${c.id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Campaign deleted', 'success')
         fetchCampaigns()

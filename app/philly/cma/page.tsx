@@ -76,7 +76,7 @@ export default function CmaPage() {
 
   async function changeStatus(id: string, status: string) {
     try {
-      const res = await fetch('/api/cma', {
+      const res = await fetch('/philly/api/cma', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status }),
@@ -90,7 +90,7 @@ export default function CmaPage() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this CMA report?')) return
     try {
-      const res = await fetch(`/api/cma?id=${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/cma?id=${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('CMA deleted', 'success')
         fetchData()
@@ -114,12 +114,12 @@ export default function CmaPage() {
         estimatedValue: Math.round((parseFloat(addValue) || 0) * 100),
       }
       const res = editingId
-        ? await fetch('/api/cma', {
+        ? await fetch('/philly/api/cma', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: editingId, ...payload }),
           })
-        : await fetch('/api/cma', {
+        : await fetch('/philly/api/cma', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -143,7 +143,7 @@ export default function CmaPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '20' })
       if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/cma?${params}`)
+      const res = await fetch(`/philly/api/cma?${params}`)
       const json = await res.json()
       setCmas(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)

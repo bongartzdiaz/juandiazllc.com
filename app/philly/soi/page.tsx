@@ -50,7 +50,7 @@ export default function SoiPage() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this category?')) return
     try {
-      const res = await fetch(`/api/soi?id=${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/soi?id=${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Category deleted', 'success')
         fetchData()
@@ -80,12 +80,12 @@ export default function SoiPage() {
         color: addColor,
       }
       const res = editingId
-        ? await fetch('/api/soi', {
+        ? await fetch('/philly/api/soi', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: editingId, ...payload }),
           })
-        : await fetch('/api/soi', {
+        : await fetch('/philly/api/soi', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -108,7 +108,7 @@ export default function SoiPage() {
     setLoading(true)
     try {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
-      const res = await fetch(`/api/soi?${params}`)
+      const res = await fetch(`/philly/api/soi?${params}`)
       const json = await res.json()
       setCategories(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)

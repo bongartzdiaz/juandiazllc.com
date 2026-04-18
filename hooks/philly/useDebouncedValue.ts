@@ -5,7 +5,7 @@
  * Use for search inputs so we don't refetch on every keystroke.
  *
  *   const debounced = useDebouncedValue(query, 300)
- *   useEffect(() => { fetch(`/api/x?q=${debounced}`) }, [debounced])
+ *   useEffect(() => { fetch(`/philly/api/x?q=${debounced}`) }, [debounced])
  */
 import { useEffect, useState } from 'react'
 

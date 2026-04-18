@@ -136,7 +136,7 @@ export default function PropertyTaxonomyPage() {
   const { addToast } = useToast()
 
   useEffect(() => {
-    fetch('/api/properties/taxonomy')
+    fetch('/philly/api/properties/taxonomy')
       .then(r => r.json())
       .then(json => { if (json.data) setTax(json.data) })
       .catch(() => addToast('Failed to load taxonomy', 'error'))
@@ -161,7 +161,7 @@ export default function PropertyTaxonomyPage() {
     if (!tax) return
     setSaving(true)
     try {
-      const res = await fetch('/api/properties/taxonomy', {
+      const res = await fetch('/philly/api/properties/taxonomy', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(tax),

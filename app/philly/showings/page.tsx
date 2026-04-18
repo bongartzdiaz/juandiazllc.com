@@ -72,7 +72,7 @@ export default function ShowingsPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
       if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/showings?${params}`)
+      const res = await fetch(`/philly/api/showings?${params}`)
       const json = await res.json()
       setShowings(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)
@@ -84,10 +84,10 @@ export default function ShowingsPage() {
   useEffect(() => { fetchData() }, [fetchData])
 
   useEffect(() => {
-    fetch('/api/properties?limit=500').then(r => r.json()).then(j => {
+    fetch('/philly/api/properties?limit=500').then(r => r.json()).then(j => {
       setProperties(Array.isArray(j.data) ? j.data.map((p: PropertyLite) => ({ id: p.id, title: p.title, address: p.address })) : [])
     }).catch(() => {})
-    fetch('/api/contacts?limit=500').then(r => r.json()).then(j => {
+    fetch('/philly/api/contacts?limit=500').then(r => r.json()).then(j => {
       setContacts(Array.isArray(j.data) ? j.data.map((c: ContactLite) => ({ id: c.id, name: c.name })) : [])
     }).catch(() => {})
   }, [])
@@ -137,12 +137,12 @@ export default function ShowingsPage() {
         notes: form.notes,
       }
       const res = editingId
-        ? await fetch(`/api/showings/${editingId}`, {
+        ? await fetch(`/philly/api/showings/${editingId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ date: dateISO, notes: form.notes }),
           })
-        : await fetch('/api/showings', {
+        : await fetch('/philly/api/showings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -161,7 +161,7 @@ export default function ShowingsPage() {
 
   async function changeStatus(id: string, status: string) {
     try {
-      const res = await fetch(`/api/showings/${id}`, {
+      const res = await fetch(`/philly/api/showings/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
@@ -176,7 +176,7 @@ export default function ShowingsPage() {
   async function saveFeedback() {
     if (!selected) return
     try {
-      const res = await fetch(`/api/showings/${selected.id}`, {
+      const res = await fetch(`/philly/api/showings/${selected.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ feedback, rating, status: 'completed' }),
@@ -192,7 +192,7 @@ export default function ShowingsPage() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this showing?')) return
     try {
-      const res = await fetch(`/api/showings/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/showings/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Showing deleted', 'success')
         setSelected(null)

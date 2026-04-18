@@ -29,7 +29,7 @@ export default function PagesListPage() {
 
   const fetchData = () => {
     setLoading(true)
-    fetch('/api/pages')
+    fetch('/philly/api/pages')
       .then(r => r.json())
       .then(j => setPages(j.data ?? []))
       .catch(() => {})
@@ -42,7 +42,7 @@ export default function PagesListPage() {
     if (!newTitle.trim()) return
     setBusy(true); setErr(null)
     try {
-      const r = await fetch('/api/pages', {
+      const r = await fetch('/philly/api/pages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -64,7 +64,7 @@ export default function PagesListPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this page? This cannot be undone.')) return
-    const r = await fetch(`/api/pages/${id}`, { method: 'DELETE' })
+    const r = await fetch(`/philly/api/pages/${id}`, { method: 'DELETE' })
     if (r.ok) fetchData()
   }
 

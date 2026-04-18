@@ -31,14 +31,20 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Gate protected routes
+  // Gate protected routes. Philly is the real app — any /philly/* request
+  // without a Supabase session is redirected to /login?next=<path> so the
+  // user comes back to where they tried to go after sign-in.
   const path = request.nextUrl.pathname;
-  const isMainProtected = path === "/app" || path.startsWith("/app/") || path.startsWith("/dashboard");
-  const isDiazProtected = path === "/diaz/app" || path.startsWith("/diaz/app/");
-  if (!user && (isMainProtected || isDiazProtected)) {
+  const isProtected =
+    path === "/app" ||
+    path.startsWith("/app/") ||
+    path.startsWith("/dashboard") ||
+    path === "/philly" ||
+    path.startsWith("/philly/");
+  if (!user && isProtected) {
     const url = request.nextUrl.clone();
-    url.pathname = isDiazProtected ? "/diaz/login" : "/login";
-    url.searchParams.set("next", path);
+    url.pathname = "/login";
+    url.searchParams.set("next", path + (request.nextUrl.search || ""));
     return NextResponse.redirect(url);
   }
 

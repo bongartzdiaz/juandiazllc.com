@@ -73,7 +73,7 @@ export default function CommissionsPage() {
 
     setSaving(true)
     try {
-      const res = await fetch('/api/commissions', {
+      const res = await fetch('/philly/api/commissions', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           agentId: form.agentId,
@@ -95,7 +95,7 @@ export default function CommissionsPage() {
 
   async function changeStatus(id: string, status: string) {
     try {
-      const res = await fetch(`/api/commissions/${id}`, {
+      const res = await fetch(`/philly/api/commissions/${id}`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       })
@@ -108,7 +108,7 @@ export default function CommissionsPage() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this commission record?')) return
     try {
-      const res = await fetch(`/api/commissions/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/commissions/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Commission deleted', 'success')
         fetchRecords()
@@ -118,7 +118,7 @@ export default function CommissionsPage() {
 
   // Fetch leaderboard
   useEffect(() => {
-    fetch('/api/leaderboard').then(r => r.json()).then(j => setLeaderboard(j.data ?? [])).catch(() => {})
+    fetch('/philly/api/leaderboard').then(r => r.json()).then(j => setLeaderboard(j.data ?? [])).catch(() => {})
   }, [])
 
   // Fetch commission records
@@ -127,7 +127,7 @@ export default function CommissionsPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
       if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/commissions?${params}`)
+      const res = await fetch(`/philly/api/commissions?${params}`)
       const json = await res.json()
       setRecords(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)

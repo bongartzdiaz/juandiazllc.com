@@ -109,7 +109,7 @@ export default function CalendarPage() {
     setLoading(true)
     setFetchError(null)
     try {
-      const res = await fetch(`/api/calendar?from=${encodeURIComponent(fromISO)}&to=${encodeURIComponent(toISO)}`, {
+      const res = await fetch(`/philly/api/calendar?from=${encodeURIComponent(fromISO)}&to=${encodeURIComponent(toISO)}`, {
         cache: 'no-store',
       })
       if (!res.ok) throw new Error(`Failed to load (${res.status})`)
@@ -216,7 +216,7 @@ export default function CalendarPage() {
         location: form.location.trim(),
         color: form.color,
       }
-      const url = editingId ? `/api/calendar/${editingId}` : '/api/calendar'
+      const url = editingId ? `/philly/api/calendar/${editingId}` : '/philly/api/calendar'
       const method = editingId ? 'PATCH' : 'POST'
       const res = await fetch(url, {
         method,
@@ -242,7 +242,7 @@ export default function CalendarPage() {
     if (!confirm('Delete this event?')) return
     setSubmitting(true)
     try {
-      const res = await fetch(`/api/calendar/${editingId}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/calendar/${editingId}`, { method: 'DELETE' })
       if (!res.ok && res.status !== 204) {
         const j = await res.json().catch(() => ({}))
         throw new Error(j.error ?? 'Delete failed')

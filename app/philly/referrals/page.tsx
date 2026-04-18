@@ -50,7 +50,7 @@ export default function ReferralsPage() {
   const { addToast } = useToast()
 
   useEffect(() => {
-    fetch('/api/contacts?limit=500')
+    fetch('/philly/api/contacts?limit=500')
       .then(r => r.json())
       .then(j => setContacts(Array.isArray(j.data) ? j.data.map((c: ContactLite) => ({ id: c.id, name: c.name })) : []))
       .catch(() => {})
@@ -63,7 +63,7 @@ export default function ReferralsPage() {
 
   async function changeStatus(id: string, status: string) {
     try {
-      const res = await fetch('/api/referrals', {
+      const res = await fetch('/philly/api/referrals', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status }),
@@ -77,7 +77,7 @@ export default function ReferralsPage() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this referral?')) return
     try {
-      const res = await fetch(`/api/referrals?id=${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/referrals?id=${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Referral deleted', 'success')
         fetchReferrals()
@@ -94,7 +94,7 @@ export default function ReferralsPage() {
     setSaving(true)
     setAddError(null)
     try {
-      const res = await fetch('/api/referrals', {
+      const res = await fetch('/philly/api/referrals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -125,7 +125,7 @@ export default function ReferralsPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
       if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/referrals?${params}`)
+      const res = await fetch(`/philly/api/referrals?${params}`)
       const json = await res.json()
       setReferrals(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)

@@ -261,7 +261,7 @@ export default function KanbanPage() {
   const [realBoards, setRealBoards] = useState<RealBoard[] | null>(null)
   const fetchBoards = useCallback(async () => {
     try {
-      const res = await fetch('/api/kanban/boards', { cache: 'no-store' })
+      const res = await fetch('/philly/api/kanban/boards', { cache: 'no-store' })
       const j = await res.json().catch(() => ({}))
       setRealBoards(Array.isArray(j.data) ? j.data : [])
     } catch {
@@ -496,7 +496,7 @@ export default function KanbanPage() {
               setAddCardLoading(true)
               setAddCardError(null)
               try {
-                const res = await fetch('/api/kanban/cards', {
+                const res = await fetch('/philly/api/kanban/cards', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
@@ -777,7 +777,7 @@ function CardDetailDrawer({
                 const newColumnId = e.target.value
                 if (!newColumnId || newColumnId === currentColumn?.id) return
                 try {
-                  const res = await fetch(`/api/kanban/cards/${card.id}`, {
+                  const res = await fetch(`/philly/api/kanban/cards/${card.id}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ columnId: newColumnId }),
@@ -826,7 +826,7 @@ function CardDetailDrawer({
           <button
             onClick={async () => {
               if (!confirm('Delete this card?')) return
-              await fetch(`/api/kanban/cards/${card.id}`, { method: 'DELETE' }).catch(() => {})
+              await fetch(`/philly/api/kanban/cards/${card.id}`, { method: 'DELETE' }).catch(() => {})
               onClose()
             }}
             style={{

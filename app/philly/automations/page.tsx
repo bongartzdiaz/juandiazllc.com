@@ -145,7 +145,7 @@ export default function AutomationsPage() {
 
   const load = useCallback(() => {
     setLoading(true)
-    fetch('/api/automations')
+    fetch('/philly/api/automations')
       .then(r => r.json())
       .then(j => setRules(j.data ?? []))
       .catch(() => setRules([]))
@@ -205,13 +205,13 @@ export default function AutomationsPage() {
     try {
       let res: Response
       if (editing) {
-        res = await fetch(`/api/automations/${editing.id}`, {
+        res = await fetch(`/philly/api/automations/${editing.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         })
       } else {
-        res = await fetch('/api/automations', {
+        res = await fetch('/philly/api/automations', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -235,7 +235,7 @@ export default function AutomationsPage() {
 
   const del = async (rule: AutomationRule) => {
     if (!confirm(`Delete rule "${rule.name}"?`)) return
-    const res = await fetch(`/api/automations/${rule.id}`, { method: 'DELETE' })
+    const res = await fetch(`/philly/api/automations/${rule.id}`, { method: 'DELETE' })
     if (res.ok) {
       addToast('Rule deleted', 'success')
       load()
@@ -248,7 +248,7 @@ export default function AutomationsPage() {
     const next = !rule.enabled
     setRules(prev => prev.map(r => r.id === rule.id ? { ...r, enabled: next } : r))
     try {
-      await fetch('/api/automations', {
+      await fetch('/philly/api/automations', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: rule.id, enabled: next }),
@@ -266,7 +266,7 @@ export default function AutomationsPage() {
     }
     setExpandedLogs(prev => ({ ...prev, [rule.id]: 'loading' }))
     try {
-      const res = await fetch(`/api/automations/${rule.id}/logs?limit=5`)
+      const res = await fetch(`/philly/api/automations/${rule.id}/logs?limit=5`)
       const j = await res.json()
       setExpandedLogs(prev => ({ ...prev, [rule.id]: j.data ?? [] }))
     } catch {

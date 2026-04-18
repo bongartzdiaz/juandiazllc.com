@@ -71,7 +71,7 @@ export default function ESignaturesPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
       if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/e-signatures?${params}`, { cache: 'no-store' })
+      const res = await fetch(`/philly/api/e-signatures?${params}`, { cache: 'no-store' })
       const json = await res.json()
       setSigs(Array.isArray(json.data) ? json.data : [])
       setTotal(json.pagination?.total ?? 0)
@@ -83,7 +83,7 @@ export default function ESignaturesPage() {
   useEffect(() => { fetchData() }, [fetchData])
 
   useEffect(() => {
-    fetch('/api/transactions?limit=500')
+    fetch('/philly/api/transactions?limit=500')
       .then(r => r.json())
       .then(j => setTransactions(Array.isArray(j.data) ? j.data.map((t: TransactionLite) => ({
         id: t.id, escrowNumber: t.escrowNumber, titleCompany: t.titleCompany,
@@ -104,7 +104,7 @@ export default function ESignaturesPage() {
 
     setSaving(true)
     try {
-      const res = await fetch('/api/e-signatures', {
+      const res = await fetch('/philly/api/e-signatures', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -127,7 +127,7 @@ export default function ESignaturesPage() {
 
   async function changeStatus(id: string, status: string) {
     try {
-      const res = await fetch(`/api/e-signatures/${id}`, {
+      const res = await fetch(`/philly/api/e-signatures/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
@@ -142,7 +142,7 @@ export default function ESignaturesPage() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this signature request?')) return
     try {
-      const res = await fetch(`/api/e-signatures/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/e-signatures/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Deleted', 'success')
         setSelected(null)

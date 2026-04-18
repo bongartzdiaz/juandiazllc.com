@@ -128,8 +128,8 @@ export default function IntegrationsPage() {
     setLoading(true)
     try {
       const [catRes, intRes] = await Promise.all([
-        fetch('/api/integrations/catalog'),
-        fetch('/api/integrations'),
+        fetch('/philly/api/integrations/catalog'),
+        fetch('/philly/api/integrations'),
       ])
       const catJson = await catRes.json()
       const intJson = await intRes.json()
@@ -178,7 +178,7 @@ export default function IntegrationsPage() {
 
   const handleConnect = (item: CatalogItem) => {
     if (item.oauth) {
-      window.location.href = `/api/integrations/oauth/${item.id}`
+      window.location.href = `/philly/api/integrations/oauth/${item.id}`
       return
     }
     if (item.apiKey) {
@@ -196,7 +196,7 @@ export default function IntegrationsPage() {
       if (keyModalFor.id === 'mailchimp' && accountIdInput.trim()) {
         metadata.accountId = accountIdInput.trim()
       }
-      const res = await fetch('/api/integrations', {
+      const res = await fetch('/philly/api/integrations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -224,7 +224,7 @@ export default function IntegrationsPage() {
   const handleTest = async (item: CatalogItem, record: Integration) => {
     setBusy(item.id)
     try {
-      const res = await fetch(`/api/integrations/${record.id}/test`, { method: 'POST' })
+      const res = await fetch(`/philly/api/integrations/${record.id}/test`, { method: 'POST' })
       const json = await res.json()
       const result = json.data
       if (result?.ok) {
@@ -244,7 +244,7 @@ export default function IntegrationsPage() {
     if (!confirm(`Disconnect ${item.name}?`)) return
     setBusy(item.id)
     try {
-      await fetch('/api/integrations', {
+      await fetch('/philly/api/integrations', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: record.id, status: 'disconnected' }),
@@ -262,7 +262,7 @@ export default function IntegrationsPage() {
     if (!confirm(`Revoke & remove ${item.name}?\n\nThis will:\n• Attempt to revoke access with ${item.name}\n• Permanently delete stored tokens\n• Remove this integration record\n\nYou will need to re-authorize to reconnect.`)) return
     setBusy(item.id)
     try {
-      const res = await fetch(`/api/integrations/${record.id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/integrations/${record.id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         setToast({ kind: 'success', message: `${item.name} revoked & removed.` })
         await fetchAll()

@@ -81,7 +81,7 @@ export default function TemplatesPage() {
     setLoading(true)
     const params = new URLSearchParams()
     if (typeFilter) params.set('type', typeFilter)
-    fetch(`/api/templates?${params}`)
+    fetch(`/philly/api/templates?${params}`)
       .then(r => r.json())
       .then(j => setTemplates(Array.isArray(j.data) ? j.data : []))
       .catch(() => { setTemplates([]) })
@@ -124,13 +124,13 @@ export default function TemplatesPage() {
       }
       let res: Response
       if (editing) {
-        res = await fetch(`/api/templates/${editing.id}`, {
+        res = await fetch(`/philly/api/templates/${editing.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         })
       } else {
-        res = await fetch('/api/templates', {
+        res = await fetch('/philly/api/templates', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -153,7 +153,7 @@ export default function TemplatesPage() {
 
   const del = async (tpl: Template) => {
     if (!confirm(`Delete template "${tpl.name}"?`)) return
-    const res = await fetch(`/api/templates/${tpl.id}`, { method: 'DELETE' })
+    const res = await fetch(`/philly/api/templates/${tpl.id}`, { method: 'DELETE' })
     if (res.ok) {
       addToast('Template deleted', 'success')
       fetchData()
@@ -169,7 +169,7 @@ export default function TemplatesPage() {
     setPreviewBody('')
     setPreviewOpen(true)
     try {
-      const res = await fetch('/api/templates/preview', {
+      const res = await fetch('/philly/api/templates/preview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ templateId: tpl.id, context: SAMPLE_CTX }),

@@ -39,7 +39,7 @@ export default function AIScoringPage() {
 
   const load = useCallback(() => {
     setLoading(true)
-    fetch('/api/ai/score?limit=500')
+    fetch('/philly/api/ai/score?limit=500')
       .then(r => r.json())
       .then(json => setReport(json.data ?? null))
       .catch(() => setReport(null))

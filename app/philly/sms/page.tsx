@@ -102,7 +102,7 @@ export default function SmsPage() {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
       if (channelFilter) params.set('channel', channelFilter)
       if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/sms?${params}`)
+      const res = await fetch(`/philly/api/sms?${params}`)
       const json = await res.json()
       setMessages(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)
@@ -156,7 +156,7 @@ export default function SmsPage() {
     setSending(true)
     setSendError(null)
     try {
-      const res = await fetch('/api/sms', {
+      const res = await fetch('/philly/api/sms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

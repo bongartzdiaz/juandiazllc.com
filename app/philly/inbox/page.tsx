@@ -83,7 +83,7 @@ export default function InboxPage() {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
       if (statusFilter) params.set('status', statusFilter)
       if (channelFilter) params.set('channel', channelFilter)
-      const res = await fetch(`/api/inbox?${params}`, { cache: 'no-store' })
+      const res = await fetch(`/philly/api/inbox?${params}`, { cache: 'no-store' })
       const json = await res.json()
       setConversations(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)
@@ -96,7 +96,7 @@ export default function InboxPage() {
 
   // Load contact options once for the New Conversation modal
   useEffect(() => {
-    fetch('/api/contacts?limit=500', { cache: 'no-store' })
+    fetch('/philly/api/contacts?limit=500', { cache: 'no-store' })
       .then(r => r.json())
       .then(j => setContactOptions(Array.isArray(j.data) ? j.data.map((c: ContactLite) => ({ id: c.id, name: c.name })) : []))
       .catch(() => {})
@@ -113,7 +113,7 @@ export default function InboxPage() {
   const loadMessages = useCallback(async (convId: string) => {
     setMessagesLoading(true)
     try {
-      const res = await fetch(`/api/inbox/${convId}/messages`, { cache: 'no-store' })
+      const res = await fetch(`/philly/api/inbox/${convId}/messages`, { cache: 'no-store' })
       const json = await res.json()
       setMessages(json.data ?? [])
     } catch { setMessages([]) }
@@ -139,7 +139,7 @@ export default function InboxPage() {
     setSending(true)
     setReplyError(null)
     try {
-      const res = await fetch(`/api/inbox/${selectedId}/messages`, {
+      const res = await fetch(`/philly/api/inbox/${selectedId}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ body: reply.trim(), direction: 'outbound' }),
@@ -186,7 +186,7 @@ export default function InboxPage() {
     if (!addSubject.trim()) { setAddError('Subject is required'); return }
     setAddSubmitting(true)
     try {
-      const res = await fetch('/api/inbox', {
+      const res = await fetch('/philly/api/inbox', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -205,7 +205,7 @@ export default function InboxPage() {
 
       // Optionally send the first message
       if (newId && addFirstMessage.trim()) {
-        await fetch(`/api/inbox/${newId}/messages`, {
+        await fetch(`/philly/api/inbox/${newId}/messages`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ body: addFirstMessage.trim(), direction: 'outbound' }),

@@ -24,7 +24,7 @@ export default function PageView() {
   useEffect(() => {
     if (!slug) return
     setLoading(true)
-    fetch(`/api/pages/${slug}`)
+    fetch(`/philly/api/pages/${slug}`)
       .then(async r => {
         if (r.status === 404) { setNotFound(true); return null }
         return r.json()

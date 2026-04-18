@@ -32,7 +32,7 @@ export default function AIAskPage() {
     if (!q.trim()) return
     setLoading(true)
     try {
-      const res = await fetch('/api/ai/query', {
+      const res = await fetch('/philly/api/ai/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: q }),

@@ -93,7 +93,7 @@ export default function OffersPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
       if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/offers?${params}`)
+      const res = await fetch(`/philly/api/offers?${params}`)
       const json = await res.json()
       setOffers(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)
@@ -105,10 +105,10 @@ export default function OffersPage() {
   useEffect(() => { fetchData() }, [fetchData])
 
   useEffect(() => {
-    fetch('/api/properties?limit=500').then(r => r.json()).then(j => {
+    fetch('/philly/api/properties?limit=500').then(r => r.json()).then(j => {
       setProperties(Array.isArray(j.data) ? j.data : [])
     }).catch(() => {})
-    fetch('/api/contacts?limit=500').then(r => r.json()).then(j => {
+    fetch('/philly/api/contacts?limit=500').then(r => r.json()).then(j => {
       setContacts(Array.isArray(j.data) ? j.data : [])
     }).catch(() => {})
   }, [])
@@ -164,12 +164,12 @@ export default function OffersPage() {
     setSaving(true)
     try {
       const res = editingId
-        ? await fetch(`/api/offers/${editingId}`, {
+        ? await fetch(`/philly/api/offers/${editingId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           })
-        : await fetch('/api/offers', {
+        : await fetch('/philly/api/offers', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -192,7 +192,7 @@ export default function OffersPage() {
       if (['accepted', 'rejected', 'withdrawn'].includes(status)) {
         payload.respondedAt = new Date().toISOString()
       }
-      const res = await fetch(`/api/offers/${id}`, {
+      const res = await fetch(`/philly/api/offers/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -207,7 +207,7 @@ export default function OffersPage() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this offer?')) return
     try {
-      const res = await fetch(`/api/offers/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/offers/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Offer deleted', 'success')
         setSelected(null)

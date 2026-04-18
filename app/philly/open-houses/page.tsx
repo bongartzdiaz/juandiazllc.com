@@ -61,7 +61,7 @@ export default function OpenHousesPage() {
     setLoading(true)
     try {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
-      const res = await fetch(`/api/open-houses?${params}`)
+      const res = await fetch(`/philly/api/open-houses?${params}`)
       const json = await res.json()
       setOpenHouses(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)
@@ -74,7 +74,7 @@ export default function OpenHousesPage() {
 
   useEffect(() => {
     // Load properties once for the scheduler
-    fetch('/api/properties?limit=500')
+    fetch('/philly/api/properties?limit=500')
       .then(r => r.json())
       .then(j => setProperties(Array.isArray(j.data) ? j.data.map((p: PropertyLite) => ({ id: p.id, title: p.title, address: p.address })) : []))
       .catch(() => {})
@@ -119,12 +119,12 @@ export default function OpenHousesPage() {
     setSubmitting(true)
     try {
       const res = editingId
-        ? await fetch(`/api/open-houses/${editingId}`, {
+        ? await fetch(`/philly/api/open-houses/${editingId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(form),
           })
-        : await fetch('/api/open-houses', {
+        : await fetch('/philly/api/open-houses', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(form),
@@ -147,7 +147,7 @@ export default function OpenHousesPage() {
   async function handleDelete(id: string) {
     if (!confirm('Cancel this open house? This cannot be undone.')) return
     try {
-      const res = await fetch(`/api/open-houses/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/open-houses/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Open house cancelled', 'success')
         setSelected(null)

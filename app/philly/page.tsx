@@ -223,7 +223,7 @@ export default function DashboardPage() {
         onAdd={async (data) => {
           if (data.csv) return  // CSV import not yet wired to API
           try {
-            await fetch('/api/contacts', {
+            await fetch('/philly/api/contacts', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(data),

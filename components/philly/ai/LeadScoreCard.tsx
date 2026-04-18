@@ -38,7 +38,7 @@ export function LeadScoreCard({ limit = 5 }: { limit?: number }) {
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    fetch('/api/ai/score?limit=200')
+    fetch('/philly/api/ai/score?limit=200')
       .then(r => r.json())
       .then(json => { if (!cancelled) setData(json.data ?? null) })
       .catch(() => { if (!cancelled) setData(null) })

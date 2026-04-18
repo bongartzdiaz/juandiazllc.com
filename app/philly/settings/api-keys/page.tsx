@@ -28,7 +28,7 @@ export default function ApiKeysPage() {
 
   const load = useCallback(() => {
     setLoading(true)
-    fetch('/api/api-keys')
+    fetch('/philly/api/api-keys')
       .then(r => r.json())
       .then(json => setKeys(json.data ?? []))
       .catch(() => setKeys([]))
@@ -42,7 +42,7 @@ export default function ApiKeysPage() {
     const payload: Record<string, unknown> = { name: name.trim(), permissions }
     const d = parseInt(expiresInDays, 10)
     if (!isNaN(d) && d > 0) payload.expiresInDays = d
-    const res = await fetch('/api/api-keys', {
+    const res = await fetch('/philly/api/api-keys', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -60,7 +60,7 @@ export default function ApiKeysPage() {
 
   const rotate = async (id: string) => {
     if (!confirm('Rotate this API key? The current key will stop working immediately — update integrations.')) return
-    const res = await fetch(`/api/api-keys/${id}/rotate`, { method: 'POST' })
+    const res = await fetch(`/philly/api/api-keys/${id}/rotate`, { method: 'POST' })
     const json = await res.json().catch(() => ({}))
     if (res.ok) {
       setNewKey(json.data)
@@ -72,7 +72,7 @@ export default function ApiKeysPage() {
 
   const del = async (id: string) => {
     if (!confirm('Revoke this API key? Apps using it will stop working immediately.')) return
-    await fetch(`/api/api-keys/${id}`, { method: 'DELETE' })
+    await fetch(`/philly/api/api-keys/${id}`, { method: 'DELETE' })
     load()
   }
 

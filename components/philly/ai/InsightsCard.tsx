@@ -35,7 +35,7 @@ export function InsightsCard({ limit = 4, showSummary = true, showRefresh = true
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/ai/insights')
+      const res = await fetch('/philly/api/ai/insights')
       const json = await res.json()
       if (!res.ok) throw new Error(json.error ?? 'Failed')
       setReport(json.data)

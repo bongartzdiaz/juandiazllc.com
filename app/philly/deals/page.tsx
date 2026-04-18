@@ -124,7 +124,7 @@ export default function DealsPage() {
   /* ---- Load pipelines & contacts ---- */
 
   useEffect(() => {
-    fetch('/api/pipelines')
+    fetch('/philly/api/pipelines')
       .then(r => r.json())
       .then(j => {
         const list: Pipeline[] = j.data ?? []
@@ -151,7 +151,7 @@ export default function DealsPage() {
   }, [addPipelineId, pipelines, addStageId])
 
   useEffect(() => {
-    fetch('/api/contacts?limit=500')
+    fetch('/philly/api/contacts?limit=500')
       .then(r => r.json())
       .then(j => setContacts((j.data ?? []).map((c: ContactOption) => ({ id: c.id, name: c.name, email: c.email }))))
       .catch(() => setContacts([]))
@@ -165,7 +165,7 @@ export default function DealsPage() {
       const params = new URLSearchParams({ page: String(page), limit: view === 'board' ? '200' : '25' })
       if (selectedPipeline) params.set('pipelineId', selectedPipeline)
       if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/deals?${params}`)
+      const res = await fetch(`/philly/api/deals?${params}`)
       const json = await res.json()
       setDeals(json.data ?? [])
       setTotal(json.pagination?.total ?? (json.data?.length ?? 0))
@@ -213,7 +213,7 @@ export default function DealsPage() {
     setSaving(true)
     setAddError(null)
     try {
-      const res = await fetch('/api/deals', {
+      const res = await fetch('/philly/api/deals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -253,7 +253,7 @@ export default function DealsPage() {
       return newStage ? { ...d, stage: { id: newStage.id, name: newStage.name, color: newStage.color } } : d
     }))
     try {
-      const res = await fetch(`/api/deals/${dealId}`, {
+      const res = await fetch(`/philly/api/deals/${dealId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stageId }),
@@ -271,7 +271,7 @@ export default function DealsPage() {
   const setDealStatus = async (dealId: string, status: string) => {
     setDeals(prev => prev.map(d => d.id === dealId ? { ...d, status } : d))
     try {
-      const res = await fetch(`/api/deals/${dealId}`, {
+      const res = await fetch(`/philly/api/deals/${dealId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),

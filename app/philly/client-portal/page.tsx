@@ -73,7 +73,7 @@ export default function ClientPortalPage() {
     setLoading(true)
     try {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
-      const res = await fetch(`/api/client-portal?${params}`, { cache: 'no-store' })
+      const res = await fetch(`/philly/api/client-portal?${params}`, { cache: 'no-store' })
       const json = await res.json()
       setClients(Array.isArray(json.data) ? json.data : [])
       setTotal(json.pagination?.total ?? 0)
@@ -85,7 +85,7 @@ export default function ClientPortalPage() {
   useEffect(() => { fetchData() }, [fetchData])
 
   useEffect(() => {
-    fetch('/api/contacts?limit=500')
+    fetch('/philly/api/contacts?limit=500')
       .then(r => r.json())
       .then(j => setContacts(Array.isArray(j.data) ? j.data.map((c: ContactLite) => ({ id: c.id, name: c.name })) : []))
       .catch(() => {})
@@ -97,7 +97,7 @@ export default function ClientPortalPage() {
     if (!addContactId) { addToast('Select a contact', 'error'); return }
     setSaving(true)
     try {
-      const res = await fetch('/api/client-portal', {
+      const res = await fetch('/philly/api/client-portal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -120,7 +120,7 @@ export default function ClientPortalPage() {
 
   async function toggleEnabled(c: ClientPortalEntry) {
     try {
-      const res = await fetch(`/api/client-portal/${c.id}`, {
+      const res = await fetch(`/philly/api/client-portal/${c.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: !c.enabled }),
@@ -134,7 +134,7 @@ export default function ClientPortalPage() {
   async function savePerms() {
     if (!selected) return
     try {
-      const res = await fetch(`/api/client-portal/${selected.id}`, {
+      const res = await fetch(`/philly/api/client-portal/${selected.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ permissions: selectedPerms }),
@@ -149,7 +149,7 @@ export default function ClientPortalPage() {
   async function handleDelete(id: string) {
     if (!confirm('Revoke this portal access? The client will no longer be able to log in.')) return
     try {
-      const res = await fetch(`/api/client-portal/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/client-portal/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Access revoked', 'success')
         setSelected(null)

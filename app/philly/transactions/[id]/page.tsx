@@ -111,7 +111,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
 
   const fetchTx = useCallback(async () => {
     try {
-      const res = await fetch(`/api/transactions/${id}`, { cache: 'no-store' })
+      const res = await fetch(`/philly/api/transactions/${id}`, { cache: 'no-store' })
       const json = await res.json()
       if (!res.ok) { setError(json.error ?? 'Transaction not found'); return }
       setTx(json.data ?? null)
@@ -161,7 +161,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
         break
     }
     try {
-      const res = await fetch(`/api/transactions/${id}`, {
+      const res = await fetch(`/philly/api/transactions/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(patch),
@@ -179,7 +179,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
     const current = checklist.length > 0 ? [...checklist] : [...DEFAULT_CHECKLIST]
     current[idx] = { ...current[idx], done: !current[idx].done }
     try {
-      const res = await fetch(`/api/transactions/${id}`, {
+      const res = await fetch(`/philly/api/transactions/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ checklistJson: JSON.stringify(current) }),
@@ -192,7 +192,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
   async function handleDelete() {
     if (!confirm('Delete this transaction? This cannot be undone.')) return
     try {
-      const res = await fetch(`/api/transactions/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/transactions/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Transaction deleted', 'success')
         router.push('/philly/transactions')
@@ -210,7 +210,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
     }
     setSigSaving(true)
     try {
-      const res = await fetch('/api/e-signatures', {
+      const res = await fetch('/philly/api/e-signatures', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

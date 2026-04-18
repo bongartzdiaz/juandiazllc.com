@@ -78,8 +78,8 @@ export default function RoomsPage() {
         priceCentsNight,
       }
       const res = editingId
-        ? await fetch(`/api/rooms/${editingId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-        : await fetch('/api/rooms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        ? await fetch(`/philly/api/rooms/${editingId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        : await fetch('/philly/api/rooms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       const j = await res.json().catch(() => ({}))
       if (!res.ok) { addToast(j.error ?? 'Save failed', 'error'); return }
       addToast(editingId ? 'Room updated' : 'Room added', 'success')
@@ -92,7 +92,7 @@ export default function RoomsPage() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this room? Reservations will be lost.')) return
     try {
-      const res = await fetch(`/api/rooms/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/rooms/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Room deleted', 'success')
         setSelectedRoom(null)
@@ -106,7 +106,7 @@ export default function RoomsPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '20' })
       if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/rooms?${params}`)
+      const res = await fetch(`/philly/api/rooms?${params}`)
       const json = await res.json()
       setRooms(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)

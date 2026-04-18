@@ -53,7 +53,7 @@ export default function LeadScoresPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
       if (gradeFilter) params.set('grade', gradeFilter)
-      const res = await fetch(`/api/lead-scores?${params}`)
+      const res = await fetch(`/philly/api/lead-scores?${params}`)
       const json = await res.json()
       setScores(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)

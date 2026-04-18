@@ -38,7 +38,7 @@ export default function NotificationsPage() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/notifications?page=${page}&limit=20`)
+      const res = await fetch(`/philly/api/notifications?page=${page}&limit=20`)
       const json = await res.json().catch(() => ({}))
       setNotifications(Array.isArray(json.data) ? json.data : [])
       setTotal(json.pagination?.total ?? 0)
@@ -61,7 +61,7 @@ export default function NotificationsPage() {
     // optimistic update
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
     try {
-      const res = await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' })
+      const res = await fetch(`/philly/api/notifications/${id}/read`, { method: 'PATCH' })
       if (!res.ok) throw new Error(`Failed to mark as read (${res.status})`)
     } catch (err) {
       // revert + surface the error
@@ -74,7 +74,7 @@ export default function NotificationsPage() {
     const snapshot = notifications
     setNotifications(prev => prev.map(n => ({ ...n, read: true })))
     try {
-      const res = await fetch('/api/notifications/mark-all-read', { method: 'POST' })
+      const res = await fetch('/philly/api/notifications/mark-all-read', { method: 'POST' })
       if (!res.ok) throw new Error(`Failed to mark all as read (${res.status})`)
     } catch (err) {
       setNotifications(snapshot)

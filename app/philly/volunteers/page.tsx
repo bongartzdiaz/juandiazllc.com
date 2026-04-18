@@ -65,8 +65,8 @@ export default function VolunteersPage() {
         status: form.status,
       }
       const res = editingId
-        ? await fetch(`/api/volunteers/${editingId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-        : await fetch('/api/volunteers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        ? await fetch(`/philly/api/volunteers/${editingId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        : await fetch('/philly/api/volunteers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       const j = await res.json().catch(() => ({}))
       if (!res.ok) { addToast(j.error ?? 'Save failed', 'error'); return }
       addToast(editingId ? 'Volunteer updated' : 'Volunteer added', 'success')
@@ -79,7 +79,7 @@ export default function VolunteersPage() {
   async function handleDelete(id: string) {
     if (!confirm('Remove this volunteer?')) return
     try {
-      const res = await fetch(`/api/volunteers/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/volunteers/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Volunteer removed', 'success')
         setSelected(null)
@@ -93,7 +93,7 @@ export default function VolunteersPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '20' })
       if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/volunteers?${params}`)
+      const res = await fetch(`/philly/api/volunteers?${params}`)
       const json = await res.json()
       setVolunteers(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)

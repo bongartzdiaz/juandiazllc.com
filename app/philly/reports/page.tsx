@@ -131,7 +131,7 @@ export default function ReportsPage() {
 
   const fetchReports = useCallback(async () => {
     try {
-      const res = await fetch('/api/reports?limit=50', { cache: 'no-store' })
+      const res = await fetch('/philly/api/reports?limit=50', { cache: 'no-store' })
       const json = await res.json()
       setReports(Array.isArray(json.data) ? json.data : [])
     } catch { /* network/offline */ }
@@ -158,7 +158,7 @@ export default function ReportsPage() {
     if (generating) return
     setGenerating(tmpl.id)
     try {
-      const res = await fetch('/api/reports', {
+      const res = await fetch('/philly/api/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

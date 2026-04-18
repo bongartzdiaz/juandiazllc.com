@@ -67,7 +67,7 @@ export default function PipelineAdminPage() {
   const fetchPipelines = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/pipelines', { cache: 'no-store' })
+      const res = await fetch('/philly/api/pipelines', { cache: 'no-store' })
       const json = await res.json()
       const list: Pipeline[] = Array.isArray(json.data) ? json.data : []
       setPipelines(list)
@@ -102,11 +102,11 @@ export default function PipelineAdminPage() {
     try {
       const payload = { name: pipelineName.trim(), industry: pipelineIndustry }
       const res = editingPipelineId
-        ? await fetch(`/api/pipelines/${editingPipelineId}`, {
+        ? await fetch(`/philly/api/pipelines/${editingPipelineId}`, {
             method: 'PATCH', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           })
-        : await fetch('/api/pipelines', {
+        : await fetch('/philly/api/pipelines', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           })
@@ -128,7 +128,7 @@ export default function PipelineAdminPage() {
     }
     if (!confirm(`Delete pipeline "${p.name}"? This cannot be undone.`)) return
     try {
-      const res = await fetch(`/api/pipelines/${p.id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/pipelines/${p.id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Pipeline deleted', 'success')
         if (selectedId === p.id) setSelectedId(null)
@@ -145,7 +145,7 @@ export default function PipelineAdminPage() {
   async function addStage() {
     if (!selectedId || !newStageName.trim()) return
     try {
-      const res = await fetch(`/api/pipelines/${selectedId}/stages`, {
+      const res = await fetch(`/philly/api/pipelines/${selectedId}/stages`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newStageName.trim(), color: newStageColor }),
       })
@@ -169,7 +169,7 @@ export default function PipelineAdminPage() {
     if (!selectedId || !editingStageId) return
     if (!stageName.trim()) { addToast('Name required', 'error'); return }
     try {
-      const res = await fetch(`/api/pipelines/${selectedId}/stages/${editingStageId}`, {
+      const res = await fetch(`/philly/api/pipelines/${selectedId}/stages/${editingStageId}`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: stageName.trim(), color: stageColor }),
       })
@@ -187,7 +187,7 @@ export default function PipelineAdminPage() {
     if (!selectedId) return
     if (!confirm(`Delete stage "${stage.name}"?`)) return
     try {
-      const res = await fetch(`/api/pipelines/${selectedId}/stages/${stage.id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/pipelines/${selectedId}/stages/${stage.id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Stage deleted', 'success')
         fetchPipelines()
@@ -205,7 +205,7 @@ export default function PipelineAdminPage() {
     if (swapIdx < 0 || swapIdx >= selected.stages.length) return
     const other = selected.stages[swapIdx]
     try {
-      const res = await fetch(`/api/pipelines/${selected.id}/stages`, {
+      const res = await fetch(`/philly/api/pipelines/${selected.id}/stages`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           stages: [

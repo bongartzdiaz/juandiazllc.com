@@ -66,7 +66,7 @@ export default function ActionPlansPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
       if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/action-plans?${params}`)
+      const res = await fetch(`/philly/api/action-plans?${params}`)
       const json = await res.json()
       setPlans(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)
@@ -87,7 +87,7 @@ export default function ActionPlansPage() {
     const newStatus = currentStatus === 'active' ? 'paused' : 'active'
     setPlans(prev => prev.map(p => p.id === id ? { ...p, status: newStatus } : p))
     try {
-      await fetch('/api/action-plans', {
+      await fetch('/philly/api/action-plans', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status: newStatus }),
@@ -100,7 +100,7 @@ export default function ActionPlansPage() {
   const deletePlan = async (id: string) => {
     if (!confirm('Delete this action plan? Enrollments will be lost.')) return
     try {
-      const res = await fetch(`/api/action-plans?id=${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/action-plans?id=${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) fetchPlans()
     } catch {}
   }
@@ -114,7 +114,7 @@ export default function ActionPlansPage() {
     setSaving(true)
     setAddError(null)
     try {
-      const res = await fetch('/api/action-plans', {
+      const res = await fetch('/philly/api/action-plans', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

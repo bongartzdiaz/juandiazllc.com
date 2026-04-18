@@ -31,7 +31,7 @@ export default function AuditLogPage() {
       if (entityFilter) params.set('entity', entityFilter)
       if (actionFilter) params.set('action', actionFilter)
 
-      const res = await fetch(`/api/audit?${params}`)
+      const res = await fetch(`/philly/api/audit?${params}`)
       if (!res.ok) throw new Error('Failed to fetch')
       const json = await res.json()
       setLogs(json.data)

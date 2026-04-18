@@ -71,7 +71,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
 
   const fetchDeal = useCallback(async () => {
     try {
-      const res = await fetch(`/api/deals/${id}`)
+      const res = await fetch(`/philly/api/deals/${id}`)
       const json = await res.json()
       if (!res.ok) { setError(json.error ?? 'Deal not found'); return }
       setDeal(json.data ?? null)
@@ -81,7 +81,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
 
   useEffect(() => {
     fetchDeal()
-    fetch('/api/pipelines')
+    fetch('/philly/api/pipelines')
       .then(r => r.json())
       .then(j => setPipelines(j.data ?? []))
       .catch(() => {})
@@ -96,7 +96,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
     if (!deal) return
     setSaving(true)
     try {
-      const res = await fetch(`/api/deals/${id}`, {
+      const res = await fetch(`/philly/api/deals/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(patch),
@@ -118,7 +118,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
 
   async function handleDelete() {
     if (!confirm('Delete this deal? This cannot be undone.')) return
-    const res = await fetch(`/api/deals/${id}`, { method: 'DELETE' })
+    const res = await fetch(`/philly/api/deals/${id}`, { method: 'DELETE' })
     if (res.status === 204 || res.ok) {
       addToast('Deal deleted', "success")
       router.push('/philly/deals')

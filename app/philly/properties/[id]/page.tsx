@@ -95,7 +95,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
 
   const fetchProperty = useCallback(async () => {
     try {
-      const res = await fetch(`/api/properties/${id}`)
+      const res = await fetch(`/philly/api/properties/${id}`)
       const json = await res.json()
       if (!res.ok) { setError(json.error ?? 'Property not found'); return }
       setProperty(json.data ?? null)
@@ -105,7 +105,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
 
   const fetchShowings = useCallback(async () => {
     try {
-      const res = await fetch(`/api/showings?propertyId=${id}&limit=50`)
+      const res = await fetch(`/philly/api/showings?propertyId=${id}&limit=50`)
       const json = await res.json()
       setShowings(Array.isArray(json.data) ? json.data : [])
     } catch { setShowings([]) }
@@ -113,7 +113,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
 
   const fetchOffers = useCallback(async () => {
     try {
-      const res = await fetch(`/api/offers?propertyId=${id}&limit=50`)
+      const res = await fetch(`/philly/api/offers?propertyId=${id}&limit=50`)
       const json = await res.json()
       setOffers(Array.isArray(json.data) ? json.data : [])
     } catch { setOffers([]) }
@@ -180,7 +180,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
     }
 
     try {
-      const res = await fetch(`/api/properties/${id}`, {
+      const res = await fetch(`/philly/api/properties/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(patch),
@@ -196,7 +196,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   async function handleDelete() {
     if (!confirm('Delete this property? This cannot be undone.')) return
     try {
-      const res = await fetch(`/api/properties/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/philly/api/properties/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Property deleted', 'success')
         router.push('/philly/properties')

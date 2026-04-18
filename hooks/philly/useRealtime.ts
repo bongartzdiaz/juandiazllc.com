@@ -49,7 +49,7 @@ export function useRealtime(handler?: Handler, deps: React.DependencyList = []) 
         try { es.close() } catch { /* ignore */ }
       }
       const q = pathname ? `?path=${encodeURIComponent(pathname)}` : ''
-      es = new EventSource(`/api/realtime${q}`)
+      es = new EventSource(`/philly/api/realtime${q}`)
 
       es.onopen = () => {
         setConnected(true)
@@ -150,7 +150,7 @@ export function usePresence() {
   const [users, setUsers] = useState<PresenceUser[]>([])
 
   useEffect(() => {
-    fetch('/api/realtime/presence')
+    fetch('/philly/api/realtime/presence')
       .then(r => r.json())
       .then(j => Array.isArray(j.data) ? setUsers(j.data) : null)
       .catch(() => {})

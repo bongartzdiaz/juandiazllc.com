@@ -187,7 +187,7 @@ export default function ContactsPage() {
 
   const handleAddContact = async (data: ContactFormData) => {
     try {
-      const res = await fetch('/api/contacts', {
+      const res = await fetch('/philly/api/contacts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

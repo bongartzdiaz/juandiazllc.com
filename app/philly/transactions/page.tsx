@@ -70,7 +70,7 @@ export default function TransactionsPage() {
     setSaving(true)
     setAddError(null)
     try {
-      const res = await fetch('/api/transactions', {
+      const res = await fetch('/philly/api/transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -106,7 +106,7 @@ export default function TransactionsPage() {
       const params = new URLSearchParams({ page: String(page), limit: '25' })
       if (statusFilter) params.set('status', statusFilter)
       if (typeFilter) params.set('type', typeFilter)
-      const res = await fetch(`/api/transactions?${params}`)
+      const res = await fetch(`/philly/api/transactions?${params}`)
       const json = await res.json()
       setTransactions(json.data ?? [])
       setTotal(json.pagination?.total ?? 0)
