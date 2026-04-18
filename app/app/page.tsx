@@ -373,7 +373,13 @@ export default async function AppPage() {
             Signed in as <b>{user.email}</b>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 10 }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <a className="btn primary" href="https://diaz.juandiazllc.com/app">
+            ◉ Diaz · Master Command →
+          </a>
+          <a className="btn ghost" href="https://philly.juandiazllc.com/app">
+            Philly · Field ops →
+          </a>
           <Link className="btn ghost" href="/">
             ← Back to site
           </Link>
