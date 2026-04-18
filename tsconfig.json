@@ -37,7 +37,6 @@
   ],
   "exclude": [
     "node_modules",
-    "preview",
-    "philly"
+    "preview"
   ]
 }
