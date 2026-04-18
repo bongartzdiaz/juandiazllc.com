@@ -137,6 +137,75 @@ export const POSTS: Insight[] = [
       { type: "p", text: "The operators who get this right stop feeling like their tech stack owns them. The ones who do not, eventually hire a Chief of Staff whose job is largely to move CSVs between tools. That is an expensive outcome to accept." }
     ]
   }
+  ,{
+    slug: "the-field-team-is-the-product",
+    title: "The field team is the product — not the dashboard",
+    summary:
+      "Executives buy software for reporting. Field teams use it to close deals. When the two are in tension, the field team wins by default — they just stop using it. Design for them first.",
+    tag: "Systems",
+    publishedAt: "2026-04-15",
+    readingMinutes: 5,
+    body: [
+      { type: "p", text: "Walk into any 50-person operator and ask two people the same question: what does the CRM do? The CFO will talk about pipeline visibility and revenue forecasting. The field rep will talk about the eight taps it takes to log a call. Those two answers describe completely different products." },
+      { type: "h2", text: "Why the office usually wins the roadmap fight" },
+      { type: "p", text: "The office pays for the tool, sits in the demos, and writes the requirements. The field team is busy — generating revenue. So the software gets built for the people who asked for it, not the people who have to use it. Six months later nobody understands why adoption is at 30 percent." },
+      { type: "h2", text: "A simple test before any CRM decision" },
+      { type: "ul", items: [
+        "Sit next to a field rep for one full day. Count the taps per deal update.",
+        "If it is more than three, the software is already fighting you.",
+        "Ask what they would need to update five deals while walking from car to front door. Build that.",
+        "Then show the CFO the dashboard — but only with data the field team can actually produce in three taps."
+      ]},
+      { type: "quote", text: "A CRM is not the system of record. It is the system of action. If it is not easier than what came before, nothing gets recorded." },
+      { type: "p", text: "This is the lens behind Philly. The dashboards came after we got the field flow right. If you reverse the order, you get a museum." }
+    ]
+  },
+  {
+    slug: "thuisbatterij-verkoop-na-2027",
+    title: "Thuisbatterijen verkopen na 2027 — wat werkelijk werkt",
+    summary:
+      "De salderingsregeling verdwijnt. De batterij-installateurs die 2027 overleven zijn niet de goedkoopste — ze zijn de duidelijkste. Drie patronen uit succesvolle NL installateurs.",
+    tag: "Energy",
+    publishedAt: "2026-04-02",
+    readingMinutes: 6,
+    body: [
+      { type: "p", text: "Vanaf 2027 is elke zonnepaneel-installatie een gesprek over zelfverbruik, niet over saldering. Dat klinkt technisch, maar het verandert het hele verkoopgesprek. Klanten stellen nieuwe vragen, en de meeste installateurs beantwoorden ze nog met oude antwoorden." },
+      { type: "h2", text: "De drie vragen die de verkoop winnen" },
+      { type: "ul", items: [
+        "Wat bespaart de batterij mij per jaar — in euro's, niet in kWh?",
+        "Wanneer heb ik mijn investering terug, met realistische energieprijzen?",
+        "Wat gebeurt er als mijn verbruik over vijf jaar verandert (EV, warmtepomp)?"
+      ]},
+      { type: "p", text: "Installateurs die alle drie beantwoorden met concrete cijfers uit de meterstandenrapportage van de klant, sluiten drie keer zoveel deals als installateurs die met algemene brochures werken. De asymmetrie zit in de voorbereiding, niet in de prijs." },
+      { type: "h2", text: "Wat helpmijbesparen.nl ziet in de pipeline" },
+      { type: "p", text: "De leads die converteren hebben allemaal één ding gemeen: ze hebben een persoonlijk verbruiksrapport gezien voordat ze met een adviseur spraken. Geen rapport = prijs-shopper. Wel een rapport = serieuze koper die een partner zoekt, niet de goedkoopste offerte." },
+      { type: "quote", text: "De prijsoorlog in thuisbatterijen komt eraan. De installateurs die winnen zijn degenen die al een jaar voor die oorlog een sterker narratief hebben opgebouwd." },
+      { type: "p", text: "Dat narratief is geen marketing. Het is een funnel die elke lead een rekenmodel geeft voordat er iemand aan de telefoon hangt. Bouw die laag nu — in 2027 is het te laat." }
+    ]
+  },
+  {
+    slug: "why-most-operator-dashboards-lie",
+    title: "Why most operator dashboards quietly lie to their CEOs",
+    summary:
+      "The numbers on the dashboard are never wrong — but the frame is. Three patterns that turn clean data into misleading narratives, and how to audit your own dashboard in under an hour.",
+    tag: "Systems",
+    publishedAt: "2026-03-11",
+    readingMinutes: 6,
+    body: [
+      { type: "p", text: "Every CEO has had the moment: the dashboard looks green, the meeting goes well, and two weeks later a customer churn or a cash crunch lands that nobody saw coming. The dashboard was not wrong. It just was not looking at the right thing." },
+      { type: "h2", text: "Three patterns that quietly mislead" },
+      { type: "ul", items: [
+        "Averages without distributions — 'average deal size €42k' hides that half your revenue is from two accounts.",
+        "Lagging indicators dressed as leading — MRR is a lagging indicator. What the CEO needs is pipeline velocity, and that lives two systems away.",
+        "Vanity ratios that move on their own — 'activation rate' climbs because you raised the bar for what counts as a signup, not because the product got better."
+      ]},
+      { type: "h2", text: "A one-hour audit you can run today" },
+      { type: "p", text: "For each tile on your dashboard, ask two questions. One: if this number goes green, what board-level decision do I make differently? Two: what would have to be true for this number to look good while the business is actually in trouble? If you cannot answer both in under a minute per tile, that tile is decoration, not instrumentation." },
+      { type: "quote", text: "The best dashboards have fewer tiles than people expect. Every tile that is not answering a decision is competing for the attention of the ones that are." },
+      { type: "p", text: "When we build reporting inside Philly, we start from the decision, not the data. It forces uncomfortable conversations — 'we actually don't know what we would do if this number moved' — but those are the conversations that make the dashboard worth building." }
+    ]
+  }
+
 ];
 
 export function getAllInsights(): Insight[] {

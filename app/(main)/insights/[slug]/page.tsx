@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllInsights, getInsight, formatDate } from "@/lib/insights";
+import { getVentureForTag } from "@/lib/ventures";
 import { ReadingProgress } from "@/components/ReadingProgress";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
@@ -65,6 +66,7 @@ export default async function InsightPage(
   };
 
   const related = getAllInsights().filter((p) => p.slug !== post.slug).slice(0, 2);
+  const venture = getVentureForTag(post.tag);
 
   return (
     <>
@@ -125,6 +127,18 @@ export default async function InsightPage(
               Start a conversation <span className="arr">→</span>
             </Link>
           </div>
+
+          {venture && (
+            <div className="ia-venture">
+              <div className="label">Seen in the wild</div>
+              <Link href={`/work/${venture.slug}`} className="ia-venture-card">
+                <div className="iav-sector">{venture.sector}</div>
+                <h3 className="iav-name">{venture.name}</h3>
+                <p className="iav-tagline">{venture.tagline}</p>
+                <span className="iav-cue">See the venture <span className="arr">→</span></span>
+              </Link>
+            </div>
+          )}
 
           {related.length > 0 && (
             <div className="ia-related">

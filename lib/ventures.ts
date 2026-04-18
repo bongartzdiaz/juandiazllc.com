@@ -166,3 +166,19 @@ export const VENTURES: Venture[] = [
 export function getVenture(slug: string) {
   return VENTURES.find((v) => v.slug === slug);
 }
+
+// Maps an insight tag ("Energy", "Systems", etc.) to the venture that
+// most clearly demonstrates the idea in production. Used on insight
+// pages to give readers a "see it in the wild" link — concrete proof
+// instead of just more writing.
+const TAG_TO_VENTURE: Record<string, string> = {
+  Energy: "voltafy",
+  Systems: "philly",
+  Growth: "help-mij-besparen",
+  Strategy: "philly",
+};
+
+export function getVentureForTag(tag: string) {
+  const slug = TAG_TO_VENTURE[tag];
+  return slug ? getVenture(slug) : undefined;
+}
