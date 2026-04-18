@@ -1,0 +1,49 @@
+name: Lighthouse CI
+
+# Runs Lighthouse against the deployed Vercel preview for every PR
+# and against production on main. Gates on mobile performance +
+# accessibility budgets so we don't ship regressions silently.
+#
+# Uses treosh/lighthouse-ci-action which handles LHCI server-less
+# (uploads to temporary-public-storage so we get a URL to inspect).
+# No LHCI server required.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  # Manual trigger for ad-hoc runs.
+  workflow_dispatch:
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    # Wait for Vercel to finish deploying before we try to audit it.
+    # On PRs Vercel posts a preview URL; on main it's the production
+    # domain. We give Vercel up to 10 minutes to land the build.
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for Vercel deployment
+        id: vercel
+        uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          max_timeout: 600
+          environment: ${{ github.event_name == 'push' && 'Production' || 'Preview' }}
+
+      - name: Run Lighthouse
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            ${{ steps.vercel.outputs.url }}
+            ${{ steps.vercel.outputs.url }}/insights
+            ${{ steps.vercel.outputs.url }}/work
+            ${{ steps.vercel.outputs.url }}/about
+            ${{ steps.vercel.outputs.url }}/contact
+          configPath: ./.lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
