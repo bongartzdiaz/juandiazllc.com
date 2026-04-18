@@ -66,7 +66,7 @@ export default function GlobalError({
           <h1 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 12px' }}>
             Unexpected error
           </h1>
-          <p style={{ color: '#cbd5f5', lineHeight: 1.5, margin: '0 0 24px' }}>
+          <p style={{ color: '#f1f5f9', lineHeight: 1.5, margin: '0 0 24px' }}>
             The page couldn&apos;t render. The error has been logged — you can try again
             or head back to the dashboard.
           </p>

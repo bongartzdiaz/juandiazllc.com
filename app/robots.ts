@@ -22,7 +22,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: ["GPTBot", "Google-Extended", "CCBot", "PerplexityBot"],
-        allow: ["/", "/story", "/work", "/signals", "/sectors", "/contact"],
+        allow: ["/", "/story", "/work", "/signals", "/sectors", "/insights", "/contact"],
         disallow: ["/philly/", "/api/", "/login"],
       },
     ],

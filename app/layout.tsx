@@ -3,6 +3,7 @@ import "./globals.css";
 import { Overlays } from "@/components/Overlays";
 import { Preloader } from "@/components/Preloader";
 import { GlobalEffects } from "@/components/GlobalEffects";
+import { CookieConsent } from "@/components/CookieConsent";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
@@ -159,6 +160,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Preloader />
           {children}
           <GlobalEffects />
+          <CookieConsent />
         </LocaleProvider>
       </body>
     </html>

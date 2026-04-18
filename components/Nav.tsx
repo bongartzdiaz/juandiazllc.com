@@ -21,6 +21,7 @@ export function Nav() {
         <span id="navTime">—</span>
         <Link href="/story" className="hide-mobile">{t("nav.story")}</Link>
         <Link href="/work">{t("nav.work")}</Link>
+        <Link href="/insights" className="hide-mobile">{t("nav.insights")}</Link>
         <Link href="/signals" className="hide-mobile">{t("nav.signals")}</Link>
         <Link href="/contact" className="hide-tiny">{t("nav.contact")}</Link>
         <Link href="/login" className="auth">◉ {t("nav.login")}</Link>

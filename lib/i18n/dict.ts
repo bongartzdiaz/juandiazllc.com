@@ -22,6 +22,7 @@ const en: Dict = {
   // Nav
   "nav.story": "Story",
   "nav.work": "Work",
+  "nav.insights": "Insights",
   "nav.signals": "Signals",
   "nav.contact": "Contact",
   "nav.login": "Login",
@@ -365,6 +366,7 @@ const de: Dict = {
 
 const es: Dict = {
   "nav.story": "Historia",
+  "nav.insights": "Perspectivas",
   "nav.work": "Trabajo",
   "nav.signals": "Señales",
   "nav.contact": "Contacto",

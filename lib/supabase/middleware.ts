@@ -35,12 +35,9 @@ export async function updateSession(request: NextRequest) {
   // without a Supabase session is redirected to /login?next=<path> so the
   // user comes back to where they tried to go after sign-in.
   const path = request.nextUrl.pathname;
-  const isProtected =
-    path === "/app" ||
-    path.startsWith("/app/") ||
-    path.startsWith("/dashboard") ||
-    path === "/philly" ||
-    path.startsWith("/philly/");
+  // Only /philly/* is the gated CRM now. /app and /dashboard were the
+  // old merged-monorepo routes — removed after the Option A unification.
+  const isProtected = path === "/philly" || path.startsWith("/philly/");
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
