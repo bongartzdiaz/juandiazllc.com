@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { VENTURES, getVenture } from "@/lib/ventures";
+import { breadcrumbSchema } from "@/lib/breadcrumb";
 
 export function generateStaticParams() {
   return VENTURES.map((v) => ({ slug: v.slug }));
@@ -24,8 +25,15 @@ export default async function VenturePage({ params }: { params: Promise<{ slug: 
 
   const others = VENTURES.filter((x) => x.slug !== v.slug).slice(0, 3);
 
+  const crumbs = breadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Work", path: "/work" },
+    { name: v.name, path: `/work/${v.slug}` },
+  ]);
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
       <header
         className="page-hero"
         style={{

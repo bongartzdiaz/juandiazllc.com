@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllInsights, getInsight, formatDate } from "@/lib/insights";
 import { getVentureForTag } from "@/lib/ventures";
+import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { ReadingProgress } from "@/components/ReadingProgress";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
@@ -67,6 +68,11 @@ export default async function InsightPage(
 
   const related = getAllInsights().filter((p) => p.slug !== post.slug).slice(0, 2);
   const venture = getVentureForTag(post.tag);
+  const crumbs = breadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Insights", path: "/insights" },
+    { name: post.title, path: `/insights/${post.slug}` },
+  ]);
 
   return (
     <>
@@ -74,6 +80,10 @@ export default async function InsightPage(
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }}
       />
       <article className="insight-article">
         <header className="ia-head">
