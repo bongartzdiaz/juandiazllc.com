@@ -5,12 +5,14 @@ import { SignOutButton } from "@/components/diaz/SignOutButton";
 import Link from "next/link";
 import { buildGreeting } from "@/lib/greeting";
 
-export const metadata: Metadata = { title: "Ops hub" };
+export const metadata: Metadata = { title: "DEUS Dashboard" };
 export const dynamic = "force-dynamic";
 
 export default async function AppPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/diaz/login?next=/diaz/app");
 
   const { greeting, firstName } = buildGreeting({
@@ -20,188 +22,66 @@ export default async function AppPage() {
   });
 
   return (
-    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "140px 32px 120px" }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      {/* Top bar — auth context above the embedded dashboard */}
       <div
         style={{
-          fontFamily: "'JetBrains Mono'",
-          fontSize: 11,
-          letterSpacing: ".18em",
-          textTransform: "uppercase",
-          color: "var(--accent)",
-          marginBottom: 20,
+          position: "fixed",
+          top: 56,
+          left: 0,
+          right: 0,
+          zIndex: 40,
+          padding: "10px 20px",
+          background: "rgba(3,20,15,.85)",
+          backdropFilter: "blur(14px)",
+          borderBottom: "1px solid var(--line)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 12,
         }}
       >
-        ◉ Diaz ops hub · live
-      </div>
-      <h1
-        style={{
-          fontWeight: 300,
-          fontSize: "clamp(48px, 7vw, 92px)",
-          letterSpacing: "-.04em",
-          lineHeight: 1,
-        }}
-      >
-        {greeting}, <em>{firstName}</em>.
-      </h1>
-      <p style={{ color: "var(--muted)", fontSize: 17, marginTop: 20, maxWidth: 640, lineHeight: 1.6 }}>
-        Signed in as <b style={{ color: "var(--text)" }}>{user.email}</b>. Use this hub to jump
-        across the dispatch surface and the wider Juan Diaz LLC venture portfolio.
-      </p>
-
-      <div
-        style={{
-          marginTop: 48,
-          padding: 32,
-          border: "1px solid var(--line)",
-          borderRadius: 18,
-          background: "linear-gradient(180deg, var(--panel), var(--bg-2))",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(500px 300px at 50% 0%, rgba(94,255,177,.08), transparent 60%)",
-            pointerEvents: "none",
-          }}
-        />
-        <div style={{ position: "relative" }}>
-          <div
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <span
             style={{
               fontFamily: "'JetBrains Mono'",
-              fontSize: 11,
-              letterSpacing: ".14em",
+              fontSize: 10.5,
+              letterSpacing: ".18em",
               textTransform: "uppercase",
-              color: "var(--muted-soft)",
-              marginBottom: 14,
+              color: "var(--accent)",
             }}
           >
-            ◉ Dispatch surface
-          </div>
-          <Link
-            href="/diaz/app/jobs"
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "18px 22px",
-              border: "1px solid var(--accent)",
-              borderRadius: 12,
-              background: "rgba(94,255,177,.06)",
-              marginBottom: 20,
-              transition: "all .3s var(--ease)",
-            }}
-          >
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 500, color: "var(--accent)" }}>
-                Jobs board →
-              </div>
-              <div
-                style={{
-                  fontFamily: "'JetBrains Mono'",
-                  fontSize: 10,
-                  color: "var(--muted-soft)",
-                  letterSpacing: ".08em",
-                  marginTop: 4,
-                }}
-              >
-                Live · create, assign, track
-              </div>
-            </div>
-            <span
-              style={{
-                fontFamily: "'JetBrains Mono'",
-                fontSize: 10,
-                letterSpacing: ".14em",
-                color: "var(--accent)",
-                textTransform: "uppercase",
-              }}
-            >
-              Enter
-            </span>
+            ◉ DEUS · LIVE
+          </span>
+          <span style={{ color: "var(--muted)", fontSize: 13 }}>
+            {greeting}, <em style={{ color: "var(--accent)", fontFamily: "'Instrument Serif', serif" }}>{firstName}</em>
+          </span>
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <Link className="btn ghost" href="/diaz/app/jobs" style={{ padding: "8px 14px", fontSize: 11 }}>
+            Jobs board →
           </Link>
-
-          <div
-            style={{
-              fontFamily: "'JetBrains Mono'",
-              fontSize: 11,
-              letterSpacing: ".14em",
-              textTransform: "uppercase",
-              color: "var(--muted-soft)",
-              marginTop: 28,
-              marginBottom: 14,
-            }}
-          >
-            ◉ Coming online
-          </div>
-          <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 14, padding: 0 }}>
-            {[
-              { name: "Field client (PWA)", status: "In build", hint: "Offline-first" },
-              { name: "Live map + routing", status: "Scoping", hint: "Phase 2" },
-              { name: "Operator analytics", status: "Scoping", hint: "Phase 3" },
-            ].map((item, i) => (
-              <li
-                key={i}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "14px 18px",
-                  border: "1px solid var(--line)",
-                  borderRadius: 12,
-                  background: "rgba(3,20,15,.4)",
-                }}
-              >
-                <div>
-                  <div style={{ fontSize: 15, fontWeight: 500 }}>{item.name}</div>
-                  <div
-                    style={{
-                      fontFamily: "'JetBrains Mono'",
-                      fontSize: 10,
-                      color: "var(--muted-soft)",
-                      letterSpacing: ".08em",
-                      marginTop: 2,
-                    }}
-                  >
-                    {item.hint}
-                  </div>
-                </div>
-                <span
-                  style={{
-                    fontFamily: "'JetBrains Mono'",
-                    fontSize: 10,
-                    letterSpacing: ".14em",
-                    textTransform: "uppercase",
-                    color: "var(--accent)",
-                    padding: "4px 10px",
-                    border: "1px solid var(--accent)",
-                    borderRadius: 999,
-                    background: "rgba(94,255,177,.06)",
-                  }}
-                >
-                  {item.status}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <Link className="btn ghost" href="/" style={{ padding: "8px 14px", fontSize: 11 }}>
+            ← Site
+          </Link>
+          <SignOutButton />
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 10, marginTop: 32, flexWrap: "wrap" }}>
-        <Link className="btn primary" href="/diaz/app/jobs">
-          ◉ Open Jobs board →
-        </Link>
-        <Link className="btn ghost" href="/app">
-          ← Operator hub
-        </Link>
-        <Link className="btn ghost" href="/">
-          ← Back to site
-        </Link>
-        <SignOutButton />
-      </div>
+      {/* The DEUS dashboard, embedded full-bleed */}
+      <iframe
+        src="/diaz/dashboard.html"
+        title="DEUS Dashboard"
+        style={{
+          flex: 1,
+          width: "100%",
+          height: "calc(100vh - 110px)",
+          border: 0,
+          marginTop: 110,
+          background: "var(--bg)",
+        }}
+      />
     </div>
   );
 }
