@@ -1,0 +1,121 @@
+/* ---------------------------------------------------------------
+   High-level email send orchestrator
+   - Renders template if templateId provided
+   - Writes draft → calls provider → updates status
+   --------------------------------------------------------------- */
+
+import { getAuthPrisma } from '@/lib/auth'
+import { resolveProvider, SendPayload } from './providers'
+import { renderTemplate } from '@/lib/templates/renderer'
+
+export interface SendEmailInput {
+  accountId: string
+  to: string | string[]
+  cc?: string | string[]
+  bcc?: string | string[]
+  subject?: string
+  bodyHtml?: string | null
+  bodyText?: string | null
+  contactId?: string | null
+  templateId?: string | null
+  templateContext?: Record<string, unknown>
+}
+
+export interface SendEmailResult {
+  ok: boolean
+  emailId: string
+  providerMessageId?: string
+  error?: string
+}
+
+function toArr(v: string | string[] | undefined): string[] {
+  if (!v) return []
+  return Array.isArray(v) ? v : [v]
+}
+
+export async function sendEmail(
+  organizationId: string,
+  input: SendEmailInput,
+): Promise<SendEmailResult> {
+  const prisma = getAuthPrisma()
+
+  const account = await prisma.emailAccount.findFirst({
+    where: { id: input.accountId, organizationId },
+  })
+  if (!account) throw new Error('Email account not found for org')
+
+  // Resolve template (if any)
+  let subject = input.subject ?? ''
+  let html = input.bodyHtml ?? null
+  let text = input.bodyText ?? null
+
+  if (input.templateId) {
+    const tpl = await prisma.template.findFirst({
+      where: { id: input.templateId, organizationId },
+    })
+    if (tpl) {
+      subject = renderTemplate(tpl.subject, input.templateContext ?? {}) || subject
+      const rendered = renderTemplate(tpl.body, input.templateContext ?? {})
+      if (tpl.type === 'email') {
+        html = html ?? rendered
+        text = text ?? stripHtml(rendered)
+      }
+    }
+  }
+
+  const toList = toArr(input.to)
+  const ccList = toArr(input.cc)
+  const bccList = toArr(input.bcc)
+
+  // Persist as draft first
+  const email = await prisma.email.create({
+    data: {
+      accountId: account.id,
+      contactId: input.contactId ?? null,
+      direction: 'outbound',
+      fromAddress: account.email,
+      toAddresses: JSON.stringify(toList),
+      ccAddresses: JSON.stringify(ccList),
+      bccAddresses: JSON.stringify(bccList),
+      subject,
+      bodyHtml: html,
+      bodyText: text,
+      status: 'queued',
+    },
+  })
+
+  const provider = resolveProvider(account)
+  const payload: SendPayload = {
+    from: account.email,
+    fromName: account.displayName || undefined,
+    to: toList,
+    cc: ccList.length ? ccList : undefined,
+    bcc: bccList.length ? bccList : undefined,
+    subject,
+    html,
+    text,
+  }
+
+  const result = await provider.send(payload)
+
+  const now = new Date()
+  await prisma.email.update({
+    where: { id: email.id },
+    data: {
+      status: result.ok ? 'sent' : 'failed',
+      sentAt: result.ok ? now : null,
+      messageId: result.providerMessageId ?? null,
+    },
+  })
+
+  return {
+    ok: result.ok,
+    emailId: email.id,
+    providerMessageId: result.providerMessageId,
+    error: result.error,
+  }
+}
+
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+}

@@ -55,7 +55,7 @@ function getSources(industry: string): Source[] {
   ]
 }
 
-export function LeadSourceCard({ industry, themeKey }: { industry: string; themeKey: string }) {
+export function LeadSourceCard({ industry }: { industry: string; themeKey: string }) {
   const sources = useMemo(() => getSources(industry), [industry])
   const total = useMemo(() => sources.reduce((s, src) => s + src.count, 0), [sources])
 
@@ -88,6 +88,15 @@ export function LeadSourceCard({ industry, themeKey }: { industry: string; theme
       }}>
         {/* Donut chart */}
         <div style={{ width: 140, height: 140, flexShrink: 0 }}>
+          {total === 0 ? (
+            <div style={{
+              width: '100%', height: '100%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'var(--txt3)', fontSize: 11, textAlign: 'center', padding: 8,
+            }}>
+              No sources yet
+            </div>
+          ) : (
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -120,6 +129,7 @@ export function LeadSourceCard({ industry, themeKey }: { industry: string; theme
               />
             </PieChart>
           </ResponsiveContainer>
+          )}
         </div>
 
         {/* Table */}

@@ -1,11 +1,20 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
-import { Search, Grid3X3, List, ArrowUpDown } from 'lucide-react'
+import { Modal } from '@/components/ui/Modal'
+import { ProjectForm } from '@/components/forms/ProjectForm'
+import type { ProjectFormData } from '@/components/forms/ProjectForm'
+import { Search, Grid3X3, List } from 'lucide-react'
 import { useIndustry } from '@/hooks/useIndustry'
 import { useApi } from '@/hooks/useApi'
+import { useToast } from '@/hooks/useToast'
+import { useEntitySubscription } from '@/hooks/useRealtime'
+import { useUrlState } from '@/hooks/useUrlState'
+import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 
 /* Shape returned by GET /api/projects */
 interface ApiProject {
@@ -116,9 +125,15 @@ const statusColors: Record<string, { bg: string; txt: string; border: string }> 
 
 export default function ProjectsPage() {
   const { industry } = useIndustry()
-  const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [view, setView] = useState<'grid' | 'list'>('grid')
+  const t = useTranslations('projects')
+  const { addToast } = useToast()
+  const [filters, setFilters] = useUrlState({ q: '', status: 'all', view: 'grid' })
+  const search = filters.q
+  const statusFilter = filters.status
+  const view = (filters.view === 'list' ? 'list' : 'grid') as 'grid' | 'list'
+  const debouncedSearch = useDebouncedValue(search, 250)
+  const [showAdd, setShowAdd] = useState(false)
+  const [selectedProject, setSelectedProject] = useState<UiProject | null>(null)
 
   const isRE = industry === 'realestate'
   const isHOS = industry === 'hospitality'
@@ -128,11 +143,42 @@ export default function ProjectsPage() {
   const apiQuery = useApi<{ data: ApiProject[] }>('/projects', {
     enabled: !isRE && !isHOS,
   })
+  // Live-refresh on any project mutation in the org
+  useEntitySubscription('project', apiQuery.refetch)
   const liveProjects = useMemo<UiProject[]>(() => {
     if (isRE || isHOS) return []
     const rows = apiQuery.data?.data ?? []
     return rows.map(mapApiProject)
   }, [apiQuery.data, isRE, isHOS])
+
+  const handleAddProject = async (data: ProjectFormData) => {
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: data.title,
+          description: data.description,
+          category: data.category,
+          status: data.status,
+          startDate: data.startDate || undefined,
+          endDate: data.endDate || undefined,
+          budgetCents: data.budget ? Math.round(Number(data.budget) * 100) : 0,
+          sdgGoals: data.sdgGoals,
+        }),
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => null)
+        throw new Error(body?.error || `Request failed (${res.status})`)
+      }
+      addToast(t('createdSuccess'), 'success')
+      setShowAdd(false)
+      apiQuery.refetch()
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t('createFailed')
+      addToast(message, 'error')
+    }
+  }
 
   const projects: UiProject[] = isHOS
     ? HOS_PROJECTS
@@ -149,7 +195,7 @@ export default function ProjectsPage() {
 
   const filtered = projects.filter(p => {
     if (statusFilter !== 'all' && p.status !== statusFilter) return false
-    if (search && !p.title.toLowerCase().includes(search.toLowerCase())) return false
+    if (debouncedSearch && !p.title.toLowerCase().includes(debouncedSearch.toLowerCase())) return false
     return true
   })
 
@@ -168,9 +214,10 @@ export default function ProjectsPage() {
   return (
     <>
       <Topbar
-        title={isHOS ? 'Venues & Rooms' : isRE ? 'Properties' : 'Projects'}
-        sub={isHOS ? 'Manage your properties' : isRE ? 'Manage your portfolio' : 'Manage your CSR initiatives'}
-        addLabel={isHOS ? 'New Room' : isRE ? 'New Property' : 'New Project'}
+        title={isHOS ? t('titleHOS') : isRE ? t('titleRE') : t('title')}
+        sub={isHOS ? t('subtitleHOS') : isRE ? t('subtitleRE') : t('subtitle')}
+        addLabel={isHOS ? t('newProjectHOS') : isRE ? t('newProjectRE') : t('newProject')}
+        onAdd={() => setShowAdd(true)}
       />
 
       <div style={{ padding: '18px 24px 40px' }}>
@@ -207,31 +254,49 @@ export default function ProjectsPage() {
           borderRadius: 10, padding: '10px 14px',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, background: 'var(--bg2)', borderRadius: 8, padding: '6px 10px' }}>
-            <Search size={14} color="var(--txt3)" />
+            <Search size={14} color="var(--txt3)" aria-hidden="true" />
             <input
               value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder={isHOS ? 'Search rooms & venues...' : isRE ? 'Search properties...' : 'Search projects...'}
+              onChange={e => setFilters({ q: e.target.value })}
+              placeholder={isHOS ? t('searchPlaceholderHOS') : isRE ? t('searchPlaceholderRE') : t('searchPlaceholder')}
+              aria-label={isHOS ? t('searchPlaceholderHOS') : isRE ? t('searchPlaceholderRE') : t('searchPlaceholder')}
               style={{ border: 'none', background: 'none', flex: 1, fontSize: 13, padding: 0 }}
             />
           </div>
           {statusOptions.map(s => (
-            <button key={s} onClick={() => setStatusFilter(s)} style={{
-              padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
-              background: statusFilter === s ? 'var(--txt)' : 'var(--bg2)',
-              color: statusFilter === s ? 'var(--panel)' : 'var(--txt2)',
-              border: 'none', cursor: 'pointer', textTransform: 'capitalize',
-            }}>{s}</button>
+            <button
+              key={s}
+              type="button"
+              onClick={() => setFilters({ status: s })}
+              aria-pressed={statusFilter === s}
+              style={{
+                padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
+                background: statusFilter === s ? 'var(--txt)' : 'var(--bg2)',
+                color: statusFilter === s ? 'var(--panel)' : 'var(--txt2)',
+                border: 'none', cursor: 'pointer', textTransform: 'capitalize',
+              }}
+            >{s === 'all' ? t('all') : t(`status.${s}` as 'status.active')}</button>
           ))}
           <div style={{ display: 'flex', gap: 4 }}>
-            <button onClick={() => setView('grid')} style={{
-              padding: 6, borderRadius: 6, background: view === 'grid' ? 'var(--txt)' : 'var(--bg2)',
-              color: view === 'grid' ? 'var(--panel)' : 'var(--txt3)', border: 'none', cursor: 'pointer',
-              display: 'flex',
-            }}><Grid3X3 size={14} /></button>
-            <button onClick={() => setView('list')} style={{
-              padding: 6, borderRadius: 6, background: view === 'list' ? 'var(--txt)' : 'var(--bg2)',
-              color: view === 'list' ? 'var(--panel)' : 'var(--txt3)', border: 'none', cursor: 'pointer',
+            <button
+              type="button"
+              onClick={() => setFilters({ view: 'grid' })}
+              aria-label={t('gridView')}
+              aria-pressed={view === 'grid'}
+              style={{
+                padding: 6, borderRadius: 6, background: view === 'grid' ? 'var(--txt)' : 'var(--bg2)',
+                color: view === 'grid' ? 'var(--panel)' : 'var(--txt3)', border: 'none', cursor: 'pointer',
+                display: 'flex',
+              }}
+            ><Grid3X3 size={14} /></button>
+            <button
+              type="button"
+              onClick={() => setFilters({ view: 'list' })}
+              aria-label={t('listView')}
+              aria-pressed={view === 'list'}
+              style={{
+                padding: 6, borderRadius: 6, background: view === 'list' ? 'var(--txt)' : 'var(--bg2)',
+                color: view === 'list' ? 'var(--panel)' : 'var(--txt3)', border: 'none', cursor: 'pointer',
               display: 'flex',
             }}><List size={14} /></button>
           </div>
@@ -244,7 +309,7 @@ export default function ProjectsPage() {
               const sc = statusColors[p.status] || statusColors.planned
               const progress = Math.round((p.completedMilestones / p.milestones) * 100)
               return (
-                <div key={p.id} className="card-hover" style={{
+                <div key={p.id} className="card-hover" onClick={() => setSelectedProject(p)} style={{
                   background: 'var(--panel)', border: '1px solid var(--border)',
                   borderRadius: 12, padding: '16px', cursor: 'pointer',
                   boxShadow: 'var(--shadow-sm)',
@@ -327,7 +392,7 @@ export default function ProjectsPage() {
                   const sc = statusColors[p.status] || statusColors.planned
                   const progress = Math.round((p.completedMilestones / p.milestones) * 100)
                   return (
-                    <tr key={p.id} style={{ borderBottom: '1px solid var(--border)', cursor: 'pointer' }}>
+                    <tr key={p.id} onClick={() => setSelectedProject(p)} style={{ borderBottom: '1px solid var(--border)', cursor: 'pointer' }}>
                       <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600 }}>{p.title}</td>
                       <td style={{ padding: '12px 14px' }}>
                         <span style={{
@@ -373,6 +438,135 @@ export default function ProjectsPage() {
           </div>
         )}
       </div>
+
+      <Modal
+        open={showAdd}
+        onClose={() => setShowAdd(false)}
+        title={isHOS ? 'New Room' : isRE ? 'New Property' : 'New Project'}
+        subtitle={isHOS ? 'Add a new room or venue' : isRE ? 'Add a new property' : 'Create a new CSR project'}
+        size="lg"
+      >
+        <ProjectForm
+          onSubmit={handleAddProject}
+          onCancel={() => setShowAdd(false)}
+        />
+      </Modal>
+
+      <Modal
+        open={!!selectedProject}
+        onClose={() => setSelectedProject(null)}
+        title={selectedProject?.title ?? ''}
+        subtitle={selectedProject ? `${selectedProject.category} · ${selectedProject.status}` : ''}
+        size="md"
+      >
+        {selectedProject && (() => {
+          const p = selectedProject
+          const sc = statusColors[p.status] || statusColors.planned
+          const progress = p.milestones > 0 ? Math.round((p.completedMilestones / p.milestones) * 100) : 0
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <span style={{
+                  fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 6,
+                  background: sc.bg, color: sc.txt, border: `1px solid ${sc.border}`,
+                  textTransform: 'capitalize',
+                }}>{p.status}</span>
+                <span style={{
+                  fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 6,
+                  background: 'var(--bg2)', color: 'var(--txt2)',
+                }}>{p.category}</span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div style={{ padding: 12, background: 'var(--bg2)', borderRadius: 10 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    {isHOS ? 'Nightly Rate' : isRE ? 'Price' : 'Budget'}
+                  </div>
+                  <div className="mono" style={{ fontSize: 18, fontWeight: 700, color: 'var(--txt)', marginTop: 4 }}>
+                    {isHOS ? (p.budget > 0 ? `€${p.budget}/night` : '—') : isRE ? formatCurrency(p.budget) : `€${(p.budget / 1000).toFixed(0)}K`}
+                  </div>
+                </div>
+                <div style={{ padding: 12, background: 'var(--bg2)', borderRadius: 10 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Spent</div>
+                  <div className="mono" style={{ fontSize: 18, fontWeight: 700, color: 'var(--txt)', marginTop: 4 }}>
+                    €{(p.spent / 1000).toFixed(0)}K
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)' }}>Milestones</span>
+                  <span className="mono" style={{ fontSize: 11, fontWeight: 700, color: 'var(--txt)' }}>
+                    {p.completedMilestones}/{p.milestones} ({progress}%)
+                  </span>
+                </div>
+                <div style={{ height: 8, borderRadius: 4, background: 'var(--bg2)', overflow: 'hidden' }}>
+                  <div style={{
+                    height: '100%', width: `${progress}%`,
+                    background: progress >= 80 ? 'var(--g)' : progress >= 50 ? 'var(--accent)' : 'var(--y)',
+                    borderRadius: 4, transition: 'width 240ms ease',
+                  }} />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, fontSize: 12 }}>
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 4 }}>Start Date</div>
+                  <div style={{ color: 'var(--txt)' }}>{p.startDate ? new Date(p.startDate).toLocaleDateString() : '—'}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 4 }}>Contacts</div>
+                  <div className="mono" style={{ fontWeight: 600, color: 'var(--txt)' }}>{p.contacts}</div>
+                </div>
+              </div>
+
+              {!isRE && !isHOS && p.sdgs.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>SDG Goals</div>
+                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                    {p.sdgs.map(s => (
+                      <div key={s} style={{
+                        width: 28, height: 28, borderRadius: 6, background: SDG_COLORS[s],
+                        fontSize: 11, fontWeight: 700, color: '#fff',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>{s}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: 8, marginTop: 4, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+                <button
+                  onClick={() => setSelectedProject(null)}
+                  style={{
+                    flex: 1, padding: '9px 14px', borderRadius: 8,
+                    background: 'var(--bg2)', color: 'var(--txt2)',
+                    border: '1px solid var(--border)', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  Close
+                </button>
+                {!isRE && !isHOS && (
+                  <Link
+                    href={`/projects/${p.id}`}
+                    style={{
+                      flex: 1, padding: '9px 14px', borderRadius: 8,
+                      background: 'var(--accent)', color: '#fff',
+                      border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                      fontFamily: 'inherit', textDecoration: 'none',
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                    }}
+                  >
+                    Open full view →
+                  </Link>
+                )}
+              </div>
+            </div>
+          )
+        })()}
+      </Modal>
     </>
   )
 }

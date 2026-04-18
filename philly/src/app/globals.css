@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ══ LIGHT THEME — PhilanthropyAI ══ */
+/* ══ LIGHT THEME — Philly Dashboard ══ */
 [data-theme="light"] {
   --bg:       #F7F8FA;
   --bg2:      #EDEEF2;
@@ -29,7 +29,7 @@
   --p: #7C3AED; --p-bg: #F5F3FF; --p-border: #C4B5FD; --p-txt: #6D28D9;
 }
 
-/* ══ DARK THEME — PhilanthropyAI ══ */
+/* ══ DARK THEME — Philly Dashboard ══ */
 [data-theme="dark"] {
   --bg:       #0B0E13;
   --bg2:      #141820;
@@ -70,7 +70,7 @@ html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
 body {
   background: var(--bg);
   color: var(--txt);
-  font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: var(--font-red-hat-mono), 'Red Hat Mono', monospace;
   font-size: 13.5px;
   line-height: 1.6;
   letter-spacing: -0.005em;
@@ -255,6 +255,11 @@ input::placeholder, textarea::placeholder {
 @media (min-width: 1025px) {
   .hamburger-btn { display: none !important; }
   .sidebar-overlay { display: none !important; }
+}
+
+/* ══ COMMAND PALETTE PILL ══ */
+@media (max-width: 900px) {
+  .cmdk-pill { display: none !important; }
 }
 
 /* ══ POPOVER ANIMATION ══ */

@@ -1,0 +1,35 @@
+# Default: let git auto-detect text vs binary
+* text=auto eol=lf
+
+# Shell scripts MUST be LF — a CRLF shebang line breaks `#!/usr/bin/env bash`
+*.sh       text eol=lf
+*.bash     text eol=lf
+
+# Likewise anything that gets executed directly on the server
+deploy/*   text eol=lf
+
+# Source — also LF so diffs are clean across platforms
+*.ts       text eol=lf
+*.tsx      text eol=lf
+*.js       text eol=lf
+*.jsx      text eol=lf
+*.json     text eol=lf
+*.md       text eol=lf
+*.yml      text eol=lf
+*.yaml     text eol=lf
+*.sql      text eol=lf
+
+# Windows-native
+*.bat      text eol=crlf
+*.cmd      text eol=crlf
+*.ps1      text eol=crlf
+
+# Binary — never touch
+*.png      binary
+*.jpg      binary
+*.jpeg     binary
+*.gif      binary
+*.ico      binary
+*.pdf      binary
+*.woff     binary
+*.woff2    binary

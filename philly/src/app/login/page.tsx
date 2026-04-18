@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, FormEvent, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import { LogIn, Eye, EyeOff } from 'lucide-react'
 
@@ -14,7 +14,6 @@ export default function LoginPage() {
 }
 
 function LoginPageInner() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams?.get('callbackUrl') || '/'
   const [email, setEmail] = useState('')
@@ -47,8 +46,13 @@ function LoginPageInner() {
       return
     }
 
-    router.push(res.url || callbackUrl)
-    router.refresh()
+    // Full page navigation — not router.push. NextAuth v4's SessionProvider
+    // caches the initial 'unauthenticated' state and doesn't always refetch
+    // fast enough for ProtectedShell's redirect-guard, so router.push() can
+    // bounce straight back to /login. A hard navigation forces the server
+    // to read the freshly-set session cookie and all layouts re-render
+    // from an authenticated starting point.
+    window.location.assign(res.url || callbackUrl)
   }
 
   const inputStyle: React.CSSProperties = {
@@ -76,7 +80,7 @@ function LoginPageInner() {
             fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em',
             color: 'var(--accent)',
           }}>
-            PhilanthropyAI
+            Philly
           </div>
           <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--txt3)', marginTop: 4 }}>
             Business Platform

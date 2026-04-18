@@ -1,0 +1,22 @@
+# /etc/systemd/system/philly-verify.timer
+#
+# Sunday 04:00 — one hour after the nightly backup so the newest dump
+# exists. Weekly cadence keeps server load low while still catching
+# schema drift / silent backup rot within a week.
+#
+# Install:
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now philly-verify.timer
+
+[Unit]
+Description=Weekly backup restore test for Philly Dashboard
+Documentation=file:///root/philly-dashboard/docs/backup-verification.md
+
+[Timer]
+OnCalendar=Sun *-*-* 04:00:00
+RandomizedDelaySec=10m
+Persistent=true
+Unit=philly-verify.service
+
+[Install]
+WantedBy=timers.target

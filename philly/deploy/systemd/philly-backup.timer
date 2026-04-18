@@ -1,0 +1,28 @@
+# /etc/systemd/system/philly-backup.timer
+#
+# Fires philly-backup.service nightly at 03:00 local time.
+# Persistent=true means if the VPS was down at 03:00, the backup runs
+# as soon as it comes back up — no silent skipped nights.
+#
+# Install:
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now philly-backup.timer
+#
+# Verify:
+#   systemctl list-timers philly-backup.timer
+#   journalctl -u philly-backup -n 50
+
+[Unit]
+Description=Daily MariaDB backup for Philly Dashboard
+Documentation=file:///root/philly-dashboard/docs/backup-verification.md
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+# Randomized jitter — avoids every VPS in the fleet dumping at the exact
+# same second (matters if you ever run multiple instances)
+RandomizedDelaySec=5m
+Persistent=true
+Unit=philly-backup.service
+
+[Install]
+WantedBy=timers.target

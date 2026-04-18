@@ -1,18 +1,18 @@
-# PhilanthropyAI — Project Context for Claude Code
+# Philly Dashboard — Project Context for Claude Code
 
 ## Project
-PhilanthropyAI Business Platform — CRM and operations dashboard.
+Philly Dashboard — CRM and operations platform for impact-driven organizations.
 Target: CSR companies, real estate, hospitality (extensible to logistics).
-Live: TBD (will be deployed to server)
+Repo: https://github.com/bongartzdiaz/philly-dashboard (private)
 
 ## Tech Stack
 - Next.js 16 (App Router, TypeScript)
 - Recharts for charts
 - Lucide React icons
 - CSS custom properties (dual-theme light/dark)
-- Plus Jakarta Sans + JetBrains Mono (Google Fonts via next/font)
-- Prisma ORM + PostgreSQL (schema ready, not yet connected)
-- NextAuth v5 (configured, not yet activated)
+- Plus Jakarta Sans + Red Hat Mono (Google Fonts via next/font)
+- Prisma 7 + MariaDB via @prisma/adapter-mariadb
+- NextAuth v4 (Credentials provider, JWT sessions, PrismaAdapter)
 - next-intl (EN/NL translations ready)
 - @dnd-kit (installed, drag-and-drop ready for implementation)
 
@@ -31,10 +31,10 @@ Live: TBD (will be deployed to server)
 - Color system: `--g` (green), `--o` (orange), `--y` (yellow), `--r` (red), `--b` (teal), `--p` (purple)
 - Each color has `-bg`, `-border`, `-txt` variants
 - borderRadius: 12 for cards, 8 for small elements
-- `.mono` class for numeric values (JetBrains Mono)
+- `.mono` class for numeric values (Red Hat Mono)
 - Theme stored in localStorage key `pai-theme`
 
-## Database (Prisma — not yet connected)
+## Database (Prisma 7 + MariaDB)
 Schema at `prisma/schema.prisma` with models:
 Organization, User, Project, ProjectMilestone, Contact, ContactProject,
 ImpactMetric, KanbanBoard, KanbanColumn, KanbanCard, DashboardLayout,
@@ -42,11 +42,11 @@ CustomPage, PageBlock
 
 ## Deployment
 - `npm run build` — production build
-- `npm start` — production server (default port 3000)
+- `npm start` — production server (default port 3100)
 - `npm run dev` — dev server on port 3100
 - Configure `DATABASE_URL` and `NEXTAUTH_SECRET` in `.env.local`
 - Run `npx prisma generate && npx prisma db push` after DB setup
 
 ## GitHub
-- Repo: https://github.com/bongartzdiaz/Phily (private)
+- Repo: https://github.com/bongartzdiaz/philly-dashboard (private)
 - Branch: master

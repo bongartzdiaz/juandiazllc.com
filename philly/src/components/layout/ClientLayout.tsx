@@ -7,6 +7,9 @@ import { IndustryProvider } from '@/hooks/useIndustry'
 import { ToastProvider } from '@/hooks/useToast'
 import { ToastContainer } from '@/components/ui/Toast'
 import { Sidebar } from './Sidebar'
+import { MobileNav } from './MobileNav'
+import { CommandPalette } from '@/components/ui/CommandPalette'
+import { OfflineBanner } from '@/components/ui/OfflineBanner'
 
 // Mobile menu context so Topbar can toggle the sidebar
 const MobileMenuCtx = createContext<{ open: boolean; toggle: () => void }>({ open: false, toggle: () => {} })
@@ -47,14 +50,27 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const toggle = useCallback(() => setMobileOpen(v => !v), [])
 
+  // Auth enforcement. Dev-only escape hatch: set NEXT_PUBLIC_BYPASS_AUTH=1 in .env.local.
+  // In production this flag has no effect — auth is always enforced.
+  const bypassAuth =
+    process.env.NODE_ENV !== 'production' &&
+    process.env.NEXT_PUBLIC_BYPASS_AUTH === '1'
+
+  // Small grace window before redirecting. NextAuth's SessionProvider can
+  // briefly report 'unauthenticated' right after a successful login while
+  // the cookie is still propagating to the client hook. Without this
+  // delay the user gets bounced back to /login immediately after sign-in.
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (bypassAuth || status !== 'unauthenticated') return
+    const t = setTimeout(() => {
       const callback = encodeURIComponent(pathname || '/')
       router.replace(`/login?callbackUrl=${callback}`)
-    }
-  }, [status, router, pathname])
+    }, 150)
+    return () => clearTimeout(t)
+  }, [bypassAuth, status, router, pathname])
 
-  if (status === 'loading' || status === 'unauthenticated') {
+  // Show spinner only while session is loading (not when unauthenticated)
+  if (status === 'loading') {
     return (
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -93,6 +109,10 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
         <main className="main-content" style={{ marginLeft: 240, flex: 1, display: 'flex', flexDirection: 'column' }}>
           {children}
         </main>
+
+        <CommandPalette />
+        <OfflineBanner />
+        <MobileNav />
       </div>
     </MobileMenuCtx.Provider>
   )

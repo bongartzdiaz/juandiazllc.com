@@ -29,7 +29,7 @@ const STATUSES = ['planned', 'active', 'paused', 'completed']
 const PROPERTY_TYPES = ['Residential', 'Commercial', 'Rental', 'Mixed-Use']
 
 export function ProjectForm({ onSubmit, onCancel, initial }: ProjectFormProps) {
-  const { industry, config } = useIndustry()
+  const { industry } = useIndustry()
 
   const categories =
     industry === 'philanthropy' ? CSR_CATEGORIES :

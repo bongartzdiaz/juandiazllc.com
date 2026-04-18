@@ -1,4 +1,4 @@
-/* GET /api/kanban/boards — list all boards in the user's org with
+﻿/* GET /api/kanban/boards — list all boards in the user's org with
    their columns and cards. Lightweight payload meant for the kanban
    page initial fetch. */
 

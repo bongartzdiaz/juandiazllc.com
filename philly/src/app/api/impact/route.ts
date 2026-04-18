@@ -1,20 +1,18 @@
-/* GET /api/impact — aggregated impact metrics for the org
+﻿/* GET /api/impact — aggregated impact metrics for the org
+   POST /api/impact — create a new impact metric
+
    Query params:
      ?projectId=<id>   restrict to one project (must belong to org)
      ?from=<iso>       only metrics on/after this date
      ?to=<iso>         only metrics on/before this date
-
-   Returns:
-     {
-       totals:    { co2_kg: number, people_helped: number, ... },
-       byProject: [{ projectId, projectTitle, totals: {...} }],
-       count:     number  // total metric rows considered
-     }
 */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/auth-helpers'
+import { validateBody } from '@/lib/validation'
+import { createImpactMetricSchema } from '@/lib/validation/schemas'
+import { logAudit } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -43,7 +41,6 @@ export async function GET(req: NextRequest) {
 
   const prisma = getAuthPrisma()
 
-  // If projectId is given, verify org ownership first
   if (projectId) {
     const owned = await prisma.project.findFirst({
       where: { id: projectId, organizationId: scope.organizationId },
@@ -73,7 +70,6 @@ export async function GET(req: NextRequest) {
     },
   })
 
-  // Aggregate totals by metricType
   const totals: Record<string, number> = {}
   const byProjectMap = new Map<
     string,
@@ -108,54 +104,30 @@ export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
 
-  let body: unknown
-  try {
-    body = await req.json()
-  } catch {
-    return jsonError('Invalid JSON body', 400)
-  }
+  const parsed = await validateBody(req, createImpactMetricSchema)
+  if (!parsed.success) return parsed.response
 
-  const input = body as {
-    projectId?: string
-    metricType?: string
-    value?: number
-    unit?: string
-    date?: string
-    notes?: string
-  }
-
-  if (!input.projectId) return jsonError('projectId is required', 400)
-  if (!input.metricType) return jsonError('metricType is required', 400)
-  if (typeof input.value !== 'number' || isNaN(input.value)) {
-    return jsonError('value must be a number', 400)
-  }
-
+  const input = parsed.data
   const prisma = getAuthPrisma()
 
-  // Verify project belongs to caller's org
   const project = await prisma.project.findFirst({
     where: { id: input.projectId, organizationId: scope.organizationId },
     select: { id: true },
   })
   if (!project) return jsonError('Project not found', 404)
 
-  let date: Date | undefined
-  if (input.date) {
-    const d = new Date(input.date)
-    if (isNaN(d.getTime())) return jsonError('date must be a valid date', 400)
-    date = d
-  }
-
   const metric = await prisma.impactMetric.create({
     data: {
       projectId: input.projectId,
       metricType: input.metricType,
       value: input.value,
-      unit: input.unit ?? '',
-      notes: input.notes ?? '',
-      ...(date ? { date } : {}),
+      unit: input.unit,
+      notes: input.notes,
+      ...(input.date ? { date: new Date(input.date) } : {}),
     },
   })
+
+  await logAudit({ scope, action: 'create', entity: 'impactMetric', entityId: metric.id })
 
   return NextResponse.json({ data: metric }, { status: 201 })
 }

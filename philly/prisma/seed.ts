@@ -207,6 +207,107 @@ async function main() {
   }
   console.log(`  kanban: ${columnSeed.length} columns / ${cardSeed.length} cards`)
 
+  // 7. Default deal pipeline (enables /deals and the Kanban deals board)
+  const pipeline = await prisma.pipeline.upsert({
+    where: { id: 'seed-pipeline-default' },
+    update: {},
+    create: {
+      id: 'seed-pipeline-default',
+      organizationId: org.id,
+      name: 'Sales Pipeline',
+      industry: 'general',
+    },
+  })
+
+  const stageSeed = [
+    { id: 'seed-stage-new',          name: 'New Lead',    position: 0, color: '#94A3B8' },
+    { id: 'seed-stage-qualified',    name: 'Qualified',   position: 1, color: '#3B82F6' },
+    { id: 'seed-stage-proposal',     name: 'Proposal',    position: 2, color: '#F59E0B' },
+    { id: 'seed-stage-negotiation',  name: 'Negotiation', position: 3, color: '#8B5CF6' },
+    { id: 'seed-stage-closed-won',   name: 'Closed Won',  position: 4, color: '#10B981' },
+    { id: 'seed-stage-closed-lost',  name: 'Closed Lost', position: 5, color: '#EF4444' },
+  ]
+  for (const s of stageSeed) {
+    await prisma.pipelineStage.upsert({
+      where: { id: s.id },
+      update: {},
+      create: { ...s, pipelineId: pipeline.id },
+    })
+  }
+  console.log(`  pipeline: 1 pipeline, ${stageSeed.length} stages`)
+
+  // 8. A couple of sample deals so the /deals board isn't empty
+  const dealSeed = [
+    {
+      id: 'seed-deal-greenfuture',
+      title: 'Green Future Foundation — Water Grant',
+      pipelineId: pipeline.id,
+      stageId: 'seed-stage-qualified',
+      contactId: 'seed-contact-sarah@greenfuture.org',
+      ownerId: admin.id,
+      valueCents: 7_500_000,
+      probability: 60,
+      status: 'open',
+      dealType: 'grant',
+      expectedClose: new Date(Date.now() + 60 * 86400_000),
+      notes: 'Initial contact made. Proposal requested.',
+    },
+    {
+      id: 'seed-deal-solarcoop',
+      title: 'Solar Co-op — School Installation Partnership',
+      pipelineId: pipeline.id,
+      stageId: 'seed-stage-proposal',
+      contactId: 'seed-contact-david@solarcoop.com',
+      ownerId: admin.id,
+      valueCents: 4_200_000,
+      probability: 45,
+      status: 'open',
+      dealType: 'partnership',
+      expectedClose: new Date(Date.now() + 90 * 86400_000),
+      notes: 'Draft SOW in review.',
+    },
+  ]
+  for (const d of dealSeed) {
+    await prisma.deal.upsert({
+      where: { id: d.id },
+      update: {},
+      create: d,
+    })
+  }
+  console.log(`  deals: ${dealSeed.length}`)
+
+  // 9. Default SOI categories (so /soi has something useful out of the box)
+  const soiSeed = [
+    { id: 'seed-soi-close',  name: 'Close Friends & Family', touchFrequency: 14, color: '#EF4444' },
+    { id: 'seed-soi-active', name: 'Active Clients',         touchFrequency: 30, color: '#F59E0B' },
+    { id: 'seed-soi-past',   name: 'Past Clients',           touchFrequency: 90, color: '#3B82F6' },
+    { id: 'seed-soi-sphere', name: 'Sphere of Influence',    touchFrequency: 60, color: '#8B5CF6' },
+  ]
+  for (const c of soiSeed) {
+    await prisma.soiCategory.upsert({
+      where: { id: c.id },
+      update: {},
+      create: { ...c, organizationId: org.id },
+    })
+  }
+  console.log(`  SOI categories: ${soiSeed.length}`)
+
+  // 10. A starter welcome notification for the admin
+  await prisma.notification.upsert({
+    where: { id: 'seed-notif-welcome' },
+    update: {},
+    create: {
+      id: 'seed-notif-welcome',
+      organizationId: org.id,
+      userId: admin.id,
+      type: 'info',
+      title: 'Welcome to Philly Dashboard',
+      message: 'Your CRM is ready. Explore /contacts, /deals, /projects — or jump to /settings/pipelines to configure stages.',
+      read: false,
+    },
+  })
+  console.log(`  notifications: welcome message`)
+
   console.log('\nSeed complete.')
   console.log(`\nLogin:  ${ADMIN_EMAIL}`)
   console.log(`Pass:   ${ADMIN_PASSWORD}\n`)

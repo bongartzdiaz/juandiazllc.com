@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Topbar } from '@/components/layout/Topbar'
 import { useTheme } from '@/hooks/useTheme'
+import { useLocale } from '@/hooks/useLocale'
 import { useIndustry } from '@/hooks/useIndustry'
 import { useToast } from '@/hooks/useToast'
 import {
@@ -10,6 +11,8 @@ import {
   KeyRound, Target, Eye, EyeOff,
 } from 'lucide-react'
 import type { Industry } from '@/hooks/useIndustry'
+import { useKpiStore } from '@/hooks/useKpiStore'
+import { useTranslations } from 'next-intl'
 
 /* ── Nav ─────────────────────────────────────────────── */
 
@@ -144,8 +147,106 @@ export default function SettingsPage() {
   const { theme, toggle } = useTheme()
   const { industry } = useIndustry()
   const { addToast } = useToast()
+  const kpi = useKpiStore(industry)
   const [activeSection, setActiveSection] = useState('profile')
-  const [lang, setLang] = useState<'en' | 'nl'>('en')
+  const { locale: lang, switchLocale: setLang } = useLocale()
+  const t = useTranslations('settings')
+
+  /* ── Profile state ───────────────── */
+  const [profileName, setProfileName] = useState('')
+  const [profileEmail, setProfileEmail] = useState('')
+  const [profileLoading, setProfileLoading] = useState(true)
+  const [profileSaving, setProfileSaving] = useState(false)
+  const [profileRole, setProfileRole] = useState<string>('member')
+
+  useEffect(() => {
+    let cancelled = false
+    setProfileLoading(true)
+    fetch('/api/me', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(j => {
+        if (cancelled) return
+        const u = j.data
+        if (u) {
+          setProfileName(u.name ?? '')
+          setProfileEmail(u.email ?? '')
+          setProfileRole(u.role ?? 'member')
+        }
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setProfileLoading(false) })
+    return () => { cancelled = true }
+  }, [])
+
+  const saveProfile = async () => {
+    if (profileSaving) return
+    if (!profileName.trim()) { addToast('Name is required', 'error'); return }
+    setProfileSaving(true)
+    try {
+      const res = await fetch('/api/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: profileName.trim(), email: profileEmail.trim() }),
+      })
+      const j = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        addToast(j.error ?? 'Failed to save profile', 'error')
+        return
+      }
+      addToast('Profile saved', 'success')
+    } catch (err) {
+      addToast(err instanceof Error ? err.message : 'Failed to save profile', 'error')
+    } finally {
+      setProfileSaving(false)
+    }
+  }
+
+  /* ── Organization state ────────── */
+  const [orgName, setOrgName] = useState('')
+  const [orgIndustry, setOrgIndustry] = useState('general')
+  const [orgLoading, setOrgLoading] = useState(true)
+  const [orgSaving, setOrgSaving] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    setOrgLoading(true)
+    fetch('/api/organization', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(j => {
+        if (cancelled) return
+        const o = j.data
+        if (o) {
+          setOrgName(o.name ?? '')
+          setOrgIndustry(o.industry ?? 'general')
+        }
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setOrgLoading(false) })
+    return () => { cancelled = true }
+  }, [])
+
+  const saveOrg = async () => {
+    if (orgSaving) return
+    if (!orgName.trim()) { addToast('Organization name is required', 'error'); return }
+    setOrgSaving(true)
+    try {
+      const res = await fetch('/api/organization', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: orgName.trim(), industry: orgIndustry }),
+      })
+      const j = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        addToast(j.error ?? 'Failed to save organization', 'error')
+        return
+      }
+      addToast('Organization saved', 'success')
+    } catch (err) {
+      addToast(err instanceof Error ? err.message : 'Failed to save organization', 'error')
+    } finally {
+      setOrgSaving(false)
+    }
+  }
 
   /* ── API Keys state ──────────────── */
   const [apiValues, setApiValues] = useState<Record<string, Record<string, string>>>({})
@@ -212,7 +313,7 @@ export default function SettingsPage() {
 
   return (
     <>
-      <Topbar title="Settings" sub="Platform configuration" />
+      <Topbar title={t('title')} sub={t('subtitle')} />
 
       <div style={{ padding: '18px 24px 40px', display: 'flex', gap: 18 }}>
         {/* Left nav */}
@@ -254,34 +355,46 @@ export default function SettingsPage() {
               <div style={sectionTitleStyle}>Profile</div>
               <div style={sectionSubStyle}>Manage your personal information</div>
 
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20, marginBottom: 20 }}>
-                <div style={{
-                  width: 64, height: 64, borderRadius: '50%', flexShrink: 0,
-                  background: 'var(--accent-bg)', border: '2px solid var(--accent-border)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 20, fontWeight: 700, color: 'var(--accent-txt)',
-                }}>JD</div>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <div>
-                    <label style={labelStyle}>Full Name</label>
-                    <input defaultValue="Juan Doe" style={inputStyle} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Email</label>
-                    <input defaultValue="juan@philanthropyai.org" type="email" style={inputStyle} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Role</label>
+              {profileLoading ? (
+                <div style={{ padding: 20, fontSize: 12, color: 'var(--txt3)' }}>Loading…</div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20, marginBottom: 20 }}>
                     <div style={{
-                      padding: '8px 12px', borderRadius: 8,
-                      background: 'var(--bg2)', border: '1px solid var(--border)',
-                      fontSize: 13, color: 'var(--txt3)',
-                    }}>Administrator</div>
+                      width: 64, height: 64, borderRadius: '50%', flexShrink: 0,
+                      background: 'var(--accent-bg)', border: '2px solid var(--accent-border)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 20, fontWeight: 700, color: 'var(--accent-txt)',
+                    }}>{(profileName || 'U').slice(0, 2).toUpperCase()}</div>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
+                      <div>
+                        <label style={labelStyle}>Full Name</label>
+                        <input value={profileName} onChange={e => setProfileName(e.target.value)} style={inputStyle} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Email</label>
+                        <input value={profileEmail} onChange={e => setProfileEmail(e.target.value)} type="email" style={inputStyle} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Role</label>
+                        <div style={{
+                          padding: '8px 12px', borderRadius: 8,
+                          background: 'var(--bg2)', border: '1px solid var(--border)',
+                          fontSize: 13, color: 'var(--txt3)', textTransform: 'capitalize',
+                        }}>{profileRole}</div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              <button style={accentBtnStyle}>Save Changes</button>
+                  <button
+                    onClick={saveProfile}
+                    disabled={profileSaving}
+                    style={{ ...accentBtnStyle, opacity: profileSaving ? 0.6 : 1, cursor: profileSaving ? 'not-allowed' : 'pointer' }}
+                  >
+                    {profileSaving ? 'Saving…' : 'Save Changes'}
+                  </button>
+                </>
+              )}
             </div>
           )}
 
@@ -291,25 +404,43 @@ export default function SettingsPage() {
               <div style={sectionTitleStyle}>Organization</div>
               <div style={sectionSubStyle}>Configure your organization details</div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 400 }}>
-                <div>
-                  <label style={labelStyle}>Organization Name</label>
-                  <input defaultValue="PhilanthropyAI Foundation" style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Industry</label>
-                  <select defaultValue="nonprofit" style={{ ...inputStyle, cursor: 'pointer' }}>
-                    <option value="nonprofit">Non-Profit / NGO</option>
-                    <option value="foundation">Foundation</option>
-                    <option value="csr">Corporate CSR</option>
-                    <option value="government">Government</option>
-                    <option value="education">Education</option>
-                    <option value="healthcare">Healthcare</option>
-                  </select>
-                </div>
-              </div>
+              {orgLoading ? (
+                <div style={{ padding: 20, fontSize: 12, color: 'var(--txt3)' }}>Loading…</div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 400 }}>
+                    <div>
+                      <label style={labelStyle}>Organization Name</label>
+                      <input value={orgName} onChange={e => setOrgName(e.target.value)} style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Industry</label>
+                      <select value={orgIndustry} onChange={e => setOrgIndustry(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                        <option value="general">General</option>
+                        <option value="nonprofit">Non-Profit / NGO</option>
+                        <option value="foundation">Foundation</option>
+                        <option value="csr">Corporate CSR</option>
+                        <option value="government">Government</option>
+                        <option value="education">Education</option>
+                        <option value="healthcare">Healthcare</option>
+                        <option value="realestate">Real Estate</option>
+                        <option value="hospitality">Hospitality</option>
+                      </select>
+                    </div>
+                  </div>
 
-              <button style={{ ...accentBtnStyle, marginTop: 18 }}>Save Changes</button>
+                  <button
+                    onClick={saveOrg}
+                    disabled={orgSaving}
+                    style={{ ...accentBtnStyle, marginTop: 18, opacity: orgSaving ? 0.6 : 1, cursor: orgSaving ? 'not-allowed' : 'pointer' }}
+                  >
+                    {orgSaving ? 'Saving…' : 'Save Changes'}
+                  </button>
+                  <div style={{ marginTop: 8, fontSize: 11, color: 'var(--txt3)' }}>
+                    Only administrators can update organization details.
+                  </div>
+                </>
+              )}
             </div>
           )}
 
@@ -510,7 +641,8 @@ export default function SettingsPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {goalDefs.map(g => {
                   const target = getTarget(g.key, g.defaultTarget)
-                  const pct = target > 0 ? Math.min((g.demoValue / target) * 100, 100) : 0
+                  const currentValue = Number(kpi.getKpiValue(g.key, g.demoValue))
+                  const pct = target > 0 ? Math.min((currentValue / target) * 100, 100) : 0
 
                   return (
                     <div key={g.key} style={{
@@ -520,7 +652,7 @@ export default function SettingsPage() {
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                         <div style={{ fontSize: 13, fontWeight: 600 }}>{g.label}</div>
                         <div style={{ fontSize: 11, color: 'var(--txt3)' }}>
-                          {g.unit === '\u20AC' && '\u20AC'}{g.demoValue}{g.unit === '%' && '%'}{g.unit === '/5' && '/5'}{g.unit === 'kg' && ' kg'}
+                          {g.unit === '\u20AC' && '\u20AC'}{currentValue}{g.unit === '%' && '%'}{g.unit === '/5' && '/5'}{g.unit === 'kg' && ' kg'}
                           {' / '}
                           {g.unit === '\u20AC' && '\u20AC'}{target}{g.unit === '%' && '%'}{g.unit === '/5' && '/5'}{g.unit === 'kg' && ' kg'}
                         </div>
@@ -544,9 +676,10 @@ export default function SettingsPage() {
                         <div style={{ flex: 1 }}>
                           <label style={{ ...labelStyle, marginBottom: 3 }}>Current</label>
                           <input
-                            readOnly
-                            value={g.demoValue}
-                            style={{ ...inputStyle, color: 'var(--txt3)', cursor: 'default' }}
+                            type="number"
+                            value={currentValue}
+                            onChange={e => kpi.setKpiValue(g.key, Number(e.target.value))}
+                            style={inputStyle}
                           />
                         </div>
                         <div style={{ flex: 1 }}>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { useIndustry } from '@/hooks/useIndustry'
@@ -8,12 +9,12 @@ import { useKpiStore } from '@/hooks/useKpiStore'
 import { useTheme } from '@/hooks/useTheme'
 import { useDashboardLayout } from '@/hooks/useDashboardLayout'
 import { CSR_WIDGETS, RE_WIDGETS, HOS_WIDGETS } from '@/lib/dashboard-layout'
-import type { WidgetId } from '@/lib/dashboard-layout'
 import { KpiDetailDrawer } from '@/components/dashboard/KpiDetailDrawer'
 import { AlertsCard } from '@/components/dashboard/AlertsCard'
 import { FunnelCard } from '@/components/dashboard/FunnelCard'
 import { GoalsCard } from '@/components/dashboard/GoalsCard'
 import { ForecastCard } from '@/components/dashboard/ForecastCard'
+import { InsightsCard } from '@/components/ai/InsightsCard'
 import { LeadSourceCard } from '@/components/dashboard/LeadSourceCard'
 import { AddLeadModal } from '@/components/dashboard/AddLeadModal'
 import {
@@ -25,8 +26,8 @@ import {
 import type { JourneyPeriod } from '@/components/dashboard/JourneyBar'
 import {
   FolderKanban, Leaf, Globe2, ArrowRight, Clock,
-  Building2, Euro, TrendingUp, Home, Key, Calendar,
-  Users, MapPin, Star, BedDouble, UtensilsCrossed, Coffee,
+  Building2, Euro, TrendingUp, Home, Calendar,
+  Users, Star, BedDouble, UtensilsCrossed,
 } from 'lucide-react'
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -190,6 +191,7 @@ const statusColors: Record<string, { bg: string; txt: string; border: string }> 
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const { industry, config } = useIndustry()
   const kpiStore = useKpiStore(industry)
   const { theme } = useTheme()
@@ -214,7 +216,21 @@ export default function DashboardPage() {
        industry === 'realestate' ? <RealEstateDashboard {...shared} /> :
        <CSRDashboard {...shared} />}
       <KpiDetailDrawer detail={kpiDetail} onClose={() => setKpiDetail(null)} />
-      <AddLeadModal open={addLeadOpen} onClose={() => setAddLeadOpen(false)} industry={industry} />
+      <AddLeadModal
+        open={addLeadOpen}
+        onClose={() => setAddLeadOpen(false)}
+        industry={industry}
+        onAdd={async (data) => {
+          if (data.csv) return  // CSV import not yet wired to API
+          try {
+            await fetch('/api/contacts', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data),
+            })
+          } catch { /* handled by modal */ }
+        }}
+      />
     </>
   )
 }
@@ -236,8 +252,8 @@ type KpiStore = ReturnType<typeof useKpiStore>
 // ══════════════════════════════════════════
 // HOSPITALITY DASHBOARD
 // ══════════════════════════════════════════
-function HospitalityDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
-  const totalRevenue = HOS_MONTHLY.reduce((s, m) => s + m.roomRevenue + m.fnbRevenue, 0)
+function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
+  const router = useRouter()
 
   return (
     <>
@@ -363,9 +379,10 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, openKpiDetail, jo
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>Rooms & Venues</div>
               </div>
-              <button style={{
+              <button onClick={() => router.push('/rooms')} style={{
                 fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none',
                 cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4,
+                fontFamily: 'inherit',
               }}>
                 View All <ArrowRight size={12} />
               </button>
@@ -374,7 +391,7 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, openKpiDetail, jo
               {HOS_ROOMS.map(p => {
                 const sc = hosStatusColors[p.status] || hosStatusColors.available
                 return (
-                  <div key={p.id} className="card-hover" style={{
+                  <div key={p.id} className="card-hover" onClick={() => router.push('/rooms')} style={{
                     padding: '12px 14px', borderRadius: 10,
                     border: '1px solid var(--border)', background: 'var(--panel2)',
                     display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
@@ -563,6 +580,11 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, openKpiDetail, jo
           <ForecastCard industry={industry} themeKey={themeKey} />
           <LeadSourceCard industry={industry} themeKey={themeKey} />
         </div>
+
+        {/* AI Insights row */}
+        <div style={{ marginTop: 14 }}>
+          <InsightsCard limit={5} />
+        </div>
       </div>
     </>
   )
@@ -572,6 +594,7 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, openKpiDetail, jo
 // REAL ESTATE DASHBOARD
 // ══════════════════════════════════════════
 function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
+  const router = useRouter()
   const [pipelineMode, setPipelineMode] = useState<'sales' | 'rental'>('sales')
   const totalRevenue = RE_MONTHLY.reduce((s, m) => s + m.revenue, 0)
   const totalClosed = RE_MONTHLY.reduce((s, m) => s + m.closed, 0)
@@ -610,12 +633,79 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
 
         {/* KPIs */}
         <div className="kpi-grid-6" style={{ marginBottom: 18 }}>
-          <KpiCard label="Active Listings" value={kpi.getKpiValue('listings', activeListings)} delta="+3 this month" deltaDir="up" icon="folder" accentColor="var(--b)" delay={80} editable onValueChange={v => kpi.setKpiValue('listings', v)} goalCurrent={activeListings} goalTarget={kpi.getGoal('listings_added')?.target ?? 10} sparkData={[5, 4, 6, 5, 7, 4, 3]} />
-          <KpiCard label="Deals Closed" value={kpi.getKpiValue('closed', totalClosed)} delta="YTD total" deltaDir="up" icon="target" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('closed', v)} goalCurrent={totalClosed} goalTarget={kpi.getGoal('deals_closed')?.target ?? 50} sparkData={[3, 5, 4, 6, 5, 7, 6]} />
-          <KpiCard label="Commission" value={kpi.getKpiValue('commission', `€${(totalRevenue / 1000).toFixed(0)}K`)} delta="+15.8% vs last quarter" deltaDir="up" icon="dollar-sign" hot delay={180} editable onValueChange={v => kpi.setKpiValue('commission', v)} sparkData={[28, 35, 42, 38, 52, 48, 55]} />
-          <KpiCard label="Avg Days on Market" value={kpi.getKpiValue('dom', avgDaysOnMarket)} delta={avgDaysOnMarket < 30 ? 'Below average' : 'Above average'} deltaDir={avgDaysOnMarket < 30 ? 'up' : 'down'} icon="calendar" accentColor="var(--y)" delay={230} editable onValueChange={v => kpi.setKpiValue('dom', v)} sparkData={[32, 28, 25, 30, 22, 26, 23]} />
-          <KpiCard label="Total Viewings" value={kpi.getKpiValue('viewings', '82')} delta="+24% this month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={280} editable onValueChange={v => kpi.setKpiValue('viewings', v)} goalCurrent={82} goalTarget={kpi.getGoal('viewings_booked')?.target ?? 100} sparkData={[12, 18, 15, 22, 19, 25, 20]} />
-          <KpiCard label="Active Rentals" value={kpi.getKpiValue('rentals', '14')} delta="Ongoing leases" deltaDir="neu" icon="home" accentColor="var(--p)" delay={330} editable onValueChange={v => kpi.setKpiValue('rentals', v)} sparkData={[10, 11, 12, 11, 13, 14, 14]} />
+          <KpiCard label="Active Listings" value={kpi.getKpiValue('listings', activeListings)} delta="+3 this month" deltaDir="up" icon="folder" accentColor="var(--b)" delay={80} editable onValueChange={v => kpi.setKpiValue('listings', v)} goalCurrent={activeListings} goalTarget={kpi.getGoal('listings_added')?.target ?? 10} sparkData={[5, 4, 6, 5, 7, 4, 3]} onOpenDetail={() => openKpiDetail({
+            title: 'Active Listings',
+            subtitle: `${activeListings} currently on the market`,
+            metrics: [
+              { label: 'New this month', value: '+3', deltaDir: 'up', delta: 'vs last month' },
+              { label: 'Avg List Price', value: '€485K' },
+              { label: 'Pending', value: '2' },
+              { label: 'Expired', value: '1' },
+            ],
+            breakdown: [
+              { label: 'Residential', value: 2, pct: 67, color: 'var(--b)' },
+              { label: 'Commercial', value: 1, pct: 33, color: 'var(--accent)' },
+            ],
+            suggestions: [
+              'Consider price adjustment on listings > 60 days on market',
+              'Schedule open houses for new listings within first 14 days',
+            ],
+          })} />
+          <KpiCard label="Deals Closed" value={kpi.getKpiValue('closed', totalClosed)} delta="YTD total" deltaDir="up" icon="target" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('closed', v)} goalCurrent={totalClosed} goalTarget={kpi.getGoal('deals_closed')?.target ?? 50} sparkData={[3, 5, 4, 6, 5, 7, 6]} onOpenDetail={() => openKpiDetail({
+            title: 'Deals Closed',
+            subtitle: `${totalClosed} total closed YTD`,
+            metrics: [
+              { label: 'This Quarter', value: '12', deltaDir: 'up', delta: '+15.8%' },
+              { label: 'Win Rate', value: '68%' },
+              { label: 'Avg Deal Size', value: '€312K' },
+              { label: 'Avg Close Time', value: '42d' },
+            ],
+            suggestions: [
+              'You are 66% to annual goal — stay focused on mid-funnel',
+              'Top source: referrals (42% of closes)',
+            ],
+          })} />
+          <KpiCard label="Commission" value={kpi.getKpiValue('commission', `€${(totalRevenue / 1000).toFixed(0)}K`)} delta="+15.8% vs last quarter" deltaDir="up" icon="dollar-sign" hot delay={180} editable onValueChange={v => kpi.setKpiValue('commission', v)} sparkData={[28, 35, 42, 38, 52, 48, 55]} onOpenDetail={() => openKpiDetail({
+            title: 'Commission',
+            subtitle: `€${(totalRevenue / 1000).toFixed(0)}K earned YTD`,
+            metrics: [
+              { label: 'Q1', value: '€85K' },
+              { label: 'Q2', value: '€118K', deltaDir: 'up', delta: '+39%' },
+              { label: 'Avg per Deal', value: '€11.5K' },
+              { label: 'Pipeline', value: '€142K' },
+            ],
+          })} />
+          <KpiCard label="Avg Days on Market" value={kpi.getKpiValue('dom', avgDaysOnMarket)} delta={avgDaysOnMarket < 30 ? 'Below average' : 'Above average'} deltaDir={avgDaysOnMarket < 30 ? 'up' : 'down'} icon="calendar" accentColor="var(--y)" delay={230} editable onValueChange={v => kpi.setKpiValue('dom', v)} sparkData={[32, 28, 25, 30, 22, 26, 23]} onOpenDetail={() => openKpiDetail({
+            title: 'Avg Days on Market',
+            subtitle: `${avgDaysOnMarket} days — ${avgDaysOnMarket < 30 ? 'Below' : 'Above'} market average`,
+            metrics: [
+              { label: 'Fastest Sale', value: '8d', deltaDir: 'up' },
+              { label: 'Slowest', value: '89d', deltaDir: 'down' },
+              { label: 'Market Avg', value: '32d' },
+              { label: 'Your Avg', value: `${avgDaysOnMarket}d` },
+            ],
+          })} />
+          <KpiCard label="Total Viewings" value={kpi.getKpiValue('viewings', '82')} delta="+24% this month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={280} editable onValueChange={v => kpi.setKpiValue('viewings', v)} goalCurrent={82} goalTarget={kpi.getGoal('viewings_booked')?.target ?? 100} sparkData={[12, 18, 15, 22, 19, 25, 20]} onOpenDetail={() => openKpiDetail({
+            title: 'Total Viewings',
+            subtitle: '82 viewings booked this month',
+            metrics: [
+              { label: 'Booked', value: '82', deltaDir: 'up', delta: '+24%' },
+              { label: 'Completed', value: '71' },
+              { label: 'No-Shows', value: '5' },
+              { label: 'Conv. to Offer', value: '18%' },
+            ],
+            suggestions: ['Follow up with no-shows within 24h', 'Open houses drive 3.2x more viewings than private'],
+          })} />
+          <KpiCard label="Active Rentals" value={kpi.getKpiValue('rentals', '14')} delta="Ongoing leases" deltaDir="neu" icon="home" accentColor="var(--p)" delay={330} editable onValueChange={v => kpi.setKpiValue('rentals', v)} sparkData={[10, 11, 12, 11, 13, 14, 14]} onOpenDetail={() => openKpiDetail({
+            title: 'Active Rentals',
+            subtitle: '14 ongoing lease agreements',
+            metrics: [
+              { label: 'Monthly Income', value: '€23.8K' },
+              { label: 'Occupancy', value: '93%' },
+              { label: 'Renewals Due', value: '3' },
+              { label: 'Vacant', value: '1' },
+            ],
+          })} />
         </div>
 
         {/* Revenue + Listings Chart */}
@@ -713,9 +803,10 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>Properties</div>
               </div>
-              <button style={{
+              <button onClick={() => router.push('/properties')} style={{
                 fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none',
                 cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4,
+                fontFamily: 'inherit',
               }}>
                 View All <ArrowRight size={12} />
               </button>
@@ -724,7 +815,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
               {RE_PROPERTIES.map(p => {
                 const sc = statusColors[p.status] || statusColors.active
                 return (
-                  <div key={p.id} className="card-hover" style={{
+                  <div key={p.id} className="card-hover" onClick={() => router.push('/properties')} style={{
                     padding: '12px 14px', borderRadius: 10,
                     border: '1px solid var(--border)', background: 'var(--panel2)',
                     display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
@@ -967,7 +1058,8 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
 // ══════════════════════════════════════════
 // CSR / PHILANTHROPY DASHBOARD (original)
 // ══════════════════════════════════════════
-function CSRDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
+function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
+  const router = useRouter()
   return (
     <>
       <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Contact" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
@@ -1061,12 +1153,12 @@ function CSRDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPer
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>Projects</div>
               </div>
-              <button style={{ fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>View All <ArrowRight size={12} /></button>
+              <button onClick={() => router.push('/projects')} style={{ fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'inherit' }}>View All <ArrowRight size={12} /></button>
             </div>
             {CSR_PROJECTS.map(p => {
               const sc = statusColors[p.status] || statusColors.planned
               return (
-                <div key={p.id} className="card-hover" style={{
+                <div key={p.id} className="card-hover" onClick={() => router.push('/projects')} style={{
                   padding: '12px 14px', borderRadius: 10, marginBottom: 8,
                   border: '1px solid var(--border)', background: 'var(--panel2)',
                   display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',

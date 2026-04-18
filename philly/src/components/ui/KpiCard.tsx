@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useRef } from 'react'
 import {
-  Users, TrendingDown, TrendingUp, MessageCircle, Calendar,
+  Users, TrendingDown, TrendingUp, MessageCircle, MessageSquare, Calendar,
   Zap, Euro, Target, Leaf, Globe2, HeartHandshake,
   TreePine, Droplets, BarChart3, FolderKanban, Award,
-  Pencil, Check, X,
+  Pencil, Check, X, Mail, CheckCircle2, Inbox as InboxIcon, Clock, Plug, Phone,
 } from 'lucide-react'
 import { LineChart, Line, ResponsiveContainer } from 'recharts'
 
@@ -27,6 +27,13 @@ const iconMap: Record<string, React.ComponentType<{ size?: number; color?: strin
   'chart': BarChart3,
   'folder': FolderKanban,
   'award': Award,
+  'mail': Mail,
+  'message-square': MessageSquare,
+  'check-circle': CheckCircle2,
+  'inbox': InboxIcon,
+  'clock': Clock,
+  'plug': Plug,
+  'phone': Phone,
 }
 
 interface KpiCardProps {
@@ -43,13 +50,14 @@ interface KpiCardProps {
   delay?: number
   editable?: boolean
   onValueChange?: (newValue: string) => void
+  onOpenDetail?: () => void
   sparkData?: number[]
 }
 
 export function KpiCard({
   label, value, delta, deltaDir = 'neu', goal, goalCurrent, goalTarget,
   hot, accentColor = 'var(--accent)', icon, delay = 0,
-  editable = false, onValueChange, sparkData,
+  editable = false, onValueChange, onOpenDetail, sparkData,
 }: KpiCardProps) {
   const [visible, setVisible] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -93,13 +101,17 @@ export function KpiCard({
   const hasGoalProgress = goalCurrent !== undefined && goalTarget !== undefined && goalTarget > 0
   const goalPct = hasGoalProgress ? Math.min(100, Math.round((goalCurrent / goalTarget) * 100)) : 0
 
+  const clickable = Boolean(onOpenDetail) && !editing
+
   return (
     <div
+      onClick={clickable ? () => onOpenDetail?.() : undefined}
       style={{
         background: hot ? 'var(--g-bg)' : 'var(--panel)',
         border: `1px solid ${hot ? 'var(--g-border)' : 'var(--border)'}`,
         borderRadius: 12, padding: '14px 15px',
-        position: 'relative', overflow: 'hidden', cursor: editable ? 'pointer' : 'default',
+        position: 'relative', overflow: 'hidden',
+        cursor: clickable ? 'pointer' : (editable ? 'default' : 'default'),
         boxShadow: 'var(--shadow-sm)',
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(12px)',
@@ -207,8 +219,8 @@ export function KpiCard({
         </div>
       )}
 
-      {/* Sparkline mini-chart */}
-      {sparkData && sparkData.length > 0 && (
+      {/* Sparkline mini-chart — needs >=2 points to render a line */}
+      {sparkData && sparkData.length >= 2 && (
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 30, opacity: 0.6, borderRadius: '0 0 12px 12px', overflow: 'hidden' }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={sparkData.map((v, i) => ({ v, i }))}>

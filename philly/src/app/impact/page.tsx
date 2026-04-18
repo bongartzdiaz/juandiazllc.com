@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, Fragment } from 'react'
+import { Fragment } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/layout/Topbar'
 import { KpiCard } from '@/components/ui/KpiCard'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
@@ -133,6 +134,7 @@ const HOS_TREND_DATA = [
 /* ── Component ── */
 
 export default function ImpactPage() {
+  const t = useTranslations('impact')
   const { industry } = useIndustry()
   const isRE = industry === 'realestate'
   const isHOS = industry === 'hospitality'
@@ -445,7 +447,7 @@ export default function ImpactPage() {
 
   return (
     <>
-      <Topbar title="Impact" sub="Measure what matters" />
+      <Topbar title={t('title')} sub={t('subtitle')} />
 
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPIs */}
