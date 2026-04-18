@@ -12,6 +12,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "", priority: 1.0, change: "weekly" },
     { path: "/story", priority: 0.85, change: "monthly" },
     { path: "/about", priority: 0.85, change: "monthly" },
+    { path: "/now", priority: 0.7, change: "monthly" },
+    { path: "/uses", priority: 0.65, change: "monthly" },
     { path: "/work", priority: 0.85, change: "weekly" },
     { path: "/sectors", priority: 0.8, change: "monthly" },
     { path: "/signals", priority: 0.8, change: "weekly" },

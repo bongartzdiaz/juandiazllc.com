@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getAllInsights } from "@/lib/insights";
 import { InsightsList } from "@/components/InsightsList";
+import { NewsletterForm } from "@/components/NewsletterForm";
 
 // /insights — long-form writing. Primary SEO surface after the home
 // page: each post is a standalone URL with its own Article schema,
@@ -45,6 +46,10 @@ export default function InsightsIndex() {
         }}
       >
         <InsightsList posts={posts} />
+
+        <div style={{ marginTop: 72 }}>
+          <NewsletterForm source="insights_index" />
+        </div>
       </section>
     </>
   );

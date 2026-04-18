@@ -14,6 +14,8 @@ export function Footer() {
       <nav aria-label="Footer" style={{ display: "flex", gap: 22, flexWrap: "wrap" }}>
         <Link href="/story">{t("nav.story")}</Link>
         <Link href="/about">About</Link>
+        <Link href="/now">Now</Link>
+        <Link href="/uses">Uses</Link>
         <Link href="/work">{t("nav.work")}</Link>
         <Link href="/insights">{t("nav.insights")}</Link>
         <Link href="/signals">{t("nav.signals")}</Link>
