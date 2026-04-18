@@ -1,0 +1,94 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "contacts": "Contacts",
+    "impact": "Impact",
+    "reports": "Reports",
+    "kanban": "Kanban",
+    "pages": "Pages",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Your impact at a glance",
+    "totalProjects": "Total Projects",
+    "activeProjects": "Active Projects",
+    "peopleHelped": "People Helped",
+    "co2Reduced": "CO2 Reduced",
+    "moneyDonated": "Total Donated",
+    "sdgCoverage": "SDG Coverage",
+    "recentActivity": "Recent Activity",
+    "impactOverview": "Impact Overview",
+    "editDashboard": "Edit Dashboard",
+    "addWidget": "Add Widget"
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Manage your CSR initiatives",
+    "newProject": "New Project",
+    "status": {
+      "planned": "Planned",
+      "active": "Active",
+      "completed": "Completed",
+      "paused": "Paused"
+    },
+    "fields": {
+      "title": "Project Title",
+      "description": "Description",
+      "category": "Category",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "budget": "Budget",
+      "sdgGoals": "SDG Goals",
+      "status": "Status"
+    }
+  },
+  "contacts": {
+    "title": "Contacts",
+    "subtitle": "Partners, donors & stakeholders",
+    "newContact": "New Contact",
+    "types": {
+      "partner": "Partner",
+      "beneficiary": "Beneficiary",
+      "stakeholder": "Stakeholder",
+      "donor": "Donor"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "company": "Company",
+      "type": "Type",
+      "notes": "Notes"
+    }
+  },
+  "impact": {
+    "title": "Impact",
+    "subtitle": "Measure what matters",
+    "totalImpact": "Total Impact",
+    "byProject": "By Project",
+    "sdgAlignment": "SDG Alignment",
+    "trends": "Trends"
+  },
+  "kanban": {
+    "title": "Kanban",
+    "subtitle": "Visual project management",
+    "newBoard": "New Board",
+    "addColumn": "Add Column",
+    "addCard": "Add Card"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search...",
+    "filter": "Filter",
+    "noResults": "No results found",
+    "loading": "Loading...",
+    "viewAll": "View All",
+    "back": "Back"
+  }
+}
