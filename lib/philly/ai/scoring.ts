@@ -200,7 +200,7 @@ export async function generateLeadScores(organizationId: string, limit = 500): P
     }
   }
 
-  const contactIds = contacts.map(c => c.id)
+  const contactIds = contacts.map((c: any) => c.id)
 
   /* Batch-fetch engagement signals */
   const [activities7d, activities30d, activities90d, notes, showings, deals] = await Promise.all([
@@ -234,10 +234,10 @@ export async function generateLeadScores(organizationId: string, limit = 500): P
     }).catch(() => [] as Array<{ contactId: string | null; status: string }>),
   ])
 
-  const a7 = new Map(activities7d.map(x => [x.contactId ?? '', (x as { _count: number })._count]))
-  const a30 = new Map(activities30d.map(x => [x.contactId ?? '', (x as { _count: number })._count]))
-  const a90 = new Map(activities90d.map(x => [x.contactId ?? '', (x as { _count: number })._count]))
-  const n = new Map(notes.map(x => [x.contactId, (x as { _count: number })._count]))
+  const a7 = new Map<string, number>(activities7d.map((x: { contactId: string | null; _count: number }) => [x.contactId ?? '', (x as { _count: number })._count]))
+  const a30 = new Map<string, number>(activities30d.map((x: { contactId: string | null; _count: number }) => [x.contactId ?? '', (x as { _count: number })._count]))
+  const a90 = new Map<string, number>(activities90d.map((x: { contactId: string | null; _count: number }) => [x.contactId ?? '', (x as { _count: number })._count]))
+  const n = new Map<string, number>(notes.map((x: { contactId: string; _count: number }) => [x.contactId, (x as { _count: number })._count]))
 
   const showingsByContact = new Map<string, { attended: number; missed: number; withFeedback: number }>()
   for (const s of showings) {
@@ -258,7 +258,7 @@ export async function generateLeadScores(organizationId: string, limit = 500): P
     dealsByContact.set(d.contactId, rec)
   }
 
-  const scores: LeadScore[] = contacts.map(c => {
+  const scores: LeadScore[] = contacts.map((c: any) => {
     const showingStats = showingsByContact.get(c.id) ?? { attended: 0, missed: 0, withFeedback: 0 }
     const dealStats = dealsByContact.get(c.id) ?? { open: 0, won: 0 }
     return scoreContact({

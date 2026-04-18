@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   ])
 
   // Mask secrets
-  const masked = webhooks.map(w => ({ ...w, secret: w.secret.slice(0, 8) + '...' }))
+  const masked = webhooks.map((w: any) => ({ ...w, secret: w.secret.slice(0, 8) + '...' }))
   return paginatedResponse(masked, total, { page, limit, skip })
 }
 

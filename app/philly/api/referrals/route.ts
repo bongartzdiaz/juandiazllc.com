@@ -32,15 +32,15 @@ export async function GET(req: NextRequest) {
   ])
 
   // Manual contact join
-  const ids = Array.from(new Set(referrals.flatMap(r => [r.referrerId, r.referredId]).filter(Boolean)))
+  const ids = Array.from(new Set(referrals.flatMap((r: any) => [r.referrerId, r.referredId]).filter(Boolean)))
   const contacts = ids.length > 0
     ? await prisma.contact.findMany({
         where: { id: { in: ids }, organizationId: scope.organizationId },
         select: { id: true, name: true },
       })
     : []
-  const byId = new Map(contacts.map(c => [c.id, c]))
-  const enriched = referrals.map(r => ({
+  const byId = new Map(contacts.map((c: any) => [c.id, c]))
+  const enriched = referrals.map((r: any) => ({
     ...r,
     referrer: byId.get(r.referrerId) ?? null,
     referred: byId.get(r.referredId) ?? null,

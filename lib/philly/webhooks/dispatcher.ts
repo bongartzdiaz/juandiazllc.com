@@ -80,7 +80,7 @@ export async function dispatchWebhookEvent(
       timestamp: new Date().toISOString(),
     })
 
-    await Promise.all(webhooks.map(async wh => {
+    await Promise.all(webhooks.map(async (wh: any) => {
       let events: string[] = []
       try { events = JSON.parse(wh.events || '[]') } catch {}
       if (!events.includes('*') && !events.includes(event)) return

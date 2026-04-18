@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     where: { id: { in: body.ids }, organizationId: scope.organizationId },
     select: { id: true },
   })
-  const ownedIds = owned.map(c => c.id)
+  const ownedIds = owned.map((c: any) => c.id)
 
   if (body.action === 'delete') {
     const result = await prisma.contact.deleteMany({

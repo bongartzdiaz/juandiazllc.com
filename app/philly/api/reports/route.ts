@@ -80,7 +80,7 @@ async function generateReport(reportId: string, orgId: string, type: string) {
       html += `<h1>${type === 'quarterly' ? 'Quarterly' : 'Impact'} Report</h1>`
       html += `<p>Generated: ${new Date().toLocaleDateString()}</p>`
       html += `<h2>Projects Overview</h2>`
-      html += `<p>Total: ${projects.length} | Active: ${projects.filter(p => p.status === 'active').length} | Completed: ${projects.filter(p => p.status === 'completed').length}</p>`
+      html += `<p>Total: ${projects.length} | Active: ${projects.filter((p: any) => p.status === 'active').length} | Completed: ${projects.filter((p: any) => p.status === 'completed').length}</p>`
       html += `<h2>Impact Totals</h2><table border="1" cellpadding="8" style="border-collapse: collapse;">`
       html += `<tr><th>Metric</th><th>Total</th></tr>`
       for (const [k, v] of Object.entries(totals)) {
@@ -93,8 +93,8 @@ async function generateReport(reportId: string, orgId: string, type: string) {
         select: { title: true, budgetCents: true, spentCents: true, status: true },
       })
 
-      const totalBudget = projects.reduce((s, p) => s + p.budgetCents, 0)
-      const totalSpent = projects.reduce((s, p) => s + p.spentCents, 0)
+      const totalBudget = projects.reduce((s: any, p: any) => s + p.budgetCents, 0)
+      const totalSpent = projects.reduce((s: any, p: any) => s + p.spentCents, 0)
 
       html += `<h1>Financial Report</h1>`
       html += `<p>Total Budget: $${(totalBudget / 100).toLocaleString()} | Total Spent: $${(totalSpent / 100).toLocaleString()} | Utilization: ${totalBudget ? Math.round((totalSpent / totalBudget) * 100) : 0}%</p>`

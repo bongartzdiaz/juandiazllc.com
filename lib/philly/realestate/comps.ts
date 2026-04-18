@@ -76,7 +76,7 @@ export async function valuateProperty(organizationId: string, subjectId: string)
     take: 50,
   })
 
-  const ranked: CompResult[] = candidates.map(c => ({
+  const ranked: CompResult[] = candidates.map((c: any) => ({
     id: c.id,
     title: c.title,
     address: c.address,
@@ -91,7 +91,7 @@ export async function valuateProperty(organizationId: string, subjectId: string)
       { bedrooms: c.bedrooms, bathrooms: c.bathrooms, sqft: c.sqft },
     ),
     status: c.status,
-  })).sort((a, b) => b.similarity - a.similarity).slice(0, 10)
+  })).sort((a: any, b: any) => b.similarity - a.similarity).slice(0, 10)
 
   const compsWithPpsqft = ranked.filter(c => c.pricePerSqftCents != null)
 

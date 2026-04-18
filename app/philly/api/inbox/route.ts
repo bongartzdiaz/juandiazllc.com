@@ -39,16 +39,16 @@ export async function GET(req: NextRequest) {
   ])
 
   // Batch-load contacts (no relation in schema — manual join)
-  const contactIds = Array.from(new Set(conversations.map(c => c.contactId).filter(Boolean)))
+  const contactIds = Array.from(new Set(conversations.map((c: any) => c.contactId).filter(Boolean)))
   const contacts = contactIds.length > 0
     ? await prisma.contact.findMany({
         where: { id: { in: contactIds }, organizationId: scope.organizationId },
         select: { id: true, name: true, email: true, phone: true },
       })
     : []
-  const contactById = new Map(contacts.map(c => [c.id, c]))
+  const contactById = new Map(contacts.map((c: any) => [c.id, c]))
 
-  const enriched = conversations.map(c => ({
+  const enriched = conversations.map((c: any) => ({
     ...c,
     contact: contactById.get(c.contactId) ?? null,
   }))

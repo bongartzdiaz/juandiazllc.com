@@ -24,7 +24,7 @@ export async function GET() {
   const yearStart = new Date(now.getFullYear(), 0, 1)
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
 
-  const leaderboard = await Promise.all(agents.map(async (agent) => {
+  const leaderboard = await Promise.all(agents.map(async (agent: any) => {
     const [totalDeals, wonDeals, monthDeals, totalVolume, commissions] = await Promise.all([
       prisma.deal.count({ where: { ownerId: agent.id, pipeline: { organizationId: scope.organizationId } } }),
       prisma.deal.count({ where: { ownerId: agent.id, status: 'won', pipeline: { organizationId: scope.organizationId } } }),
@@ -51,7 +51,7 @@ export async function GET() {
   }))
 
   // Sort by YTD commission descending
-  leaderboard.sort((a, b) => b.ytdCommissionCents - a.ytdCommissionCents)
+  leaderboard.sort((a: any, b: any) => b.ytdCommissionCents - a.ytdCommissionCents)
 
   return NextResponse.json({ data: leaderboard })
 }

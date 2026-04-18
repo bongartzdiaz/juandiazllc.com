@@ -124,7 +124,7 @@ export async function generateDonorScores(organizationId: string): Promise<Donor
     where: { id: { in: ids } },
     select: { id: true, name: true },
   })
-  const nameMap = new Map(contacts.map(c => [c.id, c.name]))
+  const nameMap = new Map<string, string | null>(contacts.map((c: { id: string; name: string | null }) => [c.id, c.name]))
 
   // Build sorted arrays for quintile calculation
   const now = Date.now()

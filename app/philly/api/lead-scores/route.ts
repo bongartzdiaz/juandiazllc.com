@@ -40,15 +40,15 @@ export async function GET(req: NextRequest) {
   ])
 
   // Manual contact join
-  const contactIds = Array.from(new Set(scores.map(s => s.contactId).filter(Boolean)))
+  const contactIds = Array.from(new Set(scores.map((s: any) => s.contactId).filter(Boolean)))
   const contacts = contactIds.length > 0
     ? await prisma.contact.findMany({
         where: { id: { in: contactIds }, organizationId: scope.organizationId },
         select: { id: true, name: true, email: true },
       })
     : []
-  const byId = new Map(contacts.map(c => [c.id, c]))
-  const enriched = scores.map(s => ({ ...s, contact: byId.get(s.contactId) ?? null }))
+  const byId = new Map(contacts.map((c: any) => [c.id, c]))
+  const enriched = scores.map((s: any) => ({ ...s, contact: byId.get(s.contactId) ?? null }))
 
   return paginatedResponse(enriched, total, { page, limit, skip })
 }

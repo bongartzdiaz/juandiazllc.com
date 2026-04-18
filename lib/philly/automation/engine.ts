@@ -186,7 +186,7 @@ export async function evaluateRules(event: AutomationEvent): Promise<void> {
       where: { organizationId: event.organizationId, enabled: true },
     })
 
-    await Promise.all(rules.map(async rule => {
+    await Promise.all(rules.map(async (rule: any) => {
       let triggerCfg: TriggerConfig = {}
       let actionCfg: ActionConfig = {}
       try { triggerCfg = JSON.parse(rule.triggerConfig || '{}') } catch {}
