@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { SignOutButton } from "@/components/diaz/SignOutButton";
 import Link from "next/link";
+import { buildGreeting } from "@/lib/greeting";
 
 export const metadata: Metadata = { title: "Ops hub" };
 export const dynamic = "force-dynamic";
@@ -12,10 +13,11 @@ export default async function AppPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/diaz/login?next=/diaz/app");
 
-  const firstName =
-    user.user_metadata?.full_name?.split(" ")[0] ??
-    user.email?.split("@")[0] ??
-    "operator";
+  const { greeting, firstName } = buildGreeting({
+    fullName: user.user_metadata?.full_name,
+    email: user.email,
+    preferredLocale: user.user_metadata?.preferred_locale,
+  });
 
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "140px 32px 120px" }}>
@@ -39,7 +41,7 @@ export default async function AppPage() {
           lineHeight: 1,
         }}
       >
-        Welcome, <em>{firstName}</em>.
+        {greeting}, <em>{firstName}</em>.
       </h1>
       <p style={{ color: "var(--muted)", fontSize: 17, marginTop: 20, maxWidth: 640, lineHeight: 1.6 }}>
         Signed in as <b style={{ color: "var(--text)" }}>{user.email}</b>. Use this hub to jump

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { SignOutButton } from "@/components/SignOutButton";
 import { VENTURES } from "@/lib/ventures";
 import Link from "next/link";
+import { buildGreeting } from "@/lib/greeting";
 
 export const metadata: Metadata = {
   title: "Operator hub",
@@ -48,10 +49,11 @@ export default async function AppPage() {
   const leadCount = leadCountRes.count ?? 0;
   const recentLeads = (recentLeadsRes.data ?? []) as Lead[];
 
-  const firstName =
-    user.user_metadata?.full_name?.split(" ")[0] ??
-    user.email?.split("@")[0] ??
-    "operator";
+  const { greeting, firstName } = buildGreeting({
+    fullName: user.user_metadata?.full_name,
+    email: user.email,
+    preferredLocale: user.user_metadata?.preferred_locale,
+  });
 
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto", padding: "140px 32px 120px" }}>
@@ -77,7 +79,7 @@ export default async function AppPage() {
             lineHeight: 1,
           }}
         >
-          Welcome back, <em>{firstName}</em>.
+          {greeting}, <em>{firstName}</em>.
         </h1>
         <p
           style={{
