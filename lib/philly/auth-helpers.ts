@@ -65,6 +65,10 @@ async function resolvePhillyUser(email: string) {
       name: email.split('@')[0],
       role,
       organizationId: org.id,
+      // Legacy required field — auth now lives in Supabase, so this
+      // hash is intentionally never a valid bcrypt hash. No local
+      // credentials login path exists to check against it.
+      passwordHash: '__supabase_auth__',
     },
     select: { id: true, email: true, role: true, organizationId: true },
   })
