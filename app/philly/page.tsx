@@ -803,7 +803,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>Properties</div>
               </div>
-              <button onClick={() => router.push('/properties')} style={{
+              <button onClick={() => router.push('/philly/properties')} style={{
                 fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none',
                 cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4,
                 fontFamily: 'inherit',
@@ -815,7 +815,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
               {RE_PROPERTIES.map(p => {
                 const sc = statusColors[p.status] || statusColors.active
                 return (
-                  <div key={p.id} className="card-hover" onClick={() => router.push('/properties')} style={{
+                  <div key={p.id} className="card-hover" onClick={() => router.push('/philly/properties')} style={{
                     padding: '12px 14px', borderRadius: 10,
                     border: '1px solid var(--border)', background: 'var(--panel2)',
                     display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
@@ -1153,12 +1153,12 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>Projects</div>
               </div>
-              <button onClick={() => router.push('/projects')} style={{ fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'inherit' }}>View All <ArrowRight size={12} /></button>
+              <button onClick={() => router.push('/philly/projects')} style={{ fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'inherit' }}>View All <ArrowRight size={12} /></button>
             </div>
             {CSR_PROJECTS.map(p => {
               const sc = statusColors[p.status] || statusColors.planned
               return (
-                <div key={p.id} className="card-hover" onClick={() => router.push('/projects')} style={{
+                <div key={p.id} className="card-hover" onClick={() => router.push('/philly/projects')} style={{
                   padding: '12px 14px', borderRadius: 10, marginBottom: 8,
                   border: '1px solid var(--border)', background: 'var(--panel2)',
                   display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',

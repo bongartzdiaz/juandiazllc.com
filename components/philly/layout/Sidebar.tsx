@@ -46,65 +46,65 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
   const LogoIcon = INDUSTRY_ICONS[industry]
 
   const NAV_PRIMARY: NavItemDef[] = [
-    { icon: LayoutDashboard, label: t('dashboard'), href: '/' },
-    { icon: FolderKanban, label: t('projects'), href: '/projects' },
-    { icon: Users2, label: t('contacts'), href: '/contacts' },
-    { icon: BarChart3, label: industry === 'realestate' ? t('market') : t('impact'), href: '/impact' },
+    { icon: LayoutDashboard, label: t('dashboard'), href: '/philly' },
+    { icon: FolderKanban, label: t('projects'), href: '/philly/projects' },
+    { icon: Users2, label: t('contacts'), href: '/philly/contacts' },
+    { icon: BarChart3, label: industry === 'realestate' ? t('market') : t('impact'), href: '/philly/impact' },
   ]
 
   const NAV_TOOLS: NavItemDef[] = [
-    { icon: FileText, label: t('reports'), href: '/reports' },
-    { icon: Columns3, label: industry === 'realestate' ? t('dealsBoard') : industry === 'hospitality' ? t('reservations') : t('board'), href: '/kanban' },
-    { icon: DollarSign, label: t('deals'), href: '/deals' },
-    { icon: CalendarDays, label: t('calendar'), href: '/calendar' },
-    { icon: GanttChart, label: t('timeline'), href: '/timeline' },
-    { icon: FileArchive, label: t('documents'), href: '/documents' },
-    { icon: Inbox, label: t('inbox'), href: '/inbox' },
-    { icon: Mail, label: t('email'), href: '/email' },
-    { icon: MessageSquare, label: t('sms'), href: '/sms' },
-    { icon: FileCode, label: t('templates'), href: '/templates' },
-    { icon: Layers, label: t('pages'), href: '/pages' },
-    { icon: Sparkles, label: t('aiInsights'), href: '/ai', badgeNew: true },
+    { icon: FileText, label: t('reports'), href: '/philly/reports' },
+    { icon: Columns3, label: industry === 'realestate' ? t('dealsBoard') : industry === 'hospitality' ? t('reservations') : t('board'), href: '/philly/kanban' },
+    { icon: DollarSign, label: t('deals'), href: '/philly/deals' },
+    { icon: CalendarDays, label: t('calendar'), href: '/philly/calendar' },
+    { icon: GanttChart, label: t('timeline'), href: '/philly/timeline' },
+    { icon: FileArchive, label: t('documents'), href: '/philly/documents' },
+    { icon: Inbox, label: t('inbox'), href: '/philly/inbox' },
+    { icon: Mail, label: t('email'), href: '/philly/email' },
+    { icon: MessageSquare, label: t('sms'), href: '/philly/sms' },
+    { icon: FileCode, label: t('templates'), href: '/philly/templates' },
+    { icon: Layers, label: t('pages'), href: '/philly/pages' },
+    { icon: Sparkles, label: t('aiInsights'), href: '/philly/ai', badgeNew: true },
   ]
 
   // Industry-specific nav items
   const NAV_INDUSTRY: NavItemDef[] = industry === 'realestate'
     ? [
-        { icon: Home, label: t('properties'), href: '/properties' },
-        { icon: Eye, label: t('showings'), href: '/showings' },
-        { icon: HandCoins, label: t('offers'), href: '/offers' },
-        { icon: DoorOpen, label: t('openHouses'), href: '/open-houses' },
-        { icon: Trophy, label: t('commissions'), href: '/commissions' },
-        { icon: Mail, label: t('dripCampaigns'), href: '/drip-campaigns' },
-        { icon: TrendingUp, label: t('marketAnalytics'), href: '/market-analytics' },
-        { icon: ClipboardList, label: t('transactions'), href: '/transactions' },
-        { icon: ListChecks, label: t('actionPlans'), href: '/action-plans' },
-        { icon: Target, label: t('leadScores'), href: '/lead-scores' },
-        { icon: GitBranch, label: t('leadRouting'), href: '/lead-routing' },
-        { icon: Phone, label: t('dialer'), href: '/dialer' },
-        { icon: UserPlus, label: t('referrals'), href: '/referrals' },
+        { icon: Home, label: t('properties'), href: '/philly/properties' },
+        { icon: Eye, label: t('showings'), href: '/philly/showings' },
+        { icon: HandCoins, label: t('offers'), href: '/philly/offers' },
+        { icon: DoorOpen, label: t('openHouses'), href: '/philly/open-houses' },
+        { icon: Trophy, label: t('commissions'), href: '/philly/commissions' },
+        { icon: Mail, label: t('dripCampaigns'), href: '/philly/drip-campaigns' },
+        { icon: TrendingUp, label: t('marketAnalytics'), href: '/philly/market-analytics' },
+        { icon: ClipboardList, label: t('transactions'), href: '/philly/transactions' },
+        { icon: ListChecks, label: t('actionPlans'), href: '/philly/action-plans' },
+        { icon: Target, label: t('leadScores'), href: '/philly/lead-scores' },
+        { icon: GitBranch, label: t('leadRouting'), href: '/philly/lead-routing' },
+        { icon: Phone, label: t('dialer'), href: '/philly/dialer' },
+        { icon: UserPlus, label: t('referrals'), href: '/philly/referrals' },
         { icon: Network, label: t('soi'), href: '/soi' },
-        { icon: BarChart, label: t('cma'), href: '/cma' },
-        { icon: Globe, label: t('clientPortal'), href: '/client-portal' },
-        { icon: PenTool, label: t('eSignatures'), href: '/e-signatures' },
+        { icon: BarChart, label: t('cma'), href: '/philly/cma' },
+        { icon: Globe, label: t('clientPortal'), href: '/philly/client-portal' },
+        { icon: PenTool, label: t('eSignatures'), href: '/philly/e-signatures' },
       ]
     : industry === 'hospitality'
       ? [
           { icon: BedDouble, label: t('rooms'), href: '/rooms' },
         ]
       : [
-          { icon: Award, label: t('grants'), href: '/grants' },
+          { icon: Award, label: t('grants'), href: '/philly/grants' },
           { icon: HandCoins, label: t('donors'), href: '/philanthropy/donors' },
           { icon: Heart, label: t('volunteers'), href: '/volunteers' },
         ]
 
   const NAV_SYSTEM: NavItemDef[] = [
-    { icon: Bell, label: t('notifications'), href: '/notifications' },
-    { icon: Zap, label: t('automations'), href: '/automations' },
-    { icon: Plug, label: t('integrations'), href: '/integrations' },
-    { icon: Webhook, label: t('webhooks'), href: '/settings/webhooks' },
-    { icon: Shield, label: t('auditLog'), href: '/audit' },
-    { icon: Settings, label: t('settings'), href: '/settings' },
+    { icon: Bell, label: t('notifications'), href: '/philly/notifications' },
+    { icon: Zap, label: t('automations'), href: '/philly/automations' },
+    { icon: Plug, label: t('integrations'), href: '/philly/integrations' },
+    { icon: Webhook, label: t('webhooks'), href: '/philly/settings/webhooks' },
+    { icon: Shield, label: t('auditLog'), href: '/philly/audit' },
+    { icon: Settings, label: t('settings'), href: '/philly/settings' },
   ]
 
   return (

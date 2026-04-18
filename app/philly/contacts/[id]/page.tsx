@@ -271,7 +271,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
         <Topbar title="Contact Detail" sub="Not found" />
         <div style={{ padding: '60px 24px', textAlign: 'center' }}>
           <div style={{ fontSize: 14, color: 'var(--txt3)', marginBottom: 16 }}>Contact not found</div>
-          <Link href="/contacts" style={{
+          <Link href="/philly/contacts" style={{
             fontSize: 13, fontWeight: 600, color: 'var(--accent)', textDecoration: 'none',
           }}>
             Back to Contacts
@@ -291,7 +291,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
       <div style={{ padding: '18px 24px 40px' }}>
 
         {/* ---- Back link ---- */}
-        <Link href="/contacts" style={{
+        <Link href="/philly/contacts" style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           fontSize: 13, fontWeight: 600, color: 'var(--txt2)',
           textDecoration: 'none', marginBottom: 16,

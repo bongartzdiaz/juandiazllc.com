@@ -73,7 +73,7 @@ export function LeadScoreCard({ limit = 5 }: { limit?: number }) {
             {data ? `${data.total} scored · ${data.distribution.hot} hot · ${data.distribution.warm} warm` : 'Loading scores…'}
           </div>
         </div>
-        <Link href="/ai/scoring" style={{
+        <Link href="/philly/ai/scoring" style={{
           display: 'flex', alignItems: 'center', gap: 4,
           fontSize: 11, fontWeight: 600, color: 'var(--accent)',
           textDecoration: 'none',

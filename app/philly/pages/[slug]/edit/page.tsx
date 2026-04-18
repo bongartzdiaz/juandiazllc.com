@@ -118,7 +118,7 @@ export default function PageEdit() {
       if (!r.ok) throw new Error(j?.error ?? 'Failed to save')
       setDirty(false)
       if (j.data?.slug && j.data.slug !== slug) {
-        router.replace(`/pages/${j.data.slug}/edit`)
+        router.replace(`/philly/pages/${j.data.slug}/edit`)
       } else {
         // refresh state with server IDs
         setPage(j.data)
@@ -152,7 +152,7 @@ export default function PageEdit() {
           marginBottom: 16, gap: 8, flexWrap: 'wrap',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Link href="/pages" style={{
+            <Link href="/philly/pages" style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
               color: 'var(--txt3)', fontSize: 12, fontWeight: 500, textDecoration: 'none',
             }}>

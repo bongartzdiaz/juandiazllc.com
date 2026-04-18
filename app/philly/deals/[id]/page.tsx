@@ -121,7 +121,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
     const res = await fetch(`/api/deals/${id}`, { method: 'DELETE' })
     if (res.status === 204 || res.ok) {
       addToast('Deal deleted', "success")
-      router.push('/deals')
+      router.push('/philly/deals')
     } else {
       const j = await res.json().catch(() => ({}))
       addToast(j.error ?? 'Delete failed', "error")
@@ -204,7 +204,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
       <div style={{ padding: '18px 24px 40px' }}>
 
         {/* Back link */}
-        <Link href="/deals" style={{
+        <Link href="/philly/deals" style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           fontSize: 12, fontWeight: 600, color: 'var(--accent)',
           textDecoration: 'none', marginBottom: 16,

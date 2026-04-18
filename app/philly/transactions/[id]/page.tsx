@@ -195,7 +195,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
       const res = await fetch(`/api/transactions/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Transaction deleted', 'success')
-        router.push('/transactions')
+        router.push('/philly/transactions')
       } else {
         const j = await res.json().catch(() => ({}))
         addToast(j.error ?? 'Delete failed', 'error')
@@ -240,7 +240,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
       />
       <div style={{ padding: '18px 24px 40px' }}>
 
-        <Link href="/transactions" style={{
+        <Link href="/philly/transactions" style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           fontSize: 12, fontWeight: 600, color: 'var(--accent)',
           textDecoration: 'none', marginBottom: 16,

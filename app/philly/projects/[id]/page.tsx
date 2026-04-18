@@ -365,7 +365,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         <Topbar title="Project" sub="Not found" />
         <div style={{ padding: '60px 24px', textAlign: 'center' }}>
           <div style={{ fontSize: 14, color: 'var(--txt3)', marginBottom: 16 }}>Project not found</div>
-          <Link href="/projects" style={{
+          <Link href="/philly/projects" style={{
             fontSize: 13, fontWeight: 600, color: 'var(--accent)', textDecoration: 'none',
           }}>
             Back to Projects
@@ -384,7 +384,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       <div style={{ padding: '18px 24px 40px' }}>
 
         {/* ---- Back link ---- */}
-        <Link href="/projects" style={{
+        <Link href="/philly/projects" style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           fontSize: 13, fontWeight: 600, color: 'var(--txt2)',
           textDecoration: 'none', marginBottom: 16,
@@ -1074,7 +1074,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <span style={{ fontSize: 14, fontWeight: 600 }}>Linked Deals ({deals.length})</span>
-                <Link href="/deals" style={{
+                <Link href="/philly/deals" style={{
                   fontSize: 11, fontWeight: 600, color: 'var(--accent)',
                   textDecoration: 'none',
                 }}>

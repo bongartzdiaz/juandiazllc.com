@@ -54,7 +54,7 @@ export default function PagesListPage() {
       const j = await r.json()
       if (!r.ok) throw new Error(j?.error ?? 'Failed to create page')
       setShowNew(false); setNewTitle(''); setNewSlug('')
-      router.push(`/pages/${j.data.slug}/edit`)
+      router.push(`/philly/pages/${j.data.slug}/edit`)
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed')
     } finally {

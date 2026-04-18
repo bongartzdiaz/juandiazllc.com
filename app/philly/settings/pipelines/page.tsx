@@ -229,7 +229,7 @@ export default function PipelineAdminPage() {
       <Topbar title="Pipeline Admin" sub="Configure deal pipelines and stages" />
       <div style={{ padding: '18px 24px 40px' }}>
 
-        <Link href="/settings" style={{
+        <Link href="/philly/settings" style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           fontSize: 12, fontWeight: 600, color: 'var(--accent)',
           textDecoration: 'none', marginBottom: 16,

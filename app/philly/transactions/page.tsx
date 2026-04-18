@@ -154,7 +154,7 @@ export default function TransactionsPage() {
           ) : transactions.length === 0 ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No transactions found.</div>
           ) : transactions.map((txn, idx) => (
-            <div key={txn.id} onClick={() => router.push(`/transactions/${txn.id}`)} className="card-hover" style={{ display: 'grid', gridTemplateColumns: '1fr 100px 120px 100px 120px 80px', gap: 12, padding: '10px 16px', borderBottom: idx < transactions.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent', cursor: 'pointer' }}>
+            <div key={txn.id} onClick={() => router.push(`/philly/transactions/${txn.id}`)} className="card-hover" style={{ display: 'grid', gridTemplateColumns: '1fr 100px 120px 100px 120px 80px', gap: 12, padding: '10px 16px', borderBottom: idx < transactions.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent', cursor: 'pointer' }}>
               <div>
                 <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{txn.escrowNumber || 'No Escrow #'}</div>
                 <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{txn.titleCompany || '-'}</div>

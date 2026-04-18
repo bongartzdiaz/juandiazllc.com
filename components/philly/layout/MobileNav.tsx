@@ -25,11 +25,11 @@ export function MobileNav() {
   const path = pathname.replace(/^\/(en|nl)/, '') || '/'
 
   const TABS: Tab[] = [
-    { icon: LayoutDashboard, label: t('dashboard'), href: '/' },
-    { icon: Users2, label: t('contacts'), href: '/contacts' },
-    { icon: Columns3, label: t('board'), href: '/kanban' },
-    { icon: CalendarDays, label: t('calendar'), href: '/calendar' },
-    { icon: Sparkles, label: t('aiInsights'), href: '/ai' },
+    { icon: LayoutDashboard, label: t('dashboard'), href: '/philly' },
+    { icon: Users2, label: t('contacts'), href: '/philly/contacts' },
+    { icon: Columns3, label: t('board'), href: '/philly/kanban' },
+    { icon: CalendarDays, label: t('calendar'), href: '/philly/calendar' },
+    { icon: Sparkles, label: t('aiInsights'), href: '/philly/ai' },
   ]
 
   return (

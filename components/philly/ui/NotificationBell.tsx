@@ -97,7 +97,7 @@ export function NotificationBell() {
         }}>
           <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>Notifications</span>
-            <Link href="/notifications" onClick={() => setOpen(false)} style={{ fontSize: 11, color: 'var(--accent)', textDecoration: 'none' }}>View all</Link>
+            <Link href="/philly/notifications" onClick={() => setOpen(false)} style={{ fontSize: 11, color: 'var(--accent)', textDecoration: 'none' }}>View all</Link>
           </div>
 
           {notifications.length === 0 ? (

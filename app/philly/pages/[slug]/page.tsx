@@ -42,7 +42,7 @@ export default function PageView() {
           <div style={{ fontSize: 14, color: 'var(--txt3)', marginBottom: 14 }}>
             This page does not exist or has been deleted.
           </div>
-          <Link href="/pages" style={{
+          <Link href="/philly/pages" style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '8px 14px', borderRadius: 7,
             background: 'var(--accent)', color: '#fff',
@@ -71,7 +71,7 @@ export default function PageView() {
       <Topbar title={page.title} sub={`/pages/${page.slug}`} />
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <Link href="/pages" style={{
+          <Link href="/philly/pages" style={{
             display: 'inline-flex', alignItems: 'center', gap: 5,
             color: 'var(--txt3)', fontSize: 12, fontWeight: 500,
             textDecoration: 'none',

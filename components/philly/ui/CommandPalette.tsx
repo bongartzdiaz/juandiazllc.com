@@ -65,64 +65,64 @@ export function CommandPalette() {
   const staticItems: CommandItem[] = useMemo(() => {
     const core: CommandItem[] = [
       { id: 'dashboard', label: 'Dashboard', description: 'Overview and KPIs', icon: <LayoutDashboard size={iconSize} />, category: 'Pages', action: () => router.push('/'), keywords: ['home', 'overview'] },
-      { id: 'projects', label: config.projectsLabel, description: `Manage ${config.projectsLabel.toLowerCase()}`, icon: <FolderKanban size={iconSize} />, category: 'Pages', action: () => router.push('/projects'), keywords: ['properties', 'projects'] },
-      { id: 'contacts', label: 'Contacts', description: 'People and organizations', icon: <Users size={iconSize} />, category: 'Pages', action: () => router.push('/contacts'), keywords: ['people', 'clients'] },
-      { id: 'impact', label: industry === 'realestate' ? 'Market' : 'Impact', description: industry === 'realestate' ? 'Market analytics' : 'Impact metrics', icon: <BarChart3 size={iconSize} />, category: 'Pages', action: () => router.push('/impact'), keywords: ['analytics', 'metrics'] },
+      { id: 'projects', label: config.projectsLabel, description: `Manage ${config.projectsLabel.toLowerCase()}`, icon: <FolderKanban size={iconSize} />, category: 'Pages', action: () => router.push('/philly/projects'), keywords: ['properties', 'projects'] },
+      { id: 'contacts', label: 'Contacts', description: 'People and organizations', icon: <Users size={iconSize} />, category: 'Pages', action: () => router.push('/philly/contacts'), keywords: ['people', 'clients'] },
+      { id: 'impact', label: industry === 'realestate' ? 'Market' : 'Impact', description: industry === 'realestate' ? 'Market analytics' : 'Impact metrics', icon: <BarChart3 size={iconSize} />, category: 'Pages', action: () => router.push('/philly/impact'), keywords: ['analytics', 'metrics'] },
     ]
 
     const tools: CommandItem[] = [
-      { id: 'reports', label: 'Reports', description: 'Generate and view reports', icon: <FileText size={iconSize} />, category: 'Tools', action: () => router.push('/reports'), keywords: ['export', 'pdf'] },
-      { id: 'kanban', label: industry === 'realestate' ? 'Deals Board' : industry === 'hospitality' ? 'Reservations' : 'Board', description: 'Pipeline board', icon: <Columns3 size={iconSize} />, category: 'Tools', action: () => router.push('/kanban'), keywords: ['board', 'pipeline', 'deals'] },
-      { id: 'deals', label: 'Deals', description: 'Deal pipeline', icon: <DollarSign size={iconSize} />, category: 'Tools', action: () => router.push('/deals'), keywords: ['pipeline', 'sales'] },
-      { id: 'calendar', label: 'Calendar', description: 'View milestones and events', icon: <Calendar size={iconSize} />, category: 'Tools', action: () => router.push('/calendar'), keywords: ['events', 'schedule'] },
-      { id: 'timeline', label: 'Timeline', description: 'Gantt view of tasks', icon: <GanttChart size={iconSize} />, category: 'Tools', action: () => router.push('/timeline'), keywords: ['gantt', 'schedule'] },
-      { id: 'documents', label: 'Documents', description: 'Manage files and documents', icon: <FileArchive size={iconSize} />, category: 'Tools', action: () => router.push('/documents'), keywords: ['files', 'uploads'] },
-      { id: 'inbox', label: 'Inbox', description: 'Conversations and messages', icon: <Inbox size={iconSize} />, category: 'Tools', action: () => router.push('/inbox'), keywords: ['messages', 'conversations'] },
-      { id: 'email', label: 'Email', description: 'Email campaigns', icon: <Mail size={iconSize} />, category: 'Tools', action: () => router.push('/email'), keywords: ['mail', 'campaigns'] },
-      { id: 'sms', label: 'SMS', description: 'SMS messaging', icon: <MessageSquare size={iconSize} />, category: 'Tools', action: () => router.push('/sms'), keywords: ['text', 'twilio'] },
-      { id: 'templates', label: 'Templates', description: 'Email and SMS templates', icon: <FileCode size={iconSize} />, category: 'Tools', action: () => router.push('/templates'), keywords: ['template', 'library'] },
-      { id: 'pages', label: 'Pages', description: 'Custom pages', icon: <Layers size={iconSize} />, category: 'Tools', action: () => router.push('/pages'), keywords: ['custom', 'builder'] },
-      { id: 'ai', label: 'AI Insights', description: 'AI-powered analysis', icon: <Sparkles size={iconSize} />, category: 'Tools', action: () => router.push('/ai'), keywords: ['ai', 'insights', 'intelligence'] },
+      { id: 'reports', label: 'Reports', description: 'Generate and view reports', icon: <FileText size={iconSize} />, category: 'Tools', action: () => router.push('/philly/reports'), keywords: ['export', 'pdf'] },
+      { id: 'kanban', label: industry === 'realestate' ? 'Deals Board' : industry === 'hospitality' ? 'Reservations' : 'Board', description: 'Pipeline board', icon: <Columns3 size={iconSize} />, category: 'Tools', action: () => router.push('/philly/kanban'), keywords: ['board', 'pipeline', 'deals'] },
+      { id: 'deals', label: 'Deals', description: 'Deal pipeline', icon: <DollarSign size={iconSize} />, category: 'Tools', action: () => router.push('/philly/deals'), keywords: ['pipeline', 'sales'] },
+      { id: 'calendar', label: 'Calendar', description: 'View milestones and events', icon: <Calendar size={iconSize} />, category: 'Tools', action: () => router.push('/philly/calendar'), keywords: ['events', 'schedule'] },
+      { id: 'timeline', label: 'Timeline', description: 'Gantt view of tasks', icon: <GanttChart size={iconSize} />, category: 'Tools', action: () => router.push('/philly/timeline'), keywords: ['gantt', 'schedule'] },
+      { id: 'documents', label: 'Documents', description: 'Manage files and documents', icon: <FileArchive size={iconSize} />, category: 'Tools', action: () => router.push('/philly/documents'), keywords: ['files', 'uploads'] },
+      { id: 'inbox', label: 'Inbox', description: 'Conversations and messages', icon: <Inbox size={iconSize} />, category: 'Tools', action: () => router.push('/philly/inbox'), keywords: ['messages', 'conversations'] },
+      { id: 'email', label: 'Email', description: 'Email campaigns', icon: <Mail size={iconSize} />, category: 'Tools', action: () => router.push('/philly/email'), keywords: ['mail', 'campaigns'] },
+      { id: 'sms', label: 'SMS', description: 'SMS messaging', icon: <MessageSquare size={iconSize} />, category: 'Tools', action: () => router.push('/philly/sms'), keywords: ['text', 'twilio'] },
+      { id: 'templates', label: 'Templates', description: 'Email and SMS templates', icon: <FileCode size={iconSize} />, category: 'Tools', action: () => router.push('/philly/templates'), keywords: ['template', 'library'] },
+      { id: 'pages', label: 'Pages', description: 'Custom pages', icon: <Layers size={iconSize} />, category: 'Tools', action: () => router.push('/philly/pages'), keywords: ['custom', 'builder'] },
+      { id: 'ai', label: 'AI Insights', description: 'AI-powered analysis', icon: <Sparkles size={iconSize} />, category: 'Tools', action: () => router.push('/philly/ai'), keywords: ['ai', 'insights', 'intelligence'] },
     ]
 
     const industryItems: CommandItem[] = industry === 'realestate'
       ? [
-          { id: 'properties', label: 'Properties', description: 'Real estate listings', icon: <Home size={iconSize} />, category: 'Real Estate', action: () => router.push('/properties') },
-          { id: 'showings', label: 'Showings', description: 'Property showings', icon: <Eye size={iconSize} />, category: 'Real Estate', action: () => router.push('/showings') },
-          { id: 'offers', label: 'Offers', description: 'Property offers', icon: <HandCoins size={iconSize} />, category: 'Real Estate', action: () => router.push('/offers') },
-          { id: 'open-houses', label: 'Open Houses', description: 'Open house events', icon: <DoorOpen size={iconSize} />, category: 'Real Estate', action: () => router.push('/open-houses') },
-          { id: 'commissions', label: 'Commissions', description: 'Team leaderboard', icon: <Trophy size={iconSize} />, category: 'Real Estate', action: () => router.push('/commissions') },
-          { id: 'drip-campaigns', label: 'Drip Campaigns', description: 'Automated sequences', icon: <Mail size={iconSize} />, category: 'Real Estate', action: () => router.push('/drip-campaigns') },
-          { id: 'market-analytics', label: 'Market Analytics', description: 'Market trends', icon: <TrendingUp size={iconSize} />, category: 'Real Estate', action: () => router.push('/market-analytics') },
-          { id: 'transactions', label: 'Transactions', description: 'Real estate transactions', icon: <ClipboardList size={iconSize} />, category: 'Real Estate', action: () => router.push('/transactions') },
-          { id: 'action-plans', label: 'Action Plans', description: 'Automated action sequences', icon: <ListChecks size={iconSize} />, category: 'Real Estate', action: () => router.push('/action-plans') },
-          { id: 'lead-scores', label: 'Lead Scores', description: 'Contact scoring', icon: <Target size={iconSize} />, category: 'Real Estate', action: () => router.push('/lead-scores') },
-          { id: 'lead-routing', label: 'Lead Routing', description: 'Route leads to agents', icon: <GitBranch size={iconSize} />, category: 'Real Estate', action: () => router.push('/lead-routing') },
-          { id: 'dialer', label: 'Power Dialer', description: 'Call logs and dialing', icon: <Phone size={iconSize} />, category: 'Real Estate', action: () => router.push('/dialer') },
-          { id: 'referrals', label: 'Referrals', description: 'Referral commissions', icon: <UserPlus size={iconSize} />, category: 'Real Estate', action: () => router.push('/referrals') },
+          { id: 'properties', label: 'Properties', description: 'Real estate listings', icon: <Home size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/properties') },
+          { id: 'showings', label: 'Showings', description: 'Property showings', icon: <Eye size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/showings') },
+          { id: 'offers', label: 'Offers', description: 'Property offers', icon: <HandCoins size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/offers') },
+          { id: 'open-houses', label: 'Open Houses', description: 'Open house events', icon: <DoorOpen size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/open-houses') },
+          { id: 'commissions', label: 'Commissions', description: 'Team leaderboard', icon: <Trophy size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/commissions') },
+          { id: 'drip-campaigns', label: 'Drip Campaigns', description: 'Automated sequences', icon: <Mail size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/drip-campaigns') },
+          { id: 'market-analytics', label: 'Market Analytics', description: 'Market trends', icon: <TrendingUp size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/market-analytics') },
+          { id: 'transactions', label: 'Transactions', description: 'Real estate transactions', icon: <ClipboardList size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/transactions') },
+          { id: 'action-plans', label: 'Action Plans', description: 'Automated action sequences', icon: <ListChecks size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/action-plans') },
+          { id: 'lead-scores', label: 'Lead Scores', description: 'Contact scoring', icon: <Target size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/lead-scores') },
+          { id: 'lead-routing', label: 'Lead Routing', description: 'Route leads to agents', icon: <GitBranch size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/lead-routing') },
+          { id: 'dialer', label: 'Power Dialer', description: 'Call logs and dialing', icon: <Phone size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/dialer') },
+          { id: 'referrals', label: 'Referrals', description: 'Referral commissions', icon: <UserPlus size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/referrals') },
           { id: 'soi', label: 'Sphere of Influence', description: 'SOI categories', icon: <Network size={iconSize} />, category: 'Real Estate', action: () => router.push('/soi') },
-          { id: 'cma', label: 'CMA Reports', description: 'Comparative market analysis', icon: <BarChart size={iconSize} />, category: 'Real Estate', action: () => router.push('/cma') },
-          { id: 'client-portal', label: 'Client Portal', description: 'Client portal access', icon: <Globe size={iconSize} />, category: 'Real Estate', action: () => router.push('/client-portal') },
-          { id: 'e-signatures', label: 'E-Signatures', description: 'Document signatures', icon: <PenTool size={iconSize} />, category: 'Real Estate', action: () => router.push('/e-signatures') },
+          { id: 'cma', label: 'CMA Reports', description: 'Comparative market analysis', icon: <BarChart size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/cma') },
+          { id: 'client-portal', label: 'Client Portal', description: 'Client portal access', icon: <Globe size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/client-portal') },
+          { id: 'e-signatures', label: 'E-Signatures', description: 'Document signatures', icon: <PenTool size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/e-signatures') },
         ]
       : industry === 'hospitality'
         ? [
             { id: 'rooms', label: 'Rooms', description: 'Manage rooms and availability', icon: <BedDouble size={iconSize} />, category: 'Hospitality', action: () => router.push('/rooms') },
           ]
         : [
-            { id: 'grants', label: 'Grants', description: 'Grant applications and funding', icon: <Award size={iconSize} />, category: 'Philanthropy', action: () => router.push('/grants') },
+            { id: 'grants', label: 'Grants', description: 'Grant applications and funding', icon: <Award size={iconSize} />, category: 'Philanthropy', action: () => router.push('/philly/grants') },
             { id: 'donors', label: 'Donors', description: 'Donor scoring dashboard', icon: <HandCoins size={iconSize} />, category: 'Philanthropy', action: () => router.push('/philanthropy/donors') },
             { id: 'volunteers', label: 'Volunteers', description: 'Volunteer team and hours', icon: <Heart size={iconSize} />, category: 'Philanthropy', action: () => router.push('/volunteers') },
           ]
 
     const system: CommandItem[] = [
-      { id: 'notifications', label: 'Notifications', description: 'All notifications', icon: <Bell size={iconSize} />, category: 'System', action: () => router.push('/notifications') },
-      { id: 'automations', label: 'Automations', description: 'Automate workflows', icon: <Zap size={iconSize} />, category: 'System', action: () => router.push('/automations') },
-      { id: 'integrations', label: 'Integrations', description: 'Connected apps', icon: <Plug size={iconSize} />, category: 'System', action: () => router.push('/integrations') },
-      { id: 'webhooks', label: 'Webhooks', description: 'Outbound webhooks', icon: <Webhook size={iconSize} />, category: 'System', action: () => router.push('/settings/webhooks') },
-      { id: 'pipelines', label: 'Pipelines', description: 'Configure deal pipelines and stages', icon: <Columns3 size={iconSize} />, category: 'System', action: () => router.push('/settings/pipelines'), keywords: ['stages', 'board', 'deals'] },
-      { id: 'audit', label: 'Audit Log', description: 'System audit trail', icon: <Shield size={iconSize} />, category: 'System', action: () => router.push('/audit') },
-      { id: 'settings', label: 'Settings', description: 'App preferences', icon: <Settings size={iconSize} />, category: 'System', action: () => router.push('/settings'), keywords: ['preferences', 'config'] },
+      { id: 'notifications', label: 'Notifications', description: 'All notifications', icon: <Bell size={iconSize} />, category: 'System', action: () => router.push('/philly/notifications') },
+      { id: 'automations', label: 'Automations', description: 'Automate workflows', icon: <Zap size={iconSize} />, category: 'System', action: () => router.push('/philly/automations') },
+      { id: 'integrations', label: 'Integrations', description: 'Connected apps', icon: <Plug size={iconSize} />, category: 'System', action: () => router.push('/philly/integrations') },
+      { id: 'webhooks', label: 'Webhooks', description: 'Outbound webhooks', icon: <Webhook size={iconSize} />, category: 'System', action: () => router.push('/philly/settings/webhooks') },
+      { id: 'pipelines', label: 'Pipelines', description: 'Configure deal pipelines and stages', icon: <Columns3 size={iconSize} />, category: 'System', action: () => router.push('/philly/settings/pipelines'), keywords: ['stages', 'board', 'deals'] },
+      { id: 'audit', label: 'Audit Log', description: 'System audit trail', icon: <Shield size={iconSize} />, category: 'System', action: () => router.push('/philly/audit') },
+      { id: 'settings', label: 'Settings', description: 'App preferences', icon: <Settings size={iconSize} />, category: 'System', action: () => router.push('/philly/settings'), keywords: ['preferences', 'config'] },
     ]
 
     const actions: CommandItem[] = [
@@ -131,12 +131,12 @@ export function CommandPalette() {
         label: industry === 'realestate' ? 'New Property' : industry === 'hospitality' ? 'New Room' : 'New Project',
         description: `Create a new ${industry === 'realestate' ? 'property' : industry === 'hospitality' ? 'room' : 'project'}`,
         icon: <Plus size={iconSize} />, category: 'Actions',
-        action: () => router.push('/projects'), keywords: ['create', 'add'],
+        action: () => router.push('/philly/projects'), keywords: ['create', 'add'],
       },
       {
         id: 'new-contact', label: 'New Contact', description: 'Add a new contact',
         icon: <UserPlus size={iconSize} />, category: 'Actions',
-        action: () => router.push('/contacts'), keywords: ['create', 'add', 'person'],
+        action: () => router.push('/philly/contacts'), keywords: ['create', 'add', 'person'],
       },
       {
         id: 'export-data', label: 'Export Data', description: 'Download current data as CSV',
@@ -247,7 +247,7 @@ export function CommandPalette() {
       description: [c.company, c.email, c.type].filter(Boolean).join(' · ') || 'Contact',
       icon: <User size={iconSize} />,
       category: 'Contacts',
-      action: () => router.push(`/contacts/${c.id}`),
+      action: () => router.push(`/philly/contacts/${c.id}`),
     }))
     const projectEntries: CommandItem[] = projectHits.map(p => ({
       id: `project-${p.id}`,
@@ -255,7 +255,7 @@ export function CommandPalette() {
       description: [p.category, p.status].filter(Boolean).join(' · ') || config.projectsLabel,
       icon: <FolderKanban size={iconSize} />,
       category: config.projectsLabel,
-      action: () => router.push(`/projects/${p.id}`),
+      action: () => router.push(`/philly/projects/${p.id}`),
     }))
     return [...contactEntries, ...projectEntries]
   }, [contactHits, projectHits, router, config.projectsLabel])

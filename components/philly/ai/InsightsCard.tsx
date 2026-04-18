@@ -93,7 +93,7 @@ export function InsightsCard({ limit = 4, showSummary = true, showRefresh = true
               <RefreshCw size={13} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
             </button>
           )}
-          <Link href="/ai" style={{
+          <Link href="/philly/ai" style={{
             fontSize: 12, color: 'var(--accent)', textDecoration: 'none',
             display: 'flex', alignItems: 'center', gap: 4, padding: '6px 8px',
           }}>
@@ -130,7 +130,7 @@ export function InsightsCard({ limit = 4, showSummary = true, showRefresh = true
       </div>
 
       {more > 0 && (
-        <Link href="/ai" style={{
+        <Link href="/philly/ai" style={{
           display: 'block', marginTop: 10, fontSize: 12, color: 'var(--txt3)',
           textAlign: 'center', textDecoration: 'none',
         }}>

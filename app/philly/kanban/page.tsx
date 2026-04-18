@@ -302,9 +302,9 @@ export default function KanbanPage() {
           }}>
             <strong>Preview mode:</strong> the cards shown below are sample data.
             Your organization has no kanban boards yet — head to
-            {' '}<a href="/deals" style={{ color: 'inherit', textDecoration: 'underline' }}>Deals</a>
+            {' '}<a href="/philly/deals" style={{ color: 'inherit', textDecoration: 'underline' }}>Deals</a>
             {' '}or
-            {' '}<a href="/projects" style={{ color: 'inherit', textDecoration: 'underline' }}>Projects</a>
+            {' '}<a href="/philly/projects" style={{ color: 'inherit', textDecoration: 'underline' }}>Projects</a>
             {' '}to start tracking real work.
           </div>
         )}

@@ -199,7 +199,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
       const res = await fetch(`/api/properties/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
         addToast('Property deleted', 'success')
-        router.push('/properties')
+        router.push('/philly/properties')
       } else {
         const j = await res.json().catch(() => ({}))
         addToast(j.error ?? 'Delete failed', 'error')
@@ -212,7 +212,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
       <Topbar title={property?.title ?? 'Property Detail'} sub={fullAddress || 'Loading...'} />
       <div style={{ padding: '18px 24px 40px' }}>
 
-        <Link href="/properties" style={{
+        <Link href="/philly/properties" style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           fontSize: 12, fontWeight: 600, color: 'var(--accent)',
           textDecoration: 'none', marginBottom: 16,
@@ -384,7 +384,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                     <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>
                       Showings ({showings.length})
                     </span>
-                    <Link href="/showings" style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent)', textDecoration: 'none' }}>
+                    <Link href="/philly/showings" style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent)', textDecoration: 'none' }}>
                       View all →
                     </Link>
                   </div>
@@ -456,7 +456,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 {/* Offers */}
                 <SideCard
                   title={`Offers (${offers.length})`}
-                  action={<Link href="/offers" style={{ fontSize: 11, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>View all →</Link>}
+                  action={<Link href="/philly/offers" style={{ fontSize: 11, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>View all →</Link>}
                 >
                   {offers.length === 0 ? (
                     <div style={{ fontSize: 11, color: 'var(--txt3)', padding: '6px 0' }}>No offers yet.</div>

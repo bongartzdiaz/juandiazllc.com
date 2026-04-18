@@ -351,7 +351,7 @@ export default function PropertiesPage() {
             </label>
           )}
           <Link
-            href="/settings/property-taxonomy"
+            href="/philly/settings/property-taxonomy"
             style={{
               marginLeft: (district || type || subtype || statusFilter || bankOwned || resaleOnly || search) ? 0 : 'auto',
               padding: '6px 12px', borderRadius: 7,
