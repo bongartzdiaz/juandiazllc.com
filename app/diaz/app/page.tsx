@@ -2,149 +2,204 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { SignOutButton } from "@/components/diaz/SignOutButton";
+import Link from "next/link";
 
-export const metadata: Metadata = { title: "Command" };
+export const metadata: Metadata = { title: "Ops hub" };
 export const dynamic = "force-dynamic";
 
-const VENTURES = [
-  { name: "Voltafy", domain: "voltafy.nl", url: "https://voltafy.nl", live: true },
-  { name: "Performance Tracker", domain: "performancetracker.nl", url: "https://performancetracker.nl", live: true },
-  { name: "Help Mij Besparen", domain: "helpmijbesparen.nl", url: "https://helpmijbesparen.nl", live: true },
-  { name: "Salderingsregeling 2027", domain: "salderingsregeling2027.nl", url: "https://salderingsregeling2027.nl", live: true },
-  { name: "Dispatch board", domain: "/diaz/app/jobs", url: "/diaz/app/jobs", live: true },
-  { name: "Operator hub", domain: "/app", url: "/app", live: true },
-];
-
-function daysUntil2027() {
-  return Math.max(0, Math.floor((new Date("2027-01-01T00:00:00+01:00").getTime() - Date.now()) / 86400000));
-}
-
-type Lead = { id: string; name: string | null; email: string; company: string | null; sector: string | null; message: string | null; created_at: string };
-type Job = { id: string; title: string; status: string; created_at: string };
-
-export default async function CommandPage() {
+export default async function AppPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/diaz/login?next=/diaz/app");
 
-  const [subRes, leadRes, recentLeadsRes, jobRes, openJobsRes, recentJobsRes] = await Promise.all([
-    supabase.from("subscribers").select("*", { count: "exact", head: true }),
-    supabase.from("leads").select("*", { count: "exact", head: true }),
-    supabase.from("leads").select("id,name,email,company,sector,message,created_at").order("created_at", { ascending: false }).limit(4),
-    supabase.from("jobs").select("*", { count: "exact", head: true }),
-    supabase.from("jobs").select("*", { count: "exact", head: true }).in("status", ["new", "assigned", "in_progress"]),
-    supabase.from("jobs").select("id,title,status,created_at").order("created_at", { ascending: false }).limit(4),
-  ]);
-
-  const recentLeads = (recentLeadsRes.data ?? []) as Lead[];
-  const recentJobs = (recentJobsRes.data ?? []) as Job[];
-  const firstName = user.user_metadata?.full_name?.split(" ")[0] ?? user.email?.split("@")[0] ?? "operator";
+  const firstName =
+    user.user_metadata?.full_name?.split(" ")[0] ??
+    user.email?.split("@")[0] ??
+    "operator";
 
   return (
-    <div className="dash">
-      <div className="dash-head">
-        <div>
-          <div className="label">◉ Command surface · live</div>
-          <h1>Welcome, <em>{firstName}.</em></h1>
-          <p>
-            Master view across every venture under Juan Diaz LLC. Signed in as{" "}
-            <b style={{ color: "var(--text)" }}>{user.email}</b>.
-          </p>
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "140px 32px 120px" }}>
+      <div
+        style={{
+          fontFamily: "'JetBrains Mono'",
+          fontSize: 11,
+          letterSpacing: ".18em",
+          textTransform: "uppercase",
+          color: "var(--accent)",
+          marginBottom: 20,
+        }}
+      >
+        ◉ Diaz ops hub · live
+      </div>
+      <h1
+        style={{
+          fontWeight: 300,
+          fontSize: "clamp(48px, 7vw, 92px)",
+          letterSpacing: "-.04em",
+          lineHeight: 1,
+        }}
+      >
+        Welcome, <em>{firstName}</em>.
+      </h1>
+      <p style={{ color: "var(--muted)", fontSize: 17, marginTop: 20, maxWidth: 640, lineHeight: 1.6 }}>
+        Signed in as <b style={{ color: "var(--text)" }}>{user.email}</b>. Use this hub to jump
+        across the dispatch surface and the wider Juan Diaz LLC venture portfolio.
+      </p>
+
+      <div
+        style={{
+          marginTop: 48,
+          padding: 32,
+          border: "1px solid var(--line)",
+          borderRadius: 18,
+          background: "linear-gradient(180deg, var(--panel), var(--bg-2))",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "radial-gradient(500px 300px at 50% 0%, rgba(94,255,177,.08), transparent 60%)",
+            pointerEvents: "none",
+          }}
+        />
+        <div style={{ position: "relative" }}>
+          <div
+            style={{
+              fontFamily: "'JetBrains Mono'",
+              fontSize: 11,
+              letterSpacing: ".14em",
+              textTransform: "uppercase",
+              color: "var(--muted-soft)",
+              marginBottom: 14,
+            }}
+          >
+            ◉ Dispatch surface
+          </div>
+          <Link
+            href="/diaz/app/jobs"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "18px 22px",
+              border: "1px solid var(--accent)",
+              borderRadius: 12,
+              background: "rgba(94,255,177,.06)",
+              marginBottom: 20,
+              transition: "all .3s var(--ease)",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 500, color: "var(--accent)" }}>
+                Jobs board →
+              </div>
+              <div
+                style={{
+                  fontFamily: "'JetBrains Mono'",
+                  fontSize: 10,
+                  color: "var(--muted-soft)",
+                  letterSpacing: ".08em",
+                  marginTop: 4,
+                }}
+              >
+                Live · create, assign, track
+              </div>
+            </div>
+            <span
+              style={{
+                fontFamily: "'JetBrains Mono'",
+                fontSize: 10,
+                letterSpacing: ".14em",
+                color: "var(--accent)",
+                textTransform: "uppercase",
+              }}
+            >
+              Enter
+            </span>
+          </Link>
+
+          <div
+            style={{
+              fontFamily: "'JetBrains Mono'",
+              fontSize: 11,
+              letterSpacing: ".14em",
+              textTransform: "uppercase",
+              color: "var(--muted-soft)",
+              marginTop: 28,
+              marginBottom: 14,
+            }}
+          >
+            ◉ Coming online
+          </div>
+          <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 14, padding: 0 }}>
+            {[
+              { name: "Field client (PWA)", status: "In build", hint: "Offline-first" },
+              { name: "Live map + routing", status: "Scoping", hint: "Phase 2" },
+              { name: "Operator analytics", status: "Scoping", hint: "Phase 3" },
+            ].map((item, i) => (
+              <li
+                key={i}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "14px 18px",
+                  border: "1px solid var(--line)",
+                  borderRadius: 12,
+                  background: "rgba(3,20,15,.4)",
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 500 }}>{item.name}</div>
+                  <div
+                    style={{
+                      fontFamily: "'JetBrains Mono'",
+                      fontSize: 10,
+                      color: "var(--muted-soft)",
+                      letterSpacing: ".08em",
+                      marginTop: 2,
+                    }}
+                  >
+                    {item.hint}
+                  </div>
+                </div>
+                <span
+                  style={{
+                    fontFamily: "'JetBrains Mono'",
+                    fontSize: 10,
+                    letterSpacing: ".14em",
+                    textTransform: "uppercase",
+                    color: "var(--accent)",
+                    padding: "4px 10px",
+                    border: "1px solid var(--accent)",
+                    borderRadius: 999,
+                    background: "rgba(94,255,177,.06)",
+                  }}
+                >
+                  {item.status}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 10, marginTop: 32, flexWrap: "wrap" }}>
+        <Link className="btn primary" href="/diaz/app/jobs">
+          ◉ Open Jobs board →
+        </Link>
+        <Link className="btn ghost" href="/app">
+          ← Operator hub
+        </Link>
+        <Link className="btn ghost" href="/">
+          ← Back to site
+        </Link>
         <SignOutButton />
       </div>
-
-      {/* KPI strip */}
-      <div className="stat-strip">
-        <div>
-          <div className="n">{subRes.count ?? 0}</div>
-          <div className="l">Subscribers</div>
-        </div>
-        <div>
-          <div className="n">{leadRes.count ?? 0}</div>
-          <div className="l">Total leads</div>
-        </div>
-        <div>
-          <div className="n">{jobRes.count ?? 0}</div>
-          <div className="l">Total jobs</div>
-        </div>
-        <div>
-          <div className="n">{openJobsRes.count ?? 0}</div>
-          <div className="l">Open jobs (Philly)</div>
-        </div>
-        <div>
-          <div className="n">{daysUntil2027()}</div>
-          <div className="l">Days to 2027</div>
-        </div>
-      </div>
-
-      {/* Recent leads + Open jobs */}
-      <div className="grid-2">
-        <section className="card">
-          <div className="label">◉ Latest leads</div>
-          <h2>From <em>juandiazllc.com</em></h2>
-          <div style={{ marginTop: 14 }}>
-            {recentLeads.length === 0 ? (
-              <div style={{ padding: "24px 0", color: "var(--muted-soft)", fontFamily: "'JetBrains Mono'", fontSize: 11.5, letterSpacing: ".12em", textTransform: "uppercase", textAlign: "center" }}>
-                — No leads yet
-              </div>
-            ) : (
-              recentLeads.map((l) => (
-                <div key={l.id} className="lead-row">
-                  <div className="top">
-                    <b>{l.name ?? l.email}{l.company && <span style={{ color: "var(--muted-soft)", fontWeight: 400 }}> · {l.company}</span>}</b>
-                    <span className="when">{new Date(l.created_at).toLocaleDateString("en-GB", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
-                  </div>
-                  {l.sector && <div className="meta">{l.sector}</div>}
-                  {l.message && <p>{l.message.length > 180 ? l.message.slice(0, 180) + "…" : l.message}</p>}
-                </div>
-              ))
-            )}
-          </div>
-        </section>
-
-        <section className="card">
-          <div className="label">◉ Latest jobs</div>
-          <h2>From <em>philly</em></h2>
-          <div style={{ marginTop: 14 }}>
-            {recentJobs.length === 0 ? (
-              <div style={{ padding: "24px 0", color: "var(--muted-soft)", fontFamily: "'JetBrains Mono'", fontSize: 11.5, letterSpacing: ".12em", textTransform: "uppercase", textAlign: "center" }}>
-                — No jobs yet
-              </div>
-            ) : (
-              recentJobs.map((j) => (
-                <div key={j.id} className="lead-row">
-                  <div className="top">
-                    <b>{j.title}</b>
-                    <span className="when">{new Date(j.created_at).toLocaleDateString("en-GB", { month: "short", day: "numeric" })}</span>
-                  </div>
-                  <div className="meta">{j.status.replace("_", " ")}</div>
-                </div>
-              ))
-            )}
-            <a href="https://philly.juandiazllc.com/app/jobs" target="_blank" rel="noopener noreferrer" className="btn ghost" style={{ marginTop: 14, width: "100%", justifyContent: "center" }}>
-              Open dispatch board ↗
-            </a>
-          </div>
-        </section>
-      </div>
-
-      {/* Ventures */}
-      <section className="card">
-        <div className="label">◉ Ventures · quick jump</div>
-        <h2>The <em>portfolio.</em></h2>
-        <div style={{ marginTop: 14 }}>
-          {VENTURES.map((v) => (
-            <a key={v.url} href={v.url} target={v.url.startsWith("http") ? "_blank" : undefined} rel={v.url.startsWith("http") ? "noopener noreferrer" : undefined} className="venture-row">
-              <div>
-                <div className="name">{v.name}</div>
-                <div className="domain">{v.domain}</div>
-              </div>
-              <span className={`badge${v.live ? "" : " soon"}`}>{v.live ? "Live ↗" : "Internal ↗"}</span>
-            </a>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }
