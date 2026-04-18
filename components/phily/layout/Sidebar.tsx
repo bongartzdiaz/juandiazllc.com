@@ -5,10 +5,11 @@ import Link from 'next/link'
 import {
   LayoutDashboard, FolderKanban, Users2, BarChart3,
   FileText, Columns3, FileStack, Settings, CalendarDays,
-  Leaf, Building2, Hotel, ChevronDown,
+  Leaf, Building2, Hotel, ChevronDown, LogOut,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useState } from 'react'
+import { useSession, signOut } from '@/lib/phily/next-auth-shim'
 import { useIndustry, INDUSTRY_CONFIGS } from '@/hooks/phily/useIndustry'
 import type { Industry } from '@/hooks/phily/useIndustry'
 
@@ -31,6 +32,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
   const path = pathname.replace(/^\/(en|nl)/, '') || '/'
   const { industry, config, setIndustry } = useIndustry()
   const [showSwitcher, setShowSwitcher] = useState(false)
+  const { data: session } = useSession()
 
   const LogoIcon = INDUSTRY_ICONS[industry]
 
@@ -182,14 +184,41 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 11, fontWeight: 700, color: '#fff',
           boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-        }}>PA</div>
-        <div>
-          <div style={{ fontSize: 12.5, fontWeight: 600 }}>Demo User</div>
-          <div style={{ fontSize: 10, color: 'var(--txt3)' }}>Admin</div>
+        }}>{getInitials(session?.user?.name)}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{
+            fontSize: 12.5, fontWeight: 600,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
+            {session?.user?.name || session?.user?.email || 'User'}
+          </div>
+          <div style={{ fontSize: 10, color: 'var(--txt3)', textTransform: 'capitalize' }}>
+            {session?.user?.role || 'viewer'}
+          </div>
         </div>
+        <button
+          type="button"
+          onClick={() => signOut({ callbackUrl: '/login' })}
+          title="Sign out"
+          aria-label="Sign out"
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'var(--txt3)', padding: 6, borderRadius: 6,
+            display: 'flex', alignItems: 'center',
+          }}
+        >
+          <LogOut size={14} />
+        </button>
       </div>
     </aside>
   )
+}
+
+function getInitials(name?: string | null): string {
+  if (!name) return 'U'
+  const parts = name.trim().split(/\s+/)
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
 }
 
 function NavLabel({ children }: { children: React.ReactNode }) {
