@@ -91,7 +91,7 @@ export default async function InsightPage(
             <span className="arr" style={{ marginRight: 6 }}>←</span> All insights
           </Link>
           <div className="ia-meta">
-            <span className="ia-tag">{post.tag}</span>
+            <Link href={`/insights/tag/${post.tag.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`} className="ia-tag">{post.tag}</Link>
             <span>·</span>
             <span>{formatDate(post.publishedAt)}</span>
             <span>·</span>
