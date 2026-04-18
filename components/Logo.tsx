@@ -1,157 +1,136 @@
 /**
  * Juan Diaz LLC — primary mark.
  *
- * A precision-instrument composition:
- *   · outer dashed bezel — calibrated frame
- *   · corner viewfinder brackets — operator's lens
- *   · cardinal tick marks — measurement scale
- *   · the J gesture — Juan, hunter's bow, plumb line, dial pointer
- *   · target-acquired dot — follow-through complete
+ * "The Plumb" — a construction plumb-bob suspended from a fixed beam.
  *
- * Reads as instrument first, monogram second, story third.
+ * Reads as:
+ *   · Plumb-bob — construction-trained operator (literal heritage)
+ *   · Scales of justice — fairness, judgment, weighing honestly
+ *   · Pendulum — time, precision, operating in the window
+ *   · Lower-case j — anchor dot, cord stem, bob descender
+ *   · Hunter's plumb — el cazador's stillness before action
+ *
+ * One mark from 1500 BC that still operates in 2026.
  * Works monochrome via currentColor.
  */
 export function Logo({
   size = 28,
   animated = false,
   draw = false,
-  detail = "full",
 }: {
   size?: number;
   animated?: boolean;
   draw?: boolean;
-  /** "full" includes bezel + brackets + ticks; "simple" is just the J */
-  detail?: "full" | "simple";
 }) {
-  const showFrame = detail === "full";
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 80 80"
+      viewBox="0 0 96 96"
       width={size}
       height={size}
       fill="none"
       aria-hidden="true"
       style={{ display: "block", flexShrink: 0, overflow: "visible" }}
     >
-      {showFrame && (
-        <>
-          {/* Outer precision bezel */}
-          <circle
-            cx="40"
-            cy="40"
-            r="36.5"
-            stroke="currentColor"
-            strokeWidth="0.7"
-            strokeDasharray="1 4"
-            opacity="0.4"
-            style={
-              animated
-                ? { transformOrigin: "40px 40px", animation: "spin 60s linear infinite" }
-                : undefined
-            }
-          />
-
-          {/* Corner brackets */}
-          <g
-            stroke="currentColor"
-            strokeWidth="1.3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity="0.55"
-            style={
-              draw
-                ? { opacity: 0, animation: "jfade 0.6s 0.6s var(--ease) forwards" }
-                : undefined
-            }
-          >
-            <path d="M 8 14 L 8 8 L 14 8" />
-            <path d="M 72 14 L 72 8 L 66 8" />
-            <path d="M 8 66 L 8 72 L 14 72" />
-            <path d="M 72 66 L 72 72 L 66 72" />
-          </g>
-
-          {/* Cardinal ticks */}
-          <g
-            stroke="currentColor"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-            opacity="0.55"
-            style={
-              draw
-                ? { opacity: 0, animation: "jfade 0.5s 0.85s var(--ease) forwards" }
-                : undefined
-            }
-          >
-            <line x1="40" y1="3" x2="40" y2="7" />
-            <line x1="40" y1="73" x2="40" y2="77" />
-            <line x1="3" y1="40" x2="7" y2="40" />
-            <line x1="73" y1="40" x2="77" y2="40" />
-          </g>
-        </>
-      )}
-
-      {/* The J gesture */}
+      {/* Fixed-origin beam — structural reference */}
       <g
         stroke="currentColor"
-        strokeWidth="3.6"
+        strokeWidth="1.4"
         strokeLinecap="round"
-        strokeLinejoin="round"
+        style={
+          draw
+            ? { opacity: 0, animation: "jfade 0.5s 1.0s var(--ease) forwards" }
+            : undefined
+        }
       >
-        <line
-          x1="54"
-          y1="28"
-          x2="54"
-          y2="48"
-          style={
-            draw
-              ? {
-                  strokeDasharray: 22,
-                  strokeDashoffset: 22,
-                  animation: "jdraw 0.8s 0.15s var(--ease) forwards",
-                }
-              : undefined
-          }
-        />
-        <path
-          d="M 54 48 C 54 63, 40 67, 27 65.5 C 16 64, 11 56, 11 48"
-          style={
-            draw
-              ? {
-                  strokeDasharray: 95,
-                  strokeDashoffset: 95,
-                  animation: "jdraw 1.4s 0.35s var(--ease) forwards",
-                }
-              : undefined
-          }
-        />
+        <line x1="30" y1="8" x2="66" y2="8" opacity="0.5" />
+        <line x1="22" y1="8" x2="26" y2="8" opacity="0.35" />
+        <line x1="70" y1="8" x2="74" y2="8" opacity="0.35" />
       </g>
 
-      {/* J's dot — aim target */}
+      {/* Suspension anchor */}
       <circle
-        cx="54"
-        cy="14"
-        r="3.8"
+        cx="48"
+        cy="8"
+        r="3.4"
         fill="currentColor"
         style={
           animated
-            ? { transformOrigin: "54px 14px", animation: "pulse 2.4s ease-in-out infinite" }
+            ? { transformOrigin: "48px 8px", animation: "pulse 2.4s ease-in-out infinite" }
             : draw
             ? { opacity: 0, animation: "jfade 0.4s 0.05s var(--ease) forwards" }
             : undefined
         }
       />
 
-      {/* Target-acquired terminus */}
-      <circle
-        cx="11"
-        cy="48"
-        r="1.6"
-        fill="currentColor"
-        opacity="0.7"
+      {/* Pendulum group — cord + bob, swings as one unit */}
+      <g
+        style={{
+          transformOrigin: "48px 8px",
+          animation: animated ? "plumbswing 5s ease-in-out infinite" : undefined,
+        }}
+      >
+        <line
+          x1="48"
+          y1="14"
+          x2="48"
+          y2="50"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          style={
+            draw
+              ? {
+                  strokeDasharray: 40,
+                  strokeDashoffset: 40,
+                  animation: "jdraw 0.7s 0.2s var(--ease) forwards",
+                }
+              : undefined
+          }
+        />
+        <path
+          d="M 48 50 Q 30 50 30 64 L 48 86 L 66 64 Q 66 50 48 50 Z M 51 64 a 3 3 0 1 0 -6 0 a 3 3 0 1 0 6 0 Z"
+          fill="currentColor"
+          fillRule="evenodd"
+          style={
+            draw
+              ? {
+                  opacity: 0,
+                  transformOrigin: "48px 50px",
+                  animation: "plumbdrop 0.6s 0.85s var(--ease) forwards",
+                }
+              : undefined
+          }
+        />
+      </g>
+
+      {/* Horizon — level reference at bob's center of mass */}
+      <g
+        stroke="currentColor"
+        strokeWidth="1.1"
+        strokeLinecap="round"
+        opacity="0.4"
         style={
           draw
-            ? { opacity: 0, animation: "jfade 0.4s 1.5s var(--ease) forwards" }
+            ? { opacity: 0, animation: "jfade 0.5s 1.25s var(--ease) forwards" }
+            : undefined
+        }
+      >
+        <line x1="6" y1="64" x2="22" y2="64" />
+        <line x1="74" y1="64" x2="90" y2="64" />
+      </g>
+
+      {/* Swing-arc reference */}
+      <path
+        d="M 22 70 A 40 40 0 0 1 74 70"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="0.7"
+        strokeDasharray="1 4"
+        opacity="0.3"
+        style={
+          draw
+            ? { opacity: 0, animation: "jfade 0.6s 1.5s var(--ease) forwards" }
             : undefined
         }
       />
