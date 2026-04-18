@@ -16,3 +16,15 @@ yarn-error.log*
 .idea/
 .vscode/
 .claude/
+
+# Philly subapp artifacts
+philly/node_modules/
+philly/.next/
+philly/out/
+philly/build/
+philly/.env
+philly/.env.local
+philly/.env*.local
+philly/*.tsbuildinfo
+philly/next-env.d.ts
+philly/.vercel
