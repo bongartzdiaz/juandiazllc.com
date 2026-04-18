@@ -112,8 +112,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 @media (hover: none) { .cursor { display: none; } }
 
 /* Preloader */
-.preload { position: fixed; inset: 0; z-index: 300; background: var(--bg); display: flex; flex-direction: column; justify-content: space-between; padding: 32px 40px; transition: opacity .6s var(--ease), visibility .6s; }
-.preload.done { opacity: 0; visibility: hidden; }
+.preload { position: fixed; inset: 0; z-index: 300; background: var(--bg); display: flex; flex-direction: column; justify-content: space-between; padding: 32px 40px; transition: opacity .6s var(--ease), visibility .6s; animation: preloadFailsafe 3500ms forwards; }
+.preload.done { opacity: 0; visibility: hidden; pointer-events: none; }
+@keyframes preloadFailsafe { 0%, 92% { } 100% { opacity: 0; visibility: hidden; pointer-events: none; } }
 .preload-top { display: flex; justify-content: space-between; align-items: center; }
 .preload-center { flex: 1; display: flex; align-items: center; }
 .preload-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
