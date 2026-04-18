@@ -119,6 +119,6 @@ export class ApiClient {
 const baseUrl =
   (typeof process !== 'undefined' &&
     process.env?.NEXT_PUBLIC_API_URL) ||
-  '/api'
+  '/philly/api'
 
 export const api = new ApiClient({ baseUrl })
