@@ -16,7 +16,7 @@ const MobileMenuCtx = createContext<{ open: boolean; toggle: () => void }>({ ope
 export const useMobileMenu = () => useContext(MobileMenuCtx)
 
 // Routes that bypass the auth shell (no sidebar, no session requirement)
-const PUBLIC_PATHS = ['/login']
+const PUBLIC_PATHS = ['/philly/login']
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -64,7 +64,7 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
     if (bypassAuth || status !== 'unauthenticated') return
     const t = setTimeout(() => {
       const callback = encodeURIComponent(pathname || '/')
-      router.replace(`/login?callbackUrl=${callback}`)
+      router.replace(`/philly/login?callbackUrl=${callback}`)
     }, 150)
     return () => clearTimeout(t)
   }, [bypassAuth, status, router, pathname])

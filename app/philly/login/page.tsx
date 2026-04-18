@@ -15,7 +15,7 @@ export default function LoginPage() {
 
 function LoginPageInner() {
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams?.get('callbackUrl') || '/'
+  const callbackUrl = searchParams?.get('callbackUrl') || '/philly'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)

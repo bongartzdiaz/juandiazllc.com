@@ -52,7 +52,7 @@ export function getAuthOptions(): NextAuthOptions {
   return {
     adapter: PrismaAdapter(getAuthPrisma()),
     pages: {
-      signIn: '/login',
+      signIn: '/philly/login',
     },
     providers: [
       CredentialsProvider({
