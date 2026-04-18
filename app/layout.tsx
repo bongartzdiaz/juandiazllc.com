@@ -41,7 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <a href="#main" className="skip">Skip to content</a>
           <Overlays />
           <Preloader />
-          <main id="main">{children}</main>
+          {children}
           <GlobalEffects />
         </LocaleProvider>
       </body>

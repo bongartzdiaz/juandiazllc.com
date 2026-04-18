@@ -46,7 +46,7 @@ export const metadata: Metadata = {
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <main id="main">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -99,6 +99,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <FloatCta />
       <Hud />
       <CommandPalette />
-    </>
+    </main>
   );
 }
