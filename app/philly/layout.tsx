@@ -24,12 +24,24 @@ export const metadata: Metadata = {
   description: 'CRM and operations platform for impact-driven businesses',
 }
 
+// Boot script — runs before hydration to set data-theme on <html> from
+// localStorage (or OS preference), so the dashboard never flashes light
+// before useTheme catches up. Scoped to /philly/* only.
+const themeBootScript = `(function(){try{
+  var t=localStorage.getItem('pai-theme');
+  if(t!=='dark'&&t!=='light'){
+    t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  }
+  document.documentElement.setAttribute('data-theme',t);
+}catch(e){document.documentElement.setAttribute('data-theme','light');}})();`
+
 export default async function PhillyLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale()
   const messages = await getMessages()
 
   return (
-    <div className={`philly-root ${jakarta.variable} ${redHatMono.variable}`} data-theme="light">
+    <div className={`philly-root ${jakarta.variable} ${redHatMono.variable}`}>
+      <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       <NextIntlClientProvider locale={locale} messages={messages}>
         <ClientLayout>{children}</ClientLayout>
       </NextIntlClientProvider>
