@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { getAllInsights, formatDate } from "@/lib/insights";
+import { getAllInsights } from "@/lib/insights";
+import { InsightsList } from "@/components/InsightsList";
 
 // /insights — long-form writing. Primary SEO surface after the home
 // page: each post is a standalone URL with its own Article schema,
@@ -44,34 +44,7 @@ export default function InsightsIndex() {
           margin: "0 auto",
         }}
       >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
-            gap: 14,
-          }}
-        >
-          {posts.map((p) => (
-            <Link
-              key={p.slug}
-              href={`/insights/${p.slug}`}
-              className="insight-card"
-              data-reveal
-            >
-              <div className="ic-top">
-                <span className="ic-tag">— {p.tag}</span>
-                <span className="ic-meta">
-                  {formatDate(p.publishedAt)} · {p.readingMinutes} min
-                </span>
-              </div>
-              <h2 className="ic-title">{p.title}</h2>
-              <p className="ic-sum">{p.summary}</p>
-              <span className="ic-read">
-                Read <span className="arr">→</span>
-              </span>
-            </Link>
-          ))}
-        </div>
+        <InsightsList posts={posts} />
       </section>
     </>
   );

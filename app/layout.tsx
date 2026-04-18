@@ -139,6 +139,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
+        {/* Feed autodiscovery — RSS for readers, JSON Feed for modern clients */}
+        <link rel="alternate" type="application/rss+xml" title="Juan Diaz LLC — Insights" href="/rss.xml" />
+        <link rel="alternate" type="application/feed+json" title="Juan Diaz LLC — Insights" href="/feed.json" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         {/* Single-family load reduces network + keeps typography consistent.
             Instrument Serif dropped — Inter italic now serves editorial emphasis. */}
