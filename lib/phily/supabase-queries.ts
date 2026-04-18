@@ -178,6 +178,74 @@ export async function getCurrentUserContext() {
   return { auth: user, profile: phUser };
 }
 
+// ── Project milestones ────────────────────────────────────────────────────
+
+export type Milestone = {
+  id: string;
+  project_id: string;
+  title: string;
+  due_date: string;
+  completed_at: string | null;
+  status: "pending" | "completed" | "overdue";
+};
+
+export async function listMilestones(): Promise<Milestone[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("project_milestones")
+    .select("*")
+    .order("due_date", { ascending: true });
+  return (data ?? []) as Milestone[];
+}
+
+// ── Recent activity (cross-entity) ────────────────────────────────────────
+
+export type ActivityEntry = {
+  id: string;
+  kind: "project" | "contact" | "kanban" | "impact" | "milestone";
+  title: string;
+  detail?: string;
+  at: string;
+};
+
+export async function recentActivity(limit = 10): Promise<ActivityEntry[]> {
+  const supabase = await createClient();
+  const [projects, contacts, impact, cards] = await Promise.all([
+    supabase.from("projects").select("id,title,status,created_at,updated_at").order("updated_at", { ascending: false }).limit(limit),
+    supabase.from("contacts").select("id,name,type,company,created_at").order("created_at", { ascending: false }).limit(limit),
+    supabase.from("impact_metrics").select("id,metric_type,value,unit,date").order("date", { ascending: false }).limit(limit),
+    supabase.from("kanban_cards").select("id,title").order("id", { ascending: false }).limit(limit),
+  ]);
+  const all: ActivityEntry[] = [
+    ...(projects.data ?? []).map((p) => ({
+      id: `p-${p.id}`,
+      kind: "project" as const,
+      title: `Project ${p.status === "completed" ? "completed" : "updated"}: ${p.title}`,
+      at: p.updated_at,
+    })),
+    ...(contacts.data ?? []).map((c) => ({
+      id: `c-${c.id}`,
+      kind: "contact" as const,
+      title: `New contact: ${c.name}`,
+      detail: c.company || c.type,
+      at: c.created_at,
+    })),
+    ...(impact.data ?? []).map((m) => ({
+      id: `i-${m.id}`,
+      kind: "impact" as const,
+      title: `${m.metric_type.replace("_", " ")} +${m.value} ${m.unit}`.trim(),
+      at: m.date,
+    })),
+    ...(cards.data ?? []).map((k) => ({
+      id: `k-${k.id}`,
+      kind: "kanban" as const,
+      title: `Kanban card: ${k.title}`,
+      at: new Date().toISOString(),
+    })),
+  ];
+  return all.sort((a, b) => b.at.localeCompare(a.at)).slice(0, limit);
+}
+
 // ── Dashboard aggregates ───────────────────────────────────────────────────
 
 export async function dashboardAggregates() {
