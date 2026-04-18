@@ -157,7 +157,7 @@ export function getAuthOptions(): NextAuthOptions {
                   const secret = decryptSecret(user.twoFactorSecret)
                   if (secret) {
                     // Lazy import to keep the auth module lightweight at build time
-                    const { verifyTotp } = await import('@/lib/two-factor')
+                    const { verifyTotp } = await import('@/lib/philly/two-factor')
                     twoFactorOk = verifyTotp(code, secret)
                   }
                 } catch {
@@ -166,7 +166,7 @@ export function getAuthOptions(): NextAuthOptions {
               }
             } else {
               // Recovery code path — lazy import to avoid a cycle with two-factor.ts
-              const { consumeRecoveryCode } = await import('@/lib/two-factor')
+              const { consumeRecoveryCode } = await import('@/lib/philly/two-factor')
               twoFactorOk = await consumeRecoveryCode(user.id, code)
             }
 
