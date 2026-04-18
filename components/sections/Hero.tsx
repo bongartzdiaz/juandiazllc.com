@@ -105,7 +105,7 @@ export function Hero() {
         uAmp: { value: 0.28 },
         uFreq: { value: 1.05 },
         uColor: { value: new THREE.Color("#0B3D2E") },
-        uGlow: { value: new THREE.Color("#4DE29C") },
+        uGlow: { value: new THREE.Color("#1F8F5C") },
       },
       vertexShader: `
         uniform float uTime; uniform float uAmp; uniform float uFreq;
@@ -129,7 +129,7 @@ export function Hero() {
           vec3 V=normalize(-vP);
           float f=pow(1.0-max(dot(vN,V),0.0), 2.2);
           vec3 col=mix(uColor*0.12, uColor*0.9, f);
-          col += uGlow*pow(f,5.0)*1.8;
+          col += uGlow*pow(f,5.0)*0.9;
           col += uGlow*0.08*smoothstep(-.2,.4,vD);
           gl_FragColor=vec4(col,1.0);
         }`,
@@ -139,10 +139,10 @@ export function Hero() {
 
     const wireGeom = new THREE.IcosahedronGeometry(1.55, 3);
     const wireMat = new THREE.MeshBasicMaterial({
-      color: 0x5effb1,
+      color: 0x2ec489,
       wireframe: true,
       transparent: true,
-      opacity: 0.08,
+      opacity: 0.06,
     });
     const wire = new THREE.Mesh(wireGeom, wireMat);
     scene.add(wire);
@@ -167,8 +167,8 @@ export function Hero() {
     const pMat = new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
-        uColor: { value: new THREE.Color("#5EFFB1") },
-        uColor2: { value: new THREE.Color("#7DD3FC") },
+        uColor: { value: new THREE.Color("#2EC489") },
+        uColor2: { value: new THREE.Color("#0E6B44") },
       },
       vertexShader: `
         uniform float uTime; attribute float aRand;
@@ -190,7 +190,7 @@ export function Hero() {
           if(d>0.5) discard;
           float a=smoothstep(0.5,0.0,d);
           vec3 c=mix(uColor,uColor2,vR);
-          gl_FragColor=vec4(c, a*0.7);
+          gl_FragColor=vec4(c, a*0.45);
         }`,
       transparent: true,
       depthWrite: false,
