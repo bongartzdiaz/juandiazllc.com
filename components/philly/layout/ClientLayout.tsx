@@ -2,7 +2,8 @@
 
 import { useState, createContext, useContext, useCallback, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { SessionProvider, useSession } from 'next-auth/react'
+import { createClient } from '@/lib/supabase/client'
+import type { Session } from '@supabase/supabase-js'
 import { IndustryProvider } from '@/hooks/philly/useIndustry'
 import { ToastProvider } from '@/hooks/philly/useToast'
 import { ToastContainer } from '@/components/philly/ui/Toast'
@@ -15,62 +16,63 @@ import { OfflineBanner } from '@/components/philly/ui/OfflineBanner'
 const MobileMenuCtx = createContext<{ open: boolean; toggle: () => void }>({ open: false, toggle: () => {} })
 export const useMobileMenu = () => useContext(MobileMenuCtx)
 
-// Routes that bypass the auth shell (no sidebar, no session requirement)
-const PUBLIC_PATHS = ['/philly/login']
-
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SessionProvider refetchOnWindowFocus={false}>
-      <IndustryProvider>
-        <ToastProvider>
-          <AuthShell>{children}</AuthShell>
-          <ToastContainer />
-        </ToastProvider>
-      </IndustryProvider>
-    </SessionProvider>
+    <IndustryProvider>
+      <ToastProvider>
+        <ProtectedShell>{children}</ProtectedShell>
+        <ToastContainer />
+      </ToastProvider>
+    </IndustryProvider>
   )
 }
 
-function AuthShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const isPublic = PUBLIC_PATHS.some(p => pathname === p || pathname?.startsWith(`${p}/`))
-
-  // Public routes (login) render bare, no sidebar or session check
-  if (isPublic) {
-    return <>{children}</>
-  }
-
-  return <ProtectedShell>{children}</ProtectedShell>
-}
+type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated'
 
 function ProtectedShell({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
-  const { status } = useSession()
+  const [status, setStatus] = useState<AuthStatus>('loading')
   const [mobileOpen, setMobileOpen] = useState(false)
   const toggle = useCallback(() => setMobileOpen(v => !v), [])
 
-  // Auth enforcement. Dev-only escape hatch: set NEXT_PUBLIC_BYPASS_AUTH=1 in .env.local.
-  // In production this flag has no effect — auth is always enforced.
+  // Dev-only escape hatch: NEXT_PUBLIC_BYPASS_AUTH=1 in .env.local
   const bypassAuth =
     process.env.NODE_ENV !== 'production' &&
     process.env.NEXT_PUBLIC_BYPASS_AUTH === '1'
 
-  // Small grace window before redirecting. NextAuth's SessionProvider can
-  // briefly report 'unauthenticated' right after a successful login while
-  // the cookie is still propagating to the client hook. Without this
-  // delay the user gets bounced back to /login immediately after sign-in.
   useEffect(() => {
-    if (bypassAuth || status !== 'unauthenticated') return
-    const t = setTimeout(() => {
-      const callback = encodeURIComponent(pathname || '/')
-      router.replace(`/philly/login?callbackUrl=${callback}`)
-    }, 150)
-    return () => clearTimeout(t)
-  }, [bypassAuth, status, router, pathname])
+    if (bypassAuth) {
+      setStatus('authenticated')
+      return
+    }
 
-  // Show spinner only while session is loading (not when unauthenticated)
-  if (status === 'loading') {
+    const supabase = createClient()
+
+    let mounted = true
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return
+      setStatus(session ? 'authenticated' : 'unauthenticated')
+    })
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session: Session | null) => {
+      setStatus(session ? 'authenticated' : 'unauthenticated')
+    })
+
+    return () => {
+      mounted = false
+      sub.subscription.unsubscribe()
+    }
+  }, [bypassAuth])
+
+  // Unauthenticated → send to brand Supabase login, bring user back afterwards.
+  useEffect(() => {
+    if (status !== 'unauthenticated') return
+    const next = encodeURIComponent(pathname || '/philly')
+    router.replace(`/login?next=${next}`)
+  }, [status, router, pathname])
+
+  if (status !== 'authenticated') {
     return (
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -91,12 +93,10 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
   return (
     <MobileMenuCtx.Provider value={{ open: mobileOpen, toggle }}>
       <div style={{ display: 'flex', minHeight: '100vh', position: 'relative', zIndex: 1 }}>
-        {/* Desktop sidebar */}
         <div className="sidebar-desktop">
           <Sidebar />
         </div>
 
-        {/* Mobile overlay + sidebar */}
         {mobileOpen && (
           <>
             <div className="sidebar-overlay" onClick={() => setMobileOpen(false)} />

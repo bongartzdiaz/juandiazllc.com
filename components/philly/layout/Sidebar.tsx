@@ -14,7 +14,8 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useState } from 'react'
-import { useSession, signOut } from 'next-auth/react'
+import { useSupabaseUser } from '@/hooks/philly/useSupabaseUser'
+import { createClient } from '@/lib/supabase/client'
 import { useIndustry, INDUSTRY_CONFIGS } from '@/hooks/philly/useIndustry'
 import type { Industry } from '@/hooks/philly/useIndustry'
 import { useTranslations } from 'next-intl'
@@ -38,7 +39,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
   const path = pathname.replace(/^\/(en|nl)/, '') || '/'
   const { industry, config, setIndustry } = useIndustry()
   const [showSwitcher, setShowSwitcher] = useState(false)
-  const { data: session } = useSession()
+  const session = useSupabaseUser()
   const t = useTranslations('nav')
   const tc = useTranslations('common')
 
@@ -261,7 +262,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
         </div>
         <button
           type="button"
-          onClick={() => signOut({ callbackUrl: '/login' })}
+          onClick={async () => { await createClient().auth.signOut(); window.location.assign('/login') }}
           title={tc('signOut')}
           aria-label={tc('signOut')}
           style={{
