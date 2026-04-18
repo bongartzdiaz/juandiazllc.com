@@ -10,7 +10,7 @@ const initial: AuthState = { status: "idle" };
 
 export function LoginForm() {
   const params = useSearchParams();
-  const next = params.get("next") ?? "/dashboard";
+  const next = params.get("next") ?? "/app";
   const error = params.get("error");
   const [state, formAction, pending] = useActionState(signInWithPassword, initial);
   const t = useT();
