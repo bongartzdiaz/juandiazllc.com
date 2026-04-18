@@ -25,6 +25,7 @@ const en: Dict = {
   "nav.insights": "Insights",
   "nav.signals": "Signals",
   "nav.contact": "Contact",
+  "nav.about": "About",
   "nav.login": "Login",
 
   // Hero
@@ -147,6 +148,7 @@ const nl: Dict = {
   "nav.work": "Werk",
   "nav.signals": "Signalen",
   "nav.contact": "Contact",
+  "nav.about": "Over",
   "nav.login": "Inloggen",
 
   "hero.chip.status": "◉ Beschikbaar · Amsterdam ↔ Philly",
@@ -258,6 +260,7 @@ const de: Dict = {
   "nav.work": "Arbeit",
   "nav.signals": "Signale",
   "nav.contact": "Kontakt",
+  "nav.about": "Über",
   "nav.login": "Login",
 
   "hero.chip.status": "◉ Verfügbar · Amsterdam ↔ Philly",
@@ -370,6 +373,7 @@ const es: Dict = {
   "nav.work": "Trabajo",
   "nav.signals": "Señales",
   "nav.contact": "Contacto",
+  "nav.about": "Sobre",
   "nav.login": "Acceder",
 
   "hero.chip.status": "◉ Disponible · Amsterdam ↔ Philly",

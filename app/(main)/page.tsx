@@ -7,6 +7,7 @@ import { Kinetic } from "@/components/sections/Kinetic";
 import { Chapters } from "@/components/sections/Chapters";
 import { Ventures } from "@/components/sections/Ventures";
 import { Stats } from "@/components/sections/Stats";
+import { ResultsStrip } from "@/components/sections/ResultsStrip";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { Signals } from "@/components/sections/Signals";
 import { CtaBig } from "@/components/sections/CtaBig";
@@ -79,6 +80,7 @@ export default function Home() {
       <Chapters />
       <Ventures />
       <Stats />
+      <ResultsStrip />
       <Testimonials />
       <Signals />
       <CtaBig />
