@@ -86,6 +86,16 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Selection */
 ::selection { background: var(--accent); color: var(--bg); }
 @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes jdraw { to { stroke-dashoffset: 0; } }
+@keyframes jfade { to { opacity: 1; } }
+@keyframes plumbswing {
+  0%, 100% { transform: rotate(-3deg); }
+  50%      { transform: rotate( 3deg); }
+}
+@keyframes plumbdrop {
+  0%   { opacity: 0; transform: translateY(-8px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0)    scale(1); }
+}
 
 .mono { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; letter-spacing: 0; }
 .label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
