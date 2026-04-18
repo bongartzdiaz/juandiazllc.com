@@ -1,0 +1,226 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  logoUrl   String?
+  industry  String   @default("general")
+  createdAt DateTime @default(now())
+
+  users        User[]
+  projects     Project[]
+  contacts     Contact[]
+  kanbanBoards KanbanBoard[]
+  customPages  CustomPage[]
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  emailVerified  DateTime?
+  name           String
+  passwordHash   String
+  role           String    @default("viewer") // admin, manager, viewer
+  locale         String    @default("en")
+  avatarUrl      String?
+  image          String?
+  organizationId String
+  createdAt      DateTime  @default(now())
+
+  organization    Organization     @relation(fields: [organizationId], references: [id])
+  dashboardLayout DashboardLayout?
+  kanbanCards     KanbanCard[]     @relation("assignee")
+  customPages     CustomPage[]
+  accounts        Account[]
+  sessions        Session[]
+}
+
+// ── NextAuth tables (PrismaAdapter compatible) ──
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Project {
+  id             String    @id @default(cuid())
+  title          String
+  description    String    @default("") @db.Text
+  status         String    @default("planned") // planned, active, completed, paused
+  category       String    @default("general")
+  startDate      DateTime
+  endDate        DateTime?
+  budgetCents    Int       @default(0)
+  spentCents     Int       @default(0)
+  sdgGoals       Json      @default("[]") // SDG numbers 1-17 as JSON array (MySQL has no native int[])
+  organizationId String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization    Organization       @relation(fields: [organizationId], references: [id])
+  milestones      ProjectMilestone[]
+  impactMetrics   ImpactMetric[]
+  contactProjects ContactProject[]
+  kanbanCards     KanbanCard[]
+}
+
+model ProjectMilestone {
+  id          String    @id @default(cuid())
+  projectId   String
+  title       String
+  dueDate     DateTime
+  completedAt DateTime?
+  status      String    @default("pending") // pending, completed, overdue
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Contact {
+  id             String   @id @default(cuid())
+  name           String
+  email          String   @default("")
+  phone          String   @default("")
+  type           String   @default("stakeholder") // partner, beneficiary, stakeholder, donor
+  company        String   @default("")
+  notes          String   @default("") @db.Text
+  avatarUrl      String?
+  organizationId String
+  createdAt      DateTime @default(now())
+
+  organization    Organization     @relation(fields: [organizationId], references: [id])
+  contactProjects ContactProject[]
+}
+
+model ContactProject {
+  id        String @id @default(cuid())
+  contactId String
+  projectId String
+  role      String @default("member")
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, projectId])
+}
+
+model ImpactMetric {
+  id         String   @id @default(cuid())
+  projectId  String
+  metricType String // co2_kg, people_helped, trees_planted, money_donated, water_liters, energy_kwh, custom
+  value      Float
+  unit       String   @default("")
+  date       DateTime @default(now())
+  notes      String   @default("") @db.Text
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model KanbanBoard {
+  id             String   @id @default(cuid())
+  title          String
+  organizationId String
+  createdAt      DateTime @default(now())
+
+  organization Organization   @relation(fields: [organizationId], references: [id])
+  columns      KanbanColumn[]
+}
+
+model KanbanColumn {
+  id       String @id @default(cuid())
+  boardId  String
+  title    String
+  position Int
+  color    String @default("#94A3B8")
+
+  board KanbanBoard  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards KanbanCard[]
+}
+
+model KanbanCard {
+  id          String    @id @default(cuid())
+  columnId    String
+  projectId   String?
+  title       String
+  description String    @default("") @db.Text
+  position    Int
+  priority    String    @default("medium") // low, medium, high, urgent
+  dueDate     DateTime?
+  assigneeId  String?
+
+  column   KanbanColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  project  Project?     @relation(fields: [projectId], references: [id])
+  assignee User?        @relation("assignee", fields: [assigneeId], references: [id])
+}
+
+model DashboardLayout {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  widgetsJson String   @default("[]") @db.LongText // JSON string of DashboardWidget[]
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CustomPage {
+  id             String   @id @default(cuid())
+  organizationId String
+  title          String
+  slug           String
+  createdBy      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  creator      User         @relation(fields: [createdBy], references: [id])
+  blocks       PageBlock[]
+
+  @@unique([organizationId, slug])
+}
+
+model PageBlock {
+  id       String @id @default(cuid())
+  pageId   String
+  type     String // text, table, chart, embed, kanban, image
+  content  String @default("{}") @db.LongText // JSON content
+  position Int
+
+  page CustomPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+}
