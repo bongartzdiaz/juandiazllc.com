@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
+import { LiveMetricsBand } from '@/components/philly/dashboard/LiveMetricsBand'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useKpiStore } from '@/hooks/philly/useKpiStore'
 import { useTheme } from '@/hooks/philly/useTheme'
@@ -212,6 +213,7 @@ export default function DashboardPage() {
 
   return (
     <>
+      <LiveMetricsBand />
       {industry === 'hospitality' ? <HospitalityDashboard {...shared} /> :
        industry === 'realestate' ? <RealEstateDashboard {...shared} /> :
        <CSRDashboard {...shared} />}
