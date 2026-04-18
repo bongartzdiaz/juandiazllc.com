@@ -11,8 +11,8 @@ const VENTURES = [
   { name: "Performance Tracker", domain: "performancetracker.nl", url: "https://performancetracker.nl", live: true },
   { name: "Help Mij Besparen", domain: "helpmijbesparen.nl", url: "https://helpmijbesparen.nl", live: true },
   { name: "Salderingsregeling 2027", domain: "salderingsregeling2027.nl", url: "https://salderingsregeling2027.nl", live: true },
-  { name: "Philly · Field ops", domain: "philly.juandiazllc.com", url: "https://philly.juandiazllc.com/app", live: false },
-  { name: "Dispatch board", domain: "philly · /app/jobs", url: "https://philly.juandiazllc.com/app/jobs", live: false },
+  { name: "Dispatch board", domain: "/diaz/app/jobs", url: "/diaz/app/jobs", live: true },
+  { name: "Operator hub", domain: "/app", url: "/app", live: true },
 ];
 
 function daysUntil2027() {
@@ -25,7 +25,7 @@ type Job = { id: string; title: string; status: string; created_at: string };
 export default async function CommandPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login?next=/app");
+  if (!user) redirect("/diaz/login?next=/diaz/app");
 
   const [subRes, leadRes, recentLeadsRes, jobRes, openJobsRes, recentJobsRes] = await Promise.all([
     supabase.from("subscribers").select("*", { count: "exact", head: true }),

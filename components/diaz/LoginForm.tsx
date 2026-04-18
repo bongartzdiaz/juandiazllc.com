@@ -9,7 +9,7 @@ const initial: AuthState = { status: "idle" };
 
 export function LoginForm() {
   const params = useSearchParams();
-  const next = params.get("next") ?? "/app";
+  const next = params.get("next") ?? "/diaz/app";
   const [state, formAction, pending] = useActionState(signInWithPassword, initial);
 
   return (

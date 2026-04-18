@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { JobDetailActions } from "@/components/philly/JobDetailActions";
+import { JobDetailActions } from "@/components/diaz/JobDetailActions";
 
 export const metadata: Metadata = { title: "Job" };
 export const dynamic = "force-dynamic";
@@ -17,7 +17,7 @@ export default async function JobDetailPage({
   const { id } = await params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?next=/app/jobs/${id}`);
+  if (!user) redirect(`/diaz/login?next=/diaz/app/jobs/${id}`);
 
   const [jobRes, teamsRes, updatesRes] = await Promise.all([
     supabase
@@ -52,7 +52,7 @@ export default async function JobDetailPage({
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "140px 32px 120px" }}>
       <Link
-        href="/app/jobs"
+        href="/diaz/app/jobs"
         style={{
           fontFamily: "'JetBrains Mono'",
           fontSize: 11,

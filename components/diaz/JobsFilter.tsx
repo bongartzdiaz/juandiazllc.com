@@ -24,7 +24,7 @@ export function JobsFilter({
         return (
           <Link
             key={f.key}
-            href={f.key === "all" ? "/app/jobs" : `/app/jobs?status=${f.key}`}
+            href={f.key === "all" ? "/diaz/app/jobs" : `/diaz/app/jobs?status=${f.key}`}
             style={{
               display: "inline-flex",
               alignItems: "center",

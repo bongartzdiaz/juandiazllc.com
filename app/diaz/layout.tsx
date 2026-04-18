@@ -12,13 +12,13 @@ export default function DiazLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="philly-shell">
       <nav className="philly-nav" aria-label="Diaz">
-        <Link href="/app" className="brand" style={{ color: "var(--accent)", gap: 12 }}>
+        <Link href="/diaz/app" className="brand" style={{ color: "var(--accent)", gap: 12 }}>
           <Logo size={24} animated />
           <span style={{ color: "var(--text)" }}>Diaz · Command</span>
         </Link>
         <div className="philly-nav-right">
-          <a href="https://juandiazllc.com">juandiazllc.com</a>
-          <a href="https://philly.juandiazllc.com">philly</a>
+          <Link href="/">← juandiazllc.com</Link>
+          <Link href="/diaz/app/jobs">Jobs</Link>
         </div>
       </nav>
       {children}

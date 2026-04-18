@@ -14,7 +14,7 @@ export function SignOutButton() {
       onClick={() => {
         start(async () => {
           await signOut();
-          router.push("/login");
+          router.push("/diaz/login");
           router.refresh();
         });
       }}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { JobsFilter } from "@/components/philly/JobsFilter";
+import { JobsFilter } from "@/components/diaz/JobsFilter";
 
 export const metadata: Metadata = { title: "Jobs" };
 export const dynamic = "force-dynamic";
@@ -35,7 +35,7 @@ export default async function JobsPage({
   const sp = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login?next=/app/jobs");
+  if (!user) redirect("/diaz/login?next=/diaz/app/jobs");
 
   let query = supabase
     .from("jobs")
@@ -67,7 +67,7 @@ export default async function JobsPage({
             Jobs <em style={{ color: "var(--muted-soft)" }}>board.</em>
           </h1>
         </div>
-        <Link className="btn primary" href="/app/jobs/new">
+        <Link className="btn primary" href="/diaz/app/jobs/new">
           + New job
         </Link>
       </div>
@@ -107,7 +107,7 @@ export default async function JobsPage({
           jobs.map((j) => (
             <Link
               key={j.id}
-              href={`/app/jobs/${j.id}`}
+              href={`/diaz/app/jobs/${j.id}`}
               style={{
                 display: "grid",
                 gridTemplateColumns: "100px 1fr auto auto",

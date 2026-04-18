@@ -33,11 +33,11 @@ export async function updateSession(request: NextRequest) {
 
   // Gate protected routes
   const path = request.nextUrl.pathname;
-  const isProtected =
-    path.startsWith("/app") || path.startsWith("/dashboard");
-  if (!user && isProtected) {
+  const isMainProtected = path === "/app" || path.startsWith("/app/") || path.startsWith("/dashboard");
+  const isDiazProtected = path === "/diaz/app" || path.startsWith("/diaz/app/");
+  if (!user && (isMainProtected || isDiazProtected)) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = isDiazProtected ? "/diaz/login" : "/login";
     url.searchParams.set("next", path);
     return NextResponse.redirect(url);
   }
