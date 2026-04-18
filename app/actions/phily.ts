@@ -53,23 +53,23 @@ export async function createProject(formData: FormData): Promise<ProjectResult> 
     .select("id")
     .single();
   if (error) return { ok: false, message: error.message };
-  revalidatePath("/diaz/dashboard/projects");
-  revalidatePath("/diaz/dashboard");
+  revalidatePath("/philly/projects");
+  revalidatePath("/philly");
   return { ok: true, id: data.id };
 }
 
 export async function updateProjectStatus(id: string, status: string) {
   const supabase = await createClient();
   await supabase.from("projects").update({ status }).eq("id", id);
-  revalidatePath("/diaz/dashboard/projects");
-  revalidatePath("/diaz/dashboard");
+  revalidatePath("/philly/projects");
+  revalidatePath("/philly");
 }
 
 export async function deleteProject(id: string) {
   const supabase = await createClient();
   await supabase.from("projects").delete().eq("id", id);
-  revalidatePath("/diaz/dashboard/projects");
-  revalidatePath("/diaz/dashboard");
+  revalidatePath("/philly/projects");
+  revalidatePath("/philly");
 }
 
 // ── Contacts ──
@@ -98,15 +98,15 @@ export async function createContact(formData: FormData) {
     notes,
   });
   if (error) return { ok: false, message: error.message };
-  revalidatePath("/diaz/dashboard/contacts");
-  revalidatePath("/diaz/dashboard");
+  revalidatePath("/philly/contacts");
+  revalidatePath("/philly");
   return { ok: true };
 }
 
 export async function deleteContact(id: string) {
   const supabase = await createClient();
   await supabase.from("contacts").delete().eq("id", id);
-  revalidatePath("/diaz/dashboard/contacts");
+  revalidatePath("/philly/contacts");
 }
 
 // ── Impact metrics ──
@@ -128,8 +128,8 @@ export async function addImpactMetric(formData: FormData) {
     notes,
   });
   if (error) return { ok: false, message: error.message };
-  revalidatePath("/diaz/dashboard/impact");
-  revalidatePath("/diaz/dashboard");
+  revalidatePath("/philly/impact");
+  revalidatePath("/philly");
   return { ok: true };
 }
 
@@ -146,7 +146,7 @@ export async function createKanbanCard(columnId: string, title: string) {
     .limit(1);
   const position = (existing?.[0]?.position ?? 0) + 1;
   await supabase.from("kanban_cards").insert({ column_id: columnId, title: title.trim(), position });
-  revalidatePath("/diaz/dashboard/kanban");
+  revalidatePath("/philly/kanban");
   return { ok: true };
 }
 
@@ -156,13 +156,13 @@ export async function moveKanbanCard(cardId: string, toColumnId: string, toPosit
     .from("kanban_cards")
     .update({ column_id: toColumnId, position: toPosition })
     .eq("id", cardId);
-  revalidatePath("/diaz/dashboard/kanban");
+  revalidatePath("/philly/kanban");
 }
 
 export async function deleteKanbanCard(id: string) {
   const supabase = await createClient();
   await supabase.from("kanban_cards").delete().eq("id", id);
-  revalidatePath("/diaz/dashboard/kanban");
+  revalidatePath("/philly/kanban");
 }
 
 // ── Seed a default kanban board if none exists ──

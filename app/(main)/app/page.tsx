@@ -376,10 +376,10 @@ export default async function AppPage() {
           </div>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <Link className="btn primary" href="/diaz/app">
+          <Link className="btn primary" href="/philly">
             ◉ Diaz · Master Command →
           </Link>
-          <Link className="btn ghost" href="/diaz/app/jobs">
+          <Link className="btn ghost" href="/philly/deals">
             Dispatch board →
           </Link>
           <Link className="btn ghost" href="/">
