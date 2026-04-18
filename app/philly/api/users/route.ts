@@ -77,7 +77,7 @@ export async function PATCH(req: NextRequest) {
     action: 'update',
     entity: 'user',
     entityId: target.id,
-    changes: { role: { from: target.role, to: parsed.data.role } },
+    changes: { role: { old: target.role, new: parsed.data.role } },
   }).catch(() => { /* audit best-effort */ })
 
   return NextResponse.json({ user: updated })
