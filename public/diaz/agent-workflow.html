@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Workflow — Energie Besparen Website</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F4F6F9; --panel: #fff; --border: #E1E5EE;
+  --txt: #0E1117; --txt2: #525C72; --txt3: #96A0B5;
+  --g: #079455; --g-bg: #ECFDF3; --g-border: #A9EFC5; --g-txt: #067647;
+  --o: #DC4A11; --o-bg: #FEF2EE; --o-border: #FAC5B0; --o-txt: #B93B0D;
+  --b: #1650DC; --b-bg: #EFF4FF; --b-border: #C7D7FD; --b-txt: #1849A9;
+  --y: #B54708; --y-bg: #FFFAEB; --y-border: #FEDF89; --y-txt: #93370D;
+  --p: #6941C6; --p-bg: #F4F3FF; --p-border: #D9D6FE; --p-txt: #5925DC;
+  --r: #C01048; --r-bg: #FFF1F3; --r-border: #FECDD6; --r-txt: #89123E;
+  --shadow: 0 1px 3px rgba(14,17,23,0.08), 0 1px 2px rgba(14,17,23,0.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'DM Sans',system-ui,sans-serif;font-size:13px;line-height:1.55;-webkit-font-smoothing:antialiased;padding:32px 24px 60px}
+.mono{font-family:'DM Mono',monospace;font-variant-numeric:tabular-nums}
+
+/* Header */
+.header{text-align:center;margin-bottom:40px}
+.header h1{font-size:26px;font-weight:700;letter-spacing:-0.03em;margin-bottom:8px}
+.header p{font-size:14px;color:var(--txt2);max-width:600px;margin:0 auto}
+.header-badge{display:inline-flex;align-items:center;gap:6px;background:var(--g-bg);color:var(--g-txt);border:1px solid var(--g-border);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;margin-bottom:16px}
+
+/* Phase headers */
+.phase-label{display:flex;align-items:center;gap:10px;margin:32px 0 14px}
+.phase-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0}
+.phase-title{font-size:16px;font-weight:700;letter-spacing:-0.02em}
+.phase-sub{font-size:12px;color:var(--txt2);margin-top:1px}
+
+/* Agent grid */
+.agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;margin-bottom:8px}
+.agent-grid-3{grid-template-columns:repeat(3,1fr)}
+.agent-grid-4{grid-template-columns:repeat(4,1fr)}
+
+/* Agent card */
+.agent{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 15px;position:relative;box-shadow:var(--shadow)}
+.agent-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.agent-name{font-size:13px;font-weight:700;letter-spacing:-0.01em}
+.agent-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;padding:2px 7px;border-radius:6px;flex-shrink:0;margin-top:2px}
+.agent-desc{font-size:11px;color:var(--txt2);margin-bottom:8px;line-height:1.5}
+.agent-tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:9px;font-weight:600;padding:2px 6px;border-radius:5px;border:1px solid}
+
+/* Orchestrator */
+.orch{background:var(--txt);color:#fff;border-color:var(--txt)}
+.orch .agent-name{color:#fff}
+.orch .agent-desc{color:rgba(255,255,255,0.65)}
+
+/* Color variants */
+.c-green .agent-type{background:var(--g-bg);color:var(--g-txt)}
+.c-green .tag{background:var(--g-bg);color:var(--g-txt);border-color:var(--g-border)}
+.c-orange .agent-type{background:var(--o-bg);color:var(--o-txt)}
+.c-orange .tag{background:var(--o-bg);color:var(--o-txt);border-color:var(--o-border)}
+.c-blue .agent-type{background:var(--b-bg);color:var(--b-txt)}
+.c-blue .tag{background:var(--b-bg);color:var(--b-txt);border-color:var(--b-border)}
+.c-yellow .agent-type{background:var(--y-bg);color:var(--y-txt)}
+.c-yellow .tag{background:var(--y-bg);color:var(--y-txt);border-color:var(--y-border)}
+.c-purple .agent-type{background:var(--p-bg);color:var(--p-txt)}
+.c-purple .tag{background:var(--p-bg);color:var(--p-txt);border-color:var(--p-border)}
+.c-red .agent-type{background:var(--r-bg);color:var(--r-txt)}
+.c-red .tag{background:var(--r-bg);color:var(--r-txt);border-color:var(--r-border)}
+
+/* Arrow connector */
+.arrow{text-align:center;color:var(--txt3);font-size:20px;padding:6px 0;font-weight:300}
+
+/* Flow connector */
+.flow-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.flow-box{flex:1;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;font-weight:600;text-align:center;box-shadow:var(--shadow)}
+.flow-arrow{color:var(--txt3);font-size:16px;flex-shrink:0}
+
+/* Stats bar */
+.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:20px 0 32px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:var(--shadow)}
+.stat{text-align:center}
+.stat-n{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.stat-l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--txt3);margin-top:3px}
+
+/* Section divider */
+.divider{height:1px;background:var(--border);margin:28px 0}
+
+/* Info box */
+.info-box{background:var(--b-bg);border:1px solid var(--b-border);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:12px;color:var(--b-txt)}
+.info-box strong{font-weight:700}
+.warn-box{background:var(--y-bg);border:1px solid var(--y-border);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:12px;color:var(--y-txt)}
+
+/* Infra table */
+.infra{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:14px}
+.infra th{text-align:left;padding:9px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--txt3);border-bottom:1px solid var(--border);background:var(--bg)}
+.infra td{padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:top}
+.infra tr:last-child td{border-bottom:none}
+.infra tr:hover td{background:var(--bg)}
+
+/* Section card */
+.section-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:16px}
+.section-card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.section-card-body{padding:16px 18px}
+.section-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px}
+
+/* Reuse badge */
+.reuse{position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;background:var(--g-bg);color:var(--g-txt);border:1px solid var(--g-border);padding:1px 6px;border-radius:6px}
+
+/* Phase bg */
+.phase-bg-green{background:rgba(7,148,85,0.03);border:1px solid rgba(7,148,85,0.1);border-radius:12px;padding:16px;margin-bottom:20px}
+.phase-bg-blue{background:rgba(22,80,220,0.03);border:1px solid rgba(22,80,220,0.1);border-radius:12px;padding:16px;margin-bottom:20px}
+.phase-bg-orange{background:rgba(220,74,17,0.03);border:1px solid rgba(220,74,17,0.1);border-radius:12px;padding:16px;margin-bottom:20px}
+.phase-bg-purple{background:rgba(105,65,198,0.03);border:1px solid rgba(105,65,198,0.1);border-radius:12px;padding:16px;margin-bottom:20px}
+.phase-bg-yellow{background:rgba(181,71,8,0.03);border:1px solid rgba(181,71,8,0.1);border-radius:12px;padding:16px;margin-bottom:20px}
+.phase-bg-red{background:rgba(192,16,72,0.03);border:1px solid rgba(192,16,72,0.1);border-radius:12px;padding:16px;margin-bottom:20px}
+
+@media(max-width:900px){.agent-grid-3,.agent-grid-4{grid-template-columns:1fr 1fr}.stats-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.agent-grid,.agent-grid-3,.agent-grid-4{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-badge">⚡ Energie Besparen Platform — Agent Architectuur</div>
+  <h1>Volledige Agent Workflow</h1>
+  <p>Van nul naar een volledig werkende energie-website in de niche van helpmijbesparen.nl — zonnepanelen, thuisbatterij, salderingsregeling — met SEO, content, chatbot en marketing geautomatiseerd door AI-agents.</p>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat"><div class="stat-n" style="color:var(--g-txt)">42</div><div class="stat-l">Agents totaal</div></div>
+  <div class="stat"><div class="stat-n" style="color:var(--b-txt)">7</div><div class="stat-l">Fases</div></div>
+  <div class="stat"><div class="stat-n" style="color:var(--o-txt)">15</div><div class="stat-l">Edge Functions</div></div>
+  <div class="stat"><div class="stat-n" style="color:var(--p-txt)">6</div><div class="stat-l">Orchestrators</div></div>
+  <div class="stat"><div class="stat-n" style="color:var(--g-txt)">18</div><div class="stat-l">Herbruikbaar HMB</div></div>
+  <div class="stat"><div class="stat-n" style="color:var(--y-txt)">24</div><div class="stat-l">Nieuw te bouwen</div></div>
+</div>
+
+<!-- FLOW OVERVIEW -->
+<div class="section-card" style="margin-bottom:28px">
+  <div class="section-card-head">
+    <div class="section-icon" style="background:#F4F6F9">🗺️</div>
+    <div>
+      <div style="font-size:14px;font-weight:700">Complete Flow — Van idee tot lead</div>
+      <div style="font-size:11px;color:var(--txt2)">Elke fase bouwt voort op de vorige</div>
+    </div>
+  </div>
+  <div class="section-card-body">
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+      <div class="flow-box" style="background:var(--g-bg);border-color:var(--g-border);color:var(--g-txt)">① SEO Research</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="background:var(--b-bg);border-color:var(--b-border);color:var(--b-txt)">② Site Architectuur</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="background:var(--p-bg);border-color:var(--p-border);color:var(--p-txt)">③ Website Bouwen</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="background:var(--o-bg);border-color:var(--o-border);color:var(--o-txt)">④ Content Machine</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="background:var(--y-bg);border-color:var(--y-border);color:var(--y-txt)">⑤ Lead + Chatbot</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="background:var(--r-bg);border-color:var(--r-border);color:var(--r-txt)">⑥ Marketing</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="background:var(--txt);border-color:var(--txt);color:#fff">⑦ Monitoring</div>
+    </div>
+    <div class="info-box" style="margin-top:14px;margin-bottom:0">
+      <strong>Niche:</strong> Thuisbatterij · Zonnepanelen · Salderingsregeling 2027 · Energie besparen NL/BE
+      &nbsp;|&nbsp; <strong>Stack:</strong> Next.js · Supabase · GHL · DM Champ WhatsApp
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     FASE 1 — SEO RESEARCH
+═══════════════════════════════════ -->
+<div class="phase-label">
+  <div class="phase-num" style="background:var(--g-bg);color:var(--g-txt)">1</div>
+  <div>
+    <div class="phase-title">SEO Research & Strategie</div>
+    <div class="phase-sub">Niche-analyse, keyword-mapping en concurrentieonderzoek voor de energie-markt</div>
+  </div>
+</div>
+
+<div class="phase-bg-green">
+  <div class="agent-grid agent-grid-4">
+
+    <div class="agent c-green">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">niche-researcher</div>
+        <div class="agent-type">Orchestrator</div>
+      </div>
+      <div class="agent-desc">Analyseert de volledige energie-niche: marktgrootte, seizoenspatronen, salderingsregeling-urgentie, concurrenten (helpmijbesparen.nl, zelfbesparen.nl etc.)</div>
+      <div class="agent-tags"><span class="tag">WebSearch</span><span class="tag">WebFetch</span><span class="tag">Read</span></div>
+    </div>
+
+    <div class="agent c-green">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">keyword-researcher</div>
+        <div class="agent-type">Specialist</div>
+      </div>
+      <div class="agent-desc">Bouwt complete keyword-matrix: thuisbatterij (hoofd), zonnepanelen, salderingsregeling 2027, energieopslag, warmtepomp. Volume + intent mapping.</div>
+      <div class="agent-tags"><span class="tag">Ahrefs MCP</span><span class="tag">WebSearch</span><span class="tag">Write</span></div>
+    </div>
+
+    <div class="agent c-green">
+      <div class="agent-head">
+        <div class="agent-name">competitor-analyzer</div>
+        <div class="agent-type">Specialist</div>
+      </div>
+      <div class="agent-desc">Scrapet en analyseert helpmijbesparen.nl, thuisbatterij.nl, sessy.nl. Identificeert contenthiaten, zwakke backlinks, ontbrekende zoekwoorden.</div>
+      <div class="agent-tags"><span class="tag">WebFetch</span><span class="tag">Ahrefs MCP</span><span class="tag">Write</span></div>
+    </div>
+
+    <div class="agent c-green">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">site-architect</div>
+        <div class="agent-type">Specialist</div>
+      </div>
+      <div class="agent-desc">Bouwt de volledige sitestructuur: pillar pages, cluster-pagina's, FAQ-hubs. Bepaalt URL-structuur en interne linkstrategie op basis van keyword-data.</div>
+      <div class="agent-tags"><span class="tag">Read</span><span class="tag">Write</span><span class="tag">Bash</span></div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:10px">
+    <div class="warn-box" style="margin:0">
+      <strong>Energie-niche specifieke keywords (prioriteit):</strong>
+      thuisbatterij kopen · thuisbatterij prijs · salderingsregeling 2027 afschaffing ·
+      zonnepanelen met thuisbatterij · thuisbatterij terugverdientijd ·
+      beste thuisbatterij nederland · thuisbatterij zonder zonnepanelen ·
+      dynamisch energiecontract thuisbatterij
+    </div>
+  </div>
+
+  <div class="info-box" style="margin-bottom:0">
+    <strong>Output fase 1:</strong> keyword-matrix.json → site-structuur.md → competitor-gaps.md → Supabase: <span class="mono">sites</span> tabel ingevuld
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     FASE 2 — WEBSITE BOUWEN
+═══════════════════════════════════ -->
+<div class="phase-label">
+  <div class="phase-num" style="background:var(--b-bg);color:var(--b-txt)">2</div>
+  <div>
+    <div class="phase-title">Website Bouwen & Technisch Fundament</div>
+    <div class="phase-sub">Next.js site opzetten, design systeem, pagina-templates, CMS-koppeling</div>
+  </div>
+</div>
+
+<div class="phase-bg-blue">
+  <div class="agent-grid agent-grid-4">
+
+    <div class="agent orch">
+      <div class="agent-head">
+        <div class="agent-name">site-orchestrator</div>
+        <div class="agent-type" style="background:rgba(255,255,255,0.15);color:#fff">Orchestrator</div>
+      </div>
+      <div class="agent-desc">Coördineert de volledige website-bouw. Delegeert naar design, frontend, backend en SEO-techniek. Bewaakt kwaliteitsgates tussen fases.</div>
+      <div class="agent-tags" style="gap:4px">
+        <span class="tag" style="background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.2)">Delegeert alles</span>
+      </div>
+    </div>
+
+    <div class="agent c-blue">
+      <div class="agent-head">
+        <div class="agent-name">hmb-webdesigner</div>
+        <div class="agent-type">Design</div>
+      </div>
+      <div class="agent-desc">Past het HMB dual-theme design systeem toe op de nieuwe site. DM Sans + DM Mono, CSS-variabelen, dual-theme toggle. Bouwt alle herbruikbare UI-componenten.</div>
+      <div class="agent-tags"><span class="tag">Read</span><span class="tag">Write</span><span class="tag">Edit</span></div>
+    </div>
+
+    <div class="agent c-blue">
+      <div class="agent-head">
+        <div class="agent-name">nextjs-pro</div>
+        <div class="agent-type">Frontend</div>
+      </div>
+      <div class="agent-desc">Bouwt Next.js 14 App Router structuur. SSG voor statische pagina's (bespaar op hosting), ISR voor content-pagina's. Optimale Core Web Vitals voor SEO.</div>
+      <div class="agent-tags"><span class="tag">Read</span><span class="tag">Write</span><span class="tag">Bash</span></div>
+    </div>
+
+    <div class="agent c-blue">
+      <div class="agent-head">
+        <div class="agent-name">seo-technicus</div>
+        <div class="agent-type">SEO-tech</div>
+      </div>
+      <div class="agent-desc">Implementeert schema.org markup (FAQPage, Article, BreadcrumbList), sitemap.xml, robots.txt, canonical tags, hreflang voor NL/BE. Koppelt met Supabase sitemap-generator.</div>
+      <div class="agent-tags"><span class="tag">Read</span><span class="tag">Write</span><span class="tag">Edit</span></div>
+    </div>
+
+    <div class="agent c-blue">
+      <div class="agent-head">
+        <div class="agent-name">page-builder</div>
+        <div class="agent-type">Templates</div>
+      </div>
+      <div class="agent-desc">Bouwt herbruikbare pagina-templates: pillar page, cluster artikel, landingspagina, vergelijkingspagina, FAQ-hub. Volledig CMS-gedreven vanuit Supabase.</div>
+      <div class="agent-tags"><span class="tag">Write</span><span class="tag">Edit</span><span class="tag">Read</span></div>
+    </div>
+
+    <div class="agent c-blue">
+      <div class="agent-head">
+        <div class="agent-name">supabase-integrator</div>
+        <div class="agent-type">Backend</div>
+      </div>
+      <div class="agent-desc">Koppelt Next.js aan Supabase voor content-opslag, lead-opslag en agent-logs. Bouwt de data-laag: articles, leads, agent_logs, settings tabellen voor de nieuwe site.</div>
+      <div class="agent-tags"><span class="tag">Supabase MCP</span><span class="tag">Write</span><span class="tag">Bash</span></div>
+    </div>
+
+    <div class="agent c-blue">
+      <div class="agent-head">
+        <div class="agent-name">performance-engineer</div>
+        <div class="agent-type">Perf</div>
+      </div>
+      <div class="agent-desc">Optimaliseert Core Web Vitals: LCP &lt;2.5s, CLS &lt;0.1, INP &lt;200ms. Image-optimalisatie, lazy loading, font-subsetting, code-splitting voor energie-niche pagina's.</div>
+      <div class="agent-tags"><span class="tag">Bash</span><span class="tag">Read</span><span class="tag">Edit</span></div>
+    </div>
+
+    <div class="agent c-blue">
+      <div class="agent-head">
+        <div class="agent-name">conversion-optimizer</div>
+        <div class="agent-type">CRO</div>
+      </div>
+      <div class="agent-desc">Bouwt CTA-componenten, lead-formulieren, bespaar-calculators (kWh vs prijs), trust-badges. Energie-niche specifiek: "Bereken uw besparing" tool, urgentie-banners voor 2027.</div>
+      <div class="agent-tags"><span class="tag">Write</span><span class="tag">Edit</span><span class="tag">Read</span></div>
+    </div>
+
+  </div>
+
+  <div class="info-box" style="margin-bottom:0">
+    <strong>Output fase 2:</strong> Werkende Next.js site op Digital Ocean · Supabase gekoppeld · Design systeem actief · Alle page-templates gebouwd
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     FASE 3 — CONTENT MACHINE
+═══════════════════════════════════ -->
+<div class="phase-label">
+  <div class="phase-num" style="background:var(--o-bg);color:var(--o-txt)">3</div>
+  <div>
+    <div class="phase-title">Content Machine — SEO Artikelen & Pillar Pages</div>
+    <div class="phase-sub">Geautomatiseerde contentproductie in Nederlandse energiesector-stijl</div>
+  </div>
+</div>
+
+<div class="phase-bg-orange">
+  <div class="agent-grid agent-grid-4">
+
+    <div class="agent orch">
+      <div class="agent-head">
+        <div class="agent-name">content-orchestrator</div>
+        <div class="agent-type" style="background:rgba(255,255,255,0.15);color:#fff">Orchestrator</div>
+      </div>
+      <div class="agent-desc">Plant en coördineert alle contentproductie. Haalt keywords op, bepaalt prioriteit (zoekvolume × concurrentie), delegeert naar schrijvers en checkt kwaliteit.</div>
+      <div class="agent-tags" style="gap:4px">
+        <span class="tag" style="background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.2)">Supabase: content_calendar</span>
+      </div>
+    </div>
+
+    <div class="agent c-orange">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">nl-content-writer</div>
+        <div class="agent-type">Schrijver</div>
+      </div>
+      <div class="agent-desc">Schrijft SEO-geoptimaliseerde artikelen in Nederlands, energie-sector toon. E-E-A-T compliant, feitelijk correct, inclusief berekeningen (terugverdientijd, besparing per jaar).</div>
+      <div class="agent-tags"><span class="tag">WebSearch</span><span class="tag">Write</span><span class="tag">Supabase</span></div>
+    </div>
+
+    <div class="agent c-orange">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">seo-auditor</div>
+        <div class="agent-type">Kwaliteit</div>
+      </div>
+      <div class="agent-desc">Controleert elk artikel: keyword-dichtheid, meta-tags, schema-markup, interne links, leesbaarheid, CTA-aanwezigheid. Geeft score 0-100 terug naar Supabase.</div>
+      <div class="agent-tags"><span class="tag">Read</span><span class="tag">Grep</span><span class="tag">Edit</span></div>
+    </div>
+
+    <div class="agent c-orange">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">internal-link-builder</div>
+        <div class="agent-name">schema-generator</div>
+        <div class="agent-type">SEO</div>
+      </div>
+      <div class="agent-desc">Bouwt intern linknetwerk op basis van topicale autoriteit. Genereert JSON-LD schema voor elk article type (FAQ, HowTo, Article, Product).</div>
+      <div class="agent-tags"><span class="tag">Read</span><span class="tag">Edit</span><span class="tag">Supabase</span></div>
+    </div>
+
+    <div class="agent c-orange">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">designer-chain</div>
+        <div class="agent-type">Banners</div>
+      </div>
+      <div class="agent-desc">Genereert banners en hero-afbeeldingen voor elk artikel via AI image generation. Energie-thema: zonnepanelen op daken, thuisbatterijen, groene energie Nederland.</div>
+      <div class="agent-tags"><span class="tag">Imagen API</span><span class="tag">Supabase</span><span class="tag">Write</span></div>
+    </div>
+
+    <div class="agent c-orange">
+      <div class="agent-head">
+        <div class="agent-name">speurder-nieuws</div>
+        <div class="agent-type">Nieuws</div>
+      </div>
+      <div class="agent-desc">Scant dagelijks nieuws: salderingsregeling updates, nieuwe thuisbatterij modellen, subsidies, energieprijzen. Genereert news-jacking artikelen binnen 2 uur na publicatie.</div>
+      <div class="agent-tags"><span class="tag">WebSearch</span><span class="tag">WebFetch</span><span class="tag">Write</span></div>
+    </div>
+
+    <div class="agent c-orange">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">content-refresher</div>
+        <div class="agent-type">Onderhoud</div>
+      </div>
+      <div class="agent-desc">Controleert bestaande artikelen op verouderde info (prijzen, regelgeving, techniek). Update automatisch feiten, statistieken en berekeningen. Prio op dalende posities.</div>
+      <div class="agent-tags"><span class="tag">WebSearch</span><span class="tag">Read</span><span class="tag">Edit</span></div>
+    </div>
+
+    <div class="agent c-orange">
+      <div class="agent-head">
+        <div class="agent-name">supabase-publisher</div>
+        <div class="agent-type">Publicatie</div>
+      </div>
+      <div class="agent-desc">Publiceert goedgekeurde content naar Supabase. Zet status op 'published', triggert Next.js revalidatie via webhook, update sitemap automatisch.</div>
+      <div class="agent-tags"><span class="tag">Supabase MCP</span><span class="tag">Bash</span><span class="tag">Read</span></div>
+    </div>
+
+  </div>
+
+  <div style="margin:10px 0 0">
+    <div style="background:var(--panel);border:1px solid var(--o-border);border-radius:8px;padding:12px 14px">
+      <div style="font-size:11px;font-weight:700;color:var(--o-txt);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em">Energie Pillar Pages (prioriteit 1)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <span style="background:var(--o-bg);color:var(--o-txt);border:1px solid var(--o-border);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600">Thuisbatterij kopen gids</span>
+        <span style="background:var(--o-bg);color:var(--o-txt);border:1px solid var(--o-border);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600">Salderingsregeling 2027 uitleg</span>
+        <span style="background:var(--o-bg);color:var(--o-txt);border:1px solid var(--o-border);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600">Zonnepanelen + thuisbatterij combi</span>
+        <span style="background:var(--o-bg);color:var(--o-txt);border:1px solid var(--o-border);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600">Beste thuisbatterij vergelijking</span>
+        <span style="background:var(--o-bg);color:var(--o-txt);border:1px solid var(--o-border);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600">Terugverdientijd calculator</span>
+        <span style="background:var(--o-bg);color:var(--o-txt);border:1px solid var(--o-border);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600">Subsidie thuisbatterij 2025</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     FASE 4 — LEAD GENERATIE + CHATBOT
+═══════════════════════════════════ -->
+<div class="phase-label">
+  <div class="phase-num" style="background:var(--y-bg);color:var(--y-txt)">4</div>
+  <div>
+    <div class="phase-title">Lead Generatie & WhatsApp Chatbot</div>
+    <div class="phase-sub">Van bezoeker naar gekwalificeerde lead via DM Champ + GHL pipeline</div>
+  </div>
+</div>
+
+<div class="phase-bg-yellow">
+
+  <!-- Chatbot sub-sectie -->
+  <div style="margin-bottom:12px;font-size:12px;font-weight:700;color:var(--y-txt);text-transform:uppercase;letter-spacing:0.08em">WhatsApp DM Champ Bot</div>
+  <div class="agent-grid agent-grid-4">
+
+    <div class="agent c-yellow">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">dmchamp-webhook</div>
+        <div class="agent-type">Edge Fn</div>
+      </div>
+      <div class="agent-desc">Ontvangt WhatsApp events van DM Champ. Slaat op in Supabase dmchamp_events. Triggert analyse en bot-instructie optimizer.</div>
+      <div class="agent-tags"><span class="tag">Supabase</span><span class="tag">Webhook</span></div>
+    </div>
+
+    <div class="agent c-yellow">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">conversation-analyzer</div>
+        <div class="agent-type">AI-analyse</div>
+      </div>
+      <div class="agent-desc">Analyseert WhatsApp-gesprekken op uitkomst, koopsignalen, bezwaren. Energie-specifiek: prijs-bezwaar, terugverdientijd-twijfel, installateur-vraag, subsidie-vraag.</div>
+      <div class="agent-tags"><span class="tag">Read</span><span class="tag">Supabase</span><span class="tag">Claude API</span></div>
+    </div>
+
+    <div class="agent c-yellow">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">pattern-learner</div>
+        <div class="agent-type">Leren</div>
+      </div>
+      <div class="agent-desc">Extraheert winnende en verliezende patronen uit gesprekken. Leert: welke antwoorden op "te duur" leiden tot conversie? Slaat op in bot_learnings.</div>
+      <div class="agent-tags"><span class="tag">Read</span><span class="tag">Supabase</span><span class="tag">Write</span></div>
+    </div>
+
+    <div class="agent c-yellow">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">instructie-optimizer</div>
+        <div class="agent-type">Bot-update</div>
+      </div>
+      <div class="agent-desc">Herschrijft bot-instructies op basis van geleerde patronen. Proposeert nieuwe versie → slaat op als 'voorstel' → na goedkeuring actief in DM Champ.</div>
+      <div class="agent-tags"><span class="tag">Read</span><span class="tag">Write</span><span class="tag">Supabase</span></div>
+    </div>
+
+  </div>
+
+  <!-- GHL pipeline sub-sectie -->
+  <div style="margin:14px 0 10px;font-size:12px;font-weight:700;color:var(--y-txt);text-transform:uppercase;letter-spacing:0.08em">GHL Sales Pipeline</div>
+  <div class="agent-grid agent-grid-4">
+
+    <div class="agent c-yellow">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">ghl-sync</div>
+        <div class="agent-type">Edge Fn</div>
+      </div>
+      <div class="agent-desc">Haalt GHL pipeline + leads op. Filtert op custom field (Juan/buitendienst). Cacht in Supabase ghl_leads + ghl_pipeline_stages. Elke 30 min auto-refresh.</div>
+      <div class="agent-tags"><span class="tag">GHL API</span><span class="tag">Supabase</span></div>
+    </div>
+
+    <div class="agent c-yellow">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">ghl-agenda-sync</div>
+        <div class="agent-type">Edge Fn</div>
+      </div>
+      <div class="agent-desc">Synchroniseert buitendienst-agenda van GHL naar Supabase agenda_events. 7 dagen terug + 30 vooruit. Status: gepland/afgerond/no_show/deal.</div>
+      <div class="agent-tags"><span class="tag">GHL API</span><span class="tag">Supabase</span></div>
+    </div>
+
+    <div class="agent c-yellow">
+      <div class="agent-head">
+        <div class="agent-name">lead-qualifier</div>
+        <div class="agent-type">Kwalificatie</div>
+      </div>
+      <div class="agent-desc">Scoort binnenkomende leads automatisch op basis van: zonnepanelen aanwezig? Postcode (netcongestie-check)? Woningtype? Budget-indicatie uit chat? Prioriteert voor buitendienst.</div>
+      <div class="agent-tags"><span class="tag">Supabase</span><span class="tag">WebSearch</span><span class="tag">Write</span></div>
+    </div>
+
+    <div class="agent c-yellow">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">coaching-reporter</div>
+        <div class="agent-type">Rapportage</div>
+      </div>
+      <div class="agent-desc">Genereert wekelijks coaching-rapport voor buitendienst: welke vragen horen ze vaker? Welke bezwaren? Welke argumenten werken? Stuurt via Slack + WhatsApp.</div>
+      <div class="agent-tags"><span class="tag">Supabase</span><span class="tag">Slack</span><span class="tag">Write</span></div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:10px">
+    <div class="info-box" style="margin-bottom:0">
+      <strong>Energie chatbot scenario's:</strong>
+      "Heb ik zonnepanelen nodig?" · "Wat kost een thuisbatterij?" · "Wanneer verdien ik het terug?" ·
+      "Wat gebeurt er met mijn saldering na 2027?" · "Welk merk is het beste?" · "Kunnen jullie langskomen?"
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     FASE 5 — META ADS & MARKETING
+═══════════════════════════════════ -->
+<div class="phase-label">
+  <div class="phase-num" style="background:var(--r-bg);color:var(--r-txt)">5</div>
+  <div>
+    <div class="phase-title">Meta Ads & Betaalde Marketing</div>
+    <div class="phase-sub">Ad-creatives, campagne-monitoring en automatische optimalisatie</div>
+  </div>
+</div>
+
+<div class="phase-bg-red">
+  <div class="agent-grid agent-grid-4">
+
+    <div class="agent c-red">
+      <div class="agent-head">
+        <div class="agent-name">ad-creative-writer</div>
+        <div class="agent-type">Creatives</div>
+      </div>
+      <div class="agent-desc">Schrijft Meta ad-teksten voor alle 7 energie-funnels. Frameworks: AIDA, PAS, urgentie (2027!). A/B varianten per funnel. Slaat op in Supabase ads-tabel.</div>
+      <div class="agent-tags"><span class="tag">Write</span><span class="tag">Supabase</span><span class="tag">Read</span></div>
+    </div>
+
+    <div class="agent c-red">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">meta-ads-sync</div>
+        <div class="agent-type">Edge Fn</div>
+      </div>
+      <div class="agent-desc">Haalt Meta Ads prestaties op via API. Berekent CPL, CTR, spend per funnel. Update status-label (goed/testfase/slecht). Triggert alert bij CPL > drempel.</div>
+      <div class="agent-tags"><span class="tag">Meta API</span><span class="tag">Supabase</span></div>
+    </div>
+
+    <div class="agent c-red">
+      <div class="agent-head">
+        <div class="agent-name">campaign-analyzer</div>
+        <div class="agent-type">Analyse</div>
+      </div>
+      <div class="agent-desc">Analyseert wekelijks campagneprestaties. Identificeert winnende creatives en funnels. Genereert aanbevelingen: schaal F1, pauzeer F5, test nieuwe angle voor F3.</div>
+      <div class="agent-tags"><span class="tag">Read</span><span class="tag">Supabase</span><span class="tag">Write</span></div>
+    </div>
+
+    <div class="agent c-red">
+      <div class="agent-head">
+        <div class="agent-name">banner-generator</div>
+        <div class="agent-type">Visuals</div>
+      </div>
+      <div class="agent-desc">Genereert Meta ad-afbeeldingen via AI. Energie-thema's: Nederlandse woning met zonnepanelen, thuisbatterij, besparing-bedragen. Facebook + Instagram formaten.</div>
+      <div class="agent-tags"><span class="tag">Imagen API</span><span class="tag">Supabase</span><span class="tag">Write</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     FASE 6 — MONITORING & RAPPORTAGE
+═══════════════════════════════════ -->
+<div class="phase-label">
+  <div class="phase-num" style="background:var(--p-bg);color:var(--p-txt)">6</div>
+  <div>
+    <div class="phase-title">Monitoring, Rapportage & Continue Verbetering</div>
+    <div class="phase-sub">Dagelijkse checks, SEO-monitoring, Slack-updates en HMB Dashboard integratie</div>
+  </div>
+</div>
+
+<div class="phase-bg-purple">
+  <div class="agent-grid agent-grid-4">
+
+    <div class="agent c-purple">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">daily-slack-update</div>
+        <div class="agent-type">Rapportage</div>
+      </div>
+      <div class="agent-desc">Stuurt elke ochtend dagrapport via Slack: leads gisteren, CPL, botconversies, top-pagina's, alerts. Energie-dashboard specifiek format.</div>
+      <div class="agent-tags"><span class="tag">Supabase</span><span class="tag">Slack</span></div>
+    </div>
+
+    <div class="agent c-purple">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">seo-auditor (site)</div>
+        <div class="agent-type">SEO check</div>
+      </div>
+      <div class="agent-desc">Wekelijkse volledige site-audit: gebroken links, missing meta, duplicate content, Core Web Vitals, schema-errors. Prioriteert fixes op impact × effort.</div>
+      <div class="agent-tags"><span class="tag">WebFetch</span><span class="tag">Supabase</span><span class="tag">Write</span></div>
+    </div>
+
+    <div class="agent c-purple">
+      <div class="agent-head">
+        <div class="agent-name">rank-tracker</div>
+        <div class="agent-type">Posities</div>
+      </div>
+      <div class="agent-desc">Bijhouden van Google rankings voor alle target keywords. Alert bij daling &gt;3 posities. Koppeling met Ahrefs MCP voor dagelijkse updates. Data naar HMB Dashboard.</div>
+      <div class="agent-tags"><span class="tag">Ahrefs MCP</span><span class="tag">Supabase</span><span class="tag">Write</span></div>
+    </div>
+
+    <div class="agent c-purple">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">generate-weekly-report</div>
+        <div class="agent-type">Weekrapport</div>
+      </div>
+      <div class="agent-desc">Genereert wekelijks managementrapport: SEO-trend, lead-kwaliteit, chatbot-verbeteringen, ad-prestaties. WhatsApp + email naar eigenaar.</div>
+      <div class="agent-tags"><span class="tag">Supabase</span><span class="tag">WhatsApp</span><span class="tag">Email</span></div>
+    </div>
+
+    <div class="agent c-purple">
+      <div class="agent-head">
+        <div class="agent-name">competitor-monitor</div>
+        <div class="agent-type">Concurrenten</div>
+      </div>
+      <div class="agent-desc">Monitort helpmijbesparen.nl en andere concurrenten wekelijks: nieuwe content, keyword-verschuivingen, prijswijzigingen. Genereert opportunity-alerts.</div>
+      <div class="agent-tags"><span class="tag">WebFetch</span><span class="tag">Ahrefs MCP</span><span class="tag">Write</span></div>
+    </div>
+
+    <div class="agent c-purple">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">notify-webhook</div>
+        <div class="agent-type">Notificaties</div>
+      </div>
+      <div class="agent-desc">Centrale notificatie-router. Verstuurt alerts naar Slack, WhatsApp, email op basis van type en urgentie. Throttling voorkomt spam bij burst-events.</div>
+      <div class="agent-tags"><span class="tag">Slack</span><span class="tag">WhatsApp</span><span class="tag">Email</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     FASE 7 — ONBOARDING & SETUP
+═══════════════════════════════════ -->
+<div class="phase-label">
+  <div class="phase-num" style="background:var(--txt);color:#fff">7</div>
+  <div>
+    <div class="phase-title">Eenmalige Setup Agents (Onboarding)</div>
+    <div class="phase-sub">Agenten die één keer draaien om alles op te zetten</div>
+  </div>
+</div>
+
+<div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px;box-shadow:var(--shadow)">
+  <div class="agent-grid agent-grid-4">
+
+    <div class="agent" style="border-color:var(--border2)">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">site-profiler</div>
+        <div class="agent-type" style="background:var(--bg);color:var(--txt2)">Setup</div>
+      </div>
+      <div class="agent-desc">Bouwt het volledige siteprofiel: niche, doelgroep, USPs, concurrenten, toon, URL-structuur. Vult Supabase sites-tabel.</div>
+      <div class="agent-tags" style=""><span class="tag" style="background:var(--bg);color:var(--txt2);border-color:var(--border)">Eenmalig</span></div>
+    </div>
+
+    <div class="agent" style="border-color:var(--border2)">
+      <div class="reuse">♻ HMB</div>
+      <div class="agent-head">
+        <div class="agent-name">writing-style-builder</div>
+        <div class="agent-type" style="background:var(--bg);color:var(--txt2)">Setup</div>
+      </div>
+      <div class="agent-desc">Definieert de schrijfstijl: zakelijk-toegankelijk, vertrouwen-opbouwend, feiten-gedreven. Voorbeeldzinnen, verboden woorden, CTA-formules voor energie-niche.</div>
+      <div class="agent-tags"><span class="tag" style="background:var(--bg);color:var(--txt2);border-color:var(--border)">Eenmalig</span></div>
+    </div>
+
+    <div class="agent" style="border-color:var(--border2)">
+      <div class="agent-head">
+        <div class="agent-name">supabase-migrator</div>
+        <div class="agent-type" style="background:var(--bg);color:var(--txt2)">Setup</div>
+      </div>
+      <div class="agent-desc">Runt alle Supabase migraties voor de nieuwe site: tabellen aanmaken, RLS policies instellen, indexes optimaliseren. Leent van HMB-schema maar in apart project.</div>
+      <div class="agent-tags"><span class="tag" style="background:var(--bg);color:var(--txt2);border-color:var(--border)">Eenmalig</span></div>
+    </div>
+
+    <div class="agent" style="border-color:var(--border2)">
+      <div class="agent-head">
+        <div class="agent-name">domain-deployer</div>
+        <div class="agent-type" style="background:var(--bg);color:var(--txt2)">Setup</div>
+      </div>
+      <div class="agent-desc">Configureert Digital Ocean deployment, GitHub Actions CI/CD pipeline, SSL, domeinnaam DNS. Zelfde werkwijze als helpmijbesparen.nl setup.</div>
+      <div class="agent-tags"><span class="tag" style="background:var(--bg);color:var(--txt2);border-color:var(--border)">Eenmalig</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     INFRASTRUCTUUR OVERZICHT
+═══════════════════════════════════ -->
+<div class="divider"></div>
+
+<div style="font-size:16px;font-weight:700;margin-bottom:16px;letter-spacing:-0.02em">Infrastructuur & Tech Stack</div>
+
+<table class="infra">
+  <thead>
+    <tr><th>Laag</th><th>Tool</th><th>Doel</th><th>Nieuw / Herbruikbaar</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Frontend</strong></td>
+      <td class="mono">Next.js 14 App Router</td>
+      <td>SSG/ISR website, snelle laadtijden voor SEO</td>
+      <td><span class="badge" style="background:var(--y-bg);color:var(--y-txt)">Nieuw project</span></td>
+    </tr>
+    <tr>
+      <td><strong>Database</strong></td>
+      <td class="mono">Supabase (nieuw project)</td>
+      <td>Content, leads, agent-logs, bot-data — apart van HMB</td>
+      <td><span class="badge" style="background:var(--y-bg);color:var(--y-txt)">Nieuw Supabase project</span></td>
+    </tr>
+    <tr>
+      <td><strong>Edge Functions</strong></td>
+      <td class="mono">Supabase Deno</td>
+      <td>15 functies: content-pipeline, GHL-sync, ads-sync, webhooks</td>
+      <td><span class="badge" style="background:var(--g-bg);color:var(--g-txt)">♻ 10 herbruikbaar van HMB</span></td>
+    </tr>
+    <tr>
+      <td><strong>CRM</strong></td>
+      <td class="mono">GoHighLevel</td>
+      <td>Pipeline, buitendienst-agenda, lead-beheer</td>
+      <td><span class="badge" style="background:var(--g-bg);color:var(--g-txt)">♻ Zelfde GHL account</span></td>
+    </tr>
+    <tr>
+      <td><strong>WhatsApp Bot</strong></td>
+      <td class="mono">DM Champ</td>
+      <td>Leadkwalificatie, afspraken boeken, 24/7 antwoorden</td>
+      <td><span class="badge" style="background:var(--y-bg);color:var(--y-txt)">Nieuwe campagne</span></td>
+    </tr>
+    <tr>
+      <td><strong>SEO Tools</strong></td>
+      <td class="mono">Ahrefs MCP</td>
+      <td>Keyword-research, rank-tracking, competitor-analyse</td>
+      <td><span class="badge" style="background:var(--g-bg);color:var(--g-txt)">♻ Bestaand account</span></td>
+    </tr>
+    <tr>
+      <td><strong>Ads</strong></td>
+      <td class="mono">Meta Ads API</td>
+      <td>Campagne-data ophalen, CPL monitoring, optimalisatie</td>
+      <td><span class="badge" style="background:var(--y-bg);color:var(--y-txt)">Nieuw ad-account</span></td>
+    </tr>
+    <tr>
+      <td><strong>Hosting</strong></td>
+      <td class="mono">Digital Ocean</td>
+      <td>App Platform deployment, zelfde setup als HMB</td>
+      <td><span class="badge" style="background:var(--g-bg);color:var(--g-txt)">♻ Zelfde infra</span></td>
+    </tr>
+    <tr>
+      <td><strong>CI/CD</strong></td>
+      <td class="mono">GitHub Actions</td>
+      <td>Auto-deploy bij push naar main, preview bij PR</td>
+      <td><span class="badge" style="background:var(--g-bg);color:var(--g-txt)">♻ Template van HMB</span></td>
+    </tr>
+    <tr>
+      <td><strong>Notificaties</strong></td>
+      <td class="mono">Slack + WhatsApp</td>
+      <td>Dagrapport, alerts, coaching-rapport buitendienst</td>
+      <td><span class="badge" style="background:var(--g-bg);color:var(--g-txt)">♻ Zelfde kanalen</span></td>
+    </tr>
+    <tr>
+      <td><strong>Dashboard</strong></td>
+      <td class="mono">HMB Energy Ops</td>
+      <td>Alles inzichtelijk: leads, CPL, chatbot, deals — nieuw site-tabblad</td>
+      <td><span class="badge" style="background:var(--g-bg);color:var(--g-txt)">♻ Extra site in HMB</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════
+     START VOLGORDE
+═══════════════════════════════════ -->
+<div class="divider"></div>
+
+<div style="font-size:16px;font-weight:700;margin-bottom:16px;letter-spacing:-0.02em">Start Volgorde — Week voor week</div>
+
+<table class="infra">
+  <thead>
+    <tr><th>Week</th><th>Focus</th><th>Agents actief</th><th>Output</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="mono" style="color:var(--g-txt);font-weight:600">Week 1</td>
+      <td><strong>Fundament</strong></td>
+      <td>niche-researcher · keyword-researcher · competitor-analyzer · site-architect</td>
+      <td>Keyword-matrix · sitestructuur · contentstrategie</td>
+    </tr>
+    <tr>
+      <td class="mono" style="color:var(--b-txt);font-weight:600">Week 2</td>
+      <td><strong>Website live</strong></td>
+      <td>site-orchestrator · hmb-webdesigner · nextjs-pro · supabase-integrator · seo-technicus</td>
+      <td>Werkende site met design systeem op domeinnaam</td>
+    </tr>
+    <tr>
+      <td class="mono" style="color:var(--o-txt);font-weight:600">Week 3</td>
+      <td><strong>Content sprint</strong></td>
+      <td>content-orchestrator · nl-content-writer · seo-auditor · designer-chain · supabase-publisher</td>
+      <td>10-15 pillar + cluster artikelen gepubliceerd</td>
+    </tr>
+    <tr>
+      <td class="mono" style="color:var(--y-txt);font-weight:600">Week 4</td>
+      <td><strong>Leads actief</strong></td>
+      <td>dmchamp-webhook · conversation-analyzer · ghl-sync · lead-qualifier</td>
+      <td>WhatsApp bot live · GHL pipeline gevuld</td>
+    </tr>
+    <tr>
+      <td class="mono" style="color:var(--r-txt);font-weight:600">Week 5</td>
+      <td><strong>Ads starten</strong></td>
+      <td>ad-creative-writer · banner-generator · meta-ads-sync · campaign-analyzer</td>
+      <td>Eerste Meta campagnes draaien · CPL meten</td>
+    </tr>
+    <tr>
+      <td class="mono" style="color:var(--p-txt);font-weight:600">Week 6+</td>
+      <td><strong>Optimalisatie</strong></td>
+      <td>Alle monitoring-agents · content-refresher · instructie-optimizer · competitor-monitor</td>
+      <td>Continu verbeteren op basis van data</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- FOOTER -->
+<div style="margin-top:32px;padding:16px 20px;background:var(--panel);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow)">
+  <div>
+    <div style="font-size:13px;font-weight:700">HMB Energy Ops — Agent Ecosysteem</div>
+    <div style="font-size:11px;color:var(--txt3)">42 agents · 7 fases · Energie-niche NL/BE · 18 herbruikbaar van HMB</div>
+  </div>
+  <div style="text-align:right">
+    <div class="mono" style="font-size:11px;color:var(--txt3)">v1.0 — Maart 2026</div>
+    <div style="font-size:11px;color:var(--txt3)">Gebaseerd op helpmijbesparen.nl niche</div>
+  </div>
+</div>
+
+</body>
+</html>
