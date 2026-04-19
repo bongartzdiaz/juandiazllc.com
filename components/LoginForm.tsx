@@ -25,7 +25,7 @@ export function LoginForm() {
 
       <div className="auth-eyebrow">
         <span className="dot-pulse" aria-hidden />
-        <span>SECURE · PHILLY · OPS</span>
+        <span>{t("login.eyebrow")}</span>
       </div>
 
       <h1>{t("login.title.a")} <em>{t("login.title.b")}</em></h1>
@@ -60,7 +60,7 @@ export function LoginForm() {
               type="button"
               className="pw-toggle"
               onClick={() => setShowPw((v) => !v)}
-              aria-label={showPw ? "Hide password" : "Show password"}
+              aria-label={showPw ? t("login.hide_pw") : t("login.show_pw")}
               tabIndex={-1}
             >
               {showPw ? (

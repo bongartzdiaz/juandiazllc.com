@@ -119,7 +119,39 @@ const en: Dict = {
 
   // Footer / generic
   "footer.version": "v1.0",
+  "footer.about": "About",
+  "footer.now": "Now",
+  "footer.uses": "Uses",
+  "footer.privacy": "Privacy",
   "lang.label": "Lang",
+  "lang.switch": "Switch language",
+
+  // Contact sectors
+  "contact.sector.energy": "Energy",
+  "contact.sector.realestate": "Real estate",
+  "contact.sector.hospitality": "Hospitality",
+  "contact.sector.logistics": "Logistics",
+  "contact.sector.retail": "Retail",
+  "contact.sector.other": "Other",
+
+  // Newsletter
+  "nl.headline": "Get new insights in your inbox.",
+  "nl.sub": "Monthly-ish. Field notes, no fluff, no tracking pixels. Unsubscribe in one click.",
+  "nl.email": "Email",
+  "nl.submit": "Subscribe",
+  "nl.subscribed": "Subscribed",
+
+  // Ventures status
+  "ventures.status.live": "Live",
+  "ventures.status.soon": "Shipping",
+
+  // Signals CTA
+  "signals.read": "Read →",
+
+  // Login extras
+  "login.eyebrow": "SECURE · PHILLY · OPS",
+  "login.show_pw": "Show password",
+  "login.hide_pw": "Hide password",
 
   // Story
   "story.label": "◉ 00 — Story",
@@ -274,7 +306,34 @@ const nl: Dict = {
   "login.footer.a": "Account nodig? Contact",
 
   "footer.version": "v1.0",
+  "footer.about": "Over",
+  "footer.now": "Nu",
+  "footer.uses": "Tools",
+  "footer.privacy": "Privacy",
   "lang.label": "Taal",
+  "lang.switch": "Taal wisselen",
+
+  "contact.sector.energy": "Energie",
+  "contact.sector.realestate": "Vastgoed",
+  "contact.sector.hospitality": "Hospitality",
+  "contact.sector.logistics": "Logistiek",
+  "contact.sector.retail": "Retail",
+  "contact.sector.other": "Anders",
+
+  "nl.headline": "Krijg nieuwe inzichten in je inbox.",
+  "nl.sub": "Ongeveer maandelijks. Veldnotities, geen onzin, geen trackingpixels. Eén klik om af te melden.",
+  "nl.email": "E-mail",
+  "nl.submit": "Aanmelden",
+  "nl.subscribed": "Aangemeld",
+
+  "ventures.status.live": "Live",
+  "ventures.status.soon": "In productie",
+
+  "signals.read": "Lezen →",
+
+  "login.eyebrow": "BEVEILIGD · PHILLY · OPS",
+  "login.show_pw": "Wachtwoord tonen",
+  "login.hide_pw": "Wachtwoord verbergen",
 
   "story.label": "◉ 00 — Verhaal",
   "story.lead.a": "De meeste bedrijven hebben geen omzetprobleem.",
@@ -423,7 +482,34 @@ const de: Dict = {
   "login.footer.a": "Zugang benötigt? Kontakt",
 
   "footer.version": "v1.0",
+  "footer.about": "Über",
+  "footer.now": "Jetzt",
+  "footer.uses": "Tools",
+  "footer.privacy": "Datenschutz",
   "lang.label": "Sprache",
+  "lang.switch": "Sprache wechseln",
+
+  "contact.sector.energy": "Energie",
+  "contact.sector.realestate": "Immobilien",
+  "contact.sector.hospitality": "Hospitality",
+  "contact.sector.logistics": "Logistik",
+  "contact.sector.retail": "Retail",
+  "contact.sector.other": "Andere",
+
+  "nl.headline": "Neue Einblicke in Ihr Postfach.",
+  "nl.sub": "Etwa monatlich. Feldnotizen, kein Geschwätz, keine Tracking-Pixel. Ein Klick zum Abbestellen.",
+  "nl.email": "E-Mail",
+  "nl.submit": "Abonnieren",
+  "nl.subscribed": "Abonniert",
+
+  "ventures.status.live": "Live",
+  "ventures.status.soon": "Kommt",
+
+  "signals.read": "Lesen →",
+
+  "login.eyebrow": "SICHER · PHILLY · OPS",
+  "login.show_pw": "Passwort anzeigen",
+  "login.hide_pw": "Passwort ausblenden",
 
   "story.label": "◉ 00 — Story",
   "story.lead.a": "Die meisten Unternehmen haben kein Umsatzproblem.",
@@ -572,7 +658,34 @@ const es: Dict = {
   "login.footer.a": "¿Necesitas acceso? Contacto",
 
   "footer.version": "v1.0",
+  "footer.about": "Sobre",
+  "footer.now": "Ahora",
+  "footer.uses": "Herramientas",
+  "footer.privacy": "Privacidad",
   "lang.label": "Idioma",
+  "lang.switch": "Cambiar idioma",
+
+  "contact.sector.energy": "Energía",
+  "contact.sector.realestate": "Inmobiliario",
+  "contact.sector.hospitality": "Hostelería",
+  "contact.sector.logistics": "Logística",
+  "contact.sector.retail": "Retail",
+  "contact.sector.other": "Otro",
+
+  "nl.headline": "Recibe nuevos insights en tu bandeja.",
+  "nl.sub": "Aproximadamente mensual. Notas de campo, sin relleno, sin píxeles de tracking. Un clic para darte de baja.",
+  "nl.email": "Email",
+  "nl.submit": "Suscribirse",
+  "nl.subscribed": "Suscrito",
+
+  "ventures.status.live": "En vivo",
+  "ventures.status.soon": "Próximamente",
+
+  "signals.read": "Leer →",
+
+  "login.eyebrow": "SEGURO · PHILLY · OPS",
+  "login.show_pw": "Mostrar contraseña",
+  "login.hide_pw": "Ocultar contraseña",
 
   "story.label": "◉ 00 — Historia",
   "story.lead.a": "La mayoría de los negocios no tienen un problema de ingresos.",

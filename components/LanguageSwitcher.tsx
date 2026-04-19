@@ -3,11 +3,13 @@
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { LOCALES, LOCALE_LABELS, type Locale } from "@/lib/i18n/dict";
 import { useState, useRef, useEffect } from "react";
+import { useT } from "@/lib/i18n/useT";
 
 export function LanguageSwitcher() {
   const { locale, setLocale } = useLocale();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const t = useT();
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
@@ -21,7 +23,7 @@ export function LanguageSwitcher() {
     <div ref={ref} style={{ position: "relative", display: "inline-flex" }}>
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label="Switch language"
+        aria-label={t("lang.switch")}
         aria-expanded={open}
         style={{
           fontFamily: "'JetBrains Mono'",

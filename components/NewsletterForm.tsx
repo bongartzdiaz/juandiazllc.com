@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { subscribeToNewsletter, type NewsletterState } from "@/app/actions/newsletter";
+import { useT } from "@/lib/i18n/useT";
 
 // Compact newsletter signup. Writes to Supabase `newsletter_subs`
 // with source tracking. No double-opt-in for now — we're small and
@@ -25,22 +26,25 @@ type Props = {
 export function NewsletterForm({
   source = "insights_footer",
   compact = false,
-  headline = "Get new insights in your inbox.",
-  sub = "Monthly-ish. Field notes, no fluff, no tracking pixels. Unsubscribe in one click.",
+  headline,
+  sub,
 }: Props) {
   const [state, formAction, pending] = useActionState(subscribeToNewsletter, initial);
+  const t = useT();
+  const resolvedHeadline = headline ?? t("nl.headline");
+  const resolvedSub = sub ?? t("nl.sub");
 
   return (
     <div className={compact ? "nl-card compact" : "nl-card"}>
       {!compact && (
         <div className="nl-copy">
-          <h3>{headline}</h3>
-          <p>{sub}</p>
+          <h3>{resolvedHeadline}</h3>
+          <p>{resolvedSub}</p>
         </div>
       )}
       <form className="nl-form" action={formAction}>
         <label className="sr-only" htmlFor="nl-email">
-          Email
+          {t("nl.email")}
         </label>
         <input
           id="nl-email"
@@ -58,7 +62,7 @@ export function NewsletterForm({
           <input id="nl-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
         </div>
         <button type="submit" disabled={pending || state.status === "ok"}>
-          {state.status === "ok" ? "Subscribed" : pending ? "…" : "Subscribe"}
+          {state.status === "ok" ? t("nl.subscribed") : pending ? "…" : t("nl.submit")}
         </button>
       </form>
       {state.status !== "idle" && state.message && (
