@@ -2,68 +2,27 @@
 
 import Link from "next/link";
 import { useT } from "@/lib/i18n/useT";
+import { Globe } from "./Globe";
 
-// True CSS-3D globe. Each meridian is a pre-rotated ring (border-radius
-// circle) inside a transform-style: preserve-3d container. When the
-// container rotates on Y, every ring rotates with it in actual 3D,
-// producing a wireframe sphere without WebGL. Works on every device,
-// every browser, regardless of fingerprinting/battery/reduced-motion
-// settings. Reduced-motion users get a still globe.
-const MERIDIAN_COUNT = 12;
-const PARALLEL_COUNT = 7;
-
+// Hero — interactive earth with real countries (SVG orthographic
+// projection via d3-geo). Background is a living Milky Way: rotating
+// galactic arms, dust lanes, nebula cloud pulses, twinkling stars,
+// and occasional shooting stars. Pure CSS + SVG; no WebGL.
 export function Hero() {
   const t = useT();
-
-  const meridians = Array.from({ length: MERIDIAN_COUNT }, (_, i) => ({
-    angle: (i * 180) / MERIDIAN_COUNT,
-  }));
-  const parallels = Array.from({ length: PARALLEL_COUNT }, (_, i) => {
-    // latitudes from -75° to 75°
-    const lat = -75 + (i * 150) / (PARALLEL_COUNT - 1);
-    return { lat };
-  });
 
   return (
     <header className="hero" aria-label="Hero">
       <div className="hero-stage" aria-hidden="true">
+        <div className="milky-way">
+          <div className="mw-core" />
+          <div className="mw-arms" />
+          <div className="mw-dust" />
+          <div className="mw-nebula" />
+        </div>
         <div className="hero-starfield" />
-        <div className="hero-globe3d">
-          <div className="globe-rotor">
-            <div className="globe-core" />
-            <div className="globe-atmosphere" />
-            {meridians.map((m, i) => (
-              <div
-                key={`m${i}`}
-                className="globe-meridian"
-                style={{ transform: `rotateY(${m.angle}deg)` }}
-              />
-            ))}
-            {parallels.map((p, i) => {
-              const rad = (p.lat * Math.PI) / 180;
-              const scale = Math.cos(rad);
-              const translateY = Math.sin(rad) * 50;
-              return (
-                <div
-                  key={`p${i}`}
-                  className="globe-parallel"
-                  style={{
-                    transform: `translateY(${translateY}%) rotateX(90deg) scale(${scale})`,
-                  }}
-                />
-              );
-            })}
-            <div className="globe-specular" />
-          </div>
-          <div className="globe-orbit orbit-1">
-            <div className="orbit-sat" />
-          </div>
-          <div className="globe-orbit orbit-2">
-            <div className="orbit-sat" />
-          </div>
-          <div className="globe-orbit orbit-3">
-            <div className="orbit-sat" />
-          </div>
+        <div className="hero-globe-container">
+          <Globe />
         </div>
       </div>
 
