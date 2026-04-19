@@ -47,6 +47,7 @@ export function Globe() {
   const [zoom, setZoom] = useState(1);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selected, setSelected] = useState<CountryFeature | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
   const animRef = useRef<number | null>(null);
   const flyRef = useRef<number | null>(null);
   const draggingRef = useRef(false);
@@ -66,8 +67,32 @@ export function Globe() {
     return () => obs.disconnect();
   }, []);
 
-  // Load TopoJSON once
+  // Gate heavy work on viewport entry — defer the ~108 KB TopoJSON
+  // fetch until the globe scrolls into view. Keeps LCP fast on pages
+  // where the globe is below the fold.
   useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setIsVisible(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setIsVisible(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // Load TopoJSON once — only after the globe enters viewport
+  useEffect(() => {
+    if (!isVisible) return;
     let alive = true;
     fetch("/world-110m.json")
       .then((r) => r.json())
@@ -83,7 +108,7 @@ export function Globe() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [isVisible]);
 
   // Auto-rotate loop (paused when a country is selected or user drags)
   useEffect(() => {
