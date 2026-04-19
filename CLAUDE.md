@@ -69,3 +69,23 @@ ROI, no mocks needed. See commit history on
   (4s), gentle float (9s), satellites get a radial highlight, a comet
   trail and richer drop-shadows, specular highlight uses
   `mix-blend-mode: screen` for a genuine lit-from-above feel.
+- **Interactive earth + Milky Way rebuild.** Replaced the decorative
+  CSS-3D wireframe with a real interactive globe: SVG orthographic
+  projection via `d3-geo`, a 110m-resolution world-atlas TopoJSON
+  (`public/world-110m.json`, ~108 KB fetched on mount) decoded with
+  `topojson-client`. Every country renders as its own `<path>` with
+  hover + click handlers. Auto-rotates gently; pointer-drag lets users
+  free-rotate; clicking a country animates `projection.rotate()` +
+  `projection.scale()` (easeInOutQuad, ~1.1s) to the `geoCentroid()`
+  and slides in an info panel. Featured copy for NL/US/DE/ES, generic
+  placeholder otherwise — extend `FEATURED` in `components/sections/Globe.tsx`
+  as real content lands. Background: layered Milky Way — slowly-rotating
+  `conic-gradient` galactic arms (180s), pulsing core, dark dust lanes
+  via `mix-blend-mode: multiply`, drifting nebula cloud. Still pure
+  CSS + SVG, no WebGL. `prefers-reduced-motion` disables animations.
+  New deps: `d3-geo`, `topojson-client`, `world-atlas` + types.
+- **Lighthouse CI fix.** The workflow was failing on PR #3 (timeout
+  waiting for Vercel preview) because Vercel Preview Protection
+  auth-walls previews. Changed `.github/workflows/lighthouse.yml` to
+  run only on pushes to `main`, so Lighthouse audits production
+  (publicly reachable). PR runs no longer false-fail.
