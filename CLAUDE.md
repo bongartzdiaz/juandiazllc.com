@@ -37,3 +37,16 @@ ROI, no mocks needed. See commit history on
   copy that leaked through NL/DE/ES pages. Added `story.tl.*`, `story.body.p*`,
   `story.sign.role`, `ch.word`, `ch.N.{eyebrow,title,body,meta}` keys in all
   four locales. Added missing `nav.insights` to NL and DE.
+- Opened PR #3 against main. Vercel Git integration picks up the branch
+  push as a preview deploy; merging to main ships production.
+- Device optimization pass in `app/globals.css` (appended block):
+  - tablet (641-1024) gets proper 2-col grids for signals + ventures +
+    insights-related + dashboard stat-strip (previously jumped 3→1 / 6→12)
+  - `(hover: none) and (pointer: coarse)` block strips lift/glow/translate
+    hover effects that were sticking after tap; enforces ≥44px touch
+    targets (WCAG 2.5.5) for `.btn` and nav links
+  - `100dvh` fallback for hero/auth/philly-hero on browsers that support
+    dynamic viewport units (fixes iOS URL-bar collapse jank)
+  - large-screen cap (≥1680px) so display type doesn't run away on 4K
+  - landscape-phone guard (`max-height: 560px`) reclaims vertical space
+  - print stylesheet hides all animated chrome
