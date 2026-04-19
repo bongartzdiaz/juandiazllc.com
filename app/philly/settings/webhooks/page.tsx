@@ -146,10 +146,14 @@ export default function WebhooksPage() {
     if (!details[id]) loadDetail(id)
   }
 
-  const copy = (text: string) => {
-    navigator.clipboard.writeText(text)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
+  const copy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      alert('Copy failed — your browser blocked clipboard access. Select the secret manually.')
+    }
   }
 
   const toggleEvent = (ev: string) => {

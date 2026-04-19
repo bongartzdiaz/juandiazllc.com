@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useCallback, useEffect, useState, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
@@ -85,16 +85,16 @@ export default function DocumentsPage() {
   const [upErr, setUpErr] = useState<string | null>(null)
   const [upBusy, setUpBusy] = useState(false)
 
-  const fetchDocs = () => {
+  const fetchDocs = useCallback(() => {
     setLoading(true)
     fetch('/philly/api/documents?limit=200')
       .then(r => r.json())
       .then(j => setDocs(j.data ?? []))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }
+  }, [])
 
-  useEffect(() => { fetchDocs() }, [])
+  useEffect(() => { fetchDocs() }, [fetchDocs])
   useEntitySubscription('document', () => { fetchDocs() })
 
   const filtered = useMemo(() => {
