@@ -1,0 +1,17 @@
+/* TEAM */
+    Founder + Builder: Juan Diaz
+    Contact:           juan [at] juandiazllc.com
+    From:              Amsterdam, NL ↔ Delaware, USA
+
+/* THANKS */
+    The operators who let me shadow the field —
+    you taught me what software is actually for.
+
+/* SITE */
+    Last update: 2026-04-19
+    Language:    English, Nederlands, Deutsch, Español
+    Doctype:     HTML5
+    IDE:         Claude Code + Vim
+    Standards:   WCAG 2.1 AA, RFC 9116, JSON-LD, hreflang
+    Components:  Next.js, React, TypeScript, Supabase, Prisma,
+                 Resend, Plausible

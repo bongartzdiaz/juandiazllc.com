@@ -88,6 +88,7 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
     shortcut: "/icon.svg",
   },
+  manifest: "/manifest.json",
 };
 
 // Lock the viewport to device-width + allow user scaling up to 5x
@@ -147,6 +148,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* Feed autodiscovery — RSS for readers, JSON Feed for modern clients */}
         <link rel="alternate" type="application/rss+xml" title="Juan Diaz LLC — Insights" href="/rss.xml" />
         <link rel="alternate" type="application/feed+json" title="Juan Diaz LLC — Insights" href="/feed.json" />
+        {/* Credits file per humanstxt.org — a weak signal but a
+            cheap one, and it gives curious readers a way in. */}
+        <link rel="author" href="/humans.txt" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         {/* Single-family load reduces network + keeps typography consistent.
             Instrument Serif dropped — Inter italic now serves editorial emphasis. */}
