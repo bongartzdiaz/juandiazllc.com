@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { SECTORS, getSector } from "@/lib/sectors";
+import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { LOCALES } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
@@ -30,14 +31,22 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function SectorPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+  const l = assertLocale(locale);
   const s = getSector(slug);
   if (!s) notFound();
 
   const others = SECTORS.filter((x) => x.slug !== s.slug);
 
+  const crumbs = breadcrumbSchema([
+    { name: "Home", path: `/${l}` },
+    { name: "Sectors", path: `/${l}/sectors` },
+    { name: s.name, path: `/${l}/sectors/${s.slug}` },
+  ]);
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
       <header className="page-hero" style={{ position: "relative", overflow: "hidden" }}>
         <div aria-hidden style={{ position: "absolute", inset: 0, background: s.gradient, pointerEvents: "none" }} />
         <div style={{ position: "relative" }}>

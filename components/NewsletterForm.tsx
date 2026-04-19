@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { subscribeToNewsletter, type NewsletterState } from "@/app/actions/newsletter";
-import { useT } from "@/lib/i18n/useT";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 
 // Compact newsletter signup. Writes to Supabase `newsletter_subs`
 // with source tracking. No double-opt-in for now — we're small and
@@ -30,7 +30,7 @@ export function NewsletterForm({
   sub,
 }: Props) {
   const [state, formAction, pending] = useActionState(subscribeToNewsletter, initial);
-  const t = useT();
+  const { locale, t } = useLocale();
   const resolvedHeadline = headline ?? t("nl.headline");
   const resolvedSub = sub ?? t("nl.sub");
 
@@ -56,6 +56,7 @@ export function NewsletterForm({
           spellCheck={false}
         />
         <input type="hidden" name="source" value={source} />
+        <input type="hidden" name="locale" value={locale} />
         {/* Honeypot — same trick as contact form. */}
         <div className="hp-field" aria-hidden="true">
           <label htmlFor="nl-website">Website</label>

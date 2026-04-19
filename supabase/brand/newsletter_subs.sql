@@ -4,12 +4,23 @@
 -- action fails gracefully and the user sees a generic error.
 
 create table if not exists public.newsletter_subs (
-  email       text primary key,
-  source      text not null default 'unknown',
-  created_at  timestamptz not null default now(),
-  confirmed_at timestamptz,           -- reserved for later double-opt-in
+  email          text primary key,
+  source         text not null default 'unknown',
+  locale         text not null default 'en',
+  created_at     timestamptz not null default now(),
+  confirm_token  uuid,                  -- double-opt-in token, cleared on confirm
+  confirmed_at   timestamptz,           -- set when the user clicks the email link
   unsubscribed_at timestamptz
 );
+
+-- Add columns if the table already exists from an earlier run.
+alter table public.newsletter_subs add column if not exists locale text not null default 'en';
+alter table public.newsletter_subs add column if not exists confirm_token uuid;
+
+-- Unique index on confirm_token so lookups are O(1) and collisions impossible.
+create unique index if not exists newsletter_subs_confirm_token_idx
+  on public.newsletter_subs (confirm_token)
+  where confirm_token is not null;
 
 -- Index on source so we can segment by entry point later (insights
 -- footer vs landing vs article detail).
@@ -28,4 +39,7 @@ create policy "anon can subscribe"
   to anon
   with check (email ~ '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$');
 
--- No select policy — the list is read only via the service role.
+-- No anon select/update policies — confirmation and list reads run
+-- through the service role (SUPABASE_SERVICE_ROLE_KEY) which bypasses
+-- RLS. That keeps the confirmation token from being exposed to the
+-- browser and prevents anyone from scraping the list.
