@@ -6,6 +6,7 @@ import { VENTURES } from "@/lib/ventures";
 import Link from "next/link";
 import { buildGreeting } from "@/lib/greeting";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+import { translate } from "@/lib/i18n/dict";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -36,7 +37,11 @@ type Lead = {
   created_at: string;
 };
 
-export default async function AppPage() {
+export default async function AppPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  const t = (k: string) => translate(l, k);
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -76,7 +81,7 @@ export default async function AppPage() {
             marginBottom: 20,
           }}
         >
-          ◉ Operator hub · live
+          {t("app.eyebrow")}
         </div>
         <h1
           style={{
@@ -98,9 +103,9 @@ export default async function AppPage() {
             lineHeight: 1.6,
           }}
         >
-          Live surface across the ventures. Signed in as{" "}
-          <b style={{ color: "var(--text)" }}>{user.email}</b>. Everything you see below is pulled
-          from Supabase in real time.
+          {t("app.lede.a")}{" "}
+          <b style={{ color: "var(--text)" }}>{user.email}</b>
+          {t("app.lede.b")}
         </p>
       </header>
 
@@ -119,10 +124,10 @@ export default async function AppPage() {
         }}
       >
         {[
-          { l: "Subscribers", n: subCount.toString() },
-          { l: "Leads", n: leadCount.toString() },
-          { l: "Days to 2027", n: daysUntil2027().toString() },
-          { l: "Live ventures", n: VENTURES.filter((v) => v.status === "live").length.toString() },
+          { l: t("app.stat.subs"), n: subCount.toString() },
+          { l: t("app.stat.leads"), n: leadCount.toString() },
+          { l: t("app.stat.days"), n: daysUntil2027().toString() },
+          { l: t("app.stat.ventures"), n: VENTURES.filter((v) => v.status === "live").length.toString() },
         ].map((s, i) => (
           <div
             key={i}
@@ -189,7 +194,7 @@ export default async function AppPage() {
             }}
           >
             <div>
-              <div className="label">◉ Recent leads</div>
+              <div className="label">{t("app.leads.eyebrow")}</div>
               <h2
                 style={{
                   fontFamily: "'Inter'",
@@ -198,9 +203,8 @@ export default async function AppPage() {
                   letterSpacing: "-.02em",
                   marginTop: 6,
                 }}
-              >
-                Latest from <em>/contact</em>
-              </h2>
+                dangerouslySetInnerHTML={{ __html: t("app.leads.title") }}
+              />
             </div>
             <span
               style={{
@@ -211,7 +215,7 @@ export default async function AppPage() {
                 textTransform: "uppercase",
               }}
             >
-              last 5
+              {t("app.leads.last5")}
             </span>
           </div>
 
@@ -227,13 +231,13 @@ export default async function AppPage() {
                 textAlign: "center",
               }}
             >
-              — No leads yet. The form is hooked up and waiting.
+              {t("app.leads.empty")}
             </div>
           ) : (
             <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: 0 }}>
-              {recentLeads.map((l, i) => (
+              {recentLeads.map((lead, i) => (
                 <li
-                  key={l.id}
+                  key={lead.id}
                   style={{
                     padding: "16px 0",
                     borderTop: i > 0 ? "1px solid var(--line)" : "none",
@@ -241,10 +245,10 @@ export default async function AppPage() {
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, marginBottom: 6 }}>
                     <div style={{ fontSize: 15, fontWeight: 500 }}>
-                      {l.name ?? l.email}
-                      {l.company && (
+                      {lead.name ?? lead.email}
+                      {lead.company && (
                         <span style={{ color: "var(--muted-soft)", fontWeight: 400, marginLeft: 8 }}>
-                          · {l.company}
+                          · {lead.company}
                         </span>
                       )}
                     </div>
@@ -257,7 +261,7 @@ export default async function AppPage() {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {new Date(l.created_at).toLocaleDateString("en-GB", {
+                      {new Date(lead.created_at).toLocaleDateString("en-GB", {
                         month: "short",
                         day: "numeric",
                         hour: "2-digit",
@@ -265,7 +269,7 @@ export default async function AppPage() {
                       })}
                     </div>
                   </div>
-                  {l.sector && (
+                  {lead.sector && (
                     <div
                       style={{
                         fontFamily: "'JetBrains Mono'",
@@ -276,12 +280,12 @@ export default async function AppPage() {
                         marginBottom: 6,
                       }}
                     >
-                      {l.sector}
+                      {lead.sector}
                     </div>
                   )}
-                  {l.message && (
+                  {lead.message && (
                     <p style={{ color: "var(--muted)", fontSize: 14, lineHeight: 1.5 }}>
-                      {l.message.length > 220 ? l.message.slice(0, 220) + "…" : l.message}
+                      {lead.message.length > 220 ? lead.message.slice(0, 220) + "…" : lead.message}
                     </p>
                   )}
                 </li>
@@ -300,7 +304,7 @@ export default async function AppPage() {
             background: "var(--panel)",
           }}
         >
-          <div className="label">◉ Ventures</div>
+          <div className="label">{t("app.ventures.eyebrow")}</div>
           <h2
             style={{
               fontFamily: "'Inter'",
@@ -310,9 +314,8 @@ export default async function AppPage() {
               marginTop: 6,
               marginBottom: 18,
             }}
-          >
-            Quick <em>jump.</em>
-          </h2>
+            dangerouslySetInnerHTML={{ __html: t("app.ventures.title") }}
+          />
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {VENTURES.map((v) => (
               <a
@@ -354,7 +357,7 @@ export default async function AppPage() {
                     textTransform: "uppercase",
                   }}
                 >
-                  {v.status === "live" ? "Live ↗" : "Shipping"}
+                  {v.status === "live" ? t("app.ventures.live") : t("app.ventures.shipping")}
                 </span>
               </a>
             ))}
@@ -378,20 +381,20 @@ export default async function AppPage() {
         }}
       >
         <div>
-          <div className="label" style={{ marginBottom: 6 }}>◉ Account</div>
+          <div className="label" style={{ marginBottom: 6 }}>{t("app.acct.eyebrow")}</div>
           <div style={{ fontSize: 15 }}>
-            Signed in as <b>{user.email}</b>
+            {t("app.acct.signedInAs")} <b>{user.email}</b>
           </div>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <Link className="btn primary" href="/philly">
-            ◉ Diaz · Master Command →
+            {t("app.btn.master")}
           </Link>
           <Link className="btn ghost" href="/philly/deals">
-            Dispatch board →
+            {t("app.btn.dispatch")}
           </Link>
           <Link className="btn ghost" href="/">
-            ← Back to site
+            {t("app.btn.back")}
           </Link>
           <SignOutButton />
         </div>
