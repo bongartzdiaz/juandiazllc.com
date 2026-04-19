@@ -1,16 +1,16 @@
 name: Lighthouse CI
 
-# Runs Lighthouse against the deployed Vercel preview for every PR
-# and against production on main. Gates on mobile performance +
-# accessibility budgets so we don't ship regressions silently.
+# Runs Lighthouse against the production deployment on main. We used to
+# also run against the PR preview, but Vercel Preview Protection puts
+# previews behind an auth wall — the Lighthouse runner hits the login
+# page and times out. Running only against production avoids the false
+# failures while still gating on regressions before the next release.
 #
 # Uses treosh/lighthouse-ci-action which handles LHCI server-less
 # (uploads to temporary-public-storage so we get a URL to inspect).
 # No LHCI server required.
 
 on:
-  pull_request:
-    branches: [main]
   push:
     branches: [main]
   # Manual trigger for ad-hoc runs.
@@ -19,9 +19,8 @@ on:
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
-    # Wait for Vercel to finish deploying before we try to audit it.
-    # On PRs Vercel posts a preview URL; on main it's the production
-    # domain. We give Vercel up to 10 minutes to land the build.
+    # Wait for Vercel to finish deploying production before we audit.
+    # We give Vercel up to 10 minutes to land the build.
     timeout-minutes: 15
 
     steps:
@@ -33,7 +32,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           max_timeout: 600
-          environment: ${{ github.event_name == 'push' && 'Production' || 'Preview' }}
+          environment: Production
 
       - name: Run Lighthouse
         uses: treosh/lighthouse-ci-action@v12
