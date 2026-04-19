@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAllInsights, getInsight, formatDate } from "@/lib/insights";
+import { getAllInsights, getInsight, formatDate, tocFromBody, headingSlug } from "@/lib/insights";
 import { getVentureForTag } from "@/lib/ventures";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { ReadingProgress } from "@/components/ReadingProgress";
@@ -79,6 +79,7 @@ export default async function InsightPage(
     inLanguage: "en",
   };
 
+  const toc = tocFromBody(post.body);
   const related = getAllInsights().filter((p) => p.slug !== post.slug).slice(0, 2);
   const venture = getVentureForTag(post.tag);
   const crumbs = breadcrumbSchema([
@@ -114,27 +115,51 @@ export default async function InsightPage(
           <p className="ia-lede">{post.summary}</p>
         </header>
 
+        {toc.length >= 2 && (
+          <nav className="ia-toc" aria-label="Table of contents">
+            <div className="ia-toc-label">On this page</div>
+            <ol>
+              {toc.map((h) => (
+                <li key={h.id}>
+                  <a href={`#${h.id}`}>{h.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+
         <div className="ia-body">
-          {post.body.map((block, i) => {
-            if (block.type === "h2") return <h2 key={i}>{block.text}</h2>;
-            if (block.type === "p") return <p key={i}>{block.text}</p>;
-            if (block.type === "ul")
-              return (
-                <ul key={i}>
-                  {block.items.map((it, j) => (
-                    <li key={j}>{it}</li>
-                  ))}
-                </ul>
-              );
-            if (block.type === "quote")
-              return (
-                <blockquote key={i}>
-                  {block.text}
-                  {block.cite ? <cite>— {block.cite}</cite> : null}
-                </blockquote>
-              );
-            return null;
-          })}
+          {(() => {
+            let h2Idx = 0;
+            return post.body.map((block, i) => {
+              if (block.type === "h2") {
+                const id = toc[h2Idx]?.id ?? headingSlug(block.text);
+                h2Idx++;
+                return (
+                  <h2 key={i} id={id}>
+                    {block.text}
+                  </h2>
+                );
+              }
+              if (block.type === "p") return <p key={i}>{block.text}</p>;
+              if (block.type === "ul")
+                return (
+                  <ul key={i}>
+                    {block.items.map((it, j) => (
+                      <li key={j}>{it}</li>
+                    ))}
+                  </ul>
+                );
+              if (block.type === "quote")
+                return (
+                  <blockquote key={i}>
+                    {block.text}
+                    {block.cite ? <cite>— {block.cite}</cite> : null}
+                  </blockquote>
+                );
+              return null;
+            });
+          })()}
         </div>
 
         <footer className="ia-foot">
