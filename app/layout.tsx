@@ -4,7 +4,6 @@ import "./globals.css";
 import { Overlays } from "@/components/Overlays";
 import { Preloader } from "@/components/Preloader";
 import { GlobalEffects } from "@/components/GlobalEffects";
-import { CookieConsent } from "@/components/CookieConsent";
 import { BackToTop } from "@/components/BackToTop";
 import { Analytics } from "@/components/Analytics";
 import { WebVitalsReporter } from "@/components/WebVitalsReporter";
@@ -175,7 +174,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Preloader />
           {children}
           <GlobalEffects />
-          <CookieConsent />
           <BackToTop />
           <Analytics />
           <WebVitalsReporter />
