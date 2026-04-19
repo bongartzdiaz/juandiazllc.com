@@ -1,18 +1,19 @@
+"use client";
+
+import { useT } from "@/lib/i18n/useT";
+
 export function Kinetic() {
-  const inner = (
-    <>
-      Honest <em>energy</em> tools <span className="o" /> Built by operators <span className="o" /> Shipped, not pitched <span className="o" />
-    </>
-  );
+  const t = useT();
+  const body = t("kinetic.body");
   return (
     <div className="kinetic">
       <div className="sub">
-        <span>◉ Transmission 001</span>
-        <span>— Building for 2027 / Amsterdam → Everywhere</span>
+        <span>{t("kinetic.transmission")}</span>
+        <span>{t("kinetic.subtitle")}</span>
       </div>
       <div className="big">
-        <span>{inner}</span>
-        <span>{inner}</span>
+        <span dangerouslySetInnerHTML={{ __html: body }} />
+        <span dangerouslySetInnerHTML={{ __html: body }} />
       </div>
     </div>
   );

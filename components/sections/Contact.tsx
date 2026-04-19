@@ -1,7 +1,12 @@
+"use client";
+
+import { useT } from "@/lib/i18n/useT";
+
 export function Contact() {
+  const t = useT();
   return (
     <section className="contact" id="contact">
-      <div className="label">◉ 05 — Direct line</div>
+      <div className="label">{t("contact.section.label")}</div>
       <a className="mail" href="mailto:juan@juandiazllc.com">
         juan<em>@</em>juandiazllc.com
       </a>
