@@ -212,6 +212,9 @@ const en: Dict = {
   "signals.title.a": "Field notes,",
   "signals.title.b": "build logs.",
   "signals.sub": "Short essays on designing operator tools, shipping dashboards that survive real environments, and running small studios at speed.",
+  "signals.tag.back": "← All signals",
+  "signals.tag.title": "Signals tagged:",
+  "signals.tag.empty": "No signals tagged \"{tag}\" yet.",
 
   // Float CTA + HUD
   "cta.float": "Book a call",
@@ -597,6 +600,9 @@ const nl: Dict = {
   "signals.title.a": "Veldnotities,",
   "signals.title.b": "bouwjournaals.",
   "signals.sub": "Korte stukken over het bouwen van tools voor operators, dashboards die de praktijk overleven en kleine studio's die snel blijven schakelen.",
+  "signals.tag.back": "← Alle signalen",
+  "signals.tag.title": "Signalen met tag:",
+  "signals.tag.empty": "Nog geen signalen met tag \"{tag}\".",
 
   "cta.float": "Plan een gesprek",
   "hud.live": "Live",
@@ -977,6 +983,9 @@ const de: Dict = {
   "signals.title.a": "Feldnotizen,",
   "signals.title.b": "Bauberichte.",
   "signals.sub": "Kurze Texte über das Bauen von Werkzeugen für Betreiber, über Dashboards, die den Alltag überleben, und über kleine Studios, die im Tempo bleiben.",
+  "signals.tag.back": "← Alle Signale",
+  "signals.tag.title": "Signale mit Tag:",
+  "signals.tag.empty": "Noch keine Signale mit Tag \"{tag}\".",
 
   "cta.float": "Gespräch buchen",
   "hud.live": "Live",
@@ -1357,6 +1366,9 @@ const es: Dict = {
   "signals.title.a": "Notas de campo,",
   "signals.title.b": "diarios de obra.",
   "signals.sub": "Textos cortos sobre diseñar herramientas para operadores, sacar dashboards que aguantan el día a día, y llevar estudios pequeños sin perder velocidad.",
+  "signals.tag.back": "← Todas las señales",
+  "signals.tag.title": "Señales etiquetadas:",
+  "signals.tag.empty": "Aún no hay señales con la etiqueta \"{tag}\".",
 
   "cta.float": "Reservar llamada",
   "hud.live": "En vivo",

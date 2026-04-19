@@ -2,8 +2,25 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { SIGNALS, getSignal } from "@/lib/signals";
-import { LOCALES } from "@/lib/i18n/dict";
+import { LOCALES, type Locale } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+import { breadcrumbSchema } from "@/lib/breadcrumb";
+
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
+
+// Maps our route locales to IETF BCP-47 tags for schema.org `inLanguage`.
+// Keeps the Article JSON-LD accurate per-locale so Google can serve the
+// right hreflang variant to the right audience.
+const IN_LANGUAGE: Record<Locale, string> = {
+  en: "en-US",
+  nl: "nl-NL",
+  de: "de-DE",
+  es: "es-ES",
+};
+
+function toTagSlug(tag: string) {
+  return tag.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
 
 export function generateStaticParams() {
   return LOCALES.flatMap((locale) => SIGNALS.map((s) => ({ locale, slug: s.slug })));
@@ -30,7 +47,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function SignalPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+  const l = assertLocale(locale);
   const s = getSignal(slug);
   if (!s) notFound();
 
@@ -38,8 +56,65 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
   const prev = idx > 0 ? SIGNALS[idx - 1] : null;
   const next = idx < SIGNALS.length - 1 ? SIGNALS[idx + 1] : null;
 
+  // Flatten the block body into a plain-text articleBody for schema.
+  // Lists are bulleted so keyword signal survives; quotes/headings
+  // kept inline — schema.org articleBody is prose, not structured.
+  const articleBody = s.body
+    .map((b) => {
+      if (b.type === "list" && Array.isArray(b.text)) {
+        return (b.text as string[]).map((it) => `• ${it}`).join("\n");
+      }
+      return typeof b.text === "string" ? b.text : "";
+    })
+    .filter(Boolean)
+    .join("\n\n");
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: s.title,
+    description: s.excerpt,
+    datePublished: s.date,
+    dateModified: s.date,
+    author: {
+      "@type": "Person",
+      name: "Juan Stefan Diaz",
+      url: `${SITE}/about`,
+      image: `${SITE}/me/portrait.jpg`,
+      jobTitle: "Founder, Juan Diaz LLC",
+      sameAs: [
+        "https://linkedin.com/in/juanstefan",
+        "https://instagram.com/diazelcazador",
+      ],
+    },
+    image: `${SITE}/me/portrait.jpg`,
+    articleBody,
+    publisher: {
+      "@type": "Organization",
+      name: "Juan Diaz LLC",
+      logo: { "@type": "ImageObject", url: `${SITE}/icon.svg` },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/${l}/signals/${s.slug}` },
+    keywords: s.tag,
+    inLanguage: IN_LANGUAGE[l],
+  };
+
+  const crumbs = breadcrumbSchema([
+    { name: "Home", path: `/${l}` },
+    { name: "Signals", path: `/${l}/signals` },
+    { name: s.title, path: `/${l}/signals/${s.slug}` },
+  ]);
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }}
+      />
       <header className="page-hero" style={{ paddingBottom: 32 }}>
         <Link href="/signals" className="eyebrow" style={{ display: "inline-block", marginBottom: 24 }}>
           ← All signals
