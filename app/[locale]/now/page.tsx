@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+import { translate } from "@/lib/i18n/dict";
 
 // /now — https://nownownow.com convention. A public "what I'm
 // actually focused on right this quarter" page. Updated roughly
@@ -22,75 +23,71 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 const LAST_UPDATED = "2026-04-18";
 
-const SHIPPING = [
-  "Philly CRM v1.2 — field-team pipeline view, offline-first drafts.",
-  "Voltafy installer mode — rolling out to first five installer partners in NL.",
-  "Help Mij Besparen — new content cluster around thuisbatterij ROI post-2027.",
-];
+const SHIPPING_KEYS = ["now.ship.1", "now.ship.2", "now.ship.3"] as const;
+const WRITING_KEYS = ["now.write.1", "now.write.2", "now.write.3"] as const;
+const LEARNING_KEYS = ["now.learn.1", "now.learn.2", "now.learn.3"] as const;
+const NOT_DOING_KEYS = ["now.nope.1", "now.nope.2", "now.nope.3"] as const;
 
-const WRITING = [
-  "A long piece on why operator dashboards lie (half-drafted).",
-  "Case notes from the salderingsregeling-2027 rollout work.",
-  "A practical guide to 'buy the commodity, build the moat' with worked examples.",
-];
+const DATE_LOCALE: Record<string, string> = {
+  en: "en-US",
+  nl: "nl-NL",
+  de: "de-DE",
+  es: "es-ES",
+};
 
-const LEARNING = [
-  "Where AI search (ChatGPT, Perplexity, Google AI Overviews) actually sources its citations — and what that means for SEO strategy in 2026.",
-  "Practical Postgres + pgvector patterns for operator-scale knowledge bases.",
-  "Spanish — slow and steady. El cazador doesn't hunt without the language.",
-];
+export default async function NowPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  const t = (k: string) => translate(l, k);
 
-const NOT_DOING = [
-  "New client engagements until July — the bench is full.",
-  "Conferences. Ship first, speak later.",
-  "Anything that requires a pitch deck.",
-];
+  const lastUpdated = new Date(LAST_UPDATED).toLocaleDateString(DATE_LOCALE[l] ?? "en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
-export default function NowPage() {
   return (
     <>
       <header className="page-hero">
-        <div className="eyebrow">◉ Now</div>
-        <h1>
-          What I&apos;m <em>actually</em> building right now.
-        </h1>
-        <p>
-          A monthly-ish snapshot of the work that has my attention. Short, dated, honest. If
-          it isn&apos;t here, it isn&apos;t the focus.
-        </p>
+        <div className="eyebrow">{t("now.eyebrow")}</div>
+        <h1 dangerouslySetInnerHTML={{ __html: t("now.title") }} />
+        <p>{t("now.lede")}</p>
       </header>
 
       <article className="long">
         <div style={{ color: "var(--muted)", fontFamily: "'JetBrains Mono', monospace", fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 24 }}>
-          Last updated {new Date(LAST_UPDATED).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+          {t("now.lastupdated")} {lastUpdated}
         </div>
 
-        <h2>Shipping</h2>
+        <h2>{t("now.h.shipping")}</h2>
         <ul>
-          {SHIPPING.map((x, i) => <li key={i}>{x}</li>)}
+          {SHIPPING_KEYS.map((k) => <li key={k}>{t(k)}</li>)}
         </ul>
 
-        <h2>Writing</h2>
+        <h2>{t("now.h.writing")}</h2>
         <ul>
-          {WRITING.map((x, i) => <li key={i}>{x}</li>)}
+          {WRITING_KEYS.map((k) => <li key={k}>{t(k)}</li>)}
         </ul>
 
-        <h2>Learning</h2>
+        <h2>{t("now.h.learning")}</h2>
         <ul>
-          {LEARNING.map((x, i) => <li key={i}>{x}</li>)}
+          {LEARNING_KEYS.map((k) => <li key={k}>{t(k)}</li>)}
         </ul>
 
-        <h2>Not doing</h2>
+        <h2>{t("now.h.notdoing")}</h2>
         <ul>
-          {NOT_DOING.map((x, i) => <li key={i}>{x}</li>)}
+          {NOT_DOING_KEYS.map((k) => <li key={k}>{t(k)}</li>)}
         </ul>
 
         <p style={{ marginTop: 48 }}>
-          If anything here matches what you&apos;re wrestling with,{" "}
-          <Link href="/contact">start a conversation</Link>. If you want context on how I
-          think, the <Link href="/insights">insights</Link> and{" "}
-          <Link href="/story">story</Link> pages are the longer read. Tools I actually use
-          are on <Link href="/uses">/uses</Link>.
+          {t("now.outro.1")}{" "}
+          <Link href="/contact">{t("now.outro.link.contact")}</Link>
+          {t("now.outro.2")}{" "}
+          <Link href="/insights">{t("now.outro.link.insights")}</Link>{" "}
+          {t("now.outro.3")}{" "}
+          <Link href="/story">{t("now.outro.link.story")}</Link>{" "}
+          {t("now.outro.4")}{" "}
+          <Link href="/uses">{t("now.outro.link.uses")}</Link>.
         </p>
       </article>
     </>
