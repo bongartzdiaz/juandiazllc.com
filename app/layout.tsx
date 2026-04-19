@@ -7,6 +7,7 @@ import { GlobalEffects } from "@/components/GlobalEffects";
 import { CookieConsent } from "@/components/CookieConsent";
 import { BackToTop } from "@/components/BackToTop";
 import { Analytics } from "@/components/Analytics";
+import { WebVitalsReporter } from "@/components/WebVitalsReporter";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 import { LOCALES, DEFAULT_LOCALE } from "@/lib/i18n/dict";
 
@@ -177,6 +178,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <CookieConsent />
           <BackToTop />
           <Analytics />
+          <WebVitalsReporter />
         </LocaleProvider>
       </body>
     </html>

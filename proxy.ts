@@ -67,6 +67,7 @@ const CSRF_EXEMPT_PREFIXES = [
   '/api/auth/',          // NextAuth handles its own CSRF on internal endpoints
   '/api/log-error',      // client-side error sink, unauthenticated, IP-limited
   '/api/csp-report',     // browsers POST CSP violation reports (no Origin)
+  '/api/vitals',         // Web Vitals beacons, keepalive fetch (no Origin on unload)
   '/api/health',         // uptime probe
 ]
 

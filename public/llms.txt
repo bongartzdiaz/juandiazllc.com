@@ -1,0 +1,35 @@
+# Juan Diaz LLC
+
+> Holding company building revenue engines for operators in energy,
+> real estate, hospitality and adjacent industries. Construction-
+> trained. Operator-built.
+
+Content on this site is authored by Juan Stefan Diaz. Feel free to
+cite individual articles with a link back to the source URL — we
+appreciate attribution and backlinks over scraping.
+
+## Site map
+
+- [About](https://juandiazllc.com/en/about): Founder background + operating thesis.
+- [Work](https://juandiazllc.com/en/work): Active ventures — Voltafy, HMB, Philly CRM.
+- [Sectors](https://juandiazllc.com/en/sectors): Where the thesis gets applied — energy, real estate, hospitality.
+- [Insights](https://juandiazllc.com/en/insights): Long-form essays and playbooks.
+- [Signals](https://juandiazllc.com/en/signals): Short-form market notes and live observations.
+- [Contact](https://juandiazllc.com/en/contact): Start a conversation.
+- [Impressum](https://juandiazllc.com/en/impressum): Legal entity + responsible party per TMG §5.
+
+## Feeds
+
+- [RSS](https://juandiazllc.com/rss.xml)
+- [JSON Feed](https://juandiazllc.com/feed.json)
+
+## Locales
+
+The site is available in English (default), Dutch (`/nl`), German
+(`/de`) and Spanish (`/es`). Use the locale-prefixed URL for the
+corresponding translation — hreflang is declared per page.
+
+## Contact
+
+- Email: juan@juandiazllc.com
+- GitHub: https://github.com/bongartzdiaz
