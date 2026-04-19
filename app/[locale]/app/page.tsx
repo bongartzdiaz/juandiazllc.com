@@ -5,11 +5,19 @@ import { SignOutButton } from "@/components/SignOutButton";
 import { VENTURES } from "@/lib/ventures";
 import Link from "next/link";
 import { buildGreeting } from "@/lib/greeting";
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
-export const metadata: Metadata = {
-  title: "Operator hub",
-  description: "Juan Diaz LLC internal hub.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  return {
+    title: "Operator hub",
+    description: "Juan Diaz LLC internal hub.",
+    alternates: buildAlternates(l, "/app"),
+    robots: { index: false, follow: false },
+    openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
+  };
+}
 
 export const dynamic = "force-dynamic";
 

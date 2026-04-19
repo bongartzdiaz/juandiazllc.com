@@ -2,19 +2,34 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { SIGNALS, getSignal } from "@/lib/signals";
+import { LOCALES } from "@/lib/i18n/dict";
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
 export function generateStaticParams() {
-  return SIGNALS.map((s) => ({ slug: s.slug }));
+  return LOCALES.flatMap((locale) => SIGNALS.map((s) => ({ locale, slug: s.slug })));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const l = assertLocale(locale);
   const s = getSignal(slug);
   if (!s) return { title: "Signal not found" };
-  return { title: s.title, description: s.excerpt };
+  return {
+    title: s.title,
+    description: s.excerpt,
+    alternates: buildAlternates(l, `/signals/${s.slug}`),
+    openGraph: {
+      type: "article",
+      url: `/${l}/signals/${s.slug}`,
+      title: s.title,
+      description: s.excerpt,
+      locale: ogLocale(l),
+      alternateLocale: alternateOgLocales(l),
+    },
+  };
 }
 
-export default async function SignalPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function SignalPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { slug } = await params;
   const s = getSignal(slug);
   if (!s) notFound();

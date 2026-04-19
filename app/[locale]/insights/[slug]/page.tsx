@@ -5,32 +5,36 @@ import { getAllInsights, getInsight, formatDate } from "@/lib/insights";
 import { getVentureForTag } from "@/lib/ventures";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { ReadingProgress } from "@/components/ReadingProgress";
+import { LOCALES } from "@/lib/i18n/dict";
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
-// Static params — generate all post URLs at build time so Vercel
-// serves them from the edge cache without hitting Node on every hit.
 export async function generateStaticParams() {
-  return getAllInsights().map((p) => ({ slug: p.slug }));
+  return LOCALES.flatMap((locale) => getAllInsights().map((p) => ({ locale, slug: p.slug })));
 }
 
 export async function generateMetadata(
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ locale: string; slug: string }> }
 ): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+  const l = assertLocale(locale);
   const post = getInsight(slug);
   if (!post) return { title: "Not found" };
   return {
     title: post.seo?.metaTitle ?? post.title,
     description: post.seo?.metaDescription ?? post.summary,
-    alternates: { canonical: `/insights/${post.slug}` },
+    alternates: buildAlternates(l, `/insights/${post.slug}`),
     openGraph: {
       type: "article",
-      url: `/insights/${post.slug}`,
+      url: `/${l}/insights/${post.slug}`,
       title: post.title,
       description: post.summary,
       publishedTime: post.publishedAt,
       tags: [post.tag],
+      locale: ogLocale(l),
+      alternateLocale: alternateOgLocales(l),
+      images: [{ url: "/me/portrait.jpg", width: 1200, height: 1200, alt: "Juan Diaz" }],
     },
     twitter: {
       card: "summary_large_image",
@@ -41,14 +45,12 @@ export async function generateMetadata(
 }
 
 export default async function InsightPage(
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ locale: string; slug: string }> }
 ) {
   const { slug } = await params;
   const post = getInsight(slug);
   if (!post) notFound();
 
-  // JSON-LD Article schema — gives the post rich-result eligibility
-  // (bylines in SERPs, Top Stories, Discover).
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -56,7 +58,17 @@ export default async function InsightPage(
     description: post.summary,
     datePublished: post.publishedAt,
     dateModified: post.publishedAt,
-    author: { "@type": "Person", name: "Juan Diaz", url: SITE },
+    author: {
+      "@type": "Person",
+      name: "Juan Stefan Diaz",
+      url: `${SITE}/about`,
+      image: `${SITE}/me/portrait.jpg`,
+      jobTitle: "Founder, Juan Diaz LLC",
+      sameAs: [
+        "https://linkedin.com/in/juanstefan",
+        "https://instagram.com/diazelcazador",
+      ],
+    },
     publisher: {
       "@type": "Organization",
       name: "Juan Diaz LLC",
@@ -64,6 +76,7 @@ export default async function InsightPage(
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/insights/${post.slug}` },
     keywords: post.tag,
+    inLanguage: "en",
   };
 
   const related = getAllInsights().filter((p) => p.slug !== post.slug).slice(0, 2);

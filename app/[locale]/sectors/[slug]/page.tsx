@@ -2,19 +2,34 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { SECTORS, getSector } from "@/lib/sectors";
+import { LOCALES } from "@/lib/i18n/dict";
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
 export function generateStaticParams() {
-  return SECTORS.map((s) => ({ slug: s.slug }));
+  return LOCALES.flatMap((locale) => SECTORS.map((s) => ({ locale, slug: s.slug })));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const l = assertLocale(locale);
   const s = getSector(slug);
   if (!s) return { title: "Sector not found" };
-  return { title: `${s.name} — ${s.tagline}`, description: s.summary };
+  return {
+    title: `${s.name} — ${s.tagline}`,
+    description: s.summary,
+    alternates: buildAlternates(l, `/sectors/${s.slug}`),
+    openGraph: {
+      type: "article",
+      url: `/${l}/sectors/${s.slug}`,
+      title: `${s.name} — ${s.tagline}`,
+      description: s.summary,
+      locale: ogLocale(l),
+      alternateLocale: alternateOgLocales(l),
+    },
+  };
 }
 
-export default async function SectorPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function SectorPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { slug } = await params;
   const s = getSector(slug);
   if (!s) notFound();

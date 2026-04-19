@@ -3,11 +3,19 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { SignOutButton } from "@/components/SignOutButton";
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
-export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Juan Diaz LLC — Philly dashboard.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  return {
+    title: "Dashboard",
+    description: "Juan Diaz LLC — Philly dashboard.",
+    alternates: buildAlternates(l, "/dashboard"),
+    robots: { index: false, follow: false },
+    openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
+  };
+}
 
 export const dynamic = "force-dynamic";
 

@@ -7,6 +7,7 @@ import { Hud } from "@/components/Hud";
 import { CommandPalette } from "@/components/CommandPalette";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { LOCALES, type Locale } from "@/lib/i18n/dict";
+import { ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -14,41 +15,38 @@ export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
 }
 
-export const metadata: Metadata = {
-  openGraph: {
-    type: "website",
-    title: "Juan Diaz LLC",
-    description:
-      "Revenue engines for operators in energy, real estate, hospitality and adjacent industries. Construction-trained. Operator-built.",
-    siteName: "Juan Diaz LLC",
-    locale: "en_US",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Juan Diaz LLC",
-    description:
-      "Revenue engines for operators in energy, real estate, hospitality and adjacent.",
-  },
-  alternates: {
-    canonical: "/",
-    languages: { en: "/", nl: "/", de: "/", es: "/" },
-  },
-  keywords: [
-    "operator tools",
-    "revenue engineering",
-    "energy operations",
-    "real estate operations",
-    "hospitality revenue",
-    "Voltafy",
-    "salderingsregeling 2027",
-    "Juan Stefan Diaz",
-    "Juan Diaz LLC",
-  ],
-  authors: [{ name: "Juan Stefan Diaz", url: SITE_URL }],
-  creator: "Juan Stefan Diaz",
-  publisher: "Juan Diaz LLC",
-  category: "business operations",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l: Locale = (LOCALES as readonly string[]).includes(locale) ? (locale as Locale) : "en";
+  return {
+    openGraph: {
+      siteName: "Juan Diaz LLC",
+      locale: ogLocale(l),
+      alternateLocale: alternateOgLocales(l),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Juan Diaz LLC",
+      description:
+        "Revenue engines for operators in energy, real estate, hospitality and adjacent.",
+    },
+    keywords: [
+      "operator tools",
+      "revenue engineering",
+      "energy operations",
+      "real estate operations",
+      "hospitality revenue",
+      "Voltafy",
+      "salderingsregeling 2027",
+      "Juan Stefan Diaz",
+      "Juan Diaz LLC",
+    ],
+    authors: [{ name: "Juan Stefan Diaz", url: SITE_URL }],
+    creator: "Juan Stefan Diaz",
+    publisher: "Juan Diaz LLC",
+    category: "business operations",
+  };
+}
 
 export default async function MainLayout({
   children,
@@ -59,7 +57,7 @@ export default async function MainLayout({
 }) {
   const { locale } = await params;
   if (!(LOCALES as readonly string[]).includes(locale)) notFound();
-  void (locale as Locale);
+  const l = locale as Locale;
   return (
     <main id="main">
       <script
@@ -73,10 +71,13 @@ export default async function MainLayout({
               alternateName: "JDL",
               url: SITE_URL,
               logo: `${SITE_URL}/icon.svg`,
+              image: `${SITE_URL}/me/portrait.jpg`,
               founder: {
                 "@type": "Person",
                 name: "Juan Stefan Diaz",
                 jobTitle: "Founder",
+                image: `${SITE_URL}/me/portrait.jpg`,
+                url: `${SITE_URL}/${l}/about`,
                 sameAs: [
                   "https://linkedin.com/in/juanstefan",
                   "https://instagram.com/diazelcazador",

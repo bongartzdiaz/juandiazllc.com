@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllInsights, formatDate } from "@/lib/insights";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
+import { LOCALES } from "@/lib/i18n/dict";
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
 // Tag archive pages — /insights/tag/systems, /insights/tag/energy etc.
 // Each becomes a dedicated SEO surface for a topic cluster. Built
@@ -30,29 +32,33 @@ function uniqueTags() {
 }
 
 export function generateStaticParams() {
-  return Array.from(uniqueTags().keys()).map((tag) => ({ tag }));
+  const tags = Array.from(uniqueTags().keys());
+  return LOCALES.flatMap((locale) => tags.map((tag) => ({ locale, tag })));
 }
 
 export async function generateMetadata(
-  { params }: { params: Promise<{ tag: string }> }
+  { params }: { params: Promise<{ locale: string; tag: string }> }
 ): Promise<Metadata> {
-  const { tag } = await params;
+  const { locale, tag } = await params;
+  const l = assertLocale(locale);
   const canonical = uniqueTags().get(tag);
   if (!canonical) return { title: "Tag not found" };
   return {
     title: `${canonical} insights — revenue engines for operators`,
     description: `Everything I've written on ${canonical.toLowerCase()} — field notes, case patterns, decisions that moved real P&Ls.`,
-    alternates: { canonical: `/insights/tag/${tag}` },
+    alternates: buildAlternates(l, `/insights/tag/${tag}`),
     openGraph: {
       type: "website",
-      url: `/insights/tag/${tag}`,
+      url: `/${l}/insights/tag/${tag}`,
       title: `${canonical} insights — Juan Diaz LLC`,
+      locale: ogLocale(l),
+      alternateLocale: alternateOgLocales(l),
     },
   };
 }
 
 export default async function TagArchivePage(
-  { params }: { params: Promise<{ tag: string }> }
+  { params }: { params: Promise<{ locale: string; tag: string }> }
 ) {
   const { tag } = await params;
   const canonical = uniqueTags().get(tag);

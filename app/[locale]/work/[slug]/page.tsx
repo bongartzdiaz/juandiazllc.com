@@ -3,22 +3,34 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { VENTURES, getVenture } from "@/lib/ventures";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
+import { LOCALES } from "@/lib/i18n/dict";
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
 export function generateStaticParams() {
-  return VENTURES.map((v) => ({ slug: v.slug }));
+  return LOCALES.flatMap((locale) => VENTURES.map((v) => ({ locale, slug: v.slug })));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const l = assertLocale(locale);
   const v = getVenture(slug);
   if (!v) return { title: "Venture not found" };
   return {
     title: `${v.name} — ${v.tagline}`,
     description: v.summary,
+    alternates: buildAlternates(l, `/work/${v.slug}`),
+    openGraph: {
+      type: "article",
+      url: `/${l}/work/${v.slug}`,
+      title: `${v.name} — ${v.tagline}`,
+      description: v.summary,
+      locale: ogLocale(l),
+      alternateLocale: alternateOgLocales(l),
+    },
   };
 }
 
-export default async function VenturePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function VenturePage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { slug } = await params;
   const v = getVenture(slug);
   if (!v) notFound();
