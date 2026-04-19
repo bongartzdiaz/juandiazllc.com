@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { useT } from "@/lib/i18n/useT";
 
 const TARGET = new Date("2027-01-01T00:00:00+01:00").getTime();
 
@@ -10,6 +11,7 @@ function pad(n: number, w = 2) {
 }
 
 export function Hud() {
+  const t = useT();
   const [now, setNow] = useState("—");
   const [days, setDays] = useState("—");
   const [audioOn, setAudioOn] = useState(false);
@@ -93,12 +95,12 @@ export function Hud() {
   return (
     <div className="hud">
       <div className="hud-inner">
-        <span className="on">Live</span>
+        <span className="on">{t("hud.live")}</span>
         <span>
           AMS <b>{now}</b>
         </span>
         <span>
-          Grid <b style={{ color: "var(--accent)" }}>stable</b>
+          {t("hud.grid")} <b style={{ color: "var(--accent)" }}>{t("hud.grid.stable")}</b>
         </span>
         <span>
           2027 · <b>{days}</b>d
@@ -118,14 +120,14 @@ export function Hud() {
             if (e.key === "Enter" || e.key === " ") toggleAudio();
           }}
         >
-          {audioOn ? "● Sound on" : "◐ Sound off"}
+          {audioOn ? t("hud.sound.on") : t("hud.sound.off")}
         </span>
         <span
           className="hud-audio"
           onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, ctrlKey: true }))}
           role="button"
           tabIndex={0}
-          title="Command palette (⌘K)"
+          title={t("hud.cmd.hint")}
         >
           ⌘K
         </span>

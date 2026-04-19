@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useCallback, useMemo } from "react";
+import { useParams, useRouter, usePathname } from "next/navigation";
 import {
   DEFAULT_LOCALE,
   type Locale,
@@ -22,44 +23,39 @@ const LocaleCtx = createContext<Ctx>({
 
 const COOKIE = "jdl_locale";
 
-function readCookie(): Locale | null {
-  if (typeof document === "undefined") return null;
-  const m = document.cookie.match(new RegExp(`(?:^|; )${COOKIE}=([^;]*)`));
-  const v = m?.[1] as Locale | undefined;
-  return v && (LOCALES as readonly string[]).includes(v) ? v : null;
+function swapLocale(pathname: string, current: Locale, next: Locale): string {
+  const prefix = `/${current}`;
+  if (pathname === prefix) return `/${next}`;
+  if (pathname.startsWith(prefix + "/")) return `/${next}${pathname.slice(prefix.length)}`;
+  return `/${next}${pathname === "/" ? "" : pathname}`;
 }
 
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
+  const params = useParams() as { locale?: string };
+  const router = useRouter();
+  const pathname = usePathname() ?? "/";
 
-  useEffect(() => {
-    const fromCookie = readCookie();
-    if (fromCookie) {
-      setLocaleState(fromCookie);
-      document.documentElement.lang = fromCookie;
-      return;
-    }
-    // Detect from browser
-    const browser = navigator.language?.slice(0, 2).toLowerCase();
-    if (browser && (LOCALES as readonly string[]).includes(browser)) {
-      setLocaleState(browser as Locale);
-      document.documentElement.lang = browser;
-    }
-  }, []);
+  const locale: Locale =
+    params.locale && (LOCALES as readonly string[]).includes(params.locale)
+      ? (params.locale as Locale)
+      : DEFAULT_LOCALE;
 
-  const setLocale = useCallback((l: Locale) => {
-    setLocaleState(l);
-    document.documentElement.lang = l;
-    document.cookie = `${COOKIE}=${l}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
-  }, []);
+  const setLocale = useCallback(
+    (l: Locale) => {
+      document.cookie = `${COOKIE}=${l}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+      // Keep the DOM in sync — root layout's <html lang> is cached across
+      // client-side navigations, so we mirror the cookie on document.
+      if (typeof document !== "undefined") document.documentElement.lang = l;
+      router.push(swapLocale(pathname, locale, l));
+    },
+    [pathname, locale, router],
+  );
 
   const t = useCallback((key: string) => translate(locale, key), [locale]);
 
-  return (
-    <LocaleCtx.Provider value={{ locale, setLocale, t }}>
-      {children}
-    </LocaleCtx.Provider>
-  );
+  const value = useMemo(() => ({ locale, setLocale, t }), [locale, setLocale, t]);
+
+  return <LocaleCtx.Provider value={value}>{children}</LocaleCtx.Provider>;
 }
 
 export function useLocale() {
