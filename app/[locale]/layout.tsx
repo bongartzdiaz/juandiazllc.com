@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { FloatCta } from "@/components/FloatCta";
 import { Hud } from "@/components/Hud";
 import { CommandPalette } from "@/components/CommandPalette";
 import { ScrollProgress } from "@/components/ScrollProgress";
+import { LOCALES, type Locale } from "@/lib/i18n/dict";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
+
+export function generateStaticParams() {
+  return LOCALES.map((locale) => ({ locale }));
+}
 
 export const metadata: Metadata = {
   openGraph: {
@@ -44,7 +50,16 @@ export const metadata: Metadata = {
   category: "business operations",
 };
 
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+export default async function MainLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  if (!(LOCALES as readonly string[]).includes(locale)) notFound();
+  void (locale as Locale);
   return (
     <main id="main">
       <script

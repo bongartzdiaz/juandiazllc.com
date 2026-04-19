@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
 import "./globals.css";
 import { Overlays } from "@/components/Overlays";
 import { Preloader } from "@/components/Preloader";
@@ -7,6 +8,7 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { BackToTop } from "@/components/BackToTop";
 import { Analytics } from "@/components/Analytics";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
+import { LOCALES, DEFAULT_LOCALE } from "@/lib/i18n/dict";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -134,9 +136,12 @@ const websiteSchema = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const c = await cookies();
+  const cookieLocale = c.get("jdl_locale")?.value;
+  const lang = cookieLocale && (LOCALES as readonly string[]).includes(cookieLocale) ? cookieLocale : DEFAULT_LOCALE;
   return (
-    <html lang="en">
+    <html lang={lang}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         {/* Feed autodiscovery — RSS for readers, JSON Feed for modern clients */}

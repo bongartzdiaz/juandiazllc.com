@@ -11,6 +11,49 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
+/* ── Locale routing ───────────────────────────────────────────────
+   Marketing pages live under /[locale]/..., Philly + API + auth +
+   static assets are locale-agnostic. Middleware redirects any
+   unprefixed marketing request to the user's preferred locale
+   (cookie > Accept-Language > default 'en') and keeps the cookie
+   fresh when a locale-prefixed URL is visited. */
+
+const LOCALES = ['en', 'nl', 'de', 'es'] as const
+const DEFAULT_LOCALE = 'en'
+const LOCALE_SET = new Set<string>(LOCALES)
+const LOCALE_COOKIE = 'jdl_locale'
+const ONE_YEAR = 60 * 60 * 24 * 365
+
+// Paths that should NEVER get a locale prefix.
+const LOCALE_EXEMPT_PREFIXES = [
+  '/philly', '/api', '/auth', '/_next',
+  '/sitemap.xml', '/robots.txt', '/rss.xml', '/feed.json',
+  '/opengraph-image', '/icon', '/favicon', '/apple-icon',
+]
+
+function isLocaleExempt(pathname: string): boolean {
+  if (LOCALE_EXEMPT_PREFIXES.some(p => pathname === p || pathname.startsWith(p + '/') || pathname.startsWith(p + '.'))) return true
+  // Files with extensions (static assets) are exempt.
+  if (/\.[a-z0-9]+$/i.test(pathname)) return true
+  return false
+}
+
+function firstSegment(pathname: string): string | null {
+  const m = /^\/([^\/]+)/.exec(pathname)
+  return m ? m[1] : null
+}
+
+function detectLocale(req: NextRequest): string {
+  const c = req.cookies.get(LOCALE_COOKIE)?.value
+  if (c && LOCALE_SET.has(c)) return c
+  const al = req.headers.get('accept-language') || ''
+  for (const part of al.split(',')) {
+    const code = part.trim().slice(0, 2).toLowerCase()
+    if (LOCALE_SET.has(code)) return code
+  }
+  return DEFAULT_LOCALE
+}
+
 /* ── 1. CSRF ──────────────────────────────────────────────────── */
 
 const UNSAFE_METHODS = new Set(['POST', 'PATCH', 'PUT', 'DELETE'])
@@ -96,6 +139,22 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(httpsUrl, 308)
   }
 
+  // Locale routing — redirect unprefixed marketing paths to the user's
+  // preferred locale. Philly / API / auth / static assets exempted.
+  if (!isLocaleExempt(pathname)) {
+    const seg = firstSegment(pathname)
+    if (!seg || !LOCALE_SET.has(seg)) {
+      const locale = detectLocale(req)
+      const target = req.nextUrl.clone()
+      target.pathname = `/${locale}${pathname === '/' ? '' : pathname}`
+      const redirect = NextResponse.redirect(target, 307)
+      redirect.cookies.set(LOCALE_COOKIE, locale, {
+        path: '/', maxAge: ONE_YEAR, sameSite: 'lax',
+      })
+      return redirect
+    }
+  }
+
   // Same-origin check for unsafe API methods.
   if (pathname.startsWith('/api/') && UNSAFE_METHODS.has(req.method) && !isCsrfExempt(pathname)) {
     const host = req.headers.get('host') ?? ''
@@ -135,6 +194,17 @@ export default async function middleware(req: NextRequest) {
   // security headers on top before returning.
   const res = await updateSession(req)
   res.headers.set('x-request-id', requestId)
+
+  // Freshen the locale cookie when a locale-prefixed URL is visited so
+  // SSR `<html lang>` reflects the current URL's locale.
+  {
+    const seg = firstSegment(pathname)
+    if (seg && LOCALE_SET.has(seg)) {
+      res.cookies.set(LOCALE_COOKIE, seg, {
+        path: '/', maxAge: ONE_YEAR, sameSite: 'lax',
+      })
+    }
+  }
 
   // Security headers on the way out
   res.headers.set('Content-Security-Policy', CSP)
