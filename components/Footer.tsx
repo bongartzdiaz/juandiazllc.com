@@ -9,7 +9,7 @@ export function Footer() {
     <footer>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <div className="f-mark">Juan Diaz LLC</div>
-        <div style={{ color: "var(--muted-soft)", fontSize: 11 }}>© 2026 · Delaware, USA</div>
+        <div style={{ color: "var(--muted-soft)", fontSize: 11 }}>{t("footer.copyright")}</div>
       </div>
       <nav aria-label="Footer" style={{ display: "flex", gap: 22, flexWrap: "wrap" }}>
         <Link href="/story">{t("nav.story")}</Link>
@@ -26,7 +26,7 @@ export function Footer() {
       </nav>
       <div style={{ display: "flex", flexDirection: "column", gap: 8, textAlign: "right" }}>
         <div>
-          <span id="footTime">—</span> · Amsterdam CET
+          <span id="footTime">—</span> · {t("footer.tz")}
         </div>
         <div style={{ color: "var(--muted-soft)", fontSize: 11 }}>
           juandiazllc.com · {t("footer.version")}

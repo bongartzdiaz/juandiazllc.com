@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SECTORS } from "@/lib/sectors";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+import { translate } from "@/lib/i18n/dict";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,17 +16,16 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-export default function SectorsIndex() {
+export default async function SectorsIndex({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  const t = (k: string) => translate(l, k);
   return (
     <>
       <header className="page-hero">
-        <div className="eyebrow">◉ Sectors</div>
-        <h1>Where the <em>playbook</em> applies.</h1>
-        <p>
-          Different industries, same five phases. Each of these pages is a real survey — the
-          common revenue leaks in the sector, how the method runs against them, and the proof
-          points I can point to (or the slot still open for a first partner).
-        </p>
+        <div className="eyebrow">{t("sectors.page.eyebrow")}</div>
+        <h1 dangerouslySetInnerHTML={{ __html: t("sectors.page.title") }} />
+        <p>{t("sectors.page.lede")}</p>
       </header>
       <section style={{ padding: "80px 40px 160px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>

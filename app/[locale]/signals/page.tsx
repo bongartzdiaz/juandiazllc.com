@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SIGNALS } from "@/lib/signals";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+import { translate } from "@/lib/i18n/dict";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,17 +16,16 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-export default function SignalsIndex() {
+export default async function SignalsIndex({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  const t = (k: string) => translate(l, k);
   return (
     <>
       <header className="page-hero">
-        <div className="eyebrow">◉ Signals</div>
-        <h1>Field notes, build <em>logs.</em></h1>
-        <p>
-          Writing is a lagging indicator of real work. These are the operating notes I&apos;d want a
-          new partner, hire, or client to read before we start. New pieces arrive when they&apos;re ready
-          — not before.
-        </p>
+        <div className="eyebrow">{t("signals.page.eyebrow")}</div>
+        <h1 dangerouslySetInnerHTML={{ __html: t("signals.page.title") }} />
+        <p>{t("signals.page.lede")}</p>
       </header>
       <section style={{ padding: "80px 40px 160px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div style={{ display: "grid", gap: 12 }}>
@@ -77,7 +77,7 @@ export default function SignalsIndex() {
                   alignSelf: "center",
                 }}
               >
-                Read →
+                {t("signals.page.read")}
               </div>
             </Link>
           ))}

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { formatDate, type Insight } from "@/lib/insights";
+import { useT } from "@/lib/i18n/useT";
 
 // Client-side tag filter + search over the insights list.
 // Keeps everything on /insights (no route changes, no server round-
@@ -15,6 +16,7 @@ import { formatDate, type Insight } from "@/lib/insights";
 type Props = { posts: Insight[] };
 
 export function InsightsList({ posts }: Props) {
+  const t = useT();
   const [tag, setTag] = useState<string | null>(null);
   const [q, setQ] = useState("");
 
@@ -39,35 +41,35 @@ export function InsightsList({ posts }: Props) {
   return (
     <>
       <div className="insights-controls">
-        <div className="insights-tags" role="group" aria-label="Filter by topic">
+        <div className="insights-tags" role="group" aria-label={t("insights.filter.aria")}>
           <button
             type="button"
             className="tag-pill"
             data-active={tag === null}
             onClick={() => setTag(null)}
           >
-            All <span className="tp-count">{posts.length}</span>
+            {t("insights.filter.all")} <span className="tp-count">{posts.length}</span>
           </button>
-          {tags.map((t) => {
-            const count = posts.filter((p) => p.tag === t).length;
+          {tags.map((tg) => {
+            const count = posts.filter((p) => p.tag === tg).length;
             return (
               <button
-                key={t}
+                key={tg}
                 type="button"
                 className="tag-pill"
-                data-active={tag === t}
-                onClick={() => setTag(tag === t ? null : t)}
+                data-active={tag === tg}
+                onClick={() => setTag(tag === tg ? null : tg)}
               >
-                {t} <span className="tp-count">{count}</span>
+                {tg} <span className="tp-count">{count}</span>
               </button>
             );
           })}
         </div>
         <label className="insights-search">
-          <span className="sr-only">Search insights</span>
+          <span className="sr-only">{t("insights.search.aria")}</span>
           <input
             type="search"
-            placeholder="Search…"
+            placeholder={t("insights.search.placeholder")}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             autoComplete="off"
@@ -100,7 +102,7 @@ export function InsightsList({ posts }: Props) {
             <h2 className="ic-title">{p.title}</h2>
             <p className="ic-sum">{p.summary}</p>
             <span className="ic-read">
-              Read <span className="arr">→</span>
+              {t("insights.card.read")} <span className="arr">→</span>
             </span>
           </Link>
         ))}
@@ -108,7 +110,7 @@ export function InsightsList({ posts }: Props) {
 
       {filtered.length === 0 && (
         <div className="insights-empty">
-          <p>No insights match that filter yet.</p>
+          <p>{t("insights.empty")}</p>
           <button
             type="button"
             className="tag-pill"
@@ -117,7 +119,7 @@ export function InsightsList({ posts }: Props) {
               setQ("");
             }}
           >
-            Reset filters
+            {t("insights.empty.reset")}
           </button>
         </div>
       )}

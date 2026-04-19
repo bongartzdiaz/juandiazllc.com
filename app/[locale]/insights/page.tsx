@@ -3,6 +3,7 @@ import { getAllInsights } from "@/lib/insights";
 import { InsightsList } from "@/components/InsightsList";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+import { translate } from "@/lib/i18n/dict";
 
 // /insights — long-form writing. Primary SEO surface after the home
 // page: each post is a standalone URL with its own Article schema,
@@ -27,21 +28,18 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-export default function InsightsIndex() {
+export default async function InsightsIndex({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  const t = (k: string) => translate(l, k);
   const posts = getAllInsights();
 
   return (
     <>
       <header className="page-hero">
-        <div className="eyebrow">◉ Insights</div>
-        <h1>
-          Field notes from <em>the build</em>.
-        </h1>
-        <p>
-          Short pieces on the systems I actually ship — operator CRMs, energy funnels,
-          the decisions that separate a stack you own from a stack that owns you. No
-          gated PDFs. No newsletter wall.
-        </p>
+        <div className="eyebrow">{t("insights.page.eyebrow")}</div>
+        <h1 dangerouslySetInnerHTML={{ __html: t("insights.page.title") }} />
+        <p>{t("insights.page.lede")}</p>
       </header>
 
       <section

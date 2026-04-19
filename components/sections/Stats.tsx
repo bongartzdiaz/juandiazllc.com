@@ -1,21 +1,22 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/i18n/useT";
 
 type StatDef = {
   value: number;
   suffix?: string;
   italicSuffix?: string;
   italicPrefix?: string;
-  label: string;
+  labelKey: string;
   format?: (n: number) => string;
 };
 
 const STATS: StatDef[] = [
-  { italicPrefix: "07", value: 0, label: "Years shipping" },
-  { value: 4, italicSuffix: "+", label: "Live products" },
-  { italicPrefix: "5", value: 0, label: "Phases every build" },
-  { value: 2, italicSuffix: "027", label: "The deadline" },
+  { italicPrefix: "07", value: 0, labelKey: "stats.l.years" },
+  { value: 4, italicSuffix: "+", labelKey: "stats.l.live" },
+  { italicPrefix: "5", value: 0, labelKey: "stats.l.phases" },
+  { value: 2, italicSuffix: "027", labelKey: "stats.l.deadline" },
 ];
 
 function useCount(target: number, active: boolean, duration = 1400) {
@@ -37,6 +38,7 @@ function useCount(target: number, active: boolean, duration = 1400) {
 }
 
 function Stat({ def, active }: { def: StatDef; active: boolean }) {
+  const t = useT();
   const n = useCount(def.value, active);
   const display = def.italicPrefix ? (
     <>
@@ -53,7 +55,7 @@ function Stat({ def, active }: { def: StatDef; active: boolean }) {
   return (
     <div className="stat">
       <div className="n">{display}</div>
-      <div className="l">{def.label}</div>
+      <div className="l">{t(def.labelKey)}</div>
     </div>
   );
 }
