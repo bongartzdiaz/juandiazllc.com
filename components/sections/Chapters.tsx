@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/i18n/useT";
 
 export function Chapters() {
   const sectionRef = useRef<HTMLElement>(null);
   const [idx, setIdx] = useState(0);
+  const t = useT();
 
   useEffect(() => {
     function sync() {
@@ -39,7 +41,7 @@ export function Chapters() {
       <div className="chapters-pin">
         <div className="ch-visual">
           <div className="ch-num">
-            <b>Chapter</b> {String(idx + 1).padStart(2, "0")} / 03
+            <b>{t("ch.word")}</b> {String(idx + 1).padStart(2, "0")} / 03
           </div>
 
           <div className={`ch-scene${idx === 0 ? " active" : ""}`} data-scene="0">
@@ -113,38 +115,18 @@ export function Chapters() {
 
         <div className="ch-text">
           <div className="ch-slides">
-            <div className={`ch-slide${idx === 0 ? " active" : ""}`} data-slide="0">
-              <div className="eyebrow">◉ Chapter 01 — The Signal</div>
-              <h3>Every real tool starts with someone <em>listening</em> to the field.</h3>
-              <p>
-                Long before Voltafy, I was the one running the dashboards — at 3am, on bad wifi,
-                watching numbers lie about what was really happening on a roof somewhere in Zwolle.
-                That&apos;s where the hunt started.
-              </p>
-              <div className="ch-meta">— 2021–2023 · the early years</div>
-            </div>
-
-            <div className={`ch-slide${idx === 1 ? " active" : ""}`} data-slide="1">
-              <div className="eyebrow">◉ Chapter 02 — The Build</div>
-              <h3>Stop complaining. <em>Build</em> what you wish existed.</h3>
-              <p>
-                Four products. One standard. No wasted screen. Voltafy as the platform. Performance
-                Tracker for owners who want the real number. Help Mij Besparen for households
-                drowning in invoices. Salderingsregeling 2027 as the public guide.
-              </p>
-              <div className="ch-meta">— 2024–2026 · Juan Diaz LLC</div>
-            </div>
-
-            <div className={`ch-slide${idx === 2 ? " active" : ""}`} data-slide="2">
-              <div className="eyebrow">◉ Chapter 03 — The Bet</div>
-              <h3>Four million Dutch rooftops are about to need <em>new software.</em></h3>
-              <p>
-                The salderingsregeling ends January 1, 2027. The rules change, the math changes, and
-                every household with solar wakes up on a different grid. I intend to be the one who
-                shipped what they need first — and shipped it honestly.
-              </p>
-              <div className="ch-meta">— 2027 and after · the reason all of this exists</div>
-            </div>
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className={`ch-slide${idx === i ? " active" : ""}`}
+                data-slide={i}
+              >
+                <div className="eyebrow">{t(`ch.${i + 1}.eyebrow`)}</div>
+                <h3 dangerouslySetInnerHTML={{ __html: t(`ch.${i + 1}.title`) }} />
+                <p>{t(`ch.${i + 1}.body`)}</p>
+                <div className="ch-meta">{t(`ch.${i + 1}.meta`)}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
