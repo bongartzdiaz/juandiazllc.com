@@ -123,8 +123,15 @@ const en: Dict = {
   "footer.now": "Now",
   "footer.uses": "Uses",
   "footer.privacy": "Privacy",
+  "footer.impressum": "Impressum",
   "lang.label": "Lang",
   "lang.switch": "Switch language",
+
+  // Cookie banner
+  "cookie.body": "This site keeps a session cookie for sign-in, a language-preference cookie, and — if you accept — a privacy-friendly analytics ping that counts page views without a personal identifier. No ad tracking, no resale.",
+  "cookie.privacy": "privacy page",
+  "cookie.decline": "Essential only",
+  "cookie.accept": "Accept all",
 
   // Contact sectors
   "contact.sector.energy": "Energy",
@@ -369,6 +376,23 @@ const en: Dict = {
   "priv.h.changes": "Changes to this page",
   "priv.p.changes": "If we ever start doing something we did not list above, this page changes before that happens. The last update date is visible in the footer.",
 
+  // Impressum (legal notice — required under German TMG §5 / DSA art. 12)
+  "impressum.eyebrow": "◉ Legal notice",
+  "impressum.title": "Impressum",
+  "impressum.lede": "Information in accordance with § 5 TMG and Article 12 of the EU Digital Services Act. Translated from German for convenience — the canonical version is the German one.",
+  "impressum.h.company": "Company",
+  "impressum.p.company": "Juan Diaz LLC, a limited liability company registered in Delaware, USA. Operating contact from Amsterdam, the Netherlands.",
+  "impressum.h.represented": "Represented by",
+  "impressum.p.represented": "Juan Diaz, founder and sole member.",
+  "impressum.h.contact": "Contact",
+  "impressum.p.contact": "Email: <a href=\"mailto:juan@juandiazllc.com\">juan@juandiazllc.com</a>. Written correspondence via email preferred — responses within three working days.",
+  "impressum.h.responsible": "Responsible for content",
+  "impressum.p.responsible": "Juan Diaz (V.i.S.d.P.) — address available on written request for legitimate legal claims.",
+  "impressum.h.dispute": "Online dispute resolution",
+  "impressum.p.dispute": "The European Commission provides a platform for online dispute resolution at <a href=\"https://ec.europa.eu/consumers/odr\" rel=\"nofollow\">ec.europa.eu/consumers/odr</a>. We do not participate in dispute-resolution proceedings before a consumer arbitration board.",
+  "impressum.h.liability": "Liability for links and content",
+  "impressum.p.liability": "External links are reviewed at the time of inclusion; we are not responsible for the current content of linked sites. All original copy on this domain is authored by Juan Diaz unless attributed otherwise.",
+
   // Contact page (/contact)
   "contact.page.eyebrow": "◉ Direct line",
   "contact.page.title": "Let's find the <em>revenue</em> you're leaving on the table.",
@@ -522,8 +546,15 @@ const nl: Dict = {
   "footer.now": "Nu",
   "footer.uses": "Tools",
   "footer.privacy": "Privacy",
+  "footer.impressum": "Colofon",
   "lang.label": "Taal",
   "lang.switch": "Taal wisselen",
+
+  // Cookie banner
+  "cookie.body": "Deze site houdt één sessiecookie voor inloggen bij, één taalvoorkeur, en — als je accepteert — een privacyvriendelijke analytics-ping die paginaweergaven telt zonder persoonlijke identifier. Geen ad-tracking, geen doorverkoop.",
+  "cookie.privacy": "privacypagina",
+  "cookie.decline": "Alleen noodzakelijk",
+  "cookie.accept": "Alles accepteren",
 
   "contact.sector.energy": "Energie",
   "contact.sector.realestate": "Vastgoed",
@@ -753,6 +784,23 @@ const nl: Dict = {
   "priv.h.changes": "Wijzigingen aan deze pagina",
   "priv.p.changes": "Gaan we ooit iets doen dat hierboven niet staat, dan verandert deze pagina eerst. De laatste wijzigingsdatum staat in de footer.",
 
+  // Impressum / colofon (vereist onder Duitse TMG §5 / EU DSA art. 12)
+  "impressum.eyebrow": "◉ Colofon",
+  "impressum.title": "Colofon",
+  "impressum.lede": "Informatie conform § 5 TMG (Duitsland) en artikel 12 van de EU Digital Services Act. Vertaald uit het Duits voor het gemak — de Duitse versie is leidend.",
+  "impressum.h.company": "Onderneming",
+  "impressum.p.company": "Juan Diaz LLC, een vennootschap met beperkte aansprakelijkheid geregistreerd in Delaware, VS. Operationeel contactpunt vanuit Amsterdam, Nederland.",
+  "impressum.h.represented": "Vertegenwoordigd door",
+  "impressum.p.represented": "Juan Diaz, oprichter en enig vennoot.",
+  "impressum.h.contact": "Contact",
+  "impressum.p.contact": "E-mail: <a href=\"mailto:juan@juandiazllc.com\">juan@juandiazllc.com</a>. Schriftelijke correspondentie bij voorkeur per e-mail — reactie binnen drie werkdagen.",
+  "impressum.h.responsible": "Verantwoordelijk voor de inhoud",
+  "impressum.p.responsible": "Juan Diaz (V.i.S.d.P.) — postadres op schriftelijk verzoek bij rechtmatige juridische claims.",
+  "impressum.h.dispute": "Online geschillenbeslechting",
+  "impressum.p.dispute": "De Europese Commissie biedt een platform voor online geschillenbeslechting: <a href=\"https://ec.europa.eu/consumers/odr\" rel=\"nofollow\">ec.europa.eu/consumers/odr</a>. Wij nemen niet deel aan procedures bij een geschillencommissie voor consumenten.",
+  "impressum.h.liability": "Aansprakelijkheid voor links en inhoud",
+  "impressum.p.liability": "Externe links worden beoordeeld op het moment van opnemen; voor de actuele inhoud van gelinkte sites zijn wij niet verantwoordelijk. Alle oorspronkelijke tekst op dit domein is van Juan Diaz, tenzij anders vermeld.",
+
   // Contact page (/contact)
   "contact.page.eyebrow": "◉ Directe lijn",
   "contact.page.title": "Laten we de <em>omzet</em> vinden die je laat liggen.",
@@ -905,8 +953,15 @@ const de: Dict = {
   "footer.now": "Jetzt",
   "footer.uses": "Tools",
   "footer.privacy": "Datenschutz",
+  "footer.impressum": "Impressum",
   "lang.label": "Sprache",
   "lang.switch": "Sprache wechseln",
+
+  // Cookie banner
+  "cookie.body": "Diese Seite speichert ein Session-Cookie für die Anmeldung, ein Sprachpräferenz-Cookie und — wenn Sie zustimmen — einen datenschutzfreundlichen Analytics-Ping, der Seitenaufrufe ohne persönliche Kennung zählt. Kein Ad-Tracking, kein Weiterverkauf.",
+  "cookie.privacy": "Datenschutzseite",
+  "cookie.decline": "Nur notwendige",
+  "cookie.accept": "Alle akzeptieren",
 
   "contact.sector.energy": "Energie",
   "contact.sector.realestate": "Immobilien",
@@ -1136,6 +1191,23 @@ const de: Dict = {
   "priv.h.changes": "Änderungen an dieser Seite",
   "priv.p.changes": "Sollten wir jemals etwas tun, das oben nicht aufgeführt ist, ändert sich diese Seite vorher. Das Datum der letzten Änderung ist im Footer sichtbar.",
 
+  // Impressum (Pflichtangaben nach § 5 TMG / DSA Art. 12)
+  "impressum.eyebrow": "◉ Impressum",
+  "impressum.title": "Impressum",
+  "impressum.lede": "Angaben gemäß § 5 TMG und Artikel 12 des EU Digital Services Act.",
+  "impressum.h.company": "Unternehmen",
+  "impressum.p.company": "Juan Diaz LLC, eine Gesellschaft mit beschränkter Haftung mit Sitz in Delaware, USA. Operativer Kontakt aus Amsterdam, Niederlande.",
+  "impressum.h.represented": "Vertreten durch",
+  "impressum.p.represented": "Juan Diaz, Gründer und alleiniger Gesellschafter.",
+  "impressum.h.contact": "Kontakt",
+  "impressum.p.contact": "E-Mail: <a href=\"mailto:juan@juandiazllc.com\">juan@juandiazllc.com</a>. Schriftliche Korrespondenz bevorzugt per E-Mail — Antwort innerhalb von drei Werktagen.",
+  "impressum.h.responsible": "Verantwortlich für den Inhalt",
+  "impressum.p.responsible": "Juan Diaz (V.i.S.d.P.) — ladungsfähige Anschrift auf schriftliche Anfrage bei berechtigtem rechtlichen Interesse.",
+  "impressum.h.dispute": "Online-Streitbeilegung",
+  "impressum.p.dispute": "Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung bereit: <a href=\"https://ec.europa.eu/consumers/odr\" rel=\"nofollow\">ec.europa.eu/consumers/odr</a>. Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.",
+  "impressum.h.liability": "Haftung für Links und Inhalte",
+  "impressum.p.liability": "Externe Links werden zum Zeitpunkt der Verlinkung geprüft; für die aktuellen Inhalte verlinkter Seiten übernehmen wir keine Haftung. Alle Originalinhalte auf dieser Domain stammen von Juan Diaz, sofern nicht anders gekennzeichnet.",
+
   // Contact page (/contact)
   "contact.page.eyebrow": "◉ Direkter Draht",
   "contact.page.title": "Finden wir den <em>Umsatz</em>, den Sie liegen lassen.",
@@ -1288,8 +1360,15 @@ const es: Dict = {
   "footer.now": "Ahora",
   "footer.uses": "Herramientas",
   "footer.privacy": "Privacidad",
+  "footer.impressum": "Aviso legal",
   "lang.label": "Idioma",
   "lang.switch": "Cambiar idioma",
+
+  // Cookie banner
+  "cookie.body": "Este sitio mantiene una cookie de sesión para el inicio de sesión, una cookie de preferencia de idioma y — si acepta — un ping de analítica respetuoso con la privacidad que cuenta vistas de página sin identificador personal. Sin tracking publicitario, sin reventa.",
+  "cookie.privacy": "página de privacidad",
+  "cookie.decline": "Solo esenciales",
+  "cookie.accept": "Aceptar todo",
 
   "contact.sector.energy": "Energía",
   "contact.sector.realestate": "Inmobiliario",
@@ -1518,6 +1597,23 @@ const es: Dict = {
   "priv.p.rights": "Bajo el RGPD, puede pedirnos una copia de todo lo que guardamos sobre usted, pedirnos que lo corrijamos o pedirnos que lo borremos. Escriba a <a href=\"mailto:juan@juandiazllc.com\">juan@juandiazllc.com</a> y recibirá respuesta en un plazo de tres días laborables.",
   "priv.h.changes": "Cambios en esta página",
   "priv.p.changes": "Si alguna vez empezamos a hacer algo que no está enumerado arriba, esta página cambia antes. La fecha de la última actualización se ve en el pie.",
+
+  // Aviso legal / Impressum (requisitos bajo § 5 TMG alemán / art. 12 DSA)
+  "impressum.eyebrow": "◉ Aviso legal",
+  "impressum.title": "Aviso legal",
+  "impressum.lede": "Información conforme al § 5 TMG (Alemania) y al artículo 12 de la Ley Europea de Servicios Digitales. Traducido del alemán por comodidad — la versión alemana es la canónica.",
+  "impressum.h.company": "Empresa",
+  "impressum.p.company": "Juan Diaz LLC, una sociedad de responsabilidad limitada registrada en Delaware, EE. UU. Contacto operativo desde Ámsterdam, Países Bajos.",
+  "impressum.h.represented": "Representada por",
+  "impressum.p.represented": "Juan Diaz, fundador y único socio.",
+  "impressum.h.contact": "Contacto",
+  "impressum.p.contact": "Email: <a href=\"mailto:juan@juandiazllc.com\">juan@juandiazllc.com</a>. Correspondencia escrita preferiblemente por email — respuesta en un plazo de tres días laborables.",
+  "impressum.h.responsible": "Responsable del contenido",
+  "impressum.p.responsible": "Juan Diaz (V.i.S.d.P.) — domicilio disponible a solicitud escrita por motivos jurídicos legítimos.",
+  "impressum.h.dispute": "Resolución de litigios en línea",
+  "impressum.p.dispute": "La Comisión Europea ofrece una plataforma de resolución de litigios en línea: <a href=\"https://ec.europa.eu/consumers/odr\" rel=\"nofollow\">ec.europa.eu/consumers/odr</a>. No participamos en procedimientos ante órganos de arbitraje de consumo.",
+  "impressum.h.liability": "Responsabilidad por enlaces y contenido",
+  "impressum.p.liability": "Los enlaces externos se revisan en el momento de su inclusión; no somos responsables del contenido actual de los sitios enlazados. Todo el contenido original en este dominio es obra de Juan Diaz, salvo indicación contraria.",
 
   // Contact page (/contact)
   "contact.page.eyebrow": "◉ Línea directa",

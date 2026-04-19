@@ -36,6 +36,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/insights", priority: 0.9, change: "weekly" },
     { path: "/contact", priority: 0.7, change: "monthly" },
     { path: "/privacy", priority: 0.3, change: "yearly" },
+    { path: "/impressum", priority: 0.3, change: "yearly" },
   ];
 
   const ventureEntries: Entry[] = VENTURES.map((v) => ({
