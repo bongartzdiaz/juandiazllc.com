@@ -55,6 +55,7 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
         <button
           className="hamburger-btn"
           onClick={handleMenu}
+          aria-label="Open navigation menu"
           style={{
             width: 36, height: 36, borderRadius: 8,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -138,6 +139,7 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
         {/* Language toggle */}
         <button
           onClick={toggleLocale}
+          aria-label={`Switch language, currently ${locale.toUpperCase()}`}
           style={{
             display: 'flex', alignItems: 'center', gap: 5,
             background: 'var(--bg2)', color: 'var(--txt2)',
@@ -154,6 +156,7 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
         {/* Theme toggle */}
         <button
           onClick={toggle}
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
           style={{
             display: 'flex', alignItems: 'center', gap: 6,
             background: 'var(--bg2)', color: 'var(--txt2)',

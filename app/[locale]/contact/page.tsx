@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/ContactForm";
+import { FaqSection } from "@/components/FaqSection";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
+import { faqSchema, contactPointSchema } from "@/lib/seo/schema";
+import { CONTACT_FAQ } from "@/lib/seo/faqs";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -22,6 +25,14 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPointSchema()) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(CONTACT_FAQ)) }}
+      />
       <header className="page-hero">
         <div className="eyebrow">{t("contact.page.eyebrow")}</div>
         <h1 dangerouslySetInnerHTML={{ __html: t("contact.page.title") }} />
@@ -30,6 +41,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
       <section style={{ padding: "60px 40px", maxWidth: 760, margin: "0 auto" }}>
         <ContactForm />
       </section>
+      <FaqSection title="Before you book a call" items={CONTACT_FAQ} />
     </>
   );
 }

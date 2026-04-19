@@ -5,6 +5,9 @@ import { SECTORS, getSector } from "@/lib/sectors";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { LOCALES } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+import { FaqSection } from "@/components/FaqSection";
+import { faqSchema, serviceSchema } from "@/lib/seo/schema";
+import { SECTOR_FAQ } from "@/lib/seo/faqs";
 
 export function generateStaticParams() {
   return LOCALES.flatMap((locale) => SECTORS.map((s) => ({ locale, slug: s.slug })));
@@ -37,6 +40,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
   if (!s) notFound();
 
   const others = SECTORS.filter((x) => x.slug !== s.slug);
+  const sectorFaq = SECTOR_FAQ[s.slug] ?? [];
 
   const crumbs = breadcrumbSchema([
     { name: "Home", path: `/${l}` },
@@ -44,9 +48,19 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
     { name: s.name, path: `/${l}/sectors/${s.slug}` },
   ]);
 
+  const service = serviceSchema({
+    name: `${s.name} — ${s.tagline}`,
+    description: s.summary,
+    slug: s.slug,
+  });
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(service) }} />
+      {sectorFaq.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(sectorFaq)) }} />
+      )}
       <header className="page-hero" style={{ position: "relative", overflow: "hidden" }}>
         <div aria-hidden style={{ position: "absolute", inset: 0, background: s.gradient, pointerEvents: "none" }} />
         <div style={{ position: "relative" }}>
@@ -220,6 +234,9 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
           ))}
         </div>
       </section>
+      {sectorFaq.length > 0 && (
+        <FaqSection title={`${s.name} — common questions`} items={sectorFaq} />
+      )}
     </>
   );
 }
