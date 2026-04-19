@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { SignOutButton } from "@/components/SignOutButton";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+import { translate } from "@/lib/i18n/dict";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -19,7 +20,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  const t = (k: string) => translate(l, k);
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -46,7 +51,7 @@ export default async function DashboardPage() {
               marginBottom: 18,
             }}
           >
-            ◉ Philly · Ops dashboard
+            {t("dash.eyebrow")}
           </div>
           <h1
             style={{
@@ -57,7 +62,7 @@ export default async function DashboardPage() {
               lineHeight: 1,
             }}
           >
-            Welcome, <em>{firstName}</em>.
+            {t("dash.welcome.a")} <em>{firstName}</em>{t("dash.welcome.b")}
           </h1>
           <p
             style={{
@@ -68,13 +73,12 @@ export default async function DashboardPage() {
               lineHeight: 1.6,
             }}
           >
-            Signed in as <b style={{ color: "var(--text)" }}>{user.email}</b>. This is where the
-            Philly dashboard will live.
+            {t("dash.lede.a")} <b style={{ color: "var(--text)" }}>{user.email}</b>{t("dash.lede.b")}
           </p>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <Link className="btn ghost" href="/">← Site</Link>
-          <Link className="btn ghost" href="/app">Hub →</Link>
+          <Link className="btn ghost" href="/">{t("dash.btn.site")}</Link>
+          <Link className="btn ghost" href="/app">{t("dash.btn.hub")}</Link>
           <SignOutButton />
         </div>
       </header>
@@ -112,7 +116,7 @@ export default async function DashboardPage() {
               marginBottom: 20,
             }}
           >
-            ◉ Reserved slot
+            {t("dash.slot.eyebrow")}
           </div>
           <h2
             style={{
@@ -124,9 +128,8 @@ export default async function DashboardPage() {
               marginBottom: 18,
               maxWidth: "28ch",
             }}
-          >
-            The <em>Philly dashboard</em> mounts here.
-          </h2>
+            dangerouslySetInnerHTML={{ __html: t("dash.slot.title") }}
+          />
           <p
             style={{
               color: "var(--muted)",
@@ -135,11 +138,8 @@ export default async function DashboardPage() {
               maxWidth: "62ch",
               marginBottom: 32,
             }}
-          >
-            This page is protected and authed. Drop your Philly dashboard component, iframe, or
-            embed directly into <code style={{ fontFamily: "'JetBrains Mono'", color: "var(--accent)", background: "rgba(94,255,177,.06)", padding: "2px 8px", borderRadius: 6 }}>app/dashboard/page.tsx</code>{" "}
-            and it ships live with your existing auth session.
-          </p>
+            dangerouslySetInnerHTML={{ __html: t("dash.slot.body") }}
+          />
 
           <div
             style={{
@@ -150,9 +150,9 @@ export default async function DashboardPage() {
             }}
           >
             {[
-              { label: "Auth", value: "Live", hint: "Supabase session active" },
-              { label: "User", value: user.email ?? "—", hint: "Read from session" },
-              { label: "Status", value: "Ready", hint: "Awaiting content mount" },
+              { label: t("dash.stat.auth.label"), value: t("dash.stat.auth.value"), hint: t("dash.stat.auth.hint") },
+              { label: t("dash.stat.user.label"), value: user.email ?? "—", hint: t("dash.stat.user.hint") },
+              { label: t("dash.stat.status.label"), value: t("dash.stat.status.value"), hint: t("dash.stat.status.hint") },
             ].map((s, i) => (
               <div
                 key={i}
@@ -206,8 +206,7 @@ export default async function DashboardPage() {
           textTransform: "uppercase",
         }}
       >
-        — Login redirects here by default · protected by Supabase auth ·
-        philly.juandiazllc.com remains available as the subdomain option
+        {t("dash.footer")}
       </div>
     </div>
   );
