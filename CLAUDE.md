@@ -50,3 +50,22 @@ ROI, no mocks needed. See commit history on
   - large-screen cap (≥1680px) so display type doesn't run away on 4K
   - landscape-phone guard (`max-height: 560px`) reclaims vertical space
   - print stylesheet hides all animated chrome
+- **Globe reliability rebuild.** WebGL globe was invisible on every device
+  tested (suspected: fingerprinting shields + some mobile GPUs silently
+  dropping the context). Rebuilt as a pure CSS-3D globe — no WebGL, no
+  Three.js, no canvas. Hero.tsx now generates 12 meridians (pre-rotated on
+  Y) and 7 parallels (rotateX 90° + translateY sin(lat)·50% + scale cos(lat))
+  inside a `transform-style: preserve-3d` rotor. Rotation is genuine 3D
+  via a single `rotateY` animation on the rotor, so every ring rotates
+  with it correctly. Works on every browser, every device, regardless of
+  fingerprinting/battery/reduced-motion settings. Reduced-motion users
+  get a still globe. Classes: `.hero-stage .hero-starfield .hero-globe3d
+  .globe-rotor .globe-core .globe-atmosphere .globe-meridian .globe-parallel
+  .globe-specular .globe-orbit .orbit-sat`.
+- **"Stunning" polish pass on the hero.** Nebula background (layered
+  radial gradients + aurora wash), multi-layer starfield (bright + fine
+  dust) with twinkle, two shooting stars sweeping diagonally, pulsing
+  aurora halo around the globe, atmospheric rim glow that breathes
+  (4s), gentle float (9s), satellites get a radial highlight, a comet
+  trail and richer drop-shadows, specular highlight uses
+  `mix-blend-mode: screen` for a genuine lit-from-above feel.

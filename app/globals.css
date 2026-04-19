@@ -205,11 +205,269 @@ nav.top > * { pointer-events: auto; }
 .nav-right .auth:hover { border-color: var(--accent); background: rgba(94,255,177,.08); }
 .nav-right .auth::after { display: none; }
 
-/* Hero */
-.hero { position: relative; min-height: 100svh; min-height: 100vh; overflow: hidden; }
+/* Hero — deep-space canvas with aurora + nebula wash */
+.hero { position: relative; min-height: 100svh; min-height: 100vh; overflow: hidden;
+  background:
+    radial-gradient(1400px 1000px at 50% 42%, rgba(46,196,137,.18) 0%, rgba(31,143,92,.08) 35%, transparent 70%),
+    radial-gradient(900px 700px at 15% 85%, rgba(94,228,176,.08), transparent 60%),
+    radial-gradient(700px 900px at 92% 12%, rgba(31,143,92,.1), transparent 55%),
+    linear-gradient(180deg, #03120d 0%, #031b14 45%, #041009 100%);
+}
 @media (max-width: 768px) { .hero { min-height: 92svh; } }
 .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.hero-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(88px, 12vw, 120px) clamp(20px, 4vw, 40px) clamp(24px, 4vw, 40px); pointer-events: none; background: linear-gradient(180deg, rgba(3,20,15,.55) 0%, rgba(3,20,15,0) 22%, rgba(3,20,15,0) 70%, rgba(3,20,15,.75) 100%); }
+
+/* True CSS-3D globe. Every meridian/parallel is a real ring inside a
+   preserve-3d rotor, so rotation is genuine 3D — no WebGL required.
+   Sized with clamp() to scale smoothly across every device. */
+.hero-stage {
+  position: absolute; inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.hero-starfield {
+  position: absolute; inset: 0;
+  background:
+    /* bright foreground stars */
+    radial-gradient(1.6px 1.6px at 12% 18%, rgba(230,255,240,1), transparent 62%),
+    radial-gradient(1.4px 1.4px at 78% 22%, rgba(200,255,228,.95), transparent 62%),
+    radial-gradient(1.8px 1.8px at 34% 72%, rgba(230,255,240,1), transparent 62%),
+    radial-gradient(1.2px 1.2px at 88% 68%, rgba(200,255,228,.7), transparent 62%),
+    radial-gradient(1.4px 1.4px at 55% 12%, rgba(210,255,235,.85), transparent 62%),
+    radial-gradient(1.6px 1.6px at 22% 88%, rgba(180,255,220,.75), transparent 62%),
+    radial-gradient(1.3px 1.3px at 66% 46%, rgba(200,255,228,.8), transparent 62%),
+    radial-gradient(1.5px 1.5px at 5% 52%, rgba(200,255,228,.75), transparent 62%),
+    radial-gradient(1.7px 1.7px at 92% 8%, rgba(230,255,240,.95), transparent 62%),
+    radial-gradient(1.3px 1.3px at 44% 34%, rgba(200,255,228,.6), transparent 62%),
+    /* mid-field fine dust */
+    radial-gradient(.8px .8px at 9% 9%, rgba(160,230,200,.6), transparent 80%),
+    radial-gradient(.8px .8px at 28% 42%, rgba(160,230,200,.5), transparent 80%),
+    radial-gradient(.8px .8px at 61% 81%, rgba(160,230,200,.55), transparent 80%),
+    radial-gradient(.8px .8px at 83% 38%, rgba(160,230,200,.5), transparent 80%),
+    radial-gradient(.8px .8px at 40% 61%, rgba(160,230,200,.45), transparent 80%),
+    radial-gradient(.8px .8px at 72% 12%, rgba(160,230,200,.55), transparent 80%),
+    radial-gradient(.8px .8px at 18% 64%, rgba(160,230,200,.45), transparent 80%),
+    radial-gradient(.8px .8px at 50% 90%, rgba(160,230,200,.45), transparent 80%);
+  opacity: .85;
+  animation: starTwinkle 4.5s ease-in-out infinite alternate;
+}
+.hero-starfield::before,
+.hero-starfield::after {
+  /* shooting stars — a thin streak that sweeps diagonally */
+  content: '';
+  position: absolute;
+  top: 14%; left: -20%;
+  width: 160px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,255,228,.9) 40%, rgba(94,228,176,1) 70%, transparent);
+  filter: drop-shadow(0 0 6px rgba(94,228,176,.8));
+  transform: rotate(20deg);
+  opacity: 0;
+  animation: shoot 9s ease-in infinite;
+}
+.hero-starfield::after {
+  top: 52%; left: -30%;
+  width: 200px;
+  transform: rotate(28deg);
+  animation-delay: 4.5s;
+  animation-duration: 11s;
+}
+@keyframes shoot {
+  0%, 85% { transform: translate(0, 0) rotate(20deg); opacity: 0; }
+  88% { opacity: 1; }
+  100% { transform: translate(140vw, 40vh) rotate(20deg); opacity: 0; }
+}
+@keyframes starTwinkle {
+  from { opacity: .55; }
+  to   { opacity: 1; }
+}
+
+.hero-globe3d {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: clamp(320px, 58vmin, 760px);
+  height: clamp(320px, 58vmin, 760px);
+  transform: translate(-50%, -50%);
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+  animation: globeFloat 9s ease-in-out infinite;
+}
+@keyframes globeFloat {
+  0%, 100% { transform: translate(-50%, -50%); }
+  50%      { transform: translate(-50%, calc(-50% - 10px)); }
+}
+.hero-globe3d::before {
+  /* atmospheric halo — large, pulsing aurora glow */
+  content: '';
+  position: absolute; inset: -30%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(94,228,176,.28) 0%,
+      rgba(46,196,137,.14) 25%,
+      rgba(31,143,92,.05) 50%,
+      transparent 70%);
+  filter: blur(18px);
+  z-index: 0;
+  animation: auroraPulse 5.5s ease-in-out infinite;
+}
+.hero-globe3d::after {
+  /* sharp inner rim glow — accents the sphere edge */
+  content: '';
+  position: absolute; inset: 5%;
+  border-radius: 50%;
+  box-shadow:
+    0 0 80px 8px rgba(94,228,176,.18),
+    0 0 40px 2px rgba(46,196,137,.25);
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes auroraPulse {
+  0%, 100% { opacity: .65; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.06); }
+}
+
+.globe-rotor {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  animation: globeSpin 32s linear infinite;
+  z-index: 1;
+}
+@keyframes globeSpin {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(360deg); }
+}
+
+.globe-core {
+  position: absolute; inset: 6%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 30%, rgba(94,228,176,.22) 0%, rgba(46,196,137,.08) 28%, rgba(3,20,15,.95) 72%),
+    radial-gradient(circle at 65% 70%, rgba(31,143,92,.18) 0%, transparent 48%),
+    radial-gradient(circle at 50% 50%, rgba(8,34,24,1) 0%, rgba(3,14,10,1) 100%);
+  box-shadow:
+    inset -20px -30px 80px rgba(3,14,10,.85),
+    inset 20px 30px 60px rgba(94,228,176,.08);
+  transform: translateZ(0);
+}
+
+.globe-atmosphere {
+  position: absolute; inset: -3%;
+  border-radius: 50%;
+  border: 1px solid rgba(94,228,176,.35);
+  box-shadow:
+    0 0 60px rgba(46,196,137,.35),
+    inset 0 0 60px rgba(94,228,176,.18);
+  transform: translateZ(0);
+  animation: atmosPulse 4s ease-in-out infinite;
+}
+@keyframes atmosPulse {
+  0%, 100% { box-shadow: 0 0 60px rgba(46,196,137,.35), inset 0 0 60px rgba(94,228,176,.18); }
+  50%      { box-shadow: 0 0 80px rgba(46,196,137,.5),  inset 0 0 80px rgba(94,228,176,.28); }
+}
+
+/* Each meridian is a circle, thin at the sides (as it rotates through
+   the Y axis), forming the vertical longitude lines of the sphere. */
+.globe-meridian {
+  position: absolute; inset: 6%;
+  border-radius: 50%;
+  border: 1px solid rgba(94,228,176,.35);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+/* Highlight the equator meridian (0° / 180°) */
+.globe-meridian:nth-child(3) { border-color: rgba(94,228,176,.55); }
+
+/* Parallels — horizontal latitude rings. A full circle tilted 90° on X
+   so it lies flat across the sphere, then translated up/down by
+   sin(lat) and scaled by cos(lat) to hug the sphere surface. */
+.globe-parallel {
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  border: 1px solid rgba(94,228,176,.3);
+  transform-style: preserve-3d;
+  will-change: transform;
+  transform-origin: center center;
+}
+.globe-parallel:nth-child(even) { border-color: rgba(94,228,176,.45); }
+
+.globe-specular {
+  position: absolute; inset: 6%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 28% 22%,
+      rgba(255,255,255,.28) 0%,
+      rgba(255,255,255,.08) 20%,
+      rgba(255,255,255,0) 42%),
+    radial-gradient(circle at 75% 82%,
+      rgba(46,196,137,.18) 0%,
+      rgba(46,196,137,0) 35%);
+  pointer-events: none;
+  transform: translateZ(1px);
+  mix-blend-mode: screen;
+}
+
+/* Orbiting satellites — a ring rotated in 3D with a dot that travels it */
+.globe-orbit {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 140%; height: 140%;
+  margin-left: -70%; margin-top: -70%;
+  border-radius: 50%;
+  border: 1px dashed rgba(94,228,176,.2);
+  transform-style: preserve-3d;
+}
+.orbit-1 { transform: rotateX(72deg) rotateZ(0deg); animation: orbitSpin 18s linear infinite; }
+.orbit-2 { transform: rotateX(60deg) rotateY(35deg); width: 160%; height: 160%; margin-left: -80%; margin-top: -80%; animation: orbitSpin 28s linear infinite reverse; border-color: rgba(31,143,92,.18); }
+.orbit-3 { transform: rotateX(80deg) rotateZ(-25deg); width: 120%; height: 120%; margin-left: -60%; margin-top: -60%; animation: orbitSpin 14s linear infinite; border-color: rgba(94,228,176,.15); }
+@keyframes orbitSpin {
+  from { transform: rotateX(72deg) rotateZ(0deg); }
+  to   { transform: rotateX(72deg) rotateZ(360deg); }
+}
+.orbit-2 { animation-name: orbitSpin2; }
+@keyframes orbitSpin2 {
+  from { transform: rotateX(60deg) rotateY(35deg) rotateZ(0deg); }
+  to   { transform: rotateX(60deg) rotateY(35deg) rotateZ(-360deg); }
+}
+.orbit-3 { animation-name: orbitSpin3; }
+@keyframes orbitSpin3 {
+  from { transform: rotateX(80deg) rotateZ(-25deg); }
+  to   { transform: rotateX(80deg) rotateZ(335deg); }
+}
+.orbit-sat {
+  position: absolute;
+  top: 50%; left: -5px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #c7ffe4 0%, var(--accent) 60%, #2ec489 100%);
+  box-shadow:
+    0 0 14px rgba(94,228,176,1),
+    0 0 32px rgba(94,228,176,.6),
+    0 0 60px rgba(46,196,137,.35);
+  transform: translateY(-50%);
+}
+.orbit-sat::before {
+  /* comet-like trail behind the satellite along the orbit ring */
+  content: '';
+  position: absolute;
+  top: 50%; right: 100%;
+  width: 60px; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(94,228,176,.7));
+  transform: translateY(-50%);
+  border-radius: 2px;
+  filter: blur(.5px);
+}
+
+@media (max-width: 768px) {
+  .hero-globe3d {
+    width: clamp(260px, 78vmin, 520px);
+    height: clamp(260px, 78vmin, 520px);
+  }
+  .globe-orbit { border-width: 1px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .globe-rotor, .globe-orbit, .hero-starfield { animation: none !important; }
+}
+.hero-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(88px, 12vw, 120px) clamp(20px, 4vw, 40px) clamp(24px, 4vw, 40px); pointer-events: none; background: linear-gradient(180deg, rgba(3,20,15,.35) 0%, rgba(3,20,15,0) 25%, rgba(3,20,15,0) 65%, rgba(3,20,15,.7) 100%); }
 .hero-overlay > * { pointer-events: auto; }
 .hero-tag { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; max-width: 720px; }
 .hero-tag .chip { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; font-family: 'JetBrains Mono'; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); background: rgba(3,20,15,.4); backdrop-filter: blur(8px); white-space: nowrap; }
