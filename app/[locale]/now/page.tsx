@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
 // /now — https://nownownow.com convention. A public "what I'm
 // actually focused on right this quarter" page. Updated roughly
@@ -7,12 +8,17 @@ import Link from "next/link";
 // later can see how plans held up. Good EEAT signal: concrete, recent,
 // and signed with a timestamp.
 
-export const metadata: Metadata = {
-  title: "Now — what I'm focused on this quarter",
-  description:
-    "A monthly-ish snapshot of what Juan Diaz LLC is actually building, shipping, and thinking about. Last updated inline.",
-  alternates: { canonical: "/now" },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  return {
+    title: "Now — what I'm focused on this quarter",
+    description:
+      "A monthly-ish snapshot of what Juan Diaz LLC is actually building, shipping, and thinking about. Last updated inline.",
+    alternates: buildAlternates(l, "/now"),
+    openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
+  };
+}
 
 const LAST_UPDATED = "2026-04-18";
 

@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
-export const metadata: Metadata = {
-  title: "Story — construction-trained, operator-built",
-  description:
-    "The story behind Juan Diaz LLC — construction management, the crossover to revenue operations, and why I build honest software for operators.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  return {
+    title: "Story — construction-trained, operator-built",
+    description:
+      "The story behind Juan Diaz LLC — construction management, the crossover to revenue operations, and why I build honest software for operators.",
+    alternates: buildAlternates(l, "/story"),
+    openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
+  };
+}
 
 export default function StoryPage() {
   return (

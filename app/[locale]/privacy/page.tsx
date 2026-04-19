@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
 // Plain-language privacy page. Not legal advice — a statement of what
 // the site actually does with data, which is what NL/EU regulators
 // (AP, ICO) increasingly expect over a lawyer-drafted wall of text.
-export const metadata: Metadata = {
-  title: "Privacy",
-  description:
-    "What this site stores, what it does not, and how to reach me about your data.",
-  alternates: { canonical: "/privacy" },
-  robots: { index: true, follow: true },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  return {
+    title: "Privacy",
+    description:
+      "What this site stores, what it does not, and how to reach me about your data.",
+    alternates: buildAlternates(l, "/privacy"),
+    robots: { index: true, follow: true },
+    openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
+  };
+}
 
 export default function PrivacyPage() {
   return (

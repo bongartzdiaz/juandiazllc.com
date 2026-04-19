@@ -1,34 +1,36 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-
-// /about — EEAT-focused "who is behind this" page. Separate from
-// /story (which is narrative) so Google and AI search have a
-// structured, factual page to quote from: name, role, background,
-// focus areas, contact. Person JSON-LD ships inline for rich-result
-// eligibility and knowledge-panel signals.
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
-export const metadata: Metadata = {
-  title: "About Juan Diaz — operator, builder, founder",
-  description:
-    "Construction-trained, operator-built. Juan Diaz runs Juan Diaz LLC — a holding company building revenue engines for operators in energy, real estate and hospitality.",
-  alternates: { canonical: "/about" },
-  openGraph: {
-    type: "profile",
-    url: "/about",
-    title: "About Juan Diaz",
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  return {
+    title: "About Juan Diaz — operator, builder, founder",
     description:
-      "Construction-trained, operator-built. Revenue engines for operators in energy, real estate and hospitality.",
-  },
-};
+      "Construction-trained, operator-built. Juan Diaz runs Juan Diaz LLC — a holding company building revenue engines for operators in energy, real estate and hospitality.",
+    alternates: buildAlternates(l, "/about"),
+    openGraph: {
+      type: "profile",
+      url: `/${l}/about`,
+      title: "About Juan Diaz",
+      description:
+        "Construction-trained, operator-built. Revenue engines for operators in energy, real estate and hospitality.",
+      locale: ogLocale(l),
+      alternateLocale: alternateOgLocales(l),
+      images: [{ url: "/me/portrait.jpg", width: 1200, height: 1200, alt: "Juan Diaz" }],
+    },
+  };
+}
 
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "Juan Diaz",
   url: `${SITE}/about`,
-  image: `${SITE}/opengraph-image`,
+  image: `${SITE}/me/portrait.jpg`,
   jobTitle: "Founder, Juan Diaz LLC",
   worksFor: {
     "@type": "Organization",

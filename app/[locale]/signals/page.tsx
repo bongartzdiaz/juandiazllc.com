@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SIGNALS } from "@/lib/signals";
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
-export const metadata: Metadata = {
-  title: "Signals — field notes and build logs",
-  description:
-    "Short essays on designing operator tools, shipping dashboards that survive real environments, and running small studios at speed.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  return {
+    title: "Signals — field notes and build logs",
+    description:
+      "Short essays on designing operator tools, shipping dashboards that survive real environments, and running small studios at speed.",
+    alternates: buildAlternates(l, "/signals"),
+    openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
+  };
+}
 
 export default function SignalsIndex() {
   return (

@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { VENTURES } from "@/lib/ventures";
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
-export const metadata: Metadata = {
-  title: "Work — revenue engines, live in the field",
-  description:
-    "Live products under Juan Diaz LLC — each one the five-phase playbook applied to a real sector with real operators.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  return {
+    title: "Work — revenue engines, live in the field",
+    description:
+      "Live products under Juan Diaz LLC — each one the five-phase playbook applied to a real sector with real operators.",
+    alternates: buildAlternates(l, "/work"),
+    openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
+  };
+}
 
 export default function WorkPage() {
   return (

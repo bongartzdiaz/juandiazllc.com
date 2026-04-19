@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SECTORS } from "@/lib/sectors";
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
-export const metadata: Metadata = {
-  title: "Sectors — where the playbook applies",
-  description:
-    "Energy, real estate, hospitality, adjacent. The five-phase method applied to the P&Ls that need it most.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  return {
+    title: "Sectors — where the playbook applies",
+    description:
+      "Energy, real estate, hospitality, adjacent. The five-phase method applied to the P&Ls that need it most.",
+    alternates: buildAlternates(l, "/sectors"),
+    openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
+  };
+}
 
 export default function SectorsIndex() {
   return (

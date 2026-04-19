@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
 // /uses — https://uses.tech convention. What I actually build with.
 // Public so clients, collaborators, and hires know the stack before
@@ -8,12 +9,17 @@ import Link from "next/link";
 // Links that go out are affiliate-free. If something shows up here
 // it's because I use it every week, not because someone paid for it.
 
-export const metadata: Metadata = {
-  title: "Uses — the stack behind Juan Diaz LLC",
-  description:
-    "The tools, frameworks, services and hardware I actually use to build revenue engines. No affiliate links. Updated as the stack evolves.",
-  alternates: { canonical: "/uses" },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  return {
+    title: "Uses — the stack behind Juan Diaz LLC",
+    description:
+      "The tools, frameworks, services and hardware I actually use to build revenue engines. No affiliate links. Updated as the stack evolves.",
+    alternates: buildAlternates(l, "/uses"),
+    openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
+  };
+}
 
 type Item = { name: string; note: string; url?: string };
 
