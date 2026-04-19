@@ -280,192 +280,262 @@ nav.top > * { pointer-events: auto; }
   to   { opacity: 1; }
 }
 
-.hero-globe3d {
-  position: absolute;
-  left: 50%; top: 50%;
-  width: clamp(320px, 58vmin, 760px);
-  height: clamp(320px, 58vmin, 760px);
-  transform: translate(-50%, -50%);
-  perspective: 1400px;
-  perspective-origin: 50% 40%;
-  animation: globeFloat 9s ease-in-out infinite;
-}
-@keyframes globeFloat {
-  0%, 100% { transform: translate(-50%, -50%); }
-  50%      { transform: translate(-50%, calc(-50% - 10px)); }
-}
-.hero-globe3d::before {
-  /* atmospheric halo — large, pulsing aurora glow */
-  content: '';
-  position: absolute; inset: -30%;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 50%,
-      rgba(94,228,176,.28) 0%,
-      rgba(46,196,137,.14) 25%,
-      rgba(31,143,92,.05) 50%,
-      transparent 70%);
-  filter: blur(18px);
+/* Milky Way — layered galactic background that feels alive. A slowly
+   rotating conic gradient provides the galactic arms, a separate dust
+   band gives the dark cosmic lanes, a nebula cloud pulses green, and
+   the whole thing sits behind the starfield + globe. */
+.milky-way {
+  position: absolute; inset: -10%;
   z-index: 0;
-  animation: auroraPulse 5.5s ease-in-out infinite;
+  overflow: hidden;
+  filter: blur(1px);
+  opacity: .95;
 }
-.hero-globe3d::after {
-  /* sharp inner rim glow — accents the sphere edge */
-  content: '';
-  position: absolute; inset: 5%;
-  border-radius: 50%;
-  box-shadow:
-    0 0 80px 8px rgba(94,228,176,.18),
-    0 0 40px 2px rgba(46,196,137,.25);
-  pointer-events: none;
-  z-index: 0;
-}
-@keyframes auroraPulse {
-  0%, 100% { opacity: .65; transform: scale(1); }
-  50%      { opacity: 1;   transform: scale(1.06); }
-}
-
-.globe-rotor {
+.mw-core {
   position: absolute; inset: 0;
-  transform-style: preserve-3d;
-  animation: globeSpin 32s linear infinite;
-  z-index: 1;
-}
-@keyframes globeSpin {
-  from { transform: rotateY(0deg); }
-  to   { transform: rotateY(360deg); }
-}
-
-.globe-core {
-  position: absolute; inset: 6%;
-  border-radius: 50%;
   background:
-    radial-gradient(circle at 32% 30%, rgba(94,228,176,.22) 0%, rgba(46,196,137,.08) 28%, rgba(3,20,15,.95) 72%),
-    radial-gradient(circle at 65% 70%, rgba(31,143,92,.18) 0%, transparent 48%),
-    radial-gradient(circle at 50% 50%, rgba(8,34,24,1) 0%, rgba(3,14,10,1) 100%);
-  box-shadow:
-    inset -20px -30px 80px rgba(3,14,10,.85),
-    inset 20px 30px 60px rgba(94,228,176,.08);
-  transform: translateZ(0);
+    radial-gradient(ellipse 60% 20% at 50% 50%,
+      rgba(120,255,200,.25) 0%,
+      rgba(46,196,137,.15) 22%,
+      rgba(31,143,92,.07) 45%,
+      transparent 70%);
+  filter: blur(24px);
+  animation: mwCorePulse 8s ease-in-out infinite;
+  transform: rotate(-18deg);
 }
-
-.globe-atmosphere {
-  position: absolute; inset: -3%;
-  border-radius: 50%;
-  border: 1px solid rgba(94,228,176,.35);
-  box-shadow:
-    0 0 60px rgba(46,196,137,.35),
-    inset 0 0 60px rgba(94,228,176,.18);
-  transform: translateZ(0);
-  animation: atmosPulse 4s ease-in-out infinite;
-}
-@keyframes atmosPulse {
-  0%, 100% { box-shadow: 0 0 60px rgba(46,196,137,.35), inset 0 0 60px rgba(94,228,176,.18); }
-  50%      { box-shadow: 0 0 80px rgba(46,196,137,.5),  inset 0 0 80px rgba(94,228,176,.28); }
-}
-
-/* Each meridian is a circle, thin at the sides (as it rotates through
-   the Y axis), forming the vertical longitude lines of the sphere. */
-.globe-meridian {
-  position: absolute; inset: 6%;
-  border-radius: 50%;
-  border: 1px solid rgba(94,228,176,.35);
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-/* Highlight the equator meridian (0° / 180°) */
-.globe-meridian:nth-child(3) { border-color: rgba(94,228,176,.55); }
-
-/* Parallels — horizontal latitude rings. A full circle tilted 90° on X
-   so it lies flat across the sphere, then translated up/down by
-   sin(lat) and scaled by cos(lat) to hug the sphere surface. */
-.globe-parallel {
-  position: absolute;
-  inset: 6%;
-  border-radius: 50%;
-  border: 1px solid rgba(94,228,176,.3);
-  transform-style: preserve-3d;
-  will-change: transform;
-  transform-origin: center center;
-}
-.globe-parallel:nth-child(even) { border-color: rgba(94,228,176,.45); }
-
-.globe-specular {
-  position: absolute; inset: 6%;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 28% 22%,
-      rgba(255,255,255,.28) 0%,
-      rgba(255,255,255,.08) 20%,
-      rgba(255,255,255,0) 42%),
-    radial-gradient(circle at 75% 82%,
-      rgba(46,196,137,.18) 0%,
-      rgba(46,196,137,0) 35%);
-  pointer-events: none;
-  transform: translateZ(1px);
+.mw-arms {
+  position: absolute; inset: -20%;
+  background: conic-gradient(from 0deg at 50% 50%,
+    transparent 0deg,
+    rgba(94,228,176,.08) 20deg,
+    rgba(46,196,137,.18) 50deg,
+    rgba(160,255,220,.1) 90deg,
+    transparent 140deg,
+    rgba(94,228,176,.12) 200deg,
+    rgba(46,196,137,.2) 230deg,
+    rgba(160,255,220,.08) 270deg,
+    transparent 320deg,
+    transparent 360deg);
+  filter: blur(40px);
   mix-blend-mode: screen;
+  animation: mwArmsRotate 180s linear infinite;
+  transform-origin: 50% 50%;
+}
+.mw-dust {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(102deg,
+      transparent 40%,
+      rgba(2,8,6,.55) 48%,
+      rgba(2,8,6,.35) 52%,
+      transparent 60%),
+    radial-gradient(ellipse 70% 10% at 50% 52%,
+      rgba(2,8,6,.55) 0%, transparent 65%);
+  filter: blur(14px);
+  mix-blend-mode: multiply;
+  transform: rotate(-18deg);
+}
+.mw-nebula {
+  position: absolute;
+  left: 10%; top: 15%;
+  width: 60%; height: 70%;
+  background: radial-gradient(ellipse 50% 30% at 40% 60%,
+    rgba(94,228,176,.22) 0%,
+    rgba(46,196,137,.12) 30%,
+    transparent 65%);
+  filter: blur(30px);
+  mix-blend-mode: screen;
+  animation: mwNebulaDrift 22s ease-in-out infinite alternate;
+}
+@keyframes mwArmsRotate {
+  to { transform: rotate(360deg); }
+}
+@keyframes mwCorePulse {
+  0%, 100% { opacity: .85; transform: rotate(-18deg) scale(1); }
+  50%      { opacity: 1;   transform: rotate(-18deg) scale(1.05); }
+}
+@keyframes mwNebulaDrift {
+  0%   { transform: translate(0, 0)    scale(1); opacity: .7; }
+  100% { transform: translate(4%, -3%) scale(1.08); opacity: 1; }
 }
 
-/* Orbiting satellites — a ring rotated in 3D with a dot that travels it */
-.globe-orbit {
+/* Interactive SVG globe container — d3-geo orthographic projection */
+.hero-globe-container {
   position: absolute;
   left: 50%; top: 50%;
-  width: 140%; height: 140%;
-  margin-left: -70%; margin-top: -70%;
-  border-radius: 50%;
-  border: 1px dashed rgba(94,228,176,.2);
-  transform-style: preserve-3d;
+  width: clamp(320px, 62vmin, 780px);
+  height: clamp(320px, 62vmin, 780px);
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  z-index: 2;
 }
-.orbit-1 { transform: rotateX(72deg) rotateZ(0deg); animation: orbitSpin 18s linear infinite; }
-.orbit-2 { transform: rotateX(60deg) rotateY(35deg); width: 160%; height: 160%; margin-left: -80%; margin-top: -80%; animation: orbitSpin 28s linear infinite reverse; border-color: rgba(31,143,92,.18); }
-.orbit-3 { transform: rotateX(80deg) rotateZ(-25deg); width: 120%; height: 120%; margin-left: -60%; margin-top: -60%; animation: orbitSpin 14s linear infinite; border-color: rgba(94,228,176,.15); }
-@keyframes orbitSpin {
-  from { transform: rotateX(72deg) rotateZ(0deg); }
-  to   { transform: rotateX(72deg) rotateZ(360deg); }
-}
-.orbit-2 { animation-name: orbitSpin2; }
-@keyframes orbitSpin2 {
-  from { transform: rotateX(60deg) rotateY(35deg) rotateZ(0deg); }
-  to   { transform: rotateX(60deg) rotateY(35deg) rotateZ(-360deg); }
-}
-.orbit-3 { animation-name: orbitSpin3; }
-@keyframes orbitSpin3 {
-  from { transform: rotateX(80deg) rotateZ(-25deg); }
-  to   { transform: rotateX(80deg) rotateZ(335deg); }
-}
-.orbit-sat {
-  position: absolute;
-  top: 50%; left: -5px;
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #c7ffe4 0%, var(--accent) 60%, #2ec489 100%);
-  box-shadow:
-    0 0 14px rgba(94,228,176,1),
-    0 0 32px rgba(94,228,176,.6),
-    0 0 60px rgba(46,196,137,.35);
-  transform: translateY(-50%);
-}
-.orbit-sat::before {
-  /* comet-like trail behind the satellite along the orbit ring */
+.hero-globe-container::before {
+  /* atmospheric halo behind the sphere */
   content: '';
-  position: absolute;
-  top: 50%; right: 100%;
-  width: 60px; height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(94,228,176,.7));
-  transform: translateY(-50%);
-  border-radius: 2px;
-  filter: blur(.5px);
+  position: absolute; inset: -14%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(94,228,176,.3) 0%,
+    rgba(46,196,137,.14) 28%,
+    rgba(31,143,92,.05) 52%,
+    transparent 70%);
+  filter: blur(22px);
+  animation: haloBreath 5.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
 }
+@keyframes haloBreath {
+  0%, 100% { opacity: .8; transform: scale(1); }
+  50%      { opacity: 1;  transform: scale(1.05); }
+}
+
+.globe-wrap {
+  position: relative;
+  width: 100%; height: 100%;
+  display: block;
+}
+.globe-svg {
+  width: 100%; height: 100%;
+  display: block;
+  touch-action: none;
+  cursor: grab;
+  filter: drop-shadow(0 0 40px rgba(46,196,137,.25));
+}
+.globe-svg:active { cursor: grabbing; }
+
+.globe-graticule {
+  fill: none;
+  stroke: rgba(94,228,176,.16);
+  stroke-width: .6;
+  pointer-events: none;
+}
+
+.globe-countries .country {
+  fill: rgba(46,196,137,.22);
+  stroke: rgba(94,228,176,.55);
+  stroke-width: .6;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: fill .25s var(--ease), stroke .25s var(--ease);
+}
+.globe-countries .country:hover,
+.globe-countries .country.hover {
+  fill: rgba(94,228,176,.55);
+  stroke: rgba(230,255,240,.9);
+}
+.globe-countries .country.selected {
+  fill: rgba(94,228,176,.75);
+  stroke: rgba(230,255,240,1);
+  stroke-width: 1;
+}
+
+/* Floating hover label */
+.globe-hint {
+  position: absolute;
+  left: 50%; bottom: 12%;
+  transform: translateX(-50%);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(3,20,15,.75);
+  border: 1px solid rgba(94,228,176,.4);
+  padding: 6px 12px;
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+  white-space: nowrap;
+  animation: hintFade .2s var(--ease);
+}
+@keyframes hintFade {
+  from { opacity: 0; transform: translate(-50%, 6px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Country info panel — slides in after fly-to */
+.country-panel {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(92%, 420px);
+  padding: 28px 28px 24px;
+  border: 1px solid rgba(94,228,176,.35);
+  background: rgba(3,20,15,.82);
+  backdrop-filter: blur(14px);
+  border-radius: 14px;
+  box-shadow:
+    0 20px 60px rgba(3,20,15,.7),
+    0 0 40px rgba(46,196,137,.18);
+  color: var(--text);
+  z-index: 3;
+  pointer-events: auto;
+  animation: panelIn .5s var(--ease);
+}
+@keyframes panelIn {
+  from { opacity: 0; transform: translate(-50%, -44%); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+.country-close {
+  position: absolute;
+  top: 10px; right: 12px;
+  width: 32px; height: 32px;
+  border: 1px solid rgba(94,228,176,.3);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--accent);
+  font-size: 22px; line-height: 1;
+  cursor: pointer;
+  transition: all .25s var(--ease);
+}
+.country-close:hover { background: rgba(94,228,176,.12); border-color: var(--accent); }
+.country-eyebrow {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 10px;
+}
+.country-name {
+  font-family: 'Inter';
+  font-size: 28px; font-weight: 400; line-height: 1.1;
+  margin-bottom: 12px;
+  letter-spacing: -.02em;
+}
+.country-body {
+  font-size: 15px; color: var(--muted); line-height: 1.55;
+  margin-bottom: 18px;
+}
+.country-back {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--accent);
+  background: transparent;
+  border: 1px solid rgba(94,228,176,.35);
+  border-radius: 999px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all .25s var(--ease);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.country-back:hover {
+  background: rgba(94,228,176,.12);
+  border-color: var(--accent);
+  transform: translateX(2px);
+}
+.country-back .arr { transition: transform .25s var(--ease); }
+.country-back:hover .arr { transform: translateX(4px); }
 
 @media (max-width: 768px) {
-  .hero-globe3d {
-    width: clamp(260px, 78vmin, 520px);
-    height: clamp(260px, 78vmin, 520px);
+  .hero-globe-container {
+    width: clamp(260px, 82vmin, 520px);
+    height: clamp(260px, 82vmin, 520px);
   }
-  .globe-orbit { border-width: 1px; }
+  .country-panel { padding: 22px 22px 20px; }
+  .country-name { font-size: 22px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .globe-rotor, .globe-orbit, .hero-starfield { animation: none !important; }
+  .mw-arms, .mw-nebula, .mw-core, .hero-starfield,
+  .hero-globe-container::before { animation: none !important; }
 }
 .hero-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(88px, 12vw, 120px) clamp(20px, 4vw, 40px) clamp(24px, 4vw, 40px); pointer-events: none; background: linear-gradient(180deg, rgba(3,20,15,.35) 0%, rgba(3,20,15,0) 25%, rgba(3,20,15,0) 65%, rgba(3,20,15,.7) 100%); }
 .hero-overlay > * { pointer-events: auto; }
