@@ -83,19 +83,19 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
         { icon: GitBranch, label: t('leadRouting'), href: '/philly/lead-routing' },
         { icon: Phone, label: t('dialer'), href: '/philly/dialer' },
         { icon: UserPlus, label: t('referrals'), href: '/philly/referrals' },
-        { icon: Network, label: t('soi'), href: '/soi' },
+        { icon: Network, label: t('soi'), href: '/philly/soi' },
         { icon: BarChart, label: t('cma'), href: '/philly/cma' },
         { icon: Globe, label: t('clientPortal'), href: '/philly/client-portal' },
         { icon: PenTool, label: t('eSignatures'), href: '/philly/e-signatures' },
       ]
     : industry === 'hospitality'
       ? [
-          { icon: BedDouble, label: t('rooms'), href: '/rooms' },
+          { icon: BedDouble, label: t('rooms'), href: '/philly/rooms' },
         ]
       : [
           { icon: Award, label: t('grants'), href: '/philly/grants' },
-          { icon: HandCoins, label: t('donors'), href: '/philanthropy/donors' },
-          { icon: Heart, label: t('volunteers'), href: '/volunteers' },
+          { icon: HandCoins, label: t('donors'), href: '/philly/philanthropy/donors' },
+          { icon: Heart, label: t('volunteers'), href: '/philly/volunteers' },
         ]
 
   const NAV_SYSTEM: NavItemDef[] = [

@@ -100,19 +100,19 @@ export function CommandPalette() {
           { id: 'lead-routing', label: 'Lead Routing', description: 'Route leads to agents', icon: <GitBranch size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/lead-routing') },
           { id: 'dialer', label: 'Power Dialer', description: 'Call logs and dialing', icon: <Phone size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/dialer') },
           { id: 'referrals', label: 'Referrals', description: 'Referral commissions', icon: <UserPlus size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/referrals') },
-          { id: 'soi', label: 'Sphere of Influence', description: 'SOI categories', icon: <Network size={iconSize} />, category: 'Real Estate', action: () => router.push('/soi') },
+          { id: 'soi', label: 'Sphere of Influence', description: 'SOI categories', icon: <Network size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/soi') },
           { id: 'cma', label: 'CMA Reports', description: 'Comparative market analysis', icon: <BarChart size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/cma') },
           { id: 'client-portal', label: 'Client Portal', description: 'Client portal access', icon: <Globe size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/client-portal') },
           { id: 'e-signatures', label: 'E-Signatures', description: 'Document signatures', icon: <PenTool size={iconSize} />, category: 'Real Estate', action: () => router.push('/philly/e-signatures') },
         ]
       : industry === 'hospitality'
         ? [
-            { id: 'rooms', label: 'Rooms', description: 'Manage rooms and availability', icon: <BedDouble size={iconSize} />, category: 'Hospitality', action: () => router.push('/rooms') },
+            { id: 'rooms', label: 'Rooms', description: 'Manage rooms and availability', icon: <BedDouble size={iconSize} />, category: 'Hospitality', action: () => router.push('/philly/rooms') },
           ]
         : [
             { id: 'grants', label: 'Grants', description: 'Grant applications and funding', icon: <Award size={iconSize} />, category: 'Philanthropy', action: () => router.push('/philly/grants') },
-            { id: 'donors', label: 'Donors', description: 'Donor scoring dashboard', icon: <HandCoins size={iconSize} />, category: 'Philanthropy', action: () => router.push('/philanthropy/donors') },
-            { id: 'volunteers', label: 'Volunteers', description: 'Volunteer team and hours', icon: <Heart size={iconSize} />, category: 'Philanthropy', action: () => router.push('/volunteers') },
+            { id: 'donors', label: 'Donors', description: 'Donor scoring dashboard', icon: <HandCoins size={iconSize} />, category: 'Philanthropy', action: () => router.push('/philly/philanthropy/donors') },
+            { id: 'volunteers', label: 'Volunteers', description: 'Volunteer team and hours', icon: <Heart size={iconSize} />, category: 'Philanthropy', action: () => router.push('/philly/volunteers') },
           ]
 
     const system: CommandItem[] = [
