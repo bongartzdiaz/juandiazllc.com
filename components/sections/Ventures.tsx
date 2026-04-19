@@ -73,7 +73,7 @@ export function Ventures() {
               <div className="v-num">{v.num}</div>
               <div className={`v-status${v.soon ? " soon" : ""}`}>
                 <span className="d" />
-                {v.soon ? "Shipping" : "Live"}
+                {v.soon ? t("ventures.status.soon") : t("ventures.status.live")}
               </div>
             </div>
             <div>

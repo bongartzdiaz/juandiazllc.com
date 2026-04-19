@@ -6,7 +6,14 @@ import { useT } from "@/lib/i18n/useT";
 
 const initial: ContactState = { status: "idle" };
 
-const SECTORS = ["Energy", "Real estate", "Hospitality", "Logistics", "Retail", "Other"];
+const SECTOR_KEYS: Array<{ value: string; key: string }> = [
+  { value: "Energy", key: "contact.sector.energy" },
+  { value: "Real estate", key: "contact.sector.realestate" },
+  { value: "Hospitality", key: "contact.sector.hospitality" },
+  { value: "Logistics", key: "contact.sector.logistics" },
+  { value: "Retail", key: "contact.sector.retail" },
+  { value: "Other", key: "contact.sector.other" },
+];
 
 export function ContactForm() {
   const [state, formAction, pending] = useActionState(submitLead, initial);
@@ -54,8 +61,8 @@ export function ContactForm() {
               }}
             >
               <option value="" disabled>{t("contact.sector.pick")}</option>
-              {SECTORS.map((s) => (
-                <option key={s} value={s}>{s}</option>
+              {SECTOR_KEYS.map((s) => (
+                <option key={s.value} value={s.value}>{t(s.key)}</option>
               ))}
             </select>
           </div>

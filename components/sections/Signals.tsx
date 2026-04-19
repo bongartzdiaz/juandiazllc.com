@@ -21,7 +21,7 @@ export function Signals() {
           <Link key={p.slug} href={`/signals/${p.slug}`} className="sig" data-reveal>
             <div className="date">— {p.dateLabel}</div>
             <h4>{p.title}</h4>
-            <div className="tag">Read →</div>
+            <div className="tag">{t("signals.read")}</div>
           </Link>
         ))}
       </div>
