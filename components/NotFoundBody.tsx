@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useT } from "@/lib/i18n/useT";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 
 export function NotFoundBody() {
-  const t = useT();
+  const { locale, t } = useLocale();
   return (
     <section
       style={{
@@ -48,13 +48,13 @@ export function NotFoundBody() {
             flexWrap: "wrap",
           }}
         >
-          <Link href="/" className="btn primary">
+          <Link href={`/${locale}`} className="btn primary">
             {t("nf.btn.home")} <span className="arr">→</span>
           </Link>
-          <Link href="/insights" className="btn ghost">
+          <Link href={`/${locale}/insights`} className="btn ghost">
             {t("nf.btn.insights")} <span className="arr">→</span>
           </Link>
-          <Link href="/contact" className="btn ghost">
+          <Link href={`/${locale}/contact`} className="btn ghost">
             {t("nf.btn.contact")} <span className="arr">→</span>
           </Link>
         </div>
