@@ -15,6 +15,7 @@ import {
   Plug, Webhook, Shield, GanttChart, FileArchive, Loader2, User,
 } from 'lucide-react'
 import { exportToCSV } from '@/lib/philly/export'
+import { AskAIMode } from './AskAIMode'
 
 /* ── Types ───────────────────────────────────────────── */
 
@@ -47,6 +48,7 @@ interface ProjectHit {
 
 export function CommandPalette() {
   const [open, setOpen] = useState(false)
+  const [aiMode, setAiMode] = useState(false)
   const [query, setQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
   const [contactHits, setContactHits] = useState<ContactHit[]>([])
@@ -280,6 +282,12 @@ export function CommandPalette() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault()
+        setOpen(true)
+        setAiMode(true)
+        return
+      }
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
         setOpen(prev => !prev)
@@ -293,8 +301,13 @@ export function CommandPalette() {
 
   useEffect(() => {
     const openHandler = () => setOpen(true)
+    const askAiHandler = () => { setOpen(true); setAiMode(true) }
     window.addEventListener('command-palette:open', openHandler)
-    return () => window.removeEventListener('command-palette:open', openHandler)
+    window.addEventListener('command-palette:ask-ai', askAiHandler)
+    return () => {
+      window.removeEventListener('command-palette:open', openHandler)
+      window.removeEventListener('command-palette:ask-ai', askAiHandler)
+    }
   }, [])
 
   /* ── Focus & reset on open ── */
@@ -305,9 +318,11 @@ export function CommandPalette() {
       setActiveIndex(0)
       setContactHits([])
       setProjectHits([])
-      setTimeout(() => inputRef.current?.focus(), 50)
+      if (!aiMode) setTimeout(() => inputRef.current?.focus(), 50)
+    } else {
+      setAiMode(false)
     }
-  }, [open])
+  }, [open, aiMode])
 
   useEffect(() => {
     setActiveIndex(0)
@@ -364,6 +379,14 @@ export function CommandPalette() {
           animation: 'scaleIn 0.15s cubic-bezier(0.16,1,0.3,1)',
         }}
       >
+        {aiMode ? (
+          <AskAIMode
+            onExit={() => setAiMode(false)}
+            onCloseAll={() => setOpen(false)}
+            industry={industry as 'realestate' | 'hospitality' | 'philanthropy' | null}
+          />
+        ) : (
+          <>
         {/* Search input */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 10,
@@ -385,6 +408,21 @@ export function CommandPalette() {
               padding: 0,
             }}
           />
+          <button
+            onClick={() => setAiMode(true)}
+            aria-label="Ask AI"
+            title="Ask AI (Cmd+Shift+K)"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              padding: '4px 8px', borderRadius: 6,
+              background: 'var(--accent-bg)', color: 'var(--accent)',
+              border: '1px solid var(--accent-border)',
+              fontSize: 11, fontWeight: 600, cursor: 'pointer',
+              flexShrink: 0,
+            }}
+          >
+            <Sparkles size={12} /> Ask AI
+          </button>
           <kbd style={{
             fontSize: 10, padding: '2px 6px', borderRadius: 4,
             background: 'var(--bg2)', border: '1px solid var(--border)',
@@ -478,6 +516,8 @@ export function CommandPalette() {
           </span>
           <span>{filtered.length} result{filtered.length === 1 ? '' : 's'}</span>
         </div>
+          </>
+        )}
       </div>
     </div>
   )
