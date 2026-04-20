@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { planStepSchema, planSchema } from './command-planner'
+import { planStepSchema, planSchema, WRITE_TOOLS, isWriteTool } from './command-planner'
 
 describe('command-planner schema', () => {
   it('accepts a valid list_contacts step with defaults applied', () => {
@@ -112,6 +112,76 @@ describe('command-planner schema', () => {
       rationale: 'x',
     })
     expect(bad.success).toBe(false)
+  })
+})
+
+describe('write tools', () => {
+  it('WRITE_TOOLS contains exactly the three mutating tools', () => {
+    expect(WRITE_TOOLS.size).toBe(3)
+    expect(WRITE_TOOLS.has('update_deal_stage')).toBe(true)
+    expect(WRITE_TOOLS.has('add_contact_note')).toBe(true)
+    expect(WRITE_TOOLS.has('set_lead_status')).toBe(true)
+  })
+
+  it('isWriteTool returns false for read-only tools', () => {
+    expect(isWriteTool('list_contacts')).toBe(false)
+    expect(isWriteTool('count_entities')).toBe(false)
+    expect(isWriteTool('navigate_to')).toBe(false)
+    expect(isWriteTool('draft_followup_email')).toBe(false)
+  })
+
+  it('isWriteTool returns true for mutating tools', () => {
+    expect(isWriteTool('update_deal_stage')).toBe(true)
+    expect(isWriteTool('add_contact_note')).toBe(true)
+    expect(isWriteTool('set_lead_status')).toBe(true)
+  })
+
+  it('update_deal_stage requires both dealIdentifier and stageName', () => {
+    const ok = planStepSchema.safeParse({
+      tool: 'update_deal_stage',
+      args: { dealIdentifier: 'Acme solar rooftop', stageName: 'Negotiation' },
+      rationale: 'user asked to move the deal',
+    })
+    expect(ok.success).toBe(true)
+
+    const missing = planStepSchema.safeParse({
+      tool: 'update_deal_stage',
+      args: { dealIdentifier: 'Acme solar rooftop' },
+      rationale: 'user asked',
+    })
+    expect(missing.success).toBe(false)
+  })
+
+  it('set_lead_status rejects invalid status values', () => {
+    const good = planStepSchema.safeParse({
+      tool: 'set_lead_status',
+      args: { identifier: 'marco@example.com', leadStatus: 'qualified' },
+      rationale: 'qualify the lead',
+    })
+    expect(good.success).toBe(true)
+
+    const bad = planStepSchema.safeParse({
+      tool: 'set_lead_status',
+      args: { identifier: 'marco@example.com', leadStatus: 'red_hot' },
+      rationale: 'bump',
+    })
+    expect(bad.success).toBe(false)
+  })
+
+  it('add_contact_note requires note length >= 3', () => {
+    const bad = planStepSchema.safeParse({
+      tool: 'add_contact_note',
+      args: { identifier: 'Marco', note: 'ok' },
+      rationale: 'add a note',
+    })
+    expect(bad.success).toBe(false)
+
+    const good = planStepSchema.safeParse({
+      tool: 'add_contact_note',
+      args: { identifier: 'Marco', note: 'followed up on Q3 solar figures' },
+      rationale: 'note the call outcome',
+    })
+    expect(good.success).toBe(true)
   })
 })
 

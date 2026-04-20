@@ -16,7 +16,7 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 import { logAudit } from '@/lib/philly/audit'
 import type { AuthScope } from '@/lib/philly/auth-helpers'
 import { logger } from '@/lib/philly/logger'
-import type { PlanStep, TimeWindow } from './command-planner'
+import { isWriteTool, type PlanStep, type TimeWindow } from './command-planner'
 
 /* ── Shared helpers ────────────────────────────────────── */
 
@@ -403,6 +403,147 @@ function runNavigateTo(
   }
 }
 
+/* ── Write handlers ────────────────────────────────────── */
+
+async function runUpdateDealStage(
+  scope: AuthScope,
+  args: Extract<PlanStep, { tool: 'update_deal_stage' }>['args'],
+): Promise<ExecuteResult> {
+  const prisma = getAuthPrisma()
+  const ident = args.dealIdentifier.trim()
+
+  // Resolve the deal — id match first, then title contains.
+  const deal = await prisma.deal.findFirst({
+    where: {
+      pipeline: { organizationId: scope.organizationId },
+      OR: [{ id: ident }, { title: { contains: ident } }],
+    },
+    select: { id: true, title: true, pipelineId: true, stageId: true, stage: { select: { name: true } } },
+  })
+  if (!deal) {
+    return { ok: false, tool: 'update_deal_stage', summary: `No deal matched "${ident}".`, error: 'deal not found' }
+  }
+
+  // Stage must live in the same pipeline as the deal.
+  const stage = await prisma.pipelineStage.findFirst({
+    where: { pipelineId: deal.pipelineId, name: { contains: args.stageName } },
+    select: { id: true, name: true },
+  })
+  if (!stage) {
+    return { ok: false, tool: 'update_deal_stage', summary: `No stage matching "${args.stageName}" in this pipeline.`, error: 'stage not found' }
+  }
+
+  if (stage.id === deal.stageId) {
+    return {
+      ok: true,
+      tool: 'update_deal_stage',
+      summary: `"${deal.title}" is already in ${stage.name}.`,
+      data: { dealId: deal.id, previousStage: deal.stage?.name, stage: stage.name, noOp: true },
+    }
+  }
+
+  await prisma.deal.update({
+    where: { id: deal.id },
+    data: { stageId: stage.id },
+  })
+
+  logAudit({
+    scope,
+    action: 'update',
+    entity: 'deal',
+    entityId: deal.id,
+    changes: { stageId: { old: deal.stageId, new: stage.id }, stage: { old: deal.stage?.name ?? null, new: stage.name } },
+  })
+
+  return {
+    ok: true,
+    tool: 'update_deal_stage',
+    summary: `Moved "${deal.title}" → ${stage.name}.`,
+    data: { dealId: deal.id, previousStage: deal.stage?.name, stage: stage.name },
+  }
+}
+
+async function runAddContactNote(
+  scope: AuthScope,
+  args: Extract<PlanStep, { tool: 'add_contact_note' }>['args'],
+): Promise<ExecuteResult> {
+  const prisma = getAuthPrisma()
+  const contact = await resolveContact(args.identifier, scope.organizationId)
+  if (!contact) {
+    return { ok: false, tool: 'add_contact_note', summary: `No contact matched "${args.identifier}".`, error: 'contact not found' }
+  }
+
+  const stamp = new Date().toISOString().slice(0, 16).replace('T', ' ')
+  const newLine = `[${stamp}] ${args.note.trim()}`
+  const existing = (contact.notes ?? '').trim()
+  const next = existing ? `${existing}\n\n${newLine}` : newLine
+
+  await prisma.contact.update({
+    where: { id: contact.id },
+    data: { notes: next },
+  })
+
+  logAudit({
+    scope,
+    action: 'update',
+    entity: 'contact',
+    entityId: contact.id,
+    changes: { notes: { old: '(append)', new: newLine } },
+  })
+
+  return {
+    ok: true,
+    tool: 'add_contact_note',
+    summary: `Note added to ${contact.name}.`,
+    data: { contactId: contact.id, name: contact.name, appended: newLine },
+  }
+}
+
+async function runSetLeadStatus(
+  scope: AuthScope,
+  args: Extract<PlanStep, { tool: 'set_lead_status' }>['args'],
+): Promise<ExecuteResult> {
+  const prisma = getAuthPrisma()
+  const contact = await resolveContact(args.identifier, scope.organizationId)
+  if (!contact) {
+    return { ok: false, tool: 'set_lead_status', summary: `No contact matched "${args.identifier}".`, error: 'contact not found' }
+  }
+
+  const prev = await prisma.contact.findUnique({
+    where: { id: contact.id },
+    select: { leadStatus: true },
+  })
+
+  if (prev?.leadStatus === args.leadStatus) {
+    return {
+      ok: true,
+      tool: 'set_lead_status',
+      summary: `${contact.name} is already "${args.leadStatus}".`,
+      data: { contactId: contact.id, name: contact.name, leadStatus: args.leadStatus, noOp: true },
+    }
+  }
+
+  await prisma.contact.update({
+    where: { id: contact.id },
+    data: { leadStatus: args.leadStatus },
+  })
+
+  logAudit({
+    scope,
+    action: 'update',
+    entity: 'contact',
+    entityId: contact.id,
+    changes: { leadStatus: { old: prev?.leadStatus ?? null, new: args.leadStatus } },
+  })
+
+  return {
+    ok: true,
+    tool: 'set_lead_status',
+    summary: `${contact.name}: ${prev?.leadStatus ?? 'new'} → ${args.leadStatus}.`,
+    data: { contactId: contact.id, name: contact.name, leadStatus: args.leadStatus, previous: prev?.leadStatus ?? null },
+  }
+}
+
 /* ── Dispatcher ────────────────────────────────────────── */
 
 export async function executeStep(scope: AuthScope, step: PlanStep): Promise<ExecuteResult> {
@@ -417,26 +558,33 @@ export async function executeStep(scope: AuthScope, step: PlanStep): Promise<Exe
     case 'summarize_contact': result = await runSummarizeContact(scope, step.args); break
     case 'draft_followup_email': result = await runDraftFollowupEmail(scope, step.args); break
     case 'navigate_to':     result = runNavigateTo(step.args); break
+    case 'update_deal_stage':  result = await runUpdateDealStage(scope, step.args); break
+    case 'add_contact_note':   result = await runAddContactNote(scope, step.args); break
+    case 'set_lead_status':    result = await runSetLeadStatus(scope, step.args); break
   }
 
-  // Audit every execution — read-only tools too, so admins can see
-  // what the command bar was asked to do. Fire-and-forget.
-  logAudit({
-    scope,
-    action: 'update',
-    entity: 'auditLog',
-    changes: {
-      aiCommand: {
-        old: null,
-        new: {
-          tool: step.tool,
-          args: step.args,
-          ok: result.ok,
-          summary: result.summary.slice(0, 200),
+  // Read-only tools still audit as a command-bar event so admins can
+  // see what the AI was asked to do. Write tools already audit against
+  // the actual entity (deal/contact) inside their handlers — skip the
+  // duplicate here so the audit trail stays clean.
+  if (!isWriteTool(step.tool)) {
+    logAudit({
+      scope,
+      action: 'update',
+      entity: 'auditLog',
+      changes: {
+        aiCommand: {
+          old: null,
+          new: {
+            tool: step.tool,
+            args: step.args,
+            ok: result.ok,
+            summary: result.summary.slice(0, 200),
+          },
         },
       },
-    },
-  })
+    })
+  }
 
   return result
 }

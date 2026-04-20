@@ -14,7 +14,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Sparkles, ArrowLeft, Loader2, Play, Check, X, Copy } from 'lucide-react'
+import { Sparkles, ArrowLeft, Loader2, Play, Check, X, Copy, AlertTriangle } from 'lucide-react'
 
 /* ── Mirrors the server schema — keep in sync with command-planner.ts ── */
 
@@ -31,6 +31,15 @@ type PlanStep =
   | { tool: 'summarize_contact'; args: { identifier: string }; rationale: string }
   | { tool: 'draft_followup_email'; args: { identifier: string; angle: string }; rationale: string }
   | { tool: 'navigate_to'; args: { path: string }; rationale: string }
+  | { tool: 'update_deal_stage'; args: { dealIdentifier: string; stageName: string }; rationale: string }
+  | { tool: 'add_contact_note'; args: { identifier: string; note: string }; rationale: string }
+  | { tool: 'set_lead_status'; args: { identifier: string; leadStatus: string }; rationale: string }
+
+const WRITE_TOOLS = new Set<PlanStep['tool']>([
+  'update_deal_stage',
+  'add_contact_note',
+  'set_lead_status',
+])
 
 interface Plan {
   understanding: string
@@ -56,6 +65,9 @@ const TOOL_LABELS: Record<PlanStep['tool'], string> = {
   summarize_contact: 'Summarize contact',
   draft_followup_email: 'Draft email',
   navigate_to: 'Navigate',
+  update_deal_stage: 'Move deal to stage',
+  add_contact_note: 'Add note to contact',
+  set_lead_status: 'Set lead status',
 }
 
 /* ── Component ─────────────────────────────────────────── */
@@ -74,6 +86,7 @@ export function AskAIMode({ onExit, onCloseAll, industry }: AskAIModeProps) {
   const [planError, setPlanError] = useState<string | null>(null)
   const [results, setResults] = useState<Record<number, ExecuteResult>>({})
   const [runningIdx, setRunningIdx] = useState<number | null>(null)
+  const [confirmingIdx, setConfirmingIdx] = useState<number | null>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const router = useRouter()
 
@@ -287,34 +300,102 @@ export function AskAIMode({ onExit, onCloseAll, industry }: AskAIModeProps) {
                       {idx + 1}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--txt)', marginBottom: 2 }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--txt)', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 6 }}>
                         {TOOL_LABELS[step.tool]}
+                        {WRITE_TOOLS.has(step.tool) && (
+                          <span style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 3,
+                            fontSize: 9, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase',
+                            padding: '1px 6px', borderRadius: 4,
+                            background: 'rgba(245,158,11,0.15)', color: '#f59e0b',
+                            border: '1px solid rgba(245,158,11,0.3)',
+                          }}>
+                            <AlertTriangle size={9} /> writes
+                          </span>
+                        )}
                       </div>
                       <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 6, lineHeight: 1.5 }}>
                         {step.rationale}
                       </div>
                       <ArgsBadge step={step} />
                     </div>
-                    {!result && (
-                      <button
-                        onClick={() => runStep(idx)}
-                        disabled={runningIdx !== null}
-                        style={{
-                          display: 'inline-flex', alignItems: 'center', gap: 4,
-                          padding: '4px 10px', borderRadius: 6,
-                          background: 'var(--accent)', color: '#fff',
-                          border: 'none', fontSize: 11, fontWeight: 500,
-                          cursor: runningIdx !== null ? 'wait' : 'pointer',
-                          opacity: runningIdx !== null && !isRunning ? 0.4 : 1,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {isRunning
-                          ? <><Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> Running</>
-                          : <><Play size={11} /> Run</>
-                        }
-                      </button>
-                    )}
+                    {!result && (() => {
+                      const isWrite = WRITE_TOOLS.has(step.tool)
+                      const isConfirming = confirmingIdx === idx
+                      if (isWrite && !isConfirming) {
+                        return (
+                          <button
+                            onClick={() => setConfirmingIdx(idx)}
+                            disabled={runningIdx !== null}
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: 4,
+                              padding: '4px 10px', borderRadius: 6,
+                              background: '#f59e0b', color: '#111',
+                              border: 'none', fontSize: 11, fontWeight: 600,
+                              cursor: runningIdx !== null ? 'wait' : 'pointer',
+                              opacity: runningIdx !== null ? 0.4 : 1,
+                              flexShrink: 0,
+                            }}
+                          >
+                            <AlertTriangle size={11} /> Review & run
+                          </button>
+                        )
+                      }
+                      if (isWrite && isConfirming) {
+                        return (
+                          <div style={{ display: 'inline-flex', gap: 4, flexShrink: 0 }}>
+                            <button
+                              onClick={() => { setConfirmingIdx(null); runStep(idx) }}
+                              disabled={runningIdx !== null}
+                              style={{
+                                display: 'inline-flex', alignItems: 'center', gap: 4,
+                                padding: '4px 10px', borderRadius: 6,
+                                background: '#dc2626', color: '#fff',
+                                border: 'none', fontSize: 11, fontWeight: 600,
+                                cursor: runningIdx !== null ? 'wait' : 'pointer',
+                              }}
+                            >
+                              {isRunning
+                                ? <><Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> Writing</>
+                                : <><Play size={11} /> Confirm write</>
+                              }
+                            </button>
+                            <button
+                              onClick={() => setConfirmingIdx(null)}
+                              style={{
+                                display: 'inline-flex', alignItems: 'center',
+                                padding: '4px 8px', borderRadius: 6,
+                                background: 'var(--bg2)', color: 'var(--txt2)',
+                                border: '1px solid var(--border)', fontSize: 11,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        )
+                      }
+                      return (
+                        <button
+                          onClick={() => runStep(idx)}
+                          disabled={runningIdx !== null}
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 4,
+                            padding: '4px 10px', borderRadius: 6,
+                            background: 'var(--accent)', color: '#fff',
+                            border: 'none', fontSize: 11, fontWeight: 500,
+                            cursor: runningIdx !== null ? 'wait' : 'pointer',
+                            opacity: runningIdx !== null && !isRunning ? 0.4 : 1,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {isRunning
+                            ? <><Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> Running</>
+                            : <><Play size={11} /> Run</>
+                          }
+                        </button>
+                      )
+                    })()}
                     {result && (
                       <div style={{
                         display: 'inline-flex', alignItems: 'center', gap: 4,
@@ -460,6 +541,35 @@ function ResultBody({ result }: { result: ExecuteResult }) {
   if (result.tool === 'navigate_to') {
     const data = result.data as { path: string } | undefined
     return <div>Opening <code style={{ fontSize: 11 }}>{data?.path}</code>…</div>
+  }
+
+  if (result.tool === 'update_deal_stage') {
+    const data = result.data as { previousStage?: string; stage?: string; noOp?: boolean } | undefined
+    if (data?.noOp) return <div style={{ color: 'var(--txt3)' }}>{result.summary}</div>
+    return <div>{data?.previousStage ?? '—'} → <strong>{data?.stage}</strong></div>
+  }
+
+  if (result.tool === 'add_contact_note') {
+    const data = result.data as { name: string; appended: string } | undefined
+    return (
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt3)', marginBottom: 4 }}>
+          Appended to {data?.name}
+        </div>
+        <pre style={{
+          whiteSpace: 'pre-wrap', fontFamily: 'inherit', margin: 0,
+          fontSize: 12, color: 'var(--txt)',
+          padding: 8, background: 'var(--panel)', borderRadius: 6,
+          border: '1px solid var(--border)',
+        }}>{data?.appended}</pre>
+      </div>
+    )
+  }
+
+  if (result.tool === 'set_lead_status') {
+    const data = result.data as { name: string; previous?: string | null; leadStatus: string; noOp?: boolean } | undefined
+    if (data?.noOp) return <div style={{ color: 'var(--txt3)' }}>{result.summary}</div>
+    return <div>{data?.name}: {data?.previous ?? 'new'} → <strong>{data?.leadStatus}</strong></div>
   }
 
   // list_* and search_entities share a row-list shape

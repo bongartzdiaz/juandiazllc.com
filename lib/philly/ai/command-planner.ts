@@ -119,6 +119,38 @@ const navigateToStep = z.object({
   rationale: z.string().min(4).max(240),
 })
 
+/* ── Write tools ───────────────────────────────────────── */
+/* These MUTATE the database. The client requires a second
+   confirmation before dispatching them, and every successful run
+   writes an audit entry keyed to the actual entity id. */
+
+const updateDealStageStep = z.object({
+  tool: z.literal('update_deal_stage'),
+  args: z.object({
+    dealIdentifier: z.string().min(1).max(120).describe('Deal title, id, or unique substring.'),
+    stageName: z.string().min(1).max(60).describe('Target pipeline stage name (matched case-insensitively within the same pipeline).'),
+  }),
+  rationale: z.string().min(4).max(240),
+})
+
+const addContactNoteStep = z.object({
+  tool: z.literal('add_contact_note'),
+  args: z.object({
+    identifier: z.string().min(1).max(120).describe('Contact name or email to match.'),
+    note: z.string().min(3).max(1000).describe('Note body. Will be appended to contact.notes with a timestamp line.'),
+  }),
+  rationale: z.string().min(4).max(240),
+})
+
+const setLeadStatusStep = z.object({
+  tool: z.literal('set_lead_status'),
+  args: z.object({
+    identifier: z.string().min(1).max(120),
+    leadStatus: z.enum(['new', 'contacted', 'qualified', 'nurture', 'hot', 'under_contract', 'closed', 'lost']),
+  }),
+  rationale: z.string().min(4).max(240),
+})
+
 export const planStepSchema = z.discriminatedUnion('tool', [
   listContactsStep,
   listDealsStep,
@@ -129,10 +161,26 @@ export const planStepSchema = z.discriminatedUnion('tool', [
   summarizeContactStep,
   draftFollowupEmailStep,
   navigateToStep,
+  updateDealStageStep,
+  addContactNoteStep,
+  setLeadStatusStep,
 ])
+
 
 export type PlanStep = z.infer<typeof planStepSchema>
 export type ToolName = PlanStep['tool']
+
+/** Tools that mutate the database. The client uses this to render a
+ *  double-confirm affordance. Keep in sync with any new write tools. */
+export const WRITE_TOOLS: ReadonlySet<ToolName> = new Set<ToolName>([
+  'update_deal_stage',
+  'add_contact_note',
+  'set_lead_status',
+])
+
+export function isWriteTool(tool: ToolName): boolean {
+  return WRITE_TOOLS.has(tool)
+}
 
 export const planSchema = z.object({
   understanding: z
@@ -166,8 +214,9 @@ const SYSTEM_PROMPT = [
   '3. For "summarize X" requests, use summarize_contact with the person\'s name/email as identifier — you never see row ids.',
   '4. draft_followup_email ONLY drafts text; it never sends. Be conservative about using it.',
   '5. navigate_to is for "take me to / open / show me the X page" requests. Path must start with /philly.',
-  '6. When the request is ambiguous (missing a target, missing an entity type), return an empty steps array and set clarification to a single question.',
-  '7. Never output tool names not in the schema. Never invent args.',
+  '6. Write tools (update_deal_stage, add_contact_note, set_lead_status) MUTATE data. Only use them when the user explicitly asked to change/update/move/add something. Never chain a write after an exploratory step — if the user needs to pick a target first, ask with clarification.',
+  '7. When the request is ambiguous (missing a target, missing an entity type), return an empty steps array and set clarification to a single question.',
+  '8. Never output tool names not in the schema. Never invent args.',
 ].join('\n')
 
 export interface PlanInput {
