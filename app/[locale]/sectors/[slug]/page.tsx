@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { SECTORS, getSector } from "@/lib/sectors";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
-import { LOCALES } from "@/lib/i18n/dict";
+import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { FaqSection } from "@/components/FaqSection";
 import { faqSchema, serviceSchema } from "@/lib/seo/schema";
@@ -94,6 +94,36 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
       </header>
 
       <article className="long" style={{ paddingTop: 60 }}>
+        {s.slug === "energy" && (
+          <Link
+            href="/tools/energy-roi"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 16,
+              padding: "18px 22px",
+              marginBottom: 48,
+              border: "1px solid var(--accent)",
+              borderRadius: 14,
+              background: "rgba(46,196,137,.08)",
+              textDecoration: "none",
+              flexWrap: "wrap",
+            }}
+          >
+            <div>
+              <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".14em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 6 }}>
+                ◉ {translate(l, "roi.eyebrow").replace(/^◉\s*/, "")}
+              </div>
+              <div style={{ fontSize: 17, fontWeight: 500 }}>
+                {translate(l, "roi.title").replace(/<[^>]+>/g, "")}
+              </div>
+            </div>
+            <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--accent)", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+              Run the math →
+            </span>
+          </Link>
+        )}
         <h2>Where <em>revenue leaks</em> in this sector.</h2>
         <p style={{ color: "var(--muted)" }}>The five common failure modes I see when I survey a new operator in this space.</p>
 
