@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
+import { useApi } from '@/hooks/philly/useApi'
 import { ListChecks, Play, Pause, Filter, Users, X, Trash2 } from 'lucide-react'
 
 interface ActionPlan {
@@ -46,11 +47,7 @@ const labelStyle: React.CSSProperties = {
 }
 
 export default function ActionPlansPage() {
-  const [plans, setPlans] = useState<ActionPlan[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
   const [addName, setAddName] = useState('')
   const [addDescription, setAddDescription] = useState('')
@@ -61,39 +58,35 @@ export default function ActionPlansPage() {
   const [statusFilter, setStatusFilter] = useState('')
   const t = useTranslations('actionPlans')
 
-  const fetchPlans = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '25' })
-      if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/philly/api/action-plans?${params}`)
-      const json = await res.json()
-      setPlans(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch {
-      setPlans([])
-    } finally {
-      setLoading(false)
-    }
-  }, [page, statusFilter])
-
-  useEffect(() => { fetchPlans() }, [fetchPlans])
+  // SWR-backed fetch — dedupes, revalidates on focus, plays nice with the
+  // SSE subscription below so optimistic updates still feel instant.
+  const queryParams = new URLSearchParams({ page: String(page), limit: '25' })
+  if (statusFilter) queryParams.set('status', statusFilter)
+  interface ApiResponse {
+    data: ActionPlan[]
+    pagination?: { total?: number; totalPages?: number }
+  }
+  const plansQuery = useApi<ApiResponse>(`/action-plans?${queryParams}`)
+  const plans = plansQuery.data?.data ?? []
+  const total = plansQuery.data?.pagination?.total ?? 0
+  const totalPages = plansQuery.data?.pagination?.totalPages ?? 0
+  const loading = plansQuery.loading
+  const fetchPlans = plansQuery.refetch
 
   // Live updates when plans are created/updated
   useEntitySubscription('actionPlan', fetchPlans)
 
   const toggleStatus = async (id: string, currentStatus: string) => {
     const newStatus = currentStatus === 'active' ? 'paused' : 'active'
-    setPlans(prev => prev.map(p => p.id === id ? { ...p, status: newStatus } : p))
     try {
       await fetch('/philly/api/action-plans', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status: newStatus }),
       })
+      fetchPlans()
     } catch {
-      setPlans(prev => prev.map(p => p.id === id ? { ...p, status: currentStatus } : p))
+      // Error state surfaces via plansQuery.error on next refetch.
     }
   }
 

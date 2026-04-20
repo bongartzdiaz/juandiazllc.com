@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
+import { useApi } from '@/hooks/philly/useApi'
 import { ChevronLeft, ChevronRight, Clock, MapPin, Users, Plus, Trash2 } from 'lucide-react'
 
 interface ApiAttendee {
@@ -83,9 +84,6 @@ export default function CalendarPage() {
     return new Date(now.getFullYear(), now.getMonth(), 1)
   })
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
-  const [events, setEvents] = useState<ApiCalendarEvent[]>([])
-  const [loading, setLoading] = useState(true)
-  const [fetchError, setFetchError] = useState<string | null>(null)
 
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -105,26 +103,18 @@ export default function CalendarPage() {
     return { fromISO: gridStart.toISOString(), toISO: gridEnd.toISOString() }
   }, [year, month])
 
-  const fetchEvents = useCallback(async () => {
-    setLoading(true)
-    setFetchError(null)
-    try {
-      const res = await fetch(`/philly/api/calendar?from=${encodeURIComponent(fromISO)}&to=${encodeURIComponent(toISO)}`, {
-        cache: 'no-store',
-      })
-      if (!res.ok) throw new Error(`Failed to load (${res.status})`)
-      const json = await res.json()
-      setEvents(Array.isArray(json.data) ? json.data : [])
-    } catch (err) {
-      setFetchError(err instanceof Error ? err.message : 'Failed to load events')
-    } finally {
-      setLoading(false)
-    }
-  }, [fromISO, toISO])
+  // SWR-backed fetch — cache-first, revalidate on focus, shared across
+  // components asking for the same window. Replaces the old manual
+  // useEffect+fetch+useState dance.
+  const eventsQuery = useApi<{ data: ApiCalendarEvent[] }>(
+    `/calendar?from=${encodeURIComponent(fromISO)}&to=${encodeURIComponent(toISO)}`,
+  )
+  const events = eventsQuery.data?.data ?? []
+  const loading = eventsQuery.loading
+  const fetchError = eventsQuery.error
+  const fetchEvents = eventsQuery.refetch
 
-  useEffect(() => { fetchEvents() }, [fetchEvents])
-
-  // Live updates via SSE
+  // Live updates via SSE — same refetch path.
   useEntitySubscription('calendarEvent', fetchEvents)
 
   const calendarDays = useMemo(() => {

@@ -1,6 +1,7 @@
 'use client'
 
-import { Fragment, useState, useEffect, useCallback } from 'react'
+import { Fragment, useState } from 'react'
+import { useApi } from '@/hooks/philly/useApi'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -58,39 +59,27 @@ const ACTION_COLORS: Record<string, { bg: string; txt: string }> = {
 
 export default function AuditLogPage() {
   const t = useTranslations('audit')
-  const [logs, setLogs] = useState<AuditLog[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [entityFilter, setEntityFilter] = useState('')
   const [actionFilter, setActionFilter] = useState('')
   const [rangeFilter, setRangeFilter] = useState('')
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const limit = 25
 
-  const fetchLogs = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: String(limit) })
-      if (entityFilter) params.set('entity', entityFilter)
-      if (actionFilter) params.set('action', actionFilter)
-      if (rangeFilter) params.set('range', rangeFilter)
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) })
+  if (entityFilter) params.set('entity', entityFilter)
+  if (actionFilter) params.set('action', actionFilter)
+  if (rangeFilter) params.set('range', rangeFilter)
 
-      const res = await fetch(`/philly/api/audit?${params}`)
-      if (!res.ok) throw new Error('Failed to fetch')
-      const json = await res.json()
-      setLogs(json.data)
-      setTotal(json.pagination.total)
-      setTotalPages(json.pagination.totalPages)
-    } catch {
-      setLogs([])
-    } finally {
-      setLoading(false)
-    }
-  }, [page, entityFilter, actionFilter, rangeFilter])
-
-  useEffect(() => { fetchLogs() }, [fetchLogs])
+  interface AuditResponse {
+    data: AuditLog[]
+    pagination: { total: number; totalPages: number }
+  }
+  const auditQuery = useApi<AuditResponse>(`/audit?${params}`)
+  const logs = auditQuery.data?.data ?? []
+  const total = auditQuery.data?.pagination.total ?? 0
+  const totalPages = auditQuery.data?.pagination.totalPages ?? 0
+  const loading = auditQuery.loading
 
   const handlePageChange = (p: number) => setPage(p)
 

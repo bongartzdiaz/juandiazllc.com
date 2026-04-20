@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
+import { useApi } from '@/hooks/philly/useApi'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
@@ -126,8 +127,6 @@ function actionSummary(rule: AutomationRule): string {
 /* ── Page ────────────────────────────────────────────── */
 
 export default function AutomationsPage() {
-  const [rules, setRules] = useState<AutomationRule[]>([])
-  const [loading, setLoading] = useState(true)
   const [expandedLogs, setExpandedLogs] = useState<Record<string, AutomationLog[] | 'loading'>>({})
 
   const [editorOpen, setEditorOpen] = useState(false)
@@ -143,18 +142,13 @@ export default function AutomationsPage() {
   const t = useTranslations('automations')
   const { addToast } = useToast()
 
-  const load = useCallback(() => {
-    setLoading(true)
-    fetch('/philly/api/automations')
-      .then(r => r.json())
-      .then(j => setRules(j.data ?? []))
-      .catch(() => setRules([]))
-      .finally(() => setLoading(false))
-  }, [])
+  // SWR-backed fetch: shared cache across the dashboard, revalidates on
+  // focus, and the SSE subscription below funnels into the same refetch.
+  const rulesQuery = useApi<{ data: AutomationRule[] }>('/automations')
+  const rules = rulesQuery.data?.data ?? []
+  const loading = rulesQuery.loading
+  const load = rulesQuery.refetch
 
-  useEffect(() => { load() }, [load])
-
-  // Live updates when rules are created/updated/deleted (own session or other users)
   useEntitySubscription('automationRule', load)
 
   const resetForm = () => {
@@ -246,15 +240,15 @@ export default function AutomationsPage() {
 
   const toggle = async (rule: AutomationRule) => {
     const next = !rule.enabled
-    setRules(prev => prev.map(r => r.id === rule.id ? { ...r, enabled: next } : r))
     try {
-      await fetch('/philly/api/automations', {
+      const res = await fetch('/philly/api/automations', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: rule.id, enabled: next }),
       })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      load()
     } catch {
-      setRules(prev => prev.map(r => r.id === rule.id ? { ...r, enabled: rule.enabled } : r))
       addToast('Toggle failed', 'error')
     }
   }

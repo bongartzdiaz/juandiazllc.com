@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
+import { useApi } from '@/hooks/philly/useApi'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { Mail, Send, Plus, X, RefreshCw, Paperclip, Clock } from 'lucide-react'
 
@@ -39,8 +40,10 @@ const labelStyle: React.CSSProperties = {
 }
 
 export default function EmailPage() {
-  const [accounts, setAccounts] = useState<EmailAccount[]>([])
-  const [loading, setLoading] = useState(true)
+  const accountsQuery = useApi<{ data: EmailAccount[] }>('/email/accounts')
+  const accounts = accountsQuery.data?.data ?? []
+  const loading = accountsQuery.loading
+  const fetchAccounts = accountsQuery.refetch
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   // Add Account modal
@@ -62,23 +65,16 @@ export default function EmailPage() {
   const [cmpSending, setCmpSending] = useState(false)
   const [sendError, setSendError] = useState<string | null>(null)
 
-  const fetchAccounts = useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await fetch('/philly/api/email/accounts')
-      const json = await res.json()
-      const list: EmailAccount[] = json.data ?? []
-      setAccounts(list)
-      if (list.length > 0 && !list.some(a => a.id === selectedId)) {
-        setSelectedId(list[0].id)
-      } else if (list.length === 0) {
-        setSelectedId(null)
-      }
-    } catch { setAccounts([]) }
-    finally { setLoading(false) }
-  }, [selectedId])
+  useEffect(() => {
+    if (accounts.length === 0) {
+      if (selectedId !== null) setSelectedId(null)
+      return
+    }
+    if (!accounts.some(a => a.id === selectedId)) {
+      setSelectedId(accounts[0].id)
+    }
+  }, [accounts, selectedId])
 
-  useEffect(() => { fetchAccounts() }, [fetchAccounts])
   useEntitySubscription('emailAccount', fetchAccounts)
   useEntitySubscription('email', fetchAccounts)
 
