@@ -2,21 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { SIGNALS, getSignal } from "@/lib/signals";
-import { LOCALES, type Locale } from "@/lib/i18n/dict";
+import { LOCALES } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
-
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
-
-// Maps our route locales to IETF BCP-47 tags for schema.org `inLanguage`.
-// Keeps the Article JSON-LD accurate per-locale so Google can serve the
-// right hreflang variant to the right audience.
-const IN_LANGUAGE: Record<Locale, string> = {
-  en: "en-US",
-  nl: "nl-NL",
-  de: "de-DE",
-  es: "es-ES",
-};
+import { blogPostingSchema } from "@/lib/seo/article";
 
 function toTagSlug(tag: string) {
   return tag.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -42,6 +31,19 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: s.excerpt,
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
+      images: [
+        {
+          url: `/${l}/signals/${s.slug}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: s.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: s.title,
+      description: s.excerpt,
     },
   };
 }
@@ -69,35 +71,15 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
     .filter(Boolean)
     .join("\n\n");
 
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
+  const articleSchema = blogPostingSchema({
+    locale: l,
+    path: `/signals/${s.slug}`,
     headline: s.title,
     description: s.excerpt,
     datePublished: s.date,
-    dateModified: s.date,
-    author: {
-      "@type": "Person",
-      name: "Juan Stefan Diaz",
-      url: `${SITE}/about`,
-      image: `${SITE}/me/portrait.jpg`,
-      jobTitle: "Founder, Juan Diaz, LLC",
-      sameAs: [
-        "https://linkedin.com/in/juanstefan",
-        "https://instagram.com/diazelcazador",
-      ],
-    },
-    image: `${SITE}/me/portrait.jpg`,
+    tag: s.tag,
     articleBody,
-    publisher: {
-      "@type": "Organization",
-      name: "Juan Diaz, LLC",
-      logo: { "@type": "ImageObject", url: `${SITE}/icon.svg` },
-    },
-    mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/${l}/signals/${s.slug}` },
-    keywords: s.tag,
-    inLanguage: IN_LANGUAGE[l],
-  };
+  });
 
   const crumbs = breadcrumbSchema([
     { name: "Home", path: `/${l}` },
@@ -169,7 +151,7 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
           }}
         >
           <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 12, letterSpacing: ".1em", color: "var(--muted-soft)", textTransform: "uppercase" }}>
-            — Juan Stefan Diaz
+            — Juan Stefan Bongartz Diaz
           </div>
           <Link className="btn primary btn-mag" href="/contact">
             Work together <span className="arr">→</span>

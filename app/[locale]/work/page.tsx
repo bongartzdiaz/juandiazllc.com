@@ -3,6 +3,8 @@ import Link from "next/link";
 import { VENTURES } from "@/lib/ventures";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
+import { breadcrumbSchema } from "@/lib/breadcrumb";
+import { collectionPageSchema } from "@/lib/seo/schema";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -21,8 +23,26 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
   const l = assertLocale(locale);
   const t = (k: string) => translate(l, k);
 
+  const crumbs = breadcrumbSchema([
+    { name: "Home", path: `/${l}` },
+    { name: "Work", path: `/${l}/work` },
+  ]);
+  const collection = collectionPageSchema({
+    locale: l,
+    path: "/work",
+    name: "Work — Juan Diaz, LLC",
+    description: "Live products under Juan Diaz, LLC — the five-phase playbook applied to real sectors.",
+    items: VENTURES.map((v) => ({
+      name: v.name,
+      url: `/${l}/work/${v.slug}`,
+      description: v.tagline,
+    })),
+  });
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collection) }} />
       <header className="page-hero">
         <div className="eyebrow">{t("work.page.eyebrow")}</div>
         <h1 dangerouslySetInnerHTML={{ __html: t("work.page.title") }} />

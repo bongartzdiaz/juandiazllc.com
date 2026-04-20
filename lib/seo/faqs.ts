@@ -4,6 +4,7 @@
 // citation gets truncated mid-thought.
 
 import type { FaqItem } from "./schema";
+import type { Locale } from "@/lib/i18n/dict";
 
 export const HOME_FAQ: FaqItem[] = [
   {
@@ -70,6 +71,9 @@ export const CONTACT_FAQ: FaqItem[] = [
   },
 ];
 
+// Kept for backwards-compat. New call sites should use SECTOR_FAQ_BY_LOCALE
+// so non-English visitors get AI-Overview-citeable answers in their own
+// language instead of English leaking through.
 export const SECTOR_FAQ: Record<string, FaqItem[]> = {
   energy: [
     {
@@ -128,3 +132,192 @@ export const SECTOR_FAQ: Record<string, FaqItem[]> = {
     },
   ],
 };
+
+// Per-locale sector FAQ. Keys must match slugs in lib/sectors; copy is
+// written natively, not machine-translated, so each language reads like
+// a local wrote it. Missing locales fall back to English via the
+// getSectorFaq() helper below.
+export const SECTOR_FAQ_BY_LOCALE: Record<Locale, Record<string, FaqItem[]>> = {
+  en: SECTOR_FAQ,
+  nl: {
+    energy: [
+      {
+        q: "Werken jullie met zonnepaneel- en batterijinstallateurs?",
+        a: "Ja. Energie is onze grootste sector — zonnepaneelinstallateurs, batterijpartners, warmtepompoperators en hybride installateurs. Typische build: WhatsApp-first leadkwalificatie, verbruiksrapportage, installateursdispatch en oplevering.",
+      },
+      {
+        q: "Hoe verandert de salderingsregeling alles?",
+        a: "De afschaffing van saldering in 2027 verschuift de verkoop van prijs naar terugverdientijd — dus je funnel heeft een rendementsgesprek nodig, geen prijsopgave. Wij bouwen die laag: verbruiksrapporten per lead en batterij-upsell-integratie.",
+      },
+      {
+        q: "Kunnen jullie integreren met bestaande ERP of field-service tools?",
+        a: "Ja. Veelvoorkomende integraties: Exact, Afas, Twinfield, Moneybird en op maat gemaakte field-service-apps. Als de integratie niet bestaat bouwen we hem — een dunne synclaag die elk systeem authoritative houdt voor zijn eigen domein.",
+      },
+    ],
+    "real-estate": [
+      {
+        q: "Is dit voor kantoren of voor individuele makelaars?",
+        a: "Allebei, maar de sweet spot zijn teams van 3 tot 25 makelaars op één kantoor. Solo-makelaars halen meer uit standaardtools; landelijke ketens hebben enterprise-systemen nodig die wij niet bouwen.",
+      },
+      {
+        q: "Integreren jullie met Funda / NVM?",
+        a: "Ja. Philly leest Funda- en NVM-feeds in (en IDX/RESO voor de VS). Elke woning wordt een eersteklas object in het CRM met biedingen, bezichtigingen, open dagen en courtages aangekoppeld.",
+      },
+      {
+        q: "Hoe zit het met warme-relatiebeheer en referrals?",
+        a: "Sphere-of-influence is een kernmodule in Philly. Scoort elke klant en slapende lead op recency, referral-snelheid en dealkans, en toont een dagelijkse shortlist. Gebouwd voor makelaars die referrals willen zonder CRM-gevecht.",
+      },
+    ],
+    hospitality: [
+      {
+        q: "Bouwen jullie PMS-systemen?",
+        a: "Niet vanaf nul — wij integreren met Mews, Cloudbeds en Apaleo. Wij bouwen de revenue- en guest-intelligence-laag erbovenop: AI-pricing, upsell-orchestratie, direct-booking-funnels en rapportages die ook daadwerkelijk de GM bereiken.",
+      },
+      {
+        q: "En voor short-stay verhuurders?",
+        a: "Wij werken met STR-operators met 10+ units. Typische build: channel-manager-sync, geautomatiseerde gastberichten, dynamic pricing, schoonmaakrooster en een ops-dashboard dat het team ter plaatse ook daadwerkelijk opent.",
+      },
+      {
+        q: "Kunnen jullie F&B en events naast kamers?",
+        a: "Ja. Mixed-use operators (boutique hotel + restaurant + events) zijn een van onze meest waardevolle profielen. Wij brengen kamers, couverts en events samen in één revenue-view, zodat de GM alles in één scherm ziet.",
+      },
+    ],
+    adjacent: [
+      {
+        q: "Wat valt onder 'aangrenzend'?",
+        a: "Sectoren met operator-DNA vergelijkbaar met onze kernsectoren — bouw, professionele dienstverlening, specialty retail, filantropie en family offices. Als je bedrijf omzetgedreven, team-geleid en data-gefragmenteerd is, past het waarschijnlijk.",
+      },
+      {
+        q: "Passen non-profits hierbij?",
+        a: "Ja — met name operator-geleide stichtingen en middelgrote subsidiegevers. Philly heeft een filantropiemodule voor donorscoring, subsidie-cycli, impactmetrics en vrijwilligersplanning.",
+      },
+      {
+        q: "Kunnen jullie helpen met family-office-operaties?",
+        a: "Ja. Typische builds: dealflow-intake, LP-relatiebeheer, cross-entity-rapportage, beveiligde documentenkluis. Geen fiscaliteit of audit — daarvoor werken we samen met accountants.",
+      },
+    ],
+  },
+  de: {
+    energy: [
+      {
+        q: "Arbeiten Sie mit Solar- und Batterieinstallateuren?",
+        a: "Ja. Energie ist unsere größte Sparte — Solarteure, Batteriehändler, Wärmepumpen-Betriebe und Hybridinstallateure. Typischer Build: WhatsApp-first-Leadqualifizierung, Verbrauchsreports, Monteurdisposition und Inbetriebnahme.",
+      },
+      {
+        q: "Wie verändert der EEG-Umbruch bzw. Netzengpass alles?",
+        a: "Der Übergang vom Einspeise- zum Eigenverbrauchs-Modell verschiebt den Verkauf von Preis auf Amortisation — Ihr Funnel braucht eine Wirtschaftlichkeitsberatung, keine reine Angebotsstrecke. Genau diese Schicht bauen wir.",
+      },
+      {
+        q: "Können Sie an bestehende ERP- oder Field-Service-Tools andocken?",
+        a: "Ja. Übliche Integrationen: DATEV, SAP Business One, Lexware, sevDesk sowie proprietäre Field-Service-Apps. Existiert die Schnittstelle nicht, bauen wir sie — eine schlanke Sync-Schicht, die jedes Tool in seiner Domäne autoritativ lässt.",
+      },
+    ],
+    "real-estate": [
+      {
+        q: "Richtet sich das an Maklerbüros oder Einzelmakler?",
+        a: "Beides, optimal für Teams von 3 bis 25 Maklern an einem Standort. Einzelmakler fahren mit Standard-Tools besser; deutschlandweite Ketten brauchen Enterprise-Systeme, die wir bewusst nicht bauen.",
+      },
+      {
+        q: "Integrieren Sie IS24, immowelt oder MLS-Feeds?",
+        a: "Ja. Philly liest IS24-, immowelt- und vergleichbare Feeds ein (plus IDX/RESO für die USA). Jedes Objekt wird zum First-Class-Objekt im CRM, inkl. Angeboten, Besichtigungen, Tagen der offenen Tür und Provisionen.",
+      },
+      {
+        q: "Wie sieht es mit Empfehlungsmanagement (SOI) aus?",
+        a: "Sphere-of-Influence ist ein Kernmodul in Philly. Bewertet jeden Bestandskunden und schlafenden Lead nach Aktualität, Empfehlungsgeschwindigkeit und Abschlusswahrscheinlichkeit — und liefert täglich eine Shortlist.",
+      },
+    ],
+    hospitality: [
+      {
+        q: "Bauen Sie PMS-Systeme?",
+        a: "Nicht von Grund auf — wir integrieren Mews, Cloudbeds und Apaleo. Darauf bauen wir die Revenue- und Guest-Intelligence-Schicht: KI-Pricing, Upsell-Orchestrierung, Direktbucher-Funnels und Reportings, die wirklich beim GM ankommen.",
+      },
+      {
+        q: "Und Ferienwohnungen / Short-Term-Rentals?",
+        a: "Wir arbeiten mit STR-Betreibern ab 10 Einheiten. Typischer Build: Channel-Manager-Sync, automatisierte Gästekommunikation, Dynamic Pricing, Reinigungsplan und ein Ops-Dashboard, das das Team vor Ort tatsächlich öffnet.",
+      },
+      {
+        q: "Geht auch F&B + Events parallel zum Zimmergeschäft?",
+        a: "Ja. Mixed-Use-Betreiber (Boutique-Hotel + Restaurant + Event) sind eines unserer profitabelsten Profile. Wir führen Zimmer, Couverts und Events zu einer Revenue-Ansicht zusammen — ein Screen für den GM.",
+      },
+    ],
+    adjacent: [
+      {
+        q: "Was zählt als 'angrenzend'?",
+        a: "Branchen mit ähnlicher Operator-DNA — Bau, professionelle Dienstleistungen, Specialty Retail, Philanthropie, Family Offices. Wenn Ihr Geschäft umsatzgetrieben, teamgeführt und datentechnisch zersplittert ist, passt es wahrscheinlich.",
+      },
+      {
+        q: "Passt das zu gemeinnützigen Organisationen?",
+        a: "Ja — insbesondere operativ geführte Stiftungen und mittelgroße Förderer. Philly hat ein Philanthropie-Modul für Donor-Scoring, Fördercyklen, Wirkungskennzahlen und Freiwilligenplanung.",
+      },
+      {
+        q: "Können Sie bei Family-Office-Operationen helfen?",
+        a: "Ja. Typische Builds: Dealflow-Intake, LP-Beziehungsmanagement, Cross-Entity-Reporting, sicherer Dokumententresor. Keine Steuer- oder Wirtschaftsprüfung — dafür arbeiten wir mit Partnern.",
+      },
+    ],
+  },
+  es: {
+    energy: [
+      {
+        q: "¿Trabajan con instaladores solares y de baterías?",
+        a: "Sí. Energía es nuestro sector principal — instaladores solares, distribuidores de baterías, operadores de bombas de calor e híbridos. Build típico: cualificación de leads por WhatsApp, reporte de consumo, despacho de instaladores y puesta en marcha.",
+      },
+      {
+        q: "¿Cómo cambia la normativa española de autoconsumo el modelo?",
+        a: "El giro de compensación simplificada a baterías + excedentes desplaza la venta de precio a periodo de retorno. Su funnel necesita una capa de estudio de rendimiento, no solo un presupuesto. Construimos precisamente esa capa.",
+      },
+      {
+        q: "¿Pueden integrarse con ERP o herramientas de field-service existentes?",
+        a: "Sí. Integraciones habituales: Holded, Sage 50, A3, Anfix y apps de field-service a medida. Si la integración no existe, la construimos — una capa fina de sincronización que respeta cada herramienta en su dominio.",
+      },
+    ],
+    "real-estate": [
+      {
+        q: "¿Es para agencias o para agentes individuales?",
+        a: "Ambos, pero el sweet spot son equipos de 3 a 25 agentes en una sola agencia. Agentes en solitario se beneficien más de herramientas estándar; las franquicias nacionales necesitan sistemas enterprise que no construimos.",
+      },
+      {
+        q: "¿Integran con Idealista, Fotocasa o MLS?",
+        a: "Sí. Philly procesa feeds de Idealista, Fotocasa y MLS locales (además de IDX/RESO para EE. UU.). Cada inmueble es un objeto first-class del CRM con ofertas, visitas, jornadas abiertas y comisiones asociadas.",
+      },
+      {
+        q: "¿Qué pasa con la esfera de influencia y las referencias?",
+        a: "La esfera de influencia es un módulo central en Philly. Puntúa cada cliente y lead dormido por recencia, velocidad de referencia y propensión a cerrar, y produce una lista diaria de cuentas a contactar.",
+      },
+    ],
+    hospitality: [
+      {
+        q: "¿Construyen sistemas PMS?",
+        a: "No desde cero — integramos con Mews, Cloudbeds y Apaleo. Encima construimos la capa de revenue e inteligencia de huésped: pricing con IA, orquestación de upsell, funnels de reserva directa y reportes que llegan de verdad al GM.",
+      },
+      {
+        q: "¿Y para alquileres de corta estancia (short-term rentals)?",
+        a: "Trabajamos con operadores de STR con 10+ unidades. Build típico: sync de channel manager, mensajería automatizada, pricing dinámico, rotación de limpieza y un dashboard de operaciones que el equipo de campo realmente abre.",
+      },
+      {
+        q: "¿Pueden cubrir F&B y eventos junto a habitaciones?",
+        a: "Sí. Operadores de uso mixto (hotel boutique + restaurante + eventos privados) son uno de nuestros perfiles más valiosos. Unificamos habitaciones, cubiertos y eventos en una única vista de revenue para el GM.",
+      },
+    ],
+    adjacent: [
+      {
+        q: "¿Qué cuenta como 'adyacente'?",
+        a: "Sectores con ADN operador similar a nuestros tres principales — construcción, servicios profesionales, specialty retail, filantropía y family offices. Si tu negocio es revenue-driven, team-operated y data-fragmented, probablemente encaje.",
+      },
+      {
+        q: "¿Encaja con entidades sin ánimo de lucro?",
+        a: "Sí — en particular fundaciones operadas por sus patronos y financiadores medianos. Philly tiene un módulo de filantropía con scoring de donantes, ciclos de subvención, métricas de impacto y gestión de voluntarios.",
+      },
+      {
+        q: "¿Pueden ayudar con operaciones de family office?",
+        a: "Sí. Builds típicos: intake de dealflow, gestión de relaciones con LPs, reporte cross-entidad, bóveda de documentos segura. No impuestos ni auditoría — para eso colaboramos con despachos.",
+      },
+    ],
+  },
+};
+
+export function getSectorFaq(locale: Locale, slug: string): FaqItem[] {
+  const byLocale = SECTOR_FAQ_BY_LOCALE[locale]?.[slug];
+  if (byLocale && byLocale.length > 0) return byLocale;
+  // Fallback to English so a new sector without translations still ships.
+  return SECTOR_FAQ_BY_LOCALE.en[slug] ?? [];
+}

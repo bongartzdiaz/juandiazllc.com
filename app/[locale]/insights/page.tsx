@@ -4,6 +4,8 @@ import { InsightsList } from "@/components/InsightsList";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
+import { breadcrumbSchema } from "@/lib/breadcrumb";
+import { collectionPageSchema } from "@/lib/seo/schema";
 
 // /insights — long-form writing. Primary SEO surface after the home
 // page: each post is a standalone URL with its own Article schema,
@@ -34,8 +36,27 @@ export default async function InsightsIndex({ params }: { params: Promise<{ loca
   const t = (k: string) => translate(l, k);
   const posts = getAllInsights();
 
+  const crumbs = breadcrumbSchema([
+    { name: "Home", path: `/${l}` },
+    { name: "Insights", path: `/${l}/insights` },
+  ]);
+
+  const collection = collectionPageSchema({
+    locale: l,
+    path: "/insights",
+    name: "Insights — Juan Diaz, LLC",
+    description: "Field notes on building the systems that move real P&Ls.",
+    items: posts.map((p) => ({
+      name: p.title,
+      url: `/${l}/insights/${p.slug}`,
+      description: p.summary,
+    })),
+  });
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collection) }} />
       <header className="page-hero">
         <div className="eyebrow">{t("insights.page.eyebrow")}</div>
         <h1 dangerouslySetInnerHTML={{ __html: t("insights.page.title") }} />

@@ -7,7 +7,7 @@ import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { FaqSection } from "@/components/FaqSection";
 import { faqSchema, serviceSchema } from "@/lib/seo/schema";
-import { SECTOR_FAQ } from "@/lib/seo/faqs";
+import { getSectorFaq } from "@/lib/seo/faqs";
 
 export function generateStaticParams() {
   return LOCALES.flatMap((locale) => SECTORS.map((s) => ({ locale, slug: s.slug })));
@@ -40,7 +40,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
   if (!s) notFound();
 
   const others = SECTORS.filter((x) => x.slug !== s.slug);
-  const sectorFaq = SECTOR_FAQ[s.slug] ?? [];
+  const sectorFaq = getSectorFaq(l, s.slug);
 
   const crumbs = breadcrumbSchema([
     { name: "Home", path: `/${l}` },

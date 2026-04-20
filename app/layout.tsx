@@ -75,6 +75,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: "@juandiazllc",
+    creator: "@juanstefandz",
     title: "Juan Diaz, LLC — Revenue Engines for Operators",
     description:
       "I build the systems that make operators more money. Construction-trained. Operator-built.",
@@ -121,8 +123,20 @@ const organizationSchema = {
     name: "Juan Stefan Bongartz Diaz",
     alternateName: "Juan Diaz",
   },
+  // Areas served — Google uses this for local / regional ranking signals.
+  areaServed: [
+    { "@type": "Country", name: "Netherlands" },
+    { "@type": "Country", name: "Germany" },
+    { "@type": "Country", name: "Spain" },
+    { "@type": "Country", name: "United States" },
+  ],
+  knowsLanguage: ["en", "nl", "de", "es"],
   sameAs: [
     "https://github.com/bongartzdiaz",
+    "https://linkedin.com/in/juanstefan",
+    "https://linkedin.com/company/juandiazllc",
+    "https://twitter.com/juandiazllc",
+    "https://instagram.com/diazelcazador",
   ],
 };
 

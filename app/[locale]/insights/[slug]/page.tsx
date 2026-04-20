@@ -7,8 +7,7 @@ import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
-
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
+import { blogPostingSchema } from "@/lib/seo/article";
 
 export async function generateStaticParams() {
   return LOCALES.flatMap((locale) => getAllInsights().map((p) => ({ locale, slug: p.slug })));
@@ -34,7 +33,14 @@ export async function generateMetadata(
       tags: [post.tag],
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
-      images: [{ url: "/me/portrait.jpg", width: 1200, height: 1200, alt: "Juan Diaz" }],
+      images: [
+        {
+          url: `/${l}/insights/${post.slug}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
@@ -53,41 +59,22 @@ export default async function InsightPage(
   const post = getInsight(slug);
   if (!post) notFound();
 
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
+  const articleSchema = blogPostingSchema({
+    locale: l,
+    path: `/insights/${post.slug}`,
     headline: post.title,
     description: post.summary,
     datePublished: post.publishedAt,
-    dateModified: post.publishedAt,
-    author: {
-      "@type": "Person",
-      name: "Juan Stefan Diaz",
-      url: `${SITE}/about`,
-      image: `${SITE}/me/portrait.jpg`,
-      jobTitle: "Founder, Juan Diaz, LLC",
-      sameAs: [
-        "https://linkedin.com/in/juanstefan",
-        "https://instagram.com/diazelcazador",
-      ],
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Juan Diaz, LLC",
-      logo: { "@type": "ImageObject", url: `${SITE}/icon.svg` },
-    },
-    mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/insights/${post.slug}` },
-    keywords: post.tag,
-    inLanguage: "en",
-  };
+    tag: post.tag,
+  });
 
   const toc = tocFromBody(post.body);
   const related = getAllInsights().filter((p) => p.slug !== post.slug).slice(0, 2);
   const venture = getVentureForTag(post.tag);
   const crumbs = breadcrumbSchema([
-    { name: "Home", path: "/" },
-    { name: "Insights", path: "/insights" },
-    { name: post.title, path: `/insights/${post.slug}` },
+    { name: "Home", path: `/${l}` },
+    { name: "Insights", path: `/${l}/insights` },
+    { name: post.title, path: `/${l}/insights/${post.slug}` },
   ]);
 
   return (

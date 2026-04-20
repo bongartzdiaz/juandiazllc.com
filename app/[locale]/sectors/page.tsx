@@ -3,6 +3,8 @@ import Link from "next/link";
 import { SECTORS } from "@/lib/sectors";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
+import { breadcrumbSchema } from "@/lib/breadcrumb";
+import { collectionPageSchema } from "@/lib/seo/schema";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -20,8 +22,25 @@ export default async function SectorsIndex({ params }: { params: Promise<{ local
   const { locale } = await params;
   const l = assertLocale(locale);
   const t = (k: string) => translate(l, k);
+  const crumbs = breadcrumbSchema([
+    { name: "Home", path: `/${l}` },
+    { name: "Sectors", path: `/${l}/sectors` },
+  ]);
+  const collection = collectionPageSchema({
+    locale: l,
+    path: "/sectors",
+    name: "Sectors — Juan Diaz, LLC",
+    description: "Energy, real estate, hospitality, adjacent. The five-phase method applied.",
+    items: SECTORS.map((s) => ({
+      name: s.name,
+      url: `/${l}/sectors/${s.slug}`,
+      description: s.tagline,
+    })),
+  });
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collection) }} />
       <header className="page-hero">
         <div className="eyebrow">{t("sectors.page.eyebrow")}</div>
         <h1 dangerouslySetInnerHTML={{ __html: t("sectors.page.title") }} />
