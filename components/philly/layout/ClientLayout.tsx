@@ -4,6 +4,7 @@ import { useState, createContext, useContext, useCallback, useEffect } from 'rea
 import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Session } from '@supabase/supabase-js'
+import { SWRConfig } from 'swr'
 import { IndustryProvider } from '@/hooks/philly/useIndustry'
 import { ToastProvider } from '@/hooks/philly/useToast'
 import { ToastContainer } from '@/components/philly/ui/Toast'
@@ -18,12 +19,34 @@ export const useMobileMenu = () => useContext(MobileMenuCtx)
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
-    <IndustryProvider>
-      <ToastProvider>
-        <ProtectedShell>{children}</ProtectedShell>
-        <ToastContainer />
-      </ToastProvider>
-    </IndustryProvider>
+    // SWR sits at the root so every useApi() call under /philly shares
+    // one cache — navigation between pages reads from cache first,
+    // then revalidates in the background. dedupingInterval 2s collapses
+    // simultaneous identical requests (common when multiple widgets ask
+    // for the same entity in the same render).
+    <SWRConfig
+      value={{
+        revalidateOnFocus: true,
+        revalidateOnReconnect: true,
+        dedupingInterval: 2000,
+        errorRetryCount: 2,
+        errorRetryInterval: 3000,
+        keepPreviousData: true,
+        shouldRetryOnError: (err) => {
+          // Don't hammer the server on 4xx — those are client errors
+          // (auth, validation, not-found) that a retry won't fix.
+          const msg = err instanceof Error ? err.message : ''
+          return !/^4\d\d\b/.test(msg)
+        },
+      }}
+    >
+      <IndustryProvider>
+        <ToastProvider>
+          <ProtectedShell>{children}</ProtectedShell>
+          <ToastContainer />
+        </ToastProvider>
+      </IndustryProvider>
+    </SWRConfig>
   )
 }
 

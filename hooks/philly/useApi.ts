@@ -1,10 +1,23 @@
 'use client'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import useSWR, { type SWRConfiguration } from 'swr'
 import { api } from '@/lib/philly/api/client'
 import { useSyncRegistry } from './useSync'
 
 /* ---------------------------------------------------------------
-   useApi<T> — Generic data-fetching hook with auto-refresh
+   useApi<T> — SWR-backed data hook for the Philly dashboard.
+
+   Migrated from a hand-rolled polling hook to useSWR so that:
+     • navigation between pages is instant (cache-first, then
+       background-revalidate) instead of re-fetching from zero on
+       every mount
+     • multiple components asking for the same path share one
+       in-flight request (deduping)
+     • focus/online events trigger a free refresh for long-idle tabs
+
+   The return shape (data, loading, error, refetch, lastSync) is
+   preserved exactly so the ~56 dashboard pages calling this hook
+   keep working without edits.
    --------------------------------------------------------------- */
 
 export interface UseApiOptions<T> {
@@ -38,68 +51,61 @@ function readSyncInterval(): number {
   return 60000
 }
 
+// Thrown strings bubble back as `error.message` through SWR, which is
+// how our hook surfaces fetch/timeout errors to callers.
+const fetcher = async <T>(path: string): Promise<T> => {
+  const res = await api.get<T>(path)
+  if (res.error) throw new Error(res.error)
+  return res.data as T
+}
+
 export function useApi<T>(
   path: string,
   options: UseApiOptions<T> = {},
 ): UseApiReturn<T> {
-  const {
-    interval,
-    enabled = true,
-    initialData = null,
-  } = options
+  const { interval, enabled = true, initialData = null } = options
 
-  const [data, setData] = useState<T | null>(initialData as T | null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  // SWR key — `null` disables the fetch (used for conditional queries).
+  const key = enabled ? path : null
+
+  // Resolve refresh interval once per render. Reading localStorage on
+  // every render is cheap enough that memoizing isn't necessary, but
+  // we still gate on typeof window via readSyncInterval.
+  const refreshInterval = interval ?? readSyncInterval()
+
+  const config = useMemo<SWRConfiguration<T, Error>>(() => ({
+    refreshInterval,
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+    dedupingInterval: 2000,
+    errorRetryCount: 2,
+    errorRetryInterval: 3000,
+    keepPreviousData: true,
+    fallbackData: initialData ?? undefined,
+  }), [refreshInterval, initialData])
+
+  const { data, error, isLoading, mutate } = useSWR<T, Error>(key, fetcher, config)
+
+  // Surface lastSync as a Date whenever data updates (SWR gives us the
+  // `isValidating` pulse but not a timestamp — track it ourselves).
   const [lastSync, setLastSync] = useState<Date | null>(null)
-
-  const hasFetched = useRef(false)
-  const mountedRef = useRef(true)
-
-  const fetchData = useCallback(async () => {
-    if (!mountedRef.current) return
-
-    /* Only show loading spinner on the very first fetch */
-    if (!hasFetched.current) setLoading(true)
-
-    const res = await api.get<T>(path)
-
-    if (!mountedRef.current) return
-
-    if (res.error) {
-      setError(res.error)
-    } else {
-      setData(res.data)
-      setError(null)
-      setLastSync(new Date())
-    }
-
-    hasFetched.current = true
-    setLoading(false)
-  }, [path])
-
-  /* Register this hook's refetch for global sync */
-  useSyncRegistry(path, fetchData)
-
-  /* Initial fetch + polling */
   useEffect(() => {
-    mountedRef.current = true
+    if (data !== undefined) setLastSync(new Date())
+  }, [data])
 
-    if (!enabled) {
-      setLoading(false)
-      return
-    }
+  const refetch = useCallback(() => {
+    void mutate()
+  }, [mutate])
 
-    fetchData()
+  // Keep the existing global-sync bus working (useSync → refresh all
+  // dashboards at once). useSyncRegistry expects a refetch function.
+  useSyncRegistry(path, refetch)
 
-    const ms = interval ?? readSyncInterval()
-    const timer = setInterval(fetchData, ms)
-
-    return () => {
-      mountedRef.current = false
-      clearInterval(timer)
-    }
-  }, [fetchData, enabled, interval])
-
-  return { data, loading, error, refetch: fetchData, lastSync }
+  return {
+    data: (data ?? null) as T | null,
+    loading: isLoading && data === undefined,
+    error: error ? error.message : null,
+    refetch,
+    lastSync,
+  }
 }
