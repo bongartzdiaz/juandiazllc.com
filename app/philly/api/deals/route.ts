@@ -9,6 +9,7 @@ import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { validateBody } from '@/lib/philly/validation'
 import { createDealSchema } from '@/lib/philly/validation/schemas'
+import { SLO, withSpan } from '@/lib/philly/observability'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -79,36 +80,46 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) return parsed.response
   const body = parsed.data
 
-  const prisma = getAuthPrisma()
-
-  // Verify pipeline belongs to org
-  const pipeline = await prisma.pipeline.findFirst({
-    where: { id: body.pipelineId, organizationId: scope.organizationId },
-    select: { id: true },
-  })
-  if (!pipeline) return jsonError('Pipeline not found', 404)
-
-  const deal = await prisma.deal.create({
-    data: {
-      pipelineId: body.pipelineId,
-      stageId: body.stageId,
-      title: body.title,
-      contactId: body.contactId ?? null,
-      ownerId: scope.userId,
-      valueCents: body.valueCents,
-      probability: body.probability,
-      status: body.status,
-      dealType: body.dealType,
-      expectedClose: body.expectedClose ? new Date(body.expectedClose) : null,
-      notes: body.notes,
+  return withSpan(
+    {
+      name: 'deal.create',
+      slo: SLO.CREATE_DEAL,
+      op: 'db.create',
+      attrs: { organizationId: scope.organizationId, pipelineId: body.pipelineId },
     },
-    include: {
-      stage: { select: { id: true, name: true, color: true } },
-      contact: { select: { id: true, name: true } },
-    },
-  })
+    async () => {
+      const prisma = getAuthPrisma()
 
-  await logAudit({ scope, action: 'create', entity: 'deal', entityId: deal.id })
-  publishEntityCreated(scope.organizationId, 'deal', deal.id, scope.userId)
-  return NextResponse.json({ data: deal }, { status: 201 })
+      // Verify pipeline belongs to org
+      const pipeline = await prisma.pipeline.findFirst({
+        where: { id: body.pipelineId, organizationId: scope.organizationId },
+        select: { id: true },
+      })
+      if (!pipeline) return jsonError('Pipeline not found', 404)
+
+      const deal = await prisma.deal.create({
+        data: {
+          pipelineId: body.pipelineId,
+          stageId: body.stageId,
+          title: body.title,
+          contactId: body.contactId ?? null,
+          ownerId: scope.userId,
+          valueCents: body.valueCents,
+          probability: body.probability,
+          status: body.status,
+          dealType: body.dealType,
+          expectedClose: body.expectedClose ? new Date(body.expectedClose) : null,
+          notes: body.notes,
+        },
+        include: {
+          stage: { select: { id: true, name: true, color: true } },
+          contact: { select: { id: true, name: true } },
+        },
+      })
+
+      await logAudit({ scope, action: 'create', entity: 'deal', entityId: deal.id })
+      publishEntityCreated(scope.organizationId, 'deal', deal.id, scope.userId)
+      return NextResponse.json({ data: deal }, { status: 201 })
+    },
+  )
 }

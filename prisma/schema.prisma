@@ -211,6 +211,16 @@ model Contact {
   nextFollowUpAt  DateTime?
   assignedToId    String?
 
+  // AI-derived attributes (Attio-style) — filled by lib/philly/ai/contact-attributes
+  // on contact create and on-demand refresh via /api/contacts/[id]/ai-attributes.
+  // Deterministic scoring still lives in LeadScore; these are LLM-inferred.
+  aiIndustry             String?   // e.g. "Residential solar", "SaaS — devtools"
+  aiIcpFit               Int?      // 0-100 match against ideal customer profile
+  aiSummary              String?   @db.Text // one-paragraph narrative summary
+  aiAttributesStatus     String?   // "pending" | "ready" | "error" (null = never run)
+  aiAttributesUpdatedAt  DateTime?
+  aiAttributesError      String?   @db.Text // last error message if status=error
+
   organization    Organization     @relation(fields: [organizationId], references: [id])
   contactProjects ContactProject[]
   contactNotes    ContactNote[]

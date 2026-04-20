@@ -5,13 +5,13 @@ import { getVenture } from "@/lib/ventures";
 // tagline over the brand gradient so shares to LinkedIn / Twitter /
 // Slack present a consistent visual card per venture.
 
-export const alt = "Juan Diaz LLC — Venture";
+export const alt = "Juan Diaz, LLC — Venture";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OG({ params }: { params: { slug: string } }) {
   const v = getVenture(params.slug);
-  const name = v?.name ?? "Juan Diaz LLC";
+  const name = v?.name ?? "Juan Diaz, LLC";
   const tagline = v?.tagline ?? "Revenue engines for operators.";
   const sector = v?.sector ?? "Holding";
   const status = v?.status ?? "";
@@ -34,7 +34,7 @@ export default async function OG({ params }: { params: { slug: string } }) {
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", fontSize: 20, letterSpacing: "0.2em", textTransform: "uppercase", color: "#9ABAA9" }}>
-            Juan Diaz LLC · Ventures
+            Juan Diaz, LLC · Ventures
           </div>
           <div style={{ display: "flex", gap: 10 }}>
             <div

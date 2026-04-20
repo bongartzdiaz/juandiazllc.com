@@ -134,7 +134,7 @@ field report.
 
 Low effort, low per-unit value, but compounds. Owner-founder profiles:
 
-- Crunchbase (Juan Diaz LLC + founder profile)
+- Crunchbase (Juan Diaz, LLC + founder profile)
 - LinkedIn company page (link from every venture back to the LLC)
 - GitHub org page → pin public repos, link to juandiazllc.com
 - Product Hunt — launch Voltafy and Help Mij Besparen separately,
@@ -162,7 +162,7 @@ as the top of funnel, the site as the conversion surface.
 ### Profile optimization
 
 - **Headline:** "Builder of revenue engines for operators ·
-  Juan Diaz LLC · Voltafy · Philly CRM" — keyword-stuffed but
+  Juan Diaz, LLC · Voltafy · Philly CRM" — keyword-stuffed but
   honest. LinkedIn search is keyword-literal.
 - **About section:** open with the one-sentence positioning,
   then 3 bullets of what you ship, then 1 line of where you've
@@ -170,7 +170,7 @@ as the top of funnel, the site as the conversion surface.
   (LinkedIn only makes the first URL clickable in bio).
 - **Featured section:** pin 3 things — `/story`, the latest
   flagship insight, and the blueprint-call booking link.
-- **Experience:** Juan Diaz LLC at the top, then each venture
+- **Experience:** Juan Diaz, LLC at the top, then each venture
   as a sub-role, then construction management. Recruiter-bait,
   but operators read these too.
 - **Photo:** use `/me/portrait.jpg` (same file driving the
@@ -211,7 +211,7 @@ retargeting, not lead gen.
 
 ### Profile: @diazelcazador
 
-- **Bio:** "El cazador · Juan Diaz LLC · revenue engines for
+- **Bio:** "El cazador · Juan Diaz, LLC · revenue engines for
   operators · Amsterdam ↔ Philly" with a link-in-bio to
   juandiazllc.com/now (so the visible page is always current).
 - **Highlights:** create 4 story highlights — "Ventures", "On site",

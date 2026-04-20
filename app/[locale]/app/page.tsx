@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const l = assertLocale(locale);
   return {
     title: "Operator hub",
-    description: "Juan Diaz LLC internal hub.",
+    description: "Juan Diaz, LLC internal hub.",
     alternates: buildAlternates(l, "/app"),
     robots: { index: false, follow: false },
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },

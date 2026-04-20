@@ -17,7 +17,17 @@ export async function GET(req: NextRequest) {
   const entity = url.searchParams.get('entity') ?? undefined
   const action = url.searchParams.get('action') ?? undefined
   const userId = url.searchParams.get('userId') ?? undefined
+  const rangeParam = url.searchParams.get('range') ?? undefined
   const { page, limit, skip } = parsePagination(req)
+
+  const RANGE_MS: Record<string, number> = {
+    '1d': 24 * 60 * 60 * 1000,
+    '7d': 7 * 24 * 60 * 60 * 1000,
+    '30d': 30 * 24 * 60 * 60 * 1000,
+  }
+  const afterDate = rangeParam && RANGE_MS[rangeParam]
+    ? new Date(Date.now() - RANGE_MS[rangeParam])
+    : undefined
 
   const prisma = getAuthPrisma()
 
@@ -26,6 +36,7 @@ export async function GET(req: NextRequest) {
     ...(entity ? { entity } : {}),
     ...(action ? { action } : {}),
     ...(userId ? { userId } : {}),
+    ...(afterDate ? { createdAt: { gte: afterDate } } : {}),
   }
 
   const [logs, total] = await Promise.all([

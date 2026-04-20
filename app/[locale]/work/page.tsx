@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { VENTURES } from "@/lib/ventures";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+import { translate } from "@/lib/i18n/dict";
+import { breadcrumbSchema } from "@/lib/breadcrumb";
+import { collectionPageSchema } from "@/lib/seo/schema";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -9,22 +12,41 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: "Work — revenue engines, live in the field",
     description:
-      "Live products under Juan Diaz LLC — each one the five-phase playbook applied to a real sector with real operators.",
+      "Live products under Juan Diaz, LLC — each one the five-phase playbook applied to a real sector with real operators.",
     alternates: buildAlternates(l, "/work"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
 }
 
-export default function WorkPage() {
+export default async function WorkPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const l = assertLocale(locale);
+  const t = (k: string) => translate(l, k);
+
+  const crumbs = breadcrumbSchema([
+    { name: "Home", path: `/${l}` },
+    { name: "Work", path: `/${l}/work` },
+  ]);
+  const collection = collectionPageSchema({
+    locale: l,
+    path: "/work",
+    name: "Work — Juan Diaz, LLC",
+    description: "Live products under Juan Diaz, LLC — the five-phase playbook applied to real sectors.",
+    items: VENTURES.map((v) => ({
+      name: v.name,
+      url: `/${l}/work/${v.slug}`,
+      description: v.tagline,
+    })),
+  });
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collection) }} />
       <header className="page-hero">
-        <div className="eyebrow">◉ The work</div>
-        <h1>The playbook, <em>in motion.</em></h1>
-        <p>
-          Each of these is the five-phase method applied to a real sector. Click through for the
-          full build notes, or visit the live product directly.
-        </p>
+        <div className="eyebrow">{t("work.page.eyebrow")}</div>
+        <h1 dangerouslySetInnerHTML={{ __html: t("work.page.title") }} />
+        <p>{t("work.page.lede")}</p>
       </header>
 
       <section style={{ padding: "80px 40px 160px", maxWidth: "var(--max)", margin: "0 auto" }}>
@@ -65,7 +87,7 @@ export default function WorkPage() {
                       background: v.status === "live" ? "rgba(94,255,177,.06)" : "rgba(255,181,71,.06)",
                     }}
                   >
-                    {v.status === "live" ? "Live" : v.status === "shipping" ? "Shipping" : "Reserved"}
+                    {v.status === "live" ? t("work.status.live") : v.status === "shipping" ? t("work.status.shipping") : t("work.status.reserved")}
                   </div>
                 </div>
 
@@ -108,7 +130,7 @@ export default function WorkPage() {
                       transition: "all .3s var(--ease)",
                     }}
                   >
-                    Details →
+                    {t("work.page.cta.details")}
                   </Link>
                   {v.external.startsWith("http") && (
                     <a
@@ -127,7 +149,7 @@ export default function WorkPage() {
                         transition: "all .3s var(--ease)",
                       }}
                     >
-                      Visit ↗
+                      {t("work.page.cta.visit")}
                     </a>
                   )}
                 </div>

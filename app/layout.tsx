@@ -4,9 +4,9 @@ import "./globals.css";
 import { Overlays } from "@/components/Overlays";
 import { Preloader } from "@/components/Preloader";
 import { GlobalEffects } from "@/components/GlobalEffects";
-import { CookieConsent } from "@/components/CookieConsent";
 import { BackToTop } from "@/components/BackToTop";
 import { Analytics } from "@/components/Analytics";
+import { WebVitalsReporter } from "@/components/WebVitalsReporter";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 import { LOCALES, DEFAULT_LOCALE } from "@/lib/i18n/dict";
 
@@ -19,11 +19,11 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Juan Diaz LLC — Revenue Engines for Operators",
-    template: "%s · Juan Diaz LLC",
+    default: "Juan Diaz, LLC — Revenue Engines for Operators",
+    template: "%s · Juan Diaz, LLC",
   },
   description:
-    "Juan Diaz LLC builds the systems that make operators more money. Revenue engines, CRM, automations and growth infrastructure for energy, real estate, hospitality and adjacent industries.",
+    "Juan Diaz, LLC builds the systems that make operators more money. Revenue engines, CRM, automations and growth infrastructure for energy, real estate, hospitality and adjacent industries.",
   keywords: [
     "juan diaz",
     "juandiazllc",
@@ -36,10 +36,10 @@ export const metadata: Metadata = {
     "construction operator",
     "b2b systems",
   ],
-  authors: [{ name: "Juan Diaz", url: SITE_URL }],
-  creator: "Juan Diaz LLC",
-  publisher: "Juan Diaz LLC",
-  applicationName: "Juan Diaz LLC",
+  authors: [{ name: "Juan Stefan Bongartz Diaz", url: SITE_URL }],
+  creator: "Juan Diaz, LLC",
+  publisher: "Juan Diaz, LLC",
+  applicationName: "Juan Diaz, LLC",
   category: "business",
   alternates: {
     canonical: "/",
@@ -58,8 +58,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: SITE_URL,
-    siteName: "Juan Diaz LLC",
-    title: "Juan Diaz LLC — Revenue Engines for Operators",
+    siteName: "Juan Diaz, LLC",
+    title: "Juan Diaz, LLC — Revenue Engines for Operators",
     description:
       "I build the systems that make operators more money. Construction-trained. Operator-built.",
     locale: "en_US",
@@ -69,13 +69,15 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Juan Diaz LLC",
+        alt: "Juan Diaz, LLC",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Juan Diaz LLC — Revenue Engines for Operators",
+    site: "@juandiazllc",
+    creator: "@juanstefandz",
+    title: "Juan Diaz, LLC — Revenue Engines for Operators",
     description:
       "I build the systems that make operators more money. Construction-trained. Operator-built.",
     images: ["/opengraph-image"],
@@ -88,6 +90,7 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
     shortcut: "/icon.svg",
   },
+  manifest: "/manifest.json",
 };
 
 // Lock the viewport to device-width + allow user scaling up to 5x
@@ -110,24 +113,37 @@ export const viewport: Viewport = {
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Juan Diaz LLC",
+  name: "Juan Diaz, LLC",
   url: SITE_URL,
   logo: `${SITE_URL}/icon.svg`,
   description:
     "Holding company building revenue engines for operators in energy, real estate, hospitality and adjacent industries.",
   founder: {
     "@type": "Person",
-    name: "Juan Diaz",
+    name: "Juan Stefan Bongartz Diaz",
+    alternateName: "Juan Diaz",
   },
+  // Areas served — Google uses this for local / regional ranking signals.
+  areaServed: [
+    { "@type": "Country", name: "Netherlands" },
+    { "@type": "Country", name: "Germany" },
+    { "@type": "Country", name: "Spain" },
+    { "@type": "Country", name: "United States" },
+  ],
+  knowsLanguage: ["en", "nl", "de", "es"],
   sameAs: [
     "https://github.com/bongartzdiaz",
+    "https://linkedin.com/in/juanstefan",
+    "https://linkedin.com/company/juandiazllc",
+    "https://twitter.com/juandiazllc",
+    "https://instagram.com/diazelcazador",
   ],
 };
 
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "Juan Diaz LLC",
+  name: "Juan Diaz, LLC",
   url: SITE_URL,
   potentialAction: {
     "@type": "SearchAction",
@@ -145,8 +161,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         {/* Feed autodiscovery — RSS for readers, JSON Feed for modern clients */}
-        <link rel="alternate" type="application/rss+xml" title="Juan Diaz LLC — Insights" href="/rss.xml" />
-        <link rel="alternate" type="application/feed+json" title="Juan Diaz LLC — Insights" href="/feed.json" />
+        <link rel="alternate" type="application/rss+xml" title="Juan Diaz, LLC — Insights" href="/rss.xml" />
+        <link rel="alternate" type="application/feed+json" title="Juan Diaz, LLC — Insights" href="/feed.json" />
+        {/* Credits file per humanstxt.org — a weak signal but a
+            cheap one, and it gives curious readers a way in. */}
+        <link rel="author" href="/humans.txt" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         {/* Single-family load reduces network + keeps typography consistent.
             Instrument Serif dropped — Inter italic now serves editorial emphasis. */}
@@ -170,9 +189,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Preloader />
           {children}
           <GlobalEffects />
-          <CookieConsent />
           <BackToTop />
           <Analytics />
+          <WebVitalsReporter />
         </LocaleProvider>
       </body>
     </html>

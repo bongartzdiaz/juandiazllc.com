@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { SECTORS, getSector } from "@/lib/sectors";
-import { LOCALES } from "@/lib/i18n/dict";
+import { breadcrumbSchema } from "@/lib/breadcrumb";
+import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+import { FaqSection } from "@/components/FaqSection";
+import { Countdown2027 } from "@/components/Countdown2027";
+import { faqSchema, serviceSchema } from "@/lib/seo/schema";
+import { getSectorFaq } from "@/lib/seo/faqs";
 
 export function generateStaticParams() {
   return LOCALES.flatMap((locale) => SECTORS.map((s) => ({ locale, slug: s.slug })));
@@ -30,14 +35,33 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function SectorPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+  const l = assertLocale(locale);
   const s = getSector(slug);
   if (!s) notFound();
 
   const others = SECTORS.filter((x) => x.slug !== s.slug);
+  const sectorFaq = getSectorFaq(l, s.slug);
+
+  const crumbs = breadcrumbSchema([
+    { name: "Home", path: `/${l}` },
+    { name: "Sectors", path: `/${l}/sectors` },
+    { name: s.name, path: `/${l}/sectors/${s.slug}` },
+  ]);
+
+  const service = serviceSchema({
+    name: `${s.name} — ${s.tagline}`,
+    description: s.summary,
+    slug: s.slug,
+  });
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(service) }} />
+      {sectorFaq.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(sectorFaq)) }} />
+      )}
       <header className="page-hero" style={{ position: "relative", overflow: "hidden" }}>
         <div aria-hidden style={{ position: "absolute", inset: 0, background: s.gradient, pointerEvents: "none" }} />
         <div style={{ position: "relative" }}>
@@ -71,6 +95,66 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
       </header>
 
       <article className="long" style={{ paddingTop: 60 }}>
+        {(() => {
+          const anchorHref =
+            s.slug === "energy" ? "/tools/energy-roi" : "/contact";
+          const eyebrow = translate(l, `fomo.anchor.${s.slug}.eyebrow`);
+          const title = translate(l, `fomo.anchor.${s.slug}.title`);
+          const body = translate(l, `fomo.anchor.${s.slug}.body`);
+          const cta = translate(l, `fomo.anchor.${s.slug}.cta`);
+          if (!eyebrow || eyebrow.startsWith("fomo.anchor.")) return null;
+          return (
+            <aside className="anchor-callout" aria-labelledby="anchor-title">
+              <div className="anchor-callout-body">
+                <span className="anchor-callout-eyebrow">{eyebrow}</span>
+                <h3
+                  id="anchor-title"
+                  className="anchor-callout-title"
+                  dangerouslySetInnerHTML={{ __html: title }}
+                />
+                <p className="anchor-callout-text">{body}</p>
+              </div>
+              <Link href={anchorHref} className="anchor-callout-cta">
+                {cta}
+              </Link>
+            </aside>
+          );
+        })()}
+        {s.slug === "energy" && (
+          <div style={{ margin: "0 0 48px" }}>
+            <Countdown2027 />
+          </div>
+        )}
+        {s.slug === "energy" && (
+          <Link
+            href="/tools/energy-roi"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 16,
+              padding: "18px 22px",
+              marginBottom: 48,
+              border: "1px solid var(--accent)",
+              borderRadius: 14,
+              background: "rgba(46,196,137,.08)",
+              textDecoration: "none",
+              flexWrap: "wrap",
+            }}
+          >
+            <div>
+              <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".14em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 6 }}>
+                ◉ {translate(l, "roi.eyebrow").replace(/^◉\s*/, "")}
+              </div>
+              <div style={{ fontSize: 17, fontWeight: 500 }}>
+                {translate(l, "roi.title").replace(/<[^>]+>/g, "")}
+              </div>
+            </div>
+            <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--accent)", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+              Run the math →
+            </span>
+          </Link>
+        )}
         <h2>Where <em>revenue leaks</em> in this sector.</h2>
         <p style={{ color: "var(--muted)" }}>The five common failure modes I see when I survey a new operator in this space.</p>
 
@@ -211,6 +295,9 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
           ))}
         </div>
       </section>
+      {sectorFaq.length > 0 && (
+        <FaqSection title={`${s.name} — common questions`} items={sectorFaq} />
+      )}
     </>
   );
 }

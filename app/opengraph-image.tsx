@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Juan Diaz LLC — I build the systems that make operators more money.";
+export const alt = "Juan Diaz, LLC — I build the systems that make operators more money.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -37,7 +37,7 @@ export default async function OG() {
               color: "#9ABAA9",
             }}
           >
-            Juan Diaz LLC
+            Juan Diaz, LLC
           </div>
         </div>
 

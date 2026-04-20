@@ -6,25 +6,27 @@ const SCR_CHARS = "!<>-_\\/[]{}—=+*^?#█▓▒░01";
 
 export function GlobalEffects() {
   useEffect(() => {
-    /* Preloader + failsafe */
+    /* Preloader — dismiss as soon as the page is painted. The fake
+       counter that used to ramp 0→100 over ~1s was gating the hero
+       behind a full-viewport dark overlay for up to 3.5s on slow JS
+       paths ("blank black screen until you scroll" bug). Now: flip
+       both classes on window.load (or immediately if already complete),
+       with a 900ms failsafe for anything that stalls. */
     const pc = document.getElementById("preloadCount");
     const pre = document.getElementById("preload");
-    let n = 0;
     const finish = () => {
+      if (pc) pc.textContent = "100";
       if (pre && !pre.classList.contains("done")) {
         pre.classList.add("done");
         document.body.classList.add("loaded");
       }
     };
-    const pl = window.setInterval(() => {
-      n = Math.min(100, n + Math.ceil(Math.random() * 6));
-      if (pc) pc.textContent = String(n).padStart(3, "0");
-      if (n >= 100) {
-        window.clearInterval(pl);
-        window.setTimeout(finish, 300);
-      }
-    }, 35);
-    const failsafe = window.setTimeout(finish, 2600);
+    if (document.readyState === "complete") {
+      finish();
+    } else {
+      window.addEventListener("load", finish, { once: true });
+    }
+    const failsafe = window.setTimeout(finish, 900);
 
     /* Cursor */
     const cur = document.getElementById("cursor");
@@ -190,7 +192,7 @@ export function GlobalEffects() {
 
     return () => {
       window.clearTimeout(failsafe);
-      window.clearInterval(pl);
+      window.removeEventListener("load", finish);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("scroll", onScrollCta);
       cancelAnimationFrame(raf);

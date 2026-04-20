@@ -1,10 +1,8 @@
+"use client";
+
 // Anonymized operator outcomes — verifiable, sector-level, no names.
 // Sits where traditional "logo wall + testimonials" would go, but
 // optimized for operators who care about numbers over logos.
-//
-// Each card is a specific metric from a specific engagement. Anonymous
-// by default (sector + region) until the relevant client signs off on
-// being named — then swap "Dutch solar installer" for the actual name.
 //
 // Rules:
 // - Never invent a number. Every metric here must be traceable to a
@@ -12,69 +10,46 @@
 //   than fudge it.
 // - Keep the strip to 3 or 4 cards. More looks like noise.
 // - Context line is one sentence max — the what-changed, not the how.
+//
+// Copy (context/sector/window) flows through translate() so NL/DE/ES
+// readers see localized strings, not the English fallback.
+
+import { useT } from "@/lib/i18n/useT";
 
 type Result = {
+  id: string;
   metric: string;
   unit?: string;
-  context: string;
-  sector: string;
-  window: string;
 };
 
 const RESULTS: Result[] = [
-  {
-    metric: "+38",
-    unit: "%",
-    context: "Lead-to-call conversion after replacing a 4-tool stack with one CRM + WhatsApp flow.",
-    sector: "Dutch solar installer",
-    window: "90 days",
-  },
-  {
-    metric: "3.2x",
-    context: "Pipeline velocity once field team + office shared the same deal state in real time.",
-    sector: "NL/BE energy broker",
-    window: "6 months",
-  },
-  {
-    metric: "−61",
-    unit: "%",
-    context: "Time-to-quote after automating data handoff from intake to survey to proposal.",
-    sector: "Residential battery installer",
-    window: "Q1 rollout",
-  },
-  {
-    metric: "€0",
-    context: "Additional SaaS spend — the savings from retired tools funded the rebuild.",
-    sector: "Multi-location operator",
-    window: "Year one",
-  },
+  { id: "r1", metric: "+38", unit: "%" },
+  { id: "r2", metric: "3.2x" },
+  { id: "r3", metric: "−61", unit: "%" },
+  { id: "r4", metric: "€0" },
 ];
 
 export function ResultsStrip() {
+  const t = useT();
   return (
     <section id="results" className="section results-strip" aria-labelledby="results-head">
       <div className="section-head">
-        <div className="eyebrow">◉ What changed in production</div>
-        <h2 id="results-head">
-          Numbers from actual <em>operators</em>.
-        </h2>
-        <p className="section-sub">
-          Anonymized by default. Every metric is from a live engagement —
-          if we can&apos;t attribute it, it doesn&apos;t go here.
-        </p>
+        <div className="eyebrow">{t("results.eyebrow")}</div>
+        <h2 id="results-head" dangerouslySetInnerHTML={{ __html: t("results.title") }} />
+        <p className="section-sub">{t("results.sub")}</p>
       </div>
 
       <div className="rs-grid">
-        {RESULTS.map((r, i) => (
-          <article key={i} className="rs-card" data-reveal>
+        {RESULTS.map((r) => (
+          <article key={r.id} className="rs-card" data-reveal>
             <div className="rs-metric">
               <span className="rs-num">{r.metric}</span>
               {r.unit && <span className="rs-unit">{r.unit}</span>}
             </div>
-            <p className="rs-context">{r.context}</p>
+            <p className="rs-context">{t(`results.${r.id}.ctx`)}</p>
             <footer className="rs-foot">
-              <span className="rs-sector">{r.sector}</span>
-              <span className="rs-window">{r.window}</span>
+              <span className="rs-sector">{t(`results.${r.id}.sector`)}</span>
+              <span className="rs-window">{t(`results.${r.id}.window`)}</span>
             </footer>
           </article>
         ))}

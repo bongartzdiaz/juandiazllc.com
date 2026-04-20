@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: "Now — what I'm focused on this quarter",
     description:
-      "A monthly-ish snapshot of what Juan Diaz LLC is actually building, shipping, and thinking about. Last updated inline.",
+      "A monthly-ish snapshot of what Juan Diaz, LLC is actually building, shipping, and thinking about. Last updated inline.",
     alternates: buildAlternates(l, "/now"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };

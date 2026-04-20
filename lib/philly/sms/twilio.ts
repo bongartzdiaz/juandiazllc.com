@@ -4,6 +4,8 @@
    - For WhatsApp, prefix `whatsapp:` on from/to numbers
    --------------------------------------------------------------- */
 
+import { logger } from '@/lib/philly/logger'
+
 export interface TwilioSendInput {
   to: string
   from?: string
@@ -38,7 +40,7 @@ export async function sendTwilioMessage(input: TwilioSendInput): Promise<TwilioS
 
   if (!creds.sid || !creds.token) {
     // Dev fallback — pretend it was sent
-    console.log(`[sms:null] ${input.to} [${channel}]: ${input.body}`)
+    logger.debug('sms:null dispatch', { to: input.to, channel, body: input.body })
     return { ok: true, sid: `null-${Date.now()}` }
   }
 

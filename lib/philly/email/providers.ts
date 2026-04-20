@@ -5,6 +5,8 @@
    - All providers return a normalized SendResult
    --------------------------------------------------------------- */
 
+import { logger } from '@/lib/philly/logger'
+
 export interface SendPayload {
   from: string
   fromName?: string
@@ -30,9 +32,9 @@ export interface EmailProvider {
     Pretends the email was sent so the UI flow works end-to-end in dev. */
 class NullProvider implements EmailProvider {
   async send(payload: SendPayload): Promise<SendResult> {
-    console.log(
-      `[email:null] ${payload.from} → ${payload.to.join(', ')} :: ${payload.subject}`,
-    )
+    logger.debug('email:null dispatch', {
+      from: payload.from, to: payload.to, subject: payload.subject,
+    })
     return { ok: true, providerMessageId: `null-${Date.now()}` }
   }
 }

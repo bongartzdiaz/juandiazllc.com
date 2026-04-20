@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -12,6 +13,9 @@ export const runtime = 'nodejs'
 export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`contacts:bulk:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   let body: { action?: string; ids?: string[]; data?: Record<string, unknown> }
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }

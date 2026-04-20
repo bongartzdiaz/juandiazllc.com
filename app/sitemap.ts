@@ -34,8 +34,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/sectors", priority: 0.8, change: "monthly" },
     { path: "/signals", priority: 0.8, change: "weekly" },
     { path: "/insights", priority: 0.9, change: "weekly" },
+    { path: "/tools/energy-roi", priority: 0.75, change: "monthly" },
     { path: "/contact", priority: 0.7, change: "monthly" },
     { path: "/privacy", priority: 0.3, change: "yearly" },
+    { path: "/impressum", priority: 0.3, change: "yearly" },
   ];
 
   const ventureEntries: Entry[] = VENTURES.map((v) => ({

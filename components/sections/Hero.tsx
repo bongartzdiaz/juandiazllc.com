@@ -20,6 +20,7 @@ export function Hero() {
           <div className="mw-dust" />
           <div className="mw-nebula" />
         </div>
+        <div className="hero-starfield-deep" />
         <div className="hero-starfield" />
         <div className="hero-globe-container">
           <Globe />
@@ -39,7 +40,7 @@ export function Hero() {
         <div className="hero-foot">
           <div style={{ maxWidth: 600 }}>
             <p className="hero-desc">
-              <b>Juan Diaz LLC</b> {t("hero.desc")}
+              <b>Juan Diaz, LLC</b> {t("hero.desc")}
             </p>
             <div className="hero-ctas">
               <Link className="btn primary btn-mag" href="/contact">

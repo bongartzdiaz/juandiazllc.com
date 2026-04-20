@@ -3,8 +3,14 @@ import { NextResponse, type NextRequest } from "next/server";
 
 type CookieToSet = { name: string; value: string; options?: CookieOptions };
 
-export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
+export async function updateSession(request: NextRequest, requestHeaders?: Headers) {
+  // When proxy.ts passes its own `requestHeaders` (nonce + request-id +
+  // CSP), forward them here so `headers()` calls inside server
+  // components see them. Otherwise fall through to request.headers.
+  const initRequest = requestHeaders
+    ? { headers: requestHeaders }
+    : { headers: request.headers };
+  let response = NextResponse.next({ request: initRequest });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,7 +24,7 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
-          response = NextResponse.next({ request });
+          response = NextResponse.next({ request: initRequest });
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options)
           );

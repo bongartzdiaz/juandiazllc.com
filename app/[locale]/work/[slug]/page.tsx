@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { VENTURES, getVenture } from "@/lib/ventures";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
-import { LOCALES } from "@/lib/i18n/dict";
+import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
 export function generateStaticParams() {
@@ -31,7 +31,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function VenturePage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+  const l = assertLocale(locale);
+  const t = (k: string) => translate(l, k);
   const v = getVenture(slug);
   if (!v) notFound();
 
@@ -64,7 +66,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
         />
         <div style={{ position: "relative" }}>
           <div className="eyebrow">
-            ◉ {v.sector} · <span style={{ color: "var(--muted-soft)" }}>{v.status === "live" ? "Live" : v.status === "shipping" ? "Shipping" : "Reserved"}</span>
+            ◉ {v.sector} · <span style={{ color: "var(--muted-soft)" }}>{v.status === "live" ? t("work.status.live") : v.status === "shipping" ? t("work.status.shipping") : t("work.status.reserved")}</span>
           </div>
           <h1>
             {v.name} — <em>{v.tagline.replace(/\.$/, "")}</em>
@@ -78,10 +80,10 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
               target={v.external.startsWith("http") ? "_blank" : undefined}
               rel={v.external.startsWith("http") ? "noopener noreferrer" : undefined}
             >
-              Visit {v.domain} <span className="arr">↗</span>
+              {t("work.d.visit")} {v.domain} <span className="arr">↗</span>
             </a>
             <Link className="btn ghost" href="/contact">
-              Talk about a build like this <span className="arr">→</span>
+              {t("work.d.talk")} <span className="arr">→</span>
             </Link>
           </div>
         </div>
@@ -99,12 +101,12 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
       </section>
 
       <article className="long" style={{ paddingTop: 40 }}>
-        <h2>The <em>story.</em></h2>
+        <h2 dangerouslySetInnerHTML={{ __html: t("work.d.story") }} />
         <p>{v.story}</p>
 
-        <h2>The <em>five phases</em>, applied.</h2>
+        <h2 dangerouslySetInnerHTML={{ __html: t("work.d.fivephases") }} />
         <p style={{ color: "var(--muted)" }}>
-          Every build under Juan Diaz LLC runs the same playbook. Here&apos;s how it ran for {v.name}.
+          {t("work.d.everybuild").replace("{name}", v.name)}
         </p>
 
         <div
@@ -157,7 +159,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
           ))}
         </div>
 
-        <h2><em>Built on.</em></h2>
+        <h2 dangerouslySetInnerHTML={{ __html: t("work.d.builton") }} />
         <div
           style={{
             display: "flex",
@@ -197,13 +199,14 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
           }}
         >
           <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 12, letterSpacing: ".14em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 14 }}>
-            ◉ Want something like this for your operation?
+            {t("work.d.want.eyebrow")}
           </div>
-          <div style={{ fontFamily: "'Inter'", fontWeight: 300, fontSize: "clamp(24px, 3vw, 36px)", letterSpacing: "-.02em", lineHeight: 1.2, marginBottom: 24, maxWidth: "30ch" }}>
-            Same <em>five phases</em>. Different sector. Let&apos;s draw the blueprint.
-          </div>
+          <div
+            style={{ fontFamily: "'Inter'", fontWeight: 300, fontSize: "clamp(24px, 3vw, 36px)", letterSpacing: "-.02em", lineHeight: 1.2, marginBottom: 24, maxWidth: "30ch" }}
+            dangerouslySetInnerHTML={{ __html: t("work.d.want.title") }}
+          />
           <Link className="btn primary btn-mag" href="/contact">
-            Book a blueprint call <span className="arr">→</span>
+            {t("work.d.want.cta")} <span className="arr">→</span>
           </Link>
         </div>
       </article>
@@ -211,10 +214,10 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
       <section style={{ padding: "80px 40px 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div className="sec-head" data-reveal style={{ marginBottom: 40 }}>
           <div>
-            <div className="label">◉ Related</div>
-            <h2>Other <em>builds.</em></h2>
+            <div className="label">{t("work.d.related.label")}</div>
+            <h2 dangerouslySetInnerHTML={{ __html: t("work.d.related.title") }} />
           </div>
-          <p>Different sectors, same playbook. Each of these is the five-phase method applied to another real P&amp;L.</p>
+          <p>{t("work.d.related.sub")}</p>
         </div>
         <div
           style={{
@@ -237,7 +240,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
                 <p>{o.tagline}</p>
               </div>
               <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--muted-soft)", textTransform: "uppercase", marginTop: 20 }}>
-                See the build →
+                {t("work.d.seebuild")}
               </div>
             </Link>
           ))}

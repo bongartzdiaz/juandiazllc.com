@@ -3,6 +3,26 @@
 Next.js 16 + Prisma 7 + Supabase marketing site + Philly CRM app.
 Tests run via Vitest: `npm test`. Typecheck: `npm run typecheck`. Build: `npm run build`.
 
+## SLOs (p95 latency budgets)
+Defined in `lib/philly/observability.ts` (`SLO` const). Wrap critical
+paths in `withSpan({ name, slo })` to tag Sentry spans with
+`slo.bucket` (`ok` / `slow` / `error`) and `slo.over_budget`.
+
+- `SLO.LOGIN` — 1,200 ms (auth.login, `app/actions/auth.ts`)
+- `SLO.CREATE_DEAL` — 800 ms (deal.create, `POST /api/deals`)
+- `SLO.AI_ACTION` — 15,000 ms (ai.score, `POST /api/ai/score`)
+
+`withSpan` no-ops transparently when `SENTRY_DSN` is unset, so tests
+and dev don't need the SDK. Uses `Sentry.startSpan` from @sentry/node
+v9 (which ships OTel-compatible tracing built-in — we skipped
+`@vercel/otel` because of a peer-dep conflict with Sentry 9's pinned
+`@opentelemetry/resources@1.30.1`).
+
+To add a new SLO-tracked path:
+1. Add the budget to `SLO` in `lib/philly/observability.ts`
+2. Wrap the work in `withSpan({ name: "<domain>.<op>", slo: SLO.X, op: "<category>" }, async () => { ... })`
+3. Document it in this section.
+
 ## Locales
 Four supported: `en`, `nl`, `de`, `es` (see `lib/i18n/dict.ts`).
 `translate()` falls back to `en` when a key is missing, so missing keys show
@@ -89,3 +109,144 @@ ROI, no mocks needed. See commit history on
   auth-walls previews. Changed `.github/workflows/lighthouse.yml` to
   run only on pushes to `main`, so Lighthouse audits production
   (publicly reachable). PR runs no longer false-fail.
+
+### 2026-04-19 (cont'd) — upgrade bundles 1–3
+
+Three shipped bundles on the same branch, each typechecked + tested
+(124 Vitest tests green) before push.
+
+**Bundle 1 — `57067aa` — FAQ/Service schema, rate limits, a11y, log hygiene**
+- `lib/seo/schema.ts` + `lib/seo/faqs.ts` (NEW). `faqSchema`, `serviceSchema`,
+  `contactPointSchema` helpers. `HOME_FAQ`, `BRAND_FAQ`, `CONTACT_FAQ`,
+  `SECTOR_FAQ` data (answers <300 chars, definitive first sentence — AI
+  Overview-ready).
+- `components/FaqSection.tsx` (NEW) — accessible `<details>`/`<summary>`
+  accordion, CSS-only toggle, crawlable without JS.
+- `app/[locale]/page.tsx` + `/contact` + `/sectors/[slug]` render FAQPage
+  JSON-LD and mount `<FaqSection />`. `/sectors/[slug]` also emits
+  `serviceSchema`. `contactPointSchema` on `/contact`.
+- `app/globals.css` added `.faq-section` styles (rotating `+` → `×` on
+  open, border-bottom list, expanding accordion). Also added
+  `.ia-toc`/`.ia-toc-label` + `counter(toc, decimal-leading-zero)` and
+  h2 `scroll-margin-top: 96px` for insight-article anchor nav.
+- `app/[locale]/insights/[slug]/page.tsx` now auto-generates a TOC from
+  h2 blocks (only when ≥2 headings). Slugs disambiguated via a Map
+  counter. Helpers live in `lib/insights.ts` as `headingSlug()` and
+  `tocFromBody()` with tests in `lib/insights.test.ts` (8 new tests).
+- `app/philly/audit/page.tsx` — expandable audit rows with per-row
+  Before/After field diff (`ChangesDiff` subcomponent using
+  `Fragment key={k}`), entity dropdown grew from 6 → 37 options,
+  date-range dropdown (1d/7d/30d) hits `app/philly/api/audit/route.ts`'s
+  new `range` param.
+- Rate limits: `enforceRateLimit(`<scope>:${scope.userId}`, PRESET_MUTATION)`
+  added to `app/philly/api/contacts/bulk/route.ts`,
+  `projects/bulk/route.ts`, `documents/upload/route.ts`, `ai/score/route.ts`
+  (capacity 10, refill 0.166/s for expensive LLM calls), `ai/insights/route.ts`
+  (`PRESET_READ` since it's rule-based, not LLM).
+- Log hygiene: replaced `console.log` with `logger.debug(...)` in
+  `lib/philly/email/providers.ts` and `lib/philly/sms/twilio.ts` so prod
+  stops leaking null-dispatch payloads.
+- A11y: `aria-label` on Topbar icon buttons (hamburger, language,
+  theme). Topbar at `components/philly/layout/Topbar.tsx`.
+- Declined two "gaps" that turned out to be already done: command
+  palette (`components/philly/ui/CommandPalette.tsx` is a 490-line cmdk
+  equivalent, not worth bolt-on migration) and sitemap hreflang
+  (`app/sitemap.ts` already emits `alternates.languages` per URL).
+
+**Bundle 2 — `ccfd30d` — cookieless analytics, Turbopack prod**
+- `components/Analytics.tsx` rewritten to load Plausible unconditionally.
+  Only suppresses when `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` is unset or
+  `localStorage.analytics-opt-out === "1"`.
+- `components/CookieConsent.tsx` DELETED; `app/layout.tsx` unmounts it.
+  Plausible is cookieless → EU DPAs (incl. Dutch AP) confirm no consent
+  is required, so the banner was legal theatre.
+- `components/AnalyticsOptOut.tsx` (NEW) — toggle button on `/privacy`
+  that reads/writes `localStorage.analytics-opt-out`. `aria-pressed` for
+  screen readers. Loading-state guard prevents SSR hydration mismatch.
+- `lib/i18n/dict.ts`: rewrote `priv.p.cookies` and `priv.p.analytics`
+  in en/nl/de/es to reflect cookieless reality (was "if you accept
+  cookies, we load…").
+- `package.json`: `next build --turbopack` + `next dev --turbopack`.
+  Turbopack is stable for prod in Next 16 — builds are ~30% faster.
+
+**Bundle 3 — `1f28427` — i18n parity on public pages**
+User reported "different languages on the website, work page for
+example". Explore agent found ~85 hardcoded English strings leaking
+through NL/DE/ES on `/work`, `/insights`, `/sectors`, `/signals`,
+`Ventures`, `Stats`, `ResultsStrip`, `InsightsList`, `Footer`.
+- Added ~55 new dict keys × 4 locales = 220 entries in `lib/i18n/dict.ts`
+  (namespaces: `work.page.*`, `work.d.*`, `work.status.*`, `sectors.page.*`,
+  `insights.page.*`, `insights.d.*`, `insights.filter.*`, `insights.search.*`,
+  `insights.card.*`, `insights.empty*`, `signals.page.*`, `ventures.v{1..5}.*`,
+  `stats.l.*`, `results.*`, `footer.copyright`, `footer.tz`).
+- Page refactors: `/work`, `/work/[slug]`, `/insights`, `/insights/[slug]`,
+  `/sectors`, `/signals` all now pull copy via `translate(l, key)` on
+  the server or `useT()` on the client.
+- Section refactors: `Ventures.tsx` — venture cards (title + body +
+  category label) read from dict, titles contain `<em>` so rendered via
+  `dangerouslySetInnerHTML` (content is author-controlled); `Stats.tsx`
+  — 4 labels via `useT()`; `ResultsStrip.tsx` converted to a client
+  component with `useT()` and 4 context/sector/window strings per card
+  (numeric metrics stay hardcoded — they're data, not copy);
+  `InsightsList.tsx` — "All" pill, search placeholder/aria, empty
+  state, reset CTA; `Footer.tsx` — copyright + timezone.
+- `Testimonials.tsx` left alone: the `TESTIMONIALS` array is empty so
+  the component renders null (no runtime leak); fix when real quotes
+  land.
+
+**`590bf07` — EnergyRoi calculator (not yet routed)**
+- `components/calculators/EnergyRoi.tsx` (NEW) — self-contained client
+  component modeling the Dutch salderingsregeling phase-out (abolition
+  on 1 Jan 2027). Three scenarios: pre-2027 baseline, post-2027 no
+  battery, post-2027 with battery. Formulas: `production = kWp * yield`,
+  `directUse = min(production * selfConsumption, consumption)`,
+  `feedIn = max(production - directUse, 0)`, savings = directUse*retail +
+  feedIn*feedInPrice. Currency via `Intl.NumberFormat('nl-NL')`.
+- Dict keys `roi.*` for all four locales already live in
+  `lib/i18n/dict.ts`; the component takes a `labels: RoiLabels` prop
+  so a server wrapper can pass translated strings.
+- **Not yet routed** — needs `app/[locale]/tools/energy-roi/page.tsx`
+  (server component that reads labels via `translate(l, key)` and passes
+  them into the client component, plus hero + outro blocks using
+  `roi.eyebrow`/`roi.title`/`roi.lede` and `roi.outro.*`). That's the
+  next ship.
+
+### Pending for the next session
+
+**Top of queue (already authorized by the user with "Lets go and do it all"):**
+1. Wire up `/tools/energy-roi` page — server wrapper for the already-shipped
+   `EnergyRoi` component. Probably link from `/sectors/energy` and add to
+   the sitemap. All dict keys exist (`roi.*`).
+2. **Vercel AI SDK v5 — Attio-style AI Attributes on contacts.** Add a
+   server action that takes a contact row, calls the AI SDK with a
+   prompt template, and writes back structured attributes (industry,
+   ICP fit score, summary). Background job + UI surface in
+   `/philly/contacts/[id]`.
+3. **SWR rollout across dashboard pages.** Currently most /philly pages
+   do `async` server fetches on every nav. Wrap list queries in SWR so
+   navigation feels instant + background revalidates. ~56 pages touched.
+4. **`@vercel/otel` + Sentry SLOs** on login, create-deal, AI-action.
+
+**Deferred (Bundle 4+, flagged but not scheduled):**
+- CopilotKit inline-generative-UI
+- Liveblocks presence on deal pages
+- EU AI Act Art. 50 transparency + DPIA (compliance work)
+- Housekeeping: empty Testimonials.tsx, missing `/public/me/portrait.jpg`
+  + `/public/hero.jpg`, `SEO.md:128` TODO
+
+### i18n discipline — lessons learned this session
+
+- Running an Explore-agent audit ("find hardcoded English in public
+  pages") took ~90 seconds and caught ~85 leaks a regex wouldn't have.
+  Do this periodically, not just when the user reports a leak.
+- The `translate()` fallback silently hides missing keys as English.
+  Treat every "English leaked through NL" user report as a translation
+  bug, and check the key exists in ALL FOUR locales.
+- Marketing-component arrays (`Ventures`, `ResultsStrip`) should read
+  copy from `dict.ts` keyed by an `id`, not hardcoded in the array.
+  The data model is `{ id, ...structuralProps }`; the copy comes from
+  `t(`namespace.${id}.field`)`.
+- Section components that are data-driven should become client
+  components if they need `useT()` — `ResultsStrip` was a server
+  component with hardcoded English; converted to `"use client"` +
+  `useT()`. Cheap, no observable perf impact.

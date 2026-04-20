@@ -219,3 +219,24 @@ export function getInsight(slug: string): Insight | undefined {
 export function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 }
+
+export function headingSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+    .slice(0, 80);
+}
+
+export function tocFromBody(blocks: InsightBlock[]): Array<{ id: string; text: string }> {
+  const seen = new Map<string, number>();
+  const out: Array<{ id: string; text: string }> = [];
+  for (const b of blocks) {
+    if (b.type !== "h2") continue;
+    const base = headingSlug(b.text);
+    const n = (seen.get(base) ?? 0) + 1;
+    seen.set(base, n);
+    out.push({ id: n === 1 ? base : `${base}-${n}`, text: b.text });
+  }
+  return out;
+}

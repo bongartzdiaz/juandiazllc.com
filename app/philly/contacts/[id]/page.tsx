@@ -11,6 +11,7 @@ import {
   Save, X, Pencil, FileText, Activity, FolderKanban, User,
   MessageSquare, Clock, CheckCircle2, AlertCircle, Briefcase, TrendingUp,
 } from 'lucide-react'
+import { AiAttributesCard, type ContactAiAttributes } from '@/components/philly/contacts/AiAttributesCard'
 
 /* ------------------------------------------------------------------
    Types
@@ -20,7 +21,7 @@ interface ContactProject {
   project: { id: string; title: string; status: string }
 }
 
-interface Contact {
+interface Contact extends ContactAiAttributes {
   id: string
   name: string
   email: string
@@ -451,6 +452,13 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
         {/* OVERVIEW */}
         {activeTab === 'overview' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+            {/* AI-derived attributes (Attio-style) */}
+            <AiAttributesCard
+              contactId={contact.id}
+              attrs={contact}
+              onUpdated={() => contactQuery.refetch?.()}
+            />
 
             {/* Quick stats row */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>

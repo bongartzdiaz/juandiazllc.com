@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireScope } from '@/lib/philly/auth-helpers'
 import { generateInsights } from '@/lib/philly/ai/insights'
+import { enforceRateLimit, PRESET_READ } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -11,6 +12,9 @@ export const runtime = 'nodejs'
 export async function GET(_req: NextRequest) {
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`ai:insights:${scope.userId}`, PRESET_READ)
+  if (limited) return limited
 
   try {
     const report = await generateInsights(scope.organizationId)

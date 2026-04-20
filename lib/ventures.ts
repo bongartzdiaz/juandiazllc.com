@@ -141,7 +141,7 @@ export const VENTURES: Venture[] = [
     domain: "philly.juandiazllc.com",
     external: "/app",
     summary:
-      "The stateside sibling. Field-first interface for ground teams — dispatch, routing, live status, built to stay alive on bad networks. The first product under Juan Diaz LLC's US arm.",
+      "The stateside sibling. Field-first interface for ground teams — dispatch, routing, live status, built to stay alive on bad networks. The first product under Juan Diaz, LLC's US arm.",
     story:
       "Philly is the first product I'm shipping with the US as the primary market. Everything I learned building operator tooling in the Dutch energy vertical transfers — the same five phases, the same refusal to lie to the person doing the actual work. What changes is the physicality: American field operations live on long distances, bad coverage, and trucks that have been running since before the software was written. That's the constraint that shapes everything.",
     phases: [

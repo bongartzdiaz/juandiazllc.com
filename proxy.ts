@@ -67,6 +67,7 @@ const CSRF_EXEMPT_PREFIXES = [
   '/api/auth/',          // NextAuth handles its own CSRF on internal endpoints
   '/api/log-error',      // client-side error sink, unauthenticated, IP-limited
   '/api/csp-report',     // browsers POST CSP violation reports (no Origin)
+  '/api/vitals',         // Web Vitals beacons, keepalive fetch (no Origin on unload)
   '/api/health',         // uptime probe
 ]
 
@@ -85,19 +86,43 @@ function genRequestId(): string {
 }
 
 /* ── 3. Content Security Policy ───────────────────────────────── */
+/*   Two-headed policy. The enforced header keeps 'unsafe-inline' for
+     script-src + style-src because our JSON-LD and React inline
+     styles depend on it, and dropping it would force every page to
+     become dynamic (via `headers()` for nonces) — a big SSG
+     regression. The *report-only* header mirrors a strict nonce +
+     'strict-dynamic' version and is attached alongside so we can
+     collect real violation data before enforcing it later.          */
 
-function buildCsp(): string {
+function genNonce(): string {
+  const bytes = new Uint8Array(16)
+  crypto.getRandomValues(bytes)
+  let s = ''
+  for (const b of bytes) s += String.fromCharCode(b)
+  return btoa(s)
+}
+
+function buildCsp(nonce: string, strict: boolean): string {
   const isDev = process.env.NODE_ENV !== 'production'
+  const scriptSrc = strict
+    ? [
+        "'self'",
+        `'nonce-${nonce}'`,
+        "'strict-dynamic'",
+        ...(isDev ? ["'unsafe-eval'"] : []),
+      ]
+    : [
+        "'self'",
+        "'unsafe-inline'",
+        `'nonce-${nonce}'`,                           // noop when unsafe-inline is present, but lets us flip to strict cheaply
+        ...(isDev ? ["'unsafe-eval'"] : []),
+      ]
   const directives: Record<string, string[]> = {
     'default-src': ["'self'"],
-    'script-src': [
-      "'self'",
-      "'unsafe-inline'",                              // Next runtime scripts
-      ...(isDev ? ["'unsafe-eval'"] : []),            // Next dev needs eval
-    ],
-    'style-src': ["'self'", "'unsafe-inline'"],
+    'script-src': scriptSrc,
+    'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
     'img-src': ["'self'", 'data:', 'blob:', 'https:'],
-    'font-src': ["'self'", 'data:'],
+    'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com'],
     'connect-src': [
       "'self'",
       ...(isDev ? ['ws:', 'wss:', 'http://localhost:*'] : []),
@@ -118,8 +143,6 @@ function buildCsp(): string {
     .map(([k, v]) => (v.length ? `${k} ${v.join(' ')}` : k))
     .join('; ')
 }
-
-const CSP = buildCsp()
 
 /* ── Middleware ───────────────────────────────────────────────── */
 
@@ -184,15 +207,25 @@ export default async function middleware(req: NextRequest) {
   const requestId =
     existingId && /^[a-z0-9-]{8,64}$/i.test(existingId) ? existingId : genRequestId()
 
+  // Per-request CSP nonce. The enforced CSP keeps 'unsafe-inline' so
+  // JSON-LD + static generation keep working; the report-only CSP
+  // mirrors the strict nonce version so we can observe violations
+  // before flipping the switch.
+  const nonce = genNonce()
+  const cspEnforced = buildCsp(nonce, false)
+  const cspStrict = buildCsp(nonce, true)
+
   const reqHeaders = new Headers(req.headers)
   reqHeaders.set('x-request-id', requestId)
+  reqHeaders.set('x-nonce', nonce)
+  reqHeaders.set('Content-Security-Policy', cspEnforced)
 
   // Supabase auth — refresh session cookie + gate protected routes.
   // Returns either a redirect (unauthenticated hitting a protected path)
   // or a pass-through NextResponse carrying refreshed auth cookies.
   // We use it as the base response so cookies propagate, then stack
   // security headers on top before returning.
-  const res = await updateSession(req)
+  const res = await updateSession(req, reqHeaders)
   res.headers.set('x-request-id', requestId)
 
   // Freshen the locale cookie when a locale-prefixed URL is visited so
@@ -207,7 +240,8 @@ export default async function middleware(req: NextRequest) {
   }
 
   // Security headers on the way out
-  res.headers.set('Content-Security-Policy', CSP)
+  res.headers.set('Content-Security-Policy', cspEnforced)
+  res.headers.set('Content-Security-Policy-Report-Only', cspStrict)
   res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   res.headers.set('X-Content-Type-Options', 'nosniff')
   res.headers.set('X-Frame-Options', 'DENY')

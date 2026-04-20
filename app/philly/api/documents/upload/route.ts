@@ -7,6 +7,7 @@ import { storeFile } from '@/lib/philly/storage'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { serverError } from '@/lib/philly/safe-error'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -14,6 +15,9 @@ export const runtime = 'nodejs'
 export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`documents:upload:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   let form: FormData
   try { form = await req.formData() }

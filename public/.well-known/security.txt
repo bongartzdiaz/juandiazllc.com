@@ -1,0 +1,10 @@
+# Security contact for juandiazllc.com (RFC 9116).
+# If you've found a vulnerability, please report it to the address
+# below. We respond to good-faith reports within three working days.
+
+Contact: mailto:security@juandiazllc.com
+Contact: mailto:juan@juandiazllc.com
+Expires: 2027-04-19T00:00:00Z
+Preferred-Languages: en, nl, de, es
+Canonical: https://juandiazllc.com/.well-known/security.txt
+Policy: https://juandiazllc.com/privacy
