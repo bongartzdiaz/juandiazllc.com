@@ -1,14 +1,16 @@
 ﻿/* GET  /api/contacts — list contacts in the user's org (paginated)
    POST /api/contacts — create a new contact (manager+ only) */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole } from '@/lib/philly/auth-helpers'
 import { validateBody } from '@/lib/philly/validation'
 import { createContactSchema } from '@/lib/philly/validation/schemas'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
-import { publishEntityCreated } from '@/lib/philly/realtime/publish'
+import { publishEntityCreated, publishEntityUpdated } from '@/lib/philly/realtime/publish'
+import { runAndPersistContactAttributes } from '@/lib/philly/ai/contact-attributes'
+import { logger } from '@/lib/philly/logger'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -74,11 +76,32 @@ export async function POST(req: NextRequest) {
       notes: input.notes,
       avatarUrl: input.avatarUrl,
       organizationId: scope.organizationId,
+      // Auto-enrichment kicks off post-response via after() below —
+      // mark pending synchronously so the UI can show a spinner.
+      aiAttributesStatus: 'pending',
     },
   })
 
   await logAudit({ scope, action: 'create', entity: 'contact', entityId: contact.id })
   publishEntityCreated(scope.organizationId, 'contact', contact.id, scope.userId)
+
+  // Attio-style auto-enrichment — fire the LLM call in the background
+  // so the create response returns instantly. after() keeps the worker
+  // alive on Vercel for the duration of the async task.
+  after(async () => {
+    try {
+      await runAndPersistContactAttributes({
+        contactId: contact.id,
+        organizationId: scope.organizationId,
+      })
+      publishEntityUpdated(scope.organizationId, 'contact', contact.id, scope.userId)
+    } catch (err) {
+      logger.error('[contacts/create] ai-enrichment failed', {
+        contactId: contact.id,
+        err: err instanceof Error ? err.message : String(err),
+      })
+    }
+  })
 
   return NextResponse.json({ data: contact }, { status: 201 })
 }
