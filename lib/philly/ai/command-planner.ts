@@ -151,6 +151,38 @@ const setLeadStatusStep = z.object({
   rationale: z.string().min(4).max(240),
 })
 
+const createTaskStep = z.object({
+  tool: z.literal('create_task'),
+  args: z.object({
+    identifier: z.string().min(1).max(120).describe('Contact name or email the task is about.'),
+    title: z.string().min(3).max(160).describe('Short task title.'),
+    dueInDays: z.number().int().min(0).max(90).default(1).describe('Days from now until the task is due. 0 = today.'),
+    description: z.string().max(1000).optional().describe('Optional longer context.'),
+  }),
+  rationale: z.string().min(4).max(240),
+})
+
+const scheduleFollowupStep = z.object({
+  tool: z.literal('schedule_followup'),
+  args: z.object({
+    identifier: z.string().min(1).max(120).optional().describe('Optional contact name/email; when set, mentioned in the event description so it links back.'),
+    title: z.string().min(3).max(160).describe('Event title as it will appear on the calendar.'),
+    daysOut: z.number().int().min(0).max(90).describe('Days from today to schedule the follow-up. 0 = today.'),
+    timeOfDay: z.enum(['morning', 'afternoon']).default('morning').describe('morning = 10:00 UTC; afternoon = 14:00 UTC. Exact time stays editable in the calendar.'),
+    durationMinutes: z.number().int().min(15).max(180).default(30),
+  }),
+  rationale: z.string().min(4).max(240),
+})
+
+const linkDealToContactStep = z.object({
+  tool: z.literal('link_deal_to_contact'),
+  args: z.object({
+    dealIdentifier: z.string().min(1).max(120).describe('Deal title, id, or unique substring.'),
+    contactIdentifier: z.string().min(1).max(120).describe('Contact name or email to link the deal to.'),
+  }),
+  rationale: z.string().min(4).max(240),
+})
+
 export const planStepSchema = z.discriminatedUnion('tool', [
   listContactsStep,
   listDealsStep,
@@ -164,6 +196,9 @@ export const planStepSchema = z.discriminatedUnion('tool', [
   updateDealStageStep,
   addContactNoteStep,
   setLeadStatusStep,
+  createTaskStep,
+  scheduleFollowupStep,
+  linkDealToContactStep,
 ])
 
 
@@ -176,6 +211,9 @@ export const WRITE_TOOLS: ReadonlySet<ToolName> = new Set<ToolName>([
   'update_deal_stage',
   'add_contact_note',
   'set_lead_status',
+  'create_task',
+  'schedule_followup',
+  'link_deal_to_contact',
 ])
 
 export function isWriteTool(tool: ToolName): boolean {
@@ -214,9 +252,12 @@ const SYSTEM_PROMPT = [
   '3. For "summarize X" requests, use summarize_contact with the person\'s name/email as identifier — you never see row ids.',
   '4. draft_followup_email ONLY drafts text; it never sends. Be conservative about using it.',
   '5. navigate_to is for "take me to / open / show me the X page" requests. Path must start with /philly.',
-  '6. Write tools (update_deal_stage, add_contact_note, set_lead_status) MUTATE data. Only use them when the user explicitly asked to change/update/move/add something. Never chain a write after an exploratory step — if the user needs to pick a target first, ask with clarification.',
-  '7. When the request is ambiguous (missing a target, missing an entity type), return an empty steps array and set clarification to a single question.',
-  '8. Never output tool names not in the schema. Never invent args.',
+  '6. Write tools (update_deal_stage, add_contact_note, set_lead_status, create_task, schedule_followup, link_deal_to_contact) MUTATE data. Only use them when the user explicitly asked to change/update/move/add/create/schedule/link something. Never chain a write after an exploratory step — if the user needs to pick a target first, ask with clarification.',
+  '7. create_task creates an Activity of type="task" on a contact. Use it for "remind me to…", "add a task to follow up with…", "create a task". Default dueInDays=1.',
+  '8. schedule_followup creates a CalendarEvent. Use it for "schedule a follow-up with…", "book a call", "set up a meeting in N days". timeOfDay morning=10:00 / afternoon=14:00. Default durationMinutes=30.',
+  '9. link_deal_to_contact sets contactId on a deal. Use it for "link the Acme deal to marco@…", "attach contact to deal".',
+  '10. When the request is ambiguous (missing a target, missing an entity type), return an empty steps array and set clarification to a single question.',
+  '11. Never output tool names not in the schema. Never invent args.',
 ].join('\n')
 
 export interface PlanInput {

@@ -116,11 +116,14 @@ describe('command-planner schema', () => {
 })
 
 describe('write tools', () => {
-  it('WRITE_TOOLS contains exactly the three mutating tools', () => {
-    expect(WRITE_TOOLS.size).toBe(3)
+  it('WRITE_TOOLS contains all six mutating tools', () => {
+    expect(WRITE_TOOLS.size).toBe(6)
     expect(WRITE_TOOLS.has('update_deal_stage')).toBe(true)
     expect(WRITE_TOOLS.has('add_contact_note')).toBe(true)
     expect(WRITE_TOOLS.has('set_lead_status')).toBe(true)
+    expect(WRITE_TOOLS.has('create_task')).toBe(true)
+    expect(WRITE_TOOLS.has('schedule_followup')).toBe(true)
+    expect(WRITE_TOOLS.has('link_deal_to_contact')).toBe(true)
   })
 
   it('isWriteTool returns false for read-only tools', () => {
@@ -182,6 +185,90 @@ describe('write tools', () => {
       rationale: 'note the call outcome',
     })
     expect(good.success).toBe(true)
+  })
+
+  it('create_task applies default dueInDays=1 when omitted', () => {
+    const parsed = planStepSchema.safeParse({
+      tool: 'create_task',
+      args: { identifier: 'Marco', title: 'Send revised solar quote' },
+      rationale: 'user asked to add a task',
+    })
+    expect(parsed.success).toBe(true)
+    if (parsed.success && parsed.data.tool === 'create_task') {
+      expect(parsed.data.args.dueInDays).toBe(1)
+    }
+  })
+
+  it('create_task rejects dueInDays > 90', () => {
+    const parsed = planStepSchema.safeParse({
+      tool: 'create_task',
+      args: { identifier: 'Marco', title: 'Do the thing', dueInDays: 365 },
+      rationale: 'too far out',
+    })
+    expect(parsed.success).toBe(false)
+  })
+
+  it('create_task requires title length >= 3', () => {
+    const parsed = planStepSchema.safeParse({
+      tool: 'create_task',
+      args: { identifier: 'Marco', title: 'x', dueInDays: 2 },
+      rationale: 'title too short',
+    })
+    expect(parsed.success).toBe(false)
+  })
+
+  it('schedule_followup accepts morning/afternoon and applies default duration', () => {
+    const parsed = planStepSchema.safeParse({
+      tool: 'schedule_followup',
+      args: { title: 'Call Marco re solar', daysOut: 3 },
+      rationale: 'user asked to schedule',
+    })
+    expect(parsed.success).toBe(true)
+    if (parsed.success && parsed.data.tool === 'schedule_followup') {
+      expect(parsed.data.args.timeOfDay).toBe('morning')
+      expect(parsed.data.args.durationMinutes).toBe(30)
+    }
+  })
+
+  it('schedule_followup rejects invalid timeOfDay', () => {
+    const parsed = planStepSchema.safeParse({
+      tool: 'schedule_followup',
+      args: { title: 'Call Marco', daysOut: 1, timeOfDay: 'midnight' },
+      rationale: 'bad time',
+    })
+    expect(parsed.success).toBe(false)
+  })
+
+  it('schedule_followup allows optional identifier', () => {
+    const noIdent = planStepSchema.safeParse({
+      tool: 'schedule_followup',
+      args: { title: 'Internal sync', daysOut: 7 },
+      rationale: 'no contact mentioned',
+    })
+    expect(noIdent.success).toBe(true)
+
+    const withIdent = planStepSchema.safeParse({
+      tool: 'schedule_followup',
+      args: { identifier: 'marco@example.com', title: 'Solar debrief', daysOut: 2 },
+      rationale: 'with contact',
+    })
+    expect(withIdent.success).toBe(true)
+  })
+
+  it('link_deal_to_contact requires both identifiers', () => {
+    const ok = planStepSchema.safeParse({
+      tool: 'link_deal_to_contact',
+      args: { dealIdentifier: 'Acme rooftop', contactIdentifier: 'marco@example.com' },
+      rationale: 'attach contact',
+    })
+    expect(ok.success).toBe(true)
+
+    const missing = planStepSchema.safeParse({
+      tool: 'link_deal_to_contact',
+      args: { dealIdentifier: 'Acme rooftop' },
+      rationale: 'incomplete',
+    })
+    expect(missing.success).toBe(false)
   })
 })
 

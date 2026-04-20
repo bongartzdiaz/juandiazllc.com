@@ -34,11 +34,17 @@ type PlanStep =
   | { tool: 'update_deal_stage'; args: { dealIdentifier: string; stageName: string }; rationale: string }
   | { tool: 'add_contact_note'; args: { identifier: string; note: string }; rationale: string }
   | { tool: 'set_lead_status'; args: { identifier: string; leadStatus: string }; rationale: string }
+  | { tool: 'create_task'; args: { identifier: string; title: string; dueInDays: number; description?: string }; rationale: string }
+  | { tool: 'schedule_followup'; args: { identifier?: string; title: string; daysOut: number; timeOfDay: 'morning' | 'afternoon'; durationMinutes: number }; rationale: string }
+  | { tool: 'link_deal_to_contact'; args: { dealIdentifier: string; contactIdentifier: string }; rationale: string }
 
 const WRITE_TOOLS = new Set<PlanStep['tool']>([
   'update_deal_stage',
   'add_contact_note',
   'set_lead_status',
+  'create_task',
+  'schedule_followup',
+  'link_deal_to_contact',
 ])
 
 interface Plan {
@@ -68,6 +74,9 @@ const TOOL_LABELS: Record<PlanStep['tool'], string> = {
   update_deal_stage: 'Move deal to stage',
   add_contact_note: 'Add note to contact',
   set_lead_status: 'Set lead status',
+  create_task: 'Create task',
+  schedule_followup: 'Schedule follow-up',
+  link_deal_to_contact: 'Link deal to contact',
 }
 
 /* ── Component ─────────────────────────────────────────── */
@@ -570,6 +579,44 @@ function ResultBody({ result }: { result: ExecuteResult }) {
     const data = result.data as { name: string; previous?: string | null; leadStatus: string; noOp?: boolean } | undefined
     if (data?.noOp) return <div style={{ color: 'var(--txt3)' }}>{result.summary}</div>
     return <div>{data?.name}: {data?.previous ?? 'new'} → <strong>{data?.leadStatus}</strong></div>
+  }
+
+  if (result.tool === 'create_task') {
+    const data = result.data as { contactName?: string; title?: string; dueAt?: string } | undefined
+    return (
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt3)', marginBottom: 4 }}>
+          Task for {data?.contactName}
+        </div>
+        <div><strong>{data?.title}</strong></div>
+        {data?.dueAt && (
+          <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 2 }}>
+            due {new Date(data.dueAt).toLocaleString()}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  if (result.tool === 'schedule_followup') {
+    const data = result.data as { title?: string; startTime?: string; contactName?: string | null } | undefined
+    return (
+      <div>
+        <div><strong>{data?.title}</strong></div>
+        {data?.startTime && (
+          <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 2 }}>
+            {new Date(data.startTime).toLocaleString()}
+            {data.contactName ? ` · ${data.contactName}` : ''}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  if (result.tool === 'link_deal_to_contact') {
+    const data = result.data as { dealTitle?: string; contactName?: string; previousContactName?: string | null; noOp?: boolean } | undefined
+    if (data?.noOp) return <div style={{ color: 'var(--txt3)' }}>{result.summary}</div>
+    return <div>{data?.dealTitle} → <strong>{data?.contactName}</strong>{data?.previousContactName ? ` (was ${data.previousContactName})` : ''}</div>
   }
 
   // list_* and search_entities share a row-list shape

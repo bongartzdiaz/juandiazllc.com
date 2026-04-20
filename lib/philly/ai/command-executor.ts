@@ -544,6 +544,182 @@ async function runSetLeadStatus(
   }
 }
 
+async function runCreateTask(
+  scope: AuthScope,
+  args: Extract<PlanStep, { tool: 'create_task' }>['args'],
+): Promise<ExecuteResult> {
+  const prisma = getAuthPrisma()
+  const contact = await resolveContact(args.identifier, scope.organizationId)
+  if (!contact) {
+    return { ok: false, tool: 'create_task', summary: `No contact matched "${args.identifier}".`, error: 'contact not found' }
+  }
+
+  const due = new Date(Date.now() + args.dueInDays * 86400000)
+  const activity = await prisma.activity.create({
+    data: {
+      organizationId: scope.organizationId,
+      contactId: contact.id,
+      userId: scope.userId,
+      type: 'task',
+      title: args.title,
+      description: args.description ?? '',
+      metadata: JSON.stringify({ dueAt: due.toISOString(), status: 'open' }),
+    },
+    select: { id: true, title: true, createdAt: true },
+  })
+
+  logAudit({
+    scope,
+    action: 'create',
+    entity: 'activity',
+    entityId: activity.id,
+    changes: { task: { old: null, new: { title: args.title, dueAt: due.toISOString(), contactId: contact.id } } },
+  })
+
+  const dueLabel = args.dueInDays === 0 ? 'today' : args.dueInDays === 1 ? 'tomorrow' : `in ${args.dueInDays} days`
+  return {
+    ok: true,
+    tool: 'create_task',
+    summary: `Task "${args.title}" for ${contact.name}, due ${dueLabel}.`,
+    data: {
+      activityId: activity.id,
+      contactId: contact.id,
+      contactName: contact.name,
+      title: args.title,
+      dueAt: due.toISOString(),
+      dueInDays: args.dueInDays,
+    },
+  }
+}
+
+async function runScheduleFollowup(
+  scope: AuthScope,
+  args: Extract<PlanStep, { tool: 'schedule_followup' }>['args'],
+): Promise<ExecuteResult> {
+  const prisma = getAuthPrisma()
+
+  // Optional contact — only resolve + fail on mismatch when user specified one.
+  let contact: Awaited<ReturnType<typeof resolveContact>> = null
+  if (args.identifier) {
+    contact = await resolveContact(args.identifier, scope.organizationId)
+    if (!contact) {
+      return { ok: false, tool: 'schedule_followup', summary: `No contact matched "${args.identifier}".`, error: 'contact not found' }
+    }
+  }
+
+  const day = new Date()
+  day.setUTCDate(day.getUTCDate() + args.daysOut)
+  day.setUTCHours(args.timeOfDay === 'afternoon' ? 14 : 10, 0, 0, 0)
+  const startTime = day
+  const endTime = new Date(startTime.getTime() + args.durationMinutes * 60000)
+
+  const description = contact
+    ? `Follow-up with ${contact.name}${contact.email ? ` (${contact.email})` : ''}.`
+    : ''
+
+  const event = await prisma.calendarEvent.create({
+    data: {
+      organizationId: scope.organizationId,
+      title: args.title,
+      description,
+      startTime,
+      endTime,
+      allDay: false,
+      location: '',
+      color: '#3B82F6',
+    },
+    select: { id: true, title: true, startTime: true, endTime: true },
+  })
+
+  logAudit({
+    scope,
+    action: 'create',
+    entity: 'calendarEvent',
+    entityId: event.id,
+    changes: { followup: { old: null, new: { title: args.title, startTime: startTime.toISOString(), contactId: contact?.id ?? null } } },
+  })
+
+  const whenLabel = args.daysOut === 0 ? 'today' : args.daysOut === 1 ? 'tomorrow' : `in ${args.daysOut} days`
+  const timeLabel = args.timeOfDay === 'afternoon' ? '14:00 UTC' : '10:00 UTC'
+  return {
+    ok: true,
+    tool: 'schedule_followup',
+    summary: contact
+      ? `Scheduled "${args.title}" with ${contact.name} ${whenLabel} at ${timeLabel}.`
+      : `Scheduled "${args.title}" ${whenLabel} at ${timeLabel}.`,
+    data: {
+      eventId: event.id,
+      title: event.title,
+      startTime: event.startTime.toISOString(),
+      endTime: event.endTime.toISOString(),
+      contactId: contact?.id ?? null,
+      contactName: contact?.name ?? null,
+    },
+  }
+}
+
+async function runLinkDealToContact(
+  scope: AuthScope,
+  args: Extract<PlanStep, { tool: 'link_deal_to_contact' }>['args'],
+): Promise<ExecuteResult> {
+  const prisma = getAuthPrisma()
+  const dealIdent = args.dealIdentifier.trim()
+
+  const deal = await prisma.deal.findFirst({
+    where: {
+      pipeline: { organizationId: scope.organizationId },
+      OR: [{ id: dealIdent }, { title: { contains: dealIdent } }],
+    },
+    select: { id: true, title: true, contactId: true, contact: { select: { id: true, name: true } } },
+  })
+  if (!deal) {
+    return { ok: false, tool: 'link_deal_to_contact', summary: `No deal matched "${dealIdent}".`, error: 'deal not found' }
+  }
+
+  const contact = await resolveContact(args.contactIdentifier, scope.organizationId)
+  if (!contact) {
+    return { ok: false, tool: 'link_deal_to_contact', summary: `No contact matched "${args.contactIdentifier}".`, error: 'contact not found' }
+  }
+
+  if (deal.contactId === contact.id) {
+    return {
+      ok: true,
+      tool: 'link_deal_to_contact',
+      summary: `"${deal.title}" is already linked to ${contact.name}.`,
+      data: { dealId: deal.id, contactId: contact.id, contactName: contact.name, noOp: true },
+    }
+  }
+
+  await prisma.deal.update({
+    where: { id: deal.id },
+    data: { contactId: contact.id },
+  })
+
+  logAudit({
+    scope,
+    action: 'update',
+    entity: 'deal',
+    entityId: deal.id,
+    changes: {
+      contactId: { old: deal.contactId, new: contact.id },
+      contact: { old: deal.contact?.name ?? null, new: contact.name },
+    },
+  })
+
+  return {
+    ok: true,
+    tool: 'link_deal_to_contact',
+    summary: `Linked "${deal.title}" → ${contact.name}.`,
+    data: {
+      dealId: deal.id,
+      dealTitle: deal.title,
+      contactId: contact.id,
+      contactName: contact.name,
+      previousContactName: deal.contact?.name ?? null,
+    },
+  }
+}
+
 /* ── Dispatcher ────────────────────────────────────────── */
 
 export async function executeStep(scope: AuthScope, step: PlanStep): Promise<ExecuteResult> {
@@ -561,6 +737,9 @@ export async function executeStep(scope: AuthScope, step: PlanStep): Promise<Exe
     case 'update_deal_stage':  result = await runUpdateDealStage(scope, step.args); break
     case 'add_contact_note':   result = await runAddContactNote(scope, step.args); break
     case 'set_lead_status':    result = await runSetLeadStatus(scope, step.args); break
+    case 'create_task':          result = await runCreateTask(scope, step.args); break
+    case 'schedule_followup':    result = await runScheduleFollowup(scope, step.args); break
+    case 'link_deal_to_contact': result = await runLinkDealToContact(scope, step.args); break
   }
 
   // Read-only tools still audit as a command-bar event so admins can
