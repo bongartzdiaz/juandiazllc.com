@@ -31,14 +31,15 @@ const LOCALE_EXEMPT_PREFIXES = [
   '/opengraph-image', '/icon', '/favicon', '/apple-icon',
 ]
 
-function isLocaleExempt(pathname: string): boolean {
+// Exported for tests — see proxy.test.ts.
+export function isLocaleExempt(pathname: string): boolean {
   if (LOCALE_EXEMPT_PREFIXES.some(p => pathname === p || pathname.startsWith(p + '/') || pathname.startsWith(p + '.'))) return true
   // Files with extensions (static assets) are exempt.
   if (/\.[a-z0-9]+$/i.test(pathname)) return true
   return false
 }
 
-function firstSegment(pathname: string): string | null {
+export function firstSegment(pathname: string): string | null {
   const m = /^\/([^\/]+)/.exec(pathname)
   return m ? m[1] : null
 }
@@ -47,6 +48,17 @@ function detectLocale(req: NextRequest): string {
   const c = req.cookies.get(LOCALE_COOKIE)?.value
   if (c && LOCALE_SET.has(c)) return c
   const al = req.headers.get('accept-language') || ''
+  for (const part of al.split(',')) {
+    const code = part.trim().slice(0, 2).toLowerCase()
+    if (LOCALE_SET.has(code)) return code
+  }
+  return DEFAULT_LOCALE
+}
+
+// Exported for tests.
+export function detectLocaleFromHeader(acceptLanguage: string | null, cookieLocale: string | null): string {
+  if (cookieLocale && LOCALE_SET.has(cookieLocale)) return cookieLocale
+  const al = acceptLanguage || ''
   for (const part of al.split(',')) {
     const code = part.trim().slice(0, 2).toLowerCase()
     if (LOCALE_SET.has(code)) return code
@@ -71,8 +83,31 @@ const CSRF_EXEMPT_PREFIXES = [
   '/api/health',         // uptime probe
 ]
 
-function isCsrfExempt(pathname: string): boolean {
+export function isCsrfExempt(pathname: string): boolean {
   return CSRF_EXEMPT_PREFIXES.some(p => pathname === p || pathname.startsWith(p))
+}
+
+/** Pure CSRF decision: returns true when the request should be rejected
+ *  with 403 due to a mismatched Origin/Referer. */
+export function isCsrfBlocked(
+  method: string,
+  pathname: string,
+  host: string,
+  origin: string | null,
+  referer: string | null,
+): boolean {
+  if (!pathname.startsWith('/api/')) return false
+  if (!UNSAFE_METHODS.has(method)) return false
+  if (isCsrfExempt(pathname)) return false
+  if (!origin && !referer) return false
+
+  let sourceHost: string | null = null
+  try {
+    if (origin) sourceHost = new URL(origin).host
+    else if (referer) sourceHost = new URL(referer).host
+  } catch { return false }
+
+  return !!sourceHost && sourceHost !== host
 }
 
 /* ── 2. Request ID ────────────────────────────────────────────── */
@@ -179,27 +214,17 @@ export default async function middleware(req: NextRequest) {
   }
 
   // Same-origin check for unsafe API methods.
-  if (pathname.startsWith('/api/') && UNSAFE_METHODS.has(req.method) && !isCsrfExempt(pathname)) {
-    const host = req.headers.get('host') ?? ''
-    const origin = req.headers.get('origin')
-    const referer = req.headers.get('referer')
-
-    if (origin || referer) {
-      const sourceHost = (() => {
-        try {
-          if (origin) return new URL(origin).host
-          if (referer) return new URL(referer).host
-        } catch { /* fall through */ }
-        return null
-      })()
-
-      if (sourceHost && sourceHost !== host) {
-        return NextResponse.json(
-          { error: 'Cross-origin request blocked' },
-          { status: 403 },
-        )
-      }
-    }
+  if (isCsrfBlocked(
+    req.method,
+    pathname,
+    req.headers.get('host') ?? '',
+    req.headers.get('origin'),
+    req.headers.get('referer'),
+  )) {
+    return NextResponse.json(
+      { error: 'Cross-origin request blocked' },
+      { status: 403 },
+    )
   }
 
   // Propagate request-id on the way in
