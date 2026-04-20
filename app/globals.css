@@ -229,29 +229,128 @@ nav.top > * { pointer-events: auto; }
 }
 .hero-starfield {
   position: absolute; inset: 0;
+  /* Dense teal Milky Way — three depth layers of stars rendered as radial
+     gradients. Colors oscillate between bright teal-white (foreground),
+     saturated teal (mid-field), and dim cyan-green (distant dust). The
+     whole thing reads as a cohesive galactic sky instead of a few scattered
+     points. Each layer is large enough that background-size + tiling gives
+     us coverage without thousands of gradient stops. */
   background:
-    /* bright foreground stars */
-    radial-gradient(1.6px 1.6px at 12% 18%, rgba(230,255,240,1), transparent 62%),
-    radial-gradient(1.4px 1.4px at 78% 22%, rgba(200,255,228,.95), transparent 62%),
-    radial-gradient(1.8px 1.8px at 34% 72%, rgba(230,255,240,1), transparent 62%),
-    radial-gradient(1.2px 1.2px at 88% 68%, rgba(200,255,228,.7), transparent 62%),
-    radial-gradient(1.4px 1.4px at 55% 12%, rgba(210,255,235,.85), transparent 62%),
-    radial-gradient(1.6px 1.6px at 22% 88%, rgba(180,255,220,.75), transparent 62%),
-    radial-gradient(1.3px 1.3px at 66% 46%, rgba(200,255,228,.8), transparent 62%),
-    radial-gradient(1.5px 1.5px at 5% 52%, rgba(200,255,228,.75), transparent 62%),
-    radial-gradient(1.7px 1.7px at 92% 8%, rgba(230,255,240,.95), transparent 62%),
-    radial-gradient(1.3px 1.3px at 44% 34%, rgba(200,255,228,.6), transparent 62%),
-    /* mid-field fine dust */
-    radial-gradient(.8px .8px at 9% 9%, rgba(160,230,200,.6), transparent 80%),
-    radial-gradient(.8px .8px at 28% 42%, rgba(160,230,200,.5), transparent 80%),
-    radial-gradient(.8px .8px at 61% 81%, rgba(160,230,200,.55), transparent 80%),
-    radial-gradient(.8px .8px at 83% 38%, rgba(160,230,200,.5), transparent 80%),
-    radial-gradient(.8px .8px at 40% 61%, rgba(160,230,200,.45), transparent 80%),
-    radial-gradient(.8px .8px at 72% 12%, rgba(160,230,200,.55), transparent 80%),
-    radial-gradient(.8px .8px at 18% 64%, rgba(160,230,200,.45), transparent 80%),
-    radial-gradient(.8px .8px at 50% 90%, rgba(160,230,200,.45), transparent 80%);
-  opacity: .85;
+    /* --- bright foreground stars (teal-white, ~1.4-1.8px) --- */
+    radial-gradient(1.8px 1.8px at 12% 18%, rgba(235,255,248,1), transparent 62%),
+    radial-gradient(1.6px 1.6px at 78% 22%, rgba(180,255,228,.98), transparent 62%),
+    radial-gradient(1.7px 1.7px at 34% 72%, rgba(220,255,245,1), transparent 62%),
+    radial-gradient(1.5px 1.5px at 88% 68%, rgba(160,245,220,.85), transparent 62%),
+    radial-gradient(1.8px 1.8px at 55% 12%, rgba(200,255,238,.95), transparent 62%),
+    radial-gradient(1.6px 1.6px at 22% 88%, rgba(150,240,215,.85), transparent 62%),
+    radial-gradient(1.5px 1.5px at 66% 46%, rgba(180,250,225,.9), transparent 62%),
+    radial-gradient(1.7px 1.7px at 5% 52%, rgba(195,255,232,.88), transparent 62%),
+    radial-gradient(1.9px 1.9px at 92% 8%, rgba(235,255,248,1), transparent 62%),
+    radial-gradient(1.4px 1.4px at 44% 34%, rgba(160,245,218,.8), transparent 62%),
+    radial-gradient(1.6px 1.6px at 17% 33%, rgba(200,255,238,.9), transparent 62%),
+    radial-gradient(1.5px 1.5px at 71% 81%, rgba(170,250,222,.85), transparent 62%),
+    radial-gradient(1.7px 1.7px at 96% 44%, rgba(220,255,245,.95), transparent 62%),
+    radial-gradient(1.4px 1.4px at 8% 76%, rgba(180,250,225,.85), transparent 62%),
+    radial-gradient(1.6px 1.6px at 38% 8%, rgba(200,255,238,.9), transparent 62%),
+    radial-gradient(1.5px 1.5px at 59% 63%, rgba(150,240,215,.8), transparent 62%),
+    radial-gradient(1.7px 1.7px at 25% 52%, rgba(235,255,248,.95), transparent 62%),
+    radial-gradient(1.4px 1.4px at 81% 55%, rgba(170,250,222,.8), transparent 62%),
+    radial-gradient(1.6px 1.6px at 47% 91%, rgba(200,255,238,.88), transparent 62%),
+    radial-gradient(1.5px 1.5px at 3% 28%, rgba(180,250,225,.82), transparent 62%),
+    /* --- mid-field stars (saturated teal, ~1.0-1.2px) --- */
+    radial-gradient(1.1px 1.1px at 9% 9%, rgba(110,230,200,.72), transparent 75%),
+    radial-gradient(1.2px 1.2px at 28% 42%, rgba(120,235,205,.7), transparent 75%),
+    radial-gradient(1.0px 1.0px at 61% 81%, rgba(110,230,200,.75), transparent 75%),
+    radial-gradient(1.1px 1.1px at 83% 38%, rgba(130,240,210,.68), transparent 75%),
+    radial-gradient(1.2px 1.2px at 40% 61%, rgba(120,235,205,.7), transparent 75%),
+    radial-gradient(1.0px 1.0px at 72% 12%, rgba(110,230,200,.72), transparent 75%),
+    radial-gradient(1.1px 1.1px at 18% 64%, rgba(130,240,210,.65), transparent 75%),
+    radial-gradient(1.2px 1.2px at 50% 28%, rgba(120,235,205,.7), transparent 75%),
+    radial-gradient(1.0px 1.0px at 93% 75%, rgba(110,230,200,.68), transparent 75%),
+    radial-gradient(1.1px 1.1px at 15% 48%, rgba(140,245,215,.72), transparent 75%),
+    radial-gradient(1.2px 1.2px at 76% 62%, rgba(120,235,205,.7), transparent 75%),
+    radial-gradient(1.0px 1.0px at 32% 25%, rgba(110,230,200,.65), transparent 75%),
+    radial-gradient(1.1px 1.1px at 54% 77%, rgba(130,240,210,.7), transparent 75%),
+    radial-gradient(1.2px 1.2px at 87% 19%, rgba(140,245,215,.72), transparent 75%),
+    radial-gradient(1.0px 1.0px at 41% 46%, rgba(120,235,205,.65), transparent 75%),
+    radial-gradient(1.1px 1.1px at 6% 87%, rgba(110,230,200,.68), transparent 75%),
+    radial-gradient(1.2px 1.2px at 67% 34%, rgba(130,240,210,.7), transparent 75%),
+    radial-gradient(1.0px 1.0px at 22% 16%, rgba(120,235,205,.68), transparent 75%),
+    radial-gradient(1.1px 1.1px at 95% 56%, rgba(140,245,215,.72), transparent 75%),
+    radial-gradient(1.2px 1.2px at 36% 82%, rgba(110,230,200,.7), transparent 75%),
+    radial-gradient(1.0px 1.0px at 79% 3%, rgba(130,240,210,.68), transparent 75%),
+    radial-gradient(1.1px 1.1px at 13% 73%, rgba(120,235,205,.7), transparent 75%),
+    radial-gradient(1.2px 1.2px at 48% 5%, rgba(140,245,215,.72), transparent 75%),
+    radial-gradient(1.0px 1.0px at 63% 55%, rgba(110,230,200,.68), transparent 75%),
+    radial-gradient(1.1px 1.1px at 2% 41%, rgba(130,240,210,.7), transparent 75%),
+    /* --- distant dust (dim cyan-green, ~0.6-0.8px) --- */
+    radial-gradient(.7px .7px at 4% 4%, rgba(94,200,175,.55), transparent 85%),
+    radial-gradient(.7px .7px at 16% 27%, rgba(80,190,165,.48), transparent 85%),
+    radial-gradient(.6px .6px at 31% 14%, rgba(94,200,175,.5), transparent 85%),
+    radial-gradient(.8px .8px at 46% 23%, rgba(80,190,165,.52), transparent 85%),
+    radial-gradient(.6px .6px at 58% 39%, rgba(94,200,175,.48), transparent 85%),
+    radial-gradient(.7px .7px at 69% 58%, rgba(100,210,180,.55), transparent 85%),
+    radial-gradient(.8px .8px at 74% 24%, rgba(80,190,165,.5), transparent 85%),
+    radial-gradient(.6px .6px at 86% 49%, rgba(94,200,175,.48), transparent 85%),
+    radial-gradient(.7px .7px at 91% 83%, rgba(100,210,180,.52), transparent 85%),
+    radial-gradient(.8px .8px at 26% 59%, rgba(80,190,165,.5), transparent 85%),
+    radial-gradient(.6px .6px at 37% 78%, rgba(94,200,175,.48), transparent 85%),
+    radial-gradient(.7px .7px at 52% 67%, rgba(100,210,180,.55), transparent 85%),
+    radial-gradient(.8px .8px at 11% 95%, rgba(80,190,165,.5), transparent 85%),
+    radial-gradient(.6px .6px at 23% 38%, rgba(94,200,175,.45), transparent 85%),
+    radial-gradient(.7px .7px at 44% 12%, rgba(100,210,180,.5), transparent 85%),
+    radial-gradient(.8px .8px at 65% 71%, rgba(80,190,165,.48), transparent 85%),
+    radial-gradient(.6px .6px at 82% 14%, rgba(94,200,175,.5), transparent 85%),
+    radial-gradient(.7px .7px at 7% 65%, rgba(100,210,180,.52), transparent 85%),
+    radial-gradient(.8px .8px at 19% 20%, rgba(80,190,165,.48), transparent 85%),
+    radial-gradient(.6px .6px at 56% 52%, rgba(94,200,175,.45), transparent 85%),
+    radial-gradient(.7px .7px at 77% 89%, rgba(100,210,180,.5), transparent 85%),
+    radial-gradient(.8px .8px at 94% 31%, rgba(80,190,165,.48), transparent 85%),
+    radial-gradient(.6px .6px at 42% 47%, rgba(94,200,175,.45), transparent 85%),
+    radial-gradient(.7px .7px at 29% 89%, rgba(100,210,180,.5), transparent 85%),
+    radial-gradient(.8px .8px at 60% 18%, rgba(80,190,165,.48), transparent 85%);
+  opacity: .9;
   animation: starTwinkle 4.5s ease-in-out infinite alternate;
+}
+/* Second starfield layer — fine teal dust that drifts in the opposite
+   direction, selling the sense of parallax + depth. Sits above the primary
+   starfield via the .hero-starfield-deep class, rotated slowly so dense
+   regions sweep past the globe like galactic substructure. */
+.hero-starfield-deep {
+  position: absolute; inset: -20%;
+  pointer-events: none;
+  background:
+    radial-gradient(.6px .6px at 7% 12%, rgba(94,228,188,.9), transparent 80%),
+    radial-gradient(.5px .5px at 18% 28%, rgba(94,228,188,.8), transparent 80%),
+    radial-gradient(.7px .7px at 29% 45%, rgba(94,228,188,.85), transparent 80%),
+    radial-gradient(.5px .5px at 41% 14%, rgba(94,228,188,.75), transparent 80%),
+    radial-gradient(.6px .6px at 52% 31%, rgba(94,228,188,.88), transparent 80%),
+    radial-gradient(.5px .5px at 63% 58%, rgba(94,228,188,.78), transparent 80%),
+    radial-gradient(.7px .7px at 74% 22%, rgba(94,228,188,.82), transparent 80%),
+    radial-gradient(.5px .5px at 85% 41%, rgba(94,228,188,.75), transparent 80%),
+    radial-gradient(.6px .6px at 96% 74%, rgba(94,228,188,.85), transparent 80%),
+    radial-gradient(.5px .5px at 6% 73%, rgba(94,228,188,.8), transparent 80%),
+    radial-gradient(.7px .7px at 19% 88%, rgba(94,228,188,.82), transparent 80%),
+    radial-gradient(.5px .5px at 34% 66%, rgba(94,228,188,.75), transparent 80%),
+    radial-gradient(.6px .6px at 47% 92%, rgba(94,228,188,.88), transparent 80%),
+    radial-gradient(.5px .5px at 59% 79%, rgba(94,228,188,.75), transparent 80%),
+    radial-gradient(.7px .7px at 71% 96%, rgba(94,228,188,.8), transparent 80%),
+    radial-gradient(.5px .5px at 84% 61%, rgba(94,228,188,.78), transparent 80%),
+    radial-gradient(.6px .6px at 92% 15%, rgba(94,228,188,.85), transparent 80%),
+    radial-gradient(.5px .5px at 14% 55%, rgba(94,228,188,.72), transparent 80%),
+    radial-gradient(.7px .7px at 26% 7%, rgba(94,228,188,.8), transparent 80%),
+    radial-gradient(.5px .5px at 38% 80%, rgba(94,228,188,.75), transparent 80%),
+    radial-gradient(.6px .6px at 50% 48%, rgba(94,228,188,.82), transparent 80%),
+    radial-gradient(.5px .5px at 62% 3%, rgba(94,228,188,.75), transparent 80%),
+    radial-gradient(.7px .7px at 75% 64%, rgba(94,228,188,.8), transparent 80%),
+    radial-gradient(.5px .5px at 88% 85%, rgba(94,228,188,.75), transparent 80%),
+    radial-gradient(.6px .6px at 99% 53%, rgba(94,228,188,.82), transparent 80%);
+  opacity: .7;
+  animation: deepDrift 240s linear infinite;
+  mix-blend-mode: screen;
+}
+@keyframes deepDrift {
+  to { transform: rotate(360deg); }
 }
 .hero-starfield::before,
 .hero-starfield::after {

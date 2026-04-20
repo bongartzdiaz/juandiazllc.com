@@ -20,6 +20,7 @@ export function Hero() {
           <div className="mw-dust" />
           <div className="mw-nebula" />
         </div>
+        <div className="hero-starfield-deep" />
         <div className="hero-starfield" />
         <div className="hero-globe-container">
           <Globe />
