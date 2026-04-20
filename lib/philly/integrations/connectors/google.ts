@@ -11,6 +11,8 @@ export class GoogleConnector extends BaseConnector {
       scopes: [
         'https://www.googleapis.com/auth/calendar',
         'https://www.googleapis.com/auth/gmail.send',
+        'https://www.googleapis.com/auth/gmail.readonly',
+        'https://www.googleapis.com/auth/gmail.metadata',
         'https://www.googleapis.com/auth/userinfo.email',
       ],
       clientIdEnv: 'GOOGLE_CLIENT_ID',

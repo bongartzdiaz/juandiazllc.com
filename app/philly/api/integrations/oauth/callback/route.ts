@@ -62,5 +62,54 @@ export async function GET(req: NextRequest) {
     },
   })
 
+  // Bridge: Google integrations double as Gmail email accounts. Upserting
+  // an EmailAccount here means the sync engine + Email list UI don't need
+  // to know about Integration at all.
+  if (provider === 'google') {
+    try {
+      const userinfo = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: { Authorization: `Bearer ${tokens.accessToken}` },
+      }).then((r) => (r.ok ? r.json() : null))
+      const email = userinfo && typeof userinfo.email === 'string' ? userinfo.email.toLowerCase() : null
+      if (email) {
+        const existing = await prisma.emailAccount.findFirst({
+          where: { organizationId: payload.orgId, email, provider: 'gmail' },
+          select: { id: true },
+        })
+        if (existing) {
+          await prisma.emailAccount.update({
+            where: { id: existing.id },
+            data: {
+              accessToken: encAccess,
+              refreshToken: encRefresh,
+              tokenExpiry: expiry,
+              status: 'active',
+              displayName: typeof userinfo.name === 'string' ? userinfo.name : '',
+            },
+          })
+        } else {
+          await prisma.emailAccount.create({
+            data: {
+              organizationId: payload.orgId,
+              userId: payload.userId,
+              provider: 'gmail',
+              email,
+              displayName: typeof userinfo.name === 'string' ? userinfo.name : '',
+              accessToken: encAccess,
+              refreshToken: encRefresh,
+              tokenExpiry: expiry,
+              syncEnabled: true,
+              status: 'active',
+            },
+          })
+        }
+      }
+    } catch (err) {
+      // Non-fatal — Integration row is already saved; user can connect Gmail
+      // manually in Settings → Email if userinfo lookup failed.
+      console.warn('[oauth/callback] gmail account bridge failed', err)
+    }
+  }
+
   return redirect(`oauth_success=${provider}`)
 }

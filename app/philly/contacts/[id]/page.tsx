@@ -12,6 +12,7 @@ import {
   MessageSquare, Clock, CheckCircle2, AlertCircle, Briefcase, TrendingUp,
 } from 'lucide-react'
 import { AiAttributesCard, type ContactAiAttributes } from '@/components/philly/contacts/AiAttributesCard'
+import { EmailThreadList } from '@/components/philly/contacts/EmailThreadList'
 
 /* ------------------------------------------------------------------
    Types
@@ -138,11 +139,12 @@ const activityIcons: Record<string, typeof Activity> = {
    Tabs
    ------------------------------------------------------------------ */
 
-type Tab = 'overview' | 'activity' | 'notes' | 'projects' | 'deals'
+type Tab = 'overview' | 'activity' | 'notes' | 'projects' | 'deals' | 'emails'
 
 const TABS: { key: Tab; label: string; icon: typeof Activity }[] = [
   { key: 'overview', label: 'Overview', icon: User },
   { key: 'activity', label: 'Activity', icon: Activity },
+  { key: 'emails', label: 'Emails', icon: Mail },
   { key: 'notes', label: 'Notes', icon: FileText },
   { key: 'projects', label: 'Projects', icon: FolderKanban },
   { key: 'deals', label: 'Deals', icon: Briefcase },
@@ -582,6 +584,11 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
               </div>
             )}
           </div>
+        )}
+
+        {/* EMAILS */}
+        {activeTab === 'emails' && (
+          <EmailThreadList contactId={contact.id} />
         )}
 
         {/* NOTES */}

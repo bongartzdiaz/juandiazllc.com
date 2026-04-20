@@ -1453,26 +1453,59 @@ model EmailAccount {
 
   organization Organization @relation(fields: [organizationId], references: [id])
   emails       Email[]
+  threads      EmailThread[]
 
   @@index([organizationId])
   @@index([userId])
 }
 
+// Gmail/Outlook thread grouping. One row per provider thread id; lets us
+// render conversation view + track last-sync watermark per thread without
+// touching every Email row. `providerThreadId` is the raw id the provider
+// gave us (Gmail: `threadId` on messages; IMAP: we derive from References).
+model EmailThread {
+  id                String   @id @default(cuid())
+  accountId         String
+  providerThreadId  String   @db.VarChar(255)
+  contactId         String?
+  subject           String   @default("")
+  snippet           String   @default("") @db.Text
+  participants      String   @default("[]") @db.Text // JSON string[] of email addrs
+  messageCount      Int      @default(0)
+  unreadCount       Int      @default(0)
+  lastMessageAt     DateTime?
+  lastSyncedAt      DateTime?
+  labels            String   @default("[]") @db.Text // JSON string[] (Gmail labels)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  account  EmailAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  messages Email[]
+
+  @@unique([accountId, providerThreadId])
+  @@index([accountId])
+  @@index([contactId])
+  @@index([lastMessageAt])
+}
+
 model Email {
   id             String   @id @default(cuid())
   accountId      String
+  threadRowId    String?  // FK → EmailThread.id (optional during migration)
   contactId      String?
   messageId      String?  @db.VarChar(512) // RFC Message-ID
-  threadId       String?
+  threadId       String?  // Provider thread id (Gmail threadId). Kept for dedupe + back-compat.
   direction      String   @default("outbound") // inbound, outbound
   fromAddress    String
   toAddresses    String   @db.Text // JSON array
   ccAddresses    String   @default("[]") @db.Text
   bccAddresses   String   @default("[]") @db.Text
   subject        String   @default("")
+  snippet        String   @default("") @db.Text
   bodyHtml       String?  @db.LongText
   bodyText       String?  @db.LongText
-  status         String   @default("draft") // draft, queued, sent, delivered, bounced, failed
+  labels         String   @default("[]") @db.Text // JSON string[] (Gmail labels or IMAP flags)
+  status         String   @default("draft") // draft, queued, sent, delivered, bounced, failed, received
   openedAt       DateTime?
   clickedAt      DateTime?
   bouncedAt      DateTime?
@@ -1481,10 +1514,15 @@ model Email {
   createdAt      DateTime @default(now())
 
   account EmailAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  thread  EmailThread? @relation(fields: [threadRowId], references: [id], onDelete: SetNull)
 
+  // Dedupe across sync runs. Gmail re-emits the same message id when a
+  // thread gets fetched multiple times; this constraint makes upsert safe.
+  @@unique([accountId, messageId])
   @@index([accountId])
   @@index([contactId])
   @@index([threadId])
+  @@index([threadRowId])
   @@index([status])
 }
 
