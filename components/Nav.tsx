@@ -11,11 +11,11 @@ export function Nav() {
       <Link
         href="/"
         className="brand"
-        aria-label="Juan Diaz LLC — home"
+        aria-label="Juan Diaz, LLC — home"
         style={{ color: "var(--accent)", gap: 12 }}
       >
         <Logo size={26} animated />
-        <span style={{ color: "var(--text)" }}>Juan Diaz LLC</span>
+        <span style={{ color: "var(--text)" }}>Juan Diaz, LLC</span>
       </Link>
       <div className="nav-right">
         <span id="navTime">—</span>

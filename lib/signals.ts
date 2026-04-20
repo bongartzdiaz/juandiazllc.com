@@ -71,7 +71,7 @@ export const SIGNALS: Signal[] = [
     excerpt:
       "Starting a holding for my work changed more than the legal wrapper. It changed what I was willing to build — and what I wasn't.",
     body: [
-      { type: "p", text: "Setting up Juan Diaz LLC was on my list for a long time before I actually did it. When I finally moved, the thing that surprised me was how much the legal structure changed the creative work, not just the accounting." },
+      { type: "p", text: "Setting up Juan Diaz, LLC was on my list for a long time before I actually did it. When I finally moved, the thing that surprised me was how much the legal structure changed the creative work, not just the accounting." },
       { type: "p", text: "Before the holding existed, every new product had to justify itself as a business in isolation. Voltafy had to be a company. Performance Tracker had to be a company. Each had to carry its own overhead, its own brand, its own survival." },
       { type: "p", text: "Once there was a holding, the calculation flipped. Each product could be a product. The holding was the business. That tiny change — product instead of company — rearranged what was worth building." },
       { type: "h2", text: "The products got braver." },

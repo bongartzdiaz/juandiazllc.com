@@ -8,7 +8,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: "Impressum",
     description:
-      "Legal notice for Juan Diaz LLC — company details, contact, and responsibility for content per German TMG §5 / EU DSA art. 12.",
+      "Legal notice for Juan Diaz, LLC — company details, contact, and responsibility for content per German TMG §5 / EU DSA art. 12.",
     alternates: buildAlternates(l, "/impressum"),
     robots: { index: true, follow: true },
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },

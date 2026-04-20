@@ -1,6 +1,6 @@
 # juandiazllc.com
 
-Personal brand + holding site for Juan Diaz LLC. Dark-green, futuristic, operator-built.
+Personal brand + holding site for Juan Diaz, LLC. Dark-green, futuristic, operator-built.
 
 ## Stack
 

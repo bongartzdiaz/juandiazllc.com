@@ -8,7 +8,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: "Story — construction-trained, operator-built",
     description:
-      "The story behind Juan Diaz LLC — construction management, the crossover to revenue operations, and why I build honest software for operators.",
+      "The story behind Juan Diaz, LLC — construction management, the crossover to revenue operations, and why I build honest software for operators.",
     alternates: buildAlternates(l, "/story"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };

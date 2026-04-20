@@ -39,7 +39,7 @@ export function Hero() {
         <div className="hero-foot">
           <div style={{ maxWidth: 600 }}>
             <p className="hero-desc">
-              <b>Juan Diaz LLC</b> {t("hero.desc")}
+              <b>Juan Diaz, LLC</b> {t("hero.desc")}
             </p>
             <div className="hero-ctas">
               <Link className="btn primary btn-mag" href="/contact">

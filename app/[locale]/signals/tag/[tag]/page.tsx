@@ -43,12 +43,12 @@ export async function generateMetadata(
   const title = `${translate(l, "signals.tag.title")} ${canonical}`;
   return {
     title,
-    description: `${translate(l, "signals.tag.title")} ${canonical.toLowerCase()} — field notes and build logs from Juan Diaz LLC.`,
+    description: `${translate(l, "signals.tag.title")} ${canonical.toLowerCase()} — field notes and build logs from Juan Diaz, LLC.`,
     alternates: buildAlternates(l, `/signals/tag/${tag}`),
     openGraph: {
       type: "website",
       url: `/${l}/signals/tag/${tag}`,
-      title: `${canonical} signals — Juan Diaz LLC`,
+      title: `${canonical} signals — Juan Diaz, LLC`,
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
     },

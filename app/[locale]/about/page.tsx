@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: "About Juan Diaz — operator, builder, founder",
     description:
-      "Construction-trained, operator-built. Juan Diaz runs Juan Diaz LLC — a holding company building revenue engines for operators in energy, real estate and hospitality.",
+      "Construction-trained, operator-built. Juan Diaz runs Juan Diaz, LLC — a holding company building revenue engines for operators in energy, real estate and hospitality.",
     alternates: buildAlternates(l, "/about"),
     openGraph: {
       type: "profile",
@@ -29,13 +29,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
-  name: "Juan Diaz",
+  name: "Juan Stefan Bongartz Diaz",
+  alternateName: "Juan Diaz",
   url: `${SITE}/about`,
   image: `${SITE}/me/portrait.jpg`,
-  jobTitle: "Founder, Juan Diaz LLC",
+  jobTitle: "Founder, Juan Diaz, LLC",
   worksFor: {
     "@type": "Organization",
-    name: "Juan Diaz LLC",
+    name: "Juan Diaz, LLC",
     url: SITE,
   },
   description:

@@ -1,5 +1,5 @@
 /* TEAM */
-    Founder + Builder: Juan Diaz
+    Founder + Builder: Juan Stefan Bongartz Diaz
     Contact:           juan [at] juandiazllc.com
     From:              Amsterdam, NL ↔ Delaware, USA
 

@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       "Field notes on building the systems that move real P&Ls. Operator CRMs, energy funnels, build-vs-buy — written for the people who own the number.",
     alternates: buildAlternates(l, "/insights"),
     openGraph: {
-      title: "Insights — Juan Diaz LLC",
+      title: "Insights — Juan Diaz, LLC",
       description: "Field notes on building the systems that move real P&Ls.",
       type: "website",
       url: `/${l}/insights`,

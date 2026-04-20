@@ -37,7 +37,7 @@ function buildItems(): FeedItem[] {
       .join("\n\n"),
     date_published: new Date(p.publishedAt).toISOString(),
     tags: [p.tag],
-    authors: [{ name: "Juan Diaz" }],
+    authors: [{ name: "Juan Stefan Bongartz Diaz" }],
   }));
 
   const signals: FeedItem[] = SIGNALS.map((s) => ({
@@ -56,7 +56,7 @@ function buildItems(): FeedItem[] {
       .join("\n\n"),
     date_published: new Date(s.date).toISOString(),
     tags: [s.tag],
-    authors: [{ name: "Juan Diaz" }],
+    authors: [{ name: "Juan Stefan Bongartz Diaz" }],
   }));
 
   return [...insights, ...signals].sort((a, b) =>
@@ -73,9 +73,9 @@ export async function GET() {
     home_page_url: SITE,
     feed_url: `${SITE}/feed.json`,
     description:
-      "Revenue-engine thinking from Juan Diaz LLC. Essays, signals, operator ops.",
+      "Revenue-engine thinking from Juan Diaz, LLC. Essays, signals, operator ops.",
     language: "en-us",
-    authors: [{ name: "Juan Diaz", url: SITE }],
+    authors: [{ name: "Juan Stefan Bongartz Diaz", url: SITE }],
     items,
   };
 

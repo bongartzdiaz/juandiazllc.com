@@ -1,13 +1,13 @@
 import { ImageResponse } from "next/og";
 import { getSignal } from "@/lib/signals";
 
-export const alt = "Juan Diaz LLC — Signal";
+export const alt = "Juan Diaz, LLC — Signal";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OG({ params }: { params: { slug: string } }) {
   const s = getSignal(params.slug);
-  const title = s?.title ?? "Juan Diaz LLC — Signal";
+  const title = s?.title ?? "Juan Diaz, LLC — Signal";
   const tag = s?.tag ?? "Signals";
   const readTime = s?.readTime;
 
@@ -40,7 +40,7 @@ export default async function OG({ params }: { params: { slug: string } }) {
               />
             </svg>
             <div style={{ display: "flex", fontSize: 20, letterSpacing: "0.2em", textTransform: "uppercase", color: "#9ABAA9" }}>
-              Juan Diaz LLC
+              Juan Diaz, LLC
             </div>
           </div>
           <div

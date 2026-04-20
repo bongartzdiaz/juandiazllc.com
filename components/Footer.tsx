@@ -8,7 +8,7 @@ export function Footer() {
   return (
     <footer>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        <div className="f-mark">Juan Diaz LLC</div>
+        <div className="f-mark">Juan Diaz, LLC</div>
         <div style={{ color: "var(--muted-soft)", fontSize: 11 }}>{t("footer.copyright")}</div>
       </div>
       <nav aria-label="Footer" style={{ display: "flex", gap: 22, flexWrap: "wrap" }}>

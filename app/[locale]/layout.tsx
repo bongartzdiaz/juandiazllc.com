@@ -20,13 +20,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const l: Locale = (LOCALES as readonly string[]).includes(locale) ? (locale as Locale) : "en";
   return {
     openGraph: {
-      siteName: "Juan Diaz LLC",
+      siteName: "Juan Diaz, LLC",
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
     },
     twitter: {
       card: "summary_large_image",
-      title: "Juan Diaz LLC",
+      title: "Juan Diaz, LLC",
       description:
         "Revenue engines for operators in energy, real estate, hospitality and adjacent.",
     },
@@ -39,11 +39,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       "Voltafy",
       "salderingsregeling 2027",
       "Juan Stefan Diaz",
-      "Juan Diaz LLC",
+      "Juan Diaz, LLC",
     ],
     authors: [{ name: "Juan Stefan Diaz", url: SITE_URL }],
     creator: "Juan Stefan Diaz",
-    publisher: "Juan Diaz LLC",
+    publisher: "Juan Diaz, LLC",
     category: "business operations",
   };
 }
@@ -67,7 +67,7 @@ export default async function MainLayout({
             {
               "@context": "https://schema.org",
               "@type": "Organization",
-              name: "Juan Diaz LLC",
+              name: "Juan Diaz, LLC",
               alternateName: "JDL",
               url: SITE_URL,
               logo: `${SITE_URL}/icon.svg`,
@@ -101,7 +101,7 @@ export default async function MainLayout({
             {
               "@context": "https://schema.org",
               "@type": "WebSite",
-              name: "Juan Diaz LLC",
+              name: "Juan Diaz, LLC",
               url: SITE_URL,
               inLanguage: ["en", "nl", "de", "es"],
             },

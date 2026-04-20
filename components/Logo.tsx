@@ -1,5 +1,5 @@
 /**
- * Juan Diaz LLC — primary mark.
+ * Juan Diaz, LLC — primary mark.
  *
  * "The Plumb" — a construction plumb-bob suspended from a fixed beam.
  *

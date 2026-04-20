@@ -65,7 +65,7 @@ export default async function InsightPage(
       name: "Juan Stefan Diaz",
       url: `${SITE}/about`,
       image: `${SITE}/me/portrait.jpg`,
-      jobTitle: "Founder, Juan Diaz LLC",
+      jobTitle: "Founder, Juan Diaz, LLC",
       sameAs: [
         "https://linkedin.com/in/juanstefan",
         "https://instagram.com/diazelcazador",
@@ -73,7 +73,7 @@ export default async function InsightPage(
     },
     publisher: {
       "@type": "Organization",
-      name: "Juan Diaz LLC",
+      name: "Juan Diaz, LLC",
       logo: { "@type": "ImageObject", url: `${SITE}/icon.svg` },
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE}/insights/${post.slug}` },

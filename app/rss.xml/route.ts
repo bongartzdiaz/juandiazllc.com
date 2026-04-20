@@ -70,7 +70,7 @@ export async function GET(): Promise<Response> {
   <channel>
     <title>Juan Diaz — Insights &amp; Signals</title>
     <link>${SITE}</link>
-    <description>Revenue-engine thinking from Juan Diaz LLC. Essays, signals, operator ops.</description>
+    <description>Revenue-engine thinking from Juan Diaz, LLC. Essays, signals, operator ops.</description>
     <language>en-us</language>
     <lastBuildDate>${lastBuildDate}</lastBuildDate>
     <atom:link href="${SITE}/rss.xml" rel="self" type="application/rss+xml"/>${items}

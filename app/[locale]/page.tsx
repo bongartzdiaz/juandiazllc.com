@@ -18,10 +18,10 @@ import { faqSchema } from "@/lib/seo/schema";
 import { HOME_FAQ } from "@/lib/seo/faqs";
 
 const TITLES: Record<string, string> = {
-  en: "Juan Diaz LLC — revenue engines for operators",
-  nl: "Juan Diaz LLC — omzetmotoren voor operators",
-  de: "Juan Diaz LLC — Umsatzmotoren für Operators",
-  es: "Juan Diaz LLC — motores de ingresos para operadores",
+  en: "Juan Diaz, LLC — revenue engines for operators",
+  nl: "Juan Diaz, LLC — omzetmotoren voor operators",
+  de: "Juan Diaz, LLC — Umsatzmotoren für Operators",
+  es: "Juan Diaz, LLC — motores de ingresos para operadores",
 };
 
 const DESCRIPTIONS: Record<string, string> = {

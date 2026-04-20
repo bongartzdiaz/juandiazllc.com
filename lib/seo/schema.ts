@@ -36,7 +36,7 @@ export function serviceSchema(opts: {
     url: `${SITE}/sectors/${opts.slug}`,
     provider: {
       "@type": "Organization",
-      name: "Juan Diaz LLC",
+      name: "Juan Diaz, LLC",
       url: SITE,
     },
     areaServed: opts.areaServed ?? ["US", "NL", "DE", "ES"],
@@ -50,7 +50,7 @@ export function contactPointSchema(): Record<string, unknown> {
     url: `${SITE}/contact`,
     mainEntity: {
       "@type": "Organization",
-      name: "Juan Diaz LLC",
+      name: "Juan Diaz, LLC",
       url: SITE,
       contactPoint: [
         {

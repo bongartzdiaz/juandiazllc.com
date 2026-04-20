@@ -22,7 +22,7 @@ const BASE_SCALE_RATIO = 0.48; // fraction of min(w,h)/2
 const FEATURED: Record<string, { eyebrow: string; body: string }> = {
   Netherlands: {
     eyebrow: "Origin",
-    body: "Amsterdam — where Juan Diaz LLC was first framed as a cross-sector operating thesis.",
+    body: "Amsterdam — where Juan Diaz, LLC was first framed as a cross-sector operating thesis.",
   },
   "United States of America": {
     eyebrow: "Active",

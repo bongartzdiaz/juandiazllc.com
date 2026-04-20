@@ -10,7 +10,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: "Work — revenue engines, live in the field",
     description:
-      "Live products under Juan Diaz LLC — each one the five-phase playbook applied to a real sector with real operators.",
+      "Live products under Juan Diaz, LLC — each one the five-phase playbook applied to a real sector with real operators.",
     alternates: buildAlternates(l, "/work"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };

@@ -50,7 +50,7 @@ export async function generateMetadata(
     openGraph: {
       type: "website",
       url: `/${l}/insights/tag/${tag}`,
-      title: `${canonical} insights — Juan Diaz LLC`,
+      title: `${canonical} insights — Juan Diaz, LLC`,
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
     },

@@ -15,28 +15,28 @@ type ConfirmCopy = { subject: string; body: (url: string) => string };
 
 const COPY: Record<Locale, ConfirmCopy> = {
   en: {
-    subject: "Confirm your subscription — Juan Diaz LLC",
+    subject: "Confirm your subscription — Juan Diaz, LLC",
     body: (url) =>
       `Thanks for signing up for the field notes from juandiazllc.com.\n\n` +
       `One click to confirm and you're in — no follow-ups, no spam:\n\n${url}\n\n` +
       `If you didn't sign up, ignore this email and nothing happens.`,
   },
   nl: {
-    subject: "Bevestig je inschrijving — Juan Diaz LLC",
+    subject: "Bevestig je inschrijving — Juan Diaz, LLC",
     body: (url) =>
       `Bedankt voor je aanmelding voor de field notes van juandiazllc.com.\n\n` +
       `Eén klik om te bevestigen en je zit erin — geen follow-ups, geen spam:\n\n${url}\n\n` +
       `Heb je je niet aangemeld? Negeer deze mail, er gebeurt niets.`,
   },
   de: {
-    subject: "Anmeldung bestätigen — Juan Diaz LLC",
+    subject: "Anmeldung bestätigen — Juan Diaz, LLC",
     body: (url) =>
       `Danke für die Anmeldung zu den Field Notes von juandiazllc.com.\n\n` +
       `Ein Klick zur Bestätigung und Sie sind dabei — keine Nachfassaktionen, kein Spam:\n\n${url}\n\n` +
       `Falls Sie sich nicht angemeldet haben, ignorieren Sie diese E-Mail einfach.`,
   },
   es: {
-    subject: "Confirma tu suscripción — Juan Diaz LLC",
+    subject: "Confirma tu suscripción — Juan Diaz, LLC",
     body: (url) =>
       `Gracias por suscribirte a las field notes de juandiazllc.com.\n\n` +
       `Un clic para confirmar y listo — sin seguimientos, sin spam:\n\n${url}\n\n` +

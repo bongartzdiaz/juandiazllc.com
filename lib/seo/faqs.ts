@@ -7,8 +7,8 @@ import type { FaqItem } from "./schema";
 
 export const HOME_FAQ: FaqItem[] = [
   {
-    q: "What does Juan Diaz LLC actually do?",
-    a: "Juan Diaz LLC builds revenue engines for operators — the CRM, automations and growth infrastructure that turn a team of humans plus software into a compounding system. We operate as a holding company with internal ventures (Philly CRM, Voltafy, Help Mij Besparen) and a small number of operator engagements per year.",
+    q: "What does Juan Diaz, LLC actually do?",
+    a: "Juan Diaz, LLC builds revenue engines for operators — the CRM, automations and growth infrastructure that turn a team of humans plus software into a compounding system. We operate as a holding company with internal ventures (Philly CRM, Voltafy, Help Mij Besparen) and a small number of operator engagements per year.",
   },
   {
     q: "Which industries do you work with?",
@@ -30,15 +30,15 @@ export const HOME_FAQ: FaqItem[] = [
 
 export const BRAND_FAQ: FaqItem[] = [
   {
-    q: "What does Juan Diaz LLC do?",
-    a: "Juan Diaz LLC builds revenue engines for operators — CRM, automation, and growth infrastructure for companies in energy, real estate, hospitality and adjacent industries. Engagement is advisory-plus-build: blueprint, then ship.",
+    q: "What does Juan Diaz, LLC do?",
+    a: "Juan Diaz, LLC builds revenue engines for operators — CRM, automation, and growth infrastructure for companies in energy, real estate, hospitality and adjacent industries. Engagement is advisory-plus-build: blueprint, then ship.",
   },
   {
     q: "Who is the right client for a blueprint call?",
     a: "Operator-founders of 10-to-50-person companies whose growth is bottlenecked by missing systems rather than missing demand. Typical profile: profitable, manual, and ready to stop running the business out of WhatsApp and memory.",
   },
   {
-    q: "How is Juan Diaz LLC different from a typical consultancy?",
+    q: "How is Juan Diaz, LLC different from a typical consultancy?",
     a: "We ship the systems we recommend. Every engagement ends with working software — usually a tailored build on top of Philly (our operator CRM) — not a slide deck. Consulting-to-code ratio is roughly 30/70.",
   },
   {

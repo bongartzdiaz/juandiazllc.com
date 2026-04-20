@@ -8,13 +8,13 @@ import { getInsight } from "@/lib/insights";
 // the slug is unknown (shouldn't happen because generateStaticParams
 // restricts to known posts, but defensive).
 
-export const alt = "Juan Diaz LLC — Insight";
+export const alt = "Juan Diaz, LLC — Insight";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OG({ params }: { params: { slug: string } }) {
   const post = getInsight(params.slug);
-  const title = post?.title ?? "Juan Diaz LLC — Insight";
+  const title = post?.title ?? "Juan Diaz, LLC — Insight";
   const tag = post?.tag ?? "Insights";
   const readingMinutes = post?.readingMinutes;
 
@@ -48,7 +48,7 @@ export default async function OG({ params }: { params: { slug: string } }) {
               />
             </svg>
             <div style={{ display: "flex", fontSize: 20, letterSpacing: "0.2em", textTransform: "uppercase", color: "#9ABAA9" }}>
-              Juan Diaz LLC
+              Juan Diaz, LLC
             </div>
           </div>
           <div
