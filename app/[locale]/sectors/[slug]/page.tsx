@@ -6,6 +6,7 @@ import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { FaqSection } from "@/components/FaqSection";
+import { Countdown2027 } from "@/components/Countdown2027";
 import { faqSchema, serviceSchema } from "@/lib/seo/schema";
 import { getSectorFaq } from "@/lib/seo/faqs";
 
@@ -94,6 +95,27 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
       </header>
 
       <article className="long" style={{ paddingTop: 60 }}>
+        {s.slug === "energy" && (
+          <>
+            <aside className="anchor-callout" aria-labelledby="anchor-title">
+              <div className="anchor-callout-body">
+                <span className="anchor-callout-eyebrow">{translate(l, "fomo.anchor.energy.eyebrow")}</span>
+                <h3
+                  id="anchor-title"
+                  className="anchor-callout-title"
+                  dangerouslySetInnerHTML={{ __html: translate(l, "fomo.anchor.energy.title") }}
+                />
+                <p className="anchor-callout-text">{translate(l, "fomo.anchor.energy.body")}</p>
+              </div>
+              <Link href="/tools/energy-roi" className="anchor-callout-cta">
+                {translate(l, "fomo.anchor.energy.cta")}
+              </Link>
+            </aside>
+            <div style={{ margin: "0 0 48px" }}>
+              <Countdown2027 />
+            </div>
+          </>
+        )}
         {s.slug === "energy" && (
           <Link
             href="/tools/energy-roi"

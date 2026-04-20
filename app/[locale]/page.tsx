@@ -13,6 +13,8 @@ import { Signals } from "@/components/sections/Signals";
 import { CtaBig } from "@/components/sections/CtaBig";
 import { Contact } from "@/components/sections/Contact";
 import { FaqSection } from "@/components/FaqSection";
+import { LiveSignals } from "@/components/LiveSignals";
+import { Countdown2027 } from "@/components/Countdown2027";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { faqSchema } from "@/lib/seo/schema";
 import { HOME_FAQ } from "@/lib/seo/faqs";
@@ -49,7 +51,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-export default function Home() {
+export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const l = assertLocale(locale);
   return (
     <>
       <script
@@ -64,6 +68,10 @@ export default function Home() {
       <Kinetic />
       <Chapters />
       <Ventures />
+      <LiveSignals locale={l} />
+      <section style={{ padding: "40px 40px 0", maxWidth: "var(--max)", margin: "0 auto" }}>
+        <Countdown2027 />
+      </section>
       <Stats />
       <ResultsStrip />
       <Signals />

@@ -578,6 +578,56 @@ const en: Dict = {
 
   "footer.copyright": "© 2026 · Delaware, USA",
   "footer.tz": "Amsterdam CET",
+
+  // FOMO / conversion psychology — Countdown 2027
+  "fomo.countdown.label": "Salderingsregeling ends in",
+  "fomo.countdown.days": "days",
+  "fomo.countdown.hours": "hours",
+  "fomo.countdown.minutes": "minutes",
+  "fomo.countdown.seconds": "seconds",
+  "fomo.countdown.suffix": "until 4M Dutch rooftops need new software.",
+  "fomo.countdown.cta": "Read the field guide →",
+
+  // Capacity
+  "fomo.capacity.eyebrow": "◉ Live capacity",
+  "fomo.capacity.title": "Blueprint calendar.",
+  "fomo.capacity.slotsLabel": "slots remaining",
+  "fomo.capacity.note": "One blueprint engagement per quarter. When it's full, it's full.",
+  "fomo.capacity.cta": "Book the next slot",
+
+  // LiveSignals (honest portfolio state)
+  "fomo.proof.eyebrow": "◉ Live · right now",
+  "fomo.proof.title": "The operation, in <em>real numbers</em>.",
+  "fomo.proof.0.l": "ventures shipping",
+  "fomo.proof.1.l": "sectors in operate",
+  "fomo.proof.2.l": "in vendor kickbacks",
+  "fomo.proof.3.l": "founder, every surface",
+
+  // Anchoring on sector/energy page
+  "fomo.anchor.energy.eyebrow": "◉ The 2027 reset",
+  "fomo.anchor.energy.title": "On Jan 1, 2027, <em>4 million</em> Dutch solar rooftops wake up on a different grid.",
+  "fomo.anchor.energy.body": "Zero vendors have shipped post-saldering tooling yet. The operator who ships honest software first wins the decade. We're already shipping.",
+  "fomo.anchor.energy.cta": "Run the 2027 math →",
+
+  // Progressive form
+  "form.step": "Step",
+  "form.of": "of",
+  "form.next": "Next",
+  "form.back": "Back",
+  "form.submit": "Book the call",
+  "form.step1.title": "What are you running?",
+  "form.step1.sub": "Pick the closest match — we'll tune from there.",
+  "form.step2.title": "Where are you in the build?",
+  "form.step2.sub": "One answer. We'll go deeper on the call.",
+  "form.step2.survey": "Revenue is leaking — not sure where.",
+  "form.step2.blueprint": "Problem is scoped — need a plan.",
+  "form.step2.build": "Plan exists — need to ship.",
+  "form.step2.operate": "Shipped — need to tune and scale.",
+  "form.step3.title": "How do we reach you?",
+  "form.step3.sub": "Name + email. I'll reply within one working day.",
+  "form.step3.name": "Name",
+  "form.step3.email": "Email",
+  "form.step3.note": "Anything you want me to know before the call?",
 };
 
 const nl: Dict = {
@@ -1113,6 +1163,52 @@ const nl: Dict = {
 
   "footer.copyright": "© 2026 · Delaware, VS",
   "footer.tz": "Amsterdam CET",
+
+  // FOMO / conversion
+  "fomo.countdown.label": "Salderingsregeling eindigt over",
+  "fomo.countdown.days": "dagen",
+  "fomo.countdown.hours": "uren",
+  "fomo.countdown.minutes": "minuten",
+  "fomo.countdown.seconds": "seconden",
+  "fomo.countdown.suffix": "tot 4 miljoen Nederlandse daken nieuwe software nodig hebben.",
+  "fomo.countdown.cta": "Lees de veldgids →",
+
+  "fomo.capacity.eyebrow": "◉ Live capaciteit",
+  "fomo.capacity.title": "Blueprint-agenda.",
+  "fomo.capacity.slotsLabel": "plekken over",
+  "fomo.capacity.note": "Eén blueprint-traject per kwartaal. Vol is vol.",
+  "fomo.capacity.cta": "Boek de volgende plek",
+
+  "fomo.proof.eyebrow": "◉ Live · nu",
+  "fomo.proof.title": "De operatie, in <em>echte cijfers</em>.",
+  "fomo.proof.0.l": "producten in de lucht",
+  "fomo.proof.1.l": "sectoren in operate",
+  "fomo.proof.2.l": "aan vendor-commissies",
+  "fomo.proof.3.l": "oprichter, elk oppervlak",
+
+  "fomo.anchor.energy.eyebrow": "◉ De reset van 2027",
+  "fomo.anchor.energy.title": "Op 1 januari 2027 worden <em>4 miljoen</em> Nederlandse zonnedaken wakker op een ander net.",
+  "fomo.anchor.energy.body": "Geen enkele leverancier heeft post-saldering-tooling gemaakt. Wie als eerste eerlijke software levert, wint het decennium. Wij leveren al.",
+  "fomo.anchor.energy.cta": "Reken 2027 door →",
+
+  "form.step": "Stap",
+  "form.of": "van",
+  "form.next": "Verder",
+  "form.back": "Terug",
+  "form.submit": "Plan het gesprek",
+  "form.step1.title": "Wat run je?",
+  "form.step1.sub": "Kies de dichtstbijzijnde — we verfijnen daarna.",
+  "form.step2.title": "Waar sta je in de bouw?",
+  "form.step2.sub": "Eén antwoord. We gaan dieper op het gesprek.",
+  "form.step2.survey": "Omzet lekt — ik weet niet waar.",
+  "form.step2.blueprint": "Probleem is scherp — ik heb een plan nodig.",
+  "form.step2.build": "Plan staat — moet live.",
+  "form.step2.operate": "Live — moet bijslijpen en opschalen.",
+  "form.step3.title": "Hoe bereiken we je?",
+  "form.step3.sub": "Naam + e-mail. Ik reageer binnen één werkdag.",
+  "form.step3.name": "Naam",
+  "form.step3.email": "E-mail",
+  "form.step3.note": "Iets wat ik vooraf moet weten?",
 };
 
 const de: Dict = {
@@ -1648,6 +1744,52 @@ const de: Dict = {
 
   "footer.copyright": "© 2026 · Delaware, USA",
   "footer.tz": "Amsterdam CET",
+
+  // FOMO / Konversion
+  "fomo.countdown.label": "Salderingsregeling endet in",
+  "fomo.countdown.days": "Tagen",
+  "fomo.countdown.hours": "Stunden",
+  "fomo.countdown.minutes": "Minuten",
+  "fomo.countdown.seconds": "Sekunden",
+  "fomo.countdown.suffix": "bis 4 Millionen niederländische Dächer neue Software brauchen.",
+  "fomo.countdown.cta": "Feldhandbuch lesen →",
+
+  "fomo.capacity.eyebrow": "◉ Live-Kapazität",
+  "fomo.capacity.title": "Blueprint-Kalender.",
+  "fomo.capacity.slotsLabel": "Plätze frei",
+  "fomo.capacity.note": "Ein Blueprint pro Quartal. Ausgebucht bedeutet ausgebucht.",
+  "fomo.capacity.cta": "Nächsten Slot buchen",
+
+  "fomo.proof.eyebrow": "◉ Live · gerade jetzt",
+  "fomo.proof.title": "Der Betrieb, in <em>echten Zahlen</em>.",
+  "fomo.proof.0.l": "Produkte im Versand",
+  "fomo.proof.1.l": "Sektoren im Betrieb",
+  "fomo.proof.2.l": "an Vendor-Provisionen",
+  "fomo.proof.3.l": "Gründer, jede Oberfläche",
+
+  "fomo.anchor.energy.eyebrow": "◉ Der 2027-Reset",
+  "fomo.anchor.energy.title": "Am 1. Januar 2027 wachen <em>4 Millionen</em> niederländische Solardächer in einem anderen Netz auf.",
+  "fomo.anchor.energy.body": "Kein Anbieter hat Post-Saldering-Software ausgeliefert. Wer ehrliche Tools zuerst versendet, gewinnt das Jahrzehnt. Wir versenden bereits.",
+  "fomo.anchor.energy.cta": "2027-Rechnung starten →",
+
+  "form.step": "Schritt",
+  "form.of": "von",
+  "form.next": "Weiter",
+  "form.back": "Zurück",
+  "form.submit": "Gespräch buchen",
+  "form.step1.title": "Was betreibst du?",
+  "form.step1.sub": "Wähl die nächste Option — wir schärfen dann nach.",
+  "form.step2.title": "Wo stehst du im Build?",
+  "form.step2.sub": "Eine Antwort. Die Tiefe kommt im Gespräch.",
+  "form.step2.survey": "Umsatz leckt — wo, unklar.",
+  "form.step2.blueprint": "Problem ist klar — Plan fehlt.",
+  "form.step2.build": "Plan steht — muss live.",
+  "form.step2.operate": "Live — muss feinjustiert und skaliert werden.",
+  "form.step3.title": "Wie erreichen wir dich?",
+  "form.step3.sub": "Name + E-Mail. Antwort innerhalb eines Werktags.",
+  "form.step3.name": "Name",
+  "form.step3.email": "E-Mail",
+  "form.step3.note": "Etwas, das ich vorher wissen sollte?",
 };
 
 const es: Dict = {
@@ -2183,6 +2325,52 @@ const es: Dict = {
 
   "footer.copyright": "© 2026 · Delaware, EE. UU.",
   "footer.tz": "Ámsterdam CET",
+
+  // FOMO / conversión
+  "fomo.countdown.label": "La salderingsregeling termina en",
+  "fomo.countdown.days": "días",
+  "fomo.countdown.hours": "horas",
+  "fomo.countdown.minutes": "minutos",
+  "fomo.countdown.seconds": "segundos",
+  "fomo.countdown.suffix": "hasta que 4 millones de tejados holandeses necesiten software nuevo.",
+  "fomo.countdown.cta": "Leer la guía →",
+
+  "fomo.capacity.eyebrow": "◉ Capacidad en vivo",
+  "fomo.capacity.title": "Agenda de blueprint.",
+  "fomo.capacity.slotsLabel": "plazas disponibles",
+  "fomo.capacity.note": "Un blueprint por trimestre. Cuando se llena, se llena.",
+  "fomo.capacity.cta": "Reservar la siguiente plaza",
+
+  "fomo.proof.eyebrow": "◉ En vivo · ahora mismo",
+  "fomo.proof.title": "La operación, en <em>números reales</em>.",
+  "fomo.proof.0.l": "productos en marcha",
+  "fomo.proof.1.l": "sectores en operate",
+  "fomo.proof.2.l": "en comisiones de proveedores",
+  "fomo.proof.3.l": "fundador, cada superficie",
+
+  "fomo.anchor.energy.eyebrow": "◉ El reset de 2027",
+  "fomo.anchor.energy.title": "El 1 de enero de 2027, <em>4 millones</em> de tejados solares holandeses despiertan en otra red.",
+  "fomo.anchor.energy.body": "Ningún proveedor ha lanzado herramientas post-saldering. Quien envíe software honesto primero, gana la década. Nosotros ya estamos enviando.",
+  "fomo.anchor.energy.cta": "Calcular 2027 →",
+
+  "form.step": "Paso",
+  "form.of": "de",
+  "form.next": "Siguiente",
+  "form.back": "Atrás",
+  "form.submit": "Reservar llamada",
+  "form.step1.title": "¿Qué estás operando?",
+  "form.step1.sub": "Elige el más cercano — afinamos desde ahí.",
+  "form.step2.title": "¿Dónde estás en la construcción?",
+  "form.step2.sub": "Una respuesta. Profundizamos en la llamada.",
+  "form.step2.survey": "Hay fugas de ingresos — no sé dónde.",
+  "form.step2.blueprint": "Problema claro — necesito plan.",
+  "form.step2.build": "Plan listo — toca enviar.",
+  "form.step2.operate": "Enviado — ajustar y escalar.",
+  "form.step3.title": "¿Cómo te contactamos?",
+  "form.step3.sub": "Nombre + email. Respondo en un día laboral.",
+  "form.step3.name": "Nombre",
+  "form.step3.email": "Email",
+  "form.step3.note": "¿Algo que deba saber antes de la llamada?",
 };
 
 export const DICT: Record<Locale, Dict> = { en, nl, de, es };
