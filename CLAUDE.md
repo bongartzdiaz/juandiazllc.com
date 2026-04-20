@@ -3,6 +3,26 @@
 Next.js 16 + Prisma 7 + Supabase marketing site + Philly CRM app.
 Tests run via Vitest: `npm test`. Typecheck: `npm run typecheck`. Build: `npm run build`.
 
+## SLOs (p95 latency budgets)
+Defined in `lib/philly/observability.ts` (`SLO` const). Wrap critical
+paths in `withSpan({ name, slo })` to tag Sentry spans with
+`slo.bucket` (`ok` / `slow` / `error`) and `slo.over_budget`.
+
+- `SLO.LOGIN` — 1,200 ms (auth.login, `app/actions/auth.ts`)
+- `SLO.CREATE_DEAL` — 800 ms (deal.create, `POST /api/deals`)
+- `SLO.AI_ACTION` — 15,000 ms (ai.score, `POST /api/ai/score`)
+
+`withSpan` no-ops transparently when `SENTRY_DSN` is unset, so tests
+and dev don't need the SDK. Uses `Sentry.startSpan` from @sentry/node
+v9 (which ships OTel-compatible tracing built-in — we skipped
+`@vercel/otel` because of a peer-dep conflict with Sentry 9's pinned
+`@opentelemetry/resources@1.30.1`).
+
+To add a new SLO-tracked path:
+1. Add the budget to `SLO` in `lib/philly/observability.ts`
+2. Wrap the work in `withSpan({ name: "<domain>.<op>", slo: SLO.X, op: "<category>" }, async () => { ... })`
+3. Document it in this section.
+
 ## Locales
 Four supported: `en`, `nl`, `de`, `es` (see `lib/i18n/dict.ts`).
 `translate()` falls back to `en` when a key is missing, so missing keys show

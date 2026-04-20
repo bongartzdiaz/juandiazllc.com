@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireScope } from '@/lib/philly/auth-helpers'
 import { generateLeadScores } from '@/lib/philly/ai/scoring'
 import { enforceRateLimit } from '@/lib/philly/rate-limit'
+import { SLO, withSpan } from '@/lib/philly/observability'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -19,11 +20,21 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url)
   const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '500', 10) || 500, 1000)
 
-  try {
-    const report = await generateLeadScores(scope.organizationId, limit)
-    return NextResponse.json({ data: report })
-  } catch (err) {
-    console.error('[ai/score] generation failed', err)
-    return NextResponse.json({ error: 'Failed to generate lead scores' }, { status: 500 })
-  }
+  return withSpan(
+    {
+      name: 'ai.score',
+      slo: SLO.AI_ACTION,
+      op: 'ai.generate',
+      attrs: { organizationId: scope.organizationId, limit },
+    },
+    async () => {
+      try {
+        const report = await generateLeadScores(scope.organizationId, limit)
+        return NextResponse.json({ data: report })
+      } catch (err) {
+        console.error('[ai/score] generation failed', err)
+        return NextResponse.json({ error: 'Failed to generate lead scores' }, { status: 500 })
+      }
+    },
+  )
 }
