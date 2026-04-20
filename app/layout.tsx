@@ -12,6 +12,13 @@ import { LOCALES, DEFAULT_LOCALE } from "@/lib/i18n/dict";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
+// Google Search Console domain verification. Hard-coded default is the
+// active token for juandiazllc.com — set GOOGLE_SITE_VERIFICATION in the
+// Vercel dashboard to override without a code change (e.g. after rotating
+// or verifying an additional property).
+const GOOGLE_SITE_VERIFICATION =
+  process.env.GOOGLE_SITE_VERIFICATION ?? "ABrD7ZNd5VJaxKfLcj9Lp5mznR-tqmKMfPTPoYQ6tKs";
+
 // SEO-focused metadata. Short, keyword-dense title template; descriptive
 // default; strong OG/Twitter cards so social shares look right. Keywords
 // array is a hint (search engines largely ignore it now) but kept for
@@ -54,6 +61,9 @@ export const metadata: Metadata = {
       "max-snippet": -1,
       "max-video-preview": -1,
     },
+  },
+  verification: {
+    google: GOOGLE_SITE_VERIFICATION,
   },
   openGraph: {
     type: "website",
