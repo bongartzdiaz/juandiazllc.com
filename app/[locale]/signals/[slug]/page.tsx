@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { SIGNALS, getSignal } from "@/lib/signals";
-import { LOCALES } from "@/lib/i18n/dict";
+import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { blogPostingSchema } from "@/lib/seo/article";
@@ -99,7 +99,7 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
       />
       <header className="page-hero" style={{ paddingBottom: 32 }}>
         <Link href="/signals" className="eyebrow" style={{ display: "inline-block", marginBottom: 24 }}>
-          ← All signals
+          ← {translate(l, "signals.d.all")}
         </Link>
         <div
           style={{
@@ -154,7 +154,7 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
             — Juan Stefan Bongartz Diaz
           </div>
           <Link className="btn primary btn-mag" href="/contact">
-            Work together <span className="arr">→</span>
+            {translate(l, "signals.d.cta")} <span className="arr">→</span>
           </Link>
         </div>
       </article>
@@ -173,7 +173,7 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
               }}
             >
               <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".14em", color: "var(--muted-soft)", textTransform: "uppercase", marginBottom: 10 }}>
-                ← Previous
+                ← {translate(l, "signals.d.prev")}
               </div>
               <div style={{ fontSize: 18, fontWeight: 500, letterSpacing: "-.015em", lineHeight: 1.3 }}>
                 {prev.title}
@@ -193,7 +193,7 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
               }}
             >
               <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".14em", color: "var(--muted-soft)", textTransform: "uppercase", marginBottom: 10 }}>
-                Next →
+                {translate(l, "signals.d.next")} →
               </div>
               <div style={{ fontSize: 18, fontWeight: 500, letterSpacing: "-.015em", lineHeight: 1.3 }}>
                 {next.title}

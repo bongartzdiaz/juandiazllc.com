@@ -95,26 +95,35 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
       </header>
 
       <article className="long" style={{ paddingTop: 60 }}>
-        {s.slug === "energy" && (
-          <>
+        {(() => {
+          const anchorHref =
+            s.slug === "energy" ? "/tools/energy-roi" : "/contact";
+          const eyebrow = translate(l, `fomo.anchor.${s.slug}.eyebrow`);
+          const title = translate(l, `fomo.anchor.${s.slug}.title`);
+          const body = translate(l, `fomo.anchor.${s.slug}.body`);
+          const cta = translate(l, `fomo.anchor.${s.slug}.cta`);
+          if (!eyebrow || eyebrow.startsWith("fomo.anchor.")) return null;
+          return (
             <aside className="anchor-callout" aria-labelledby="anchor-title">
               <div className="anchor-callout-body">
-                <span className="anchor-callout-eyebrow">{translate(l, "fomo.anchor.energy.eyebrow")}</span>
+                <span className="anchor-callout-eyebrow">{eyebrow}</span>
                 <h3
                   id="anchor-title"
                   className="anchor-callout-title"
-                  dangerouslySetInnerHTML={{ __html: translate(l, "fomo.anchor.energy.title") }}
+                  dangerouslySetInnerHTML={{ __html: title }}
                 />
-                <p className="anchor-callout-text">{translate(l, "fomo.anchor.energy.body")}</p>
+                <p className="anchor-callout-text">{body}</p>
               </div>
-              <Link href="/tools/energy-roi" className="anchor-callout-cta">
-                {translate(l, "fomo.anchor.energy.cta")}
+              <Link href={anchorHref} className="anchor-callout-cta">
+                {cta}
               </Link>
             </aside>
-            <div style={{ margin: "0 0 48px" }}>
-              <Countdown2027 />
-            </div>
-          </>
+          );
+        })()}
+        {s.slug === "energy" && (
+          <div style={{ margin: "0 0 48px" }}>
+            <Countdown2027 />
+          </div>
         )}
         {s.slug === "energy" && (
           <Link

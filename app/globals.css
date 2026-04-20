@@ -2280,3 +2280,103 @@ em { color: var(--accent); font-style: italic; font-weight: 300; letter-spacing:
   .anchor-callout { grid-template-columns: 1fr; }
   .countdown-full-grid { gap: 6px 10px; }
 }
+
+/* ============================================================
+   Device-specific optimization for conversion components.
+   Phones, tablets, landscape phones, 4K, touch-only, reduced-motion,
+   and print. Matches the existing site-wide device-ladder pattern.
+   ============================================================ */
+
+/* Tablet (641-1024) — keep horizontal flow but tighten */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .livesignals-grid { grid-template-columns: repeat(2, 1fr); }
+  .countdown-full { padding: 20px 22px; }
+  .countdown-num { font-size: 32px; }
+  .capacity-full { padding: 20px 22px; }
+  .anchor-callout { padding: 24px 26px; }
+  .pf-choices { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Mobile (<=640) — stack everything, collapse dense data */
+@media (max-width: 640px) {
+  .livesignals { padding: 40px 20px; }
+  .livesignals-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .livesignals-cell { padding: 18px 16px; }
+  .livesignals-num { font-size: 34px; }
+  .livesignals-title { font-size: 24px; }
+  .countdown-full { padding: 18px 18px; border-radius: 14px; }
+  .countdown-full-grid { gap: 8px 10px; }
+  .countdown-num { font-size: 26px; }
+  .countdown-unit { font-size: 9px; }
+  .countdown-sep { display: none; }
+  .countdown-full-head { flex-direction: column; gap: 8px; }
+  .countdown-full-suffix { font-size: 12px; }
+  .countdown-chip {
+    font-size: 10px; gap: 8px; padding: 7px 12px;
+    flex-wrap: wrap; max-width: 100%;
+  }
+  .capacity-full { padding: 18px 18px; }
+  .capacity-title { font-size: 19px; }
+  .capacity-strip { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .capacity-strip-cta { border-left: 0; padding-left: 0; }
+  .anchor-callout { padding: 22px 20px; grid-template-columns: 1fr; gap: 14px; }
+  .anchor-callout-title { font-size: 19px; }
+  .anchor-callout-text { font-size: 14px; }
+  .pf-choices { grid-template-columns: 1fr; }
+  .pf-choice { padding: 16px 18px; font-size: 14px; }
+  .pf-h2 { font-size: 19px; }
+  .pf-actions { flex-direction: column-reverse; gap: 10px; }
+  .pf-actions > * { width: 100%; text-align: center; }
+}
+
+/* Landscape phones (wide but short) — reclaim vertical, shrink hero-free */
+@media (max-height: 560px) and (orientation: landscape) {
+  .countdown-num { font-size: 24px; }
+  .capacity-full, .countdown-full { padding: 14px 18px; }
+  .anchor-callout { padding: 18px 22px; margin: 24px 0; }
+}
+
+/* Large screens (4K, ultrawide) — cap line-length, keep type sane */
+@media (min-width: 1680px) {
+  .livesignals-title { font-size: 44px; }
+  .livesignals-num { font-size: 60px; }
+  .countdown-num { font-size: 44px; }
+  .anchor-callout { max-width: 1200px; margin-left: auto; margin-right: auto; }
+}
+
+/* Touch / coarse-pointer — kill hover animations that stick on tap */
+@media (hover: none) and (pointer: coarse) {
+  .livesignals-cell,
+  .pf-choice,
+  .pf-next, .pf-back,
+  .anchor-callout-cta,
+  .capacity-strip-cta,
+  .countdown-chip,
+  .countdown-full-cta,
+  .capacity-cta {
+    transition: none !important;
+  }
+  .livesignals-cell:hover { border-color: var(--line) !important; }
+  .pf-choice:hover:not(.is-selected) { border-color: var(--line) !important; background: rgba(3,20,15,.5) !important; }
+  /* 44x44 CSS px touch-target floor (WCAG 2.5.5) */
+  .pf-choice, .pf-next, .pf-back, .pf-done-icon,
+  .capacity-cta, .anchor-callout-cta, .countdown-chip,
+  .countdown-full-cta { min-height: 44px; }
+}
+
+/* Reduced motion — no heartbeat dots, no parallax drift */
+@media (prefers-reduced-motion: reduce) {
+  .countdown-chip-dot,
+  .capacity-dot,
+  .livesignals-dot { animation: none !important; }
+  .progressive-form .pf-progress-bar { transition: none !important; }
+  .hero-starfield-deep { animation: none !important; }
+}
+
+/* Print — hide everything animated / all CTAs */
+@media print {
+  .countdown-full, .countdown-chip,
+  .capacity-full, .capacity-strip,
+  .anchor-callout, .livesignals,
+  .progressive-form { display: none !important; }
+}
