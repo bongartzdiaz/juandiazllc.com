@@ -120,9 +120,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 @media (hover: none) { .cursor { display: none; } }
 
 /* Preloader */
-.preload { position: fixed; inset: 0; z-index: 300; background: var(--bg); display: flex; flex-direction: column; justify-content: space-between; padding: 32px 40px; transition: opacity .6s var(--ease), visibility .6s; animation: preloadFailsafe 3500ms forwards; }
+.preload { position: fixed; inset: 0; z-index: 300; background: var(--bg); display: flex; flex-direction: column; justify-content: space-between; padding: 32px 40px; transition: opacity .4s var(--ease), visibility .4s; animation: preloadFailsafe 1200ms forwards; }
 .preload.done { opacity: 0; visibility: hidden; pointer-events: none; }
-@keyframes preloadFailsafe { 0%, 92% { } 100% { opacity: 0; visibility: hidden; pointer-events: none; } }
+/* CSS-only failsafe: if JS never fires (blocked, slow, or disabled),
+   the preloader still dismisses at 1.2s so the hero is never hidden
+   behind a dark overlay for longer than that. */
+@keyframes preloadFailsafe { 0%, 80% { } 100% { opacity: 0; visibility: hidden; pointer-events: none; } }
 
 /* ─── Subdomain (philly + diaz) chrome ─── */
 .philly-shell { min-height: 100vh; display: flex; flex-direction: column; }
@@ -555,11 +558,14 @@ nav.top > * { pointer-events: auto; }
 .hero-title { font-family: 'Inter'; font-weight: 400; font-size: clamp(48px, 10vw, 160px); line-height: .94; letter-spacing: -.04em; max-width: 1600px; text-shadow: 0 2px 40px rgba(3,20,15,.6); }
 .hero-title em { font-style: italic; color: var(--accent); font-weight: 300; }
 .hero-title .line { overflow: hidden; display: block; }
-.hero-title .line > span { display: block; transform: translateY(110%); transition: transform 1s var(--ease); }
-.loaded .hero-title .line > span { transform: translateY(0); }
+.hero-title .line > span { display: block; transform: translateY(110%); transition: transform 1s var(--ease); animation: heroLineReveal 1s var(--ease) 1.2s forwards; }
+.loaded .hero-title .line > span { transform: translateY(0); animation: none; }
 .loaded .hero-title .line:nth-child(1) > span { transition-delay: .1s; }
 .loaded .hero-title .line:nth-child(2) > span { transition-delay: .2s; }
 .loaded .hero-title .line:nth-child(3) > span { transition-delay: .3s; }
+/* CSS-only reveal fallback — guarantees the hero title appears even if
+   the `loaded` class is never applied (JS blocked, hydration failure). */
+@keyframes heroLineReveal { to { transform: translateY(0); } }
 .hero-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; }
 .hero-desc { max-width: 560px; font-size: 16px; color: var(--muted); line-height: 1.6; background: rgba(3,20,15,.35); backdrop-filter: blur(6px); padding: 18px 20px; border-radius: 10px; border: 1px solid rgba(22,58,43,.6); }
 .hero-desc b { color: var(--text); font-weight: 500; }
