@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
   // Self-audit the prune (only for admin-triggered runs — cron has no session)
   if (triggeredBy === 'admin' && adminUserId && orgFilter) {
     await logAudit({
-      scope: { userId: adminUserId, organizationId: orgFilter, role: 'admin', email: null },
+      scope: { userId: adminUserId, organizationId: orgFilter, role: 'admin', email: null, dashboardSections: null },
       action: 'delete',
       entity: 'auditLog',
       changes: { pruned: { old: count, new: 0 } },

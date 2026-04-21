@@ -15,10 +15,12 @@ import {
 import type { LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useSupabaseUser } from '@/hooks/philly/useSupabaseUser'
+import { useMySections } from '@/hooks/philly/useMySections'
 import { createClient } from '@/lib/supabase/client'
 import { useIndustry, INDUSTRY_CONFIGS } from '@/hooks/philly/useIndustry'
 import type { Industry } from '@/hooks/philly/useIndustry'
 import { useTranslations } from 'next-intl'
+import { hasSection, sectionForPath } from '@/lib/philly/sections'
 
 interface NavItemDef {
   icon: LucideIcon
@@ -40,8 +42,21 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
   const { industry, config, setIndustry } = useIndustry()
   const [showSwitcher, setShowSwitcher] = useState(false)
   const session = useSupabaseUser()
+  const { role, dashboardSections, loading: sectionsLoading } = useMySections()
   const t = useTranslations('nav')
   const tc = useTranslations('common')
+
+  // Hide any nav item whose section slug is not in the user's allow-list.
+  // Items whose URL doesn't map to a known section (e.g. deep utility
+  // pages) are left visible — `sectionForPath` returns null for those.
+  // Admins and users with `dashboardSections === null` pass everything.
+  const visible = (item: NavItemDef) => {
+    // Avoid flicker-hiding during the first /me fetch.
+    if (sectionsLoading) return true
+    const section = sectionForPath(item.href)
+    if (!section) return true
+    return hasSection({ role, dashboardSections }, section.slug)
+  }
 
   const LogoIcon = INDUSTRY_ICONS[industry]
 
@@ -210,31 +225,10 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
 
       {/* Nav */}
       <nav style={{ flex: 1, overflowY: 'auto', padding: '10px 10px 14px' }}>
-        <NavLabel>{t('core')}</NavLabel>
-        {NAV_PRIMARY.map(item => (
-          <NavItem key={item.href} active={path === item.href || (item.href !== '/' && path.startsWith(item.href))} {...item} onClick={onNavigate} />
-        ))}
-
-        <div style={{ height: 1, background: 'var(--border)', margin: '8px 10px' }} />
-
-        <NavLabel>{t('tools')}</NavLabel>
-        {NAV_TOOLS.map(item => (
-          <NavItem key={item.href} active={path === item.href || path.startsWith(item.href)} {...item} onClick={onNavigate} />
-        ))}
-
-        <div style={{ height: 1, background: 'var(--border)', margin: '8px 10px' }} />
-
-        <NavLabel>{config.shortLabel}</NavLabel>
-        {NAV_INDUSTRY.map(item => (
-          <NavItem key={item.href} active={path === item.href || path.startsWith(item.href)} {...item} onClick={onNavigate} />
-        ))}
-
-        <div style={{ height: 1, background: 'var(--border)', margin: '8px 10px' }} />
-
-        <NavLabel>{t('system')}</NavLabel>
-        {NAV_SYSTEM.map(item => (
-          <NavItem key={item.href} active={path === item.href || path.startsWith(item.href)} {...item} onClick={onNavigate} />
-        ))}
+        <NavGroup label={t('core')} items={NAV_PRIMARY.filter(visible)} path={path} onNavigate={onNavigate} firstGroup />
+        <NavGroup label={t('tools')} items={NAV_TOOLS.filter(visible)} path={path} onNavigate={onNavigate} />
+        <NavGroup label={config.shortLabel} items={NAV_INDUSTRY.filter(visible)} path={path} onNavigate={onNavigate} />
+        <NavGroup label={t('system')} items={NAV_SYSTEM.filter(visible)} path={path} onNavigate={onNavigate} />
       </nav>
 
       {/* Footer */}
@@ -283,6 +277,37 @@ function getInitials(name?: string | null): string {
   const parts = name.trim().split(/\s+/)
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+}
+
+function NavGroup({
+  label, items, path, onNavigate, firstGroup = false,
+}: {
+  label: string
+  items: NavItemDef[]
+  path: string
+  onNavigate?: () => void
+  firstGroup?: boolean
+}) {
+  // Drop the group entirely when its visible-item list is empty,
+  // so we never render a floating "Tools" / "System" header with
+  // nothing beneath it.
+  if (items.length === 0) return null
+  return (
+    <>
+      {!firstGroup && (
+        <div style={{ height: 1, background: 'var(--border)', margin: '8px 10px' }} />
+      )}
+      <NavLabel>{label}</NavLabel>
+      {items.map(item => (
+        <NavItem
+          key={item.href}
+          active={path === item.href || (item.href !== '/' && path.startsWith(item.href))}
+          {...item}
+          onClick={onNavigate}
+        />
+      ))}
+    </>
+  )
 }
 
 function NavLabel({ children }: { children: React.ReactNode }) {

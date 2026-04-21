@@ -9,6 +9,7 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit, diffChanges } from '@/lib/philly/audit'
 import { serverError } from '@/lib/philly/safe-error'
+import { parseDashboardSections } from '@/lib/philly/sections'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -21,6 +22,7 @@ const ME_SELECT = {
   locale: true,
   avatarUrl: true,
   createdAt: true,
+  dashboardSections: true,
   organization: {
     select: {
       id: true,
@@ -45,7 +47,14 @@ export async function GET() {
 
   if (!user) return jsonError('User not found', 404)
 
-  return NextResponse.json({ data: user })
+  // Normalise the raw JSON column to the parsed allow-list shape the
+  // sidebar expects (null = full access, string[] = strict list).
+  const data = {
+    ...user,
+    dashboardSections: parseDashboardSections(user.dashboardSections),
+  }
+
+  return NextResponse.json({ data })
 }
 
 export async function PATCH(req: NextRequest) {

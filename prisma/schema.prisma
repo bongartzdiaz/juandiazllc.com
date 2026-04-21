@@ -61,6 +61,11 @@ model User {
   name           String
   passwordHash   String
   role           String    @default("viewer") // admin, manager, viewer
+  // Per-user dashboard-section allow-list. Null = full access
+  // (superadmin / legacy users). Array of slugs from
+  // lib/philly/sections.ts = strict allow-list. `role === 'admin'`
+  // bypasses this regardless (admins can't lock themselves out).
+  dashboardSections Json?
   locale         String    @default("en")
   avatarUrl      String?
   image          String?

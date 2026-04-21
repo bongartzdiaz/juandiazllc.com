@@ -16,12 +16,16 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
+import { hasSection, parseDashboardSections } from '@/lib/philly/sections'
 
 export type AuthScope = {
   userId: string
   organizationId: string
   role: string
   email: string | null
+  // Null = full access (admins + legacy users).
+  // Array = strict allow-list of section slugs.
+  dashboardSections: string[] | null
 }
 
 export function jsonError(message: string, status: number) {
@@ -39,7 +43,7 @@ async function resolvePhillyUser(email: string) {
 
   let user = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, email: true, role: true, organizationId: true },
+    select: { id: true, email: true, role: true, organizationId: true, dashboardSections: true },
   })
   if (user) return user
 
@@ -70,7 +74,7 @@ async function resolvePhillyUser(email: string) {
       // credentials login path exists to check against it.
       passwordHash: '__supabase_auth__',
     },
-    select: { id: true, email: true, role: true, organizationId: true },
+    select: { id: true, email: true, role: true, organizationId: true, dashboardSections: true },
   })
 
   return user
@@ -121,6 +125,7 @@ export async function requireScope(): Promise<AuthScope | NextResponse> {
       organizationId: phillyUser.organizationId,
       role: authoritativeRole,
       email: phillyUser.email,
+      dashboardSections: parseDashboardSections(phillyUser.dashboardSections),
     }
   } catch (err) {
     console.error('[requireScope] failed to resolve philly user', err)
@@ -142,5 +147,23 @@ export async function requireRole(
     return jsonError('Forbidden', 403)
   }
 
+  return scope
+}
+
+/**
+ * Guards an API route by dashboard-section. Returns the scope on
+ * success, or a 403 NextResponse if this user's `dashboardSections`
+ * allow-list doesn't include `slug`. Admins always pass; users with
+ * `dashboardSections === null` also pass (legacy/superadmin).
+ *
+ * Unknown slugs fail closed — defensive against typos introducing
+ * unintended public access.
+ */
+export async function requireSection(slug: string): Promise<AuthScope | NextResponse> {
+  const scope = await requireScope()
+  if (scope instanceof NextResponse) return scope
+  if (!hasSection({ role: scope.role, dashboardSections: scope.dashboardSections }, slug)) {
+    return jsonError('Forbidden', 403)
+  }
   return scope
 }

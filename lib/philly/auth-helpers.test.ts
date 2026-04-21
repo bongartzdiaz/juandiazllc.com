@@ -5,7 +5,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // Vitest's transform, so this runs before the `import` on line 15.
 const supabaseState = { email: null as string | null }
 const prismaState = {
-  existingUsers: [] as Array<{ id: string; email: string; role: string; organizationId: string | null }>,
+  existingUsers: [] as Array<{
+    id: string; email: string; role: string; organizationId: string | null;
+    dashboardSections?: unknown
+  }>,
   orgs: [] as Array<{ id: string; slug: string }>,
   userCreateCalls: [] as Array<{ email: string; role: string }>,
 }
@@ -54,7 +57,7 @@ vi.mock('@/lib/philly/auth', () => ({
   }),
 }))
 
-import { jsonError, requireScope, requireRole } from './auth-helpers'
+import { jsonError, requireScope, requireRole, requireSection } from './auth-helpers'
 import { NextResponse } from 'next/server'
 
 function reset() {
@@ -183,5 +186,78 @@ describe('requireRole', () => {
     if (result instanceof NextResponse) {
       expect(result.status).toBe(401)
     }
+  })
+})
+
+describe('requireSection', () => {
+  beforeEach(reset)
+
+  it('returns the scope when the user has that section in their allow-list', async () => {
+    prismaState.orgs = [{ id: 'org_1', slug: 'volitfy' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'viewer@example.com', role: 'viewer',
+      organizationId: 'org_1', dashboardSections: ['dashboard', 'deals'],
+    }]
+    supabaseState.email = 'viewer@example.com'
+
+    const result = await requireSection('deals')
+    if (result instanceof NextResponse) throw new Error(`expected scope, got ${result.status}`)
+    expect(result.role).toBe('viewer')
+    expect(result.dashboardSections).toEqual(['dashboard', 'deals'])
+  })
+
+  it('returns 403 when the section is not in the allow-list', async () => {
+    prismaState.orgs = [{ id: 'org_1', slug: 'volitfy' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'viewer@example.com', role: 'viewer',
+      organizationId: 'org_1', dashboardSections: ['dashboard'],
+    }]
+    supabaseState.email = 'viewer@example.com'
+
+    const result = await requireSection('deals')
+    expect(result).toBeInstanceOf(NextResponse)
+    if (result instanceof NextResponse) {
+      expect(result.status).toBe(403)
+      expect((await readBody(result)).error).toBe('Forbidden')
+    }
+  })
+
+  it('always allows admins regardless of their allow-list', async () => {
+    prismaState.orgs = [{ id: 'org_1', slug: 'volitfy' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'admin@example.com', role: 'admin',
+      organizationId: 'org_1', dashboardSections: ['dashboard'],
+    }]
+    supabaseState.email = 'admin@example.com'
+
+    const result = await requireSection('settings')
+    if (result instanceof NextResponse) throw new Error(`expected scope, got ${result.status}`)
+    expect(result.role).toBe('admin')
+  })
+
+  it('treats dashboardSections === null as full access (legacy users)', async () => {
+    prismaState.orgs = [{ id: 'org_1', slug: 'volitfy' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'legacy@example.com', role: 'viewer',
+      organizationId: 'org_1', dashboardSections: null,
+    }]
+    supabaseState.email = 'legacy@example.com'
+
+    const result = await requireSection('deals')
+    if (result instanceof NextResponse) throw new Error(`expected scope, got ${result.status}`)
+    expect(result.dashboardSections).toBeNull()
+  })
+
+  it('fails closed on unknown slugs even for admins', async () => {
+    prismaState.orgs = [{ id: 'org_1', slug: 'volitfy' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'admin@example.com', role: 'admin',
+      organizationId: 'org_1', dashboardSections: null,
+    }]
+    supabaseState.email = 'admin@example.com'
+
+    const result = await requireSection('this-slug-does-not-exist')
+    expect(result).toBeInstanceOf(NextResponse)
+    if (result instanceof NextResponse) expect(result.status).toBe(403)
   })
 })
