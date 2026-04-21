@@ -125,36 +125,53 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
             <Countdown2027 />
           </div>
         )}
-        {s.slug === "energy" && (
-          <Link
-            href="/tools/energy-roi"
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: 16,
-              padding: "18px 22px",
-              marginBottom: 48,
-              border: "1px solid var(--accent)",
-              borderRadius: 14,
-              background: "rgba(46,196,137,.08)",
-              textDecoration: "none",
-              flexWrap: "wrap",
-            }}
-          >
-            <div>
-              <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".14em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 6 }}>
-                ◉ {translate(l, "roi.eyebrow").replace(/^◉\s*/, "")}
-              </div>
-              <div style={{ fontSize: 17, fontWeight: 500 }}>
-                {translate(l, "roi.title").replace(/<[^>]+>/g, "")}
-              </div>
+        {(() => {
+          const TOOLS_BY_SECTOR: Record<string, Array<{ href: string; ns: string; tag: string }>> = {
+            energy: [
+              { href: "/tools/energy-roi", ns: "energy", tag: "tools.energy" },
+              { href: "/tools/peak-shift", ns: "peak", tag: "tools.peak" },
+            ],
+            "real-estate": [{ href: "/tools/deal-cycle", ns: "cycle", tag: "tools.cycle" }],
+            hospitality: [{ href: "/tools/deal-cycle", ns: "cycle", tag: "tools.cycle" }],
+            adjacent: [{ href: "/tools/deal-cycle", ns: "cycle", tag: "tools.cycle" }],
+          };
+          const tools = TOOLS_BY_SECTOR[s.slug] ?? [];
+          if (tools.length === 0) return null;
+          return (
+            <div style={{ display: "grid", gap: 12, marginBottom: 48 }}>
+              {tools.map((tool) => (
+                <Link
+                  key={tool.href}
+                  href={tool.href}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 16,
+                    padding: "18px 22px",
+                    border: "1px solid var(--accent)",
+                    borderRadius: 14,
+                    background: "rgba(46,196,137,.08)",
+                    textDecoration: "none",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div>
+                    <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".14em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 6 }}>
+                      ◉ {translate(l, `${tool.tag}.tag`)}
+                    </div>
+                    <div style={{ fontSize: 17, fontWeight: 500 }}>
+                      {translate(l, `${tool.tag}.title`)} — {translate(l, `${tool.tag}.body`)}
+                    </div>
+                  </div>
+                  <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--accent)", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                    {translate(l, `${tool.tag}.cta`)}
+                  </span>
+                </Link>
+              ))}
             </div>
-            <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--accent)", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-              Run the math →
-            </span>
-          </Link>
-        )}
+          );
+        })()}
         <h2>Where <em>revenue leaks</em> in this sector.</h2>
         <p style={{ color: "var(--muted)" }}>The five common failure modes I see when I survey a new operator in this space.</p>
 
