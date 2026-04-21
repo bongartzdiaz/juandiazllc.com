@@ -1,7 +1,7 @@
 ﻿/* POST /api/email/send — send an email (via provider adapter) */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
+import { requireSection, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { sendEmail } from '@/lib/philly/email/send'
 import { serverError } from '@/lib/philly/safe-error'
@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
-  const scope = await requireRole(['admin', 'manager'])
+  const scope = await requireSection('email', ['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
 
   // Strict rate limit for outbound email (per org).

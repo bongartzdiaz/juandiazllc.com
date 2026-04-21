@@ -3,7 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
+import { requireSection, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 
@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 export async function GET(req: NextRequest) {
-  const scope = await requireScope()
+  const scope = await requireSection('documents')
   if (scope instanceof NextResponse) return scope
 
   const { page, limit, skip } = parsePagination(req)
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const scope = await requireRole(['admin', 'manager'])
+  const scope = await requireSection('documents', ['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
 
   let body: {

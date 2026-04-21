@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
+import { requireSection, jsonError } from '@/lib/philly/auth-helpers'
 import { validateBody } from '@/lib/philly/validation'
 import { updateContactSchema } from '@/lib/philly/validation/schemas'
 import { logAudit, diffChanges } from '@/lib/philly/audit'
@@ -16,7 +16,7 @@ export const runtime = 'nodejs'
 type RouteCtx = { params: Promise<{ id: string }> }
 
 export async function GET(_req: NextRequest, ctx: RouteCtx) {
-  const scope = await requireScope()
+  const scope = await requireSection('contacts')
   if (scope instanceof NextResponse) return scope
 
   const { id } = await ctx.params
@@ -33,7 +33,7 @@ export async function GET(_req: NextRequest, ctx: RouteCtx) {
 }
 
 export async function PATCH(req: NextRequest, ctx: RouteCtx) {
-  const scope = await requireRole(['admin', 'manager'])
+  const scope = await requireSection('contacts', ['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
 
   const { id } = await ctx.params
@@ -68,7 +68,7 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 }
 
 export async function DELETE(_req: NextRequest, ctx: RouteCtx) {
-  const scope = await requireRole(['admin'])
+  const scope = await requireSection('contacts', ['admin'])
   if (scope instanceof NextResponse) return scope
 
   const { id } = await ctx.params

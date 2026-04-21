@@ -156,13 +156,23 @@ export async function requireRole(
  * allow-list doesn't include `slug`. Admins always pass; users with
  * `dashboardSections === null` also pass (legacy/superadmin).
  *
+ * Pass `allowedRoles` to additionally require the user's role is in
+ * the list — same contract as `requireRole()` but folded in so a
+ * mutation route only needs one call instead of two.
+ *
  * Unknown slugs fail closed — defensive against typos introducing
  * unintended public access.
  */
-export async function requireSection(slug: string): Promise<AuthScope | NextResponse> {
+export async function requireSection(
+  slug: string,
+  allowedRoles?: ReadonlyArray<'admin' | 'manager' | 'viewer'>,
+): Promise<AuthScope | NextResponse> {
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
   if (!hasSection({ role: scope.role, dashboardSections: scope.dashboardSections }, slug)) {
+    return jsonError('Forbidden', 403)
+  }
+  if (allowedRoles && !allowedRoles.includes(scope.role as 'admin' | 'manager' | 'viewer')) {
     return jsonError('Forbidden', 403)
   }
   return scope
