@@ -16,6 +16,7 @@ import { FaqSection } from "@/components/FaqSection";
 import { LiveSignals } from "@/components/LiveSignals";
 import { Countdown2027 } from "@/components/Countdown2027";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+import { translate } from "@/lib/i18n/dict";
 import { faqSchema } from "@/lib/seo/schema";
 import { HOME_FAQ } from "@/lib/seo/faqs";
 
@@ -76,7 +77,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <ResultsStrip />
       <Signals />
       <CtaBig />
-      <FaqSection title="Operator questions, answered" items={HOME_FAQ} />
+      <FaqSection title={translate(l, "home.faq.title")} items={HOME_FAQ} />
       <Contact />
     </>
   );

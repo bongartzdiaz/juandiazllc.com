@@ -39,7 +39,10 @@ export const metadata: Metadata = {
     "Juan Diaz, LLC builds the systems that make operators more money. Revenue engines, CRM, automations and growth infrastructure for energy, real estate, hospitality and adjacent industries.",
   keywords: [
     "juan diaz",
+    "juan stefan bongartz diaz",
+    "juan stefan bongartz",
     "juandiazllc",
+    "juan diaz llc",
     "revenue engine",
     "operator crm",
     "energy crm",
@@ -129,15 +132,33 @@ export const viewport: Viewport = {
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": `${SITE_URL}/#organization`,
   name: "Juan Diaz, LLC",
+  alternateName: ["JuanDiazLLC", "juandiazllc"],
   url: SITE_URL,
   logo: `${SITE_URL}/icon.svg`,
   description:
-    "Holding company building revenue engines for operators in energy, real estate, hospitality and adjacent industries.",
+    "Holding company building revenue engines for operators in energy, real estate, hospitality and adjacent industries. Founded and run by Juan Stefan Bongartz Diaz.",
+  foundingDate: "2024",
   founder: {
     "@type": "Person",
+    "@id": `${SITE_URL}/about#person`,
     name: "Juan Stefan Bongartz Diaz",
-    alternateName: "Juan Diaz",
+    alternateName: ["Juan Diaz", "Juan S. Diaz"],
+    jobTitle: "Founder",
+    url: `${SITE_URL}/about`,
+    image: `${SITE_URL}/me/portrait.jpg`,
+    nationality: { "@type": "Country", name: "Netherlands" },
+    workLocation: {
+      "@type": "Place",
+      name: "Amsterdam, Netherlands",
+    },
+    sameAs: [
+      "https://github.com/bongartzdiaz",
+      "https://linkedin.com/in/juanstefan",
+      "https://twitter.com/juandiazllc",
+      "https://instagram.com/diazelcazador",
+    ],
   },
   // Areas served — Google uses this for local / regional ranking signals.
   areaServed: [

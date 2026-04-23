@@ -8,6 +8,14 @@ import type { Locale } from "@/lib/i18n/dict";
 
 export const HOME_FAQ: FaqItem[] = [
   {
+    q: "Who is Juan Diaz?",
+    a: "Juan Diaz (full name: Juan Stefan Bongartz Diaz) is the founder of Juan Diaz, LLC — a holding company that builds revenue engines for operators in energy, real estate and hospitality. Construction-management-trained, operator-built. Based in Amsterdam, Netherlands.",
+  },
+  {
+    q: "Who runs Juan Diaz, LLC?",
+    a: "Juan Stefan Bongartz Diaz runs Juan Diaz, LLC as a solo founder. The company ships operator software (Philly CRM, Voltafy, Help Mij Besparen) and takes on a small number of advisory-plus-build engagements per year. No team page because there is no team — one founder, five phases, zero fluff.",
+  },
+  {
     q: "What does Juan Diaz, LLC actually do?",
     a: "Juan Diaz, LLC builds revenue engines for operators — the CRM, automations and growth infrastructure that turn a team of humans plus software into a compounding system. We operate as a holding company with internal ventures (Philly CRM, Voltafy, Help Mij Besparen) and a small number of operator engagements per year.",
   },
@@ -30,6 +38,14 @@ export const HOME_FAQ: FaqItem[] = [
 ];
 
 export const BRAND_FAQ: FaqItem[] = [
+  {
+    q: "Who is Juan Diaz?",
+    a: "Juan Diaz — formally Juan Stefan Bongartz Diaz — is the founder of Juan Diaz, LLC. Construction-management-trained operator turned systems-builder. Amsterdam-based, building and shipping operator software across energy, real estate and hospitality.",
+  },
+  {
+    q: "Who founded Juan Diaz, LLC?",
+    a: "Juan Stefan Bongartz Diaz founded Juan Diaz, LLC as a solo holding company. The firm builds revenue engines for operators through internal ventures (Philly CRM, Voltafy, Help Mij Besparen) and a small number of external engagements per year.",
+  },
   {
     q: "What does Juan Diaz, LLC do?",
     a: "Juan Diaz, LLC builds revenue engines for operators — CRM, automation, and growth infrastructure for companies in energy, real estate, hospitality and adjacent industries. Engagement is advisory-plus-build: blueprint, then ship.",

@@ -66,6 +66,7 @@ export default async function InsightPage(
     description: post.summary,
     datePublished: post.publishedAt,
     tag: post.tag,
+    readingMinutes: post.readingMinutes,
   });
 
   const toc = tocFromBody(post.body);

@@ -62,10 +62,14 @@ export interface BlogPostingInput {
   /** Optional override; defaults to the site-level OG portrait. */
   image?: string;
   articleBody?: string;
+  /** Reading time in minutes — used to estimate `wordCount` (≈220 wpm) and
+   *  emit `timeRequired` in ISO 8601 duration form for Google Discover. */
+  readingMinutes?: number;
 }
 
 export function blogPostingSchema(input: BlogPostingInput): Record<string, unknown> {
   const url = `${SITE}/${input.locale}${input.path.startsWith("/") ? input.path : `/${input.path}`}`;
+  const wordCount = input.readingMinutes ? input.readingMinutes * 220 : undefined;
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -81,6 +85,8 @@ export function blogPostingSchema(input: BlogPostingInput): Record<string, unkno
     image: input.image ?? `${SITE}/me/portrait.jpg`,
     ...(input.tag ? { keywords: input.tag } : {}),
     ...(input.articleBody ? { articleBody: input.articleBody } : {}),
+    ...(wordCount ? { wordCount } : {}),
+    ...(input.readingMinutes ? { timeRequired: `PT${input.readingMinutes}M` } : {}),
     isAccessibleForFree: true,
   };
 }

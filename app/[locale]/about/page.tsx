@@ -24,21 +24,43 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
+// Person entity for Google's Knowledge Panel eligibility. The legal
+// name is the canonical identifier (what Google matches against),
+// with `alternateName` covering the form that appears on bylines,
+// social handles, and the company name itself. Every disambiguation
+// field (workLocation, nationality, worksFor, sameAs, description)
+// is a signal Google uses to merge this into a single entity and
+// decide which "Juan Diaz" on the web this is.
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
+  "@id": `${SITE}/about#person`,
   name: "Juan Stefan Bongartz Diaz",
-  alternateName: "Juan Diaz",
+  alternateName: ["Juan Diaz", "Juan S. Diaz", "Juan Bongartz Diaz"],
+  givenName: "Juan",
+  additionalName: "Stefan",
+  familyName: "Bongartz Diaz",
   url: `${SITE}/about`,
+  mainEntityOfPage: `${SITE}/about`,
   image: `${SITE}/me/portrait.jpg`,
   jobTitle: "Founder, Juan Diaz, LLC",
+  nationality: { "@type": "Country", name: "Netherlands" },
+  workLocation: {
+    "@type": "Place",
+    name: "Amsterdam, Netherlands",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Amsterdam",
+      addressCountry: "NL",
+    },
+  },
   worksFor: {
     "@type": "Organization",
     name: "Juan Diaz, LLC",
     url: SITE,
   },
   description:
-    "Construction-management-trained operator turned systems-builder. Builds revenue engines for operators in energy, real estate, hospitality and adjacent industries.",
+    "Construction-management-trained operator turned systems-builder. Founder of Juan Diaz, LLC and multiple operator-focused ventures including Philly CRM, Voltafy and Help Mij Besparen. Builds revenue engines for operators in energy, real estate, hospitality and adjacent industries.",
   knowsAbout: [
     "Revenue operations",
     "CRM design",
@@ -47,8 +69,33 @@ const personSchema = {
     "Real estate operations",
     "Sales automation",
     "Data engineering for operators",
+    "Solar and battery economics",
+    "Salderingsregeling 2027",
+    "Holding-company operations",
   ],
-  sameAs: ["https://github.com/bongartzdiaz"],
+  knowsLanguage: ["en", "nl", "de", "es"],
+  sameAs: [
+    "https://github.com/bongartzdiaz",
+    "https://linkedin.com/in/juanstefan",
+    "https://twitter.com/juandiazllc",
+    "https://instagram.com/diazelcazador",
+  ],
+};
+
+// ProfilePage is Google's purpose-built schema for author / founder
+// disambiguation — it tells the crawler "this URL is the canonical
+// profile page for the Person below", which is exactly what we need
+// for name-search Knowledge Panel eligibility.
+const profilePageSchema = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "@id": `${SITE}/about`,
+  url: `${SITE}/about`,
+  mainEntity: { "@id": `${SITE}/about#person` },
+  dateCreated: "2024-01-01",
+  dateModified: new Date().toISOString().slice(0, 10),
+  inLanguage: "en",
+  about: { "@id": `${SITE}/about#person` },
 };
 
 const FOCUS_KEYS = [
@@ -76,6 +123,10 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageSchema) }}
       />
       <header className="page-hero">
         <div className="eyebrow">{t("about.eyebrow")}</div>
