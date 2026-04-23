@@ -16,6 +16,18 @@ const TITLES: Record<string, string> = {
   es: "Calculadora de ROI energético — aritmética honesta del saldo 2027",
 };
 
+// BCP47 locale codes for Intl.NumberFormat / toLocaleString so a DE
+// user sees "1.234 €" (de-DE), an EN/US user sees "€1,234" (en-US),
+// etc. The calculator is Dutch-market specific (Saldering 2027) so
+// the currency stays EUR — only the separators + symbol position
+// track the viewer's locale.
+const INTL_LOCALES: Record<string, string> = {
+  en: "en-US",
+  nl: "nl-NL",
+  de: "de-DE",
+  es: "es-ES",
+};
+
 export async function generateMetadata({
   params,
 }: {
@@ -92,7 +104,7 @@ export default async function EnergyRoiPage({
       </header>
 
       <section style={{ padding: "40px 40px 80px", maxWidth: "var(--max)", margin: "0 auto" }}>
-        <EnergyRoi labels={labels} />
+        <EnergyRoi labels={labels} localeCode={INTL_LOCALES[l] ?? "en-US"} />
       </section>
 
       <section style={{ padding: "40px 40px 140px", maxWidth: "var(--max)", margin: "0 auto" }}>

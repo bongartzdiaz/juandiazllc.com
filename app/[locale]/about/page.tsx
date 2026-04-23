@@ -9,16 +9,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "About Juan Diaz — operator, builder, founder",
-    description:
-      "Construction-trained, operator-built. Juan Diaz runs Juan Diaz, LLC — a holding company building revenue engines for operators in energy, real estate and hospitality.",
+    title: translate(l, "about.meta.title"),
+    description: translate(l, "about.meta.desc"),
     alternates: buildAlternates(l, "/about"),
     openGraph: {
       type: "profile",
       url: `/${l}/about`,
-      title: "About Juan Diaz",
-      description:
-        "Construction-trained, operator-built. Revenue engines for operators in energy, real estate and hospitality.",
+      title: translate(l, "about.og.title"),
+      description: translate(l, "about.og.desc"),
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
       images: [{ url: "/me/portrait.jpg", width: 1200, height: 1200, alt: "Juan Diaz" }],

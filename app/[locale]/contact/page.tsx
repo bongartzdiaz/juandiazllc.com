@@ -11,9 +11,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "Contact — book a blueprint call",
-    description:
-      "Direct line to Juan. Blueprint calls are free, blunt, and under 30 minutes. Leave your details and I'll come back within 24 hours.",
+    title: translate(l, "contact.meta.title"),
+    description: translate(l, "contact.meta.desc"),
     alternates: buildAlternates(l, "/contact"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
@@ -45,7 +44,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
       <section style={{ padding: "20px 40px 40px", maxWidth: 760, margin: "0 auto" }}>
         <ContactForm />
       </section>
-      <FaqSection title="Before you book a call" items={CONTACT_FAQ} />
+      <FaqSection title={t("contact.faq.title")} items={CONTACT_FAQ} />
     </>
   );
 }

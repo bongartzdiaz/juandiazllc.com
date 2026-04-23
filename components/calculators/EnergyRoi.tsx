@@ -41,11 +41,15 @@ export type RoiLabels = {
   smallprint: string;
 };
 
-type Props = { labels: RoiLabels };
+type Props = { labels: RoiLabels; localeCode?: string };
 
-function eur(n: number): string {
+// Currency + number formatting follows the user's locale. EUR stays
+// the unit (the calculator is Dutch-market specific — Salderingsregeling
+// 2027 only applies in NL), but the thousands/decimal separators and
+// currency-symbol placement track en-US / nl-NL / de-DE / es-ES.
+function eur(n: number, localeCode: string): string {
   if (!isFinite(n)) return "—";
-  return new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
+  return new Intl.NumberFormat(localeCode, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
 }
 
 function years(n: number): string {
@@ -53,7 +57,7 @@ function years(n: number): string {
   return n.toFixed(1);
 }
 
-export function EnergyRoi({ labels }: Props) {
+export function EnergyRoi({ labels, localeCode = "nl-NL" }: Props) {
   const [consumption, setConsumption] = useState(3500);
   const [systemSize, setSystemSize] = useState(4);
   const [systemPrice, setSystemPrice] = useState(5000);
@@ -222,6 +226,7 @@ export function EnergyRoi({ labels }: Props) {
               payback={r.paybackSald}
               delta={null}
               labels={labels}
+              localeCode={localeCode}
               muted
             />
             <ScenarioCard
@@ -231,6 +236,7 @@ export function EnergyRoi({ labels }: Props) {
               payback={r.paybackNoBat}
               delta={r.deltaNoBat}
               labels={labels}
+              localeCode={localeCode}
             />
             {withBattery && (
               <ScenarioCard
@@ -240,12 +246,13 @@ export function EnergyRoi({ labels }: Props) {
                 payback={r.paybackWithBat}
                 delta={r.deltaWithBat}
                 labels={labels}
+                localeCode={localeCode}
                 highlight
               />
             )}
           </div>
           <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--muted-soft)", marginTop: 20 }}>
-            {labels.productionLine.replace("{kwh}", Math.round(r.production).toLocaleString("nl-NL"))}
+            {labels.productionLine.replace("{kwh}", Math.round(r.production).toLocaleString(localeCode))}
           </div>
           <p style={{ color: "var(--muted)", fontSize: 13, lineHeight: 1.6, marginTop: 16 }}>{labels.smallprint}</p>
         </div>
@@ -261,6 +268,7 @@ function ScenarioCard({
   payback,
   delta,
   labels,
+  localeCode,
   muted,
   highlight,
 }: {
@@ -270,6 +278,7 @@ function ScenarioCard({
   payback: number;
   delta: number | null;
   labels: RoiLabels;
+  localeCode: string;
   muted?: boolean;
   highlight?: boolean;
 }) {
@@ -288,10 +297,10 @@ function ScenarioCard({
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <div>
           <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--muted-soft)", marginBottom: 4 }}>{labels.annualSavings}</div>
-          <div style={{ fontFamily: "'Inter'", fontSize: 22, fontWeight: 400, letterSpacing: "-.02em" }}>{eur(annual)}</div>
+          <div style={{ fontFamily: "'Inter'", fontSize: 22, fontWeight: 400, letterSpacing: "-.02em" }}>{eur(annual, localeCode)}</div>
           {delta !== null && (
             <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, color: delta < 0 ? "#ff8b7a" : "var(--accent)", marginTop: 4 }}>
-              {labels.deltaLabel.replace("{amount}", eur(delta))}
+              {labels.deltaLabel.replace("{amount}", eur(delta, localeCode))}
             </div>
           )}
         </div>

@@ -10,7 +10,11 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 
-export const runtime = 'nodejs'
+// Edge runtime — zero cold-start, runs geographically close to the
+// beacon source so Web Vitals land with sub-50ms latency. The
+// in-memory token bucket is per-region (weaker as a global rate
+// limit, acceptable for an anti-flood on a fire-and-forget beacon).
+export const runtime = 'edge'
 
 type Bucket = { tokens: number; last: number }
 const buckets = new Map<string, Bucket>()

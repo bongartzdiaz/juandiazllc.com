@@ -12,8 +12,34 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   devIndicators: false,
+  images: {
+    // Prefer AVIF then fall back to WebP — ~40% smaller than JPEG.
+    formats: ['image/avif', 'image/webp'],
+  },
+  compiler: {
+    // Strip console.* in prod builds (keeps error + warn for Sentry).
+    removeConsole: process.env.NODE_ENV === 'production'
+      ? { exclude: ['error', 'warn'] }
+      : false,
+  },
   experimental: {
-    optimizePackageImports: ['three', 'lucide-react', 'recharts'],
+    // Tree-shake icon libs and heavy geo deps at build time. `three`
+    // still used by LoginScene via dynamic import; d3-geo + topojson
+    // added for the SVG globe on the marketing hero.
+    optimizePackageImports: ['three', 'lucide-react', 'recharts', 'd3-geo', 'topojson-client'],
+  },
+  async headers() {
+    return [
+      {
+        // The world atlas topojson is a static 108KB asset the Globe
+        // fetches on mount. Immutable cache lets browsers + CDN pin
+        // it for a year; we version by filename when we ever swap it.
+        source: '/world-110m.json',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+    ];
   },
 };
 

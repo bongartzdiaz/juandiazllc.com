@@ -252,7 +252,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
                 </div>
                 {p.href && (
                   <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--accent)", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-                    See the build →
+                    {translate(l, "sec.d.seebuild")}
                   </span>
                 )}
               </div>
@@ -281,11 +281,12 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
           <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 12, letterSpacing: ".14em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 14 }}>
             ◉ {s.cta}
           </div>
-          <div style={{ fontFamily: "'Inter'", fontWeight: 300, fontSize: "clamp(26px, 3vw, 42px)", letterSpacing: "-.02em", lineHeight: 1.15, marginBottom: 28, maxWidth: "26ch" }}>
-            Let&apos;s draw the <em>blueprint</em>.
-          </div>
-          <Link className="btn primary btn-mag" href="/contact">
-            Book a blueprint call <span className="arr">→</span>
+          <div
+            style={{ fontFamily: "'Inter'", fontWeight: 300, fontSize: "clamp(26px, 3vw, 42px)", letterSpacing: "-.02em", lineHeight: 1.15, marginBottom: 28, maxWidth: "26ch" }}
+            dangerouslySetInnerHTML={{ __html: translate(l, "sec.d.bp.title") }}
+          />
+          <Link className="btn primary btn-mag" href={`/${l}/contact`}>
+            {translate(l, "sec.d.bp.cta")} <span className="arr">→</span>
           </Link>
         </div>
       </article>
@@ -293,20 +294,20 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
       <section style={{ padding: "80px 40px 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div className="sec-head" data-reveal style={{ marginBottom: 40 }}>
           <div>
-            <div className="label">◉ Other sectors</div>
-            <h2>Same playbook. <em>Different</em> P&amp;L.</h2>
+            <div className="label">{translate(l, "sec.d.others.label")}</div>
+            <h2 dangerouslySetInnerHTML={{ __html: translate(l, "sec.d.others.title") }} />
           </div>
-          <p>The method doesn&apos;t care what industry your operators run. If there&apos;s complexity and bad software, it applies.</p>
+          <p>{translate(l, "sec.d.others.body")}</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
           {others.map((o) => (
-            <Link key={o.slug} href={`/sectors/${o.slug}`} className="sec-card" data-reveal style={{ minHeight: 200 }}>
+            <Link key={o.slug} href={`/${l}/sectors/${o.slug}`} className="sec-card" data-reveal style={{ minHeight: 200 }}>
               <div>
                 <div className="ix">— {o.name}</div>
                 <h4 style={{ marginTop: 14, fontSize: 22 }}>{o.tagline}</h4>
               </div>
               <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--muted-soft)", textTransform: "uppercase", marginTop: 20 }}>
-                See the sector →
+                {translate(l, "sec.d.seesector")}
               </div>
             </Link>
           ))}

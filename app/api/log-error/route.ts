@@ -12,7 +12,11 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = "nodejs";
+// Edge runtime — the Slack webhook + console.error are both edge-
+// safe (global fetch, console). Rate-limit bucket is per-region,
+// which is fine for anti-flood since a runaway client typically
+// sticks to one region anyway.
+export const runtime = "edge";
 
 // Simple in-memory token bucket — good enough for a single Vercel
 // lambda instance. If we scale horizontally we'd move to Upstash
