@@ -12,6 +12,12 @@ import { LOCALES, DEFAULT_LOCALE } from "@/lib/i18n/dict";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
+// Preconnect hint target for Plausible. Reading the same env vars the
+// Analytics component reads keeps behaviour in lockstep — if analytics
+// is disabled (no domain set) we don't emit a wasted preconnect.
+const PLAUSIBLE_DOMAIN = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
+const PLAUSIBLE_HOST = process.env.NEXT_PUBLIC_PLAUSIBLE_HOST ?? "https://plausible.io";
+
 // Google Search Console domain verification. Hard-coded default is the
 // active token for juandiazllc.com — set GOOGLE_SITE_VERIFICATION in the
 // Vercel dashboard to override without a code change (e.g. after rotating
@@ -170,6 +176,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang={lang}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
+        {PLAUSIBLE_DOMAIN ? (
+          <link rel="preconnect" href={PLAUSIBLE_HOST} crossOrigin="" />
+        ) : null}
         {/* Feed autodiscovery — RSS for readers, JSON Feed for modern clients */}
         <link rel="alternate" type="application/rss+xml" title="Juan Diaz, LLC — Insights" href="/rss.xml" />
         <link rel="alternate" type="application/feed+json" title="Juan Diaz, LLC — Insights" href="/feed.json" />

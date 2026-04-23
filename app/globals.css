@@ -732,7 +732,7 @@ section { padding: var(--section-pad-y) var(--section-pad-x); max-width: var(--m
 .v-card .v-arrow svg { width: 14px; height: 14px; transition: transform .3s var(--ease); }
 .v-card:hover .v-arrow svg { transform: translate(2px,-2px); }
 .v-card.wide { grid-column: span 12; min-height: 420px; }
-@media (max-width: 860px) { .v-card, .v-card.wide { grid-column: span 12; } }
+@media (max-width: 860px) { .v-card, .v-card.wide { grid-column: span 12; } .v-card.wide { min-height: 0; } }
 
 /* Stats */
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-block: 1px solid var(--line); margin: 0; }
@@ -1260,6 +1260,20 @@ footer .f-mark { color: var(--text); }
 @media (max-width: 420px) {
   nav.top .nav-right a.hide-tiny { display: none; }
   .hero-overlay { padding: 88px 14px 24px; }
+}
+
+/* Very small viewports — iPhone SE, Galaxy Fold folded, tight Android phones.
+   The 420px block still assumes ~40px breathing room; below 380 the hero
+   title + CTA stack grows cramped and the overlay padding cuts into text. */
+@media (max-width: 380px) {
+  .hero-overlay { padding: 80px 12px 18px; }
+  .hero-title { font-size: clamp(36px, 13vw, 56px); }
+  .hero-tag .chip { font-size: 9.5px; padding: 4px 8px; }
+  .hero-ctas { gap: 8px; }
+  .hero-ctas .btn { min-width: 0; padding: 12px 14px; font-size: 10.5px; letter-spacing: .1em; }
+  .btn { padding: 11px 16px; font-size: 11px; }
+  section { padding: 56px 14px; }
+  .sec-head h2, .story-lead { font-size: clamp(26px, 10vw, 40px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1979,6 +1993,13 @@ em { color: var(--accent); font-style: italic; font-weight: 300; letter-spacing:
   .hero-overlay { padding: 80px 24px 20px; }
   .hero-title { font-size: clamp(32px, 6vw, 56px); }
   .scroll-hint { display: none; }
+}
+
+/* Landscape tablets (iPad 1024x768, iPad Pro 11" 1194x834) — the sticky
+   chapters pin at 100vh eats the whole viewport and the parallel-scroll
+   sync feels locked when height < content. Fall back to static flow. */
+@media (min-width: 641px) and (max-width: 1366px) and (orientation: landscape) and (max-height: 900px) {
+  .chapters-pin { position: relative; height: auto; min-height: 0; }
 }
 
 /* Print — don't waste toner on animated chrome */
