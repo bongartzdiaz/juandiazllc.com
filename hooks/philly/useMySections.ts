@@ -28,17 +28,19 @@ export type MySections = {
 }
 
 export function useMySections(): MySections {
-  const { data, loading } = useApi<MeResponse>('/me', {
+  const { data, loading } = useApi<{ data: MeResponse }>('/me', {
     // /me rarely changes; avoid hammering it on every poll cycle.
     interval: 5 * 60_000,
   })
 
+  const me = data?.data ?? null
+
   return {
-    role: data?.role ?? 'viewer',
+    role: me?.role ?? 'viewer',
     // Treat "no data yet" as restrictive (empty array) so nav doesn't
     // briefly flash items the user isn't allowed to see. `hasSection`
     // will still return true for admins regardless.
-    dashboardSections: data ? (data.dashboardSections ?? null) : [],
+    dashboardSections: me ? (me.dashboardSections ?? null) : [],
     loading,
   }
 }

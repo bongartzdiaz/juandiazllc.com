@@ -10,6 +10,7 @@ import { ToastProvider } from '@/hooks/philly/useToast'
 import { ToastContainer } from '@/components/philly/ui/Toast'
 import { Sidebar } from './Sidebar'
 import { MobileNav } from './MobileNav'
+import { SectionGuard } from './SectionGuard'
 import { CommandPalette } from '@/components/philly/ui/CommandPalette'
 import { OfflineBanner } from '@/components/philly/ui/OfflineBanner'
 
@@ -130,7 +131,7 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
         )}
 
         <main className="main-content" style={{ marginLeft: 240, flex: 1, display: 'flex', flexDirection: 'column' }}>
-          {children}
+          <SectionGuard>{children}</SectionGuard>
         </main>
 
         <CommandPalette />
