@@ -4,10 +4,6 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 import { translate } from "@/lib/i18n/dict";
 import { webPageSchema } from "@/lib/seo/schema";
 
-const NOW_META_TITLE = "Now — what I'm focused on this quarter";
-const NOW_META_DESC =
-  "A monthly-ish snapshot of what Juan Diaz, LLC is actually building, shipping, and thinking about. Last updated inline.";
-
 // /now — https://nownownow.com convention. A public "what I'm
 // actually focused on right this quarter" page. Updated roughly
 // monthly. Stays honest because it's dated; anyone checking a year
@@ -18,8 +14,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: NOW_META_TITLE,
-    description: NOW_META_DESC,
+    title: translate(l, "now.meta.title"),
+    description: translate(l, "now.meta.desc"),
     alternates: buildAlternates(l, "/now"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
@@ -52,8 +48,8 @@ export default async function NowPage({ params }: { params: Promise<{ locale: st
   const pageSchema = webPageSchema({
     locale: l,
     path: "/now",
-    name: NOW_META_TITLE,
-    description: NOW_META_DESC,
+    name: t("now.meta.title"),
+    description: t("now.meta.desc"),
   });
 
   return (

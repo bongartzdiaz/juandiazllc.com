@@ -3,16 +3,12 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 import { translate } from "@/lib/i18n/dict";
 import { webPageSchema } from "@/lib/seo/schema";
 
-const STORY_META_TITLE = "Story — construction-trained, operator-built";
-const STORY_META_DESC =
-  "The story behind Juan Diaz, LLC — construction management, the crossover to revenue operations, and why I build honest software for operators.";
-
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: STORY_META_TITLE,
-    description: STORY_META_DESC,
+    title: translate(l, "sp.meta.title"),
+    description: translate(l, "sp.meta.desc"),
     alternates: buildAlternates(l, "/story"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
@@ -25,8 +21,8 @@ export default async function StoryPage({ params }: { params: Promise<{ locale: 
   const pageSchema = webPageSchema({
     locale: l,
     path: "/story",
-    name: STORY_META_TITLE,
-    description: STORY_META_DESC,
+    name: t("sp.meta.title"),
+    description: t("sp.meta.desc"),
   });
 
   return (

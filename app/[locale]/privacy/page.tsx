@@ -4,10 +4,6 @@ import { translate } from "@/lib/i18n/dict";
 import { AnalyticsOptOut } from "@/components/AnalyticsOptOut";
 import { webPageSchema } from "@/lib/seo/schema";
 
-const PRIVACY_META_TITLE = "Privacy";
-const PRIVACY_META_DESC =
-  "What this site stores, what it does not, and how to reach me about your data.";
-
 // Plain-language privacy page. Not legal advice — a statement of what
 // the site actually does with data, which is what NL/EU regulators
 // (AP, ICO) increasingly expect over a lawyer-drafted wall of text.
@@ -15,8 +11,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: PRIVACY_META_TITLE,
-    description: PRIVACY_META_DESC,
+    title: translate(l, "priv.meta.title"),
+    description: translate(l, "priv.meta.desc"),
     alternates: buildAlternates(l, "/privacy"),
     robots: { index: true, follow: true },
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
@@ -30,8 +26,8 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
   const pageSchema = webPageSchema({
     locale: l,
     path: "/privacy",
-    name: PRIVACY_META_TITLE,
-    description: PRIVACY_META_DESC,
+    name: t("priv.meta.title"),
+    description: t("priv.meta.desc"),
   });
 
   return (

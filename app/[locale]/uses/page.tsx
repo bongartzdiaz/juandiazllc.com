@@ -11,16 +11,12 @@ import { webPageSchema } from "@/lib/seo/schema";
 // Links that go out are affiliate-free. If something shows up here
 // it's because I use it every week, not because someone paid for it.
 
-const USES_META_TITLE = "Uses — the stack behind Juan Diaz, LLC";
-const USES_META_DESC =
-  "The tools, frameworks, services and hardware I actually use to build revenue engines. No affiliate links. Updated as the stack evolves.";
-
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: USES_META_TITLE,
-    description: USES_META_DESC,
+    title: translate(l, "uses.meta.title"),
+    description: translate(l, "uses.meta.desc"),
     alternates: buildAlternates(l, "/uses"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
@@ -91,8 +87,8 @@ export default async function UsesPage({ params }: { params: Promise<{ locale: s
   const pageSchema = webPageSchema({
     locale: l,
     path: "/uses",
-    name: USES_META_TITLE,
-    description: USES_META_DESC,
+    name: t("uses.meta.title"),
+    description: t("uses.meta.desc"),
   });
 
   return (
