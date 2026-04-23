@@ -337,3 +337,172 @@ export function getSectorFaq(locale: Locale, slug: string): FaqItem[] {
   // Fallback to English so a new sector without translations still ships.
   return SECTOR_FAQ_BY_LOCALE.en[slug] ?? [];
 }
+
+// Per-locale HOME FAQ. Before this block the homepage FAQ rendered
+// English on every locale — same AI-overview citation problem as
+// sector FAQs. Native copy for each locale; brand terms (Juan Diaz,
+// LLC, Philly CRM, Voltafy, Help Mij Besparen, Salderingsregeling)
+// kept untranslated. Name + alternate name in the first sentence of
+// the first two entries so Knowledge Panel disambiguation works
+// regardless of which locale Google indexes first.
+export const HOME_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
+  en: HOME_FAQ,
+  nl: [
+    {
+      q: "Wie is Juan Diaz?",
+      a: "Juan Diaz (volledige naam: Juan Stefan Bongartz Diaz) is oprichter van Juan Diaz, LLC — een holding die omzetmotoren bouwt voor operators in energie, vastgoed en horeca. Getraind in bouwmanagement, door operators gebouwd. Gevestigd in Amsterdam.",
+    },
+    {
+      q: "Wie runt Juan Diaz, LLC?",
+      a: "Juan Stefan Bongartz Diaz runt Juan Diaz, LLC als solo-oprichter. Het bedrijf levert operator-software (Philly CRM, Voltafy, Help Mij Besparen) en neemt een klein aantal advisory-plus-build opdrachten per jaar aan. Geen teampagina want er is geen team — één oprichter, vijf fases, nul gezwets.",
+    },
+    {
+      q: "Wat doet Juan Diaz, LLC eigenlijk?",
+      a: "Juan Diaz, LLC bouwt omzetmotoren voor operators — de CRM, automatiseringen en groei-infrastructuur die van een team mensen plus software een samenstellend systeem maken. We opereren als holding met interne ventures (Philly CRM, Voltafy, Help Mij Besparen) en een klein aantal operator-opdrachten per jaar.",
+    },
+    {
+      q: "Met welke sectoren werken jullie?",
+      a: "Energie (installateurs, zonnepanelen, batterijen), vastgoed (makelaars, vastgoedbeheer), horeca (multi-locatie) en operator-zware aanverwante sectoren zoals logistiek, ambachten en thuisdiensten. De rode draad: een veldteam dat omzet genereert en een kantoor dat er chocola van probeert te maken.",
+    },
+    {
+      q: "Bouwen jullie vanaf nul of configureren jullie bestaande tools?",
+      a: "Allebei — we matchen het gereedschap aan de klus. Kernworkflows die jouw bedrijf onderscheiden worden gebouwd (of zwaar aangepast). Commodity-workflows (mail, boekhouden, payroll) krijgen de goedkoopste betrouwbare tool die je datacontracten niet breekt. De moat zit in de integratielaag plus twee of drie kernflows — niet in het bezitten van elke SaaS-seat.",
+    },
+    {
+      q: "Wat is een blueprint-gesprek?",
+      a: "Een gratis gesprek van 30 minuten waarin we jouw huidige omzetstroom van begin tot eind in kaart brengen en de twee of drie hefboompunten identificeren. Recht voor z'n raap, gestructureerd, geen sheets. Je vertrekt met een eenpagina-diagnose, ongeacht of we daarna samenwerken.",
+    },
+    {
+      q: "Waar zitten jullie?",
+      a: "We opereren vanuit Nederland met klanten door de EU en af en toe opdrachten in de VS. Remote-first, met on-site tijd voor ontdekking en uitrol als dat de naald beweegt.",
+    },
+  ],
+  de: [
+    {
+      q: "Wer ist Juan Diaz?",
+      a: "Juan Diaz (vollständiger Name: Juan Stefan Bongartz Diaz) ist Gründer von Juan Diaz, LLC — einer Holding, die Umsatzmotoren für Operators in Energie, Immobilien und Gastgewerbe baut. Bauleitungs-geschult, operatorgebaut. Sitz in Amsterdam, Niederlande.",
+    },
+    {
+      q: "Wer leitet Juan Diaz, LLC?",
+      a: "Juan Stefan Bongartz Diaz leitet Juan Diaz, LLC als Solo-Gründer. Das Unternehmen liefert Operator-Software (Philly CRM, Voltafy, Help Mij Besparen) und übernimmt pro Jahr eine kleine Anzahl an Advisory-plus-Build-Engagements. Keine Team-Seite, weil es kein Team gibt — ein Gründer, fünf Phasen, null Geschwafel.",
+    },
+    {
+      q: "Was macht Juan Diaz, LLC eigentlich?",
+      a: "Juan Diaz, LLC baut Umsatzmotoren für Operators — CRM, Automatisierungen und Wachstumsinfrastruktur, die aus einem Team von Menschen plus Software ein sich verstärkendes System machen. Wir operieren als Holding mit internen Ventures (Philly CRM, Voltafy, Help Mij Besparen) und wenigen Operator-Engagements pro Jahr.",
+    },
+    {
+      q: "Mit welchen Branchen arbeiten Sie?",
+      a: "Energie (Installateure, Solar, Batterien), Immobilien (Makler, Hausverwaltung), Gastgewerbe (Multi-Location) und operatorlastige angrenzende Branchen wie Logistik, Handwerk und Haushaltsdienste. Der rote Faden: ein Feldteam, das Umsatz erzeugt, und ein Büro, das Ordnung hineinbringen will.",
+    },
+    {
+      q: "Bauen Sie von Grund auf oder konfigurieren Sie bestehende Tools?",
+      a: "Beides — wir passen das Werkzeug zum Auftrag an. Kern-Workflows, die Ihr Unternehmen unterscheiden, werden gebaut (oder stark angepasst). Commodity-Workflows (E-Mail, Buchhaltung, Payroll) bekommen das günstigste verlässliche Tool, das Ihre Datenverträge nicht bricht. Der Burggraben liegt in der Integrationsebene plus zwei bis drei Kern-Flows — nicht darin, jeden SaaS-Platz zu besitzen.",
+    },
+    {
+      q: "Was ist ein Blueprint-Call?",
+      a: "Ein kostenloser 30-minütiger Call, in dem wir Ihren aktuellen Umsatzfluss Ende-zu-Ende kartieren und die zwei oder drei Hebelpunkte identifizieren. Direkt, strukturiert, keine Folien. Sie verlassen den Call mit einer einseitigen Diagnose — unabhängig davon, ob wir danach zusammenarbeiten.",
+    },
+    {
+      q: "Wo sitzen Sie?",
+      a: "Wir operieren von den Niederlanden aus mit Kunden in der EU und gelegentlichen US-Engagements. Remote-first, mit Vor-Ort-Zeit für Discovery und Rollout, wenn es den Unterschied macht.",
+    },
+  ],
+  es: [
+    {
+      q: "¿Quién es Juan Diaz?",
+      a: "Juan Diaz (nombre completo: Juan Stefan Bongartz Diaz) es el fundador de Juan Diaz, LLC — una holding que construye motores de ingresos para operadores en energía, real estate y hospitality. Formado en gestión de construcción, hecho por operadores. Con sede en Ámsterdam.",
+    },
+    {
+      q: "¿Quién dirige Juan Diaz, LLC?",
+      a: "Juan Stefan Bongartz Diaz dirige Juan Diaz, LLC como fundador en solitario. La empresa entrega software para operadores (Philly CRM, Voltafy, Help Mij Besparen) y acepta un número reducido de encargos advisory-plus-build al año. Sin página de equipo porque no hay equipo — un fundador, cinco fases, cero relleno.",
+    },
+    {
+      q: "¿Qué hace Juan Diaz, LLC en realidad?",
+      a: "Juan Diaz, LLC construye motores de ingresos para operadores — el CRM, las automatizaciones y la infraestructura de crecimiento que convierten a un equipo de personas más software en un sistema que compone. Operamos como holding con ventures internas (Philly CRM, Voltafy, Help Mij Besparen) y un número reducido de encargos para operadores al año.",
+    },
+    {
+      q: "¿Con qué sectores trabajan?",
+      a: "Energía (instaladores, solar, baterías), real estate (inmobiliarias, property management), hospitality (multi-sede) y sectores adyacentes pesados en operadores como logística, oficios y servicios a domicilio. El hilo común: un equipo de campo que genera ingresos y una oficina que intenta entenderlos.",
+    },
+    {
+      q: "¿Construyen desde cero o configuran herramientas existentes?",
+      a: "Ambas — adaptamos la herramienta al trabajo. Los flujos que diferencian tu negocio se construyen (o se personalizan a fondo). Los flujos commodity (email, contabilidad, nóminas) se resuelven con la herramienta fiable más barata que no rompa tus contratos de datos. El foso está en la capa de integración más dos o tres flujos centrales — no en poseer cada asiento de cada SaaS.",
+    },
+    {
+      q: "¿Qué es una llamada blueprint?",
+      a: "Una llamada gratuita de 30 minutos en la que mapeamos tu flujo de ingresos actual de punta a punta e identificamos los dos o tres puntos de apalancamiento. Directa, estructurada, sin diapositivas. Sales con un diagnóstico de una página, trabajemos juntos después o no.",
+    },
+    {
+      q: "¿Dónde tienen la base?",
+      a: "Operamos desde los Países Bajos con clientes por toda la UE y encargos ocasionales en EE. UU. Remote-first, con tiempo presencial para discovery y rollout cuando mueve la aguja.",
+    },
+  ],
+};
+
+// Per-locale CONTACT FAQ — short, practical, pre-call objection-
+// handlers. Same translation discipline as HOME_FAQ_BY_LOCALE.
+export const CONTACT_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
+  en: CONTACT_FAQ,
+  nl: [
+    {
+      q: "Hoe snel reageren jullie?",
+      a: "Binnen 24 uur op werkdagen, vaak sneller. Blueprint-gesprekken worden doorgaans binnen één werkweek ingepland.",
+    },
+    {
+      q: "Wat gebeurt er op een blueprint-gesprek?",
+      a: "Een gestructureerd gesprek van 30 minuten: huidige bottleneck, wat je al geprobeerd hebt, hoe een werkend systeem eruit zou zien. Je vertrekt met een tweepagina-plan binnen 48 uur, ongeacht of we daarna samenwerken.",
+    },
+    {
+      q: "Tekenen jullie NDA's?",
+      a: "Ja — een wederzijdse NDA is op verzoek beschikbaar en we initiëren hem vaak zelf voor gevoelige commerciële gesprekken. Standaard 2-jarige looptijd.",
+    },
+    {
+      q: "Kunnen we klein beginnen?",
+      a: "Ja. Veel opdrachten starten met een diagnostische sprint van 30 dagen, zodat beide kanten kunnen de-risken voordat we committeren aan een build. De diagnose wordt als vaste prijs gefactureerd en de volledige scope wordt daarna geoffreerd.",
+    },
+  ],
+  de: [
+    {
+      q: "Wie schnell antworten Sie?",
+      a: "Innerhalb von 24 Stunden an Werktagen, oft schneller. Blueprint-Calls werden in der Regel innerhalb einer Arbeitswoche terminiert.",
+    },
+    {
+      q: "Was passiert auf einem Blueprint-Call?",
+      a: "Ein strukturiertes 30-minütiges Gespräch: aktueller Bottleneck, was Sie bereits versucht haben, wie ein funktionierendes System aussähe. Sie gehen mit einem zweiseitigen schriftlichen Plan innerhalb von 48 Stunden — unabhängig davon, ob wir danach zusammenarbeiten.",
+    },
+    {
+      q: "Unterschreiben Sie NDAs?",
+      a: "Ja — eine gegenseitige NDA ist auf Anfrage verfügbar und wir initiieren sie häufig selbst bei sensiblen kommerziellen Gesprächen. Standard-Laufzeit: 2 Jahre.",
+    },
+    {
+      q: "Können wir klein anfangen?",
+      a: "Ja. Viele Engagements beginnen mit einem 30-tägigen Diagnose-Sprint, damit beide Seiten vor dem Commitment zu einem Build entschärfen können. Die Diagnose wird als Festpreis abgerechnet, der volle Scope wird danach angeboten.",
+    },
+  ],
+  es: [
+    {
+      q: "¿Con qué rapidez responden?",
+      a: "En menos de 24 horas en días laborables, a menudo antes. Las llamadas blueprint se suelen agendar dentro de una semana laboral.",
+    },
+    {
+      q: "¿Qué pasa en una llamada blueprint?",
+      a: "Una conversación estructurada de 30 minutos: cuello de botella actual, lo que ya has probado, cómo se vería un sistema que funciona. Sales con un plan escrito de dos páginas en 48 horas, trabajemos juntos después o no.",
+    },
+    {
+      q: "¿Firman NDAs?",
+      a: "Sí — un NDA mutuo está disponible a petición y a menudo lo iniciamos nosotros para conversaciones comerciales sensibles. Plazo estándar: 2 años.",
+    },
+    {
+      q: "¿Podemos empezar poco a poco?",
+      a: "Sí. Muchos encargos comienzan con un sprint diagnóstico de 30 días para que ambas partes puedan reducir riesgo antes de comprometerse a un build. El diagnóstico se factura como precio cerrado y el alcance completo se cotiza después.",
+    },
+  ],
+};
+
+export function getHomeFaq(locale: Locale): FaqItem[] {
+  return HOME_FAQ_BY_LOCALE[locale] ?? HOME_FAQ_BY_LOCALE.en;
+}
+
+export function getContactFaq(locale: Locale): FaqItem[] {
+  return CONTACT_FAQ_BY_LOCALE[locale] ?? CONTACT_FAQ_BY_LOCALE.en;
+}

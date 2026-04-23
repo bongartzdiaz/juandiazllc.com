@@ -18,7 +18,7 @@ import { Countdown2027 } from "@/components/Countdown2027";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import { faqSchema } from "@/lib/seo/schema";
-import { HOME_FAQ } from "@/lib/seo/faqs";
+import { getHomeFaq } from "@/lib/seo/faqs";
 
 const TITLES: Record<string, string> = {
   en: "Juan Diaz, LLC — revenue engines for operators",
@@ -55,11 +55,12 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const l = assertLocale(locale);
+  const homeFaq = getHomeFaq(l);
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(HOME_FAQ)) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(homeFaq)) }}
       />
       <Hero />
       <Marquee />
@@ -77,7 +78,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <ResultsStrip />
       <Signals />
       <CtaBig />
-      <FaqSection title={translate(l, "home.faq.title")} items={HOME_FAQ} />
+      <FaqSection title={translate(l, "home.faq.title")} items={homeFaq} />
       <Contact />
     </>
   );
