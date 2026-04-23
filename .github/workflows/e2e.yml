@@ -1,0 +1,87 @@
+name: E2E smoke (Playwright)
+
+# Public-site smoke tests. Runs a headless Chromium against the
+# production build (`next start`) on every PR and on every push to
+# main. Catches regressions that Vitest + typecheck cannot — hydration
+# errors, missing images, title drift, broken SSR, console errors,
+# proxy redirect loops.
+#
+# Deliberately a separate workflow from Lighthouse because:
+#   - Lighthouse runs post-deploy against the live Vercel URL,
+#     gated on perf thresholds.
+#   - This runs pre-merge on the actual built bundle, gated on
+#     functional correctness.
+# The two complement each other without overlap.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Cancel in-flight runs when a newer commit lands on the same PR.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      # Marketing-only smoke: no real Supabase / Plausible / email
+      # credentials needed. Dev-safe defaults are fine; the tests
+      # themselves filter known noise (Plausible beacons, font
+      # warnings) from the console-error assertion.
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
+      # Skip the Supabase middleware auth path for /philly — we don't
+      # test the CRM here. Empty env means updateSession() becomes a
+      # no-op pass-through.
+      NEXT_PUBLIC_SUPABASE_URL: ""
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ""
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium --with-deps
+
+      - name: Install Playwright system deps (cache hit path)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      # Build the production bundle once; Playwright's webServer config
+      # will start `next start` against it for every test session.
+      - name: Build
+        run: npm run build
+
+      - name: Run smoke tests
+        run: npm run test:e2e
+        env:
+          CI: "1"
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
