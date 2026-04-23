@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
+import { webPageSchema } from "@/lib/seo/schema";
+
+const NOW_META_TITLE = "Now — what I'm focused on this quarter";
+const NOW_META_DESC =
+  "A monthly-ish snapshot of what Juan Diaz, LLC is actually building, shipping, and thinking about. Last updated inline.";
 
 // /now — https://nownownow.com convention. A public "what I'm
 // actually focused on right this quarter" page. Updated roughly
@@ -13,9 +18,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "Now — what I'm focused on this quarter",
-    description:
-      "A monthly-ish snapshot of what Juan Diaz, LLC is actually building, shipping, and thinking about. Last updated inline.",
+    title: NOW_META_TITLE,
+    description: NOW_META_DESC,
     alternates: buildAlternates(l, "/now"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
@@ -45,9 +49,16 @@ export default async function NowPage({ params }: { params: Promise<{ locale: st
     month: "long",
     day: "numeric",
   });
+  const pageSchema = webPageSchema({
+    locale: l,
+    path: "/now",
+    name: NOW_META_TITLE,
+    description: NOW_META_DESC,
+  });
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }} />
       <header className="page-hero">
         <div className="eyebrow">{t("now.eyebrow")}</div>
         <h1 dangerouslySetInnerHTML={{ __html: t("now.title") }} />

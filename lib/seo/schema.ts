@@ -117,6 +117,84 @@ export function webPageSchema(opts: {
   };
 }
 
+// SoftwareApplication for the ventures under /work/*. Each internal
+// product (Voltafy, Philly CRM, Help Mij Besparen, …) gets this on
+// its detail page — unlocks product-card eligibility in Google and
+// lets Perplexity / ChatGPT cite the product with structured facts
+// (name, publisher, audience) instead of a generic page snippet.
+export function softwareApplicationSchema(opts: {
+  locale: Locale;
+  slug: string;
+  name: string;
+  description: string;
+  /** Landing URL for the product itself (e.g. voltafy.nl). */
+  external: string;
+  /** Free-form sector string, used as `applicationCategory`. */
+  sector: string;
+  /** Launch year or YYYY-MM-DD; helpful for datePublished when known. */
+  launchedYear?: string;
+  /** Tech stack array — maps to `softwareRequirements`. */
+  stack?: string[];
+  /** Screenshot / logo URL for image-rich cards. */
+  image?: string;
+}): Record<string, unknown> {
+  const detailUrl = `${SITE}/${opts.locale}/work/${opts.slug}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "@id": `${detailUrl}#software`,
+    name: opts.name,
+    description: opts.description,
+    url: opts.external,
+    mainEntityOfPage: detailUrl,
+    applicationCategory: opts.sector,
+    inLanguage: IN_LANGUAGE[opts.locale],
+    // Browser-based products — no install required. Every venture
+    // here is a web app, not a mobile binary.
+    operatingSystem: "Web",
+    publisher: {
+      "@type": "Organization",
+      "@id": `${SITE}/#organization`,
+      name: "Juan Diaz, LLC",
+      url: SITE,
+    },
+    creator: { "@id": `${SITE}/about#person` },
+    ...(opts.launchedYear ? { datePublished: opts.launchedYear } : {}),
+    ...(opts.stack && opts.stack.length > 0 ? { softwareRequirements: opts.stack.join(", ") } : {}),
+    ...(opts.image ? { image: opts.image } : {}),
+    // We don't sell consumer SKUs with fixed pricing — leave `offers`
+    // off rather than fabricate one. Google tolerates its absence.
+    isAccessibleForFree: false,
+  };
+}
+
+// AboutPage — purpose-built schema for the /about route. Distinct
+// from the Person + ProfilePage already on that page: AboutPage says
+// "this URL describes an entity" while ProfilePage says "this URL is
+// the canonical profile for a Person". Both help disambiguation.
+export function aboutPageSchema(opts: {
+  locale: Locale;
+  name: string;
+  description: string;
+}): Record<string, unknown> {
+  const url = `${SITE}/${opts.locale}/about`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    name: opts.name,
+    description: opts.description,
+    url,
+    inLanguage: IN_LANGUAGE[opts.locale],
+    isPartOf: {
+      "@type": "WebSite",
+      "@id": `${SITE}/#organization`,
+      name: "Juan Diaz, LLC",
+      url: SITE,
+    },
+    about: { "@id": `${SITE}/about#person` },
+  };
+}
+
 export function contactPointSchema(): Record<string, unknown> {
   return {
     "@context": "https://schema.org",

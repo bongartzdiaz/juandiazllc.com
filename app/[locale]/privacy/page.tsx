@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import { AnalyticsOptOut } from "@/components/AnalyticsOptOut";
+import { webPageSchema } from "@/lib/seo/schema";
+
+const PRIVACY_META_TITLE = "Privacy";
+const PRIVACY_META_DESC =
+  "What this site stores, what it does not, and how to reach me about your data.";
 
 // Plain-language privacy page. Not legal advice — a statement of what
 // the site actually does with data, which is what NL/EU regulators
@@ -10,9 +15,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "Privacy",
-    description:
-      "What this site stores, what it does not, and how to reach me about your data.",
+    title: PRIVACY_META_TITLE,
+    description: PRIVACY_META_DESC,
     alternates: buildAlternates(l, "/privacy"),
     robots: { index: true, follow: true },
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
@@ -23,9 +27,16 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
   const { locale } = await params;
   const l = assertLocale(locale);
   const t = (k: string) => translate(l, k);
+  const pageSchema = webPageSchema({
+    locale: l,
+    path: "/privacy",
+    name: PRIVACY_META_TITLE,
+    description: PRIVACY_META_DESC,
+  });
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }} />
       <header className="page-hero">
         <div className="eyebrow">{t("priv.eyebrow")}</div>
         <h1 dangerouslySetInnerHTML={{ __html: t("priv.title") }} />

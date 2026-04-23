@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
+import { webPageSchema } from "@/lib/seo/schema";
+
+const STORY_META_TITLE = "Story — construction-trained, operator-built";
+const STORY_META_DESC =
+  "The story behind Juan Diaz, LLC — construction management, the crossover to revenue operations, and why I build honest software for operators.";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "Story — construction-trained, operator-built",
-    description:
-      "The story behind Juan Diaz, LLC — construction management, the crossover to revenue operations, and why I build honest software for operators.",
+    title: STORY_META_TITLE,
+    description: STORY_META_DESC,
     alternates: buildAlternates(l, "/story"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
@@ -18,9 +22,16 @@ export default async function StoryPage({ params }: { params: Promise<{ locale: 
   const { locale } = await params;
   const l = assertLocale(locale);
   const t = (k: string) => translate(l, k);
+  const pageSchema = webPageSchema({
+    locale: l,
+    path: "/story",
+    name: STORY_META_TITLE,
+    description: STORY_META_DESC,
+  });
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }} />
       <header className="page-hero">
         <div className="eyebrow">{t("sp.eyebrow")}</div>
         <h1 dangerouslySetInnerHTML={{ __html: t("sp.title") }} />

@@ -5,6 +5,7 @@ import { VENTURES, getVenture } from "@/lib/ventures";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+import { softwareApplicationSchema } from "@/lib/seo/schema";
 
 export function generateStaticParams() {
   return LOCALES.flatMap((locale) => VENTURES.map((v) => ({ locale, slug: v.slug })));
@@ -45,9 +46,25 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
     { name: v.name, path: `/work/${v.slug}` },
   ]);
 
+  // Pull the launch year out of the display metrics — ventures.ts
+  // stores it as "Launched: 2024" for the stat strip; reuse that
+  // rather than duplicating it into a schema-only field.
+  const launchedYear = v.metrics.find((m) => m.label.toLowerCase() === "launched")?.value;
+  const softwareSchema = softwareApplicationSchema({
+    locale: l,
+    slug: v.slug,
+    name: v.name,
+    description: v.summary,
+    external: v.external,
+    sector: v.sector,
+    launchedYear,
+    stack: v.stack,
+  });
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }} />
       <header
         className="page-hero"
         style={{

@@ -16,7 +16,15 @@ type Entry = {
   priority: number;
   change: MetadataRoute.Sitemap[number]["changeFrequency"];
   lastMod?: Date;
+  /** Absolute URLs of images associated with this page. Included in the
+   *  sitemap so Google Images / Discover surfaces the founder portrait
+   *  against name queries, and so venture + insight OG cards appear in
+   *  Image-search results alongside the text page. */
+  images?: string[];
 };
+
+const PORTRAIT = `${SITE}/me/portrait.jpg`;
+const OG_DEFAULT = `${SITE}/opengraph-image`;
 
 // Emits one URL per (locale, path) combination with hreflang alternates
 // so Google sees the four-language site. Gated + auth-only routes
@@ -25,9 +33,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
   const staticEntries: Entry[] = [
-    { path: "", priority: 1.0, change: "weekly" },
-    { path: "/story", priority: 0.85, change: "monthly" },
-    { path: "/about", priority: 0.9, change: "monthly" },
+    { path: "", priority: 1.0, change: "weekly", images: [OG_DEFAULT, PORTRAIT] },
+    { path: "/story", priority: 0.85, change: "monthly", images: [PORTRAIT] },
+    { path: "/about", priority: 0.9, change: "monthly", images: [PORTRAIT] },
     { path: "/now", priority: 0.7, change: "monthly" },
     { path: "/uses", priority: 0.65, change: "monthly" },
     { path: "/work", priority: 0.85, change: "weekly" },
@@ -47,6 +55,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     path: `/work/${v.slug}`,
     priority: 0.8,
     change: "monthly",
+    // Every venture page emits a per-locale OG via the route segment's
+    // opengraph-image conventions; the venture slug is the same across
+    // locales so Google can match the OG to the multi-lang set.
+    images: [`${SITE}/en/work/${v.slug}/opengraph-image`],
   }));
 
   const sectorEntries: Entry[] = SECTORS.map((s) => ({
@@ -66,6 +78,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
     change: "monthly",
     lastMod: new Date(p.publishedAt),
+    images: [`${SITE}/en/insights/${p.slug}/opengraph-image`],
   }));
 
   const tagSet = new Set(getAllInsights().map((p) => toSlug(p.tag)));
@@ -94,6 +107,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: entry.change,
       priority: entry.priority,
       alternates: { languages },
+      ...(entry.images && entry.images.length > 0 ? { images: entry.images } : {}),
     }));
   });
 }

@@ -95,6 +95,8 @@ export default async function InsightPage(
             <span className="arr" style={{ marginRight: 6 }}>←</span> {t("insights.d.allposts")}
           </Link>
           <div className="ia-meta">
+            <Link href={`/${l}/about`} className="ia-byline" rel="author">{t("insights.d.byline")}</Link>
+            <span>·</span>
             <Link href={`/insights/tag/${post.tag.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`} className="ia-tag">{post.tag}</Link>
             <span>·</span>
             <span>{formatDate(post.publishedAt)}</span>

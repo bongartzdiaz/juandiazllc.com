@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
+import { webPageSchema } from "@/lib/seo/schema";
 
 // /uses — https://uses.tech convention. What I actually build with.
 // Public so clients, collaborators, and hires know the stack before
@@ -10,13 +11,16 @@ import { translate } from "@/lib/i18n/dict";
 // Links that go out are affiliate-free. If something shows up here
 // it's because I use it every week, not because someone paid for it.
 
+const USES_META_TITLE = "Uses — the stack behind Juan Diaz, LLC";
+const USES_META_DESC =
+  "The tools, frameworks, services and hardware I actually use to build revenue engines. No affiliate links. Updated as the stack evolves.";
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "Uses — the stack behind Juan Diaz, LLC",
-    description:
-      "The tools, frameworks, services and hardware I actually use to build revenue engines. No affiliate links. Updated as the stack evolves.",
+    title: USES_META_TITLE,
+    description: USES_META_DESC,
     alternates: buildAlternates(l, "/uses"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
@@ -84,9 +88,16 @@ export default async function UsesPage({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   const t = (k: string) => translate(l, k);
+  const pageSchema = webPageSchema({
+    locale: l,
+    path: "/uses",
+    name: USES_META_TITLE,
+    description: USES_META_DESC,
+  });
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }} />
       <header className="page-hero">
         <div className="eyebrow">{t("uses.eyebrow")}</div>
         <h1 dangerouslySetInnerHTML={{ __html: t("uses.title") }} />

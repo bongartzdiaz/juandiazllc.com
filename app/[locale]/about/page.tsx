@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
+import { aboutPageSchema } from "@/lib/seo/schema";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -117,6 +118,11 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   const { locale } = await params;
   const l = assertLocale(locale);
   const t = (k: string) => translate(l, k);
+  const aboutSchema = aboutPageSchema({
+    locale: l,
+    name: translate(l, "about.meta.title"),
+    description: translate(l, "about.meta.desc"),
+  });
 
   return (
     <>
@@ -127,6 +133,10 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutSchema) }}
       />
       <header className="page-hero">
         <div className="eyebrow">{t("about.eyebrow")}</div>
