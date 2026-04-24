@@ -23,7 +23,7 @@ type Entry = {
   images?: string[];
 };
 
-const PORTRAIT = `${SITE}/me/portrait.jpg`;
+const PORTRAIT = `${SITE}/me/portrait.svg`;
 const OG_DEFAULT = `${SITE}/opengraph-image`;
 
 // Emits one URL per (locale, path) combination with hreflang alternates

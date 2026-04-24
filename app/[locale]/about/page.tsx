@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: translate(l, "about.og.desc"),
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
-      images: [{ url: "/me/portrait.jpg", width: 1200, height: 1200, alt: "Juan Diaz" }],
+      images: [{ url: "/me/portrait.svg", width: 1200, height: 1200, alt: "Juan Diaz" }],
     },
   };
 }
@@ -43,7 +43,7 @@ const personSchema = {
   familyName: "Bongartz Diaz",
   url: `${SITE}/about`,
   mainEntityOfPage: `${SITE}/about`,
-  image: `${SITE}/me/portrait.jpg`,
+  image: `${SITE}/me/portrait.svg`,
   jobTitle: "Founder, Juan Diaz, LLC",
   nationality: { "@type": "Country", name: "Netherlands" },
   workLocation: {

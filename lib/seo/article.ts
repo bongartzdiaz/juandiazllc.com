@@ -29,7 +29,7 @@ export const AUTHOR_PERSON = {
   name: "Juan Stefan Bongartz Diaz",
   alternateName: "Juan Diaz",
   url: `${SITE}/about`,
-  image: `${SITE}/me/portrait.jpg`,
+  image: `${SITE}/me/portrait.svg`,
   jobTitle: "Founder, Juan Diaz, LLC",
   worksFor: {
     "@type": "Organization",
@@ -82,7 +82,7 @@ export function blogPostingSchema(input: BlogPostingInput): Record<string, unkno
     publisher: PUBLISHER_ORG,
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     url,
-    image: input.image ?? `${SITE}/me/portrait.jpg`,
+    image: input.image ?? `${SITE}/me/portrait.svg`,
     ...(input.tag ? { keywords: input.tag } : {}),
     ...(input.articleBody ? { articleBody: input.articleBody } : {}),
     ...(wordCount ? { wordCount } : {}),

@@ -71,12 +71,12 @@ export default async function MainLayout({
               alternateName: "JDL",
               url: SITE_URL,
               logo: `${SITE_URL}/icon.svg`,
-              image: `${SITE_URL}/me/portrait.jpg`,
+              image: `${SITE_URL}/me/portrait.svg`,
               founder: {
                 "@type": "Person",
                 name: "Juan Stefan Diaz",
                 jobTitle: "Founder",
-                image: `${SITE_URL}/me/portrait.jpg`,
+                image: `${SITE_URL}/me/portrait.svg`,
                 url: `${SITE_URL}/${l}/about`,
                 sameAs: [
                   "https://linkedin.com/in/juanstefan",

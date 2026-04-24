@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Placeholder portrait — monogram on deep-forest ground, brand accent
+  stroke. Sized to the Person schema + OG expectations (1200×1200, 1:1).
+  Replace with a real JPG of Juan when available and change the .svg
+  references in layout.tsx, about/page.tsx, lib/seo/article.ts and
+  app/sitemap.ts back to .jpg in one pass.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200" role="img" aria-label="Juan Diaz, LLC">
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="30%" r="90%">
+      <stop offset="0%" stop-color="#0E6B44" stop-opacity="0.35"/>
+      <stop offset="55%" stop-color="#04150F"/>
+      <stop offset="100%" stop-color="#020D0A"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2EC489"/>
+      <stop offset="50%" stop-color="#5EFFB1"/>
+      <stop offset="100%" stop-color="#1F8F5C"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1200" fill="url(#bg)"/>
+  <circle cx="600" cy="600" r="460" fill="none" stroke="url(#ring)" stroke-width="4" opacity="0.7"/>
+  <circle cx="600" cy="600" r="520" fill="none" stroke="#163A2B" stroke-width="2" opacity="0.6"/>
+  <text x="600" y="660" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="380" font-weight="300" fill="#E8F4EC" text-anchor="middle" letter-spacing="-20">
+    JD
+  </text>
+  <text x="600" y="900" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="28" font-weight="400" fill="#9ABAA9" text-anchor="middle" letter-spacing="4">
+    JUAN DIAZ, LLC
+  </text>
+</svg>

@@ -2004,6 +2004,34 @@ em { color: var(--accent); font-style: italic; font-weight: 300; letter-spacing:
   .chapters-pin { position: relative; height: auto; min-height: 0; }
 }
 
+/* Below-fold render deferral.
+   ─────────────────────────────────────────────────────────────
+   `content-visibility: auto` tells the browser to skip layout
+   + paint work for off-screen sections, dropping them onto a
+   "render when near the viewport" path. Pairs with
+   `contain-intrinsic-size` so the page height is still correct
+   and in-page anchors/scroll don't jump when content gets
+   skipped.
+
+   Applied only to sections that are:
+     - consistently below the first viewport on every layout
+     - not position:sticky (breaks the chapters pin)
+     - self-contained (no cross-section layout dependencies)
+
+   The results-strip / ventures / signals / faq / contact meet
+   all three. Excluded: hero, story, sectors, process, kinetic,
+   chapters (sticky), stats (intentionally in-flow under
+   chapters), marquee (horizontal ticker that the browser must
+   animate continuously). */
+.results-strip,
+#ventures,
+#signals,
+.faq-section,
+.contact {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
+}
+
 /* Print — don't waste toner on animated chrome */
 @media print {
   .grain, .vignette, .cursor, .preload, .hud, .float-cta,

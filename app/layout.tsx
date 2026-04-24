@@ -173,7 +173,7 @@ const organizationSchema = {
     alternateName: ["Juan Diaz", "Juan S. Diaz"],
     jobTitle: "Founder",
     url: `${SITE_URL}/about`,
-    image: `${SITE_URL}/me/portrait.jpg`,
+    image: `${SITE_URL}/me/portrait.svg`,
     nationality: { "@type": "Country", name: "Netherlands" },
     workLocation: {
       "@type": "Place",
