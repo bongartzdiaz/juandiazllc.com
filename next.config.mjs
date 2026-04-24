@@ -1,4 +1,17 @@
 import createNextIntlPlugin from 'next-intl/plugin';
+import createBundleAnalyzer from '@next/bundle-analyzer';
+
+// Opt-in bundle-size inspection. Runs only when `ANALYZE=true` is set.
+// NOTE: @next/bundle-analyzer is webpack-only and does not emit a
+// report under Turbopack (which our default `npm run build` uses).
+// To get a report, run `npm run analyze` which drops --turbopack
+// and routes through webpack specifically for this analysis path.
+// When Turbopack's first-party analyzer matures (`next
+// experimental-analyze`), swap this over.
+const withBundleAnalyzer = createBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+  openAnalyzer: false,
+});
 
 // juandiazllc.com — gemergde monorepo: brand + Philly CRM onder /philly/*
 // in één Next-app. Eén build, één deploy, één Vercel-project. Supabase
@@ -43,4 +56,4 @@ const nextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withNextIntl(withBundleAnalyzer(nextConfig));
