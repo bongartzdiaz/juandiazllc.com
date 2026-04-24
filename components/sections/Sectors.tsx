@@ -1,7 +1,5 @@
-"use client";
-
 import Link from "next/link";
-import { useT } from "@/lib/i18n/useT";
+import { translate, type Locale } from "@/lib/i18n/dict";
 
 const ICONS = {
   energy: (
@@ -30,8 +28,8 @@ const ICONS = {
   ),
 };
 
-export function Sectors() {
-  const t = useT();
+export function Sectors({ locale }: { locale: Locale }) {
+  const t = (k: string) => translate(locale, k);
   const cards = [
     { slug: "energy", ix: "— 01 / Energy", titleA: t("sectors.e.title.a"), titleB: t("sectors.e.title.b"), body: t("sectors.e.body"), icon: ICONS.energy, tags: ["Solar", "Installers", "Metering", "Post-2027"] },
     { slug: "real-estate", ix: "— 02 / Real Estate", titleA: t("sectors.re.title.a"), titleB: t("sectors.re.title.b"), body: t("sectors.re.body"), icon: ICONS.re, tags: ["Retrofit", "Portfolio", "Tenant ops", "ESG"] },

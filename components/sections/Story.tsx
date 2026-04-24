@@ -1,7 +1,5 @@
-"use client";
-
 import { Countdown } from "./Countdown";
-import { useT } from "@/lib/i18n/useT";
+import { translate, type Locale } from "@/lib/i18n/dict";
 
 const TIMELINE = [
   "amsterdam",
@@ -21,8 +19,8 @@ const BODY_KEYS = [
   "story.body.p5",
 ] as const;
 
-export function Story() {
-  const t = useT();
+export function Story({ locale }: { locale: Locale }) {
+  const t = (k: string) => translate(locale, k);
   return (
     <section className="story" id="story">
       <div data-reveal>

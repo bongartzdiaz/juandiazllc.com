@@ -1,9 +1,7 @@
-"use client";
+import { translate, type Locale } from "@/lib/i18n/dict";
 
-import { useT } from "@/lib/i18n/useT";
-
-export function Contact() {
-  const t = useT();
+export function Contact({ locale }: { locale: Locale }) {
+  const t = (k: string) => translate(locale, k);
   return (
     <section className="contact" id="contact">
       <div className="label">{t("contact.section.label")}</div>

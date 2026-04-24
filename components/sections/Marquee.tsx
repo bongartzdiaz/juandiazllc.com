@@ -1,10 +1,7 @@
-"use client";
+import { translate, type Locale } from "@/lib/i18n/dict";
 
-import { useT } from "@/lib/i18n/useT";
-
-export function Marquee() {
-  const t = useT();
-  const html = t("marquee.full");
+export function Marquee({ locale }: { locale: Locale }) {
+  const html = translate(locale, "marquee.full");
   return (
     <div className="marquee">
       <div className="marquee-track">

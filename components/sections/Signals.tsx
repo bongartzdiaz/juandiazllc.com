@@ -1,11 +1,9 @@
-"use client";
-
 import Link from "next/link";
-import { useT } from "@/lib/i18n/useT";
+import { translate, type Locale } from "@/lib/i18n/dict";
 import { SIGNALS } from "@/lib/signals";
 
-export function Signals() {
-  const t = useT();
+export function Signals({ locale }: { locale: Locale }) {
+  const t = (k: string) => translate(locale, k);
   const posts = SIGNALS.slice(0, 3);
   return (
     <section id="signals">

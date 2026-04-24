@@ -1,5 +1,3 @@
-"use client";
-
 // Anonymized operator outcomes — verifiable, sector-level, no names.
 // Sits where traditional "logo wall + testimonials" would go, but
 // optimized for operators who care about numbers over logos.
@@ -14,7 +12,7 @@
 // Copy (context/sector/window) flows through translate() so NL/DE/ES
 // readers see localized strings, not the English fallback.
 
-import { useT } from "@/lib/i18n/useT";
+import { translate, type Locale } from "@/lib/i18n/dict";
 
 type Result = {
   id: string;
@@ -29,8 +27,8 @@ const RESULTS: Result[] = [
   { id: "r4", metric: "€0" },
 ];
 
-export function ResultsStrip() {
-  const t = useT();
+export function ResultsStrip({ locale }: { locale: Locale }) {
+  const t = (k: string) => translate(locale, k);
   return (
     <section id="results" className="section results-strip" aria-labelledby="results-head">
       <div className="section-head">

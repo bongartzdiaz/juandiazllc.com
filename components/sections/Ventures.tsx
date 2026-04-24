@@ -1,6 +1,4 @@
-"use client";
-
-import { useT } from "@/lib/i18n/useT";
+import { translate, type Locale } from "@/lib/i18n/dict";
 
 const VENTURES = [
   { id: "v1", wide: true,  href: "https://voltafy.nl",                   domain: "voltafy.nl",                   live: true,  soon: false },
@@ -10,8 +8,8 @@ const VENTURES = [
   { id: "v5", wide: true,  href: "#",                                    domain: "philly.juandiazllc.com",       live: false, soon: true  },
 ];
 
-export function Ventures() {
-  const t = useT();
+export function Ventures({ locale }: { locale: Locale }) {
+  const t = (k: string) => translate(locale, k);
   return (
     <section id="ventures">
       <div className="sec-head" data-reveal>

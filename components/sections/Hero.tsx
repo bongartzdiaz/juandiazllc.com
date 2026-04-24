@@ -1,15 +1,18 @@
-"use client";
-
 import Link from "next/link";
-import { useT } from "@/lib/i18n/useT";
+import { translate, type Locale } from "@/lib/i18n/dict";
 import { Globe } from "./Globe";
 
 // Hero — interactive earth with real countries (SVG orthographic
 // projection via d3-geo). Background is a living Milky Way: rotating
 // galactic arms, dust lanes, nebula cloud pulses, twinkling stars,
 // and occasional shooting stars. Pure CSS + SVG; no WebGL.
-export function Hero() {
-  const t = useT();
+//
+// Server component: the interactive Globe child keeps "use client"
+// on its own, but the surrounding layout + title + CTA labels need
+// nothing beyond the URL locale, so hoisting this out of the client
+// bundle shaves the initial JS parse on every homepage load.
+export function Hero({ locale }: { locale: Locale }) {
+  const t = (k: string) => translate(locale, k);
 
   return (
     <header className="hero" aria-label="Hero">

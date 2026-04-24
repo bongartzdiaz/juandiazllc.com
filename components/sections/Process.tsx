@@ -1,9 +1,7 @@
-"use client";
+import { translate, type Locale } from "@/lib/i18n/dict";
 
-import { useT } from "@/lib/i18n/useT";
-
-export function Process() {
-  const t = useT();
+export function Process({ locale }: { locale: Locale }) {
+  const t = (k: string) => translate(locale, k);
   const steps = [1, 2, 3, 4, 5].map((i) => ({
     n: `0${i}`,
     name: t(`process.${i}.name`),

@@ -1,9 +1,7 @@
-"use client";
+import { translate, type Locale } from "@/lib/i18n/dict";
 
-import { useT } from "@/lib/i18n/useT";
-
-export function Kinetic() {
-  const t = useT();
+export function Kinetic({ locale }: { locale: Locale }) {
+  const t = (k: string) => translate(locale, k);
   const body = t("kinetic.body");
   return (
     <div className="kinetic">

@@ -62,24 +62,24 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(homeFaq)) }}
       />
-      <Hero />
-      <Marquee />
-      <Story />
-      <Sectors />
-      <Process />
-      <Kinetic />
+      <Hero locale={l} />
+      <Marquee locale={l} />
+      <Story locale={l} />
+      <Sectors locale={l} />
+      <Process locale={l} />
+      <Kinetic locale={l} />
       <Chapters />
-      <Ventures />
+      <Ventures locale={l} />
       <LiveSignals locale={l} />
       <section style={{ padding: "40px 40px 0", maxWidth: "var(--max)", margin: "0 auto" }}>
         <Countdown2027 />
       </section>
       <Stats />
-      <ResultsStrip />
-      <Signals />
+      <ResultsStrip locale={l} />
+      <Signals locale={l} />
       <CtaBig />
       <FaqSection title={translate(l, "home.faq.title")} items={homeFaq} />
-      <Contact />
+      <Contact locale={l} />
     </>
   );
 }
