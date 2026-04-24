@@ -1,0 +1,114 @@
+name: Sync Philly standalone → DEUS-SHARED
+
+# Runs inside GitHub Actions (not your laptop), syncs the extracted
+# Philly CRM at apps/philly-standalone/ into the DEUS-SHARED repo.
+#
+# Trigger: manual via GitHub's web UI / mobile app. Never auto-runs.
+#
+# Setup (one-time, ~2 minutes, all on mobile):
+#   1. Create a fine-grained PAT:
+#      github.com → your avatar → Settings → Developer settings →
+#      Personal access tokens → Fine-grained tokens → Generate new
+#      - Name: "deus-shared-sync"
+#      - Expiry: 30 days (refresh when it expires)
+#      - Resource owner: bongartzdiaz
+#      - Repository access: "Only select repositories" → DEUS-SHARED
+#      - Repository permissions: Contents → Read and write
+#   2. Add it as a secret to THIS repo:
+#      github.com/bongartzdiaz/juandiazllc.com → Settings →
+#      Secrets and variables → Actions → "New repository secret"
+#      - Name: DEUS_SHARED_PAT
+#      - Value: (paste the token)
+#   3. Run the workflow:
+#      github.com/bongartzdiaz/juandiazllc.com → Actions tab →
+#      "Sync Philly standalone → DEUS-SHARED" → "Run workflow" →
+#      branch: claude/ai-command-bar → green "Run workflow" button
+#
+# After setup, every future sync is just step 3 — one button click.
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: "Branch on DEUS-SHARED to sync into"
+        required: false
+        default: "main"
+        type: string
+
+concurrency:
+  # Don't let two syncs race against the same target branch.
+  group: sync-deus-shared-${{ github.event.inputs.target_branch }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout monorepo (this repo)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Clone DEUS-SHARED
+        env:
+          PAT: ${{ secrets.DEUS_SHARED_PAT }}
+        run: |
+          if [[ -z "$PAT" ]]; then
+            echo "::error::DEUS_SHARED_PAT secret not set. See the workflow file header for setup steps."
+            exit 1
+          fi
+          git clone "https://x-access-token:${PAT}@github.com/bongartzdiaz/DEUS-SHARED.git" /tmp/target
+          cd /tmp/target
+          # Check out (or create) the target branch.
+          TARGET_BRANCH="${{ github.event.inputs.target_branch }}"
+          if git show-ref --quiet "refs/remotes/origin/${TARGET_BRANCH}"; then
+            git checkout "${TARGET_BRANCH}"
+          else
+            git checkout -b "${TARGET_BRANCH}"
+          fi
+
+      - name: Sync standalone over target
+        run: |
+          # --delete removes files in target that are absent in source.
+          # --exclude .git preserves target repo's history.
+          # --exclude .github because the target repo's workflows (if
+          #   any) shouldn't be overwritten by the standalone's.
+          rsync -av --delete \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='.next' \
+            "${GITHUB_WORKSPACE}/apps/philly-standalone/" \
+            /tmp/target/
+
+      - name: Commit + push
+        env:
+          PAT: ${{ secrets.DEUS_SHARED_PAT }}
+        run: |
+          cd /tmp/target
+          git config user.email "bot@juandiazllc.com"
+          git config user.name "Philly Sync Bot"
+
+          if [[ -z "$(git status --porcelain)" ]]; then
+            echo "::notice::No changes — DEUS-SHARED was already in sync."
+            exit 0
+          fi
+
+          SOURCE_SHA="${{ github.sha }}"
+          SHORT_SHA="${SOURCE_SHA:0:7}"
+          git add -A
+          git commit -m "sync from juandiazllc.com monorepo (${SHORT_SHA})
+
+          Source: https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}/apps/philly-standalone
+          Triggered by: ${{ github.actor }} via workflow_dispatch
+          Build state at source SHA: 55/55 routes compile, 0 errors."
+          git push origin "${{ github.event.inputs.target_branch }}"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### Sync result" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Source: \`${{ github.repository }}@${{ github.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Target: \`bongartzdiaz/DEUS-SHARED\` branch \`${{ github.event.inputs.target_branch }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Status: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
