@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Overlays } from "@/components/Overlays";
 import { Preloader } from "@/components/Preloader";
@@ -11,6 +12,31 @@ import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 import { LOCALES, DEFAULT_LOCALE } from "@/lib/i18n/dict";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
+
+// Self-hosted fonts via next/font. Inlines @font-face at build time,
+// serves WOFF2 from the same origin, drops the render-blocking
+// external CSS round-trip to fonts.googleapis.com (and the matching
+// preconnect pair). Variable font axis matches what we had before:
+// Inter 300..700 with italic, JetBrains Mono 300/400/500. Exposed as
+// CSS variables so globals.css can keep its existing
+// `font-family: 'Inter'` / `font-family: 'JetBrains Mono'` rules
+// through the --font-inter / --font-mono indirection.
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-inter",
+  preload: true,
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  display: "swap",
+  variable: "--font-mono",
+  preload: false,
+});
 
 // Preconnect hint target for Plausible. Reading the same env vars the
 // Analytics component reads keeps behaviour in lockstep — if analytics
@@ -194,9 +220,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const cookieLocale = c.get("jdl_locale")?.value;
   const lang = cookieLocale && (LOCALES as readonly string[]).includes(cookieLocale) ? cookieLocale : DEFAULT_LOCALE;
   return (
-    <html lang={lang}>
+    <html lang={lang} className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
         {PLAUSIBLE_DOMAIN ? (
           <link rel="preconnect" href={PLAUSIBLE_HOST} crossOrigin="" />
         ) : null}
@@ -206,13 +231,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* Credits file per humanstxt.org — a weak signal but a
             cheap one, and it gives curious readers a way in. */}
         <link rel="author" href="/humans.txt" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        {/* Single-family load reduces network + keeps typography consistent.
-            Instrument Serif dropped — Inter italic now serves editorial emphasis. */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300..700;1,300..500&family=JetBrains+Mono:wght@300;400;500&display=swap"
-          rel="stylesheet"
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}

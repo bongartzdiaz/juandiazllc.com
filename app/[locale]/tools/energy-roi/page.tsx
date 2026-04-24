@@ -118,7 +118,7 @@ export default async function EnergyRoiPage({
         >
           <div
             style={{
-              fontFamily: "'JetBrains Mono'",
+              fontFamily: "var(--font-mono)",
               fontSize: 12,
               letterSpacing: ".14em",
               color: "var(--accent)",
@@ -130,7 +130,7 @@ export default async function EnergyRoiPage({
           </div>
           <div
             style={{
-              fontFamily: "'Inter'",
+              fontFamily: "var(--font-inter)",
               fontWeight: 300,
               fontSize: "clamp(26px, 3vw, 42px)",
               letterSpacing: "-.02em",

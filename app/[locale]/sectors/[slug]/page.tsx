@@ -76,7 +76,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
               <span
                 key={t}
                 style={{
-                  fontFamily: "'JetBrains Mono'",
+                  fontFamily: "var(--font-mono)",
                   fontSize: 11,
                   letterSpacing: ".12em",
                   textTransform: "uppercase",
@@ -157,14 +157,14 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
                   }}
                 >
                   <div>
-                    <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".14em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 6 }}>
+                    <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: ".14em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 6 }}>
                       ◉ {translate(l, `${tool.tag}.tag`)}
                     </div>
                     <div style={{ fontSize: 17, fontWeight: 500 }}>
                       {translate(l, `${tool.tag}.title`)} — {translate(l, `${tool.tag}.body`)}
                     </div>
                   </div>
-                  <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--accent)", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: ".12em", color: "var(--accent)", textTransform: "uppercase", whiteSpace: "nowrap" }}>
                     {translate(l, `${tool.tag}.cta`)}
                   </span>
                 </Link>
@@ -188,11 +188,11 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
                 alignItems: "baseline",
               }}
             >
-              <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".14em", color: "var(--accent)" }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: ".14em", color: "var(--accent)" }}>
                 0{i + 1}
               </div>
               <div>
-                <div style={{ fontFamily: "'Inter'", fontWeight: 500, fontSize: 18, marginBottom: 8 }}>{l.title}</div>
+                <div style={{ fontFamily: "var(--font-inter)", fontWeight: 500, fontSize: 18, marginBottom: 8 }}>{l.title}</div>
                 <div style={{ color: "var(--muted)", fontSize: 16, lineHeight: 1.6 }}>{l.body}</div>
               </div>
             </div>
@@ -215,10 +215,10 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
                 alignItems: "baseline",
               }}
             >
-              <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 12, letterSpacing: ".14em", color: "var(--muted-soft)" }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: ".14em", color: "var(--muted-soft)" }}>
                 <em style={{ color: "var(--accent)", fontStyle: "normal" }}>0{i + 1}</em>
               </div>
-              <div style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 20, letterSpacing: "-.015em" }}>
+              <div style={{ fontFamily: "var(--font-inter)", fontWeight: 400, fontSize: 20, letterSpacing: "-.015em" }}>
                 {p.phase}
               </div>
               <div style={{ color: "var(--muted)", fontSize: 16, lineHeight: 1.65 }}>{p.applied}</div>
@@ -251,7 +251,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
                   </div>
                 </div>
                 {p.href && (
-                  <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--accent)", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: ".12em", color: "var(--accent)", textTransform: "uppercase", whiteSpace: "nowrap" }}>
                     {translate(l, "sec.d.seebuild")}
                   </span>
                 )}
@@ -278,11 +278,11 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
             overflow: "hidden",
           }}
         >
-          <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 12, letterSpacing: ".14em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 14 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: ".14em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 14 }}>
             ◉ {s.cta}
           </div>
           <div
-            style={{ fontFamily: "'Inter'", fontWeight: 300, fontSize: "clamp(26px, 3vw, 42px)", letterSpacing: "-.02em", lineHeight: 1.15, marginBottom: 28, maxWidth: "26ch" }}
+            style={{ fontFamily: "var(--font-inter)", fontWeight: 300, fontSize: "clamp(26px, 3vw, 42px)", letterSpacing: "-.02em", lineHeight: 1.15, marginBottom: 28, maxWidth: "26ch" }}
             dangerouslySetInnerHTML={{ __html: translate(l, "sec.d.bp.title") }}
           />
           <Link className="btn primary btn-mag" href={`/${l}/contact`}>
@@ -306,7 +306,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
                 <div className="ix">— {o.name}</div>
                 <h4 style={{ marginTop: 14, fontSize: 22 }}>{o.tagline}</h4>
               </div>
-              <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--muted-soft)", textTransform: "uppercase", marginTop: 20 }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: ".12em", color: "var(--muted-soft)", textTransform: "uppercase", marginTop: 20 }}>
                 {translate(l, "sec.d.seesector")}
               </div>
             </Link>

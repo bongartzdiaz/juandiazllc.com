@@ -52,7 +52,7 @@ export default async function StoryPage({ params }: { params: Promise<{ locale: 
 
         <p style={{ marginTop: 56 }}>
           — Juan Stefan Diaz<br />
-          <span style={{ color: "var(--muted-soft)", fontSize: 14, letterSpacing: ".08em", textTransform: "uppercase", fontFamily: "'JetBrains Mono'" }}>
+          <span style={{ color: "var(--muted-soft)", fontSize: 14, letterSpacing: ".08em", textTransform: "uppercase", fontFamily: "var(--font-mono)" }}>
             {t("sp.sign.role")}
           </span>
         </p>

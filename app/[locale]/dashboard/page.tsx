@@ -43,7 +43,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
         <div>
           <div
             style={{
-              fontFamily: "'JetBrains Mono'",
+              fontFamily: "var(--font-mono)",
               fontSize: 11,
               letterSpacing: ".18em",
               textTransform: "uppercase",
@@ -55,7 +55,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
           </div>
           <h1
             style={{
-              fontFamily: "'Inter'",
+              fontFamily: "var(--font-inter)",
               fontWeight: 300,
               fontSize: "clamp(44px, 6vw, 84px)",
               letterSpacing: "-.04em",
@@ -108,7 +108,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
         <div style={{ position: "relative" }}>
           <div
             style={{
-              fontFamily: "'JetBrains Mono'",
+              fontFamily: "var(--font-mono)",
               fontSize: 11,
               letterSpacing: ".18em",
               textTransform: "uppercase",
@@ -120,7 +120,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
           </div>
           <h2
             style={{
-              fontFamily: "'Inter'",
+              fontFamily: "var(--font-inter)",
               fontWeight: 300,
               fontSize: "clamp(32px, 4vw, 56px)",
               letterSpacing: "-.035em",
@@ -165,7 +165,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
               >
                 <div
                   style={{
-                    fontFamily: "'JetBrains Mono'",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 10,
                     letterSpacing: ".14em",
                     textTransform: "uppercase",
@@ -180,7 +180,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
                     fontSize: 16,
                     fontWeight: 500,
                     color: "var(--accent)",
-                    fontFamily: "'JetBrains Mono'",
+                    fontFamily: "var(--font-mono)",
                     letterSpacing: ".04em",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -199,7 +199,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
       <div
         style={{
           marginTop: 32,
-          fontFamily: "'JetBrains Mono'",
+          fontFamily: "var(--font-mono)",
           fontSize: 11,
           letterSpacing: ".12em",
           color: "var(--muted-soft)",

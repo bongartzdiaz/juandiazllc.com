@@ -67,7 +67,7 @@ export default async function SignalsIndex({ params }: { params: Promise<{ local
             >
               <div
                 style={{
-                  fontFamily: "'JetBrains Mono'",
+                  fontFamily: "var(--font-mono)",
                   fontSize: 11,
                   letterSpacing: ".14em",
                   textTransform: "uppercase",
@@ -78,7 +78,7 @@ export default async function SignalsIndex({ params }: { params: Promise<{ local
                 <div style={{ color: "var(--muted-soft)", marginTop: 6 }}>{s.readTime}</div>
               </div>
               <div>
-                <h2 style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 28, lineHeight: 1.15, letterSpacing: "-.02em", marginBottom: 12 }}>
+                <h2 style={{ fontFamily: "var(--font-inter)", fontWeight: 400, fontSize: 28, lineHeight: 1.15, letterSpacing: "-.02em", marginBottom: 12 }}>
                   {s.title}
                 </h2>
                 <p style={{ color: "var(--muted)", fontSize: 16, lineHeight: 1.6, maxWidth: "60ch" }}>
@@ -87,7 +87,7 @@ export default async function SignalsIndex({ params }: { params: Promise<{ local
               </div>
               <div
                 style={{
-                  fontFamily: "'JetBrains Mono'",
+                  fontFamily: "var(--font-mono)",
                   fontSize: 11,
                   letterSpacing: ".12em",
                   color: "var(--muted-soft)",

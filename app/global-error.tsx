@@ -67,7 +67,7 @@ export default function GlobalError({
         >
           <div
             style={{
-              fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+              fontFamily: "var(--font-mono), ui-monospace, monospace",
               fontSize: 11,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
@@ -99,7 +99,7 @@ export default function GlobalError({
                 color: "#2EC489",
                 borderRadius: 999,
                 cursor: "pointer",
-                fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                fontFamily: "var(--font-mono), ui-monospace, monospace",
                 fontSize: 12,
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
@@ -115,7 +115,7 @@ export default function GlobalError({
                 color: "#E8F4EC",
                 borderRadius: 999,
                 textDecoration: "none",
-                fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                fontFamily: "var(--font-mono), ui-monospace, monospace",
                 fontSize: 12,
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
@@ -128,7 +128,7 @@ export default function GlobalError({
             <div
               style={{
                 marginTop: 20,
-                fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                fontFamily: "var(--font-mono), ui-monospace, monospace",
                 fontSize: 11,
                 color: "#7FA393",
               }}

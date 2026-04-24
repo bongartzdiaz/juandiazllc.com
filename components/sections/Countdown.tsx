@@ -36,7 +36,7 @@ export function Countdown() {
           <div className="label" style={{ marginBottom: 8 }}>{tr("cd.label")}</div>
           <div
             style={{
-              fontFamily: "'Inter'",
+              fontFamily: "var(--font-inter)",
               fontWeight: 300,
               fontSize: "clamp(22px,2.6vw,32px)",
               lineHeight: 1.25,

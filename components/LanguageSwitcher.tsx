@@ -26,7 +26,7 @@ export function LanguageSwitcher() {
         aria-label={t("lang.switch")}
         aria-expanded={open}
         style={{
-          fontFamily: "'JetBrains Mono'",
+          fontFamily: "var(--font-mono)",
           fontSize: "inherit",
           letterSpacing: "inherit",
           textTransform: "uppercase",
@@ -71,7 +71,7 @@ export function LanguageSwitcher() {
                 alignItems: "center",
                 padding: "8px 12px",
                 borderRadius: 6,
-                fontFamily: "'JetBrains Mono'",
+                fontFamily: "var(--font-mono)",
                 fontSize: 11,
                 letterSpacing: ".1em",
                 textTransform: "uppercase",

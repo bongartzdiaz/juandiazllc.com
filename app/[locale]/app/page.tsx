@@ -73,7 +73,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
       <header data-reveal style={{ marginBottom: 56 }}>
         <div
           style={{
-            fontFamily: "'JetBrains Mono'",
+            fontFamily: "var(--font-mono)",
             fontSize: 11,
             letterSpacing: ".18em",
             textTransform: "uppercase",
@@ -85,7 +85,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
         </div>
         <h1
           style={{
-            fontFamily: "'Inter'",
+            fontFamily: "var(--font-inter)",
             fontWeight: 300,
             fontSize: "clamp(48px, 7vw, 96px)",
             letterSpacing: "-.04em",
@@ -138,7 +138,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
           >
             <div
               style={{
-                fontFamily: "'Inter'",
+                fontFamily: "var(--font-inter)",
                 fontWeight: 300,
                 fontSize: "clamp(40px, 5vw, 64px)",
                 letterSpacing: "-.04em",
@@ -152,7 +152,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
             <div
               style={{
                 marginTop: 10,
-                fontFamily: "'JetBrains Mono'",
+                fontFamily: "var(--font-mono)",
                 fontSize: 11,
                 letterSpacing: ".14em",
                 textTransform: "uppercase",
@@ -197,7 +197,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
               <div className="label">{t("app.leads.eyebrow")}</div>
               <h2
                 style={{
-                  fontFamily: "'Inter'",
+                  fontFamily: "var(--font-inter)",
                   fontWeight: 400,
                   fontSize: 28,
                   letterSpacing: "-.02em",
@@ -208,7 +208,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
             </div>
             <span
               style={{
-                fontFamily: "'JetBrains Mono'",
+                fontFamily: "var(--font-mono)",
                 fontSize: 11,
                 letterSpacing: ".12em",
                 color: "var(--muted-soft)",
@@ -224,7 +224,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
               style={{
                 padding: "40px 0",
                 color: "var(--muted-soft)",
-                fontFamily: "'JetBrains Mono'",
+                fontFamily: "var(--font-mono)",
                 fontSize: 12,
                 letterSpacing: ".12em",
                 textTransform: "uppercase",
@@ -254,7 +254,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
                     </div>
                     <div
                       style={{
-                        fontFamily: "'JetBrains Mono'",
+                        fontFamily: "var(--font-mono)",
                         fontSize: 10,
                         color: "var(--muted-soft)",
                         letterSpacing: ".08em",
@@ -272,7 +272,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
                   {lead.sector && (
                     <div
                       style={{
-                        fontFamily: "'JetBrains Mono'",
+                        fontFamily: "var(--font-mono)",
                         fontSize: 10,
                         color: "var(--accent)",
                         letterSpacing: ".12em",
@@ -307,7 +307,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
           <div className="label">{t("app.ventures.eyebrow")}</div>
           <h2
             style={{
-              fontFamily: "'Inter'",
+              fontFamily: "var(--font-inter)",
               fontWeight: 400,
               fontSize: 28,
               letterSpacing: "-.02em",
@@ -338,7 +338,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
                   <div style={{ fontSize: 14, fontWeight: 500 }}>{v.name}</div>
                   <div
                     style={{
-                      fontFamily: "'JetBrains Mono'",
+                      fontFamily: "var(--font-mono)",
                       fontSize: 10,
                       color: "var(--muted-soft)",
                       letterSpacing: ".08em",
@@ -350,7 +350,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
                 </div>
                 <span
                   style={{
-                    fontFamily: "'JetBrains Mono'",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 10,
                     letterSpacing: ".12em",
                     color: v.status === "live" ? "var(--accent)" : "var(--warn)",

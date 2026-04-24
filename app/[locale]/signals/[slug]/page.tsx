@@ -107,7 +107,7 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
             gap: 20,
             alignItems: "center",
             marginBottom: 20,
-            fontFamily: "'JetBrains Mono'",
+            fontFamily: "var(--font-mono)",
             fontSize: 11,
             letterSpacing: ".14em",
             textTransform: "uppercase",
@@ -150,7 +150,7 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
             flexWrap: "wrap",
           }}
         >
-          <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 12, letterSpacing: ".1em", color: "var(--muted-soft)", textTransform: "uppercase" }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: ".1em", color: "var(--muted-soft)", textTransform: "uppercase" }}>
             — Juan Stefan Bongartz Diaz
           </div>
           <Link className="btn primary btn-mag" href="/contact">
@@ -172,7 +172,7 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
                 transition: "all .3s var(--ease)",
               }}
             >
-              <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".14em", color: "var(--muted-soft)", textTransform: "uppercase", marginBottom: 10 }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: ".14em", color: "var(--muted-soft)", textTransform: "uppercase", marginBottom: 10 }}>
                 ← {translate(l, "signals.d.prev")}
               </div>
               <div style={{ fontSize: 18, fontWeight: 500, letterSpacing: "-.015em", lineHeight: 1.3 }}>
@@ -192,7 +192,7 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
                 transition: "all .3s var(--ease)",
               }}
             >
-              <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".14em", color: "var(--muted-soft)", textTransform: "uppercase", marginBottom: 10 }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: ".14em", color: "var(--muted-soft)", textTransform: "uppercase", marginBottom: 10 }}>
                 {translate(l, "signals.d.next")} →
               </div>
               <div style={{ fontSize: 18, fontWeight: 500, letterSpacing: "-.015em", lineHeight: 1.3 }}>

@@ -166,7 +166,7 @@ export function ContactForm() {
                 background: "rgba(3,20,15,.6)",
                 border: "1px solid var(--line)",
                 color: "var(--text)",
-                fontFamily: "'Inter'",
+                fontFamily: "var(--font-inter)",
                 fontSize: 15,
                 lineHeight: 1.55,
                 outline: "none",

@@ -149,7 +149,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
             >
               <div
                 style={{
-                  fontFamily: "'JetBrains Mono'",
+                  fontFamily: "var(--font-mono)",
                   fontSize: 12,
                   letterSpacing: ".14em",
                   color: "var(--muted-soft)",
@@ -161,7 +161,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
               </div>
               <div
                 style={{
-                  fontFamily: "'Inter'",
+                  fontFamily: "var(--font-inter)",
                   fontWeight: 400,
                   fontSize: 22,
                   letterSpacing: "-.015em",
@@ -189,7 +189,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
             <span
               key={s}
               style={{
-                fontFamily: "'JetBrains Mono'",
+                fontFamily: "var(--font-mono)",
                 fontSize: 12,
                 letterSpacing: ".08em",
                 color: "var(--muted)",
@@ -215,11 +215,11 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
             overflow: "hidden",
           }}
         >
-          <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 12, letterSpacing: ".14em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 14 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: ".14em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 14 }}>
             {t("work.d.want.eyebrow")}
           </div>
           <div
-            style={{ fontFamily: "'Inter'", fontWeight: 300, fontSize: "clamp(24px, 3vw, 36px)", letterSpacing: "-.02em", lineHeight: 1.2, marginBottom: 24, maxWidth: "30ch" }}
+            style={{ fontFamily: "var(--font-inter)", fontWeight: 300, fontSize: "clamp(24px, 3vw, 36px)", letterSpacing: "-.02em", lineHeight: 1.2, marginBottom: 24, maxWidth: "30ch" }}
             dangerouslySetInnerHTML={{ __html: t("work.d.want.title") }}
           />
           <Link className="btn primary btn-mag" href="/contact">
@@ -256,7 +256,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
                 <h4 style={{ marginTop: 18 }}>{o.name}</h4>
                 <p>{o.tagline}</p>
               </div>
-              <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--muted-soft)", textTransform: "uppercase", marginTop: 20 }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: ".12em", color: "var(--muted-soft)", textTransform: "uppercase", marginTop: 20 }}>
                 {t("work.d.seebuild")}
               </div>
             </Link>

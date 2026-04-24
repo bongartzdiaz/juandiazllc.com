@@ -76,7 +76,7 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
                   <div className="ix">— {v.sector}</div>
                   <div
                     style={{
-                      fontFamily: "'JetBrains Mono'",
+                      fontFamily: "var(--font-mono)",
                       fontSize: 10,
                       letterSpacing: ".14em",
                       textTransform: "uppercase",
@@ -112,14 +112,14 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
                   flexWrap: "wrap",
                 }}
               >
-                <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 12, color: "var(--muted-soft)", letterSpacing: ".08em" }}>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--muted-soft)", letterSpacing: ".08em" }}>
                   {v.domain}
                 </div>
                 <div style={{ display: "flex", gap: 10 }}>
                   <Link
                     href={`/work/${v.slug}`}
                     style={{
-                      fontFamily: "'JetBrains Mono'",
+                      fontFamily: "var(--font-mono)",
                       fontSize: 11,
                       letterSpacing: ".14em",
                       textTransform: "uppercase",
@@ -138,7 +138,7 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
-                        fontFamily: "'JetBrains Mono'",
+                        fontFamily: "var(--font-mono)",
                         fontSize: 11,
                         letterSpacing: ".14em",
                         textTransform: "uppercase",

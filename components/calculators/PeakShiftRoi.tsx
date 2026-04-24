@@ -80,12 +80,12 @@ export function PeakShiftRoi({ labels }: Props) {
     border: "1px solid var(--line)",
     borderRadius: 8,
     color: "var(--fg)",
-    fontFamily: "'JetBrains Mono'",
+    fontFamily: "var(--font-mono)",
     fontSize: 14,
   };
   const labelStyle: React.CSSProperties = {
     display: "block",
-    fontFamily: "'JetBrains Mono'",
+    fontFamily: "var(--font-mono)",
     fontSize: 11,
     letterSpacing: ".12em",
     textTransform: "uppercase",
@@ -122,7 +122,7 @@ export function PeakShiftRoi({ labels }: Props) {
         <div>
           <div
             style={{
-              fontFamily: "'JetBrains Mono'",
+              fontFamily: "var(--font-mono)",
               fontSize: 12,
               letterSpacing: ".14em",
               color: "var(--accent)",
@@ -148,7 +148,7 @@ export function PeakShiftRoi({ labels }: Props) {
         <div>
           <div
             style={{
-              fontFamily: "'JetBrains Mono'",
+              fontFamily: "var(--font-mono)",
               fontSize: 12,
               letterSpacing: ".14em",
               color: "var(--accent)",
@@ -166,7 +166,7 @@ export function PeakShiftRoi({ labels }: Props) {
           </div>
           <div
             style={{
-              fontFamily: "'JetBrains Mono'",
+              fontFamily: "var(--font-mono)",
               fontSize: 11,
               letterSpacing: ".1em",
               textTransform: "uppercase",
@@ -199,7 +199,7 @@ function ResultCard({ title, value, highlight }: { title: string; value: string;
     >
       <div
         style={{
-          fontFamily: "'JetBrains Mono'",
+          fontFamily: "var(--font-mono)",
           fontSize: 11,
           letterSpacing: ".12em",
           textTransform: "uppercase",
@@ -208,7 +208,7 @@ function ResultCard({ title, value, highlight }: { title: string; value: string;
       >
         {title}
       </div>
-      <div style={{ fontFamily: "'Inter'", fontSize: 22, fontWeight: 400, letterSpacing: "-.02em" }}>{value}</div>
+      <div style={{ fontFamily: "var(--font-inter)", fontSize: 22, fontWeight: 400, letterSpacing: "-.02em" }}>{value}</div>
     </div>
   );
 }

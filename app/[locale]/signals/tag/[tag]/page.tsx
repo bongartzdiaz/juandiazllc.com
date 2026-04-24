@@ -128,7 +128,7 @@ export default async function SignalsTagArchivePage(
               >
                 <div
                   style={{
-                    fontFamily: "'JetBrains Mono'",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 11,
                     letterSpacing: ".14em",
                     textTransform: "uppercase",
@@ -143,7 +143,7 @@ export default async function SignalsTagArchivePage(
                 <div>
                   <h2
                     style={{
-                      fontFamily: "'Inter'",
+                      fontFamily: "var(--font-inter)",
                       fontWeight: 400,
                       fontSize: 28,
                       lineHeight: 1.15,
@@ -166,7 +166,7 @@ export default async function SignalsTagArchivePage(
                 </div>
                 <div
                   style={{
-                    fontFamily: "'JetBrains Mono'",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 11,
                     letterSpacing: ".12em",
                     color: "var(--muted-soft)",

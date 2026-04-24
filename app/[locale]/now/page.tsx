@@ -62,7 +62,7 @@ export default async function NowPage({ params }: { params: Promise<{ locale: st
       </header>
 
       <article className="long">
-        <div style={{ color: "var(--muted)", fontFamily: "'JetBrains Mono', monospace", fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 24 }}>
+        <div style={{ color: "var(--muted)", fontFamily: "var(--font-mono), monospace", fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 24 }}>
           {t("now.lastupdated")} {lastUpdated}
         </div>
 

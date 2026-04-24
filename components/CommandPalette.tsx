@@ -137,7 +137,7 @@ export function CommandPalette() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "18px 20px", borderBottom: "1px solid var(--line)" }}>
-          <span style={{ color: "var(--accent)", fontFamily: "'JetBrains Mono'", fontSize: 14 }}>◉</span>
+          <span style={{ color: "var(--accent)", fontFamily: "var(--font-mono)", fontSize: 14 }}>◉</span>
           <input
             ref={inputRef}
             value={q}
@@ -149,26 +149,26 @@ export function CommandPalette() {
               border: 0,
               outline: "none",
               color: "var(--text)",
-              fontFamily: "'Inter'",
+              fontFamily: "var(--font-inter)",
               fontSize: 16,
               letterSpacing: "-.01em",
             }}
             autoComplete="off"
             spellCheck={false}
           />
-          <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 10, letterSpacing: ".14em", color: "var(--muted-soft)", textTransform: "uppercase", padding: "4px 8px", border: "1px solid var(--line)", borderRadius: 6 }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: ".14em", color: "var(--muted-soft)", textTransform: "uppercase", padding: "4px 8px", border: "1px solid var(--line)", borderRadius: 6 }}>
             ESC
           </span>
         </div>
         <div style={{ maxHeight: "52vh", overflowY: "auto", padding: 8 }}>
           {grouped.length === 0 ? (
-            <div style={{ padding: "24px 16px", color: "var(--muted)", fontFamily: "'JetBrains Mono'", fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase" }}>
+            <div style={{ padding: "24px 16px", color: "var(--muted)", fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase" }}>
               No matches
             </div>
           ) : (
             grouped.map((g) => (
               <div key={g.section} style={{ marginBottom: 4 }}>
-                <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 10, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--muted-soft)", padding: "10px 12px 6px" }}>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--muted-soft)", padding: "10px 12px 6px" }}>
                   {g.section}
                 </div>
                 {g.items.map((c) => {
@@ -190,18 +190,18 @@ export function CommandPalette() {
                         color: isActive ? "var(--text)" : "var(--muted)",
                         border: isActive ? "1px solid rgba(94,255,177,.25)" : "1px solid transparent",
                         cursor: "pointer",
-                        fontFamily: "'Inter'",
+                        fontFamily: "var(--font-inter)",
                         fontSize: 14,
                         textAlign: "left",
                         transition: "background .15s",
                       }}
                     >
                       <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <span style={{ color: isActive ? "var(--accent)" : "var(--muted-soft)", fontFamily: "'JetBrains Mono'", fontSize: 10 }}>›</span>
+                        <span style={{ color: isActive ? "var(--accent)" : "var(--muted-soft)", fontFamily: "var(--font-mono)", fontSize: 10 }}>›</span>
                         {c.label}
                       </span>
                       {c.hint && (
-                        <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".08em", color: "var(--muted-soft)" }}>
+                        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: ".08em", color: "var(--muted-soft)" }}>
                           {c.hint}
                         </span>
                       )}
@@ -212,7 +212,7 @@ export function CommandPalette() {
             ))
           )}
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 16px", borderTop: "1px solid var(--line)", fontFamily: "'JetBrains Mono'", fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--muted-soft)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 16px", borderTop: "1px solid var(--line)", fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--muted-soft)" }}>
           <span>↑↓ Navigate · ↵ Select</span>
           <span>⌘K to toggle</span>
         </div>

@@ -103,7 +103,7 @@ export default async function ToolsHub({
             >
               <div
                 style={{
-                  fontFamily: "'JetBrains Mono'",
+                  fontFamily: "var(--font-mono)",
                   fontSize: 11,
                   letterSpacing: ".14em",
                   color: "var(--accent)",
@@ -115,7 +115,7 @@ export default async function ToolsHub({
               </div>
               <div
                 style={{
-                  fontFamily: "'Inter'",
+                  fontFamily: "var(--font-inter)",
                   fontWeight: 400,
                   fontSize: 24,
                   letterSpacing: "-.02em",
@@ -127,7 +127,7 @@ export default async function ToolsHub({
               <p style={{ color: "var(--muted)", fontSize: 15, lineHeight: 1.6, marginBottom: 18 }}>
                 {t(`tools.${c.ns}.body`)}
               </p>
-              <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 13, color: "var(--accent)" }}>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--accent)" }}>
                 {t(`tools.${c.ns}.cta`)}
               </span>
             </Link>

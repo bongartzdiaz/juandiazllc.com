@@ -119,13 +119,13 @@ export function EnergyRoi({ labels, localeCode = "nl-NL" }: Props) {
     border: "1px solid var(--line)",
     borderRadius: 8,
     color: "var(--fg)",
-    fontFamily: "'JetBrains Mono'",
+    fontFamily: "var(--font-mono)",
     fontSize: 14,
   };
 
   const labelStyle: React.CSSProperties = {
     display: "block",
-    fontFamily: "'JetBrains Mono'",
+    fontFamily: "var(--font-mono)",
     fontSize: 11,
     letterSpacing: ".12em",
     textTransform: "uppercase",
@@ -168,7 +168,7 @@ export function EnergyRoi({ labels, localeCode = "nl-NL" }: Props) {
         <div>
           <div
             style={{
-              fontFamily: "'JetBrains Mono'",
+              fontFamily: "var(--font-mono)",
               fontSize: 12,
               letterSpacing: ".14em",
               color: "var(--accent)",
@@ -208,7 +208,7 @@ export function EnergyRoi({ labels, localeCode = "nl-NL" }: Props) {
         <div>
           <div
             style={{
-              fontFamily: "'JetBrains Mono'",
+              fontFamily: "var(--font-mono)",
               fontSize: 12,
               letterSpacing: ".14em",
               color: "var(--accent)",
@@ -251,7 +251,7 @@ export function EnergyRoi({ labels, localeCode = "nl-NL" }: Props) {
               />
             )}
           </div>
-          <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--muted-soft)", marginTop: 20 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--muted-soft)", marginTop: 20 }}>
             {labels.productionLine.replace("{kwh}", Math.round(r.production).toLocaleString(localeCode))}
           </div>
           <p style={{ color: "var(--muted)", fontSize: 13, lineHeight: 1.6, marginTop: 16 }}>{labels.smallprint}</p>
@@ -296,17 +296,17 @@ function ScenarioCard({
       <div style={{ fontSize: 12, color: "var(--muted-soft)", marginBottom: 14 }}>{subtitle}</div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <div>
-          <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--muted-soft)", marginBottom: 4 }}>{labels.annualSavings}</div>
-          <div style={{ fontFamily: "'Inter'", fontSize: 22, fontWeight: 400, letterSpacing: "-.02em" }}>{eur(annual, localeCode)}</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--muted-soft)", marginBottom: 4 }}>{labels.annualSavings}</div>
+          <div style={{ fontFamily: "var(--font-inter)", fontSize: 22, fontWeight: 400, letterSpacing: "-.02em" }}>{eur(annual, localeCode)}</div>
           {delta !== null && (
-            <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, color: delta < 0 ? "#ff8b7a" : "var(--accent)", marginTop: 4 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: delta < 0 ? "#ff8b7a" : "var(--accent)", marginTop: 4 }}>
               {labels.deltaLabel.replace("{amount}", eur(delta, localeCode))}
             </div>
           )}
         </div>
         <div>
-          <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--muted-soft)", marginBottom: 4 }}>{labels.payback}</div>
-          <div style={{ fontFamily: "'Inter'", fontSize: 22, fontWeight: 400, letterSpacing: "-.02em" }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--muted-soft)", marginBottom: 4 }}>{labels.payback}</div>
+          <div style={{ fontFamily: "var(--font-inter)", fontSize: 22, fontWeight: 400, letterSpacing: "-.02em" }}>
             {years(payback)} <span style={{ fontSize: 14, color: "var(--muted)" }}>{labels.years}</span>
           </div>
         </div>
