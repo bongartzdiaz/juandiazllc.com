@@ -115,9 +115,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .vignette { position: fixed; inset: 0; pointer-events: none; z-index: 99; background: radial-gradient(120% 80% at 50% 40%, transparent 45%, rgba(0,0,0,.55) 100%); }
 
 /* Cursor */
-.cursor { position: fixed; top: 0; left: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); pointer-events: none; z-index: 200; transform: translate(-50%,-50%); mix-blend-mode: screen; transition: width .25s var(--ease), height .25s var(--ease), background .25s; }
-.cursor.lg { width: 60px; height: 60px; background: transparent; border: 1px solid var(--accent); }
-@media (hover: none) { .cursor { display: none; } }
 
 /* Preloader */
 .preload { position: fixed; inset: 0; z-index: 300; background: var(--bg); display: flex; flex-direction: column; justify-content: space-between; padding: 32px 40px; transition: opacity .4s var(--ease), visibility .4s; animation: preloadFailsafe 1200ms forwards; }
@@ -2034,7 +2031,7 @@ em { color: var(--accent); font-style: italic; font-weight: 300; letter-spacing:
 
 /* Print — don't waste toner on animated chrome */
 @media print {
-  .grain, .vignette, .cursor, .preload, .hud, .float-cta,
+  .grain, .vignette, .preload, .hud, .float-cta,
   .back-to-top, .cookie-banner, .hero canvas, .chapters .ch-visual {
     display: none !important;
   }

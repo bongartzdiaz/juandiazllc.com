@@ -28,29 +28,6 @@ export function GlobalEffects() {
     }
     const failsafe = window.setTimeout(finish, 900);
 
-    /* Cursor */
-    const cur = document.getElementById("cursor");
-    let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
-    let tx = cx, ty = cy;
-    const onMove = (e: MouseEvent) => { tx = e.clientX; ty = e.clientY; };
-    window.addEventListener("mousemove", onMove);
-    let raf = 0;
-    const animCur = () => {
-      cx += (tx - cx) * 0.18;
-      cy += (ty - cy) * 0.18;
-      if (cur) cur.style.transform = `translate(${cx}px,${cy}px) translate(-50%,-50%)`;
-      raf = requestAnimationFrame(animCur);
-    };
-    animCur();
-
-    const hoverables = document.querySelectorAll("a, button, .v-card, .sec-card, .proc-step");
-    const onEnter = () => cur?.classList.add("lg");
-    const onLeave = () => cur?.classList.remove("lg");
-    hoverables.forEach((el) => {
-      el.addEventListener("mouseenter", onEnter);
-      el.addEventListener("mouseleave", onLeave);
-    });
-
     /* Card glow follow */
     const cards = document.querySelectorAll<HTMLElement>(".v-card, .sec-card");
     const cardHandlers = new Map<HTMLElement, (e: MouseEvent) => void>();
@@ -193,13 +170,7 @@ export function GlobalEffects() {
     return () => {
       window.clearTimeout(failsafe);
       window.removeEventListener("load", finish);
-      window.removeEventListener("mousemove", onMove);
       window.removeEventListener("scroll", onScrollCta);
-      cancelAnimationFrame(raf);
-      hoverables.forEach((el) => {
-        el.removeEventListener("mouseenter", onEnter);
-        el.removeEventListener("mouseleave", onLeave);
-      });
       cards.forEach((card) => {
         const h = cardHandlers.get(card);
         if (h) card.removeEventListener("mousemove", h);
