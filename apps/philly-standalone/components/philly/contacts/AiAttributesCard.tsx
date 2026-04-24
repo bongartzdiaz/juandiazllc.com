@@ -1,0 +1,222 @@
+'use client'
+
+import { useState } from 'react'
+import { Sparkles, RefreshCw, AlertTriangle, Loader2 } from 'lucide-react'
+
+// Attio-style AI attributes card. Renders industry, ICP-fit score,
+// and summary for a contact. The data is generated server-side by
+// lib/philly/ai/contact-attributes and persisted on the Contact row;
+// this card's only job is to display the current state and offer a
+// "refresh" button that re-POSTs to /api/contacts/[id]/ai-attributes.
+
+export interface ContactAiAttributes {
+  aiIndustry?: string | null
+  aiIcpFit?: number | null
+  aiSummary?: string | null
+  aiAttributesStatus?: string | null
+  aiAttributesUpdatedAt?: string | null
+  aiAttributesError?: string | null
+}
+
+type Props = {
+  contactId: string
+  attrs: ContactAiAttributes
+  onUpdated?: () => void
+}
+
+function fitColor(score: number): string {
+  if (score >= 75) return 'var(--accent)'
+  if (score >= 50) return 'var(--g, #f5c542)'
+  return 'var(--txt3)'
+}
+
+export function AiAttributesCard({ contactId, attrs, onUpdated }: Props) {
+  const [busy, setBusy] = useState(false)
+  const [localError, setLocalError] = useState<string | null>(null)
+
+  const status = busy ? 'pending' : attrs.aiAttributesStatus ?? 'idle'
+  const ready = status === 'ready'
+  const pending = status === 'pending'
+  const errored = status === 'error' || !!localError
+  const errorMessage = localError ?? attrs.aiAttributesError ?? null
+
+  async function refresh() {
+    if (busy) return
+    setBusy(true)
+    setLocalError(null)
+    try {
+      const res = await fetch(`/api/contacts/${contactId}/ai-attributes`, {
+        method: 'POST',
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        setLocalError(body.error ?? `Request failed (${res.status})`)
+      } else {
+        onUpdated?.()
+      }
+    } catch (err) {
+      setLocalError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div
+      style={{
+        background: 'var(--panel)',
+        border: '1px solid var(--border)',
+        borderRadius: 12,
+        padding: '20px 24px',
+        boxShadow: 'var(--shadow-sm)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Sparkles size={14} color="var(--accent)" />
+          <div style={{ fontSize: 14, fontWeight: 600 }}>AI Intelligence</div>
+          {pending && (
+            <span
+              className="mono"
+              style={{
+                fontSize: 10,
+                padding: '2px 8px',
+                borderRadius: 999,
+                background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
+                color: 'var(--accent)',
+                letterSpacing: '.08em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Enriching
+            </span>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={refresh}
+          disabled={busy}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 10px',
+            border: '1px solid var(--border)',
+            borderRadius: 8,
+            background: 'transparent',
+            color: 'var(--txt2)',
+            fontSize: 12,
+            cursor: busy ? 'not-allowed' : 'pointer',
+            opacity: busy ? 0.6 : 1,
+          }}
+          aria-label="Refresh AI attributes"
+        >
+          {busy ? <Loader2 size={12} className="spin" /> : <RefreshCw size={12} />}
+          Refresh
+        </button>
+      </div>
+
+      {errored && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 8,
+            padding: '10px 12px',
+            borderRadius: 8,
+            background: 'color-mix(in srgb, var(--danger, #e04f5f) 8%, transparent)',
+            color: 'var(--danger, #e04f5f)',
+            fontSize: 12,
+            marginBottom: 12,
+          }}
+        >
+          <AlertTriangle size={14} style={{ flexShrink: 0, marginTop: 1 }} />
+          <div>{errorMessage ?? 'Generation failed.'}</div>
+        </div>
+      )}
+
+      {pending && !ready && (
+        <div style={{ fontSize: 13, color: 'var(--txt3)', lineHeight: 1.6 }}>
+          Generating industry, ICP fit, and summary…
+        </div>
+      )}
+
+      {ready && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px', gap: 20, alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div>
+              <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 4 }}>Industry</div>
+              <div style={{ fontSize: 14, fontWeight: 500 }}>{attrs.aiIndustry ?? '—'}</div>
+            </div>
+            {attrs.aiSummary && (
+              <div>
+                <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 4 }}>Summary</div>
+                <div style={{ fontSize: 13, color: 'var(--txt2)', lineHeight: 1.6 }}>
+                  {attrs.aiSummary}
+                </div>
+              </div>
+            )}
+            {attrs.aiAttributesUpdatedAt && (
+              <div style={{ fontSize: 11, color: 'var(--txt3)' }}>
+                Updated {new Date(attrs.aiAttributesUpdatedAt).toLocaleString()}
+              </div>
+            )}
+          </div>
+          <IcpFitDial score={attrs.aiIcpFit ?? 0} />
+        </div>
+      )}
+
+      {!ready && !pending && !errored && (
+        <div style={{ fontSize: 13, color: 'var(--txt3)', lineHeight: 1.6 }}>
+          No AI intelligence yet. Click Refresh to generate an industry label, ICP-fit score, and summary from the current contact data.
+        </div>
+      )}
+      <style jsx>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spin { animation: spin 1s linear infinite; }
+      `}</style>
+    </div>
+  )
+}
+
+function IcpFitDial({ score }: { score: number }) {
+  const pct = Math.max(0, Math.min(100, score))
+  const r = 48
+  const c = 2 * Math.PI * r
+  const offset = c * (1 - pct / 100)
+  const col = fitColor(pct)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+      <div style={{ position: 'relative', width: 120, height: 120 }}>
+        <svg viewBox="0 0 120 120" width="120" height="120">
+          <circle cx="60" cy="60" r={r} fill="none" stroke="var(--border)" strokeWidth="8" />
+          <circle
+            cx="60" cy="60" r={r}
+            fill="none"
+            stroke={col}
+            strokeWidth="8"
+            strokeLinecap="round"
+            strokeDasharray={c}
+            strokeDashoffset={offset}
+            transform="rotate(-90 60 60)"
+            style={{ transition: 'stroke-dashoffset .6s ease' }}
+          />
+        </svg>
+        <div
+          style={{
+            position: 'absolute', inset: 0,
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <div className="mono" style={{ fontSize: 26, fontWeight: 700, color: col, lineHeight: 1 }}>
+            {pct}
+          </div>
+          <div style={{ fontSize: 10, color: 'var(--txt3)', letterSpacing: '.1em', textTransform: 'uppercase', marginTop: 3 }}>
+            ICP Fit
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

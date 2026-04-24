@@ -9,7 +9,7 @@ export default defineConfig({
   },
   test: {
     include: ["**/*.test.ts", "**/*.test.tsx"],
-    exclude: ["node_modules/**", ".next/**", "preview/**", ".claude/**"],
+    exclude: ["node_modules/**", ".next/**", "preview/**", ".claude/**", "apps/**"],
     environment: "node",
   },
 });
