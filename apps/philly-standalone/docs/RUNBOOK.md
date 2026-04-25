@@ -90,8 +90,10 @@ See `docker/ollama/README.md` for provisioning.
 | `GET /api/assistant/conversations` | Any user | List the caller's chat history             |
 
 Required env on the standalone: `OLLAMA_BASE_URL`,
-`ASSISTANT_CHAT_MODEL`, `ASSISTANT_EMBED_MODEL`. Default models:
-`qwen2.5:14b-instruct-q4_K_M` (chat) + `bge-m3` (embeddings).
+`ASSISTANT_CHAT_MODEL`, `ASSISTANT_EMBED_MODEL`. Plus
+`OLLAMA_AUTH_TOKEN` for production deployments where Caddy gates
+the Ollama VPS. Default models: `qwen2.5:14b-instruct-q4_K_M`
+(chat) + `bge-m3` (embeddings).
 
 Build the KB index with `npm run kb:build` whenever docs change.
 The output (`data/assistant-kb.json`) is committed to git so

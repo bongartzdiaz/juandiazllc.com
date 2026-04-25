@@ -21,6 +21,20 @@ function baseUrl(): string {
   return raw.replace(/\/+$/, '')
 }
 
+/**
+ * Build the headers used on every Ollama call. Adds
+ * `Authorization: Bearer ${OLLAMA_AUTH_TOKEN}` when the env var is
+ * set so the Caddy reverse proxy in front of the Ollama VPS can
+ * gate access (see docker/ollama/Caddyfile). When unset, the
+ * client makes plain requests — fine for localhost dev.
+ */
+function defaultHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  const token = process.env.OLLAMA_AUTH_TOKEN?.trim()
+  if (token) headers['Authorization'] = `Bearer ${token}`
+  return headers
+}
+
 export class OllamaError extends Error {
   constructor(
     message: string,
@@ -73,7 +87,7 @@ export async function* chat(opts: ChatOptions): AsyncGenerator<ChatChunk> {
   try {
     res = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: defaultHeaders(),
       signal: opts.signal,
       body: JSON.stringify({
         model: opts.model,
@@ -165,7 +179,7 @@ export async function embed(opts: EmbedOptions): Promise<EmbedResult> {
   try {
     res = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: defaultHeaders(),
       body: JSON.stringify({ model: opts.model, input: inputArray }),
     })
   } catch (err) {
@@ -197,7 +211,7 @@ export async function listModels(): Promise<string[]> {
   const url = `${baseUrl()}/api/tags`
   let res: Response
   try {
-    res = await fetch(url, { method: 'GET' })
+    res = await fetch(url, { method: 'GET', headers: defaultHeaders() })
   } catch (err) {
     throw new OllamaError(
       `Could not reach Ollama at ${baseUrl()}: ${err instanceof Error ? err.message : 'fetch failed'}`,

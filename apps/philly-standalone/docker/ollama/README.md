@@ -115,10 +115,12 @@ ASSISTANT_CHAT_MODEL=qwen2.5:14b-instruct-q4_K_M
 ASSISTANT_EMBED_MODEL=bge-m3
 ```
 
-Note the `lib/assistant/ollama.ts` client doesn't currently send a
-bearer token — that's an upcoming feature. For now, scope your VPS
-firewall to only allow inbound from Vercel's egress IP ranges, OR
-disable the Caddy bearer-token check until the client supports it.
+The Node Ollama client at `lib/assistant/ollama.ts` reads
+`OLLAMA_AUTH_TOKEN` and sends it on every request as
+`Authorization: Bearer ${OLLAMA_AUTH_TOKEN}`. Caddy validates against
+the same token configured in step 4. If the token mismatches, Caddy
+returns 401 and the assistant surfaces "The assistant is offline" to
+the user.
 
 ### 8. Run the KB build
 
