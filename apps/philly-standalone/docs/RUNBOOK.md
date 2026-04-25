@@ -78,6 +78,25 @@ losing it means every encrypted column becomes unreadable.
 | `/api/cron/gdpr-retention` | `0 3 * * *` | GDPR Art. 5(1)(e) retention purge + finalises    |
 |                            |             | scheduled-deletion users from Bundle A.          |
 
+### In-app AI assistant
+
+The `/assistant` page calls a self-hosted Ollama box (separate VPS).
+See `docker/ollama/README.md` for provisioning.
+
+| Endpoint                   | Auth        | Purpose                                          |
+| -------------------------- | ----------- | ------------------------------------------------ |
+| `GET /api/assistant/health`| Admin       | Diagnostics: Ollama reachable + models loaded + KB index |
+| `POST /api/assistant/ask`  | Any user    | Streaming chat (NDJSON)                          |
+| `GET /api/assistant/conversations` | Any user | List the caller's chat history             |
+
+Required env on the standalone: `OLLAMA_BASE_URL`,
+`ASSISTANT_CHAT_MODEL`, `ASSISTANT_EMBED_MODEL`. Default models:
+`qwen2.5:14b-instruct-q4_K_M` (chat) + `bge-m3` (embeddings).
+
+Build the KB index with `npm run kb:build` whenever docs change.
+The output (`data/assistant-kb.json`) is committed to git so
+production deploys don't need a running Ollama at build time.
+
 The cron is registered in `vercel.json`. For non-Vercel deploys,
 configure your scheduler to POST with the Bearer token and a 60s
 timeout. Failures are logged at error level; alert on consecutive

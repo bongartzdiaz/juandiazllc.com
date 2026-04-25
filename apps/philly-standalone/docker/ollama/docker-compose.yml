@@ -1,0 +1,56 @@
+# Ollama VPS — runs the chat model + embedding model used by the
+# in-app AI assistant. The standalone (typically on Vercel) calls
+# this box over HTTPS via the OLLAMA_BASE_URL env var.
+#
+# Spin up:
+#   docker compose up -d
+#   docker compose exec ollama bash /opt/init-models.sh
+#
+# Bring down:
+#   docker compose down       # keeps models on disk
+#   docker compose down -v    # also wipes the model cache
+#
+# See README.md for Hetzner / fly.io / DigitalOcean provisioning notes.
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports:
+      # Ollama listens on 11434. We bind to 127.0.0.1 only — the
+      # outside world never talks to Ollama directly. Caddy (below)
+      # terminates TLS and forwards.
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+      - ./init-models.sh:/opt/init-models.sh:ro
+    environment:
+      # Tune for the host you run this on. Defaults below assume a
+      # CPU-only box with 16+ GB RAM.
+      OLLAMA_KEEP_ALIVE: "30m"      # keep model loaded between requests
+      OLLAMA_NUM_PARALLEL: "1"       # 1 concurrent request per model
+      OLLAMA_MAX_LOADED_MODELS: "2"  # chat + embed simultaneously
+      OLLAMA_FLASH_ATTENTION: "1"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:11434/api/tags || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - ollama
+
+volumes:
+  ollama-models:
+  caddy-data:
+  caddy-config:

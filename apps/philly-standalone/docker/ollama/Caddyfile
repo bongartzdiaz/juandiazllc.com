@@ -1,0 +1,42 @@
+# Caddy reverse proxy in front of Ollama. Caddy auto-issues a Let's
+# Encrypt cert for the hostname so the standalone can call Ollama
+# over HTTPS.
+#
+# Replace `ollama.example.com` with your real hostname AND set up an
+# A record pointing to this VPS before the first start. Caddy fetches
+# the cert on first launch and caches it under /data.
+#
+# Auth: a long random shared secret in the Authorization header. The
+# standalone sends `Authorization: Bearer $OLLAMA_AUTH_TOKEN` and
+# Caddy rejects anything else. Set OLLAMA_AUTH_TOKEN as an env var
+# in the docker-compose file or use a separate `.env` next to it.
+
+ollama.example.com {
+    encode gzip
+
+    # Reject anything that doesn't carry the expected bearer token.
+    @authed header Authorization "Bearer {$OLLAMA_AUTH_TOKEN}"
+    handle @authed {
+        reverse_proxy ollama:11434 {
+            transport http {
+                # Streaming responses (NDJSON from /api/chat) need
+                # this to keep the connection open across long
+                # generations.
+                read_timeout 600s
+                write_timeout 600s
+            }
+        }
+    }
+
+    # Default deny — anything without the bearer header gets 401.
+    respond 401 {
+        body "Missing or invalid bearer token"
+        close
+    }
+
+    log {
+        output stdout
+        format console
+        level INFO
+    }
+}

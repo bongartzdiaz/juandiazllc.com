@@ -61,6 +61,8 @@ const EXEMPT_PATHS = new Set<string>([
   // Self-scoped to the caller's own User row by primary key — there
   // is no possible way for the query to return another tenant's row.
   'app/api/me/route.ts',
+  // Assistant health probe — admin-only diagnostics, no tenant data.
+  'app/api/assistant/health/route.ts',
 ])
 
 interface Finding {
