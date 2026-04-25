@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "audit:tenant": "tsx scripts/audit-tenant-isolation.ts",
     "kb:build": "tsx scripts/build-assistant-kb.ts",
+    "kb:check": "tsx scripts/check-assistant-kb.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",

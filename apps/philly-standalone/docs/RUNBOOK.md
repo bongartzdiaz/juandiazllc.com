@@ -99,6 +99,12 @@ Build the KB index with `npm run kb:build` whenever docs change.
 The output (`data/assistant-kb.json`) is committed to git so
 production deploys don't need a running Ollama at build time.
 
+Translation coverage: `npm run kb:check` reports which en docs
+are missing nl/de/es translations and which translations have
+gone stale (en updated more recently than the translation).
+Informational by default; set `CHECK_KB_STRICT=1` to make CI
+fail when coverage isn't 100%.
+
 The cron is registered in `vercel.json`. For non-Vercel deploys,
 configure your scheduler to POST with the Bearer token and a 60s
 timeout. Failures are logged at error level; alert on consecutive
