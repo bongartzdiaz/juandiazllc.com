@@ -114,7 +114,13 @@ const draftFollowupEmailStep = z.object({
 const navigateToStep = z.object({
   tool: z.literal('navigate_to'),
   args: z.object({
-    path: z.string().regex(/^\/philly(\/[\w\-./]*)?$/, 'path must be under /philly').max(160),
+    // Standalone owns the entire path-space; only block API endpoints
+    // and protocol-relative escapes. The legacy `/philly/*` prefix is
+    // gone — dashboard routes now live at `/contacts`, `/deals`, etc.
+    path: z
+      .string()
+      .max(160)
+      .regex(/^\/(?!api(?:\/|$))(?!\/)[\w\-./]*$/, 'path must be an internal CRM page, not an API endpoint'),
   }),
   rationale: z.string().min(4).max(240),
 })
@@ -251,7 +257,7 @@ const SYSTEM_PROMPT = [
   '2. Every step\'s rationale must explain WHY, in one sentence, in the same language the user used.',
   '3. For "summarize X" requests, use summarize_contact with the person\'s name/email as identifier — you never see row ids.',
   '4. draft_followup_email ONLY drafts text; it never sends. Be conservative about using it.',
-  '5. navigate_to is for "take me to / open / show me the X page" requests. Path must start with /philly.',
+  '5. navigate_to is for "take me to / open / show me the X page" requests. Path must be an internal CRM page (e.g. /contacts, /deals, /settings/pipelines) — never an /api/ endpoint.',
   '6. Write tools (update_deal_stage, add_contact_note, set_lead_status, create_task, schedule_followup, link_deal_to_contact) MUTATE data. Only use them when the user explicitly asked to change/update/move/add/create/schedule/link something. Never chain a write after an exploratory step — if the user needs to pick a target first, ask with clarification.',
   '7. create_task creates an Activity of type="task" on a contact. Use it for "remind me to…", "add a task to follow up with…", "create a task". Default dueInDays=1.',
   '8. schedule_followup creates a CalendarEvent. Use it for "schedule a follow-up with…", "book a call", "set up a meeting in N days". timeOfDay morning=10:00 / afternoon=14:00. Default durationMinutes=30.',

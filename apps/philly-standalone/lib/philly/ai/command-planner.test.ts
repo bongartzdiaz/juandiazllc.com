@@ -44,16 +44,28 @@ describe('command-planner schema', () => {
     expect(parsed.success).toBe(false)
   })
 
-  it('rejects navigate_to paths outside /philly', () => {
+  it('rejects navigate_to paths under /api', () => {
+    // The standalone serves both UI pages and API endpoints from the
+    // same origin; the planner must not be coaxed into telling the
+    // client to navigate to a JSON endpoint.
     const parsed = planStepSchema.safeParse({
       tool: 'navigate_to',
-      args: { path: '/admin' },
-      rationale: 'open admin',
+      args: { path: '/api/contacts' },
+      rationale: 'open contacts api',
     })
     expect(parsed.success).toBe(false)
   })
 
-  it('accepts navigate_to paths under /philly', () => {
+  it('rejects protocol-relative paths', () => {
+    const parsed = planStepSchema.safeParse({
+      tool: 'navigate_to',
+      args: { path: '//evil.example.com/phish' },
+      rationale: 'phishing',
+    })
+    expect(parsed.success).toBe(false)
+  })
+
+  it('accepts internal CRM paths', () => {
     const parsed = planStepSchema.safeParse({
       tool: 'navigate_to',
       args: { path: '/settings/pipelines' },

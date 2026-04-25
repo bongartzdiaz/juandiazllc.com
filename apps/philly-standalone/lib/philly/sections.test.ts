@@ -89,7 +89,12 @@ describe('hasSection', () => {
 describe('sectionForPath', () => {
   it('returns null for an unknown path', () => {
     expect(sectionForPath('/marketing/landing')).toBeNull()
-    expect(sectionForPath('/')).toBeNull()
+  })
+
+  it('maps the root path to the dashboard section', () => {
+    // Standalone owns its own /. The dashboard SectionDef declares
+    // paths: ["/"], so this is the canonical root mapping.
+    expect(sectionForPath('/')?.slug).toBe('dashboard')
   })
 
   it('matches the canonical landing path exactly', () => {
