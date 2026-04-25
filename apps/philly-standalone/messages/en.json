@@ -90,5 +90,47 @@
     "loading": "Loading...",
     "viewAll": "View All",
     "back": "Back"
+  },
+  "gdpr": {
+    "title": "Privacy & data rights",
+    "subtitle": "Export your data, schedule account deletion, or review how we process personal data.",
+    "self": {
+      "exportTitle": "Export my account data",
+      "exportBody": "Download a JSON copy of every record we hold about your operator account. Generated on demand under GDPR Article 15.",
+      "exportCta": "Download my data",
+      "deleteTitle": "Delete my account",
+      "deleteBody": "Schedule deletion of your account and all data we hold about it. You have 30 days to cancel before the deletion is final.",
+      "deleteCta": "Schedule deletion",
+      "deleteConfirm": "Type DELETE to confirm",
+      "cancelCta": "Cancel scheduled deletion",
+      "scheduledFor": "Scheduled for {date}",
+      "lastAdminBlock": "You are the last admin in this organization. Promote another user to admin before deleting your account."
+    },
+    "admin": {
+      "title": "Data-subject rights",
+      "subtitle": "Process access requests and erasure requests on behalf of contacts and counterparties.",
+      "exportTab": "Access request (export)",
+      "eraseTab": "Erasure (delete)",
+      "emailLabel": "Data subject email",
+      "reasonLabel": "Reason / ticket reference",
+      "reasonRequired": "(required for erasure)",
+      "submitExport": "Generate export",
+      "submitErase": "Erase data",
+      "eraseConfirmPrompt": "Permanently erase all data for {email}? This cannot be undone.",
+      "eraseSuccess": "Erased {totalRows} rows across {tableCount} tables.",
+      "exportSuccess": "Export downloaded.",
+      "ropaTitle": "Records of Processing Activities (Art. 30)",
+      "ropaSubtitle": "Living register of every processing activity, kept as code so it is reviewed in pull requests."
+    },
+    "ropa": {
+      "lawfulBasis": "Lawful basis",
+      "dataSubjects": "Data subjects",
+      "dataCategories": "Data categories",
+      "recipients": "Recipients",
+      "retention": "Retention",
+      "transfers": "Third-country transfers",
+      "security": "Security measures",
+      "noRecipients": "None"
+    }
   }
 }

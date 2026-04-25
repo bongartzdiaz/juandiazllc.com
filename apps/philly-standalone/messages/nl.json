@@ -90,5 +90,47 @@
     "loading": "Laden...",
     "viewAll": "Alles Bekijken",
     "back": "Terug"
+  },
+  "gdpr": {
+    "title": "Privacy & gegevensrechten",
+    "subtitle": "Exporteer je gegevens, plan accountverwijdering, of bekijk hoe we persoonsgegevens verwerken.",
+    "self": {
+      "exportTitle": "Mijn accountgegevens exporteren",
+      "exportBody": "Download een JSON-kopie van elk record dat we over jouw operatoraccount bewaren. Op aanvraag gegenereerd onder AVG-artikel 15.",
+      "exportCta": "Download mijn gegevens",
+      "deleteTitle": "Mijn account verwijderen",
+      "deleteBody": "Plan de verwijdering van jouw account en alle bijbehorende gegevens. Je hebt 30 dagen om te annuleren voordat de verwijdering definitief is.",
+      "deleteCta": "Verwijdering plannen",
+      "deleteConfirm": "Typ DELETE om te bevestigen",
+      "cancelCta": "Geplande verwijdering annuleren",
+      "scheduledFor": "Gepland voor {date}",
+      "lastAdminBlock": "Je bent de laatste beheerder in deze organisatie. Promoveer eerst een andere gebruiker tot beheerder voordat je je account verwijdert."
+    },
+    "admin": {
+      "title": "Rechten van betrokkenen",
+      "subtitle": "Verwerk inzage- en verwijderingsverzoeken namens contacten en wederpartijen.",
+      "exportTab": "Inzageverzoek (export)",
+      "eraseTab": "Verwijdering",
+      "emailLabel": "E-mailadres betrokkene",
+      "reasonLabel": "Reden / ticketnummer",
+      "reasonRequired": "(verplicht bij verwijdering)",
+      "submitExport": "Export genereren",
+      "submitErase": "Gegevens verwijderen",
+      "eraseConfirmPrompt": "Alle gegevens van {email} permanent verwijderen? Dit kan niet ongedaan worden gemaakt.",
+      "eraseSuccess": "{totalRows} rijen verwijderd in {tableCount} tabellen.",
+      "exportSuccess": "Export gedownload.",
+      "ropaTitle": "Verwerkingsregister (art. 30)",
+      "ropaSubtitle": "Levend register van elke verwerkingsactiviteit, bijgehouden als code zodat het wordt beoordeeld in pull requests."
+    },
+    "ropa": {
+      "lawfulBasis": "Verwerkingsgrondslag",
+      "dataSubjects": "Betrokkenen",
+      "dataCategories": "Gegevenscategorieën",
+      "recipients": "Ontvangers",
+      "retention": "Bewaartermijn",
+      "transfers": "Doorgifte naar derde landen",
+      "security": "Beveiligingsmaatregelen",
+      "noRecipients": "Geen"
+    }
   }
 }

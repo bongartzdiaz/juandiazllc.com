@@ -52,6 +52,9 @@ model Organization {
   smsMessages        SmsMessage[]
   integrations       Integration[]
   propertyTaxonomy   PropertyTaxonomy?
+  gdprErasureLogs    GdprErasureLog[]
+  gdprExportLogs     GdprExportLog[]
+  gdprConsentRecords GdprConsentRecord[]
 }
 
 model User {
@@ -79,6 +82,11 @@ model User {
   // Security: global session invalidation — any JWT issued before this
   // timestamp is rejected. Bump this to log the user out on all devices.
   tokensInvalidAfter DateTime?
+  // GDPR Art. 17 — when set, account is scheduled for deletion at this
+  // timestamp. Reads/writes from this user are blocked once set; the
+  // retention cron hard-deletes the row when `now() >= deletionScheduledAt`.
+  deletionScheduledAt DateTime?
+  deletionRequestedAt DateTime?
   // TOTP two-factor auth
   twoFactorSecret     String?   // encrypted via src/lib/crypto.ts
   twoFactorEnabled    Boolean   @default(false)
@@ -1603,4 +1611,93 @@ model PropertyTaxonomy {
   organization   Organization @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId])
+}
+
+// ── GDPR — Art. 15 / 17 / 30 ──────────────────────────────────────
+//
+// Three append-only tables that satisfy data-subject-rights audit
+// obligations without retaining the personal data themselves. We
+// store HASHES of identifiers (subjectEmailHash) so we can prove
+// "we erased X's data on Y" to a regulator without keeping X's email
+// after erasure. Hashing function: SHA-256 over the lowercased email.
+
+/// Subject Access Request export audit. One row per data export
+/// triggered (self-export or admin-led). Retain for 6 years to
+/// match standard contractual claim windows.
+model GdprExportLog {
+  id                String   @id @default(cuid())
+  organizationId    String
+  /// Operator who triggered the export. Null for cron / system.
+  actorUserId       String?
+  /// Sha-256 of lowercased email of the data subject the export was about.
+  /// Equal to actorUserId's email hash for self-exports.
+  subjectEmailHash  String
+  /// 'self' (operator exported their own data) | 'admin' (operator
+  /// exported a contact's data on the contact's request).
+  channel           String
+  /// Number of rows included in the export, by model — JSON.
+  /// Example: {"User":1,"Contact":3,"Reservation":12}
+  rowCounts         String   @db.Text
+  /// IP of the actor at export time, for forensics.
+  actorIp           String?
+  createdAt         DateTime @default(now())
+
+  organization      Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, createdAt])
+  @@index([subjectEmailHash])
+}
+
+/// Right-to-erasure audit. Retains forever — proof of erasure must
+/// outlive the data itself. The `subjectEmailHash` is a one-way SHA-256
+/// hash so the regulator can verify a specific person's data was erased
+/// (by hashing their email and looking up this table) without us
+/// retaining the email.
+model GdprErasureLog {
+  id                String   @id @default(cuid())
+  organizationId    String
+  actorUserId       String?
+  subjectEmailHash  String
+  /// 'self' (user deleted own account) | 'admin' (admin erased a
+  /// contact's data on request) | 'retention' (auto-purge by cron).
+  channel           String
+  /// Comma-separated list of Prisma model names erased.
+  modelsErased      String   @db.Text
+  /// Number of rows erased per model — JSON, e.g. {"Contact":2,"Message":17}
+  rowCounts         String   @db.Text
+  /// Optional human-readable note (e.g. ticket number).
+  reason            String?  @db.Text
+  actorIp           String?
+  createdAt         DateTime @default(now())
+
+  organization      Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, createdAt])
+  @@index([subjectEmailHash])
+}
+
+/// Consent record for processing operations that rely on Art. 6(1)(a)
+/// consent. Volunteer signups, marketing opt-in, etc. Append-only;
+/// withdrawal is recorded as a new row with `withdrawn = true`.
+model GdprConsentRecord {
+  id                String   @id @default(cuid())
+  organizationId    String
+  /// Sha-256 of lowercased email of the data subject.
+  subjectEmailHash  String
+  /// Stable identifier for the processing activity, matching a key in
+  /// lib/gdpr/ropa.ts. Examples: 'volunteer_roster', 'marketing_email'.
+  purpose           String
+  granted           Boolean  @default(true)
+  withdrawn         Boolean  @default(false)
+  /// Free text capturing what was shown to the data subject when they
+  /// gave consent. Required for proof-of-consent under Art. 7.
+  noticeShown       String?  @db.Text
+  ipAddress         String?
+  userAgent         String?  @db.Text
+  createdAt         DateTime @default(now())
+
+  organization      Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId, subjectEmailHash])
+  @@index([purpose, createdAt])
 }
