@@ -5,11 +5,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { exchangeCode, verifyState } from '@/lib/philly/integrations/oauth'
 import { encryptSecret } from '@/lib/philly/crypto'
+import { enforceRateLimit, clientIp, PRESET_AUTH } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 export async function GET(req: NextRequest) {
+  // Public-facing endpoint — rate-limit by IP. The state parameter
+  // is HMAC-signed, but cycling code+state pairs against a flawed
+  // exchangeCode could otherwise be a low-cost amplification vector.
+  const limited = enforceRateLimit(`oauth-callback:${clientIp(req)}`, PRESET_AUTH)
+  if (limited) return limited
+
   const url = new URL(req.url)
   const code = url.searchParams.get('code')
   const state = url.searchParams.get('state')

@@ -6,6 +6,8 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
+import { encryptSecret } from '@/lib/philly/crypto'
+import { maskWebhookSecret } from '@/lib/philly/webhooks/secrets'
 import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
@@ -29,8 +31,8 @@ export async function GET(req: NextRequest) {
     prisma.webhook.count({ where }),
   ])
 
-  // Mask secrets
-  const masked = webhooks.map((w: any) => ({ ...w, secret: w.secret.slice(0, 8) + '...' }))
+  // Mask secrets — unwrap first since the storage form is encrypted.
+  const masked = webhooks.map((w: any) => ({ ...w, secret: maskWebhookSecret(w.secret) }))
   return paginatedResponse(masked, total, { page, limit, skip })
 }
 
@@ -43,7 +45,11 @@ export async function POST(req: NextRequest) {
 
   if (!body.url?.trim()) return jsonError('url is required', 400)
 
+  // Generate plaintext for the operator to copy, encrypt before storage.
+  // The plaintext is returned exactly once in the create response.
   const secret = crypto.randomBytes(32).toString('hex')
+  const encrypted = encryptSecret(secret)
+  if (!encrypted) return jsonError('Failed to encrypt webhook secret', 500)
 
   const prisma = getAuthPrisma()
   const webhook = await prisma.webhook.create({
@@ -51,7 +57,7 @@ export async function POST(req: NextRequest) {
       organizationId: scope.organizationId,
       url: body.url.trim(),
       events: JSON.stringify(body.events ?? ['*']),
-      secret,
+      secret: encrypted,
       enabled: body.enabled ?? true,
     },
   })

@@ -361,12 +361,21 @@ model AuditLog {
   entityId       String?
   changes        String   @default("{}") @db.LongText // JSON diff {field: {old, new}}
   createdAt      DateTime @default(now())
+  // Tamper-evident hash chain — see lib/philly/audit.ts.
+  // prevHash = most recent existing row's hash for the same organizationId
+  //            (null for the first row in the chain).
+  // hash     = SHA-256 hex digest of (prevHash || canonicalJson(row)).
+  // Both nullable so legacy rows pre-dating the chain remain readable;
+  // verifier flags them as `unhashed` rather than `tampered`.
+  prevHash       String?  @db.VarChar(64)
+  hash           String?  @db.VarChar(64)
 
   organization Organization @relation(fields: [organizationId], references: [id])
   user         User         @relation(fields: [userId], references: [id])
 
   @@index([organizationId, createdAt])
   @@index([entity, entityId])
+  @@index([organizationId, hash])
 }
 
 // ── Phase 2A: Contact 360 ──

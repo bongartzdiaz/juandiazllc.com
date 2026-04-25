@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
 import { buildAuthorizeUrl, signState } from '@/lib/philly/integrations/oauth'
 import { getConnector } from '@/lib/philly/integrations/registry'
+import { enforceRateLimit, PRESET_AUTH } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -13,6 +14,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ pro
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
   const { provider } = await params
+
+  // Rate-limit OAuth initiations per user. Without this, a script with
+  // a valid session could spam authorize redirects, churning state
+  // tokens and burning the upstream provider's quota.
+  const limited = enforceRateLimit(`oauth-init:${scope.userId}`, PRESET_AUTH)
+  if (limited) return limited
 
   const conn = getConnector(provider)
   if (!conn) return jsonError('Unknown provider', 404)

@@ -1,0 +1,68 @@
+# Security CI — dependency audit + secret scan
+#
+# Runs on:
+# - every PR (so a high-severity advisory blocks merge)
+# - every push to main (catch drift)
+# - weekly on Monday 06:00 UTC (catch newly-disclosed advisories)
+#
+# Two jobs:
+# - npm-audit: surfaces high+ severity advisories in transitive deps.
+#              Pinned to --audit-level=high so noisy moderate findings
+#              don't wake anyone up; flip to --audit-level=moderate
+#              once the high backlog is at zero.
+# - gitleaks: secret scan against the working tree + git history.
+#             Detects accidental commits of API keys, JWTs, private
+#             PEMs, etc. Uses the upstream gitleaks Action.
+#
+# Both jobs run for the parent monorepo and apps/philly-standalone
+# in parallel. Standalone deps are audited separately because its
+# package.json + lockfile are independent of the parent.
+
+name: security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  npm-audit:
+    name: npm audit (${{ matrix.workspace }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        workspace:
+          - .
+          - apps/philly-standalone
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ matrix.workspace }}/package-lock.json
+      - name: Install
+        working-directory: ${{ matrix.workspace }}
+        run: npm ci --ignore-scripts
+      - name: Audit (high+)
+        working-directory: ${{ matrix.workspace }}
+        run: npm audit --audit-level=high
+
+  gitleaks:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # gitleaks needs the full history to scan past commits
+          fetch-depth: 0
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

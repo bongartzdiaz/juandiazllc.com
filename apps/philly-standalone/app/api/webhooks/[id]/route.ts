@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
+import { encryptSecret } from '@/lib/philly/crypto'
+import { maskWebhookSecret } from '@/lib/philly/webhooks/secrets'
 import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
@@ -24,7 +26,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     },
   })
   if (!wh) return jsonError('Webhook not found', 404)
-  return NextResponse.json({ data: { ...wh, secret: wh.secret.slice(0, 8) + '...' } })
+  return NextResponse.json({ data: { ...wh, secret: maskWebhookSecret(wh.secret) } })
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -45,14 +47,22 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (typeof body.url === 'string') data.url = body.url.trim()
   if (Array.isArray(body.events)) data.events = JSON.stringify(body.events)
   if (typeof body.enabled === 'boolean') data.enabled = body.enabled
-  if (body.rotateSecret === true) data.secret = crypto.randomBytes(32).toString('hex')
+
+  // Hold the plaintext so we can return it once on rotation.
+  let rotatedPlaintext: string | null = null
+  if (body.rotateSecret === true) {
+    rotatedPlaintext = crypto.randomBytes(32).toString('hex')
+    const enc = encryptSecret(rotatedPlaintext)
+    if (!enc) return jsonError('Failed to encrypt rotated secret', 500)
+    data.secret = enc
+  }
 
   const updated = await prisma.webhook.update({ where: { id }, data })
   await logAudit({ scope, action: 'update', entity: 'webhook', entityId: id })
   return NextResponse.json({
     data: {
       ...updated,
-      secret: body.rotateSecret === true ? updated.secret : updated.secret.slice(0, 8) + '...',
+      secret: rotatedPlaintext ?? maskWebhookSecret(updated.secret),
     },
   })
 }

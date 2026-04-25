@@ -9,6 +9,7 @@
 
 import crypto from 'crypto'
 import { getAuthPrisma } from '@/lib/philly/auth'
+import { unwrapWebhookSecret } from '@/lib/philly/webhooks/secrets'
 
 interface DispatchOptions {
   /** Direct URL to POST to (skips lookup). Used by automation callWebhook action. */
@@ -85,7 +86,13 @@ export async function dispatchWebhookEvent(
       try { events = JSON.parse(wh.events || '[]') } catch {}
       if (!events.includes('*') && !events.includes(event)) return
 
-      const delivery = await deliverWithRetry(wh.url, body, wh.secret)
+      // Decrypt the stored secret (encrypted at rest via lib/philly/crypto.ts).
+      // unwrapWebhookSecret falls back to plaintext for legacy rows; null
+      // means decryption failed and the secret is unusable — skip delivery
+      // rather than send unsigned.
+      const plaintextSecret = unwrapWebhookSecret(wh.secret)
+      if (!plaintextSecret) return
+      const delivery = await deliverWithRetry(wh.url, body, plaintextSecret)
       await prisma.webhookDelivery.create({
         data: {
           webhookId: wh.id,

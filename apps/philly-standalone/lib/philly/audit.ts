@@ -6,6 +6,7 @@
 
 import { getAuthPrisma } from '@/lib/philly/auth'
 import type { AuthScope } from '@/lib/philly/auth-helpers'
+import { computeAuditHash } from '@/lib/philly/audit-chain'
 
 export type AuditAction = 'create' | 'update' | 'delete'
 
@@ -79,6 +80,12 @@ interface LogAuditParams {
 /**
  * Logs an audit entry. Fire-and-forget — errors are caught silently
  * so audit failures never block the main mutation response.
+ *
+ * Each row commits to its predecessor via SHA-256 (lib/philly/audit-chain.ts);
+ * a verifier (lib/philly/audit-verify.ts) walks the chain to detect
+ * tampering. Concurrent inserts may produce two rows with the same
+ * prevHash (chain fork); per-row integrity is still verifiable, the
+ * verifier reports forks as informational rather than as breakages.
  */
 export async function logAudit({
   scope,
@@ -89,6 +96,30 @@ export async function logAudit({
 }: LogAuditParams): Promise<void> {
   try {
     const prisma = getAuthPrisma()
+
+    // Read the most recently written row for this org to anchor the chain.
+    // A small race window exists when two requests log simultaneously; both
+    // see the same prevHash and produce a fork. That is acceptable — see
+    // the doc comment in lib/philly/audit-chain.ts.
+    const tip = await prisma.auditLog.findFirst({
+      where: { organizationId: scope.organizationId, hash: { not: null } },
+      orderBy: { createdAt: 'desc' },
+      select: { hash: true },
+    })
+    const prevHash = tip?.hash ?? null
+
+    const createdAt = new Date()
+    const changesJson = changes ? JSON.stringify(changes) : '{}'
+    const hash = computeAuditHash(prevHash, {
+      organizationId: scope.organizationId,
+      userId: scope.userId,
+      action,
+      entity,
+      entityId: entityId ?? null,
+      changes: changesJson,
+      createdAt,
+    })
+
     await prisma.auditLog.create({
       data: {
         organizationId: scope.organizationId,
@@ -96,7 +127,10 @@ export async function logAudit({
         action,
         entity,
         entityId: entityId ?? null,
-        changes: changes ? JSON.stringify(changes) : '{}',
+        changes: changesJson,
+        createdAt,
+        prevHash,
+        hash,
       },
     })
   } catch (err) {
