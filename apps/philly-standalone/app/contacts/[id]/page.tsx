@@ -181,6 +181,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
   const [editEmail, setEditEmail] = useState('')
   const [editPhone, setEditPhone] = useState('')
   const [editCompany, setEditCompany] = useState('')
+  const [savingContact, setSavingContact] = useState(false)
 
   useEffect(() => {
     if (contact) {
@@ -192,6 +193,8 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
   }, [contact])
 
   const handleSave = useCallback(async () => {
+    if (savingContact) return
+    setSavingContact(true)
     try {
       const res = await fetch(`/api/contacts/${id}`, {
         method: 'PATCH',
@@ -213,8 +216,10 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Something went wrong'
       addToast(msg, 'error')
+    } finally {
+      setSavingContact(false)
     }
-  }, [id, editName, editEmail, editPhone, editCompany, addToast, contactQuery])
+  }, [id, editName, editEmail, editPhone, editCompany, addToast, contactQuery, savingContact])
 
   const handleCancelEdit = useCallback(() => {
     if (contact) {
@@ -395,20 +400,32 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
           {/* Edit / Save / Cancel */}
           {editing ? (
             <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-              <button onClick={handleSave} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
-                background: 'var(--accent)', color: '#fff', border: 'none',
-                cursor: 'pointer', fontFamily: 'inherit',
-              }}>
-                <Save size={13} /> {tCommon('save')}
+              <button
+                onClick={handleSave}
+                disabled={savingContact}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+                  background: 'var(--accent)', color: '#fff', border: 'none',
+                  cursor: savingContact ? 'default' : 'pointer',
+                  opacity: savingContact ? 0.6 : 1,
+                  fontFamily: 'inherit',
+                }}
+              >
+                <Save size={13} /> {savingContact ? '…' : tCommon('save')}
               </button>
-              <button onClick={handleCancelEdit} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
-                background: 'var(--bg2)', color: 'var(--txt2)', border: '1px solid var(--border)',
-                cursor: 'pointer', fontFamily: 'inherit',
-              }}>
+              <button
+                onClick={handleCancelEdit}
+                disabled={savingContact}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+                  background: 'var(--bg2)', color: 'var(--txt2)', border: '1px solid var(--border)',
+                  cursor: savingContact ? 'default' : 'pointer',
+                  opacity: savingContact ? 0.6 : 1,
+                  fontFamily: 'inherit',
+                }}
+              >
                 <X size={13} /> {tCommon('cancel')}
               </button>
             </div>

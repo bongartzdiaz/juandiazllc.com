@@ -148,6 +148,10 @@ export default function ContactsPage() {
   const apiQuery = useApi<{ data: ApiContact[] }>('/contacts', {
     enabled: !isRE && !isHOS,
   })
+  // Live mode is loading when the API call is in flight. Demo/showcase
+  // modes never set this true — they render their hand-curated data
+  // synchronously.
+  const isLiveLoading = !isRE && !isHOS && apiQuery.loading
   // Live-refresh on any contact mutation in the org
   useEntitySubscription('contact', apiQuery.refetch)
   const liveContacts = useMemo<Contact[]>(() => {
@@ -272,6 +276,23 @@ export default function ContactsPage() {
             >{s === 'all' ? t('all') : t(`types.${s}` as 'types.partner')}</button>
           ))}
         </div>
+
+        {/* Loading indicator — only in live mode while the API call is in
+            flight. Demo/showcase modes render synchronously and never
+            show this. */}
+        {isLiveLoading && (
+          <div
+            role="status"
+            aria-live="polite"
+            style={{
+              padding: '10px 14px', marginBottom: 12,
+              background: 'var(--bg2)', border: '1px solid var(--border)',
+              borderRadius: 8, fontSize: 12, color: 'var(--txt2)',
+            }}
+          >
+            Loading contacts…
+          </div>
+        )}
 
         {/* Contact cards grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>

@@ -145,6 +145,9 @@ export default function ProjectsPage() {
   })
   // Live-refresh on any project mutation in the org
   useEntitySubscription('project', apiQuery.refetch)
+  // Surface a loading indicator only in live mode; demo modes render
+  // synchronously and never set this true.
+  const isLiveLoading = !isRE && !isHOS && apiQuery.loading
   const liveProjects = useMemo<UiProject[]>(() => {
     if (isRE || isHOS) return []
     const rows = apiQuery.data?.data ?? []
@@ -301,6 +304,21 @@ export default function ProjectsPage() {
             }}><List size={14} /></button>
           </div>
         </div>
+
+        {/* Loading indicator — live mode only. */}
+        {isLiveLoading && (
+          <div
+            role="status"
+            aria-live="polite"
+            style={{
+              padding: '10px 14px', marginBottom: 12,
+              background: 'var(--bg2)', border: '1px solid var(--border)',
+              borderRadius: 8, fontSize: 12, color: 'var(--txt2)',
+            }}
+          >
+            Loading projects…
+          </div>
+        )}
 
         {/* Projects Grid/List */}
         {view === 'grid' ? (

@@ -78,6 +78,10 @@
     "addColumn": "Add Column",
     "addCard": "Add Card"
   },
+  "automations": {
+    "title": "Automations",
+    "subtitle": "Trigger-based rules to automate workflows"
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",

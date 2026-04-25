@@ -25,6 +25,8 @@ export default function ApiKeysPage() {
   const [expiresInDays, setExpiresInDays] = useState('')
   const [newKey, setNewKey] = useState<ApiKey | null>(null)
   const [copied, setCopied] = useState(false)
+  const [creating, setCreating] = useState(false)
+  const [createError, setCreateError] = useState<string | null>(null)
 
   const load = useCallback(() => {
     setLoading(true)
@@ -38,23 +40,35 @@ export default function ApiKeysPage() {
   useEffect(() => { load() }, [load])
 
   const create = async () => {
-    if (!name.trim()) return
-    const payload: Record<string, unknown> = { name: name.trim(), permissions }
-    const d = parseInt(expiresInDays, 10)
-    if (!isNaN(d) && d > 0) payload.expiresInDays = d
-    const res = await fetch('/api/api-keys', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-    const json = await res.json()
-    if (res.ok) {
+    if (!name.trim() || creating) return
+    setCreating(true)
+    setCreateError(null)
+    try {
+      const payload: Record<string, unknown> = { name: name.trim(), permissions }
+      const d = parseInt(expiresInDays, 10)
+      if (!isNaN(d) && d > 0) payload.expiresInDays = d
+      const res = await fetch('/api/api-keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        // Previously this branch was silent — the user clicked Create
+        // and saw nothing happen. Surface the error.
+        setCreateError(json?.error ?? `Request failed (${res.status})`)
+        return
+      }
       setNewKey(json.data)
       setName('')
       setPermissions('read')
       setExpiresInDays('')
       setShowCreate(false)
       load()
+    } catch (err) {
+      setCreateError(err instanceof Error ? err.message : 'Network error')
+    } finally {
+      setCreating(false)
     }
   }
 
@@ -207,28 +221,42 @@ export default function ApiKeysPage() {
             <div style={{ display: 'flex', gap: 6 }}>
               <button
                 onClick={create}
-                disabled={!name.trim()}
+                disabled={!name.trim() || creating}
                 style={{
                   padding: '7px 14px', borderRadius: 7,
                   background: 'var(--accent)', color: 'white', border: 'none',
-                  fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                  opacity: name.trim() ? 1 : 0.5, fontFamily: 'inherit',
+                  fontSize: 12, fontWeight: 600,
+                  cursor: !name.trim() || creating ? 'default' : 'pointer',
+                  opacity: !name.trim() || creating ? 0.5 : 1, fontFamily: 'inherit',
                 }}
               >
-                Create Key
+                {creating ? 'Creating…' : 'Create Key'}
               </button>
               <button
-                onClick={() => { setShowCreate(false); setName('') }}
+                onClick={() => { setShowCreate(false); setName(''); setCreateError(null) }}
+                disabled={creating}
                 style={{
                   padding: '7px 14px', borderRadius: 7,
                   background: 'var(--panel)', color: 'var(--txt2)',
                   border: '1px solid var(--border)',
-                  fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                  fontSize: 12, fontWeight: 600,
+                  cursor: creating ? 'default' : 'pointer',
+                  opacity: creating ? 0.5 : 1, fontFamily: 'inherit',
                 }}
               >
                 Cancel
               </button>
             </div>
+            {createError && (
+              <div role="alert" style={{
+                marginTop: 10, padding: '8px 12px', borderRadius: 7,
+                background: 'var(--r-bg)', color: 'var(--r-txt)',
+                border: '1px solid var(--r-border)',
+                fontSize: 12,
+              }}>
+                {createError}
+              </div>
+            )}
           </div>
         )}
 

@@ -272,7 +272,7 @@ export default function AutomationsPage() {
     <>
       <Topbar
         title={t('title')}
-        sub="Trigger-based rules to automate workflows"
+        sub={t('subtitle')}
         onAdd={openNew}
         addLabel="Rule"
       />

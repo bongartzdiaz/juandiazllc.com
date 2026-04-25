@@ -140,6 +140,12 @@ export default function TimelinePage() {
     return rows.map(mapApiProject)
   }, [apiQuery.data, isRE, isHOS])
 
+  // Surface fetch state to the user — previously the page silently
+  // fell back to demo data while the live request was in flight or had
+  // errored, which gave no signal that the API failed.
+  const isLiveLoading = !isRE && !isHOS && apiQuery.loading
+  const liveError = !isRE && !isHOS ? apiQuery.error : null
+
   const tasks: TimelineTask[] = isHOS
     ? HOS_TASKS
     : isRE
@@ -236,6 +242,34 @@ export default function TimelinePage() {
       />
 
       <div style={{ padding: '18px 24px 40px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {/* Live-mode fetch state — collapsed in demo industries. */}
+        {isLiveLoading && (
+          <div
+            role="status"
+            aria-live="polite"
+            style={{
+              padding: '10px 14px',
+              background: 'var(--bg2)', border: '1px solid var(--border)',
+              borderRadius: 8, fontSize: 12, color: 'var(--txt2)',
+            }}
+          >
+            Loading timeline…
+          </div>
+        )}
+        {liveError && !isLiveLoading && (
+          <div
+            role="alert"
+            style={{
+              padding: '10px 14px',
+              background: 'var(--r-bg)', border: '1px solid var(--r-border)',
+              borderRadius: 8, fontSize: 12, color: 'var(--r-txt)',
+            }}
+          >
+            Failed to load projects from the API. Showing demo data —
+            check /api/health and retry.
+          </div>
+        )}
+
         {/* Summary Stats Strip */}
         <div style={{
           display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10,

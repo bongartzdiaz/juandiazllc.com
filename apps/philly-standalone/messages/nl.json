@@ -78,6 +78,10 @@
     "addColumn": "Kolom Toevoegen",
     "addCard": "Kaart Toevoegen"
   },
+  "automations": {
+    "title": "Automatiseringen",
+    "subtitle": "Trigger-gebaseerde regels om workflows te automatiseren"
+  },
   "common": {
     "save": "Opslaan",
     "cancel": "Annuleren",

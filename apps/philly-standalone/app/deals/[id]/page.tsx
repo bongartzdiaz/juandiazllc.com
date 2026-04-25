@@ -81,11 +81,18 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
 
   useEffect(() => {
     fetchDeal()
-    fetch('/api/pipelines')
-      .then(r => r.json())
-      .then(j => setPipelines(j.data ?? []))
-      .catch(() => {})
   }, [fetchDeal])
+
+  // Pipelines list is org-scoped and changes rarely — fetch once on
+  // mount, not on every fetchDeal change. Previously this lived inside
+  // the [fetchDeal] effect and re-ran whenever `id` changed, churning
+  // the pipelines call needlessly.
+  useEffect(() => {
+    fetch('/api/pipelines')
+      .then((r) => r.json())
+      .then((j) => setPipelines(j.data ?? []))
+      .catch(() => {})
+  }, [])
 
   useEntitySubscription('deal', (evt) => {
     if (evt.entityId === id) fetchDeal()
