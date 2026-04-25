@@ -12,8 +12,11 @@ export async function POST() {
   if (scope instanceof NextResponse) return scope
 
   const prisma = getAuthPrisma()
+  // Belt-and-braces: scope by org as well as user so the updateMany
+  // can never escape the caller's tenant even if userId↔org mapping
+  // were ever corrupted.
   const result = await prisma.notification.updateMany({
-    where: { userId: scope.userId, read: false },
+    where: { userId: scope.userId, organizationId: scope.organizationId, read: false },
     data: { read: true },
   })
 

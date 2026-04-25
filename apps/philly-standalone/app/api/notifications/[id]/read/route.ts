@@ -16,8 +16,11 @@ export async function PATCH(_req: NextRequest, ctx: Ctx) {
   const { id } = await ctx.params
   const prisma = getAuthPrisma()
 
+  // Defense-in-depth: scope by both userId and organizationId so a
+  // bug elsewhere that misrouted a notification to the wrong tenant
+  // cannot leak through this read path.
   const notif = await prisma.notification.findFirst({
-    where: { id, userId: scope.userId },
+    where: { id, userId: scope.userId, organizationId: scope.organizationId },
     select: { id: true },
   })
   if (!notif) return jsonError('Not found', 404)

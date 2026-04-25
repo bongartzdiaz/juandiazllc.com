@@ -33,57 +33,40 @@ export function jsonError(message: string, status: number) {
 }
 
 /**
- * Find the Philly user that belongs to this Supabase email, or
- * auto-provision one on first sign-in. The first user onboarded lands
- * in a default 'Volitfy' org as admin; later users join the same org
- * as viewer (upgrade via admin UI).
+ * Find the Philly user that belongs to this Supabase email.
+ *
+ * Returns `null` when no row exists — the caller must redirect the
+ * Supabase-authenticated user to the onboarding flow so they can
+ * either create a new organization (and become its admin) or wait
+ * for an admin to invite them.
+ *
+ * The previous auto-provisioning behavior (drop everyone into a
+ * single shared 'Volitfy' org) was a multi-tenancy break: two
+ * unrelated companies signing up would share a tenant. Onboarding
+ * is the deliberate fix.
  */
 async function resolvePhillyUser(email: string) {
   const prisma = getAuthPrisma()
 
-  let user = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { email },
     select: { id: true, email: true, role: true, organizationId: true, dashboardSections: true },
   })
-  if (user) return user
-
-  // Auto-provision: look up or create the default org.
-  let org = await prisma.organization.findFirst({
-    orderBy: { createdAt: 'asc' },
-    select: { id: true },
-  })
-  if (!org) {
-    org = await prisma.organization.create({
-      data: { name: 'Volitfy', slug: 'volitfy' },
-      select: { id: true },
-    })
-  }
-
-  // First user onboarded is admin, subsequent users viewer.
-  const userCount = await prisma.user.count()
-  const role = userCount === 0 ? 'admin' : 'viewer'
-
-  user = await prisma.user.create({
-    data: {
-      email,
-      name: email.split('@')[0],
-      role,
-      organizationId: org.id,
-      // Legacy required field — auth now lives in Supabase, so this
-      // hash is intentionally never a valid bcrypt hash. No local
-      // credentials login path exists to check against it.
-      passwordHash: '__supabase_auth__',
-    },
-    select: { id: true, email: true, role: true, organizationId: true, dashboardSections: true },
-  })
-
   return user
 }
 
 /**
  * Resolves the current session from Supabase cookies and returns a
- * strongly typed AuthScope, or a NextResponse with 401 if the user
- * isn't signed in.
+ * strongly typed AuthScope, or a NextResponse with:
+ *   401 — not signed in to Supabase
+ *   409 — signed in but no Philly User row yet → must complete
+ *         onboarding at /onboarding (create org or accept an invite).
+ *         Body: { error, code: 'NEEDS_ONBOARDING' } so clients can
+ *         distinguish from a generic 403.
+ *
+ * Routes that participate in onboarding (POST /api/onboarding/*)
+ * MUST use `requireSupabaseUser()` instead, since the caller has no
+ * Philly User row yet.
  */
 export async function requireScope(): Promise<AuthScope | NextResponse> {
   const supabase = await createClient()
@@ -97,6 +80,12 @@ export async function requireScope(): Promise<AuthScope | NextResponse> {
 
   try {
     const phillyUser = await resolvePhillyUser(supabaseUser.email)
+    if (!phillyUser) {
+      return NextResponse.json(
+        { error: 'Onboarding required', code: 'NEEDS_ONBOARDING' },
+        { status: 409 },
+      )
+    }
     if (!phillyUser.organizationId) {
       return jsonError('User has no organization scope', 403)
     }
@@ -131,6 +120,25 @@ export async function requireScope(): Promise<AuthScope | NextResponse> {
     console.error('[requireScope] failed to resolve philly user', err)
     return jsonError('Auth provisioning failed', 500)
   }
+}
+
+export interface SupabaseSubject {
+  email: string
+  supabaseUserId: string
+}
+
+/**
+ * For routes that must run BEFORE a Philly User row exists — i.e. the
+ * onboarding flow. Returns just the Supabase identity. Anything that
+ * needs an organization must use requireScope() instead.
+ */
+export async function requireSupabaseUser(): Promise<SupabaseSubject | NextResponse> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user?.email) return jsonError('Unauthorized', 401)
+  return { email: user.email, supabaseUserId: user.id }
 }
 
 /**

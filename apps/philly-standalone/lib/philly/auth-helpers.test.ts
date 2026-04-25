@@ -19,7 +19,7 @@ vi.mock('@/lib/supabase/server', () => ({
       getUser: async () => ({
         data: {
           user: supabaseState.email
-            ? { email: supabaseState.email, app_metadata: {} }
+            ? { id: `sb_${supabaseState.email}`, email: supabaseState.email, app_metadata: {} }
             : null,
         },
       }),
@@ -57,7 +57,7 @@ vi.mock('@/lib/philly/auth', () => ({
   }),
 }))
 
-import { jsonError, requireScope, requireRole, requireSection } from './auth-helpers'
+import { jsonError, requireScope, requireRole, requireSection, requireSupabaseUser } from './auth-helpers'
 import { NextResponse } from 'next/server'
 
 function reset() {
@@ -93,31 +93,35 @@ describe('requireScope', () => {
     }
   })
 
-  it('auto-provisions the first user as admin in a new Volitfy org', async () => {
-    supabaseState.email = 'juan@example.com'
+  it('returns 409 NEEDS_ONBOARDING when the Supabase user has no Philly row', async () => {
+    supabaseState.email = 'newcomer@example.com'
     const result = await requireScope()
 
-    if (result instanceof NextResponse) throw new Error(`expected scope, got ${result.status}`)
-    expect(result.email).toBe('juan@example.com')
-    expect(result.role).toBe('admin')
-    expect(prismaState.orgs).toHaveLength(1)
-    expect(prismaState.orgs[0].slug).toBe('volitfy')
-    expect(prismaState.userCreateCalls).toEqual([{ email: 'juan@example.com', role: 'admin' }])
+    expect(result).toBeInstanceOf(NextResponse)
+    if (result instanceof NextResponse) {
+      expect(result.status).toBe(409)
+      const body = JSON.parse(await result.text()) as { error?: string; code?: string }
+      expect(body.code).toBe('NEEDS_ONBOARDING')
+    }
+    // No auto-provisioning — that would defeat tenant isolation.
+    expect(prismaState.userCreateCalls).toHaveLength(0)
+    expect(prismaState.orgs).toHaveLength(0)
   })
 
-  it('auto-provisions the second user as viewer in the existing org', async () => {
-    prismaState.orgs = [{ id: 'org_existing', slug: 'volitfy' }]
+  it('does not auto-create users into an existing organization', async () => {
+    prismaState.orgs = [{ id: 'org_existing', slug: 'acme' }]
     prismaState.existingUsers = [
       { id: 'user_1', email: 'juan@example.com', role: 'admin', organizationId: 'org_existing' },
     ]
-    supabaseState.email = 'newcomer@example.com'
+    supabaseState.email = 'stranger@example.com'
 
     const result = await requireScope()
-    if (result instanceof NextResponse) throw new Error(`expected scope, got ${result.status}`)
-
-    expect(result.role).toBe('viewer')
-    expect(result.organizationId).toBe('org_existing')
-    expect(prismaState.userCreateCalls).toEqual([{ email: 'newcomer@example.com', role: 'viewer' }])
+    expect(result).toBeInstanceOf(NextResponse)
+    if (result instanceof NextResponse) {
+      expect(result.status).toBe(409)
+    }
+    // Stranger never gets a row in someone else's org.
+    expect(prismaState.userCreateCalls).toHaveLength(0)
   })
 
   it('returns 403 when the resolved user has no organizationId', async () => {
@@ -259,5 +263,24 @@ describe('requireSection', () => {
     const result = await requireSection('this-slug-does-not-exist')
     expect(result).toBeInstanceOf(NextResponse)
     if (result instanceof NextResponse) expect(result.status).toBe(403)
+  })
+})
+
+describe('requireSupabaseUser', () => {
+  beforeEach(reset)
+
+  it('returns the supabase identity without requiring a Philly row', async () => {
+    supabaseState.email = 'newcomer@example.com'
+    // Crucially: no Philly user provisioned.
+    const result = await requireSupabaseUser()
+    if (result instanceof NextResponse) throw new Error(`expected subject, got ${result.status}`)
+    expect(result.email).toBe('newcomer@example.com')
+    expect(result.supabaseUserId).toBe('sb_newcomer@example.com')
+  })
+
+  it('returns 401 when there is no Supabase session', async () => {
+    const result = await requireSupabaseUser()
+    expect(result).toBeInstanceOf(NextResponse)
+    if (result instanceof NextResponse) expect(result.status).toBe(401)
   })
 })
