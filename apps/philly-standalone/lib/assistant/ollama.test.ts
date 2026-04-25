@@ -32,23 +32,28 @@ describe('cosineSimilarity', () => {
 })
 
 describe('bearer-token auth', () => {
-  let originalFetch: typeof fetch
   let lastInit: RequestInit | undefined
 
   beforeEach(() => {
-    originalFetch = global.fetch
     lastInit = undefined
-    global.fetch = vi.fn(async (_url, init) => {
-      lastInit = init
-      return new Response(JSON.stringify({ embeddings: [[0.1, 0.2, 0.3]] }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      })
-    }) as typeof fetch
+    // vi.stubGlobal restores cleanly via vi.unstubAllGlobals() in
+    // afterEach — safer than mutating `global.fetch` directly when
+    // other test files in the suite also use fetch (Vitest may run
+    // them in parallel).
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (_url: unknown, init: RequestInit | undefined) => {
+        lastInit = init
+        return new Response(JSON.stringify({ embeddings: [[0.1, 0.2, 0.3]] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }),
+    )
   })
 
   afterEach(() => {
-    global.fetch = originalFetch
+    vi.unstubAllGlobals()
     delete process.env.OLLAMA_AUTH_TOKEN
   })
 
@@ -69,10 +74,13 @@ describe('bearer-token auth', () => {
 
   it('sends the bearer header on listModels too', async () => {
     process.env.OLLAMA_AUTH_TOKEN = 'secret-vps-token'
-    global.fetch = vi.fn(async (_url, init) => {
-      lastInit = init
-      return new Response(JSON.stringify({ models: [] }), { status: 200 })
-    }) as typeof fetch
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (_url: unknown, init: RequestInit | undefined) => {
+        lastInit = init
+        return new Response(JSON.stringify({ models: [] }), { status: 200 })
+      }),
+    )
     await listModels()
     const headers = lastInit?.headers as Record<string, string>
     expect(headers?.Authorization).toBe('Bearer secret-vps-token')

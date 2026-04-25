@@ -39,6 +39,14 @@ export async function updateSession(request: NextRequest, requestHeaders?: Heade
 
   // Gate protected routes. Standalone CRM: every non-public path is
   // protected. Unauthenticated hits redirect to /login?next=<path>.
+  //
+  // The public list is the union of three categories:
+  //   1. UI routes that the user reaches before signing in (login, signup).
+  //   2. Anonymous telemetry / probe endpoints (csp-report, vitals, health, log-error).
+  //   3. API routes with their own out-of-band auth that doesn't use the
+  //      Supabase session — Bearer secrets, HMAC signatures, OAuth state,
+  //      ApiKey headers, etc. These bypass the Supabase gate but still
+  //      enforce their own auth at the route handler.
   const path = request.nextUrl.pathname;
   const PUBLIC_PREFIXES = [
     "/login",
@@ -49,6 +57,12 @@ export async function updateSession(request: NextRequest, requestHeaders?: Heade
     "/api/csp-report",
     "/api/vitals",
     "/api/health",
+    // Out-of-band auth on API routes — each enforces its own check.
+    "/api/cron/",                       // Bearer CRON_SECRET
+    "/api/sms/webhook",                 // Twilio HMAC signature
+    "/api/webhooks/inbound/",           // HMAC(NEXTAUTH_SECRET, ...) token
+    "/api/v1/",                         // ApiKey via Authorization: Bearer
+    "/api/integrations/oauth/callback", // OAuth state HMAC + state cookie
     "/_next/",
     "/favicon",
     "/robots.txt",

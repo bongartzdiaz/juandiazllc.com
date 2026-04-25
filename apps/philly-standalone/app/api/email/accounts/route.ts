@@ -6,9 +6,20 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
+import { encryptSecret } from '@/lib/philly/crypto'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+// Strip the encryptedPass field on every response — even though the
+// stored value is encrypted at rest, leaking the ciphertext narrows
+// an attacker's brute-force search if they ever exfiltrated it.
+function redactAccount<T extends { encryptedPass?: string }>(account: T): Omit<T, 'encryptedPass'> {
+  const { encryptedPass: _, ...rest } = account
+  void _
+  return rest
+}
 
 export async function GET(req: NextRequest) {
   const scope = await requireScope()
@@ -28,16 +39,28 @@ export async function GET(req: NextRequest) {
     prisma.emailAccount.count({ where }),
   ])
 
-  return paginatedResponse(accounts, total, { page, limit, skip })
+  return paginatedResponse(accounts.map(redactAccount), total, { page, limit, skip })
 }
 
 export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
 
+  // Connecting an email account is an expensive op (it'll attempt
+  // SMTP/IMAP probes downstream) and stores a credential. Rate-limit
+  // per user to make abuse loud rather than silent.
+  const limited = enforceRateLimit(`email-accounts:create:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   let body: Record<string, any>
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
   if (!body.email?.trim()) return jsonError('email is required', 400)
+
+  // Encrypt the SMTP/IMAP password before insert. The DB column is
+  // named `encryptedPass`; that name has been a contract for a while
+  // but the encryption was missing — fixed here.
+  const passPlaintext = typeof body.password === 'string' ? body.password : ''
+  const encryptedPass = passPlaintext ? (encryptSecret(passPlaintext) ?? '') : ''
 
   const prisma = getAuthPrisma()
   const account = await prisma.emailAccount.create({
@@ -52,11 +75,11 @@ export async function POST(req: NextRequest) {
       imapHost: body.imapHost ?? '',
       imapPort: body.imapPort ?? 993,
       username: body.username ?? '',
-      encryptedPass: body.password ?? '',
+      encryptedPass,
       status: 'active',
     },
   })
 
   await logAudit({ scope, action: 'create', entity: 'emailAccount', entityId: account.id })
-  return NextResponse.json({ data: account }, { status: 201 })
+  return NextResponse.json({ data: redactAccount(account) }, { status: 201 })
 }

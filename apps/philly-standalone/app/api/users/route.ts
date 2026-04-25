@@ -25,6 +25,7 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 import { logAudit } from '@/lib/philly/audit'
 import { createServiceClient } from '@/lib/supabase/service'
 import { isValidSectionSlug } from '@/lib/philly/sections'
+import { enforceRateLimit } from '@/lib/philly/rate-limit'
 
 export const runtime = 'nodejs'
 
@@ -74,9 +75,18 @@ const createSchema = z.object({
   dashboardSections: sectionsField,
 })
 
+// Inviting a teammate sends a Supabase email and creates a Philly
+// User row. Rate-limit per admin to prevent invite-spam — 20 per
+// hour is plenty for honest onboarding and tight enough that a
+// runaway script trips quickly.
+const INVITE_LIMIT = { capacity: 20, refillPerSec: 20 / 3600 } as const
+
 export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`users:invite:${scope.userId}`, INVITE_LIMIT)
+  if (limited) return limited
 
   let body: unknown
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }

@@ -25,6 +25,12 @@ const CSRF_EXEMPT_PREFIXES = [
   '/api/csp-report',
   '/api/vitals',
   '/api/health',
+  // Vercel Cron POSTs are server-to-server, no origin/referer header.
+  // Today the CSRF check passes them through (its `!origin && !referer`
+  // branch). Listing the prefix explicitly is defense-in-depth — if
+  // Vercel ever starts attaching an origin header, the cron call still
+  // bypasses the same-origin check.
+  '/api/cron/',
 ]
 
 export function isCsrfExempt(pathname: string): boolean {
