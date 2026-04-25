@@ -14,6 +14,7 @@
     "audit:tenant": "tsx scripts/audit-tenant-isolation.ts",
     "kb:build": "tsx scripts/build-assistant-kb.ts",
     "kb:check": "tsx scripts/check-assistant-kb.ts",
+    "kb:translate": "tsx scripts/translate-assistant-kb.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",

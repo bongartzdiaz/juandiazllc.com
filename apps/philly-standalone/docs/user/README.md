@@ -80,6 +80,53 @@ docs/user/
 4. Keep the frontmatter `tags` and `related` lists identical
    across languages — they're keys, not display strings.
 
+## Operator translation workflow (DeepL)
+
+`scripts/translate-assistant-kb.ts` automates the en → nl/de/es
+translation. It uses DeepL because (a) DeepL's nl/de/es quality
+beats most alternatives for this kind of technical-but-readable
+content, (b) the free tier (500k chars/month) covers the entire
+KB across three languages with room to spare, and (c) the script
+preserves frontmatter structure, code blocks, paths, and env-var
+names without manual cleanup.
+
+Run:
+
+```bash
+# Set your DeepL key (free tier ends in :fx; pro tier doesn't)
+export DEEPL_API_KEY=your-deepl-key:fx
+
+# Translate every en doc to all three target languages, skipping
+# any that are already fresh (translation.updated >= en.updated)
+npm run kb:translate
+
+# Translate to a specific language only
+npm run kb:translate -- --langs nl
+
+# Re-translate one specific doc
+npm run kb:translate -- --slug onboarding/welcome --force
+
+# Preview without spending API credits
+npm run kb:translate -- --dry-run
+```
+
+After translation: re-run `npm run kb:build` so the new
+translations are embedded into the RAG index, then commit both
+the markdown files and the regenerated `data/assistant-kb.json`.
+
+`npm run kb:check` reports translation coverage. Set
+`CHECK_KB_STRICT=1` to make CI fail when coverage isn't 100%.
+
+### Hand-translating instead
+
+For organisations with translators on staff, skip the script and
+write the translation directly. The frontmatter contract is the
+same — match the en source's `slug`, `tags`, `related`, and
+`updated` fields verbatim; translate `title`, `summary`, and the
+body. Don't translate paths (`/api/...`, `/settings/...`),
+env-var names, or technical identifiers (`organizationId`,
+`requireScope`, etc.).
+
 ## Indexing
 
 `scripts/build-assistant-kb.ts` walks this tree, chunks each file
