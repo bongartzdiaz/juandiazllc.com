@@ -16,3 +16,10 @@ npm-debug.log*
 playwright-report/
 test-results/
 playwright/.cache/
+
+# Obsidian vault — operator points OBSIDIAN_VAULT_PATH at their real
+# vault.  The default location is ./obsidian-vault inside this repo,
+# kept out of git so two operators don't fight over the same notes.
+obsidian-vault/
+# Conflict files left by `vault:sync` when it can't auto-resolve.
+*.conflict-*.md

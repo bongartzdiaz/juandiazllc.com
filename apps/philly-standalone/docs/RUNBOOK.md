@@ -105,6 +105,23 @@ gone stale (en updated more recently than the translation).
 Informational by default; set `CHECK_KB_STRICT=1` to make CI
 fail when coverage isn't 100%.
 
+### Obsidian vault sync
+
+The KB + legal docs + runbook + auto-generated RoPA / PII registry
+/ schema diagram / API inventory two-way sync to an Obsidian
+vault for offline review and graph-style navigation.
+
+```bash
+OBSIDIAN_VAULT_PATH=/path/to/your/vault npm run vault:sync
+```
+
+Subcommands: `vault:export` (push only), `vault:import` (pull
+only), `vault:check` (dry-run). Default vault path is
+`./obsidian-vault` (gitignored). Markdown links round-trip
+losslessly to/from Obsidian wikilinks; auto-generated
+`system/*` notes are regenerated from code on every export and
+never imported back.
+
 The cron is registered in `vercel.json`. For non-Vercel deploys,
 configure your scheduler to POST with the Bearer token and a 60s
 timeout. Failures are logged at error level; alert on consecutive

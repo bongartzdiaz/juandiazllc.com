@@ -127,6 +127,40 @@ body. Don't translate paths (`/api/...`, `/settings/...`),
 env-var names, or technical identifiers (`organizationId`,
 `requireScope`, etc.).
 
+## Two-way Obsidian sync
+
+The KB plus the legal docs, runbook, GDPR records of processing,
+PII registry, schema diagram, and API inventory all sync to an
+Obsidian vault. Both directions:
+
+```bash
+# Export everything to the vault. Internal markdown links become
+# Obsidian wikilinks; auto-generated notes (RoPA, PII, schema,
+# API inventory) get rebuilt from the source.
+npm run vault:export
+
+# Pull edits back from the vault into docs/user/, docs/legal/,
+# RUNBOOK. Auto-generated system/* notes are skipped on import
+# (they're regenerated from code, never authoritative in the vault).
+npm run vault:import
+
+# Run both directions; mtime-newer wins on each file.
+npm run vault:sync
+
+# Dry-run — see what would change without writing anything.
+npm run vault:check
+```
+
+By default the vault lives at `./obsidian-vault` (gitignored).
+Point at your real vault directory by setting
+`OBSIDIAN_VAULT_PATH=/path/to/your/vault` before running the
+script.
+
+The link transformer (`lib/vault/transform.ts`) is round-trip
+identity-tested — the same doc passed through `toObsidian` then
+`toMarkdown` is byte-identical to the original. So you can
+freely edit notes in Obsidian and re-import without drift.
+
 ## Indexing
 
 `scripts/build-assistant-kb.ts` walks this tree, chunks each file
