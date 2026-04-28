@@ -49,6 +49,7 @@ const ENTITY_OPTIONS: Array<[string, string]> = [
   ['apiKey', 'API key'],
   ['user', 'User'],
   ['organization', 'Organization'],
+  ['membership', 'Membership'],
 ]
 
 const ACTION_COLORS: Record<string, { bg: string; txt: string }> = {

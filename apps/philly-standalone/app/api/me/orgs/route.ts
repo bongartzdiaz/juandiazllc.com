@@ -5,6 +5,7 @@
 import { NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope } from '@/lib/philly/auth-helpers'
+import { enforceRateLimit, PRESET_READ } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -12,6 +13,8 @@ export const runtime = 'nodejs'
 export async function GET() {
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
+  const limited = enforceRateLimit(`me:orgs:${scope.userId}`, PRESET_READ)
+  if (limited) return limited
 
   const prisma = getAuthPrisma()
   // Single query, no N+1 — Prisma's `include` joins the Org row.
