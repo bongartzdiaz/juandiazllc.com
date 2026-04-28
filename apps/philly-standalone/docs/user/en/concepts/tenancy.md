@@ -73,16 +73,14 @@ A new route that forgets to scope fails the build.
 
 ## What if a user belongs to multiple organizations?
 
-Today, no. `User.organizationId` is 1:1 — a user belongs to exactly
-one organization. The data model expects this; the auth flow
-enforces it.
+Yes — as of Bundle G a single user can hold roles in any number of
+organizations. See [Multi-org membership](concepts/multi-org) for the
+mechanics: the `Membership` table, the active-org cookie, the
+top-bar org-switcher, and the per-org last-admin guard.
 
-If you legitimately need cross-org access (e.g. a consultant working
-with several clients), the workaround for now is to create separate
-user accounts with different emails — one per organization.
-
-A future "Membership" table that lets one user belong to multiple
-orgs is on the roadmap; ask if you need it sooner.
+Tenancy isolation is unchanged: every API route still scopes Prisma
+queries by `scope.organizationId`, and the active org is resolved
+once per request from the caller's `Membership` set.
 
 ## What about admin-led data-subject requests?
 

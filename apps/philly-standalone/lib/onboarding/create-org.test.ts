@@ -26,6 +26,7 @@ function makePrisma(initial: { orgs?: OrgRow[]; users?: UserRow[] } = {}): {
   const orgs: OrgRow[] = initial.orgs ?? []
   const users: UserRow[] = initial.users ?? []
 
+  const memberships: Array<{ userId: string; organizationId: string; role: string }> = []
   const tx: OnboardingTxPrisma = {
     organization: {
       create: async ({ data }) => {
@@ -36,6 +37,16 @@ function makePrisma(initial: { orgs?: OrgRow[]; users?: UserRow[] } = {}): {
         }
         orgs.push(row)
         return row
+      },
+    },
+    membership: {
+      create: async ({ data }) => {
+        memberships.push({
+          userId: data.userId,
+          organizationId: data.organizationId,
+          role: data.role,
+        })
+        return {}
       },
     },
     user: {
@@ -199,6 +210,9 @@ describe('createOrgAndAdmin', () => {
       fn({
         organization: {
           create: async ({ data }) => ({ id: 'org_x', name: data.name, slug: data.slug }),
+        },
+        membership: {
+          create: async () => ({}),
         },
         user: {
           create: async ({ data }) => {

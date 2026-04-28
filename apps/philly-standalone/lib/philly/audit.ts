@@ -66,6 +66,7 @@ export type AuditEntity =
   | 'pipelineStage'
   | 'user'
   | 'organization'
+  | 'membership'
   | 'auditLog'
   | 'activity'
 

@@ -6,6 +6,7 @@ import { useMobileMenu } from '@/components/philly/layout/ClientLayout'
 import { Moon, Sun, RefreshCw, Plus, Globe, Menu, GripVertical, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { NotificationBell } from '@/components/philly/dashboard/NotificationBell'
+import { OrgSwitcher } from '@/components/philly/layout/OrgSwitcher'
 import { PresenceIndicator } from '@/components/philly/ui/PresenceIndicator'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useSync } from '@/hooks/philly/useSync'
@@ -72,6 +73,11 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* Multi-org switcher (Bundle G) — empty render when the
+             user has only one membership, so single-org tenants
+             never see the dropdown. */}
+        <OrgSwitcher />
+
         {/* Command palette search pill */}
         <button
           type="button"

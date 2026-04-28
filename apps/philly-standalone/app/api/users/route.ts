@@ -102,25 +102,71 @@ export async function POST(req: NextRequest) {
     where: { email },
     select: { id: true, organizationId: true },
   })
-  if (existing) {
-    // Invited twice by mistake — surface a clear message instead of
-    // silently cross-moving someone between orgs.
-    return jsonError('A user with that email already exists', 409)
-  }
 
-  const user = await prisma.user.create({
-    data: {
-      email,
-      name: name?.trim() || email.split('@')[0],
-      role,
-      organizationId: scope.organizationId,
-      dashboardSections: dashboardSections ?? undefined,
-      // Supabase owns auth; this sentinel prevents any local
-      // credentials login from ever matching.
-      passwordHash: '__supabase_auth__',
-    },
-    select: USER_SELECT,
-  })
+  // Multi-org (Bundle G): if the email already has a User row, we
+  // don't create a second User — we add a Membership row attaching
+  // them to THIS org with the requested role. This is the
+  // consultant / shared-employee use case. The User's home org
+  // (User.organizationId) stays whatever it was.
+  type UserSummary = {
+    id: string
+    email: string
+    name: string
+    role: string
+    dashboardSections: unknown
+    avatarUrl: string | null
+    lastLoginAt: Date | null
+    createdAt: Date
+  }
+  let user: UserSummary
+  if (existing) {
+    if (existing.organizationId === scope.organizationId) {
+      return jsonError('User is already a member of this organization', 409)
+    }
+    // Add a Membership in THIS org. Idempotent: upsert pattern
+    // protects against a double-submit re-creating the row.
+    await prisma.membership.upsert({
+      where: { userId_organizationId: { userId: existing.id, organizationId: scope.organizationId } },
+      create: {
+        userId: existing.id,
+        organizationId: scope.organizationId,
+        role,
+        dashboardSections: dashboardSections ?? undefined,
+      },
+      update: {
+        role,
+        dashboardSections: dashboardSections ?? undefined,
+      },
+    })
+    user = await prisma.user.findUniqueOrThrow({
+      where: { id: existing.id },
+      select: USER_SELECT,
+    })
+  } else {
+    user = await prisma.user.create({
+      data: {
+        email,
+        name: name?.trim() || email.split('@')[0],
+        role,
+        organizationId: scope.organizationId,
+        dashboardSections: dashboardSections ?? undefined,
+        // Supabase owns auth; this sentinel prevents any local
+        // credentials login from ever matching.
+        passwordHash: '__supabase_auth__',
+      },
+      select: USER_SELECT,
+    })
+    // Mirror the home-org membership row so listing memberships
+    // is the canonical source ("show me everyone in this org").
+    await prisma.membership.create({
+      data: {
+        userId: user.id,
+        organizationId: scope.organizationId,
+        role,
+        dashboardSections: dashboardSections ?? undefined,
+      },
+    })
+  }
 
   // Best-effort Supabase invite. Fails soft: the Philly row is
   // already created, so an admin can resend the invite separately

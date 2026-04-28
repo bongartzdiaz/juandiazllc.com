@@ -14,9 +14,19 @@
    --------------------------------------------------------------- */
 
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { hasSection, parseDashboardSections } from '@/lib/philly/sections'
+
+/**
+ * Cookie name carrying the user's active-org id (Bundle G).
+ * Set by POST /api/me/active-org when they switch in the topbar.
+ * Empty / unset → fall back to User.organizationId (home org).
+ * Pointing at an org the user is no longer a member of → fall back
+ * to home (cookie left in place; the next switch will clear it).
+ */
+export const ACTIVE_ORG_COOKIE = 'philly-active-org'
 
 export type AuthScope = {
   userId: string
@@ -134,12 +144,46 @@ export async function requireScope(): Promise<AuthScope | NextResponse> {
       }
     }
 
+    // Multi-org resolution (Bundle G):
+    // 1. Read the active-org cookie. If unset, the active org IS the
+    //    user's home org (User.organizationId).
+    // 2. If the cookie points at an org the user has a Membership in,
+    //    use that as the active org and read role + sections from
+    //    the Membership row (per-org, not the home-org cached values
+    //    on User).
+    // 3. If the cookie points at an org with no Membership for this
+    //    user — they were removed, or the cookie is forged — fall
+    //    back silently to home org. We don't clear the cookie here
+    //    (that would race with the org-switcher); the next switch
+    //    will overwrite it cleanly.
+    const cookieJar = await cookies()
+    const requestedOrgId = cookieJar.get(ACTIVE_ORG_COOKIE)?.value || null
+
+    let activeOrgId = phillyUser.organizationId
+    let activeRole = authoritativeRole
+    let activeSections = parseDashboardSections(phillyUser.dashboardSections)
+
+    if (requestedOrgId && requestedOrgId !== phillyUser.organizationId) {
+      const prisma = getAuthPrisma()
+      const membership = await prisma.membership.findUnique({
+        where: { userId_organizationId: { userId: phillyUser.id, organizationId: requestedOrgId } },
+        select: { role: true, dashboardSections: true },
+      })
+      if (membership) {
+        activeOrgId = requestedOrgId
+        activeRole = membership.role
+        activeSections = parseDashboardSections(membership.dashboardSections)
+      }
+      // Otherwise: silent fall-through to home org. Audit could log
+      // this if it became operationally relevant.
+    }
+
     return {
       userId: phillyUser.id,
-      organizationId: phillyUser.organizationId,
-      role: authoritativeRole,
+      organizationId: activeOrgId,
+      role: activeRole,
       email: phillyUser.email,
-      dashboardSections: parseDashboardSections(phillyUser.dashboardSections),
+      dashboardSections: activeSections,
       mfaEnrolled: Boolean(phillyUser.twoFactorEnabled && phillyUser.twoFactorSecret),
     }
   } catch (err) {

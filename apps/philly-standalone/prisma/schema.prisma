@@ -52,6 +52,11 @@ model Organization {
   smsMessages        SmsMessage[]
   integrations       Integration[]
   propertyTaxonomy   PropertyTaxonomy?
+  // Multi-org: every user that belongs to this organization is
+  // represented by a Membership row. A user's User.organizationId is
+  // their primary/home org; membership in additional orgs is purely
+  // through this table.
+  memberships        Membership[]
   gdprErasureLogs    GdprErasureLog[]
   gdprExportLogs     GdprExportLog[]
   gdprConsentRecords GdprConsentRecord[]
@@ -95,6 +100,13 @@ model User {
   twoFactorVerifiedAt DateTime?
 
   organization    Organization     @relation(fields: [organizationId], references: [id])
+  // Multi-org membership. organizationId above is the user's "home"
+  // (primary) org — the one they were originally created in. The
+  // Membership rows enumerate every org they belong to with the role
+  // and section-allow-list per org. The active org for a given
+  // request is resolved by lib/philly/auth-helpers.ts from a cookie
+  // (`philly-active-org`), falling back to organizationId when unset.
+  memberships     Membership[]
   twoFactorRecoveryCodes TwoFactorRecoveryCode[]
   dashboardLayout DashboardLayout?
   kanbanCards     KanbanCard[]     @relation("assignee")
@@ -1778,3 +1790,39 @@ model AssistantMemory {
   @@index([organizationId, userId])
 }
 
+
+// ── Multi-org membership (Bundle G) ───────────────────────────────
+//
+// One row per (user, organization) pair. The user's permissions
+// inside that org live here. User.organizationId above is the
+// user's "home" (primary) org — the one they were created in —
+// and the canonical role/sections for that org. Memberships in
+// OTHER orgs add additional org access.
+//
+// Composite unique on (userId, organizationId) — at most one
+// membership per (user, org) pair.
+//
+// Indexes optimised for the two hot paths:
+//   - "what orgs does this user belong to?" → @@index([userId])
+//   - "who is in this org?"                 → @@index([organizationId, role])
+
+model Membership {
+  id                String   @id @default(cuid())
+  userId            String
+  organizationId    String
+  /// Role in THIS organization. Independent of User.role (which is
+  /// the home-org role). admin / manager / viewer.
+  role              String   @default("viewer")
+  /// Per-org dashboard-section allow-list. Same shape as
+  /// User.dashboardSections (null = full access, JSON array = list).
+  dashboardSections Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([userId])
+  @@index([organizationId, role])
+}

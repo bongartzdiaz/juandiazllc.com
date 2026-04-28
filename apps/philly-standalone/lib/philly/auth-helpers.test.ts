@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // picks up the fakes. vi.mock() is hoisted to the top of the file by
 // Vitest's transform, so this runs before the `import` on line 15.
 const supabaseState = { email: null as string | null }
+const cookieState = { activeOrg: null as string | null }
 const prismaState = {
   existingUsers: [] as Array<{
     id: string; email: string; role: string; organizationId: string | null;
@@ -13,7 +14,26 @@ const prismaState = {
   }>,
   orgs: [] as Array<{ id: string; slug: string }>,
   userCreateCalls: [] as Array<{ email: string; role: string }>,
+  // Bundle G — Membership rows. Keyed by (userId, organizationId).
+  memberships: [] as Array<{
+    userId: string; organizationId: string; role: string;
+    dashboardSections?: unknown
+  }>,
 }
+
+// Bundle G — requireScope reads next/headers cookies to resolve
+// active org. Mock cookies() to return whatever cookieState.activeOrg
+// is set to.
+vi.mock('next/headers', () => ({
+  cookies: async () => ({
+    get: (name: string) => {
+      if (name === 'philly-active-org' && cookieState.activeOrg) {
+        return { value: cookieState.activeOrg }
+      }
+      return undefined
+    },
+  }),
+}))
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: async () => ({
@@ -56,6 +76,16 @@ vi.mock('@/lib/philly/auth', () => ({
         return row
       },
     },
+    membership: {
+      findUnique: async ({ where }: { where: { userId_organizationId: { userId: string; organizationId: string } } }) => {
+        const m = prismaState.memberships.find(
+          (row) =>
+            row.userId === where.userId_organizationId.userId &&
+            row.organizationId === where.userId_organizationId.organizationId,
+        )
+        return m ?? null
+      },
+    },
   }),
 }))
 
@@ -64,6 +94,8 @@ import { NextResponse } from 'next/server'
 
 function reset() {
   supabaseState.email = null
+  cookieState.activeOrg = null
+  prismaState.memberships = []
   prismaState.existingUsers = []
   prismaState.orgs = []
   prismaState.userCreateCalls = []
@@ -400,5 +432,105 @@ describe('requireSupabaseUser', () => {
     const result = await requireSupabaseUser()
     expect(result).toBeInstanceOf(NextResponse)
     if (result instanceof NextResponse) expect(result.status).toBe(401)
+  })
+})
+
+describe('multi-org active-org resolution (Bundle G)', () => {
+  beforeEach(reset)
+
+  it('falls back to home org when no cookie is set', async () => {
+    prismaState.orgs = [{ id: 'org_home', slug: 'home' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'jane@example.com', role: 'admin',
+      organizationId: 'org_home', dashboardSections: null,
+    }]
+    supabaseState.email = 'jane@example.com'
+
+    const result = await requireScope()
+    if (result instanceof NextResponse) throw new Error(`expected scope, got ${result.status}`)
+    expect(result.organizationId).toBe('org_home')
+    expect(result.role).toBe('admin')
+  })
+
+  it('returns the cookie-named org when the user has a membership in it', async () => {
+    prismaState.orgs = [
+      { id: 'org_home', slug: 'home' },
+      { id: 'org_other', slug: 'other' },
+    ]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'jane@example.com', role: 'admin',
+      organizationId: 'org_home', dashboardSections: null,
+    }]
+    prismaState.memberships = [
+      { userId: 'user_1', organizationId: 'org_other', role: 'manager', dashboardSections: null },
+    ]
+    supabaseState.email = 'jane@example.com'
+    cookieState.activeOrg = 'org_other'
+
+    const result = await requireScope()
+    if (result instanceof NextResponse) throw new Error(`expected scope, got ${result.status}`)
+    expect(result.organizationId).toBe('org_other')
+    // Role comes from the Membership, not from the User row
+    expect(result.role).toBe('manager')
+  })
+
+  it('falls back to home org silently when cookie points at an org without a membership', async () => {
+    // The cookie could be stale (user was removed) or forged (script).
+    // Either way: do not return that org. Resolve to home.
+    prismaState.orgs = [
+      { id: 'org_home', slug: 'home' },
+      { id: 'org_other', slug: 'other' },
+    ]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'jane@example.com', role: 'admin',
+      organizationId: 'org_home', dashboardSections: null,
+    }]
+    // No membership row for user_1 in org_other
+    supabaseState.email = 'jane@example.com'
+    cookieState.activeOrg = 'org_other'
+
+    const result = await requireScope()
+    if (result instanceof NextResponse) throw new Error(`expected scope, got ${result.status}`)
+    expect(result.organizationId).toBe('org_home')
+    expect(result.role).toBe('admin')
+  })
+
+  it('cookie equal to home org id is a no-op (skips the lookup)', async () => {
+    prismaState.orgs = [{ id: 'org_home', slug: 'home' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'jane@example.com', role: 'admin',
+      organizationId: 'org_home', dashboardSections: null,
+    }]
+    // No membership row at all — but the cookie matches home, so the
+    // resolver shouldn't query memberships.
+    supabaseState.email = 'jane@example.com'
+    cookieState.activeOrg = 'org_home'
+
+    const result = await requireScope()
+    if (result instanceof NextResponse) throw new Error(`expected scope, got ${result.status}`)
+    expect(result.organizationId).toBe('org_home')
+  })
+
+  it('per-org membership dashboardSections override the home-org sections', async () => {
+    prismaState.orgs = [
+      { id: 'org_home', slug: 'home' },
+      { id: 'org_other', slug: 'other' },
+    ]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'jane@example.com', role: 'admin',
+      organizationId: 'org_home',
+      dashboardSections: ['dashboard', 'contacts', 'deals'],
+    }]
+    prismaState.memberships = [{
+      userId: 'user_1', organizationId: 'org_other', role: 'viewer',
+      dashboardSections: ['dashboard'],
+    }]
+    supabaseState.email = 'jane@example.com'
+    cookieState.activeOrg = 'org_other'
+
+    const result = await requireScope()
+    if (result instanceof NextResponse) throw new Error(`expected scope, got ${result.status}`)
+    expect(result.dashboardSections).toEqual(['dashboard'])
+    expect(result.role).toBe('viewer')
   })
 })

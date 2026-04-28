@@ -47,6 +47,11 @@ export interface OnboardingTxPrisma {
       select: { id: true; name: true; slug: true }
     }) => Promise<{ id: string; name: string; slug: string }>
   }
+  membership: {
+    create: (args: {
+      data: { userId: string; organizationId: string; role: string }
+    }) => Promise<unknown>
+  }
   user: {
     create: (args: {
       data: {
@@ -136,6 +141,17 @@ export async function createOrgAndAdmin(
         passwordHash: '__supabase_auth__',
       },
       select: { id: true, role: true, email: true },
+    })
+    // Bundle G: also write the home-org Membership so the multi-org
+    // listing endpoints have a uniform source of truth. The User row
+    // still holds the home-org as the canonical primary, but every
+    // org the user belongs to MUST have a Membership row.
+    await tx.membership.create({
+      data: {
+        userId: user.id,
+        organizationId: organization.id,
+        role: 'admin',
+      },
     })
     return { organization, user }
   })

@@ -187,6 +187,14 @@ two separate organizations") — that test pins the fix for the
 prior shared-default-org behavior. Removing or weakening it should
 require a security-team review.
 
+Multi-org access (Bundle G) is unit-tested in
+`lib/philly/auth-helpers.test.ts` (active-org cookie resolution +
+fallback paths) and `lib/membership/remove.test.ts` (last-admin and
+home-org guards). The `Membership` table is the canonical source for
+"who can administer org X"; every home-org user has a mirrored
+Membership row by migration backfill plus the POST /api/users
+invariant.
+
 ## 6. Common operational tasks
 
 ### Onboarding a new organization
@@ -203,16 +211,42 @@ require a security-team review.
 ### Inviting a teammate
 
 `/settings/users` (admin) → `POST /api/users { email, role,
-dashboardSections }` → pre-creates the Philly `User` row in the
-admin's org → sends a Supabase invite email. When the invitee signs
-in, `resolvePhillyUser` finds their row by email and lands them in
-the admin's org.
+dashboardSections }`. The route branches on whether the email
+already has a `User` row:
+
+- **New email** — pre-creates the Philly `User` row in the admin's
+  org, mirrors the home-org `Membership`, sends a Supabase invite.
+  When the invitee signs in, `resolvePhillyUser` finds their row
+  and lands them in the admin's org.
+- **Existing email, different org** (multi-org consultant case) —
+  upserts a `Membership` row in the admin's org with the requested
+  role. The user's home org is unchanged. The next sign-in shows the
+  org-switcher in the topbar so they can move between orgs.
+- **Existing email, same org** — 409 (already on this team).
+
+### Switching orgs (multi-org users)
+
+The topbar `OrgSwitcher` lists every org the user has a `Membership`
+in. Selecting one calls `POST /api/me/active-org` which sets the
+`philly-active-org` cookie (httpOnly, sameSite=lax, 30 days) and
+reloads. `requireScope` reads the cookie and resolves
+`scope.organizationId`, `scope.role`, and `scope.dashboardSections`
+from the matching `Membership` row. A cookie pointing at an org the
+user no longer belongs to silently falls back to the home org; the
+next switch will overwrite the cookie cleanly.
 
 ### Demoting / removing an admin
 
-`PATCH /api/users { userId, role: "viewer" }`. The route refuses to
-demote the last admin in an org (HTTP 400). Promote a successor
-first.
+- `PATCH /api/users { userId, role: "viewer" }` demotes a home-org
+  user. Refuses to drop the last admin (HTTP 400). Promote a
+  successor first.
+- `DELETE /api/users/[id]/membership` revokes a non-home-org
+  Membership. Refuses if the user's home org is the caller's org
+  (use the user-deletion path instead) or if removing the row would
+  leave the org with zero admins. The User record and any data the
+  user authored stay in place — this is access-revocation, not data
+  deletion. See `docs/user/en/concepts/multi-org.md` for the full
+  data model.
 
 ### Rotating `INTEGRATION_SECRET`
 
