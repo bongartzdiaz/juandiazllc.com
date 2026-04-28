@@ -123,6 +123,7 @@ export function CommandPalette() {
       { id: 'integrations', label: 'Integrations', description: 'Connected apps', icon: <Plug size={iconSize} />, category: 'System', action: () => router.push('/integrations') },
       { id: 'webhooks', label: 'Webhooks', description: 'Outbound webhooks', icon: <Webhook size={iconSize} />, category: 'System', action: () => router.push('/settings/webhooks') },
       { id: 'pipelines', label: 'Pipelines', description: 'Configure deal pipelines and stages', icon: <Columns3 size={iconSize} />, category: 'System', action: () => router.push('/settings/pipelines'), keywords: ['stages', 'board', 'deals'] },
+      { id: 'security', label: 'Security', description: 'IP allowlist and idle timeout', icon: <Shield size={iconSize} />, category: 'System', action: () => router.push('/settings/security'), keywords: ['ip', 'allowlist', 'session', 'idle', 'enterprise'] },
       { id: 'audit', label: 'Audit Log', description: 'System audit trail', icon: <Shield size={iconSize} />, category: 'System', action: () => router.push('/audit') },
       { id: 'settings', label: 'Settings', description: 'App preferences', icon: <Settings size={iconSize} />, category: 'System', action: () => router.push('/settings'), keywords: ['preferences', 'config'] },
     ]
