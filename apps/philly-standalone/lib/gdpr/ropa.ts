@@ -195,6 +195,35 @@ export const PROCESSING_ACTIVITIES: ReadonlyArray<ProcessingActivity> = [
       'Append-only by API contract',
     ],
   },
+  {
+    id: 'ai_contact_enrichment',
+    name: 'AI-assisted contact enrichment',
+    description:
+      'Use a large language model (Anthropic Claude Haiku) to infer three structured attributes from existing CRM contact data — likely industry, an ICP-fit score (0-100), and a one-paragraph narrative summary. Inputs are limited to data the operator has already lawfully collected (name, email, phone, company, contact type, notes, lead source). The model is invoked only on demand or once at contact-create time; outputs are persisted to Contact.aiIndustry / aiIcpFit / aiSummary and surfaced behind an "AI generated" disclosure label per EU AI Act Art. 50. Implements a recital-71-aligned safeguard: the score never auto-routes leads or auto-rejects contacts on its own — it is decision-support only.',
+    dataSubjects: ['Business contacts whose details are already held by the controller'],
+    dataCategories: ['Name', 'Email', 'Phone', 'Company', 'Contact type', 'Free-text notes (truncated to 1,500 chars at the SDK boundary)', 'Lead source'],
+    lawfulBasis: 'legitimate_interest',
+    recipients: [
+      'Anthropic, PBC (sub-processor providing the Claude inference API; see docs/legal/SUB-PROCESSORS.md)',
+    ],
+    thirdCountryTransfers: [
+      {
+        country: 'United States',
+        safeguard: 'scc',
+        notes: 'Anthropic operates EU SCC + DPA with zero-retention on API traffic when configured.',
+      },
+    ],
+    retentionPolicy:
+      'Inferred attributes are stored on the Contact row and inherit that row\'s lifecycle — purged when the contact itself is purged via lib/gdpr/retention.ts. The model provider does not retain prompt or completion content beyond the request lifetime when called with the API key configured for zero-retention.',
+    securityMeasures: [
+      'Outputs validated against a Zod schema (lib/philly/ai/contact-attributes.ts) — invalid responses are rejected, not persisted',
+      'Per-user rate-limit (10 calls/min) on POST /api/contacts/[id]/ai-attributes',
+      'Wrapped in withSpan({ slo: SLO.AI_ACTION }) so latency + error rate are observable',
+      'No internal IDs or cross-org data ever included in the prompt',
+      'UI shows an explicit "AI generated" badge on every inferred field (EU AI Act Art. 50)',
+      'A DPIA is maintained for this activity at docs/legal/DPIA-AI-ATTRIBUTES.md',
+    ],
+  },
 ] as const
 
 export function findActivity(id: string): ProcessingActivity | undefined {
