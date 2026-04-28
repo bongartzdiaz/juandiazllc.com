@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "audit:tenant": "tsx scripts/audit-tenant-isolation.ts",
+    "audit:chain": "tsx scripts/verify-audit-chain.ts",
     "kb:build": "tsx scripts/build-assistant-kb.ts",
     "kb:check": "tsx scripts/check-assistant-kb.ts",
     "kb:translate": "tsx scripts/translate-assistant-kb.ts",
