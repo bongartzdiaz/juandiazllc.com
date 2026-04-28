@@ -89,32 +89,68 @@ The backfill is idempotent and per-row safe — re-running it skips
 already-encrypted rows and continues past per-row errors. Exit code
 1 = at least one row failed (printed at the end with the row id).
 
-## Key rotation
+## Key rotation (online — Bundle Q)
 
-Today the platform supports rotation only with downtime, because
-the same key encrypts every row.
+`lib/philly/crypto.ts` supports a key list. Writes use the **first**
+configured key; reads try every configured key in order. A standard
+rotation is a three-phase deploy with **zero downtime**:
 
-To rotate cleanly **without** downtime, the path is:
+### Phase 1 — deploy with both keys
 
-1. Add `lib/philly/crypto.ts` support for a key list, with the
-   newest key used for writes and any key in the list valid for
-   reads. (Estimate: half a day of focused work.)
-2. Generate a new `INTEGRATION_SECRET_V2` env var, deploy with
-   *both* set.
-3. Run a CLI similar to `pii:backfill` that re-encrypts every row
-   under the new key.
-4. Once 100% migrated, retire the old key (delete from env, then
-   from the code).
+Set both env vars. The NEW key takes the primary slot, the OLD key
+moves to the V2 slot:
 
-Until that's shipped, the practical rotation procedure is:
+```bash
+INTEGRATION_SECRET=<NEW>
+INTEGRATION_SECRET_V2=<OLD>
+```
 
-1. Take the platform offline.
-2. Set the new env var.
-3. Re-encrypt rows by exporting → decrypting under the old key →
-   encrypting under the new → importing.
-4. Bring the platform back up.
+Deploy. From this point new writes encrypt under `<NEW>`, and old
+rows continue to decrypt under `<OLD>` — both flows work.
 
-This is documented as a known gap.
+### Phase 2 — re-encrypt every row under the new key
+
+```bash
+# Dry-run first — counts what would change.
+npm run pii:rotate -- --dry
+
+# Then for real:
+npm run pii:rotate
+
+# Or per-tenant (useful for staged rollouts):
+npm run pii:rotate -- --org=<organizationId>
+```
+
+The CLI is idempotent and per-row safe. It reads each encrypted
+row, identifies which key opened it (returns `keyIndex`), and if the
+match was anything other than the primary key (index 0), re-encrypts
+under primary and writes back. Exit codes:
+
+- `0` — every non-primary row re-encrypted (or dry-run completed)
+- `1` — at least one row failed (errors listed at the end)
+- `2` — only one key configured; nothing to rotate from
+- `3` — transient error
+
+Run it multiple times during the rotation window if you want — once
+all rows show up as `keyIndex 0`, the work is done.
+
+### Phase 3 — retire the old key
+
+Once `npm run pii:rotate -- --dry` reports `rotated=0` and
+`already-primary=<all rows>`, you can remove `INTEGRATION_SECRET_V2`
+from production env and redeploy. The OLD key is now unused.
+
+> **Why not auto-rotate on every read?** We could re-encrypt-on-read
+> opportunistically, but that turns idempotent reads into writes
+> (lock contention, audit-log bloat, breaks `prisma migrate deploy`
+> on a read-heavy host). Better to do it explicitly via the CLI.
+
+### Multi-step rotation
+
+Up to 8 keys (`INTEGRATION_SECRET` plus `INTEGRATION_SECRET_V2…V8`)
+can be active simultaneously. This is mostly useful when staging
+many short-lived keys for compliance attestations — the common case
+is just primary + one previous key.
 
 ## What this protects against
 

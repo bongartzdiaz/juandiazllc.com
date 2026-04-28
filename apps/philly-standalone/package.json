@@ -14,6 +14,7 @@
     "audit:tenant": "tsx scripts/audit-tenant-isolation.ts",
     "audit:chain": "tsx scripts/verify-audit-chain.ts",
     "pii:backfill": "tsx scripts/encrypt-contact-notes.ts",
+    "pii:rotate": "tsx scripts/rotate-pii-key.ts",
     "kb:build": "tsx scripts/build-assistant-kb.ts",
     "kb:check": "tsx scripts/check-assistant-kb.ts",
     "kb:translate": "tsx scripts/translate-assistant-kb.ts",
