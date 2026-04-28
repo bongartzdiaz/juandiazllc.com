@@ -106,7 +106,6 @@ export async function consumeRecoveryCode(userId: string, code: string): Promise
   for (const c of candidates) {
     // bcrypt.compare is constant-time within itself; looping all candidates
     // means total time ~= candidate count × per-compare.
-    // eslint-disable-next-line no-await-in-loop
     if (await bcrypt.compare(normalized, c.codeHash)) {
       matchedId = c.id
       // Don't break — keep looping so timing is uniform regardless of position.

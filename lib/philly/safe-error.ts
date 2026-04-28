@@ -15,8 +15,7 @@ import crypto from 'crypto'
 
 export function serverError(err: unknown, publicMessage = 'Internal server error', status = 500) {
   const id = crypto.randomBytes(6).toString('hex')
-  // Server-side full detail (goes to platform logs, not to client)
-  // eslint-disable-next-line no-console
+  // Server-side full detail (goes to platform logs, not to client).
   console.error(`[server-error ${id}]`, err)
   return NextResponse.json(
     { error: publicMessage, errorId: id },

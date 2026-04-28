@@ -86,7 +86,7 @@ export default function UsersSettingsPage() {
     }
   }
 
-  useEffect(() => { refresh() /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [])
+  useEffect(() => { refresh() }, [])
 
   return (
     <>

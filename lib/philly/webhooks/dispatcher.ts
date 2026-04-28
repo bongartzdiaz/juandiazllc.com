@@ -9,6 +9,7 @@
 
 import crypto from 'crypto'
 import { getAuthPrisma } from '@/lib/philly/auth'
+import { logger } from '@/lib/philly/logger'
 
 interface DispatchOptions {
   /** Direct URL to POST to (skips lookup). Used by automation callWebhook action. */
@@ -63,8 +64,9 @@ export async function dispatchWebhookEvent(
     if (opts.url) {
       const body = JSON.stringify({ event, payload: opts.payload ?? payload, timestamp: new Date().toISOString() })
       const result = await deliverWithRetry(opts.url, body, null)
-      // Log under a synthetic webhook if possible (skipped — just console)
-      console.log(`[webhook:direct] ${opts.url} → ${result.status}`)
+      // No persistent WebhookDelivery row for direct-mode dispatches
+      // (those come from automation actions, not configured webhooks).
+      logger.debug('[webhook:direct] dispatched', { url: opts.url, status: result.status })
       return
     }
 
