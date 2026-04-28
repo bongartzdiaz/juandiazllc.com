@@ -9,7 +9,10 @@ export default defineConfig({
   },
   test: {
     include: ['**/*.test.ts', '**/*.test.tsx'],
-    exclude: ['node_modules/**', '.next/**'],
+    // Integration tests (*.integration.test.ts) require a real
+    // MariaDB and are run via the separate vitest.integration.config.ts.
+    // Excluding them here keeps `npm test` hermetic.
+    exclude: ['node_modules/**', '.next/**', '**/*.integration.test.ts'],
     environment: 'node',
   },
 })

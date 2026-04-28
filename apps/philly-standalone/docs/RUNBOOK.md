@@ -105,6 +105,47 @@ gone stale (en updated more recently than the translation).
 Informational by default; set `CHECK_KB_STRICT=1` to make CI
 fail when coverage isn't 100%.
 
+### Mandatory 2FA on admin role
+
+Admins are required to enroll a TOTP authenticator. Without it,
+`requireRole(['admin'])` returns 409 with `code: 'NEEDS_2FA'`,
+admin server pages redirect to `/setup-2fa`, and admin API
+routes reject. The `/setup-2fa` wizard generates a QR, verifies
+the first code, and surfaces 10 single-use recovery codes once.
+
+Enforcement is env-gated:
+
+```
+ADMIN_MFA_ENFORCED=true     # production default
+ADMIN_MFA_ENFORCED=false    # dev / test (also default when NODE_ENV != production)
+```
+
+The `/api/2fa/{setup,verify,disable,recovery-codes}` endpoints
+use `requireScope` (not `requireRole`) so an admin who hasn't
+enrolled yet can still reach them. Disabling 2FA while admin-MFA
+is enforced is rejected by `/api/2fa/disable` — demote yourself
+to manager first if you need to remove your own 2FA.
+
+### Cross-org integration tests
+
+`scripts/test-integration.sh` brings up a MariaDB container
+(`docker/test-db/docker-compose.yml` — tmpfs-backed for speed),
+runs `prisma migrate deploy`, and executes
+`lib/security/cross-org.integration.test.ts` against it. The
+suite proves cross-tenant isolation holds end-to-end through
+the full Prisma + DB stack: reads, writes, GDPR erasure, GDPR
+export, audit log, assistant memory, and global user
+uniqueness.
+
+```
+npm run test:integration         # bring DB up + migrate + run
+npm run test:integration:down    # stop + wipe the test DB
+```
+
+The container stays running between iterations for fast
+turnaround; each test resets DB state in `beforeEach` so order
+doesn't matter.
+
 ### Obsidian vault sync
 
 The KB + legal docs + runbook + auto-generated RoPA / PII registry

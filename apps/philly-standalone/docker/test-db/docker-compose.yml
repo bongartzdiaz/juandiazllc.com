@@ -1,0 +1,33 @@
+# Test-only MariaDB for the cross-org integration suite.
+#
+# `npm run test:integration` brings this up, runs prisma migrate
+# deploy against it, executes the integration tests, then leaves
+# the container running for the next iteration. Stop with
+# `docker compose -f docker/test-db/docker-compose.yml down`.
+#
+# Designed to be DESTROYED freely — never wire production data
+# here. The database starts fresh each `down -v`.
+
+services:
+  test-mariadb:
+    image: mariadb:11
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:33306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: testpw
+      MARIADB_DATABASE: philly_test
+      MARIADB_USER: philly
+      MARIADB_PASSWORD: testpw
+    healthcheck:
+      test: ["CMD-SHELL", "healthcheck.sh --connect --innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    tmpfs:
+      # Keep the data dir in tmpfs — integration tests shouldn't
+      # need disk persistence, and tmpfs makes the suite ~10× faster.
+      - /var/lib/mysql
+
+# DATABASE_URL for prisma + the integration tests:
+#   mysql://philly:testpw@127.0.0.1:33306/philly_test

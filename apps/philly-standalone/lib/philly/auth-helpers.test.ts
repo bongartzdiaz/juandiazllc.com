@@ -8,6 +8,8 @@ const prismaState = {
   existingUsers: [] as Array<{
     id: string; email: string; role: string; organizationId: string | null;
     dashboardSections?: unknown
+    twoFactorEnabled?: boolean
+    twoFactorSecret?: string | null
   }>,
   orgs: [] as Array<{ id: string; slug: string }>,
   userCreateCalls: [] as Array<{ email: string; role: string }>,
@@ -263,6 +265,122 @@ describe('requireSection', () => {
     const result = await requireSection('this-slug-does-not-exist')
     expect(result).toBeInstanceOf(NextResponse)
     if (result instanceof NextResponse) expect(result.status).toBe(403)
+  })
+})
+
+describe('mandatory admin 2FA enforcement', () => {
+  beforeEach(() => {
+    reset()
+    delete process.env.ADMIN_MFA_ENFORCED
+  })
+
+  it('admin without 2FA + enforcement ON returns 409 NEEDS_2FA from requireRole(["admin"])', async () => {
+    process.env.ADMIN_MFA_ENFORCED = 'true'
+    prismaState.orgs = [{ id: 'org_1', slug: 'acme' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'admin@example.com', role: 'admin',
+      organizationId: 'org_1', dashboardSections: null,
+      twoFactorEnabled: false, twoFactorSecret: null,
+    }]
+    supabaseState.email = 'admin@example.com'
+
+    const result = await requireRole(['admin'])
+    expect(result).toBeInstanceOf(NextResponse)
+    if (result instanceof NextResponse) {
+      expect(result.status).toBe(409)
+      const body = JSON.parse(await result.text()) as { code?: string }
+      expect(body.code).toBe('NEEDS_2FA')
+    }
+  })
+
+  it('admin WITH 2FA + enforcement ON passes through requireRole(["admin"])', async () => {
+    process.env.ADMIN_MFA_ENFORCED = 'true'
+    prismaState.orgs = [{ id: 'org_1', slug: 'acme' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'admin@example.com', role: 'admin',
+      organizationId: 'org_1', dashboardSections: null,
+      twoFactorEnabled: true, twoFactorSecret: 'enc.iv.tag',
+    }]
+    supabaseState.email = 'admin@example.com'
+
+    const result = await requireRole(['admin'])
+    if (result instanceof NextResponse) {
+      throw new Error(`expected scope, got ${result.status}`)
+    }
+    expect(result.role).toBe('admin')
+    expect(result.mfaEnrolled).toBe(true)
+  })
+
+  it('admin without 2FA + enforcement OFF passes through (dev convenience)', async () => {
+    process.env.ADMIN_MFA_ENFORCED = 'false'
+    prismaState.orgs = [{ id: 'org_1', slug: 'acme' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'admin@example.com', role: 'admin',
+      organizationId: 'org_1', dashboardSections: null,
+      twoFactorEnabled: false, twoFactorSecret: null,
+    }]
+    supabaseState.email = 'admin@example.com'
+
+    const result = await requireRole(['admin'])
+    if (result instanceof NextResponse) {
+      throw new Error(`expected scope, got ${result.status}`)
+    }
+    expect(result.mfaEnrolled).toBe(false)
+  })
+
+  it('manager without 2FA passes through unconditionally — only admins are gated', async () => {
+    process.env.ADMIN_MFA_ENFORCED = 'true'
+    prismaState.orgs = [{ id: 'org_1', slug: 'acme' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'manager@example.com', role: 'manager',
+      organizationId: 'org_1', dashboardSections: null,
+      twoFactorEnabled: false, twoFactorSecret: null,
+    }]
+    supabaseState.email = 'manager@example.com'
+
+    const result = await requireRole(['admin', 'manager'])
+    if (result instanceof NextResponse) {
+      throw new Error(`expected scope, got ${result.status}`)
+    }
+    expect(result.role).toBe('manager')
+  })
+
+  it('mfaEnrolled is false when twoFactorEnabled is true but secret is missing', async () => {
+    // Defensive: a flipped flag without a secret would let an admin
+    // bypass enrollment. Treat both as required.
+    process.env.ADMIN_MFA_ENFORCED = 'true'
+    prismaState.orgs = [{ id: 'org_1', slug: 'acme' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'admin@example.com', role: 'admin',
+      organizationId: 'org_1', dashboardSections: null,
+      twoFactorEnabled: true, twoFactorSecret: null,
+    }]
+    supabaseState.email = 'admin@example.com'
+
+    const result = await requireRole(['admin'])
+    expect(result).toBeInstanceOf(NextResponse)
+    if (result instanceof NextResponse) {
+      expect(result.status).toBe(409)
+    }
+  })
+
+  it('admin-only requireSection enforces 2FA the same way', async () => {
+    process.env.ADMIN_MFA_ENFORCED = 'true'
+    prismaState.orgs = [{ id: 'org_1', slug: 'acme' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'admin@example.com', role: 'admin',
+      organizationId: 'org_1', dashboardSections: null,
+      twoFactorEnabled: false, twoFactorSecret: null,
+    }]
+    supabaseState.email = 'admin@example.com'
+
+    const result = await requireSection('settings', ['admin'])
+    expect(result).toBeInstanceOf(NextResponse)
+    if (result instanceof NextResponse) {
+      expect(result.status).toBe(409)
+      const body = JSON.parse(await result.text()) as { code?: string }
+      expect(body.code).toBe('NEEDS_2FA')
+    }
   })
 })
 

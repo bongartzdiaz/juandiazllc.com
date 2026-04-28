@@ -63,6 +63,14 @@ const EXEMPT_PATHS = new Set<string>([
   'app/api/me/route.ts',
   // Assistant health probe — admin-only diagnostics, no tenant data.
   'app/api/assistant/health/route.ts',
+  // 2FA enrollment endpoints — operate on the calling user's own
+  // User row by primary key (scope.userId). Cross-tenant
+  // impossible because the User row is identified by the
+  // Supabase-resolved id, which uniquely belongs to one org.
+  'app/api/2fa/setup/route.ts',
+  'app/api/2fa/verify/route.ts',
+  'app/api/2fa/disable/route.ts',
+  'app/api/2fa/recovery-codes/route.ts',
 ])
 
 interface Finding {

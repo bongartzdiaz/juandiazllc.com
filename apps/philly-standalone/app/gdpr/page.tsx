@@ -15,6 +15,12 @@ export const runtime = 'nodejs'
 export default async function GdprAdminPage() {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) {
+    // 409 with NEEDS_2FA → admin who hasn't enrolled MFA. Send them
+    // to the setup wizard so the next admin click works.
+    if (scope.status === 409) {
+      const body = await scope.json().catch(() => null)
+      if (body?.code === 'NEEDS_2FA') redirect('/setup-2fa')
+    }
     // Non-admins are bounced back to the dashboard rather than seeing
     // a JSON 403. The route handler still returns 403 to API clients.
     redirect('/')

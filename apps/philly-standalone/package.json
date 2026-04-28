@@ -19,6 +19,8 @@
     "vault:import": "tsx scripts/vault-sync.ts import",
     "vault:sync": "tsx scripts/vault-sync.ts sync",
     "vault:check": "tsx scripts/vault-sync.ts check",
+    "test:integration": "bash scripts/test-integration.sh",
+    "test:integration:down": "docker compose -f docker/test-db/docker-compose.yml down -v",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",

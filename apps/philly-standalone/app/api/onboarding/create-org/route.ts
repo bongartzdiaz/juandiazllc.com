@@ -65,6 +65,10 @@ export async function POST(req: NextRequest) {
       role: 'admin',
       email: result.user.email,
       dashboardSections: null,
+      // Brand-new admin hasn't enrolled 2FA yet — they'll be
+      // prompted on next admin click. Audit-write itself doesn't
+      // need MFA, so this is fine here.
+      mfaEnrolled: false,
     },
     action: 'create',
     entity: 'organization',

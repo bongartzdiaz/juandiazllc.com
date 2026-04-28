@@ -26,6 +26,23 @@ export type AuthScope = {
   // Null = full access (admins + legacy users).
   // Array = strict allow-list of section slugs.
   dashboardSections: string[] | null
+  // True if this user has finished TOTP enrollment (twoFactorEnabled
+  // is true AND a TOTP secret exists). Used by `requireRole(['admin'])`
+  // for mandatory-2FA enforcement on admins.
+  mfaEnrolled: boolean
+}
+
+/**
+ * Whether mandatory-2FA enforcement on admins is active. Defaults to
+ * `true` in production and `false` everywhere else so dev / test
+ * environments don't trip it before the operator has gone through
+ * setup. Override via env: `ADMIN_MFA_ENFORCED=true` or `=false`.
+ */
+export function isAdminMfaEnforced(): boolean {
+  const raw = process.env.ADMIN_MFA_ENFORCED?.trim().toLowerCase()
+  if (raw === 'true' || raw === '1') return true
+  if (raw === 'false' || raw === '0') return false
+  return process.env.NODE_ENV === 'production'
 }
 
 export function jsonError(message: string, status: number) {
@@ -50,7 +67,15 @@ async function resolvePhillyUser(email: string) {
 
   const user = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, email: true, role: true, organizationId: true, dashboardSections: true },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      organizationId: true,
+      dashboardSections: true,
+      twoFactorEnabled: true,
+      twoFactorSecret: true,
+    },
   })
   return user
 }
@@ -115,6 +140,7 @@ export async function requireScope(): Promise<AuthScope | NextResponse> {
       role: authoritativeRole,
       email: phillyUser.email,
       dashboardSections: parseDashboardSections(phillyUser.dashboardSections),
+      mfaEnrolled: Boolean(phillyUser.twoFactorEnabled && phillyUser.twoFactorSecret),
     }
   } catch (err) {
     console.error('[requireScope] failed to resolve philly user', err)
@@ -143,7 +169,19 @@ export async function requireSupabaseUser(): Promise<SupabaseSubject | NextRespo
 
 /**
  * Same as requireScope but additionally verifies the role is in the
- * allowed list. Returns a 403 NextResponse if the user lacks permission.
+ * allowed list.
+ *
+ * Returns a NextResponse with:
+ *   403 — role not allowed
+ *   409 + { code: 'NEEDS_2FA' } — admin without 2FA enrolled, when
+ *         mandatory-admin-2FA enforcement is active. The operator
+ *         must complete /setup-2fa before reaching admin-gated
+ *         endpoints. This adds the bank-grade requirement that
+ *         high-privilege accounts must hold a second factor.
+ *
+ * Routes that participate in 2FA setup (POST /api/2fa/*) MUST use
+ * `requireScope()` directly so an admin who hasn't enrolled yet
+ * can still reach the setup endpoints.
  */
 export async function requireRole(
   allowed: ReadonlyArray<'admin' | 'manager' | 'viewer'>,
@@ -153,6 +191,13 @@ export async function requireRole(
 
   if (!allowed.includes(scope.role as 'admin' | 'manager' | 'viewer')) {
     return jsonError('Forbidden', 403)
+  }
+
+  if (scope.role === 'admin' && !scope.mfaEnrolled && isAdminMfaEnforced()) {
+    return NextResponse.json(
+      { error: 'Admin must enroll TOTP 2FA before using admin endpoints', code: 'NEEDS_2FA' },
+      { status: 409 },
+    )
   }
 
   return scope
@@ -182,6 +227,22 @@ export async function requireSection(
   }
   if (allowedRoles && !allowedRoles.includes(scope.role as 'admin' | 'manager' | 'viewer')) {
     return jsonError('Forbidden', 403)
+  }
+  if (
+    allowedRoles &&
+    allowedRoles.includes('admin') &&
+    !allowedRoles.includes('manager') &&
+    !allowedRoles.includes('viewer') &&
+    scope.role === 'admin' &&
+    !scope.mfaEnrolled &&
+    isAdminMfaEnforced()
+  ) {
+    // Same NEEDS_2FA contract as requireRole — only fires when this
+    // section is admin-only AND the admin hasn't enrolled.
+    return NextResponse.json(
+      { error: 'Admin must enroll TOTP 2FA before using admin endpoints', code: 'NEEDS_2FA' },
+      { status: 409 },
+    )
   }
   return scope
 }
