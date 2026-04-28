@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
+import { useApi } from '@/hooks/philly/useApi'
 import { Search } from 'lucide-react'
 
 interface MarketSnapshot {
@@ -23,25 +24,16 @@ interface MarketSnapshot {
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 export default function MarketAnalyticsPage() {
-  const [snapshots, setSnapshots] = useState<MarketSnapshot[]>([])
   const [zipCode, setZipCode] = useState('')
   const [year, setYear] = useState(new Date().getFullYear())
-  const [loading, setLoading] = useState(true)
   const t = useTranslations('marketAnalytics')
 
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ year: String(year) })
-      if (zipCode) params.set('zipCode', zipCode)
-      const res = await fetch(`/api/market-data?${params}`)
-      const json = await res.json()
-      setSnapshots(json.data ?? [])
-    } catch { setSnapshots([]) }
-    finally { setLoading(false) }
-  }, [zipCode, year])
-
-  useEffect(() => { fetchData() }, [fetchData])
+  const params = new URLSearchParams({ year: String(year) })
+  if (zipCode) params.set('zipCode', zipCode)
+  interface SnapshotsResponse { data: MarketSnapshot[] }
+  const snapshotsQuery = useApi<SnapshotsResponse>(`/market-data?${params}`)
+  const snapshots = snapshotsQuery.data?.data ?? []
+  const loading = snapshotsQuery.loading
 
   // Aggregate stats
   const latestMonth = snapshots.length > 0 ? snapshots[snapshots.length - 1] : null

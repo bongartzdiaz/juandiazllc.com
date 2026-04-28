@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
@@ -10,6 +10,7 @@ import {
   Layers, ChevronUp, ChevronDown, ArrowLeft,
 } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
+import { useApi } from '@/hooks/philly/useApi'
 
 interface Stage {
   id: string
@@ -43,9 +44,18 @@ const INDUSTRY_LABELS: Record<string, string> = {
 
 export default function PipelineAdminPage() {
   const { addToast } = useToast()
-  const [pipelines, setPipelines] = useState<Pipeline[]>([])
-  const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState<string | null>(null)
+
+  interface PipelinesResponse { data: Pipeline[] }
+  const pipelinesQuery = useApi<PipelinesResponse>('/pipelines')
+  const pipelines = pipelinesQuery.data?.data ?? []
+  const loading = pipelinesQuery.loading
+  const fetchPipelines = pipelinesQuery.refetch
+
+  // Auto-select the first pipeline on first successful load.
+  useEffect(() => {
+    if (!selectedId && pipelines.length > 0) setSelectedId(pipelines[0].id)
+  }, [pipelines, selectedId])
 
   // Pipeline create/edit modal
   const [showPipelineForm, setShowPipelineForm] = useState(false)
@@ -63,20 +73,6 @@ export default function PipelineAdminPage() {
   const [addingStage, setAddingStage] = useState(false)
   const [newStageName, setNewStageName] = useState('')
   const [newStageColor, setNewStageColor] = useState('#94A3B8')
-
-  const fetchPipelines = useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/pipelines', { cache: 'no-store' })
-      const json = await res.json()
-      const list: Pipeline[] = Array.isArray(json.data) ? json.data : []
-      setPipelines(list)
-      if (list.length > 0 && !selectedId) setSelectedId(list[0].id)
-    } catch { setPipelines([]) }
-    finally { setLoading(false) }
-  }, [selectedId])
-
-  useEffect(() => { fetchPipelines() }, [fetchPipelines])
 
   const selected = pipelines.find(p => p.id === selectedId) ?? null
 

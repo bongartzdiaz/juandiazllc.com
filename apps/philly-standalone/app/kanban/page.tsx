@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect, useCallback, Fragment } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Calendar, Plus, FileText, Check, Clock, X, User, Tag, Columns3, Pencil, Trash2 } from 'lucide-react'
 import { Modal } from '@/components/philly/ui/Modal'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
+import { useApi } from '@/hooks/philly/useApi'
 
 const SDG_COLORS: Record<number, string> = {
   1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21',
@@ -258,18 +259,10 @@ export default function KanbanPage() {
 
   // Fetch real boards from API. If the org has real boards, show them with
   // live CRUD; otherwise fall back to the industry-specific demo preview.
-  const [realBoards, setRealBoards] = useState<RealBoard[] | null>(null)
-  const fetchBoards = useCallback(async () => {
-    try {
-      const res = await fetch('/api/kanban/boards', { cache: 'no-store' })
-      const j = await res.json().catch(() => ({}))
-      setRealBoards(Array.isArray(j.data) ? j.data : [])
-    } catch {
-      setRealBoards([])
-    }
-  }, [])
-
-  useEffect(() => { fetchBoards() }, [fetchBoards])
+  interface BoardsResponse { data: RealBoard[] }
+  const boardsQuery = useApi<BoardsResponse>('/kanban/boards')
+  const realBoards: RealBoard[] | null = boardsQuery.data ? boardsQuery.data.data : null
+  const fetchBoards = boardsQuery.refetch
 
   // Live updates when kanban cards/columns/boards change anywhere in the org.
   useEntitySubscription('kanbanCard', fetchBoards)

@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
+import { useApi } from '@/hooks/philly/useApi'
 import { Play, Pause, X, Users, Zap, Trash2 } from 'lucide-react'
 
 interface LeadRoutingRule {
@@ -45,12 +46,17 @@ function parseAgentPool(pool: string): string[] {
 }
 
 export default function LeadRoutingPage() {
-  const [rules, setRules] = useState<LeadRoutingRule[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
+
+  const params = new URLSearchParams({ page: String(page), limit: '25' })
+  interface RulesResponse { data: LeadRoutingRule[]; pagination: { total: number; totalPages: number } }
+  const rulesQuery = useApi<RulesResponse>(`/lead-routing?${params}`)
+  const rules = rulesQuery.data?.data ?? []
+  const total = rulesQuery.data?.pagination.total ?? 0
+  const totalPages = rulesQuery.data?.pagination.totalPages ?? 0
+  const loading = rulesQuery.loading
+  const fetchData = rulesQuery.refetch
   const [addName, setAddName] = useState('')
   const [addStrategy, setAddStrategy] = useState(STRATEGY_OPTIONS[0][0])
   const [addEnabled, setAddEnabled] = useState(true)
@@ -99,32 +105,15 @@ export default function LeadRoutingPage() {
     }
   }
 
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '25' })
-      const res = await fetch(`/api/lead-routing?${params}`)
-      const json = await res.json()
-      setRules(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setRules([]) }
-    finally { setLoading(false) }
-  }, [page])
-
-  useEffect(() => { fetchData() }, [fetchData])
-
   const toggleEnabled = async (id: string, enabled: boolean) => {
-    setRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !enabled } : r))
     try {
-      await fetch('/api/lead-routing', {
+      const res = await fetch('/api/lead-routing', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, enabled: !enabled }),
       })
-    } catch {
-      setRules(prev => prev.map(r => r.id === id ? { ...r, enabled } : r))
-    }
+      if (res.ok) fetchData()
+    } catch { /* swallow — the SWR refetch on focus will recover */ }
   }
 
   const deleteRule = async (id: string) => {

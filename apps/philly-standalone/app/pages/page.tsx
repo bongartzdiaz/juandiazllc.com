@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
+import { useApi } from '@/hooks/philly/useApi'
 import { FileText, Layers, Calendar, Trash2, Pencil, ExternalLink } from 'lucide-react'
 
 interface PageRow {
@@ -18,8 +19,6 @@ interface PageRow {
 }
 
 export default function PagesListPage() {
-  const [pages, setPages] = useState<PageRow[]>([])
-  const [loading, setLoading] = useState(true)
   const [showNew, setShowNew] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [newSlug, setNewSlug] = useState('')
@@ -27,16 +26,11 @@ export default function PagesListPage() {
   const [err, setErr] = useState<string | null>(null)
   const router = useRouter()
 
-  const fetchData = () => {
-    setLoading(true)
-    fetch('/api/pages')
-      .then(r => r.json())
-      .then(j => setPages(j.data ?? []))
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }
-
-  useEffect(() => { fetchData() }, [])
+  interface PagesResponse { data: PageRow[] }
+  const pagesQuery = useApi<PagesResponse>('/pages')
+  const pages = pagesQuery.data?.data ?? []
+  const loading = pagesQuery.loading
+  const fetchData = pagesQuery.refetch
 
   const handleCreate = async () => {
     if (!newTitle.trim()) return

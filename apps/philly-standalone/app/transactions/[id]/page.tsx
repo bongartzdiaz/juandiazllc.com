@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useState, useEffect, useCallback } from 'react'
+import { use, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
+import { useApi } from '@/hooks/philly/useApi'
 
 interface ESignature {
   id: string
@@ -95,10 +96,6 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
   const router = useRouter()
   const { addToast } = useToast()
 
-  const [tx, setTx] = useState<Transaction | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-
   const [editField, setEditField] = useState<string | null>(null)
   const [editValue, setEditValue] = useState('')
 
@@ -109,17 +106,12 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
   const [sigEmail, setSigEmail] = useState('')
   const [sigSaving, setSigSaving] = useState(false)
 
-  const fetchTx = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/transactions/${id}`, { cache: 'no-store' })
-      const json = await res.json()
-      if (!res.ok) { setError(json.error ?? 'Transaction not found'); return }
-      setTx(json.data ?? null)
-    } catch { setError('Failed to load transaction') }
-    finally { setLoading(false) }
-  }, [id])
-
-  useEffect(() => { fetchTx() }, [fetchTx])
+  interface TxResponse { data: Transaction | null; error?: string }
+  const txQuery = useApi<TxResponse>(`/transactions/${id}`)
+  const tx = txQuery.data?.data ?? null
+  const loading = txQuery.loading
+  const error = txQuery.error ?? ''
+  const fetchTx = txQuery.refetch
 
   useEntitySubscription('transaction', (evt) => {
     if (evt.entityId === id) fetchTx()

@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
+import { useApi } from '@/hooks/philly/useApi'
 import { Phone, PhoneCall, List, Filter, X, Loader2 } from 'lucide-react'
 
 /* ── Types ──────────────────────────────────────────────── */
@@ -112,19 +113,30 @@ export default function DialerPage() {
   const [activeTab, setActiveTab] = useState<'calls' | 'lists'>('calls')
 
   /* Call Log state */
-  const [calls, setCalls] = useState<Call[]>([])
   const [callPage, setCallPage] = useState(1)
-  const [callTotal, setCallTotal] = useState(0)
-  const [callTotalPages, setCallTotalPages] = useState(0)
   const [outcomeFilter, setOutcomeFilter] = useState('')
-  const [callsLoading, setCallsLoading] = useState(true)
+
+  const callsParams = new URLSearchParams({ page: String(callPage), limit: '25' })
+  if (outcomeFilter) callsParams.set('outcome', outcomeFilter)
+  interface CallsResponse { data: Call[]; pagination: { total: number; totalPages: number } }
+  const callsQuery = useApi<CallsResponse>(`/calls?${callsParams}`)
+  const calls = callsQuery.data?.data ?? []
+  const callTotal = callsQuery.data?.pagination.total ?? 0
+  const callTotalPages = callsQuery.data?.pagination.totalPages ?? 0
+  const callsLoading = callsQuery.loading
+  const fetchCalls = callsQuery.refetch
 
   /* Dialer Lists state */
-  const [lists, setLists] = useState<DialerList[]>([])
   const [listPage, setListPage] = useState(1)
-  const [listTotal, setListTotal] = useState(0)
-  const [listTotalPages, setListTotalPages] = useState(0)
-  const [listsLoading, setListsLoading] = useState(true)
+
+  const listsParams = new URLSearchParams({ page: String(listPage), limit: '25' })
+  interface ListsResponse { data: DialerList[]; pagination: { total: number; totalPages: number } }
+  const listsQuery = useApi<ListsResponse>(`/dialer-lists?${listsParams}`)
+  const lists = listsQuery.data?.data ?? []
+  const listTotal = listsQuery.data?.pagination.total ?? 0
+  const listTotalPages = listsQuery.data?.pagination.totalPages ?? 0
+  const listsLoading = listsQuery.loading
+  const fetchLists = listsQuery.refetch
 
   /* Add List modal */
   const [showAddList, setShowAddList] = useState(false)
@@ -146,41 +158,8 @@ export default function DialerPage() {
   const [callError, setCallError] = useState<string | null>(null)
   const [callSubmitting, setCallSubmitting] = useState(false)
 
-  /* ── Fetch calls ──────────────────────────────────────── */
-
-  const fetchCalls = useCallback(async () => {
-    setCallsLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(callPage), limit: '25' })
-      if (outcomeFilter) params.set('outcome', outcomeFilter)
-      const res = await fetch(`/api/calls?${params}`, { cache: 'no-store' })
-      const json = await res.json()
-      setCalls(json.data ?? [])
-      setCallTotal(json.pagination?.total ?? 0)
-      setCallTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setCalls([]) }
-    finally { setCallsLoading(false) }
-  }, [callPage, outcomeFilter])
-
-  useEffect(() => { fetchCalls() }, [fetchCalls])
+  /* ── SSE refresh subscriptions ────────────────────────── */
   useEntitySubscription('call', fetchCalls)
-
-  /* ── Fetch dialer lists ───────────────────────────────── */
-
-  const fetchLists = useCallback(async () => {
-    setListsLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(listPage), limit: '25' })
-      const res = await fetch(`/api/dialer-lists?${params}`, { cache: 'no-store' })
-      const json = await res.json()
-      setLists(json.data ?? [])
-      setListTotal(json.pagination?.total ?? 0)
-      setListTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setLists([]) }
-    finally { setListsLoading(false) }
-  }, [listPage])
-
-  useEffect(() => { fetchLists() }, [fetchLists])
   useEntitySubscription('dialerList', fetchLists)
 
   /* ── KPI computations ─────────────────────────────────── */

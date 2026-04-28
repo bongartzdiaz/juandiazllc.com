@@ -6,6 +6,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
+import { useApi } from '@/hooks/philly/useApi'
 import { Filter, Mail, MessageSquare, Phone, MessageCircle, Clock, Inbox, Send, ArrowLeft, Loader2 } from 'lucide-react'
 
 interface Message {
@@ -50,13 +51,20 @@ const CHANNEL_ICONS: Record<string, { icon: typeof Mail; color: string }> = {
 }
 
 export default function InboxPage() {
-  const [conversations, setConversations] = useState<Conversation[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')
   const [channelFilter, setChannelFilter] = useState('')
-  const [loading, setLoading] = useState(true)
+
+  const params = new URLSearchParams({ page: String(page), limit: '25' })
+  if (statusFilter) params.set('status', statusFilter)
+  if (channelFilter) params.set('channel', channelFilter)
+  interface ConversationsResponse { data: Conversation[]; pagination: { total: number; totalPages: number } }
+  const conversationsQuery = useApi<ConversationsResponse>(`/inbox?${params}`)
+  const conversations = conversationsQuery.data?.data ?? []
+  const total = conversationsQuery.data?.pagination.total ?? 0
+  const totalPages = conversationsQuery.data?.pagination.totalPages ?? 0
+  const loading = conversationsQuery.loading
+  const fetchConversations = conversationsQuery.refetch
   const [showAdd, setShowAdd] = useState(false)
   const [addContactId, setAddContactId] = useState('')
   const [addChannel, setAddChannel] = useState('email')
@@ -76,23 +84,6 @@ export default function InboxPage() {
 
   const t = useTranslations('inbox')
   const threadEndRef = useRef<HTMLDivElement | null>(null)
-
-  const fetchConversations = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '25' })
-      if (statusFilter) params.set('status', statusFilter)
-      if (channelFilter) params.set('channel', channelFilter)
-      const res = await fetch(`/api/inbox?${params}`, { cache: 'no-store' })
-      const json = await res.json()
-      setConversations(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setConversations([]) }
-    finally { setLoading(false) }
-  }, [page, statusFilter, channelFilter])
-
-  useEffect(() => { fetchConversations() }, [fetchConversations])
 
   // Load contact options once for the New Conversation modal
   useEffect(() => {

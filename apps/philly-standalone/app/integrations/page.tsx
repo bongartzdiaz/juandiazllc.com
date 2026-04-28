@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
+import { useApi } from '@/hooks/philly/useApi'
 import {
   Plug, Search, Filter, Check, X, ExternalLink, AlertCircle,
   Calendar, MessageSquare, CreditCard, FileText, Megaphone, Zap,
@@ -90,9 +91,17 @@ export default function IntegrationsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  const [catalog, setCatalog] = useState<CatalogItem[]>([])
-  const [integrations, setIntegrations] = useState<Integration[]>([])
-  const [loading, setLoading] = useState(true)
+  interface CatalogResponse { data: CatalogItem[] }
+  interface IntegrationsResponse { data: Integration[] }
+  const catalogQuery = useApi<CatalogResponse>('/integrations/catalog')
+  const integrationsQuery = useApi<IntegrationsResponse>('/integrations')
+  const catalog = catalogQuery.data?.data ?? []
+  const integrations = integrationsQuery.data?.data ?? []
+  const loading = catalogQuery.loading || integrationsQuery.loading
+  const fetchAll = useCallback(() => {
+    catalogQuery.refetch()
+    integrationsQuery.refetch()
+  }, [catalogQuery, integrationsQuery])
   const [busy, setBusy] = useState<string | null>(null)
   const [category, setCategory] = useState<string>('All')
   const [search, setSearch] = useState('')
@@ -123,27 +132,6 @@ export default function IntegrationsPage() {
       router.replace(url.pathname + (url.search || ''))
     }
   }, [searchParams, router])
-
-  const fetchAll = useCallback(async () => {
-    setLoading(true)
-    try {
-      const [catRes, intRes] = await Promise.all([
-        fetch('/api/integrations/catalog'),
-        fetch('/api/integrations'),
-      ])
-      const catJson = await catRes.json()
-      const intJson = await intRes.json()
-      setCatalog(catJson.data ?? [])
-      setIntegrations(intJson.data ?? [])
-    } catch {
-      setCatalog([])
-      setIntegrations([])
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => { fetchAll() }, [fetchAll])
 
   // Toast auto-dismiss
   useEffect(() => {

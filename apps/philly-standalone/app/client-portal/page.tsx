@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
+import { useApi } from '@/hooks/philly/useApi'
 
 interface Permissions {
   viewListings?: boolean
@@ -48,12 +49,17 @@ function parsePermissions(raw: string): Permissions {
 }
 
 export default function ClientPortalPage() {
-  const [clients, setClients] = useState<ClientPortalEntry[]>([])
   const [contacts, setContacts] = useState<ContactLite[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [loading, setLoading] = useState(true)
+
+  const params = new URLSearchParams({ page: String(page), limit: '25' })
+  interface ClientsResponse { data: ClientPortalEntry[]; pagination: { total: number; totalPages: number } }
+  const clientsQuery = useApi<ClientsResponse>(`/client-portal?${params}`)
+  const clients = clientsQuery.data?.data ?? []
+  const total = clientsQuery.data?.pagination.total ?? 0
+  const totalPages = clientsQuery.data?.pagination.totalPages ?? 0
+  const loading = clientsQuery.loading
+  const fetchData = clientsQuery.refetch
 
   const [showAdd, setShowAdd] = useState(false)
   const [addContactId, setAddContactId] = useState('')
@@ -68,21 +74,6 @@ export default function ClientPortalPage() {
 
   const t = useTranslations('clientPortal')
   const { addToast } = useToast()
-
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '25' })
-      const res = await fetch(`/api/client-portal?${params}`, { cache: 'no-store' })
-      const json = await res.json()
-      setClients(Array.isArray(json.data) ? json.data : [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setClients([]) }
-    finally { setLoading(false) }
-  }, [page])
-
-  useEffect(() => { fetchData() }, [fetchData])
 
   useEffect(() => {
     fetch('/api/contacts?limit=500')

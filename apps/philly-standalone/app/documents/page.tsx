@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
+import { useApi } from '@/hooks/philly/useApi'
 
 interface Doc {
   id: string
@@ -67,14 +68,18 @@ const FILTER_FIELDS: FilterField[] = [
 export default function DocumentsPage() {
   const t = useTranslations('documents')
   const { addToast } = useToast()
-  const [docs, setDocs] = useState<Doc[]>([])
-  const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<FilterGroup>(emptyFilter())
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<string[]>([])
   const [showFilter, setShowFilter] = useState(false)
   const [showUpload, setShowUpload] = useState(false)
   const [view, setView] = useState<'grid' | 'table'>('grid')
+
+  interface DocsResponse { data: Doc[] }
+  const docsQuery = useApi<DocsResponse>('/documents?limit=200')
+  const docs = docsQuery.data?.data ?? []
+  const loading = docsQuery.loading
+  const fetchDocs = docsQuery.refetch
 
   const [upName, setUpName] = useState('')
   const [upUrl, setUpUrl] = useState('')
@@ -85,16 +90,6 @@ export default function DocumentsPage() {
   const [upErr, setUpErr] = useState<string | null>(null)
   const [upBusy, setUpBusy] = useState(false)
 
-  const fetchDocs = useCallback(() => {
-    setLoading(true)
-    fetch('/api/documents?limit=200')
-      .then(r => r.json())
-      .then(j => setDocs(j.data ?? []))
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
-
-  useEffect(() => { fetchDocs() }, [fetchDocs])
   useEntitySubscription('document', () => { fetchDocs() })
 
   const filtered = useMemo(() => {

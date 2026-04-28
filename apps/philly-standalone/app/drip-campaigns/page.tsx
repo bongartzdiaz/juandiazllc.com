@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
+import { useApi } from '@/hooks/philly/useApi'
 import {
   Filter, Mail, Play, Pause, Plus, Trash2, Edit2, GripVertical, X,
   MessageSquare, Phone,
@@ -60,12 +61,19 @@ function parseSteps(stepsJson: string): DripStep[] {
 }
 
 export default function DripCampaignsPage() {
-  const [campaigns, setCampaigns] = useState<DripCampaign[]>([])
   const [typeFilter, setTypeFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [loading, setLoading] = useState(true)
   const t = useTranslations('dripCampaigns')
   const { addToast } = useToast()
+
+  const params = new URLSearchParams()
+  if (typeFilter) params.set('type', typeFilter)
+  params.set('limit', '100')
+  interface CampaignsResponse { data: DripCampaign[] }
+  const campaignsQuery = useApi<CampaignsResponse>(`/drip-campaigns?${params}`)
+  const campaigns = campaignsQuery.data?.data ?? []
+  const loading = campaignsQuery.loading
+  const fetchCampaigns = campaignsQuery.refetch
 
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -75,23 +83,6 @@ export default function DripCampaignsPage() {
   const [formSteps, setFormSteps] = useState<DripStep[]>([])
   const [saving, setSaving] = useState(false)
 
-  const fetchCampaigns = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams()
-      if (typeFilter) params.set('type', typeFilter)
-      params.set('limit', '100')
-      const res = await fetch(`/api/drip-campaigns?${params}`)
-      const j = await res.json().catch(() => ({}))
-      setCampaigns(Array.isArray(j.data) ? j.data : [])
-    } catch {
-      setCampaigns([])
-    } finally {
-      setLoading(false)
-    }
-  }, [typeFilter])
-
-  useEffect(() => { fetchCampaigns() }, [fetchCampaigns])
   useEntitySubscription('dripCampaign', fetchCampaigns)
 
   const filtered = statusFilter ? campaigns.filter(c => c.status === statusFilter) : campaigns

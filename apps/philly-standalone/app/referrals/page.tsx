@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Users, Filter, Plus, X, ArrowRight, Trash2, CheckCircle2 } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
+import { useApi } from '@/hooks/philly/useApi'
 
 interface Referral {
   id: string
@@ -32,13 +33,19 @@ const STATUS_COLORS: Record<string, { bg: string; txt: string }> = {
 }
 
 export default function ReferralsPage() {
-  const [referrals, setReferrals] = useState<Referral[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')
-  const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
+
+  const params = new URLSearchParams({ page: String(page), limit: '25' })
+  if (statusFilter) params.set('status', statusFilter)
+  interface ReferralsResponse { data: Referral[]; pagination: { total: number; totalPages: number } }
+  const referralsQuery = useApi<ReferralsResponse>(`/referrals?${params}`)
+  const referrals = referralsQuery.data?.data ?? []
+  const total = referralsQuery.data?.pagination.total ?? 0
+  const totalPages = referralsQuery.data?.pagination.totalPages ?? 0
+  const loading = referralsQuery.loading
+  const fetchReferrals = referralsQuery.refetch
   const [addReferrerId, setAddReferrerId] = useState('')
   const [addReferredId, setAddReferredId] = useState('')
   const [addCommissionPct, setAddCommissionPct] = useState('')
@@ -119,22 +126,6 @@ export default function ReferralsPage() {
       setSaving(false)
     }
   }
-
-  const fetchReferrals = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '25' })
-      if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/referrals?${params}`)
-      const json = await res.json()
-      setReferrals(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setReferrals([]) }
-    finally { setLoading(false) }
-  }, [page, statusFilter])
-
-  useEffect(() => { fetchReferrals() }, [fetchReferrals])
 
   const totalReferrals = total
   const activeCount = referrals.filter(r => r.status === 'active').length

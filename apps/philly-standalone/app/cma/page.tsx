@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Filter, MapPin, Bed, Bath, Maximize, BarChart3, Trash2, Edit2, Send, Eye } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
+import { useApi } from '@/hooks/philly/useApi'
 
 interface CMA {
   id: string
@@ -33,13 +34,19 @@ const STATUS_COLORS: Record<string, { bg: string; txt: string; border: string }>
 }
 
 export default function CmaPage() {
-  const [cmas, setCmas] = useState<CMA[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')
-  const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
+
+  const params = new URLSearchParams({ page: String(page), limit: '20' })
+  if (statusFilter) params.set('status', statusFilter)
+  interface CmasResponse { data: CMA[]; pagination: { total: number; totalPages: number } }
+  const cmasQuery = useApi<CmasResponse>(`/cma?${params}`)
+  const cmas = cmasQuery.data?.data ?? []
+  const total = cmasQuery.data?.pagination.total ?? 0
+  const totalPages = cmasQuery.data?.pagination.totalPages ?? 0
+  const loading = cmasQuery.loading
+  const fetchData = cmasQuery.refetch
   const [addAddress, setAddAddress] = useState('')
   const [addCity, setAddCity] = useState('')
   const [addZip, setAddZip] = useState('')
@@ -137,22 +144,6 @@ export default function CmaPage() {
       setSaving(false)
     }
   }
-
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '20' })
-      if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/cma?${params}`)
-      const json = await res.json()
-      setCmas(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setCmas([]) }
-    finally { setLoading(false) }
-  }, [page, statusFilter])
-
-  useEffect(() => { fetchData() }, [fetchData])
 
   const drafts = cmas.filter(c => c.status === 'draft').length
   const sent = cmas.filter(c => c.status === 'sent').length
