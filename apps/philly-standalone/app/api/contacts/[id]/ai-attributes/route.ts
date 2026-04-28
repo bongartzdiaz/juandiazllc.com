@@ -9,6 +9,7 @@ import { runAndPersistContactAttributes } from '@/lib/philly/ai/contact-attribut
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityUpdated } from '@/lib/philly/realtime/publish'
+import { SLO, withSpan } from '@/lib/philly/observability'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -38,38 +39,48 @@ export async function POST(_req: NextRequest, ctx: RouteCtx) {
   })
   if (!exists) return jsonError('Contact not found', 404)
 
-  const result = await runAndPersistContactAttributes({
-    contactId: id,
-    organizationId: scope.organizationId,
-  })
-
-  if (!result.ok) {
-    await logAudit({
-      scope,
-      action: 'update',
-      entity: 'contact',
-      entityId: id,
-      changes: {
-        aiAttributesStatus: { old: 'pending', new: 'error' },
-        aiAttributesError: { old: null, new: result.error ?? 'unknown' },
-      },
-    })
-    return NextResponse.json(
-      { error: result.error ?? 'Failed to generate attributes' },
-      { status: 502 },
-    )
-  }
-
-  await logAudit({
-    scope,
-    action: 'update',
-    entity: 'contact',
-    entityId: id,
-    changes: {
-      aiAttributes: { old: null, new: 'regenerated' },
+  return withSpan(
+    {
+      name: 'ai.contact-attributes',
+      slo: SLO.AI_ACTION,
+      op: 'ai.generate',
+      attrs: { organizationId: scope.organizationId, contactId: id },
     },
-  })
-  publishEntityUpdated(scope.organizationId, 'contact', id, scope.userId)
+    async () => {
+      const result = await runAndPersistContactAttributes({
+        contactId: id,
+        organizationId: scope.organizationId,
+      })
 
-  return NextResponse.json({ data: result.data })
+      if (!result.ok) {
+        await logAudit({
+          scope,
+          action: 'update',
+          entity: 'contact',
+          entityId: id,
+          changes: {
+            aiAttributesStatus: { old: 'pending', new: 'error' },
+            aiAttributesError: { old: null, new: result.error ?? 'unknown' },
+          },
+        })
+        return NextResponse.json(
+          { error: result.error ?? 'Failed to generate attributes' },
+          { status: 502 },
+        )
+      }
+
+      await logAudit({
+        scope,
+        action: 'update',
+        entity: 'contact',
+        entityId: id,
+        changes: {
+          aiAttributes: { old: null, new: 'regenerated' },
+        },
+      })
+      publishEntityUpdated(scope.organizationId, 'contact', id, scope.userId)
+
+      return NextResponse.json({ data: result.data })
+    },
+  )
 }

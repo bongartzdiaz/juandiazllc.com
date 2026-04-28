@@ -10,7 +10,9 @@ paths in `withSpan({ name, slo })` to tag Sentry spans with
 
 - `SLO.LOGIN` — 1,200 ms (auth.login, `app/actions/auth.ts`)
 - `SLO.CREATE_DEAL` — 800 ms (deal.create, `POST /api/deals`)
-- `SLO.AI_ACTION` — 15,000 ms (ai.score, `POST /api/ai/score`)
+- `SLO.AI_ACTION` — 15,000 ms — wrap-points:
+  - ai.score, `POST /api/ai/score`
+  - ai.contact-attributes, `POST /api/contacts/[id]/ai-attributes` (philly-standalone)
 
 `withSpan` no-ops transparently when `SENTRY_DSN` is unset, so tests
 and dev don't need the SDK. Uses `Sentry.startSpan` from @sentry/node
