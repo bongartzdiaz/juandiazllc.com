@@ -19,11 +19,16 @@ const prismaState = {
     userId: string; organizationId: string; role: string;
     dashboardSections?: unknown
   }>,
+  // Bundle M — per-org enterprise policy override. When set,
+  // organization.findUnique returns this for matching id.
+  orgPolicy: null as null | { id: string; ipAllowlist: string | null; sessionIdleTimeoutMinutes: number | null },
 }
 
 // Bundle G — requireScope reads next/headers cookies to resolve
 // active org. Mock cookies() to return whatever cookieState.activeOrg
-// is set to.
+// is set to. headers() is also mocked so the Bundle M IP-allowlist
+// path can be exercised.
+const headerState = { xff: null as string | null }
 vi.mock('next/headers', () => ({
   cookies: async () => ({
     get: (name: string) => {
@@ -31,6 +36,12 @@ vi.mock('next/headers', () => ({
         return { value: cookieState.activeOrg }
       }
       return undefined
+    },
+  }),
+  headers: async () => ({
+    get: (name: string) => {
+      if (name.toLowerCase() === 'x-forwarded-for') return headerState.xff
+      return null
     },
   }),
 }))
@@ -67,9 +78,21 @@ vi.mock('@/lib/philly/auth', () => ({
         prismaState.existingUsers.push(row)
         return row
       },
+      // Bundle M — requireScope touches User.lastActivityAt on every
+      // authenticated request. The test mock just needs to not throw.
+      update: async () => ({}),
     },
     organization: {
       findFirst: async () => prismaState.orgs[0] ?? null,
+      // Bundle M — requireScope reads the active org's enterprise
+      // policies (ipAllowlist + sessionIdleTimeoutMinutes). Tests
+      // can override per-suite via prismaState.orgPolicy.
+      findUnique: async ({ where }: { where: { id: string } }) => {
+        if (prismaState.orgPolicy && prismaState.orgPolicy.id === where.id) {
+          return prismaState.orgPolicy
+        }
+        return { ipAllowlist: null, sessionIdleTimeoutMinutes: null }
+      },
       create: async ({ data }: { data: { name: string; slug: string } }) => {
         const row = { id: `org_${prismaState.orgs.length + 1}`, slug: data.slug }
         prismaState.orgs.push(row)
@@ -99,6 +122,8 @@ function reset() {
   prismaState.existingUsers = []
   prismaState.orgs = []
   prismaState.userCreateCalls = []
+  prismaState.orgPolicy = null
+  headerState.xff = null
 }
 
 async function readBody(res: NextResponse) {
@@ -532,5 +557,88 @@ describe('multi-org active-org resolution (Bundle G)', () => {
     if (result instanceof NextResponse) throw new Error(`expected scope, got ${result.status}`)
     expect(result.dashboardSections).toEqual(['dashboard'])
     expect(result.role).toBe('viewer')
+  })
+})
+
+describe('enterprise access controls (Bundle M)', () => {
+  beforeEach(reset)
+
+  function seedSingleUser() {
+    prismaState.orgs = [{ id: 'org_home', slug: 'home' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'jane@example.com', role: 'admin',
+      organizationId: 'org_home',
+    }]
+    supabaseState.email = 'jane@example.com'
+  }
+
+  it('allows the request when ipAllowlist is null', async () => {
+    seedSingleUser()
+    headerState.xff = '203.0.113.7'
+    const result = await requireScope()
+    expect(result).not.toBeInstanceOf(NextResponse)
+  })
+
+  it('allows the request when client IP is in the allowlist', async () => {
+    seedSingleUser()
+    prismaState.orgPolicy = { id: 'org_home', ipAllowlist: '203.0.113.0/24', sessionIdleTimeoutMinutes: null }
+    headerState.xff = '203.0.113.42'
+    const result = await requireScope()
+    expect(result).not.toBeInstanceOf(NextResponse)
+  })
+
+  it('rejects with 403 IP_NOT_ALLOWED when client IP is not in allowlist', async () => {
+    seedSingleUser()
+    prismaState.orgPolicy = { id: 'org_home', ipAllowlist: '10.0.0.0/8', sessionIdleTimeoutMinutes: null }
+    headerState.xff = '8.8.8.8'
+    const result = await requireScope()
+    expect(result).toBeInstanceOf(NextResponse)
+    if (result instanceof NextResponse) {
+      expect(result.status).toBe(403)
+      const body = JSON.parse(await result.text()) as { code?: string }
+      expect(body.code).toBe('IP_NOT_ALLOWED')
+    }
+  })
+
+  it('takes only the first XFF hop when matching', async () => {
+    seedSingleUser()
+    prismaState.orgPolicy = { id: 'org_home', ipAllowlist: '203.0.113.0/24', sessionIdleTimeoutMinutes: null }
+    headerState.xff = '203.0.113.7, 10.0.0.1'
+    const result = await requireScope()
+    expect(result).not.toBeInstanceOf(NextResponse)
+  })
+
+  it('rejects with 401 IDLE_REAUTH_REQUIRED when lastActivityAt exceeds the limit', async () => {
+    prismaState.orgs = [{ id: 'org_home', slug: 'home' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'jane@example.com', role: 'admin',
+      organizationId: 'org_home',
+      // 90 minutes ago — older than the 30-minute timeout below
+      lastActivityAt: new Date(Date.now() - 90 * 60_000),
+    } as { id: string; email: string; role: string; organizationId: string; lastActivityAt: Date }]
+    supabaseState.email = 'jane@example.com'
+    prismaState.orgPolicy = { id: 'org_home', ipAllowlist: null, sessionIdleTimeoutMinutes: 30 }
+
+    const result = await requireScope()
+    expect(result).toBeInstanceOf(NextResponse)
+    if (result instanceof NextResponse) {
+      expect(result.status).toBe(401)
+      const body = JSON.parse(await result.text()) as { code?: string }
+      expect(body.code).toBe('IDLE_REAUTH_REQUIRED')
+    }
+  })
+
+  it('allows the request when lastActivityAt is fresh', async () => {
+    prismaState.orgs = [{ id: 'org_home', slug: 'home' }]
+    prismaState.existingUsers = [{
+      id: 'user_1', email: 'jane@example.com', role: 'admin',
+      organizationId: 'org_home',
+      lastActivityAt: new Date(),
+    } as { id: string; email: string; role: string; organizationId: string; lastActivityAt: Date }]
+    supabaseState.email = 'jane@example.com'
+    prismaState.orgPolicy = { id: 'org_home', ipAllowlist: null, sessionIdleTimeoutMinutes: 30 }
+
+    const result = await requireScope()
+    expect(result).not.toBeInstanceOf(NextResponse)
   })
 })

@@ -62,6 +62,21 @@ model Organization {
   gdprConsentRecords GdprConsentRecord[]
   assistantConversations AssistantConversation[]
   assistantMemories      AssistantMemory[]
+
+  // Enterprise — per-org access controls. NULL on both = no
+  // restrictions (default). Both can be set via the admin Security
+  // settings page; updates are audit-logged.
+  //
+  // ipAllowlist: comma-separated CIDR ranges. If non-null,
+  //   requireScope rejects with 403 when the request's client IP is
+  //   not in any of the listed ranges. Loopback + RFC1918 are NEVER
+  //   auto-allowed — the admin chooses what to trust.
+  //
+  // sessionIdleTimeoutMinutes: if set, sessions older than this many
+  //   minutes since User.lastActivityAt are rejected (forces
+  //   re-authentication).
+  ipAllowlist               String? @db.Text
+  sessionIdleTimeoutMinutes Int?
 }
 
 model User {
@@ -86,6 +101,10 @@ model User {
   lockedUntil        DateTime?
   lastLoginAt        DateTime?
   lastLoginIp        String?
+  // Updated on every authenticated request via touchActivity() in
+  // requireScope. Used by the per-org sessionIdleTimeoutMinutes
+  // policy to force re-authentication on stale sessions.
+  lastActivityAt     DateTime?
   // Security: global session invalidation — any JWT issued before this
   // timestamp is rejected. Bump this to log the user out on all devices.
   tokensInvalidAfter DateTime?

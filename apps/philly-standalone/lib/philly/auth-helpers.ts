@@ -14,10 +14,11 @@
    --------------------------------------------------------------- */
 
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { hasSection, parseDashboardSections } from '@/lib/philly/sections'
+import { checkIpAllowlist, isAllowlistOpen } from '@/lib/philly/ip-allowlist'
 
 /**
  * Cookie name carrying the user's active-org id (Bundle G).
@@ -85,6 +86,7 @@ async function resolvePhillyUser(email: string) {
       dashboardSections: true,
       twoFactorEnabled: true,
       twoFactorSecret: true,
+      lastActivityAt: true,
     },
   })
   return user
@@ -178,6 +180,53 @@ export async function requireScope(): Promise<AuthScope | NextResponse> {
       // this if it became operationally relevant.
     }
 
+    // Enterprise access controls (Bundle M).
+    //
+    // Look up the active organisation's IP allowlist + idle-timeout.
+    // We only hit the database for this when at least one is *likely*
+    // configured — the org row is fetched along with the activity-touch
+    // path below, so the cost is one round-trip per authenticated
+    // request, not two.
+    const prismaForOrg = getAuthPrisma()
+    const orgPolicy = await prismaForOrg.organization.findUnique({
+      where: { id: activeOrgId },
+      select: { ipAllowlist: true, sessionIdleTimeoutMinutes: true },
+    })
+
+    if (orgPolicy && !isAllowlistOpen(orgPolicy.ipAllowlist)) {
+      const ip = await readClientIp()
+      const verdict = checkIpAllowlist(ip, orgPolicy.ipAllowlist)
+      if (!verdict.ok) {
+        return NextResponse.json(
+          { error: 'Access from this network is not permitted by your organisation', code: 'IP_NOT_ALLOWED' },
+          { status: 403 },
+        )
+      }
+    }
+
+    if (orgPolicy?.sessionIdleTimeoutMinutes && phillyUser.lastActivityAt) {
+      const idleMs = Date.now() - new Date(phillyUser.lastActivityAt).getTime()
+      const limitMs = orgPolicy.sessionIdleTimeoutMinutes * 60_000
+      if (idleMs > limitMs) {
+        return NextResponse.json(
+          { error: 'Session idle — please sign in again', code: 'IDLE_REAUTH_REQUIRED' },
+          { status: 401 },
+        )
+      }
+    }
+
+    // Touch lastActivityAt — best effort, do not block the request.
+    // Throttle to once per minute by checking if the existing value is
+    // already within the last 60s.
+    const sinceLast = phillyUser.lastActivityAt
+      ? Date.now() - new Date(phillyUser.lastActivityAt).getTime()
+      : Infinity
+    if (sinceLast > 60_000) {
+      void prismaForOrg.user
+        .update({ where: { id: phillyUser.id }, data: { lastActivityAt: new Date() } })
+        .catch(() => { /* swallow — UI doesn't care */ })
+    }
+
     return {
       userId: phillyUser.id,
       organizationId: activeOrgId,
@@ -190,6 +239,15 @@ export async function requireScope(): Promise<AuthScope | NextResponse> {
     console.error('[requireScope] failed to resolve philly user', err)
     return jsonError('Auth provisioning failed', 500)
   }
+}
+
+async function readClientIp(): Promise<string> {
+  const h = await headers()
+  const xff = h.get('x-forwarded-for')
+  if (xff) return xff.split(',')[0].trim()
+  const real = h.get('x-real-ip')
+  if (real) return real.trim()
+  return 'unknown'
 }
 
 export interface SupabaseSubject {
