@@ -731,6 +731,10 @@ model ApiKey {
   keyHash        String    @unique
   prefix         String    // first 8 chars for identification
   permissions    String    @default("read") // read, write, admin
+  // Bundle R — scope grants beyond legacy `permissions`. JSON array
+  // of strings, e.g. ["scim:users"]. Legacy "permissions"-only keys
+  // continue to work; SCIM endpoints additionally require this scope.
+  scopes         String?   @db.Text
   lastUsedAt     DateTime?
   expiresAt      DateTime?
   createdAt      DateTime  @default(now())

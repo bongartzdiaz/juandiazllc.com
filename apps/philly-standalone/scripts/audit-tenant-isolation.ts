@@ -71,6 +71,16 @@ const EXEMPT_PATHS = new Set<string>([
   'app/api/2fa/verify/route.ts',
   'app/api/2fa/disable/route.ts',
   'app/api/2fa/recovery-codes/route.ts',
+  // SCIM 2.0 endpoints — bearer-token auth via authScimRequest
+  // (lib/philly/scim/auth.ts) which validates the ApiKey, checks
+  // the `scim:users` scope, and returns the bound organizationId.
+  // All queries scope to that organizationId. The audit script's
+  // requireScope-or-bust heuristic doesn't know about the alternate
+  // auth path; the SCIM tests cover the cross-org guarantee.
+  'app/api/scim/v2/ServiceProviderConfig/route.ts',
+  'app/api/scim/v2/ResourceTypes/route.ts',
+  'app/api/scim/v2/Users/route.ts',
+  'app/api/scim/v2/Users/[id]/route.ts',
 ])
 
 interface Finding {
