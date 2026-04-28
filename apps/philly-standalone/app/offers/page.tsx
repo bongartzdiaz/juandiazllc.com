@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -9,6 +9,7 @@ import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { Filter, Plus, Trash2, CheckCircle2, XCircle, RefreshCw, Edit2, DollarSign } from 'lucide-react'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
+import { useApi } from '@/hooks/philly/useApi'
 
 interface Offer {
   id: string
@@ -69,14 +70,20 @@ function fmtMoney(cents: number) {
 }
 
 export default function OffersPage() {
-  const [offers, setOffers] = useState<Offer[]>([])
   const [properties, setProperties] = useState<PropertyLite[]>([])
   const [contacts, setContacts] = useState<ContactLite[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')
-  const [loading, setLoading] = useState(true)
+
+  const params = new URLSearchParams({ page: String(page), limit: '25' })
+  if (statusFilter) params.set('status', statusFilter)
+  interface OffersResponse { data: Offer[]; pagination: { total: number; totalPages: number } }
+  const offersQuery = useApi<OffersResponse>(`/offers?${params}`)
+  const offers = offersQuery.data?.data ?? []
+  const total = offersQuery.data?.pagination.total ?? 0
+  const totalPages = offersQuery.data?.pagination.totalPages ?? 0
+  const loading = offersQuery.loading
+  const fetchData = offersQuery.refetch
 
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -87,22 +94,6 @@ export default function OffersPage() {
 
   const t = useTranslations('offers')
   const { addToast } = useToast()
-
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '25' })
-      if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/offers?${params}`)
-      const json = await res.json()
-      setOffers(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setOffers([]) }
-    finally { setLoading(false) }
-  }, [page, statusFilter])
-
-  useEffect(() => { fetchData() }, [fetchData])
 
   useEffect(() => {
     fetch('/api/properties?limit=500').then(r => r.json()).then(j => {

@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
+import { useApi } from '@/hooks/philly/useApi'
 import { Filter } from 'lucide-react'
 
 interface LeadScore {
@@ -40,29 +41,18 @@ function gradeBarColor(grade: string): string {
 }
 
 export default function LeadScoresPage() {
-  const [scores, setScores] = useState<LeadScore[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
   const [gradeFilter, setGradeFilter] = useState('')
-  const [loading, setLoading] = useState(true)
   const t = useTranslations('leadScores')
 
-  const fetchScores = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '25' })
-      if (gradeFilter) params.set('grade', gradeFilter)
-      const res = await fetch(`/api/lead-scores?${params}`)
-      const json = await res.json()
-      setScores(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setScores([]) }
-    finally { setLoading(false) }
-  }, [page, gradeFilter])
-
-  useEffect(() => { fetchScores() }, [fetchScores])
+  const params = new URLSearchParams({ page: String(page), limit: '25' })
+  if (gradeFilter) params.set('grade', gradeFilter)
+  interface ScoresResponse { data: LeadScore[]; pagination: { total: number; totalPages: number } }
+  const scoresQuery = useApi<ScoresResponse>(`/lead-scores?${params}`)
+  const scores = scoresQuery.data?.data ?? []
+  const total = scoresQuery.data?.pagination.total ?? 0
+  const totalPages = scoresQuery.data?.pagination.totalPages ?? 0
+  const loading = scoresQuery.loading
 
   const totalScored = total
   const avgScore = scores.length ? Math.round(scores.reduce((s, r) => s + r.score, 0) / scores.length) : 0

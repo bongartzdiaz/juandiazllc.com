@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -9,6 +9,7 @@ import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { Filter, Plus, Send, Eye, CheckCircle2, Trash2, RefreshCw, X } from 'lucide-react'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
+import { useApi } from '@/hooks/philly/useApi'
 
 interface ESignature {
   id: string
@@ -45,13 +46,19 @@ const PROVIDER_COLORS: Record<string, { bg: string; txt: string }> = {
 }
 
 export default function ESignaturesPage() {
-  const [sigs, setSigs] = useState<ESignature[]>([])
   const [transactions, setTransactions] = useState<TransactionLite[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')
-  const [loading, setLoading] = useState(true)
+
+  const params = new URLSearchParams({ page: String(page), limit: '25' })
+  if (statusFilter) params.set('status', statusFilter)
+  interface SigsResponse { data: ESignature[]; pagination: { total: number; totalPages: number } }
+  const sigsQuery = useApi<SigsResponse>(`/e-signatures?${params}`)
+  const sigs = sigsQuery.data?.data ?? []
+  const total = sigsQuery.data?.pagination.total ?? 0
+  const totalPages = sigsQuery.data?.pagination.totalPages ?? 0
+  const loading = sigsQuery.loading
+  const fetchData = sigsQuery.refetch
 
   const [showAdd, setShowAdd] = useState(false)
   const [addTxId, setAddTxId] = useState('')
@@ -65,22 +72,6 @@ export default function ESignaturesPage() {
 
   const t = useTranslations('eSignatures')
   const { addToast } = useToast()
-
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '25' })
-      if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/e-signatures?${params}`, { cache: 'no-store' })
-      const json = await res.json()
-      setSigs(Array.isArray(json.data) ? json.data : [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setSigs([]) }
-    finally { setLoading(false) }
-  }, [page, statusFilter])
-
-  useEffect(() => { fetchData() }, [fetchData])
 
   useEffect(() => {
     fetch('/api/transactions?limit=500')

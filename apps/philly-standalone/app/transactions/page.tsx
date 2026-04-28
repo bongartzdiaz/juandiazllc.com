@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Filter, PenTool, X } from 'lucide-react'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
+import { useApi } from '@/hooks/philly/useApi'
 import { useRouter } from 'next/navigation'
 
 interface Transaction {
@@ -40,13 +41,9 @@ const STATUS_COLORS: Record<string, { bg: string; txt: string }> = {
 }
 
 export default function TransactionsPage() {
-  const [transactions, setTransactions] = useState<Transaction[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
-  const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
   const [addType, setAddType] = useState('purchase')
   const [addEscrow, setAddEscrow] = useState('')
@@ -100,22 +97,16 @@ export default function TransactionsPage() {
     }
   }
 
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '25' })
-      if (statusFilter) params.set('status', statusFilter)
-      if (typeFilter) params.set('type', typeFilter)
-      const res = await fetch(`/api/transactions?${params}`)
-      const json = await res.json()
-      setTransactions(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setTransactions([]) }
-    finally { setLoading(false) }
-  }, [page, statusFilter, typeFilter])
-
-  useEffect(() => { fetchData() }, [fetchData])
+  const params = new URLSearchParams({ page: String(page), limit: '25' })
+  if (statusFilter) params.set('status', statusFilter)
+  if (typeFilter) params.set('type', typeFilter)
+  interface TransactionsResponse { data: Transaction[]; pagination: { total: number; totalPages: number } }
+  const transactionsQuery = useApi<TransactionsResponse>(`/transactions?${params}`)
+  const transactions = transactionsQuery.data?.data ?? []
+  const total = transactionsQuery.data?.pagination.total ?? 0
+  const totalPages = transactionsQuery.data?.pagination.totalPages ?? 0
+  const loading = transactionsQuery.loading
+  const fetchData = transactionsQuery.refetch
 
   // Live-refresh on any transaction mutation in the org
   useEntitySubscription('transaction', fetchData)

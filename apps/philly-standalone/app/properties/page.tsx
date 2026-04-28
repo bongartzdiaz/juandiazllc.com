@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -8,6 +8,7 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { MapPin, Filter, Search, Tag } from 'lucide-react'
 import Link from 'next/link'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
+import { useApi } from '@/hooks/philly/useApi'
 
 type Option = { value: string; label: string }
 type Flag = { key: string; label: string }
@@ -69,11 +70,7 @@ const selectStyle: React.CSSProperties = {
 }
 
 export default function PropertiesPage() {
-  const [properties, setProperties] = useState<Property[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [taxonomy, setTaxonomy] = useState<Taxonomy | null>(null)
 
   // Filters
@@ -207,28 +204,22 @@ export default function PropertiesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taxonomy])
 
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '20' })
-      if (listingType) params.set('listingType', listingType)
-      if (district) params.set('district', district)
-      if (type) params.set('type', type)
-      if (subtype) params.set('subtype', subtype)
-      if (statusFilter) params.set('status', statusFilter)
-      if (bankOwned) params.set('bankOwned', 'true')
-      if (resaleOnly) params.set('resale', 'true')
-      if (search) params.set('q', search)
-      const res = await fetch(`/api/properties?${params}`)
-      const json = await res.json()
-      setProperties(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setProperties([]) }
-    finally { setLoading(false) }
-  }, [page, listingType, district, type, subtype, statusFilter, bankOwned, resaleOnly, search])
-
-  useEffect(() => { fetchData() }, [fetchData])
+  const params = new URLSearchParams({ page: String(page), limit: '20' })
+  if (listingType) params.set('listingType', listingType)
+  if (district) params.set('district', district)
+  if (type) params.set('type', type)
+  if (subtype) params.set('subtype', subtype)
+  if (statusFilter) params.set('status', statusFilter)
+  if (bankOwned) params.set('bankOwned', 'true')
+  if (resaleOnly) params.set('resale', 'true')
+  if (search) params.set('q', search)
+  interface PropertiesResponse { data: Property[]; pagination: { total: number; totalPages: number } }
+  const propertiesQuery = useApi<PropertiesResponse>(`/properties?${params}`)
+  const properties = propertiesQuery.data?.data ?? []
+  const total = propertiesQuery.data?.pagination.total ?? 0
+  const totalPages = propertiesQuery.data?.pagination.totalPages ?? 0
+  const loading = propertiesQuery.loading
+  const fetchData = propertiesQuery.refetch
 
   // Live-refresh on any property mutation in the org
   useEntitySubscription('property', fetchData)

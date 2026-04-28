@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -9,6 +9,7 @@ import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { Filter, Star, Plus, Trash2, CheckCircle2, Edit2 } from 'lucide-react'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
+import { useApi } from '@/hooks/philly/useApi'
 
 interface Showing {
   id: string
@@ -46,14 +47,20 @@ const emptyForm = {
 }
 
 export default function ShowingsPage() {
-  const [showings, setShowings] = useState<Showing[]>([])
   const [properties, setProperties] = useState<PropertyLite[]>([])
   const [contacts, setContacts] = useState<ContactLite[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')
-  const [loading, setLoading] = useState(true)
+
+  const params = new URLSearchParams({ page: String(page), limit: '25' })
+  if (statusFilter) params.set('status', statusFilter)
+  interface ShowingsResponse { data: Showing[]; pagination: { total: number; totalPages: number } }
+  const showingsQuery = useApi<ShowingsResponse>(`/showings?${params}`)
+  const showings = showingsQuery.data?.data ?? []
+  const total = showingsQuery.data?.pagination.total ?? 0
+  const totalPages = showingsQuery.data?.pagination.totalPages ?? 0
+  const loading = showingsQuery.loading
+  const fetchData = showingsQuery.refetch
 
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -66,22 +73,6 @@ export default function ShowingsPage() {
 
   const t = useTranslations('showings')
   const { addToast } = useToast()
-
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '25' })
-      if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/showings?${params}`)
-      const json = await res.json()
-      setShowings(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setShowings([]) }
-    finally { setLoading(false) }
-  }, [page, statusFilter])
-
-  useEffect(() => { fetchData() }, [fetchData])
 
   useEffect(() => {
     fetch('/api/properties?limit=500').then(r => r.json()).then(j => {

@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { X, Trash2, Edit2 } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
+import { useApi } from '@/hooks/philly/useApi'
 
 interface SoiCategory {
   id: string
@@ -24,12 +25,17 @@ const inputStyle: React.CSSProperties = {
 }
 
 export default function SoiPage() {
-  const [categories, setCategories] = useState<SoiCategory[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
+
+  const params = new URLSearchParams({ page: String(page), limit: '25' })
+  interface CategoriesResponse { data: SoiCategory[]; pagination: { total: number; totalPages: number } }
+  const categoriesQuery = useApi<CategoriesResponse>(`/soi?${params}`)
+  const categories = categoriesQuery.data?.data ?? []
+  const total = categoriesQuery.data?.pagination.total ?? 0
+  const totalPages = categoriesQuery.data?.pagination.totalPages ?? 0
+  const loading = categoriesQuery.loading
+  const fetchData = categoriesQuery.refetch
   const [addName, setAddName] = useState('')
   const [addFrequency, setAddFrequency] = useState('30')
   const [addColor, setAddColor] = useState('#4f46e5')
@@ -103,21 +109,6 @@ export default function SoiPage() {
       setSaving(false)
     }
   }
-
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '25' })
-      const res = await fetch(`/api/soi?${params}`)
-      const json = await res.json()
-      setCategories(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setCategories([]) }
-    finally { setLoading(false) }
-  }, [page])
-
-  useEffect(() => { fetchData() }, [fetchData])
 
   const avgFrequency = categories.length > 0
     ? Math.round(categories.reduce((s, c) => s + c.touchFrequency, 0) / categories.length)

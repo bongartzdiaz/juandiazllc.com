@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -9,6 +9,7 @@ import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { Filter, Mail, Phone, Clock, Calendar as CalIcon, Plus, Trash2, Edit2 } from 'lucide-react'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
+import { useApi } from '@/hooks/philly/useApi'
 
 interface Volunteer {
   id: string
@@ -32,13 +33,19 @@ const emptyForm = { name: '', email: '', phone: '', status: 'onboarding' }
 export default function VolunteersPage() {
   const t = useTranslations('volunteers')
   const { addToast } = useToast()
-  const [volunteers, setVolunteers] = useState<Volunteer[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState('')
   const [selected, setSelected] = useState<Volunteer | null>(null)
+
+  const params = new URLSearchParams({ page: String(page), limit: '20' })
+  if (statusFilter) params.set('status', statusFilter)
+  interface VolunteersResponse { data: Volunteer[]; pagination: { total: number; totalPages: number } }
+  const volunteersQuery = useApi<VolunteersResponse>(`/volunteers?${params}`)
+  const volunteers = volunteersQuery.data?.data ?? []
+  const total = volunteersQuery.data?.pagination.total ?? 0
+  const totalPages = volunteersQuery.data?.pagination.totalPages ?? 0
+  const loading = volunteersQuery.loading
+  const fetchData = volunteersQuery.refetch
 
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -87,22 +94,6 @@ export default function VolunteersPage() {
       } else { addToast('Delete failed', 'error') }
     } catch { addToast('Network error', 'error') }
   }
-
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '20' })
-      if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/volunteers?${params}`)
-      const json = await res.json()
-      setVolunteers(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setVolunteers([]) }
-    finally { setLoading(false) }
-  }, [page, statusFilter])
-
-  useEffect(() => { fetchData() }, [fetchData])
 
   // Live-refresh on any volunteer mutation in the org
   useEntitySubscription('volunteer', fetchData)

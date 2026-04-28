@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
+import { useApi } from '@/hooks/philly/useApi'
 
 interface OpenHouse {
   id: string
@@ -40,14 +41,19 @@ const emptyForm = {
 }
 
 export default function OpenHousesPage() {
-  const [openHouses, setOpenHouses] = useState<OpenHouse[]>([])
   const [properties, setProperties] = useState<PropertyLite[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all')
   const [selected, setSelected] = useState<OpenHouse | null>(null)
+
+  const params = new URLSearchParams({ page: String(page), limit: '25' })
+  interface OpenHousesResponse { data: OpenHouse[]; pagination: { total: number; totalPages: number } }
+  const openHousesQuery = useApi<OpenHousesResponse>(`/open-houses?${params}`)
+  const openHouses = openHousesQuery.data?.data ?? []
+  const total = openHousesQuery.data?.pagination.total ?? 0
+  const totalPages = openHousesQuery.data?.pagination.totalPages ?? 0
+  const loading = openHousesQuery.loading
+  const fetchData = openHousesQuery.refetch
 
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -56,21 +62,6 @@ export default function OpenHousesPage() {
 
   const t = useTranslations('openHouses')
   const { addToast } = useToast()
-
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '25' })
-      const res = await fetch(`/api/open-houses?${params}`)
-      const json = await res.json()
-      setOpenHouses(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setOpenHouses([]) }
-    finally { setLoading(false) }
-  }, [page])
-
-  useEffect(() => { fetchData() }, [fetchData])
 
   useEffect(() => {
     // Load properties once for the scheduler

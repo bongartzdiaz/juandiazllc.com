@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -9,6 +9,7 @@ import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { Filter, Euro, Calendar as CalIcon, Building2, CheckCircle2, Plus, Trash2, Edit2 } from 'lucide-react'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
+import { useApi } from '@/hooks/philly/useApi'
 
 interface Grant {
   id: string
@@ -49,13 +50,19 @@ function fmtDate(s: string | null) {
 export default function GrantsPage() {
   const t = useTranslations('grants')
   const { addToast } = useToast()
-  const [grants, setGrants] = useState<Grant[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState('')
   const [selected, setSelected] = useState<Grant | null>(null)
+
+  const params = new URLSearchParams({ page: String(page), limit: '20' })
+  if (statusFilter) params.set('status', statusFilter)
+  interface GrantsResponse { data: Grant[]; pagination: { total: number; totalPages: number } }
+  const grantsQuery = useApi<GrantsResponse>(`/grants?${params}`)
+  const grants = grantsQuery.data?.data ?? []
+  const total = grantsQuery.data?.pagination.total ?? 0
+  const totalPages = grantsQuery.data?.pagination.totalPages ?? 0
+  const loading = grantsQuery.loading
+  const fetchData = grantsQuery.refetch
 
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -136,22 +143,6 @@ export default function GrantsPage() {
       } else { addToast('Delete failed', 'error') }
     } catch { addToast('Network error', 'error') }
   }
-
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '20' })
-      if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/grants?${params}`)
-      const json = await res.json()
-      setGrants(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setGrants([]) }
-    finally { setLoading(false) }
-  }, [page, statusFilter])
-
-  useEffect(() => { fetchData() }, [fetchData])
 
   // Live-refresh on any grant mutation in the org
   useEntitySubscription('grant', fetchData)

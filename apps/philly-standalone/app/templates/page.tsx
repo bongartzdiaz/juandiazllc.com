@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useToast } from '@/hooks/philly/useToast'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
+import { useApi } from '@/hooks/philly/useApi'
 import { FileText, Mail, MessageSquare, Phone, Edit3, Trash2, Eye, Filter } from 'lucide-react'
 
 interface Template {
@@ -56,9 +57,15 @@ function parseVars(v: string): string[] {
 }
 
 export default function TemplatesPage() {
-  const [templates, setTemplates] = useState<Template[]>([])
   const [typeFilter, setTypeFilter] = useState('')
-  const [loading, setLoading] = useState(true)
+
+  const params = new URLSearchParams()
+  if (typeFilter) params.set('type', typeFilter)
+  interface TemplatesResponse { data: Template[] }
+  const templatesQuery = useApi<TemplatesResponse>(`/templates?${params}`)
+  const templates = templatesQuery.data?.data ?? []
+  const loading = templatesQuery.loading
+  const fetchData = templatesQuery.refetch
 
   const [editorOpen, setEditorOpen] = useState(false)
   const [editing, setEditing] = useState<Template | null>(null)
@@ -76,19 +83,6 @@ export default function TemplatesPage() {
 
   const t = useTranslations('templates')
   const { addToast } = useToast()
-
-  const fetchData = useCallback(() => {
-    setLoading(true)
-    const params = new URLSearchParams()
-    if (typeFilter) params.set('type', typeFilter)
-    fetch(`/api/templates?${params}`)
-      .then(r => r.json())
-      .then(j => setTemplates(Array.isArray(j.data) ? j.data : []))
-      .catch(() => { setTemplates([]) })
-      .finally(() => setLoading(false))
-  }, [typeFilter])
-
-  useEffect(() => { fetchData() }, [fetchData])
 
   // Live updates when templates are created/updated/deleted
   useEntitySubscription('template', fetchData)

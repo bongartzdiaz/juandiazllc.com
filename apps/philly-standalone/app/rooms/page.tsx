@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -9,6 +9,7 @@ import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { Filter, Plus, Trash2, Edit2 } from 'lucide-react'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
+import { useApi } from '@/hooks/philly/useApi'
 
 interface Room {
   id: string
@@ -37,13 +38,19 @@ const emptyForm = {
 export default function RoomsPage() {
   const t = useTranslations('rooms')
   const { addToast } = useToast()
-  const [rooms, setRooms] = useState<Room[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState('')
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
+
+  const params = new URLSearchParams({ page: String(page), limit: '20' })
+  if (statusFilter) params.set('status', statusFilter)
+  interface RoomsResponse { data: Room[]; pagination: { total: number; totalPages: number } }
+  const roomsQuery = useApi<RoomsResponse>(`/rooms?${params}`)
+  const rooms = roomsQuery.data?.data ?? []
+  const total = roomsQuery.data?.pagination.total ?? 0
+  const totalPages = roomsQuery.data?.pagination.totalPages ?? 0
+  const loading = roomsQuery.loading
+  const fetchData = roomsQuery.refetch
 
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -100,22 +107,6 @@ export default function RoomsPage() {
       } else { addToast('Delete failed', 'error') }
     } catch { addToast('Network error', 'error') }
   }
-
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '20' })
-      if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/rooms?${params}`)
-      const json = await res.json()
-      setRooms(json.data ?? [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch { setRooms([]) }
-    finally { setLoading(false) }
-  }, [page, statusFilter])
-
-  useEffect(() => { fetchData() }, [fetchData])
 
   // Live-refresh on any room mutation in the org
   useEntitySubscription('room', fetchData)
