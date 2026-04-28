@@ -1,4 +1,4 @@
-﻿/* GET  /api/contacts — list contacts in the user's org (paginated)
+/* GET  /api/contacts — list contacts in the user's org (paginated)
    POST /api/contacts — create a new contact (manager+ only) */
 
 import { NextRequest, NextResponse, after } from 'next/server'
@@ -12,6 +12,12 @@ import { publishEntityCreated, publishEntityUpdated } from '@/lib/philly/realtim
 import { runAndPersistContactAttributes } from '@/lib/philly/ai/contact-attributes'
 import { logger } from '@/lib/philly/logger'
 import { encryptPii, decryptPii } from '@/lib/philly/pii'
+import {
+  hashEmail,
+  hashPhone,
+  looksLikeEmailQuery,
+  looksLikePhoneQuery,
+} from '@/lib/philly/blind-index'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -27,18 +33,35 @@ export async function GET(req: NextRequest) {
 
   const prisma = getAuthPrisma()
 
+  // Search rewrite for blind-index (Bundle P):
+  //   - if `q` looks like a full email → exact-match by emailHash
+  //   - if `q` looks like a phone → exact-match by phoneHash
+  //   - otherwise → name + company substring search only
+  // Substring on email/phone is no longer possible (the values are
+  // encrypted with random IVs); operators search by the full value
+  // they have, or by name/company fragments.
+  const searchClause = ((): Record<string, unknown> | null => {
+    if (!search) return null
+    if (looksLikeEmailQuery(search)) {
+      const h = hashEmail(search)
+      if (h) return { emailHash: h }
+    }
+    if (looksLikePhoneQuery(search)) {
+      const h = hashPhone(search)
+      if (h) return { phoneHash: h }
+    }
+    return {
+      OR: [
+        { name: { contains: search } },
+        { company: { contains: search } },
+      ],
+    }
+  })()
+
   const where = {
     organizationId: scope.organizationId,
     ...(type ? { type } : {}),
-    ...(search
-      ? {
-          OR: [
-            { name: { contains: search } },
-            { email: { contains: search } },
-            { company: { contains: search } },
-          ],
-        }
-      : {}),
+    ...(searchClause ?? {}),
   }
 
   const [contacts, total] = await Promise.all([
@@ -54,10 +77,13 @@ export async function GET(req: NextRequest) {
     prisma.contact.count({ where }),
   ])
 
-  // Decrypt at-rest PII fields on the way out. Bundle N — notes only;
-  // email/phone are searchable so they remain in plaintext until the
-  // blind-index design lands.
-  const decrypted = contacts.map((c) => ({ ...c, notes: decryptPii(c.notes) }))
+  // Decrypt at-rest PII on the way out: email, phone, notes.
+  const decrypted = contacts.map((c) => ({
+    ...c,
+    email: decryptPii(c.email) ?? '',
+    phone: decryptPii(c.phone) ?? '',
+    notes: decryptPii(c.notes),
+  }))
   return paginatedResponse(decrypted, total, { page, limit, skip })
 }
 
@@ -74,8 +100,10 @@ export async function POST(req: NextRequest) {
   const contact = await prisma.contact.create({
     data: {
       name: input.name,
-      email: input.email,
-      phone: input.phone,
+      email: encryptPii(input.email) ?? '',
+      phone: encryptPii(input.phone) ?? '',
+      emailHash: hashEmail(input.email),
+      phoneHash: hashPhone(input.phone),
       type: input.type,
       company: input.company,
       notes: encryptPii(input.notes ?? null) ?? '',
@@ -108,10 +136,16 @@ export async function POST(req: NextRequest) {
     }
   })
 
-  // Hand back plaintext notes to the caller — they sent it that way,
-  // so they expect it that way.
+  // Hand back plaintext to the caller — they sent it that way.
   return NextResponse.json(
-    { data: { ...contact, notes: decryptPii(contact.notes) } },
+    {
+      data: {
+        ...contact,
+        email: decryptPii(contact.email) ?? '',
+        phone: decryptPii(contact.phone) ?? '',
+        notes: decryptPii(contact.notes),
+      },
+    },
     { status: 201 },
   )
 }

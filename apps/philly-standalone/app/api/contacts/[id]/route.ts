@@ -10,6 +10,7 @@ import { updateContactSchema } from '@/lib/philly/validation/schemas'
 import { logAudit, diffChanges } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { encryptPii, decryptPii } from '@/lib/philly/pii'
+import { hashEmail, hashPhone } from '@/lib/philly/blind-index'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -30,7 +31,14 @@ export async function GET(_req: NextRequest, ctx: RouteCtx) {
   })
 
   if (!contact) return jsonError('Contact not found', 404)
-  return NextResponse.json({ data: { ...contact, notes: decryptPii(contact.notes) } })
+  return NextResponse.json({
+    data: {
+      ...contact,
+      email: decryptPii(contact.email) ?? '',
+      phone: decryptPii(contact.phone) ?? '',
+      notes: decryptPii(contact.notes),
+    },
+  })
 }
 
 export async function PATCH(req: NextRequest, ctx: RouteCtx) {
@@ -52,8 +60,14 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
   const data: Record<string, unknown> = {}
   if (input.name !== undefined) data.name = input.name
-  if (input.email !== undefined) data.email = input.email
-  if (input.phone !== undefined) data.phone = input.phone
+  if (input.email !== undefined) {
+    data.email = encryptPii(input.email) ?? ''
+    data.emailHash = hashEmail(input.email)
+  }
+  if (input.phone !== undefined) {
+    data.phone = encryptPii(input.phone) ?? ''
+    data.phoneHash = hashPhone(input.phone)
+  }
   if (input.type !== undefined) data.type = input.type
   if (input.company !== undefined) data.company = input.company
   if (input.notes !== undefined) data.notes = encryptPii(input.notes)
@@ -62,13 +76,26 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
   const contact = await prisma.contact.update({ where: { id }, data })
 
   // Diff against the plaintext-equivalent so the audit log records
-  // "notes changed", not "ciphertext A → ciphertext B".
-  const existingPlain = { ...existing, notes: decryptPii((existing as { notes: string | null }).notes) }
+  // "email/phone/notes changed", not "ciphertext A → ciphertext B".
+  const existingRow = existing as { email: string; phone: string; notes: string | null }
+  const existingPlain = {
+    ...existing,
+    email: decryptPii(existingRow.email) ?? '',
+    phone: decryptPii(existingRow.phone) ?? '',
+    notes: decryptPii(existingRow.notes),
+  }
   const changes = diffChanges(existingPlain as unknown as Record<string, unknown>, input as Record<string, unknown>)
   await logAudit({ scope, action: 'update', entity: 'contact', entityId: id, changes })
   publishEntityUpdated(scope.organizationId, 'contact', id, scope.userId)
 
-  return NextResponse.json({ data: { ...contact, notes: decryptPii(contact.notes) } })
+  return NextResponse.json({
+    data: {
+      ...contact,
+      email: decryptPii(contact.email) ?? '',
+      phone: decryptPii(contact.phone) ?? '',
+      notes: decryptPii(contact.notes),
+    },
+  })
 }
 
 export async function DELETE(_req: NextRequest, ctx: RouteCtx) {

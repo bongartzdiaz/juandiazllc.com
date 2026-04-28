@@ -140,13 +140,14 @@ export async function runAndPersistContactAttributes(args: {
 
   const result = await generateContactAttributes({
     name: contact.name,
-    email: contact.email,
-    phone: contact.phone,
-    company: contact.company,
-    type: contact.type,
-    // Notes are at-rest encrypted (Bundle N) — decrypt before
+    // email/phone are at-rest encrypted under blind-index (Bundle P);
+    // notes is at-rest encrypted (Bundle N). Decrypt all three before
     // sending to the model. decryptPii passes plaintext through
     // unchanged for legacy unprefixed values.
+    email: decryptPii(contact.email) ?? '',
+    phone: decryptPii(contact.phone) ?? '',
+    company: contact.company,
+    type: contact.type,
     notes: decryptPii(contact.notes) ?? '',
     leadSource: contact.leadSource,
     orgName: contact.organization?.name,

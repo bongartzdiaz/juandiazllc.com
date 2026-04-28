@@ -7,6 +7,7 @@ import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
+import { decryptPii } from '@/lib/philly/pii'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -32,7 +33,9 @@ export async function GET(req: NextRequest) {
         select: { id: true, name: true, email: true },
       })
     : []
-  const contactById = new Map(contacts.map((c: any) => [c.id, c]))
+  const contactById = new Map(
+    contacts.map((c: any) => [c.id, { ...c, email: decryptPii(c.email) ?? '' }]),
+  )
 
   const enriched = accesses.map((a: any) => ({
     ...a,

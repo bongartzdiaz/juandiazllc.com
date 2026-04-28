@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { enforceRateLimit, clientIp } from '@/lib/philly/rate-limit'
+import { hashPhone } from '@/lib/philly/blind-index'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -95,15 +96,17 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  // Try to map incoming number to a known contact
+  // Try to map incoming number to a known contact via the
+  // blind-index hash (Bundle P). The plaintext `phone` column is
+  // encrypted with a random IV so direct equality no longer works.
   const cleanFrom = From.replace(/^whatsapp:/, '')
-  const contact = await prisma.contact.findFirst({
-    where: {
-      organizationId: prior.organizationId,
-      OR: [{ phone: cleanFrom }, { phone: From }],
-    },
-    select: { id: true },
-  })
+  const phoneHash = hashPhone(cleanFrom) ?? hashPhone(From)
+  const contact = phoneHash
+    ? await prisma.contact.findFirst({
+        where: { organizationId: prior.organizationId, phoneHash },
+        select: { id: true },
+      })
+    : null
 
   await prisma.smsMessage.create({
     data: {

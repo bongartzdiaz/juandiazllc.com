@@ -234,8 +234,15 @@ model ProjectMilestone {
 model Contact {
   id             String   @id @default(cuid())
   name           String
+  // email / phone — at-rest encrypted (Bundle P, AES-256-GCM via
+  // lib/philly/pii.ts with the `enc:v1:` prefix). Searchable via
+  // the *Hash columns below: HMAC-SHA-256 of the normalised value
+  // using BLIND_INDEX_SECRET. Lookups are by hash (exact match,
+  // indexed); the actual value is decrypted on read.
   email          String   @default("")
   phone          String   @default("")
+  emailHash      String?  @db.VarChar(64)
+  phoneHash      String?  @db.VarChar(64)
   type           String   @default("stakeholder") // partner, beneficiary, stakeholder, donor, buyer, seller, tenant, landlord
   company        String   @default("")
   notes          String   @default("") @db.Text
@@ -280,6 +287,8 @@ model Contact {
   @@index([organizationId, createdAt])
   @@index([organizationId, leadScore])
   @@index([organizationId, leadStatus])
+  @@index([organizationId, emailHash])
+  @@index([organizationId, phoneHash])
   @@index([assignedToId])
 }
 

@@ -6,6 +6,7 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
+import { decryptPii } from '@/lib/philly/pii'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -46,7 +47,14 @@ export async function GET(req: NextRequest) {
         select: { id: true, name: true, email: true, phone: true },
       })
     : []
-  const contactById = new Map(contacts.map((c: any) => [c.id, c]))
+  // Decrypt email/phone (Bundle P) for the inline-display join.
+  const contactById = new Map(
+    contacts.map((c: any) => [c.id, {
+      ...c,
+      email: decryptPii(c.email) ?? '',
+      phone: decryptPii(c.phone) ?? '',
+    }]),
+  )
 
   const enriched = conversations.map((c: any) => ({
     ...c,

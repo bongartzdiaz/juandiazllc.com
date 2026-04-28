@@ -6,6 +6,7 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { decryptPii } from '@/lib/philly/pii'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -65,7 +66,14 @@ export async function POST(req: NextRequest) {
       where: { id: { in: ownedIds } },
       include: { contactProjects: { include: { project: { select: { title: true } } } } },
     })
-    return NextResponse.json({ data: contacts })
+    // Decrypt at-rest PII fields (Bundles N + P) before handing back.
+    const decrypted = contacts.map((c: any) => ({
+      ...c,
+      email: decryptPii(c.email) ?? '',
+      phone: decryptPii(c.phone) ?? '',
+      notes: decryptPii(c.notes),
+    }))
+    return NextResponse.json({ data: decrypted })
   }
 
   return jsonError('Unknown action. Use: delete, update, export', 400)
