@@ -8,8 +8,9 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Modal } from '@/components/philly/ui/Modal'
 import { ContactForm } from '@/components/philly/forms/ContactForm'
 import type { ContactFormData } from '@/components/philly/forms/ContactForm'
-import { Search, Mail, Phone, FolderKanban } from 'lucide-react'
+import { Search, Mail, Phone, FolderKanban, Eye } from 'lucide-react'
 import { useIndustry } from '@/hooks/philly/useIndustry'
+import { ContactQuickView } from '@/components/philly/contacts/ContactQuickView'
 import { useApi } from '@/hooks/philly/useApi'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
@@ -137,6 +138,7 @@ export default function ContactsPage() {
   const typeFilter = filters.type
   const debouncedSearch = useDebouncedValue(search, 250)
   const [showAdd, setShowAdd] = useState(false)
+  const [quickViewId, setQuickViewId] = useState<string | null>(null)
   const { addToast } = useToast()
 
   const isRE = industry === 'realestate'
@@ -305,7 +307,30 @@ export default function ContactsPage() {
                 borderRadius: 12, padding: '16px', cursor: 'pointer',
                 boxShadow: 'var(--shadow-sm)',
                 textDecoration: 'none', color: 'inherit', display: 'block',
+                position: 'relative',
               }}>
+                {/* Quick-view trigger — Bundle T. Stops propagation so
+                    the click doesn't follow the surrounding <Link>. */}
+                <button
+                  type="button"
+                  aria-label={`Quick view ${c.firstName} ${c.lastName}`}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setQuickViewId(c.id)
+                  }}
+                  style={{
+                    position: 'absolute', top: 10, right: 10,
+                    width: 28, height: 28, borderRadius: 8,
+                    border: '1px solid var(--border)',
+                    background: 'var(--panel)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', color: 'var(--txt3)',
+                    zIndex: 1,
+                  }}
+                >
+                  <Eye size={13} />
+                </button>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                   {/* Avatar */}
                   <div style={{
@@ -315,7 +340,7 @@ export default function ContactsPage() {
                     fontSize: 14, fontWeight: 700, color: '#fff',
                     flexShrink: 0,
                   }}>{initials}</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ flex: 1, minWidth: 0, paddingRight: 36 }}>
                     <div style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.3 }}>{c.firstName} {c.lastName}</div>
                     <div style={{ fontSize: 11.5, color: 'var(--txt3)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.company}</div>
                   </div>
@@ -360,6 +385,8 @@ export default function ContactsPage() {
           onCancel={() => setShowAdd(false)}
         />
       </Modal>
+
+      <ContactQuickView contactId={quickViewId} onClose={() => setQuickViewId(null)} />
     </>
   )
 }

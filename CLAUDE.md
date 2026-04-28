@@ -215,42 +215,72 @@ through NL/DE/ES on `/work`, `/insights`, `/sectors`, `/signals`,
 
 ### Launch readiness — 2026-04-28
 
-Bundles G–O shipped on `claude/ai-command-bar`. The CRM is launch-
+Bundles G–T shipped on `claude/ai-command-bar`. The CRM is launch-
 ready for big-company / EU-GDPR procurement subject to the operator
 setup steps below.
+
+**Bundles in this branch:**
+- G — multi-org Membership + per-org last-admin guard
+- H — DB migration for Contact AI attributes (Vercel AI SDK v5)
+- I — SWR rollout on 28 dashboard list pages
+- J — Sentry SLO-tagging on AI/login/create-deal paths
+- K — security hardening: missing headers + Sentry PII scrub +
+  audit-chain integrity CLI
+- L — compliance docs: RoPA / sub-processors / DPIA / AI-Act
+- M — enterprise auth: per-org IP allowlist + session idle timeout
+- N — at-rest encryption for `Contact.notes`
+- O — launch audit cleanup
+- P — blind-index encryption (Contact.email + Contact.phone)
+- Q — online key rotation (zero-downtime)
+- R — SCIM 2.0 user provisioning (RFC 7643/7644)
+- S — operator UI for `/api/admin/security`
+- T — contact quick-view popover
 
 **Verified at HEAD:**
 - `npm run build` clean on both apps (root + standalone)
 - `npm run typecheck` clean on both
-- 378/378 standalone tests + 276/276 root tests green
+- **422/422** standalone tests + 281/281 root tests green
 - `npm run audit:tenant` clean
 - `npm run audit:chain` ready (run daily in production)
-- Lint: 0 errors, 178 warnings (mostly explicit-`any`s, cosmetic)
+- Lint: 0 errors, ~178 warnings (mostly explicit-`any`s, cosmetic)
 
 **Operator setup required before customer traffic:**
-1. `prisma migrate deploy` — three pending migrations:
+1. `prisma migrate deploy` — five pending migrations:
    `20260428000000_multi_org_membership`,
    `20260428010000_contact_ai_attributes`,
-   `20260428020000_enterprise_access_controls`.
-2. Set `INTEGRATION_SECRET` (32+ bytes of entropy) in production env.
-3. `npm run pii:backfill -- --dry` then `npm run pii:backfill` once.
+   `20260428020000_enterprise_access_controls`,
+   `20260428030000_contact_blind_index`,
+   `20260428040000_apikey_scopes`.
+2. Set both encryption secrets in production env (32+ bytes each,
+   distinct values):
+   - `INTEGRATION_SECRET` — AES-256-GCM key for at-rest encryption
+   - `BLIND_INDEX_SECRET` — HMAC-SHA-256 key for the email/phone
+     blind-index search columns
+3. Run the backfills (in this order, dry-run first):
+   - `npm run pii:backfill` (encrypts `Contact.notes`)
+   - `npm run pii:backfill-hashes` (encrypts `Contact.email`/`phone`
+     and populates the hashes)
 4. Lawyer review of `docs/legal/{DPA,PRIVACY-NOTICE,COOKIE-POLICY,
    BREACH-RESPONSE,RECORDS-OF-PROCESSING,SUB-PROCESSORS,
    DPIA-AI-ATTRIBUTES}.md` and fill in placeholder fields.
 5. Per-customer SSO wiring per `docs/operations/SSO-SETUP.md`.
+6. Per-customer SCIM tokens per `docs/operations/SCIM-SETUP.md`
+   (issue `ApiKey` row with `scopes: ["scim:users"]`).
 
 **Deferred (post-launch follow-ups):**
-- Field-level encryption on `Contact.email` + `Contact.phone` via a
-  blind-index column (HMAC-SHA-256). Outline in
-  `docs/operations/PII-ENCRYPTION.md`.
-- Online key rotation (today only with downtime).
-- SCIM 2.0 endpoint for automated provisioning from IdP.
+- `ContactNote.content` at-rest encryption (same approach as
+  `Contact.notes`).
+- SCIM Groups → role/sections mapping (today: User-only).
+- SCIM `externalId` round-trip persistence.
 - CopilotKit inline-generative-UI; Liveblocks presence on deal pages.
 - DeepL: ~60 hand translations (operator-side).
 - `Testimonials.tsx` — intentionally empty placeholder until Juan
   signs off on quotes; renders null today, no runtime leak.
 - `SEO.md:128` `/docs/pitch-template.md` TODO (operator content,
   not code).
+- Quick-view popover propagation to deals/properties/projects
+  (Bundle T did contacts only — pattern is established in
+  `components/philly/contacts/ContactQuickView.tsx`).
 
 ### i18n discipline — lessons learned this session
 

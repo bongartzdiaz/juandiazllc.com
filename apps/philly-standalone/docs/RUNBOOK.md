@@ -248,21 +248,44 @@ next switch will overwrite the cookie cleanly.
   deletion. See `docs/user/en/concepts/multi-org.md` for the full
   data model.
 
-### Rotating `INTEGRATION_SECRET`
+### Rotating `INTEGRATION_SECRET` (online — Bundle Q)
 
-There is currently no in-place rotation. Rotation requires:
+`lib/philly/crypto.ts` supports a key list. Writes use the FIRST
+configured key; reads try every configured key in order. Three-phase
+rotation, zero downtime:
 
-1. Bring up a worker that decrypts every `Integration.accessToken`,
-   `Integration.refreshToken`, `Webhook.secret`, and
-   `User.twoFactorSecret` with the OLD key, then re-encrypts with
-   the NEW key.
-2. Deploy with `INTEGRATION_SECRET` = new key.
-3. Verify via `/api/health` and a representative integration
-   round-trip.
+1. Deploy with `INTEGRATION_SECRET=<NEW>` and
+   `INTEGRATION_SECRET_V2=<OLD>` set simultaneously.
+2. Run `npm run pii:rotate -- --dry`, then `npm run pii:rotate` to
+   re-encrypt every row under the new key.
+3. Once `pii:rotate --dry` reports `rotated=0`, unset
+   `INTEGRATION_SECRET_V2` and redeploy.
 
-This is on the roadmap as `keys-rotate` but not implemented yet.
-Until it is, treat `INTEGRATION_SECRET` as a once-set, never-rotate
-secret — back it up offline.
+Up to 8 keys (V1..V8) can be active simultaneously for staged
+rotations. Full procedure + exit-code reference in
+`docs/operations/PII-ENCRYPTION.md`.
+
+### Configuring SCIM (Bundle R)
+
+To wire an enterprise customer's IdP for automated user
+provisioning:
+
+1. Issue an `ApiKey` row with `scopes: ["scim:users"]` (32+ bytes
+   of entropy, hashed at rest).
+2. Hand the bearer token to the customer's IT.
+3. Customer points their IdP at `/api/scim/v2/`. Full Okta + Entra
+   ID setup walkthrough in `docs/operations/SCIM-SETUP.md`.
+
+### Verifying audit-chain integrity
+
+```bash
+npm run audit:chain                    # all orgs, summary
+npm run audit:chain -- --json          # CI/cron pipe
+npm run audit:chain -- --org=<orgId>   # one tenant
+```
+
+Exit 0 = clean, 1 = chains have broken entries (tampering),
+2 = transient error. Schedule daily; pipe to your SIEM.
 
 ## 7. Security CI
 
