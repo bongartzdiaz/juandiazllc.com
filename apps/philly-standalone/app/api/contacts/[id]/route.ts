@@ -9,6 +9,7 @@ import { validateBody } from '@/lib/philly/validation'
 import { updateContactSchema } from '@/lib/philly/validation/schemas'
 import { logAudit, diffChanges } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
+import { encryptPii, decryptPii } from '@/lib/philly/pii'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -29,7 +30,7 @@ export async function GET(_req: NextRequest, ctx: RouteCtx) {
   })
 
   if (!contact) return jsonError('Contact not found', 404)
-  return NextResponse.json({ data: contact })
+  return NextResponse.json({ data: { ...contact, notes: decryptPii(contact.notes) } })
 }
 
 export async function PATCH(req: NextRequest, ctx: RouteCtx) {
@@ -55,16 +56,19 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
   if (input.phone !== undefined) data.phone = input.phone
   if (input.type !== undefined) data.type = input.type
   if (input.company !== undefined) data.company = input.company
-  if (input.notes !== undefined) data.notes = input.notes
+  if (input.notes !== undefined) data.notes = encryptPii(input.notes)
   if (input.avatarUrl !== undefined) data.avatarUrl = input.avatarUrl
 
   const contact = await prisma.contact.update({ where: { id }, data })
 
-  const changes = diffChanges(existing as unknown as Record<string, unknown>, input as Record<string, unknown>)
+  // Diff against the plaintext-equivalent so the audit log records
+  // "notes changed", not "ciphertext A → ciphertext B".
+  const existingPlain = { ...existing, notes: decryptPii((existing as { notes: string | null }).notes) }
+  const changes = diffChanges(existingPlain as unknown as Record<string, unknown>, input as Record<string, unknown>)
   await logAudit({ scope, action: 'update', entity: 'contact', entityId: id, changes })
   publishEntityUpdated(scope.organizationId, 'contact', id, scope.userId)
 
-  return NextResponse.json({ data: contact })
+  return NextResponse.json({ data: { ...contact, notes: decryptPii(contact.notes) } })
 }
 
 export async function DELETE(_req: NextRequest, ctx: RouteCtx) {

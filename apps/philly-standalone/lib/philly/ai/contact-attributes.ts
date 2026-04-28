@@ -24,6 +24,7 @@ import { createAnthropic } from '@ai-sdk/anthropic'
 import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { logger } from '@/lib/philly/logger'
+import { decryptPii } from '@/lib/philly/pii'
 
 export const attributeSchema = z.object({
   industry: z
@@ -143,7 +144,10 @@ export async function runAndPersistContactAttributes(args: {
     phone: contact.phone,
     company: contact.company,
     type: contact.type,
-    notes: contact.notes,
+    // Notes are at-rest encrypted (Bundle N) — decrypt before
+    // sending to the model. decryptPii passes plaintext through
+    // unchanged for legacy unprefixed values.
+    notes: decryptPii(contact.notes) ?? '',
     leadSource: contact.leadSource,
     orgName: contact.organization?.name,
   })

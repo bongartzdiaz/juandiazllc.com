@@ -11,6 +11,7 @@ import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated, publishEntityUpdated } from '@/lib/philly/realtime/publish'
 import { runAndPersistContactAttributes } from '@/lib/philly/ai/contact-attributes'
 import { logger } from '@/lib/philly/logger'
+import { encryptPii, decryptPii } from '@/lib/philly/pii'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -53,7 +54,11 @@ export async function GET(req: NextRequest) {
     prisma.contact.count({ where }),
   ])
 
-  return paginatedResponse(contacts, total, { page, limit, skip })
+  // Decrypt at-rest PII fields on the way out. Bundle N — notes only;
+  // email/phone are searchable so they remain in plaintext until the
+  // blind-index design lands.
+  const decrypted = contacts.map((c) => ({ ...c, notes: decryptPii(c.notes) }))
+  return paginatedResponse(decrypted, total, { page, limit, skip })
 }
 
 export async function POST(req: NextRequest) {
@@ -73,7 +78,7 @@ export async function POST(req: NextRequest) {
       phone: input.phone,
       type: input.type,
       company: input.company,
-      notes: input.notes,
+      notes: encryptPii(input.notes ?? null) ?? '',
       avatarUrl: input.avatarUrl,
       organizationId: scope.organizationId,
       // Auto-enrichment kicks off post-response via after() below —
@@ -103,5 +108,10 @@ export async function POST(req: NextRequest) {
     }
   })
 
-  return NextResponse.json({ data: contact }, { status: 201 })
+  // Hand back plaintext notes to the caller — they sent it that way,
+  // so they expect it that way.
+  return NextResponse.json(
+    { data: { ...contact, notes: decryptPii(contact.notes) } },
+    { status: 201 },
+  )
 }
