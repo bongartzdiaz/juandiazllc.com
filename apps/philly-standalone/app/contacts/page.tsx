@@ -314,12 +314,12 @@ export default function ContactsPage() {
   const handleBulkExport = useCallback(() => {
     if (selectedRows.length === 0) return
     exportContactsToCsv(selectedRows, 'contacts-selected')
-    addToast(`Exported ${selectedRows.length} contact${selectedRows.length === 1 ? '' : 's'}`, 'success')
-  }, [selectedRows, exportContactsToCsv, addToast])
+    addToast(t('toasts.exported', { count: selectedRows.length }), 'success')
+  }, [selectedRows, exportContactsToCsv, addToast, t])
 
   const handleExportAllVisible = useCallback(() => {
     if (filtered.length === 0) {
-      addToast('Nothing to export', 'error')
+      addToast(t('toasts.nothingToExport'), 'error')
       return
     }
     exportContactsToCsv(filtered, 'contacts-all')
@@ -330,7 +330,7 @@ export default function ContactsPage() {
   const handleBulkDelete = useCallback(async () => {
     if (!isLive || selected.size === 0) return
     const ids = Array.from(selected)
-    if (!confirm(`Delete ${ids.length} contact${ids.length === 1 ? '' : 's'}? This cannot be undone.`)) return
+    if (!confirm(t('confirms.bulkDelete', { count: ids.length }))) return
     setBulkBusy(true)
     try {
       const res = await fetch('/api/contacts/bulk', {
@@ -340,15 +340,15 @@ export default function ContactsPage() {
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(json?.error ?? `Failed (${res.status})`)
-      addToast(`Deleted ${json?.data?.deleted ?? ids.length} contact${ids.length === 1 ? '' : 's'}`, 'success')
+      addToast(t('toasts.deleted', { count: json?.data?.deleted ?? ids.length }), 'success')
       clearSelected()
       apiQuery.refetch()
     } catch (e: unknown) {
-      addToast(e instanceof Error ? e.message : 'Bulk delete failed', 'error')
+      addToast(e instanceof Error ? e.message : t('toasts.deleteFailed'), 'error')
     } finally {
       setBulkBusy(false)
     }
-  }, [isLive, selected, addToast, clearSelected, apiQuery])
+  }, [isLive, selected, addToast, clearSelected, apiQuery, t])
 
   const handleBulkChangeType = useCallback(async (type: ContactTypeOption) => {
     if (!isLive || selected.size === 0) return
@@ -362,15 +362,15 @@ export default function ContactsPage() {
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(json?.error ?? `Failed (${res.status})`)
-      addToast(`Updated ${json?.data?.updated ?? ids.length} contact${ids.length === 1 ? '' : 's'}`, 'success')
+      addToast(t('toasts.updated', { count: json?.data?.updated ?? ids.length }), 'success')
       clearSelected()
       apiQuery.refetch()
     } catch (e: unknown) {
-      addToast(e instanceof Error ? e.message : 'Bulk update failed', 'error')
+      addToast(e instanceof Error ? e.message : t('toasts.updateFailed'), 'error')
     } finally {
       setBulkBusy(false)
     }
-  }, [isLive, selected, addToast, clearSelected, apiQuery])
+  }, [isLive, selected, addToast, clearSelected, apiQuery, t])
 
   /* ---- Drag-drop reorder (Bundle AG, live mode only) ---- */
   const handleReorderDrop = useCallback(async (sourceId: string, targetId: string) => {
@@ -396,13 +396,13 @@ export default function ContactsPage() {
         const j = await res.json().catch(() => ({}))
         throw new Error(j?.error ?? `Failed (${res.status})`)
       }
-      addToast('Contacts reordered', 'success')
+      addToast(t('toasts.reordered'), 'success')
       apiQuery.refetch()
     } catch (e: unknown) {
-      addToast(e instanceof Error ? e.message : 'Reorder failed', 'error')
+      addToast(e instanceof Error ? e.message : t('toasts.reorderFailed'), 'error')
       setOrderOverride(null) // revert
     }
-  }, [isLive, filtered, addToast, apiQuery])
+  }, [isLive, filtered, addToast, apiQuery, t])
 
   const allVisibleSelected = filtered.length > 0 && filtered.every((c) => selected.has(c.id))
   const toggleSelectAllVisible = useCallback(() => {
@@ -767,10 +767,10 @@ export default function ContactsPage() {
             label: 'Copy email',
             icon: Copy,
             onClick: () => {
-              if (!c.email) { addToast('No email on file', 'error'); return }
+              if (!c.email) { addToast(t('toasts.noEmail'), 'error'); return }
               navigator.clipboard?.writeText(c.email).then(
-                () => addToast('Email copied', 'success'),
-                () => addToast('Copy failed', 'error'),
+                () => addToast(t('toasts.emailCopied'), 'success'),
+                () => addToast(t('toasts.copyFailed'), 'error'),
               )
             },
             disabled: !c.email,
@@ -780,10 +780,10 @@ export default function ContactsPage() {
             label: 'Copy phone',
             icon: Copy,
             onClick: () => {
-              if (!c.phone) { addToast('No phone on file', 'error'); return }
+              if (!c.phone) { addToast(t('toasts.noPhone'), 'error'); return }
               navigator.clipboard?.writeText(c.phone).then(
-                () => addToast('Phone copied', 'success'),
-                () => addToast('Copy failed', 'error'),
+                () => addToast(t('toasts.phoneCopied'), 'success'),
+                () => addToast(t('toasts.copyFailed'), 'error'),
               )
             },
             disabled: !c.phone,

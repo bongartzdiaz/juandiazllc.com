@@ -671,23 +671,23 @@ export default function PropertiesPage() {
           { kind: 'action', label: 'Copy address', icon: Copy,
             disabled: !fullAddress,
             onClick: () => {
-              if (!fullAddress) { addToast('No address on file', 'error'); return }
+              if (!fullAddress) { addToast(t('toasts.noAddress'), 'error'); return }
               navigator.clipboard?.writeText(fullAddress).then(
-                () => addToast('Address copied', 'success'),
-                () => addToast('Copy failed', 'error'),
+                () => addToast(t('toasts.addressCopied'), 'success'),
+                () => addToast(t('toasts.copyFailed'), 'error'),
               )
             } },
           { kind: 'separator' },
           { kind: 'action', label: 'Delete', icon: Trash2, destructive: true,
             onClick: async () => {
-              if (!confirm(`Delete "${p.title}"? This cannot be undone.`)) return
+              if (!confirm(t('confirms.delete', { title: p.title }))) return
               try {
                 const res = await fetch(`/api/properties/${p.id}`, { method: 'DELETE' })
                 if (!res.ok && res.status !== 204) throw new Error(`Failed (${res.status})`)
-                addToast('Property deleted', 'success')
+                addToast(t('toasts.deleted'), 'success')
                 propertiesQuery.refetch()
               } catch (e) {
-                addToast(e instanceof Error ? e.message : 'Delete failed', 'error')
+                addToast(e instanceof Error ? e.message : t('toasts.deleteFailed'), 'error')
               }
             } },
         ]

@@ -611,22 +611,22 @@ export default function ProjectsPage() {
           { kind: 'action', label: 'Copy title', icon: Copy,
             onClick: () => {
               navigator.clipboard?.writeText(proj.title).then(
-                () => addToast('Title copied', 'success'),
-                () => addToast('Copy failed', 'error'),
+                () => addToast(t('toasts.titleCopied'), 'success'),
+                () => addToast(t('toasts.copyFailed'), 'error'),
               )
             } },
           { kind: 'separator' },
           { kind: 'action', label: 'Delete', icon: Trash2, destructive: true,
             disabled: !isLive,
             onClick: async () => {
-              if (!confirm(`Delete "${proj.title}"? This cannot be undone.`)) return
+              if (!confirm(t('confirms.delete', { title: proj.title }))) return
               try {
                 const res = await fetch(`/api/projects/${proj.id}`, { method: 'DELETE' })
                 if (!res.ok && res.status !== 204) throw new Error(`Failed (${res.status})`)
-                addToast('Project deleted', 'success')
+                addToast(t('toasts.deleted'), 'success')
                 apiQuery.refetch()
               } catch (e) {
-                addToast(e instanceof Error ? e.message : 'Delete failed', 'error')
+                addToast(e instanceof Error ? e.message : t('toasts.deleteFailed'), 'error')
               }
             } },
         ]

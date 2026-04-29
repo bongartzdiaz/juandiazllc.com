@@ -215,7 +215,7 @@ through NL/DE/ES on `/work`, `/insights`, `/sectors`, `/signals`,
 
 ### Launch readiness — 2026-04-28 (updated 2026-04-29)
 
-Bundles G–AP shipped on `claude/ai-command-bar`. The CRM is launch-
+Bundles G–AQ shipped on `claude/ai-command-bar`. The CRM is launch-
 ready for big-company / EU-GDPR procurement subject to the operator
 setup steps below.
 
@@ -254,7 +254,8 @@ setup steps below.
 - AK — right-click context menu on projects (Quick view / Open full page / Copy title / Delete; Open + Delete disabled in RE/HOS demo modes).
 - AL — drag-drop reorder on the deals LIST view (kanban already has dnd for stage moves; we don't double-bind). New `Deal.displayOrder BIGINT NULL` + `(pipelineId, displayOrder)` index, migration `20260429010000_deal_display_order`, `POST /api/deals/reorder` endpoint (rate-limited, transaction, audit-logged), optimistic UI override.
 - AM — advanced filter builder (contacts as proof point). New `lib/philly/filter/{types,schemas,compile}.ts` with a JSON-safe DSL → Prisma `where` compiler (29 tests, allowlists every field). `GET /api/contacts?filter=<json>` accepts the spec; the schema-registry whitelist + the unconditional `organizationId` AND wrap is the injection-prevention story. Email/phone routing through blind-index hash columns (Bundle P) honoured. `<AdvancedFilterBuilder>` modal with type-aware operators + value inputs. Saved-views (Bundle AA) carry the spec under `filters.advanced`.
-- AP — dashboard i18n sweep on the shared components introduced by Bundles T–AM. Wired every `<KeyboardShortcuts>`, `<BulkActionBar>`, `<SavedViewsBar>`, `<ColumnPicker>`, `<AdvancedFilterBuilder>`, `<ContactQuickView>`, `<DealQuickView>`, `<PropertyQuickView>` through `useTranslations()`. Added six new namespaces to `apps/philly-standalone/messages/{en,nl}.json` (`keyboard.*`, `bulk.*`, `views.*`, `columns.*`, `filter.*`, `quickview.*`) plus extending `common.*` with `close/open/openFullPage/applyFilter/clearAll`. ICU plural form for "{count, plural, one {# rule} other {# rules}}" used on the active-filter chip. Page-level toasts and `confirm()` prompts inside list pages are still hardcoded English — those are entity-specific copy and remain on the deferred list (smaller follow-up sweep, ~80 strings).
+- AP — dashboard i18n sweep on the shared components introduced by Bundles T–AM. Wired every `<KeyboardShortcuts>`, `<BulkActionBar>`, `<SavedViewsBar>`, `<ColumnPicker>`, `<AdvancedFilterBuilder>`, `<ContactQuickView>`, `<DealQuickView>`, `<PropertyQuickView>` through `useTranslations()`. Added six new namespaces to `apps/philly-standalone/messages/{en,nl}.json` (`keyboard.*`, `bulk.*`, `views.*`, `columns.*`, `filter.*`, `quickview.*`) plus extending `common.*` with `close/open/openFullPage/applyFilter/clearAll`. ICU plural form for "{count, plural, one {# rule} other {# rules}}" used on the active-filter chip.
+- AQ — page-level toast + confirm() i18n sweep on the four major list pages. Every `addToast(...)` and `confirm(...)` call inside `app/contacts/page.tsx`, `app/deals/page.tsx`, `app/properties/page.tsx`, `app/projects/page.tsx` now reads from a per-entity `*.toasts.*` / `*.confirms.*` namespace. ICU plural rules on the contact bulk operations (`{count, plural, one {Deleted # contact} other {Deleted # contacts}}`). Variable interpolation for {name} (saved view), {title} (project/property), {status} (deal won/lost), {count}. Transactions page had no toasts to wire. Added ~28 new keys per locale across `contacts.{toasts,confirms}`, `deals.{toasts,confirms}`, `properties.{toasts,confirms}`, `projects.{toasts,confirms}`.
 - AO — translation parity audit + fixes. Two parallel agents diffed every locale across `lib/i18n/dict.ts` (en/nl/de/es) and the next-intl message JSONs (en/nl, root + standalone), and one agent scanned for hardcoded English on the marketing site. Fixed:
   - `lib/i18n/dict.ts` German `nav.login` was the literal English word "Login" — corrected to "Anmelden". (NL "Contact" cases flagged by the agent were false positives — "Contact" is correct Dutch.)
   - `dashboard.subtitle` + `automations.subtitle` drift between root `messages/{en,nl}.json` and standalone `apps/philly-standalone/messages/{en,nl}.json` — root rewritten to match the standalone (the dashboard-aligned wording).
@@ -338,11 +339,12 @@ setup steps below.
   - GDPR `runScheduledErasures` cron loops `prisma.user.delete` per
     row; should batch into a single `deleteMany`. Audit finding,
     medium severity (correctness fine, just slow at scale).
-  - Dashboard i18n sweep (Bundle AP) — DONE for the shared components.
-    Page-level toasts + `confirm()` prompts on the contacts/deals/
-    properties/projects/transactions pages are still hardcoded English
-    (~80 strings, entity-specific copy). Mechanical lift remaining;
-    same `useTranslations()` recipe as Bundle AP.
+  - Dashboard i18n sweep — DONE for shared components (Bundle AP) +
+    page-level toasts/confirms on the four major list pages (Bundle
+    AQ). Remaining English-only surfaces: less-used pages
+    (showings/open-houses/dialer/commissions/inbox/transactions/
+    grants/volunteers — most don't use addToast at all, but their
+    UI labels are static English). Audit + fix pending.
   - DeepL machine-translation passthrough is still deferred — when wired,
     auto-fills missing NL/DE/ES keys for any string we add later.
   - de/es next-intl support: today the dashboard only has en+nl

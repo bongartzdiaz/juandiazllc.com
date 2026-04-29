@@ -42,6 +42,15 @@
       "budget": "Budget",
       "sdgGoals": "SDG Goals",
       "status": "Status"
+    },
+    "toasts": {
+      "deleted": "Project deleted",
+      "deleteFailed": "Delete failed",
+      "titleCopied": "Title copied",
+      "copyFailed": "Copy failed"
+    },
+    "confirms": {
+      "delete": "Delete \"{title}\"? This cannot be undone."
     }
   },
   "contacts": {
@@ -61,6 +70,24 @@
       "company": "Company",
       "type": "Type",
       "notes": "Notes"
+    },
+    "toasts": {
+      "exported": "{count, plural, one {Exported # contact} other {Exported # contacts}}",
+      "nothingToExport": "Nothing to export",
+      "deleted": "{count, plural, one {Deleted # contact} other {Deleted # contacts}}",
+      "deleteFailed": "Bulk delete failed",
+      "updated": "{count, plural, one {Updated # contact} other {Updated # contacts}}",
+      "updateFailed": "Bulk update failed",
+      "reordered": "Contacts reordered",
+      "reorderFailed": "Reorder failed",
+      "noEmail": "No email on file",
+      "emailCopied": "Email copied",
+      "noPhone": "No phone on file",
+      "phoneCopied": "Phone copied",
+      "copyFailed": "Copy failed"
+    },
+    "confirms": {
+      "bulkDelete": "{count, plural, one {Delete # contact?} other {Delete # contacts?}} This cannot be undone."
     }
   },
   "impact": {
@@ -77,6 +104,39 @@
     "newBoard": "New Board",
     "addColumn": "Add Column",
     "addCard": "Add Card"
+  },
+  "deals": {
+    "toasts": {
+      "applied": "Applied \"{name}\"",
+      "created": "Deal created",
+      "moved": "Deal moved",
+      "moveFailed": "Move failed",
+      "marked": "Marked {status}",
+      "updateFailed": "Update failed",
+      "deleted": "Deal deleted",
+      "deleteFailed": "Delete failed",
+      "reordered": "Deals reordered",
+      "reorderFailed": "Reorder failed",
+      "noContact": "No contact linked",
+      "contactCopied": "Contact copied",
+      "copyFailed": "Copy failed"
+    },
+    "confirms": {
+      "delete": "Delete this deal? This cannot be undone."
+    }
+  },
+  "properties": {
+    "toasts": {
+      "applied": "Applied \"{name}\"",
+      "deleted": "Property deleted",
+      "deleteFailed": "Delete failed",
+      "noAddress": "No address on file",
+      "addressCopied": "Address copied",
+      "copyFailed": "Copy failed"
+    },
+    "confirms": {
+      "delete": "Delete \"{title}\"? This cannot be undone."
+    }
   },
   "automations": {
     "title": "Automations",

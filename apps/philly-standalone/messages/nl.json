@@ -42,6 +42,15 @@
       "budget": "Budget",
       "sdgGoals": "SDG Doelen",
       "status": "Status"
+    },
+    "toasts": {
+      "deleted": "Project verwijderd",
+      "deleteFailed": "Verwijderen mislukt",
+      "titleCopied": "Titel gekopieerd",
+      "copyFailed": "Kopiëren mislukt"
+    },
+    "confirms": {
+      "delete": "\"{title}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
     }
   },
   "contacts": {
@@ -61,6 +70,24 @@
       "company": "Bedrijf",
       "type": "Type",
       "notes": "Notities"
+    },
+    "toasts": {
+      "exported": "{count, plural, one {# contact geëxporteerd} other {# contacten geëxporteerd}}",
+      "nothingToExport": "Niets om te exporteren",
+      "deleted": "{count, plural, one {# contact verwijderd} other {# contacten verwijderd}}",
+      "deleteFailed": "Bulk verwijderen mislukt",
+      "updated": "{count, plural, one {# contact bijgewerkt} other {# contacten bijgewerkt}}",
+      "updateFailed": "Bulk wijzigen mislukt",
+      "reordered": "Contacten herordend",
+      "reorderFailed": "Herordening mislukt",
+      "noEmail": "Geen e-mail bekend",
+      "emailCopied": "E-mail gekopieerd",
+      "noPhone": "Geen telefoonnummer bekend",
+      "phoneCopied": "Telefoonnummer gekopieerd",
+      "copyFailed": "Kopiëren mislukt"
+    },
+    "confirms": {
+      "bulkDelete": "{count, plural, one {# contact verwijderen?} other {# contacten verwijderen?}} Dit kan niet ongedaan worden gemaakt."
     }
   },
   "impact": {
@@ -77,6 +104,39 @@
     "newBoard": "Nieuw Bord",
     "addColumn": "Kolom Toevoegen",
     "addCard": "Kaart Toevoegen"
+  },
+  "deals": {
+    "toasts": {
+      "applied": "\"{name}\" toegepast",
+      "created": "Deal aangemaakt",
+      "moved": "Deal verplaatst",
+      "moveFailed": "Verplaatsen mislukt",
+      "marked": "Gemarkeerd als {status}",
+      "updateFailed": "Bijwerken mislukt",
+      "deleted": "Deal verwijderd",
+      "deleteFailed": "Verwijderen mislukt",
+      "reordered": "Deals herordend",
+      "reorderFailed": "Herordening mislukt",
+      "noContact": "Geen contact gekoppeld",
+      "contactCopied": "Contact gekopieerd",
+      "copyFailed": "Kopiëren mislukt"
+    },
+    "confirms": {
+      "delete": "Deze deal verwijderen? Dit kan niet ongedaan worden gemaakt."
+    }
+  },
+  "properties": {
+    "toasts": {
+      "applied": "\"{name}\" toegepast",
+      "deleted": "Pand verwijderd",
+      "deleteFailed": "Verwijderen mislukt",
+      "noAddress": "Geen adres bekend",
+      "addressCopied": "Adres gekopieerd",
+      "copyFailed": "Kopiëren mislukt"
+    },
+    "confirms": {
+      "delete": "\"{title}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    }
   },
   "automations": {
     "title": "Automatiseringen",

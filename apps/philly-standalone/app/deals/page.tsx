@@ -127,8 +127,8 @@ export default function DealsPage() {
     if (typeof f.pipelineId === 'string') next.pipelineId = f.pipelineId
     if (typeof f.view === 'string') next.view = f.view
     setFilters(next)
-    addToast(`Applied "${saved.name}"`, 'success')
-  }, [setFilters, addToast])
+    addToast(t('toasts.applied', { name: saved.name }), 'success')
+  }, [setFilters, addToast, t])
 
   const [page, setPage] = useState(1)
   const [showAdd, setShowAdd] = useState(false)
@@ -292,13 +292,13 @@ export default function DealsPage() {
         const j = await res.json().catch(() => ({}))
         throw new Error(j?.error ?? `Failed (${res.status})`)
       }
-      addToast('Deals reordered', 'success')
+      addToast(t('toasts.reordered'), 'success')
       fetchDeals()
     } catch (e) {
-      addToast(e instanceof Error ? e.message : 'Reorder failed', 'error')
+      addToast(e instanceof Error ? e.message : t('toasts.reorderFailed'), 'error')
       setListOrderOverride(null)
     }
-  }, [visibleDeals, addToast, fetchDeals])
+  }, [visibleDeals, addToast, fetchDeals, t])
 
   /* ---- j/k row navigation (Bundle AF) — list view only ---- */
   const moveFocus = useCallback((delta: number) => {
@@ -377,7 +377,7 @@ export default function DealsPage() {
       }
       resetAddForm()
       setShowAdd(false)
-      addToast('Deal created', 'success')
+      addToast(t('toasts.created'), 'success')
       fetchDeals()
     } catch (err) {
       setAddError(err instanceof Error ? err.message : 'Network error')
@@ -408,17 +408,17 @@ export default function DealsPage() {
         body: JSON.stringify({ stageId }),
       })
       if (!res.ok) throw new Error('Failed to move deal')
-      addToast('Deal moved', 'success')
+      addToast(t('toasts.moved'), 'success')
     } catch (e) {
-      addToast(e instanceof Error ? e.message : 'Move failed', 'error')
+      addToast(e instanceof Error ? e.message : t('toasts.moveFailed'), 'error')
       void dealsMutate(snapshot, { revalidate: true })
     }
-  }, [dealsData, dealsMutate, currentPipelineStages, addToast])
+  }, [dealsData, dealsMutate, currentPipelineStages, addToast, t])
 
   /* ---- Delete (used by context menu) ---- */
   const deleteDeal = useCallback(async (dealId: string) => {
     if (!dealsData) return
-    if (!confirm('Delete this deal? This cannot be undone.')) return
+    if (!confirm(t('confirms.delete'))) return
     const snapshot = dealsData
     const next: DealsResponse = {
       ...dealsData,
@@ -428,12 +428,12 @@ export default function DealsPage() {
     try {
       const res = await fetch(`/api/deals/${dealId}`, { method: 'DELETE' })
       if (!res.ok && res.status !== 204) throw new Error(`Failed (${res.status})`)
-      addToast('Deal deleted', 'success')
+      addToast(t('toasts.deleted'), 'success')
     } catch (e) {
-      addToast(e instanceof Error ? e.message : 'Delete failed', 'error')
+      addToast(e instanceof Error ? e.message : t('toasts.deleteFailed'), 'error')
       void dealsMutate(snapshot, { revalidate: true })
     }
-  }, [dealsData, dealsMutate, addToast])
+  }, [dealsData, dealsMutate, addToast, t])
 
   /* ---- Change status (for quick won/lost) ---- */
   const setDealStatus = async (dealId: string, status: string) => {
@@ -451,9 +451,9 @@ export default function DealsPage() {
         body: JSON.stringify({ status }),
       })
       if (!res.ok) throw new Error('Failed to update')
-      addToast(`Marked ${status}`, 'success')
+      addToast(t('toasts.marked', { status }), 'success')
     } catch (e) {
-      addToast(e instanceof Error ? e.message : 'Update failed', 'error')
+      addToast(e instanceof Error ? e.message : t('toasts.updateFailed'), 'error')
       void dealsMutate(snapshot, { revalidate: true })
     }
   }
@@ -1119,10 +1119,10 @@ export default function DealsPage() {
             icon: Copy,
             disabled: !d.contact?.name,
             onClick: () => {
-              if (!d.contact) { addToast('No contact linked', 'error'); return }
+              if (!d.contact) { addToast(t('toasts.noContact'), 'error'); return }
               navigator.clipboard?.writeText(d.contact.name).then(
-                () => addToast('Contact copied', 'success'),
-                () => addToast('Copy failed', 'error'),
+                () => addToast(t('toasts.contactCopied'), 'success'),
+                () => addToast(t('toasts.copyFailed'), 'error'),
               )
             } },
           { kind: 'separator' },
