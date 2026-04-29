@@ -276,6 +276,13 @@ model Contact {
   aiAttributesUpdatedAt  DateTime?
   aiAttributesError      String?   @db.Text // last error message if status=error
 
+  // Bundle AG — manual ordering for the contacts list. NULL means
+  // "use createdAt fallback"; explicit values sort lower-first. The
+  // reorder endpoint writes monotonically increasing integers from
+  // a base of (createdAt epoch ms) so insertions don't require a
+  // global rewrite.
+  displayOrder           BigInt?
+
   organization    Organization     @relation(fields: [organizationId], references: [id])
   contactProjects ContactProject[]
   contactNotes    ContactNote[]
@@ -289,6 +296,7 @@ model Contact {
   @@index([organizationId, leadStatus])
   @@index([organizationId, emailHash])
   @@index([organizationId, phoneHash])
+  @@index([organizationId, displayOrder])
   @@index([assignedToId])
 }
 

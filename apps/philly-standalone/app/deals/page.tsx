@@ -8,9 +8,10 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useToast } from '@/hooks/philly/useToast'
 import {
   Filter, Search, LayoutGrid, List as ListIcon, X, Plus, GripVertical,
-  Calendar, User as UserIcon, Eye,
+  Calendar, User as UserIcon, Eye, ExternalLink, Copy, Trash2, CheckCircle, XCircle,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useDebouncedValue } from '@/hooks/philly/useDebouncedValue'
 import { useUrlState } from '@/hooks/philly/useUrlState'
@@ -20,6 +21,8 @@ import { SavedViewsBar } from '@/components/philly/views/SavedViewsBar'
 import type { SavedView } from '@/hooks/philly/useSavedViews'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+import { ContextMenu, type ContextMenuItem } from '@/components/philly/ui/ContextMenu'
+import { useGlobalShortcuts } from '@/hooks/philly/useGlobalShortcuts'
 
 const DEAL_COLUMN_DEFS: ColumnDef[] = [
   { id: 'deal', label: 'Deal', required: true },
@@ -105,6 +108,7 @@ function fmtDate(iso: string | null): string {
 export default function DealsPage() {
   const t = useTranslations('deals')
   const { addToast } = useToast()
+  const router = useRouter()
 
   const [filters, setFilters] = useUrlState({
     q: '', status: '', pipelineId: '', view: 'board',
@@ -146,6 +150,13 @@ export default function DealsPage() {
 
   // Bundle V — quick-view popover for deals (list + kanban).
   const [quickViewId, setQuickViewId] = useState<string | null>(null)
+
+  // Bundle AE — right-click context menu.
+  const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; dealId: string } | null>(null)
+
+  // Bundle AF — j/k row navigation in list view.
+  const [focusedDealId, setFocusedDealId] = useState<string | null>(null)
+  const rowRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())
 
   // Bundle AC — column visibility prefs (list view only).
   const dealColumns = useColumnPrefs('pai-deals-columns-v1', DEAL_COLUMN_DEFAULTS)
@@ -226,6 +237,10 @@ export default function DealsPage() {
     return pipelines[0]?.stages ?? []
   }, [selectedPipeline, pipelines])
 
+  /* ---- j/k row navigation (Bundle AF) ---- */
+  // Defined here so visibleDeals (referenced inside) is in scope below.
+  // The hook handlers themselves are registered after visibleDeals.
+
   /* ---- Client-side search ---- */
   const visibleDeals = useMemo(() => {
     const q = debouncedSearch.trim().toLowerCase()
@@ -237,6 +252,37 @@ export default function DealsPage() {
       (d.stage?.name ?? '').toLowerCase().includes(q),
     )
   }, [deals, debouncedSearch])
+
+  /* ---- j/k row navigation (Bundle AF) — list view only ---- */
+  const moveFocus = useCallback((delta: number) => {
+    if (visibleDeals.length === 0) return
+    const idx = focusedDealId
+      ? visibleDeals.findIndex((d) => d.id === focusedDealId)
+      : -1
+    const nextIdx = Math.max(0, Math.min(visibleDeals.length - 1, (idx === -1 ? 0 : idx + delta)))
+    const nextId = visibleDeals[nextIdx].id
+    setFocusedDealId(nextId)
+    const el = rowRefs.current.get(nextId)
+    el?.scrollIntoView({ block: 'nearest' })
+  }, [visibleDeals, focusedDealId])
+
+  useGlobalShortcuts(
+    {
+      j: () => moveFocus(1),
+      k: () => moveFocus(-1),
+      Enter: () => {
+        if (focusedDealId) router.push(`/deals/${focusedDealId}`)
+      },
+    },
+    view === 'list',
+  )
+
+  // Reset focus when the underlying list changes (filter / page swap).
+  useEffect(() => {
+    if (focusedDealId && !visibleDeals.some((d) => d.id === focusedDealId)) {
+      setFocusedDealId(null)
+    }
+  }, [visibleDeals, focusedDealId])
 
   /* ---- Aggregated KPIs (based on visible deals) ---- */
   const kpis = useMemo(() => {
@@ -321,6 +367,26 @@ export default function DealsPage() {
       void dealsMutate(snapshot, { revalidate: true })
     }
   }, [dealsData, dealsMutate, currentPipelineStages, addToast])
+
+  /* ---- Delete (used by context menu) ---- */
+  const deleteDeal = useCallback(async (dealId: string) => {
+    if (!dealsData) return
+    if (!confirm('Delete this deal? This cannot be undone.')) return
+    const snapshot = dealsData
+    const next: DealsResponse = {
+      ...dealsData,
+      data: dealsData.data.filter((d) => d.id !== dealId),
+    }
+    void dealsMutate(next, { revalidate: false })
+    try {
+      const res = await fetch(`/api/deals/${dealId}`, { method: 'DELETE' })
+      if (!res.ok && res.status !== 204) throw new Error(`Failed (${res.status})`)
+      addToast('Deal deleted', 'success')
+    } catch (e) {
+      addToast(e instanceof Error ? e.message : 'Delete failed', 'error')
+      void dealsMutate(snapshot, { revalidate: true })
+    }
+  }, [dealsData, dealsMutate, addToast])
 
   /* ---- Change status (for quick won/lost) ---- */
   const setDealStatus = async (dealId: string, status: string) => {
@@ -572,6 +638,10 @@ export default function DealsPage() {
                           e.dataTransfer.effectAllowed = 'move'
                         }}
                         onDragEnd={() => { setDraggingId(null); setDropTargetStage(null) }}
+                        onContextMenu={(e) => {
+                          e.preventDefault()
+                          setCtxMenu({ x: e.clientX, y: e.clientY, dealId: deal.id })
+                        }}
                         style={{
                           background: 'var(--bg2)',
                           border: '1px solid var(--border)',
@@ -718,15 +788,31 @@ export default function DealsPage() {
                 <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
                   {debouncedSearch ? 'No deals match your search.' : 'No deals found.'}
                 </div>
-              ) : visibleDeals.map((deal, idx) => (
-                <Link key={deal.id} href={`/deals/${deal.id}`} style={{
+              ) : visibleDeals.map((deal, idx) => {
+                const isFocused = focusedDealId === deal.id
+                return (
+                <Link key={deal.id} href={`/deals/${deal.id}`}
+                  ref={(el) => {
+                    if (el) rowRefs.current.set(deal.id, el)
+                    else rowRefs.current.delete(deal.id)
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault()
+                    setCtxMenu({ x: e.clientX, y: e.clientY, dealId: deal.id })
+                  }}
+                  onMouseEnter={() => setFocusedDealId(deal.id)}
+                  style={{
                   display: 'grid',
                   gridTemplateColumns: dealsGridTemplate,
                   gap: 12, padding: '10px 16px',
                   borderBottom: idx < visibleDeals.length - 1 ? '1px solid var(--border)' : 'none',
                   fontSize: 12, alignItems: 'center',
-                  background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent',
+                  background: isFocused
+                    ? 'color-mix(in srgb, var(--accent) 8%, var(--panel))'
+                    : (idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent'),
                   textDecoration: 'none', color: 'inherit',
+                  outline: isFocused ? '2px solid var(--accent)' : 'none',
+                  outlineOffset: isFocused ? -2 : 0,
                 }}>
                   {visibleDealColumns.map((c) => {
                     if (c.id === 'deal') return (
@@ -786,7 +872,8 @@ export default function DealsPage() {
                     <Eye size={14} />
                   </button>
                 </Link>
-              ))}
+                )
+              })}
             </div>
             <Pagination page={page} totalPages={totalPages} total={total} onPageChange={setPage} />
           </>
@@ -936,6 +1023,46 @@ export default function DealsPage() {
       )}
 
       <DealQuickView dealId={quickViewId} onClose={() => setQuickViewId(null)} />
+
+      {ctxMenu && (() => {
+        const d = dealsData?.data.find((x) => x.id === ctxMenu.dealId)
+        if (!d) return null
+        const items: ContextMenuItem[] = [
+          { kind: 'action', label: 'Open', icon: ExternalLink, shortcut: 'Enter',
+            onClick: () => router.push(`/deals/${d.id}`) },
+          { kind: 'action', label: 'Quick view', icon: Eye,
+            onClick: () => setQuickViewId(d.id) },
+          { kind: 'separator' },
+          { kind: 'action', label: 'Mark won', icon: CheckCircle,
+            disabled: d.status !== 'open',
+            onClick: () => setDealStatus(d.id, 'won') },
+          { kind: 'action', label: 'Mark lost', icon: XCircle,
+            disabled: d.status !== 'open',
+            onClick: () => setDealStatus(d.id, 'lost') },
+          { kind: 'separator' },
+          { kind: 'action', label: 'Copy contact email',
+            icon: Copy,
+            disabled: !d.contact?.name,
+            onClick: () => {
+              if (!d.contact) { addToast('No contact linked', 'error'); return }
+              navigator.clipboard?.writeText(d.contact.name).then(
+                () => addToast('Contact copied', 'success'),
+                () => addToast('Copy failed', 'error'),
+              )
+            } },
+          { kind: 'separator' },
+          { kind: 'action', label: 'Delete', icon: Trash2, destructive: true,
+            onClick: () => deleteDeal(d.id) },
+        ]
+        return (
+          <ContextMenu
+            x={ctxMenu.x}
+            y={ctxMenu.y}
+            items={items}
+            onClose={() => setCtxMenu(null)}
+          />
+        )
+      })()}
     </>
   )
 }

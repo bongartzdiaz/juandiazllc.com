@@ -67,7 +67,12 @@ export async function GET(req: NextRequest) {
   const [contacts, total] = await Promise.all([
     prisma.contact.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      // Bundle AG: explicit displayOrder wins (NULLS LAST via Prisma's
+      // sort), createdAt is the secondary key for unordered rows.
+      orderBy: [
+        { displayOrder: { sort: 'asc', nulls: 'last' } },
+        { createdAt: 'desc' },
+      ],
       skip,
       take: limit,
       include: {

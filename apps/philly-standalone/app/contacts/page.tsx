@@ -148,6 +148,12 @@ export default function ContactsPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [bulkBusy, setBulkBusy] = useState(false)
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; contactId: string } | null>(null)
+  // Bundle AG — drag-drop reorder (live mode only).
+  const [dragId, setDragId] = useState<string | null>(null)
+  const [dragOverId, setDragOverId] = useState<string | null>(null)
+  // Optimistic ordering override — when set, takes precedence over the
+  // server's `liveContacts` order until the next refetch.
+  const [orderOverride, setOrderOverride] = useState<string[] | null>(null)
   const { addToast } = useToast()
   const router = useRouter()
 
@@ -207,7 +213,20 @@ export default function ContactsPage() {
     ? ['all', 'buyer', 'seller', 'tenant', 'investor', 'landlord']
     : ['all', 'partner', 'beneficiary', 'stakeholder', 'donor']
 
-  const filtered = contacts.filter(c => {
+  // Apply optimistic reorder override (Bundle AG) before filtering so
+  // a drag-and-drop is reflected immediately, even if the user has a
+  // search/type filter active.
+  const orderedContacts = useMemo(() => {
+    if (!orderOverride) return contacts
+    const indexed = new Map(orderOverride.map((id, i) => [id, i]))
+    return [...contacts].sort((a, b) => {
+      const ai = indexed.has(a.id) ? indexed.get(a.id)! : Number.MAX_SAFE_INTEGER
+      const bi = indexed.has(b.id) ? indexed.get(b.id)! : Number.MAX_SAFE_INTEGER
+      return ai - bi
+    })
+  }, [contacts, orderOverride])
+
+  const filtered = orderedContacts.filter(c => {
     if (typeFilter !== 'all' && c.type !== typeFilter) return false
     if (debouncedSearch) {
       const q = debouncedSearch.toLowerCase()
@@ -324,6 +343,38 @@ export default function ContactsPage() {
       setBulkBusy(false)
     }
   }, [isLive, selected, addToast, clearSelected, apiQuery])
+
+  /* ---- Drag-drop reorder (Bundle AG, live mode only) ---- */
+  const handleReorderDrop = useCallback(async (sourceId: string, targetId: string) => {
+    if (!isLive || sourceId === targetId) return
+    // Compute the new order based on the currently-rendered list, not the
+    // unfiltered one — moving Alice above Bob within a typeFilter view
+    // shouldn't disturb contacts hidden by the filter.
+    const currentOrder = filtered.map((c) => c.id)
+    const fromIdx = currentOrder.indexOf(sourceId)
+    const toIdx = currentOrder.indexOf(targetId)
+    if (fromIdx === -1 || toIdx === -1) return
+    const reordered = [...currentOrder]
+    reordered.splice(fromIdx, 1)
+    reordered.splice(toIdx, 0, sourceId)
+    setOrderOverride(reordered)
+    try {
+      const res = await fetch('/api/contacts/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: reordered }),
+      })
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}))
+        throw new Error(j?.error ?? `Failed (${res.status})`)
+      }
+      addToast('Contacts reordered', 'success')
+      apiQuery.refetch()
+    } catch (e: unknown) {
+      addToast(e instanceof Error ? e.message : 'Reorder failed', 'error')
+      setOrderOverride(null) // revert
+    }
+  }, [isLive, filtered, addToast, apiQuery])
 
   const allVisibleSelected = filtered.length > 0 && filtered.every((c) => selected.has(c.id))
   const toggleSelectAllVisible = useCallback(() => {
@@ -475,15 +526,46 @@ export default function ContactsPage() {
                   e.preventDefault()
                   setCtxMenu({ x: e.clientX, y: e.clientY, contactId: c.id })
                 }}
+                draggable={isLive}
+                onDragStart={(e) => {
+                  if (!isLive) return
+                  setDragId(c.id)
+                  e.dataTransfer.setData('text/contact-id', c.id)
+                  e.dataTransfer.effectAllowed = 'move'
+                }}
+                onDragOver={(e) => {
+                  if (!isLive || !dragId || dragId === c.id) return
+                  e.preventDefault()
+                  e.dataTransfer.dropEffect = 'move'
+                  if (dragOverId !== c.id) setDragOverId(c.id)
+                }}
+                onDragLeave={() => {
+                  if (dragOverId === c.id) setDragOverId(null)
+                }}
+                onDrop={(e) => {
+                  if (!isLive) return
+                  e.preventDefault()
+                  const sourceId = e.dataTransfer.getData('text/contact-id') || dragId
+                  setDragId(null)
+                  setDragOverId(null)
+                  if (sourceId) handleReorderDrop(sourceId, c.id)
+                }}
+                onDragEnd={() => { setDragId(null); setDragOverId(null) }}
                 style={{
                 background: selected.has(c.id)
                   ? 'color-mix(in srgb, var(--accent) 6%, var(--panel))'
                   : 'var(--panel)',
-                border: `1px solid ${selected.has(c.id) ? 'var(--accent)' : 'var(--border)'}`,
+                border: `1px solid ${
+                  dragOverId === c.id
+                    ? 'var(--accent)'
+                    : selected.has(c.id) ? 'var(--accent)' : 'var(--border)'
+                }`,
                 borderRadius: 12, padding: '16px', cursor: 'pointer',
-                boxShadow: 'var(--shadow-sm)',
+                boxShadow: dragOverId === c.id ? '0 0 0 2px var(--accent)' : 'var(--shadow-sm)',
                 textDecoration: 'none', color: 'inherit', display: 'block',
                 position: 'relative',
+                opacity: dragId === c.id ? 0.55 : 1,
+                transition: 'opacity 120ms ease, box-shadow 120ms ease',
               }}>
                 {/* Selection checkbox — Bundle X. Stops propagation so
                     selection doesn't follow the surrounding <Link>. */}

@@ -327,13 +327,50 @@ set.
 To extend to another table-shaped page, see the "Column
 customization — Bundle AC reference" section in `CLAUDE.md`.
 
-### Right-click menu (Bundle AD)
+### Right-click menu (Bundle AD + AE)
 
-Contact cards expose a right-click context menu (Open / Quick
-view / Edit / Select / Copy email / Copy phone / Delete). The
-menu primitive (`<ContextMenu>`) is generic; per-page wiring is
-in `app/contacts/page.tsx` and lifts to deals/properties/projects
-by adding the same pattern (see `CLAUDE.md`).
+Contact / deal / property cards expose a right-click context menu.
+Menu items per page:
+- Contacts: Open / Quick view / Edit / Select / Copy email /
+  Copy phone / Delete
+- Deals: Open / Quick view / Mark won / Mark lost / Copy contact /
+  Delete (list + kanban)
+- Properties: Open / Quick view / Valuation / Copy address / Delete
+
+The menu primitive (`<ContextMenu>`) is generic — per-page wiring
+lives in each `app/<entity>/page.tsx`. Projects already presents
+its own inline detail modal, so a context-menu lift there is
+smaller (only per-page items needed) and is left as a follow-up.
+
+### `j` / `k` row navigation (Bundle AF)
+
+Deals list view only. `j` next, `k` previous, `Enter` opens the
+focused deal. Focus follows mouse hover too, so keyboard and
+mouse don't fight. Hidden in kanban view via the
+`useGlobalShortcuts(..., view === 'list')` toggle.
+
+### Drag-drop reorder on contacts (Bundle AG)
+
+Adds manual ordering to the contacts list (live mode only — demo
+industries keep their hand-curated arrays). Operators drag a card
+onto another to insert above it. Visual: dragged card fades, drop
+target gets an accent ring.
+
+Backend: `POST /api/contacts/reorder { ids: string[] }` writes
+`Contact.displayOrder = idx + 1` for each id inside a single
+transaction. Rate-limited via `PRESET_MUTATION`, capped at 500
+ids/call, requires admin/manager.
+
+Schema: nullable `displayOrder BIGINT` + composite index
+`(organizationId, displayOrder)`. Migration
+`20260429000000_contact_display_order` is idempotent. The GET
+list endpoint orders by `displayOrder asc nulls last`, then
+`createdAt desc` as a fallback.
+
+To reset all manual orders for an org back to chronological:
+```sql
+UPDATE Contact SET displayOrder = NULL WHERE organizationId = '<orgId>';
+```
 
 ### Saved views (Bundle AA)
 

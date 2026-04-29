@@ -5,13 +5,16 @@ import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
-import { MapPin, Filter, Search, Tag, Eye } from 'lucide-react'
+import { MapPin, Filter, Search, Tag, Eye, ExternalLink, Copy, Trash2, Calculator } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
 import { PropertyQuickView } from '@/components/philly/properties/PropertyQuickView'
 import { SavedViewsBar } from '@/components/philly/views/SavedViewsBar'
 import type { SavedView } from '@/hooks/philly/useSavedViews'
+import { ContextMenu, type ContextMenuItem } from '@/components/philly/ui/ContextMenu'
+import { useToast } from '@/hooks/philly/useToast'
 
 type Option = { value: string; label: string }
 type Flag = { key: string; label: string }
@@ -107,6 +110,11 @@ export default function PropertiesPage() {
 
   // Bundle V — quick-view popover.
   const [quickViewId, setQuickViewId] = useState<string | null>(null)
+
+  // Bundle AE — right-click context menu.
+  const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; propertyId: string } | null>(null)
+  const router = useRouter()
+  const { addToast } = useToast()
 
   const applySavedView = useCallback((saved: SavedView) => {
     const f = saved.filters
@@ -400,7 +408,12 @@ export default function PropertiesPage() {
           ) : properties.map(prop => {
             const sc = STATUS_COLORS[prop.status] ?? { bg: 'var(--bg2)', txt: 'var(--txt2)' }
             return (
-              <Link key={prop.id} href={`/properties/${prop.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link key={prop.id} href={`/properties/${prop.id}`}
+                onContextMenu={(e) => {
+                  e.preventDefault()
+                  setCtxMenu({ x: e.clientX, y: e.clientY, propertyId: prop.id })
+                }}
+                style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div className="card-hover" style={{ padding: '16px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--panel)', boxShadow: 'var(--shadow-sm)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8, gap: 8 }}>
                     <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--txt)', lineHeight: 1.3, flex: 1, minWidth: 0 }}>{prop.title}</div>
@@ -604,6 +617,51 @@ export default function PropertiesPage() {
       )}
 
       <PropertyQuickView propertyId={quickViewId} onClose={() => setQuickViewId(null)} />
+
+      {ctxMenu && (() => {
+        const p = properties.find((x) => x.id === ctxMenu.propertyId)
+        if (!p) return null
+        const fullAddress = [p.address, p.town, p.city].filter(Boolean).join(', ')
+        const items: ContextMenuItem[] = [
+          { kind: 'action', label: 'Open', icon: ExternalLink, shortcut: 'Enter',
+            onClick: () => router.push(`/properties/${p.id}`) },
+          { kind: 'action', label: 'Quick view', icon: Eye,
+            onClick: () => setQuickViewId(p.id) },
+          { kind: 'action', label: 'Valuation', icon: Calculator,
+            onClick: () => router.push(`/properties/${p.id}/valuation`) },
+          { kind: 'separator' },
+          { kind: 'action', label: 'Copy address', icon: Copy,
+            disabled: !fullAddress,
+            onClick: () => {
+              if (!fullAddress) { addToast('No address on file', 'error'); return }
+              navigator.clipboard?.writeText(fullAddress).then(
+                () => addToast('Address copied', 'success'),
+                () => addToast('Copy failed', 'error'),
+              )
+            } },
+          { kind: 'separator' },
+          { kind: 'action', label: 'Delete', icon: Trash2, destructive: true,
+            onClick: async () => {
+              if (!confirm(`Delete "${p.title}"? This cannot be undone.`)) return
+              try {
+                const res = await fetch(`/api/properties/${p.id}`, { method: 'DELETE' })
+                if (!res.ok && res.status !== 204) throw new Error(`Failed (${res.status})`)
+                addToast('Property deleted', 'success')
+                propertiesQuery.refetch()
+              } catch (e) {
+                addToast(e instanceof Error ? e.message : 'Delete failed', 'error')
+              }
+            } },
+        ]
+        return (
+          <ContextMenu
+            x={ctxMenu.x}
+            y={ctxMenu.y}
+            items={items}
+            onClose={() => setCtxMenu(null)}
+          />
+        )
+      })()}
     </>
   )
 }

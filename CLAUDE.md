@@ -215,7 +215,7 @@ through NL/DE/ES on `/work`, `/insights`, `/sectors`, `/signals`,
 
 ### Launch readiness — 2026-04-28 (updated 2026-04-29)
 
-Bundles G–AD shipped on `claude/ai-command-bar`. The CRM is launch-
+Bundles G–AG shipped on `claude/ai-command-bar`. The CRM is launch-
 ready for big-company / EU-GDPR procurement subject to the operator
 setup steps below.
 
@@ -245,6 +245,9 @@ setup steps below.
 - AB — global keyboard shortcuts (`?` cheat sheet, `g {c,d,p,k,i,n,s,a,h}` nav chords, `/` focus search) via `useGlobalShortcuts` hook + `<KeyboardShortcuts />` mounted in `ProtectedShell`
 - AC — column customization on the deals list view (`useColumnPrefs` localStorage hook + `<ColumnPicker>` popover, persists per-browser per-table)
 - AD — right-click context menu on contact cards (Open / Quick view / Edit / Select / Copy email / Copy phone / Delete) via reusable `<ContextMenu>` primitive
+- AE — context menu propagation to deals (list + kanban: Mark won/lost, Copy contact, Delete) and properties (list: Valuation deep link, Copy address, Delete)
+- AF — `j` / `k` / `Enter` row navigation on the deals list view (focused row gets accent ring, scrollIntoView on move, hover updates focus too)
+- AG — drag-drop reorder on the contacts page (live mode only): adds `Contact.displayOrder BIGINT NULL` + index, new migration `20260429000000_contact_display_order`, optimistic UI override, `POST /api/contacts/reorder` with rate-limit + transaction
 
 **Verified at HEAD:**
 - `npm run build` clean on both apps (root + standalone)
@@ -254,12 +257,13 @@ setup steps below.
 - `npm run audit:chain` ready (run daily in production)
 
 **Operator setup required before customer traffic:**
-1. `prisma migrate deploy` — five pending migrations:
+1. `prisma migrate deploy` — six pending migrations:
    `20260428000000_multi_org_membership`,
    `20260428010000_contact_ai_attributes`,
    `20260428020000_enterprise_access_controls`,
    `20260428030000_contact_blind_index`,
-   `20260428040000_apikey_scopes`.
+   `20260428040000_apikey_scopes`,
+   `20260429000000_contact_display_order`.
    (`SavedView` is in the schema already; verify it's in your DB and
    create-if-missing — no dedicated migration was needed because the
    model was added to the schema in an earlier branch.)
@@ -292,19 +296,19 @@ setup steps below.
   signs off on quotes; renders null today, no runtime leak.
 - `SEO.md:128` `/docs/pitch-template.md` TODO (operator content,
   not code).
-- Advanced features remaining after Bundles AA–AD:
+- Advanced features remaining after Bundles AA–AG:
   - Advanced filter builder (server-side query DSL — bigger lift, needs
     product spec on field + operator vocabulary).
-  - Drag-drop reorder on contacts (needs `Contact.displayOrder`
-    schema add + migration + persistence path).
-  - Right-click context menu propagation to deals/properties/projects
-    (the `<ContextMenu>` primitive is generic; per-page menu items
-    are the only work left).
-  - Column customization propagation to other table-shaped pages
-    (today only the deals list uses `<ColumnPicker>`; the same
-    `useColumnPrefs` hook covers any table).
-  - `j/k` row navigation in list views (needs visible-row tracking
-    state + scrollIntoView per page).
+  - Column customization propagation to remaining table-shaped pages
+    (transactions, grants, volunteers, documents, inbox, referrals —
+    same `useColumnPrefs` hook + `<ColumnPicker>` as Bundle AC).
+  - Context-menu items for the projects page (the page already has
+    its own inline detail modal so the lift is smaller — just per-page
+    menu items, the primitive is shared).
+  - `j/k` row navigation propagation to the deal kanban + the
+    properties grid (today AF only covers the deals list view).
+  - Drag-drop reorder propagation to deals/properties (`displayOrder`
+    column add + analogous reorder endpoint).
 
 ### Saved views — Bundle AA reference
 
@@ -399,8 +403,62 @@ Per-page wiring:
    close over the targeted entity's data (used for "Copy email"
    / disable-when-empty / etc.).
 
-Today only the contacts page wires it. Same pattern lifts to
-deals/properties/projects without touching the primitive.
+Wired today on contacts, deals (list + kanban), and properties.
+Items are page-specific — see each page file for its `items` array.
+
+### `j` / `k` row navigation — Bundle AF reference
+
+Implemented inline on `app/deals/page.tsx` only (list view). Pattern:
+
+1. `[focusedDealId, setFocusedDealId] = useState<string | null>(null)`
+2. `rowRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())` —
+   each rendered row populates this in its `ref` callback.
+3. `useGlobalShortcuts({ j, k, Enter }, view === 'list')` — the
+   second arg disables the bindings outside the list view so kanban
+   keyboard input still fires the kanban-native shortcuts.
+4. `moveFocus(delta)` clamps to `[0, visibleDeals.length - 1]`,
+   updates state, calls `el.scrollIntoView({ block: 'nearest' })`.
+5. Hover on a row updates `focusedDealId` so the keyboard and
+   mouse focus always agree.
+6. A `useEffect` resets the focus when the focused id no longer
+   appears in `visibleDeals` (filter / search changed).
+
+To extend to another list-view page: copy items 1–6, swap the
+shortcut hook's enabled-condition, and adjust the `Enter` handler
+to push the right detail route.
+
+### Drag-drop reorder — Bundle AG reference
+
+Adds manual ordering to the contacts list. Live mode only — demo
+industries (RE / HOS) keep their hand-curated arrays.
+
+Schema:
+- `Contact.displayOrder BIGINT NULL` + composite index
+  `(organizationId, displayOrder)`.
+- Migration `20260429000000_contact_display_order` is idempotent
+  (`ADD COLUMN IF NOT EXISTS` + `CREATE INDEX IF NOT EXISTS`).
+
+API:
+- `POST /api/contacts/reorder { ids: string[] }` — rate-limited
+  via `PRESET_MUTATION`, requires admin/manager. Caps at 500 ids
+  per call. Verifies every id is in the caller's org, drops the
+  rest silently (so a deleted-in-another-tab contact doesn't fail
+  the whole batch). Writes `displayOrder = idx + 1` for the kept
+  ids inside a single `prisma.$transaction`.
+
+UI:
+- `dragId / dragOverId / orderOverride` state on the contacts page.
+- `<Link>` cards get `draggable={isLive}` + `onDragStart/Over/Leave/Drop/End`.
+- Visual: dragged card → `opacity 0.55`; drop target → 2-px accent
+  ring + accent border. Feedback is purely CSS, no flash.
+- `orderOverride` is an array of contact ids that takes precedence
+  over the server's order until the next `apiQuery.refetch()`.
+  Filters/search apply AFTER the override, so reordering inside a
+  filtered view doesn't disturb hidden rows.
+
+To extend to deals/properties: add `displayOrder` to the model +
+matching migration + `/api/<entity>/reorder` route, then copy the
+state + handler block from `app/contacts/page.tsx`.
 
 ### i18n discipline — lessons learned this session
 
