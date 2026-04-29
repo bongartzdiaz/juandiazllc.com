@@ -21,7 +21,7 @@ describe('serverError', () => {
 
   beforeEach(() => {
     errorMock = vi.fn()
-    console.error = errorMock
+    console.error = errorMock as unknown as typeof console.error
   })
   afterEach(() => {
     console.error = realConsoleError

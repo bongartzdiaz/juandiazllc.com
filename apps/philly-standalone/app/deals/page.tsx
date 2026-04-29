@@ -16,6 +16,8 @@ import { useDebouncedValue } from '@/hooks/philly/useDebouncedValue'
 import { useUrlState } from '@/hooks/philly/useUrlState'
 import { useApi } from '@/hooks/philly/useApi'
 import { DealQuickView } from '@/components/philly/deals/DealQuickView'
+import { SavedViewsBar } from '@/components/philly/views/SavedViewsBar'
+import type { SavedView } from '@/hooks/philly/useSavedViews'
 
 /* ------------------------------------------------------------------
    Types
@@ -92,6 +94,17 @@ export default function DealsPage() {
   const selectedPipeline = filters.pipelineId
   const view = (filters.view === 'list' ? 'list' : 'board') as 'list' | 'board'
   const debouncedSearch = useDebouncedValue(search, 250)
+
+  const applySavedView = useCallback((saved: SavedView) => {
+    const f = saved.filters
+    const next: Record<string, string> = {}
+    if (typeof f.q === 'string') next.q = f.q
+    if (typeof f.status === 'string') next.status = f.status
+    if (typeof f.pipelineId === 'string') next.pipelineId = f.pipelineId
+    if (typeof f.view === 'string') next.view = f.view
+    setFilters(next)
+    addToast(`Applied "${saved.name}"`, 'success')
+  }, [setFilters, addToast])
 
   const [page, setPage] = useState(1)
   const [showAdd, setShowAdd] = useState(false)
@@ -434,6 +447,15 @@ export default function DealsPage() {
               Create a pipeline via the API first (POST /api/pipelines).
             </div>
           </div>
+        )}
+
+        {/* Saved views (Bundle AA) — persists q/status/pipelineId/view. */}
+        {!noPipelines && (
+          <SavedViewsBar
+            entity="deals"
+            currentFilters={{ q: search, status: statusFilter, pipelineId: selectedPipeline, view }}
+            onApply={applySavedView}
+          />
         )}
 
         {/* ========== BOARD VIEW ========== */}

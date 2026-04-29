@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -34,6 +35,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`views:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   let body: {
     entity?: string; name?: string; filtersJson?: string

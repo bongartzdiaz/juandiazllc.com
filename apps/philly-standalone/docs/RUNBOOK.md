@@ -287,6 +287,48 @@ npm run audit:chain -- --org=<orgId>   # one tenant
 Exit 0 = clean, 1 = chains have broken entries (tampering),
 2 = transient error. Schedule daily; pipe to your SIEM.
 
+### Encrypting `ContactNote.content` (Bundle U)
+
+Bundle U adds at-rest encryption (AES-256-GCM, `enc:v1:` prefix) to
+`ContactNote.content`. New writes encrypt automatically; legacy
+plaintext rows fall through on read until backfilled:
+
+```bash
+npm run pii:backfill-notes -- --dry              # report counts
+npm run pii:backfill-notes                       # all orgs
+npm run pii:backfill-notes -- --org=<orgId>      # one tenant
+```
+
+Idempotent. Re-running skips rows already prefixed. The shared
+`npm run pii:rotate` covers BOTH `Contact.notes` and
+`ContactNote.content` in a single pass — no separate rotate CLI for
+notes.
+
+### Saved views (Bundle AA)
+
+Per-user filter+view bundles persisted on `SavedView`. The chip-bar
+appears above the list/grid on `/contacts`, `/deals`, `/properties`.
+Operators can save the current filter state, switch back to it
+later, or share with the org.
+
+API surface:
+- `GET    /api/views?entity=<contacts|deals|properties>`
+- `POST   /api/views { entity, name, filtersJson, isShared }`
+- `PATCH  /api/views/[id]` (rename / toggle shared)
+- `DELETE /api/views/[id]`
+
+Permission model:
+- A user can always edit/delete their OWN view.
+- Admins/managers can edit/delete a SHARED view.
+- A shared view becomes visible to every user in the same org.
+
+There's no separate migration — `SavedView` was added to the schema
+in an earlier branch. Verify the column is present before deploy:
+
+```bash
+mysql -e "DESCRIBE SavedView" $DB_NAME
+```
+
 ## 7. Security CI
 
 GitHub Actions `.github/workflows/security.yml` runs:

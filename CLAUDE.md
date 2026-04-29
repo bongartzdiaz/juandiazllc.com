@@ -213,9 +213,9 @@ through NL/DE/ES on `/work`, `/insights`, `/sectors`, `/signals`,
   `roi.eyebrow`/`roi.title`/`roi.lede` and `roi.outro.*`). That's the
   next ship.
 
-### Launch readiness — 2026-04-28
+### Launch readiness — 2026-04-28 (updated 2026-04-29)
 
-Bundles G–T shipped on `claude/ai-command-bar`. The CRM is launch-
+Bundles G–AA shipped on `claude/ai-command-bar`. The CRM is launch-
 ready for big-company / EU-GDPR procurement subject to the operator
 setup steps below.
 
@@ -235,14 +235,20 @@ setup steps below.
 - R — SCIM 2.0 user provisioning (RFC 7643/7644)
 - S — operator UI for `/api/admin/security`
 - T — contact quick-view popover
+- U — `ContactNote.content` at-rest encryption + `useApi.mutate` exposed
+- V — quick-view popovers for deals + properties (projects already had inline modal)
+- W — SWR migration for notifications + deals (uses `useApi.mutate` from U)
+- X — contact bulk operations (select / change-type / delete) + CSV export (`lib/philly/csv.ts`)
+- Y — contact inline edit (Edit button in ContactQuickView swaps to ContactForm)
+- Z — test coverage push: `pagination` / `safe-error` / `utils` / `audit-verify` (+55 tests)
+- AA — saved views per user/org on contacts / deals / properties (`SavedView` table, `/api/views`, `useSavedViews` hook, `SavedViewsBar` chip-bar)
 
 **Verified at HEAD:**
 - `npm run build` clean on both apps (root + standalone)
 - `npm run typecheck` clean on both
-- **422/422** standalone tests + 281/281 root tests green
+- **483/483** standalone tests + 281/281 root tests green
 - `npm run audit:tenant` clean
 - `npm run audit:chain` ready (run daily in production)
-- Lint: 0 errors, ~178 warnings (mostly explicit-`any`s, cosmetic)
 
 **Operator setup required before customer traffic:**
 1. `prisma migrate deploy` — five pending migrations:
@@ -251,6 +257,9 @@ setup steps below.
    `20260428020000_enterprise_access_controls`,
    `20260428030000_contact_blind_index`,
    `20260428040000_apikey_scopes`.
+   (`SavedView` is in the schema already; verify it's in your DB and
+   create-if-missing — no dedicated migration was needed because the
+   model was added to the schema in an earlier branch.)
 2. Set both encryption secrets in production env (32+ bytes each,
    distinct values):
    - `INTEGRATION_SECRET` — AES-256-GCM key for at-rest encryption
@@ -258,6 +267,7 @@ setup steps below.
      blind-index search columns
 3. Run the backfills (in this order, dry-run first):
    - `npm run pii:backfill` (encrypts `Contact.notes`)
+   - `npm run pii:backfill-notes` (encrypts `ContactNote.content` — Bundle U)
    - `npm run pii:backfill-hashes` (encrypts `Contact.email`/`phone`
      and populates the hashes)
 4. Lawyer review of `docs/legal/{DPA,PRIVACY-NOTICE,COOKIE-POLICY,
@@ -268,19 +278,46 @@ setup steps below.
    (issue `ApiKey` row with `scopes: ["scim:users"]`).
 
 **Deferred (post-launch follow-ups):**
-- `ContactNote.content` at-rest encryption (same approach as
-  `Contact.notes`).
 - SCIM Groups → role/sections mapping (today: User-only).
 - SCIM `externalId` round-trip persistence.
+- Quick-view popover propagation to projects (the page already
+  has an inline detail modal, so this is style-only — keeping the
+  existing pattern).
 - CopilotKit inline-generative-UI; Liveblocks presence on deal pages.
 - DeepL: ~60 hand translations (operator-side).
 - `Testimonials.tsx` — intentionally empty placeholder until Juan
   signs off on quotes; renders null today, no runtime leak.
 - `SEO.md:128` `/docs/pitch-template.md` TODO (operator content,
   not code).
-- Quick-view popover propagation to deals/properties/projects
-  (Bundle T did contacts only — pattern is established in
-  `components/philly/contacts/ContactQuickView.tsx`).
+- Advanced features remaining after Bundle AA: column customization,
+  advanced filter builder (server-side query DSL), keyboard shortcuts
+  (j/k/`/`/esc/`?`), right-click context menus, drag-drop ordering on
+  contacts.
+
+### Saved views — Bundle AA reference
+
+`SavedView { organizationId, userId, entity, name, filtersJson,
+columnsJson, sortJson, isShared, isDefault }`. Per-user views are
+private; setting `isShared=true` exposes them to the org.
+
+API:
+- `GET    /api/views?entity=<contacts|deals|properties>` — own + shared
+- `POST   /api/views { entity, name, filtersJson, isShared? }` — rate-limited
+- `PATCH  /api/views/[id]` — owner (or admin/manager for shared) edits
+- `DELETE /api/views/[id]` — owner (or admin/manager for shared) deletes
+
+Client:
+- `useSavedViews(entity)` — `{ views, saveCurrent, rename, deleteView, refetch }`
+- `<SavedViewsBar entity currentFilters onApply />` — chip bar with
+  inline Save / share-with-org toggle / hover-delete.
+
+When wiring a new entity:
+1. Choose what to persist into `currentFilters` (a `Record<string, unknown>`).
+2. Implement `applySavedView(view)` to extract back into your local
+   state setters (the hook is intentionally agnostic about what each
+   filter shape contains — unknown keys are ignored).
+3. Hide the bar in demo/showcase modes that use hand-curated rows
+   (we do this on the contacts page for `realestate`/`hospitality`).
 
 ### i18n discipline — lessons learned this session
 

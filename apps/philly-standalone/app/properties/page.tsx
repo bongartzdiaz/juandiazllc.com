@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useCallback, useState, useEffect, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -10,6 +10,8 @@ import Link from 'next/link'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
 import { PropertyQuickView } from '@/components/philly/properties/PropertyQuickView'
+import { SavedViewsBar } from '@/components/philly/views/SavedViewsBar'
+import type { SavedView } from '@/hooks/philly/useSavedViews'
 
 type Option = { value: string; label: string }
 type Flag = { key: string; label: string }
@@ -105,6 +107,18 @@ export default function PropertiesPage() {
 
   // Bundle V — quick-view popover.
   const [quickViewId, setQuickViewId] = useState<string | null>(null)
+
+  const applySavedView = useCallback((saved: SavedView) => {
+    const f = saved.filters
+    if (typeof f.listingType === 'string') setListingType(f.listingType)
+    if (typeof f.district === 'string') setDistrict(f.district)
+    if (typeof f.type === 'string') setType(f.type)
+    if (typeof f.subtype === 'string') setSubtype(f.subtype)
+    if (typeof f.statusFilter === 'string') setStatusFilter(f.statusFilter)
+    if (typeof f.bankOwned === 'boolean') setBankOwned(f.bankOwned)
+    if (typeof f.resaleOnly === 'boolean') setResaleOnly(f.resaleOnly)
+    if (typeof f.search === 'string') setSearch(f.search)
+  }, [])
 
   const t = useTranslations('properties')
 
@@ -366,6 +380,16 @@ export default function PropertiesPage() {
             >Clear filters</button>
           )}
         </div>
+
+        {/* Saved views (Bundle AA) */}
+        <SavedViewsBar
+          entity="properties"
+          currentFilters={{
+            listingType, district, type, subtype, statusFilter,
+            bankOwned, resaleOnly, search,
+          }}
+          onApply={applySavedView}
+        />
 
         {/* Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>

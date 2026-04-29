@@ -12,6 +12,8 @@ import { Search, Mail, Phone, FolderKanban, Eye, Download } from 'lucide-react'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { ContactQuickView } from '@/components/philly/contacts/ContactQuickView'
 import { BulkActionBar, type ContactTypeOption } from '@/components/philly/contacts/BulkActionBar'
+import { SavedViewsBar } from '@/components/philly/views/SavedViewsBar'
+import type { SavedView } from '@/hooks/philly/useSavedViews'
 import { useApi } from '@/hooks/philly/useApi'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
@@ -160,6 +162,15 @@ export default function ContactsPage() {
     })
   }, [])
   const clearSelected = useCallback(() => setSelected(new Set()), [])
+
+  const applySavedView = useCallback((view: SavedView) => {
+    const f = view.filters
+    const next: Record<string, string> = {}
+    if (typeof f.q === 'string') next.q = f.q
+    if (typeof f.type === 'string') next.type = f.type
+    setFilters(next)
+    addToast(`Applied "${view.name}"`, 'success')
+  }, [setFilters, addToast])
 
   /* Live data for the default (philanthropy) view comes from the API.
      RE and HOS modes are showcase / demo industries, so they keep their
@@ -420,6 +431,17 @@ export default function ContactsPage() {
             <Download size={12} /> Export
           </button>
         </div>
+
+        {/* Saved views (Bundle AA) — live mode only. Demo/showcase
+            industries can't persist views because the contact ids
+            are hand-curated fake rows. */}
+        {isLive && (
+          <SavedViewsBar
+            entity="contacts"
+            currentFilters={{ q: search, type: typeFilter }}
+            onApply={applySavedView}
+          />
+        )}
 
         {/* Loading indicator — only in live mode while the API call is in
             flight. Demo/showcase modes render synchronously and never
