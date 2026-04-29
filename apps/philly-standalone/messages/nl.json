@@ -142,6 +142,97 @@
     "title": "Automatiseringen",
     "subtitle": "Trigger-gebaseerde regels om workflows te automatiseren"
   },
+  "grants": {
+    "title": "Subsidies",
+    "subtitle": "Subsidieaanvragen en financiering bijhouden",
+    "newGrant": "Subsidie Toevoegen",
+    "editGrant": "Subsidie Bewerken",
+    "kpis": {
+      "total": "Totaal Subsidies",
+      "funded": "Gefinancierd",
+      "pending": "In behandeling",
+      "active": "Actief"
+    },
+    "filters": {
+      "all": "Alle Statussen",
+      "applied": "Aangevraagd",
+      "awarded": "Toegekend",
+      "active": "Actief",
+      "completed": "Voltooid",
+      "rejected": "Afgewezen"
+    },
+    "fields": {
+      "title": "Titel Subsidie",
+      "amount": "Bedrag (USD)",
+      "funder": "Financier",
+      "status": "Status",
+      "appliedDate": "Aanvraagdatum",
+      "awardedDate": "Toekenningsdatum",
+      "startDate": "Startdatum",
+      "endDate": "Einddatum",
+      "description": "Beschrijving",
+      "requirements": "Vereisten"
+    },
+    "placeholders": {
+      "title": "Volkshuisvestingsfonds",
+      "amount": "50000",
+      "funder": "Naam stichting",
+      "description": "Doel en omvang van de subsidie…",
+      "requirements": "Rapportagetermijnen, deliverables…"
+    },
+    "toasts": {
+      "titleRequired": "Titel vereist",
+      "funderRequired": "Financier vereist",
+      "invalidAmount": "Ongeldig bedrag",
+      "saveFailed": "Opslaan mislukt",
+      "updated": "Subsidie bijgewerkt",
+      "added": "Subsidie toegevoegd",
+      "deleted": "Subsidie verwijderd",
+      "deleteFailed": "Verwijderen mislukt",
+      "networkError": "Netwerkfout"
+    },
+    "confirms": {
+      "delete": "Deze subsidie verwijderen?"
+    }
+  },
+  "volunteers": {
+    "title": "Vrijwilligers",
+    "subtitle": "Beheer vrijwilligersteam en uren",
+    "newVolunteer": "Vrijwilliger Toevoegen",
+    "editVolunteer": "Vrijwilliger Bewerken",
+    "kpis": {
+      "total": "Totaal Vrijwilligers",
+      "active": "Actief",
+      "totalHours": "Totaal Uren",
+      "avgHours": "Gem. Uren / Vrijwilliger"
+    },
+    "filters": {
+      "all": "Alle Statussen",
+      "active": "Actief",
+      "inactive": "Inactief",
+      "onboarding": "Onboarding"
+    },
+    "fields": {
+      "name": "Naam",
+      "email": "E-mail",
+      "phone": "Telefoon",
+      "status": "Status",
+      "skills": "Vaardigheden",
+      "notes": "Notities"
+    },
+    "toasts": {
+      "nameRequired": "Naam vereist",
+      "saveFailed": "Opslaan mislukt",
+      "updated": "Vrijwilliger bijgewerkt",
+      "added": "Vrijwilliger toegevoegd",
+      "removed": "Vrijwilliger verwijderd",
+      "deleteFailed": "Verwijderen mislukt",
+      "networkError": "Netwerkfout"
+    },
+    "confirms": {
+      "remove": "Deze vrijwilliger verwijderen?"
+    }
+  },
   "common": {
     "save": "Opslaan",
     "cancel": "Annuleren",

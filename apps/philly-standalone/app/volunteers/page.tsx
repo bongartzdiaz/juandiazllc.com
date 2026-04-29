@@ -91,7 +91,7 @@ export default function VolunteersPage() {
   }
 
   async function submitForm() {
-    if (!form.name.trim()) { addToast('Name required', 'error'); return }
+    if (!form.name.trim()) { addToast(t('toasts.nameRequired'), 'error'); return }
     setSaving(true)
     try {
       const payload = {
@@ -104,24 +104,24 @@ export default function VolunteersPage() {
         ? await fetch(`/api/volunteers/${editingId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
         : await fetch('/api/volunteers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       const j = await res.json().catch(() => ({}))
-      if (!res.ok) { addToast(j.error ?? 'Save failed', 'error'); return }
-      addToast(editingId ? 'Volunteer updated' : 'Volunteer added', 'success')
+      if (!res.ok) { addToast(j.error ?? t('toasts.saveFailed'), 'error'); return }
+      addToast(editingId ? t('toasts.updated') : t('toasts.added'), 'success')
       setShowForm(false)
       fetchData()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
     finally { setSaving(false) }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Remove this volunteer?')) return
+    if (!confirm(t('confirms.remove'))) return
     try {
       const res = await fetch(`/api/volunteers/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
-        addToast('Volunteer removed', 'success')
+        addToast(t('toasts.removed'), 'success')
         setSelected(null)
         fetchData()
-      } else { addToast('Delete failed', 'error') }
-    } catch { addToast('Network error', 'error') }
+      } else { addToast(t('toasts.deleteFailed'), 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
   }
 
   // Live-refresh on any volunteer mutation in the org

@@ -142,6 +142,97 @@
     "title": "Automations",
     "subtitle": "Trigger-based rules to automate workflows"
   },
+  "grants": {
+    "title": "Grants",
+    "subtitle": "Track grant applications and funding",
+    "newGrant": "Add Grant",
+    "editGrant": "Edit Grant",
+    "kpis": {
+      "total": "Total Grants",
+      "funded": "Funded",
+      "pending": "Pending",
+      "active": "Active"
+    },
+    "filters": {
+      "all": "All Statuses",
+      "applied": "Applied",
+      "awarded": "Awarded",
+      "active": "Active",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    },
+    "fields": {
+      "title": "Grant Title",
+      "amount": "Amount (USD)",
+      "funder": "Funder",
+      "status": "Status",
+      "appliedDate": "Applied Date",
+      "awardedDate": "Awarded Date",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "description": "Description",
+      "requirements": "Requirements"
+    },
+    "placeholders": {
+      "title": "Community Housing Fund",
+      "amount": "50000",
+      "funder": "Foundation name",
+      "description": "Grant purpose and scope…",
+      "requirements": "Reporting deadlines, deliverables…"
+    },
+    "toasts": {
+      "titleRequired": "Title required",
+      "funderRequired": "Funder required",
+      "invalidAmount": "Invalid amount",
+      "saveFailed": "Save failed",
+      "updated": "Grant updated",
+      "added": "Grant added",
+      "deleted": "Grant deleted",
+      "deleteFailed": "Delete failed",
+      "networkError": "Network error"
+    },
+    "confirms": {
+      "delete": "Delete this grant?"
+    }
+  },
+  "volunteers": {
+    "title": "Volunteers",
+    "subtitle": "Manage volunteer team and hours",
+    "newVolunteer": "Add Volunteer",
+    "editVolunteer": "Edit Volunteer",
+    "kpis": {
+      "total": "Total Volunteers",
+      "active": "Active",
+      "totalHours": "Total Hours",
+      "avgHours": "Avg Hours / Volunteer"
+    },
+    "filters": {
+      "all": "All Statuses",
+      "active": "Active",
+      "inactive": "Inactive",
+      "onboarding": "Onboarding"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "status": "Status",
+      "skills": "Skills",
+      "notes": "Notes"
+    },
+    "toasts": {
+      "nameRequired": "Name required",
+      "saveFailed": "Save failed",
+      "updated": "Volunteer updated",
+      "added": "Volunteer added",
+      "removed": "Volunteer removed",
+      "deleteFailed": "Delete failed",
+      "networkError": "Network error"
+    },
+    "confirms": {
+      "remove": "Remove this volunteer?"
+    }
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",

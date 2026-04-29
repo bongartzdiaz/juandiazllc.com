@@ -123,10 +123,10 @@ export default function GrantsPage() {
   }
 
   async function submitForm() {
-    if (!form.title.trim()) { addToast('Title required', 'error'); return }
-    if (!form.funder.trim()) { addToast('Funder required', 'error'); return }
+    if (!form.title.trim()) { addToast(t('toasts.titleRequired'), 'error'); return }
+    if (!form.funder.trim()) { addToast(t('toasts.funderRequired'), 'error'); return }
     const amountCents = Math.round((parseFloat(form.amount) || 0) * 100)
-    if (amountCents < 0) { addToast('Invalid amount', 'error'); return }
+    if (amountCents < 0) { addToast(t('toasts.invalidAmount'), 'error'); return }
 
     const payload = {
       title: form.title.trim(),
@@ -153,24 +153,24 @@ export default function GrantsPage() {
             body: JSON.stringify(payload),
           })
       const j = await res.json().catch(() => ({}))
-      if (!res.ok) { addToast(j.error ?? 'Save failed', 'error'); return }
-      addToast(editingId ? 'Grant updated' : 'Grant added', 'success')
+      if (!res.ok) { addToast(j.error ?? t('toasts.saveFailed'), 'error'); return }
+      addToast(editingId ? t('toasts.updated') : t('toasts.added'), 'success')
       setShowForm(false)
       fetchData()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
     finally { setSaving(false) }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this grant?')) return
+    if (!confirm(t('confirms.delete'))) return
     try {
       const res = await fetch(`/api/grants/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
-        addToast('Grant deleted', 'success')
+        addToast(t('toasts.deleted'), 'success')
         setSelected(null)
         fetchData()
-      } else { addToast('Delete failed', 'error') }
-    } catch { addToast('Network error', 'error') }
+      } else { addToast(t('toasts.deleteFailed'), 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
   }
 
   // Live-refresh on any grant mutation in the org
