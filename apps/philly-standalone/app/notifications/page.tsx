@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { useRealtime } from '@/hooks/philly/useRealtime'
+import { useApi } from '@/hooks/philly/useApi'
 import { Bell, CheckCheck, Info, AlertTriangle, CheckCircle2, XCircle, Clock } from 'lucide-react'
 
 interface Notification {
@@ -17,6 +18,11 @@ interface Notification {
   createdAt: string
 }
 
+interface NotificationsResponse {
+  data: Notification[]
+  pagination: { total: number; totalPages: number }
+}
+
 type IconComponent = typeof Info
 const TYPE_ICONS: Record<string, IconComponent> = { info: Info, warning: AlertTriangle, success: CheckCircle2, error: XCircle }
 const TYPE_COLORS: Record<string, { bg: string; txt: string }> = {
@@ -27,62 +33,52 @@ const TYPE_COLORS: Record<string, { bg: string; txt: string }> = {
 }
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState<Notification[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [actionError, setActionError] = useState<string | null>(null)
   const t = useTranslations('notifications')
 
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await fetch(`/api/notifications?page=${page}&limit=20`)
-      const json = await res.json().catch(() => ({}))
-      setNotifications(Array.isArray(json.data) ? json.data : [])
-      setTotal(json.pagination?.total ?? 0)
-      setTotalPages(json.pagination?.totalPages ?? 0)
-    } catch {
-      setNotifications([])
-    } finally {
-      setLoading(false)
-    }
-  }, [page])
-
-  useEffect(() => { fetchData() }, [fetchData])
+  const { data, loading, mutate, refetch } = useApi<NotificationsResponse>(
+    `/notifications?page=${page}&limit=20`,
+  )
+  const notifications = data?.data ?? []
+  const total = data?.pagination?.total ?? 0
+  const totalPages = data?.pagination?.totalPages ?? 0
 
   // Live updates: when a new notification arrives via SSE, refetch.
   useRealtime((msg) => {
-    if (msg.type === 'notification') fetchData()
-  }, [fetchData])
+    if (msg.type === 'notification') refetch()
+  }, [refetch])
 
-  const markRead = async (id: string) => {
-    // optimistic update
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
+  const markRead = useCallback(async (id: string) => {
+    if (!data) return
+    const snapshot = data
+    // Optimistic update — write the patched cache shape, no revalidate.
+    const next = { ...data, data: data.data.map((n) => (n.id === id ? { ...n, read: true } : n)) }
+    void mutate(next, { revalidate: false })
     try {
       const res = await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' })
       if (!res.ok) throw new Error(`Failed to mark as read (${res.status})`)
     } catch (err) {
-      // revert + surface the error
-      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: false } : n))
+      void mutate(snapshot, { revalidate: false })
       setActionError(err instanceof Error ? err.message : 'Failed to mark as read')
     }
-  }
+  }, [data, mutate])
 
-  const markAllRead = async () => {
-    const snapshot = notifications
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+  const markAllRead = useCallback(async () => {
+    if (!data) return
+    const snapshot = data
+    const next = { ...data, data: data.data.map((n) => ({ ...n, read: true })) }
+    void mutate(next, { revalidate: false })
     try {
       const res = await fetch('/api/notifications/mark-all-read', { method: 'POST' })
       if (!res.ok) throw new Error(`Failed to mark all as read (${res.status})`)
     } catch (err) {
-      setNotifications(snapshot)
+      void mutate(snapshot, { revalidate: false })
       setActionError(err instanceof Error ? err.message : 'Failed to mark all as read')
     }
-  }
+  }, [data, mutate])
 
-  const unreadCount = notifications.filter(n => !n.read).length
+  const unreadCount = notifications.filter((n) => !n.read).length
 
   return (
     <>

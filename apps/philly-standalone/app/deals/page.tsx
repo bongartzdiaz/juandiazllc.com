@@ -14,6 +14,7 @@ import Link from 'next/link'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useDebouncedValue } from '@/hooks/philly/useDebouncedValue'
 import { useUrlState } from '@/hooks/philly/useUrlState'
+import { useApi } from '@/hooks/philly/useApi'
 import { DealQuickView } from '@/components/philly/deals/DealQuickView'
 
 /* ------------------------------------------------------------------
@@ -46,6 +47,11 @@ interface ContactOption {
   id: string
   name: string
   email: string
+}
+
+interface DealsResponse {
+  data: Deal[]
+  pagination?: { total: number; totalPages: number }
 }
 
 const STATUS_COLORS: Record<string, { bg: string; txt: string; border: string }> = {
@@ -87,13 +93,7 @@ export default function DealsPage() {
   const view = (filters.view === 'list' ? 'list' : 'board') as 'list' | 'board'
   const debouncedSearch = useDebouncedValue(search, 250)
 
-  const [deals, setDeals] = useState<Deal[]>([])
-  const [pipelines, setPipelines] = useState<Pipeline[]>([])
-  const [contacts, setContacts] = useState<ContactOption[]>([])
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [dropTargetStage, setDropTargetStage] = useState<string | null>(null)
@@ -125,22 +125,18 @@ export default function DealsPage() {
     setAddError(null)
   }
 
-  /* ---- Load pipelines & contacts ---- */
+  /* ---- Load pipelines & contacts via SWR ---- */
 
+  const pipelinesQuery = useApi<{ data: Pipeline[] }>('/pipelines')
+  const pipelines = pipelinesQuery.data?.data ?? []
+
+  // Initialise add-form pipeline/stage to the first pipeline once it's loaded.
   useEffect(() => {
-    fetch('/api/pipelines')
-      .then(r => r.json())
-      .then(j => {
-        const list: Pipeline[] = j.data ?? []
-        setPipelines(list)
-        if (list.length > 0 && !addPipelineId) {
-          setAddPipelineId(list[0].id)
-          if (list[0].stages.length > 0) setAddStageId(list[0].stages[0].id)
-        }
-      })
-      .catch(() => setPipelines([]))
+    if (pipelines.length === 0 || addPipelineId) return
+    setAddPipelineId(pipelines[0].id)
+    if (pipelines[0].stages.length > 0) setAddStageId(pipelines[0].stages[0].id)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [pipelines.length])
 
   useEffect(() => {
     // When pipeline changes in Add form, reset to first stage
@@ -154,32 +150,37 @@ export default function DealsPage() {
     }
   }, [addPipelineId, pipelines, addStageId])
 
-  useEffect(() => {
-    fetch('/api/contacts?limit=500')
-      .then(r => r.json())
-      .then(j => setContacts((j.data ?? []).map((c: ContactOption) => ({ id: c.id, name: c.name, email: c.email }))))
-      .catch(() => setContacts([]))
-  }, [])
+  const contactsQuery = useApi<{ data: ContactOption[] }>('/contacts?limit=500')
+  const contacts = contactsQuery.data?.data ?? []
 
   /* ---- Load deals ---- */
 
-  const fetchDeals = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: view === 'board' ? '200' : '25' })
-      if (selectedPipeline) params.set('pipelineId', selectedPipeline)
-      if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/deals?${params}`)
-      const json = await res.json()
-      setDeals(json.data ?? [])
-      setTotal(json.pagination?.total ?? (json.data?.length ?? 0))
-      setTotalPages(json.pagination?.totalPages ?? 1)
-    } catch { setDeals([]) }
-    finally { setLoading(false) }
+  const dealsQueryString = useMemo(() => {
+    const params = new URLSearchParams({ page: String(page), limit: view === 'board' ? '200' : '25' })
+    if (selectedPipeline) params.set('pipelineId', selectedPipeline)
+    if (statusFilter) params.set('status', statusFilter)
+    return params.toString()
   }, [page, selectedPipeline, statusFilter, view])
 
-  useEffect(() => { fetchDeals() }, [fetchDeals])
+  const dealsQuery = useApi<DealsResponse>(`/deals?${dealsQueryString}`)
+  const dealsData = dealsQuery.data
+  const deals = dealsData?.data ?? []
+  const loading = dealsQuery.loading
+  const total = dealsData?.pagination?.total ?? deals.length
+  const totalPages = dealsData?.pagination?.totalPages ?? 1
+  const fetchDeals = dealsQuery.refetch
+  const dealsMutate = dealsQuery.mutate
+
   useEntitySubscription('deal', fetchDeals)
+
+  /* ---- Current pipeline's stages (for board) ---- */
+  const currentPipelineStages = useMemo(() => {
+    if (selectedPipeline) {
+      return pipelines.find(p => p.id === selectedPipeline)?.stages ?? []
+    }
+    // default to first pipeline
+    return pipelines[0]?.stages ?? []
+  }, [selectedPipeline, pipelines])
 
   /* ---- Client-side search ---- */
   const visibleDeals = useMemo(() => {
@@ -250,12 +251,19 @@ export default function DealsPage() {
 
   /* ---- Move deal between stages (drag-and-drop) ---- */
   const moveDeal = useCallback(async (dealId: string, stageId: string) => {
-    // optimistic: update locally
-    setDeals(prev => prev.map(d => {
-      if (d.id !== dealId) return d
-      const newStage = currentPipelineStages.find(s => s.id === stageId)
-      return newStage ? { ...d, stage: { id: newStage.id, name: newStage.name, color: newStage.color } } : d
-    }))
+    if (!dealsData) return
+    const snapshot = dealsData
+    const newStage = currentPipelineStages.find(s => s.id === stageId)
+    if (!newStage) return
+    const next: DealsResponse = {
+      ...dealsData,
+      data: dealsData.data.map(d =>
+        d.id === dealId
+          ? { ...d, stage: { id: newStage.id, name: newStage.name, color: newStage.color } }
+          : d,
+      ),
+    }
+    void dealsMutate(next, { revalidate: false })
     try {
       const res = await fetch(`/api/deals/${dealId}`, {
         method: 'PATCH',
@@ -266,14 +274,19 @@ export default function DealsPage() {
       addToast('Deal moved', 'success')
     } catch (e) {
       addToast(e instanceof Error ? e.message : 'Move failed', 'error')
-      fetchDeals() // revert on error
+      void dealsMutate(snapshot, { revalidate: true })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchDeals, addToast])
+  }, [dealsData, dealsMutate, currentPipelineStages, addToast])
 
   /* ---- Change status (for quick won/lost) ---- */
   const setDealStatus = async (dealId: string, status: string) => {
-    setDeals(prev => prev.map(d => d.id === dealId ? { ...d, status } : d))
+    if (!dealsData) return
+    const snapshot = dealsData
+    const next: DealsResponse = {
+      ...dealsData,
+      data: dealsData.data.map(d => (d.id === dealId ? { ...d, status } : d)),
+    }
+    void dealsMutate(next, { revalidate: false })
     try {
       const res = await fetch(`/api/deals/${dealId}`, {
         method: 'PATCH',
@@ -284,18 +297,9 @@ export default function DealsPage() {
       addToast(`Marked ${status}`, 'success')
     } catch (e) {
       addToast(e instanceof Error ? e.message : 'Update failed', 'error')
-      fetchDeals()
+      void dealsMutate(snapshot, { revalidate: true })
     }
   }
-
-  /* ---- Current pipeline's stages (for board) ---- */
-  const currentPipelineStages = useMemo(() => {
-    if (selectedPipeline) {
-      return pipelines.find(p => p.id === selectedPipeline)?.stages ?? []
-    }
-    // default to first pipeline
-    return pipelines[0]?.stages ?? []
-  }, [selectedPipeline, pipelines])
 
   // Auto-set filter to first pipeline for board mode
   const firstPipelineRef = useRef<string>('')
