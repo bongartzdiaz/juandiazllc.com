@@ -185,18 +185,18 @@ export default function GrantsPage() {
       <Topbar title={t('title')} sub={t('subtitle')} />
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="award" label="Total Grants" value={String(total)} />
-          <KpiCard icon="dollar-sign" label="Total Funding" value={`$${(totalFunding / 100).toLocaleString()}`} />
-          <KpiCard icon="target" label="Active" value={String(activeGrants.length)} />
-          <KpiCard icon="calendar" label="Pending" value={String(pending.length)} />
+          <KpiCard icon="award" label={t('kpis.total')} value={String(total)} />
+          <KpiCard icon="dollar-sign" label={t('kpis.funded')} value={`$${(totalFunding / 100).toLocaleString()}`} />
+          <KpiCard icon="target" label={t('kpis.active')} value={String(activeGrants.length)} />
+          <KpiCard icon="calendar" label={t('kpis.pending')} value={String(pending.length)} />
         </div>
 
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
             <Filter size={13} style={{ color: 'var(--txt3)' }} />
             <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
-              <option value="">All Statuses</option>
-              {Object.keys(STATUS_COLORS).map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
+              <option value="">{t('filters.all')}</option>
+              {Object.keys(STATUS_COLORS).map(s => <option key={s} value={s}>{t(`filters.${s}` as 'filters.applied')}</option>)}
             </select>
           </div>
           <div style={{ flex: 1 }} />
@@ -207,7 +207,7 @@ export default function GrantsPage() {
             border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
             fontFamily: 'inherit', boxShadow: 'var(--shadow-sm)',
           }}>
-            <Plus size={13} /> New Grant
+            <Plus size={13} /> {t('newGrant')}
           </button>
         </div>
 
@@ -344,7 +344,7 @@ export default function GrantsPage() {
       <Modal
         open={showForm}
         onClose={() => { if (!saving) setShowForm(false) }}
-        title={editingId ? 'Edit Grant' : 'New Grant'}
+        title={editingId ? t('editGrant') : t('newGrant')}
         subtitle={editingId ? 'Update grant details' : 'Track a grant from application to award'}
         size="md"
       >

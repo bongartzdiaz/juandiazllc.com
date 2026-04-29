@@ -155,9 +155,14 @@
     },
     "filters": {
       "all": "Alle Statussen",
+      "prospect": "Prospect",
       "applied": "Aangevraagd",
+      "under_review": "In behandeling",
+      "approved": "Goedgekeurd",
       "awarded": "Toegekend",
       "active": "Actief",
+      "reporting": "Rapportage",
+      "closed": "Afgesloten",
       "completed": "Voltooid",
       "rejected": "Afgewezen"
     },
@@ -307,7 +312,8 @@
       "phone": "Telefoon",
       "status": "Status",
       "skills": "Vaardigheden",
-      "notes": "Notities"
+      "notes": "Notities",
+      "activityLogs": "Activiteitenlogs"
     },
     "toasts": {
       "nameRequired": "Naam vereist",

@@ -135,19 +135,19 @@ export default function VolunteersPage() {
       <Topbar title={t('title')} sub={t('subtitle')} />
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="users" label="Total Volunteers" value={String(total)} />
-          <KpiCard icon="target" label="Active" value={String(active)} />
-          <KpiCard icon="calendar" label="Total Hours" value={totalHours.toLocaleString()} />
-          <KpiCard icon="trending-down" label="Inactive" value={String(volunteers.filter(v => v.status === 'inactive').length)} />
+          <KpiCard icon="users" label={t('kpis.total')} value={String(total)} />
+          <KpiCard icon="target" label={t('kpis.active')} value={String(active)} />
+          <KpiCard icon="calendar" label={t('kpis.totalHours')} value={totalHours.toLocaleString()} />
+          <KpiCard icon="trending-down" label={t('filters.inactive')} value={String(volunteers.filter(v => v.status === 'inactive').length)} />
         </div>
 
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
             <Filter size={13} style={{ color: 'var(--txt3)' }} />
             <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
-              <option value="">All Statuses</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
+              <option value="">{t('filters.all')}</option>
+              <option value="active">{t('filters.active')}</option>
+              <option value="inactive">{t('filters.inactive')}</option>
               <option value="onboarding">Onboarding</option>
             </select>
           </div>
@@ -159,7 +159,7 @@ export default function VolunteersPage() {
             border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
             fontFamily: 'inherit', boxShadow: 'var(--shadow-sm)',
           }}>
-            <Plus size={13} /> Add Volunteer
+            <Plus size={13} /> {t('newVolunteer')}
           </button>
         </div>
 
@@ -232,10 +232,10 @@ export default function VolunteersPage() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <DetailTile icon={Mail} label="Email" value={v.email || '-'} />
-                <DetailTile icon={Phone} label="Phone" value={v.phone || '-'} />
-                <DetailTile icon={Clock} label="Total Hours" value={v.totalHours.toLocaleString()} />
-                <DetailTile icon={CalIcon} label="Activity Logs" value={String(v._count.volunteerLogs)} />
+                <DetailTile icon={Mail} label={t('fields.email')} value={v.email || '-'} />
+                <DetailTile icon={Phone} label={t('fields.phone')} value={v.phone || '-'} />
+                <DetailTile icon={Clock} label={t('kpis.totalHours')} value={v.totalHours.toLocaleString()} />
+                <DetailTile icon={CalIcon} label={t('fields.activityLogs')} value={String(v._count.volunteerLogs)} />
               </div>
 
               <div style={{ display: 'flex', gap: 8, borderTop: '1px solid var(--border)', paddingTop: 16, flexWrap: 'wrap' }}>
@@ -281,27 +281,27 @@ export default function VolunteersPage() {
       <Modal
         open={showForm}
         onClose={() => { if (!saving) setShowForm(false) }}
-        title={editingId ? 'Edit Volunteer' : 'Add Volunteer'}
+        title={editingId ? t('editVolunteer') : t('newVolunteer')}
         subtitle={editingId ? 'Update contact details' : 'Onboard a new volunteer'}
         size="md"
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <FormField label="Name">
-            <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Full name" style={inputStyle} />
+          <FormField label={t('fields.name')}>
+            <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} style={inputStyle} />
           </FormField>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <FormField label="Email">
+            <FormField label={t('fields.email')}>
               <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="volunteer@example.com" style={inputStyle} />
             </FormField>
-            <FormField label="Phone">
+            <FormField label={t('fields.phone')}>
               <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+1 555 555 0100" style={inputStyle} />
             </FormField>
           </div>
-          <FormField label="Status">
+          <FormField label={t('fields.status')}>
             <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} style={inputStyle}>
-              <option value="onboarding">Onboarding</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
+              <option value="onboarding">{t('filters.onboarding')}</option>
+              <option value="active">{t('filters.active')}</option>
+              <option value="inactive">{t('filters.inactive')}</option>
             </select>
           </FormField>
 

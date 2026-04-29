@@ -155,9 +155,14 @@
     },
     "filters": {
       "all": "All Statuses",
+      "prospect": "Prospect",
       "applied": "Applied",
+      "under_review": "Under review",
+      "approved": "Approved",
       "awarded": "Awarded",
       "active": "Active",
+      "reporting": "Reporting",
+      "closed": "Closed",
       "completed": "Completed",
       "rejected": "Rejected"
     },
@@ -307,7 +312,8 @@
       "phone": "Phone",
       "status": "Status",
       "skills": "Skills",
-      "notes": "Notes"
+      "notes": "Notes",
+      "activityLogs": "Activity Logs"
     },
     "toasts": {
       "nameRequired": "Name required",
