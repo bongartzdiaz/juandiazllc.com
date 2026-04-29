@@ -21,6 +21,8 @@
    in any log line.
    --------------------------------------------------------------- */
 
+import { hashEmail } from '../philly/blind-index'
+
 export interface ErasureResult {
   rowCounts: Record<string, number>
   totalRows: number
@@ -95,13 +97,24 @@ export async function eraseContactSubject(
 ): Promise<ErasureResult> {
   const normalized = email.trim().toLowerCase()
 
+  // Bundle AN — Contact.email is encrypted at rest with random IVs
+  // (Bundle P), so plaintext lookups never match. Use the
+  // emailHash blind-index column instead. The hash is the same one
+  // populated by POST/PATCH /api/contacts, so any contact that
+  // could be looked up via the API is also reachable here.
+  const emailHash = hashEmail(normalized)
+
   // Pre-fetch contact ids so we can delete dependent rows that
   // weren't marked Cascade in the schema (CallLog scopes via
-  // contactId, SmsMessage via contactId).
-  const contacts = await prisma.contact.findMany({
-    where: { organizationId, email: normalized },
-    select: { id: true },
-  })
+  // contactId, SmsMessage via contactId). The other email-bearing
+  // models (Reservation, Volunteer, etc.) carry plaintext email so
+  // their lookups stay direct.
+  const contacts = emailHash
+    ? await prisma.contact.findMany({
+        where: { organizationId, emailHash },
+        select: { id: true },
+      })
+    : []
   const contactIds = contacts.map((c) => c.id)
 
   const [
@@ -120,7 +133,9 @@ export async function eraseContactSubject(
     contactIds.length > 0
       ? prisma.smsMessage.deleteMany({ where: { contactId: { in: contactIds } } })
       : Promise.resolve({ count: 0 }),
-    prisma.contact.deleteMany({ where: { organizationId, email: normalized } }),
+    emailHash
+      ? prisma.contact.deleteMany({ where: { organizationId, emailHash } })
+      : Promise.resolve({ count: 0 }),
     prisma.reservation.deleteMany({
       where: { guestEmail: normalized, room: { organizationId } },
     }),

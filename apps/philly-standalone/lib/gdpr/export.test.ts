@@ -85,18 +85,30 @@ describe('collectOperatorData', () => {
 })
 
 describe('collectContactSubjectData', () => {
-  it('lowercases + trims the email before querying', async () => {
-    const captured: Array<Record<string, unknown>> = []
+  it('lowercases + trims the email before querying (emailHash for Contact, plaintext elsewhere)', async () => {
+    const capturedContact: Array<Record<string, unknown>> = []
+    const capturedReservation: Array<Record<string, unknown>> = []
     const prisma = makeOperatorPrisma({
       contact: {
         findMany: async ({ where }) => {
-          captured.push(where as Record<string, unknown>)
+          capturedContact.push(where as Record<string, unknown>)
+          return []
+        },
+      },
+      reservation: {
+        findMany: async ({ where }) => {
+          capturedReservation.push(where as Record<string, unknown>)
           return []
         },
       },
     })
     await collectContactSubjectData(prisma, 'org1', '  Alice@EXAMPLE.com ', 'fakehash')
-    expect(captured[0].email).toBe('alice@example.com')
+    // Bundle AN — Contact is encrypted; lookup uses emailHash (the
+    // caller-supplied one). Reservation/Volunteer/etc. carry plaintext
+    // email so they still see the normalised lowercase value.
+    expect(capturedContact[0]).toMatchObject({ organizationId: 'org1', emailHash: 'fakehash' })
+    expect(capturedContact[0].email).toBeUndefined()
+    expect(capturedReservation[0].guestEmail).toBe('alice@example.com')
   })
 
   it('scopes Reservation/OpenHouseVisit/Message/ESignature via parent table organizationId', async () => {

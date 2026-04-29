@@ -215,7 +215,7 @@ through NL/DE/ES on `/work`, `/insights`, `/sectors`, `/signals`,
 
 ### Launch readiness — 2026-04-28 (updated 2026-04-29)
 
-Bundles G–AM shipped on `claude/ai-command-bar`. The CRM is launch-
+Bundles G–AN shipped on `claude/ai-command-bar`. The CRM is launch-
 ready for big-company / EU-GDPR procurement subject to the operator
 setup steps below.
 
@@ -254,6 +254,14 @@ setup steps below.
 - AK — right-click context menu on projects (Quick view / Open full page / Copy title / Delete; Open + Delete disabled in RE/HOS demo modes).
 - AL — drag-drop reorder on the deals LIST view (kanban already has dnd for stage moves; we don't double-bind). New `Deal.displayOrder BIGINT NULL` + `(pipelineId, displayOrder)` index, migration `20260429010000_deal_display_order`, `POST /api/deals/reorder` endpoint (rate-limited, transaction, audit-logged), optimistic UI override.
 - AM — advanced filter builder (contacts as proof point). New `lib/philly/filter/{types,schemas,compile}.ts` with a JSON-safe DSL → Prisma `where` compiler (29 tests, allowlists every field). `GET /api/contacts?filter=<json>` accepts the spec; the schema-registry whitelist + the unconditional `organizationId` AND wrap is the injection-prevention story. Email/phone routing through blind-index hash columns (Bundle P) honoured. `<AdvancedFilterBuilder>` modal with type-aware operators + value inputs. Saved-views (Bundle AA) carry the spec under `filters.advanced`.
+- AN — deep software audit + fixes. Four parallel audits (security / code-quality / data-layer / a11y) surfaced 5 real bugs, all fixed:
+  - **CRITICAL**: `lib/gdpr/erasure.ts` and `lib/gdpr/export.ts` queried `Contact.email` plaintext, but Bundle P encrypted that column. Lookups silently returned 0 rows — Art. 17 erasure + Art. 15 export both broken. Fixed to use `emailHash` + `hashEmail()`. SAR export now decrypts email/phone/notes per Contact row before return.
+  - Contacts page KPI percentages divided by `contacts.length` without a guard → `NaN%` when the live list was empty. Added `pctOfTotal()` helper that returns `—`.
+  - Lead-scores page used `window.open(url, '_self')` for in-app navigation. Replaced with `router.push()`.
+  - SavedViewsBar's per-view delete button was hidden behind `display: none unless hover` — touch + keyboard users couldn't reach it. Now always rendered with opacity 0.45 → 0.85 on hover/focus.
+  - ContactForm name/email inputs now wire `aria-invalid` + `aria-describedby` + `role="alert"` on the error divs.
+  - Decorative Mail/Phone/FolderKanban icons in contact card detail rows now have `aria-hidden="true"`.
+  - Documented as audit deferred items: the security agent flagged 45+ mutation routes lacking `enforceRateLimit()` — separate bundle (mechanical sweep).
 
 **Verified at HEAD:**
 - `npm run build` clean on both apps (root + standalone)
@@ -303,7 +311,7 @@ setup steps below.
   signs off on quotes; renders null today, no runtime leak.
 - `SEO.md:128` `/docs/pitch-template.md` TODO (operator content,
   not code).
-- Advanced features remaining after Bundles AA–AM:
+- Advanced features remaining after Bundles AA–AN:
   - Advanced filter builder lift to deals + properties (the DSL
     is generic; need per-entity `FilterEntitySchema` + the same
     `?filter=` route plumbing).
@@ -313,6 +321,14 @@ setup steps below.
     `Property.displayOrder`, reorder endpoint, dnd handlers on the grid).
   - Column customization for less-used tables (showings, open-houses,
     commissions, dialer) — same recipe.
+  - Rate-limiting sweep on the 45+ mutation routes that don't
+    currently call `enforceRateLimit()` (Bundle AN audit finding).
+    Mechanical: `enforceRateLimit(\`<scope>:${scope.userId}\`,
+    PRESET_MUTATION)` on every POST/PATCH/DELETE that holds a
+    `requireRole` / `requireSection` gate.
+  - GDPR `runScheduledErasures` cron loops `prisma.user.delete` per
+    row; should batch into a single `deleteMany`. Audit finding,
+    medium severity (correctness fine, just slow at scale).
 
 ### Saved views — Bundle AA reference
 

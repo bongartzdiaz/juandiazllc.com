@@ -6,6 +6,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useApi } from '@/hooks/philly/useApi'
+import { useRouter } from 'next/navigation'
 import { Filter } from 'lucide-react'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
@@ -62,6 +63,7 @@ export default function LeadScoresPage() {
   const [page, setPage] = useState(1)
   const [gradeFilter, setGradeFilter] = useState('')
   const t = useTranslations('leadScores')
+  const router = useRouter()
 
   const params = new URLSearchParams({ page: String(page), limit: '25' })
   if (gradeFilter) params.set('grade', gradeFilter)
@@ -158,7 +160,7 @@ export default function LeadScoresPage() {
                 if (c.id === 'actions') return (
                   <div key="actions" style={{ display: 'flex', gap: 4 }}>
                     <button
-                      onClick={() => window.open(`/contacts/${record.contactId}`, '_self')}
+                      onClick={() => router.push(`/contacts/${record.contactId}`)}
                       style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 10, fontWeight: 600, color: 'var(--accent)', cursor: 'pointer', fontFamily: 'inherit' }}
                     >View</button>
                   </div>

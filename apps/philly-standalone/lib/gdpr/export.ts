@@ -168,9 +168,13 @@ export async function collectContactSubjectData(
   // Some PII-bearing models (Reservation, OpenHouseVisit, Message,
   // ESignature) don't carry organizationId directly — they're scoped
   // via a parent table. Use Prisma nested where to enforce tenancy.
+  // Bundle AN — Contact.email is encrypted at rest (Bundle P), so
+  // plaintext lookups never match; use emailHash. Other email-bearing
+  // models (Reservation, Volunteer, etc.) carry plaintext email so
+  // their lookups stay direct.
   const [contacts, reservations, volunteers, openHouseVisits, messages, eSignatures, consentRecords] =
     await Promise.all([
-      prisma.contact.findMany({ where: { organizationId, email: normalized } }),
+      prisma.contact.findMany({ where: { organizationId, emailHash } }),
       prisma.reservation.findMany({
         where: { guestEmail: normalized, room: { organizationId } },
       }),
@@ -192,13 +196,27 @@ export async function collectContactSubjectData(
       }),
     ])
 
+  // Bundle AN — decrypt email/phone/notes on each Contact row before
+  // returning to the data subject. The data subject's Art. 15 export
+  // must be plaintext (it's their data).
+  const plaintextContacts = contacts.map((c) => {
+    const out = { ...c }
+    for (const k of ['email', 'phone', 'notes'] as const) {
+      const v = (out as Record<string, unknown>)[k]
+      if (typeof v === 'string') {
+        ;(out as Record<string, unknown>)[k] = decryptPii(v) ?? ''
+      }
+    }
+    return out
+  })
+
   return {
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),
     subjectKind: 'contact',
     subjectEmail: normalized,
     organizationId,
-    contacts,
+    contacts: plaintextContacts,
     reservations,
     volunteers,
     openHouseVisits,

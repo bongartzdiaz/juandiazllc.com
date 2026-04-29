@@ -1,4 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeAll } from 'vitest'
+// Bundle AN — eraseContactSubject hashes the email via blind-index;
+// without the secret the hash is null and the contact-deletion path
+// skips. Set the env var BEFORE importing the module so the loader
+// caches a real key.
+process.env.BLIND_INDEX_SECRET = process.env.BLIND_INDEX_SECRET
+  ?? 'gdpr-erasure-test-blind-index-secret-32-bytes-min-len'
 import {
   scheduleAccountDeletion,
   cancelAccountDeletion,
@@ -6,6 +12,9 @@ import {
   runScheduledErasures,
 } from './erasure'
 import type { PrismaForErasure } from './erasure'
+import { __resetBlindIndexForTests } from '../philly/blind-index'
+
+beforeAll(() => { __resetBlindIndexForTests() })
 
 interface UserRow {
   id: string

@@ -265,6 +265,9 @@ export default function ContactsPage() {
   })
 
   const countByType = (type: string) => contacts.filter(c => c.type === type).length
+  // Bundle AN — KPI percentages: guard against divide-by-zero when
+  // live mode returns an empty list. fmt returns "—" instead of NaN%.
+  const pctOfTotal = (n: number) => contacts.length === 0 ? '—' : `${Math.round((n / contacts.length) * 100)}% of total`
 
   const handleAddContact = async (data: ContactFormData) => {
     try {
@@ -426,22 +429,22 @@ export default function ContactsPage() {
           {isHOS ? (
             <>
               <KpiCard label="Total Contacts" value={contacts.length} icon="users" accentColor="var(--accent)" delay={80} />
-              <KpiCard label="Guests" value={countByType('guest')} delta={`${Math.round((countByType('guest') / contacts.length) * 100)}% of total`} deltaDir="neu" icon="heart" accentColor="var(--accent)" delay={130} />
-              <KpiCard label="Vendors" value={countByType('vendor')} delta={`${Math.round((countByType('vendor') / contacts.length) * 100)}% of total`} deltaDir="up" icon="dollar-sign" accentColor="var(--o)" delay={180} />
+              <KpiCard label="Guests" value={countByType('guest')} delta={pctOfTotal(countByType('guest'))} deltaDir="neu" icon="heart" accentColor="var(--accent)" delay={130} />
+              <KpiCard label="Vendors" value={countByType('vendor')} delta={pctOfTotal(countByType('vendor'))} deltaDir="up" icon="dollar-sign" accentColor="var(--o)" delay={180} />
               <KpiCard label="Staff" value={countByType('staff')} icon="globe" accentColor="var(--y)" delay={230} />
             </>
           ) : isRE ? (
             <>
               <KpiCard label="Total Contacts" value={contacts.length} icon="users" accentColor="var(--accent)" delay={80} />
-              <KpiCard label="Buyers" value={countByType('buyer')} delta={`${Math.round((countByType('buyer') / contacts.length) * 100)}% of total`} deltaDir="neu" icon="heart" accentColor="var(--accent)" delay={130} />
-              <KpiCard label="Sellers" value={countByType('seller')} delta={`${Math.round((countByType('seller') / contacts.length) * 100)}% of total`} deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={180} />
+              <KpiCard label="Buyers" value={countByType('buyer')} delta={pctOfTotal(countByType('buyer'))} deltaDir="neu" icon="heart" accentColor="var(--accent)" delay={130} />
+              <KpiCard label="Sellers" value={countByType('seller')} delta={pctOfTotal(countByType('seller'))} deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={180} />
               <KpiCard label="Investors" value={countByType('investor')} icon="globe" accentColor="var(--p)" delay={230} />
             </>
           ) : (
             <>
               <KpiCard label="Total Contacts" value={contacts.length} icon="users" accentColor="var(--accent)" delay={80} />
-              <KpiCard label="Partners" value={countByType('partner')} delta={`${Math.round((countByType('partner') / contacts.length) * 100)}% of total`} deltaDir="neu" icon="heart" accentColor="var(--accent)" delay={130} />
-              <KpiCard label="Donors" value={countByType('donor')} delta={`${Math.round((countByType('donor') / contacts.length) * 100)}% of total`} deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={180} />
+              <KpiCard label="Partners" value={countByType('partner')} delta={pctOfTotal(countByType('partner'))} deltaDir="neu" icon="heart" accentColor="var(--accent)" delay={130} />
+              <KpiCard label="Donors" value={countByType('donor')} delta={pctOfTotal(countByType('donor'))} deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={180} />
               <KpiCard label="Stakeholders" value={countByType('stakeholder')} icon="globe" accentColor="var(--p)" delay={230} />
             </>
           )}
