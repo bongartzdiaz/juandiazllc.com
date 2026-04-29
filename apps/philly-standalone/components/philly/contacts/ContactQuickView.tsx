@@ -1,12 +1,16 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import {
   Mail, Phone, Building2, Tag, Sparkles, Calendar,
-  ExternalLink, X, FolderKanban,
+  ExternalLink, X, FolderKanban, Pencil,
 } from 'lucide-react'
 import { Modal } from '@/components/philly/ui/Modal'
 import { useApi } from '@/hooks/philly/useApi'
+import { useToast } from '@/hooks/philly/useToast'
+import { ContactForm } from '@/components/philly/forms/ContactForm'
+import type { ContactFormData } from '@/components/philly/forms/ContactForm'
 
 /* Bundle T — popover quick-view for a contact. Used from the
    contacts list grid (and reusable elsewhere). Fetches the full
@@ -68,11 +72,41 @@ export function ContactQuickView({ contactId, onClose }: Props) {
   })
   const c = query.data?.data ?? null
   const tc = (c && typeColors[c.type]) || typeColors.partner
+  const { addToast } = useToast()
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  // Reset edit state when the modal closes or the contactId changes.
+  const handleClose = () => {
+    setEditing(false)
+    onClose()
+  }
+
+  const handleSave = async (data: ContactFormData) => {
+    if (!c || saving) return
+    setSaving(true)
+    try {
+      const res = await fetch(`/api/contacts/${c.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.error ?? `Failed (${res.status})`)
+      addToast('Contact updated', 'success')
+      setEditing(false)
+      query.refetch()
+    } catch (e: unknown) {
+      addToast(e instanceof Error ? e.message : 'Update failed', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <Modal
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       title={c?.name ?? 'Contact'}
       subtitle={c?.company || ''}
       size="md"
@@ -81,6 +115,19 @@ export function ContactQuickView({ contactId, onClose }: Props) {
         <div style={{ padding: 24, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
           {query.loading ? 'Loading…' : query.error ?? 'Contact not found'}
         </div>
+      ) : editing ? (
+        <ContactForm
+          initial={{
+            name: c.name,
+            email: c.email,
+            phone: c.phone,
+            type: c.type,
+            company: c.company,
+            notes: c.notes ?? '',
+          }}
+          onSubmit={handleSave}
+          onCancel={() => setEditing(false)}
+        />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* Type + source pill row */}
@@ -240,14 +287,29 @@ export function ContactQuickView({ contactId, onClose }: Props) {
             </Link>
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => setEditing(true)}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '7px 14px', borderRadius: 8,
+                fontSize: 12, fontWeight: 600,
+                background: 'var(--bg2)', color: 'var(--txt)',
+                border: '1px solid var(--border)', cursor: 'pointer',
+                fontFamily: 'inherit',
+              }}
+            >
+              <Pencil size={12} />
+              Edit
+            </button>
+            <button
+              type="button"
+              onClick={handleClose}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5,
                 padding: '7px 14px', borderRadius: 8,
                 fontSize: 12, fontWeight: 500,
                 background: 'transparent', color: 'var(--txt2)',
                 border: '1px solid var(--border)', cursor: 'pointer',
-                fontFamily: 'inherit',
+                fontFamily: 'inherit', marginLeft: 'auto',
               }}
             >
               <X size={12} />
