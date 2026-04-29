@@ -19,11 +19,16 @@ type MeResponse = {
   name: string | null
   role: string
   dashboardSections: string[] | null
+  organization?: { industry?: string | null } | null
 }
 
 export type MySections = {
   role: string
   dashboardSections: string[] | null
+  /** Raw `organization.industry` value — "general" / "realestate" /
+      "hospitality" / "philanthropy". Caller decides what to do with
+      "general" (multi-vertical org, switcher remains free). */
+  orgIndustry: string | null
   loading: boolean
 }
 
@@ -41,6 +46,7 @@ export function useMySections(): MySections {
     // briefly flash items the user isn't allowed to see. `hasSection`
     // will still return true for admins regardless.
     dashboardSections: me ? (me.dashboardSections ?? null) : [],
+    orgIndustry: me?.organization?.industry ?? null,
     loading,
   }
 }

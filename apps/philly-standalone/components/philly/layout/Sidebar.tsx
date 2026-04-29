@@ -39,7 +39,7 @@ const INDUSTRY_ICONS: Record<Industry, LucideIcon> = {
 export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
   const pathname = usePathname()
   const path = pathname.replace(/^\/(en|nl)/, '') || '/'
-  const { industry, config, setIndustry } = useIndustry()
+  const { industry, config, setIndustry, orgLocked } = useIndustry()
   const [showSwitcher, setShowSwitcher] = useState(false)
   const session = useSupabaseUser()
   const { role, dashboardSections, loading: sectionsLoading } = useMySections()
@@ -165,7 +165,9 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
           </div>
         </div>
 
-        {/* Industry Switcher */}
+        {/* Industry Switcher — hidden for non-admins when the org's
+            industry is bound to a specific vertical (Bundle AT). */}
+        {!orgLocked && (
         <div style={{ padding: '0 12px 10px', position: 'relative' }}>
           <button
             onClick={() => setShowSwitcher(!showSwitcher)}
@@ -221,6 +223,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
             </div>
           )}
         </div>
+        )}
       </div>
 
       {/* Nav */}

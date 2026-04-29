@@ -14,6 +14,7 @@ import { SectionGuard } from './SectionGuard'
 import { CommandPalette } from '@/components/philly/ui/CommandPalette'
 import { KeyboardShortcuts } from '@/components/philly/ui/KeyboardShortcuts'
 import { OfflineBanner } from '@/components/philly/ui/OfflineBanner'
+import { OrgIndustrySync } from './OrgIndustrySync'
 
 // Mobile menu context so Topbar can toggle the sidebar
 const MobileMenuCtx = createContext<{ open: boolean; toggle: () => void }>({ open: false, toggle: () => {} })
@@ -137,6 +138,7 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
 
         <CommandPalette />
         <KeyboardShortcuts />
+        <OrgIndustrySync />
         <OfflineBanner />
         <MobileNav />
       </div>
