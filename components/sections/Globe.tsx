@@ -38,7 +38,27 @@ const FEATURED: Record<string, { eyebrow: string; body: string }> = {
   },
 };
 
-export function Globe() {
+export interface GlobeLabels {
+  aria: string
+  close: string
+  back: string
+  eyebrowFallback: string
+  bodyFallback: string
+}
+
+interface GlobeProps {
+  labels?: GlobeLabels
+}
+
+const DEFAULT_LABELS: GlobeLabels = {
+  aria: "Interactive earth globe — drag to rotate, click a country to zoom in",
+  close: "Close",
+  back: "Back to orbit",
+  eyebrowFallback: "Signal",
+  bodyFallback: "Exploring opportunities here — tap another country, or close to return to orbit.",
+}
+
+export function Globe({ labels = DEFAULT_LABELS }: GlobeProps = {}) {
   const svgRef = useRef<SVGSVGElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 640, h: 640 });
@@ -230,7 +250,7 @@ export function Globe() {
         className="globe-svg"
         viewBox={`0 0 ${size.w} ${size.h}`}
         role="img"
-        aria-label="Interactive earth globe — drag to rotate, click a country to zoom in"
+        aria-label={labels.aria}
       >
         <defs>
           <radialGradient id="oceanGrad" cx="38%" cy="34%" r="68%">
@@ -313,16 +333,16 @@ export function Globe() {
       {/* Info panel — appears on country click */}
       {selected && (
         <div className="country-panel" role="dialog" aria-label={selected.properties?.name}>
-          <button className="country-close" onClick={flyHome} aria-label="Close">
+          <button className="country-close" onClick={flyHome} aria-label={labels.close}>
             <span aria-hidden="true">×</span>
           </button>
-          <div className="country-eyebrow">{featured?.eyebrow ?? "Signal"}</div>
+          <div className="country-eyebrow">{featured?.eyebrow ?? labels.eyebrowFallback}</div>
           <h3 className="country-name">{selected.properties?.name}</h3>
           <p className="country-body">
-            {featured?.body ?? "Exploring opportunities here — tap another country, or close to return to orbit."}
+            {featured?.body ?? labels.bodyFallback}
           </p>
           <button className="country-back" onClick={flyHome}>
-            Back to orbit <span className="arr">→</span>
+            {labels.back} <span className="arr">→</span>
           </button>
         </div>
       )}

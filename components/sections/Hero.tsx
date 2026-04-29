@@ -26,7 +26,15 @@ export function Hero({ locale }: { locale: Locale }) {
         <div className="hero-starfield-deep" />
         <div className="hero-starfield" />
         <div className="hero-globe-container">
-          <Globe />
+          <Globe
+            labels={{
+              aria: t("globe.aria"),
+              close: t("globe.close"),
+              back: t("globe.back"),
+              eyebrowFallback: t("globe.eyebrow.fallback"),
+              bodyFallback: t("globe.body.fallback"),
+            }}
+          />
         </div>
       </div>
 

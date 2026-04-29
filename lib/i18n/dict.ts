@@ -79,6 +79,13 @@ const en: Dict = {
   "hero.cta.secondary": "See the work",
   "hero.scroll": "Scroll",
 
+  // Globe
+  "globe.aria": "Interactive earth globe — drag to rotate, click a country to zoom in",
+  "globe.close": "Close",
+  "globe.back": "Back to orbit",
+  "globe.eyebrow.fallback": "Signal",
+  "globe.body.fallback": "Exploring opportunities here — tap another country, or close to return to orbit.",
+
   // CTA block
   "cta.label": "◉ Work with me",
   "cta.title.a": "Ready to find the revenue you're",
@@ -803,6 +810,12 @@ const nl: Dict = {
   "hero.cta.secondary": "Bekijk het werk",
   "hero.scroll": "Scrollen",
 
+  "globe.aria": "Interactieve aarde — sleep om te draaien, klik op een land om in te zoomen",
+  "globe.close": "Sluiten",
+  "globe.back": "Terug naar baan",
+  "globe.eyebrow.fallback": "Signaal",
+  "globe.body.fallback": "Verkennen we hier kansen — tik op een ander land, of sluit om terug te keren naar de baan.",
+
   "cta.label": "◉ Samenwerken",
   "cta.title.a": "Klaar om de omzet te pakken",
   "cta.title.b": "die je laat liggen?",
@@ -1453,7 +1466,7 @@ const de: Dict = {
   "nav.tools": "Tools",
   "nav.contact": "Kontakt",
   "nav.about": "Über",
-  "nav.login": "Login",
+  "nav.login": "Anmelden",
 
   "story.tl.amsterdam.y": "— Amsterdam / NL",
   "story.tl.amsterdam.t": "Zwischen zwei Kulturen, zwei Sprachen, zwei Sichtweisen.",
@@ -1500,6 +1513,12 @@ const de: Dict = {
   "hero.cta.primary": "Erstgespräch vereinbaren",
   "hero.cta.secondary": "Die Arbeit ansehen",
   "hero.scroll": "Scrollen",
+
+  "globe.aria": "Interaktiver Erdball — zum Drehen ziehen, auf ein Land klicken, um hineinzuzoomen",
+  "globe.close": "Schließen",
+  "globe.back": "Zurück in die Umlaufbahn",
+  "globe.eyebrow.fallback": "Signal",
+  "globe.body.fallback": "Hier Chancen erkunden — auf ein anderes Land tippen oder schließen, um in die Umlaufbahn zurückzukehren.",
 
   "cta.label": "◉ Zusammenarbeiten",
   "cta.title.a": "Bereit, den Umsatz einzusammeln,",
@@ -2198,6 +2217,12 @@ const es: Dict = {
   "hero.cta.primary": "Reservar una llamada inicial",
   "hero.cta.secondary": "Ver el trabajo",
   "hero.scroll": "Bajar",
+
+  "globe.aria": "Globo terráqueo interactivo — arrastra para rotar, haz clic en un país para acercarte",
+  "globe.close": "Cerrar",
+  "globe.back": "Volver a la órbita",
+  "globe.eyebrow.fallback": "Señal",
+  "globe.body.fallback": "Explorando oportunidades aquí — toca otro país, o cierra para volver a la órbita.",
 
   "cta.label": "◉ Trabajemos",
   "cta.title.a": "¿Listo para recoger los ingresos",

@@ -56,7 +56,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Your portfolio at a glance",
+    "subtitle": "Your impact at a glance",
     "totalProjects": "Total Projects",
     "activeProjects": "Active Projects",
     "peopleHelped": "People Helped",
@@ -291,7 +291,7 @@
   },
   "automations": {
     "title": "Automations",
-    "subtitle": "Automate workflows and notifications",
+    "subtitle": "Trigger-based rules to automate workflows",
     "totalRules": "Total Rules",
     "active": "Active",
     "totalRuns": "Total Runs"

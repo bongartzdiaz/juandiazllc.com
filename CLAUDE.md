@@ -215,7 +215,7 @@ through NL/DE/ES on `/work`, `/insights`, `/sectors`, `/signals`,
 
 ### Launch readiness — 2026-04-28 (updated 2026-04-29)
 
-Bundles G–AN shipped on `claude/ai-command-bar`. The CRM is launch-
+Bundles G–AO shipped on `claude/ai-command-bar`. The CRM is launch-
 ready for big-company / EU-GDPR procurement subject to the operator
 setup steps below.
 
@@ -254,6 +254,14 @@ setup steps below.
 - AK — right-click context menu on projects (Quick view / Open full page / Copy title / Delete; Open + Delete disabled in RE/HOS demo modes).
 - AL — drag-drop reorder on the deals LIST view (kanban already has dnd for stage moves; we don't double-bind). New `Deal.displayOrder BIGINT NULL` + `(pipelineId, displayOrder)` index, migration `20260429010000_deal_display_order`, `POST /api/deals/reorder` endpoint (rate-limited, transaction, audit-logged), optimistic UI override.
 - AM — advanced filter builder (contacts as proof point). New `lib/philly/filter/{types,schemas,compile}.ts` with a JSON-safe DSL → Prisma `where` compiler (29 tests, allowlists every field). `GET /api/contacts?filter=<json>` accepts the spec; the schema-registry whitelist + the unconditional `organizationId` AND wrap is the injection-prevention story. Email/phone routing through blind-index hash columns (Bundle P) honoured. `<AdvancedFilterBuilder>` modal with type-aware operators + value inputs. Saved-views (Bundle AA) carry the spec under `filters.advanced`.
+- AO — translation parity audit + fixes. Two parallel agents diffed every locale across `lib/i18n/dict.ts` (en/nl/de/es) and the next-intl message JSONs (en/nl, root + standalone), and one agent scanned for hardcoded English on the marketing site. Fixed:
+  - `lib/i18n/dict.ts` German `nav.login` was the literal English word "Login" — corrected to "Anmelden". (NL "Contact" cases flagged by the agent were false positives — "Contact" is correct Dutch.)
+  - `dashboard.subtitle` + `automations.subtitle` drift between root `messages/{en,nl}.json` and standalone `apps/philly-standalone/messages/{en,nl}.json` — root rewritten to match the standalone (the dashboard-aligned wording).
+  - Deleted dead `messages/phily-en.json` + `messages/phily-nl.json` (zero references in the codebase).
+  - `components/sections/Globe.tsx` had 5 hardcoded English strings (svg aria-label, close button, fallback eyebrow, fallback body, "Back to orbit"). Now takes a `labels: GlobeLabels` prop; `Hero.tsx` passes labels via `translate()`. Added `globe.{aria,close,back,eyebrow.fallback,body.fallback}` keys × 4 locales (20 entries).
+  - Honeypot fields ("Website (leave blank)") are `aria-hidden="true"` and visually hidden — never reach NL/DE/ES users, so those flags were false positives.
+  - "AMS" airport code + "CET" timezone abbreviation are international identifiers; not translated.
+  - **Documented but deferred**: the standalone dashboard has ~150 hardcoded English strings introduced by recent bundles (T–AM) — quick-views, bulk-action bars, saved-views chip-bar, keyboard cheat-sheet, column picker, advanced filter builder, plus toast messages + confirm() prompts on every page. The new components were built quickly to ship features; rolling them through `useTranslations()` is a separate sweep (Bundle AP candidate). Operator-facing English in NL+DE markets is currently the biggest UX cliff for the dashboard; addressing it requires either (a) wrapping every string in `t()` calls + extending `apps/philly-standalone/messages/{en,nl}.json` (hundreds of new keys), or (b) deferring until DeepL pass-through is wired (already deferred in this same list).
 - AN — deep software audit + fixes. Four parallel audits (security / code-quality / data-layer / a11y) surfaced 5 real bugs, all fixed:
   - **CRITICAL**: `lib/gdpr/erasure.ts` and `lib/gdpr/export.ts` queried `Contact.email` plaintext, but Bundle P encrypted that column. Lookups silently returned 0 rows — Art. 17 erasure + Art. 15 export both broken. Fixed to use `emailHash` + `hashEmail()`. SAR export now decrypts email/phone/notes per Contact row before return.
   - Contacts page KPI percentages divided by `contacts.length` without a guard → `NaN%` when the live list was empty. Added `pctOfTotal()` helper that returns `—`.
@@ -329,6 +337,16 @@ setup steps below.
   - GDPR `runScheduledErasures` cron loops `prisma.user.delete` per
     row; should batch into a single `deleteMany`. Audit finding,
     medium severity (correctness fine, just slow at scale).
+  - Dashboard i18n sweep (Bundle AO audit finding): ~150 hardcoded
+    English strings across the standalone CRM components added in
+    Bundles T–AM (quick-views, bulk-action bar, saved-views,
+    keyboard shortcuts, column picker, context menu, advanced
+    filter builder + page-level toasts/confirms/labels). Bundle AO
+    fixed only the marketing-site Globe component; the dashboard
+    sweep is intentionally deferred until either (a) we extend
+    `apps/philly-standalone/messages/{en,nl}.json` with the new keys
+    (and add de/es to next-intl, currently dict-only), or (b) DeepL
+    machine-translation passthrough is wired.
 
 ### Saved views — Bundle AA reference
 

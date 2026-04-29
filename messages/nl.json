@@ -56,7 +56,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Jouw portfolio in een oogopslag",
+    "subtitle": "Jouw impact in een oogopslag",
     "totalProjects": "Totaal Projecten",
     "activeProjects": "Actieve Projecten",
     "peopleHelped": "Mensen Geholpen",
@@ -291,7 +291,7 @@
   },
   "automations": {
     "title": "Automatiseringen",
-    "subtitle": "Automatiseer workflows en meldingen",
+    "subtitle": "Trigger-gebaseerde regels om workflows te automatiseren",
     "totalRules": "Totaal Regels",
     "active": "Actief",
     "totalRuns": "Totaal Uitvoeringen"
