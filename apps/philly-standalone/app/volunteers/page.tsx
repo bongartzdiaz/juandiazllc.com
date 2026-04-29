@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -10,6 +10,24 @@ import { Filter, Mail, Phone, Clock, Calendar as CalIcon, Plus, Trash2, Edit2 } 
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
+import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+
+const VOL_COLUMNS: ColumnDef[] = [
+  { id: 'name', label: 'Name', required: true },
+  { id: 'email', label: 'Email' },
+  { id: 'status', label: 'Status' },
+  { id: 'hours', label: 'Hours' },
+  { id: 'logs', label: 'Logs' },
+]
+const VOL_DEFAULTS = ['name', 'email', 'status', 'hours', 'logs']
+const VOL_WIDTHS: Record<string, string> = {
+  name: '1fr',
+  email: '180px',
+  status: '120px',
+  hours: '80px',
+  logs: '80px',
+}
 
 interface Volunteer {
   id: string
@@ -36,6 +54,17 @@ export default function VolunteersPage() {
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState('')
   const [selected, setSelected] = useState<Volunteer | null>(null)
+
+  // Bundle AH — column visibility prefs.
+  const volColumns = useColumnPrefs('pai-volunteers-columns-v1', VOL_DEFAULTS)
+  const visibleVolColumns = useMemo(
+    () => VOL_COLUMNS.filter((c) => c.required || volColumns.visible.has(c.id)),
+    [volColumns.visible],
+  )
+  const volsGridTemplate = useMemo(
+    () => visibleVolColumns.map((c) => VOL_WIDTHS[c.id]).join(' '),
+    [visibleVolColumns],
+  )
 
   const params = new URLSearchParams({ page: String(page), limit: '20' })
   if (statusFilter) params.set('status', statusFilter)
@@ -134,9 +163,18 @@ export default function VolunteersPage() {
           </button>
         </div>
 
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+          <ColumnPicker
+            columns={VOL_COLUMNS}
+            visible={volColumns.visible}
+            onToggle={volColumns.toggle}
+            onReset={volColumns.reset}
+            isOverridden={volColumns.isOverridden}
+          />
+        </div>
         <div style={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 180px 120px 80px 80px', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
-            <span>Name</span><span>Email</span><span>Status</span><span>Hours</span><span>Logs</span>
+          <div style={{ display: 'grid', gridTemplateColumns: volsGridTemplate, gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
+            {visibleVolColumns.map((c) => <span key={c.id}>{c.label}</span>)}
           </div>
           {loading ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
@@ -150,21 +188,26 @@ export default function VolunteersPage() {
                 onClick={() => setSelected(vol)}
                 className="card-hover"
                 style={{
-                  display: 'grid', gridTemplateColumns: '1fr 180px 120px 80px 80px', gap: 12,
+                  display: 'grid', gridTemplateColumns: volsGridTemplate, gap: 12,
                   padding: '10px 16px',
                   borderBottom: idx < volunteers.length - 1 ? '1px solid var(--border)' : 'none',
                   fontSize: 12, alignItems: 'center', cursor: 'pointer',
                   background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent',
                 }}
               >
-                <div>
-                  <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{vol.name}</div>
-                  {vol.phone && <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{vol.phone}</div>}
-                </div>
-                <span style={{ color: 'var(--txt2)', fontSize: 11 }}>{vol.email || '-'}</span>
-                <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 9, fontWeight: 600, textTransform: 'uppercase', background: sc.bg, color: sc.txt, display: 'inline-block', maxWidth: 'fit-content' }}>{vol.status}</span>
-                <span style={{ fontFamily: "var(--font-red-hat-mono), monospace", fontWeight: 600 }}>{vol.totalHours}</span>
-                <span style={{ color: 'var(--txt3)' }}>{vol._count.volunteerLogs}</span>
+                {visibleVolColumns.map((c) => {
+                  if (c.id === 'name') return (
+                    <div key="name">
+                      <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{vol.name}</div>
+                      {vol.phone && <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{vol.phone}</div>}
+                    </div>
+                  )
+                  if (c.id === 'email') return <span key="email" style={{ color: 'var(--txt2)', fontSize: 11 }}>{vol.email || '-'}</span>
+                  if (c.id === 'status') return <span key="status" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 9, fontWeight: 600, textTransform: 'uppercase', background: sc.bg, color: sc.txt, display: 'inline-block', maxWidth: 'fit-content' }}>{vol.status}</span>
+                  if (c.id === 'hours') return <span key="hours" style={{ fontFamily: 'var(--font-red-hat-mono), monospace', fontWeight: 600 }}>{vol.totalHours}</span>
+                  if (c.id === 'logs') return <span key="logs" style={{ color: 'var(--txt3)' }}>{vol._count.volunteerLogs}</span>
+                  return <span key={c.id} />
+                })}
               </div>
             )
           })}

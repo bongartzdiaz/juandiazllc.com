@@ -33,8 +33,8 @@ const ACTIONS: ShortcutEntry[] = [
   { keys: 'Esc', description: 'Close any open modal' },
   { keys: '⌘K', description: 'Open command palette (search + AI)' },
   { keys: '⌘⇧K', description: 'Open command palette in AI mode' },
-  { keys: 'j', description: 'Next row (deals list view)' },
-  { keys: 'k', description: 'Previous row (deals list view)' },
+  { keys: 'j', description: 'Next row (deals list, properties, transactions)' },
+  { keys: 'k', description: 'Previous row' },
   { keys: 'Enter', description: 'Open focused row' },
 ]
 

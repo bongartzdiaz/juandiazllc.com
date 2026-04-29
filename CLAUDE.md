@@ -215,7 +215,7 @@ through NL/DE/ES on `/work`, `/insights`, `/sectors`, `/signals`,
 
 ### Launch readiness — 2026-04-28 (updated 2026-04-29)
 
-Bundles G–AG shipped on `claude/ai-command-bar`. The CRM is launch-
+Bundles G–AI shipped on `claude/ai-command-bar`. The CRM is launch-
 ready for big-company / EU-GDPR procurement subject to the operator
 setup steps below.
 
@@ -248,6 +248,8 @@ setup steps below.
 - AE — context menu propagation to deals (list + kanban: Mark won/lost, Copy contact, Delete) and properties (list: Valuation deep link, Copy address, Delete)
 - AF — `j` / `k` / `Enter` row navigation on the deals list view (focused row gets accent ring, scrollIntoView on move, hover updates focus too)
 - AG — drag-drop reorder on the contacts page (live mode only): adds `Contact.displayOrder BIGINT NULL` + index, new migration `20260429000000_contact_display_order`, optimistic UI override, `POST /api/contacts/reorder` with rate-limit + transaction
+- AH — column-customization sweep on transactions / grants / volunteers list views (each with its own `pai-<entity>-columns-v1` localStorage key)
+- AI — `j` / `k` / `Enter` row navigation propagated to properties grid + transactions list (deal-list view already had it via Bundle AF)
 
 **Verified at HEAD:**
 - `npm run build` clean on both apps (root + standalone)
@@ -296,17 +298,17 @@ setup steps below.
   signs off on quotes; renders null today, no runtime leak.
 - `SEO.md:128` `/docs/pitch-template.md` TODO (operator content,
   not code).
-- Advanced features remaining after Bundles AA–AG:
+- Advanced features remaining after Bundles AA–AI:
   - Advanced filter builder (server-side query DSL — bigger lift, needs
     product spec on field + operator vocabulary).
-  - Column customization propagation to remaining table-shaped pages
-    (transactions, grants, volunteers, documents, inbox, referrals —
-    same `useColumnPrefs` hook + `<ColumnPicker>` as Bundle AC).
+  - Column customization for documents / inbox / referrals (same
+    `useColumnPrefs` + `<ColumnPicker>` recipe; AH covered the three
+    largest tables).
   - Context-menu items for the projects page (the page already has
     its own inline detail modal so the lift is smaller — just per-page
     menu items, the primitive is shared).
-  - `j/k` row navigation propagation to the deal kanban + the
-    properties grid (today AF only covers the deals list view).
+  - `j/k` propagation to the deal kanban (2D layout — needs row+column
+    arrow-key handling, not the same shape as the linear lists AF/AI cover).
   - Drag-drop reorder propagation to deals/properties (`displayOrder`
     column add + analogous reorder endpoint).
 
@@ -375,14 +377,19 @@ can be recomputed on visibility change.
 renders the toolbar button + popover. Outside-click + Escape
 close it. `required: true` on a `ColumnDef` makes it un-toggleable.
 
-Today only the deals list view uses it; the contacts page uses
-cards (no columns) and the properties page uses a card grid.
-Lift to other table-shaped pages by:
-1. Defining `<ENTITY>_COLUMN_DEFS`, `<ENTITY>_COLUMN_DEFAULTS`,
-   `<ENTITY>_COLUMN_WIDTHS` constants near the top of the page.
-2. Calling `useColumnPrefs('pai-<entity>-columns-v1', defaults)`.
-3. Memoising the visible columns + grid template, then mapping
-   over `visibleColumns` in both the header and each row.
+Wired today on the deals list view, transactions, grants, and
+volunteers (Bundle AH). Each page declares its own
+`<ENTITY>_COLUMN_DEFS / DEFAULTS / WIDTHS` constants near the top
++ calls `useColumnPrefs('pai-<entity>-columns-v1', DEFAULTS)`.
+Header and row both `.map(visibleColumns)` so toggling a column
+re-flows everything in one render. The contacts page uses cards
+(no columns) and the properties page uses a card grid (also no
+columns).
+
+To extend to documents / inbox / referrals: copy the recipe from
+`app/transactions/page.tsx`. The `<ColumnPicker>` button is
+conventionally placed in a flex-end `<div>` directly above the
+table.
 
 ### Right-click context menu — Bundle AD reference
 
@@ -406,9 +413,13 @@ Per-page wiring:
 Wired today on contacts, deals (list + kanban), and properties.
 Items are page-specific — see each page file for its `items` array.
 
-### `j` / `k` row navigation — Bundle AF reference
+### `j` / `k` row navigation — Bundle AF + AI reference
 
-Implemented inline on `app/deals/page.tsx` only (list view). Pattern:
+Wired today on the deals list view, properties grid, and transactions
+list. The same inline pattern is replicated per page (kept inline
+rather than extracted into a hook so each page can wire its own
+ref-collection type — `HTMLAnchorElement` for `<Link>`, `HTMLDivElement`
+for plain rows). Pattern:
 
 1. `[focusedDealId, setFocusedDealId] = useState<string | null>(null)`
 2. `rowRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())` —

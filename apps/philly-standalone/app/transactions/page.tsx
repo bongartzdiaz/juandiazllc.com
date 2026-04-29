@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -9,6 +9,27 @@ import { Filter, PenTool, X } from 'lucide-react'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
 import { useRouter } from 'next/navigation'
+import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
+import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+import { useGlobalShortcuts } from '@/hooks/philly/useGlobalShortcuts'
+
+const TXN_COLUMNS: ColumnDef[] = [
+  { id: 'transaction', label: 'Transaction', required: true },
+  { id: 'type', label: 'Type' },
+  { id: 'salePrice', label: 'Sale Price' },
+  { id: 'status', label: 'Status' },
+  { id: 'closingDate', label: 'Closing Date' },
+  { id: 'signatures', label: 'Signatures' },
+]
+const TXN_DEFAULTS = ['transaction', 'type', 'salePrice', 'status', 'closingDate', 'signatures']
+const TXN_WIDTHS: Record<string, string> = {
+  transaction: '1fr',
+  type: '100px',
+  salePrice: '120px',
+  status: '100px',
+  closingDate: '120px',
+  signatures: '80px',
+}
 
 interface Transaction {
   id: string
@@ -56,6 +77,21 @@ export default function TransactionsPage() {
   const [addError, setAddError] = useState<string | null>(null)
   const t = useTranslations('transactions')
   const router = useRouter()
+
+  // Bundle AI — j/k navigation through transactions list.
+  const [focusedTxnId, setFocusedTxnId] = useState<string | null>(null)
+  const txnRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+
+  // Bundle AH — column visibility prefs.
+  const txnColumns = useColumnPrefs('pai-transactions-columns-v1', TXN_DEFAULTS)
+  const visibleTxnColumns = useMemo(
+    () => TXN_COLUMNS.filter((c) => c.required || txnColumns.visible.has(c.id)),
+    [txnColumns.visible],
+  )
+  const txnGridTemplate = useMemo(
+    () => visibleTxnColumns.map((c) => TXN_WIDTHS[c.id]).join(' '),
+    [visibleTxnColumns],
+  )
 
   const closeAddModal = () => {
     setShowAdd(false)
@@ -111,6 +147,24 @@ export default function TransactionsPage() {
   // Live-refresh on any transaction mutation in the org
   useEntitySubscription('transaction', fetchData)
 
+  // Bundle AI — j/k row nav.
+  const moveTxnFocus = useCallback((delta: number) => {
+    if (transactions.length === 0) return
+    const idx = focusedTxnId ? transactions.findIndex((t) => t.id === focusedTxnId) : -1
+    const nextIdx = Math.max(0, Math.min(transactions.length - 1, idx === -1 ? 0 : idx + delta))
+    const nextId = transactions[nextIdx].id
+    setFocusedTxnId(nextId)
+    txnRefs.current.get(nextId)?.scrollIntoView({ block: 'nearest' })
+  }, [transactions, focusedTxnId])
+  useGlobalShortcuts({
+    j: () => moveTxnFocus(1),
+    k: () => moveTxnFocus(-1),
+    Enter: () => { if (focusedTxnId) router.push(`/transactions/${focusedTxnId}`) },
+  })
+  useEffect(() => {
+    if (focusedTxnId && !transactions.some((t) => t.id === focusedTxnId)) setFocusedTxnId(null)
+  }, [transactions, focusedTxnId])
+
   const totalVolume = transactions.reduce((s, t) => s + t.salePrice, 0)
   const activeCount = transactions.filter(t => t.status === 'active').length
   const pendingClose = transactions.filter(t => t.status === 'closing').length
@@ -136,28 +190,71 @@ export default function TransactionsPage() {
         </div>
 
         {/* Table */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+          <ColumnPicker
+            columns={TXN_COLUMNS}
+            visible={txnColumns.visible}
+            onToggle={txnColumns.toggle}
+            onReset={txnColumns.reset}
+            isOverridden={txnColumns.isOverridden}
+          />
+        </div>
         <div style={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 100px 120px 100px 120px 80px', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
-            <span>Transaction</span><span>Type</span><span>Sale Price</span><span>Status</span><span>Closing Date</span><span>Signatures</span>
+          <div style={{ display: 'grid', gridTemplateColumns: txnGridTemplate, gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
+            {visibleTxnColumns.map((c) => <span key={c.id}>{c.label}</span>)}
           </div>
           {loading ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
           ) : transactions.length === 0 ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No transactions found.</div>
           ) : transactions.map((txn, idx) => (
-            <div key={txn.id} onClick={() => router.push(`/transactions/${txn.id}`)} className="card-hover" style={{ display: 'grid', gridTemplateColumns: '1fr 100px 120px 100px 120px 80px', gap: 12, padding: '10px 16px', borderBottom: idx < transactions.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent', cursor: 'pointer' }}>
-              <div>
-                <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{txn.escrowNumber || 'No Escrow #'}</div>
-                <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{txn.titleCompany || '-'}</div>
-              </div>
-              <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: 'var(--bg2)', color: 'var(--txt2)', display: 'inline-block', maxWidth: 'fit-content' }}>{txn.type}</span>
-              <span style={{ fontWeight: 600, fontFamily: "var(--font-red-hat-mono), monospace" }}>${(txn.salePrice / 100).toLocaleString()}</span>
-              <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: STATUS_COLORS[txn.status]?.bg ?? 'var(--bg2)', color: STATUS_COLORS[txn.status]?.txt ?? 'var(--txt2)', display: 'inline-block', maxWidth: 'fit-content' }}>{txn.status}</span>
-              <span style={{ fontSize: 11, fontFamily: "var(--font-red-hat-mono), monospace" }}>{txn.closingDate ? new Date(txn.closingDate).toLocaleDateString() : '-'}</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <PenTool size={11} style={{ color: 'var(--txt3)' }} />
-                <span style={{ fontFamily: "var(--font-red-hat-mono), monospace", fontWeight: 500 }}>{txn._count?.signatures ?? 0}</span>
-              </div>
+            <div key={txn.id}
+              ref={(el) => {
+                if (el) txnRefs.current.set(txn.id, el)
+                else txnRefs.current.delete(txn.id)
+              }}
+              onClick={() => router.push(`/transactions/${txn.id}`)}
+              onMouseEnter={() => setFocusedTxnId(txn.id)}
+              className="card-hover"
+              style={{
+                display: 'grid', gridTemplateColumns: txnGridTemplate, gap: 12,
+                padding: '10px 16px',
+                borderBottom: idx < transactions.length - 1 ? '1px solid var(--border)' : 'none',
+                fontSize: 12, alignItems: 'center',
+                background: focusedTxnId === txn.id
+                  ? 'color-mix(in srgb, var(--accent) 8%, var(--panel))'
+                  : (idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent'),
+                outline: focusedTxnId === txn.id ? '2px solid var(--accent)' : 'none',
+                outlineOffset: focusedTxnId === txn.id ? -2 : 0,
+                cursor: 'pointer',
+              }}>
+              {visibleTxnColumns.map((c) => {
+                if (c.id === 'transaction') return (
+                  <div key="transaction">
+                    <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{txn.escrowNumber || 'No Escrow #'}</div>
+                    <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{txn.titleCompany || '-'}</div>
+                  </div>
+                )
+                if (c.id === 'type') return (
+                  <span key="type" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: 'var(--bg2)', color: 'var(--txt2)', display: 'inline-block', maxWidth: 'fit-content' }}>{txn.type}</span>
+                )
+                if (c.id === 'salePrice') return (
+                  <span key="salePrice" style={{ fontWeight: 600, fontFamily: 'var(--font-red-hat-mono), monospace' }}>${(txn.salePrice / 100).toLocaleString()}</span>
+                )
+                if (c.id === 'status') return (
+                  <span key="status" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: STATUS_COLORS[txn.status]?.bg ?? 'var(--bg2)', color: STATUS_COLORS[txn.status]?.txt ?? 'var(--txt2)', display: 'inline-block', maxWidth: 'fit-content' }}>{txn.status}</span>
+                )
+                if (c.id === 'closingDate') return (
+                  <span key="closingDate" style={{ fontSize: 11, fontFamily: 'var(--font-red-hat-mono), monospace' }}>{txn.closingDate ? new Date(txn.closingDate).toLocaleDateString() : '-'}</span>
+                )
+                if (c.id === 'signatures') return (
+                  <div key="signatures" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <PenTool size={11} style={{ color: 'var(--txt3)' }} />
+                    <span style={{ fontFamily: 'var(--font-red-hat-mono), monospace', fontWeight: 500 }}>{txn._count?.signatures ?? 0}</span>
+                  </div>
+                )
+                return <span key={c.id} />
+              })}
             </div>
           ))}
         </div>

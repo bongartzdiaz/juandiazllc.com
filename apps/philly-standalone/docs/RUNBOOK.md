@@ -316,16 +316,15 @@ To add a binding: edit `components/philly/ui/KeyboardShortcuts.tsx`
 — add to the `useGlobalShortcuts({...})` map AND to the `NAV` or
 `ACTIONS` array so the cheat sheet stays in sync.
 
-### Column customization (Bundle AC)
+### Column customization (Bundle AC + AH)
 
-The deals list view ships a Columns popover (top-right of the
-list, not the kanban). Visibility persists to `localStorage` per
-browser per table key (`pai-deals-columns-v1`). The Reset button
-clears the override and falls back to the page's default column
-set.
+Each table-shaped list view ships a `Columns` popover top-right.
+Visibility persists per browser per `pai-<entity>-columns-v1`
+key. The Reset button clears the override.
 
-To extend to another table-shaped page, see the "Column
-customization — Bundle AC reference" section in `CLAUDE.md`.
+Wired today: deals (list view), transactions, grants, volunteers.
+Documents / inbox / referrals are mechanical lifts using the same
+`useColumnPrefs` + `<ColumnPicker>` recipe (see `CLAUDE.md`).
 
 ### Right-click menu (Bundle AD + AE)
 
@@ -342,12 +341,13 @@ lives in each `app/<entity>/page.tsx`. Projects already presents
 its own inline detail modal, so a context-menu lift there is
 smaller (only per-page items needed) and is left as a follow-up.
 
-### `j` / `k` row navigation (Bundle AF)
+### `j` / `k` row navigation (Bundle AF + AI)
 
-Deals list view only. `j` next, `k` previous, `Enter` opens the
-focused deal. Focus follows mouse hover too, so keyboard and
-mouse don't fight. Hidden in kanban view via the
-`useGlobalShortcuts(..., view === 'list')` toggle.
+Wired on: deals list view, properties grid, transactions list.
+`j` next, `k` previous, `Enter` opens the focused row. Focus
+follows mouse hover too. The deals page hides the bindings in
+kanban view via `useGlobalShortcuts(..., view === 'list')`. The
+deal kanban (2D layout) is intentionally not bound yet.
 
 ### Drag-drop reorder on contacts (Bundle AG)
 

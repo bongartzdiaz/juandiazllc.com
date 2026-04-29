@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState, useEffect, useMemo } from 'react'
+import { useCallback, useRef, useState, useEffect, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -15,6 +15,7 @@ import { SavedViewsBar } from '@/components/philly/views/SavedViewsBar'
 import type { SavedView } from '@/hooks/philly/useSavedViews'
 import { ContextMenu, type ContextMenuItem } from '@/components/philly/ui/ContextMenu'
 import { useToast } from '@/hooks/philly/useToast'
+import { useGlobalShortcuts } from '@/hooks/philly/useGlobalShortcuts'
 
 type Option = { value: string; label: string }
 type Flag = { key: string; label: string }
@@ -113,6 +114,11 @@ export default function PropertiesPage() {
 
   // Bundle AE — right-click context menu.
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; propertyId: string } | null>(null)
+
+  // Bundle AI — j/k keyboard navigation through the property grid.
+  const [focusedPropId, setFocusedPropId] = useState<string | null>(null)
+  const propRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())
+
   const router = useRouter()
   const { addToast } = useToast()
 
@@ -249,6 +255,28 @@ export default function PropertiesPage() {
 
   // Live-refresh on any property mutation in the org
   useEntitySubscription('property', fetchData)
+
+  // Bundle AI — j/k navigation through the grid (document order).
+  const movePropFocus = useCallback((delta: number) => {
+    if (properties.length === 0) return
+    const idx = focusedPropId ? properties.findIndex((p) => p.id === focusedPropId) : -1
+    const nextIdx = Math.max(0, Math.min(properties.length - 1, idx === -1 ? 0 : idx + delta))
+    const nextId = properties[nextIdx].id
+    setFocusedPropId(nextId)
+    propRefs.current.get(nextId)?.scrollIntoView({ block: 'nearest' })
+  }, [properties, focusedPropId])
+
+  useGlobalShortcuts({
+    j: () => movePropFocus(1),
+    k: () => movePropFocus(-1),
+    Enter: () => { if (focusedPropId) router.push(`/properties/${focusedPropId}`) },
+  })
+
+  useEffect(() => {
+    if (focusedPropId && !properties.some((p) => p.id === focusedPropId)) {
+      setFocusedPropId(null)
+    }
+  }, [properties, focusedPropId])
 
   const totalValue = properties.reduce((s, p) => s + p.priceCents, 0)
   const available = properties.filter(p => p.status === 'available').length
@@ -409,12 +437,22 @@ export default function PropertiesPage() {
             const sc = STATUS_COLORS[prop.status] ?? { bg: 'var(--bg2)', txt: 'var(--txt2)' }
             return (
               <Link key={prop.id} href={`/properties/${prop.id}`}
+                ref={(el) => {
+                  if (el) propRefs.current.set(prop.id, el)
+                  else propRefs.current.delete(prop.id)
+                }}
                 onContextMenu={(e) => {
                   e.preventDefault()
                   setCtxMenu({ x: e.clientX, y: e.clientY, propertyId: prop.id })
                 }}
+                onMouseEnter={() => setFocusedPropId(prop.id)}
                 style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div className="card-hover" style={{ padding: '16px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--panel)', boxShadow: 'var(--shadow-sm)' }}>
+                <div className="card-hover" style={{
+                  padding: '16px', borderRadius: 12,
+                  border: focusedPropId === prop.id ? '2px solid var(--accent)' : '1px solid var(--border)',
+                  background: 'var(--panel)',
+                  boxShadow: focusedPropId === prop.id ? '0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent)' : 'var(--shadow-sm)',
+                }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8, gap: 8 }}>
                     <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--txt)', lineHeight: 1.3, flex: 1, minWidth: 0 }}>{prop.title}</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>

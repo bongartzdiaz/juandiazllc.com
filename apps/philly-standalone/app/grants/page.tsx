@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -10,6 +10,24 @@ import { Filter, Euro, Calendar as CalIcon, Building2, CheckCircle2, Plus, Trash
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
+import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+
+const GRANT_COLUMNS: ColumnDef[] = [
+  { id: 'grant', label: 'Grant', required: true },
+  { id: 'funder', label: 'Funder' },
+  { id: 'amount', label: 'Amount' },
+  { id: 'status', label: 'Status' },
+  { id: 'dates', label: 'Dates' },
+]
+const GRANT_DEFAULTS = ['grant', 'funder', 'amount', 'status', 'dates']
+const GRANT_WIDTHS: Record<string, string> = {
+  grant: '1fr',
+  funder: '150px',
+  amount: '120px',
+  status: '100px',
+  dates: '140px',
+}
 
 interface Grant {
   id: string
@@ -53,6 +71,17 @@ export default function GrantsPage() {
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState('')
   const [selected, setSelected] = useState<Grant | null>(null)
+
+  // Bundle AH — column visibility prefs.
+  const grantColumns = useColumnPrefs('pai-grants-columns-v1', GRANT_DEFAULTS)
+  const visibleGrantColumns = useMemo(
+    () => GRANT_COLUMNS.filter((c) => c.required || grantColumns.visible.has(c.id)),
+    [grantColumns.visible],
+  )
+  const grantsGridTemplate = useMemo(
+    () => visibleGrantColumns.map((c) => GRANT_WIDTHS[c.id]).join(' '),
+    [visibleGrantColumns],
+  )
 
   const params = new URLSearchParams({ page: String(page), limit: '20' })
   if (statusFilter) params.set('status', statusFilter)
@@ -182,9 +211,18 @@ export default function GrantsPage() {
           </button>
         </div>
 
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+          <ColumnPicker
+            columns={GRANT_COLUMNS}
+            visible={grantColumns.visible}
+            onToggle={grantColumns.toggle}
+            onReset={grantColumns.reset}
+            isOverridden={grantColumns.isOverridden}
+          />
+        </div>
         <div style={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 150px 120px 100px 140px', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
-            <span>Grant</span><span>Funder</span><span>Amount</span><span>Status</span><span>Dates</span>
+          <div style={{ display: 'grid', gridTemplateColumns: grantsGridTemplate, gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
+            {visibleGrantColumns.map((c) => <span key={c.id}>{c.label}</span>)}
           </div>
           {loading ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
@@ -198,18 +236,21 @@ export default function GrantsPage() {
                 onClick={() => setSelected(grant)}
                 className="card-hover"
                 style={{
-                  display: 'grid', gridTemplateColumns: '1fr 150px 120px 100px 140px', gap: 12,
+                  display: 'grid', gridTemplateColumns: grantsGridTemplate, gap: 12,
                   padding: '10px 16px',
                   borderBottom: idx < grants.length - 1 ? '1px solid var(--border)' : 'none',
                   fontSize: 12, alignItems: 'center', cursor: 'pointer',
                   background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent',
                 }}
               >
-                <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{grant.title}</div>
-                <span style={{ color: 'var(--txt2)' }}>{grant.funder || '-'}</span>
-                <span style={{ fontWeight: 600, fontFamily: "var(--font-red-hat-mono), monospace" }}>${(grant.amountCents / 100).toLocaleString()}</span>
-                <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 9, fontWeight: 600, textTransform: 'uppercase', background: sc.bg, color: sc.txt, display: 'inline-block', maxWidth: 'fit-content' }}>{grant.status.replace('_', ' ')}</span>
-                <span style={{ fontSize: 10, color: 'var(--txt3)' }}>{grant.startDate ? new Date(grant.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '-'}</span>
+                {visibleGrantColumns.map((c) => {
+                  if (c.id === 'grant') return <div key="grant" style={{ fontWeight: 600, color: 'var(--txt)' }}>{grant.title}</div>
+                  if (c.id === 'funder') return <span key="funder" style={{ color: 'var(--txt2)' }}>{grant.funder || '-'}</span>
+                  if (c.id === 'amount') return <span key="amount" style={{ fontWeight: 600, fontFamily: 'var(--font-red-hat-mono), monospace' }}>${(grant.amountCents / 100).toLocaleString()}</span>
+                  if (c.id === 'status') return <span key="status" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 9, fontWeight: 600, textTransform: 'uppercase', background: sc.bg, color: sc.txt, display: 'inline-block', maxWidth: 'fit-content' }}>{grant.status.replace('_', ' ')}</span>
+                  if (c.id === 'dates') return <span key="dates" style={{ fontSize: 10, color: 'var(--txt3)' }}>{grant.startDate ? new Date(grant.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '-'}</span>
+                  return <span key={c.id} />
+                })}
               </div>
             )
           })}
