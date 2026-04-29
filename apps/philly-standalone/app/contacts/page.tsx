@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
@@ -8,14 +8,16 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Modal } from '@/components/philly/ui/Modal'
 import { ContactForm } from '@/components/philly/forms/ContactForm'
 import type { ContactFormData } from '@/components/philly/forms/ContactForm'
-import { Search, Mail, Phone, FolderKanban, Eye } from 'lucide-react'
+import { Search, Mail, Phone, FolderKanban, Eye, Download } from 'lucide-react'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { ContactQuickView } from '@/components/philly/contacts/ContactQuickView'
+import { BulkActionBar, type ContactTypeOption } from '@/components/philly/contacts/BulkActionBar'
 import { useApi } from '@/hooks/philly/useApi'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useUrlState } from '@/hooks/philly/useUrlState'
 import { useDebouncedValue } from '@/hooks/philly/useDebouncedValue'
+import { toCsv, downloadCsv } from '@/lib/philly/csv'
 
 interface Contact {
   id: string
@@ -139,10 +141,25 @@ export default function ContactsPage() {
   const debouncedSearch = useDebouncedValue(search, 250)
   const [showAdd, setShowAdd] = useState(false)
   const [quickViewId, setQuickViewId] = useState<string | null>(null)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [bulkBusy, setBulkBusy] = useState(false)
   const { addToast } = useToast()
 
   const isRE = industry === 'realestate'
   const isHOS = industry === 'hospitality'
+  const isLive = !isRE && !isHOS
+  const industryKey: 'philanthropy' | 'realestate' | 'hospitality' =
+    isRE ? 'realestate' : isHOS ? 'hospitality' : 'philanthropy'
+
+  const toggleSelected = useCallback((id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }, [])
+  const clearSelected = useCallback(() => setSelected(new Set()), [])
 
   /* Live data for the default (philanthropy) view comes from the API.
      RE and HOS modes are showcase / demo industries, so they keep their
@@ -211,6 +228,99 @@ export default function ContactsPage() {
     }
   }
 
+  /* ---- Bulk operations (Bundle X) ---- */
+
+  const exportContactsToCsv = useCallback((rows: Contact[], filenameStem: string) => {
+    const csv = toCsv(rows, [
+      { header: 'First name', value: (r) => r.firstName },
+      { header: 'Last name', value: (r) => r.lastName },
+      { header: 'Company', value: (r) => r.company },
+      { header: 'Type', value: (r) => r.type },
+      { header: 'Email', value: (r) => r.email },
+      { header: 'Phone', value: (r) => r.phone },
+      { header: 'Linked', value: (r) => r.projects },
+    ])
+    const stamp = new Date().toISOString().slice(0, 10)
+    downloadCsv(`${filenameStem}-${stamp}`, csv)
+  }, [])
+
+  const selectedRows = useMemo(
+    () => contacts.filter((c) => selected.has(c.id)),
+    [contacts, selected],
+  )
+
+  const handleBulkExport = useCallback(() => {
+    if (selectedRows.length === 0) return
+    exportContactsToCsv(selectedRows, 'contacts-selected')
+    addToast(`Exported ${selectedRows.length} contact${selectedRows.length === 1 ? '' : 's'}`, 'success')
+  }, [selectedRows, exportContactsToCsv, addToast])
+
+  const handleExportAllVisible = useCallback(() => {
+    if (filtered.length === 0) {
+      addToast('Nothing to export', 'error')
+      return
+    }
+    exportContactsToCsv(filtered, 'contacts-all')
+  // filtered is recomputed each render; capture inside the click.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtered, exportContactsToCsv, addToast])
+
+  const handleBulkDelete = useCallback(async () => {
+    if (!isLive || selected.size === 0) return
+    const ids = Array.from(selected)
+    if (!confirm(`Delete ${ids.length} contact${ids.length === 1 ? '' : 's'}? This cannot be undone.`)) return
+    setBulkBusy(true)
+    try {
+      const res = await fetch('/api/contacts/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', ids }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.error ?? `Failed (${res.status})`)
+      addToast(`Deleted ${json?.data?.deleted ?? ids.length} contact${ids.length === 1 ? '' : 's'}`, 'success')
+      clearSelected()
+      apiQuery.refetch()
+    } catch (e: unknown) {
+      addToast(e instanceof Error ? e.message : 'Bulk delete failed', 'error')
+    } finally {
+      setBulkBusy(false)
+    }
+  }, [isLive, selected, addToast, clearSelected, apiQuery])
+
+  const handleBulkChangeType = useCallback(async (type: ContactTypeOption) => {
+    if (!isLive || selected.size === 0) return
+    const ids = Array.from(selected)
+    setBulkBusy(true)
+    try {
+      const res = await fetch('/api/contacts/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'update', ids, data: { type } }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.error ?? `Failed (${res.status})`)
+      addToast(`Updated ${json?.data?.updated ?? ids.length} contact${ids.length === 1 ? '' : 's'}`, 'success')
+      clearSelected()
+      apiQuery.refetch()
+    } catch (e: unknown) {
+      addToast(e instanceof Error ? e.message : 'Bulk update failed', 'error')
+    } finally {
+      setBulkBusy(false)
+    }
+  }, [isLive, selected, addToast, clearSelected, apiQuery])
+
+  const allVisibleSelected = filtered.length > 0 && filtered.every((c) => selected.has(c.id))
+  const toggleSelectAllVisible = useCallback(() => {
+    if (allVisibleSelected) {
+      clearSelected()
+    } else {
+      setSelected(new Set(filtered.map((c) => c.id)))
+    }
+  // filtered changes per render; capture lazily.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allVisibleSelected, filtered, clearSelected])
+
   return (
     <>
       <Topbar
@@ -277,6 +387,38 @@ export default function ContactsPage() {
               }}
             >{s === 'all' ? t('all') : t(`types.${s}` as 'types.partner')}</button>
           ))}
+          <span style={{ width: 1, height: 22, background: 'var(--border)', margin: '0 2px' }} />
+          <label
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '5px 10px', borderRadius: 7, fontSize: 11.5,
+              background: 'var(--bg2)', color: 'var(--txt2)',
+              cursor: filtered.length === 0 ? 'default' : 'pointer',
+              userSelect: 'none', opacity: filtered.length === 0 ? 0.5 : 1,
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={allVisibleSelected}
+              disabled={filtered.length === 0}
+              onChange={toggleSelectAllVisible}
+              style={{ accentColor: 'var(--accent)', cursor: 'inherit' }}
+            />
+            Select all
+          </label>
+          <button
+            type="button"
+            onClick={handleExportAllVisible}
+            aria-label="Export all visible contacts to CSV"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5,
+              padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
+              background: 'var(--bg2)', color: 'var(--txt2)',
+              border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+            }}
+          >
+            <Download size={12} /> Export
+          </button>
         </div>
 
         {/* Loading indicator — only in live mode while the API call is in
@@ -303,12 +445,32 @@ export default function ContactsPage() {
             const initials = c.firstName[0] + c.lastName[0]
             return (
               <Link key={c.id} href={`/contacts/${c.id}`} className="card-hover" style={{
-                background: 'var(--panel)', border: '1px solid var(--border)',
+                background: selected.has(c.id)
+                  ? 'color-mix(in srgb, var(--accent) 6%, var(--panel))'
+                  : 'var(--panel)',
+                border: `1px solid ${selected.has(c.id) ? 'var(--accent)' : 'var(--border)'}`,
                 borderRadius: 12, padding: '16px', cursor: 'pointer',
                 boxShadow: 'var(--shadow-sm)',
                 textDecoration: 'none', color: 'inherit', display: 'block',
                 position: 'relative',
               }}>
+                {/* Selection checkbox — Bundle X. Stops propagation so
+                    selection doesn't follow the surrounding <Link>. */}
+                <label
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleSelected(c.id) }}
+                  aria-label={`Select ${c.firstName} ${c.lastName}`}
+                  style={{
+                    position: 'absolute', top: 10, left: 10,
+                    width: 22, height: 22, borderRadius: 6,
+                    background: selected.has(c.id) ? 'var(--accent)' : 'var(--panel)',
+                    border: `1px solid ${selected.has(c.id) ? 'var(--accent)' : 'var(--border)'}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', color: '#fff', fontSize: 12, fontWeight: 700,
+                    zIndex: 1, userSelect: 'none',
+                  }}
+                >
+                  {selected.has(c.id) ? '✓' : ''}
+                </label>
                 {/* Quick-view trigger — Bundle T. Stops propagation so
                     the click doesn't follow the surrounding <Link>. */}
                 <button
@@ -331,7 +493,7 @@ export default function ContactsPage() {
                 >
                   <Eye size={13} />
                 </button>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, paddingLeft: 24 }}>
                   {/* Avatar */}
                   <div style={{
                     width: 40, height: 40, borderRadius: 20,
@@ -387,6 +549,16 @@ export default function ContactsPage() {
       </Modal>
 
       <ContactQuickView contactId={quickViewId} onClose={() => setQuickViewId(null)} />
+
+      <BulkActionBar
+        count={selected.size}
+        industry={industryKey}
+        busy={bulkBusy}
+        onClear={clearSelected}
+        onExport={handleBulkExport}
+        onDelete={handleBulkDelete}
+        onChangeType={handleBulkChangeType}
+      />
     </>
   )
 }
