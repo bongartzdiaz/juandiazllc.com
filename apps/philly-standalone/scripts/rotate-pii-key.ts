@@ -1,10 +1,11 @@
 #!/usr/bin/env tsx
 /* ---------------------------------------------------------------
-   Online PII key rotation (Bundle Q)
+   Online PII key rotation (Bundle Q + U)
    ---------------------------------------------------------------
-   Re-encrypts every Contact.notes row that's currently sealed
-   under a non-primary key, using the current primary key. Designed
-   to run during phase 2 of an online rotation:
+   Re-encrypts every encrypted PII column (Contact.notes,
+   ContactNote.content) that's currently sealed under a non-primary
+   key, using the current primary key. Designed to run during phase 2
+   of an online rotation:
 
      phase 1:  set INTEGRATION_SECRET=<NEW>, INTEGRATION_SECRET_V2=<OLD>
      phase 2:  npm run pii:rotate                  ← this script
@@ -57,6 +58,89 @@ function parseArgs(argv: string[]): Args {
   return { org, dry, batch }
 }
 
+interface Stats {
+  scanned: number
+  alreadyPrimary: number
+  rotated: number
+  nullSkipped: number
+  plaintextSkipped: number
+  errors: Array<{ id: string; err: string }>
+}
+
+interface TableSpec {
+  label: string
+  // Stream rows in id-order for cursor-based pagination.
+  fetchPage: (
+    cursor: string | undefined,
+    take: number,
+  ) => Promise<Array<{ id: string; cipher: string | null }>>
+  // Persist a re-encrypted row.
+  updateRow: (id: string, cipher: string) => Promise<void>
+}
+
+async function rotateTable(spec: TableSpec, batch: number, dry: boolean): Promise<Stats> {
+  const stats: Stats = {
+    scanned: 0,
+    alreadyPrimary: 0,
+    rotated: 0,
+    nullSkipped: 0,
+    plaintextSkipped: 0,
+    errors: [],
+  }
+
+  let cursor: string | undefined = undefined
+  while (true) {
+    const rows = await spec.fetchPage(cursor, batch)
+    if (rows.length === 0) break
+
+    for (const row of rows) {
+      stats.scanned += 1
+      if (row.cipher == null || row.cipher === '') {
+        stats.nullSkipped += 1
+        continue
+      }
+      if (!isEncryptedPii(row.cipher)) {
+        // Legacy plaintext — leave it for `npm run pii:backfill*`.
+        stats.plaintextSkipped += 1
+        continue
+      }
+      const inner = row.cipher.slice(PII_PREFIX.length)
+      const result = decryptSecretDetailed(inner)
+      if (result.plaintext == null || result.keyIndex < 0) {
+        stats.errors.push({ id: row.id, err: 'decrypt failed under every configured key' })
+        continue
+      }
+      if (result.keyIndex === 0) {
+        stats.alreadyPrimary += 1
+        continue
+      }
+      const reCt = encryptSecret(result.plaintext)
+      if (!reCt) {
+        stats.errors.push({ id: row.id, err: 'encryptSecret returned null' })
+        continue
+      }
+      if (dry) {
+        stats.rotated += 1
+        continue
+      }
+      try {
+        await spec.updateRow(row.id, `${PII_PREFIX}${reCt}`)
+        stats.rotated += 1
+      } catch (err) {
+        stats.errors.push({ id: row.id, err: err instanceof Error ? err.message : String(err) })
+      }
+    }
+
+    cursor = rows[rows.length - 1].id
+    console.log(
+      `pii:rotate[${spec.label}]: scanned=${stats.scanned} rotated=${stats.rotated} ` +
+        `already=${stats.alreadyPrimary} plaintext=${stats.plaintextSkipped} ` +
+        `null=${stats.nullSkipped} errors=${stats.errors.length}`,
+    )
+  }
+  return stats
+}
+
 async function main(): Promise<number> {
   const { org, dry, batch } = parseArgs(process.argv)
 
@@ -72,87 +156,55 @@ async function main(): Promise<number> {
 
   const prisma = new PrismaClient()
 
-  let scanned = 0
-  let alreadyPrimary = 0
-  let rotated = 0
-  let nullSkipped = 0
-  let plaintextSkipped = 0
-  const errors: Array<{ id: string; err: string }> = []
-
   try {
-    let cursor: string | undefined = undefined
-    while (true) {
-      const rows: Array<{ id: string; notes: string | null }> = await prisma.contact.findMany({
-        where: org ? { organizationId: org } : {},
-        select: { id: true, notes: true },
-        orderBy: { id: 'asc' },
-        take: batch,
-        ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-      })
-      if (rows.length === 0) break
-
-      for (const row of rows) {
-        scanned += 1
-        if (row.notes == null || row.notes === '') {
-          nullSkipped += 1
-          continue
-        }
-        if (!isEncryptedPii(row.notes)) {
-          // Legacy plaintext — leave it for `npm run pii:backfill`,
-          // not this rotate script's job.
-          plaintextSkipped += 1
-          continue
-        }
-        const inner = row.notes.slice(PII_PREFIX.length)
-        const result = decryptSecretDetailed(inner)
-        if (result.plaintext == null || result.keyIndex < 0) {
-          errors.push({ id: row.id, err: 'decrypt failed under every configured key' })
-          continue
-        }
-        if (result.keyIndex === 0) {
-          alreadyPrimary += 1
-          continue
-        }
-        // Re-encrypt under the primary key.
-        const reCt = encryptSecret(result.plaintext)
-        if (!reCt) {
-          errors.push({ id: row.id, err: 'encryptSecret returned null' })
-          continue
-        }
-        if (dry) {
-          rotated += 1
-          continue
-        }
-        try {
-          await prisma.contact.update({
-            where: { id: row.id },
-            data: { notes: `${PII_PREFIX}${reCt}` },
-          })
-          rotated += 1
-        } catch (err) {
-          errors.push({ id: row.id, err: err instanceof Error ? err.message : String(err) })
-        }
-      }
-
-      cursor = rows[rows.length - 1].id
-      console.log(
-        `pii:rotate: progress scanned=${scanned} rotated=${rotated} ` +
-          `already=${alreadyPrimary} plaintext=${plaintextSkipped} ` +
-          `null=${nullSkipped} errors=${errors.length}`,
-      )
+    const contactSpec: TableSpec = {
+      label: 'Contact.notes',
+      fetchPage: async (cursor, take) => {
+        const rows = await prisma.contact.findMany({
+          where: org ? { organizationId: org } : {},
+          select: { id: true, notes: true },
+          orderBy: { id: 'asc' },
+          take,
+          ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+        })
+        return rows.map((r) => ({ id: r.id, cipher: r.notes }))
+      },
+      updateRow: async (id, cipher) => {
+        await prisma.contact.update({ where: { id }, data: { notes: cipher } })
+      },
+    }
+    const noteSpec: TableSpec = {
+      label: 'ContactNote.content',
+      fetchPage: async (cursor, take) => {
+        const rows = await prisma.contactNote.findMany({
+          where: org ? { contact: { organizationId: org } } : {},
+          select: { id: true, content: true },
+          orderBy: { id: 'asc' },
+          take,
+          ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+        })
+        return rows.map((r) => ({ id: r.id, cipher: r.content }))
+      },
+      updateRow: async (id, cipher) => {
+        await prisma.contactNote.update({ where: { id }, data: { content: cipher } })
+      },
     }
 
+    const contact = await rotateTable(contactSpec, batch, dry)
+    const note = await rotateTable(noteSpec, batch, dry)
+
+    const totalErrors = contact.errors.length + note.errors.length
     const summary = dry
-      ? `pii:rotate: DRY RUN — would re-encrypt ${rotated} rows under the primary key ` +
-        `(already-primary: ${alreadyPrimary}, legacy plaintext: ${plaintextSkipped}, null: ${nullSkipped}, errors: ${errors.length})`
-      : `pii:rotate: re-encrypted ${rotated} rows under the primary key ` +
-        `(already-primary: ${alreadyPrimary}, legacy plaintext: ${plaintextSkipped}, null: ${nullSkipped}, errors: ${errors.length})`
+      ? `pii:rotate: DRY RUN — would re-encrypt ${contact.rotated} Contact.notes + ${note.rotated} ContactNote.content rows`
+      : `pii:rotate: re-encrypted ${contact.rotated} Contact.notes + ${note.rotated} ContactNote.content rows`
     console.log(summary)
 
-    if (errors.length > 0) {
+    if (totalErrors > 0) {
       console.error('pii:rotate: errors:')
-      for (const e of errors.slice(0, 50)) console.error(`  ${e.id}: ${e.err}`)
-      if (errors.length > 50) console.error(`  …and ${errors.length - 50} more`)
+      for (const e of [...contact.errors, ...note.errors].slice(0, 50)) {
+        console.error(`  ${e.id}: ${e.err}`)
+      }
+      if (totalErrors > 50) console.error(`  …and ${totalErrors - 50} more`)
       return 1
     }
     return 0

@@ -6,6 +6,7 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
+import { encryptPii, decryptPii } from '@/lib/philly/pii'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -38,7 +39,8 @@ export async function GET(req: NextRequest, ctx: Ctx) {
     prisma.contactNote.count({ where }),
   ])
 
-  return paginatedResponse(notes, total, { page, limit, skip })
+  const decrypted = notes.map((n) => ({ ...n, content: decryptPii(n.content) ?? '' }))
+  return paginatedResponse(decrypted, total, { page, limit, skip })
 }
 
 export async function POST(req: NextRequest, ctx: Ctx) {
@@ -58,11 +60,14 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   })
   if (!contact) return jsonError('Contact not found', 404)
 
+  const plaintext = body.content.trim()
   const note = await prisma.contactNote.create({
-    data: { contactId: id, userId: scope.userId, content: body.content.trim() },
+    data: { contactId: id, userId: scope.userId, content: encryptPii(plaintext) ?? '' },
     include: { user: { select: { id: true, name: true, avatarUrl: true } } },
   })
 
   await logAudit({ scope, action: 'create', entity: 'contact', entityId: id })
-  return NextResponse.json({ data: note }, { status: 201 })
+  // Return plaintext to the caller — the row is encrypted at rest, but
+  // the response shape mirrors what the client just sent.
+  return NextResponse.json({ data: { ...note, content: plaintext } }, { status: 201 })
 }

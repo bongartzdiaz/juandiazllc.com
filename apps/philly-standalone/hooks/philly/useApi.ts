@@ -1,6 +1,6 @@
 'use client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import useSWR, { type SWRConfiguration } from 'swr'
+import useSWR, { type SWRConfiguration, type KeyedMutator } from 'swr'
 import { api } from '@/lib/philly/api/client'
 import { useSyncRegistry } from './useSync'
 
@@ -35,6 +35,13 @@ export interface UseApiReturn<T> {
   error: string | null
   refetch: () => void
   lastSync: Date | null
+  /**
+   * SWR's mutate — for optimistic updates.
+   * `mutate(newData, { revalidate: false })` writes to cache without re-fetching.
+   * `mutate(updater)` runs the updater against current cached data.
+   * `mutate()` revalidates from network.
+   */
+  mutate: KeyedMutator<T>
 }
 
 function readSyncInterval(): number {
@@ -107,5 +114,6 @@ export function useApi<T>(
     error: error ? error.message : null,
     refetch,
     lastSync,
+    mutate,
   }
 }

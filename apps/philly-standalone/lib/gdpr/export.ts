@@ -19,6 +19,8 @@
    new model with PII MUST be added here AND to lib/gdpr/pii-registry.ts.
    --------------------------------------------------------------- */
 
+import { decryptPii } from '../philly/pii'
+
 export interface OperatorExport {
   schemaVersion: 1
   generatedAt: string
@@ -133,6 +135,15 @@ export async function collectOperatorData(
   )
   const safeSessions = sessions.map((s) => redactSensitive(s, ['sessionToken']))
 
+  // Decrypt ContactNote.content for the subject's data export — at-rest
+  // encryption is for the database, not for the data subject who has
+  // an Art. 15/20 right to a portable copy of their notes.
+  const plaintextContactNotes = contactNotes.map((n) => {
+    const content = (n as { content?: unknown }).content
+    if (typeof content !== 'string') return n
+    return { ...n, content: decryptPii(content) ?? '' }
+  })
+
   return {
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),
@@ -140,7 +151,7 @@ export async function collectOperatorData(
     user: safeUser,
     sessions: safeSessions,
     accounts: safeAccounts,
-    contactNotes,
+    contactNotes: plaintextContactNotes,
     activities,
     auditLogs,
     twoFactorRecoveryCodeCount,

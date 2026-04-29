@@ -7,7 +7,7 @@
 | `Contact.notes` | ✅ encrypted | Bundle N — AES-256-GCM, versioned `enc:v1:` prefix |
 | `Contact.email` | ✅ encrypted + blind-index | Bundle P — AES-256-GCM at rest, HMAC-SHA-256 in `emailHash` for search |
 | `Contact.phone` | ✅ encrypted + blind-index | Bundle P — same approach as email |
-| `ContactNote.content` | ⏳ planned | Same approach as `Contact.notes` |
+| `ContactNote.content` | ✅ encrypted | Bundle U — AES-256-GCM, same `enc:v1:` envelope as `Contact.notes` |
 | `User.twoFactorSecret` | ✅ encrypted | Pre-existing, via `lib/philly/crypto.ts` |
 | OAuth tokens (`Integration.accessToken`, etc.) | ✅ encrypted | Pre-existing |
 
@@ -127,7 +127,15 @@ order:
    npm run pii:backfill-hashes
    ```
 
-5. **Verify** by sampling:
+5. **Backfill `ContactNote.content` encryption** (Bundle U):
+   ```bash
+   npm run pii:backfill-notes -- --dry
+   npm run pii:backfill-notes
+   # per-tenant:
+   npm run pii:backfill-notes -- --org=<organizationId>
+   ```
+
+6. **Verify** by sampling:
 
    ```sql
    -- notes should all be enc:v1:* after step 3
@@ -141,9 +149,13 @@ order:
           LEFT(phone, 7) AS phone_prefix,
           (phoneHash IS NOT NULL) AS has_phone_hash
    FROM Contact LIMIT 20;
+
+   -- ContactNote.content should all be enc:v1:* after step 5
+   SELECT id, LEFT(content, 7) AS prefix FROM ContactNote
+   WHERE content IS NOT NULL AND content <> '' LIMIT 20;
    ```
 
-All three backfills are idempotent and per-row safe — re-running
+All four backfills are idempotent and per-row safe — re-running
 them skips already-migrated rows and continues past per-row errors.
 Exit code
 1 = at least one row failed (printed at the end with the row id).
@@ -235,5 +247,9 @@ is just primary + one previous key.
 
 - Helpers: `lib/philly/pii.ts`
 - AES-256-GCM core: `lib/philly/crypto.ts`
-- Backfill CLI: `scripts/encrypt-contact-notes.ts` (`npm run pii:backfill`)
+- Backfill CLIs:
+  - `scripts/encrypt-contact-notes.ts` → `npm run pii:backfill` (Contact.notes)
+  - `scripts/encrypt-contact-note-content.ts` → `npm run pii:backfill-notes` (ContactNote.content)
+  - `scripts/backfill-contact-blind-index.ts` → `npm run pii:backfill-hashes` (email/phone hashes)
+- Rotation CLI: `scripts/rotate-pii-key.ts` → `npm run pii:rotate` (rotates Contact.notes + ContactNote.content together)
 - Tests: `lib/philly/pii.test.ts`

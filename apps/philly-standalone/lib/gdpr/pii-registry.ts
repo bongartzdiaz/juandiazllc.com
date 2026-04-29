@@ -123,10 +123,10 @@ export const PII_REGISTRY: ReadonlyArray<PiiModel> = [
     ownerField: null,
     fields: [
       { name: 'name', description: 'Full name', sensitivity: 'basic' },
-      { name: 'email', description: 'Contact email', sensitivity: 'contact' },
-      { name: 'phone', description: 'Contact phone', sensitivity: 'contact' },
+      { name: 'email', description: 'Contact email (AES-256-GCM at rest, blind-index for search)', sensitivity: 'contact', encrypted: true },
+      { name: 'phone', description: 'Contact phone (AES-256-GCM at rest, blind-index for search)', sensitivity: 'contact', encrypted: true },
       { name: 'company', description: 'Employer / organization', sensitivity: 'basic' },
-      { name: 'notes', description: 'Free-text notes', sensitivity: 'contact' },
+      { name: 'notes', description: 'Free-text notes (AES-256-GCM at rest)', sensitivity: 'contact', encrypted: true },
     ],
   },
   {
@@ -137,7 +137,7 @@ export const PII_REGISTRY: ReadonlyArray<PiiModel> = [
     retentionDays: 365 * 3,
     emailField: null,
     ownerField: 'userId',
-    fields: [{ name: 'content', description: 'Note body', sensitivity: 'contact' }],
+    fields: [{ name: 'content', description: 'Note body (AES-256-GCM at rest)', sensitivity: 'contact', encrypted: true }],
   },
   {
     model: 'Activity',
