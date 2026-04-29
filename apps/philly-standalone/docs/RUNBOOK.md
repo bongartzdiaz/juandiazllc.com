@@ -304,6 +304,37 @@ Idempotent. Re-running skips rows already prefixed. The shared
 `ContactNote.content` in a single pass — no separate rotate CLI for
 notes.
 
+### Keyboard shortcuts (Bundle AB)
+
+Mounted globally on every authenticated page via
+`<KeyboardShortcuts />` (in `ProtectedShell`). Operators press
+`?` to see the cheat sheet. Two-key chords (e.g. `g c` → Contacts)
+expire after 1.2 seconds. Shortcuts are suppressed while typing
+in inputs.
+
+To add a binding: edit `components/philly/ui/KeyboardShortcuts.tsx`
+— add to the `useGlobalShortcuts({...})` map AND to the `NAV` or
+`ACTIONS` array so the cheat sheet stays in sync.
+
+### Column customization (Bundle AC)
+
+The deals list view ships a Columns popover (top-right of the
+list, not the kanban). Visibility persists to `localStorage` per
+browser per table key (`pai-deals-columns-v1`). The Reset button
+clears the override and falls back to the page's default column
+set.
+
+To extend to another table-shaped page, see the "Column
+customization — Bundle AC reference" section in `CLAUDE.md`.
+
+### Right-click menu (Bundle AD)
+
+Contact cards expose a right-click context menu (Open / Quick
+view / Edit / Select / Copy email / Copy phone / Delete). The
+menu primitive (`<ContextMenu>`) is generic; per-page wiring is
+in `app/contacts/page.tsx` and lifts to deals/properties/projects
+by adding the same pattern (see `CLAUDE.md`).
+
 ### Saved views (Bundle AA)
 
 Per-user filter+view bundles persisted on `SavedView`. The chip-bar

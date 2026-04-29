@@ -18,6 +18,26 @@ import { useApi } from '@/hooks/philly/useApi'
 import { DealQuickView } from '@/components/philly/deals/DealQuickView'
 import { SavedViewsBar } from '@/components/philly/views/SavedViewsBar'
 import type { SavedView } from '@/hooks/philly/useSavedViews'
+import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
+import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+
+const DEAL_COLUMN_DEFS: ColumnDef[] = [
+  { id: 'deal', label: 'Deal', required: true },
+  { id: 'stage', label: 'Stage' },
+  { id: 'value', label: 'Value' },
+  { id: 'probability', label: 'Probability' },
+  { id: 'contact', label: 'Contact' },
+  { id: 'status', label: 'Status' },
+]
+const DEAL_COLUMN_DEFAULTS = ['deal', 'stage', 'value', 'probability', 'contact', 'status']
+const DEAL_COLUMN_WIDTHS: Record<string, string> = {
+  deal: '1fr',
+  stage: '140px',
+  value: '110px',
+  probability: '90px',
+  contact: '140px',
+  status: '100px',
+}
 
 /* ------------------------------------------------------------------
    Types
@@ -126,6 +146,17 @@ export default function DealsPage() {
 
   // Bundle V — quick-view popover for deals (list + kanban).
   const [quickViewId, setQuickViewId] = useState<string | null>(null)
+
+  // Bundle AC — column visibility prefs (list view only).
+  const dealColumns = useColumnPrefs('pai-deals-columns-v1', DEAL_COLUMN_DEFAULTS)
+  const visibleDealColumns = useMemo(
+    () => DEAL_COLUMN_DEFS.filter((c) => c.required || dealColumns.visible.has(c.id)),
+    [dealColumns.visible],
+  )
+  const dealsGridTemplate = useMemo(
+    () => visibleDealColumns.map((c) => DEAL_COLUMN_WIDTHS[c.id]).join(' ') + ' 32px',
+    [visibleDealColumns],
+  )
 
   const resetAddForm = () => {
     setAddTitle(''); setAddValue(''); setAddProbability('50'); setAddStatus('open')
@@ -656,18 +687,30 @@ export default function DealsPage() {
         {/* ========== LIST VIEW ========== */}
         {view === 'list' && !noPipelines && (
           <>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+              <ColumnPicker
+                columns={DEAL_COLUMN_DEFS}
+                visible={dealColumns.visible}
+                onToggle={dealColumns.toggle}
+                onReset={dealColumns.reset}
+                isOverridden={dealColumns.isOverridden}
+              />
+            </div>
             <div style={{
               background: 'var(--panel)', border: '1px solid var(--border)',
               borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
             }}>
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr 140px 110px 90px 140px 100px 32px',
+                gridTemplateColumns: dealsGridTemplate,
                 gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)',
                 fontSize: 10, fontWeight: 600, textTransform: 'uppercase',
                 letterSpacing: '0.06em', color: 'var(--txt3)',
               }}>
-                <span>Deal</span><span>Stage</span><span>Value</span><span>Prob.</span><span>Contact</span><span>Status</span><span aria-hidden></span>
+                {visibleDealColumns.map((c) => (
+                  <span key={c.id}>{c.id === 'probability' ? 'Prob.' : c.label}</span>
+                ))}
+                <span aria-hidden></span>
               </div>
               {loading ? (
                 <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading…</div>
@@ -678,32 +721,47 @@ export default function DealsPage() {
               ) : visibleDeals.map((deal, idx) => (
                 <Link key={deal.id} href={`/deals/${deal.id}`} style={{
                   display: 'grid',
-                  gridTemplateColumns: '1fr 140px 110px 90px 140px 100px 32px',
+                  gridTemplateColumns: dealsGridTemplate,
                   gap: 12, padding: '10px 16px',
                   borderBottom: idx < visibleDeals.length - 1 ? '1px solid var(--border)' : 'none',
                   fontSize: 12, alignItems: 'center',
                   background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent',
                   textDecoration: 'none', color: 'inherit',
                 }}>
-                  <div>
-                    <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{deal.title}</div>
-                    <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{deal.owner?.name ?? 'Unassigned'}</div>
-                  </div>
-                  <span style={{
-                    padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
-                    background: deal.stage.color + '22', color: deal.stage.color,
-                    display: 'inline-block', maxWidth: 'fit-content',
-                  }}>{deal.stage.name}</span>
-                  <span className="mono" style={{ fontWeight: 600 }}>{fmtMoney(deal.valueCents)}</span>
-                  <span className="mono">{deal.probability}%</span>
-                  <span style={{ fontSize: 11, color: 'var(--txt2)' }}>{deal.contact?.name ?? '-'}</span>
-                  <span style={{
-                    padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
-                    textTransform: 'uppercase',
-                    background: STATUS_COLORS[deal.status]?.bg ?? 'var(--bg2)',
-                    color: STATUS_COLORS[deal.status]?.txt ?? 'var(--txt2)',
-                    display: 'inline-block', maxWidth: 'fit-content',
-                  }}>{deal.status}</span>
+                  {visibleDealColumns.map((c) => {
+                    if (c.id === 'deal') return (
+                      <div key="deal">
+                        <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{deal.title}</div>
+                        <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{deal.owner?.name ?? 'Unassigned'}</div>
+                      </div>
+                    )
+                    if (c.id === 'stage') return (
+                      <span key="stage" style={{
+                        padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
+                        background: deal.stage.color + '22', color: deal.stage.color,
+                        display: 'inline-block', maxWidth: 'fit-content',
+                      }}>{deal.stage.name}</span>
+                    )
+                    if (c.id === 'value') return (
+                      <span key="value" className="mono" style={{ fontWeight: 600 }}>{fmtMoney(deal.valueCents)}</span>
+                    )
+                    if (c.id === 'probability') return (
+                      <span key="probability" className="mono">{deal.probability}%</span>
+                    )
+                    if (c.id === 'contact') return (
+                      <span key="contact" style={{ fontSize: 11, color: 'var(--txt2)' }}>{deal.contact?.name ?? '-'}</span>
+                    )
+                    if (c.id === 'status') return (
+                      <span key="status" style={{
+                        padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
+                        textTransform: 'uppercase',
+                        background: STATUS_COLORS[deal.status]?.bg ?? 'var(--bg2)',
+                        color: STATUS_COLORS[deal.status]?.txt ?? 'var(--txt2)',
+                        display: 'inline-block', maxWidth: 'fit-content',
+                      }}>{deal.status}</span>
+                    )
+                    return <span key={c.id} />
+                  })}
                   <button
                     type="button"
                     aria-label={`Quick view ${deal.title}`}

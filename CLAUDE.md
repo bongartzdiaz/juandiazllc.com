@@ -215,7 +215,7 @@ through NL/DE/ES on `/work`, `/insights`, `/sectors`, `/signals`,
 
 ### Launch readiness — 2026-04-28 (updated 2026-04-29)
 
-Bundles G–AA shipped on `claude/ai-command-bar`. The CRM is launch-
+Bundles G–AD shipped on `claude/ai-command-bar`. The CRM is launch-
 ready for big-company / EU-GDPR procurement subject to the operator
 setup steps below.
 
@@ -242,6 +242,9 @@ setup steps below.
 - Y — contact inline edit (Edit button in ContactQuickView swaps to ContactForm)
 - Z — test coverage push: `pagination` / `safe-error` / `utils` / `audit-verify` (+55 tests)
 - AA — saved views per user/org on contacts / deals / properties (`SavedView` table, `/api/views`, `useSavedViews` hook, `SavedViewsBar` chip-bar)
+- AB — global keyboard shortcuts (`?` cheat sheet, `g {c,d,p,k,i,n,s,a,h}` nav chords, `/` focus search) via `useGlobalShortcuts` hook + `<KeyboardShortcuts />` mounted in `ProtectedShell`
+- AC — column customization on the deals list view (`useColumnPrefs` localStorage hook + `<ColumnPicker>` popover, persists per-browser per-table)
+- AD — right-click context menu on contact cards (Open / Quick view / Edit / Select / Copy email / Copy phone / Delete) via reusable `<ContextMenu>` primitive
 
 **Verified at HEAD:**
 - `npm run build` clean on both apps (root + standalone)
@@ -289,10 +292,19 @@ setup steps below.
   signs off on quotes; renders null today, no runtime leak.
 - `SEO.md:128` `/docs/pitch-template.md` TODO (operator content,
   not code).
-- Advanced features remaining after Bundle AA: column customization,
-  advanced filter builder (server-side query DSL), keyboard shortcuts
-  (j/k/`/`/esc/`?`), right-click context menus, drag-drop ordering on
-  contacts.
+- Advanced features remaining after Bundles AA–AD:
+  - Advanced filter builder (server-side query DSL — bigger lift, needs
+    product spec on field + operator vocabulary).
+  - Drag-drop reorder on contacts (needs `Contact.displayOrder`
+    schema add + migration + persistence path).
+  - Right-click context menu propagation to deals/properties/projects
+    (the `<ContextMenu>` primitive is generic; per-page menu items
+    are the only work left).
+  - Column customization propagation to other table-shaped pages
+    (today only the deals list uses `<ColumnPicker>`; the same
+    `useColumnPrefs` hook covers any table).
+  - `j/k` row navigation in list views (needs visible-row tracking
+    state + scrollIntoView per page).
 
 ### Saved views — Bundle AA reference
 
@@ -318,6 +330,77 @@ When wiring a new entity:
    filter shape contains — unknown keys are ignored).
 3. Hide the bar in demo/showcase modes that use hand-curated rows
    (we do this on the contacts page for `realestate`/`hospitality`).
+
+### Keyboard shortcuts — Bundle AB reference
+
+`<KeyboardShortcuts />` is mounted once in `ProtectedShell`
+(components/philly/layout/ClientLayout.tsx). It listens via
+`useGlobalShortcuts(handlers)` — a hook that:
+
+- Suppresses keys while the focus is on input/textarea/select or
+  contenteditable (so search inputs aren't hijacked).
+- Ignores meta/ctrl/alt-modified keys (those belong to the OS or
+  the command palette's `cmd+K`).
+- Supports two-key chord prefixes ("g c" → Contacts) with a 1.2s
+  expiry between presses.
+
+Bindings today:
+- `?` — opens the cheat-sheet modal
+- `/` — focuses the first visible search input via
+  `focusFirstSearchInput()` (matches `[type=search]` /
+  `[placeholder*="Search" i]` / `[aria-label*="search" i]`)
+- `g h|c|d|p|k|i|n|s|a` — navigate to home / contacts / deals /
+  properties / projects / insights / notifications / settings /
+  audit
+
+To add a shortcut: edit the `useGlobalShortcuts({...})` map in
+`KeyboardShortcuts.tsx` AND add the row to the `NAV` or
+`ACTIONS` array in the same file so the cheat sheet stays honest.
+
+### Column customization — Bundle AC reference
+
+`hooks/philly/useColumnPrefs(storageKey, defaults)` returns
+`{ visible, toggle, setAll, reset, isOverridden }`. Persists the
+visible column id set to localStorage under the supplied key
+(versioned: `pai-deals-columns-v1`). Defaults live in the page
+file as a `ColumnDef[]` so the picker can label them; widths
+live in a sibling `Record<string, string>` so the grid template
+can be recomputed on visibility change.
+
+`<ColumnPicker columns visible onToggle onReset isOverridden />`
+renders the toolbar button + popover. Outside-click + Escape
+close it. `required: true` on a `ColumnDef` makes it un-toggleable.
+
+Today only the deals list view uses it; the contacts page uses
+cards (no columns) and the properties page uses a card grid.
+Lift to other table-shaped pages by:
+1. Defining `<ENTITY>_COLUMN_DEFS`, `<ENTITY>_COLUMN_DEFAULTS`,
+   `<ENTITY>_COLUMN_WIDTHS` constants near the top of the page.
+2. Calling `useColumnPrefs('pai-<entity>-columns-v1', defaults)`.
+3. Memoising the visible columns + grid template, then mapping
+   over `visibleColumns` in both the header and each row.
+
+### Right-click context menu — Bundle AD reference
+
+`<ContextMenu x y items onClose />` is a viewport-positioned
+popover with auto-clamping. Closes on outside click, Escape,
+scroll, and resize. Items are either:
+
+- `{ kind: 'action', label, icon?, onClick, shortcut?, destructive?, disabled? }`
+- `{ kind: 'separator' }`
+
+Per-page wiring:
+1. Add an `onContextMenu` handler on each row/card that calls
+   `e.preventDefault()` + sets `{ x: e.clientX, y: e.clientY,
+   <entityId> }` in state.
+2. Render `<ContextMenu>` conditionally at the bottom of the
+   page when state is non-null.
+3. Build the `items` array inside the conditional so it can
+   close over the targeted entity's data (used for "Copy email"
+   / disable-when-empty / etc.).
+
+Today only the contacts page wires it. Same pattern lifts to
+deals/properties/projects without touching the primitive.
 
 ### i18n discipline — lessons learned this session
 

@@ -8,11 +8,13 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Modal } from '@/components/philly/ui/Modal'
 import { ContactForm } from '@/components/philly/forms/ContactForm'
 import type { ContactFormData } from '@/components/philly/forms/ContactForm'
-import { Search, Mail, Phone, FolderKanban, Eye, Download } from 'lucide-react'
+import { Search, Mail, Phone, FolderKanban, Eye, Download, CheckSquare, Square, Pencil, Trash2, ExternalLink, Copy } from 'lucide-react'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { ContactQuickView } from '@/components/philly/contacts/ContactQuickView'
 import { BulkActionBar, type ContactTypeOption } from '@/components/philly/contacts/BulkActionBar'
 import { SavedViewsBar } from '@/components/philly/views/SavedViewsBar'
+import { ContextMenu, type ContextMenuItem } from '@/components/philly/ui/ContextMenu'
+import { useRouter } from 'next/navigation'
 import type { SavedView } from '@/hooks/philly/useSavedViews'
 import { useApi } from '@/hooks/philly/useApi'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
@@ -145,7 +147,9 @@ export default function ContactsPage() {
   const [quickViewId, setQuickViewId] = useState<string | null>(null)
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [bulkBusy, setBulkBusy] = useState(false)
+  const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; contactId: string } | null>(null)
   const { addToast } = useToast()
+  const router = useRouter()
 
   const isRE = industry === 'realestate'
   const isHOS = industry === 'hospitality'
@@ -466,7 +470,12 @@ export default function ContactsPage() {
             const tc = typeColors[c.type] || typeColors.partner
             const initials = c.firstName[0] + c.lastName[0]
             return (
-              <Link key={c.id} href={`/contacts/${c.id}`} className="card-hover" style={{
+              <Link key={c.id} href={`/contacts/${c.id}`} className="card-hover"
+                onContextMenu={(e) => {
+                  e.preventDefault()
+                  setCtxMenu({ x: e.clientX, y: e.clientY, contactId: c.id })
+                }}
+                style={{
                 background: selected.has(c.id)
                   ? 'color-mix(in srgb, var(--accent) 6%, var(--panel))'
                   : 'var(--panel)',
@@ -581,6 +590,87 @@ export default function ContactsPage() {
         onDelete={handleBulkDelete}
         onChangeType={handleBulkChangeType}
       />
+
+      {ctxMenu && (() => {
+        const c = contacts.find((x) => x.id === ctxMenu.contactId)
+        if (!c) return null
+        const items: ContextMenuItem[] = [
+          {
+            kind: 'action',
+            label: 'Open',
+            icon: ExternalLink,
+            shortcut: 'Enter',
+            onClick: () => router.push(`/contacts/${c.id}`),
+          },
+          {
+            kind: 'action',
+            label: 'Quick view',
+            icon: Eye,
+            onClick: () => setQuickViewId(c.id),
+          },
+          {
+            kind: 'action',
+            label: 'Edit',
+            icon: Pencil,
+            onClick: () => setQuickViewId(c.id), // opens the quick-view; user clicks Edit there
+            disabled: !isLive,
+          },
+          { kind: 'separator' },
+          {
+            kind: 'action',
+            label: selected.has(c.id) ? 'Deselect' : 'Select',
+            icon: selected.has(c.id) ? CheckSquare : Square,
+            onClick: () => toggleSelected(c.id),
+          },
+          { kind: 'separator' },
+          {
+            kind: 'action',
+            label: 'Copy email',
+            icon: Copy,
+            onClick: () => {
+              if (!c.email) { addToast('No email on file', 'error'); return }
+              navigator.clipboard?.writeText(c.email).then(
+                () => addToast('Email copied', 'success'),
+                () => addToast('Copy failed', 'error'),
+              )
+            },
+            disabled: !c.email,
+          },
+          {
+            kind: 'action',
+            label: 'Copy phone',
+            icon: Copy,
+            onClick: () => {
+              if (!c.phone) { addToast('No phone on file', 'error'); return }
+              navigator.clipboard?.writeText(c.phone).then(
+                () => addToast('Phone copied', 'success'),
+                () => addToast('Copy failed', 'error'),
+              )
+            },
+            disabled: !c.phone,
+          },
+          { kind: 'separator' },
+          {
+            kind: 'action',
+            label: 'Delete',
+            icon: Trash2,
+            destructive: true,
+            disabled: !isLive,
+            onClick: () => {
+              setSelected(new Set([c.id]))
+              handleBulkDelete()
+            },
+          },
+        ]
+        return (
+          <ContextMenu
+            x={ctxMenu.x}
+            y={ctxMenu.y}
+            items={items}
+            onClose={() => setCtxMenu(null)}
+          />
+        )
+      })()}
     </>
   )
 }

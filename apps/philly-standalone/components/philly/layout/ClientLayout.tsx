@@ -12,6 +12,7 @@ import { Sidebar } from './Sidebar'
 import { MobileNav } from './MobileNav'
 import { SectionGuard } from './SectionGuard'
 import { CommandPalette } from '@/components/philly/ui/CommandPalette'
+import { KeyboardShortcuts } from '@/components/philly/ui/KeyboardShortcuts'
 import { OfflineBanner } from '@/components/philly/ui/OfflineBanner'
 
 // Mobile menu context so Topbar can toggle the sidebar
@@ -135,6 +136,7 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
         </main>
 
         <CommandPalette />
+        <KeyboardShortcuts />
         <OfflineBanner />
         <MobileNav />
       </div>
