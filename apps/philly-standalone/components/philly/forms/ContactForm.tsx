@@ -77,8 +77,10 @@ export function ContactForm({ onSubmit, onCancel, initial }: ContactFormProps) {
           placeholder="Full name"
           value={form.name}
           onChange={e => update('name', e.target.value)}
+          aria-invalid={errors.name ? 'true' : undefined}
+          aria-describedby={errors.name ? 'contact-form-name-error' : undefined}
         />
-        {errors.name && <div style={errorStyle}>{errors.name}</div>}
+        {errors.name && <div id="contact-form-name-error" role="alert" style={errorStyle}>{errors.name}</div>}
       </FormField>
 
       <FormField label="Email" required>
@@ -88,8 +90,10 @@ export function ContactForm({ onSubmit, onCancel, initial }: ContactFormProps) {
           placeholder="email@example.com"
           value={form.email}
           onChange={e => update('email', e.target.value)}
+          aria-invalid={errors.email ? 'true' : undefined}
+          aria-describedby={errors.email ? 'contact-form-email-error' : undefined}
         />
-        {errors.email && <div style={errorStyle}>{errors.email}</div>}
+        {errors.email && <div id="contact-form-email-error" role="alert" style={errorStyle}>{errors.email}</div>}
       </FormField>
 
       <FormField label="Phone">

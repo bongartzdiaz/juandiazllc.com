@@ -211,10 +211,16 @@ function ViewChip({
           width: 18, height: 18, padding: 0, borderRadius: 4,
           background: 'transparent', border: 'none', cursor: 'pointer',
           color: active ? '#fff' : 'var(--txt3)',
-          display: hover ? 'inline-flex' : 'none',
+          // Always rendered so the button is reachable on touch +
+          // by keyboard. Visual prominence via opacity boosts on
+          // hover/focus. (Bundle AN — a11y fix.)
+          display: 'inline-flex',
           alignItems: 'center', justifyContent: 'center',
-          opacity: 0.85,
+          opacity: hover ? 0.85 : 0.45,
+          transition: 'opacity 120ms ease',
         }}
+        onFocus={(e) => { e.currentTarget.style.opacity = '0.85' }}
+        onBlur={(e) => { e.currentTarget.style.opacity = hover ? '0.85' : '0.45' }}
       >
         <Trash2 size={10} />
       </button>

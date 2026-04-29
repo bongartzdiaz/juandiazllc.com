@@ -672,15 +672,15 @@ export default function ContactsPage() {
                 {/* Details */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--txt2)' }}>
-                    <Mail size={12} color="var(--txt3)" />
+                    <Mail size={12} color="var(--txt3)" aria-hidden="true" />
                     <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.email}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--txt2)' }}>
-                    <Phone size={12} color="var(--txt3)" />
+                    <Phone size={12} color="var(--txt3)" aria-hidden="true" />
                     <span>{c.phone}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--txt2)' }}>
-                    <FolderKanban size={12} color="var(--txt3)" />
+                    <FolderKanban size={12} color="var(--txt3)" aria-hidden="true" />
                     <span className="mono" style={{ fontWeight: 600 }}>{c.projects}</span>
                     <span>connected {isHOS ? 'reservation' : isRE ? 'propert' : 'project'}{c.projects !== 1 ? (isHOS ? 's' : isRE ? 'ies' : 's') : (isRE ? 'y' : '')}</span>
                   </div>
