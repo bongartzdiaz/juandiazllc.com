@@ -3,7 +3,7 @@
 
 import { NextRequest, NextResponse, after } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireSection } from '@/lib/philly/auth-helpers'
+import { requireSection, jsonError } from '@/lib/philly/auth-helpers'
 import { validateBody } from '@/lib/philly/validation'
 import { createContactSchema } from '@/lib/philly/validation/schemas'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
@@ -18,6 +18,9 @@ import {
   looksLikeEmailQuery,
   looksLikePhoneQuery,
 } from '@/lib/philly/blind-index'
+import { compileFilter, FilterCompileError } from '@/lib/philly/filter/compile'
+import { CONTACT_FILTER_SCHEMA } from '@/lib/philly/filter/schemas'
+import type { FilterSpec } from '@/lib/philly/filter/types'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -58,10 +61,34 @@ export async function GET(req: NextRequest) {
     }
   })()
 
-  const where = {
+  // Bundle AM — advanced filter builder. Accepts a JSON-encoded
+  // FilterSpec under `?filter=`. Compile errors come back as 400.
+  let advancedClause: Record<string, unknown> | null = null
+  const filterParam = url.searchParams.get('filter')
+  if (filterParam) {
+    let parsed: unknown
+    try { parsed = JSON.parse(filterParam) } catch { return jsonError('Invalid filter JSON', 400) }
+    try {
+      advancedClause = compileFilter(parsed as FilterSpec, CONTACT_FILTER_SCHEMA)
+    } catch (e) {
+      if (e instanceof FilterCompileError) return jsonError(e.message, 400)
+      throw e
+    }
+  }
+
+  // organizationId is enforced unconditionally — even an attacker
+  // who somehow injects a where clause via the filter spec can't
+  // escape their tenant.
+  const where: Record<string, unknown> = {
     organizationId: scope.organizationId,
     ...(type ? { type } : {}),
     ...(searchClause ?? {}),
+  }
+  if (advancedClause && Object.keys(advancedClause).length > 0) {
+    // Wrap the user's filter in AND with the tenancy guard. The
+    // compiled filter never references organizationId (the schema
+    // doesn't list it), but defence-in-depth.
+    where.AND = [advancedClause]
   }
 
   const [contacts, total] = await Promise.all([

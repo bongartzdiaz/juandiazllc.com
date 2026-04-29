@@ -8,12 +8,15 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Modal } from '@/components/philly/ui/Modal'
 import { ContactForm } from '@/components/philly/forms/ContactForm'
 import type { ContactFormData } from '@/components/philly/forms/ContactForm'
-import { Search, Mail, Phone, FolderKanban, Eye, Download, CheckSquare, Square, Pencil, Trash2, ExternalLink, Copy } from 'lucide-react'
+import { Search, Mail, Phone, FolderKanban, Eye, Download, CheckSquare, Square, Pencil, Trash2, ExternalLink, Copy, Filter as FilterIcon } from 'lucide-react'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { ContactQuickView } from '@/components/philly/contacts/ContactQuickView'
 import { BulkActionBar, type ContactTypeOption } from '@/components/philly/contacts/BulkActionBar'
 import { SavedViewsBar } from '@/components/philly/views/SavedViewsBar'
 import { ContextMenu, type ContextMenuItem } from '@/components/philly/ui/ContextMenu'
+import { AdvancedFilterBuilder, describeFilter } from '@/components/philly/filter/AdvancedFilterBuilder'
+import type { FilterSpec } from '@/lib/philly/filter/types'
+import { CONTACT_FILTER_SCHEMA } from '@/lib/philly/filter/schemas'
 import { useRouter } from 'next/navigation'
 import type { SavedView } from '@/hooks/philly/useSavedViews'
 import { useApi } from '@/hooks/philly/useApi'
@@ -154,6 +157,10 @@ export default function ContactsPage() {
   // Optimistic ordering override — when set, takes precedence over the
   // server's `liveContacts` order until the next refetch.
   const [orderOverride, setOrderOverride] = useState<string[] | null>(null)
+
+  // Bundle AM — advanced filter builder.
+  const [filterSpec, setFilterSpec] = useState<FilterSpec | null>(null)
+  const [filterOpen, setFilterOpen] = useState(false)
   const { addToast } = useToast()
   const router = useRouter()
 
@@ -179,13 +186,30 @@ export default function ContactsPage() {
     if (typeof f.q === 'string') next.q = f.q
     if (typeof f.type === 'string') next.type = f.type
     setFilters(next)
+    // Bundle AM — pull the advanced filter spec back if the saved view
+    // included one. Unknown shapes are silently ignored (saved views
+    // pre-AM don't carry an `advanced` key).
+    if (f.advanced && typeof f.advanced === 'object') {
+      setFilterSpec(f.advanced as FilterSpec)
+    } else {
+      setFilterSpec(null)
+    }
     addToast(`Applied "${view.name}"`, 'success')
   }, [setFilters, addToast])
 
   /* Live data for the default (philanthropy) view comes from the API.
      RE and HOS modes are showcase / demo industries, so they keep their
      hand-curated demo data. */
-  const apiQuery = useApi<{ data: ApiContact[] }>('/contacts', {
+  const contactsApiPath = useMemo(() => {
+    const params = new URLSearchParams()
+    if (filterSpec && filterSpec.rules.length > 0) {
+      params.set('filter', JSON.stringify(filterSpec))
+    }
+    const qs = params.toString()
+    return `/contacts${qs ? `?${qs}` : ''}`
+  }, [filterSpec])
+
+  const apiQuery = useApi<{ data: ApiContact[] }>(contactsApiPath, {
     enabled: !isRE && !isHOS,
   })
   // Live mode is loading when the API call is in flight. Demo/showcase
@@ -485,6 +509,25 @@ export default function ContactsPage() {
           >
             <Download size={12} /> Export
           </button>
+          {/* Bundle AM — advanced filter builder (live mode only). */}
+          {isLive && (
+            <button
+              type="button"
+              onClick={() => setFilterOpen(true)}
+              aria-label="Open advanced filter builder"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
+                background: filterSpec ? 'color-mix(in srgb, var(--accent) 14%, transparent)' : 'var(--bg2)',
+                color: filterSpec ? 'var(--accent)' : 'var(--txt2)',
+                border: filterSpec ? '1px solid var(--accent)' : 'none',
+                cursor: 'pointer', fontFamily: 'inherit',
+              }}
+            >
+              <FilterIcon size={12} />
+              {filterSpec ? `Filters: ${describeFilter(filterSpec)}` : 'Filters'}
+            </button>
+          )}
         </div>
 
         {/* Saved views (Bundle AA) — live mode only. Demo/showcase
@@ -493,7 +536,7 @@ export default function ContactsPage() {
         {isLive && (
           <SavedViewsBar
             entity="contacts"
-            currentFilters={{ q: search, type: typeFilter }}
+            currentFilters={{ q: search, type: typeFilter, advanced: filterSpec ?? undefined }}
             onApply={applySavedView}
           />
         )}
@@ -662,6 +705,14 @@ export default function ContactsPage() {
       </Modal>
 
       <ContactQuickView contactId={quickViewId} onClose={() => setQuickViewId(null)} />
+
+      <AdvancedFilterBuilder
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        schema={CONTACT_FILTER_SCHEMA}
+        initial={filterSpec}
+        onApply={(spec) => setFilterSpec(spec)}
+      />
 
       <BulkActionBar
         count={selected.size}

@@ -384,6 +384,32 @@ UPDATE Contact SET displayOrder = NULL WHERE organizationId = '<orgId>';
 UPDATE Deal SET displayOrder = NULL WHERE pipelineId = '<pipelineId>';
 ```
 
+### Advanced filter builder (Bundle AM)
+
+The contacts list ships an "Filters" button (live mode only) that
+opens a builder modal. Operators add type-aware rules (Name
+contains, ICP fit ≥ 70, Type is any of donor/partner, Added after
+2026-01-01, etc.) joined by AND or OR.
+
+The filter compiles server-side via
+`lib/philly/filter/compile.ts`. Every field is declared on
+`lib/philly/filter/schemas.ts:CONTACT_FILTER_SCHEMA` — fields not
+on that allowlist are rejected with a 400. The unconditional
+`{ organizationId: scope.organizationId }` AND wrap means an
+attacker who somehow injects a clause can't escape their tenant.
+
+Email + phone use exact-match only via the blind-index hashes
+from Bundle P; substring on those columns isn't possible (random
+IVs). The UI surfaces this caveat in the builder footer.
+
+Saved views (Bundle AA) carry the advanced filter under
+`filters.advanced`, so a saved-and-shared filter survives a
+refresh.
+
+Operators using the Saved Views feature can save an advanced
+filter to share across the org — see `CLAUDE.md` for the
+reference.
+
 ### Saved views (Bundle AA)
 
 Per-user filter+view bundles persisted on `SavedView`. The chip-bar

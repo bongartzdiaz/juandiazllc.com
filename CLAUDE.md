@@ -215,7 +215,7 @@ through NL/DE/ES on `/work`, `/insights`, `/sectors`, `/signals`,
 
 ### Launch readiness — 2026-04-28 (updated 2026-04-29)
 
-Bundles G–AL shipped on `claude/ai-command-bar`. The CRM is launch-
+Bundles G–AM shipped on `claude/ai-command-bar`. The CRM is launch-
 ready for big-company / EU-GDPR procurement subject to the operator
 setup steps below.
 
@@ -253,6 +253,7 @@ setup steps below.
 - AJ — column-customization sweep on referrals / lead-scores / e-signatures (each with its own `pai-<entity>-columns-v1` localStorage key). Documents (card grid) and inbox (master/detail with 3 cols) intentionally skipped.
 - AK — right-click context menu on projects (Quick view / Open full page / Copy title / Delete; Open + Delete disabled in RE/HOS demo modes).
 - AL — drag-drop reorder on the deals LIST view (kanban already has dnd for stage moves; we don't double-bind). New `Deal.displayOrder BIGINT NULL` + `(pipelineId, displayOrder)` index, migration `20260429010000_deal_display_order`, `POST /api/deals/reorder` endpoint (rate-limited, transaction, audit-logged), optimistic UI override.
+- AM — advanced filter builder (contacts as proof point). New `lib/philly/filter/{types,schemas,compile}.ts` with a JSON-safe DSL → Prisma `where` compiler (29 tests, allowlists every field). `GET /api/contacts?filter=<json>` accepts the spec; the schema-registry whitelist + the unconditional `organizationId` AND wrap is the injection-prevention story. Email/phone routing through blind-index hash columns (Bundle P) honoured. `<AdvancedFilterBuilder>` modal with type-aware operators + value inputs. Saved-views (Bundle AA) carry the spec under `filters.advanced`.
 
 **Verified at HEAD:**
 - `npm run build` clean on both apps (root + standalone)
@@ -302,9 +303,10 @@ setup steps below.
   signs off on quotes; renders null today, no runtime leak.
 - `SEO.md:128` `/docs/pitch-template.md` TODO (operator content,
   not code).
-- Advanced features remaining after Bundles AA–AL:
-  - Advanced filter builder (server-side query DSL — bigger lift, needs
-    product spec on field + operator vocabulary).
+- Advanced features remaining after Bundles AA–AM:
+  - Advanced filter builder lift to deals + properties (the DSL
+    is generic; need per-entity `FilterEntitySchema` + the same
+    `?filter=` route plumbing).
   - `j/k` propagation to the deal kanban (2D layout — needs row+column
     arrow handling, distinct from the linear lists AF/AI cover).
   - Drag-drop reorder for properties (analogous to deals AL: add
@@ -475,6 +477,46 @@ so we don't double-bind there — the reorder lives on the list
 view only. To extend to properties: add `Property.displayOrder`
 + migration + `/api/properties/reorder`, then copy the state +
 handler block.
+
+### Advanced filter builder — Bundle AM reference
+
+JSON-safe DSL in `lib/philly/filter/types.ts`:
+
+```ts
+type FilterSpec = FilterGroup // top level always a group
+interface FilterGroup { kind: 'group'; combinator: 'AND'|'OR'; rules: (FilterRule|FilterGroup)[] }
+interface FilterRule  { kind: 'rule';  field: string; operator: Operator; value?: unknown }
+```
+
+Every field is declared on a per-entity schema (`FilterEntitySchema`)
+in `lib/philly/filter/schemas.ts`. The compiler refuses any field
+not on the registry — that's the injection-prevention story.
+Email and phone use the existing blind-index hash columns from
+Bundle P (random-IV ciphertext can't be substring-searched), so
+their schema entries supply a custom `toPrisma()` that routes
+`eq`/`neq` through the hash and rejects everything else.
+
+API contract: `GET /api/contacts?filter=<JSON-stringified spec>`.
+Compile errors come back as 400 with the message; success folds
+the compiled where clause into an `AND` with the unconditional
+`organizationId` tenancy guard.
+
+UI lives in `components/philly/filter/AdvancedFilterBuilder.tsx`:
+modal with a flat list of rules joined by AND or OR. Operator and
+value inputs adapt to the field type (string/number/date/enum/
+boolean). Nested groups are supported by the spec + compiler but
+not yet by the UI — paste-from-JSON would surface them in a
+follow-up.
+
+Saved views (Bundle AA) carry the spec under `filters.advanced`,
+so a saved-and-shared advanced filter survives a refresh.
+
+To extend to a new entity:
+1. Add a `FilterEntitySchema` in `lib/philly/filter/schemas.ts`.
+2. Update the GET route to compile + AND the result with the
+   entity's tenancy clause.
+3. Wire `<AdvancedFilterBuilder schema={X_FILTER_SCHEMA} ...>`
+   into the page.
 
 ### i18n discipline — lessons learned this session
 
