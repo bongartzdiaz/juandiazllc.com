@@ -14,7 +14,7 @@ import { ContactQuickView } from '@/components/philly/contacts/ContactQuickView'
 import { BulkActionBar, type ContactTypeOption } from '@/components/philly/contacts/BulkActionBar'
 import { SavedViewsBar } from '@/components/philly/views/SavedViewsBar'
 import { ContextMenu, type ContextMenuItem } from '@/components/philly/ui/ContextMenu'
-import { AdvancedFilterBuilder, describeFilter } from '@/components/philly/filter/AdvancedFilterBuilder'
+import { AdvancedFilterBuilder } from '@/components/philly/filter/AdvancedFilterBuilder'
 import type { FilterSpec } from '@/lib/philly/filter/types'
 import { CONTACT_FILTER_SCHEMA } from '@/lib/philly/filter/schemas'
 import { useRouter } from 'next/navigation'
@@ -142,6 +142,7 @@ const avatarColors: Record<string, string> = {
 export default function ContactsPage() {
   const { industry } = useIndustry()
   const t = useTranslations('contacts')
+  const tFilter = useTranslations('filter')
   const [filters, setFilters] = useUrlState({ q: '', type: 'all' })
   const search = filters.q
   const typeFilter = filters.type
@@ -528,7 +529,9 @@ export default function ContactsPage() {
               }}
             >
               <FilterIcon size={12} />
-              {filterSpec ? `Filters: ${describeFilter(filterSpec)}` : 'Filters'}
+              {filterSpec
+                ? tFilter('labelWithCount', { count: tFilter('ruleCount', { count: filterSpec.rules.length }) })
+                : tFilter('label')}
             </button>
           )}
         </div>

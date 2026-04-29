@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Plus, Trash2, Filter as FilterIcon, X, Check } from 'lucide-react'
 import { Modal } from '@/components/philly/ui/Modal'
 import type {
@@ -16,45 +17,22 @@ import type {
    handles them; nested groups can be authored via JSON paste in
    a future iteration). */
 
-const OPERATORS_BY_TYPE: Record<FieldType, Array<{ value: Operator; label: string }>> = {
-  string: [
-    { value: 'contains', label: 'contains' },
-    { value: 'eq', label: 'equals' },
-    { value: 'neq', label: 'does not equal' },
-    { value: 'starts_with', label: 'starts with' },
-    { value: 'ends_with', label: 'ends with' },
-    { value: 'is_empty', label: 'is empty' },
-    { value: 'is_not_empty', label: 'is not empty' },
-  ],
-  number: [
-    { value: 'eq', label: '=' },
-    { value: 'neq', label: '≠' },
-    { value: 'gt', label: '>' },
-    { value: 'gte', label: '≥' },
-    { value: 'lt', label: '<' },
-    { value: 'lte', label: '≤' },
-    { value: 'between', label: 'between' },
-    { value: 'is_empty', label: 'is empty' },
-    { value: 'is_not_empty', label: 'is not empty' },
-  ],
-  date: [
-    { value: 'before', label: 'before' },
-    { value: 'after', label: 'after' },
-    { value: 'on', label: 'on' },
-    { value: 'between', label: 'between' },
-    { value: 'is_empty', label: 'is empty' },
-    { value: 'is_not_empty', label: 'is not empty' },
-  ],
-  enum: [
-    { value: 'eq', label: 'is' },
-    { value: 'neq', label: 'is not' },
-    { value: 'in', label: 'is any of' },
-    { value: 'not_in', label: 'is none of' },
-  ],
-  boolean: [
-    { value: 'is_true', label: 'is true' },
-    { value: 'is_false', label: 'is false' },
-  ],
+// Operator IDs per field type — labels are looked up via `filter.operator.*`
+// at render time so the dropdown localises.
+const OPERATOR_IDS_BY_TYPE: Record<FieldType, Operator[]> = {
+  string: ['contains', 'eq', 'neq', 'starts_with', 'ends_with', 'is_empty', 'is_not_empty'],
+  number: ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'between', 'is_empty', 'is_not_empty'],
+  date: ['before', 'after', 'on', 'between', 'is_empty', 'is_not_empty'],
+  enum: ['eq', 'neq', 'in', 'not_in'],
+  boolean: ['is_true', 'is_false'],
+}
+
+// Some operators map to a different filter.operator.* key when used on
+// enum fields (e.g. `eq` reads "is" rather than "equals").
+function operatorLabelKey(type: FieldType, op: Operator): string {
+  if (type === 'enum' && op === 'eq') return 'is'
+  if (type === 'enum' && op === 'neq') return 'isNot'
+  return op
 }
 
 const UNARY_OPERATORS = new Set<Operator>([
@@ -72,6 +50,8 @@ interface Props {
 }
 
 export function AdvancedFilterBuilder({ open, onClose, schema, initial, onApply }: Props) {
+  const t = useTranslations('filter')
+  const tc = useTranslations('common')
   const [combinator, setCombinator] = useState<'AND' | 'OR'>('AND')
   const [rules, setRules] = useState<FilterRule[]>([])
 
@@ -124,21 +104,21 @@ export function AdvancedFilterBuilder({ open, onClose, schema, initial, onApply 
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Advanced filter" subtitle={`${schema.entity} list`} size="lg">
+    <Modal open={open} onClose={onClose} title={t('title')} subtitle={t('subtitlePrefix', { entity: schema.entity })} size="lg">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         {/* Combinator selector */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-          <span style={{ color: 'var(--txt3)' }}>Match</span>
-          <CombinatorButton active={combinator === 'AND'} onClick={() => setCombinator('AND')}>All</CombinatorButton>
-          <CombinatorButton active={combinator === 'OR'} onClick={() => setCombinator('OR')}>Any</CombinatorButton>
-          <span style={{ color: 'var(--txt3)' }}>of the following:</span>
+          <span style={{ color: 'var(--txt3)' }}>{t('matchPrefix')}</span>
+          <CombinatorButton active={combinator === 'AND'} onClick={() => setCombinator('AND')}>{t('matchAll')}</CombinatorButton>
+          <CombinatorButton active={combinator === 'OR'} onClick={() => setCombinator('OR')}>{t('matchAny')}</CombinatorButton>
+          <span style={{ color: 'var(--txt3)' }}>{t('matchOf')}</span>
         </div>
 
         {/* Rules */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {rules.map((rule, idx) => {
             const field = schema.fields.find((f) => f.id === rule.field)
-            const operators = field ? OPERATORS_BY_TYPE[field.type] : []
+            const operators = field ? OPERATOR_IDS_BY_TYPE[field.type] : []
             const isUnary = UNARY_OPERATORS.has(rule.operator)
             return (
               <div
@@ -156,10 +136,10 @@ export function AdvancedFilterBuilder({ open, onClose, schema, initial, onApply 
                   onChange={(e) => {
                     const f = schema.fields.find((x) => x.id === e.target.value)
                     if (!f) return
-                    const ops = OPERATORS_BY_TYPE[f.type]
+                    const ops = OPERATOR_IDS_BY_TYPE[f.type]
                     updateRule(idx, {
                       field: f.id,
-                      operator: ops[0]?.value ?? 'eq',
+                      operator: ops[0] ?? 'eq',
                       value: undefined,
                     })
                   }}
@@ -174,8 +154,10 @@ export function AdvancedFilterBuilder({ open, onClose, schema, initial, onApply 
                   onChange={(e) => updateRule(idx, { operator: e.target.value as Operator, value: undefined })}
                   style={selectStyle}
                 >
-                  {operators.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
+                  {operators.map((op) => (
+                    <option key={op} value={op}>
+                      {field ? t(`operator.${operatorLabelKey(field.type, op)}`) : op}
+                    </option>
                   ))}
                 </select>
                 <ValueInput
@@ -186,7 +168,7 @@ export function AdvancedFilterBuilder({ open, onClose, schema, initial, onApply 
                 />
                 <button
                   type="button"
-                  aria-label="Remove rule"
+                  aria-label={t('removeRule')}
                   onClick={() => removeRule(idx)}
                   style={{
                     width: 26, height: 26, padding: 0, borderRadius: 5,
@@ -214,7 +196,7 @@ export function AdvancedFilterBuilder({ open, onClose, schema, initial, onApply 
               alignSelf: 'flex-start',
             }}
           >
-            <Plus size={11} /> Add rule
+            <Plus size={11} /> {t('addRule')}
           </button>
         </div>
 
@@ -231,7 +213,7 @@ export function AdvancedFilterBuilder({ open, onClose, schema, initial, onApply 
               fontSize: 12, fontWeight: 600, fontFamily: 'inherit',
             }}
           >
-            <Check size={12} /> Apply filter
+            <Check size={12} /> {tc('applyFilter')}
           </button>
           <button
             type="button"
@@ -244,7 +226,7 @@ export function AdvancedFilterBuilder({ open, onClose, schema, initial, onApply 
               fontSize: 12, fontWeight: 500, fontFamily: 'inherit',
             }}
           >
-            Clear all
+            {tc('clearAll')}
           </button>
           <button
             type="button"
@@ -258,15 +240,13 @@ export function AdvancedFilterBuilder({ open, onClose, schema, initial, onApply 
               marginLeft: 'auto',
             }}
           >
-            <X size={12} /> Cancel
+            <X size={12} /> {tc('cancel')}
           </button>
         </div>
 
         <div style={{ fontSize: 11, color: 'var(--txt3)', lineHeight: 1.5 }}>
           <FilterIcon size={11} style={{ display: 'inline', marginRight: 4 }} />
-          Filters apply on the server. Email and phone use exact-match
-          only (the values are encrypted at rest); use Contains on Name
-          or Company for partial searches.
+          {t('footnote')}
         </div>
       </div>
     </Modal>
@@ -311,10 +291,11 @@ function ValueInput({
   disabled: boolean
   onChange: (value: FilterRule['value']) => void
 }) {
+  const t = useTranslations('filter')
   if (disabled || !field) {
     return (
       <span style={{ fontSize: 11, color: 'var(--txt3)', padding: '6px 8px' }}>
-        (no value needed)
+        {t('noValueNeeded')}
       </span>
     )
   }
@@ -354,7 +335,7 @@ function ValueInput({
         onChange={(e) => onChange(e.target.value)}
         style={selectStyle}
       >
-        <option value="">— select —</option>
+        <option value="">{t('selectPlaceholder')}</option>
         {field.options.map((o) => (
           <option key={o.value} value={o.value}>{o.label}</option>
         ))}
@@ -372,14 +353,14 @@ function ValueInput({
           value={typeof lo === 'string' || typeof lo === 'number' ? String(lo) : ''}
           onChange={(e) => onChange([e.target.value, hi as string])}
           style={inputStyle}
-          placeholder="from"
+          placeholder={t('rangeFrom')}
         />
         <input
           type={inputType}
           value={typeof hi === 'string' || typeof hi === 'number' ? String(hi) : ''}
           onChange={(e) => onChange([lo as string, e.target.value])}
           style={inputStyle}
-          placeholder="to"
+          placeholder={t('rangeTo')}
         />
       </div>
     )
@@ -396,7 +377,7 @@ function ValueInput({
       }
       onChange={(e) => onChange(field.type === 'number' ? Number(e.target.value) : e.target.value)}
       style={inputStyle}
-      placeholder="value"
+      placeholder={t('valuePlaceholder')}
     />
   )
 }
@@ -414,18 +395,8 @@ const inputStyle: React.CSSProperties = {
 
 function emptyRule(field?: FilterField): FilterRule {
   if (!field) return { kind: 'rule', field: '', operator: 'eq', value: '' }
-  const op = OPERATORS_BY_TYPE[field.type][0]?.value ?? 'eq'
-  return { kind: 'rule', field: field.id, operator: op as Operator, value: undefined }
-}
-
-/** Trivial pretty-print for the active-filter chip count. */
-export function describeFilter(spec: FilterSpec | null | undefined): string {
-  if (!spec || !spec.rules.length) return ''
-  const ruleCount = spec.rules.filter((r) => r.kind === 'rule').length
-  const groupCount = spec.rules.filter((r) => r.kind === 'group').length
-  const total = ruleCount + groupCount
-  if (total === 1) return '1 rule'
-  return `${total} rules`
+  const op = OPERATOR_IDS_BY_TYPE[field.type][0] ?? 'eq'
+  return { kind: 'rule', field: field.id, operator: op, value: undefined }
 }
 
 /* Re-exports so consumers don't need to drill into the lib. */

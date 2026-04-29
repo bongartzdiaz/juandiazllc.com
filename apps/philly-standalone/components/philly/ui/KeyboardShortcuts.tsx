@@ -2,44 +2,25 @@
 
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Modal } from '@/components/philly/ui/Modal'
 import { useGlobalShortcuts, focusFirstSearchInput } from '@/hooks/philly/useGlobalShortcuts'
 
 /* Bundle AB — global keyboard shortcuts + cheat-sheet modal.
    Mounted once in ClientLayout's ProtectedShell so the bindings
    are active on every authenticated page. The CommandPalette
-   handles its own cmd+K — we avoid stepping on it. */
+   handles its own cmd+K — we avoid stepping on it.
+
+   Bundle AP — operator-facing copy now flows through next-intl. */
 
 interface ShortcutEntry {
   keys: string
   description: string
 }
 
-const NAV: ShortcutEntry[] = [
-  { keys: 'g h', description: 'Home' },
-  { keys: 'g c', description: 'Contacts' },
-  { keys: 'g d', description: 'Deals' },
-  { keys: 'g p', description: 'Properties' },
-  { keys: 'g k', description: 'Projects' },
-  { keys: 'g i', description: 'Insights' },
-  { keys: 'g n', description: 'Notifications' },
-  { keys: 'g s', description: 'Settings' },
-  { keys: 'g a', description: 'Audit log' },
-]
-
-const ACTIONS: ShortcutEntry[] = [
-  { keys: '/', description: 'Focus search on current page' },
-  { keys: '?', description: 'Show this cheat sheet' },
-  { keys: 'Esc', description: 'Close any open modal' },
-  { keys: '⌘K', description: 'Open command palette (search + AI)' },
-  { keys: '⌘⇧K', description: 'Open command palette in AI mode' },
-  { keys: 'j', description: 'Next row (deals list, properties, transactions)' },
-  { keys: 'k', description: 'Previous row' },
-  { keys: 'Enter', description: 'Open focused row' },
-]
-
 export function KeyboardShortcuts() {
   const router = useRouter()
+  const t = useTranslations('keyboard')
   const [cheatOpen, setCheatOpen] = useState(false)
 
   const go = useCallback((path: string) => () => router.push(path), [router])
@@ -58,17 +39,39 @@ export function KeyboardShortcuts() {
     'g a': go('/audit'),
   })
 
+  const NAV: ShortcutEntry[] = [
+    { keys: 'g h', description: t('nav.home') },
+    { keys: 'g c', description: t('nav.contacts') },
+    { keys: 'g d', description: t('nav.deals') },
+    { keys: 'g p', description: t('nav.properties') },
+    { keys: 'g k', description: t('nav.projects') },
+    { keys: 'g i', description: t('nav.insights') },
+    { keys: 'g n', description: t('nav.notifications') },
+    { keys: 'g s', description: t('nav.settings') },
+    { keys: 'g a', description: t('nav.audit') },
+  ]
+  const ACTIONS: ShortcutEntry[] = [
+    { keys: '/', description: t('actions.focusSearch') },
+    { keys: '?', description: t('actions.showCheatSheet') },
+    { keys: 'Esc', description: t('actions.closeModal') },
+    { keys: '⌘K', description: t('actions.openPalette') },
+    { keys: '⌘⇧K', description: t('actions.openPaletteAi') },
+    { keys: 'j', description: t('actions.nextRow') },
+    { keys: 'k', description: t('actions.prevRow') },
+    { keys: 'Enter', description: t('actions.openRow') },
+  ]
+
   return (
     <Modal
       open={cheatOpen}
       onClose={() => setCheatOpen(false)}
-      title="Keyboard shortcuts"
-      subtitle="Press ? on any page"
+      title={t('title')}
+      subtitle={t('subtitle')}
       size="md"
     >
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
-        <Section title="Navigation" rows={NAV} />
-        <Section title="Actions" rows={ACTIONS} />
+        <Section title={t('navigationHeading')} rows={NAV} />
+        <Section title={t('actionsHeading')} rows={ACTIONS} />
       </div>
       <div
         style={{
@@ -77,10 +80,7 @@ export function KeyboardShortcuts() {
           fontSize: 11.5, color: 'var(--txt3)', lineHeight: 1.6,
         }}
       >
-        Two-key shortcuts (e.g. <Kbd>g</Kbd> <Kbd>c</Kbd>) — press them in
-        sequence within ~1 second. Shortcuts are suppressed while you're
-        typing in an input, so you don't have to worry about clobbering
-        a search field.
+        {t('footnote')}
       </div>
     </Modal>
   )

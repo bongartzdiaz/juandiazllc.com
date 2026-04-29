@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import {
   User as UserIcon, Calendar, ExternalLink, X, FolderKanban,
 } from 'lucide-react'
@@ -53,6 +54,8 @@ interface Props {
 }
 
 export function DealQuickView({ dealId, onClose }: Props) {
+  const t = useTranslations('quickview')
+  const tc = useTranslations('common')
   const open = dealId != null
   const query = useApi<{ data: DealDetail }>(open ? `/deals/${dealId}` : '', { enabled: open })
   const d = query.data?.data ?? null
@@ -68,7 +71,7 @@ export function DealQuickView({ dealId, onClose }: Props) {
     >
       {!d ? (
         <div style={{ padding: 24, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-          {query.loading ? 'Loading…' : query.error ?? 'Deal not found'}
+          {query.loading ? t('loading') : query.error ?? t('notFound', { entity: 'Deal' })}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -86,7 +89,7 @@ export function DealQuickView({ dealId, onClose }: Props) {
             <span style={{ flex: 1 }} />
             <span style={{ fontSize: 11, color: 'var(--txt3)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
               <Calendar size={11} />
-              opened {fmtDate(d.createdAt)}
+              {t('openedOn', { date: fmtDate(d.createdAt) })}
             </span>
           </div>
 
@@ -98,13 +101,13 @@ export function DealQuickView({ dealId, onClose }: Props) {
             display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10,
           }}>
             <div>
-              <div style={{ fontSize: 10.5, color: 'var(--txt3)', marginBottom: 2 }}>Value</div>
+              <div style={{ fontSize: 10.5, color: 'var(--txt3)', marginBottom: 2 }}>{t('deal.value')}</div>
               <div className="mono" style={{ fontSize: 22, fontWeight: 700, lineHeight: 1.1 }}>
                 {fmtMoney(d.valueCents)}
               </div>
             </div>
             <div>
-              <div style={{ fontSize: 10.5, color: 'var(--txt3)', marginBottom: 2 }}>Probability</div>
+              <div style={{ fontSize: 10.5, color: 'var(--txt3)', marginBottom: 2 }}>{t('deal.probability')}</div>
               <div className="mono" style={{ fontSize: 22, fontWeight: 700, lineHeight: 1.1 }}>
                 {d.probability}%
               </div>
@@ -118,10 +121,10 @@ export function DealQuickView({ dealId, onClose }: Props) {
             background: 'var(--bg2)', border: '1px solid var(--border)',
             borderRadius: 10,
           }}>
-            <Field icon={UserIcon} label="Owner" value={d.owner?.name ?? 'Unassigned'} />
-            <Field icon={UserIcon} label="Contact" value={d.contact?.name ?? '—'} />
-            <Field icon={Calendar} label="Expected close" value={fmtDate(d.expectedClose)} />
-            <Field icon={Calendar} label="Actual close" value={fmtDate(d.actualClose)} />
+            <Field icon={UserIcon} label={t('deal.owner')} value={d.owner?.name ?? t('deal.unassigned')} />
+            <Field icon={UserIcon} label={t('deal.contact')} value={d.contact?.name ?? '—'} />
+            <Field icon={Calendar} label={t('deal.expectedClose')} value={fmtDate(d.expectedClose)} />
+            <Field icon={Calendar} label={t('deal.actualClose')} value={fmtDate(d.actualClose)} />
           </div>
 
           {/* Linked project */}
@@ -133,7 +136,7 @@ export function DealQuickView({ dealId, onClose }: Props) {
               fontSize: 12, color: 'var(--txt2)',
             }}>
               <FolderKanban size={12} color="var(--txt3)" />
-              <span style={{ color: 'var(--txt3)', fontSize: 11 }}>Linked project</span>
+              <span style={{ color: 'var(--txt3)', fontSize: 11 }}>{t('linkedProject')}</span>
               <span style={{ flex: 1 }} />
               <Link
                 href={`/projects/${d.project.id}`}
@@ -147,7 +150,7 @@ export function DealQuickView({ dealId, onClose }: Props) {
           {/* Notes */}
           {d.notes && d.notes.trim() && (
             <div>
-              <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 4 }}>Notes</div>
+              <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 4 }}>{t('notes')}</div>
               <div style={{
                 fontSize: 12.5, color: 'var(--txt2)', lineHeight: 1.6,
                 whiteSpace: 'pre-wrap',
@@ -174,7 +177,7 @@ export function DealQuickView({ dealId, onClose }: Props) {
               }}
             >
               <ExternalLink size={12} />
-              Open full page
+              {tc('openFullPage')}
             </Link>
             <button
               type="button"
@@ -189,7 +192,7 @@ export function DealQuickView({ dealId, onClose }: Props) {
               }}
             >
               <X size={12} />
-              Close
+              {tc('close')}
             </button>
           </div>
         </div>

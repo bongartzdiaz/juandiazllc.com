@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Download, Trash2, Edit3, X, Check } from 'lucide-react'
 
 /* Bundle X — sticky bulk-action bar shown at the bottom of the
@@ -28,6 +29,7 @@ interface Props {
 }
 
 export function BulkActionBar({ count, industry, busy, onClear, onExport, onDelete, onChangeType }: Props) {
+  const t = useTranslations('bulk')
   const [typeMenuOpen, setTypeMenuOpen] = useState(false)
   const types: readonly string[] =
     industry === 'realestate' ? TYPE_OPTIONS_RE
@@ -58,7 +60,7 @@ export function BulkActionBar({ count, industry, busy, onClear, onExport, onDele
         background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
         color: 'var(--accent)',
       }}>
-        {count} selected
+        {t('selected', { count })}
       </span>
 
       <button
@@ -67,7 +69,7 @@ export function BulkActionBar({ count, industry, busy, onClear, onExport, onDele
         disabled={busy}
         style={btnStyle('default', busy)}
       >
-        <Download size={13} /> Export CSV
+        <Download size={13} /> {t('exportCsv')}
       </button>
 
       <div style={{ position: 'relative' }}>
@@ -79,7 +81,7 @@ export function BulkActionBar({ count, industry, busy, onClear, onExport, onDele
           disabled={busy}
           style={btnStyle('default', busy)}
         >
-          <Edit3 size={13} /> Change type
+          <Edit3 size={13} /> {t('changeType')}
         </button>
         {typeMenuOpen && (
           <div
@@ -124,7 +126,7 @@ export function BulkActionBar({ count, industry, busy, onClear, onExport, onDele
         disabled={busy}
         style={btnStyle('danger', busy)}
       >
-        <Trash2 size={13} /> Delete
+        <Trash2 size={13} /> {t('delete')}
       </button>
 
       <span style={{ width: 1, height: 22, background: 'var(--border)', margin: '0 4px' }} />
@@ -133,7 +135,7 @@ export function BulkActionBar({ count, industry, busy, onClear, onExport, onDele
         type="button"
         onClick={onClear}
         disabled={busy}
-        aria-label="Clear selection"
+        aria-label={t('clearSelection')}
         style={btnStyle('ghost', busy)}
       >
         <X size={13} />

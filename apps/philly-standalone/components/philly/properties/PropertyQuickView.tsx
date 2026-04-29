@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import {
   MapPin, Home, BedDouble, Bath, Ruler,
   ExternalLink, X, Calendar, Calculator,
@@ -56,6 +57,8 @@ interface Props {
 }
 
 export function PropertyQuickView({ propertyId, onClose }: Props) {
+  const t = useTranslations('quickview')
+  const tc = useTranslations('common')
   const open = propertyId != null
   const query = useApi<{ data: PropertyDetail }>(open ? `/properties/${propertyId}` : '', { enabled: open })
   const p = query.data?.data ?? null
@@ -75,7 +78,7 @@ export function PropertyQuickView({ propertyId, onClose }: Props) {
     >
       {!p ? (
         <div style={{ padding: 24, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-          {query.loading ? 'Loading…' : query.error ?? 'Property not found'}
+          {query.loading ? t('loading') : query.error ?? t('notFound', { entity: 'Property' })}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -90,23 +93,23 @@ export function PropertyQuickView({ propertyId, onClose }: Props) {
               fontSize: 11, fontWeight: 600, padding: '3px 9px', borderRadius: 6,
               background: 'var(--bg2)', color: 'var(--txt2)', border: '1px solid var(--border)',
               textTransform: 'capitalize',
-            }}>For {p.listingType}</span>
+            }}>{p.listingType === 'rent' ? t('property.forRent') : t('property.forSale')}</span>
             {p.isBankOwned && (
               <span style={{
                 fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 5,
                 background: 'var(--y-bg)', color: 'var(--y-txt)',
-              }}>BANK</span>
+              }}>{t('property.bank')}</span>
             )}
             {p.isResale && (
               <span style={{
                 fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 5,
                 background: 'var(--accent-bg)', color: 'var(--accent-txt)',
-              }}>RESALE</span>
+              }}>{t('property.resale')}</span>
             )}
             <span style={{ flex: 1 }} />
             <span style={{ fontSize: 11, color: 'var(--txt3)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
               <Calendar size={11} />
-              listed {new Date(p.createdAt).toLocaleDateString()}
+              {t('listedOn', { date: new Date(p.createdAt).toLocaleDateString() })}
             </span>
           </div>
 
@@ -116,16 +119,16 @@ export function PropertyQuickView({ propertyId, onClose }: Props) {
             background: 'var(--bg2)', border: '1px solid var(--border)',
             borderRadius: 10,
           }}>
-            <div style={{ fontSize: 10.5, color: 'var(--txt3)', marginBottom: 2 }}>Price</div>
+            <div style={{ fontSize: 10.5, color: 'var(--txt3)', marginBottom: 2 }}>{t('property.price')}</div>
             <div className="mono" style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.1 }}>
               €{(p.priceCents / 100).toLocaleString()}
               {p.listingType === 'rent' && (
-                <span style={{ fontSize: 12, color: 'var(--txt3)', fontWeight: 400 }}> /mo</span>
+                <span style={{ fontSize: 12, color: 'var(--txt3)', fontWeight: 400 }}> {t('property.perMonth')}</span>
               )}
             </div>
             {p.hoaCents != null && p.hoaCents > 0 && (
               <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 4 }}>
-                + €{(p.hoaCents / 100).toLocaleString()} HOA
+                {t('property.hoa', { amount: (p.hoaCents / 100).toLocaleString() })}
               </div>
             )}
           </div>
@@ -150,10 +153,10 @@ export function PropertyQuickView({ propertyId, onClose }: Props) {
             background: 'var(--bg2)', border: '1px solid var(--border)',
             borderRadius: 10,
           }}>
-            <Stat icon={BedDouble} label="Bed" value={p.bedrooms != null ? String(p.bedrooms) : '—'} />
-            <Stat icon={Bath} label="Bath" value={p.bathrooms != null ? String(p.bathrooms) : '—'} />
-            <Stat icon={Ruler} label="m²" value={p.sqft != null ? p.sqft.toLocaleString() : '—'} />
-            <Stat icon={Home} label="Built" value={p.yearBuilt != null ? String(p.yearBuilt) : '—'} />
+            <Stat icon={BedDouble} label={t('property.bed')} value={p.bedrooms != null ? String(p.bedrooms) : '—'} />
+            <Stat icon={Bath} label={t('property.bath')} value={p.bathrooms != null ? String(p.bathrooms) : '—'} />
+            <Stat icon={Ruler} label={t('property.area')} value={p.sqft != null ? p.sqft.toLocaleString() : '—'} />
+            <Stat icon={Home} label={t('property.built')} value={p.yearBuilt != null ? String(p.yearBuilt) : '—'} />
           </div>
 
           {/* Engagement counts */}
@@ -163,16 +166,16 @@ export function PropertyQuickView({ propertyId, onClose }: Props) {
             background: 'color-mix(in srgb, var(--accent) 4%, transparent)',
             border: '1px solid var(--border)', borderRadius: 10,
           }}>
-            <Count label="Viewings" value={p._count.viewings ?? 0} />
-            <Count label="Showings" value={p._count.showings ?? 0} />
-            <Count label="Offers" value={p._count.offers ?? 0} />
-            <Count label="Open houses" value={p._count.openHouses ?? 0} />
+            <Count label={t('property.viewings')} value={p._count.viewings ?? 0} />
+            <Count label={t('property.showings')} value={p._count.showings ?? 0} />
+            <Count label={t('property.offers')} value={p._count.offers ?? 0} />
+            <Count label={t('property.openHouses')} value={p._count.openHouses ?? 0} />
           </div>
 
           {/* Description */}
           {p.description && p.description.trim() && (
             <div>
-              <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 4 }}>Description</div>
+              <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 4 }}>{t('description')}</div>
               <div style={{
                 fontSize: 12.5, color: 'var(--txt2)', lineHeight: 1.6,
                 whiteSpace: 'pre-wrap',
@@ -199,7 +202,7 @@ export function PropertyQuickView({ propertyId, onClose }: Props) {
               }}
             >
               <ExternalLink size={12} />
-              Open full page
+              {tc('openFullPage')}
             </Link>
             <Link
               href={`/properties/${p.id}/valuation`}
@@ -212,7 +215,7 @@ export function PropertyQuickView({ propertyId, onClose }: Props) {
               }}
             >
               <Calculator size={12} />
-              Valuation
+              {t('property.valuation')}
             </Link>
             <button
               type="button"
@@ -227,7 +230,7 @@ export function PropertyQuickView({ propertyId, onClose }: Props) {
               }}
             >
               <X size={12} />
-              Close
+              {tc('close')}
             </button>
           </div>
         </div>

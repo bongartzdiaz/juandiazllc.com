@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Columns3, RotateCcw } from 'lucide-react'
 
 /* Bundle AC — column toggle popover for list-view tables. */
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export function ColumnPicker({ columns, visible, onToggle, onReset, isOverridden }: Props) {
+  const t = useTranslations('columns')
   const [open, setOpen] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
 
@@ -51,7 +53,7 @@ export function ColumnPicker({ columns, visible, onToggle, onReset, isOverridden
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-haspopup="menu"
-        title="Show / hide columns"
+        title={t('showHide')}
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 5,
           padding: '7px 12px', borderRadius: 8,
@@ -61,7 +63,7 @@ export function ColumnPicker({ columns, visible, onToggle, onReset, isOverridden
         }}
       >
         <Columns3 size={14} />
-        Columns
+        {t('title')}
         <span
           className="mono"
           style={{
@@ -119,7 +121,7 @@ export function ColumnPicker({ columns, visible, onToggle, onReset, isOverridden
                         textTransform: 'uppercase', letterSpacing: '.06em',
                       }}
                     >
-                      Always
+                      {t('always')}
                     </span>
                   )}
                 </label>
@@ -143,7 +145,7 @@ export function ColumnPicker({ columns, visible, onToggle, onReset, isOverridden
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
               >
                 <RotateCcw size={11} />
-                Reset to defaults
+                {t('resetDefaults')}
               </button>
             </>
           )}

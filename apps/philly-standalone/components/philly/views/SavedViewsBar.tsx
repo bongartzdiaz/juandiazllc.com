@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Bookmark, BookmarkPlus, Check, Trash2, Users, X } from 'lucide-react'
 import { useSavedViews, type SavedView } from '@/hooks/philly/useSavedViews'
 
@@ -27,6 +28,8 @@ interface Props {
 }
 
 export function SavedViewsBar({ entity, currentFilters, onApply, canShare = true, activeId }: Props) {
+  const t = useTranslations('views')
+  const tc = useTranslations('common')
   const { views, loading, saveCurrent, deleteView } = useSavedViews(entity)
   const [saving, setSaving] = useState(false)
   const [draftName, setDraftName] = useState('')
@@ -59,12 +62,12 @@ export function SavedViewsBar({ entity, currentFilters, onApply, canShare = true
     >
       <Bookmark size={13} color="var(--txt3)" />
       <span style={{ fontSize: 11, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '.06em', marginRight: 4 }}>
-        Views
+        {t('label')}
       </span>
 
       {views.length === 0 && !saving && (
         <span style={{ fontSize: 11.5, color: 'var(--txt3)', fontStyle: 'italic' }}>
-          No saved views yet — save your current filters as one
+          {t('noneYet')}
         </span>
       )}
 
@@ -94,7 +97,7 @@ export function SavedViewsBar({ entity, currentFilters, onApply, canShare = true
               if (e.key === 'Enter') handleSave()
               if (e.key === 'Escape') { setSaving(false); setDraftName('') }
             }}
-            placeholder="Name this view…"
+            placeholder={t('namePlaceholder')}
             style={{
               width: 160, fontSize: 12, border: 'none', background: 'transparent',
               outline: 'none', color: 'var(--txt)', fontFamily: 'inherit',
@@ -102,7 +105,7 @@ export function SavedViewsBar({ entity, currentFilters, onApply, canShare = true
           />
           {canShare && (
             <label
-              title="Make this view available to everyone in the org"
+              title={t('shareWithOrg')}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 4,
                 fontSize: 11, color: 'var(--txt2)', cursor: 'pointer',
@@ -123,7 +126,7 @@ export function SavedViewsBar({ entity, currentFilters, onApply, canShare = true
             type="button"
             onClick={handleSave}
             disabled={!draftName.trim()}
-            aria-label="Save view"
+            aria-label={t('saveCurrent')}
             style={{
               width: 24, height: 24, padding: 0, borderRadius: 5,
               background: 'var(--accent)', color: '#fff',
@@ -137,7 +140,7 @@ export function SavedViewsBar({ entity, currentFilters, onApply, canShare = true
           <button
             type="button"
             onClick={() => { setSaving(false); setDraftName('') }}
-            aria-label="Cancel"
+            aria-label={tc('cancel')}
             style={{
               width: 24, height: 24, padding: 0, borderRadius: 5,
               background: 'transparent', color: 'var(--txt3)',
@@ -160,7 +163,7 @@ export function SavedViewsBar({ entity, currentFilters, onApply, canShare = true
             fontFamily: 'inherit',
           }}
         >
-          <BookmarkPlus size={11} /> Save current
+          <BookmarkPlus size={11} /> {t('saveCurrent')}
         </button>
       )}
     </div>
@@ -175,6 +178,7 @@ function ViewChip({
   onApply: () => void
   onDelete: () => void
 }) {
+  const t = useTranslations('views')
   const [hover, setHover] = useState(false)
   return (
     <span
@@ -200,13 +204,13 @@ function ViewChip({
           display: 'inline-flex', alignItems: 'center', gap: 5,
         }}
       >
-        {view.isShared && <Users size={10} aria-label="Shared with org" />}
+        {view.isShared && <Users size={10} aria-label={t('shareWithOrg')} />}
         {view.name}
       </button>
       <button
         type="button"
-        aria-label={`Delete view ${view.name}`}
-        onClick={(e) => { e.stopPropagation(); if (confirm(`Delete view "${view.name}"?`)) onDelete() }}
+        aria-label={t('deletePrompt', { name: view.name })}
+        onClick={(e) => { e.stopPropagation(); if (confirm(t('deletePrompt', { name: view.name }))) onDelete() }}
         style={{
           width: 18, height: 18, padding: 0, borderRadius: 4,
           background: 'transparent', border: 'none', cursor: 'pointer',
