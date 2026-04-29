@@ -116,9 +116,9 @@ export default function ESignaturesPage() {
   const completionRate = total > 0 ? Math.round((signed / total) * 100) : 0
 
   async function handleAddSignature() {
-    if (!addTxId) { addToast('Select a transaction', 'error'); return }
-    if (!addDocName.trim()) { addToast('Document name required', 'error'); return }
-    if (!addSignerEmail.trim()) { addToast('Signer email required', 'error'); return }
+    if (!addTxId) { addToast(t('toasts.selectTransaction'), 'error'); return }
+    if (!addDocName.trim()) { addToast(t('toasts.documentNameRequired'), 'error'); return }
+    if (!addSignerEmail.trim()) { addToast(t('toasts.signerEmailRequired'), 'error'); return }
 
     setSaving(true)
     try {
@@ -134,12 +134,12 @@ export default function ESignaturesPage() {
         }),
       })
       const j = await res.json().catch(() => ({}))
-      if (!res.ok) { addToast(j.error ?? 'Failed', 'error'); return }
-      addToast('Signature request created', 'success')
+      if (!res.ok) { addToast(j.error ?? t('toasts.saveFailed'), 'error'); return }
+      addToast(t('toasts.created'), 'success')
       setAddTxId(''); setAddDocName(''); setAddSignerName(''); setAddSignerEmail(''); setAddProvider('manual')
       setShowAdd(false)
       fetchData()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
     finally { setSaving(false) }
   }
 
@@ -150,23 +150,23 @@ export default function ESignaturesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       })
-      if (!res.ok) { addToast('Update failed', 'error'); return }
-      addToast(`Marked ${status}`, 'success')
+      if (!res.ok) { addToast(t('toasts.updateFailed'), 'error'); return }
+      addToast(t('toasts.marked', { status }), 'success')
       setSelected(null)
       fetchData()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this signature request?')) return
+    if (!confirm(t('confirms.delete'))) return
     try {
       const res = await fetch(`/api/e-signatures/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
-        addToast('Deleted', 'success')
+        addToast(t('toasts.deleted'), 'success')
         setSelected(null)
         fetchData()
-      } else { addToast('Delete failed', 'error') }
-    } catch { addToast('Network error', 'error') }
+      } else { addToast(t('toasts.deleteFailed'), 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
   }
 
   return (

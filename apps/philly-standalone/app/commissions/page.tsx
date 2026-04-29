@@ -72,11 +72,11 @@ export default function CommissionsPage() {
   const [saving, setSaving] = useState(false)
 
   async function submitForm() {
-    if (!form.agentId) { addToast('Select an agent', 'error'); return }
+    if (!form.agentId) { addToast(t('toasts.selectAgent'), 'error'); return }
     const grossCents = Math.round((parseFloat(form.gross) || 0) * 100)
-    if (grossCents <= 0) { addToast('Enter a positive gross amount', 'error'); return }
+    if (grossCents <= 0) { addToast(t('toasts.positiveGross'), 'error'); return }
     const splitPct = parseFloat(form.splitPct) || 100
-    if (splitPct < 0 || splitPct > 100) { addToast('Split must be 0-100', 'error'); return }
+    if (splitPct < 0 || splitPct > 100) { addToast(t('toasts.splitRange'), 'error'); return }
 
     setSaving(true)
     try {
@@ -91,12 +91,12 @@ export default function CommissionsPage() {
         }),
       })
       const j = await res.json().catch(() => ({}))
-      if (!res.ok) { addToast(j.error ?? 'Save failed', 'error'); return }
-      addToast('Commission added', 'success')
+      if (!res.ok) { addToast(j.error ?? t('toasts.saveFailed'), 'error'); return }
+      addToast(t('toasts.added'), 'success')
       setForm(emptyForm)
       setShowAdd(false)
       fetchRecords()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
     finally { setSaving(false) }
   }
 
@@ -106,21 +106,21 @@ export default function CommissionsPage() {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       })
-      if (!res.ok) { addToast('Update failed', 'error'); return }
-      addToast(`Marked ${status}`, 'success')
+      if (!res.ok) { addToast(t('toasts.updateFailed'), 'error'); return }
+      addToast(t('toasts.marked', { status }), 'success')
       fetchRecords()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this commission record?')) return
+    if (!confirm(t('confirms.delete'))) return
     try {
       const res = await fetch(`/api/commissions/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
-        addToast('Commission deleted', 'success')
+        addToast(t('toasts.deleted'), 'success')
         fetchRecords()
-      } else { addToast('Delete failed', 'error') }
-    } catch { addToast('Network error', 'error') }
+      } else { addToast(t('toasts.deleteFailed'), 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
   }
 
   // Fetch leaderboard

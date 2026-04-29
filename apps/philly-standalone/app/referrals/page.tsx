@@ -102,18 +102,18 @@ export default function ReferralsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status }),
       })
-      if (!res.ok) { addToast('Update failed', 'error'); return }
-      addToast(`Marked ${status}`, 'success')
+      if (!res.ok) { addToast(t('toasts.updateFailed'), 'error'); return }
+      addToast(t('toasts.marked', { status }), 'success')
       fetchReferrals()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this referral?')) return
+    if (!confirm(t('confirms.delete'))) return
     try {
       const res = await fetch(`/api/referrals?id=${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
-        addToast('Referral deleted', 'success')
+        addToast(t('toasts.deleted'), 'success')
         fetchReferrals()
       }
     } catch {}

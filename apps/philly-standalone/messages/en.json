@@ -195,6 +195,57 @@
       "delete": "Delete this grant?"
     }
   },
+  "commissions": {
+    "title": "Commissions",
+    "subtitle": "Commission tracking and team leaderboard",
+    "toasts": {
+      "selectAgent": "Select an agent",
+      "positiveGross": "Enter a positive gross amount",
+      "splitRange": "Split must be 0-100",
+      "saveFailed": "Save failed",
+      "added": "Commission added",
+      "marked": "Marked {status}",
+      "updateFailed": "Update failed",
+      "deleted": "Commission deleted",
+      "deleteFailed": "Delete failed",
+      "networkError": "Network error"
+    },
+    "confirms": {
+      "delete": "Delete this commission record?"
+    }
+  },
+  "eSignatures": {
+    "title": "E-Signatures",
+    "subtitle": "Track and request signatures on contracts",
+    "toasts": {
+      "selectTransaction": "Select a transaction",
+      "documentNameRequired": "Document name required",
+      "signerEmailRequired": "Signer email required",
+      "saveFailed": "Failed",
+      "created": "Signature request created",
+      "marked": "Marked {status}",
+      "updateFailed": "Update failed",
+      "deleted": "Deleted",
+      "deleteFailed": "Delete failed",
+      "networkError": "Network error"
+    },
+    "confirms": {
+      "delete": "Delete this signature request?"
+    }
+  },
+  "referrals": {
+    "title": "Referrals",
+    "subtitle": "Track referral commissions and partners",
+    "toasts": {
+      "marked": "Marked {status}",
+      "updateFailed": "Update failed",
+      "deleted": "Referral deleted",
+      "networkError": "Network error"
+    },
+    "confirms": {
+      "delete": "Delete this referral?"
+    }
+  },
   "showings": {
     "title": "Showings",
     "subtitle": "Schedule and track property showings",

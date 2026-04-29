@@ -195,6 +195,57 @@
       "delete": "Deze subsidie verwijderen?"
     }
   },
+  "commissions": {
+    "title": "Commissies",
+    "subtitle": "Commissietracking en team-leaderboard",
+    "toasts": {
+      "selectAgent": "Kies een makelaar",
+      "positiveGross": "Voer een positief brutobedrag in",
+      "splitRange": "Splitsing moet 0-100 zijn",
+      "saveFailed": "Opslaan mislukt",
+      "added": "Commissie toegevoegd",
+      "marked": "Gemarkeerd als {status}",
+      "updateFailed": "Bijwerken mislukt",
+      "deleted": "Commissie verwijderd",
+      "deleteFailed": "Verwijderen mislukt",
+      "networkError": "Netwerkfout"
+    },
+    "confirms": {
+      "delete": "Deze commissie verwijderen?"
+    }
+  },
+  "eSignatures": {
+    "title": "E-Handtekeningen",
+    "subtitle": "Volg en vraag handtekeningen op contracten",
+    "toasts": {
+      "selectTransaction": "Kies een transactie",
+      "documentNameRequired": "Documentnaam vereist",
+      "signerEmailRequired": "E-mail ondertekenaar vereist",
+      "saveFailed": "Mislukt",
+      "created": "Handtekeningverzoek aangemaakt",
+      "marked": "Gemarkeerd als {status}",
+      "updateFailed": "Bijwerken mislukt",
+      "deleted": "Verwijderd",
+      "deleteFailed": "Verwijderen mislukt",
+      "networkError": "Netwerkfout"
+    },
+    "confirms": {
+      "delete": "Dit handtekeningverzoek verwijderen?"
+    }
+  },
+  "referrals": {
+    "title": "Verwijzingen",
+    "subtitle": "Volg verwijzingscommissies en partners",
+    "toasts": {
+      "marked": "Gemarkeerd als {status}",
+      "updateFailed": "Bijwerken mislukt",
+      "deleted": "Verwijzing verwijderd",
+      "networkError": "Netwerkfout"
+    },
+    "confirms": {
+      "delete": "Deze verwijzing verwijderen?"
+    }
+  },
   "showings": {
     "title": "Bezichtigingen",
     "subtitle": "Plan en volg pandbezichtigingen",
