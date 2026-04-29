@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -8,6 +8,22 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Users, Filter, Plus, X, ArrowRight, Trash2, CheckCircle2 } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
+import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+
+const REF_COLUMNS: ColumnDef[] = [
+  { id: 'referrer', label: 'Referrer', required: true },
+  { id: 'referred', label: 'Referred' },
+  { id: 'pct', label: 'Pct' },
+  { id: 'commission', label: 'Commission' },
+  { id: 'status', label: 'Status' },
+  { id: 'actions', label: 'Actions', required: true },
+]
+const REF_DEFAULTS = ['referrer', 'referred', 'pct', 'commission', 'status', 'actions']
+const REF_WIDTHS: Record<string, string> = {
+  referrer: '1fr', referred: '1fr', pct: '80px',
+  commission: '100px', status: '90px', actions: '100px',
+}
 
 interface Referral {
   id: string
@@ -55,6 +71,17 @@ export default function ReferralsPage() {
   const [contacts, setContacts] = useState<ContactLite[]>([])
   const t = useTranslations('referrals')
   const { addToast } = useToast()
+
+  // Bundle AJ — column visibility prefs.
+  const refColumns = useColumnPrefs('pai-referrals-columns-v1', REF_DEFAULTS)
+  const visibleRefColumns = useMemo(
+    () => REF_COLUMNS.filter((c) => c.required || refColumns.visible.has(c.id)),
+    [refColumns.visible],
+  )
+  const refsGridTemplate = useMemo(
+    () => visibleRefColumns.map((c) => REF_WIDTHS[c.id]).join(' '),
+    [visibleRefColumns],
+  )
 
   useEffect(() => {
     fetch('/api/contacts?limit=500')
@@ -157,41 +184,59 @@ export default function ReferralsPage() {
         </div>
 
         {/* Table */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+          <ColumnPicker
+            columns={REF_COLUMNS}
+            visible={refColumns.visible}
+            onToggle={refColumns.toggle}
+            onReset={refColumns.reset}
+            isOverridden={refColumns.isOverridden}
+          />
+        </div>
         <div style={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 80px 100px 90px 100px', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
-            <span>Referrer</span><span>Referred</span><span>Pct</span><span>Commission</span><span>Status</span><span>Actions</span>
+          <div style={{ display: 'grid', gridTemplateColumns: refsGridTemplate, gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
+            {visibleRefColumns.map((c) => <span key={c.id}>{c.label}</span>)}
           </div>
           {loading ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
           ) : referrals.length === 0 ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No referrals found.</div>
           ) : referrals.map((ref, idx) => (
-            <div key={ref.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 80px 100px 90px 100px', gap: 12, padding: '10px 16px', borderBottom: idx < referrals.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                <Users size={13} style={{ color: 'var(--txt3)', flexShrink: 0 }} />
-                <span style={{ fontWeight: 600, color: 'var(--txt)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {ref.referrer?.name ?? `#${ref.referrerId.slice(0, 6)}`}
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                <ArrowRight size={12} style={{ color: 'var(--txt3)', flexShrink: 0 }} />
-                <span style={{ color: 'var(--txt2)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {ref.referred?.name ?? `#${ref.referredId.slice(0, 6)}`}
-                </span>
-              </div>
-              <span className="mono" style={{ fontWeight: 600 }}>{ref.commissionPct}%</span>
-              <span className="mono" style={{ fontWeight: 600, color: 'var(--g-txt)' }}>${(ref.commissionCents / 100).toLocaleString()}</span>
-              <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: STATUS_COLORS[ref.status]?.bg ?? 'var(--bg2)', color: STATUS_COLORS[ref.status]?.txt ?? 'var(--txt2)', justifySelf: 'start' }}>{ref.status}</span>
-              <div style={{ display: 'flex', gap: 4 }}>
-                {ref.status !== 'paid' && (
-                  <button onClick={() => changeStatus(ref.id, 'paid')} title="Mark paid" style={miniBtn('var(--g-txt)')}>
-                    <CheckCircle2 size={11} />
-                  </button>
-                )}
-                <button onClick={() => handleDelete(ref.id)} title="Delete" style={miniBtn('var(--r-txt)')}>
-                  <Trash2 size={11} />
-                </button>
-              </div>
+            <div key={ref.id} style={{ display: 'grid', gridTemplateColumns: refsGridTemplate, gap: 12, padding: '10px 16px', borderBottom: idx < referrals.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent' }}>
+              {visibleRefColumns.map((c) => {
+                if (c.id === 'referrer') return (
+                  <div key="referrer" style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                    <Users size={13} style={{ color: 'var(--txt3)', flexShrink: 0 }} />
+                    <span style={{ fontWeight: 600, color: 'var(--txt)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {ref.referrer?.name ?? `#${ref.referrerId.slice(0, 6)}`}
+                    </span>
+                  </div>
+                )
+                if (c.id === 'referred') return (
+                  <div key="referred" style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                    <ArrowRight size={12} style={{ color: 'var(--txt3)', flexShrink: 0 }} />
+                    <span style={{ color: 'var(--txt2)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {ref.referred?.name ?? `#${ref.referredId.slice(0, 6)}`}
+                    </span>
+                  </div>
+                )
+                if (c.id === 'pct') return <span key="pct" className="mono" style={{ fontWeight: 600 }}>{ref.commissionPct}%</span>
+                if (c.id === 'commission') return <span key="commission" className="mono" style={{ fontWeight: 600, color: 'var(--g-txt)' }}>${(ref.commissionCents / 100).toLocaleString()}</span>
+                if (c.id === 'status') return <span key="status" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: STATUS_COLORS[ref.status]?.bg ?? 'var(--bg2)', color: STATUS_COLORS[ref.status]?.txt ?? 'var(--txt2)', justifySelf: 'start' }}>{ref.status}</span>
+                if (c.id === 'actions') return (
+                  <div key="actions" style={{ display: 'flex', gap: 4 }}>
+                    {ref.status !== 'paid' && (
+                      <button onClick={() => changeStatus(ref.id, 'paid')} title="Mark paid" style={miniBtn('var(--g-txt)')}>
+                        <CheckCircle2 size={11} />
+                      </button>
+                    )}
+                    <button onClick={() => handleDelete(ref.id)} title="Delete" style={miniBtn('var(--r-txt)')}>
+                      <Trash2 size={11} />
+                    </button>
+                  </div>
+                )
+                return <span key={c.id} />
+              })}
             </div>
           ))}
         </div>

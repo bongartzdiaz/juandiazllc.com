@@ -61,7 +61,12 @@ export async function GET(req: NextRequest) {
   const [deals, total] = await Promise.all([
     prisma.deal.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      // Bundle AL: explicit displayOrder wins (NULLS LAST), createdAt
+      // is the secondary key for unordered rows.
+      orderBy: [
+        { displayOrder: { sort: 'asc', nulls: 'last' } },
+        { createdAt: 'desc' },
+      ],
       skip,
       take: limit,
       include: dealInclude,

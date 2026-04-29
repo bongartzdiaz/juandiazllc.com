@@ -215,7 +215,7 @@ through NL/DE/ES on `/work`, `/insights`, `/sectors`, `/signals`,
 
 ### Launch readiness — 2026-04-28 (updated 2026-04-29)
 
-Bundles G–AI shipped on `claude/ai-command-bar`. The CRM is launch-
+Bundles G–AL shipped on `claude/ai-command-bar`. The CRM is launch-
 ready for big-company / EU-GDPR procurement subject to the operator
 setup steps below.
 
@@ -250,6 +250,9 @@ setup steps below.
 - AG — drag-drop reorder on the contacts page (live mode only): adds `Contact.displayOrder BIGINT NULL` + index, new migration `20260429000000_contact_display_order`, optimistic UI override, `POST /api/contacts/reorder` with rate-limit + transaction
 - AH — column-customization sweep on transactions / grants / volunteers list views (each with its own `pai-<entity>-columns-v1` localStorage key)
 - AI — `j` / `k` / `Enter` row navigation propagated to properties grid + transactions list (deal-list view already had it via Bundle AF)
+- AJ — column-customization sweep on referrals / lead-scores / e-signatures (each with its own `pai-<entity>-columns-v1` localStorage key). Documents (card grid) and inbox (master/detail with 3 cols) intentionally skipped.
+- AK — right-click context menu on projects (Quick view / Open full page / Copy title / Delete; Open + Delete disabled in RE/HOS demo modes).
+- AL — drag-drop reorder on the deals LIST view (kanban already has dnd for stage moves; we don't double-bind). New `Deal.displayOrder BIGINT NULL` + `(pipelineId, displayOrder)` index, migration `20260429010000_deal_display_order`, `POST /api/deals/reorder` endpoint (rate-limited, transaction, audit-logged), optimistic UI override.
 
 **Verified at HEAD:**
 - `npm run build` clean on both apps (root + standalone)
@@ -259,13 +262,14 @@ setup steps below.
 - `npm run audit:chain` ready (run daily in production)
 
 **Operator setup required before customer traffic:**
-1. `prisma migrate deploy` — six pending migrations:
+1. `prisma migrate deploy` — seven pending migrations:
    `20260428000000_multi_org_membership`,
    `20260428010000_contact_ai_attributes`,
    `20260428020000_enterprise_access_controls`,
    `20260428030000_contact_blind_index`,
    `20260428040000_apikey_scopes`,
-   `20260429000000_contact_display_order`.
+   `20260429000000_contact_display_order`,
+   `20260429010000_deal_display_order`.
    (`SavedView` is in the schema already; verify it's in your DB and
    create-if-missing — no dedicated migration was needed because the
    model was added to the schema in an earlier branch.)
@@ -298,19 +302,15 @@ setup steps below.
   signs off on quotes; renders null today, no runtime leak.
 - `SEO.md:128` `/docs/pitch-template.md` TODO (operator content,
   not code).
-- Advanced features remaining after Bundles AA–AI:
+- Advanced features remaining after Bundles AA–AL:
   - Advanced filter builder (server-side query DSL — bigger lift, needs
     product spec on field + operator vocabulary).
-  - Column customization for documents / inbox / referrals (same
-    `useColumnPrefs` + `<ColumnPicker>` recipe; AH covered the three
-    largest tables).
-  - Context-menu items for the projects page (the page already has
-    its own inline detail modal so the lift is smaller — just per-page
-    menu items, the primitive is shared).
   - `j/k` propagation to the deal kanban (2D layout — needs row+column
-    arrow-key handling, not the same shape as the linear lists AF/AI cover).
-  - Drag-drop reorder propagation to deals/properties (`displayOrder`
-    column add + analogous reorder endpoint).
+    arrow handling, distinct from the linear lists AF/AI cover).
+  - Drag-drop reorder for properties (analogous to deals AL: add
+    `Property.displayOrder`, reorder endpoint, dnd handlers on the grid).
+  - Column customization for less-used tables (showings, open-houses,
+    commissions, dialer) — same recipe.
 
 ### Saved views — Bundle AA reference
 
@@ -410,8 +410,10 @@ Per-page wiring:
    close over the targeted entity's data (used for "Copy email"
    / disable-when-empty / etc.).
 
-Wired today on contacts, deals (list + kanban), and properties.
-Items are page-specific — see each page file for its `items` array.
+Wired today on contacts, deals (list + kanban), properties, and
+projects. Items are page-specific — see each page file for its
+`items` array. The projects page disables Open + Delete in
+RE/HOS demo modes (the row ids are hand-curated fakes there).
 
 ### `j` / `k` row navigation — Bundle AF + AI reference
 
@@ -467,9 +469,12 @@ UI:
   Filters/search apply AFTER the override, so reordering inside a
   filtered view doesn't disturb hidden rows.
 
-To extend to deals/properties: add `displayOrder` to the model +
-matching migration + `/api/<entity>/reorder` route, then copy the
-state + handler block from `app/contacts/page.tsx`.
+Wired today on contacts (Bundle AG) and the deals LIST view
+(Bundle AL). The deal kanban already does dnd between stages,
+so we don't double-bind there — the reorder lives on the list
+view only. To extend to properties: add `Property.displayOrder`
++ migration + `/api/properties/reorder`, then copy the state +
+handler block.
 
 ### i18n discipline — lessons learned this session
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -10,6 +10,22 @@ import { Filter, Plus, Send, Eye, CheckCircle2, Trash2, RefreshCw, X } from 'luc
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
+import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+
+const ESIG_COLUMNS: ColumnDef[] = [
+  { id: 'document', label: 'Document', required: true },
+  { id: 'signer', label: 'Signer' },
+  { id: 'transaction', label: 'Transaction' },
+  { id: 'provider', label: 'Provider' },
+  { id: 'status', label: 'Status' },
+  { id: 'signed', label: 'Signed' },
+]
+const ESIG_DEFAULTS = ['document', 'signer', 'transaction', 'provider', 'status', 'signed']
+const ESIG_WIDTHS: Record<string, string> = {
+  document: '1fr', signer: '1fr', transaction: '140px',
+  provider: '100px', status: '100px', signed: '110px',
+}
 
 interface ESignature {
   id: string
@@ -69,6 +85,17 @@ export default function ESignaturesPage() {
   const [saving, setSaving] = useState(false)
 
   const [selected, setSelected] = useState<ESignature | null>(null)
+
+  // Bundle AJ — column visibility prefs.
+  const esigColumns = useColumnPrefs('pai-esignatures-columns-v1', ESIG_DEFAULTS)
+  const visibleEsigColumns = useMemo(
+    () => ESIG_COLUMNS.filter((c) => c.required || esigColumns.visible.has(c.id)),
+    [esigColumns.visible],
+  )
+  const esigGridTemplate = useMemo(
+    () => visibleEsigColumns.map((c) => ESIG_WIDTHS[c.id]).join(' '),
+    [visibleEsigColumns],
+  )
 
   const t = useTranslations('eSignatures')
   const { addToast } = useToast()
@@ -176,18 +203,22 @@ export default function ESignaturesPage() {
           </button>
         </div>
 
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+          <ColumnPicker
+            columns={ESIG_COLUMNS}
+            visible={esigColumns.visible}
+            onToggle={esigColumns.toggle}
+            onReset={esigColumns.reset}
+            isOverridden={esigColumns.isOverridden}
+          />
+        </div>
         <div style={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
           <div style={{
-            display: 'grid', gridTemplateColumns: '1fr 1fr 140px 100px 100px 110px',
+            display: 'grid', gridTemplateColumns: esigGridTemplate,
             gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)',
             fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)',
           }}>
-            <span>Document</span>
-            <span>Signer</span>
-            <span>Transaction</span>
-            <span>Provider</span>
-            <span>Status</span>
-            <span>Signed</span>
+            {visibleEsigColumns.map((c) => <span key={c.id}>{c.label}</span>)}
           </div>
           {loading ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
@@ -204,37 +235,27 @@ export default function ESignaturesPage() {
                 onClick={() => setSelected(sig)}
                 className="card-hover"
                 style={{
-                  display: 'grid', gridTemplateColumns: '1fr 1fr 140px 100px 100px 110px',
+                  display: 'grid', gridTemplateColumns: esigGridTemplate,
                   gap: 12, padding: '10px 16px',
                   borderBottom: idx < sigs.length - 1 ? '1px solid var(--border)' : 'none',
                   fontSize: 12, alignItems: 'center', cursor: 'pointer',
                   background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent',
                 }}
               >
-                <div style={{ fontWeight: 600, color: 'var(--txt)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {sig.documentName}
-                </div>
-                <div>
-                  <div style={{ fontWeight: 500, color: 'var(--txt)', fontSize: 12 }}>{sig.signerName || '—'}</div>
-                  <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{sig.signerEmail}</div>
-                </div>
-                <span style={{ fontSize: 11, color: 'var(--txt2)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {sig.transaction?.escrowNumber || '—'}
-                </span>
-                <span style={{
-                  padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
-                  textTransform: 'uppercase', background: pc.bg, color: pc.txt,
-                  justifySelf: 'start',
-                }}>{sig.provider}</span>
-                <span style={{
-                  padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
-                  textTransform: 'uppercase', background: sc.bg, color: sc.txt,
-                  border: `1px solid ${sc.border}`,
-                  justifySelf: 'start',
-                }}>{sig.status}</span>
-                <span style={{ fontSize: 11, fontFamily: 'var(--font-red-hat-mono), monospace', color: 'var(--txt2)' }}>
-                  {sig.signedAt ? new Date(sig.signedAt).toLocaleDateString() : '-'}
-                </span>
+                {visibleEsigColumns.map((c) => {
+                  if (c.id === 'document') return <div key="document" style={{ fontWeight: 600, color: 'var(--txt)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sig.documentName}</div>
+                  if (c.id === 'signer') return (
+                    <div key="signer">
+                      <div style={{ fontWeight: 500, color: 'var(--txt)', fontSize: 12 }}>{sig.signerName || '—'}</div>
+                      <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{sig.signerEmail}</div>
+                    </div>
+                  )
+                  if (c.id === 'transaction') return <span key="transaction" style={{ fontSize: 11, color: 'var(--txt2)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sig.transaction?.escrowNumber || '—'}</span>
+                  if (c.id === 'provider') return <span key="provider" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: pc.bg, color: pc.txt, justifySelf: 'start' }}>{sig.provider}</span>
+                  if (c.id === 'status') return <span key="status" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: sc.bg, color: sc.txt, border: `1px solid ${sc.border}`, justifySelf: 'start' }}>{sig.status}</span>
+                  if (c.id === 'signed') return <span key="signed" style={{ fontSize: 11, fontFamily: 'var(--font-red-hat-mono), monospace', color: 'var(--txt2)' }}>{sig.signedAt ? new Date(sig.signedAt).toLocaleDateString() : '-'}</span>
+                  return <span key={c.id} />
+                })}
               </div>
             )
           })}

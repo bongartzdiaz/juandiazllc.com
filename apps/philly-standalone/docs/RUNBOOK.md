@@ -316,30 +316,34 @@ To add a binding: edit `components/philly/ui/KeyboardShortcuts.tsx`
 — add to the `useGlobalShortcuts({...})` map AND to the `NAV` or
 `ACTIONS` array so the cheat sheet stays in sync.
 
-### Column customization (Bundle AC + AH)
+### Column customization (Bundle AC + AH + AJ)
 
 Each table-shaped list view ships a `Columns` popover top-right.
 Visibility persists per browser per `pai-<entity>-columns-v1`
 key. The Reset button clears the override.
 
-Wired today: deals (list view), transactions, grants, volunteers.
-Documents / inbox / referrals are mechanical lifts using the same
-`useColumnPrefs` + `<ColumnPicker>` recipe (see `CLAUDE.md`).
+Wired today: deals (list view), transactions, grants, volunteers,
+referrals, lead-scores, e-signatures. Documents (card grid) and
+inbox (master/detail with only 3 columns) are intentionally
+not wired — the picker has too few togglables to be useful there.
 
-### Right-click menu (Bundle AD + AE)
+Showings / open-houses / commissions / dialer are mechanical
+lifts using the same recipe (see `CLAUDE.md`).
 
-Contact / deal / property cards expose a right-click context menu.
-Menu items per page:
+### Right-click menu (Bundle AD + AE + AK)
+
+Cards on every list/grid page expose a right-click menu. Items
+per page:
 - Contacts: Open / Quick view / Edit / Select / Copy email /
   Copy phone / Delete
 - Deals: Open / Quick view / Mark won / Mark lost / Copy contact /
   Delete (list + kanban)
 - Properties: Open / Quick view / Valuation / Copy address / Delete
+- Projects: Quick view / Open full page / Copy title / Delete
+  (Open + Delete disabled in RE/HOS demo modes)
 
 The menu primitive (`<ContextMenu>`) is generic — per-page wiring
-lives in each `app/<entity>/page.tsx`. Projects already presents
-its own inline detail modal, so a context-menu lift there is
-smaller (only per-page items needed) and is left as a follow-up.
+lives in each `app/<entity>/page.tsx`.
 
 ### `j` / `k` row navigation (Bundle AF + AI)
 
@@ -349,27 +353,35 @@ follows mouse hover too. The deals page hides the bindings in
 kanban view via `useGlobalShortcuts(..., view === 'list')`. The
 deal kanban (2D layout) is intentionally not bound yet.
 
-### Drag-drop reorder on contacts (Bundle AG)
+### Drag-drop reorder (Bundle AG + AL)
 
-Adds manual ordering to the contacts list (live mode only — demo
-industries keep their hand-curated arrays). Operators drag a card
-onto another to insert above it. Visual: dragged card fades, drop
-target gets an accent ring.
+Adds manual ordering. Operators drag one row/card onto another
+to insert above it.
 
-Backend: `POST /api/contacts/reorder { ids: string[] }` writes
-`Contact.displayOrder = idx + 1` for each id inside a single
-transaction. Rate-limited via `PRESET_MUTATION`, capped at 500
-ids/call, requires admin/manager.
+Wired today:
+- Contacts (live mode only — demo industries keep their hand-curated arrays)
+- Deals LIST view (kanban already uses dnd to move between stages,
+  so reorder lives on the list only — we don't double-bind)
 
-Schema: nullable `displayOrder BIGINT` + composite index
-`(organizationId, displayOrder)`. Migration
-`20260429000000_contact_display_order` is idempotent. The GET
-list endpoint orders by `displayOrder asc nulls last`, then
-`createdAt desc` as a fallback.
+Backends:
+- `POST /api/contacts/reorder { ids: string[] }`
+- `POST /api/deals/reorder { ids: string[] }`
 
-To reset all manual orders for an org back to chronological:
+Both write `displayOrder = idx + 1` inside a `prisma.$transaction`,
+rate-limited via `PRESET_MUTATION`, capped at 500 ids/call.
+
+Schemas:
+- `Contact.displayOrder BIGINT NULL` + `(organizationId, displayOrder)` index
+  — migration `20260429000000_contact_display_order`
+- `Deal.displayOrder BIGINT NULL` + `(pipelineId, displayOrder)` index
+  — migration `20260429010000_deal_display_order`
+
+Both list endpoints `orderBy: [displayOrder asc nulls last, createdAt desc]`.
+
+To reset all manual orders for an org/pipeline:
 ```sql
 UPDATE Contact SET displayOrder = NULL WHERE organizationId = '<orgId>';
+UPDATE Deal SET displayOrder = NULL WHERE pipelineId = '<pipelineId>';
 ```
 
 ### Saved views (Bundle AA)

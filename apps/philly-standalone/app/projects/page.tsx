@@ -8,13 +8,15 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Modal } from '@/components/philly/ui/Modal'
 import { ProjectForm } from '@/components/philly/forms/ProjectForm'
 import type { ProjectFormData } from '@/components/philly/forms/ProjectForm'
-import { Search, Grid3X3, List } from 'lucide-react'
+import { Search, Grid3X3, List, ExternalLink, Eye, Trash2, Copy } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useUrlState } from '@/hooks/philly/useUrlState'
 import { useDebouncedValue } from '@/hooks/philly/useDebouncedValue'
+import { ContextMenu, type ContextMenuItem } from '@/components/philly/ui/ContextMenu'
 
 /* Shape returned by GET /api/projects */
 interface ApiProject {
@@ -134,6 +136,9 @@ export default function ProjectsPage() {
   const debouncedSearch = useDebouncedValue(search, 250)
   const [showAdd, setShowAdd] = useState(false)
   const [selectedProject, setSelectedProject] = useState<UiProject | null>(null)
+  // Bundle AK — right-click context menu (live mode only).
+  const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; projectId: string } | null>(null)
+  const router = useRouter()
 
   const isRE = industry === 'realestate'
   const isHOS = industry === 'hospitality'
@@ -327,7 +332,13 @@ export default function ProjectsPage() {
               const sc = statusColors[p.status] || statusColors.planned
               const progress = Math.round((p.completedMilestones / p.milestones) * 100)
               return (
-                <div key={p.id} className="card-hover" onClick={() => setSelectedProject(p)} style={{
+                <div key={p.id} className="card-hover"
+                  onClick={() => setSelectedProject(p)}
+                  onContextMenu={(e) => {
+                    e.preventDefault()
+                    setCtxMenu({ x: e.clientX, y: e.clientY, projectId: p.id })
+                  }}
+                  style={{
                   background: 'var(--panel)', border: '1px solid var(--border)',
                   borderRadius: 12, padding: '16px', cursor: 'pointer',
                   boxShadow: 'var(--shadow-sm)',
@@ -585,6 +596,49 @@ export default function ProjectsPage() {
           )
         })()}
       </Modal>
+
+      {ctxMenu && (() => {
+        const proj = projects.find((x) => x.id === ctxMenu.projectId)
+        if (!proj) return null
+        const isLive = !isRE && !isHOS
+        const items: ContextMenuItem[] = [
+          { kind: 'action', label: 'Quick view', icon: Eye,
+            onClick: () => setSelectedProject(proj) },
+          { kind: 'action', label: 'Open full page', icon: ExternalLink,
+            disabled: !isLive,
+            onClick: () => router.push(`/projects/${proj.id}`) },
+          { kind: 'separator' },
+          { kind: 'action', label: 'Copy title', icon: Copy,
+            onClick: () => {
+              navigator.clipboard?.writeText(proj.title).then(
+                () => addToast('Title copied', 'success'),
+                () => addToast('Copy failed', 'error'),
+              )
+            } },
+          { kind: 'separator' },
+          { kind: 'action', label: 'Delete', icon: Trash2, destructive: true,
+            disabled: !isLive,
+            onClick: async () => {
+              if (!confirm(`Delete "${proj.title}"? This cannot be undone.`)) return
+              try {
+                const res = await fetch(`/api/projects/${proj.id}`, { method: 'DELETE' })
+                if (!res.ok && res.status !== 204) throw new Error(`Failed (${res.status})`)
+                addToast('Project deleted', 'success')
+                apiQuery.refetch()
+              } catch (e) {
+                addToast(e instanceof Error ? e.message : 'Delete failed', 'error')
+              }
+            } },
+        ]
+        return (
+          <ContextMenu
+            x={ctxMenu.x}
+            y={ctxMenu.y}
+            items={items}
+            onClose={() => setCtxMenu(null)}
+          />
+        )
+      })()}
     </>
   )
 }

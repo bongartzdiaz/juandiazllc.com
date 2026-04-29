@@ -158,6 +158,12 @@ export default function DealsPage() {
   const [focusedDealId, setFocusedDealId] = useState<string | null>(null)
   const rowRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())
 
+  // Bundle AL — drag-drop reorder on the LIST view (kanban already
+  // uses dnd to move between stages; we don't double-bind).
+  const [listDragId, setListDragId] = useState<string | null>(null)
+  const [listDragOverId, setListDragOverId] = useState<string | null>(null)
+  const [listOrderOverride, setListOrderOverride] = useState<string[] | null>(null)
+
   // Bundle AC — column visibility prefs (list view only).
   const dealColumns = useColumnPrefs('pai-deals-columns-v1', DEAL_COLUMN_DEFAULTS)
   const visibleDealColumns = useMemo(
@@ -244,14 +250,55 @@ export default function DealsPage() {
   /* ---- Client-side search ---- */
   const visibleDeals = useMemo(() => {
     const q = debouncedSearch.trim().toLowerCase()
-    if (!q) return deals
-    return deals.filter(d =>
-      d.title.toLowerCase().includes(q) ||
-      (d.contact?.name ?? '').toLowerCase().includes(q) ||
-      (d.owner?.name ?? '').toLowerCase().includes(q) ||
-      (d.stage?.name ?? '').toLowerCase().includes(q),
-    )
-  }, [deals, debouncedSearch])
+    let base = deals
+    if (q) {
+      base = base.filter(d =>
+        d.title.toLowerCase().includes(q) ||
+        (d.contact?.name ?? '').toLowerCase().includes(q) ||
+        (d.owner?.name ?? '').toLowerCase().includes(q) ||
+        (d.stage?.name ?? '').toLowerCase().includes(q),
+      )
+    }
+    // Bundle AL: optimistic reorder override (list view only).
+    if (listOrderOverride) {
+      const indexed = new Map(listOrderOverride.map((id, i) => [id, i]))
+      base = [...base].sort((a, b) => {
+        const ai = indexed.has(a.id) ? indexed.get(a.id)! : Number.MAX_SAFE_INTEGER
+        const bi = indexed.has(b.id) ? indexed.get(b.id)! : Number.MAX_SAFE_INTEGER
+        return ai - bi
+      })
+    }
+    return base
+  }, [deals, debouncedSearch, listOrderOverride])
+
+  /* ---- Drag-drop reorder (Bundle AL, list view only) ---- */
+  const handleListReorderDrop = useCallback(async (sourceId: string, targetId: string) => {
+    if (sourceId === targetId) return
+    const currentOrder = visibleDeals.map((d) => d.id)
+    const fromIdx = currentOrder.indexOf(sourceId)
+    const toIdx = currentOrder.indexOf(targetId)
+    if (fromIdx === -1 || toIdx === -1) return
+    const reordered = [...currentOrder]
+    reordered.splice(fromIdx, 1)
+    reordered.splice(toIdx, 0, sourceId)
+    setListOrderOverride(reordered)
+    try {
+      const res = await fetch('/api/deals/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: reordered }),
+      })
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}))
+        throw new Error(j?.error ?? `Failed (${res.status})`)
+      }
+      addToast('Deals reordered', 'success')
+      fetchDeals()
+    } catch (e) {
+      addToast(e instanceof Error ? e.message : 'Reorder failed', 'error')
+      setListOrderOverride(null)
+    }
+  }, [visibleDeals, addToast, fetchDeals])
 
   /* ---- j/k row navigation (Bundle AF) — list view only ---- */
   const moveFocus = useCallback((delta: number) => {
@@ -790,6 +837,7 @@ export default function DealsPage() {
                 </div>
               ) : visibleDeals.map((deal, idx) => {
                 const isFocused = focusedDealId === deal.id
+                const isDragOver = listDragOverId === deal.id
                 return (
                 <Link key={deal.id} href={`/deals/${deal.id}`}
                   ref={(el) => {
@@ -801,18 +849,45 @@ export default function DealsPage() {
                     setCtxMenu({ x: e.clientX, y: e.clientY, dealId: deal.id })
                   }}
                   onMouseEnter={() => setFocusedDealId(deal.id)}
+                  draggable
+                  onDragStart={(e) => {
+                    setListDragId(deal.id)
+                    e.dataTransfer.setData('text/deal-id', deal.id)
+                    e.dataTransfer.effectAllowed = 'move'
+                  }}
+                  onDragOver={(e) => {
+                    if (!listDragId || listDragId === deal.id) return
+                    e.preventDefault()
+                    e.dataTransfer.dropEffect = 'move'
+                    if (listDragOverId !== deal.id) setListDragOverId(deal.id)
+                  }}
+                  onDragLeave={() => { if (listDragOverId === deal.id) setListDragOverId(null) }}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    const sourceId = e.dataTransfer.getData('text/deal-id') || listDragId
+                    setListDragId(null)
+                    setListDragOverId(null)
+                    if (sourceId) handleListReorderDrop(sourceId, deal.id)
+                  }}
+                  onDragEnd={() => { setListDragId(null); setListDragOverId(null) }}
                   style={{
                   display: 'grid',
                   gridTemplateColumns: dealsGridTemplate,
                   gap: 12, padding: '10px 16px',
                   borderBottom: idx < visibleDeals.length - 1 ? '1px solid var(--border)' : 'none',
                   fontSize: 12, alignItems: 'center',
-                  background: isFocused
+                  background: isDragOver
+                    ? 'color-mix(in srgb, var(--accent) 14%, var(--panel))'
+                    : isFocused
                     ? 'color-mix(in srgb, var(--accent) 8%, var(--panel))'
                     : (idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent'),
                   textDecoration: 'none', color: 'inherit',
-                  outline: isFocused ? '2px solid var(--accent)' : 'none',
-                  outlineOffset: isFocused ? -2 : 0,
+                  outline: isDragOver
+                    ? '2px solid var(--accent)'
+                    : (isFocused ? '2px solid var(--accent)' : 'none'),
+                  outlineOffset: (isFocused || isDragOver) ? -2 : 0,
+                  opacity: listDragId === deal.id ? 0.55 : 1,
+                  cursor: listDragId === deal.id ? 'grabbing' : 'grab',
                 }}>
                   {visibleDealColumns.map((c) => {
                     if (c.id === 'deal') return (

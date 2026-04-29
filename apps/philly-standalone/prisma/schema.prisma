@@ -515,6 +515,10 @@ model PipelineStage {
   @@index([pipelineId])
 }
 
+/// Bundle AL — manual ordering for the deals list view. NULL = unordered
+/// (fall back to createdAt desc); explicit values sort lower-first. Index
+/// is (pipelineId, displayOrder) so reorder queries stay cheap inside one
+/// pipeline.
 model Deal {
   id          String    @id @default(cuid())
   pipelineId  String
@@ -553,6 +557,10 @@ model Deal {
   contingenciesJson  String  @default("[]") @db.LongText // JSON array of {name, status, dueDate}
   closingChecklistJson String @default("[]") @db.LongText // JSON array of {task, done, dueDate}
 
+  // Manual ordering for the deals LIST view (Bundle AL). NULL falls
+  // back to createdAt-desc; explicit values sort lower-first.
+  displayOrder       BigInt?
+
   // Source tracking
   leadSource  String @default("")
 
@@ -565,6 +573,7 @@ model Deal {
   offers   Offer[]
 
   @@index([pipelineId, stageId])
+  @@index([pipelineId, displayOrder])
   @@index([contactId])
   @@index([propertyId])
   @@index([status])
