@@ -5,10 +5,11 @@ import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
-import { MapPin, Filter, Search, Tag } from 'lucide-react'
+import { MapPin, Filter, Search, Tag, Eye } from 'lucide-react'
 import Link from 'next/link'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
+import { PropertyQuickView } from '@/components/philly/properties/PropertyQuickView'
 
 type Option = { value: string; label: string }
 type Flag = { key: string; label: string }
@@ -101,6 +102,9 @@ export default function PropertiesPage() {
   const [addSqft, setAddSqft] = useState('')
   const [saving, setSaving] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
+
+  // Bundle V — quick-view popover.
+  const [quickViewId, setQuickViewId] = useState<string | null>(null)
 
   const t = useTranslations('properties')
 
@@ -375,8 +379,25 @@ export default function PropertiesPage() {
               <Link key={prop.id} href={`/properties/${prop.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div className="card-hover" style={{ padding: '16px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--panel)', boxShadow: 'var(--shadow-sm)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8, gap: 8 }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--txt)', lineHeight: 1.3 }}>{prop.title}</div>
-                    <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 9, fontWeight: 600, textTransform: 'uppercase', background: sc.bg, color: sc.txt, whiteSpace: 'nowrap' }}>{prop.status.replace('_', ' ')}</span>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--txt)', lineHeight: 1.3, flex: 1, minWidth: 0 }}>{prop.title}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                      <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 9, fontWeight: 600, textTransform: 'uppercase', background: sc.bg, color: sc.txt, whiteSpace: 'nowrap' }}>{prop.status.replace('_', ' ')}</span>
+                      <button
+                        type="button"
+                        aria-label={`Quick view ${prop.title}`}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setQuickViewId(prop.id) }}
+                        style={{
+                          width: 24, height: 24, padding: 0, borderRadius: 5,
+                          background: 'transparent', border: '1px solid transparent',
+                          color: 'var(--txt3)', cursor: 'pointer',
+                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg2)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--txt)' }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.color = 'var(--txt3)' }}
+                      >
+                        <Eye size={12} />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Chips */}
@@ -557,6 +578,8 @@ export default function PropertiesPage() {
           </div>
         </div>
       )}
+
+      <PropertyQuickView propertyId={quickViewId} onClose={() => setQuickViewId(null)} />
     </>
   )
 }

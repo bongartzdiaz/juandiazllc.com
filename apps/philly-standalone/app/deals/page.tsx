@@ -8,12 +8,13 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useToast } from '@/hooks/philly/useToast'
 import {
   Filter, Search, LayoutGrid, List as ListIcon, X, Plus, GripVertical,
-  Calendar, User as UserIcon,
+  Calendar, User as UserIcon, Eye,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useDebouncedValue } from '@/hooks/philly/useDebouncedValue'
 import { useUrlState } from '@/hooks/philly/useUrlState'
+import { DealQuickView } from '@/components/philly/deals/DealQuickView'
 
 /* ------------------------------------------------------------------
    Types
@@ -109,6 +110,9 @@ export default function DealsPage() {
   const [addNotes, setAddNotes] = useState('')
   const [saving, setSaving] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
+
+  // Bundle V — quick-view popover for deals (list + kanban).
+  const [quickViewId, setQuickViewId] = useState<string | null>(null)
 
   const resetAddForm = () => {
     setAddTitle(''); setAddValue(''); setAddProbability('50'); setAddStatus('open')
@@ -523,10 +527,38 @@ export default function DealsPage() {
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
                           <GripVertical size={12} style={{ color: 'var(--txt3)', marginTop: 2, flexShrink: 0 }} />
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <Link href={`/deals/${deal.id}`} style={{
-                              fontSize: 12.5, fontWeight: 600, color: 'var(--txt)',
-                              textDecoration: 'none', display: 'block', lineHeight: 1.35,
-                            }}>{deal.title}</Link>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                              <Link href={`/deals/${deal.id}`} style={{
+                                flex: 1, minWidth: 0,
+                                fontSize: 12.5, fontWeight: 600, color: 'var(--txt)',
+                                textDecoration: 'none', display: 'block', lineHeight: 1.35,
+                              }}>{deal.title}</Link>
+                              <button
+                                type="button"
+                                aria-label={`Quick view ${deal.title}`}
+                                onClick={(e) => { e.stopPropagation(); setQuickViewId(deal.id) }}
+                                onMouseDown={(e) => e.stopPropagation()}
+                                style={{
+                                  width: 22, height: 22, padding: 0, borderRadius: 5,
+                                  background: 'transparent', border: '1px solid transparent',
+                                  color: 'var(--txt3)', cursor: 'pointer',
+                                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                  flexShrink: 0,
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = 'var(--bg2)'
+                                  e.currentTarget.style.borderColor = 'var(--border)'
+                                  e.currentTarget.style.color = 'var(--txt)'
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = 'transparent'
+                                  e.currentTarget.style.borderColor = 'transparent'
+                                  e.currentTarget.style.color = 'var(--txt3)'
+                                }}
+                              >
+                                <Eye size={12} />
+                              </button>
+                            </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, fontSize: 10.5, color: 'var(--txt3)' }}>
                               <span className="mono" style={{ fontWeight: 700, color: 'var(--txt)' }}>
                                 {fmtMoney(deal.valueCents)}
@@ -604,12 +636,12 @@ export default function DealsPage() {
             }}>
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr 140px 110px 90px 140px 100px',
+                gridTemplateColumns: '1fr 140px 110px 90px 140px 100px 32px',
                 gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)',
                 fontSize: 10, fontWeight: 600, textTransform: 'uppercase',
                 letterSpacing: '0.06em', color: 'var(--txt3)',
               }}>
-                <span>Deal</span><span>Stage</span><span>Value</span><span>Prob.</span><span>Contact</span><span>Status</span>
+                <span>Deal</span><span>Stage</span><span>Value</span><span>Prob.</span><span>Contact</span><span>Status</span><span aria-hidden></span>
               </div>
               {loading ? (
                 <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading…</div>
@@ -620,7 +652,7 @@ export default function DealsPage() {
               ) : visibleDeals.map((deal, idx) => (
                 <Link key={deal.id} href={`/deals/${deal.id}`} style={{
                   display: 'grid',
-                  gridTemplateColumns: '1fr 140px 110px 90px 140px 100px',
+                  gridTemplateColumns: '1fr 140px 110px 90px 140px 100px 32px',
                   gap: 12, padding: '10px 16px',
                   borderBottom: idx < visibleDeals.length - 1 ? '1px solid var(--border)' : 'none',
                   fontSize: 12, alignItems: 'center',
@@ -646,6 +678,29 @@ export default function DealsPage() {
                     color: STATUS_COLORS[deal.status]?.txt ?? 'var(--txt2)',
                     display: 'inline-block', maxWidth: 'fit-content',
                   }}>{deal.status}</span>
+                  <button
+                    type="button"
+                    aria-label={`Quick view ${deal.title}`}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setQuickViewId(deal.id) }}
+                    style={{
+                      width: 28, height: 28, padding: 0, borderRadius: 6,
+                      background: 'transparent', border: '1px solid transparent',
+                      color: 'var(--txt3)', cursor: 'pointer',
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'var(--bg2)'
+                      e.currentTarget.style.borderColor = 'var(--border)'
+                      e.currentTarget.style.color = 'var(--txt)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent'
+                      e.currentTarget.style.borderColor = 'transparent'
+                      e.currentTarget.style.color = 'var(--txt3)'
+                    }}
+                  >
+                    <Eye size={14} />
+                  </button>
                 </Link>
               ))}
             </div>
@@ -795,6 +850,8 @@ export default function DealsPage() {
           </div>
         </div>
       )}
+
+      <DealQuickView dealId={quickViewId} onClose={() => setQuickViewId(null)} />
     </>
   )
 }
