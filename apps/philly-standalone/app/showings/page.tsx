@@ -113,8 +113,8 @@ export default function ShowingsPage() {
   }
 
   async function submitForm() {
-    if (!form.propertyId) { addToast('Select a property', 'error'); return }
-    if (!form.date) { addToast('Pick a date', 'error'); return }
+    if (!form.propertyId) { addToast(t('toasts.selectProperty'), 'error'); return }
+    if (!form.date) { addToast(t('toasts.pickDate'), 'error'); return }
     const duration = Number(form.duration) || 30
     const dateISO = new Date(`${form.date}T${form.time}:00`).toISOString()
 
@@ -139,12 +139,12 @@ export default function ShowingsPage() {
             body: JSON.stringify(payload),
           })
       const j = await res.json().catch(() => ({}))
-      if (!res.ok) { addToast(j.error ?? 'Save failed', 'error'); return }
-      addToast(editingId ? 'Showing updated' : 'Showing scheduled', 'success')
+      if (!res.ok) { addToast(j.error ?? t('toasts.saveFailed'), 'error'); return }
+      addToast(editingId ? t('toasts.updated') : t('toasts.scheduled'), 'success')
       setShowForm(false)
       fetchData()
     } catch {
-      addToast('Network error', 'error')
+      addToast(t('toasts.networkError'), 'error')
     } finally {
       setSaving(false)
     }
@@ -157,11 +157,11 @@ export default function ShowingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       })
-      if (!res.ok) { addToast('Update failed', 'error'); return }
-      addToast(`Marked ${status.replace('_', ' ')}`, 'success')
+      if (!res.ok) { addToast(t('toasts.updateFailed'), 'error'); return }
+      addToast(t('toasts.marked', { status: status.replace('_', ' ') }), 'success')
       setSelected(null)
       fetchData()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
   }
 
   async function saveFeedback() {
@@ -172,26 +172,26 @@ export default function ShowingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ feedback, rating, status: 'completed' }),
       })
-      if (!res.ok) { addToast('Save failed', 'error'); return }
-      addToast('Feedback saved', 'success')
+      if (!res.ok) { addToast(t('toasts.saveFailed'), 'error'); return }
+      addToast(t('toasts.feedbackSaved'), 'success')
       setSelected(null)
       setFeedback(''); setRating(null)
       fetchData()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this showing?')) return
+    if (!confirm(t('confirms.delete'))) return
     try {
       const res = await fetch(`/api/showings/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
-        addToast('Showing deleted', 'success')
+        addToast(t('toasts.deleted'), 'success')
         setSelected(null)
         fetchData()
       } else {
-        addToast('Delete failed', 'error')
+        addToast(t('toasts.deleteFailed'), 'error')
       }
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
   }
 
   function openDetail(sh: Showing) {

@@ -103,9 +103,9 @@ export default function OpenHousesPage() {
   }
 
   async function submitForm() {
-    if (!form.propertyId) { addToast('Select a property', 'error'); return }
-    if (!form.date) { addToast('Pick a date', 'error'); return }
-    if (form.startTime >= form.endTime) { addToast('End time must be after start', 'error'); return }
+    if (!form.propertyId) { addToast(t('toasts.selectProperty'), 'error'); return }
+    if (!form.date) { addToast(t('toasts.pickDate'), 'error'); return }
+    if (form.startTime >= form.endTime) { addToast(t('toasts.endAfterStart'), 'error'); return }
 
     setSubmitting(true)
     try {
@@ -122,33 +122,33 @@ export default function OpenHousesPage() {
           })
       const j = await res.json().catch(() => ({}))
       if (!res.ok) {
-        addToast(j.error ?? 'Save failed', 'error')
+        addToast(j.error ?? t('toasts.saveFailed'), 'error')
         return
       }
-      addToast(editingId ? 'Open house updated' : 'Open house scheduled', 'success')
+      addToast(editingId ? t('toasts.updated') : t('toasts.scheduled'), 'success')
       setShowForm(false)
       fetchData()
     } catch {
-      addToast('Network error', 'error')
+      addToast(t('toasts.networkError'), 'error')
     } finally {
       setSubmitting(false)
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Cancel this open house? This cannot be undone.')) return
+    if (!confirm(t('confirms.cancel'))) return
     try {
       const res = await fetch(`/api/open-houses/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
-        addToast('Open house cancelled', 'success')
+        addToast(t('toasts.cancelled'), 'success')
         setSelected(null)
         fetchData()
       } else {
         const j = await res.json().catch(() => ({}))
-        addToast(j.error ?? 'Delete failed', 'error')
+        addToast(j.error ?? t('toasts.deleteFailed'), 'error')
       }
     } catch {
-      addToast('Network error', 'error')
+      addToast(t('toasts.networkError'), 'error')
     }
   }
 

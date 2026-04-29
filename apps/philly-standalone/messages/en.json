@@ -195,6 +195,44 @@
       "delete": "Delete this grant?"
     }
   },
+  "showings": {
+    "title": "Showings",
+    "subtitle": "Schedule and track property showings",
+    "toasts": {
+      "selectProperty": "Select a property",
+      "pickDate": "Pick a date",
+      "saveFailed": "Save failed",
+      "scheduled": "Showing scheduled",
+      "updated": "Showing updated",
+      "marked": "Marked {status}",
+      "updateFailed": "Update failed",
+      "feedbackSaved": "Feedback saved",
+      "deleted": "Showing deleted",
+      "deleteFailed": "Delete failed",
+      "networkError": "Network error"
+    },
+    "confirms": {
+      "delete": "Delete this showing?"
+    }
+  },
+  "openHouses": {
+    "title": "Open Houses",
+    "subtitle": "Schedule and manage open house events",
+    "toasts": {
+      "selectProperty": "Select a property",
+      "pickDate": "Pick a date",
+      "endAfterStart": "End time must be after start",
+      "saveFailed": "Save failed",
+      "scheduled": "Open house scheduled",
+      "updated": "Open house updated",
+      "cancelled": "Open house cancelled",
+      "deleteFailed": "Delete failed",
+      "networkError": "Network error"
+    },
+    "confirms": {
+      "cancel": "Cancel this open house? This cannot be undone."
+    }
+  },
   "volunteers": {
     "title": "Volunteers",
     "subtitle": "Manage volunteer team and hours",

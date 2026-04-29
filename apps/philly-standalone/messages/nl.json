@@ -195,6 +195,44 @@
       "delete": "Deze subsidie verwijderen?"
     }
   },
+  "showings": {
+    "title": "Bezichtigingen",
+    "subtitle": "Plan en volg pandbezichtigingen",
+    "toasts": {
+      "selectProperty": "Kies een pand",
+      "pickDate": "Kies een datum",
+      "saveFailed": "Opslaan mislukt",
+      "scheduled": "Bezichtiging ingepland",
+      "updated": "Bezichtiging bijgewerkt",
+      "marked": "Gemarkeerd als {status}",
+      "updateFailed": "Bijwerken mislukt",
+      "feedbackSaved": "Feedback opgeslagen",
+      "deleted": "Bezichtiging verwijderd",
+      "deleteFailed": "Verwijderen mislukt",
+      "networkError": "Netwerkfout"
+    },
+    "confirms": {
+      "delete": "Deze bezichtiging verwijderen?"
+    }
+  },
+  "openHouses": {
+    "title": "Open Huizen",
+    "subtitle": "Plan en beheer open-huis evenementen",
+    "toasts": {
+      "selectProperty": "Kies een pand",
+      "pickDate": "Kies een datum",
+      "endAfterStart": "Eindtijd moet na starttijd zijn",
+      "saveFailed": "Opslaan mislukt",
+      "scheduled": "Open huis ingepland",
+      "updated": "Open huis bijgewerkt",
+      "cancelled": "Open huis geannuleerd",
+      "deleteFailed": "Verwijderen mislukt",
+      "networkError": "Netwerkfout"
+    },
+    "confirms": {
+      "cancel": "Dit open huis annuleren? Dit kan niet ongedaan worden gemaakt."
+    }
+  },
   "volunteers": {
     "title": "Vrijwilligers",
     "subtitle": "Beheer vrijwilligersteam en uren",
