@@ -41,6 +41,27 @@ export function WebVitalsReporter() {
       keepalive: true,
       headers: { "Content-Type": "application/json" },
     }).catch(() => { /* best-effort */ });
+
+    // Mirror to Sentry as a performance measurement when Sentry has
+    // initialised. Lazy import keeps the bundle weight on
+    // observability-enabled deploys only.
+    if (typeof window !== "undefined" && process.env.NEXT_PUBLIC_SENTRY_DSN) {
+      import("@sentry/react")
+        .then((Sentry) => {
+          // Web-vitals values are ms (or unitless for CLS/LCP);
+          // bucket the rating as a tag so dashboards can filter
+          // poor-rated sessions.
+          Sentry.setMeasurement?.(
+            metric.name,
+            metric.name === "CLS" ? metric.value : Math.round(metric.value),
+            metric.name === "CLS" ? "" : "millisecond",
+          );
+          if (metric.rating === "poor") {
+            Sentry.captureMessage(`web-vital ${metric.name} = ${metric.value} (poor)`, "info");
+          }
+        })
+        .catch(() => { /* sdk not available, swallow */ });
+    }
   });
   return null;
 }
