@@ -25,6 +25,7 @@
 
 import { PrismaClient } from '@prisma/client'
 import { verifyAuditChain, type VerifyReport } from '../lib/philly/audit-verify'
+import { sendAlert } from '../lib/philly/alerts'
 
 interface Args {
   org: string | null
@@ -86,7 +87,31 @@ async function main(): Promise<number> {
       console.log(summary)
     }
 
-    return reports.every(r => r.ok) ? 0 : 1
+    const cleanAll = reports.every(r => r.ok)
+    if (!cleanAll) {
+      // Audit-chain integrity is a high-severity event. Page on-call
+      // unconditionally — never let a tamper signal sit silent.
+      const broken = reports.filter(r => !r.ok)
+      const totalBroken = broken.reduce((s, r) => s + r.broken.length, 0)
+      const totalForked = broken.reduce((s, r) => s + r.forked.length, 0)
+      await sendAlert({
+        severity: 'critical',
+        source: 'audit-chain',
+        title: `AuditLog integrity check FAILED on ${broken.length} org${broken.length === 1 ? '' : 's'}`,
+        body:
+          'Hash-chain mismatch detected — possible tampering or replication drift. ' +
+          'Run `npm run audit:chain -- --json` for full report.',
+        fields: {
+          orgs_total: reports.length,
+          orgs_broken: broken.length,
+          rows_broken: totalBroken,
+          rows_forked: totalForked,
+          first_org: broken[0]?.name ?? '—',
+        },
+      })
+    }
+
+    return cleanAll ? 0 : 1
   } finally {
     await prisma.$disconnect()
   }
