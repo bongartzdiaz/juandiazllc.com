@@ -1,0 +1,539 @@
+{
+  "nav": {
+    "dashboard": "Übersicht",
+    "projects": "Projekte",
+    "contacts": "Kontakte",
+    "impact": "Wirkung",
+    "reports": "Berichte",
+    "kanban": "Kanban",
+    "pages": "Seiten",
+    "settings": "Einstellungen"
+  },
+  "dashboard": {
+    "title": "Übersicht",
+    "subtitle": "Ihre Wirkung auf einen Blick",
+    "totalProjects": "Projekte gesamt",
+    "activeProjects": "Aktive Projekte",
+    "peopleHelped": "Menschen unterstützt",
+    "co2Reduced": "CO2 reduziert",
+    "moneyDonated": "Spenden gesamt",
+    "sdgCoverage": "SDG-Abdeckung",
+    "recentActivity": "Letzte Aktivität",
+    "impactOverview": "Wirkungsübersicht",
+    "editDashboard": "Dashboard bearbeiten",
+    "addWidget": "Widget hinzufügen"
+  },
+  "projects": {
+    "title": "Projekte",
+    "subtitle": "Verwalten Sie Ihre CSR-Initiativen",
+    "newProject": "Neues Projekt",
+    "status": {
+      "planned": "Geplant",
+      "active": "Aktiv",
+      "completed": "Abgeschlossen",
+      "paused": "Pausiert"
+    },
+    "fields": {
+      "title": "Projekttitel",
+      "description": "Beschreibung",
+      "category": "Kategorie",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "budget": "Budget",
+      "sdgGoals": "SDG-Ziele",
+      "status": "Status"
+    },
+    "toasts": {
+      "deleted": "Projekt gelöscht",
+      "deleteFailed": "Löschen fehlgeschlagen",
+      "titleCopied": "Titel kopiert",
+      "copyFailed": "Kopieren fehlgeschlagen"
+    },
+    "confirms": {
+      "delete": "\"{title}\" löschen? Dies kann nicht rückgängig gemacht werden."
+    }
+  },
+  "contacts": {
+    "title": "Kontakte",
+    "subtitle": "Partner, Spender und Stakeholder",
+    "newContact": "Neuer Kontakt",
+    "types": {
+      "partner": "Partner",
+      "beneficiary": "Begünstigter",
+      "stakeholder": "Stakeholder",
+      "donor": "Spender"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "company": "Unternehmen",
+      "type": "Typ",
+      "notes": "Notizen"
+    },
+    "toasts": {
+      "exported": "{count, plural, one {# Kontakt exportiert} other {# Kontakte exportiert}}",
+      "nothingToExport": "Nichts zum Exportieren",
+      "deleted": "{count, plural, one {# Kontakt gelöscht} other {# Kontakte gelöscht}}",
+      "deleteFailed": "Massenlöschung fehlgeschlagen",
+      "updated": "{count, plural, one {# Kontakt aktualisiert} other {# Kontakte aktualisiert}}",
+      "updateFailed": "Massenaktualisierung fehlgeschlagen",
+      "reordered": "Kontakte neu sortiert",
+      "reorderFailed": "Neusortierung fehlgeschlagen",
+      "noEmail": "Keine E-Mail hinterlegt",
+      "emailCopied": "E-Mail kopiert",
+      "noPhone": "Keine Telefonnummer hinterlegt",
+      "phoneCopied": "Telefonnummer kopiert",
+      "copyFailed": "Kopieren fehlgeschlagen"
+    },
+    "confirms": {
+      "bulkDelete": "{count, plural, one {# Kontakt löschen?} other {# Kontakte löschen?}} Dies kann nicht rückgängig gemacht werden."
+    }
+  },
+  "impact": {
+    "title": "Wirkung",
+    "subtitle": "Messen, was zählt",
+    "totalImpact": "Gesamtwirkung",
+    "byProject": "Nach Projekt",
+    "sdgAlignment": "SDG-Ausrichtung",
+    "trends": "Trends"
+  },
+  "kanban": {
+    "title": "Kanban",
+    "subtitle": "Visuelle Projektverwaltung",
+    "newBoard": "Neues Board",
+    "addColumn": "Spalte hinzufügen",
+    "addCard": "Karte hinzufügen"
+  },
+  "deals": {
+    "toasts": {
+      "applied": "\"{name}\" angewendet",
+      "created": "Deal erstellt",
+      "moved": "Deal verschoben",
+      "moveFailed": "Verschieben fehlgeschlagen",
+      "marked": "Als {status} markiert",
+      "updateFailed": "Aktualisierung fehlgeschlagen",
+      "deleted": "Deal gelöscht",
+      "deleteFailed": "Löschen fehlgeschlagen",
+      "reordered": "Deals neu sortiert",
+      "reorderFailed": "Neusortierung fehlgeschlagen",
+      "noContact": "Kein Kontakt verknüpft",
+      "contactCopied": "Kontakt kopiert",
+      "copyFailed": "Kopieren fehlgeschlagen"
+    },
+    "confirms": {
+      "delete": "Diesen Deal löschen? Dies kann nicht rückgängig gemacht werden."
+    }
+  },
+  "properties": {
+    "toasts": {
+      "applied": "\"{name}\" angewendet",
+      "deleted": "Immobilie gelöscht",
+      "deleteFailed": "Löschen fehlgeschlagen",
+      "noAddress": "Keine Adresse hinterlegt",
+      "addressCopied": "Adresse kopiert",
+      "copyFailed": "Kopieren fehlgeschlagen"
+    },
+    "confirms": {
+      "delete": "\"{title}\" löschen? Dies kann nicht rückgängig gemacht werden."
+    }
+  },
+  "automations": {
+    "title": "Automatisierungen",
+    "subtitle": "Trigger-basierte Regeln zur Automatisierung von Workflows"
+  },
+  "grants": {
+    "title": "Förderungen",
+    "subtitle": "Förderanträge und Finanzierung verfolgen",
+    "newGrant": "Förderung hinzufügen",
+    "editGrant": "Förderung bearbeiten",
+    "kpis": {
+      "total": "Förderungen gesamt",
+      "funded": "Finanziert",
+      "pending": "Ausstehend",
+      "active": "Aktiv"
+    },
+    "filters": {
+      "all": "Alle Status",
+      "prospect": "Interessent",
+      "applied": "Beantragt",
+      "under_review": "In Prüfung",
+      "approved": "Genehmigt",
+      "awarded": "Bewilligt",
+      "active": "Aktiv",
+      "reporting": "Berichterstattung",
+      "closed": "Abgeschlossen",
+      "completed": "Erledigt",
+      "rejected": "Abgelehnt"
+    },
+    "fields": {
+      "title": "Förderungstitel",
+      "amount": "Betrag (USD)",
+      "funder": "Förderer",
+      "status": "Status",
+      "appliedDate": "Antragsdatum",
+      "awardedDate": "Bewilligungsdatum",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "description": "Beschreibung",
+      "requirements": "Anforderungen"
+    },
+    "placeholders": {
+      "title": "Wohnbauförderung",
+      "amount": "50000",
+      "funder": "Stiftungsname",
+      "description": "Zweck und Umfang der Förderung…",
+      "requirements": "Berichtsfristen, Leistungen…"
+    },
+    "toasts": {
+      "titleRequired": "Titel erforderlich",
+      "funderRequired": "Förderer erforderlich",
+      "invalidAmount": "Ungültiger Betrag",
+      "saveFailed": "Speichern fehlgeschlagen",
+      "updated": "Förderung aktualisiert",
+      "added": "Förderung hinzugefügt",
+      "deleted": "Förderung gelöscht",
+      "deleteFailed": "Löschen fehlgeschlagen",
+      "networkError": "Netzwerkfehler"
+    },
+    "confirms": {
+      "delete": "Diese Förderung löschen?"
+    }
+  },
+  "commissions": {
+    "title": "Provisionen",
+    "subtitle": "Provisionsverfolgung und Team-Bestenliste",
+    "toasts": {
+      "selectAgent": "Makler auswählen",
+      "positiveGross": "Positiven Bruttobetrag eingeben",
+      "splitRange": "Aufteilung muss 0-100 sein",
+      "saveFailed": "Speichern fehlgeschlagen",
+      "added": "Provision hinzugefügt",
+      "marked": "Als {status} markiert",
+      "updateFailed": "Aktualisierung fehlgeschlagen",
+      "deleted": "Provision gelöscht",
+      "deleteFailed": "Löschen fehlgeschlagen",
+      "networkError": "Netzwerkfehler"
+    },
+    "confirms": {
+      "delete": "Diesen Provisionsdatensatz löschen?"
+    }
+  },
+  "eSignatures": {
+    "title": "E-Signaturen",
+    "subtitle": "Verträge nachverfolgen und Signaturen anfordern",
+    "toasts": {
+      "selectTransaction": "Transaktion auswählen",
+      "documentNameRequired": "Dokumentname erforderlich",
+      "signerEmailRequired": "E-Mail des Unterzeichners erforderlich",
+      "saveFailed": "Fehlgeschlagen",
+      "created": "Signaturanfrage erstellt",
+      "marked": "Als {status} markiert",
+      "updateFailed": "Aktualisierung fehlgeschlagen",
+      "deleted": "Gelöscht",
+      "deleteFailed": "Löschen fehlgeschlagen",
+      "networkError": "Netzwerkfehler"
+    },
+    "confirms": {
+      "delete": "Diese Signaturanfrage löschen?"
+    }
+  },
+  "referrals": {
+    "title": "Empfehlungen",
+    "subtitle": "Empfehlungsprovisionen und Partner verfolgen",
+    "toasts": {
+      "marked": "Als {status} markiert",
+      "updateFailed": "Aktualisierung fehlgeschlagen",
+      "deleted": "Empfehlung gelöscht",
+      "networkError": "Netzwerkfehler"
+    },
+    "confirms": {
+      "delete": "Diese Empfehlung löschen?"
+    }
+  },
+  "showings": {
+    "title": "Besichtigungen",
+    "subtitle": "Immobilienbesichtigungen planen und verfolgen",
+    "toasts": {
+      "selectProperty": "Immobilie auswählen",
+      "pickDate": "Datum auswählen",
+      "saveFailed": "Speichern fehlgeschlagen",
+      "scheduled": "Besichtigung geplant",
+      "updated": "Besichtigung aktualisiert",
+      "marked": "Als {status} markiert",
+      "updateFailed": "Aktualisierung fehlgeschlagen",
+      "feedbackSaved": "Feedback gespeichert",
+      "deleted": "Besichtigung gelöscht",
+      "deleteFailed": "Löschen fehlgeschlagen",
+      "networkError": "Netzwerkfehler"
+    },
+    "confirms": {
+      "delete": "Diese Besichtigung löschen?"
+    }
+  },
+  "openHouses": {
+    "title": "Tag der offenen Tür",
+    "subtitle": "Tag-der-offenen-Tür-Veranstaltungen planen und verwalten",
+    "toasts": {
+      "selectProperty": "Immobilie auswählen",
+      "pickDate": "Datum auswählen",
+      "endAfterStart": "Endzeit muss nach der Startzeit liegen",
+      "saveFailed": "Speichern fehlgeschlagen",
+      "scheduled": "Tag der offenen Tür geplant",
+      "updated": "Tag der offenen Tür aktualisiert",
+      "cancelled": "Tag der offenen Tür abgesagt",
+      "deleteFailed": "Löschen fehlgeschlagen",
+      "networkError": "Netzwerkfehler"
+    },
+    "confirms": {
+      "cancel": "Diesen Tag der offenen Tür absagen? Dies kann nicht rückgängig gemacht werden."
+    }
+  },
+  "volunteers": {
+    "title": "Freiwillige",
+    "subtitle": "Freiwilligenteam und Stunden verwalten",
+    "newVolunteer": "Freiwilligen hinzufügen",
+    "editVolunteer": "Freiwilligen bearbeiten",
+    "kpis": {
+      "total": "Freiwillige gesamt",
+      "active": "Aktiv",
+      "totalHours": "Stunden gesamt",
+      "avgHours": "Ø Stunden / Freiwilligen"
+    },
+    "filters": {
+      "all": "Alle Status",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "onboarding": "Einarbeitung"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "status": "Status",
+      "skills": "Fähigkeiten",
+      "notes": "Notizen",
+      "activityLogs": "Aktivitätsprotokolle"
+    },
+    "toasts": {
+      "nameRequired": "Name erforderlich",
+      "saveFailed": "Speichern fehlgeschlagen",
+      "updated": "Freiwilliger aktualisiert",
+      "added": "Freiwilliger hinzugefügt",
+      "removed": "Freiwilliger entfernt",
+      "deleteFailed": "Löschen fehlgeschlagen",
+      "networkError": "Netzwerkfehler"
+    },
+    "confirms": {
+      "remove": "Diesen Freiwilligen entfernen?"
+    }
+  },
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "add": "Hinzufügen",
+    "search": "Suchen...",
+    "filter": "Filter",
+    "noResults": "Keine Ergebnisse gefunden",
+    "loading": "Laden...",
+    "viewAll": "Alle anzeigen",
+    "back": "Zurück",
+    "close": "Schließen",
+    "open": "Öffnen",
+    "openFullPage": "Vollständige Seite öffnen",
+    "applyFilter": "Filter anwenden",
+    "clearAll": "Alle löschen"
+  },
+  "keyboard": {
+    "title": "Tastaturkürzel",
+    "subtitle": "Drücken Sie ? auf jeder Seite",
+    "navigationHeading": "Navigation",
+    "actionsHeading": "Aktionen",
+    "footnote": "Zwei-Tasten-Kürzel (z. B. g c) — drücken Sie sie nacheinander innerhalb von ~1 Sekunde. Kürzel werden unterdrückt, während Sie in einem Eingabefeld tippen, sodass Sie sich keine Sorgen um ein Suchfeld machen müssen.",
+    "nav": {
+      "home": "Startseite",
+      "contacts": "Kontakte",
+      "deals": "Deals",
+      "properties": "Immobilien",
+      "projects": "Projekte",
+      "insights": "Erkenntnisse",
+      "notifications": "Benachrichtigungen",
+      "settings": "Einstellungen",
+      "audit": "Auditprotokoll"
+    },
+    "actions": {
+      "focusSearch": "Suche auf aktueller Seite fokussieren",
+      "showCheatSheet": "Diese Übersicht anzeigen",
+      "closeModal": "Geöffnetes Fenster schließen",
+      "openPalette": "Befehlspalette öffnen (Suche + KI)",
+      "openPaletteAi": "Befehlspalette im KI-Modus öffnen",
+      "nextRow": "Nächste Zeile (Deals-Liste, Immobilien, Transaktionen)",
+      "prevRow": "Vorherige Zeile",
+      "openRow": "Fokussierte Zeile öffnen"
+    }
+  },
+  "bulk": {
+    "selected": "{count} ausgewählt",
+    "exportCsv": "CSV exportieren",
+    "changeType": "Typ ändern",
+    "delete": "Löschen",
+    "clearSelection": "Auswahl aufheben"
+  },
+  "views": {
+    "label": "Ansichten",
+    "noneYet": "Noch keine gespeicherten Ansichten — speichern Sie Ihre aktuellen Filter",
+    "saveCurrent": "Aktuelle speichern",
+    "namePlaceholder": "Diese Ansicht benennen…",
+    "shareWithOrg": "Diese Ansicht für alle in der Organisation verfügbar machen",
+    "saved": "Ansicht \"{name}\" gespeichert",
+    "applied": "\"{name}\" angewendet",
+    "renamed": "Ansicht umbenannt",
+    "deletePrompt": "Ansicht \"{name}\" löschen?",
+    "deleted": "Ansicht gelöscht",
+    "deleteFailed": "Löschen fehlgeschlagen",
+    "renameFailed": "Umbenennen fehlgeschlagen",
+    "saveFailed": "Speichern der Ansicht fehlgeschlagen"
+  },
+  "columns": {
+    "title": "Spalten",
+    "showHide": "Spalten anzeigen / ausblenden",
+    "always": "Immer",
+    "resetDefaults": "Auf Standard zurücksetzen"
+  },
+  "filter": {
+    "title": "Erweiterter Filter",
+    "subtitlePrefix": "{entity}-Liste",
+    "matchAll": "Alle",
+    "matchAny": "Beliebige",
+    "matchOf": "der folgenden:",
+    "matchPrefix": "Übereinstimmung",
+    "addRule": "Regel hinzufügen",
+    "removeRule": "Regel entfernen",
+    "noValueNeeded": "(kein Wert erforderlich)",
+    "valuePlaceholder": "Wert",
+    "rangeFrom": "von",
+    "rangeTo": "bis",
+    "selectPlaceholder": "— wählen —",
+    "footnote": "Filter werden auf dem Server angewendet. E-Mail und Telefon verwenden nur exakte Übereinstimmung (die Werte sind verschlüsselt gespeichert); verwenden Sie Enthält bei Name oder Unternehmen für Teilsuchen.",
+    "label": "Filter",
+    "labelWithCount": "Filter: {count}",
+    "ruleCount": "{count, plural, one {# Regel} other {# Regeln}}",
+    "operator": {
+      "contains": "enthält",
+      "eq": "gleich",
+      "neq": "ungleich",
+      "starts_with": "beginnt mit",
+      "ends_with": "endet mit",
+      "is_empty": "ist leer",
+      "is_not_empty": "ist nicht leer",
+      "gt": ">",
+      "gte": "≥",
+      "lt": "<",
+      "lte": "≤",
+      "between": "zwischen",
+      "before": "vor",
+      "after": "nach",
+      "on": "am",
+      "is": "ist",
+      "isNot": "ist nicht",
+      "in": "ist eines von",
+      "not_in": "ist keines von",
+      "is_true": "ist wahr",
+      "is_false": "ist falsch"
+    }
+  },
+  "quickview": {
+    "loading": "Laden…",
+    "notFound": "{entity} nicht gefunden",
+    "addedOn": "hinzugefügt am {date}",
+    "listedOn": "gelistet am {date}",
+    "openedOn": "geöffnet am {date}",
+    "linkedProject": "Verknüpftes Projekt",
+    "linkedCount": "Verknüpft ({count})",
+    "more": "+{count} mehr",
+    "notes": "Notizen",
+    "description": "Beschreibung",
+    "deal": {
+      "value": "Wert",
+      "probability": "Wahrscheinlichkeit",
+      "owner": "Inhaber",
+      "contact": "Kontakt",
+      "expectedClose": "Voraussichtlicher Abschluss",
+      "actualClose": "Tatsächlicher Abschluss",
+      "unassigned": "Nicht zugewiesen"
+    },
+    "property": {
+      "price": "Preis",
+      "perMonth": "/Monat",
+      "hoa": "+ €{amount} HOA",
+      "bed": "Zimmer",
+      "bath": "Bad",
+      "area": "m²",
+      "built": "Baujahr",
+      "viewings": "Besichtigungen",
+      "showings": "Vorführungen",
+      "offers": "Angebote",
+      "openHouses": "Tage der offenen Tür",
+      "valuation": "Bewertung",
+      "forSale": "Zum Verkauf",
+      "forRent": "Zur Miete",
+      "bank": "BANK",
+      "resale": "WIEDERVERKAUF"
+    },
+    "contact": {
+      "industry": "Branche",
+      "icpFit": "ICP-Eignung",
+      "aiBadge": "KI-generiert",
+      "aiHeading": "KI-Erkenntnisse",
+      "via": "über {source}",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "company": "Unternehmen",
+      "type": "Typ"
+    }
+  },
+  "gdpr": {
+    "title": "Datenschutz & Datenrechte",
+    "subtitle": "Exportieren Sie Ihre Daten, planen Sie die Kontolöschung oder überprüfen Sie, wie wir personenbezogene Daten verarbeiten.",
+    "self": {
+      "exportTitle": "Meine Kontodaten exportieren",
+      "exportBody": "Laden Sie eine JSON-Kopie aller Datensätze herunter, die wir über Ihr Operator-Konto haben. Auf Anfrage gemäß DSGVO Artikel 15 generiert.",
+      "exportCta": "Meine Daten herunterladen",
+      "deleteTitle": "Mein Konto löschen",
+      "deleteBody": "Planen Sie die Löschung Ihres Kontos und aller Daten, die wir darüber haben. Sie haben 30 Tage Zeit, um die Löschung abzubrechen, bevor sie endgültig wird.",
+      "deleteCta": "Löschung planen",
+      "deleteConfirm": "Geben Sie LÖSCHEN ein, um zu bestätigen",
+      "cancelCta": "Geplante Löschung abbrechen",
+      "scheduledFor": "Geplant für {date}",
+      "lastAdminBlock": "Sie sind der letzte Admin in dieser Organisation. Befördern Sie einen anderen Benutzer zum Admin, bevor Sie Ihr Konto löschen."
+    },
+    "admin": {
+      "title": "Datensubjektrechte",
+      "subtitle": "Bearbeiten Sie Auskunfts- und Löschungsanfragen im Namen von Kontakten und Geschäftspartnern.",
+      "exportTab": "Auskunftsanfrage (Export)",
+      "eraseTab": "Löschung (Entfernen)",
+      "emailLabel": "E-Mail des Datensubjekts",
+      "reasonLabel": "Grund / Ticket-Referenz",
+      "reasonRequired": "(für Löschung erforderlich)",
+      "submitExport": "Export erstellen",
+      "submitErase": "Daten löschen",
+      "eraseConfirmPrompt": "Alle Daten für {email} dauerhaft löschen? Dies kann nicht rückgängig gemacht werden.",
+      "eraseSuccess": "{totalRows} Zeilen in {tableCount} Tabellen gelöscht.",
+      "exportSuccess": "Export heruntergeladen.",
+      "ropaTitle": "Verzeichnis von Verarbeitungstätigkeiten (Art. 30)",
+      "ropaSubtitle": "Lebendiges Register aller Verarbeitungstätigkeiten, als Code geführt, damit es in Pull Requests überprüft wird."
+    },
+    "ropa": {
+      "lawfulBasis": "Rechtsgrundlage",
+      "dataSubjects": "Datensubjekte",
+      "dataCategories": "Datenkategorien",
+      "recipients": "Empfänger",
+      "retention": "Aufbewahrung",
+      "transfers": "Drittlandübermittlungen",
+      "security": "Sicherheitsmaßnahmen",
+      "noRecipients": "Keine"
+    }
+  }
+}

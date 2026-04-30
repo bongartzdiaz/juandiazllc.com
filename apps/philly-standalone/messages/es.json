@@ -1,0 +1,539 @@
+{
+  "nav": {
+    "dashboard": "Panel",
+    "projects": "Proyectos",
+    "contacts": "Contactos",
+    "impact": "Impacto",
+    "reports": "Informes",
+    "kanban": "Kanban",
+    "pages": "Páginas",
+    "settings": "Ajustes"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "subtitle": "Tu impacto de un vistazo",
+    "totalProjects": "Proyectos totales",
+    "activeProjects": "Proyectos activos",
+    "peopleHelped": "Personas ayudadas",
+    "co2Reduced": "CO2 reducido",
+    "moneyDonated": "Total donado",
+    "sdgCoverage": "Cobertura ODS",
+    "recentActivity": "Actividad reciente",
+    "impactOverview": "Resumen de impacto",
+    "editDashboard": "Editar panel",
+    "addWidget": "Añadir widget"
+  },
+  "projects": {
+    "title": "Proyectos",
+    "subtitle": "Gestiona tus iniciativas de RSC",
+    "newProject": "Nuevo Proyecto",
+    "status": {
+      "planned": "Planificado",
+      "active": "Activo",
+      "completed": "Completado",
+      "paused": "Pausado"
+    },
+    "fields": {
+      "title": "Título del proyecto",
+      "description": "Descripción",
+      "category": "Categoría",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de fin",
+      "budget": "Presupuesto",
+      "sdgGoals": "Objetivos ODS",
+      "status": "Estado"
+    },
+    "toasts": {
+      "deleted": "Proyecto eliminado",
+      "deleteFailed": "Eliminación fallida",
+      "titleCopied": "Título copiado",
+      "copyFailed": "Copia fallida"
+    },
+    "confirms": {
+      "delete": "¿Eliminar \"{title}\"? Esta acción no se puede deshacer."
+    }
+  },
+  "contacts": {
+    "title": "Contactos",
+    "subtitle": "Socios, donantes y partes interesadas",
+    "newContact": "Nuevo Contacto",
+    "types": {
+      "partner": "Socio",
+      "beneficiary": "Beneficiario",
+      "stakeholder": "Parte interesada",
+      "donor": "Donante"
+    },
+    "fields": {
+      "name": "Nombre",
+      "email": "Correo",
+      "phone": "Teléfono",
+      "company": "Empresa",
+      "type": "Tipo",
+      "notes": "Notas"
+    },
+    "toasts": {
+      "exported": "{count, plural, one {# contacto exportado} other {# contactos exportados}}",
+      "nothingToExport": "Nada que exportar",
+      "deleted": "{count, plural, one {# contacto eliminado} other {# contactos eliminados}}",
+      "deleteFailed": "Eliminación masiva fallida",
+      "updated": "{count, plural, one {# contacto actualizado} other {# contactos actualizados}}",
+      "updateFailed": "Actualización masiva fallida",
+      "reordered": "Contactos reordenados",
+      "reorderFailed": "Reordenación fallida",
+      "noEmail": "Sin correo registrado",
+      "emailCopied": "Correo copiado",
+      "noPhone": "Sin teléfono registrado",
+      "phoneCopied": "Teléfono copiado",
+      "copyFailed": "Copia fallida"
+    },
+    "confirms": {
+      "bulkDelete": "{count, plural, one {¿Eliminar # contacto?} other {¿Eliminar # contactos?}} Esta acción no se puede deshacer."
+    }
+  },
+  "impact": {
+    "title": "Impacto",
+    "subtitle": "Mide lo que importa",
+    "totalImpact": "Impacto total",
+    "byProject": "Por proyecto",
+    "sdgAlignment": "Alineación con ODS",
+    "trends": "Tendencias"
+  },
+  "kanban": {
+    "title": "Kanban",
+    "subtitle": "Gestión visual de proyectos",
+    "newBoard": "Nuevo tablero",
+    "addColumn": "Añadir columna",
+    "addCard": "Añadir tarjeta"
+  },
+  "deals": {
+    "toasts": {
+      "applied": "\"{name}\" aplicado",
+      "created": "Operación creada",
+      "moved": "Operación movida",
+      "moveFailed": "Movimiento fallido",
+      "marked": "Marcado como {status}",
+      "updateFailed": "Actualización fallida",
+      "deleted": "Operación eliminada",
+      "deleteFailed": "Eliminación fallida",
+      "reordered": "Operaciones reordenadas",
+      "reorderFailed": "Reordenación fallida",
+      "noContact": "Ningún contacto vinculado",
+      "contactCopied": "Contacto copiado",
+      "copyFailed": "Copia fallida"
+    },
+    "confirms": {
+      "delete": "¿Eliminar esta operación? Esta acción no se puede deshacer."
+    }
+  },
+  "properties": {
+    "toasts": {
+      "applied": "\"{name}\" aplicado",
+      "deleted": "Inmueble eliminado",
+      "deleteFailed": "Eliminación fallida",
+      "noAddress": "Sin dirección registrada",
+      "addressCopied": "Dirección copiada",
+      "copyFailed": "Copia fallida"
+    },
+    "confirms": {
+      "delete": "¿Eliminar \"{title}\"? Esta acción no se puede deshacer."
+    }
+  },
+  "automations": {
+    "title": "Automatizaciones",
+    "subtitle": "Reglas basadas en eventos para automatizar flujos de trabajo"
+  },
+  "grants": {
+    "title": "Subvenciones",
+    "subtitle": "Sigue solicitudes de subvención y financiación",
+    "newGrant": "Añadir subvención",
+    "editGrant": "Editar subvención",
+    "kpis": {
+      "total": "Subvenciones totales",
+      "funded": "Financiado",
+      "pending": "Pendiente",
+      "active": "Activa"
+    },
+    "filters": {
+      "all": "Todos los estados",
+      "prospect": "Prospecto",
+      "applied": "Solicitado",
+      "under_review": "En revisión",
+      "approved": "Aprobado",
+      "awarded": "Concedido",
+      "active": "Activa",
+      "reporting": "Reportando",
+      "closed": "Cerrado",
+      "completed": "Completada",
+      "rejected": "Rechazado"
+    },
+    "fields": {
+      "title": "Título de la subvención",
+      "amount": "Importe (USD)",
+      "funder": "Financiador",
+      "status": "Estado",
+      "appliedDate": "Fecha de solicitud",
+      "awardedDate": "Fecha de concesión",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de fin",
+      "description": "Descripción",
+      "requirements": "Requisitos"
+    },
+    "placeholders": {
+      "title": "Fondo de Vivienda Comunitaria",
+      "amount": "50000",
+      "funder": "Nombre de la fundación",
+      "description": "Propósito y alcance de la subvención…",
+      "requirements": "Plazos de informes, entregables…"
+    },
+    "toasts": {
+      "titleRequired": "Título obligatorio",
+      "funderRequired": "Financiador obligatorio",
+      "invalidAmount": "Importe no válido",
+      "saveFailed": "Guardado fallido",
+      "updated": "Subvención actualizada",
+      "added": "Subvención añadida",
+      "deleted": "Subvención eliminada",
+      "deleteFailed": "Eliminación fallida",
+      "networkError": "Error de red"
+    },
+    "confirms": {
+      "delete": "¿Eliminar esta subvención?"
+    }
+  },
+  "commissions": {
+    "title": "Comisiones",
+    "subtitle": "Seguimiento de comisiones y clasificación del equipo",
+    "toasts": {
+      "selectAgent": "Selecciona un agente",
+      "positiveGross": "Introduce un importe bruto positivo",
+      "splitRange": "El reparto debe estar entre 0 y 100",
+      "saveFailed": "Guardado fallido",
+      "added": "Comisión añadida",
+      "marked": "Marcado como {status}",
+      "updateFailed": "Actualización fallida",
+      "deleted": "Comisión eliminada",
+      "deleteFailed": "Eliminación fallida",
+      "networkError": "Error de red"
+    },
+    "confirms": {
+      "delete": "¿Eliminar este registro de comisión?"
+    }
+  },
+  "eSignatures": {
+    "title": "Firmas electrónicas",
+    "subtitle": "Sigue y solicita firmas en contratos",
+    "toasts": {
+      "selectTransaction": "Selecciona una transacción",
+      "documentNameRequired": "Nombre del documento obligatorio",
+      "signerEmailRequired": "Correo del firmante obligatorio",
+      "saveFailed": "Fallido",
+      "created": "Solicitud de firma creada",
+      "marked": "Marcado como {status}",
+      "updateFailed": "Actualización fallida",
+      "deleted": "Eliminado",
+      "deleteFailed": "Eliminación fallida",
+      "networkError": "Error de red"
+    },
+    "confirms": {
+      "delete": "¿Eliminar esta solicitud de firma?"
+    }
+  },
+  "referrals": {
+    "title": "Referencias",
+    "subtitle": "Sigue las comisiones de referencias y socios",
+    "toasts": {
+      "marked": "Marcado como {status}",
+      "updateFailed": "Actualización fallida",
+      "deleted": "Referencia eliminada",
+      "networkError": "Error de red"
+    },
+    "confirms": {
+      "delete": "¿Eliminar esta referencia?"
+    }
+  },
+  "showings": {
+    "title": "Visitas",
+    "subtitle": "Programa y sigue visitas a inmuebles",
+    "toasts": {
+      "selectProperty": "Selecciona un inmueble",
+      "pickDate": "Elige una fecha",
+      "saveFailed": "Guardado fallido",
+      "scheduled": "Visita programada",
+      "updated": "Visita actualizada",
+      "marked": "Marcado como {status}",
+      "updateFailed": "Actualización fallida",
+      "feedbackSaved": "Comentarios guardados",
+      "deleted": "Visita eliminada",
+      "deleteFailed": "Eliminación fallida",
+      "networkError": "Error de red"
+    },
+    "confirms": {
+      "delete": "¿Eliminar esta visita?"
+    }
+  },
+  "openHouses": {
+    "title": "Jornadas de puertas abiertas",
+    "subtitle": "Programa y gestiona jornadas de puertas abiertas",
+    "toasts": {
+      "selectProperty": "Selecciona un inmueble",
+      "pickDate": "Elige una fecha",
+      "endAfterStart": "La hora de fin debe ser posterior a la de inicio",
+      "saveFailed": "Guardado fallido",
+      "scheduled": "Jornada programada",
+      "updated": "Jornada actualizada",
+      "cancelled": "Jornada cancelada",
+      "deleteFailed": "Eliminación fallida",
+      "networkError": "Error de red"
+    },
+    "confirms": {
+      "cancel": "¿Cancelar esta jornada de puertas abiertas? Esta acción no se puede deshacer."
+    }
+  },
+  "volunteers": {
+    "title": "Voluntarios",
+    "subtitle": "Gestiona el equipo de voluntarios y horas",
+    "newVolunteer": "Añadir voluntario",
+    "editVolunteer": "Editar voluntario",
+    "kpis": {
+      "total": "Voluntarios totales",
+      "active": "Activos",
+      "totalHours": "Horas totales",
+      "avgHours": "Horas medias / Voluntario"
+    },
+    "filters": {
+      "all": "Todos los estados",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "onboarding": "Incorporación"
+    },
+    "fields": {
+      "name": "Nombre",
+      "email": "Correo",
+      "phone": "Teléfono",
+      "status": "Estado",
+      "skills": "Habilidades",
+      "notes": "Notas",
+      "activityLogs": "Registros de actividad"
+    },
+    "toasts": {
+      "nameRequired": "Nombre obligatorio",
+      "saveFailed": "Guardado fallido",
+      "updated": "Voluntario actualizado",
+      "added": "Voluntario añadido",
+      "removed": "Voluntario eliminado",
+      "deleteFailed": "Eliminación fallida",
+      "networkError": "Error de red"
+    },
+    "confirms": {
+      "remove": "¿Eliminar este voluntario?"
+    }
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Añadir",
+    "search": "Buscar...",
+    "filter": "Filtrar",
+    "noResults": "No se encontraron resultados",
+    "loading": "Cargando...",
+    "viewAll": "Ver todo",
+    "back": "Atrás",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "openFullPage": "Abrir página completa",
+    "applyFilter": "Aplicar filtro",
+    "clearAll": "Borrar todo"
+  },
+  "keyboard": {
+    "title": "Atajos de teclado",
+    "subtitle": "Pulsa ? en cualquier página",
+    "navigationHeading": "Navegación",
+    "actionsHeading": "Acciones",
+    "footnote": "Atajos de dos teclas (p. ej. g c) — púlsalos en secuencia en ~1 segundo. Los atajos se suprimen mientras escribes en un campo, así que no tienes que preocuparte por interferir con un campo de búsqueda.",
+    "nav": {
+      "home": "Inicio",
+      "contacts": "Contactos",
+      "deals": "Operaciones",
+      "properties": "Inmuebles",
+      "projects": "Proyectos",
+      "insights": "Información",
+      "notifications": "Notificaciones",
+      "settings": "Ajustes",
+      "audit": "Registro de auditoría"
+    },
+    "actions": {
+      "focusSearch": "Enfocar búsqueda en la página actual",
+      "showCheatSheet": "Mostrar esta hoja de referencia",
+      "closeModal": "Cerrar cualquier ventana abierta",
+      "openPalette": "Abrir paleta de comandos (búsqueda + IA)",
+      "openPaletteAi": "Abrir paleta de comandos en modo IA",
+      "nextRow": "Fila siguiente (lista de operaciones, inmuebles, transacciones)",
+      "prevRow": "Fila anterior",
+      "openRow": "Abrir fila enfocada"
+    }
+  },
+  "bulk": {
+    "selected": "{count} seleccionados",
+    "exportCsv": "Exportar CSV",
+    "changeType": "Cambiar tipo",
+    "delete": "Eliminar",
+    "clearSelection": "Borrar selección"
+  },
+  "views": {
+    "label": "Vistas",
+    "noneYet": "Aún no hay vistas guardadas — guarda tus filtros actuales como una",
+    "saveCurrent": "Guardar actual",
+    "namePlaceholder": "Nombra esta vista…",
+    "shareWithOrg": "Hacer esta vista disponible para todos en la organización",
+    "saved": "Vista \"{name}\" guardada",
+    "applied": "\"{name}\" aplicada",
+    "renamed": "Vista renombrada",
+    "deletePrompt": "¿Eliminar la vista \"{name}\"?",
+    "deleted": "Vista eliminada",
+    "deleteFailed": "Eliminación fallida",
+    "renameFailed": "Renombrado fallido",
+    "saveFailed": "Error al guardar la vista"
+  },
+  "columns": {
+    "title": "Columnas",
+    "showHide": "Mostrar / ocultar columnas",
+    "always": "Siempre",
+    "resetDefaults": "Restablecer predeterminado"
+  },
+  "filter": {
+    "title": "Filtro avanzado",
+    "subtitlePrefix": "Lista de {entity}",
+    "matchAll": "Todas",
+    "matchAny": "Cualquiera",
+    "matchOf": "de las siguientes:",
+    "matchPrefix": "Coincidir",
+    "addRule": "Añadir regla",
+    "removeRule": "Quitar regla",
+    "noValueNeeded": "(no se necesita valor)",
+    "valuePlaceholder": "valor",
+    "rangeFrom": "desde",
+    "rangeTo": "hasta",
+    "selectPlaceholder": "— elegir —",
+    "footnote": "Los filtros se aplican en el servidor. El correo y el teléfono usan solo coincidencia exacta (los valores están cifrados en reposo); usa Contiene en Nombre o Empresa para búsquedas parciales.",
+    "label": "Filtros",
+    "labelWithCount": "Filtros: {count}",
+    "ruleCount": "{count, plural, one {# regla} other {# reglas}}",
+    "operator": {
+      "contains": "contiene",
+      "eq": "igual a",
+      "neq": "distinto de",
+      "starts_with": "empieza con",
+      "ends_with": "termina con",
+      "is_empty": "está vacío",
+      "is_not_empty": "no está vacío",
+      "gt": ">",
+      "gte": "≥",
+      "lt": "<",
+      "lte": "≤",
+      "between": "entre",
+      "before": "antes de",
+      "after": "después de",
+      "on": "el",
+      "is": "es",
+      "isNot": "no es",
+      "in": "es uno de",
+      "not_in": "no es ninguno de",
+      "is_true": "es verdadero",
+      "is_false": "es falso"
+    }
+  },
+  "quickview": {
+    "loading": "Cargando…",
+    "notFound": "{entity} no encontrado",
+    "addedOn": "añadido el {date}",
+    "listedOn": "listado el {date}",
+    "openedOn": "abierto el {date}",
+    "linkedProject": "Proyecto vinculado",
+    "linkedCount": "Vinculados ({count})",
+    "more": "+{count} más",
+    "notes": "Notas",
+    "description": "Descripción",
+    "deal": {
+      "value": "Valor",
+      "probability": "Probabilidad",
+      "owner": "Propietario",
+      "contact": "Contacto",
+      "expectedClose": "Cierre previsto",
+      "actualClose": "Cierre real",
+      "unassigned": "Sin asignar"
+    },
+    "property": {
+      "price": "Precio",
+      "perMonth": "/mes",
+      "hoa": "+ €{amount} comunidad",
+      "bed": "Hab.",
+      "bath": "Baño",
+      "area": "m²",
+      "built": "Año",
+      "viewings": "Visitas",
+      "showings": "Muestras",
+      "offers": "Ofertas",
+      "openHouses": "Jornadas",
+      "valuation": "Tasación",
+      "forSale": "En venta",
+      "forRent": "En alquiler",
+      "bank": "BANCO",
+      "resale": "REVENTA"
+    },
+    "contact": {
+      "industry": "Industria",
+      "icpFit": "Ajuste ICP",
+      "aiBadge": "Generado por IA",
+      "aiHeading": "Inteligencia IA",
+      "via": "vía {source}",
+      "email": "Correo",
+      "phone": "Teléfono",
+      "company": "Empresa",
+      "type": "Tipo"
+    }
+  },
+  "gdpr": {
+    "title": "Privacidad y derechos sobre los datos",
+    "subtitle": "Exporta tus datos, programa la eliminación de cuenta o revisa cómo procesamos los datos personales.",
+    "self": {
+      "exportTitle": "Exportar datos de mi cuenta",
+      "exportBody": "Descarga una copia JSON de cada registro que tenemos sobre tu cuenta de operador. Generado bajo demanda según el artículo 15 del RGPD.",
+      "exportCta": "Descargar mis datos",
+      "deleteTitle": "Eliminar mi cuenta",
+      "deleteBody": "Programa la eliminación de tu cuenta y de todos los datos que tenemos sobre ella. Tienes 30 días para cancelar antes de que la eliminación sea definitiva.",
+      "deleteCta": "Programar eliminación",
+      "deleteConfirm": "Escribe ELIMINAR para confirmar",
+      "cancelCta": "Cancelar eliminación programada",
+      "scheduledFor": "Programado para {date}",
+      "lastAdminBlock": "Eres el último admin de esta organización. Promueve a otro usuario a admin antes de eliminar tu cuenta."
+    },
+    "admin": {
+      "title": "Derechos del titular de los datos",
+      "subtitle": "Procesa solicitudes de acceso y supresión en nombre de contactos y contrapartes.",
+      "exportTab": "Solicitud de acceso (exportar)",
+      "eraseTab": "Supresión (eliminar)",
+      "emailLabel": "Correo del titular de los datos",
+      "reasonLabel": "Motivo / referencia del ticket",
+      "reasonRequired": "(obligatorio para supresión)",
+      "submitExport": "Generar exportación",
+      "submitErase": "Eliminar datos",
+      "eraseConfirmPrompt": "¿Eliminar permanentemente todos los datos de {email}? Esta acción no se puede deshacer.",
+      "eraseSuccess": "Eliminadas {totalRows} filas en {tableCount} tablas.",
+      "exportSuccess": "Exportación descargada.",
+      "ropaTitle": "Registro de actividades de tratamiento (Art. 30)",
+      "ropaSubtitle": "Registro vivo de cada actividad de tratamiento, mantenido como código para que se revise en pull requests."
+    },
+    "ropa": {
+      "lawfulBasis": "Base jurídica",
+      "dataSubjects": "Titulares de datos",
+      "dataCategories": "Categorías de datos",
+      "recipients": "Destinatarios",
+      "retention": "Conservación",
+      "transfers": "Transferencias a terceros países",
+      "security": "Medidas de seguridad",
+      "noRecipients": "Ninguno"
+    }
+  }
+}
