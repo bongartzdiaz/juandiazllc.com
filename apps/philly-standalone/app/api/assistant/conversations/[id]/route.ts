@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -43,6 +44,10 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
 export async function DELETE(_req: NextRequest, ctx: Ctx) {
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`assistant.conversations.delete:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   const { id } = await ctx.params
 
   const prisma = getAuthPrisma()

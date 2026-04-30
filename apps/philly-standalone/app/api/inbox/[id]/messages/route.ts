@@ -7,6 +7,7 @@ import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated, publishEntityUpdated } from '@/lib/philly/realtime/publish'
+import { enforceRateLimit, PRESET_SEND } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -37,6 +38,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`inbox.messages.send:${scope.userId}`, PRESET_SEND)
+  if (limited) return limited
 
   const { id } = await params
   let body: Record<string, any>

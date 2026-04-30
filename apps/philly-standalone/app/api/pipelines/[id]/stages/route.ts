@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -14,6 +15,10 @@ type Ctx = { params: Promise<{ id: string }> }
 export async function POST(req: NextRequest, ctx: Ctx) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`pipelines.stage.create:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   const { id: pipelineId } = await ctx.params
   let body: { name?: string; color?: string; position?: number }
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
@@ -43,6 +48,10 @@ export async function POST(req: NextRequest, ctx: Ctx) {
 export async function PUT(req: NextRequest, ctx: Ctx) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`pipelines.stage.reorder:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   const { id: pipelineId } = await ctx.params
   let body: { stages?: { id: string; position: number }[] }
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }

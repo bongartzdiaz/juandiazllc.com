@@ -8,6 +8,7 @@ import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { validateBody } from '@/lib/philly/validation'
 import { createGrantSchema } from '@/lib/philly/validation/schemas'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -37,6 +38,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`grants.create:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   const parsed = await validateBody(req, createGrantSchema)
   if (!parsed.success) return parsed.response

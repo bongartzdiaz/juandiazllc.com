@@ -7,6 +7,7 @@ import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated, publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -34,6 +35,9 @@ export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
 
+  const limited = enforceRateLimit(`action-plans.create:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   let body: Record<string, any>
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
   if (!body.name?.trim()) return jsonError('name is required', 400)
@@ -60,6 +64,9 @@ const ALLOWED_STATUSES = ['active', 'paused', 'archived']
 export async function PATCH(req: NextRequest) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`action-plans.update:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   let body: Record<string, unknown>
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
@@ -93,6 +100,10 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`action-plans.delete:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   const url = new URL(req.url)
   const id = url.searchParams.get('id')
   if (!id) return jsonError('id is required', 400)

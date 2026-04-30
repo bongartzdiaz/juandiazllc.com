@@ -7,6 +7,7 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -36,6 +37,9 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
 
+  const limited = enforceRateLimit(`open-houses.update:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   const { id } = await ctx.params
   let body: Record<string, unknown>
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
@@ -64,6 +68,9 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
 export async function DELETE(_req: NextRequest, ctx: Ctx) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`open-houses.delete:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   const { id } = await ctx.params
   const prisma = getAuthPrisma()

@@ -6,6 +6,7 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireSection, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -37,6 +38,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const scope = await requireSection('documents', ['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`documents.create:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   let body: {
     name?: string; type?: string; mimeType?: string; sizeBytes?: number

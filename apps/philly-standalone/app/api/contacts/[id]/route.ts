@@ -11,6 +11,7 @@ import { logAudit, diffChanges } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { encryptPii, decryptPii } from '@/lib/philly/pii'
 import { hashEmail, hashPhone } from '@/lib/philly/blind-index'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -44,6 +45,9 @@ export async function GET(_req: NextRequest, ctx: RouteCtx) {
 export async function PATCH(req: NextRequest, ctx: RouteCtx) {
   const scope = await requireSection('contacts', ['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`contacts.update:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   const { id } = await ctx.params
 
@@ -101,6 +105,9 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 export async function DELETE(_req: NextRequest, ctx: RouteCtx) {
   const scope = await requireSection('contacts', ['admin'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`contacts.delete:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   const { id } = await ctx.params
   const prisma = getAuthPrisma()

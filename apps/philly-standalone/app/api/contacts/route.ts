@@ -21,6 +21,7 @@ import {
 import { compileFilter, FilterCompileError } from '@/lib/philly/filter/compile'
 import { CONTACT_FILTER_SCHEMA } from '@/lib/philly/filter/schemas'
 import type { FilterSpec } from '@/lib/philly/filter/types'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -122,6 +123,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const scope = await requireSection('contacts', ['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`contacts.create:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   const parsed = await validateBody(req, createContactSchema)
   if (!parsed.success) return parsed.response
