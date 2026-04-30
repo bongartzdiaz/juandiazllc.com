@@ -46,6 +46,7 @@ export interface PrismaForErasure {
     update: (args: { where: { id: string }; data: Record<string, unknown> }) => Promise<unknown>
     delete: (args: { where: { id: string } }) => Promise<unknown>
     findMany: (args: { where: Record<string, unknown> }) => Promise<Array<{ id: string; email: string }>>
+    deleteMany: (args: { where: Record<string, unknown> }) => Promise<{ count: number }>
   }
 }
 
@@ -182,10 +183,14 @@ export async function runScheduledErasures(
   const due = await prisma.user.findMany({
     where: { deletionScheduledAt: { lte: now } },
   })
-  const erasedUserIds: string[] = []
-  for (const u of due) {
-    await prisma.user.delete({ where: { id: u.id } })
-    erasedUserIds.push(u.id)
-  }
+  if (due.length === 0) return { erasedUserIds: [] }
+
+  const erasedUserIds = due.map(u => u.id)
+
+  // Single batch delete instead of N round-trips. Cascades on related
+  // tables fire per-row regardless, but the user-row delete itself
+  // collapses to one statement. Bundle AN audit finding.
+  await prisma.user.deleteMany({ where: { id: { in: erasedUserIds } } })
+
   return { erasedUserIds }
 }

@@ -62,6 +62,20 @@ function makePrisma(
         const cutoff = w.deletionScheduledAt.lte
         return users.filter((u) => u.deletionScheduledAt && u.deletionScheduledAt <= cutoff)
       },
+      deleteMany: async ({ where }) => {
+        const w = where as { id?: { in?: string[] } }
+        const ids = w.id?.in ?? []
+        let count = 0
+        for (const id of ids) {
+          const idx = users.findIndex((u) => u.id === id)
+          if (idx >= 0) {
+            users.splice(idx, 1)
+            deletedUserIds.push(id)
+            count++
+          }
+        }
+        return { count }
+      },
     },
     contact: {
       findMany: async () => [],
