@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Plus_Jakarta_Sans, Red_Hat_Mono } from 'next/font/google'
 import './globals.css'
 import { ClientLayout } from '@/components/philly/layout/ClientLayout'
+import { SentryBootstrap } from '@/components/philly/SentryBootstrap'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
 
@@ -49,6 +50,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ClientLayout>{children}</ClientLayout>
         </NextIntlClientProvider>
+        <SentryBootstrap />
       </body>
     </html>
   )

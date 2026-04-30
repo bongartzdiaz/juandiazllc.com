@@ -306,12 +306,50 @@ If all four arrive in `#ops-alerts`, you're observable.
 
 ---
 
-## 8. Future work
+## 8. Frontend Sentry — browser errors + Session Replay
 
-- Frontend Sentry (React error boundary + Session Replay). Today,
-  client-side errors only show up if they propagate to a server
-  fetch. Adding `@sentry/react` init in `app/layout.tsx` is a
-  ~30-minute task.
+`<SentryBootstrap />` is mounted in both root layouts. It calls
+`initBrowserSentry()` once per page load, which lazy-loads
+`@sentry/react` only if `NEXT_PUBLIC_SENTRY_DSN` is set.
+
+### 8.1 Setup (5 min, after server-side Sentry §1.1)
+
+1. In Vercel, set the public mirrors of the server vars:
+   ```
+   NEXT_PUBLIC_SENTRY_DSN              = <same DSN as server>
+   NEXT_PUBLIC_SENTRY_ENVIRONMENT      = production
+   NEXT_PUBLIC_SENTRY_RELEASE          = $VERCEL_GIT_COMMIT_SHA
+   NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE          = 0.1   (optional)
+   NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE = 0      (default — only record on error)
+   NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE = 1     (default — record 100% of error sessions)
+   ```
+2. In Sentry → Project Settings → Replay, enable "Capture Replays".
+3. (Optional) Lift `replaysSessionSampleRate` to `0.05` once you have
+   a feel for volume — captures 5% of normal sessions for general
+   UX research, not just errors.
+
+### 8.2 What's protected by default
+
+- All text content masked (`maskAllText`).
+- All form inputs masked (`maskAllInputs`).
+- All `<img>` / `<video>` blocked (`blockAllMedia`).
+- Network bodies redacted for any URL matching `/api/auth/*`,
+  `/api/.../token`, or `/login*`.
+- Email-shaped strings, sensitive keys (`password`, `secret`,
+  `token`, `api_key`, etc.), `Authorization` / `Cookie` /
+  `X-API-Key` headers, and `request.user.ip_address` are all
+  scrubbed in `beforeSend`.
+- Console breadcrumbs dropped — they leak too easily.
+
+### 8.3 Cost shape
+
+Replay-on-error means you only pay (in Sentry quota) when something
+actually broke. Sessions on a healthy page produce no replay
+events — Sentry buffers locally and discards if no error fires. The
+default `replaysSessionSampleRate=0` keeps it that way.
+
+## 9. Future work
+
 - Source map upload in CI. Today, prod stack traces are partially
   minified. Add `sentry-cli releases files <release> upload-sourcemaps`
   as a GitHub Actions step on the `main` push.
