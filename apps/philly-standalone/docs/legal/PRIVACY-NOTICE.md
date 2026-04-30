@@ -2,10 +2,10 @@
 
 _Template — adapt to the controller's identity and jurisdiction before publishing._
 
-**Last updated:** \<DATE>
-**Controller:** \<LEGAL ENTITY NAME>, \<ADDRESS>
-**Contact:** \<privacy@example.com>
-**Data Protection Officer (if appointed):** \<NAME / EMAIL>
+**Last updated:** [TO FILL: publication date in YYYY-MM-DD]
+**Controller:** [TO FILL: legal entity name], [TO FILL: registered address]
+**Contact:** [TO FILL: privacy@yourdomain.com]
+**Data Protection Officer (if appointed):** [TO FILL: name + email, or "not appointed — controller is the contact"]
 
 This notice explains how the Philly CRM ("the platform") processes
 personal data, in plain language, alongside the legal references
@@ -71,7 +71,7 @@ Under Articles 15–22 GDPR you may:
 - **CRM operators** can self-serve at:
   - Account data export: `GET /api/me/data-export`
   - Schedule account deletion: `POST /api/me/account-deletion` (30-day grace; cancel via `DELETE` on the same path)
-- **Contacts and counterparties** should write to \<privacy@example.com>.
+- **Contacts and counterparties** should write to [TO FILL: privacy@yourdomain.com].
   We respond within 30 days (Art. 12(3)). If the request is complex
   we may extend by a further 60 days and will tell you so within the
   first 30.

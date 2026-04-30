@@ -12,10 +12,10 @@ systems under EU AI Act Art. 27._
 | Field | Value |
 | ---- | ---- |
 | **Activity** | `ai_contact_enrichment` (see `lib/gdpr/ropa.ts`) |
-| **Owner** | _\<NAME, ROLE\>_ |
-| **DPO consulted** | _\<YES / NO + DATE\>_ |
-| **First version** | _\<DATE\>_ |
-| **Last reviewed** | _\<DATE\>_ |
+| **Owner** | [TO FILL: name + role of the person accountable for this DPIA] |
+| **DPO consulted** | [TO FILL: "yes, DD-MM-YYYY" or "no — controller acts as DPO"] |
+| **First version** | [TO FILL: YYYY-MM-DD this DPIA was first signed off] |
+| **Last reviewed** | [TO FILL: YYYY-MM-DD of most recent review] |
 | **Review cadence** | Annual + on any change to model, prompt, or downstream use |
 
 ---
@@ -138,6 +138,6 @@ in their own privacy notice — sample text is in the
 | | |
 | ---- | ---- |
 | **Outcome** | Residual risk acceptable subject to mitigations §3 |
-| **DPO sign-off** | _\<NAME / DATE\>_ |
-| **Controller sign-off** | _\<NAME / DATE\>_ |
+| **DPO sign-off** | [TO FILL: name + DD-MM-YYYY signature date, or "controller-acted"] |
+| **Controller sign-off** | [TO FILL: name + DD-MM-YYYY signature date] |
 | **Trigger for re-DPIA** | Change of `MODEL_ID`; change of recipient sub-processor; expansion of input fields beyond the current set; addition of an auto-action downstream of the score. |

@@ -8,10 +8,10 @@ The code is the source of truth; this file is regenerated when
 
 | Field | Value |
 | ---- | ---- |
-| **Controller** | _\<LEGAL ENTITY NAME\>_, _\<ADDRESS\>_ |
-| **Contact** | _\<privacy@example.com\>_ |
-| **Data Protection Officer** _(if appointed)_ | _\<NAME / EMAIL\>_ |
-| **Last updated** | _\<DATE\>_ |
+| **Controller** | [TO FILL: legal entity name], [TO FILL: registered address] |
+| **Contact** | [TO FILL: privacy@yourdomain.com] |
+| **Data Protection Officer** _(if appointed)_ | [TO FILL: name + email, or "not appointed"] |
+| **Last updated** | [TO FILL: YYYY-MM-DD] |
 | **Format** | Article 30 §1(a)–(g) per activity |
 
 The platform is **multi-tenant** — each customer organisation is its

@@ -54,4 +54,4 @@ consent is required. The platform does not fingerprint today.
 
 ## Contact
 
-Questions: \<privacy@example.com>.
+Questions: [TO FILL: privacy@yourdomain.com].

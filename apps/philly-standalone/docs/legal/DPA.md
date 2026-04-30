@@ -9,8 +9,8 @@ This DPA is governed by Article 28 of the General Data Protection
 Regulation (Regulation (EU) 2016/679, "GDPR") and forms part of
 the underlying services agreement ("Main Agreement") between:
 
-- **Controller:** \<LEGAL ENTITY>, \<ADDRESS> (the "Controller")
-- **Processor:** \<LEGAL ENTITY>, \<ADDRESS> (the "Processor")
+- **Controller:** [TO FILL: legal entity], [TO FILL: registered address] (the "Controller")
+- **Processor:** [TO FILL: legal entity], [TO FILL: registered address] (the "Processor")
 
 ## 1. Subject matter and duration
 
@@ -23,7 +23,7 @@ required for return or deletion of the data.
 
 | Item                   | Description                                                |
 | ---------------------- | ---------------------------------------------------------- |
-| Nature of processing   | \<E.g. hosting, analytics, AI inference, email delivery>   |
+| Nature of processing   | [TO FILL: e.g. hosting, analytics, AI inference, email delivery]   |
 | Purpose                | Performance of the Main Agreement                          |
 | Categories of subjects | CRM operators; contacts and counterparties of the Controller |
 | Categories of data     | As described in `lib/gdpr/pii-registry.ts`                 |
@@ -80,7 +80,7 @@ under Art. 33(3) GDPR. The Controller's breach-response runbook
 
 | Name | Service          | Country | Transfer mechanism |
 | ---- | ---------------- | ------- | ------------------ |
-| \<>  | \<E.g. hosting>  | \<>     | \<E.g. EEA / SCCs> |
+| [TO FILL: vendor name] | [TO FILL: e.g. hosting] | [TO FILL: country of processing] | [TO FILL: e.g. EEA / SCCs / adequacy decision] |
 
 ## 7. Liability and term
 

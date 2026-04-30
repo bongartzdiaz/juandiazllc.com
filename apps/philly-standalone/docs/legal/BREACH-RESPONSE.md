@@ -137,11 +137,11 @@ the canonical record. Retain for at least 6 years.
 
 | Role                  | Primary           | Backup            |
 | --------------------- | ----------------- | ----------------- |
-| Incident Commander    | \<NAME / EMAIL>   | \<NAME / EMAIL>   |
-| Privacy on-call (DPO) | \<NAME / EMAIL>   | \<NAME / EMAIL>   |
+| Incident Commander    | [TO FILL: name + email] | [TO FILL: name + email] |
+| Privacy on-call (DPO) | [TO FILL: name + email] | [TO FILL: name + email] |
 | Engineering on-call   | rotating          | rotating          |
-| Communications lead   | \<NAME / EMAIL>   | \<NAME / EMAIL>   |
-| Outside counsel       | \<FIRM / EMAIL>   | —                 |
+| Communications lead   | [TO FILL: name + email] | [TO FILL: name + email] |
+| Outside counsel       | [TO FILL: firm + email] | —                 |
 
 ## Appendix B — Notification template (supervisory authority)
 
@@ -152,4 +152,4 @@ the canonical record. Retain for at least 6 years.
 > 3. Categories and approximate number of records concerned: [N]
 > 4. Likely consequences: [describe]
 > 5. Measures taken or proposed: [describe]
-> 6. Contact point for further information: \<DPO email>
+> 6. Contact point for further information: [TO FILL: DPO email]

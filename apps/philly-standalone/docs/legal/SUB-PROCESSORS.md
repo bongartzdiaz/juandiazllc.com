@@ -9,8 +9,8 @@ in advance, with at least 30 days for objection, per the
 
 | Field | Value |
 | ---- | ---- |
-| **Last updated** | _\<DATE\>_ |
-| **Notice channel** | _\<emails subscribed via the admin → Account → Sub-processor notifications page\>_ |
+| **Last updated** | [TO FILL: YYYY-MM-DD] |
+| **Notice channel** | [TO FILL: e.g. "emails subscribed via the admin → Account → Sub-processor notifications page", or a Slack channel, or a status page URL] |
 | **Objection window** | 30 days from notice |
 
 ---
