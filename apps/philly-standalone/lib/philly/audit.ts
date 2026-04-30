@@ -69,6 +69,7 @@ export type AuditEntity =
   | 'membership'
   | 'auditLog'
   | 'activity'
+  | 'housekeepingTask'
 
 interface LogAuditParams {
   scope: AuthScope

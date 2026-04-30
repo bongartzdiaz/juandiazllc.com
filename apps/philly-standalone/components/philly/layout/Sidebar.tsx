@@ -106,6 +106,8 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
     : industry === 'hospitality'
       ? [
           { icon: BedDouble, label: t('rooms'), href: '/rooms' },
+          { icon: CalendarDays, label: t('reservations'), href: '/reservations' },
+          { icon: Sparkles, label: t('housekeeping'), href: '/housekeeping' },
         ]
       : [
           { icon: Award, label: t('grants'), href: '/grants' },

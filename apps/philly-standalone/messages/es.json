@@ -7,7 +7,10 @@
     "reports": "Informes",
     "kanban": "Kanban",
     "pages": "Páginas",
-    "settings": "Ajustes"
+    "settings": "Ajustes",
+    "rooms": "Habitaciones",
+    "reservations": "Reservas",
+    "housekeeping": "Limpieza"
   },
   "dashboard": {
     "title": "Panel",
@@ -249,6 +252,106 @@
     },
     "confirms": {
       "delete": "¿Eliminar esta referencia?"
+    }
+  },
+  "housekeeping": {
+    "title": "Limpieza",
+    "subtitle": "Limpieza, inspección, mantenimiento, cambio de huésped",
+    "newTask": "Añadir tarea",
+    "dropHere": "Arrastra tareas aquí",
+    "kpis": {
+      "total": "Total",
+      "pending": "Pendientes",
+      "urgent": "Urgentes",
+      "completed": "Completadas"
+    },
+    "statuses": {
+      "pending": "Pendiente",
+      "in_progress": "En progreso",
+      "completed": "Completada"
+    },
+    "types": {
+      "cleaning": "Limpieza",
+      "inspection": "Inspección",
+      "maintenance": "Mantenimiento",
+      "turnover": "Cambio de huésped"
+    },
+    "priorities": {
+      "low": "Baja",
+      "medium": "Media",
+      "high": "Alta",
+      "urgent": "Urgente"
+    },
+    "filters": {
+      "allRooms": "Selecciona una habitación…"
+    },
+    "fields": {
+      "room": "Habitación",
+      "type": "Tipo",
+      "priority": "Prioridad",
+      "notes": "Notas"
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "save": "Guardar tarea"
+    },
+    "toasts": {
+      "selectRoom": "Selecciona una habitación",
+      "saveFailed": "Guardado fallido",
+      "added": "Tarea añadida",
+      "moved": "Marcado como {status}",
+      "updateFailed": "Actualización fallida",
+      "networkError": "Error de red"
+    }
+  },
+  "reservations": {
+    "title": "Reservas",
+    "subtitle": "Reservas, check-ins e ingresos",
+    "newReservation": "Añadir reserva",
+    "noResults": "Aún no hay reservas.",
+    "kpis": {
+      "total": "Total",
+      "upcoming": "Próximas",
+      "checkedIn": "Registradas",
+      "revenue": "Ingresos"
+    },
+    "filters": {
+      "all": "Todos los estados",
+      "allRooms": "Selecciona una habitación…",
+      "inquiry": "Consulta",
+      "confirmed": "Confirmada",
+      "checked_in": "Registrado",
+      "checked_out": "Salida",
+      "cancelled": "Cancelada"
+    },
+    "fields": {
+      "room": "Habitación",
+      "guest": "Nombre del huésped",
+      "email": "Correo",
+      "phone": "Teléfono",
+      "checkIn": "Entrada",
+      "checkOut": "Salida",
+      "total": "Total (USD)",
+      "notes": "Notas"
+    },
+    "actions": {
+      "checkIn": "Marcar registrado",
+      "checkOut": "Marcar salida",
+      "cancel": "Cancelar reserva",
+      "cancelForm": "Cancelar",
+      "save": "Guardar reserva"
+    },
+    "toasts": {
+      "selectRoom": "Selecciona una habitación",
+      "guestNameRequired": "Nombre del huésped obligatorio",
+      "datesRequired": "Entrada y salida son obligatorias",
+      "checkoutAfterCheckin": "La salida debe ser posterior a la entrada",
+      "saveFailed": "Guardado fallido",
+      "created": "Reserva creada",
+      "updated": "Reserva actualizada",
+      "marked": "Marcado como {status}",
+      "updateFailed": "Actualización fallida",
+      "networkError": "Error de red"
     }
   },
   "showings": {

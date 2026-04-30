@@ -7,7 +7,10 @@
     "reports": "Rapporten",
     "kanban": "Kanban",
     "pages": "Pagina's",
-    "settings": "Instellingen"
+    "settings": "Instellingen",
+    "rooms": "Kamers",
+    "reservations": "Reserveringen",
+    "housekeeping": "Schoonmaak"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -249,6 +252,106 @@
     },
     "confirms": {
       "delete": "Deze verwijzing verwijderen?"
+    }
+  },
+  "housekeeping": {
+    "title": "Schoonmaak",
+    "subtitle": "Schoonmaak, inspectie, onderhoud, kamerwissel",
+    "newTask": "Taak toevoegen",
+    "dropHere": "Sleep taken hierheen",
+    "kpis": {
+      "total": "Totaal",
+      "pending": "Open",
+      "urgent": "Urgent",
+      "completed": "Voltooid"
+    },
+    "statuses": {
+      "pending": "Open",
+      "in_progress": "In uitvoering",
+      "completed": "Voltooid"
+    },
+    "types": {
+      "cleaning": "Schoonmaak",
+      "inspection": "Inspectie",
+      "maintenance": "Onderhoud",
+      "turnover": "Kamerwissel"
+    },
+    "priorities": {
+      "low": "Laag",
+      "medium": "Gemiddeld",
+      "high": "Hoog",
+      "urgent": "Urgent"
+    },
+    "filters": {
+      "allRooms": "Kies een kamer…"
+    },
+    "fields": {
+      "room": "Kamer",
+      "type": "Type",
+      "priority": "Prioriteit",
+      "notes": "Notities"
+    },
+    "actions": {
+      "cancel": "Annuleren",
+      "save": "Taak opslaan"
+    },
+    "toasts": {
+      "selectRoom": "Kies een kamer",
+      "saveFailed": "Opslaan mislukt",
+      "added": "Taak toegevoegd",
+      "moved": "Gemarkeerd als {status}",
+      "updateFailed": "Bijwerken mislukt",
+      "networkError": "Netwerkfout"
+    }
+  },
+  "reservations": {
+    "title": "Reserveringen",
+    "subtitle": "Boekingen, check-ins en omzet",
+    "newReservation": "Reservering toevoegen",
+    "noResults": "Nog geen reserveringen.",
+    "kpis": {
+      "total": "Totaal",
+      "upcoming": "Aankomend",
+      "checkedIn": "Ingecheckt",
+      "revenue": "Omzet"
+    },
+    "filters": {
+      "all": "Alle statussen",
+      "allRooms": "Kies een kamer…",
+      "inquiry": "Aanvraag",
+      "confirmed": "Bevestigd",
+      "checked_in": "Ingecheckt",
+      "checked_out": "Uitgecheckt",
+      "cancelled": "Geannuleerd"
+    },
+    "fields": {
+      "room": "Kamer",
+      "guest": "Gastnaam",
+      "email": "E-mail",
+      "phone": "Telefoon",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "total": "Totaal (USD)",
+      "notes": "Notities"
+    },
+    "actions": {
+      "checkIn": "Markeer ingecheckt",
+      "checkOut": "Markeer uitgecheckt",
+      "cancel": "Reservering annuleren",
+      "cancelForm": "Annuleren",
+      "save": "Reservering opslaan"
+    },
+    "toasts": {
+      "selectRoom": "Kies een kamer",
+      "guestNameRequired": "Gastnaam vereist",
+      "datesRequired": "Check-in en check-out zijn vereist",
+      "checkoutAfterCheckin": "Check-out moet na check-in zijn",
+      "saveFailed": "Opslaan mislukt",
+      "created": "Reservering aangemaakt",
+      "updated": "Reservering bijgewerkt",
+      "marked": "Gemarkeerd als {status}",
+      "updateFailed": "Bijwerken mislukt",
+      "networkError": "Netwerkfout"
     }
   },
   "showings": {

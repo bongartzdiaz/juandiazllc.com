@@ -7,7 +7,10 @@
     "reports": "Reports",
     "kanban": "Kanban",
     "pages": "Pages",
-    "settings": "Settings"
+    "settings": "Settings",
+    "rooms": "Rooms",
+    "reservations": "Reservations",
+    "housekeeping": "Housekeeping"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -249,6 +252,106 @@
     },
     "confirms": {
       "delete": "Delete this referral?"
+    }
+  },
+  "housekeeping": {
+    "title": "Housekeeping",
+    "subtitle": "Cleaning, inspection, maintenance, turnover",
+    "newTask": "Add Task",
+    "dropHere": "Drop tasks here",
+    "kpis": {
+      "total": "Total",
+      "pending": "Pending",
+      "urgent": "Urgent",
+      "completed": "Completed"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "in_progress": "In progress",
+      "completed": "Completed"
+    },
+    "types": {
+      "cleaning": "Cleaning",
+      "inspection": "Inspection",
+      "maintenance": "Maintenance",
+      "turnover": "Turnover"
+    },
+    "priorities": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "filters": {
+      "allRooms": "Select a room…"
+    },
+    "fields": {
+      "room": "Room",
+      "type": "Type",
+      "priority": "Priority",
+      "notes": "Notes"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save task"
+    },
+    "toasts": {
+      "selectRoom": "Select a room",
+      "saveFailed": "Save failed",
+      "added": "Task added",
+      "moved": "Marked {status}",
+      "updateFailed": "Update failed",
+      "networkError": "Network error"
+    }
+  },
+  "reservations": {
+    "title": "Reservations",
+    "subtitle": "Bookings, check-ins, and revenue",
+    "newReservation": "Add Reservation",
+    "noResults": "No reservations yet.",
+    "kpis": {
+      "total": "Total",
+      "upcoming": "Upcoming",
+      "checkedIn": "Checked In",
+      "revenue": "Revenue"
+    },
+    "filters": {
+      "all": "All Statuses",
+      "allRooms": "Select a room…",
+      "inquiry": "Inquiry",
+      "confirmed": "Confirmed",
+      "checked_in": "Checked in",
+      "checked_out": "Checked out",
+      "cancelled": "Cancelled"
+    },
+    "fields": {
+      "room": "Room",
+      "guest": "Guest name",
+      "email": "Email",
+      "phone": "Phone",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "total": "Total (USD)",
+      "notes": "Notes"
+    },
+    "actions": {
+      "checkIn": "Mark checked in",
+      "checkOut": "Mark checked out",
+      "cancel": "Cancel reservation",
+      "cancelForm": "Cancel",
+      "save": "Save reservation"
+    },
+    "toasts": {
+      "selectRoom": "Select a room",
+      "guestNameRequired": "Guest name required",
+      "datesRequired": "Check-in and check-out are required",
+      "checkoutAfterCheckin": "Check-out must be after check-in",
+      "saveFailed": "Save failed",
+      "created": "Reservation created",
+      "updated": "Reservation updated",
+      "marked": "Marked {status}",
+      "updateFailed": "Update failed",
+      "networkError": "Network error"
     }
   },
   "showings": {

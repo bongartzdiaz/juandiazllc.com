@@ -7,7 +7,10 @@
     "reports": "Berichte",
     "kanban": "Kanban",
     "pages": "Seiten",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "rooms": "Zimmer",
+    "reservations": "Reservierungen",
+    "housekeeping": "Reinigung"
   },
   "dashboard": {
     "title": "Übersicht",
@@ -249,6 +252,106 @@
     },
     "confirms": {
       "delete": "Diese Empfehlung löschen?"
+    }
+  },
+  "housekeeping": {
+    "title": "Reinigung",
+    "subtitle": "Reinigung, Inspektion, Wartung, Zimmerwechsel",
+    "newTask": "Aufgabe hinzufügen",
+    "dropHere": "Aufgaben hierher ziehen",
+    "kpis": {
+      "total": "Gesamt",
+      "pending": "Offen",
+      "urgent": "Dringend",
+      "completed": "Abgeschlossen"
+    },
+    "statuses": {
+      "pending": "Offen",
+      "in_progress": "In Bearbeitung",
+      "completed": "Abgeschlossen"
+    },
+    "types": {
+      "cleaning": "Reinigung",
+      "inspection": "Inspektion",
+      "maintenance": "Wartung",
+      "turnover": "Zimmerwechsel"
+    },
+    "priorities": {
+      "low": "Niedrig",
+      "medium": "Mittel",
+      "high": "Hoch",
+      "urgent": "Dringend"
+    },
+    "filters": {
+      "allRooms": "Zimmer auswählen…"
+    },
+    "fields": {
+      "room": "Zimmer",
+      "type": "Typ",
+      "priority": "Priorität",
+      "notes": "Notizen"
+    },
+    "actions": {
+      "cancel": "Abbrechen",
+      "save": "Aufgabe speichern"
+    },
+    "toasts": {
+      "selectRoom": "Zimmer auswählen",
+      "saveFailed": "Speichern fehlgeschlagen",
+      "added": "Aufgabe hinzugefügt",
+      "moved": "Als {status} markiert",
+      "updateFailed": "Aktualisierung fehlgeschlagen",
+      "networkError": "Netzwerkfehler"
+    }
+  },
+  "reservations": {
+    "title": "Reservierungen",
+    "subtitle": "Buchungen, Check-ins und Umsatz",
+    "newReservation": "Reservierung hinzufügen",
+    "noResults": "Noch keine Reservierungen.",
+    "kpis": {
+      "total": "Gesamt",
+      "upcoming": "Anstehend",
+      "checkedIn": "Eingecheckt",
+      "revenue": "Umsatz"
+    },
+    "filters": {
+      "all": "Alle Status",
+      "allRooms": "Zimmer auswählen…",
+      "inquiry": "Anfrage",
+      "confirmed": "Bestätigt",
+      "checked_in": "Eingecheckt",
+      "checked_out": "Ausgecheckt",
+      "cancelled": "Storniert"
+    },
+    "fields": {
+      "room": "Zimmer",
+      "guest": "Gastname",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "total": "Gesamt (USD)",
+      "notes": "Notizen"
+    },
+    "actions": {
+      "checkIn": "Als eingecheckt markieren",
+      "checkOut": "Als ausgecheckt markieren",
+      "cancel": "Reservierung stornieren",
+      "cancelForm": "Abbrechen",
+      "save": "Reservierung speichern"
+    },
+    "toasts": {
+      "selectRoom": "Zimmer auswählen",
+      "guestNameRequired": "Gastname erforderlich",
+      "datesRequired": "Check-in und Check-out sind erforderlich",
+      "checkoutAfterCheckin": "Check-out muss nach dem Check-in liegen",
+      "saveFailed": "Speichern fehlgeschlagen",
+      "created": "Reservierung erstellt",
+      "updated": "Reservierung aktualisiert",
+      "marked": "Als {status} markiert",
+      "updateFailed": "Aktualisierung fehlgeschlagen",
+      "networkError": "Netzwerkfehler"
     }
   },
   "showings": {
