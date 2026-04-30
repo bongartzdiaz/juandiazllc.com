@@ -5,6 +5,7 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { getConnector } from '@/lib/philly/integrations/registry'
 import { decryptIntegration } from '@/lib/philly/integrations/secrets'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -12,6 +13,10 @@ export const runtime = 'nodejs'
 export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`integrations.test:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   const { id } = await params
 
   const prisma = getAuthPrisma()

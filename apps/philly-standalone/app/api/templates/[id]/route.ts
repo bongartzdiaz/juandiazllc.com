@@ -8,6 +8,7 @@ import { extractVariables } from '@/lib/philly/templates/renderer'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { validateBody } from '@/lib/philly/validation'
 import { updateTemplateSchema } from '@/lib/philly/validation/schemas'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -28,6 +29,10 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`templates.update:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   const { id } = await params
 
   const parsed = await validateBody(req, updateTemplateSchema)
@@ -59,6 +64,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`templates.delete:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   const { id } = await params
 
   const prisma = getAuthPrisma()

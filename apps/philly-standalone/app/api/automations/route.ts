@@ -10,6 +10,7 @@ import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated, publishEntityUpdated } from '@/lib/philly/realtime/publish'
 import { validateBody } from '@/lib/philly/validation'
 import { createAutomationRuleSchema, updateAutomationRuleSchema } from '@/lib/philly/validation/schemas'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 function toJsonString(v: unknown): string {
   if (v === undefined || v === null) return '{}'
@@ -45,6 +46,9 @@ export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) return scope
 
+  const limited = enforceRateLimit(`automations.create:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   const parsed = await validateBody(req, createAutomationRuleSchema)
   if (!parsed.success) return parsed.response
   const body = parsed.data
@@ -70,6 +74,9 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`automations.update:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   const parsed = await validateBody(req, updateAutomationRuleSchema)
   if (!parsed.success) return parsed.response

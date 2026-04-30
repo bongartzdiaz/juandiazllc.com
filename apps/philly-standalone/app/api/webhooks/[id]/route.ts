@@ -7,6 +7,7 @@ import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { encryptSecret } from '@/lib/philly/crypto'
 import { maskWebhookSecret } from '@/lib/philly/webhooks/secrets'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
@@ -32,6 +33,10 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`webhooks.update:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   const { id } = await params
 
   let body: Record<string, unknown>
@@ -70,6 +75,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`webhooks.delete:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   const { id } = await params
 
   const prisma = getAuthPrisma()

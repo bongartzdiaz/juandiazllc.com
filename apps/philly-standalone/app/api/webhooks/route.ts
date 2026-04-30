@@ -8,6 +8,7 @@ import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { encryptSecret } from '@/lib/philly/crypto'
 import { maskWebhookSecret } from '@/lib/philly/webhooks/secrets'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
@@ -39,6 +40,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`webhooks.create:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   let body: { url?: string; events?: string[]; enabled?: boolean }
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }

@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
 import { renderTemplate } from '@/lib/philly/templates/renderer'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -13,6 +14,9 @@ export const runtime = 'nodejs'
 export async function POST(req: NextRequest) {
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`templates.preview:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   let body: Record<string, unknown>
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }

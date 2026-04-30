@@ -9,6 +9,7 @@ import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { validateBody } from '@/lib/philly/validation'
 import { createTemplateSchema } from '@/lib/philly/validation/schemas'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -37,6 +38,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`templates.create:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   const parsed = await validateBody(req, createTemplateSchema)
   if (!parsed.success) return parsed.response

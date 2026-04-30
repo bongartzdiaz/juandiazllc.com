@@ -19,6 +19,7 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit, diffChanges } from '@/lib/philly/audit'
 import { checkIpAllowlist } from '@/lib/philly/ip-allowlist'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
@@ -45,6 +46,9 @@ export async function GET() {
 export async function PATCH(req: NextRequest) {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`admin.security.update:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   const json = await req.json().catch(() => null)
   const parsed = updateSchema.safeParse(json)

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
+import { enforceRateLimit, PRESET_SEND } from '@/lib/philly/rate-limit'
 import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
@@ -18,6 +19,10 @@ function sign(body: string, secret: string): string {
 export async function POST(_req: NextRequest, ctx: Ctx) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`webhooks.retry:${scope.userId}`, PRESET_SEND)
+  if (limited) return limited
+
   const { id: webhookId, deliveryId } = await ctx.params
 
   const prisma = getAuthPrisma()

@@ -7,6 +7,7 @@ import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { generateApiKey } from '@/lib/philly/api-keys'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -34,6 +35,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`api-keys.create:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   let body: { name?: string; permissions?: string; expiresInDays?: number }
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }

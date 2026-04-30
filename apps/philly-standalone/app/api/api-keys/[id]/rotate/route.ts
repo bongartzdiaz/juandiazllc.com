@@ -5,6 +5,7 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { generateApiKey } from '@/lib/philly/api-keys'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -14,6 +15,10 @@ type Ctx = { params: Promise<{ id: string }> }
 export async function POST(_req: NextRequest, ctx: Ctx) {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`api-keys.rotate:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   const { id } = await ctx.params
 
   const prisma = getAuthPrisma()
