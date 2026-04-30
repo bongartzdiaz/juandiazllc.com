@@ -11,6 +11,7 @@ import {
   PROPERTY_TYPES,
   PROPERTY_SUBTYPES,
 } from '@/lib/philly/constants/cyprus-property'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -77,6 +78,9 @@ export async function GET() {
 export async function PUT(req: NextRequest) {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`properties.taxonomy.update:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   let body: any
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }

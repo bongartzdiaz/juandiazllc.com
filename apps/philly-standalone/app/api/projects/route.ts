@@ -9,6 +9,7 @@ import { createProjectSchema } from '@/lib/philly/validation/schemas'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -54,6 +55,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const scope = await requireSection('projects', ['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`projects.create:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   const parsed = await validateBody(req, createProjectSchema)
   if (!parsed.success) return parsed.response

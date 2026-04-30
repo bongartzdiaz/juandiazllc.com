@@ -8,6 +8,7 @@ import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { validateBody } from '@/lib/philly/validation'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityUpdated } from '@/lib/philly/realtime/publish'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -46,6 +47,9 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
 export async function POST(req: NextRequest, ctx: Ctx) {
   const scope = await requireRole(['admin', 'manager'])
   if (scope instanceof NextResponse) return scope
+
+  const limited = enforceRateLimit(`projects.metrics.create:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
 
   const { id } = await ctx.params
 
