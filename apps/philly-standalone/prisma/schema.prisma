@@ -62,6 +62,7 @@ model Organization {
   gdprConsentRecords GdprConsentRecord[]
   assistantConversations AssistantConversation[]
   assistantMemories      AssistantMemory[]
+  featureFlags       FeatureFlag[]
 
   // Enterprise — per-org access controls. NULL on both = no
   // restrictions (default). Both can be set via the admin Security
@@ -1874,4 +1875,36 @@ model Membership {
   @@unique([userId, organizationId])
   @@index([userId])
   @@index([organizationId, role])
+}
+
+// FeatureFlag — per-org kill-switch for runtime feature toggling
+// without redeploy. organizationId NULL = global default that applies
+// to every org until they override locally. Resolution order:
+//   org-specific row → global default → enabledByDefault (code constant)
+//
+// Use cases:
+//   - Kill AI enrichment if it misbehaves (no redeploy needed)
+//   - Disable webhooks during a migration window
+//   - Roll out a new feature to one customer at a time
+//   - Emergency-disable a route under attack
+//
+// Reads are cached for 60s (lib/philly/features.ts) so a hot path
+// doesn't pay a DB round-trip on every call.
+model FeatureFlag {
+  id             String   @id @default(cuid())
+  /// NULL = global default; otherwise scoped to a specific org.
+  organizationId String?
+  /// Stable string key from FEATURES const (lib/philly/features.ts).
+  key            String
+  enabled        Boolean  @default(true)
+  /// Free-text description shown in the admin UI (e.g. "Disable
+  /// to stop the AI scoring an ICP-fit per contact").
+  description    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, key])
+  @@index([key])
 }

@@ -10,6 +10,7 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityUpdated } from '@/lib/philly/realtime/publish'
 import { SLO, withSpan } from '@/lib/philly/observability'
+import { isFeatureEnabled, FEATURES } from '@/lib/philly/features'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -31,8 +32,15 @@ export async function POST(_req: NextRequest, ctx: RouteCtx) {
 
   const { id } = await ctx.params
 
-  // Quick ownership check so a 404 comes before the model call.
   const prisma = getAuthPrisma()
+
+  // Kill-switch — admins can disable AI enrichment org-wide via
+  // /api/admin/features without redeploying.
+  if (!(await isFeatureEnabled(prisma, scope.organizationId, FEATURES.AI_CONTACT_ENRICHMENT.key))) {
+    return jsonError('AI contact enrichment is disabled for this organization', 403)
+  }
+
+  // Quick ownership check so a 404 comes before the model call.
   const exists = await prisma.contact.findFirst({
     where: { id, organizationId: scope.organizationId },
     select: { id: true },
