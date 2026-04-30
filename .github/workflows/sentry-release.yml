@@ -1,0 +1,93 @@
+name: Sentry release + source maps
+
+# When a commit lands on main, create a Sentry release tagged with the
+# commit SHA, upload the just-built source maps, and finalise the
+# release. Without this, prod stack traces show minified gibberish.
+#
+# Operator setup (one-time):
+#   - SENTRY_AUTH_TOKEN  → GitHub repo secret. Sentry → User Settings →
+#     Auth Tokens; needs project:releases scope.
+#   - SENTRY_ORG         → GitHub repo variable (your Sentry org slug).
+#   - SENTRY_PROJECT     → GitHub repo variable (your Sentry project slug).
+#
+# When any of these are unset the workflow short-circuits, so it
+# stays dormant until the operator wires it.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: sentry-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: ${{ vars.SENTRY_ORG != '' && vars.SENTRY_PROJECT != '' }}
+
+    env:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+      # Sentry release tag = the commit SHA. Mirrors what the runtime
+      # uses for SENTRY_RELEASE / NEXT_PUBLIC_SENTRY_RELEASE so events
+      # land in the right release group.
+      SENTRY_RELEASE: ${{ github.sha }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build (root marketing site)
+        run: npm run build
+        env:
+          # Force source maps for upload. Next.js by default omits
+          # them from production for footprint reasons.
+          NEXT_PRIVATE_PROD_SOURCEMAPS: "true"
+
+      - name: Build (philly-standalone)
+        run: |
+          cd apps/philly-standalone
+          npm ci
+          npm run build
+        env:
+          NEXT_PRIVATE_PROD_SOURCEMAPS: "true"
+
+      - name: Install Sentry CLI
+        run: npm install --no-save @sentry/cli
+
+      - name: Create release
+        run: npx sentry-cli releases new "$SENTRY_RELEASE"
+
+      - name: Upload source maps — root
+        run: |
+          npx sentry-cli sourcemaps upload \
+            --release "$SENTRY_RELEASE" \
+            --strip-prefix "$(pwd)" \
+            --url-prefix "~/_next" \
+            .next
+
+      - name: Upload source maps — standalone
+        run: |
+          cd apps/philly-standalone
+          npx sentry-cli sourcemaps upload \
+            --release "$SENTRY_RELEASE" \
+            --strip-prefix "$(pwd)" \
+            --url-prefix "~/_next" \
+            .next
+
+      - name: Associate commits
+        run: npx sentry-cli releases set-commits "$SENTRY_RELEASE" --auto
+
+      - name: Finalise release
+        run: npx sentry-cli releases finalize "$SENTRY_RELEASE"

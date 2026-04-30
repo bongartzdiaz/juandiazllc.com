@@ -348,16 +348,53 @@ actually broke. Sessions on a healthy page produce no replay
 events — Sentry buffers locally and discards if no error fires. The
 default `replaysSessionSampleRate=0` keeps it that way.
 
-## 9. Future work
+## 9. Source-map upload — `.github/workflows/sentry-release.yml`
 
-- Source map upload in CI. Today, prod stack traces are partially
-  minified. Add `sentry-cli releases files <release> upload-sourcemaps`
-  as a GitHub Actions step on the `main` push.
+When a commit lands on `main`, GitHub Actions creates a Sentry
+release tagged with the commit SHA, uploads the just-built source
+maps, and finalises the release. Without this, prod stack traces
+show minified gibberish.
+
+### 9.1 Setup (5 min)
+
+1. Sentry → User Settings → Auth Tokens → New token. Scope:
+   `project:releases`. Copy the value.
+2. GitHub → repo settings → Secrets and variables → Actions:
+   - Secret `SENTRY_AUTH_TOKEN` ← the token from step 1.
+   - Variable `SENTRY_ORG` ← your Sentry org slug.
+   - Variable `SENTRY_PROJECT` ← your Sentry project slug.
+3. Done. The next push to `main` creates a release. The workflow
+   short-circuits if the variables are unset, so it stays dormant
+   on forks / pre-wiring.
+
+The workflow forces production source maps via
+`NEXT_PRIVATE_PROD_SOURCEMAPS=true`. Vercel's deploy doesn't ship
+source maps to the public bundle by default — they go to Sentry
+only.
+
+## 10. Synthetic probe — `.github/workflows/synthetic-prod.yml`
+
+Hits production `/api/health` every 15 minutes from the
+GitHub-hosted runner. Pages Slack on failure. Complements the
+Better Stack monitor — different infrastructure, different region,
+two cheap probes are better than one.
+
+### 10.1 Setup (3 min)
+
+1. GitHub → repo variables:
+   - `PROD_HEALTH_URL_ROOT`       — e.g. `https://juandiazllc.com/api/health`
+   - `PROD_HEALTH_URL_STANDALONE` — e.g. `https://app.juandiazllc.com/api/health`
+2. GitHub → repo secrets:
+   - `SLACK_ALERTS_WEBHOOK` (same webhook the app uses).
+3. Done. First run within 15 minutes, then every 15 minutes after.
+   Steps for any URL not set are skipped.
+
+## 11. Future work
+
 - DB slow-query alerts. Supabase exposes `pg_stat_statements`; the
   query is one-line, the alerting wiring is not.
-- Synthetic monitoring — Playwright/Checkly hits the golden path
-  (login → create-deal → log-out) every 5 min. Catches "loads but
-  silently broken" failures the health check misses.
-- Status page (Better Stack does this from the same monitor).
-- Feature flags / kill-switches. `KillSwitch` table or a 3rd-party
-  service. Today, the only off-switch is unset env var + redeploy.
+- Status page (Better Stack does this from the same monitor that
+  drives §3.2).
+- Frontend Real User Monitoring (Vercel Speed Insights or
+  `@vercel/analytics/web` web-vitals). Sentry traces give the
+  important slice; RUM is a comfort layer.

@@ -1,0 +1,95 @@
+name: Synthetic production probe
+
+# Hits production /api/health every 15 minutes from the GitHub-hosted
+# Actions runner. Catches outages that the in-process Sentry / log
+# stack can't tell you about (DNS gone, Vercel deploy hung, edge
+# routing broken, cert expired). Pages on-call via Slack.
+#
+# This complements the Better Stack uptime monitor described in
+# docs/operations/OBSERVABILITY.md §3.2 — they probe from different
+# regions, on different infrastructure, and can both fall over for
+# different reasons. Two cheap probes are better than one.
+#
+# Operator setup (one-time):
+#   - PROD_HEALTH_URL_ROOT       → repo variable, e.g. "https://juandiazllc.com/api/health"
+#   - PROD_HEALTH_URL_STANDALONE → repo variable, e.g. "https://app.juandiazllc.com/api/health"
+#   - SLACK_ALERTS_WEBHOOK       → repo secret; same webhook the app uses
+#
+# When any URL is unset the corresponding step is skipped. When the
+# webhook is unset the failure mode is just a non-zero workflow run
+# (still visible in GitHub's checks UI).
+
+on:
+  schedule:
+    # Every 15 minutes. Cron syntax: m h dom mon dow.
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: synthetic-prod
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Probe root marketing site
+        if: ${{ vars.PROD_HEALTH_URL_ROOT != '' }}
+        id: probe-root
+        run: |
+          set +e
+          URL="${{ vars.PROD_HEALTH_URL_ROOT }}"
+          BODY=$(curl -sS --max-time 10 -o /tmp/root.json -w "%{http_code}" "$URL")
+          echo "status=$BODY" >> "$GITHUB_OUTPUT"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          if [ "$BODY" != "200" ]; then
+            echo "::error::root health probe returned $BODY"
+            exit 1
+          fi
+
+      - name: Probe philly-standalone
+        if: ${{ vars.PROD_HEALTH_URL_STANDALONE != '' }}
+        id: probe-standalone
+        run: |
+          set +e
+          URL="${{ vars.PROD_HEALTH_URL_STANDALONE }}"
+          BODY=$(curl -sS --max-time 10 -o /tmp/standalone.json -w "%{http_code}" "$URL")
+          echo "status=$BODY" >> "$GITHUB_OUTPUT"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          if [ "$BODY" != "200" ]; then
+            echo "::error::standalone health probe returned $BODY"
+            exit 1
+          fi
+
+      - name: Notify Slack on failure
+        if: failure() && env.SLACK_ALERTS_WEBHOOK != ''
+        env:
+          SLACK_ALERTS_WEBHOOK: ${{ secrets.SLACK_ALERTS_WEBHOOK }}
+          ROOT_URL: ${{ vars.PROD_HEALTH_URL_ROOT }}
+          STANDALONE_URL: ${{ vars.PROD_HEALTH_URL_STANDALONE }}
+          ROOT_STATUS: ${{ steps.probe-root.outputs.status }}
+          STANDALONE_STATUS: ${{ steps.probe-standalone.outputs.status }}
+        run: |
+          PAYLOAD=$(cat <<EOF
+          {
+            "text": ":rotating_light: *Synthetic probe failed*",
+            "attachments": [
+              {
+                "color": "#7c1d6f",
+                "title": "Production health probe failed",
+                "text": "GitHub Actions probe could not reach /api/health from the GH-hosted runner.",
+                "fields": [
+                  { "title": "root", "value": "${ROOT_URL:-not-set} → ${ROOT_STATUS:-unset}", "short": false },
+                  { "title": "standalone", "value": "${STANDALONE_URL:-not-set} → ${STANDALONE_STATUS:-unset}", "short": false },
+                  { "title": "run", "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}", "short": false }
+                ]
+              }
+            ]
+          }
+          EOF
+          )
+          curl -sS -X POST -H "content-type: application/json" \
+            --data "$PAYLOAD" \
+            "$SLACK_ALERTS_WEBHOOK" || true
