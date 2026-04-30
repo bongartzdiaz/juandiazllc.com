@@ -570,7 +570,17 @@ export default function ContactsPage() {
             const tc = typeColors[c.type] || typeColors.partner
             const initials = c.firstName[0] + c.lastName[0]
             return (
-              <Link key={c.id} href={`/contacts/${c.id}`} className="card-hover"
+              <Link key={c.id} href={isLive ? `/contacts/${c.id}` : '#'} className="card-hover"
+                onClick={(e) => {
+                  // Demo modes (RE/HOS) show hand-curated rows whose ids
+                  // don't exist in the DB. Routing to /contacts/<id>
+                  // would 404 on the detail page. Swap nav for the
+                  // quick-view popover so demo viewers see something.
+                  if (!isLive) {
+                    e.preventDefault()
+                    setQuickViewId(c.id)
+                  }
+                }}
                 onContextMenu={(e) => {
                   e.preventDefault()
                   setCtxMenu({ x: e.clientX, y: e.clientY, contactId: c.id })

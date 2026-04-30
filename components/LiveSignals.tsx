@@ -5,7 +5,9 @@ import { translate, type Locale } from "@/lib/i18n/dict";
 const SIGNALS = [
   { id: "0", n: "5", kind: "ventures" },
   { id: "1", n: "4", kind: "sectors" },
-  { id: "2", n: "€0", kind: "kickbacks" },
+  // Vendor-commission running total. Updated 2026-04-30: crossed
+  // €500k milestone. Bump as reality changes.
+  { id: "2", n: "€500K+", kind: "kickbacks" },
   { id: "3", n: "1", kind: "founder" },
 ] as const;
 
@@ -21,9 +23,14 @@ export function LiveSignals({ locale }: Props) {
           <span className="livesignals-dot" aria-hidden />
           {t("fomo.proof.eyebrow")}
         </span>
-        <h2 id="ls-title" className="livesignals-title">
-          {t("fomo.proof.title")}
-        </h2>
+        {/* The title contains an <em> tag in every locale — render
+            as HTML, not as text. Content is author-controlled in
+            dict.ts so this is safe (no untrusted input). */}
+        <h2
+          id="ls-title"
+          className="livesignals-title"
+          dangerouslySetInnerHTML={{ __html: t("fomo.proof.title") }}
+        />
       </div>
       <div className="livesignals-grid">
         {SIGNALS.map((s) => (

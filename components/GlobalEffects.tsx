@@ -28,55 +28,11 @@ export function GlobalEffects() {
     }
     const failsafe = window.setTimeout(finish, 900);
 
-    /* Card glow follow */
-    const cards = document.querySelectorAll<HTMLElement>(".v-card, .sec-card");
-    const cardHandlers = new Map<HTMLElement, (e: MouseEvent) => void>();
-    cards.forEach((card) => {
-      const handler = (e: MouseEvent) => {
-        const r = card.getBoundingClientRect();
-        card.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`);
-        card.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
-      };
-      cardHandlers.set(card, handler);
-      card.addEventListener("mousemove", handler);
-    });
-
-    /* 3D tilt on cards */
-    const tiltCards = document.querySelectorAll<HTMLElement>(".v-card, .sec-card");
-    const tiltHandlers = new Map<HTMLElement, { move: (e: MouseEvent) => void; leave: () => void }>();
-    const isCoarse = window.matchMedia("(hover: none)").matches;
-    if (!isCoarse) {
-      tiltCards.forEach((card) => {
-        const move = (e: MouseEvent) => {
-          const r = card.getBoundingClientRect();
-          const nx = (e.clientX - r.left) / r.width - 0.5;
-          const ny = (e.clientY - r.top) / r.height - 0.5;
-          const ry = nx * 6;
-          const rx = -ny * 6;
-          card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
-        };
-        const leave = () => { card.style.transform = ""; };
-        card.addEventListener("mousemove", move);
-        card.addEventListener("mouseleave", leave);
-        tiltHandlers.set(card, { move, leave });
-      });
-    }
-
-    /* Magnetic buttons */
-    const mags = document.querySelectorAll<HTMLElement>(".btn-mag");
-    const magHandlers = new Map<HTMLElement, { move: (e: MouseEvent) => void; leave: () => void }>();
-    mags.forEach((b) => {
-      const move = (e: MouseEvent) => {
-        const r = b.getBoundingClientRect();
-        const x = (e.clientX - r.left - r.width / 2) * 0.28;
-        const y = (e.clientY - r.top - r.height / 2) * 0.4;
-        b.style.transform = `translate(${x}px,${y}px)`;
-      };
-      const leave = () => { b.style.transform = ""; };
-      b.addEventListener("mousemove", move);
-      b.addEventListener("mouseleave", leave);
-      magHandlers.set(b, { move, leave });
-    });
+    /* Cursor-tracking visual effects (card glow follow / 3D tilt /
+       magnetic buttons) were removed in Bundle AZ — they were
+       distracting and felt gimmicky on touch devices that mostly
+       saw stuck transforms after a tap. Cards now use plain CSS
+       hover states. */
 
     /* Floating CTA */
     const floatCta = document.getElementById("floatCta");
@@ -171,24 +127,6 @@ export function GlobalEffects() {
       window.clearTimeout(failsafe);
       window.removeEventListener("load", finish);
       window.removeEventListener("scroll", onScrollCta);
-      cards.forEach((card) => {
-        const h = cardHandlers.get(card);
-        if (h) card.removeEventListener("mousemove", h);
-      });
-      tiltCards.forEach((card) => {
-        const h = tiltHandlers.get(card);
-        if (h) {
-          card.removeEventListener("mousemove", h.move);
-          card.removeEventListener("mouseleave", h.leave);
-        }
-      });
-      mags.forEach((b) => {
-        const h = magHandlers.get(b);
-        if (h) {
-          b.removeEventListener("mousemove", h.move);
-          b.removeEventListener("mouseleave", h.leave);
-        }
-      });
       io.disconnect();
       sio?.disconnect();
     };
