@@ -1,0 +1,75 @@
+name: DB slow-query report
+
+# Daily probe of pg_stat_statements. Posts to Slack when at least one
+# query crosses the threshold. Complements Sentry's SLO bucket alerts —
+# Sentry tells you which user-facing path is slow, this one tells you
+# which underlying query is the bottleneck.
+#
+# Operator setup:
+#   - DATABASE_URL          → repo secret (same connection string the
+#                              app uses)
+#   - SLACK_ALERTS_WEBHOOK  → repo secret (same webhook the app uses)
+#
+# When DATABASE_URL is unset the workflow short-circuits.
+
+on:
+  schedule:
+    # Daily at 06:30 UTC (08:30 CET) — early enough to land in
+    # morning ops review.
+    - cron: "30 6 * * *"
+  workflow_dispatch:
+    inputs:
+      threshold:
+        description: "Mean exec time threshold (ms)"
+        required: false
+        default: "200"
+      limit:
+        description: "Top-N rows"
+        required: false
+        default: "20"
+
+concurrency:
+  group: db-slow-queries
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: ${{ secrets.DATABASE_URL != '' }}
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SLACK_ALERTS_WEBHOOK: ${{ secrets.SLACK_ALERTS_WEBHOOK }}
+      SENTRY_ENVIRONMENT: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install root deps
+        run: npm ci
+
+      - name: Install standalone deps
+        working-directory: apps/philly-standalone
+        run: npm ci
+
+      - name: Prisma generate
+        working-directory: apps/philly-standalone
+        run: npx prisma generate
+
+      - name: Run report (alert mode)
+        working-directory: apps/philly-standalone
+        run: |
+          npm run db:slow -- \
+            --threshold=${{ github.event.inputs.threshold || '200' }} \
+            --limit=${{ github.event.inputs.limit || '20' }} \
+            --alert
+        # Exit code 1 = at least one slow query; that's expected info
+        # not a workflow failure. Exit 2 = pg_stat_statements missing
+        # or connection failed; let it bubble up so we notice.
+        continue-on-error: true

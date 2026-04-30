@@ -389,12 +389,63 @@ two cheap probes are better than one.
 3. Done. First run within 15 minutes, then every 15 minutes after.
    Steps for any URL not set are skipped.
 
-## 11. Future work
+## 11. DB slow-query report — `npm run db:slow`
 
-- DB slow-query alerts. Supabase exposes `pg_stat_statements`; the
-  query is one-line, the alerting wiring is not.
+CLI + scheduled GitHub Action that walks `pg_stat_statements` and
+reports queries above a mean-exec-time threshold. Complements
+Sentry's SLO buckets — Sentry tells you which user path is slow,
+this one tells you which underlying query is the bottleneck.
+
+### 11.1 Local usage
+
+```bash
+cd apps/philly-standalone
+
+npm run db:slow                    # top 20 by mean exec ms (≥100ms)
+npm run db:slow -- --limit=50      # top 50
+npm run db:slow -- --order=total   # sort by total exec time
+npm run db:slow -- --threshold=200 # only ≥200ms
+npm run db:slow -- --json          # JSON output (for piping)
+npm run db:slow -- --alert         # also post a Slack alert
+```
+
+Exit codes: `0` = clean, `1` = slow queries found (intentional for
+cron alerting), `2` = `pg_stat_statements` not installed or
+connection failed.
+
+### 11.2 Daily cron — `.github/workflows/db-slow-queries.yml`
+
+Runs daily at 06:30 UTC. Posts to Slack via `sendAlert()` when at
+least one query crosses the threshold. Operator wiring:
+
+- GitHub repo secrets:
+  - `DATABASE_URL` — same connection string the app uses
+  - `SLACK_ALERTS_WEBHOOK` — same webhook the app uses
+
+When `DATABASE_URL` is unset the workflow short-circuits, so it
+stays dormant until wired.
+
+### 11.3 Extension setup (Supabase)
+
+`pg_stat_statements` is enabled in every Supabase project by
+default. If for some reason it isn't:
+
+1. Supabase Dashboard → Database → Extensions → enable
+   `pg_stat_statements`, OR
+2. Run `CREATE EXTENSION pg_stat_statements;` from a privileged
+   connection.
+
+The script connects with the same role the app uses; no extra
+grants needed.
+
+## 12. Future work
+
 - Status page (Better Stack does this from the same monitor that
-  drives §3.2).
-- Frontend Real User Monitoring (Vercel Speed Insights or
-  `@vercel/analytics/web` web-vitals). Sentry traces give the
-  important slice; RUM is a comfort layer.
+  drives §3.2). One toggle on the same paid plan.
+- Frontend Real User Monitoring beyond web-vitals → Sentry. Vercel
+  Speed Insights is the obvious next step; we already capture the
+  Core Web Vitals via `WebVitalsReporter` and forward them as
+  Sentry measurements when the SDK is initialised.
+- `pgaudit` extension for query-level audit beyond what
+  `AuditLog` covers (mostly compliance theatre — `AuditLog` is the
+  source of truth and already hash-chained).
