@@ -196,6 +196,8 @@ export const ENDPOINTS = {
     countries: '/outreach?view=countries',
     errors: '/outreach?view=errors',
     messages: '/outreach/messages',
+    leads: '/outreach/leads',
+    lead: (id: string) => `/outreach/leads/${id}`,
   },
 } as const
 

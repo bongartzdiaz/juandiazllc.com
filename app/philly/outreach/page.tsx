@@ -207,6 +207,34 @@ export default function OutreachPage() {
 
         {d && (
           <>
+            {/* Navigation */}
+            <div style={{
+              display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap',
+            }}>
+              <Link
+                href="/philly/outreach/leads"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+                  border: '1px solid var(--border)', color: 'var(--txt)',
+                  textDecoration: 'none', background: 'var(--panel)',
+                }}
+              >
+                <Users size={14} /> View All Leads
+              </Link>
+              <Link
+                href="/philly/outreach/messages"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+                  border: '1px solid var(--border)', color: 'var(--txt)',
+                  textDecoration: 'none', background: 'var(--panel)',
+                }}
+              >
+                <FileCheck size={14} /> Message Queue
+              </Link>
+            </div>
+
             {/* KPI Strip */}
             <div style={{
               display: 'grid',
