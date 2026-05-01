@@ -354,6 +354,13 @@ export default function DealsPage() {
     }
   }, [visibleDeals, focusedDealId])
 
+  /* Bundle BV state declarations live above the dealsByStage memo
+     so refs/state are valid during render; the moveKanbanFocus
+     callback is declared further down (right after dealsByStage)
+     so it can read the per-stage deal arrays without a TDZ. */
+  const [kanbanFocusedDealId, setKanbanFocusedDealId] = useState<string | null>(null)
+  const kanbanCardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+
   /* ---- Aggregated KPIs (based on visible deals) ---- */
   const kpis = useMemo(() => {
     const totalValue = visibleDeals.reduce((s, d) => s + d.valueCents, 0)
@@ -502,6 +509,75 @@ export default function DealsPage() {
     }
     return map
   }, [visibleDeals, currentPipelineStages])
+
+  /* ---- Bundle BV — 2D kanban navigation (board view only) ----
+     j / k       → next / previous deal in the same stage column
+     h / l       → previous / next stage column (clamps row to
+                   target stage's bounds; skips empty stages)
+     Enter       → open the focused deal full page */
+  const moveKanbanFocus = useCallback((dx: number, dy: number) => {
+    const stages = currentPipelineStages
+    if (stages.length === 0) return
+
+    let curStageIdx = -1
+    let curRow = -1
+    if (kanbanFocusedDealId) {
+      for (let s = 0; s < stages.length; s++) {
+        const sd = dealsByStage.get(stages[s].id) ?? []
+        const r = sd.findIndex(d => d.id === kanbanFocusedDealId)
+        if (r >= 0) { curStageIdx = s; curRow = r; break }
+      }
+    }
+    if (curStageIdx === -1) {
+      for (let s = 0; s < stages.length; s++) {
+        const sd = dealsByStage.get(stages[s].id) ?? []
+        if (sd.length > 0) { curStageIdx = s; curRow = 0; break }
+      }
+      if (curStageIdx === -1) return
+    } else {
+      let newStageIdx = curStageIdx + dx
+      let newRow = curRow + dy
+      // Skip empty stages on horizontal move so h/l never lands dead.
+      while (dx !== 0 && newStageIdx >= 0 && newStageIdx < stages.length) {
+        const sd = dealsByStage.get(stages[newStageIdx].id) ?? []
+        if (sd.length > 0) break
+        newStageIdx += dx > 0 ? 1 : -1
+      }
+      if (newStageIdx < 0 || newStageIdx >= stages.length) return
+      const targetDeals = dealsByStage.get(stages[newStageIdx].id) ?? []
+      if (targetDeals.length === 0) return
+      newRow = Math.max(0, Math.min(targetDeals.length - 1, newRow))
+      curStageIdx = newStageIdx
+      curRow = newRow
+    }
+
+    const stageDeals = dealsByStage.get(stages[curStageIdx].id) ?? []
+    const nextId = stageDeals[curRow]?.id
+    if (!nextId) return
+    setKanbanFocusedDealId(nextId)
+    const el = kanbanCardRefs.current.get(nextId)
+    el?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  }, [currentPipelineStages, dealsByStage, kanbanFocusedDealId])
+
+  useGlobalShortcuts(
+    {
+      j: () => moveKanbanFocus(0, 1),
+      k: () => moveKanbanFocus(0, -1),
+      h: () => moveKanbanFocus(-1, 0),
+      l: () => moveKanbanFocus(1, 0),
+      Enter: () => {
+        if (kanbanFocusedDealId) router.push(`/deals/${kanbanFocusedDealId}`)
+      },
+    },
+    view === 'board',
+  )
+
+  // Reset kanban focus when the underlying data drops the focused id.
+  useEffect(() => {
+    if (kanbanFocusedDealId && !visibleDeals.some(d => d.id === kanbanFocusedDealId)) {
+      setKanbanFocusedDealId(null)
+    }
+  }, [visibleDeals, kanbanFocusedDealId])
 
   /* ------------------------------------------------------------------
      Render
@@ -738,9 +814,15 @@ export default function DealsPage() {
                       }}>
                         Drop deals here
                       </div>
-                    ) : stageDeals.map(deal => (
+                    ) : stageDeals.map(deal => {
+                      const isKanbanFocused = kanbanFocusedDealId === deal.id
+                      return (
                       <div
                         key={deal.id}
+                        ref={(el) => {
+                          if (el) kanbanCardRefs.current.set(deal.id, el)
+                          else kanbanCardRefs.current.delete(deal.id)
+                        }}
                         draggable
                         onDragStart={e => {
                           setDraggingId(deal.id)
@@ -752,13 +834,17 @@ export default function DealsPage() {
                           e.preventDefault()
                           setCtxMenu({ x: e.clientX, y: e.clientY, dealId: deal.id })
                         }}
+                        onMouseEnter={() => setKanbanFocusedDealId(deal.id)}
                         style={{
                           background: 'var(--bg2)',
-                          border: '1px solid var(--border)',
+                          border: isKanbanFocused ? '2px solid var(--accent)' : '1px solid var(--border)',
                           borderRadius: 10, padding: '10px 12px',
                           cursor: 'grab',
                           opacity: draggingId === deal.id ? 0.4 : 1,
-                          transition: 'opacity 120ms ease, transform 120ms ease',
+                          boxShadow: isKanbanFocused
+                            ? '0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent)'
+                            : undefined,
+                          transition: 'opacity 120ms ease, transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease',
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
@@ -856,7 +942,8 @@ export default function DealsPage() {
                           </div>
                         )}
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               )
