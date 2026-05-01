@@ -163,10 +163,17 @@ Status of the implementation:
   by `externalId eq <value>` works; `GET /Users/<id>` accepts
   either the platform id OR the externalId as the lookup key.
   De-provisioning by stable identifier is no longer email-bound.
-- **Groups**: not yet shipped — group → role/sections mapping
-  is the next milestone. Today, all SCIM-provisioned users land
-  with the default `viewer` role and the operator manually
-  promotes them.
+- **Groups**: shipped (Bundle BW). Full CRUD on
+  `/api/scim/v2/Groups` + `/[id]`, members add/remove via PATCH
+  (Okta-shape `add members[value eq "..."]` + remove-by-filter +
+  Azure-style path-less replace). When the operator sets a
+  `role` and/or `dashboardSections` on a ScimGroup row (via DB
+  or admin UI), users added to the group via SCIM PATCH get
+  their per-org Membership upserted to those values — so
+  `engineering` → manager / `marketing` → viewer mapping works
+  without a custom IdP claim parser. Removing a user from a
+  group does NOT auto-revert the role (RFC unspecified +
+  operator should make that call).
 
 ## Troubleshooting
 

@@ -63,6 +63,7 @@ model Organization {
   assistantConversations AssistantConversation[]
   assistantMemories      AssistantMemory[]
   featureFlags       FeatureFlag[]
+  scimGroups         ScimGroup[]
 
   // Enterprise — per-org access controls. NULL on both = no
   // restrictions (default). Both can be set via the admin Security
@@ -134,6 +135,7 @@ model User {
   // request is resolved by lib/philly/auth-helpers.ts from a cookie
   // (`philly-active-org`), falling back to organizationId when unset.
   memberships     Membership[]
+  scimGroupMemberships ScimGroupMembership[]
   twoFactorRecoveryCodes TwoFactorRecoveryCode[]
   dashboardLayout DashboardLayout?
   kanbanCards     KanbanCard[]     @relation("assignee")
@@ -1921,4 +1923,54 @@ model FeatureFlag {
 
   @@unique([organizationId, key])
   @@index([key])
+}
+
+// ScimGroup — IdP group surfaced via SCIM 2.0 (RFC 7643 §4.2).
+// Operators set `role` / `dashboardSections` on the group via the
+// admin UI (or directly in DB). When an IdP sends a member-add
+// PATCH against the group, the user's Membership in that org is
+// upserted to the group's role + sections — which is how
+// `engineering` → manager / `marketing` → viewer mapping works
+// without a custom claim parser per IdP.
+//
+// scimExternalId is the IdP's stable id (e.g. Okta group id).
+// displayName is what the IdP sees + sends back in payloads.
+//
+// Bundle BW; closes the SSO-SETUP.md "Groups outstanding" gap.
+model ScimGroup {
+  id                String                @id @default(cuid())
+  organizationId    String
+  scimExternalId    String?
+  displayName       String
+  /// Maps to Membership.role for users added via this group.
+  /// Null = no role assignment (group is just metadata + a way
+  /// to track which IdP groups the user belongs to).
+  role              String?
+  /// Maps to Membership.dashboardSections (Json array of
+  /// section ids, or null = full access). Null on the group
+  /// means "don't override the user's per-org sections".
+  dashboardSections Json?
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+
+  organization Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members      ScimGroupMembership[]
+
+  @@unique([organizationId, displayName])
+  @@index([organizationId, scimExternalId])
+}
+
+// ScimGroupMembership — many-to-many join between User and ScimGroup.
+// Cascades when either side is deleted so we don't leak orphan rows.
+model ScimGroupMembership {
+  id        String   @id @default(cuid())
+  groupId   String
+  userId    String
+  createdAt DateTime @default(now())
+
+  group ScimGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([userId])
 }

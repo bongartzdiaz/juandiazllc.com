@@ -1,10 +1,10 @@
 /* GET /api/scim/v2/ResourceTypes
    ─────────────────────────────────────────────────────────────
-   Lists the SCIM resource types we expose. Today: User only.
-   Group will be added when IdP-group → role mapping ships. */
+   Lists the SCIM resource types we expose: User + Group.
+   Bundle BW added Group with IdP-group → role mapping. */
 
 import { NextRequest } from 'next/server'
-import { scimJson, LIST_RESPONSE_SCHEMA, USER_SCHEMA } from '@/lib/philly/scim/schemas'
+import { scimJson, LIST_RESPONSE_SCHEMA, USER_SCHEMA, GROUP_SCHEMA } from '@/lib/philly/scim/schemas'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -23,6 +23,18 @@ export async function GET(req: NextRequest) {
       meta: {
         resourceType: 'ResourceType',
         location: `${baseUrl}/ResourceTypes/User`,
+      },
+    },
+    {
+      schemas: ['urn:ietf:params:scim:schemas:core:2.0:ResourceType'],
+      id: 'Group',
+      name: 'Group',
+      endpoint: '/Groups',
+      description: 'IdP groups — drive role + dashboardSections mapping for members',
+      schema: GROUP_SCHEMA,
+      meta: {
+        resourceType: 'ResourceType',
+        location: `${baseUrl}/ResourceTypes/Group`,
       },
     },
   ]

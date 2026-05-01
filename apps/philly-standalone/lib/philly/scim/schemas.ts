@@ -25,6 +25,7 @@
 import { NextResponse } from 'next/server'
 
 export const USER_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User'
+export const GROUP_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group'
 export const LIST_RESPONSE_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:ListResponse'
 export const ERROR_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:Error'
 export const PATCH_OP_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:PatchOp'
@@ -40,6 +41,34 @@ export interface ScimUser {
   /** RFC 7643 §4.1.2 — usually "User" */
   meta: {
     resourceType: 'User'
+    created: string
+    lastModified: string
+    location: string
+    version?: string
+  }
+}
+
+/* ── Group resource (RFC 7643 §4.2) ─────────────────────────── */
+
+export interface ScimGroupMember {
+  /** Platform User id (matches ScimUser.id). */
+  value: string
+  /** Optional URL the IdP uses to fetch the user. */
+  $ref?: string
+  /** Optional human label (the user's email or display name). */
+  display?: string
+  /** Always "User" for now (no nested Group memberships). */
+  type?: 'User'
+}
+
+export interface ScimGroup {
+  schemas: string[]
+  id: string
+  externalId?: string
+  displayName: string
+  members: ScimGroupMember[]
+  meta: {
+    resourceType: 'Group'
     created: string
     lastModified: string
     location: string
