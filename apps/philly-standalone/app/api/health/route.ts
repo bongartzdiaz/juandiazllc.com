@@ -25,18 +25,27 @@ export async function GET() {
     version: process.env.npm_package_version ?? '0.1.0',
   }
 
-  /* DB liveness check with short timeout so a stuck DB doesn't pin the probe */
+  /* DB liveness check with short timeout so a stuck DB doesn't pin the probe.
+     Clear the timer on success so we don't leak a Node timer per probe.
+     The underlying $queryRawUnsafe still runs to completion if the
+     timeout wins (Prisma doesn't expose AbortSignal on raw queries) —
+     a single in-flight `SELECT 1` is the connection-leak ceiling.
+     Bundle BJ audit fix. */
+  let timer: ReturnType<typeof setTimeout> | null = null
   try {
     const prisma = getAuthPrisma()
     const dbStart = Date.now()
     await Promise.race([
-      prisma.$queryRawUnsafe('SELECT 1'),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('db timeout after 2000ms')), 2000),
-      ),
+      prisma.$queryRawUnsafe('SELECT 1').finally(() => {
+        if (timer) clearTimeout(timer)
+      }),
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error('db timeout after 2000ms')), 2000)
+      }),
     ])
     result.checks.push({ name: 'database', ok: true, latencyMs: Date.now() - dbStart })
   } catch (err) {
+    if (timer) clearTimeout(timer)
     result.status = 'down'
     result.checks.push({
       name: 'database',

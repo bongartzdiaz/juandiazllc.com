@@ -37,31 +37,31 @@ export const FEATURES = {
     enabledByDefault: true,
     description: 'AI-derived lead-score numeric on Contact rows.',
   },
-  /** Outbound webhooks fan-out (audit-log mirroring, integrations). */
+  /** Outbound webhooks fan-out (audit-log mirroring, integrations).
+   *  Wired into `lib/philly/webhooks/dispatcher.ts`. */
   WEBHOOKS: {
     key: 'webhooks',
     enabledByDefault: true,
     description: 'Outbound webhook delivery. Disable to silence all integrations during a migration window.',
   },
-  /** SCIM provisioning endpoints. */
-  SCIM: {
-    key: 'scim',
-    enabledByDefault: true,
-    description: 'SCIM 2.0 user-provisioning endpoints. Disable to halt IdP sync without rotating tokens.',
-  },
-  /** Drip-campaign sender (outbound email/SMS at scheduled times). */
-  DRIP_CAMPAIGNS: {
-    key: 'drip-campaigns',
-    enabledByDefault: true,
-    description: 'Scheduled outbound email + SMS dispatch. Disable to pause every drip campaign without editing each one.',
-  },
-  /** Realtime publish (Supabase channel fan-out). */
+  /** Realtime publish (in-process event bus → SSE fan-out + automation).
+   *  Wired into `lib/philly/realtime/publish.ts`. Webhook dispatcher
+   *  has a separate WEBHOOKS check so webhooks survive a realtime pause. */
   REALTIME: {
     key: 'realtime',
     enabledByDefault: true,
-    description: 'Supabase realtime channel fan-out. Disable to bypass realtime broadcasts during incidents.',
+    description: 'In-process realtime event bus + automation fan-out. Disable to halt SSE broadcasts + automation engine without affecting webhooks.',
   },
 } as const
+
+/* SCIM and DRIP_CAMPAIGNS were removed from the catalogue in Bundle BJ.
+   They were declared but never wired into a hot path, which made the
+   admin "kill-switch" UI lie about the surface area it actually
+   controlled. Re-add them here when the corresponding gate goes into
+   `app/api/scim/v2/Users/route.ts` (+ /[id]) and the drip dispatcher
+   loop. The migration is forward-only — DB rows from earlier writes
+   (if any) become orphan keys that listFeatures() simply doesn't
+   surface. */
 
 export type FeatureDef = (typeof FEATURES)[keyof typeof FEATURES]
 export type FeatureKey = FeatureDef['key']
@@ -89,14 +89,26 @@ function cacheKey(orgId: string | null | undefined, key: FeatureKey): string {
   return `${orgId ?? 'global'}::${key}`
 }
 
-/** Bust every cache entry for a (org, key) pair. Call after a write. */
+/** Bust every cache entry for a (org, key) pair. Call after a write.
+ *  When orgId is null/undefined (i.e. the global default just changed),
+ *  every per-org cached value for that key needs to drop too — they
+ *  may have been resolved against the old global. */
 export function bustFeatureCache(orgId: string | null | undefined, key?: FeatureKey): void {
+  const isGlobalUpdate = orgId == null
   if (key) {
-    cache.delete(cacheKey(orgId, key))
-    cache.delete(cacheKey(null, key)) // global default may have shifted
+    if (isGlobalUpdate) {
+      // Drop every cached resolution for this key across every org.
+      const suffix = `::${key}`
+      for (const k of cache.keys()) {
+        if (k.endsWith(suffix)) cache.delete(k)
+      }
+    } else {
+      cache.delete(cacheKey(orgId, key))
+      cache.delete(cacheKey(null, key)) // global default may have shifted under us
+    }
     return
   }
-  // Bust everything for the org (and the global slot — cheap).
+  // No key supplied — bust everything for the org (and the global slot).
   for (const k of cache.keys()) {
     if (k.startsWith(`${orgId ?? 'global'}::`) || k.startsWith('global::')) {
       cache.delete(k)
@@ -169,6 +181,32 @@ export function readCachedFeature(
     return null
   }
   return hit.value
+}
+
+/**
+ * Sync, fail-open kill-switch check for hot-path callers that can't
+ * await (sync publishers, fan-out helpers). Resolution:
+ *   - Cache hit → return cached value.
+ *   - Cache miss → return the code-side default + warm the cache
+ *     async for the next call. The DB-backed override will take
+ *     effect on the second call after rotation, not the first.
+ *
+ * Trade-off: a flag flip propagates within one request per process
+ * instead of immediately. Acceptable for kill-switches; not for
+ * gating logic where the wrong default is dangerous.
+ */
+export function isFeatureEnabledSync(
+  prisma: PrismaClient,
+  orgId: string | null | undefined,
+  key: FeatureKey,
+): boolean {
+  const cached = readCachedFeature(orgId, key)
+  if (cached !== null) return cached
+  // Warm the cache asynchronously for the next call. Errors are
+  // swallowed — a failing DB shouldn't break the hot path.
+  void isFeatureEnabled(prisma, orgId, key).catch(() => {})
+  const def = Object.values(FEATURES).find(f => f.key === key)
+  return def ? def.enabledByDefault : false
 }
 
 /* ---------- Writes ---------- */

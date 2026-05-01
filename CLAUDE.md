@@ -302,7 +302,8 @@ setup steps below.
    `20260428040000_apikey_scopes`,
    `20260429000000_contact_display_order`,
    `20260429010000_deal_display_order`,
-   `20260430000000_feature_flags`.
+   `20260430000000_feature_flags`,
+   `20260430010000_feature_flags_harden`.
    (`SavedView` is in the schema already; verify it's in your DB and
    create-if-missing — no dedicated migration was needed because the
    model was added to the schema in an earlier branch.)

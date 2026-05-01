@@ -10,6 +10,7 @@ import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated, publishEntityUpdated } from '@/lib/philly/realtime/publish'
 import { runAndPersistContactAttributes } from '@/lib/philly/ai/contact-attributes'
+import { isFeatureEnabled, FEATURES } from '@/lib/philly/features'
 import { logger } from '@/lib/philly/logger'
 import { encryptPii, decryptPii } from '@/lib/philly/pii'
 import {
@@ -156,9 +157,14 @@ export async function POST(req: NextRequest) {
 
   // Attio-style auto-enrichment — fire the LLM call in the background
   // so the create response returns instantly. after() keeps the worker
-  // alive on Vercel for the duration of the async task.
+  // alive on Vercel for the duration of the async task. Gated on the
+  // AI_CONTACT_ENRICHMENT kill-switch so admins can pause enrichment
+  // org-wide without redeploy. Bundle BJ audit fix.
   after(async () => {
     try {
+      if (!(await isFeatureEnabled(prisma, scope.organizationId, FEATURES.AI_CONTACT_ENRICHMENT.key))) {
+        return
+      }
       await runAndPersistContactAttributes({
         contactId: contact.id,
         organizationId: scope.organizationId,

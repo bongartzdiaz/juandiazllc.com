@@ -9,8 +9,11 @@ name: DB slow-query report
 #   - DATABASE_URL          → repo secret (same connection string the
 #                              app uses)
 #   - SLACK_ALERTS_WEBHOOK  → repo secret (same webhook the app uses)
+#   - DB_SLOW_ENABLED       → repo VARIABLE (set to "true" to activate)
 #
-# When DATABASE_URL is unset the workflow short-circuits.
+# We can't gate a job on a secret (`secrets.*` is not allowed in
+# `jobs.<id>.if`), so we use a public variable as the on/off toggle.
+# Until the variable is set to "true" the scheduled run no-ops.
 
 on:
   schedule:
@@ -36,7 +39,12 @@ jobs:
   report:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: ${{ secrets.DATABASE_URL != '' }}
+    # Public-variable gate. `secrets.*` cannot be used in job-level
+    # `if:` conditions on GitHub Actions, so the operator flips this
+    # variable to activate the cron once the DATABASE_URL secret is
+    # in place. workflow_dispatch ignores the gate so manual runs
+    # always work.
+    if: ${{ vars.DB_SLOW_ENABLED == 'true' || github.event_name == 'workflow_dispatch' }}
 
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -64,12 +72,20 @@ jobs:
 
       - name: Run report (alert mode)
         working-directory: apps/philly-standalone
+        # Exit code 1 = at least one slow query; that's expected info,
+        # not a workflow failure — Slack already got the alert. Exit
+        # code 2 = pg_stat_statements missing OR connection failed; we
+        # want THAT to bubble up as a red workflow. So map 1→0 in the
+        # shell, leave 2 alone.
         run: |
+          set +e
           npm run db:slow -- \
             --threshold=${{ github.event.inputs.threshold || '200' }} \
             --limit=${{ github.event.inputs.limit || '20' }} \
             --alert
-        # Exit code 1 = at least one slow query; that's expected info
-        # not a workflow failure. Exit 2 = pg_stat_statements missing
-        # or connection failed; let it bubble up so we notice.
-        continue-on-error: true
+          rc=$?
+          if [ "$rc" = "1" ]; then
+            echo "::notice::slow queries detected (Slack alerted)"
+            exit 0
+          fi
+          exit "$rc"

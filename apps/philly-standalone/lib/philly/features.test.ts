@@ -158,12 +158,46 @@ describe('features', () => {
         expect(readCachedFeature('org_1', FEATURES.WEBHOOKS.key)).toBeNull()
       })
     })
+
+    it('busts every per-org cached entry when the global flag flips (Bundle BJ audit fix)', async () => {
+      const { prisma } = fakePrisma([])
+      // Warm three different orgs + the global slot for the same key.
+      await isFeatureEnabled(prisma as never, 'org_1', FEATURES.WEBHOOKS.key)
+      await isFeatureEnabled(prisma as never, 'org_2', FEATURES.WEBHOOKS.key)
+      await isFeatureEnabled(prisma as never, 'org_3', FEATURES.WEBHOOKS.key)
+      await isFeatureEnabled(prisma as never, null, FEATURES.WEBHOOKS.key)
+      expect(readCachedFeature('org_1', FEATURES.WEBHOOKS.key)).not.toBeNull()
+      expect(readCachedFeature('org_2', FEATURES.WEBHOOKS.key)).not.toBeNull()
+      expect(readCachedFeature('org_3', FEATURES.WEBHOOKS.key)).not.toBeNull()
+      expect(readCachedFeature(null, FEATURES.WEBHOOKS.key)).not.toBeNull()
+
+      // Admin updates the global default → every org's cached value
+      // for this key should drop, since they all might have been
+      // resolved against the old global.
+      bustFeatureCache(null, FEATURES.WEBHOOKS.key)
+
+      expect(readCachedFeature('org_1', FEATURES.WEBHOOKS.key)).toBeNull()
+      expect(readCachedFeature('org_2', FEATURES.WEBHOOKS.key)).toBeNull()
+      expect(readCachedFeature('org_3', FEATURES.WEBHOOKS.key)).toBeNull()
+      expect(readCachedFeature(null, FEATURES.WEBHOOKS.key)).toBeNull()
+    })
+
+    it('only busts the matching key (not other features)', async () => {
+      const { prisma } = fakePrisma([])
+      await isFeatureEnabled(prisma as never, 'org_1', FEATURES.WEBHOOKS.key)
+      await isFeatureEnabled(prisma as never, 'org_1', FEATURES.AI_CONTACT_ENRICHMENT.key)
+
+      bustFeatureCache(null, FEATURES.WEBHOOKS.key)
+
+      expect(readCachedFeature('org_1', FEATURES.WEBHOOKS.key)).toBeNull()
+      expect(readCachedFeature('org_1', FEATURES.AI_CONTACT_ENRICHMENT.key)).not.toBeNull()
+    })
   })
 
   describe('listFeatures', () => {
     it('returns every catalogued feature with its default + description', () => {
       const list = listFeatures()
-      expect(list.length).toBeGreaterThanOrEqual(6)
+      expect(list.length).toBeGreaterThanOrEqual(3)
       const keys = list.map(f => f.key)
       expect(keys).toContain(FEATURES.AI_CONTACT_ENRICHMENT.key)
       expect(keys).toContain(FEATURES.WEBHOOKS.key)

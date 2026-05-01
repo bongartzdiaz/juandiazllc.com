@@ -421,9 +421,13 @@ least one query crosses the threshold. Operator wiring:
 - GitHub repo secrets:
   - `DATABASE_URL` — same connection string the app uses
   - `SLACK_ALERTS_WEBHOOK` — same webhook the app uses
-
-When `DATABASE_URL` is unset the workflow short-circuits, so it
-stays dormant until wired.
+- GitHub repo variable:
+  - `DB_SLOW_ENABLED = true` — the cron-gate. GitHub Actions
+    forbids `secrets.*` in job-level `if:` conditions, so we use a
+    public variable as the on/off toggle. Set this to `true` once
+    the secrets above are in place; the scheduled run no-ops until
+    you do. `workflow_dispatch` ignores the gate so manual runs
+    always work.
 
 ### 11.3 Extension setup (Supabase)
 

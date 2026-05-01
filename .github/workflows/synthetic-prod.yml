@@ -34,6 +34,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
+    # Job-level env so the step-level `if:` guard below can read it.
+    # Step-scoped env isn't visible to its own `if:` expression.
+    env:
+      SLACK_ALERTS_WEBHOOK: ${{ secrets.SLACK_ALERTS_WEBHOOK }}
+
     steps:
       - name: Probe root marketing site
         if: ${{ vars.PROD_HEALTH_URL_ROOT != '' }}
@@ -66,7 +71,6 @@ jobs:
       - name: Notify Slack on failure
         if: failure() && env.SLACK_ALERTS_WEBHOOK != ''
         env:
-          SLACK_ALERTS_WEBHOOK: ${{ secrets.SLACK_ALERTS_WEBHOOK }}
           ROOT_URL: ${{ vars.PROD_HEALTH_URL_ROOT }}
           STANDALONE_URL: ${{ vars.PROD_HEALTH_URL_STANDALONE }}
           ROOT_STATUS: ${{ steps.probe-root.outputs.status }}

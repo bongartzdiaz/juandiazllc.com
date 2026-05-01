@@ -11,6 +11,7 @@ import crypto from 'crypto'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { unwrapWebhookSecret } from '@/lib/philly/webhooks/secrets'
 import { logger } from '@/lib/philly/logger'
+import { isFeatureEnabled, FEATURES } from '@/lib/philly/features'
 
 interface DispatchOptions {
   /** Direct URL to POST to (skips lookup). Used by automation callWebhook action. */
@@ -60,6 +61,13 @@ export async function dispatchWebhookEvent(
 ): Promise<void> {
   try {
     const prisma = getAuthPrisma()
+
+    // Kill-switch — admins can pause every outbound webhook
+    // (configured + direct-mode) via /api/admin/features without
+    // redeploy. Bundle BJ audit fix.
+    if (!(await isFeatureEnabled(prisma, organizationId, FEATURES.WEBHOOKS.key))) {
+      return
+    }
 
     // Direct-call mode (from automation action)
     if (opts.url) {
