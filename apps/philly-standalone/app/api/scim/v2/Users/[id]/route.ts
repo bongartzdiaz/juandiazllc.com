@@ -14,11 +14,21 @@ import {
 } from '@/lib/philly/scim/schemas'
 import { parseScimUserInput, userToScim } from '@/lib/philly/scim/mapping'
 import { logAudit } from '@/lib/philly/audit'
+import { isFeatureEnabled, FEATURES } from '@/lib/philly/features'
+import type { PrismaClient } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 type RouteCtx = { params: Promise<{ id: string }> }
+
+/* Bundle BP — SCIM kill-switch helper. 503 = "retry later" so IdPs
+   queue locally instead of giving up + de-provisioning users while
+   the flag is paused. */
+async function scimGate(prisma: PrismaClient, organizationId: string): Promise<NextResponse | null> {
+  if (await isFeatureEnabled(prisma, organizationId, FEATURES.SCIM.key)) return null
+  return scimError(503, 'SCIM provisioning is disabled for this organization')
+}
 
 const SELECT = {
   id: true,
@@ -35,6 +45,9 @@ export async function GET(req: NextRequest, ctx: RouteCtx) {
   const { id } = await ctx.params
 
   const prisma = getAuthPrisma()
+  const gated = await scimGate(prisma, auth.organizationId)
+  if (gated) return gated
+
   const user = await prisma.user.findFirst({
     where: { id, organizationId: auth.organizationId },
     select: SELECT,
@@ -50,6 +63,10 @@ export async function PUT(req: NextRequest, ctx: RouteCtx) {
   if (auth instanceof NextResponse) return auth
   const { id } = await ctx.params
 
+  const prisma = getAuthPrisma()
+  const gated = await scimGate(prisma, auth.organizationId)
+  if (gated) return gated
+
   let body: unknown
   try { body = await req.json() } catch { return scimError(400, 'Invalid JSON', 'invalidSyntax') }
 
@@ -58,7 +75,6 @@ export async function PUT(req: NextRequest, ctx: RouteCtx) {
     return scimError(400, err instanceof Error ? err.message : 'Invalid SCIM User', 'invalidValue')
   }
 
-  const prisma = getAuthPrisma()
   const existing = await prisma.user.findFirst({
     where: { id, organizationId: auth.organizationId },
     select: { id: true, email: true },
@@ -104,13 +120,16 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
   if (auth instanceof NextResponse) return auth
   const { id } = await ctx.params
 
+  const prisma = getAuthPrisma()
+  const gated = await scimGate(prisma, auth.organizationId)
+  if (gated) return gated
+
   let body: unknown
   try { body = await req.json() } catch { return scimError(400, 'Invalid JSON', 'invalidSyntax') }
   if (!isValidPatchRequest(body)) {
     return scimError(400, 'Body must be a SCIM PatchOp request', 'invalidSyntax')
   }
 
-  const prisma = getAuthPrisma()
   const existing = await prisma.user.findFirst({
     where: { id, organizationId: auth.organizationId },
     select: { id: true, email: true, name: true, deletionScheduledAt: true },
@@ -157,6 +176,9 @@ export async function DELETE(req: NextRequest, ctx: RouteCtx) {
   const { id } = await ctx.params
 
   const prisma = getAuthPrisma()
+  const gated = await scimGate(prisma, auth.organizationId)
+  if (gated) return gated
+
   const existing = await prisma.user.findFirst({
     where: { id, organizationId: auth.organizationId },
     select: { id: true, email: true },

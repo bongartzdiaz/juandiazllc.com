@@ -17,15 +17,29 @@ import {
 } from '@/lib/philly/scim/schemas'
 import { parseScimUserInput, userToScim } from '@/lib/philly/scim/mapping'
 import { logAudit } from '@/lib/philly/audit'
+import { isFeatureEnabled, FEATURES } from '@/lib/philly/features'
+import type { PrismaClient } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 const MAX_COUNT = 200
 
+/* Bundle BP — SCIM kill-switch helper. Returns 503 (Service
+   Unavailable) when the SCIM flag is off so IdPs queue locally
+   and retry later instead of giving up + de-provisioning users. */
+async function scimGate(prisma: PrismaClient, organizationId: string): Promise<NextResponse | null> {
+  if (await isFeatureEnabled(prisma, organizationId, FEATURES.SCIM.key)) return null
+  return scimError(503, 'SCIM provisioning is disabled for this organization')
+}
+
 export async function GET(req: NextRequest) {
   const auth = await authScimRequest(req)
   if (auth instanceof NextResponse) return auth
+
+  const prisma = getAuthPrisma()
+  const gated = await scimGate(prisma, auth.organizationId)
+  if (gated) return gated
 
   const url = new URL(req.url)
   const filter = parseScimFilter(url.searchParams.get('filter'))
@@ -41,7 +55,6 @@ export async function GET(req: NextRequest) {
   if (filter.active === true) where.deletionScheduledAt = null
   if (filter.active === false) where.deletionScheduledAt = { not: null }
 
-  const prisma = getAuthPrisma()
   const [users, total] = await Promise.all([
     count === 0
       ? Promise.resolve([])
@@ -77,6 +90,10 @@ export async function POST(req: NextRequest) {
   const auth = await authScimRequest(req)
   if (auth instanceof NextResponse) return auth
 
+  const prisma = getAuthPrisma()
+  const gated = await scimGate(prisma, auth.organizationId)
+  if (gated) return gated
+
   let body: unknown
   try {
     body = await req.json()
@@ -90,8 +107,6 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     return scimError(400, err instanceof Error ? err.message : 'Invalid SCIM User', 'invalidValue')
   }
-
-  const prisma = getAuthPrisma()
 
   // Uniqueness check (RFC 7644 §3.3 — return 409 + scimType:uniqueness)
   const existing = await prisma.user.findUnique({

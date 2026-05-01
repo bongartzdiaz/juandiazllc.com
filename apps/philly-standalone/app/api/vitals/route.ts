@@ -65,6 +65,11 @@ export async function POST(req: NextRequest) {
   const nav = typeof body.navigationType === 'string' ? body.navigationType.slice(0, 40) : undefined
 
   // Stdout — Vercel log drain picks this up without any extra plumbing.
+  // Intentional console.log: this route runs on the EDGE runtime
+  // (export const runtime = 'edge' above), so lib/philly/logger's
+  // process.stdout.write isn't available. console.log is the canonical
+  // edge-compatible sink; Axiom's Vercel integration parses the
+  // JSON payload directly.
   console.log('[vitals]', JSON.stringify({ name, value, rating, path, nav }))
 
   return new NextResponse(null, { status: 204 })

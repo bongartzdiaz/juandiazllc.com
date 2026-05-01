@@ -52,16 +52,25 @@ export const FEATURES = {
     enabledByDefault: true,
     description: 'In-process realtime event bus + automation fan-out. Disable to halt SSE broadcasts + automation engine without affecting webhooks.',
   },
+  /** SCIM 2.0 user-provisioning endpoints (RFC 7643 / 7644).
+   *  Wired into `app/api/scim/v2/Users/route.ts` + `/[id]/route.ts` +
+   *  `/ResourceTypes/route.ts`. Returns 503 when disabled — IdPs
+   *  treat 503 as "retry later", which is what we want during a
+   *  pause: the IdP queues changes locally instead of giving up. */
+  SCIM: {
+    key: 'scim',
+    enabledByDefault: true,
+    description: 'SCIM 2.0 user-provisioning endpoints. Disable to halt IdP sync without rotating tokens — IdPs see 503 and retry later.',
+  },
 } as const
 
-/* SCIM and DRIP_CAMPAIGNS were removed from the catalogue in Bundle BJ.
-   They were declared but never wired into a hot path, which made the
-   admin "kill-switch" UI lie about the surface area it actually
-   controlled. Re-add them here when the corresponding gate goes into
-   `app/api/scim/v2/Users/route.ts` (+ /[id]) and the drip dispatcher
-   loop. The migration is forward-only — DB rows from earlier writes
-   (if any) become orphan keys that listFeatures() simply doesn't
-   surface. */
+/* DRIP_CAMPAIGNS was removed from the catalogue in Bundle BJ and
+   intentionally NOT re-added: today the platform stores drip-campaign
+   CONFIG (POST /api/drip-campaigns + the /drip-campaigns page) but
+   has no dispatcher loop that actually sends. There's nothing to
+   gate. Re-add this key when the sender loop ships — the gate point
+   is wherever the cron / queue worker reads queued messages and
+   hands them to lib/philly/email/providers.ts. */
 
 export type FeatureDef = (typeof FEATURES)[keyof typeof FEATURES]
 export type FeatureKey = FeatureDef['key']
