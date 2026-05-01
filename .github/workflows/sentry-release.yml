@@ -1,17 +1,44 @@
 name: Sentry release + source maps
 
 # When a commit lands on main, create a Sentry release tagged with the
-# commit SHA, upload the just-built source maps, and finalise the
-# release. Without this, prod stack traces show minified gibberish.
+# commit SHA, upload source maps, and finalise the release. Without
+# this, prod stack traces show minified gibberish.
 #
-# Operator setup (one-time):
+# ─────────────────────────────────────────────────────────────────
+# IMPORTANT — known trade-off (Bundle BJ audit finding #9):
+# ─────────────────────────────────────────────────────────────────
+# This workflow builds the bundle on the GH-hosted runner and uploads
+# THOSE source maps. Vercel runs its own build to deploy production,
+# so bundle hashes can drift between this run and Vercel's. A frame
+# in a real prod stack trace might reference `chunks/abc123.js` but
+# this run uploaded `chunks/def456.js` — Sentry's frame matching then
+# fails silently and the trace stays minified.
+#
+# RECOMMENDED — use Vercel's native Sentry integration instead.
+# It runs source-map upload in the same build that produces the
+# deployed artifact, so hashes always match. Setup is one click:
+#
+#   vercel.com/integrations/sentry → Add → pick the project →
+#   sign in to your Sentry org → done.
+#
+# After installing the Vercel integration, DISABLE this workflow
+# (rename to `.disabled` or delete) — running both will create
+# duplicate releases.
+#
+# Keep this file as a fallback for non-Vercel deploys (self-hosted,
+# Render, Cloudflare Pages, etc.) where a marketplace integration
+# isn't available.
+# ─────────────────────────────────────────────────────────────────
+#
+# Operator setup (one-time, fallback path):
 #   - SENTRY_AUTH_TOKEN  → GitHub repo secret. Sentry → User Settings →
 #     Auth Tokens; needs project:releases scope.
 #   - SENTRY_ORG         → GitHub repo variable (your Sentry org slug).
 #   - SENTRY_PROJECT     → GitHub repo variable (your Sentry project slug).
 #
-# When any of these are unset the workflow short-circuits, so it
-# stays dormant until the operator wires it.
+# When SENTRY_ORG / SENTRY_PROJECT variables are unset the workflow
+# short-circuits at the job-level if-gate, so it stays dormant until
+# the operator wires it.
 
 on:
   push:

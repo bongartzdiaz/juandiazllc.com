@@ -348,29 +348,54 @@ actually broke. Sessions on a healthy page produce no replay
 events — Sentry buffers locally and discards if no error fires. The
 default `replaysSessionSampleRate=0` keeps it that way.
 
-## 9. Source-map upload — `.github/workflows/sentry-release.yml`
+## 9. Source-map upload — Sentry release tracking
 
-When a commit lands on `main`, GitHub Actions creates a Sentry
-release tagged with the commit SHA, uploads the just-built source
-maps, and finalises the release. Without this, prod stack traces
-show minified gibberish.
+Without source-map upload, prod stack traces show minified gibberish.
+There are two ways to wire this; pick one and disable the other.
 
-### 9.1 Setup (5 min)
+### 9.1 RECOMMENDED — Vercel native Sentry integration (1 click)
 
+When the platform is hosted on Vercel, Vercel's own marketplace
+integration runs the source-map upload in the SAME build that
+produces the deployed artifact, so bundle hashes always match.
+
+Setup:
+1. <https://vercel.com/integrations/sentry> → **Add Integration**.
+2. Pick the Vercel project (root + standalone separately if both
+   are deployed).
+3. Sign in to your Sentry org → grant access.
+4. Done. Sentry releases land automatically on every Vercel deploy,
+   tagged with the deploy's git SHA + Vercel deployment URL.
+
+If you go this route, **delete or disable
+`.github/workflows/sentry-release.yml`** (next section) so you don't
+create duplicate releases.
+
+### 9.2 FALLBACK — self-managed via GitHub Actions
+
+Use this only when not deploying to Vercel (self-hosted, Render,
+Cloudflare Pages, etc.). The workflow at
+`.github/workflows/sentry-release.yml` triggers on push to `main`,
+builds both apps, uploads the source maps, finalises the release.
+
+**Trade-off:** the GH runner runs its OWN build separate from the
+production deploy. Bundle hashes can drift between the two builds,
+which means Sentry's frame matching may silently fail and traces
+stay minified. The workflow is best-effort; the Vercel native
+integration is the correct answer.
+
+Setup:
 1. Sentry → User Settings → Auth Tokens → New token. Scope:
    `project:releases`. Copy the value.
 2. GitHub → repo settings → Secrets and variables → Actions:
    - Secret `SENTRY_AUTH_TOKEN` ← the token from step 1.
    - Variable `SENTRY_ORG` ← your Sentry org slug.
    - Variable `SENTRY_PROJECT` ← your Sentry project slug.
-3. Done. The next push to `main` creates a release. The workflow
-   short-circuits if the variables are unset, so it stays dormant
-   on forks / pre-wiring.
+3. Done. The next push to `main` creates a release.
 
 The workflow forces production source maps via
-`NEXT_PRIVATE_PROD_SOURCEMAPS=true`. Vercel's deploy doesn't ship
-source maps to the public bundle by default — they go to Sentry
-only.
+`NEXT_PRIVATE_PROD_SOURCEMAPS=true`. Source maps go to Sentry only —
+not the public `_next/static/` bundle.
 
 ## 10. Synthetic probe — `.github/workflows/synthetic-prod.yml`
 
