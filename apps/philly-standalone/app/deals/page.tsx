@@ -22,6 +22,9 @@ import type { SavedView } from '@/hooks/philly/useSavedViews'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { ContextMenu, type ContextMenuItem } from '@/components/philly/ui/ContextMenu'
+import { AdvancedFilterBuilder } from '@/components/philly/filter/AdvancedFilterBuilder'
+import { DEAL_FILTER_SCHEMA } from '@/lib/philly/filter/schemas'
+import type { FilterSpec } from '@/lib/philly/filter/types'
 import { useGlobalShortcuts } from '@/hooks/philly/useGlobalShortcuts'
 
 const DEAL_COLUMN_DEFS: ColumnDef[] = [
@@ -127,6 +130,14 @@ export default function DealsPage() {
     if (typeof f.pipelineId === 'string') next.pipelineId = f.pipelineId
     if (typeof f.view === 'string') next.view = f.view
     setFilters(next)
+    // Bundle BU — round-trip the advanced filter spec from the saved
+    // view. Pre-BU saved views don't have an `advanced` key; clear in
+    // that case so the user doesn't carry over a stale spec.
+    if (f.advanced && typeof f.advanced === 'object') {
+      setFilterSpec(f.advanced as FilterSpec)
+    } else {
+      setFilterSpec(null)
+    }
     addToast(t('toasts.applied', { name: saved.name }), 'success')
   }, [setFilters, addToast, t])
 
@@ -150,6 +161,13 @@ export default function DealsPage() {
 
   // Bundle V — quick-view popover for deals (list + kanban).
   const [quickViewId, setQuickViewId] = useState<string | null>(null)
+
+  // Bundle BU — advanced filter builder (deals lift). Mirrors Bundle AM
+  // on contacts. SavedView.filtersJson carries the spec under the
+  // `advanced` key for round-tripping; the API receives it as a
+  // JSON-encoded `?filter=` query param.
+  const [filterSpec, setFilterSpec] = useState<FilterSpec | null>(null)
+  const [filterOpen, setFilterOpen] = useState(false)
 
   // Bundle AE — right-click context menu.
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; dealId: string } | null>(null)
@@ -220,8 +238,13 @@ export default function DealsPage() {
     const params = new URLSearchParams({ page: String(page), limit: view === 'board' ? '200' : '25' })
     if (selectedPipeline) params.set('pipelineId', selectedPipeline)
     if (statusFilter) params.set('status', statusFilter)
+    // Bundle BU — JSON-encoded advanced filter spec. Server compiles
+    // against DEAL_FILTER_SCHEMA + AND-wraps under tenancy guard.
+    if (filterSpec && filterSpec.rules.length > 0) {
+      params.set('filter', JSON.stringify(filterSpec))
+    }
     return params.toString()
-  }, [page, selectedPipeline, statusFilter, view])
+  }, [page, selectedPipeline, statusFilter, view, filterSpec])
 
   const dealsQuery = useApi<DealsResponse>(`/deals?${dealsQueryString}`)
   const dealsData = dealsQuery.data
@@ -593,11 +616,51 @@ export default function DealsPage() {
           </div>
         )}
 
-        {/* Saved views (Bundle AA) — persists q/status/pipelineId/view. */}
+        {/* Bundle BU — advanced filter builder (deals lift). */}
+        {!noPipelines && (
+          <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+            <button
+              type="button"
+              onClick={() => setFilterOpen(true)}
+              aria-label="Open advanced filter builder"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
+                background: filterSpec ? 'color-mix(in srgb, var(--accent) 14%, transparent)' : 'var(--bg2)',
+                color: filterSpec ? 'var(--accent)' : 'var(--txt2)',
+                border: filterSpec ? '1px solid var(--accent)' : '1px solid var(--border)',
+                cursor: 'pointer', fontFamily: 'inherit',
+              }}
+            >
+              <Filter size={12} />
+              {filterSpec
+                ? `Advanced filter (${filterSpec.rules.length} rule${filterSpec.rules.length === 1 ? '' : 's'})`
+                : 'Advanced filter'}
+            </button>
+            {filterSpec && (
+              <button
+                type="button"
+                onClick={() => setFilterSpec(null)}
+                aria-label="Clear advanced filter"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  padding: '5px 10px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
+                  background: 'var(--bg2)', color: 'var(--txt2)',
+                  border: '1px solid var(--border)', cursor: 'pointer', fontFamily: 'inherit',
+                }}
+              >
+                <X size={12} />
+                Clear
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Saved views (Bundle AA) — persists q/status/pipelineId/view + advanced. */}
         {!noPipelines && (
           <SavedViewsBar
             entity="deals"
-            currentFilters={{ q: search, status: statusFilter, pipelineId: selectedPipeline, view }}
+            currentFilters={{ q: search, status: statusFilter, pipelineId: selectedPipeline, view, advanced: filterSpec ?? undefined }}
             onApply={applySavedView}
           />
         )}
@@ -1098,6 +1161,14 @@ export default function DealsPage() {
       )}
 
       <DealQuickView dealId={quickViewId} onClose={() => setQuickViewId(null)} />
+
+      <AdvancedFilterBuilder
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        schema={DEAL_FILTER_SCHEMA}
+        initial={filterSpec}
+        onApply={(spec) => setFilterSpec(spec)}
+      />
 
       {ctxMenu && (() => {
         const d = dealsData?.data.find((x) => x.id === ctxMenu.dealId)

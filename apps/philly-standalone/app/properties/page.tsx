@@ -16,6 +16,9 @@ import type { SavedView } from '@/hooks/philly/useSavedViews'
 import { ContextMenu, type ContextMenuItem } from '@/components/philly/ui/ContextMenu'
 import { useToast } from '@/hooks/philly/useToast'
 import { useGlobalShortcuts } from '@/hooks/philly/useGlobalShortcuts'
+import { AdvancedFilterBuilder } from '@/components/philly/filter/AdvancedFilterBuilder'
+import { PROPERTY_FILTER_SCHEMA } from '@/lib/philly/filter/schemas'
+import type { FilterSpec } from '@/lib/philly/filter/types'
 
 type Option = { value: string; label: string }
 type Flag = { key: string; label: string }
@@ -122,6 +125,12 @@ export default function PropertiesPage() {
   const router = useRouter()
   const { addToast } = useToast()
 
+  // Bundle BU — advanced filter builder (properties lift). Declared
+  // above applySavedView so the saved-view round-trip can write to
+  // setFilterSpec without a TDZ hazard.
+  const [filterSpec, setFilterSpec] = useState<FilterSpec | null>(null)
+  const [filterOpen, setFilterOpen] = useState(false)
+
   const applySavedView = useCallback((saved: SavedView) => {
     const f = saved.filters
     if (typeof f.listingType === 'string') setListingType(f.listingType)
@@ -132,6 +141,13 @@ export default function PropertiesPage() {
     if (typeof f.bankOwned === 'boolean') setBankOwned(f.bankOwned)
     if (typeof f.resaleOnly === 'boolean') setResaleOnly(f.resaleOnly)
     if (typeof f.search === 'string') setSearch(f.search)
+    // Bundle BU — round-trip the advanced filter spec from the saved
+    // view; clear if absent so the user doesn't carry stale state.
+    if (f.advanced && typeof f.advanced === 'object') {
+      setFilterSpec(f.advanced as FilterSpec)
+    } else {
+      setFilterSpec(null)
+    }
   }, [])
 
   const t = useTranslations('properties')
@@ -245,6 +261,9 @@ export default function PropertiesPage() {
   if (bankOwned) params.set('bankOwned', 'true')
   if (resaleOnly) params.set('resale', 'true')
   if (search) params.set('q', search)
+  if (filterSpec && filterSpec.rules.length > 0) {
+    params.set('filter', JSON.stringify(filterSpec))
+  }
   interface PropertiesResponse { data: Property[]; pagination: { total: number; totalPages: number } }
   const propertiesQuery = useApi<PropertiesResponse>(`/properties?${params}`)
   const serverProperties = propertiesQuery.data?.data ?? []
@@ -471,12 +490,50 @@ export default function PropertiesPage() {
           )}
         </div>
 
+        {/* Bundle BU — advanced filter builder (properties lift). */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+          <button
+            type="button"
+            onClick={() => setFilterOpen(true)}
+            aria-label="Open advanced filter builder"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5,
+              padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
+              background: filterSpec ? 'color-mix(in srgb, var(--accent) 14%, transparent)' : 'var(--bg2)',
+              color: filterSpec ? 'var(--accent)' : 'var(--txt2)',
+              border: filterSpec ? '1px solid var(--accent)' : '1px solid var(--border)',
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}
+          >
+            <Filter size={12} />
+            {filterSpec
+              ? `Advanced filter (${filterSpec.rules.length} rule${filterSpec.rules.length === 1 ? '' : 's'})`
+              : 'Advanced filter'}
+          </button>
+          {filterSpec && (
+            <button
+              type="button"
+              onClick={() => setFilterSpec(null)}
+              aria-label="Clear advanced filter"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '5px 10px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
+                background: 'var(--bg2)', color: 'var(--txt2)',
+                border: '1px solid var(--border)', cursor: 'pointer', fontFamily: 'inherit',
+              }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
+
         {/* Saved views (Bundle AA) */}
         <SavedViewsBar
           entity="properties"
           currentFilters={{
             listingType, district, type, subtype, statusFilter,
             bankOwned, resaleOnly, search,
+            advanced: filterSpec ?? undefined,
           }}
           onApply={applySavedView}
         />
@@ -745,6 +802,14 @@ export default function PropertiesPage() {
       )}
 
       <PropertyQuickView propertyId={quickViewId} onClose={() => setQuickViewId(null)} />
+
+      <AdvancedFilterBuilder
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        schema={PROPERTY_FILTER_SCHEMA}
+        initial={filterSpec}
+        onApply={(spec) => setFilterSpec(spec)}
+      />
 
       {ctxMenu && (() => {
         const p = properties.find((x) => x.id === ctxMenu.propertyId)
