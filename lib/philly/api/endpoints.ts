@@ -195,6 +195,7 @@ export const ENDPOINTS = {
     costs: '/outreach?view=costs',
     countries: '/outreach?view=countries',
     errors: '/outreach?view=errors',
+    messages: '/outreach/messages',
   },
 } as const
 
