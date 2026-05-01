@@ -186,6 +186,16 @@ export const ENDPOINTS = {
     test: (id: string) => `/integrations/${id}/test`,
     oauth: (provider: string) => `/integrations/oauth/${provider}`,
   },
+  outreach: {
+    dashboard: '/outreach',
+    funnel: '/outreach?view=funnel',
+    campaigns: '/outreach?view=campaigns',
+    accounts: '/outreach?view=accounts',
+    replies: '/outreach?view=replies',
+    costs: '/outreach?view=costs',
+    countries: '/outreach?view=countries',
+    errors: '/outreach?view=errors',
+  },
 } as const
 
 /* Derived helper types */

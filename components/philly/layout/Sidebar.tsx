@@ -10,7 +10,7 @@ import {
   Home, BedDouble, Eye, HandCoins, Trophy, DoorOpen, Mail, TrendingUp,
   Inbox, FileCode, ListChecks, ClipboardList, Target, GitBranch,
   Phone, UserPlus, Network, BarChart, Globe, PenTool,
-  MessageSquare, Plug, Layers, Sparkles, Webhook,
+  MessageSquare, Plug, Layers, Sparkles, Webhook, Linkedin,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -65,6 +65,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
     { icon: FileCode, label: t('templates'), href: '/philly/templates' },
     { icon: Layers, label: t('pages'), href: '/philly/pages' },
     { icon: Sparkles, label: t('aiInsights'), href: '/philly/ai', badgeNew: true },
+    { icon: Linkedin, label: t('outreach'), href: '/philly/outreach', badgeNew: true },
   ]
 
   // Industry-specific nav items
