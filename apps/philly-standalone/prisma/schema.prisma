@@ -1106,7 +1106,50 @@ model DripCampaign {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
+  enrollments DripEnrollment[]
+
   @@index([organizationId, type])
+}
+
+// DripEnrollment — one row per (campaign, contact) pair. Tracks how
+// far through the campaign's stepsJson we've delivered, when the next
+// step is due, and whether the enrollment is still active. Bundle BZ.
+//
+// nextDueAt is the queue cursor — the cron polls
+// `WHERE status='active' AND nextDueAt <= now()` and sends the step
+// at lastStepIndex + 1, then advances. Done when lastStepIndex
+// reaches the end of stepsJson.
+model DripEnrollment {
+  id             String    @id @default(cuid())
+  campaignId     String
+  contactId      String
+  organizationId String
+  /// active | paused | done | cancelled
+  status         String    @default("active")
+  /// 0-based index of the LAST delivered step. -1 means nothing
+  /// delivered yet (the first step is at index 0). The cron picks
+  /// up step[lastStepIndex + 1] when nextDueAt fires.
+  lastStepIndex  Int       @default(-1)
+  /// When the next step should fire. NULL means the enrollment is
+  /// complete or paused.
+  nextDueAt      DateTime?
+  /// Timestamp of the last successful send — used for audit + the
+  /// "lastDelivered" UI column.
+  lastDeliveredAt DateTime?
+  /// If the last send attempt failed (provider error), we record the
+  /// reason here so the operator can debug. Cleared on next success.
+  lastError      String?   @db.Text
+  /// How many delivery attempts have happened total. Useful for the
+  /// admin UI + for retries that don't bump lastStepIndex.
+  attemptCount   Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  campaign DripCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, contactId])
+  @@index([organizationId, status, nextDueAt])
+  @@index([contactId])
 }
 
 // ── Real Estate: Agent Performance / Commission Tracker ──

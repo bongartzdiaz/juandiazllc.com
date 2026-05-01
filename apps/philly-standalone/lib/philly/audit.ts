@@ -72,6 +72,7 @@ export type AuditEntity =
   | 'housekeepingTask'
   | 'featureFlag'
   | 'scimGroup'
+  | 'dripEnrollment'
 
 interface LogAuditParams {
   scope: AuthScope

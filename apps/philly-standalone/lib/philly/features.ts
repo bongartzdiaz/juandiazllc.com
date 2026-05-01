@@ -62,15 +62,16 @@ export const FEATURES = {
     enabledByDefault: true,
     description: 'SCIM 2.0 user-provisioning endpoints. Disable to halt IdP sync without rotating tokens — IdPs see 503 and retry later.',
   },
+  /** Drip-campaign dispatcher (Bundle BZ). Wired into the cron route
+   *  `/api/cron/drip-dispatch`. When disabled, the cron skips the
+   *  org's enrollments — config CRUD on /api/drip-campaigns still
+   *  works so operators can prep / edit while paused. */
+  DRIP_CAMPAIGNS: {
+    key: 'drip-campaigns',
+    enabledByDefault: true,
+    description: 'Scheduled outbound email + SMS dispatch from drip campaigns. Disable to pause every drip without editing each campaign.',
+  },
 } as const
-
-/* DRIP_CAMPAIGNS was removed from the catalogue in Bundle BJ and
-   intentionally NOT re-added: today the platform stores drip-campaign
-   CONFIG (POST /api/drip-campaigns + the /drip-campaigns page) but
-   has no dispatcher loop that actually sends. There's nothing to
-   gate. Re-add this key when the sender loop ships — the gate point
-   is wherever the cron / queue worker reads queued messages and
-   hands them to lib/philly/email/providers.ts. */
 
 export type FeatureDef = (typeof FEATURES)[keyof typeof FEATURES]
 export type FeatureKey = FeatureDef['key']

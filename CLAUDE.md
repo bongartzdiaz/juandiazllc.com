@@ -373,7 +373,8 @@ setup steps below.
    `20260430010000_feature_flags_harden`,
    `20260501000000_user_scim_external_id`,
    `20260501010000_property_display_order`,
-   `20260501020000_scim_groups`.
+   `20260501020000_scim_groups`,
+   `20260501030000_drip_enrollment`.
    (`SavedView` is in the schema already; verify it's in your DB and
    create-if-missing — no dedicated migration was needed because the
    model was added to the schema in an earlier branch.)
