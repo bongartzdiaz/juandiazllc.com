@@ -11,6 +11,9 @@ import { validateBody } from '@/lib/philly/validation'
 import { createDealSchema } from '@/lib/philly/validation/schemas'
 import { SLO, withSpan } from '@/lib/philly/observability'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { compileFilter, FilterCompileError } from '@/lib/philly/filter/compile'
+import { DEAL_FILTER_SCHEMA } from '@/lib/philly/filter/schemas'
+import type { FilterSpec } from '@/lib/philly/filter/types'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -49,7 +52,25 @@ export async function GET(req: NextRequest) {
   const stageId = url.searchParams.get('stageId') ?? undefined
   const projectId = url.searchParams.get('projectId') ?? undefined
 
-  const where = {
+  // Bundle BT — advanced filter builder. Accepts a JSON-encoded
+  // FilterSpec under `?filter=`. Compile errors come back as 400.
+  let advancedClause: Record<string, unknown> | null = null
+  const filterParam = url.searchParams.get('filter')
+  if (filterParam) {
+    let parsed: unknown
+    try { parsed = JSON.parse(filterParam) } catch { return jsonError('Invalid filter JSON', 400) }
+    try {
+      advancedClause = compileFilter(parsed as FilterSpec, DEAL_FILTER_SCHEMA)
+    } catch (e) {
+      if (e instanceof FilterCompileError) return jsonError(e.message, 400)
+      throw e
+    }
+  }
+
+  const where: Record<string, unknown> = {
+    // Tenancy guard runs through the pipeline relation. Defence-in-depth:
+    // the compiled advancedClause never references organizationId
+    // (the schema doesn't list it), and we AND-wrap below.
     pipeline: { organizationId: scope.organizationId },
     ...(pipelineId ? { pipelineId } : {}),
     ...(status ? { status } : {}),
@@ -57,6 +78,9 @@ export async function GET(req: NextRequest) {
     ...(ownerId ? { ownerId } : {}),
     ...(stageId ? { stageId } : {}),
     ...(projectId ? { projectId } : {}),
+  }
+  if (advancedClause && Object.keys(advancedClause).length > 0) {
+    where.AND = [advancedClause]
   }
 
   const [deals, total] = await Promise.all([

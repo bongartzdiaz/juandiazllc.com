@@ -90,6 +90,98 @@ export const CONTACT_FILTER_SCHEMA: FilterEntitySchema = {
   ],
 }
 
+/* ---------------------------------------------------------------
+   Deal — Bundle BT
+   ---------------------------------------------------------------
+   Allowed fields: title (string), status (enum), dealType (enum),
+   valueCents (number — exposed in cents; UI converts), probability
+   (number 0-100), expectedClose (date), createdAt (date),
+   leadSource (enum). pipelineId / stageId / contactId / propertyId
+   / ownerId are foreign keys; equality-only via `eq`. */
+
+const DEAL_STATUSES = ['open', 'won', 'lost'] as const
+const DEAL_TYPES = ['buy', 'sell', 'rent', 'lease', 'dual'] as const
+const DEAL_LEAD_SOURCES = [
+  'website', 'zillow', 'realtor_com', 'referral', 'open_house',
+  'facebook', 'google', 'cold_call', 'sphere',
+] as const
+
+export const DEAL_FILTER_SCHEMA: FilterEntitySchema = {
+  entity: 'deal',
+  fields: [
+    { id: 'title', label: 'Title', type: 'string' },
+    {
+      id: 'status', label: 'Status', type: 'enum',
+      options: DEAL_STATUSES.map(s => ({ value: s, label: s })),
+    },
+    {
+      id: 'dealType', label: 'Type', type: 'enum',
+      options: DEAL_TYPES.map(t => ({ value: t, label: t })),
+    },
+    { id: 'valueCents', label: 'Value (cents)', type: 'number' },
+    { id: 'probability', label: 'Probability', type: 'number' },
+    { id: 'expectedClose', label: 'Expected close', type: 'date' },
+    { id: 'createdAt', label: 'Created', type: 'date' },
+    {
+      id: 'leadSource', label: 'Lead source', type: 'enum',
+      options: DEAL_LEAD_SOURCES.map(s => ({ value: s, label: s })),
+    },
+    { id: 'pipelineId', label: 'Pipeline', type: 'string' },
+    { id: 'stageId', label: 'Stage', type: 'string' },
+    { id: 'contactId', label: 'Contact', type: 'string' },
+    { id: 'propertyId', label: 'Property', type: 'string' },
+    { id: 'ownerId', label: 'Owner', type: 'string' },
+  ],
+}
+
+/* ---------------------------------------------------------------
+   Property — Bundle BT
+   ---------------------------------------------------------------
+   Allowed fields: title (string), type (enum), status (enum),
+   listingType (enum), district / town / city / state (string),
+   priceCents (number), bedrooms / bathrooms / sqft / yearBuilt
+   (number), createdAt / listingDate (date), bankOwned / isResale
+   (boolean), mlsNumber (string). */
+
+const PROPERTY_TYPES = ['residential', 'commercial', 'land', 'industrial'] as const
+const PROPERTY_STATUSES = ['available', 'under_contract', 'sold', 'rented'] as const
+const PROPERTY_LISTING_TYPES = ['sale', 'rent'] as const
+
+export const PROPERTY_FILTER_SCHEMA: FilterEntitySchema = {
+  entity: 'property',
+  fields: [
+    { id: 'title', label: 'Title', type: 'string' },
+    {
+      id: 'type', label: 'Type', type: 'enum',
+      options: PROPERTY_TYPES.map(t => ({ value: t, label: t })),
+    },
+    {
+      id: 'status', label: 'Status', type: 'enum',
+      options: PROPERTY_STATUSES.map(s => ({ value: s, label: s.replace('_', ' ') })),
+    },
+    {
+      id: 'listingType', label: 'Listing type', type: 'enum',
+      options: PROPERTY_LISTING_TYPES.map(t => ({ value: t, label: t })),
+    },
+    { id: 'district', label: 'District', type: 'string' },
+    { id: 'town', label: 'Town', type: 'string' },
+    { id: 'city', label: 'City', type: 'string' },
+    { id: 'state', label: 'State / Region', type: 'string' },
+    { id: 'priceCents', label: 'Price (cents)', type: 'number' },
+    { id: 'bedrooms', label: 'Bedrooms', type: 'number' },
+    { id: 'bathrooms', label: 'Bathrooms', type: 'number' },
+    { id: 'sqft', label: 'Sqft', type: 'number' },
+    { id: 'yearBuilt', label: 'Year built', type: 'number' },
+    { id: 'createdAt', label: 'Created', type: 'date' },
+    { id: 'listingDate', label: 'Listed', type: 'date' },
+    { id: 'mlsNumber', label: 'MLS #', type: 'string' },
+    { id: 'bankOwned', label: 'Bank owned', type: 'boolean' },
+    { id: 'isResale', label: 'Resale', type: 'boolean' },
+  ],
+}
+
 export const FILTER_SCHEMAS: Record<string, FilterEntitySchema> = {
   contact: CONTACT_FILTER_SCHEMA,
+  deal: DEAL_FILTER_SCHEMA,
+  property: PROPERTY_FILTER_SCHEMA,
 }

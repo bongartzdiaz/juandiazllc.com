@@ -10,6 +10,9 @@ import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { validateBody } from '@/lib/philly/validation'
 import { createPropertySchema } from '@/lib/philly/validation/schemas'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { compileFilter, FilterCompileError } from '@/lib/philly/filter/compile'
+import { PROPERTY_FILTER_SCHEMA } from '@/lib/philly/filter/schemas'
+import type { FilterSpec } from '@/lib/philly/filter/types'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -43,7 +46,23 @@ export async function GET(req: NextRequest) {
   const search = url.searchParams.get('q') ?? undefined
 
   const prisma = getAuthPrisma()
-  const where: any = {
+
+  // Bundle BT — advanced filter builder. Accepts a JSON-encoded
+  // FilterSpec under `?filter=`. Compile errors come back as 400.
+  let advancedClause: Record<string, unknown> | null = null
+  const filterParam = url.searchParams.get('filter')
+  if (filterParam) {
+    let parsed: unknown
+    try { parsed = JSON.parse(filterParam) } catch { return jsonError('Invalid filter JSON', 400) }
+    try {
+      advancedClause = compileFilter(parsed as FilterSpec, PROPERTY_FILTER_SCHEMA)
+    } catch (e) {
+      if (e instanceof FilterCompileError) return jsonError(e.message, 400)
+      throw e
+    }
+  }
+
+  const where: Record<string, unknown> = {
     organizationId: scope.organizationId,
     ...(status ? { status } : {}),
     ...(type ? { type } : {}),
@@ -58,6 +77,12 @@ export async function GET(req: NextRequest) {
       { city: { contains: search } },
       { town: { contains: search } },
     ] } : {}),
+  }
+  if (advancedClause && Object.keys(advancedClause).length > 0) {
+    // Wrap user filter in AND with the tenancy guard so the compiled
+    // spec can never override organizationId (it's not in the schema
+    // either, but defence-in-depth).
+    where.AND = [advancedClause]
   }
 
   const [properties, total] = await Promise.all([
