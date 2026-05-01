@@ -145,21 +145,25 @@ controls — these are independent of the IdP:
   [`docs/legal/DPIA-AI-ATTRIBUTES.md`](../legal/DPIA-AI-ATTRIBUTES.md)
   if the customer enables AI Attributes on contacts.
 
-## SCIM provisioning (deferred)
+## SCIM provisioning
 
-Production-grade enterprise customers also expect **SCIM 2.0** for
-automated user provisioning + de-provisioning from their IdP. The
-platform does not yet expose a SCIM endpoint — when this becomes
-the gating factor on a deal:
+Production-grade enterprise customers expect **SCIM 2.0** for
+automated user provisioning + de-provisioning from their IdP.
+The platform now ships SCIM 2.0 (Bundle R, RFCs 7643 + 7644).
+Operator setup lives in [`SCIM-SETUP.md`](./SCIM-SETUP.md) — the
+short version is: issue a long-lived `ApiKey` row with
+`scopes: ["scim:users"]`, hand it to the customer's IdP, point
+the IdP at `https://<your-host>/api/scim/v2/Users`.
 
-- Spec: <https://datatracker.ietf.org/doc/html/rfc7643> (core schema)
-  and <https://datatracker.ietf.org/doc/html/rfc7644> (protocol).
-- Endpoint shape: `app/api/scim/v2/{Users,Groups}/route.ts`.
-- Auth: long-lived bearer token issued by an admin, stored hashed.
-- Requires no Supabase changes — the platform writes directly to
-  `User`/`Membership` tables.
-- Implementation effort: ~2 weeks of focused work for a compliant
-  subset (Users CRUD, Groups CRUD, filtering, pagination).
+Status of the implementation:
+- **Users**: shipped (CRUD, filter, pagination — RFC 7644).
+- **Groups**: not yet shipped — group → role/sections mapping
+  is the next milestone. Today, all SCIM-provisioned users land
+  with the default `viewer` role and the operator manually
+  promotes them.
+- **`externalId` round-trip**: not persisted — the IdP's stable
+  identifier isn't stored on the User row yet, so de-provisioning
+  is by email, not by `externalId`.
 
 ## Troubleshooting
 

@@ -213,11 +213,78 @@ through NL/DE/ES on `/work`, `/insights`, `/sectors`, `/signals`,
   `roi.eyebrow`/`roi.title`/`roi.lede` and `roi.outro.*`). That's the
   next ship.
 
-### Launch readiness — 2026-04-28 (updated 2026-04-29)
+### Launch readiness — 2026-04-28 (updated 2026-05-01)
 
-Bundles G–AY shipped on `claude/ai-command-bar`. The CRM is launch-
+Bundles G–BO shipped on `claude/ai-command-bar`. The CRM is launch-
 ready for big-company / EU-GDPR procurement subject to the operator
 setup steps below.
+
+**Bundles AZ–BO (post-AY work, summarised):**
+- AZ — hot-fix pass: LiveSignals `<em>` rendering, vendor-commission stat
+  (€500K+), removed cursor-tracker effects, fixed CRM contacts dead-end
+  in RE/HOS demo modes (open QuickView instead of routing to a 404).
+- BA — observability: standalone instrumentation.ts (Sentry init), root
+  /api/health, lib/philly/alerts.ts (Slack webhook helper, 9 tests),
+  audit-chain CLI now pages on integrity failure, OBSERVABILITY.md.
+- BB — rate-limit sweep: 86 mutation routes hardened with
+  `enforceRateLimit(...)` (PRESET_MUTATION; PRESET_SEND on outbound
+  message dispatch). 8 routes intentionally left unrate-limited
+  (cron, vitals, csp-report, log-error, me, scim).
+- BC — frontend Sentry: `lib/philly/sentry-browser.ts` (both apps),
+  `<SentryBootstrap />` in both layouts, replays-on-error w/ PII scrub.
+- BD — feature flags: `FeatureFlag` Prisma model + migration
+  `20260430000000_feature_flags`, `lib/philly/features.ts` (12 tests),
+  `/api/admin/features` GET/PATCH (admin + rate-limited + audit-logged),
+  AI contact-enrichment kill-switch wired as proof-of-concept.
+- BE — `runScheduledErasures` batched: per-row delete loop → single
+  `deleteMany`, shipping the Bundle AN audit win.
+- BF — CI hardening: `.github/workflows/sentry-release.yml` for source-
+  map upload + `synthetic-prod.yml` for /api/health probe every 15 min.
+- BG — frontend resilience: route-segment `error.tsx` (both apps),
+  standalone `not-found.tsx`, `WebVitalsReporter` forwards to Sentry as
+  measurements when SDK is initialised.
+- BH — DB slow-query report: `npm run db:slow` CLI on
+  `pg_stat_statements`, `.github/workflows/db-slow-queries.yml` daily
+  cron, OBSERVABILITY.md §11.
+- BI — operator runbooks: `STATUS-PAGE.md` (Better Stack wiring) +
+  `BACKUP-RESTORE.md` (GDPR Art. 32(1)(c) quarterly drill protocol).
+- BJ — audit fixes (10 findings): AI half-switch on contact create
+  closed; synthetic-probe Slack `if:` fixed; db-slow-queries job-level
+  gate switched to `vars.DB_SLOW_ENABLED`; wired AI_DEAL_SCORING +
+  WEBHOOKS + REALTIME flags into hot paths (new `isFeatureEnabledSync`
+  helper for sync publishers); demoted unwired SCIM + DRIP_CAMPAIGNS
+  from the catalogue; cross-org cache bust on global flag mutation;
+  `/api/health` timer cleanup; new migration `20260430010000_feature_
+  flags_harden` (idempotent FK + partial unique index for the global
+  slot to fix the NULL-in-unique-index hole); strict exit codes in
+  slow-query workflow.
+- BK — admin UI for feature flags at `/settings/features`. Listed in
+  the global Cmd-K palette under System.
+- BL — i18n sweep on dialer + inbox (last RE-side English leaks).
+  ~125 keys × 4 locales = ~500 new translations under `dialer.*` and
+  `inbox.*` namespaces.
+- BM — Sentry source-map: docs rewrite recommending Vercel native
+  marketplace integration as primary path; GH workflow stays as
+  fallback for non-Vercel deploys with the bundle-hash drift trade-off
+  explicit.
+- BN — SECURITY hotfix (HIGH): AI command-execute privilege
+  escalation. `/api/ai/command-execute` was gated only by
+  `requireScope()`, letting any logged-in user (including viewers)
+  invoke write tools (update_deal_stage / set_lead_status /
+  add_contact_note / create_task / schedule_followup /
+  link_deal_to_contact) and bypass the in-org RBAC of the
+  conventional PATCH/POST routes. Now branches on `isWriteTool(tool)`
+  and elevates to `requireRole(['admin','manager'])` + a separate
+  write-bucket rate-limit before dispatch. Both apps fixed.
+- BO — dead-code + dependency cleanup: 5 orphan files deleted (×2
+  apps = 10 file deletes — chart-config, LeadScoreCard, ContactDrawer,
+  ApiErrorBanner, StatusBadge); `@dnd-kit/*` × 3 + `react-is`
+  removed from both `package.json` files (drag-drop uses native
+  HTML5 API, react-is unused); `qrcode` + `@types/qrcode` removed
+  from root (only used by standalone). `SSO-SETUP.md` updated —
+  the "SCIM provisioning (deferred)" section now reflects that
+  SCIM is shipped (Bundle R) with Groups + externalId still
+  outstanding.
 
 **Bundles in this branch:**
 - G — multi-org Membership + per-org last-admin guard
