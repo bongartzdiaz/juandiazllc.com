@@ -118,6 +118,13 @@ model User {
   twoFactorSecret     String?   // encrypted via src/lib/crypto.ts
   twoFactorEnabled    Boolean   @default(false)
   twoFactorVerifiedAt DateTime?
+  // SCIM externalId — the IdP's stable identifier for this user
+  // (e.g. "okta-00u4abc123"). Persisted on POST + PUT + PATCH so
+  // de-provisioning by externalId works without round-tripping
+  // email. Null when the user wasn't SCIM-provisioned.
+  // Bundle BQ; RFC 7644 §3.4 (filter by externalId).
+  scimExternalId      String?
+  @@index([organizationId, scimExternalId])
 
   organization    Organization     @relation(fields: [organizationId], references: [id])
   // Multi-org membership. organizationId above is the user's "home"

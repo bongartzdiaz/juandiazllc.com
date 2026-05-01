@@ -157,13 +157,16 @@ the IdP at `https://<your-host>/api/scim/v2/Users`.
 
 Status of the implementation:
 - **Users**: shipped (CRUD, filter, pagination — RFC 7644).
+- **`externalId` round-trip**: shipped (Bundle BQ). The IdP's
+  stable identifier (`scimExternalId` on the User row, e.g.
+  `"okta-00u4abc123"`) round-trips on POST + PUT + PATCH; filter
+  by `externalId eq <value>` works; `GET /Users/<id>` accepts
+  either the platform id OR the externalId as the lookup key.
+  De-provisioning by stable identifier is no longer email-bound.
 - **Groups**: not yet shipped — group → role/sections mapping
   is the next milestone. Today, all SCIM-provisioned users land
   with the default `viewer` role and the operator manually
   promotes them.
-- **`externalId` round-trip**: not persisted — the IdP's stable
-  identifier isn't stored on the User row yet, so de-provisioning
-  is by email, not by `externalId`.
 
 ## Troubleshooting
 

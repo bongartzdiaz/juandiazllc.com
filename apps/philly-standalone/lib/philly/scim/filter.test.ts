@@ -41,7 +41,17 @@ describe('parseScimFilter', () => {
 
   it('rejects unsupported attributes', () => {
     expect(parseScimFilter('emails eq "x@y.com"')).toBeNull()
-    expect(parseScimFilter('externalId eq "abc"')).toBeNull()
+  })
+
+  it('parses externalId eq (Bundle BQ)', () => {
+    expect(parseScimFilter('externalId eq "okta-00u4abc123"')).toEqual({
+      externalId: 'okta-00u4abc123',
+    })
+    // Combined with active.
+    expect(parseScimFilter('externalId eq "okta-x" and active eq false')).toEqual({
+      externalId: 'okta-x',
+      active: false,
+    })
   })
 
   it('rejects unsupported operators', () => {

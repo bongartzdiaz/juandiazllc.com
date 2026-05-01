@@ -35,6 +35,9 @@ export interface PlatformUserRow {
   deletionScheduledAt: Date | null
   createdAt: Date
   updatedAt?: Date
+  /** Bundle BQ — IdP's stable identifier, round-tripped to SCIM
+   *  `externalId`. Null when the user wasn't SCIM-provisioned. */
+  scimExternalId?: string | null
 }
 
 export function userToScim(
@@ -48,6 +51,7 @@ export function userToScim(
   return {
     schemas: [USER_SCHEMA],
     id: user.id,
+    ...(user.scimExternalId ? { externalId: user.scimExternalId } : {}),
     userName: user.email,
     name: {
       givenName,

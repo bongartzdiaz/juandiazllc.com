@@ -37,6 +37,7 @@ const SELECT = {
   organizationId: true,
   deletionScheduledAt: true,
   createdAt: true,
+  scimExternalId: true,
 } as const
 
 export async function GET(req: NextRequest, ctx: RouteCtx) {
@@ -48,8 +49,14 @@ export async function GET(req: NextRequest, ctx: RouteCtx) {
   const gated = await scimGate(prisma, auth.organizationId)
   if (gated) return gated
 
+  // Bundle BQ — accept either the platform id OR the SCIM externalId
+  // as the lookup key. IdPs that store externalId locally can hit
+  // /Users/<externalId> directly.
   const user = await prisma.user.findFirst({
-    where: { id, organizationId: auth.organizationId },
+    where: {
+      organizationId: auth.organizationId,
+      OR: [{ id }, { scimExternalId: id }],
+    },
     select: SELECT,
   })
   if (!user) return scimError(404, `User ${id} not found`)
@@ -96,6 +103,8 @@ export async function PUT(req: NextRequest, ctx: RouteCtx) {
     data: {
       email: parsed.email,
       name: parsed.name,
+      // Bundle BQ — round-trip externalId on PUT.
+      ...(parsed.externalId !== null ? { scimExternalId: parsed.externalId } : {}),
       ...(parsed.active === false
         ? { deletionScheduledAt: existing.id ? new Date() : null }
         : { deletionScheduledAt: null, tokensInvalidAfter: null }),
@@ -244,6 +253,7 @@ function applyPatchOp(
   if (!path && op.op === 'replace' && value && typeof value === 'object') {
     const v = value as Record<string, unknown>
     if (typeof v.userName === 'string') data.email = v.userName
+    if (typeof v.externalId === 'string') data.scimExternalId = v.externalId
     if (typeof v.active === 'boolean') {
       if (v.active === false) {
         data.deletionScheduledAt = new Date()
@@ -283,6 +293,11 @@ function applyPatchOp(
   if (path === 'userName') {
     if (typeof value !== 'string') return { error: '`userName` must be a string' }
     data.email = value
+    return
+  }
+  if (path === 'externalId') {
+    if (typeof value !== 'string') return { error: '`externalId` must be a string' }
+    data.scimExternalId = value
     return
   }
   if (path === 'name.formatted') {

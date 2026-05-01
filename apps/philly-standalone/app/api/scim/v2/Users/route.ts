@@ -52,6 +52,7 @@ export async function GET(req: NextRequest) {
 
   const where: Record<string, unknown> = { organizationId: auth.organizationId }
   if (filter.userName) where.email = filter.userName
+  if (filter.externalId) where.scimExternalId = filter.externalId
   if (filter.active === true) where.deletionScheduledAt = null
   if (filter.active === false) where.deletionScheduledAt = { not: null }
 
@@ -70,6 +71,7 @@ export async function GET(req: NextRequest) {
             organizationId: true,
             deletionScheduledAt: true,
             createdAt: true,
+            scimExternalId: true,
           },
         }),
     prisma.user.count({ where }),
@@ -124,9 +126,10 @@ export async function POST(req: NextRequest) {
       passwordHash: '', // SSO-provisioned — no local password; SAML/OIDC is the auth path
       role: 'viewer',
       organizationId: auth.organizationId,
-      // Capture externalId in app_metadata or a side table if needed
-      // — for now we ignore it (RFC says SHOULD round-trip; we don't
-      // yet persist externalId, which is a known limitation).
+      // Bundle BQ — externalId now persists. IdPs can de-provision
+      // by externalId via DELETE /Users/<id> after looking up the
+      // platform id with `?filter=externalId eq "..."`.
+      ...(parsed.externalId ? { scimExternalId: parsed.externalId } : {}),
       ...(parsed.active === false ? { deletionScheduledAt: new Date() } : {}),
     },
     select: {
@@ -136,6 +139,7 @@ export async function POST(req: NextRequest) {
       organizationId: true,
       deletionScheduledAt: true,
       createdAt: true,
+      scimExternalId: true,
     },
   })
 
