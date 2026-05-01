@@ -13,6 +13,7 @@ import {
   Phone, Network, BarChart, Globe, PenTool, BedDouble, Award,
   Inbox, MessageSquare, FileCode, Layers, Sparkles, Bell, Zap,
   Plug, Webhook, Shield, GanttChart, FileArchive, Loader2, User,
+  ToggleRight,
 } from 'lucide-react'
 import { exportToCSV } from '@/lib/philly/export'
 import { AskAIMode } from './AskAIMode'
@@ -124,6 +125,7 @@ export function CommandPalette() {
       { id: 'webhooks', label: 'Webhooks', description: 'Outbound webhooks', icon: <Webhook size={iconSize} />, category: 'System', action: () => router.push('/settings/webhooks') },
       { id: 'pipelines', label: 'Pipelines', description: 'Configure deal pipelines and stages', icon: <Columns3 size={iconSize} />, category: 'System', action: () => router.push('/settings/pipelines'), keywords: ['stages', 'board', 'deals'] },
       { id: 'security', label: 'Security', description: 'IP allowlist and idle timeout', icon: <Shield size={iconSize} />, category: 'System', action: () => router.push('/settings/security'), keywords: ['ip', 'allowlist', 'session', 'idle', 'enterprise'] },
+      { id: 'features', label: 'Feature flags', description: 'Per-org kill-switches without redeploy', icon: <ToggleRight size={iconSize} />, category: 'System', action: () => router.push('/settings/features'), keywords: ['kill-switch', 'killswitch', 'toggle', 'flag', 'flags', 'enable', 'disable', 'ai'] },
       { id: 'audit', label: 'Audit Log', description: 'System audit trail', icon: <Shield size={iconSize} />, category: 'System', action: () => router.push('/audit') },
       { id: 'settings', label: 'Settings', description: 'App preferences', icon: <Settings size={iconSize} />, category: 'System', action: () => router.push('/settings'), keywords: ['preferences', 'config'] },
     ]

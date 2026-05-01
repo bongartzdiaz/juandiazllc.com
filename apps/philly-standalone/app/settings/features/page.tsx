@@ -1,0 +1,235 @@
+'use client'
+
+import { useState } from 'react'
+import { Topbar } from '@/components/philly/layout/Topbar'
+import { useApi } from '@/hooks/philly/useApi'
+import { useToast } from '@/hooks/philly/useToast'
+import { ToggleLeft, ToggleRight, Info, RotateCcw, Power } from 'lucide-react'
+
+/* Bundle BK — operator UI for the per-org feature flags introduced
+   in Bundle BD. Lists every catalogued feature with its current
+   state for the caller's org, lets admins flip the toggle or
+   clear an override (fall back to global / code default). Every
+   change goes through PATCH /api/admin/features which audit-logs +
+   busts the cache. */
+
+interface FlagState {
+  key: string
+  description: string
+  enabledByDefault: boolean
+  enabled: boolean
+}
+
+const sectionTitleStyle: React.CSSProperties = {
+  fontSize: 22, fontWeight: 700, marginBottom: 4, color: 'var(--txt)',
+}
+const sectionSubStyle: React.CSSProperties = {
+  fontSize: 13, color: 'var(--txt2)', marginBottom: 24, maxWidth: 640, lineHeight: 1.55,
+}
+
+export default function FeatureFlagsPage() {
+  const { addToast } = useToast()
+  const flagsQuery = useApi<{ data: FlagState[] }>('/admin/features')
+  const flags = flagsQuery.data?.data ?? []
+  const [busy, setBusy] = useState<string | null>(null)
+
+  async function setFlag(key: string, enabled: boolean | null) {
+    if (busy) return
+    setBusy(key)
+    try {
+      const res = await fetch('/api/admin/features', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, enabled }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        addToast(json?.error ?? `Update failed (${res.status})`, 'error')
+        return
+      }
+      addToast(
+        enabled === null
+          ? 'Reset to default'
+          : enabled
+            ? 'Feature enabled'
+            : 'Feature disabled',
+        'success',
+      )
+      flagsQuery.refetch()
+    } catch (err) {
+      addToast(err instanceof Error ? err.message : 'Network error', 'error')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  return (
+    <>
+      <Topbar title="Feature flags" sub="Per-org runtime kill-switches — no redeploy required" />
+
+      <div style={{ padding: '24px 32px', maxWidth: 880 }}>
+        <h1 style={sectionTitleStyle}>Feature flags</h1>
+        <p style={sectionSubStyle}>
+          Each switch below is a per-organisation kill-switch. Flip one off to disable that
+          feature across this organisation immediately — no redeploy, no code change. Changes
+          take effect within ~60 seconds (the in-memory cache TTL). Every change is recorded
+          in the audit log.
+        </p>
+
+        <div
+          style={{
+            display: 'flex', alignItems: 'flex-start', gap: 10,
+            padding: '12px 14px', borderRadius: 10,
+            background: 'var(--accent-bg)', border: '1px solid var(--accent-border)',
+            marginBottom: 24, fontSize: 12.5, color: 'var(--accent-txt)', lineHeight: 1.55,
+          }}
+        >
+          <Info size={15} style={{ flexShrink: 0, marginTop: 1 }} />
+          <span>
+            Flipping a flag here sets a per-organisation override. The "Reset to default" button
+            removes the override and falls back to the global default (or the code-side default
+            if no global is set).
+          </span>
+        </div>
+
+        {flagsQuery.loading && (
+          <div style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
+            Loading…
+          </div>
+        )}
+
+        {flagsQuery.error && (
+          <div
+            style={{
+              padding: '14px 16px', borderRadius: 10,
+              background: 'var(--r-bg)', border: '1px solid var(--r-border)',
+              color: 'var(--r-txt)', fontSize: 13,
+            }}
+          >
+            {flagsQuery.error}
+          </div>
+        )}
+
+        {!flagsQuery.loading && !flagsQuery.error && flags.length === 0 && (
+          <div style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
+            No feature flags catalogued.
+          </div>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {flags.map((f) => {
+            const isOverridden = f.enabled !== f.enabledByDefault
+            return (
+              <div
+                key={f.key}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '40px 1fr auto',
+                  gap: 14,
+                  alignItems: 'center',
+                  padding: '14px 16px',
+                  borderRadius: 12,
+                  background: 'var(--panel)',
+                  border: `1px solid ${isOverridden ? 'var(--accent-border)' : 'var(--border)'}`,
+                  boxShadow: 'var(--shadow-sm)',
+                }}
+              >
+                <div
+                  style={{
+                    width: 32, height: 32, borderRadius: 8,
+                    background: f.enabled ? 'var(--g-bg)' : 'var(--r-bg)',
+                    border: `1px solid ${f.enabled ? 'var(--g-border)' : 'var(--r-border)'}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
+                  <Power size={14} color={f.enabled ? 'var(--g-txt)' : 'var(--r-txt)'} />
+                </div>
+
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <code
+                      style={{
+                        fontFamily: 'var(--font-red-hat-mono), monospace',
+                        fontSize: 13, fontWeight: 600, color: 'var(--txt)',
+                      }}
+                    >
+                      {f.key}
+                    </code>
+                    {isOverridden && (
+                      <span
+                        style={{
+                          fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 5,
+                          background: 'var(--accent-bg)', color: 'var(--accent-txt)',
+                          border: '1px solid var(--accent-border)',
+                          textTransform: 'uppercase', letterSpacing: '0.04em',
+                        }}
+                      >
+                        Org override
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--txt2)', lineHeight: 1.5 }}>
+                    {f.description}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 4 }}>
+                    Code default: {f.enabledByDefault ? 'enabled' : 'disabled'}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                  {isOverridden && (
+                    <button
+                      type="button"
+                      onClick={() => setFlag(f.key, null)}
+                      disabled={busy === f.key}
+                      title="Clear org override (fall back to default)"
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 5,
+                        padding: '6px 10px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
+                        background: 'var(--bg2)', color: 'var(--txt2)',
+                        border: '1px solid var(--border)', cursor: 'pointer',
+                        fontFamily: 'inherit',
+                        opacity: busy === f.key ? 0.5 : 1,
+                      }}
+                    >
+                      <RotateCcw size={11} />
+                      Reset
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setFlag(f.key, !f.enabled)}
+                    disabled={busy === f.key}
+                    aria-label={`Toggle ${f.key}`}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 5,
+                      padding: '6px 10px', borderRadius: 7, fontSize: 11.5, fontWeight: 700,
+                      background: f.enabled ? 'var(--g-bg)' : 'var(--bg2)',
+                      color: f.enabled ? 'var(--g-txt)' : 'var(--txt2)',
+                      border: `1px solid ${f.enabled ? 'var(--g-border)' : 'var(--border)'}`,
+                      cursor: 'pointer', fontFamily: 'inherit',
+                      opacity: busy === f.key ? 0.5 : 1,
+                      minWidth: 90, justifyContent: 'center',
+                    }}
+                  >
+                    {f.enabled ? (
+                      <>
+                        <ToggleRight size={14} />
+                        ENABLED
+                      </>
+                    ) : (
+                      <>
+                        <ToggleLeft size={14} />
+                        DISABLED
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </>
+  )
+}
