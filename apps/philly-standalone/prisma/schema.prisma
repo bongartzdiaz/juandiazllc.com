@@ -819,6 +819,12 @@ model Property {
   isBankOwned   Boolean @default(false)
   isResale      Boolean @default(false)
 
+  // Bundle BR — manual reorder column. Mirrors Contact.displayOrder
+  // (Bundle AG) and Deal.displayOrder (Bundle AL). NULL = unsorted
+  // (server's default order wins). The grid renders ascending; the
+  // /api/properties/reorder endpoint writes 1..N inside a transaction.
+  displayOrder  BigInt?
+
   organization Organization @relation(fields: [organizationId], references: [id])
   viewings     Viewing[]
   deals        Deal[]
@@ -829,6 +835,7 @@ model Property {
   @@index([organizationId, status])
   @@index([organizationId, mlsNumber])
   @@index([organizationId, listingType, district])
+  @@index([organizationId, displayOrder])
   @@index([organizationId, type, subtype])
 }
 

@@ -247,14 +247,68 @@ export default function PropertiesPage() {
   if (search) params.set('q', search)
   interface PropertiesResponse { data: Property[]; pagination: { total: number; totalPages: number } }
   const propertiesQuery = useApi<PropertiesResponse>(`/properties?${params}`)
-  const properties = propertiesQuery.data?.data ?? []
+  const serverProperties = propertiesQuery.data?.data ?? []
   const total = propertiesQuery.data?.pagination.total ?? 0
   const totalPages = propertiesQuery.data?.pagination.totalPages ?? 0
   const loading = propertiesQuery.loading
   const fetchData = propertiesQuery.refetch
 
+  // Bundle BR — drag-drop reorder state. Mirrors Bundle AG (contacts)
+  // and AL (deals). Optimistic ordering override takes precedence
+  // over the server's order until the next refetch lands.
+  const [dragId, setDragId] = useState<string | null>(null)
+  const [dragOverId, setDragOverId] = useState<string | null>(null)
+  const [orderOverride, setOrderOverride] = useState<string[] | null>(null)
+
+  const properties = useMemo(() => {
+    if (!orderOverride) return serverProperties
+    const byId = new Map(serverProperties.map(p => [p.id, p]))
+    const ordered: Property[] = []
+    for (const id of orderOverride) {
+      const p = byId.get(id)
+      if (p) { ordered.push(p); byId.delete(id) }
+    }
+    // Anything not in the override (filtered-out, freshly-fetched)
+    // appended after, preserving the server's relative order.
+    for (const p of serverProperties) if (byId.has(p.id)) ordered.push(p)
+    return ordered
+  }, [serverProperties, orderOverride])
+
   // Live-refresh on any property mutation in the org
   useEntitySubscription('property', fetchData)
+
+  // Reset the optimistic override when the server's id-set no longer
+  // matches what we're holding (filter changed, refetch landed, etc.).
+  useEffect(() => {
+    if (!orderOverride) return
+    const serverIds = new Set(serverProperties.map(p => p.id))
+    const allPresent = orderOverride.every(id => serverIds.has(id))
+    if (!allPresent) setOrderOverride(null)
+  }, [serverProperties, orderOverride])
+
+  const handleReorderDrop = useCallback(async (sourceId: string, targetId: string) => {
+    if (sourceId === targetId) return
+    const ids = properties.map(p => p.id)
+    const from = ids.indexOf(sourceId)
+    const to = ids.indexOf(targetId)
+    if (from < 0 || to < 0) return
+    const next = ids.slice()
+    next.splice(from, 1)
+    next.splice(to, 0, sourceId)
+    setOrderOverride(next)
+    try {
+      const res = await fetch('/api/properties/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: next }),
+      })
+      if (!res.ok) throw new Error(`Reorder failed (${res.status})`)
+      fetchData()
+    } catch (err) {
+      addToast(err instanceof Error ? err.message : 'Reorder failed', 'error')
+      setOrderOverride(null)
+    }
+  }, [properties, fetchData, addToast])
 
   // Bundle AI — j/k navigation through the grid (document order).
   const movePropFocus = useCallback((delta: number) => {
@@ -441,17 +495,53 @@ export default function PropertiesPage() {
                   if (el) propRefs.current.set(prop.id, el)
                   else propRefs.current.delete(prop.id)
                 }}
+                draggable
+                onDragStart={(e) => {
+                  setDragId(prop.id)
+                  e.dataTransfer.setData('text/property-id', prop.id)
+                  e.dataTransfer.effectAllowed = 'move'
+                }}
+                onDragOver={(e) => {
+                  if (!dragId || dragId === prop.id) return
+                  e.preventDefault()
+                  e.dataTransfer.dropEffect = 'move'
+                  if (dragOverId !== prop.id) setDragOverId(prop.id)
+                }}
+                onDragLeave={() => {
+                  if (dragOverId === prop.id) setDragOverId(null)
+                }}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  const sourceId = e.dataTransfer.getData('text/property-id') || dragId
+                  setDragId(null)
+                  setDragOverId(null)
+                  if (sourceId) handleReorderDrop(sourceId, prop.id)
+                }}
+                onDragEnd={() => { setDragId(null); setDragOverId(null) }}
                 onContextMenu={(e) => {
                   e.preventDefault()
                   setCtxMenu({ x: e.clientX, y: e.clientY, propertyId: prop.id })
                 }}
                 onMouseEnter={() => setFocusedPropId(prop.id)}
-                style={{ textDecoration: 'none', color: 'inherit' }}>
+                style={{
+                  textDecoration: 'none', color: 'inherit',
+                  opacity: dragId === prop.id ? 0.55 : 1,
+                  transition: 'opacity 120ms ease',
+                }}>
                 <div className="card-hover" style={{
                   padding: '16px', borderRadius: 12,
-                  border: focusedPropId === prop.id ? '2px solid var(--accent)' : '1px solid var(--border)',
+                  border: dragOverId === prop.id
+                    ? '2px solid var(--accent)'
+                    : focusedPropId === prop.id
+                      ? '2px solid var(--accent)'
+                      : '1px solid var(--border)',
                   background: 'var(--panel)',
-                  boxShadow: focusedPropId === prop.id ? '0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent)' : 'var(--shadow-sm)',
+                  boxShadow: dragOverId === prop.id
+                    ? '0 0 0 2px var(--accent)'
+                    : focusedPropId === prop.id
+                      ? '0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent)'
+                      : 'var(--shadow-sm)',
+                  transition: 'box-shadow 120ms ease, border-color 120ms ease',
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8, gap: 8 }}>
                     <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--txt)', lineHeight: 1.3, flex: 1, minWidth: 0 }}>{prop.title}</div>
