@@ -70,12 +70,26 @@ export async function GET(req: NextRequest) {
       db.from("campaigns").select("id", { count: "exact", head: true }).eq("status", "active"),
     ]);
 
+  // Message queue counts
+  const [pendingMsgs, approvedMsgs, sentMsgs, draftMsgs] = await Promise.all([
+    db.from("messages").select("id", { count: "exact", head: true }).eq("status", "pending_approval"),
+    db.from("messages").select("id", { count: "exact", head: true }).eq("status", "approved"),
+    db.from("messages").select("id", { count: "exact", head: true }).eq("status", "sent"),
+    db.from("messages").select("id", { count: "exact", head: true }).eq("status", "draft"),
+  ]);
+
   return NextResponse.json({
     data: {
       summary: {
         total_leads: leadCount.count ?? 0,
         active_accounts: accountCount.count ?? 0,
         active_campaigns: campaignCount.count ?? 0,
+      },
+      message_queue: {
+        pending_approval: pendingMsgs.count ?? 0,
+        approved: approvedMsgs.count ?? 0,
+        sent: sentMsgs.count ?? 0,
+        draft: draftMsgs.count ?? 0,
       },
       funnel: funnel.data ?? [],
       campaigns: campaigns.data ?? [],

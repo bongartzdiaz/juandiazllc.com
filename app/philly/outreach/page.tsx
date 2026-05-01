@@ -1,12 +1,13 @@
 'use client'
 
 import { useMemo } from 'react'
+import Link from 'next/link'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useApi } from '@/hooks/philly/useApi'
 import {
   Users, Send, UserCheck, MessageSquare, Phone,
-  TrendingUp, Globe2, AlertTriangle, DollarSign,
+  TrendingUp, Globe2, AlertTriangle, DollarSign, FileCheck,
 } from 'lucide-react'
 
 interface FunnelRow {
@@ -80,8 +81,16 @@ interface ErrorRow {
   created_at: string
 }
 
+interface MessageQueue {
+  pending_approval: number
+  approved: number
+  sent: number
+  draft: number
+}
+
 interface OutreachData {
   summary: { total_leads: number; active_accounts: number; active_campaigns: number }
+  message_queue: MessageQueue
   funnel: FunnelRow[]
   campaigns: CampaignRow[]
   accounts: AccountRow[]
@@ -216,6 +225,47 @@ export default function OutreachPage() {
               <KpiCard label="Errors" value={unresolvedErrors} icon="zap" delay={350}
                 accentColor={unresolvedErrors > 0 ? 'var(--r)' : 'var(--g)'} />
             </div>
+
+            {/* Message Queue */}
+            {d.message_queue && (d.message_queue.pending_approval > 0 || d.message_queue.approved > 0 || d.message_queue.draft > 0) && (
+              <Link href="/philly/outreach/messages" style={{ textDecoration: 'none' }}>
+                <div style={{
+                  ...sectionStyle, display: 'flex', alignItems: 'center', gap: 16,
+                  padding: '14px 20px', cursor: 'pointer',
+                  borderColor: d.message_queue.pending_approval > 0 ? 'var(--y)' : 'var(--border)',
+                }}>
+                  <FileCheck size={18} color="var(--accent)" />
+                  <div style={{ flex: 1 }}>
+                    <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--txt)' }}>
+                      Message Queue
+                    </span>
+                    <span style={{ fontSize: 12, color: 'var(--txt3)', marginLeft: 8 }}>
+                      Click to review →
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 16, fontSize: 12 }}>
+                    {d.message_queue.pending_approval > 0 && (
+                      <span style={{ color: 'var(--y)', fontWeight: 600 }}>
+                        {d.message_queue.pending_approval} pending
+                      </span>
+                    )}
+                    {d.message_queue.approved > 0 && (
+                      <span style={{ color: 'var(--g)' }}>
+                        {d.message_queue.approved} approved
+                      </span>
+                    )}
+                    {d.message_queue.draft > 0 && (
+                      <span style={{ color: 'var(--txt3)' }}>
+                        {d.message_queue.draft} drafts
+                      </span>
+                    )}
+                    <span className="mono" style={{ color: 'var(--txt3)' }}>
+                      {d.message_queue.sent} sent
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            )}
 
             {/* Pipeline Funnel */}
             <div style={sectionStyle}>
