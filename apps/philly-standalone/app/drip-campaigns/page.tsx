@@ -10,8 +10,9 @@ import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import {
   Filter, Mail, Play, Pause, Plus, Trash2, Edit2, GripVertical, X,
-  MessageSquare, Phone,
+  MessageSquare, Phone, Users,
 } from 'lucide-react'
+import { EnrollmentModal } from '@/components/philly/drip/EnrollmentModal'
 
 interface DripStep {
   day: number
@@ -76,6 +77,8 @@ export default function DripCampaignsPage() {
   const fetchCampaigns = campaignsQuery.refetch
 
   const [showForm, setShowForm] = useState(false)
+  // Bundle CA — enrollment modal target (campaign id + name + step count).
+  const [enrollTarget, setEnrollTarget] = useState<{ id: string; name: string; steps: number } | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [formName, setFormName] = useState('')
   const [formType, setFormType] = useState('buyer')
@@ -277,6 +280,14 @@ export default function DripCampaignsPage() {
                       Created {new Date(campaign.createdAt).toLocaleDateString()}
                     </span>
                     <div style={{ display: 'flex', gap: 4 }}>
+                      <button
+                        onClick={() => setEnrollTarget({ id: campaign.id, name: campaign.name, steps: steps.length })}
+                        title="Manage enrollments"
+                        aria-label="Manage enrollments"
+                        style={miniBtn}
+                      >
+                        <Users size={11} />
+                      </button>
                       <button onClick={() => toggleStatus(campaign)} title={campaign.status === 'active' ? 'Pause' : 'Activate'}
                         style={miniBtn}>
                         {campaign.status === 'active' ? <Pause size={11} /> : <Play size={11} />}
@@ -449,6 +460,14 @@ export default function DripCampaignsPage() {
           </div>
         </div>
       </Modal>
+
+      <EnrollmentModal
+        campaignId={enrollTarget?.id ?? null}
+        campaignName={enrollTarget?.name ?? ''}
+        totalSteps={enrollTarget?.steps ?? 0}
+        onClose={() => setEnrollTarget(null)}
+        onChanged={() => campaignsQuery.refetch()}
+      />
     </>
   )
 }
