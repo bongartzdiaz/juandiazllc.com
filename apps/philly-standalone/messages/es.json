@@ -431,6 +431,196 @@
       "remove": "¿Eliminar este voluntario?"
     }
   },
+  "dialer": {
+    "title": "Marcador automático",
+    "subtitle": "Cola de llamadas, listas de marcación e historial",
+    "tabs": {
+      "callLog": "Registro de llamadas",
+      "dialerLists": "Listas de marcación"
+    },
+    "add": {
+      "list": "Lista",
+      "logCall": "Registrar llamada"
+    },
+    "kpis": {
+      "totalCalls": "Llamadas totales",
+      "outbound": "Salientes",
+      "avgDuration": "Duración media",
+      "callbacks": "Devoluciones",
+      "totalLists": "Listas totales",
+      "active": "Activas",
+      "totalContacts": "Contactos totales"
+    },
+    "columns": {
+      "phoneNumber": "Número de teléfono",
+      "direction": "Dirección",
+      "duration": "Duración",
+      "outcome": "Resultado",
+      "startedAt": "Iniciada",
+      "notes": "Notas"
+    },
+    "filters": {
+      "allOutcomes": "Todos los resultados"
+    },
+    "outcomes": {
+      "connected": "Conectada",
+      "voicemail": "Buzón de voz",
+      "no_answer": "Sin respuesta",
+      "busy": "Ocupado",
+      "callback": "Devolución"
+    },
+    "statuses": {
+      "active": "Activa",
+      "completed": "Completada",
+      "paused": "En pausa"
+    },
+    "states": {
+      "loading": "Cargando...",
+      "noCalls": "No se encontraron llamadas.",
+      "noLists": "Aún no hay listas de marcación."
+    },
+    "list": {
+      "contacts": "Contactos",
+      "remaining": "Restantes",
+      "assignedTo": "Asignada a",
+      "unassigned": "Sin asignar"
+    },
+    "actions": {
+      "dialNext": "Llamar al siguiente",
+      "reset": "Reiniciar",
+      "resetTitle": "Reiniciar posición al primer contacto",
+      "close": "Cerrar"
+    },
+    "fields": {
+      "name": "Nombre",
+      "assignedTo": "Asignada a",
+      "phoneNumber": "Número de teléfono",
+      "outcome": "Resultado",
+      "durationSec": "Duración (s)",
+      "notes": "Notas"
+    },
+    "placeholders": {
+      "listName": "p. ej. Hot Leads Q2",
+      "agentName": "Nombre del agente",
+      "callNotes": "Resumen de la llamada, próximos pasos…"
+    },
+    "addList": {
+      "aria": "Añadir lista de marcación",
+      "title": "Añadir lista de marcación",
+      "subtitle": "Crea una nueva lista de marcación",
+      "submit": "Añadir lista",
+      "creating": "Creando…"
+    },
+    "callModal": {
+      "aria": "Registrar llamada",
+      "titleDial": "Llamar al siguiente contacto",
+      "titleLog": "Registrar llamada",
+      "contactOf": "Contacto {index} de {total}",
+      "manualLog": "Registrar una llamada manualmente",
+      "loadingContact": "Cargando contacto…",
+      "unnamed": "Contacto sin nombre",
+      "noPhone": "No hay teléfono registrado",
+      "notFound": "Contacto no encontrado.",
+      "logging": "Registrando…",
+      "logCall": "Registrar llamada",
+      "logAndAdvance": "Registrar y avanzar"
+    },
+    "toasts": {
+      "emptyList": "Esta lista no tiene contactos.",
+      "loadContactFailed": "No se pudo cargar el contacto.",
+      "phoneRequired": "El número de teléfono es obligatorio.",
+      "invalidDuration": "La duración debe ser un número no negativo.",
+      "logFailed": "No se pudo registrar la llamada.",
+      "nameRequired": "El nombre es obligatorio.",
+      "createListFailed": "No se pudo crear la lista."
+    }
+  },
+  "inbox": {
+    "title": "Bandeja de entrada",
+    "subtitle": "Bandeja unificada para correo, SMS, WhatsApp y teléfono",
+    "add": {
+      "conversation": "Conversación"
+    },
+    "kpis": {
+      "total": "Conversaciones totales",
+      "open": "Abiertas",
+      "closed": "Cerradas",
+      "channels": "Canales"
+    },
+    "columns": {
+      "conversation": "Conversación",
+      "channel": "Canal",
+      "time": "Hora"
+    },
+    "filters": {
+      "allStatuses": "Todos los estados",
+      "allChannels": "Todos los canales"
+    },
+    "statuses": {
+      "open": "Abierta",
+      "closed": "Cerrada",
+      "archived": "Archivada"
+    },
+    "channels": {
+      "email": "Correo",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp",
+      "phone": "Teléfono"
+    },
+    "states": {
+      "loading": "Cargando...",
+      "noConversations": "No se encontraron conversaciones.",
+      "noMessagesYet": "Aún no hay mensajes",
+      "unknownContact": "Contacto desconocido",
+      "noSubject": "Sin asunto",
+      "selectConversation": "Selecciona una conversación para leer mensajes y responder.",
+      "loadingMessages": "Cargando mensajes...",
+      "noMessagesPrompt": "Aún no hay mensajes — escribe una respuesta abajo para iniciar el hilo.",
+      "contactShort": "Contacto {id}"
+    },
+    "time": {
+      "justNow": "ahora mismo",
+      "mAgo": "hace {count}m",
+      "hAgo": "hace {count}h",
+      "dAgo": "hace {count}d"
+    },
+    "thread": {
+      "you": "Tú",
+      "contact": "Contacto"
+    },
+    "actions": {
+      "backToInbox": "Volver a la bandeja"
+    },
+    "reply": {
+      "placeholder": "Responder por {channel}…  (⌘/Ctrl+Enter para enviar)",
+      "send": "Enviar",
+      "sending": "Enviando"
+    },
+    "fields": {
+      "contact": "Contacto",
+      "channel": "Canal",
+      "subject": "Asunto",
+      "firstMessage": "Primer mensaje (opcional)"
+    },
+    "placeholders": {
+      "selectContact": "Selecciona un contacto…",
+      "subject": "Asunto de la conversación",
+      "firstMessage": "Envía un primer mensaje saliente…"
+    },
+    "addModal": {
+      "aria": "Nueva conversación",
+      "title": "Nueva conversación",
+      "subtitle": "Inicia un nuevo hilo de conversación",
+      "submit": "Crear conversación",
+      "creating": "Creando…"
+    },
+    "toasts": {
+      "selectContact": "Selecciona un contacto",
+      "subjectRequired": "El asunto es obligatorio",
+      "createFailed": "No se pudo crear",
+      "sendFailed": "No se pudo enviar"
+    }
+  },
   "common": {
     "save": "Guardar",
     "cancel": "Cancelar",

@@ -431,6 +431,196 @@
       "remove": "Deze vrijwilliger verwijderen?"
     }
   },
+  "dialer": {
+    "title": "Power Dialer",
+    "subtitle": "Belwachtrij, belrijsten en gespreksgeschiedenis",
+    "tabs": {
+      "callLog": "Gesprekslog",
+      "dialerLists": "Belrijsten"
+    },
+    "add": {
+      "list": "Lijst",
+      "logCall": "Gesprek loggen"
+    },
+    "kpis": {
+      "totalCalls": "Totaal gesprekken",
+      "outbound": "Uitgaand",
+      "avgDuration": "Gem. duur",
+      "callbacks": "Terugbelverzoeken",
+      "totalLists": "Totaal lijsten",
+      "active": "Actief",
+      "totalContacts": "Totaal contacten"
+    },
+    "columns": {
+      "phoneNumber": "Telefoonnummer",
+      "direction": "Richting",
+      "duration": "Duur",
+      "outcome": "Resultaat",
+      "startedAt": "Gestart op",
+      "notes": "Notities"
+    },
+    "filters": {
+      "allOutcomes": "Alle resultaten"
+    },
+    "outcomes": {
+      "connected": "Verbonden",
+      "voicemail": "Voicemail",
+      "no_answer": "Geen antwoord",
+      "busy": "Bezet",
+      "callback": "Terugbellen"
+    },
+    "statuses": {
+      "active": "Actief",
+      "completed": "Afgerond",
+      "paused": "Gepauzeerd"
+    },
+    "states": {
+      "loading": "Laden...",
+      "noCalls": "Geen gesprekken gevonden.",
+      "noLists": "Nog geen belrijsten."
+    },
+    "list": {
+      "contacts": "Contacten",
+      "remaining": "Resterend",
+      "assignedTo": "Toegewezen aan",
+      "unassigned": "Niet toegewezen"
+    },
+    "actions": {
+      "dialNext": "Volgende bellen",
+      "reset": "Reset",
+      "resetTitle": "Positie terugzetten naar eerste contact",
+      "close": "Sluiten"
+    },
+    "fields": {
+      "name": "Naam",
+      "assignedTo": "Toegewezen aan",
+      "phoneNumber": "Telefoonnummer",
+      "outcome": "Resultaat",
+      "durationSec": "Duur (sec)",
+      "notes": "Notities"
+    },
+    "placeholders": {
+      "listName": "bijv. Hot Leads Q2",
+      "agentName": "Naam van agent",
+      "callNotes": "Gespreksamenvatting, vervolgstappen…"
+    },
+    "addList": {
+      "aria": "Belrijst toevoegen",
+      "title": "Belrijst toevoegen",
+      "subtitle": "Maak een nieuwe belrijst aan",
+      "submit": "Lijst toevoegen",
+      "creating": "Aanmaken…"
+    },
+    "callModal": {
+      "aria": "Gesprek loggen",
+      "titleDial": "Volgende contact bellen",
+      "titleLog": "Gesprek loggen",
+      "contactOf": "Contact {index} van {total}",
+      "manualLog": "Een gesprek handmatig loggen",
+      "loadingContact": "Contact laden…",
+      "unnamed": "Naamloos contact",
+      "noPhone": "Geen telefoonnummer bekend",
+      "notFound": "Contact niet gevonden.",
+      "logging": "Loggen…",
+      "logCall": "Gesprek loggen",
+      "logAndAdvance": "Loggen & doorgaan"
+    },
+    "toasts": {
+      "emptyList": "Deze lijst bevat geen contacten.",
+      "loadContactFailed": "Contact laden mislukt.",
+      "phoneRequired": "Telefoonnummer is verplicht.",
+      "invalidDuration": "Duur moet een niet-negatief getal zijn.",
+      "logFailed": "Gesprek loggen mislukt.",
+      "nameRequired": "Naam is verplicht.",
+      "createListFailed": "Lijst aanmaken mislukt."
+    }
+  },
+  "inbox": {
+    "title": "Inbox",
+    "subtitle": "Geünificeerde inbox voor e-mail, sms, WhatsApp en telefoon",
+    "add": {
+      "conversation": "Gesprek"
+    },
+    "kpis": {
+      "total": "Totaal gesprekken",
+      "open": "Open",
+      "closed": "Gesloten",
+      "channels": "Kanalen"
+    },
+    "columns": {
+      "conversation": "Gesprek",
+      "channel": "Kanaal",
+      "time": "Tijd"
+    },
+    "filters": {
+      "allStatuses": "Alle statussen",
+      "allChannels": "Alle kanalen"
+    },
+    "statuses": {
+      "open": "Open",
+      "closed": "Gesloten",
+      "archived": "Gearchiveerd"
+    },
+    "channels": {
+      "email": "E-mail",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp",
+      "phone": "Telefoon"
+    },
+    "states": {
+      "loading": "Laden...",
+      "noConversations": "Geen gesprekken gevonden.",
+      "noMessagesYet": "Nog geen berichten",
+      "unknownContact": "Onbekend contact",
+      "noSubject": "Geen onderwerp",
+      "selectConversation": "Selecteer een gesprek om berichten te lezen en te antwoorden.",
+      "loadingMessages": "Berichten laden...",
+      "noMessagesPrompt": "Nog geen berichten — schrijf hieronder een antwoord om de thread te starten.",
+      "contactShort": "Contact {id}"
+    },
+    "time": {
+      "justNow": "zojuist",
+      "mAgo": "{count}m geleden",
+      "hAgo": "{count}u geleden",
+      "dAgo": "{count}d geleden"
+    },
+    "thread": {
+      "you": "Jij",
+      "contact": "Contact"
+    },
+    "actions": {
+      "backToInbox": "Terug naar inbox"
+    },
+    "reply": {
+      "placeholder": "Antwoorden via {channel}…  (⌘/Ctrl+Enter om te verzenden)",
+      "send": "Verzenden",
+      "sending": "Verzenden"
+    },
+    "fields": {
+      "contact": "Contact",
+      "channel": "Kanaal",
+      "subject": "Onderwerp",
+      "firstMessage": "Eerste bericht (optioneel)"
+    },
+    "placeholders": {
+      "selectContact": "Selecteer een contact…",
+      "subject": "Onderwerp van gesprek",
+      "firstMessage": "Verstuur een eerste uitgaand bericht…"
+    },
+    "addModal": {
+      "aria": "Nieuw gesprek",
+      "title": "Nieuw gesprek",
+      "subtitle": "Start een nieuwe gespreksdraad",
+      "submit": "Gesprek aanmaken",
+      "creating": "Aanmaken…"
+    },
+    "toasts": {
+      "selectContact": "Selecteer een contact",
+      "subjectRequired": "Onderwerp is verplicht",
+      "createFailed": "Aanmaken mislukt",
+      "sendFailed": "Verzenden mislukt"
+    }
+  },
   "common": {
     "save": "Opslaan",
     "cancel": "Annuleren",

@@ -137,7 +137,7 @@ export default function InboxPage() {
       })
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
-        setReplyError(j.error ?? 'Failed to send')
+        setReplyError(j.error ?? t('toasts.sendFailed'))
         return
       }
       setReply('')
@@ -145,11 +145,11 @@ export default function InboxPage() {
       // Optimistic conversation list refresh in case SSE is slow
       fetchConversations()
     } catch (err) {
-      setReplyError(err instanceof Error ? err.message : 'Failed to send')
+      setReplyError(err instanceof Error ? err.message : t('toasts.sendFailed'))
     } finally {
       setSending(false)
     }
-  }, [selectedId, reply, sending, loadMessages, fetchConversations])
+  }, [selectedId, reply, sending, loadMessages, fetchConversations, t])
 
   const openCount = conversations.filter(c => c.status === 'open').length
   const closedCount = conversations.filter(c => c.status === 'closed').length
@@ -158,12 +158,12 @@ export default function InboxPage() {
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime()
     const mins = Math.floor(diff / 60000)
-    if (mins < 1) return 'just now'
-    if (mins < 60) return `${mins}m ago`
+    if (mins < 1) return t('time.justNow')
+    if (mins < 60) return t('time.mAgo', { count: mins })
     const hrs = Math.floor(mins / 60)
-    if (hrs < 24) return `${hrs}h ago`
+    if (hrs < 24) return t('time.hAgo', { count: hrs })
     const days = Math.floor(hrs / 24)
-    return `${days}d ago`
+    return t('time.dAgo', { count: days })
   }
 
   const formatStamp = (iso: string) => {
@@ -173,8 +173,8 @@ export default function InboxPage() {
 
   const submitAdd = async () => {
     setAddError(null)
-    if (!addContactId) { setAddError('Select a contact'); return }
-    if (!addSubject.trim()) { setAddError('Subject is required'); return }
+    if (!addContactId) { setAddError(t('toasts.selectContact')); return }
+    if (!addSubject.trim()) { setAddError(t('toasts.subjectRequired')); return }
     setAddSubmitting(true)
     try {
       const res = await fetch('/api/inbox', {
@@ -188,7 +188,7 @@ export default function InboxPage() {
       })
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
-        setAddError(j.error ?? 'Failed to create')
+        setAddError(j.error ?? t('toasts.createFailed'))
         return
       }
       const created = await res.json().catch(() => ({}))
@@ -208,7 +208,7 @@ export default function InboxPage() {
       await fetchConversations()
       if (newId) setSelectedId(newId)
     } catch (err) {
-      setAddError(err instanceof Error ? err.message : 'Failed to create')
+      setAddError(err instanceof Error ? err.message : t('toasts.createFailed'))
     } finally {
       setAddSubmitting(false)
     }
@@ -216,22 +216,22 @@ export default function InboxPage() {
 
   return (
     <>
-      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => setShowAdd(true)} addLabel="Conversation" />
+      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => setShowAdd(true)} addLabel={t('add.conversation')} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPI Row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="mail" label="Total Conversations" value={String(total)} />
-          <KpiCard icon="message-circle" label="Open" value={String(openCount)} />
-          <KpiCard icon="check-circle" label="Closed" value={String(closedCount)} />
-          <KpiCard icon="zap" label="Channels" value={String(channelCount)} />
+          <KpiCard icon="mail" label={t('kpis.total')} value={String(total)} />
+          <KpiCard icon="message-circle" label={t('kpis.open')} value={String(openCount)} />
+          <KpiCard icon="check-circle" label={t('kpis.closed')} value={String(closedCount)} />
+          <KpiCard icon="zap" label={t('kpis.channels')} value={String(channelCount)} />
         </div>
 
         {/* Filters */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
           <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
-            options={[{ value: '', label: 'All Statuses' }, { value: 'open', label: 'Open' }, { value: 'closed', label: 'Closed' }, { value: 'archived', label: 'Archived' }]} />
+            options={[{ value: '', label: t('filters.allStatuses') }, { value: 'open', label: t('statuses.open') }, { value: 'closed', label: t('statuses.closed') }, { value: 'archived', label: t('statuses.archived') }]} />
           <FilterSelect value={channelFilter} onChange={v => { setChannelFilter(v); setPage(1) }}
-            options={[{ value: '', label: 'All Channels' }, { value: 'email', label: 'Email' }, { value: 'sms', label: 'SMS' }, { value: 'whatsapp', label: 'WhatsApp' }, { value: 'phone', label: 'Phone' }]} />
+            options={[{ value: '', label: t('filters.allChannels') }, { value: 'email', label: t('channels.email') }, { value: 'sms', label: t('channels.sms') }, { value: 'whatsapp', label: t('channels.whatsapp') }, { value: 'phone', label: t('channels.phone') }]} />
         </div>
 
         {/* Two-pane layout: list (left) + thread (right) */}
@@ -239,15 +239,15 @@ export default function InboxPage() {
           {/* Conversation List */}
           <div style={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 70px 80px', gap: 10, padding: '10px 14px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
-              <span>Conversation</span><span>Channel</span><span>Time</span>
+              <span>{t('columns.conversation')}</span><span>{t('columns.channel')}</span><span>{t('columns.time')}</span>
             </div>
             <div style={{ maxHeight: 'calc(100vh - 360px)', overflowY: 'auto' }}>
               {loading ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('states.loading')}</div>
               ) : conversations.length === 0 ? (
                 <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
                   <Inbox size={32} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-                  No conversations found.
+                  {t('states.noConversations')}
                 </div>
               ) : conversations.map((conv, idx) => {
                 const channelInfo = CHANNEL_ICONS[conv.channel] ?? CHANNEL_ICONS.email
@@ -255,7 +255,7 @@ export default function InboxPage() {
                 const lastMessage = conv.messages?.[0]
                 const snippet = lastMessage?.body
                   ? lastMessage.body.length > 50 ? lastMessage.body.slice(0, 50) + '...' : lastMessage.body
-                  : 'No messages yet'
+                  : t('states.noMessagesYet')
                 const isSelected = conv.id === selectedId
 
                 return (
@@ -281,10 +281,10 @@ export default function InboxPage() {
                   >
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontWeight: 600, color: 'var(--txt)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {conv.contact?.name ?? 'Unknown contact'}
+                        {conv.contact?.name ?? t('states.unknownContact')}
                       </div>
                       <div style={{ fontSize: 11, color: 'var(--txt2)', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {conv.subject || 'No subject'}
+                        {conv.subject || t('states.noSubject')}
                       </div>
                       <div style={{ fontSize: 10, color: 'var(--txt3)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {snippet}
@@ -296,7 +296,7 @@ export default function InboxPage() {
                       background: channelInfo.color + '18', color: channelInfo.color,
                       maxWidth: 'fit-content', justifySelf: 'start',
                     }}>
-                      <ChannelIcon size={9} /> {conv.channel}
+                      <ChannelIcon size={9} /> {channelLabel(conv.channel, t)}
                     </span>
                     <span style={{
                       fontSize: 10, color: 'var(--txt3)',
@@ -326,7 +326,7 @@ export default function InboxPage() {
                 color: 'var(--txt3)', fontSize: 13, padding: 24, textAlign: 'center',
               }}>
                 <Inbox size={36} style={{ opacity: 0.3, marginBottom: 12 }} />
-                Select a conversation to read messages and reply.
+                {t('states.selectConversation')}
               </div>
             ) : (
               <>
@@ -337,7 +337,7 @@ export default function InboxPage() {
                 }}>
                   <button
                     onClick={() => setSelectedId(null)}
-                    aria-label="Back to inbox"
+                    aria-label={t('actions.backToInbox')}
                     style={{
                       width: 28, height: 28, borderRadius: 8, border: '1px solid var(--border)',
                       background: 'var(--bg2)', cursor: 'pointer',
@@ -349,10 +349,10 @@ export default function InboxPage() {
                   </button>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--txt)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {selected.subject || 'No subject'}
+                      {selected.subject || t('states.noSubject')}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 2 }}>
-                      {selected.contact?.name ?? `Contact ${selected.contactId.slice(0, 8)}`} · {selected.channel}
+                      {selected.contact?.name ?? t('states.contactShort', { id: selected.contactId.slice(0, 8) })} · {channelLabel(selected.channel, t)}
                       {selected.contact?.email && ` · ${selected.contact.email}`}
                     </div>
                   </div>
@@ -361,18 +361,18 @@ export default function InboxPage() {
                     textTransform: 'uppercase',
                     background: STATUS_COLORS[selected.status]?.bg ?? 'var(--bg2)',
                     color: STATUS_COLORS[selected.status]?.txt ?? 'var(--txt2)',
-                  }}>{selected.status}</span>
+                  }}>{statusLabel(selected.status, t)}</span>
                 </div>
 
                 {/* Message thread */}
                 <div style={{ flex: 1, overflowY: 'auto', padding: '14px 18px' }}>
                   {messagesLoading ? (
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--txt3)', fontSize: 13, gap: 8 }}>
-                      <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> Loading messages...
+                      <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> {t('states.loadingMessages')}
                     </div>
                   ) : messages.length === 0 ? (
                     <div style={{ textAlign: 'center', color: 'var(--txt3)', fontSize: 13, padding: '40px 0' }}>
-                      No messages yet — write a reply below to start the thread.
+                      {t('states.noMessagesPrompt')}
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -398,7 +398,7 @@ export default function InboxPage() {
                               fontFamily: 'var(--font-red-hat-mono), monospace',
                               color: outbound ? 'rgba(255,255,255,0.85)' : 'var(--txt3)',
                             }}>
-                              {outbound ? 'You' : (m.fromAddress || 'Contact')} · {formatStamp(m.createdAt)}
+                              {outbound ? t('thread.you') : (m.fromAddress || t('thread.contact'))} · {formatStamp(m.createdAt)}
                             </div>
                           </div>
                         )
@@ -426,7 +426,7 @@ export default function InboxPage() {
                           sendReply()
                         }
                       }}
-                      placeholder={`Reply via ${selected.channel}…  (⌘/Ctrl+Enter to send)`}
+                      placeholder={t('reply.placeholder', { channel: channelLabel(selected.channel, t) })}
                       rows={2}
                       style={{
                         flex: 1, padding: '8px 12px', borderRadius: 8,
@@ -450,7 +450,7 @@ export default function InboxPage() {
                       }}
                     >
                       {sending ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <Send size={13} />}
-                      {sending ? 'Sending' : 'Send'}
+                      {sending ? t('reply.sending') : t('reply.send')}
                     </button>
                   </div>
                 </div>
@@ -465,7 +465,7 @@ export default function InboxPage() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="New conversation"
+          aria-label={t('addModal.aria')}
           style={{
             position: 'fixed', inset: 0, zIndex: 100,
             background: 'rgba(0,0,0,0.35)', display: 'flex',
@@ -478,8 +478,8 @@ export default function InboxPage() {
             border: '1px solid var(--border)', boxShadow: 'var(--shadow-lg)',
             padding: '24px 28px', width: 420, maxHeight: '80vh', overflowY: 'auto',
           }}>
-            <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>New Conversation</div>
-            <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>Start a new conversation thread</div>
+            <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{t('addModal.title')}</div>
+            <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>{t('addModal.subtitle')}</div>
             {addError && (
               <div style={{ background: 'var(--r-bg)', color: 'var(--r-txt)', padding: '8px 12px', borderRadius: 8, fontSize: 12, marginBottom: 12 }}>
                 {addError}
@@ -487,41 +487,41 @@ export default function InboxPage() {
             )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Contact</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.contact')}</label>
                 <select value={addContactId} onChange={e => setAddContactId(e.target.value)} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
                 }}>
-                  <option value="">Select a contact…</option>
+                  <option value="">{t('placeholders.selectContact')}</option>
                   {contactOptions.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Channel</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.channel')}</label>
                 <select value={addChannel} onChange={e => setAddChannel(e.target.value)} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
                 }}>
-                  <option value="email">Email</option>
-                  <option value="sms">SMS</option>
-                  <option value="whatsapp">WhatsApp</option>
-                  <option value="phone">Phone</option>
+                  <option value="email">{t('channels.email')}</option>
+                  <option value="sms">{t('channels.sms')}</option>
+                  <option value="whatsapp">{t('channels.whatsapp')}</option>
+                  <option value="phone">{t('channels.phone')}</option>
                 </select>
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Subject</label>
-                <input value={addSubject} onChange={e => setAddSubject(e.target.value)} placeholder="Conversation subject" style={{
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.subject')}</label>
+                <input value={addSubject} onChange={e => setAddSubject(e.target.value)} placeholder={t('placeholders.subject')} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
                 }} />
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>First message (optional)</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.firstMessage')}</label>
                 <textarea value={addFirstMessage} onChange={e => setAddFirstMessage(e.target.value)} rows={3}
-                  placeholder="Send an initial outbound message…" style={{
+                  placeholder={t('placeholders.firstMessage')} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit', resize: 'vertical',
@@ -540,13 +540,28 @@ export default function InboxPage() {
                 cursor: addSubmitting ? 'not-allowed' : 'pointer',
                 fontFamily: 'inherit',
               }}
-            >{addSubmitting ? 'Creating…' : 'Create Conversation'}</button>
+            >{addSubmitting ? t('addModal.creating') : t('addModal.submit')}</button>
           </div>
         </div>
       )}
 
     </>
   )
+}
+
+type InboxT = ReturnType<typeof useTranslations<'inbox'>>
+
+const KNOWN_CHANNELS = new Set(['email', 'sms', 'whatsapp', 'phone'])
+const KNOWN_STATUSES = new Set(['open', 'closed', 'archived'])
+
+function channelLabel(channel: string, t: InboxT): string {
+  if (KNOWN_CHANNELS.has(channel)) return t(`channels.${channel as 'email' | 'sms' | 'whatsapp' | 'phone'}`)
+  return channel
+}
+
+function statusLabel(status: string, t: InboxT): string {
+  if (KNOWN_STATUSES.has(status)) return t(`statuses.${status as 'open' | 'closed' | 'archived'}`)
+  return status
 }
 
 function FilterSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {

@@ -431,6 +431,196 @@
       "remove": "Remove this volunteer?"
     }
   },
+  "dialer": {
+    "title": "Power Dialer",
+    "subtitle": "Call queue, dialer lists, and call history",
+    "tabs": {
+      "callLog": "Call Log",
+      "dialerLists": "Dialer Lists"
+    },
+    "add": {
+      "list": "List",
+      "logCall": "Log Call"
+    },
+    "kpis": {
+      "totalCalls": "Total Calls",
+      "outbound": "Outbound",
+      "avgDuration": "Avg Duration",
+      "callbacks": "Callbacks",
+      "totalLists": "Total Lists",
+      "active": "Active",
+      "totalContacts": "Total Contacts"
+    },
+    "columns": {
+      "phoneNumber": "Phone Number",
+      "direction": "Direction",
+      "duration": "Duration",
+      "outcome": "Outcome",
+      "startedAt": "Started At",
+      "notes": "Notes"
+    },
+    "filters": {
+      "allOutcomes": "All Outcomes"
+    },
+    "outcomes": {
+      "connected": "Connected",
+      "voicemail": "Voicemail",
+      "no_answer": "No answer",
+      "busy": "Busy",
+      "callback": "Callback"
+    },
+    "statuses": {
+      "active": "Active",
+      "completed": "Completed",
+      "paused": "Paused"
+    },
+    "states": {
+      "loading": "Loading...",
+      "noCalls": "No calls found.",
+      "noLists": "No dialer lists yet."
+    },
+    "list": {
+      "contacts": "Contacts",
+      "remaining": "Remaining",
+      "assignedTo": "Assigned To",
+      "unassigned": "Unassigned"
+    },
+    "actions": {
+      "dialNext": "Dial Next",
+      "reset": "Reset",
+      "resetTitle": "Reset position to first contact",
+      "close": "Close"
+    },
+    "fields": {
+      "name": "Name",
+      "assignedTo": "Assigned To",
+      "phoneNumber": "Phone Number",
+      "outcome": "Outcome",
+      "durationSec": "Duration (sec)",
+      "notes": "Notes"
+    },
+    "placeholders": {
+      "listName": "e.g. Hot Leads Q2",
+      "agentName": "Agent name",
+      "callNotes": "Call summary, next steps…"
+    },
+    "addList": {
+      "aria": "Add dialer list",
+      "title": "Add Dialer List",
+      "subtitle": "Create a new dialer list",
+      "submit": "Add List",
+      "creating": "Creating…"
+    },
+    "callModal": {
+      "aria": "Log call",
+      "titleDial": "Dial Next Contact",
+      "titleLog": "Log Call",
+      "contactOf": "Contact {index} of {total}",
+      "manualLog": "Manually log a call",
+      "loadingContact": "Loading contact…",
+      "unnamed": "Unnamed contact",
+      "noPhone": "No phone on file",
+      "notFound": "Contact not found.",
+      "logging": "Logging…",
+      "logCall": "Log Call",
+      "logAndAdvance": "Log Call & Advance"
+    },
+    "toasts": {
+      "emptyList": "This list has no contacts.",
+      "loadContactFailed": "Failed to load contact.",
+      "phoneRequired": "Phone number is required.",
+      "invalidDuration": "Duration must be a non-negative number.",
+      "logFailed": "Failed to log call.",
+      "nameRequired": "Name is required.",
+      "createListFailed": "Failed to create list."
+    }
+  },
+  "inbox": {
+    "title": "Inbox",
+    "subtitle": "Unified inbox across email, SMS, WhatsApp, and phone",
+    "add": {
+      "conversation": "Conversation"
+    },
+    "kpis": {
+      "total": "Total Conversations",
+      "open": "Open",
+      "closed": "Closed",
+      "channels": "Channels"
+    },
+    "columns": {
+      "conversation": "Conversation",
+      "channel": "Channel",
+      "time": "Time"
+    },
+    "filters": {
+      "allStatuses": "All Statuses",
+      "allChannels": "All Channels"
+    },
+    "statuses": {
+      "open": "Open",
+      "closed": "Closed",
+      "archived": "Archived"
+    },
+    "channels": {
+      "email": "Email",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp",
+      "phone": "Phone"
+    },
+    "states": {
+      "loading": "Loading...",
+      "noConversations": "No conversations found.",
+      "noMessagesYet": "No messages yet",
+      "unknownContact": "Unknown contact",
+      "noSubject": "No subject",
+      "selectConversation": "Select a conversation to read messages and reply.",
+      "loadingMessages": "Loading messages...",
+      "noMessagesPrompt": "No messages yet — write a reply below to start the thread.",
+      "contactShort": "Contact {id}"
+    },
+    "time": {
+      "justNow": "just now",
+      "mAgo": "{count}m ago",
+      "hAgo": "{count}h ago",
+      "dAgo": "{count}d ago"
+    },
+    "thread": {
+      "you": "You",
+      "contact": "Contact"
+    },
+    "actions": {
+      "backToInbox": "Back to inbox"
+    },
+    "reply": {
+      "placeholder": "Reply via {channel}…  (⌘/Ctrl+Enter to send)",
+      "send": "Send",
+      "sending": "Sending"
+    },
+    "fields": {
+      "contact": "Contact",
+      "channel": "Channel",
+      "subject": "Subject",
+      "firstMessage": "First message (optional)"
+    },
+    "placeholders": {
+      "selectContact": "Select a contact…",
+      "subject": "Conversation subject",
+      "firstMessage": "Send an initial outbound message…"
+    },
+    "addModal": {
+      "aria": "New conversation",
+      "title": "New Conversation",
+      "subtitle": "Start a new conversation thread",
+      "submit": "Create Conversation",
+      "creating": "Creating…"
+    },
+    "toasts": {
+      "selectContact": "Select a contact",
+      "subjectRequired": "Subject is required",
+      "createFailed": "Failed to create",
+      "sendFailed": "Failed to send"
+    }
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",

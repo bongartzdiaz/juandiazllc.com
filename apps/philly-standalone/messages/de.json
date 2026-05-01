@@ -431,6 +431,196 @@
       "remove": "Diesen Freiwilligen entfernen?"
     }
   },
+  "dialer": {
+    "title": "Power Dialer",
+    "subtitle": "Anrufwarteschlange, Anruflisten und Anrufverlauf",
+    "tabs": {
+      "callLog": "Anrufprotokoll",
+      "dialerLists": "Anruflisten"
+    },
+    "add": {
+      "list": "Liste",
+      "logCall": "Anruf protokollieren"
+    },
+    "kpis": {
+      "totalCalls": "Anrufe gesamt",
+      "outbound": "Ausgehend",
+      "avgDuration": "Ø Dauer",
+      "callbacks": "Rückrufe",
+      "totalLists": "Listen gesamt",
+      "active": "Aktiv",
+      "totalContacts": "Kontakte gesamt"
+    },
+    "columns": {
+      "phoneNumber": "Telefonnummer",
+      "direction": "Richtung",
+      "duration": "Dauer",
+      "outcome": "Ergebnis",
+      "startedAt": "Begonnen am",
+      "notes": "Notizen"
+    },
+    "filters": {
+      "allOutcomes": "Alle Ergebnisse"
+    },
+    "outcomes": {
+      "connected": "Verbunden",
+      "voicemail": "Mailbox",
+      "no_answer": "Keine Antwort",
+      "busy": "Besetzt",
+      "callback": "Rückruf"
+    },
+    "statuses": {
+      "active": "Aktiv",
+      "completed": "Abgeschlossen",
+      "paused": "Pausiert"
+    },
+    "states": {
+      "loading": "Wird geladen...",
+      "noCalls": "Keine Anrufe gefunden.",
+      "noLists": "Noch keine Anruflisten."
+    },
+    "list": {
+      "contacts": "Kontakte",
+      "remaining": "Verbleibend",
+      "assignedTo": "Zugewiesen an",
+      "unassigned": "Nicht zugewiesen"
+    },
+    "actions": {
+      "dialNext": "Nächsten anrufen",
+      "reset": "Zurücksetzen",
+      "resetTitle": "Position auf ersten Kontakt zurücksetzen",
+      "close": "Schließen"
+    },
+    "fields": {
+      "name": "Name",
+      "assignedTo": "Zugewiesen an",
+      "phoneNumber": "Telefonnummer",
+      "outcome": "Ergebnis",
+      "durationSec": "Dauer (Sek.)",
+      "notes": "Notizen"
+    },
+    "placeholders": {
+      "listName": "z. B. Hot Leads Q2",
+      "agentName": "Name des Agenten",
+      "callNotes": "Gesprächszusammenfassung, nächste Schritte…"
+    },
+    "addList": {
+      "aria": "Anrufliste hinzufügen",
+      "title": "Anrufliste hinzufügen",
+      "subtitle": "Eine neue Anrufliste erstellen",
+      "submit": "Liste hinzufügen",
+      "creating": "Erstellen…"
+    },
+    "callModal": {
+      "aria": "Anruf protokollieren",
+      "titleDial": "Nächsten Kontakt anrufen",
+      "titleLog": "Anruf protokollieren",
+      "contactOf": "Kontakt {index} von {total}",
+      "manualLog": "Einen Anruf manuell protokollieren",
+      "loadingContact": "Kontakt wird geladen…",
+      "unnamed": "Unbenannter Kontakt",
+      "noPhone": "Keine Telefonnummer hinterlegt",
+      "notFound": "Kontakt nicht gefunden.",
+      "logging": "Protokollieren…",
+      "logCall": "Anruf protokollieren",
+      "logAndAdvance": "Protokollieren & weiter"
+    },
+    "toasts": {
+      "emptyList": "Diese Liste enthält keine Kontakte.",
+      "loadContactFailed": "Kontakt konnte nicht geladen werden.",
+      "phoneRequired": "Telefonnummer ist erforderlich.",
+      "invalidDuration": "Dauer muss eine nicht-negative Zahl sein.",
+      "logFailed": "Anruf konnte nicht protokolliert werden.",
+      "nameRequired": "Name ist erforderlich.",
+      "createListFailed": "Liste konnte nicht erstellt werden."
+    }
+  },
+  "inbox": {
+    "title": "Posteingang",
+    "subtitle": "Vereinheitlichter Posteingang für E-Mail, SMS, WhatsApp und Telefon",
+    "add": {
+      "conversation": "Unterhaltung"
+    },
+    "kpis": {
+      "total": "Unterhaltungen gesamt",
+      "open": "Offen",
+      "closed": "Geschlossen",
+      "channels": "Kanäle"
+    },
+    "columns": {
+      "conversation": "Unterhaltung",
+      "channel": "Kanal",
+      "time": "Zeit"
+    },
+    "filters": {
+      "allStatuses": "Alle Status",
+      "allChannels": "Alle Kanäle"
+    },
+    "statuses": {
+      "open": "Offen",
+      "closed": "Geschlossen",
+      "archived": "Archiviert"
+    },
+    "channels": {
+      "email": "E-Mail",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp",
+      "phone": "Telefon"
+    },
+    "states": {
+      "loading": "Wird geladen...",
+      "noConversations": "Keine Unterhaltungen gefunden.",
+      "noMessagesYet": "Noch keine Nachrichten",
+      "unknownContact": "Unbekannter Kontakt",
+      "noSubject": "Kein Betreff",
+      "selectConversation": "Wähle eine Unterhaltung aus, um Nachrichten zu lesen und zu antworten.",
+      "loadingMessages": "Nachrichten werden geladen...",
+      "noMessagesPrompt": "Noch keine Nachrichten — schreibe unten eine Antwort, um den Thread zu starten.",
+      "contactShort": "Kontakt {id}"
+    },
+    "time": {
+      "justNow": "gerade eben",
+      "mAgo": "vor {count} Min.",
+      "hAgo": "vor {count} Std.",
+      "dAgo": "vor {count} T."
+    },
+    "thread": {
+      "you": "Du",
+      "contact": "Kontakt"
+    },
+    "actions": {
+      "backToInbox": "Zurück zum Posteingang"
+    },
+    "reply": {
+      "placeholder": "Antworten via {channel}…  (⌘/Strg+Enter zum Senden)",
+      "send": "Senden",
+      "sending": "Wird gesendet"
+    },
+    "fields": {
+      "contact": "Kontakt",
+      "channel": "Kanal",
+      "subject": "Betreff",
+      "firstMessage": "Erste Nachricht (optional)"
+    },
+    "placeholders": {
+      "selectContact": "Kontakt auswählen…",
+      "subject": "Betreff der Unterhaltung",
+      "firstMessage": "Eine erste ausgehende Nachricht senden…"
+    },
+    "addModal": {
+      "aria": "Neue Unterhaltung",
+      "title": "Neue Unterhaltung",
+      "subtitle": "Einen neuen Unterhaltungsthread starten",
+      "submit": "Unterhaltung erstellen",
+      "creating": "Erstellen…"
+    },
+    "toasts": {
+      "selectContact": "Kontakt auswählen",
+      "subjectRequired": "Betreff ist erforderlich",
+      "createFailed": "Erstellung fehlgeschlagen",
+      "sendFailed": "Senden fehlgeschlagen"
+    }
+  },
   "common": {
     "save": "Speichern",
     "cancel": "Abbrechen",

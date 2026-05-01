@@ -66,13 +66,7 @@ const LIST_STATUS_COLORS: Record<string, { bg: string; txt: string }> = {
   paused: { bg: 'var(--y-bg)', txt: 'var(--y-txt)' },
 }
 
-const OUTCOMES = [
-  { value: 'connected', label: 'Connected' },
-  { value: 'voicemail', label: 'Voicemail' },
-  { value: 'no_answer', label: 'No Answer' },
-  { value: 'busy', label: 'Busy' },
-  { value: 'callback', label: 'Callback' },
-]
+const OUTCOME_VALUES = ['connected', 'voicemail', 'no_answer', 'busy', 'callback'] as const
 
 /* ── Helpers ────────────────────────────────────────────── */
 
@@ -108,6 +102,8 @@ function setCursor(listId: string, idx: number) {
 
 export default function DialerPage() {
   const t = useTranslations('dialer')
+
+  const OUTCOMES = OUTCOME_VALUES.map(v => ({ value: v, label: t(`outcomes.${v}`) }))
 
   /* Tab state */
   const [activeTab, setActiveTab] = useState<'calls' | 'lists'>('calls')
@@ -183,7 +179,7 @@ export default function DialerPage() {
       setCallPhone('')
       setCallModalIndex(0)
       setCallOutcome('connected'); setCallDuration('0'); setCallNotes('')
-      setCallError('This list has no contacts. Add contacts before dialing.')
+      setCallError(t('toasts.emptyList'))
       setCallModalOpen(true)
       return
     }
@@ -205,11 +201,11 @@ export default function DialerPage() {
       setCallModalContact(c)
       setCallPhone(c?.phone ?? '')
     } catch (err) {
-      setCallError(err instanceof Error ? err.message : 'Could not load contact')
+      setCallError(err instanceof Error ? err.message : t('toasts.loadContactFailed'))
     } finally {
       setCallModalLoading(false)
     }
-  }, [])
+  }, [t])
 
   const openAdHocCallModal = useCallback(() => {
     setCallModalListId(null)
@@ -230,9 +226,9 @@ export default function DialerPage() {
 
   const submitCall = useCallback(async () => {
     setCallError(null)
-    if (!callPhone.trim()) { setCallError('Phone number is required'); return }
+    if (!callPhone.trim()) { setCallError(t('toasts.phoneRequired')); return }
     const dur = parseInt(callDuration || '0', 10)
-    if (!Number.isFinite(dur) || dur < 0) { setCallError('Duration must be a non-negative number'); return }
+    if (!Number.isFinite(dur) || dur < 0) { setCallError(t('toasts.invalidDuration')); return }
     setCallSubmitting(true)
     try {
       const res = await fetch('/api/calls', {
@@ -252,7 +248,7 @@ export default function DialerPage() {
       })
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
-        setCallError(j.error ?? 'Failed to log call')
+        setCallError(j.error ?? t('toasts.logFailed'))
         return
       }
       // Advance cursor for the active list (if any)
@@ -268,17 +264,17 @@ export default function DialerPage() {
       setCallModalContact(null)
       fetchCalls()
     } catch (err) {
-      setCallError(err instanceof Error ? err.message : 'Failed to log call')
+      setCallError(err instanceof Error ? err.message : t('toasts.logFailed'))
     } finally {
       setCallSubmitting(false)
     }
-  }, [callPhone, callDuration, callOutcome, callNotes, callModalContact, callModalListId, callModalIndex, lists, fetchCalls])
+  }, [callPhone, callDuration, callOutcome, callNotes, callModalContact, callModalListId, callModalIndex, lists, fetchCalls, t])
 
   /* ── Add-list submit ──────────────────────────────────── */
 
   const submitAddList = useCallback(async () => {
     setAddError(null)
-    if (!addName.trim()) { setAddError('Name is required'); return }
+    if (!addName.trim()) { setAddError(t('toasts.nameRequired')); return }
     setAddSubmitting(true)
     try {
       const res = await fetch('/api/dialer-lists', {
@@ -291,18 +287,18 @@ export default function DialerPage() {
       })
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
-        setAddError(j.error ?? 'Failed to create list')
+        setAddError(j.error ?? t('toasts.createListFailed'))
         return
       }
       setAddName(''); setAddAssigned('')
       setShowAddList(false)
       fetchLists()
     } catch (err) {
-      setAddError(err instanceof Error ? err.message : 'Failed to create list')
+      setAddError(err instanceof Error ? err.message : t('toasts.createListFailed'))
     } finally {
       setAddSubmitting(false)
     }
-  }, [addName, addAssigned, fetchLists])
+  }, [addName, addAssigned, fetchLists, t])
 
   /* ── Render ───────────────────────────────────────────── */
 
@@ -312,17 +308,17 @@ export default function DialerPage() {
         title={t('title')}
         sub={t('subtitle')}
         onAdd={activeTab === 'lists' ? () => setShowAddList(true) : openAdHocCallModal}
-        addLabel={activeTab === 'lists' ? 'List' : 'Log Call'}
+        addLabel={activeTab === 'lists' ? t('add.list') : t('add.logCall')}
       />
 
       <div style={{ padding: '18px 24px 40px' }}>
         {/* ── Tab buttons ─────────────────────────────────── */}
         <div style={{ display: 'flex', gap: 6, marginBottom: 18 }}>
           <TabButton active={activeTab === 'calls'} onClick={() => setActiveTab('calls')}>
-            <Phone size={13} /> Call Log
+            <Phone size={13} /> {t('tabs.callLog')}
           </TabButton>
           <TabButton active={activeTab === 'lists'} onClick={() => setActiveTab('lists')}>
-            <List size={13} /> Dialer Lists
+            <List size={13} /> {t('tabs.dialerLists')}
           </TabButton>
         </div>
 
@@ -333,10 +329,10 @@ export default function DialerPage() {
           <>
             {/* KPI Row */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-              <KpiCard icon="zap" label="Total Calls" value={String(callTotal)} />
-              <KpiCard icon="trending-up" label="Outbound" value={String(outboundCalls)} />
-              <KpiCard icon="calendar" label="Avg Duration" value={formatDuration(avgDuration)} />
-              <KpiCard icon="target" label="Callbacks" value={String(callbacks)} />
+              <KpiCard icon="zap" label={t('kpis.totalCalls')} value={String(callTotal)} />
+              <KpiCard icon="trending-up" label={t('kpis.outbound')} value={String(outboundCalls)} />
+              <KpiCard icon="calendar" label={t('kpis.avgDuration')} value={formatDuration(avgDuration)} />
+              <KpiCard icon="target" label={t('kpis.callbacks')} value={String(callbacks)} />
             </div>
 
             {/* Outcome filter */}
@@ -345,7 +341,7 @@ export default function DialerPage() {
                 value={outcomeFilter}
                 onChange={v => { setOutcomeFilter(v); setCallPage(1) }}
                 options={[
-                  { value: '', label: 'All Outcomes' },
+                  { value: '', label: t('filters.allOutcomes') },
                   ...OUTCOMES,
                 ]}
               />
@@ -354,18 +350,18 @@ export default function DialerPage() {
             {/* Calls table */}
             <div style={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 100px 90px 110px 140px 1fr', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
-                <span>Phone Number</span>
-                <span>Direction</span>
-                <span>Duration</span>
-                <span>Outcome</span>
-                <span>Started At</span>
-                <span>Notes</span>
+                <span>{t('columns.phoneNumber')}</span>
+                <span>{t('columns.direction')}</span>
+                <span>{t('columns.duration')}</span>
+                <span>{t('columns.outcome')}</span>
+                <span>{t('columns.startedAt')}</span>
+                <span>{t('columns.notes')}</span>
               </div>
 
               {callsLoading ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('states.loading')}</div>
               ) : calls.length === 0 ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No calls found.</div>
+                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('states.noCalls')}</div>
               ) : calls.map((call, idx) => (
                 <div key={call.id} style={{
                   display: 'grid', gridTemplateColumns: '1fr 100px 90px 110px 140px 1fr',
@@ -424,16 +420,16 @@ export default function DialerPage() {
           <>
             {/* KPI Row */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
-              <KpiCard icon="folder" label="Total Lists" value={String(listTotal)} />
-              <KpiCard icon="zap" label="Active" value={String(activeLists)} />
-              <KpiCard icon="users" label="Total Contacts" value={String(totalContacts)} />
+              <KpiCard icon="folder" label={t('kpis.totalLists')} value={String(listTotal)} />
+              <KpiCard icon="zap" label={t('kpis.active')} value={String(activeLists)} />
+              <KpiCard icon="users" label={t('kpis.totalContacts')} value={String(totalContacts)} />
             </div>
 
             {/* List cards */}
             {listsLoading ? (
-              <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+              <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('states.loading')}</div>
             ) : lists.length === 0 ? (
-              <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No dialer lists yet.</div>
+              <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('states.noLists')}</div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 12, marginBottom: 16 }}>
                 {lists.map(list => {
@@ -457,27 +453,27 @@ export default function DialerPage() {
                           background: LIST_STATUS_COLORS[list.status]?.bg ?? 'var(--bg2)',
                           color: LIST_STATUS_COLORS[list.status]?.txt ?? 'var(--txt2)',
                         }}>
-                          {list.status}
+                          {t(`statuses.${list.status}`)}
                         </span>
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                          <span style={{ color: 'var(--txt3)' }}>Contacts</span>
+                          <span style={{ color: 'var(--txt3)' }}>{t('list.contacts')}</span>
                           <span style={{ fontWeight: 600, fontFamily: 'var(--font-red-hat-mono), monospace', color: 'var(--txt)' }}>
                             {list.totalContacts}
                           </span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                          <span style={{ color: 'var(--txt3)' }}>Remaining</span>
+                          <span style={{ color: 'var(--txt3)' }}>{t('list.remaining')}</span>
                           <span style={{ fontWeight: 600, fontFamily: 'var(--font-red-hat-mono), monospace', color: 'var(--txt)' }}>
                             {remaining}
                           </span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                          <span style={{ color: 'var(--txt3)' }}>Assigned To</span>
+                          <span style={{ color: 'var(--txt3)' }}>{t('list.assignedTo')}</span>
                           <span style={{ color: 'var(--txt2)' }}>
-                            {list.assignedTo ?? 'Unassigned'}
+                            {list.assignedTo ?? t('list.unassigned')}
                           </span>
                         </div>
                       </div>
@@ -497,12 +493,12 @@ export default function DialerPage() {
                             fontFamily: 'inherit',
                           }}
                         >
-                          <PhoneCall size={13} /> Dial Next
+                          <PhoneCall size={13} /> {t('actions.dialNext')}
                         </button>
                         {ids.length > 0 && (
                           <button
                             onClick={() => { setCursor(list.id, 0); fetchLists() }}
-                            title="Reset position to first contact"
+                            title={t('actions.resetTitle')}
                             style={{
                               padding: '8px 12px', borderRadius: 8,
                               border: '1px solid var(--border)', background: 'var(--bg2)',
@@ -510,7 +506,7 @@ export default function DialerPage() {
                               fontFamily: 'inherit',
                             }}
                           >
-                            Reset
+                            {t('actions.reset')}
                           </button>
                         )}
                       </div>
@@ -532,7 +528,7 @@ export default function DialerPage() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Add dialer list"
+          aria-label={t('addList.aria')}
           style={{
             position: 'fixed', inset: 0, zIndex: 100,
             background: 'rgba(0,0,0,0.35)', display: 'flex',
@@ -546,10 +542,10 @@ export default function DialerPage() {
             padding: '24px 28px', width: 420, maxHeight: '80vh', overflowY: 'auto',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-              <div style={{ fontSize: 16, fontWeight: 700 }}>Add Dialer List</div>
+              <div style={{ fontSize: 16, fontWeight: 700 }}>{t('addList.title')}</div>
               <button
                 onClick={() => !addSubmitting && setShowAddList(false)}
-                aria-label="Close"
+                aria-label={t('actions.close')}
                 style={{
                   width: 28, height: 28, borderRadius: 8, border: 'none',
                   background: 'var(--bg2)', cursor: 'pointer', color: 'var(--txt3)',
@@ -559,7 +555,7 @@ export default function DialerPage() {
                 <X size={14} />
               </button>
             </div>
-            <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>Create a new dialer list</div>
+            <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>{t('addList.subtitle')}</div>
 
             {addError && (
               <div style={{ background: 'var(--r-bg)', color: 'var(--r-txt)', padding: '8px 12px', borderRadius: 8, fontSize: 12, marginBottom: 12 }}>
@@ -569,16 +565,16 @@ export default function DialerPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Name</label>
-                <input value={addName} onChange={e => setAddName(e.target.value)} placeholder="e.g. Hot Leads Q2" style={{
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.name')}</label>
+                <input value={addName} onChange={e => setAddName(e.target.value)} placeholder={t('placeholders.listName')} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
                 }} />
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Assigned To</label>
-                <input value={addAssigned} onChange={e => setAddAssigned(e.target.value)} placeholder="Agent name" style={{
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.assignedTo')}</label>
+                <input value={addAssigned} onChange={e => setAddAssigned(e.target.value)} placeholder={t('placeholders.agentName')} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
@@ -598,7 +594,7 @@ export default function DialerPage() {
                 cursor: addSubmitting ? 'not-allowed' : 'pointer',
                 fontFamily: 'inherit',
               }}
-            >{addSubmitting ? 'Creating…' : 'Add List'}</button>
+            >{addSubmitting ? t('addList.creating') : t('addList.submit')}</button>
           </div>
         </div>
       )}
@@ -610,7 +606,7 @@ export default function DialerPage() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Log call"
+          aria-label={t('callModal.aria')}
           style={{
             position: 'fixed', inset: 0, zIndex: 110,
             background: 'rgba(0,0,0,0.35)', display: 'flex',
@@ -625,11 +621,11 @@ export default function DialerPage() {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
               <div style={{ fontSize: 16, fontWeight: 700 }}>
-                {callModalListId ? 'Dial Next Contact' : 'Log Call'}
+                {callModalListId ? t('callModal.titleDial') : t('callModal.titleLog')}
               </div>
               <button
                 onClick={closeCallModal}
-                aria-label="Close"
+                aria-label={t('actions.close')}
                 style={{
                   width: 28, height: 28, borderRadius: 8, border: 'none',
                   background: 'var(--bg2)', cursor: 'pointer', color: 'var(--txt3)',
@@ -641,8 +637,11 @@ export default function DialerPage() {
             </div>
             <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 14 }}>
               {callModalListId
-                ? `Contact ${callModalIndex + 1} of ${(lists.find(l => l.id === callModalListId) ? parseContactIds(lists.find(l => l.id === callModalListId)!.contactIds).length : 0)}`
-                : 'Manually log a call'}
+                ? t('callModal.contactOf', {
+                    index: callModalIndex + 1,
+                    total: lists.find(l => l.id === callModalListId) ? parseContactIds(lists.find(l => l.id === callModalListId)!.contactIds).length : 0,
+                  })
+                : t('callModal.manualLog')}
             </div>
 
             {/* Contact context */}
@@ -653,20 +652,20 @@ export default function DialerPage() {
               }}>
                 {callModalLoading ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--txt3)', fontSize: 12 }}>
-                    <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> Loading contact…
+                    <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> {t('callModal.loadingContact')}
                   </div>
                 ) : callModalContact ? (
                   <>
                     <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>
-                      {callModalContact.name ?? 'Unnamed contact'}
+                      {callModalContact.name ?? t('callModal.unnamed')}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 3, fontFamily: 'var(--font-red-hat-mono), monospace' }}>
-                      {callModalContact.phone ?? 'No phone on file'}
+                      {callModalContact.phone ?? t('callModal.noPhone')}
                       {callModalContact.email && <> · {callModalContact.email}</>}
                     </div>
                   </>
                 ) : (
-                  <div style={{ fontSize: 12, color: 'var(--txt3)' }}>Contact not found.</div>
+                  <div style={{ fontSize: 12, color: 'var(--txt3)' }}>{t('callModal.notFound')}</div>
                 )}
               </div>
             )}
@@ -679,7 +678,7 @@ export default function DialerPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Phone Number</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.phoneNumber')}</label>
                 <input
                   value={callPhone}
                   onChange={e => setCallPhone(e.target.value)}
@@ -695,7 +694,7 @@ export default function DialerPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Outcome</label>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.outcome')}</label>
                   <select value={callOutcome} onChange={e => setCallOutcome(e.target.value)} style={{
                     width: '100%', padding: '8px 12px', borderRadius: 8,
                     border: '1px solid var(--border)', background: 'var(--bg2)',
@@ -705,7 +704,7 @@ export default function DialerPage() {
                   </select>
                 </div>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Duration (sec)</label>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.durationSec')}</label>
                   <input
                     value={callDuration}
                     onChange={e => setCallDuration(e.target.value.replace(/[^0-9]/g, ''))}
@@ -720,12 +719,12 @@ export default function DialerPage() {
               </div>
 
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Notes</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.notes')}</label>
                 <textarea
                   value={callNotes}
                   onChange={e => setCallNotes(e.target.value)}
                   rows={3}
-                  placeholder="Call summary, next steps…"
+                  placeholder={t('placeholders.callNotes')}
                   style={{
                     width: '100%', padding: '8px 12px', borderRadius: 8,
                     border: '1px solid var(--border)', background: 'var(--bg2)',
@@ -751,7 +750,7 @@ export default function DialerPage() {
               }}
             >
               {callSubmitting ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <Phone size={13} />}
-              {callSubmitting ? 'Logging…' : (callModalListId ? 'Log Call & Advance' : 'Log Call')}
+              {callSubmitting ? t('callModal.logging') : (callModalListId ? t('callModal.logAndAdvance') : t('callModal.logCall'))}
             </button>
           </div>
         </div>
