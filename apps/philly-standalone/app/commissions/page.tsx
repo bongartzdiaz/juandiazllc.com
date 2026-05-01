@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -10,6 +10,26 @@ import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
+import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+
+const COMMISSION_COLUMNS: ColumnDef[] = [
+  { id: 'type', label: 'Type / Notes', required: true },
+  { id: 'gross', label: 'Gross' },
+  { id: 'split', label: 'Split %' },
+  { id: 'net', label: 'Net' },
+  { id: 'status', label: 'Status' },
+  { id: 'actions', label: 'Actions', required: true },
+]
+const COMMISSION_DEFAULTS = ['type', 'gross', 'split', 'net', 'status', 'actions']
+const COMMISSION_WIDTHS: Record<string, string> = {
+  type: '1fr',
+  gross: '100px',
+  split: '80px',
+  net: '100px',
+  status: '90px',
+  actions: '110px',
+}
 
 interface CommissionRecord {
   id: string
@@ -70,6 +90,17 @@ export default function CommissionsPage() {
   const [showAdd, setShowAdd] = useState(false)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
+
+  // Bundle BS — column visibility prefs.
+  const commissionColumns = useColumnPrefs('pai-commissions-columns-v1', COMMISSION_DEFAULTS)
+  const visibleCommissionColumns = useMemo(
+    () => COMMISSION_COLUMNS.filter((c) => c.required || commissionColumns.visible.has(c.id)),
+    [commissionColumns.visible],
+  )
+  const commissionGridTemplate = useMemo(
+    () => visibleCommissionColumns.map((c) => COMMISSION_WIDTHS[c.id]).join(' '),
+    [visibleCommissionColumns],
+  )
 
   async function submitForm() {
     if (!form.agentId) { addToast(t('toasts.selectAgent'), 'error'); return }
@@ -212,6 +243,13 @@ export default function CommissionsPage() {
               <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
                 options={[{ value: '', label: 'All Statuses' }, { value: 'pending', label: 'Pending' }, { value: 'paid', label: 'Paid' }, { value: 'voided', label: 'Voided' }]} />
               <div style={{ flex: 1 }} />
+              <ColumnPicker
+                columns={COMMISSION_COLUMNS}
+                visible={commissionColumns.visible}
+                onToggle={commissionColumns.toggle}
+                onReset={commissionColumns.reset}
+                isOverridden={commissionColumns.isOverridden}
+              />
               <button onClick={() => setShowAdd(true)} style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 padding: '8px 14px', borderRadius: 10,
@@ -223,38 +261,53 @@ export default function CommissionsPage() {
               </button>
             </div>
             <div style={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 100px 80px 100px 90px 110px', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
-                <span>Type / Notes</span><span>Gross</span><span>Split %</span><span>Net</span><span>Status</span><span>Actions</span>
+              <div style={{ display: 'grid', gridTemplateColumns: commissionGridTemplate, gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
+                {visibleCommissionColumns.map((c) => <span key={c.id}>{c.label}</span>)}
               </div>
               {loading ? (
                 <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
               ) : records.length === 0 ? (
                 <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No commission records. Click Add Commission.</div>
               ) : records.map((rec, idx) => (
-                <div key={rec.id} style={{ display: 'grid', gridTemplateColumns: '1fr 100px 80px 100px 90px 110px', gap: 12, padding: '10px 16px', borderBottom: idx < records.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent' }}>
-                  <div>
-                    <div style={{ fontWeight: 600, color: 'var(--txt)', textTransform: 'capitalize' }}>{rec.type}</div>
-                    <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{rec.notes || new Date(rec.createdAt).toLocaleDateString()}</div>
-                  </div>
-                  <span style={{ fontWeight: 600, fontFamily: "var(--font-red-hat-mono), monospace" }}>${(rec.grossCents / 100).toLocaleString()}</span>
-                  <span style={{ fontFamily: "var(--font-red-hat-mono), monospace" }}>{rec.splitPct}%</span>
-                  <span style={{ fontWeight: 700, fontFamily: "var(--font-red-hat-mono), monospace", color: 'var(--g-txt)' }}>${(rec.netCents / 100).toLocaleString()}</span>
-                  <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: STATUS_COLORS[rec.status]?.bg ?? 'var(--bg2)', color: STATUS_COLORS[rec.status]?.txt ?? 'var(--txt2)', justifySelf: 'start' }}>{rec.status}</span>
-                  <div style={{ display: 'flex', gap: 4 }}>
-                    {rec.status === 'pending' && (
-                      <>
-                        <button onClick={() => changeStatus(rec.id, 'paid')} title="Mark paid" style={miniBtn('var(--g-txt)')}>
-                          <CheckCircle2 size={11} />
+                <div key={rec.id} style={{ display: 'grid', gridTemplateColumns: commissionGridTemplate, gap: 12, padding: '10px 16px', borderBottom: idx < records.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent' }}>
+                  {visibleCommissionColumns.map((c) => {
+                    if (c.id === 'type') return (
+                      <div key="type">
+                        <div style={{ fontWeight: 600, color: 'var(--txt)', textTransform: 'capitalize' }}>{rec.type}</div>
+                        <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{rec.notes || new Date(rec.createdAt).toLocaleDateString()}</div>
+                      </div>
+                    )
+                    if (c.id === 'gross') return (
+                      <span key="gross" style={{ fontWeight: 600, fontFamily: "var(--font-red-hat-mono), monospace" }}>${(rec.grossCents / 100).toLocaleString()}</span>
+                    )
+                    if (c.id === 'split') return (
+                      <span key="split" style={{ fontFamily: "var(--font-red-hat-mono), monospace" }}>{rec.splitPct}%</span>
+                    )
+                    if (c.id === 'net') return (
+                      <span key="net" style={{ fontWeight: 700, fontFamily: "var(--font-red-hat-mono), monospace", color: 'var(--g-txt)' }}>${(rec.netCents / 100).toLocaleString()}</span>
+                    )
+                    if (c.id === 'status') return (
+                      <span key="status" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: STATUS_COLORS[rec.status]?.bg ?? 'var(--bg2)', color: STATUS_COLORS[rec.status]?.txt ?? 'var(--txt2)', justifySelf: 'start' }}>{rec.status}</span>
+                    )
+                    if (c.id === 'actions') return (
+                      <div key="actions" style={{ display: 'flex', gap: 4 }}>
+                        {rec.status === 'pending' && (
+                          <>
+                            <button onClick={() => changeStatus(rec.id, 'paid')} title="Mark paid" style={miniBtn('var(--g-txt)')}>
+                              <CheckCircle2 size={11} />
+                            </button>
+                            <button onClick={() => changeStatus(rec.id, 'voided')} title="Void" style={miniBtn('var(--txt3)')}>
+                              <XCircle size={11} />
+                            </button>
+                          </>
+                        )}
+                        <button onClick={() => handleDelete(rec.id)} title="Delete" style={miniBtn('var(--r-txt)')}>
+                          <Trash2 size={11} />
                         </button>
-                        <button onClick={() => changeStatus(rec.id, 'voided')} title="Void" style={miniBtn('var(--txt3)')}>
-                          <XCircle size={11} />
-                        </button>
-                      </>
-                    )}
-                    <button onClick={() => handleDelete(rec.id)} title="Delete" style={miniBtn('var(--r-txt)')}>
-                      <Trash2 size={11} />
-                    </button>
-                  </div>
+                      </div>
+                    )
+                    return <span key={c.id} />
+                  })}
                 </div>
               ))}
             </div>

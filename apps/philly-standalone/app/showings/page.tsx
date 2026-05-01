@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -10,6 +10,24 @@ import { Filter, Star, Plus, Trash2, CheckCircle2, Edit2 } from 'lucide-react'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
+import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+
+const SHOWING_COLUMNS: ColumnDef[] = [
+  { id: 'property', label: 'Property', required: true },
+  { id: 'date', label: 'Date/Time' },
+  { id: 'duration', label: 'Duration' },
+  { id: 'rating', label: 'Rating' },
+  { id: 'status', label: 'Status' },
+]
+const SHOWING_DEFAULTS = ['property', 'date', 'duration', 'rating', 'status']
+const SHOWING_WIDTHS: Record<string, string> = {
+  property: '1fr',
+  date: '160px',
+  duration: '80px',
+  rating: '80px',
+  status: '100px',
+}
 
 interface Showing {
   id: string
@@ -73,6 +91,17 @@ export default function ShowingsPage() {
 
   const t = useTranslations('showings')
   const { addToast } = useToast()
+
+  // Bundle BS — column visibility prefs.
+  const showingColumns = useColumnPrefs('pai-showings-columns-v1', SHOWING_DEFAULTS)
+  const visibleShowingColumns = useMemo(
+    () => SHOWING_COLUMNS.filter((c) => c.required || showingColumns.visible.has(c.id)),
+    [showingColumns.visible],
+  )
+  const showingsGridTemplate = useMemo(
+    () => visibleShowingColumns.map((c) => SHOWING_WIDTHS[c.id]).join(' '),
+    [visibleShowingColumns],
+  )
 
   useEffect(() => {
     fetch('/api/properties?limit=500').then(r => r.json()).then(j => {
@@ -222,6 +251,13 @@ export default function ShowingsPage() {
               { value: 'no_show', label: 'No Show' },
             ]} />
           <div style={{ flex: 1 }} />
+          <ColumnPicker
+            columns={SHOWING_COLUMNS}
+            visible={showingColumns.visible}
+            onToggle={showingColumns.toggle}
+            onReset={showingColumns.reset}
+            isOverridden={showingColumns.isOverridden}
+          />
           <button
             onClick={openCreate}
             style={{
@@ -237,8 +273,8 @@ export default function ShowingsPage() {
         </div>
 
         <div style={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 160px 80px 80px 100px', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
-            <span>Property</span><span>Date/Time</span><span>Duration</span><span>Rating</span><span>Status</span>
+          <div style={{ display: 'grid', gridTemplateColumns: showingsGridTemplate, gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
+            {visibleShowingColumns.map((c) => <span key={c.id}>{c.label}</span>)}
           </div>
           {loading ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
@@ -252,41 +288,54 @@ export default function ShowingsPage() {
                 onClick={() => openDetail(showing)}
                 className="card-hover"
                 style={{
-                  display: 'grid', gridTemplateColumns: '1fr 160px 80px 80px 100px', gap: 12,
+                  display: 'grid', gridTemplateColumns: showingsGridTemplate, gap: 12,
                   padding: '10px 16px',
                   borderBottom: idx < showings.length - 1 ? '1px solid var(--border)' : 'none',
                   fontSize: 12, alignItems: 'center', cursor: 'pointer',
                   background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent',
                 }}
               >
-                <div>
-                  <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{showing.property?.title ?? 'Unknown'}</div>
-                  <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{showing.property?.address ?? ''}</div>
-                </div>
-                <div>
-                  <div style={{ fontWeight: 500, fontSize: 11, fontFamily: "var(--font-red-hat-mono), monospace" }}>
-                    {d.toLocaleDateString()}
-                  </div>
-                  <div style={{ fontSize: 10, color: 'var(--txt3)' }}>
-                    {d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </div>
-                </div>
-                <span style={{ fontSize: 11, fontFamily: "var(--font-red-hat-mono), monospace", color: 'var(--txt2)' }}>{showing.duration}min</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  {showing.rating != null ? (
-                    <>
-                      <Star size={11} style={{ color: '#f59e0b', fill: '#f59e0b' }} />
-                      <span style={{ fontSize: 11, fontWeight: 600, fontFamily: "var(--font-red-hat-mono), monospace" }}>{showing.rating}</span>
-                    </>
-                  ) : <span style={{ fontSize: 10, color: 'var(--txt3)' }}>-</span>}
-                </div>
-                <span style={{
-                  padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
-                  textTransform: 'uppercase',
-                  background: STATUS_COLORS[showing.status]?.bg ?? 'var(--bg2)',
-                  color: STATUS_COLORS[showing.status]?.txt ?? 'var(--txt2)',
-                  justifySelf: 'start',
-                }}>{showing.status.replace('_', ' ')}</span>
+                {visibleShowingColumns.map((c) => {
+                  if (c.id === 'property') return (
+                    <div key="property">
+                      <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{showing.property?.title ?? 'Unknown'}</div>
+                      <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{showing.property?.address ?? ''}</div>
+                    </div>
+                  )
+                  if (c.id === 'date') return (
+                    <div key="date">
+                      <div style={{ fontWeight: 500, fontSize: 11, fontFamily: "var(--font-red-hat-mono), monospace" }}>
+                        {d.toLocaleDateString()}
+                      </div>
+                      <div style={{ fontSize: 10, color: 'var(--txt3)' }}>
+                        {d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                    </div>
+                  )
+                  if (c.id === 'duration') return (
+                    <span key="duration" style={{ fontSize: 11, fontFamily: "var(--font-red-hat-mono), monospace", color: 'var(--txt2)' }}>{showing.duration}min</span>
+                  )
+                  if (c.id === 'rating') return (
+                    <div key="rating" style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      {showing.rating != null ? (
+                        <>
+                          <Star size={11} style={{ color: '#f59e0b', fill: '#f59e0b' }} />
+                          <span style={{ fontSize: 11, fontWeight: 600, fontFamily: "var(--font-red-hat-mono), monospace" }}>{showing.rating}</span>
+                        </>
+                      ) : <span style={{ fontSize: 10, color: 'var(--txt3)' }}>-</span>}
+                    </div>
+                  )
+                  if (c.id === 'status') return (
+                    <span key="status" style={{
+                      padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
+                      textTransform: 'uppercase',
+                      background: STATUS_COLORS[showing.status]?.bg ?? 'var(--bg2)',
+                      color: STATUS_COLORS[showing.status]?.txt ?? 'var(--txt2)',
+                      justifySelf: 'start',
+                    }}>{showing.status.replace('_', ' ')}</span>
+                  )
+                  return <span key={c.id} />
+                })}
               </div>
             )
           })}

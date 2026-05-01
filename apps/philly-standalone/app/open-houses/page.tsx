@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -13,6 +13,24 @@ import {
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
+import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+
+const OH_COLUMNS: ColumnDef[] = [
+  { id: 'property', label: 'Property', required: true },
+  { id: 'date', label: 'Date' },
+  { id: 'time', label: 'Time' },
+  { id: 'status', label: 'Status' },
+  { id: 'visitors', label: 'Visitors' },
+]
+const OH_DEFAULTS = ['property', 'date', 'time', 'status', 'visitors']
+const OH_WIDTHS: Record<string, string> = {
+  property: '1fr',
+  date: '120px',
+  time: '140px',
+  status: '100px',
+  visitors: '80px',
+}
 
 interface OpenHouse {
   id: string
@@ -62,6 +80,17 @@ export default function OpenHousesPage() {
 
   const t = useTranslations('openHouses')
   const { addToast } = useToast()
+
+  // Bundle BS — column visibility prefs.
+  const ohColumns = useColumnPrefs('pai-openHouses-columns-v1', OH_DEFAULTS)
+  const visibleOhColumns = useMemo(
+    () => OH_COLUMNS.filter((c) => c.required || ohColumns.visible.has(c.id)),
+    [ohColumns.visible],
+  )
+  const ohGridTemplate = useMemo(
+    () => visibleOhColumns.map((c) => OH_WIDTHS[c.id]).join(' '),
+    [visibleOhColumns],
+  )
 
   useEffect(() => {
     // Load properties once for the scheduler

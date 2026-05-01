@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
+import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
+import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { Phone, PhoneCall, List, Filter, X, Loader2 } from 'lucide-react'
 
 /* ── Types ──────────────────────────────────────────────── */
@@ -68,6 +70,16 @@ const LIST_STATUS_COLORS: Record<string, { bg: string; txt: string }> = {
 
 const OUTCOME_VALUES = ['connected', 'voicemail', 'no_answer', 'busy', 'callback'] as const
 
+const CALL_DEFAULTS = ['phoneNumber', 'direction', 'duration', 'outcome', 'startedAt', 'notes']
+const CALL_WIDTHS: Record<string, string> = {
+  phoneNumber: '1fr',
+  direction: '100px',
+  duration: '90px',
+  outcome: '110px',
+  startedAt: '140px',
+  notes: '1fr',
+}
+
 /* ── Helpers ────────────────────────────────────────────── */
 
 function formatDuration(seconds: number): string {
@@ -104,6 +116,25 @@ export default function DialerPage() {
   const t = useTranslations('dialer')
 
   const OUTCOMES = OUTCOME_VALUES.map(v => ({ value: v, label: t(`outcomes.${v}`) }))
+
+  // Bundle BS — column visibility prefs for the call log table.
+  const CALL_COLUMNS: ColumnDef[] = useMemo(() => [
+    { id: 'phoneNumber', label: t('columns.phoneNumber'), required: true },
+    { id: 'direction', label: t('columns.direction') },
+    { id: 'duration', label: t('columns.duration') },
+    { id: 'outcome', label: t('columns.outcome') },
+    { id: 'startedAt', label: t('columns.startedAt') },
+    { id: 'notes', label: t('columns.notes') },
+  ], [t])
+  const callColumns = useColumnPrefs('pai-dialer-columns-v1', CALL_DEFAULTS)
+  const visibleCallColumns = useMemo(
+    () => CALL_COLUMNS.filter((c) => c.required || callColumns.visible.has(c.id)),
+    [callColumns.visible, CALL_COLUMNS],
+  )
+  const callGridTemplate = useMemo(
+    () => visibleCallColumns.map((c) => CALL_WIDTHS[c.id]).join(' '),
+    [visibleCallColumns],
+  )
 
   /* Tab state */
   const [activeTab, setActiveTab] = useState<'calls' | 'lists'>('calls')
@@ -336,7 +367,7 @@ export default function DialerPage() {
             </div>
 
             {/* Outcome filter */}
-            <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
               <FilterSelect
                 value={outcomeFilter}
                 onChange={v => { setOutcomeFilter(v); setCallPage(1) }}
@@ -345,17 +376,20 @@ export default function DialerPage() {
                   ...OUTCOMES,
                 ]}
               />
+              <div style={{ flex: 1 }} />
+              <ColumnPicker
+                columns={CALL_COLUMNS}
+                visible={callColumns.visible}
+                onToggle={callColumns.toggle}
+                onReset={callColumns.reset}
+                isOverridden={callColumns.isOverridden}
+              />
             </div>
 
             {/* Calls table */}
             <div style={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 100px 90px 110px 140px 1fr', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
-                <span>{t('columns.phoneNumber')}</span>
-                <span>{t('columns.direction')}</span>
-                <span>{t('columns.duration')}</span>
-                <span>{t('columns.outcome')}</span>
-                <span>{t('columns.startedAt')}</span>
-                <span>{t('columns.notes')}</span>
+              <div style={{ display: 'grid', gridTemplateColumns: callGridTemplate, gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
+                {visibleCallColumns.map((c) => <span key={c.id}>{c.label}</span>)}
               </div>
 
               {callsLoading ? (
@@ -364,47 +398,57 @@ export default function DialerPage() {
                 <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('states.noCalls')}</div>
               ) : calls.map((call, idx) => (
                 <div key={call.id} style={{
-                  display: 'grid', gridTemplateColumns: '1fr 100px 90px 110px 140px 1fr',
+                  display: 'grid', gridTemplateColumns: callGridTemplate,
                   gap: 12, padding: '10px 16px',
                   borderBottom: idx < calls.length - 1 ? '1px solid var(--border)' : 'none',
                   fontSize: 12, alignItems: 'center',
                   background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent',
                 }}>
-                  <span style={{ fontWeight: 600, color: 'var(--txt)' }}>{call.phoneNumber}</span>
-
-                  <span style={{
-                    padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
-                    textTransform: 'uppercase', display: 'inline-block', maxWidth: 'fit-content',
-                    background: DIRECTION_COLORS[call.direction]?.bg ?? 'var(--bg2)',
-                    color: DIRECTION_COLORS[call.direction]?.txt ?? 'var(--txt2)',
-                  }}>
-                    {call.direction}
-                  </span>
-
-                  <span style={{ fontFamily: 'var(--font-red-hat-mono), monospace', fontWeight: 500 }}>
-                    {formatDuration(call.duration)}
-                  </span>
-
-                  <span style={{
-                    padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
-                    textTransform: 'uppercase', display: 'inline-block', maxWidth: 'fit-content',
-                    background: OUTCOME_COLORS[call.outcome]?.bg ?? 'var(--bg2)',
-                    color: OUTCOME_COLORS[call.outcome]?.txt ?? 'var(--txt2)',
-                  }}>
-                    {(call.outcome || '—').replace('_', ' ')}
-                  </span>
-
-                  <span style={{ fontSize: 11, color: 'var(--txt2)', fontFamily: 'var(--font-red-hat-mono), monospace' }}>
-                    {new Date(call.startedAt).toLocaleDateString()}{' '}
-                    {new Date(call.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-
-                  <span style={{
-                    fontSize: 11, color: 'var(--txt3)',
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  }}>
-                    {call.notes || '-'}
-                  </span>
+                  {visibleCallColumns.map((c) => {
+                    if (c.id === 'phoneNumber') return (
+                      <span key="phoneNumber" style={{ fontWeight: 600, color: 'var(--txt)' }}>{call.phoneNumber}</span>
+                    )
+                    if (c.id === 'direction') return (
+                      <span key="direction" style={{
+                        padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
+                        textTransform: 'uppercase', display: 'inline-block', maxWidth: 'fit-content',
+                        background: DIRECTION_COLORS[call.direction]?.bg ?? 'var(--bg2)',
+                        color: DIRECTION_COLORS[call.direction]?.txt ?? 'var(--txt2)',
+                      }}>
+                        {call.direction}
+                      </span>
+                    )
+                    if (c.id === 'duration') return (
+                      <span key="duration" style={{ fontFamily: 'var(--font-red-hat-mono), monospace', fontWeight: 500 }}>
+                        {formatDuration(call.duration)}
+                      </span>
+                    )
+                    if (c.id === 'outcome') return (
+                      <span key="outcome" style={{
+                        padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
+                        textTransform: 'uppercase', display: 'inline-block', maxWidth: 'fit-content',
+                        background: OUTCOME_COLORS[call.outcome]?.bg ?? 'var(--bg2)',
+                        color: OUTCOME_COLORS[call.outcome]?.txt ?? 'var(--txt2)',
+                      }}>
+                        {(call.outcome || '—').replace('_', ' ')}
+                      </span>
+                    )
+                    if (c.id === 'startedAt') return (
+                      <span key="startedAt" style={{ fontSize: 11, color: 'var(--txt2)', fontFamily: 'var(--font-red-hat-mono), monospace' }}>
+                        {new Date(call.startedAt).toLocaleDateString()}{' '}
+                        {new Date(call.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    )
+                    if (c.id === 'notes') return (
+                      <span key="notes" style={{
+                        fontSize: 11, color: 'var(--txt3)',
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}>
+                        {call.notes || '-'}
+                      </span>
+                    )
+                    return <span key={c.id} />
+                  })}
                 </div>
               ))}
             </div>
