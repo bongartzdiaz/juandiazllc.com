@@ -20,7 +20,6 @@ export function LiveSignals({ locale }: Props) {
     <section className="livesignals" aria-labelledby="ls-title">
       <div className="livesignals-head">
         <span className="livesignals-eyebrow">
-          <span className="livesignals-dot" aria-hidden />
           {t("fomo.proof.eyebrow")}
         </span>
         {/* The title contains an <em> tag in every locale — render

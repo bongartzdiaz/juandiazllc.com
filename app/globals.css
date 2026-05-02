@@ -774,7 +774,8 @@ footer .f-mark { color: var(--text); }
 .cd-head { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 32px; position: relative; }
 .cd-head .label { color: var(--accent); }
 .cd-pulse { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
-.cd-pulse::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); animation: pulse 1.4s infinite; }
+/* Bundle CB — pulsing dots removed site-wide. The .cd-pulse text
+   stays (so the "LIVE" eyebrow label remains); only the dot is gone. */
 .cd-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; position: relative; }
 .cd-cell { padding: 24px 18px; background: rgba(3,20,15,.5); border: 1px solid var(--line); border-radius: 12px; text-align: left; }
 .cd-cell .num { font-family: var(--font-inter); font-weight: 300; font-size: clamp(44px, 6vw, 80px); line-height: 1; letter-spacing: -.04em; color: var(--text); font-variant-numeric: tabular-nums; }
@@ -833,7 +834,7 @@ footer .f-mark { color: var(--text); }
 .hud-inner > * { padding: 4px 14px; display: flex; align-items: center; gap: 8px; border-right: 1px solid var(--line); white-space: nowrap; }
 .hud-inner > *:last-child { border-right: 0; }
 .hud-inner .on { color: var(--accent); }
-.hud-inner .on::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 1.6s infinite; }
+/* Bundle CB — HUD live-pulse dot removed. .on text retains accent colour. */
 .hud-inner b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
 .hud-audio { cursor: pointer; transition: color .2s; }
 .hud-audio:hover { color: var(--accent); }
@@ -2068,15 +2069,7 @@ em { color: var(--accent); font-style: italic; font-weight: 300; letter-spacing:
   color: var(--muted); font-size: 13px; letter-spacing: .01em;
   line-height: 1.5; max-width: 46ch;
 }
-.countdown-chip-dot {
-  width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
-  box-shadow: 0 0 10px rgba(46,196,137,.8);
-  animation: liveDot 1.8s ease-in-out infinite;
-}
-@keyframes liveDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: .6; transform: scale(.85); }
-}
+/* Bundle CB — countdown-chip-dot removed (JSX usages dropped). */
 .countdown-full-grid {
   display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: baseline;
   margin: 8px 0 18px;
@@ -2136,11 +2129,7 @@ em { color: var(--accent); font-style: italic; font-weight: 300; letter-spacing:
   font-family: "JetBrains Mono"; font-size: 11px;
   letter-spacing: .14em; color: var(--accent); text-transform: uppercase;
 }
-.capacity-dot {
-  width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
-  box-shadow: 0 0 10px rgba(46,196,137,.8);
-  animation: liveDot 1.8s ease-in-out infinite;
-}
+/* Bundle CB — capacity-dot removed (JSX usages dropped). */
 .capacity-quarter {
   font-family: "JetBrains Mono"; font-size: 11px;
   letter-spacing: .1em; color: var(--muted-soft); text-transform: uppercase;
@@ -2200,11 +2189,7 @@ em { color: var(--accent); font-style: italic; font-weight: 300; letter-spacing:
   letter-spacing: .14em; color: var(--accent); text-transform: uppercase;
   margin-bottom: 12px;
 }
-.livesignals-dot {
-  width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
-  box-shadow: 0 0 10px rgba(46,196,137,.8);
-  animation: liveDot 1.8s ease-in-out infinite;
-}
+/* Bundle CB — livesignals-dot removed (JSX usages dropped). */
 .livesignals-title {
   font-family: "Inter"; font-weight: 300;
   font-size: clamp(26px, 3vw, 40px);
@@ -2412,11 +2397,9 @@ em { color: var(--accent); font-style: italic; font-weight: 300; letter-spacing:
   .countdown-full-cta { min-height: 44px; }
 }
 
-/* Reduced motion — no heartbeat dots, no parallax drift */
+/* Reduced motion — no parallax drift. Heartbeat-dot rules dropped
+   in Bundle CB along with the dots themselves. */
 @media (prefers-reduced-motion: reduce) {
-  .countdown-chip-dot,
-  .capacity-dot,
-  .livesignals-dot { animation: none !important; }
   .progressive-form .pf-progress-bar { transition: none !important; }
   .hero-starfield-deep { animation: none !important; }
 }

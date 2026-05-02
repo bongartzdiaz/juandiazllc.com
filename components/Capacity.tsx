@@ -24,7 +24,6 @@ export function Capacity({ locale, variant = "full", quarter = "Q3 2026" }: Prop
   if (variant === "strip") {
     return (
       <div className="capacity-strip" role="status">
-        <span className="capacity-dot" aria-hidden />
         <span className="capacity-strip-text">
           <strong>{quarter}</strong> — {SLOTS_REMAINING}/{TOTAL_SLOTS} {t("fomo.capacity.slotsLabel")}
         </span>
@@ -39,7 +38,6 @@ export function Capacity({ locale, variant = "full", quarter = "Q3 2026" }: Prop
     <aside className="capacity-full" aria-labelledby="cap-title">
       <div className="capacity-head">
         <span className="capacity-eyebrow">
-          <span className="capacity-dot" aria-hidden />
           {t("fomo.capacity.eyebrow")}
         </span>
         <span className="capacity-quarter">{quarter}</span>

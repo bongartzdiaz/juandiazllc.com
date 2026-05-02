@@ -38,7 +38,6 @@ export function Countdown2027({ variant = "full", href = "/work/salderingsregeli
   if (variant === "chip") {
     return (
       <Link href={href} className="countdown-chip" aria-label={t("fomo.countdown.label")}>
-        <span className="countdown-chip-dot" aria-hidden />
         <span className="countdown-chip-label">{t("fomo.countdown.label")}</span>
         <span className="countdown-chip-value">
           <span>{r.days}</span>
@@ -57,7 +56,6 @@ export function Countdown2027({ variant = "full", href = "/work/salderingsregeli
     <aside className="countdown-full" aria-labelledby="cd27-title">
       <div className="countdown-full-head">
         <span className="countdown-full-eyebrow">
-          <span className="countdown-chip-dot" aria-hidden />
           {t("fomo.countdown.label")}
         </span>
         <span className="countdown-full-suffix">{t("fomo.countdown.suffix")}</span>
