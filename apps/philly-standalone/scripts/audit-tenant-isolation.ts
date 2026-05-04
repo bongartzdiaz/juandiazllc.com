@@ -42,6 +42,11 @@ const EXEMPT_PATHS = new Set<string>([
   'app/api/me/account-deletion/route.ts',
   // Cron — Bearer-secret auth, not user-scoped.
   'app/api/cron/gdpr-retention/route.ts',
+  // Drip-campaign dispatcher cron — Bearer-secret auth via
+  // CRON_SECRET. Sweeps every org's due enrollments; the per-org
+  // tenancy is enforced inside the loop on each Prisma query.
+  // Bundle CD — was a false positive on the previous regex.
+  'app/api/cron/drip-dispatch/route.ts',
   // Public webhook receivers — auth is per-provider HMAC.
   'app/api/webhooks/inbound/[provider]/route.ts',
   'app/api/sms/webhook/route.ts',
@@ -71,16 +76,14 @@ const EXEMPT_PATHS = new Set<string>([
   'app/api/2fa/verify/route.ts',
   'app/api/2fa/disable/route.ts',
   'app/api/2fa/recovery-codes/route.ts',
-  // SCIM 2.0 endpoints — bearer-token auth via authScimRequest
-  // (lib/philly/scim/auth.ts) which validates the ApiKey, checks
-  // the `scim:users` scope, and returns the bound organizationId.
-  // All queries scope to that organizationId. The audit script's
-  // requireScope-or-bust heuristic doesn't know about the alternate
-  // auth path; the SCIM tests cover the cross-org guarantee.
+  // SCIM ServiceProviderConfig + ResourceTypes — RFC 7644 §4
+  // discovery metadata; IdPs hit before authenticating, no tenant
+  // data returned. The other SCIM endpoints (Users, Users/[id],
+  // Groups, Groups/[id]) are now auto-recognised by the
+  // authScimRequest pattern below — no longer need to be listed
+  // here.
   'app/api/scim/v2/ServiceProviderConfig/route.ts',
   'app/api/scim/v2/ResourceTypes/route.ts',
-  'app/api/scim/v2/Users/route.ts',
-  'app/api/scim/v2/Users/[id]/route.ts',
 ])
 
 interface Finding {
@@ -109,22 +112,34 @@ async function audit(): Promise<Finding[]> {
 
     const src = await readFile(filePath, 'utf8')
 
+    // Recognised auth-gate patterns:
+    //   - requireScope / requireRole / requireSection — Supabase-
+    //     session-backed; canonical for in-app routes.
+    //   - authScimRequest — bearer-token-backed; resolves an ApiKey
+    //     row to { organizationId, scopes }. Bundle CD added so
+    //     SCIM Groups + Groups/[id] don't surface as false positives
+    //     after Bundle BW.
     const hasAuthGuard =
       /\brequireScope\b/.test(src) ||
       /\brequireRole\b/.test(src) ||
-      /\brequireSection\b/.test(src)
+      /\brequireSection\b/.test(src) ||
+      /\bauthScimRequest\b/.test(src)
 
     if (!hasAuthGuard) {
-      findings.push({ path: rel, reason: 'no requireScope / requireRole / requireSection call' })
+      findings.push({
+        path: rel,
+        reason:
+          'no recognised auth gate (requireScope / requireRole / requireSection / authScimRequest)',
+      })
       continue
     }
 
     // If the route calls Prisma directly, at least one query must
-    // reference scope.organizationId. We don't try to be smart about
+    // reference organizationId. We don't try to be smart about
     // distinguishing where vs data vs include — any mention of
-    // `organizationId` in proximity of `prisma.` is enough to clear
-    // the heuristic. Routes that legitimately do not query Prisma
-    // (e.g. pure response-shapers) are exempted via EXEMPT_PATHS.
+    // `organizationId` in the file is enough to clear the heuristic.
+    // Routes that legitimately do not query Prisma (e.g. pure
+    // response-shapers) are exempted via EXEMPT_PATHS.
     const queriesPrisma = /\bprisma\.[a-zA-Z]+\.(?:findMany|findFirst|findUnique|create|update|upsert|delete|deleteMany|updateMany|count|aggregate|groupBy)\b/.test(
       src,
     )
