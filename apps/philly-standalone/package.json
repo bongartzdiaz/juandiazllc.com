@@ -69,5 +69,10 @@
     "tsx": "^4.19.2",
     "typescript": "^5",
     "vitest": "^3.2.4"
+  },
+  "//overrides": "Bundle CN — pin transitive deps with moderate-severity advisories so the security CI workflow stays clean. postcss <8.5.10 GHSA-qx2v-qp2m-jg93; @hono/node-server <1.19.13 GHSA-92pp-h63x-v22m. Both reach via Next + @prisma/dev; both ship in build/dev tooling only but the audit gate doesn't distinguish.",
+  "overrides": {
+    "postcss": "^8.5.10",
+    "@hono/node-server": "^1.19.13"
   }
 }

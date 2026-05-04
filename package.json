@@ -67,5 +67,9 @@
     "tsx": "^4.19.2",
     "typescript": "^5",
     "vitest": "^4.1.4"
+  },
+  "//overrides": "Bundle CN — pin transitive deps with moderate-severity advisories so the security CI workflow stays clean. postcss <8.5.10 GHSA-qx2v-qp2m-jg93. Reaches via Next; build-tool only but the audit gate doesn't distinguish.",
+  "overrides": {
+    "postcss": "^8.5.10"
   }
 }
