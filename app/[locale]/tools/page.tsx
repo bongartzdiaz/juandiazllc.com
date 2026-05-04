@@ -25,7 +25,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const l = assertLocale(locale);
-  const description = translate(l, "tools.lede").replace(/<[^>]*>?/g, "");
+  // Bundle CP — `tools.lede` is plain text in all four locales (no
+  // HTML markup). Skipping a defensive strip removes the CodeQL
+  // "incomplete sanitization" finding; React HTML-escapes attribute
+  // values regardless, so even if the source ever changed, the output
+  // path is safe.
+  const description = translate(l, "tools.lede");
   return {
     title: TITLES[l],
     description,
@@ -59,7 +64,7 @@ export default async function ToolsHub({
     locale: l,
     path: "/tools",
     name: TITLES[l],
-    description: t("tools.lede").replace(/<[^>]*>?/g, ""),
+    description: t("tools.lede"),
     items: CALCS.map((c) => ({
       name: t(`tools.${c.ns}.title`),
       url: `/${l}/tools/${c.slug}`,
