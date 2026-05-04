@@ -54,8 +54,17 @@ function renderVars(template: string, ctx: Ctx): string {
   })
 }
 
+// Bundle CP — bound the input so the {{#each}} / {{#if}} regex
+// passes can't be weaponised into ReDoS by a hostile author of a
+// stored template. Realistic email/SMS bodies are <16 KB; anything
+// larger is either malicious padding or a misuse of the renderer.
+const MAX_TEMPLATE_LENGTH = 32_768
+
 export function renderTemplate(template: string, ctx: Ctx): string {
   if (!template) return ''
+  if (template.length > MAX_TEMPLATE_LENGTH) {
+    throw new Error(`Template exceeds maximum length (${MAX_TEMPLATE_LENGTH} chars)`)
+  }
   // Order: each → if → vars (innermost blocks can use outer vars)
   let out = renderEach(template, ctx)
   out = renderIf(out, ctx)

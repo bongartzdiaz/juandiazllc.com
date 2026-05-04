@@ -20,23 +20,35 @@ let _cachedAtMtime: number | null = null
 const INDEX_PATH = path.join(process.cwd(), 'data', 'assistant-kb.json')
 
 async function loadIndex(): Promise<KbIndex> {
-  const stat = await fs.stat(INDEX_PATH).catch(() => null)
-  if (!stat) {
+  // Bundle CP — atomic open-then-fstat avoids the TOCTOU race the
+  // earlier `fs.stat` → `fs.readFile` pattern had: a writer
+  // replacing the file between the two calls would either skip the
+  // cache invalidation or read partial content. Using the same file
+  // descriptor for both stat and read closes the gap.
+  let fh: import('node:fs/promises').FileHandle
+  try {
+    fh = await fs.open(INDEX_PATH, 'r')
+  } catch {
     throw new Error(
       `Knowledge base index not found at ${INDEX_PATH}. Run npm run kb:build first.`,
     )
   }
-  if (_cachedIndex && _cachedAtMtime === stat.mtimeMs) {
-    return _cachedIndex
+  try {
+    const stat = await fh.stat()
+    if (_cachedIndex && _cachedAtMtime === stat.mtimeMs) {
+      return _cachedIndex
+    }
+    const raw = await fh.readFile('utf8')
+    const parsed = JSON.parse(raw) as KbIndex
+    if (parsed.schemaVersion !== 1) {
+      throw new Error(`KB index schema version ${parsed.schemaVersion} is not supported`)
+    }
+    _cachedIndex = parsed
+    _cachedAtMtime = stat.mtimeMs
+    return parsed
+  } finally {
+    await fh.close()
   }
-  const raw = await fs.readFile(INDEX_PATH, 'utf8')
-  const parsed = JSON.parse(raw) as KbIndex
-  if (parsed.schemaVersion !== 1) {
-    throw new Error(`KB index schema version ${parsed.schemaVersion} is not supported`)
-  }
-  _cachedIndex = parsed
-  _cachedAtMtime = stat.mtimeMs
-  return parsed
 }
 
 export interface RetrievalResult {

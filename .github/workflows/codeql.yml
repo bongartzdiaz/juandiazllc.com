@@ -47,7 +47,9 @@ jobs:
           # security-extended adds higher-recall queries beyond the
           # default set (SSRF, log injection, broken crypto patterns).
           # security-and-quality is too noisy on a Next.js codebase.
-          queries: security-extended
+          # codeql-config.yml excludes specific queries that produce
+          # false positives on this codebase (see file for rationale).
+          config-file: .github/codeql/codeql-config.yml
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3

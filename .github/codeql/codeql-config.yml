@@ -1,0 +1,26 @@
+name: "CodeQL config"
+
+# Bundle CP — query filters for findings that are false positives on
+# this codebase. Each exclusion is justified inline; review before
+# adding more.
+
+queries:
+  - uses: security-extended
+
+query-filters:
+  # `js/insufficient-password-hash` flags any use of a fast hash
+  # (SHA-256, HMAC-SHA-256) on data that *could* be a password. We
+  # use these patterns for:
+  #   1. API key fingerprinting (192-bit random secret → SHA-256
+  #      digest used as a DB lookup key). Stripe / GitHub pattern.
+  #      Brute-forcing is computationally infeasible regardless of
+  #      hash speed because of the input entropy.
+  #   2. Audit-chain integrity (each row's `prevHash` chained via
+  #      SHA-256). Tamper-evident logs, not passwords.
+  #   3. Webhook signature verification (HMAC-SHA-256 — Stripe /
+  #      GitHub / Slack standard).
+  # Real password storage in the codebase uses bcryptjs via
+  # `lib/philly/auth.ts:hashPassword()` and is unaffected by this
+  # exclusion.
+  - exclude:
+      id: js/insufficient-password-hash
