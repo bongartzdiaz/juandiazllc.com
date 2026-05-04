@@ -234,7 +234,10 @@ export async function POST(req: NextRequest) {
           status: advance.done ? 'done' : 'active',
           lastDeliveredAt: now,
           lastError: null,
-          attemptCount: e.attemptCount + 1,
+          // attemptCount tracks CONSECUTIVE FAILED sends — reset to 0
+          // on success so a flaky third send can't be misread as
+          // exhausted on the very next failure (Bundle CC audit fix).
+          attemptCount: 0,
         },
       })
       summary.sent += 1

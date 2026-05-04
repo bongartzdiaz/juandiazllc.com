@@ -12,6 +12,7 @@ import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import { parseSteps, initialDueAt } from '@/lib/philly/drip/steps'
+import { logger } from '@/lib/philly/logger'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -77,39 +78,56 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   })
   if (!contact) return jsonError('Contact not found in this organization', 404)
 
-  // Idempotent — re-enrolling resets the cursor to step 0.
-  const enrollment = await prisma.dripEnrollment.upsert({
+  // Bundle CC audit fix — split the upsert into a findUnique +
+  // create-or-update so we know whether this was a fresh enroll or a
+  // re-enroll. Only the fresh path bumps enrolledCount + audits as
+  // 'create'; re-enroll audits as 'update' (the cursor was reset).
+  const existing = await prisma.dripEnrollment.findUnique({
     where: { campaignId_contactId: { campaignId: id, contactId: body.contactId } },
-    update: {
-      status: 'active',
-      lastStepIndex: -1,
-      nextDueAt: due,
-      lastError: null,
-      attemptCount: 0,
-    },
-    create: {
-      campaignId: id,
-      contactId: body.contactId,
-      organizationId: scope.organizationId,
-      status: 'active',
-      lastStepIndex: -1,
-      nextDueAt: due,
-    },
+    select: { id: true },
   })
+  const isFresh = existing == null
 
-  // Bump the campaign's enrolledCount (best-effort — eventually-
-  // consistent if races happen, that's fine for a vanity metric).
-  await prisma.dripCampaign.update({
-    where: { id },
-    data: { enrolledCount: { increment: 1 } },
-  }).catch(() => {})
+  const enrollment = isFresh
+    ? await prisma.dripEnrollment.create({
+        data: {
+          campaignId: id,
+          contactId: body.contactId,
+          organizationId: scope.organizationId,
+          status: 'active',
+          lastStepIndex: -1,
+          nextDueAt: due,
+        },
+      })
+    : await prisma.dripEnrollment.update({
+        where: { id: existing!.id },
+        data: {
+          status: 'active',
+          lastStepIndex: -1,
+          nextDueAt: due,
+          lastError: null,
+          attemptCount: 0,
+        },
+      })
+
+  if (isFresh) {
+    await prisma.dripCampaign.update({
+      where: { id },
+      data: { enrolledCount: { increment: 1 } },
+    }).catch((err) => logger.error('[drip-enroll] enrolledCount bump failed', { err: String(err) }))
+  }
 
   await logAudit({
-    scope, action: 'create', entity: 'dripEnrollment', entityId: enrollment.id,
-    changes: { campaignId: { old: null, new: id }, contactId: { old: null, new: body.contactId } },
-  }).catch(() => {})
+    scope,
+    action: isFresh ? 'create' : 'update',
+    entity: 'dripEnrollment',
+    entityId: enrollment.id,
+    changes: isFresh
+      ? { campaignId: { old: null, new: id }, contactId: { old: null, new: body.contactId } }
+      : { reset: { old: null, new: 'cursor restored to step 0' } },
+  }).catch((err) => logger.error('[drip-enroll] audit log failed', { err: String(err) }))
 
-  return NextResponse.json({ data: enrollment }, { status: 201 })
+  return NextResponse.json({ data: enrollment }, { status: isFresh ? 201 : 200 })
 }
 
 export async function DELETE(req: NextRequest, ctx: Ctx) {

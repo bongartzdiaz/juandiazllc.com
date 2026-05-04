@@ -12,7 +12,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { authScimRequest } from '@/lib/philly/scim/auth'
+import { authScimRequest, scimGate } from '@/lib/philly/scim/auth'
 import {
   scimJson, scimError, isValidPatchRequest,
 } from '@/lib/philly/scim/schemas'
@@ -21,18 +21,12 @@ import {
   type MemberDiff,
 } from '@/lib/philly/scim/group-mapping'
 import { logAudit } from '@/lib/philly/audit'
-import { isFeatureEnabled, FEATURES } from '@/lib/philly/features'
 import type { PrismaClient } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 type RouteCtx = { params: Promise<{ id: string }> }
-
-async function scimGate(prisma: PrismaClient, organizationId: string): Promise<NextResponse | null> {
-  if (await isFeatureEnabled(prisma, organizationId, FEATURES.SCIM.key)) return null
-  return scimError(503, 'SCIM provisioning is disabled for this organization')
-}
 
 const SELECT = {
   id: true,
@@ -169,7 +163,10 @@ export async function PUT(req: NextRequest, ctx: RouteCtx) {
       where: { id },
       data: {
         displayName: parsed.displayName,
-        ...(parsed.externalId !== null ? { scimExternalId: parsed.externalId } : {}),
+        // Bundle CC audit fix — PUT replaces, so explicit null
+        // clears the column. parseScimGroupInput coerces missing
+        // to null already.
+        scimExternalId: parsed.externalId,
         members: { create: [...valid].map((userId) => ({ userId })) },
       },
     }),

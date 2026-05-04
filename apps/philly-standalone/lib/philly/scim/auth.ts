@@ -18,7 +18,9 @@
 
 import crypto from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
+import type { PrismaClient as PrismaClientType } from '@prisma/client'
 import { getAuthPrisma } from '@/lib/philly/auth'
+import { isFeatureEnabled, FEATURES } from '@/lib/philly/features'
 import { scimError } from './schemas'
 
 export interface ScimAuthScope {
@@ -81,4 +83,18 @@ function parseScopes(raw: string | null | undefined): string[] {
   }
   // Fallback: comma- or space-separated string.
   return raw.split(/[\s,]+/).map((s) => s.trim()).filter(Boolean)
+}
+
+/**
+ * Bundle CC — shared SCIM kill-switch gate. Returns 503 when the
+ * SCIM feature flag is off so IdPs see "retry later" instead of
+ * giving up + de-provisioning users. Extracted from four duplicate
+ * inline copies in /api/scim/v2/{Users,Users/[id],Groups,Groups/[id]}.
+ */
+export async function scimGate(
+  prisma: PrismaClientType,
+  organizationId: string,
+): Promise<NextResponse | null> {
+  if (await isFeatureEnabled(prisma, organizationId, FEATURES.SCIM.key)) return null
+  return scimError(503, 'SCIM provisioning is disabled for this organization')
 }

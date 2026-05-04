@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { authScimRequest } from '@/lib/philly/scim/auth'
+import { authScimRequest, scimGate } from '@/lib/philly/scim/auth'
 import {
   scimJson,
   scimError,
@@ -14,21 +14,11 @@ import {
 } from '@/lib/philly/scim/schemas'
 import { parseScimUserInput, userToScim } from '@/lib/philly/scim/mapping'
 import { logAudit } from '@/lib/philly/audit'
-import { isFeatureEnabled, FEATURES } from '@/lib/philly/features'
-import type { PrismaClient } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 type RouteCtx = { params: Promise<{ id: string }> }
-
-/* Bundle BP — SCIM kill-switch helper. 503 = "retry later" so IdPs
-   queue locally instead of giving up + de-provisioning users while
-   the flag is paused. */
-async function scimGate(prisma: PrismaClient, organizationId: string): Promise<NextResponse | null> {
-  if (await isFeatureEnabled(prisma, organizationId, FEATURES.SCIM.key)) return null
-  return scimError(503, 'SCIM provisioning is disabled for this organization')
-}
 
 const SELECT = {
   id: true,
@@ -103,8 +93,11 @@ export async function PUT(req: NextRequest, ctx: RouteCtx) {
     data: {
       email: parsed.email,
       name: parsed.name,
-      // Bundle BQ — round-trip externalId on PUT.
-      ...(parsed.externalId !== null ? { scimExternalId: parsed.externalId } : {}),
+      // Bundle BQ — round-trip externalId on PUT. RFC 7644 PUT
+      // replaces the resource so an absent / null externalId in
+      // the payload must clear the column. parseScimUserInput
+      // already coerces missing → null. Bundle CC audit fix.
+      scimExternalId: parsed.externalId,
       ...(parsed.active === false
         ? { deletionScheduledAt: existing.id ? new Date() : null }
         : { deletionScheduledAt: null, tokensInvalidAfter: null }),

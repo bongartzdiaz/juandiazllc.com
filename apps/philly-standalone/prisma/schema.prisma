@@ -64,6 +64,7 @@ model Organization {
   assistantMemories      AssistantMemory[]
   featureFlags       FeatureFlag[]
   scimGroups         ScimGroup[]
+  dripEnrollments    DripEnrollment[]
 
   // Enterprise — per-org access controls. NULL on both = no
   // restrictions (default). Both can be set via the admin Security
@@ -296,6 +297,7 @@ model Contact {
   organization    Organization     @relation(fields: [organizationId], references: [id])
   contactProjects ContactProject[]
   contactNotes    ContactNote[]
+  dripEnrollments DripEnrollment[]
   activities      Activity[]
   deals           Deal[]
   offers          Offer[]
@@ -1145,7 +1147,12 @@ model DripEnrollment {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  campaign DripCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaign     DripCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  // Bundle CC audit fix — closing the FK gap so a Contact erasure
+  // (GDPR Art. 17) and an Organization deletion both cascade-clean
+  // the enrollments instead of leaving orphan rows.
+  contact      Contact      @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@unique([campaignId, contactId])
   @@index([organizationId, status, nextDueAt])

@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { authScimRequest } from '@/lib/philly/scim/auth'
+import { authScimRequest, scimGate } from '@/lib/philly/scim/auth'
 import { parseScimFilter } from '@/lib/philly/scim/filter'
 import {
   scimJson,
@@ -17,21 +17,11 @@ import {
 } from '@/lib/philly/scim/schemas'
 import { parseScimUserInput, userToScim } from '@/lib/philly/scim/mapping'
 import { logAudit } from '@/lib/philly/audit'
-import { isFeatureEnabled, FEATURES } from '@/lib/philly/features'
-import type { PrismaClient } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 const MAX_COUNT = 200
-
-/* Bundle BP — SCIM kill-switch helper. Returns 503 (Service
-   Unavailable) when the SCIM flag is off so IdPs queue locally
-   and retry later instead of giving up + de-provisioning users. */
-async function scimGate(prisma: PrismaClient, organizationId: string): Promise<NextResponse | null> {
-  if (await isFeatureEnabled(prisma, organizationId, FEATURES.SCIM.key)) return null
-  return scimError(503, 'SCIM provisioning is disabled for this organization')
-}
 
 export async function GET(req: NextRequest) {
   const auth = await authScimRequest(req)
