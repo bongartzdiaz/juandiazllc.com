@@ -360,6 +360,15 @@ setup steps below.
 - `npm run audit:tenant` clean
 - `npm run audit:chain` ready (run daily in production)
 
+**Before flipping a customer's tenant on:**
+Walk `docs/operations/GO-LIVE-CHECKLIST.md` end-to-end. It's the
+bridge between "structurally compliant code" and "we can prove it
+to the customer's DPO". Every HARD item must be checked + signed
+off. The seven-line operator-setup list below is just §1–§3 of the
+checklist — full coverage spans encryption, backups, identity,
+observability, GDPR docs, feature flags, customer onboarding, and
+final pre-flip sanity in 9 sections.
+
 **Operator setup required before customer traffic:**
 1. `prisma migrate deploy` — seven pending migrations:
    `20260428000000_multi_org_membership`,
