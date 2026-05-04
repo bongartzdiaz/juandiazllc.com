@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
@@ -28,6 +29,7 @@ const sectionSubStyle: React.CSSProperties = {
 }
 
 export default function FeatureFlagsPage() {
+  const t = useTranslations('features')
   const { addToast } = useToast()
   const flagsQuery = useApi<{ data: FlagState[] }>('/admin/features')
   const flags = flagsQuery.data?.data ?? []
@@ -44,20 +46,20 @@ export default function FeatureFlagsPage() {
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) {
-        addToast(json?.error ?? `Update failed (${res.status})`, 'error')
+        addToast(json?.error ?? t('toasts.updateFailed', { status: res.status }), 'error')
         return
       }
       addToast(
         enabled === null
-          ? 'Reset to default'
+          ? t('toasts.resetToDefault')
           : enabled
-            ? 'Feature enabled'
-            : 'Feature disabled',
+            ? t('toasts.featureEnabled')
+            : t('toasts.featureDisabled'),
         'success',
       )
       flagsQuery.refetch()
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Network error', 'error')
+      addToast(err instanceof Error ? err.message : t('toasts.networkError'), 'error')
     } finally {
       setBusy(null)
     }
@@ -65,16 +67,11 @@ export default function FeatureFlagsPage() {
 
   return (
     <>
-      <Topbar title="Feature flags" sub="Per-org runtime kill-switches — no redeploy required" />
+      <Topbar title={t('title')} sub={t('subtitle')} />
 
       <div style={{ padding: '24px 32px', maxWidth: 880 }}>
-        <h1 style={sectionTitleStyle}>Feature flags</h1>
-        <p style={sectionSubStyle}>
-          Each switch below is a per-organisation kill-switch. Flip one off to disable that
-          feature across this organisation immediately — no redeploy, no code change. Changes
-          take effect within ~60 seconds (the in-memory cache TTL). Every change is recorded
-          in the audit log.
-        </p>
+        <h1 style={sectionTitleStyle}>{t('heading')}</h1>
+        <p style={sectionSubStyle}>{t('description')}</p>
 
         <div
           style={{
@@ -85,16 +82,12 @@ export default function FeatureFlagsPage() {
           }}
         >
           <Info size={15} style={{ flexShrink: 0, marginTop: 1 }} />
-          <span>
-            Flipping a flag here sets a per-organisation override. The "Reset to default" button
-            removes the override and falls back to the global default (or the code-side default
-            if no global is set).
-          </span>
+          <span>{t('info')}</span>
         </div>
 
         {flagsQuery.loading && (
           <div style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-            Loading…
+            {t('loading')}
           </div>
         )}
 
@@ -112,7 +105,7 @@ export default function FeatureFlagsPage() {
 
         {!flagsQuery.loading && !flagsQuery.error && flags.length === 0 && (
           <div style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-            No feature flags catalogued.
+            {t('empty')}
           </div>
         )}
 
@@ -164,7 +157,7 @@ export default function FeatureFlagsPage() {
                           textTransform: 'uppercase', letterSpacing: '0.04em',
                         }}
                       >
-                        Org override
+                        {t('orgOverride')}
                       </span>
                     )}
                   </div>
@@ -172,7 +165,7 @@ export default function FeatureFlagsPage() {
                     {f.description}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 4 }}>
-                    Code default: {f.enabledByDefault ? 'enabled' : 'disabled'}
+                    {t('codeDefault', { state: f.enabledByDefault ? t('enabled') : t('disabled') })}
                   </div>
                 </div>
 
@@ -182,7 +175,7 @@ export default function FeatureFlagsPage() {
                       type="button"
                       onClick={() => setFlag(f.key, null)}
                       disabled={busy === f.key}
-                      title="Clear org override (fall back to default)"
+                      title={t('resetTitle')}
                       style={{
                         display: 'inline-flex', alignItems: 'center', gap: 5,
                         padding: '6px 10px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
@@ -193,14 +186,14 @@ export default function FeatureFlagsPage() {
                       }}
                     >
                       <RotateCcw size={11} />
-                      Reset
+                      {t('reset')}
                     </button>
                   )}
                   <button
                     type="button"
                     onClick={() => setFlag(f.key, !f.enabled)}
                     disabled={busy === f.key}
-                    aria-label={`Toggle ${f.key}`}
+                    aria-label={t('toggleAriaLabel', { key: f.key })}
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 5,
                       padding: '6px 10px', borderRadius: 7, fontSize: 11.5, fontWeight: 700,
@@ -215,12 +208,12 @@ export default function FeatureFlagsPage() {
                     {f.enabled ? (
                       <>
                         <ToggleRight size={14} />
-                        ENABLED
+                        {t('enabledLabel')}
                       </>
                     ) : (
                       <>
                         <ToggleLeft size={14} />
-                        DISABLED
+                        {t('disabledLabel')}
                       </>
                     )}
                   </button>

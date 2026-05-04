@@ -838,5 +838,91 @@
     "toasts": {
       "loadFailed": "No se pudieron cargar los datos"
     }
+  },
+  "features": {
+    "title": "Feature flags",
+    "subtitle": "Kill-switches por organización en tiempo de ejecución — sin redeploy",
+    "heading": "Feature flags",
+    "description": "Cada interruptor a continuación es un kill-switch por organización. Apaga uno para desactivar esa función en esta organización inmediatamente — sin redeploy, sin cambio de código. Los cambios se aplican en ~60 segundos (TTL del caché en memoria). Cada cambio queda registrado en el log de auditoría.",
+    "info": "Cambiar un flag aquí establece un override por organización. El botón \"Restablecer al predeterminado\" elimina el override y cae al predeterminado global (o al predeterminado del código si no hay global definido).",
+    "loading": "Cargando…",
+    "empty": "No hay feature flags catalogados.",
+    "orgOverride": "Override de org",
+    "codeDefault": "Predeterminado de código: {state}",
+    "enabled": "activado",
+    "disabled": "desactivado",
+    "toggleAriaLabel": "Cambiar {key}",
+    "resetTitle": "Eliminar override de org (volver al predeterminado)",
+    "reset": "Restablecer",
+    "enabledLabel": "ACTIVADO",
+    "disabledLabel": "DESACTIVADO",
+    "toasts": {
+      "updateFailed": "Actualización fallida ({status})",
+      "networkError": "Error de red",
+      "resetToDefault": "Restablecido al predeterminado",
+      "featureEnabled": "Función activada",
+      "featureDisabled": "Función desactivada"
+    }
+  },
+  "scimGroups": {
+    "title": "Grupos SCIM",
+    "subtitle": "Mapea grupos del IdP a roles de plataforma + secciones del dashboard",
+    "heading": "Grupos SCIM",
+    "descriptionPart1": "Cuando un IdP (Okta, Azure AD, etc.) provisiona un usuario vía ",
+    "descriptionPart2": ", la membresía-organización del nuevo miembro se actualiza al rol y secciones del dashboard que estableces a continuación. Eliminar un miembro nunca revierte automáticamente — si necesitas degradar a un usuario, hazlo manualmente desde ",
+    "descriptionPart3": ".",
+    "info": "El rol establece Membership.role; déjalo en ninguno para omitir el mapeo de rol por completo. Las secciones anulan la lista de permitidos personal del dashboard — elige custom para seleccionar superficies específicas, o acceso completo para borrar el override (los miembros vuelven a sus secciones personales).",
+    "loading": "Cargando…",
+    "emptyPart1": "Aún no hay grupos SCIM. Una vez que tu IdP provisione un grupo vía ",
+    "emptyPart2": ", aparecerá aquí.",
+    "members": "{count, plural, one {# miembro} other {# miembros}}",
+    "role": "Rol",
+    "roleNone": "— ninguno (omitir mapeo de rol) —",
+    "dashboardSections": "Secciones del dashboard",
+    "fullAccess": "Acceso completo",
+    "custom": "Personalizado",
+    "personalAllowlist": "Los miembros mantienen su lista de permitidos personal (User.dashboardSections).",
+    "discard": "Descartar",
+    "saveLabel": "Guardar ({count, plural, one {# miembro} other {# miembros}})",
+    "saving": "Guardando…",
+    "toasts": {
+      "saved": "Guardado",
+      "savedWithUpdate": "Guardado — {count, plural, one {# miembro existente actualizado} other {# miembros existentes actualizados}}",
+      "updateFailed": "Actualización fallida ({status})",
+      "networkError": "Error de red"
+    }
+  },
+  "dripEnrollment": {
+    "title": "Inscripciones — {name}",
+    "subtitle": "{count} inscritos · {steps, plural, one {# paso} other {# pasos}} por contacto",
+    "searchPlaceholder": "Buscar contactos para inscribir…",
+    "loadingContacts": "Cargando contactos…",
+    "noMatches": "Sin coincidencias.",
+    "noContactsYet": "Aún no hay contactos en esta organización.",
+    "enrolled": "Inscrito",
+    "enroll": "Inscribir",
+    "currentEnrollments": "Inscripciones actuales ({count})",
+    "loadingEnrollments": "Cargando inscripciones…",
+    "noneEnrolled": "Nadie inscrito todavía. Usa el selector de arriba para inscribir tu primer contacto.",
+    "step": "Paso {n} / {total}",
+    "noSendsYet": "sin envíos aún",
+    "lastSent": "último envío {ago}",
+    "next": "próximo {when}",
+    "attempts": "{count, plural, one {# intento} other {# intentos}}",
+    "status": {
+      "active": "activo",
+      "paused": "en pausa",
+      "done": "completado",
+      "cancelled": "cancelado"
+    },
+    "cancelTitle": "Cancelar inscripción",
+    "cancelConfirm": "¿Cancelar esta inscripción? El contacto no recibirá más pasos.",
+    "toasts": {
+      "enrolled": "Inscrito",
+      "cancelled": "Inscripción cancelada",
+      "enrollFailed": "Inscripción fallida ({status})",
+      "cancelFailed": "Cancelación fallida ({status})",
+      "networkError": "Error de red"
+    }
   }
 }

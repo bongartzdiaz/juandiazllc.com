@@ -838,5 +838,91 @@
     "toasts": {
       "loadFailed": "Laden van gegevens mislukt"
     }
+  },
+  "features": {
+    "title": "Feature flags",
+    "subtitle": "Per-organisatie kill-switches — geen redeploy nodig",
+    "heading": "Feature flags",
+    "description": "Elke schakelaar hieronder is een per-organisatie kill-switch. Zet er één uit om die functie binnen deze organisatie direct uit te schakelen — geen redeploy, geen codewijziging. Wijzigingen zijn binnen ~60 seconden actief (de in-memory cache TTL). Elke wijziging wordt vastgelegd in de auditlog.",
+    "info": "Een flag hier omzetten plaatst een per-organisatie override. De \"Reset naar standaard\"-knop verwijdert de override en valt terug op de globale standaard (of de code-zijde standaard als er geen globale is ingesteld).",
+    "loading": "Laden…",
+    "empty": "Geen feature flags geregistreerd.",
+    "orgOverride": "Org override",
+    "codeDefault": "Code-standaard: {state}",
+    "enabled": "ingeschakeld",
+    "disabled": "uitgeschakeld",
+    "toggleAriaLabel": "Schakel {key}",
+    "resetTitle": "Org override wissen (terug naar standaard)",
+    "reset": "Reset",
+    "enabledLabel": "AAN",
+    "disabledLabel": "UIT",
+    "toasts": {
+      "updateFailed": "Bijwerken mislukt ({status})",
+      "networkError": "Netwerkfout",
+      "resetToDefault": "Naar standaard hersteld",
+      "featureEnabled": "Functie ingeschakeld",
+      "featureDisabled": "Functie uitgeschakeld"
+    }
+  },
+  "scimGroups": {
+    "title": "SCIM-groepen",
+    "subtitle": "Koppel IdP-groepen aan platformrollen en dashboard-secties",
+    "heading": "SCIM-groepen",
+    "descriptionPart1": "Wanneer een IdP (Okta, Azure AD, etc.) een gebruiker provisionert via ",
+    "descriptionPart2": ", wordt het organisatie-lidmaatschap van het nieuwe lid bijgewerkt naar de rol en dashboard-secties die je hieronder instelt. Het verwijderen van een lid draait nooit automatisch terug — als je een gebruiker wilt degraderen, doe dat handmatig via ",
+    "descriptionPart3": ".",
+    "info": "Rol stelt Membership.role in; laat staan op geen om de rol-mapping over te slaan. Secties overschrijven de persoonlijke dashboard-allowlist — kies custom om specifieke onderdelen te selecteren, of volledige toegang om de override te wissen (leden vallen terug op hun persoonlijke secties).",
+    "loading": "Laden…",
+    "emptyPart1": "Nog geen SCIM-groepen. Zodra je IdP een groep provisioneert via ",
+    "emptyPart2": ", verschijnt deze hier.",
+    "members": "{count, plural, one {# lid} other {# leden}}",
+    "role": "Rol",
+    "roleNone": "— geen (rol-mapping overslaan) —",
+    "dashboardSections": "Dashboard-secties",
+    "fullAccess": "Volledige toegang",
+    "custom": "Custom",
+    "personalAllowlist": "Leden behouden hun persoonlijke sectie-allowlist (User.dashboardSections).",
+    "discard": "Annuleren",
+    "saveLabel": "Opslaan ({count, plural, one {# lid} other {# leden}})",
+    "saving": "Opslaan…",
+    "toasts": {
+      "saved": "Opgeslagen",
+      "savedWithUpdate": "Opgeslagen — {count, plural, one {# bestaand lid bijgewerkt} other {# bestaande leden bijgewerkt}}",
+      "updateFailed": "Bijwerken mislukt ({status})",
+      "networkError": "Netwerkfout"
+    }
+  },
+  "dripEnrollment": {
+    "title": "Inschrijvingen — {name}",
+    "subtitle": "{count} ingeschreven · {steps, plural, one {# stap} other {# stappen}} per contact",
+    "searchPlaceholder": "Zoek contacten om in te schrijven…",
+    "loadingContacts": "Contacten laden…",
+    "noMatches": "Geen matches.",
+    "noContactsYet": "Nog geen contacten in deze organisatie.",
+    "enrolled": "Ingeschreven",
+    "enroll": "Inschrijven",
+    "currentEnrollments": "Huidige inschrijvingen ({count})",
+    "loadingEnrollments": "Inschrijvingen laden…",
+    "noneEnrolled": "Nog niemand ingeschreven. Gebruik de zoeker hierboven om je eerste contact in te schrijven.",
+    "step": "Stap {n} / {total}",
+    "noSendsYet": "nog geen verzonden",
+    "lastSent": "laatst verzonden {ago}",
+    "next": "volgende {when}",
+    "attempts": "{count, plural, one {# poging} other {# pogingen}}",
+    "status": {
+      "active": "actief",
+      "paused": "gepauzeerd",
+      "done": "klaar",
+      "cancelled": "geannuleerd"
+    },
+    "cancelTitle": "Inschrijving annuleren",
+    "cancelConfirm": "Deze inschrijving annuleren? Het contact ontvangt geen verdere stappen meer.",
+    "toasts": {
+      "enrolled": "Ingeschreven",
+      "cancelled": "Inschrijving geannuleerd",
+      "enrollFailed": "Inschrijven mislukt ({status})",
+      "cancelFailed": "Annuleren mislukt ({status})",
+      "networkError": "Netwerkfout"
+    }
   }
 }

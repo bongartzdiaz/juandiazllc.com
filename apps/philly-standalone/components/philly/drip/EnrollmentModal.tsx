@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Modal } from '@/components/philly/ui/Modal'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
@@ -45,11 +46,13 @@ interface Props {
   onChanged?: () => void
 }
 
-const STATUS_STYLE: Record<EnrollmentRow['status'], { bg: string; txt: string; label: string; Icon: typeof Clock }> = {
-  active:    { bg: 'var(--g-bg)',      txt: 'var(--g-txt)',      label: 'active',    Icon: Clock },
-  paused:    { bg: 'var(--y-bg)',      txt: 'var(--y-txt)',      label: 'paused',    Icon: Pause },
-  done:      { bg: 'var(--accent-bg)', txt: 'var(--accent-txt)', label: 'done',      Icon: CheckCircle2 },
-  cancelled: { bg: 'var(--r-bg)',      txt: 'var(--r-txt)',      label: 'cancelled', Icon: X },
+// Bundle CL — labels resolved at use-site via t('status.<key>') so the
+// chip respects the active locale. Style + icon stay static.
+const STATUS_STYLE: Record<EnrollmentRow['status'], { bg: string; txt: string; Icon: typeof Clock }> = {
+  active:    { bg: 'var(--g-bg)',      txt: 'var(--g-txt)',      Icon: Clock },
+  paused:    { bg: 'var(--y-bg)',      txt: 'var(--y-txt)',      Icon: Pause },
+  done:      { bg: 'var(--accent-bg)', txt: 'var(--accent-txt)', Icon: CheckCircle2 },
+  cancelled: { bg: 'var(--r-bg)',      txt: 'var(--r-txt)',      Icon: X },
 }
 
 function fmtRelative(iso: string | null): string {
@@ -66,6 +69,7 @@ function fmtRelative(iso: string | null): string {
 }
 
 export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose, onChanged }: Props) {
+  const t = useTranslations('dripEnrollment')
   const open = campaignId != null
   const { addToast } = useToast()
 
@@ -120,14 +124,14 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) {
-        addToast(json?.error ?? `Enroll failed (${res.status})`, 'error')
+        addToast(json?.error ?? t('toasts.enrollFailed', { status: res.status }), 'error')
         return
       }
-      addToast('Enrolled', 'success')
+      addToast(t('toasts.enrolled'), 'success')
       enrollmentsQuery.refetch()
       onChanged?.()
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Network error', 'error')
+      addToast(err instanceof Error ? err.message : t('toasts.networkError'), 'error')
     } finally {
       setBusyFor(contactId, false)
     }
@@ -135,7 +139,7 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
 
   async function unenroll(contactId: string) {
     if (!campaignId || isBusy(contactId)) return
-    if (!confirm('Cancel this enrollment? The contact will not receive any further steps.')) return
+    if (!confirm(t('cancelConfirm'))) return
     setBusyFor(contactId, true)
     try {
       const res = await fetch(`/api/drip-campaigns/${campaignId}/enroll?contactId=${encodeURIComponent(contactId)}`, {
@@ -143,14 +147,14 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
       })
       if (!res.ok) {
         const json = await res.json().catch(() => ({}))
-        addToast(json?.error ?? `Cancel failed (${res.status})`, 'error')
+        addToast(json?.error ?? t('toasts.cancelFailed', { status: res.status }), 'error')
         return
       }
-      addToast('Enrollment cancelled', 'success')
+      addToast(t('toasts.cancelled'), 'success')
       enrollmentsQuery.refetch()
       onChanged?.()
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Network error', 'error')
+      addToast(err instanceof Error ? err.message : t('toasts.networkError'), 'error')
     } finally {
       setBusyFor(contactId, false)
     }
@@ -172,8 +176,8 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
     <Modal
       open={open}
       onClose={onClose}
-      title={`Enrollments — ${campaignName}`}
-      subtitle={`${enrollments.length} enrolled · ${totalSteps} step${totalSteps === 1 ? '' : 's'} per contact`}
+      title={t('title', { name: campaignName })}
+      subtitle={t('subtitle', { count: enrollments.length, steps: totalSteps })}
       size="lg"
     >
       {/* Add-contact picker */}
@@ -188,7 +192,7 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
           />
           <input
             type="search"
-            placeholder="Search contacts to enroll…"
+            placeholder={t('searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
@@ -209,12 +213,12 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
         >
           {contactsQuery.loading && (
             <div style={{ padding: 14, textAlign: 'center', color: 'var(--txt3)', fontSize: 12 }}>
-              Loading contacts…
+              {t('loadingContacts')}
             </div>
           )}
           {!contactsQuery.loading && filtered.length === 0 && (
             <div style={{ padding: 14, textAlign: 'center', color: 'var(--txt3)', fontSize: 12 }}>
-              {search ? 'No matches.' : 'No contacts in this organisation yet.'}
+              {search ? t('noMatches') : t('noContactsYet')}
             </div>
           )}
           {filtered.map((c) => {
@@ -251,7 +255,7 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
                     opacity: isBusy(c.id) ? 0.6 : 1,
                   }}
                 >
-                  {already ? 'Enrolled' : isBusy(c.id) ? '…' : 'Enroll'}
+                  {already ? t('enrolled') : isBusy(c.id) ? '…' : t('enroll')}
                 </button>
               </div>
             )
@@ -261,12 +265,12 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
 
       {/* Current enrollments */}
       <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--txt2)', marginBottom: 6 }}>
-        Current enrollments ({enrollments.length})
+        {t('currentEnrollments', { count: enrollments.length })}
       </div>
 
       {enrollmentsQuery.loading && (
         <div style={{ padding: 18, textAlign: 'center', color: 'var(--txt3)', fontSize: 12 }}>
-          Loading enrollments…
+          {t('loadingEnrollments')}
         </div>
       )}
 
@@ -277,7 +281,7 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
             border: '1px dashed var(--border)', borderRadius: 8,
           }}
         >
-          No one enrolled yet. Use the picker above to enroll your first contact.
+          {t('noneEnrolled')}
         </div>
       )}
 
@@ -301,23 +305,23 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
                   {contactLabel(e)}
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--txt3)', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                  <span>
-                    Step {Math.max(0, stepsDelivered)} / {totalSteps}
-                  </span>
+                  <span>{t('step', { n: Math.max(0, stepsDelivered), total: totalSteps })}</span>
                   <span>·</span>
                   <span>
-                    {e.lastDeliveredAt ? `last sent ${fmtRelative(e.lastDeliveredAt)}` : 'no sends yet'}
+                    {e.lastDeliveredAt
+                      ? t('lastSent', { ago: fmtRelative(e.lastDeliveredAt) })
+                      : t('noSendsYet')}
                   </span>
                   {e.nextDueAt && (
                     <>
                       <span>·</span>
-                      <span>next {fmtRelative(e.nextDueAt)}</span>
+                      <span>{t('next', { when: fmtRelative(e.nextDueAt) })}</span>
                     </>
                   )}
                   {e.attemptCount > 0 && (
                     <>
                       <span>·</span>
-                      <span>{e.attemptCount} attempt{e.attemptCount === 1 ? '' : 's'}</span>
+                      <span>{t('attempts', { count: e.attemptCount })}</span>
                     </>
                   )}
                 </div>
@@ -344,15 +348,15 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
                 }}
               >
                 <Icon size={10} />
-                {sStyle.label}
+                {t(`status.${e.status}`)}
               </span>
               {(e.status === 'active' || e.status === 'paused') ? (
                 <button
                   type="button"
                   onClick={() => unenroll(e.contactId)}
                   disabled={isBusy(e.contactId)}
-                  title="Cancel enrollment"
-                  aria-label="Cancel enrollment"
+                  title={t('cancelTitle')}
+                  aria-label={t('cancelTitle')}
                   style={{
                     padding: '5px 8px', borderRadius: 6,
                     background: 'var(--bg2)', color: 'var(--r-txt)',

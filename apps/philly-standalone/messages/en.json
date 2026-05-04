@@ -838,5 +838,91 @@
     "toasts": {
       "loadFailed": "Failed to load data"
     }
+  },
+  "features": {
+    "title": "Feature flags",
+    "subtitle": "Per-org runtime kill-switches — no redeploy required",
+    "heading": "Feature flags",
+    "description": "Each switch below is a per-organisation kill-switch. Flip one off to disable that feature across this organisation immediately — no redeploy, no code change. Changes take effect within ~60 seconds (the in-memory cache TTL). Every change is recorded in the audit log.",
+    "info": "Flipping a flag here sets a per-organisation override. The \"Reset to default\" button removes the override and falls back to the global default (or the code-side default if no global is set).",
+    "loading": "Loading…",
+    "empty": "No feature flags catalogued.",
+    "orgOverride": "Org override",
+    "codeDefault": "Code default: {state}",
+    "enabled": "enabled",
+    "disabled": "disabled",
+    "toggleAriaLabel": "Toggle {key}",
+    "resetTitle": "Clear org override (fall back to default)",
+    "reset": "Reset",
+    "enabledLabel": "ENABLED",
+    "disabledLabel": "DISABLED",
+    "toasts": {
+      "updateFailed": "Update failed ({status})",
+      "networkError": "Network error",
+      "resetToDefault": "Reset to default",
+      "featureEnabled": "Feature enabled",
+      "featureDisabled": "Feature disabled"
+    }
+  },
+  "scimGroups": {
+    "title": "SCIM groups",
+    "subtitle": "Map IdP groups to platform roles + dashboard sections",
+    "heading": "SCIM groups",
+    "descriptionPart1": "When an IdP (Okta, Azure AD, etc.) provisions a user via ",
+    "descriptionPart2": ", the new member's organization-membership is upserted to the role and dashboard sections you set below. Removing a member never auto-reverts — if you need to demote a user, do it manually from ",
+    "descriptionPart3": ".",
+    "info": "Role sets Membership.role; leave it on none to skip the role mapping entirely. Sections override the per-user dashboard allow-list — choose custom to pick specific surfaces, or full access to clear the override (members fall back to their personal sections).",
+    "loading": "Loading…",
+    "emptyPart1": "No SCIM groups yet. Once your IdP provisions a group via ",
+    "emptyPart2": ", it will appear here.",
+    "members": "{count, plural, one {# member} other {# members}}",
+    "role": "Role",
+    "roleNone": "— none (skip role mapping) —",
+    "dashboardSections": "Dashboard sections",
+    "fullAccess": "Full access",
+    "custom": "Custom",
+    "personalAllowlist": "Members keep their personal section allow-list (User.dashboardSections).",
+    "discard": "Discard",
+    "saveLabel": "Save ({count, plural, one {# member} other {# members}})",
+    "saving": "Saving…",
+    "toasts": {
+      "saved": "Saved",
+      "savedWithUpdate": "Saved — {count, plural, one {# existing member updated} other {# existing members updated}}",
+      "updateFailed": "Update failed ({status})",
+      "networkError": "Network error"
+    }
+  },
+  "dripEnrollment": {
+    "title": "Enrollments — {name}",
+    "subtitle": "{count} enrolled · {steps, plural, one {# step} other {# steps}} per contact",
+    "searchPlaceholder": "Search contacts to enroll…",
+    "loadingContacts": "Loading contacts…",
+    "noMatches": "No matches.",
+    "noContactsYet": "No contacts in this organisation yet.",
+    "enrolled": "Enrolled",
+    "enroll": "Enroll",
+    "currentEnrollments": "Current enrollments ({count})",
+    "loadingEnrollments": "Loading enrollments…",
+    "noneEnrolled": "No one enrolled yet. Use the picker above to enroll your first contact.",
+    "step": "Step {n} / {total}",
+    "noSendsYet": "no sends yet",
+    "lastSent": "last sent {ago}",
+    "next": "next {when}",
+    "attempts": "{count, plural, one {# attempt} other {# attempts}}",
+    "status": {
+      "active": "active",
+      "paused": "paused",
+      "done": "done",
+      "cancelled": "cancelled"
+    },
+    "cancelTitle": "Cancel enrollment",
+    "cancelConfirm": "Cancel this enrollment? The contact will not receive any further steps.",
+    "toasts": {
+      "enrolled": "Enrolled",
+      "cancelled": "Enrollment cancelled",
+      "enrollFailed": "Enroll failed ({status})",
+      "cancelFailed": "Cancel failed ({status})",
+      "networkError": "Network error"
+    }
   }
 }

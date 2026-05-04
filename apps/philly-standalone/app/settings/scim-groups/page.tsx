@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
@@ -36,6 +37,7 @@ const subStyle: React.CSSProperties = {
 }
 
 export default function ScimGroupsPage() {
+  const t = useTranslations('scimGroups')
   const { addToast } = useToast()
   const groupsQuery = useApi<{ data: ScimGroupRow[] }>('/admin/scim-groups')
   const groups = groupsQuery.data?.data ?? []
@@ -88,20 +90,20 @@ export default function ScimGroupsPage() {
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) {
-        addToast(json?.error ?? `Update failed (${res.status})`, 'error')
+        addToast(json?.error ?? t('toasts.updateFailed', { status: res.status }), 'error')
         return
       }
       const updated = json.data?.membersUpdated ?? 0
       addToast(
         updated > 0
-          ? `Saved — ${updated} existing member${updated === 1 ? '' : 's'} updated`
-          : 'Saved',
+          ? t('toasts.savedWithUpdate', { count: updated })
+          : t('toasts.saved'),
         'success',
       )
       discardDraft(g)
       groupsQuery.refetch()
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Network error', 'error')
+      addToast(err instanceof Error ? err.message : t('toasts.networkError'), 'error')
     } finally {
       setBusyId(null)
     }
@@ -121,22 +123,20 @@ export default function ScimGroupsPage() {
 
   return (
     <>
-      <Topbar title="SCIM groups" sub="Map IdP groups to platform roles + dashboard sections" />
+      <Topbar title={t('title')} sub={t('subtitle')} />
 
       <div style={{ padding: '24px 32px', maxWidth: 1080 }}>
-        <h1 style={titleStyle}>SCIM groups</h1>
+        <h1 style={titleStyle}>{t('heading')}</h1>
         <p style={subStyle}>
-          When an IdP (Okta, Azure AD, etc.) provisions a user via{' '}
+          {t('descriptionPart1')}
           <code style={{ fontFamily: 'var(--font-red-hat-mono), monospace', fontSize: 12 }}>
             PATCH /api/scim/v2/Groups/{'<id>'}
           </code>
-          , the new member&apos;s organization-membership is upserted to the role and
-          dashboard sections you set below. Removing a member never auto-reverts —
-          if you need to demote a user, do it manually from{' '}
+          {t('descriptionPart2')}
           <code style={{ fontFamily: 'var(--font-red-hat-mono), monospace', fontSize: 12 }}>
             /settings/users
           </code>
-          .
+          {t('descriptionPart3')}
         </p>
 
         <div
@@ -148,18 +148,12 @@ export default function ScimGroupsPage() {
           }}
         >
           <Info size={15} style={{ flexShrink: 0, marginTop: 1 }} />
-          <span>
-            <b>Role</b> sets <code>Membership.role</code>; leave it on <i>none</i> to skip the
-            role mapping entirely.{' '}
-            <b>Sections</b> override the per-user dashboard allow-list — choose
-            <i> custom</i> to pick specific surfaces, or <i>full access</i> to clear the
-            override (members fall back to their personal sections).
-          </span>
+          <span>{t('info')}</span>
         </div>
 
         {groupsQuery.loading && (
           <div style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-            Loading…
+            {t('loading')}
           </div>
         )}
 
@@ -183,11 +177,11 @@ export default function ScimGroupsPage() {
               borderRadius: 12, color: 'var(--txt3)', fontSize: 13,
             }}
           >
-            No SCIM groups yet. Once your IdP provisions a group via{' '}
+            {t('emptyPart1')}
             <code style={{ fontFamily: 'var(--font-red-hat-mono), monospace', fontSize: 12 }}>
               POST /api/scim/v2/Groups
             </code>
-            , it will appear here.
+            {t('emptyPart2')}
           </div>
         )}
 
@@ -222,7 +216,7 @@ export default function ScimGroupsPage() {
                       {g.displayName}
                     </div>
                     <div style={{ fontSize: 11.5, color: 'var(--txt3)', marginTop: 2 }}>
-                      {g.memberCount} member{g.memberCount === 1 ? '' : 's'}
+                      {t('members', { count: g.memberCount })}
                       {g.externalId ? (
                         <>
                           {' · '}
@@ -239,7 +233,7 @@ export default function ScimGroupsPage() {
                   {/* Role select */}
                   <div>
                     <div style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--txt2)', marginBottom: 5 }}>
-                      Role
+                      {t('role')}
                     </div>
                     <select
                       value={d.role ?? ''}
@@ -250,7 +244,7 @@ export default function ScimGroupsPage() {
                         fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
                       }}
                     >
-                      <option value="">— none (skip role mapping) —</option>
+                      <option value="">{t('roleNone')}</option>
                       {ROLES.map((r) => (
                         <option key={r} value={r}>{r}</option>
                       ))}
@@ -264,7 +258,7 @@ export default function ScimGroupsPage() {
                       marginBottom: 5,
                     }}>
                       <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--txt2)' }}>
-                        Dashboard sections
+                        {t('dashboardSections')}
                       </span>
                       <div style={{ display: 'flex', gap: 6 }}>
                         <button
@@ -280,7 +274,7 @@ export default function ScimGroupsPage() {
                             fontFamily: 'inherit',
                           }}
                         >
-                          Full access
+                          {t('fullAccess')}
                         </button>
                         <button
                           type="button"
@@ -299,7 +293,7 @@ export default function ScimGroupsPage() {
                             fontFamily: 'inherit',
                           }}
                         >
-                          Custom
+                          {t('custom')}
                         </button>
                       </div>
                     </div>
@@ -342,7 +336,7 @@ export default function ScimGroupsPage() {
                         border: '1px dashed var(--border)', color: 'var(--txt3)',
                         background: 'var(--bg2)',
                       }}>
-                        Members keep their personal section allow-list (User.dashboardSections).
+                        {t('personalAllowlist')}
                       </div>
                     )}
                   </div>
@@ -366,7 +360,7 @@ export default function ScimGroupsPage() {
                       }}
                     >
                       <RotateCcw size={11} />
-                      Discard
+                      {t('discard')}
                     </button>
                     <button
                       type="button"
@@ -382,7 +376,7 @@ export default function ScimGroupsPage() {
                       }}
                     >
                       <Save size={11} />
-                      {busyId === g.id ? 'Saving…' : `Save (${g.memberCount} member${g.memberCount === 1 ? '' : 's'})`}
+                      {busyId === g.id ? t('saving') : t('saveLabel', { count: g.memberCount })}
                     </button>
                   </div>
                 )}

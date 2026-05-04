@@ -838,5 +838,91 @@
     "toasts": {
       "loadFailed": "Daten konnten nicht geladen werden"
     }
+  },
+  "features": {
+    "title": "Feature-Flags",
+    "subtitle": "Per-Org-Laufzeit-Kill-Switches — kein Redeploy erforderlich",
+    "heading": "Feature-Flags",
+    "description": "Jeder Schalter unten ist ein Per-Organisation-Kill-Switch. Schalten Sie einen aus, um diese Funktion in dieser Organisation sofort zu deaktivieren — kein Redeploy, keine Codeänderung. Änderungen werden innerhalb von ~60 Sekunden wirksam (In-Memory-Cache-TTL). Jede Änderung wird im Audit-Log erfasst.",
+    "info": "Das Umschalten eines Flags hier setzt einen Per-Organisation-Override. Die Schaltfläche \"Auf Standard zurücksetzen\" entfernt den Override und greift auf den globalen Standard zurück (oder den Code-seitigen Standard, falls kein globaler gesetzt ist).",
+    "loading": "Laden…",
+    "empty": "Keine Feature-Flags katalogisiert.",
+    "orgOverride": "Org-Override",
+    "codeDefault": "Code-Standard: {state}",
+    "enabled": "aktiviert",
+    "disabled": "deaktiviert",
+    "toggleAriaLabel": "{key} umschalten",
+    "resetTitle": "Org-Override entfernen (Fallback auf Standard)",
+    "reset": "Zurücksetzen",
+    "enabledLabel": "AKTIVIERT",
+    "disabledLabel": "DEAKTIVIERT",
+    "toasts": {
+      "updateFailed": "Aktualisierung fehlgeschlagen ({status})",
+      "networkError": "Netzwerkfehler",
+      "resetToDefault": "Auf Standard zurückgesetzt",
+      "featureEnabled": "Funktion aktiviert",
+      "featureDisabled": "Funktion deaktiviert"
+    }
+  },
+  "scimGroups": {
+    "title": "SCIM-Gruppen",
+    "subtitle": "IdP-Gruppen Plattformrollen + Dashboard-Bereichen zuordnen",
+    "heading": "SCIM-Gruppen",
+    "descriptionPart1": "Wenn ein IdP (Okta, Azure AD usw.) einen Benutzer über ",
+    "descriptionPart2": " bereitstellt, wird die Organisationsmitgliedschaft des neuen Mitglieds auf die unten festgelegte Rolle und Dashboard-Bereiche gesetzt. Das Entfernen eines Mitglieds wird nie automatisch zurückgesetzt — wenn Sie einen Benutzer herabstufen müssen, tun Sie dies manuell unter ",
+    "descriptionPart3": ".",
+    "info": "Rolle setzt Membership.role; lassen Sie es auf keine, um die Rollenzuordnung ganz zu überspringen. Bereiche überschreiben die persönliche Dashboard-Erlaubnisliste — wählen Sie custom, um bestimmte Oberflächen auszuwählen, oder Vollzugriff, um den Override zu entfernen (Mitglieder fallen auf ihre persönlichen Bereiche zurück).",
+    "loading": "Laden…",
+    "emptyPart1": "Noch keine SCIM-Gruppen. Sobald Ihr IdP eine Gruppe über ",
+    "emptyPart2": " bereitstellt, erscheint sie hier.",
+    "members": "{count, plural, one {# Mitglied} other {# Mitglieder}}",
+    "role": "Rolle",
+    "roleNone": "— keine (Rollenzuordnung überspringen) —",
+    "dashboardSections": "Dashboard-Bereiche",
+    "fullAccess": "Vollzugriff",
+    "custom": "Benutzerdefiniert",
+    "personalAllowlist": "Mitglieder behalten ihre persönliche Bereichs-Erlaubnisliste (User.dashboardSections).",
+    "discard": "Verwerfen",
+    "saveLabel": "Speichern ({count, plural, one {# Mitglied} other {# Mitglieder}})",
+    "saving": "Speichern…",
+    "toasts": {
+      "saved": "Gespeichert",
+      "savedWithUpdate": "Gespeichert — {count, plural, one {# vorhandenes Mitglied aktualisiert} other {# vorhandene Mitglieder aktualisiert}}",
+      "updateFailed": "Aktualisierung fehlgeschlagen ({status})",
+      "networkError": "Netzwerkfehler"
+    }
+  },
+  "dripEnrollment": {
+    "title": "Anmeldungen — {name}",
+    "subtitle": "{count} angemeldet · {steps, plural, one {# Schritt} other {# Schritte}} pro Kontakt",
+    "searchPlaceholder": "Kontakte zum Anmelden suchen…",
+    "loadingContacts": "Kontakte werden geladen…",
+    "noMatches": "Keine Treffer.",
+    "noContactsYet": "Noch keine Kontakte in dieser Organisation.",
+    "enrolled": "Angemeldet",
+    "enroll": "Anmelden",
+    "currentEnrollments": "Aktuelle Anmeldungen ({count})",
+    "loadingEnrollments": "Anmeldungen werden geladen…",
+    "noneEnrolled": "Noch niemand angemeldet. Verwenden Sie den Picker oben, um Ihren ersten Kontakt anzumelden.",
+    "step": "Schritt {n} / {total}",
+    "noSendsYet": "noch keine Sendungen",
+    "lastSent": "zuletzt gesendet {ago}",
+    "next": "nächste {when}",
+    "attempts": "{count, plural, one {# Versuch} other {# Versuche}}",
+    "status": {
+      "active": "aktiv",
+      "paused": "pausiert",
+      "done": "erledigt",
+      "cancelled": "storniert"
+    },
+    "cancelTitle": "Anmeldung stornieren",
+    "cancelConfirm": "Diese Anmeldung stornieren? Der Kontakt erhält keine weiteren Schritte.",
+    "toasts": {
+      "enrolled": "Angemeldet",
+      "cancelled": "Anmeldung storniert",
+      "enrollFailed": "Anmelden fehlgeschlagen ({status})",
+      "cancelFailed": "Stornieren fehlgeschlagen ({status})",
+      "networkError": "Netzwerkfehler"
+    }
   }
 }
