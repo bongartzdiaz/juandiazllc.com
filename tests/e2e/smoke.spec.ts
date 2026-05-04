@@ -54,6 +54,29 @@ const SAMPLE_DETAIL_ROUTES = [
 
 type ConsoleBucket = { errors: string[]; warnings: string[] };
 
+/** Block every request that isn't to our own origin so CI's network
+ *  throttling on Plausible / Google Fonts / Sentry beacons can't flake
+ *  the suite. Smoke is a structural test of our SSR — it does not
+ *  care whether a third-party CDN happened to 429 or hit an SSL
+ *  handshake bug during a particular run. The previous attempt to
+ *  filter these errors out after they were already logged lost track
+ *  of which message/location pairs Chromium emits, so we now stop
+ *  the requests at the network layer instead. */
+async function blockExternalRequests(page: Page) {
+  const ALLOWED_HOSTS = new Set(["127.0.0.1", "localhost"]);
+  await page.route("**/*", (route) => {
+    try {
+      const host = new URL(route.request().url()).hostname;
+      if (ALLOWED_HOSTS.has(host)) {
+        return route.continue();
+      }
+      return route.abort();
+    } catch {
+      return route.continue();
+    }
+  });
+}
+
 /** Collect console errors/warnings while the page loads so we can
  *  assert on them after navigation. Browser-level errors surface
  *  here too (network, CORS, CSP, etc.). */
@@ -111,6 +134,13 @@ function isIgnorableConsoleMessage(text: string, url = ""): boolean {
   ];
   return noise.some((n) => text.toLowerCase().includes(n.toLowerCase()));
 }
+
+// Bundle CN — block external hosts globally for every test that
+// uses the `page` fixture. Tests that only use `request` (the
+// proxy/redirect block below) skip this hook automatically.
+test.beforeEach(async ({ page }) => {
+  await blockExternalRequests(page);
+});
 
 for (const locale of LOCALES) {
   test.describe(`locale: ${locale}`, () => {

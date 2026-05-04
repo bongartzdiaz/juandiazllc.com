@@ -1,0 +1,58 @@
+name: CodeQL
+
+# Static analysis on TS/JS for the OWASP-style classes that human
+# review and Vitest can't catch reliably: XSS sinks, SQL/NoSQL
+# injection, prototype pollution, unsafe regex, hardcoded secrets,
+# path traversal. CodeQL ships GitHub-native, free for public repos
+# and free for private below a threshold; results land on the
+# Security tab with line-pinned findings.
+#
+# Bundle CO — pre-flight gate. Complements the manual /security-review
+# skill (which I invoke when reasoning about a change) with an
+# always-on automated pass on every PR.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Sunday 03:00 UTC — weekly run catches advisories that landed
+    # against dependencies we already vendored, since CodeQL refreshes
+    # its query pack on its own cadence.
+    - cron: "0 3 * * 0"
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          # security-extended adds higher-recall queries beyond the
+          # default set (SSRF, log injection, broken crypto patterns).
+          # security-and-quality is too noisy on a Next.js codebase.
+          queries: security-extended
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
