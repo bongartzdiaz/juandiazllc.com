@@ -12,9 +12,24 @@ export async function updateSession(request: NextRequest, requestHeaders?: Heade
     : { headers: request.headers };
   let response = NextResponse.next({ request: initRequest });
 
+  // Bundle CN — no-op when Supabase isn't configured (CI smoke test,
+  // marketing-only deploys, local dev without auth wired up). The
+  // workflow file's comment promised this; the code didn't deliver
+  // it, which 500'd every marketing page in the smoke run because
+  // createServerClient throws on empty creds. /philly/* routes
+  // would still need auth in this state — but they're not part of
+  // the public surface, so leaving them un-gated here is fine: the
+  // CRM has its own Supabase requireScope() gate that fires on
+  // first request anyway.
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return response
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {
