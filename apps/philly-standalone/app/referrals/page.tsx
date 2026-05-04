@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+import { fetchJson } from '@/lib/philly/fetch-json'
 
 const REF_COLUMNS: ColumnDef[] = [
   { id: 'referrer', label: 'Referrer', required: true },
@@ -84,10 +85,13 @@ export default function ReferralsPage() {
   )
 
   useEffect(() => {
-    fetch('/api/contacts?limit=500')
-      .then(r => r.json())
+    // Bundle CK — fetchJson surfaces non-2xx as a typed error so a
+    // 401 / 500 doesn't silently fall to "[]" and look like an empty
+    // contact picker.
+    fetchJson<{ data: ContactLite[] }>('/api/contacts?limit=500')
       .then(j => setContacts(Array.isArray(j.data) ? j.data.map((c: ContactLite) => ({ id: c.id, name: c.name })) : []))
-      .catch(() => {})
+      .catch(err => addToast(err instanceof Error ? err.message : t('toasts.loadFailed'), 'error'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const closeAddModal = () => {

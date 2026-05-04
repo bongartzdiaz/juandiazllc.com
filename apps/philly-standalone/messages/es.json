@@ -248,7 +248,8 @@
       "marked": "Marcado como {status}",
       "updateFailed": "Actualización fallida",
       "deleted": "Referencia eliminada",
-      "networkError": "Error de red"
+      "networkError": "Error de red",
+      "loadFailed": "No se pudieron cargar los contactos"
     },
     "confirms": {
       "delete": "¿Eliminar esta referencia?"
@@ -386,7 +387,8 @@
       "updated": "Jornada actualizada",
       "cancelled": "Jornada cancelada",
       "deleteFailed": "Eliminación fallida",
-      "networkError": "Error de red"
+      "networkError": "Error de red",
+      "loadFailed": "No se pudieron cargar los inmuebles"
     },
     "confirms": {
       "cancel": "¿Cancelar esta jornada de puertas abiertas? Esta acción no se puede deshacer."
@@ -828,6 +830,13 @@
       "transfers": "Transferencias a terceros países",
       "security": "Medidas de seguridad",
       "noRecipients": "Ninguno"
+    }
+  },
+  "offers": {
+    "title": "Ofertas",
+    "subtitle": "Sigue las ofertas de compradores y contraofertas",
+    "toasts": {
+      "loadFailed": "No se pudieron cargar los datos"
     }
   }
 }

@@ -10,6 +10,7 @@ import { Filter, Plus, Trash2, CheckCircle2, XCircle, RefreshCw, Edit2, DollarSi
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { fetchJson } from '@/lib/philly/fetch-json'
 
 interface Offer {
   id: string
@@ -96,12 +97,16 @@ export default function OffersPage() {
   const { addToast } = useToast()
 
   useEffect(() => {
-    fetch('/api/properties?limit=500').then(r => r.json()).then(j => {
-      setProperties(Array.isArray(j.data) ? j.data : [])
-    }).catch(() => {})
-    fetch('/api/contacts?limit=500').then(r => r.json()).then(j => {
-      setContacts(Array.isArray(j.data) ? j.data : [])
-    }).catch(() => {})
+    // Bundle CK — fetchJson surfaces non-2xx as a typed error so a
+    // 401 / 500 doesn't silently fall to "[]" and look like an empty
+    // picker.
+    fetchJson<{ data: PropertyLite[] }>('/api/properties?limit=500')
+      .then(j => setProperties(Array.isArray(j.data) ? j.data : []))
+      .catch(err => addToast(err instanceof Error ? err.message : t('toasts.loadFailed'), 'error'))
+    fetchJson<{ data: ContactLite[] }>('/api/contacts?limit=500')
+      .then(j => setContacts(Array.isArray(j.data) ? j.data : []))
+      .catch(err => addToast(err instanceof Error ? err.message : t('toasts.loadFailed'), 'error'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEntitySubscription('offer', fetchData)

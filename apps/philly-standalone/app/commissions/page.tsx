@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+import { fetchJson } from '@/lib/philly/fetch-json'
 
 const COMMISSION_COLUMNS: ColumnDef[] = [
   { id: 'type', label: 'Type / Notes', required: true },
@@ -156,8 +157,14 @@ export default function CommissionsPage() {
 
   // Fetch leaderboard
   useEffect(() => {
-    fetch('/api/leaderboard').then(r => r.json()).then(j => setLeaderboard(j.data ?? [])).catch(() => {})
-  }, [])
+    // Bundle CK — fetchJson surfaces non-2xx as a typed error so a
+    // 401 / 500 doesn't silently leave the leaderboard empty.
+    fetchJson<{ data: LeaderboardEntry[] }>('/api/leaderboard')
+      .then(j => setLeaderboard(j.data ?? []))
+      .catch((err: unknown) => {
+        addToast(err instanceof Error ? err.message : t('toasts.leaderboardLoadFailed'), 'error')
+      })
+  }, [addToast, t])
 
   useEntitySubscription('commissionRecord', fetchRecords)
 

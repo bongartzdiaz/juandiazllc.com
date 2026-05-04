@@ -248,7 +248,8 @@
       "marked": "Marked {status}",
       "updateFailed": "Update failed",
       "deleted": "Referral deleted",
-      "networkError": "Network error"
+      "networkError": "Network error",
+      "loadFailed": "Failed to load contacts"
     },
     "confirms": {
       "delete": "Delete this referral?"
@@ -386,7 +387,8 @@
       "updated": "Open house updated",
       "cancelled": "Open house cancelled",
       "deleteFailed": "Delete failed",
-      "networkError": "Network error"
+      "networkError": "Network error",
+      "loadFailed": "Failed to load properties"
     },
     "confirms": {
       "cancel": "Cancel this open house? This cannot be undone."
@@ -828,6 +830,13 @@
       "transfers": "Third-country transfers",
       "security": "Security measures",
       "noRecipients": "None"
+    }
+  },
+  "offers": {
+    "title": "Offers",
+    "subtitle": "Track buyer offers and counter-offers",
+    "toasts": {
+      "loadFailed": "Failed to load data"
     }
   }
 }

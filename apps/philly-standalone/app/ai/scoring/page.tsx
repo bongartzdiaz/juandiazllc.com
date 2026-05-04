@@ -1,9 +1,12 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Flame, RefreshCw } from 'lucide-react'
+import { useToast } from '@/hooks/philly/useToast'
+import { fetchJson } from '@/lib/philly/fetch-json'
 
 type LeadTier = 'hot' | 'warm' | 'nurture' | 'cold' | 'dormant'
 
@@ -36,15 +39,22 @@ export default function AIScoringPage() {
   const [report, setReport] = useState<Report | null>(null)
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<LeadTier | 'all'>('all')
+  const t = useTranslations('aiScoring')
+  const { addToast } = useToast()
 
   const load = useCallback(() => {
     setLoading(true)
-    fetch('/api/ai/score?limit=500')
-      .then(r => r.json())
+    // Bundle CK — fetchJson surfaces non-2xx as a typed error so a
+    // 401 / 500 doesn't silently leave the report null and look like
+    // there are no scored contacts.
+    fetchJson<{ data: Report | null }>('/api/ai/score?limit=500')
       .then(json => setReport(json.data ?? null))
-      .catch(() => setReport(null))
+      .catch((err: unknown) => {
+        setReport(null)
+        addToast(err instanceof Error ? err.message : t('toasts.loadFailed'), 'error')
+      })
       .finally(() => setLoading(false))
-  }, [])
+  }, [addToast, t])
 
   useEffect(() => { load() }, [load])
 

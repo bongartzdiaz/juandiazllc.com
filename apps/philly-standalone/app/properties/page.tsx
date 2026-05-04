@@ -19,6 +19,7 @@ import { useGlobalShortcuts } from '@/hooks/philly/useGlobalShortcuts'
 import { AdvancedFilterBuilder } from '@/components/philly/filter/AdvancedFilterBuilder'
 import { PROPERTY_FILTER_SCHEMA } from '@/lib/philly/filter/schemas'
 import type { FilterSpec } from '@/lib/philly/filter/types'
+import { fetchJson } from '@/lib/philly/fetch-json'
 
 type Option = { value: string; label: string }
 type Flag = { key: string; label: string }
@@ -229,12 +230,17 @@ export default function PropertiesPage() {
   // Fetch taxonomy once on mount
   useEffect(() => {
     let cancelled = false
-    fetch('/api/properties/taxonomy')
-      .then(r => r.json())
+    // Bundle CK — fetchJson surfaces non-2xx as a typed error so a
+    // 401 / 500 doesn't silently leave the taxonomy empty (which
+    // hides every filter chip in the UI).
+    fetchJson<{ data: Taxonomy }>('/api/properties/taxonomy')
       .then(json => { if (!cancelled && json.data) setTaxonomy(json.data) })
-      .catch(() => {})
+      .catch((err: unknown) => {
+        if (cancelled) return
+        addToast(err instanceof Error ? err.message : t('toasts.taxonomyLoadFailed'), 'error')
+      })
     return () => { cancelled = true }
-  }, [])
+  }, [addToast, t])
 
   // Once taxonomy loaded, set default listingType from taxonomy (first option)
   useEffect(() => {

@@ -248,7 +248,8 @@
       "marked": "Als {status} markiert",
       "updateFailed": "Aktualisierung fehlgeschlagen",
       "deleted": "Empfehlung gelöscht",
-      "networkError": "Netzwerkfehler"
+      "networkError": "Netzwerkfehler",
+      "loadFailed": "Kontakte konnten nicht geladen werden"
     },
     "confirms": {
       "delete": "Diese Empfehlung löschen?"
@@ -386,7 +387,8 @@
       "updated": "Tag der offenen Tür aktualisiert",
       "cancelled": "Tag der offenen Tür abgesagt",
       "deleteFailed": "Löschen fehlgeschlagen",
-      "networkError": "Netzwerkfehler"
+      "networkError": "Netzwerkfehler",
+      "loadFailed": "Immobilien konnten nicht geladen werden"
     },
     "confirms": {
       "cancel": "Diesen Tag der offenen Tür absagen? Dies kann nicht rückgängig gemacht werden."
@@ -828,6 +830,13 @@
       "transfers": "Drittlandübermittlungen",
       "security": "Sicherheitsmaßnahmen",
       "noRecipients": "Keine"
+    }
+  },
+  "offers": {
+    "title": "Angebote",
+    "subtitle": "Käuferangebote und Gegenangebote verfolgen",
+    "toasts": {
+      "loadFailed": "Daten konnten nicht geladen werden"
     }
   }
 }

@@ -248,7 +248,8 @@
       "marked": "Gemarkeerd als {status}",
       "updateFailed": "Bijwerken mislukt",
       "deleted": "Verwijzing verwijderd",
-      "networkError": "Netwerkfout"
+      "networkError": "Netwerkfout",
+      "loadFailed": "Contacten laden mislukt"
     },
     "confirms": {
       "delete": "Deze verwijzing verwijderen?"
@@ -386,7 +387,8 @@
       "updated": "Open huis bijgewerkt",
       "cancelled": "Open huis geannuleerd",
       "deleteFailed": "Verwijderen mislukt",
-      "networkError": "Netwerkfout"
+      "networkError": "Netwerkfout",
+      "loadFailed": "Panden laden mislukt"
     },
     "confirms": {
       "cancel": "Dit open huis annuleren? Dit kan niet ongedaan worden gemaakt."
@@ -828,6 +830,13 @@
       "transfers": "Doorgifte naar derde landen",
       "security": "Beveiligingsmaatregelen",
       "noRecipients": "Geen"
+    }
+  },
+  "offers": {
+    "title": "Biedingen",
+    "subtitle": "Volg biedingen en tegenvoorstellen",
+    "toasts": {
+      "loadFailed": "Laden van gegevens mislukt"
     }
   }
 }
