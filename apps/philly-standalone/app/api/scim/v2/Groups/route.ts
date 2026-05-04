@@ -119,10 +119,15 @@ export async function POST(req: NextRequest) {
   }
 
   // Validate every member id belongs to the same org. Drop unknowns
-  // silently — IdPs sometimes send stale ids.
-  const memberRows = parsed.memberIds.length > 0
+  // silently — IdPs sometimes send stale ids. Bundle CM —
+  // parsed.memberIds is undefined when the IdP omitted `members`;
+  // treat that the same as an empty array on POST (creating a
+  // group with no members is fine). The PUT route uses the
+  // undefined-vs-[] distinction to avoid mass-unenrolling.
+  const requestedMemberIds = parsed.memberIds ?? []
+  const memberRows = requestedMemberIds.length > 0
     ? await prisma.user.findMany({
-        where: { id: { in: parsed.memberIds }, organizationId: auth.organizationId },
+        where: { id: { in: requestedMemberIds }, organizationId: auth.organizationId },
         select: { id: true, email: true },
       })
     : []

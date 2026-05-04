@@ -140,25 +140,36 @@ export async function PUT(req: NextRequest, ctx: RouteCtx) {
     if (clash) return scimError(409, `displayName "${parsed.displayName}" already in use`, 'uniqueness')
   }
 
-  // Resolve member ids against this org.
-  const memberRows = parsed.memberIds.length > 0
+  // Bundle CM — distinguish "members field absent" (undefined,
+  // leave membership alone) from "members: []" (explicit clear).
+  // RFC 7644 PUT replaces the resource — but Okta is known to PUT
+  // a renamed group without re-sending members, and treating that
+  // as "clear all members" mass-unenrolls the group.
+  const replaceMembers = parsed.memberIds !== undefined
+  const memberRows = replaceMembers && parsed.memberIds!.length > 0
     ? await prisma.user.findMany({
-        where: { id: { in: parsed.memberIds }, organizationId: auth.organizationId },
+        where: { id: { in: parsed.memberIds! }, organizationId: auth.organizationId },
         select: { id: true },
       })
     : []
   const valid = new Set(memberRows.map((u) => u.id))
 
-  // Compute the add-set so we can apply role mapping after the write.
-  const before = await prisma.scimGroupMembership.findMany({
-    where: { groupId: id }, select: { userId: true },
-  })
+  // Snapshot the existing memberships ONLY when we plan to replace,
+  // so the role-mapping diff can compute "newly added" correctly.
+  const before = replaceMembers
+    ? await prisma.scimGroupMembership.findMany({
+        where: { groupId: id }, select: { userId: true },
+      })
+    : []
   const beforeSet = new Set(before.map((m) => m.userId))
-  const addedIds = [...valid].filter((u) => !beforeSet.has(u))
+  const addedIds = replaceMembers ? [...valid].filter((u) => !beforeSet.has(u)) : []
 
-  // Replace the entire member set + update displayName/externalId.
+  // Group-attribute update (always). Membership replace only when
+  // the IdP explicitly sent a members array.
   await prisma.$transaction([
-    prisma.scimGroupMembership.deleteMany({ where: { groupId: id } }),
+    ...(replaceMembers
+      ? [prisma.scimGroupMembership.deleteMany({ where: { groupId: id } })]
+      : []),
     prisma.scimGroup.update({
       where: { id },
       data: {
@@ -167,12 +178,16 @@ export async function PUT(req: NextRequest, ctx: RouteCtx) {
         // clears the column. parseScimGroupInput coerces missing
         // to null already.
         scimExternalId: parsed.externalId,
-        members: { create: [...valid].map((userId) => ({ userId })) },
+        ...(replaceMembers
+          ? { members: { create: [...valid].map((userId) => ({ userId })) } }
+          : {}),
       },
     }),
   ])
 
-  await applyRoleMapping(prisma, { ...existing, organizationId: auth.organizationId }, addedIds)
+  if (replaceMembers) {
+    await applyRoleMapping(prisma, { ...existing, organizationId: auth.organizationId }, addedIds)
+  }
 
   const updated = await prisma.scimGroup.findUniqueOrThrow({
     where: { id }, select: SELECT,
@@ -184,7 +199,11 @@ export async function PUT(req: NextRequest, ctx: RouteCtx) {
     entity: 'scimGroup', entityId: id,
     changes: {
       displayName: { old: existing.displayName, new: parsed.displayName },
-      memberCount: { old: beforeSet.size, new: valid.size },
+      // Bundle CM — only audit member changes when the PUT actually
+      // replaced them; an absent members field is a no-op.
+      ...(replaceMembers
+        ? { memberCount: { old: beforeSet.size, new: valid.size } }
+        : {}),
     },
   }).catch(() => { /* best-effort */ })
 

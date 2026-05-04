@@ -55,8 +55,14 @@ export interface ScimGroupCreateInput {
   displayName: string
   externalId: string | null
   /** Member ids (platform User ids). RFC 7643 says member.value is
-   *  the SCIM resource id; for User members that's User.id. */
-  memberIds: string[]
+   *  the SCIM resource id; for User members that's User.id.
+   *  Bundle CM — distinguish "members field absent" (undefined)
+   *  from "members: []" (explicit clear). RFC 7644 PUT replaces
+   *  the resource: an absent members field is "no change",
+   *  whereas explicit empty array is "clear all members". Some
+   *  IdPs (notably Okta on rename) PUT without re-sending members;
+   *  treating that as "clear all" mass-unenrolls the group. */
+  memberIds: string[] | undefined
 }
 
 /** Parse a SCIM Group POST/PUT body. Throws on structural errors;
@@ -73,8 +79,12 @@ export function parseScimGroupInput(body: unknown): ScimGroupCreateInput {
 
   const externalId = typeof b.externalId === 'string' ? b.externalId : null
 
-  const memberIds: string[] = []
+  // Bundle CM — undefined means "members field absent"; an empty
+  // array means "explicit clear". The PUT route relies on this
+  // distinction to avoid mass-unenrolling on Okta-style renames.
+  let memberIds: string[] | undefined
   if (Array.isArray(b.members)) {
+    memberIds = []
     for (const raw of b.members) {
       if (!raw || typeof raw !== 'object') continue
       const m = raw as Record<string, unknown>

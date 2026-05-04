@@ -32,8 +32,16 @@ describe('parseScimGroupInput', () => {
     expect(r.memberIds).toEqual(['user_1', 'user_2'])
   })
 
-  it('returns an empty memberIds list when members is missing', () => {
+  it('returns memberIds=undefined when members is absent (Bundle CM)', () => {
+    // Bundle CM — distinguishes "absent" from "explicit empty".
+    // PUT route uses this distinction so an Okta-style rename
+    // (PUT without members field) doesn't mass-unenroll the group.
     const r = parseScimGroupInput({ displayName: 'Sales' })
+    expect(r.memberIds).toBeUndefined()
+  })
+
+  it('returns memberIds=[] when members is an explicit empty array (Bundle CM)', () => {
+    const r = parseScimGroupInput({ displayName: 'Sales', members: [] })
     expect(r.memberIds).toEqual([])
   })
 })
