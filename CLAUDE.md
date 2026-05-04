@@ -395,6 +395,11 @@ setup steps below.
 5. Per-customer SSO wiring per `docs/operations/SSO-SETUP.md`.
 6. Per-customer SCIM tokens per `docs/operations/SCIM-SETUP.md`
    (issue `ApiKey` row with `scopes: ["scim:users"]`).
+7. After every bundle push, mirror the standalone CRM into the
+   `bongartzdiaz/DEUS-SHARED` repo per
+   `docs/operations/MIRROR-SYNC.md`. One-button workflow run on
+   `juandiazllc.com` Actions tab; sync is required before any
+   downstream deploy or audit handoff.
 
 **Deferred (post-launch follow-ups):**
 - SCIM Groups → role/sections mapping (today: User-only).
