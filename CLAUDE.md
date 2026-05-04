@@ -213,11 +213,119 @@ through NL/DE/ES on `/work`, `/insights`, `/sectors`, `/signals`,
   `roi.eyebrow`/`roi.title`/`roi.lede` and `roi.outro.*`). That's the
   next ship.
 
-### Launch readiness — 2026-04-28 (updated 2026-05-01)
+### Launch readiness — 2026-04-28 (updated 2026-05-04)
 
-Bundles G–BO shipped on `claude/ai-command-bar`. The CRM is launch-
-ready for big-company / EU-GDPR procurement subject to the operator
-setup steps below.
+Bundles G–CH shipped on `claude/ai-command-bar`. PR #10 open and
+description updated to reflect the full release scope. The CRM is
+launch-ready for big-company / EU-GDPR procurement subject to the
+operator setup steps below.
+
+**Bundles BP–CH (post-BO summarised):**
+- BP — SCIM kill-switch wired into Users + Users/[id] routes; 503 on
+  disable so IdPs queue locally. DRIP_CAMPAIGNS deliberately not
+  re-added (no dispatcher yet — wired in BZ). vitals console.log
+  comment clarifying edge-runtime intent (both apps).
+- BQ — `User.scimExternalId` + index + migration
+  `20260501000000_user_scim_external_id`. `userToScim` emits
+  externalId; filter parser accepts `externalId eq`; GET /Users/[id]
+  accepts platform id OR externalId. PUT/PATCH round-trip externalId.
+  SSO-SETUP.md updated.
+- BR — `Property.displayOrder BIGINT NULL` + migration
+  `20260501010000_property_display_order` + `POST /api/properties/
+  reorder` (admin/manager, rate-limited, audit-logged, transactional).
+  UI: drag-drop on the properties grid mirroring contacts (AG).
+- BS — column customization on the last 4 list pages: showings,
+  open-houses, commissions (Records tab), dialer (call-log tab).
+  Each declares ENTITY_COLUMN_DEFS/DEFAULTS/WIDTHS + uses
+  useColumnPrefs('pai-<entity>-columns-v1', DEFAULTS).
+- BT — filter DSL extended to deals + properties.
+  DEAL_FILTER_SCHEMA (13 fields) + PROPERTY_FILTER_SCHEMA (18 fields)
+  added to FILTER_SCHEMAS registry. /api/deals + /api/properties
+  accept `?filter=<json>`; compile errors → 400; clause AND-wrapped
+  under tenancy guard. 9 schema tests.
+- BU — AdvancedFilterBuilder UI mounted on deals + properties.
+  Filter button next to existing toolbars (chip + rule-count badge);
+  inline Clear pill; saved-views round-trip the spec under
+  filtersJson.advanced.
+- BV — j/k/h/l 2D navigation on the deal kanban (board view).
+  h/l skips empty stage columns; row index clamps to target column's
+  bounds; focused card grows accent ring + tinted halo. Hover updates
+  focus too.
+- BW — SCIM Groups + members + role/sections mapping. New
+  `ScimGroup` + `ScimGroupMembership` Prisma models + migration
+  `20260501020000_scim_groups`. group-mapping.ts handles all three
+  IdP PATCH shapes (Okta add-array, Okta filter-remove, Azure
+  path-less replace). When a user is added to a group with non-null
+  role/dashboardSections, their per-org Membership upserts to those
+  values. 13 mapping tests.
+- BX — admin UI for SCIM group → role mapping at
+  `/settings/scim-groups`. Per-row role select + sections picker
+  (Full-access / Custom toggle); save propagates to every existing
+  member's Membership. Cmd-K palette entry.
+- BY — DeepL passthrough script. `npm run i18n:fill` walks en.json
+  as source of truth, fills missing nl/de/es via DeepL API.
+  Skips ICU plural/select strings. Dry-run by default; --apply
+  writes; --locale=de restricts. 11 helper tests.
+- BZ — drip-campaign dispatcher. `DripEnrollment` model +
+  migration `20260501030000_drip_enrollment`. Pure helpers
+  (lib/philly/drip/steps.ts, parseSteps + dueAtForStep +
+  advanceAfterDelivery + initialDueAt + renderTemplate, 18 tests).
+  `POST /api/cron/drip-dispatch` (CRON_SECRET-auth, batch=100,
+  per-org flag/step/email-account caches, MAX_ATTEMPTS=3-then-pause).
+  `POST/GET/DELETE /api/drip-campaigns/[id]/enroll` (admin/manager,
+  idempotent, soft-cancel). DRIP_CAMPAIGNS re-added to FEATURES.
+- CA — drip enrollment management UI. EnrollmentModal opened from
+  each campaign card. Search + scrollable contact picker;
+  current-enrollments list with status pill, "Step X / N", relative
+  timestamps, lastError chip. Cancel button per active/paused row.
+- CB — removed every pulsing accent dot site-wide. User reported
+  the dots as "still have the cursor tracker" even though Bundle AZ
+  removed the JS mouse-follower. Five stationary CSS-pulse dots
+  identified + JSX removed (LiveSignals + Capacity x2 + Countdown2027
+  x2). CSS rules + @keyframes liveDot deleted. Eyebrow text labels
+  kept.
+- CC — audit fixes for BK–CB (5 must-fix + scimGate dedup).
+  Drip dispatcher attemptCount semantics fix. Drip enroll over-count
+  fix (split upsert). SCIM externalId clearing on PUT. New migration
+  `20260502000000_drip_enrollment_fks` adds cascading FKs to
+  Contact + Organization. `/api/cron/drip-dispatch` registered in
+  vercel.json. scimGate extracted to lib/philly/scim/auth.ts.
+- CD — `scripts/audit-tenant-isolation.ts` recognises
+  authScimRequest pattern + drip-dispatch cron exemption. Was
+  surfacing 3 false-positive findings; now reports clean.
+- CE — `docs/operations/MIRROR-SYNC.md` operator runbook for
+  triggering the DEUS-SHARED partner-repo sync after every bundle.
+- CF — `docs/operations/ONBOARDING.md` for new team members
+  (sales-engineer / customer-success / partner-dev): 10 sections
+  spanning positioning → demo flow → customization → compliance →
+  bundle convention → known gaps → 5 starter PRs (~2,257 words).
+- CG — runtime bug fixes from the post-CF debug audit (5 high-impact
+  C-class bugs). Drip dispatcher idempotency under cron retry
+  (optimistic-concurrency claim before send). EnrollmentModal
+  switched to server-side ?q= search; GET /enroll now joins the
+  contact name/company inline. SCIM Group PATCH `value: null`
+  clears externalId. SCIM PUT no longer un-deletes soft-deleted
+  users on re-sync (parsed.active is now `boolean | undefined`).
+  Drip step DST drift fixed via setUTCDate calendar arithmetic.
+- CH — `docs/operations/GO-LIVE-CHECKLIST.md` operator + DPO + on-
+  call sign-off gate. 9 sections, 60+ items, three severity levels
+  (HARD / SOFT / NICE). Sign-off block captures customer + tenant
+  id + deploy SHA + three signatures.
+
+**Audit history (this branch):**
+- BJ closed 10 findings from a code-review + security-review pass.
+- BN closed a HIGH security finding (AI command-execute privilege
+  escalation) caught by `/security-review`.
+- CC closed 5 must-fix findings from a fresh code-review pass over
+  BK–CB.
+- CD closed 3 false-positive findings from `npm run audit:tenant`.
+- CG closed 5 must-fix findings (C1–C6) from a runtime debug audit.
+- Multiple `/security-review` skill invocations across the branch
+  returned no confidence-≥7 cross-tenant leaks.
+
+**State at HEAD `da21aac`:** 588/588 standalone + 290/290 root tests
+green; both typechecks clean; `audit:tenant` + `audit:chain` both
+clean.
 
 **Bundles AZ–BO (post-AY work, summarised):**
 - AZ — hot-fix pass: LiveSignals `<em>` rendering, vendor-commission stat
