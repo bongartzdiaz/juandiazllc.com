@@ -48,8 +48,8 @@ const SAMPLE_DETAIL_ROUTES = [
   "/work/philly",
   "/sectors/energy",
   "/sectors/real-estate",
-  "/insights/buy-vs-build",
-  "/signals/three-second-rule",
+  "/insights/the-build-vs-buy-trap",
+  "/signals/instruments-not-saas",
 ];
 
 type ConsoleBucket = { errors: string[]; warnings: string[] };
