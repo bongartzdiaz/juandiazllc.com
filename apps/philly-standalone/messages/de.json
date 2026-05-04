@@ -618,7 +618,8 @@
       "selectContact": "Kontakt auswählen",
       "subjectRequired": "Betreff ist erforderlich",
       "createFailed": "Erstellung fehlgeschlagen",
-      "sendFailed": "Senden fehlgeschlagen"
+      "sendFailed": "Senden fehlgeschlagen",
+      "loadMessagesFailed": "Konversation konnte nicht geladen werden"
     }
   },
   "common": {

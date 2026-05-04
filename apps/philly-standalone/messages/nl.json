@@ -618,7 +618,8 @@
       "selectContact": "Selecteer een contact",
       "subjectRequired": "Onderwerp is verplicht",
       "createFailed": "Aanmaken mislukt",
-      "sendFailed": "Verzenden mislukt"
+      "sendFailed": "Verzenden mislukt",
+      "loadMessagesFailed": "Kon dit gesprek niet laden"
     }
   },
   "common": {

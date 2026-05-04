@@ -7,6 +7,8 @@ import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
+import { useToast } from '@/hooks/philly/useToast'
+import { fetchJson } from '@/lib/philly/fetch-json'
 import { Filter, Mail, MessageSquare, Phone, MessageCircle, Clock, Inbox, Send, ArrowLeft, Loader2 } from 'lucide-react'
 
 interface Message {
@@ -83,6 +85,7 @@ export default function InboxPage() {
   const [replyError, setReplyError] = useState<string | null>(null)
 
   const t = useTranslations('inbox')
+  const { addToast } = useToast()
   const threadEndRef = useRef<HTMLDivElement | null>(null)
 
   // Load contact options once for the New Conversation modal
@@ -104,12 +107,17 @@ export default function InboxPage() {
   const loadMessages = useCallback(async (convId: string) => {
     setMessagesLoading(true)
     try {
-      const res = await fetch(`/api/inbox/${convId}/messages`, { cache: 'no-store' })
-      const json = await res.json()
+      // Bundle CJ — fetchJson surfaces non-2xx as a typed error so a
+      // 401 / 500 doesn't silently fall to "[]" and look like an
+      // empty inbox.
+      const json = await fetchJson<{ data: typeof messages }>(`/api/inbox/${convId}/messages`, { cache: 'no-store' })
       setMessages(json.data ?? [])
-    } catch { setMessages([]) }
+    } catch (err) {
+      setMessages([])
+      addToast(err instanceof Error ? err.message : t('toasts.loadMessagesFailed'), 'error')
+    }
     finally { setMessagesLoading(false) }
-  }, [])
+  }, [addToast, t])
 
   // Load messages whenever a conversation is opened
   useEffect(() => {

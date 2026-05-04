@@ -618,7 +618,8 @@
       "selectContact": "Selecciona un contacto",
       "subjectRequired": "El asunto es obligatorio",
       "createFailed": "No se pudo crear",
-      "sendFailed": "No se pudo enviar"
+      "sendFailed": "No se pudo enviar",
+      "loadMessagesFailed": "No se pudo cargar esta conversación"
     }
   },
   "common": {

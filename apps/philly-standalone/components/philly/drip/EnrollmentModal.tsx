@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Modal } from '@/components/philly/ui/Modal'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
@@ -92,11 +92,26 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
   const filtered = contactsQuery.data?.data ?? []
   const enrolledIds = useMemo(() => new Set(enrollments.map((e) => e.contactId)), [enrollments])
 
-  const [busyId, setBusyId] = useState<string | null>(null)
+  // Bundle CJ — Set instead of single string. The previous
+  // `busyId | null` model dropped concurrent enroll clicks
+  // silently: clicking Enroll on contact A then on B before A's
+  // network round-trip resolved would no-op the B click. The
+  // Set lets per-button busy state coexist; UX shows individual
+  // spinners instead of one global lock.
+  const [busy, setBusy] = useState<Set<string>>(new Set())
+  const isBusy = useCallback((id: string) => busy.has(id), [busy])
+  const setBusyFor = useCallback((id: string, on: boolean) => {
+    setBusy((prev) => {
+      const next = new Set(prev)
+      if (on) next.add(id)
+      else next.delete(id)
+      return next
+    })
+  }, [])
 
   async function enroll(contactId: string) {
-    if (!campaignId || busyId) return
-    setBusyId(contactId)
+    if (!campaignId || isBusy(contactId)) return
+    setBusyFor(contactId, true)
     try {
       const res = await fetch(`/api/drip-campaigns/${campaignId}/enroll`, {
         method: 'POST',
@@ -114,14 +129,14 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
     } catch (err) {
       addToast(err instanceof Error ? err.message : 'Network error', 'error')
     } finally {
-      setBusyId(null)
+      setBusyFor(contactId, false)
     }
   }
 
   async function unenroll(contactId: string) {
-    if (!campaignId || busyId) return
+    if (!campaignId || isBusy(contactId)) return
     if (!confirm('Cancel this enrollment? The contact will not receive any further steps.')) return
-    setBusyId(contactId)
+    setBusyFor(contactId, true)
     try {
       const res = await fetch(`/api/drip-campaigns/${campaignId}/enroll?contactId=${encodeURIComponent(contactId)}`, {
         method: 'DELETE',
@@ -137,7 +152,7 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
     } catch (err) {
       addToast(err instanceof Error ? err.message : 'Network error', 'error')
     } finally {
-      setBusyId(null)
+      setBusyFor(contactId, false)
     }
   }
 
@@ -226,17 +241,17 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
                 <button
                   type="button"
                   onClick={() => enroll(c.id)}
-                  disabled={already || busyId === c.id}
+                  disabled={already || isBusy(c.id)}
                   style={{
                     padding: '4px 10px', borderRadius: 6, fontSize: 11, fontWeight: 600,
                     background: already ? 'var(--bg2)' : 'var(--accent)',
                     color: already ? 'var(--txt3)' : '#fff',
                     border: 'none', cursor: already ? 'default' : 'pointer',
                     fontFamily: 'inherit', flexShrink: 0,
-                    opacity: busyId === c.id ? 0.6 : 1,
+                    opacity: isBusy(c.id) ? 0.6 : 1,
                   }}
                 >
-                  {already ? 'Enrolled' : busyId === c.id ? '…' : 'Enroll'}
+                  {already ? 'Enrolled' : isBusy(c.id) ? '…' : 'Enroll'}
                 </button>
               </div>
             )
@@ -335,7 +350,7 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
                 <button
                   type="button"
                   onClick={() => unenroll(e.contactId)}
-                  disabled={busyId === e.contactId}
+                  disabled={isBusy(e.contactId)}
                   title="Cancel enrollment"
                   aria-label="Cancel enrollment"
                   style={{
@@ -343,7 +358,7 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
                     background: 'var(--bg2)', color: 'var(--r-txt)',
                     border: '1px solid var(--border)', cursor: 'pointer',
                     display: 'inline-flex', alignItems: 'center',
-                    opacity: busyId === e.contactId ? 0.5 : 1,
+                    opacity: isBusy(e.contactId) ? 0.5 : 1,
                   }}
                 >
                   <UserMinus size={12} />
