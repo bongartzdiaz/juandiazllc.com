@@ -23,8 +23,15 @@ export interface ParsedFilter {
   active?: boolean
 }
 
+// Bundle CP — bound input length to defang the polynomial regexes
+// below before any backtracking-prone match runs. Realistic SCIM
+// filters from Okta / Azure / OneLogin are <512 chars; anything
+// longer is either malicious padding or a misconfigured client.
+const MAX_FILTER_LENGTH = 1024
+
 export function parseScimFilter(raw: string | null | undefined): ParsedFilter | null {
   if (!raw) return {}
+  if (raw.length > MAX_FILTER_LENGTH) return null
   const filter = raw.trim()
   if (!filter) return {}
 

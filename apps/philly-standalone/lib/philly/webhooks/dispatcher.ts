@@ -20,6 +20,9 @@ interface DispatchOptions {
 }
 
 function sign(body: string, secret: string): string {
+  // codeql[js/insufficient-password-hash] — HMAC-SHA-256 is the
+  // industry standard for webhook signature verification (Stripe,
+  // GitHub, Slack). Not a password hash.
   return crypto.createHmac('sha256', secret).update(body).digest('hex')
 }
 

@@ -68,7 +68,13 @@ export async function PATCH(req: NextRequest) {
   if (typeof body.name === 'string' && body.name.trim()) data.name = body.name.trim()
   if (typeof body.email === 'string' && body.email.trim()) {
     const email = body.email.trim().toLowerCase()
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return jsonError('Invalid email', 400)
+    // Bundle CP — bounded quantifiers + max-length pre-check defang
+    // the original `[^\s@]+@[^\s@]+\.[^\s@]+` against ReDoS on padded
+    // input like `!@!.` × N. RFC 5321 caps local-part at 64 and the
+    // full address at 254, so 320 is a safe upper bound here.
+    if (email.length > 320 || !/^[^\s@]{1,64}@[^\s@]{1,253}\.[^\s@]{1,63}$/.test(email)) {
+      return jsonError('Invalid email', 400)
+    }
     data.email = email
   }
   if (typeof body.locale === 'string' && ['en', 'nl'].includes(body.locale)) data.locale = body.locale

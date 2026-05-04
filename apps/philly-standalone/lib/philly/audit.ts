@@ -148,13 +148,21 @@ export async function logAudit({
  * Computes a JSON diff between an old and new record.
  * Only includes fields that actually changed.
  */
+// Bundle CP — prototype-pollution defence. `newInput` can ultimately
+// originate from request bodies; refusing to copy `__proto__` /
+// `constructor` / `prototype` keys removes the only path by which
+// a hostile payload could mutate Object.prototype through the
+// downstream JSON serialiser.
+const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype'])
+
 export function diffChanges(
   oldRecord: Record<string, unknown>,
   newInput: Record<string, unknown>,
 ): Record<string, { old: unknown; new: unknown }> | undefined {
-  const diff: Record<string, { old: unknown; new: unknown }> = {}
+  const diff: Record<string, { old: unknown; new: unknown }> = Object.create(null)
 
   for (const key of Object.keys(newInput)) {
+    if (FORBIDDEN_KEYS.has(key)) continue
     const oldVal = oldRecord[key]
     const newVal = newInput[key]
 

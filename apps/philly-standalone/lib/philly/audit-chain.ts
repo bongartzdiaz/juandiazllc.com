@@ -72,5 +72,7 @@ export function computeAuditHash(prevHash: string | null, row: AuditChainRow): s
     createdAt: row.createdAt.toISOString(),
   })
   const input = (prevHash ?? '') + '|' + canonical
+  // codeql[js/insufficient-password-hash] — chain integrity hash, not a
+  // password. SHA-256 is the standard for tamper-evident logs.
   return createHash('sha256').update(input).digest('hex')
 }

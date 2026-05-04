@@ -116,6 +116,17 @@ export async function sendEmail(
   }
 }
 
+// Bundle CP — produces plain-text fallback for the `text/plain` MIME
+// part of the email. Output is NEVER reinterpreted as HTML, so the
+// "incomplete sanitization" finding from CodeQL is informational
+// only. Two-pass strip handles the `<scrip<script>t>`-style nesting
+// that would otherwise leave `<script>` reassembled after one pass.
 function stripHtml(html: string): string {
-  return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+  let out = html
+  let prev = ''
+  while (out !== prev) {
+    prev = out
+    out = out.replace(/<[^>]*>?/g, '')
+  }
+  return out.replace(/\s+/g, ' ').trim()
 }

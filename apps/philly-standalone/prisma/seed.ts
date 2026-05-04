@@ -53,7 +53,10 @@ async function main() {
       organizationId: org.id,
     },
   })
-  console.log(`  admin: ${admin.email} / ${ADMIN_PASSWORD}`)
+  // Bundle CP — don't echo the password to stdout. Operator already
+  // knows it (they set SEED_ADMIN_PASSWORD); printing it back risks
+  // shell-history capture, log shipping, terminal scrollback.
+  console.log(`  admin: ${admin.email} / [password set from SEED_ADMIN_PASSWORD env var]`)
 
   // 3. Sample contacts
   const contactSeed = [
@@ -310,7 +313,7 @@ async function main() {
 
   console.log('\nSeed complete.')
   console.log(`\nLogin:  ${ADMIN_EMAIL}`)
-  console.log(`Pass:   ${ADMIN_PASSWORD}\n`)
+  console.log(`Pass:   [as set in SEED_ADMIN_PASSWORD env var]\n`)
 }
 
 main()

@@ -254,6 +254,13 @@ export default function SettingsPage() {
 
   useEffect(() => {
     try {
+      // Bundle CP — known limitation flagged by CodeQL. This UI is a
+      // demo/setup screen that round-trips API tokens via localStorage
+      // for the sample integrations panel; production tenants should
+      // wire each integration through `/api/integrations` (the real
+      // Integration model encrypts secrets at rest via Bundle N's
+      // INTEGRATION_SECRET key). Tracked as a deferred follow-up in
+      // CLAUDE.md ("API keys settings UI → server-side store").
       const stored = localStorage.getItem('pai-api-keys')
       if (stored) setApiValues(JSON.parse(stored))
     } catch { /* ignore */ }

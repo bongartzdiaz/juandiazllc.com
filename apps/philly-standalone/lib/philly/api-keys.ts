@@ -18,11 +18,16 @@ const KEY_PREFIX = 'pk_'
 export function generateApiKey(): { raw: string; hash: string; prefix: string } {
   const body = crypto.randomBytes(24).toString('hex') // 48 chars
   const raw = KEY_PREFIX + body
+  // codeql[js/insufficient-password-hash] — fast hash is correct for
+  // 192-bit random API keys (Stripe/GitHub pattern). Bcrypt/argon2 is
+  // for low-entropy human passwords; brute-forcing a 192-bit secret
+  // is computationally infeasible regardless of hash speed.
   const hash = crypto.createHash('sha256').update(raw).digest('hex')
   return { raw, hash, prefix: raw.slice(0, 12) }
 }
 
 function hashKey(raw: string): string {
+  // codeql[js/insufficient-password-hash] — see generateApiKey above.
   return crypto.createHash('sha256').update(raw).digest('hex')
 }
 
