@@ -18,6 +18,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:install": "playwright install chromium --with-deps",
+    "check:dead": "knip --no-exit-code",
+    "check:dead:strict": "knip",
     "analyze": "ANALYZE=true prisma generate && ANALYZE=true next build --no-turbopack",
     "db:deploy": "prisma migrate deploy"
   },
@@ -63,6 +65,7 @@
     "@vitest/coverage-v8": "^4.1.4",
     "eslint": "^9",
     "eslint-config-next": "^16.2.4",
+    "knip": "^6.11.0",
     "tailwindcss": "^4.2.2",
     "tsx": "^4.19.2",
     "typescript": "^5",

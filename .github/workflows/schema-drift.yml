@@ -1,0 +1,34 @@
+name: Schema drift
+
+# Bundle CO — fails if a PR edits prisma/schema.prisma without
+# adding a matching migration file. Catches the "schema in HEAD
+# doesn't match what `migrate deploy` would apply" surprise that
+# would otherwise hit the next operator running migrations.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "prisma/schema.prisma"
+      - "apps/**/prisma/schema.prisma"
+      - "**/prisma/migrations/**"
+      - "scripts/check-schema-drift.sh"
+      - ".github/workflows/schema-drift.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  drift:
+    name: Check schema vs migrations parity
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Need full history for `git merge-base` against main.
+          fetch-depth: 0
+
+      - name: Run schema-drift check
+        run: bash scripts/check-schema-drift.sh "origin/${{ github.base_ref }}"

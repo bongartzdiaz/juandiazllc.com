@@ -1,0 +1,42 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "app/**/page.tsx",
+    "app/**/layout.tsx",
+    "app/**/route.ts",
+    "app/**/loading.tsx",
+    "app/**/error.tsx",
+    "app/**/not-found.tsx",
+    "app/**/opengraph-image.tsx",
+    "app/**/sitemap.ts",
+    "app/**/robots.ts",
+    "app/**/manifest.ts",
+    "instrumentation.ts",
+    "next.config.ts",
+    "next.config.js",
+    "tailwind.config.{js,ts}",
+    "postcss.config.{js,mjs}",
+    "vitest.config.{js,ts}",
+    "prisma/seed.ts",
+    "scripts/**/*.{js,ts}",
+    "**/*.test.{ts,tsx}"
+  ],
+  "project": [
+    "**/*.{js,ts,tsx}",
+    "!.next/**",
+    "!node_modules/**",
+    "!coverage/**"
+  ],
+  "ignoreDependencies": [
+    "@prisma/dev",
+    "tailwindcss",
+    "postcss",
+    "autoprefixer"
+  ],
+  "ignoreBinaries": [
+    "next",
+    "prisma",
+    "tsc",
+    "vitest"
+  ]
+}

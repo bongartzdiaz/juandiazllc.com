@@ -13,6 +13,8 @@
     "test:watch": "vitest",
     "audit:tenant": "tsx scripts/audit-tenant-isolation.ts",
     "audit:chain": "tsx scripts/verify-audit-chain.ts",
+    "check:dead": "knip --no-exit-code",
+    "check:dead:strict": "knip",
     "db:slow": "tsx scripts/db-slow-queries.ts",
     "i18n:fill": "tsx scripts/i18n-fill-missing.ts",
     "pii:backfill": "tsx scripts/encrypt-contact-notes.ts",
@@ -66,6 +68,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "^16.2.4",
+    "knip": "^6.11.0",
     "tsx": "^4.19.2",
     "typescript": "^5",
     "vitest": "^3.2.4"
