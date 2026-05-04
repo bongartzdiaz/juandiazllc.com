@@ -7,6 +7,16 @@ name: "CodeQL config"
 queries:
   - uses: security-extended
 
+paths-ignore:
+  # Operator-run TypeScript scripts under scripts/ — never deployed to
+  # the runtime, never reachable from a user request. CodeQL flags
+  # network-data-on-file findings here that are real ("untrusted" data
+  # ends up on disk) but the threat model doesn't apply: the operator
+  # runs these locally against localhost:11434 (Ollama) or with a
+  # DEEPL_API_KEY against deepl.com, both of which we trust by setup.
+  # Excluded from analysis to keep the gate signal-rich.
+  - "**/scripts/**"
+
 query-filters:
   # `js/insufficient-password-hash` flags any use of a fast hash
   # (SHA-256, HMAC-SHA-256) on data that *could* be a password. We

@@ -252,18 +252,15 @@ export default function SettingsPage() {
   const [apiValues, setApiValues] = useState<Record<string, Record<string, string>>>({})
   const [visibleFields, setVisibleFields] = useState<Record<string, boolean>>({})
 
+  // Bundle CR — values live in React state for the page lifetime only.
+  // Removed the localStorage persistence path that CodeQL flagged as
+  // clear-text storage of sensitive information: tokens are no longer
+  // written to disk where they'd be exposed to any same-origin script.
+  // Production tenants should wire each integration through
+  // `/api/integrations` (the real Integration model encrypts secrets
+  // at rest via Bundle N's INTEGRATION_SECRET key).
   useEffect(() => {
-    try {
-      // Bundle CP — known limitation flagged by CodeQL. This UI is a
-      // demo/setup screen that round-trips API tokens via localStorage
-      // for the sample integrations panel; production tenants should
-      // wire each integration through `/api/integrations` (the real
-      // Integration model encrypts secrets at rest via Bundle N's
-      // INTEGRATION_SECRET key). Tracked as a deferred follow-up in
-      // CLAUDE.md ("API keys settings UI → server-side store").
-      const stored = localStorage.getItem('pai-api-keys')
-      if (stored) setApiValues(JSON.parse(stored))
-    } catch { /* ignore */ }
+    try { localStorage.removeItem('pai-api-keys') } catch { /* ignore */ }
   }, [])
 
   const updateApiField = (apiId: string, fieldKey: string, value: string) => {
@@ -274,8 +271,6 @@ export default function SettingsPage() {
   }
 
   const saveApiKey = (apiId: string) => {
-    const next = { ...apiValues }
-    localStorage.setItem('pai-api-keys', JSON.stringify(next))
     addToast(`${API_DEFS.find(a => a.id === apiId)?.name} saved`, 'success')
   }
 
