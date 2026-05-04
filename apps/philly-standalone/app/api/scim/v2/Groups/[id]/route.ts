@@ -256,13 +256,16 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
   const beforeSet = new Set(before.map((m) => m.userId))
 
   await prisma.$transaction(async (tx) => {
-    // Group-attribute updates first.
-    if (merged.setDisplayName || merged.setExternalId) {
+    // Group-attribute updates first. Bundle CG — use !== undefined so
+    // an explicit null on setExternalId clears the column (RFC 7644
+    // PATCH-replace value:null semantics) instead of being dropped
+    // by a falsy check.
+    if (merged.setDisplayName !== undefined || merged.setExternalId !== undefined) {
       await tx.scimGroup.update({
         where: { id },
         data: {
-          ...(merged.setDisplayName ? { displayName: merged.setDisplayName } : {}),
-          ...(merged.setExternalId ? { scimExternalId: merged.setExternalId } : {}),
+          ...(merged.setDisplayName !== undefined ? { displayName: merged.setDisplayName } : {}),
+          ...(merged.setExternalId !== undefined ? { scimExternalId: merged.setExternalId } : {}),
         },
       })
     }

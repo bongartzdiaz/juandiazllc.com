@@ -21,8 +21,6 @@
    delivery is delayed by a transient provider error.
    --------------------------------------------------------------- */
 
-const MS_PER_DAY = 24 * 60 * 60 * 1000
-
 export interface DripStep {
   day: number
   channel: 'email' | 'sms'
@@ -63,9 +61,17 @@ export function parseSteps(json: unknown): DripStep[] {
 }
 
 /** Compute the firing time for a given step relative to the
- *  enrollment time. */
+ *  enrollment time. Bundle CG — uses calendar-day arithmetic via
+ *  setUTCDate() instead of fixed 86,400,000 ms math, so a step
+ *  scheduled "7 days after enrollment" still fires at the same
+ *  UTC clock time across DST boundaries. (Local-time DST drift
+ *  in the operator's timezone is unavoidable without a TZ-aware
+ *  date library; UTC stability is the strongest guarantee we can
+ *  make without that dependency.) */
 export function dueAtForStep(enrolledAt: Date, step: DripStep): Date {
-  return new Date(enrolledAt.getTime() + step.day * MS_PER_DAY)
+  const d = new Date(enrolledAt.getTime())
+  d.setUTCDate(d.getUTCDate() + step.day)
+  return d
 }
 
 export interface AdvanceResult {

@@ -39,6 +39,10 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
       id: true, contactId: true, status: true,
       lastStepIndex: true, nextDueAt: true, lastDeliveredAt: true,
       lastError: true, attemptCount: true, createdAt: true,
+      // Bundle CG — return contact name/email inline so the
+      // EnrollmentModal doesn't need a parallel /api/contacts
+      // pre-fetch (which was silently capped at MAX_LIMIT=200).
+      contact: { select: { name: true, company: true } },
     },
   })
   return NextResponse.json({ data: enrollments })

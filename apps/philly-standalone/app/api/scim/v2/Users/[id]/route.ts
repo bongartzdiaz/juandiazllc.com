@@ -98,9 +98,14 @@ export async function PUT(req: NextRequest, ctx: RouteCtx) {
       // the payload must clear the column. parseScimUserInput
       // already coerces missing → null. Bundle CC audit fix.
       scimExternalId: parsed.externalId,
+      // Bundle CG — only mutate deletion state when active is
+      // explicit. Omitted active leaves the existing flag alone, so
+      // a re-sync PUT doesn't undelete a previously-soft-deleted user.
       ...(parsed.active === false
-        ? { deletionScheduledAt: existing.id ? new Date() : null }
-        : { deletionScheduledAt: null, tokensInvalidAfter: null }),
+        ? { deletionScheduledAt: new Date() }
+        : parsed.active === true
+          ? { deletionScheduledAt: null, tokensInvalidAfter: null }
+          : {}),
     },
     select: SELECT,
   })

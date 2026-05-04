@@ -111,7 +111,10 @@ export interface MemberDiff {
   replace?: string[]
   /** Mutations to non-member group attributes (displayName etc.). */
   setDisplayName?: string
-  setExternalId?: string
+  /** string = set to that value; null = clear the column (RFC 7644
+   *  PATCH-replace value:null semantics); undefined = no change.
+   *  Bundle CG. */
+  setExternalId?: string | null
 }
 
 const MEMBER_FILTER_RE = /^members\[\s*value\s+eq\s+"([^"]*)"\s*\]$/
@@ -152,6 +155,7 @@ export function parseGroupPatchOp(
     const v = op.value as Record<string, unknown>
     if (typeof v.displayName === 'string') diff.setDisplayName = v.displayName
     if (typeof v.externalId === 'string') diff.setExternalId = v.externalId
+    else if (v.externalId === null) diff.setExternalId = null  // explicit clear (Bundle CG)
     if (Array.isArray(v.members)) {
       const ids: string[] = []
       for (const m of v.members) {
@@ -171,8 +175,16 @@ export function parseGroupPatchOp(
     return diff
   }
   if (op.op === 'replace' && path === 'externalId') {
-    if (typeof op.value !== 'string') return { error: 'externalId must be a string' }
-    diff.setExternalId = op.value
+    // Bundle CG — accept explicit null to clear the column. RFC 7644
+    // PATCH-replace with `value: null` is the canonical "remove this
+    // attribute" form for nullable single-valued attributes.
+    if (op.value === null) {
+      diff.setExternalId = null
+    } else if (typeof op.value === 'string') {
+      diff.setExternalId = op.value
+    } else {
+      return { error: 'externalId must be a string or null' }
+    }
     return diff
   }
 

@@ -72,7 +72,13 @@ export function userToScim(
 export interface ScimUserCreateInput {
   email: string
   name: string
-  active: boolean
+  /** Bundle CG — preserve `undefined` distinct from `true`/`false` so
+   *  PUT routes can leave `deletionScheduledAt` untouched when the
+   *  IdP omits `active` in a re-sync payload. The previous behaviour
+   *  (default to `true`) silently un-deleted users that had been
+   *  SCIM-DELETE'd, because IdPs don't always re-send `active: true`
+   *  on a routine re-sync. */
+  active: boolean | undefined
   externalId: string | null
 }
 
@@ -118,7 +124,10 @@ export function parseScimUserInput(body: unknown): ScimUserCreateInput {
     }
   }
 
-  const active = b.active === undefined ? true : Boolean(b.active)
+  // Distinguish "omitted" from "true". Omitted = leave deletion state
+  // untouched; explicit true = active; explicit false = deactivate.
+  const active: boolean | undefined =
+    b.active === undefined ? undefined : Boolean(b.active)
   const externalId = typeof b.externalId === 'string' ? b.externalId : null
 
   return { email, name: resolvedName, active, externalId }

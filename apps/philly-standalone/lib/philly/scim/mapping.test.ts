@@ -47,9 +47,18 @@ describe('parseScimUserInput', () => {
     expect(result.email).toBe('first@example.com')
   })
 
-  it('defaults active to true when omitted', () => {
+  it('preserves undefined when active is omitted (Bundle CG)', () => {
+    // Distinguish "omitted" from "true" so PUT routes can leave
+    // deletionScheduledAt untouched on a re-sync that doesn't carry
+    // active. Previously this returned `true` and silently undeleted
+    // soft-deleted users.
     const result = parseScimUserInput({ userName: 'd@x.com' })
-    expect(result.active).toBe(true)
+    expect(result.active).toBeUndefined()
+  })
+
+  it('coerces explicit true / false', () => {
+    expect(parseScimUserInput({ userName: 't@x.com', active: true }).active).toBe(true)
+    expect(parseScimUserInput({ userName: 'f@x.com', active: false }).active).toBe(false)
   })
 
   it('captures externalId when present', () => {

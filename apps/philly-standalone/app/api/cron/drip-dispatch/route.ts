@@ -51,6 +51,7 @@ interface EnrollmentRow {
   lastStepIndex: number
   attemptCount: number
   createdAt: Date
+  nextDueAt: Date | null
 }
 
 interface DispatchSummary {
@@ -140,6 +141,7 @@ export async function POST(req: NextRequest) {
       lastStepIndex: true,
       attemptCount: true,
       createdAt: true,
+      nextDueAt: true, // Bundle CG — optimistic-concurrency guard.
     },
   })
 
@@ -223,6 +225,23 @@ export async function POST(req: NextRequest) {
     }
     const emailAccountId = emailAccountCache.get(e.organizationId)!
 
+    // Bundle CG — claim the row BEFORE sending so a concurrent cron
+    // run (Vercel retry, region failover, or operator-triggered
+    // workflow_dispatch overlapping the schedule) can't double-send.
+    // updateMany returns count: 0 when the WHERE optimistic guard
+    // doesn't match — meaning another runner already advanced this
+    // row. We skip the send entirely in that case.
+    const claim = await prisma.dripEnrollment.updateMany({
+      where: { id: e.id, nextDueAt: e.nextDueAt, status: 'active' },
+      data: { nextDueAt: null }, // null = "in flight"; gets restored below.
+    })
+    if (claim.count === 0) {
+      logger.info('[drip] skipped — claimed by another runner', {
+        enrollmentId: e.id,
+      })
+      continue
+    }
+
     const result = await dispatchOne(prisma, e, camp.steps, contact, emailAccountId)
     if (result.ok) {
       const advance = advanceAfterDelivery(e.lastStepIndex, camp.steps, e.createdAt)
@@ -249,7 +268,11 @@ export async function POST(req: NextRequest) {
         data: {
           attemptCount: newAttempts,
           lastError: result.error ?? 'unknown error',
-          ...(exhausted ? { status: 'paused' } : {}),
+          // Restore nextDueAt so the next cron run picks this up
+          // again. If exhausted, pause the row (no more retries).
+          // Bundle CG — paired with the optimistic-concurrency
+          // claim above.
+          ...(exhausted ? { status: 'paused', nextDueAt: null } : { nextDueAt: e.nextDueAt }),
         },
       })
       summary.failed += 1

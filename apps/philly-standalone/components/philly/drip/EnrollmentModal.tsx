@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { Modal } from '@/components/philly/ui/Modal'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
+import { useDebouncedValue } from '@/hooks/philly/useDebouncedValue'
 import { Search, X, UserMinus, AlertCircle, Clock, CheckCircle2, Pause } from 'lucide-react'
 
 /* Bundle CA — operator UI for enrolling / unenrolling contacts in
@@ -21,6 +22,9 @@ interface EnrollmentRow {
   lastError: string | null
   attemptCount: number
   createdAt: string
+  // Bundle CG — server returns the joined contact so the modal
+  // doesn't need a separate /api/contacts pre-fetch.
+  contact?: { name: string; company: string } | null
 }
 
 interface ContactOption {
@@ -71,23 +75,22 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
   )
   const enrollments = enrollmentsQuery.data?.data ?? []
 
-  // Contacts dropdown. Big-fetch since the API is paginated to 500.
-  const contactsQuery = useApi<{ data: ContactOption[] }>(
-    open ? '/contacts?limit=500' : '',
-    { enabled: open },
-  )
-  const allContacts = contactsQuery.data?.data ?? []
-  const enrolledIds = useMemo(() => new Set(enrollments.map((e) => e.contactId)), [enrollments])
-
+  // Bundle CG — server-side search (was client-side over a 500-item
+  // pre-fetch which got silently truncated to 200 by the contacts
+  // API's MAX_LIMIT). Empty query returns the first page (50 by
+  // default); a non-empty query goes through ?q= which honours the
+  // blind-index hash for email/phone exact-match.
   const [search, setSearch] = useState('')
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    if (!q) return allContacts.slice(0, 50)
-    return allContacts.filter((c) => {
-      const name = (c.name ?? `${c.firstName ?? ''} ${c.lastName ?? ''}`).toLowerCase()
-      return name.includes(q) || (c.email ?? '').toLowerCase().includes(q)
-    }).slice(0, 50)
-  }, [allContacts, search])
+  const debouncedSearch = useDebouncedValue(search, 250)
+  const contactsQueryUrl = useMemo(() => {
+    if (!open) return ''
+    const params = new URLSearchParams({ limit: '50' })
+    if (debouncedSearch.trim()) params.set('q', debouncedSearch.trim())
+    return `/contacts?${params.toString()}`
+  }, [open, debouncedSearch])
+  const contactsQuery = useApi<{ data: ContactOption[] }>(contactsQueryUrl, { enabled: open })
+  const filtered = contactsQuery.data?.data ?? []
+  const enrolledIds = useMemo(() => new Set(enrollments.map((e) => e.contactId)), [enrollments])
 
   const [busyId, setBusyId] = useState<string | null>(null)
 
@@ -138,11 +141,16 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
     }
   }
 
-  function contactLabel(contactId: string): string {
-    const c = allContacts.find((x) => x.id === contactId)
-    if (!c) return contactId.slice(0, 8) + '…'
-    const name = c.name ?? `${c.firstName ?? ''} ${c.lastName ?? ''}`.trim()
-    return name || c.email || contactId.slice(0, 8) + '…'
+  // Bundle CG — read the inline contact relation returned by GET
+  // /api/drip-campaigns/[id]/enroll. Falls back to id-prefix when
+  // the row was somehow stored without a contact (shouldn't happen
+  // with the FK in place, but defensive).
+  function contactLabel(e: EnrollmentRow): string {
+    const name = e.contact?.name?.trim()
+    if (name) return name
+    const company = e.contact?.company?.trim()
+    if (company) return company
+    return e.contactId.slice(0, 8) + '…'
   }
 
   return (
@@ -275,7 +283,7 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
             >
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--txt)', marginBottom: 2 }}>
-                  {contactLabel(e.contactId)}
+                  {contactLabel(e)}
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--txt3)', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                   <span>
