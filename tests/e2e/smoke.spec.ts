@@ -61,12 +61,10 @@ function attachConsoleBucket(page: Page): ConsoleBucket {
   const bucket: ConsoleBucket = { errors: [], warnings: [] };
   const onMsg = (msg: ConsoleMessage) => {
     const text = msg.text();
-    // Sentry breadcrumbs + fonts.googleapis + plausible beacons log
-    // "warning" level during dev; ignore those to keep the signal
-    // focused on real failures.
-    if (msg.type() === "error" && !isIgnorableConsoleMessage(text)) {
+    const url = msg.location()?.url ?? "";
+    if (msg.type() === "error" && !isIgnorableConsoleMessage(text, url)) {
       bucket.errors.push(text);
-    } else if (msg.type() === "warning" && !isIgnorableConsoleMessage(text)) {
+    } else if (msg.type() === "warning" && !isIgnorableConsoleMessage(text, url)) {
       bucket.warnings.push(text);
     }
   };
@@ -77,7 +75,29 @@ function attachConsoleBucket(page: Page): ConsoleBucket {
   return bucket;
 }
 
-function isIgnorableConsoleMessage(text: string): boolean {
+// Hosts whose console-logged "Failed to load resource" / 429 / SSL
+// errors are environmental noise from CI's network, not regressions
+// in our app. Keep this list narrow — anything not on it should still
+// trip the assertion.
+const EXTERNAL_NOISE_HOSTS = [
+  "plausible.io",
+  "fonts.googleapis.com",
+  "fonts.gstatic.com",
+  "sentry.io",
+  "ingest.sentry.io",
+];
+
+function isIgnorableConsoleMessage(text: string, url = ""): boolean {
+  // Filter by location URL first — Chrome's "Failed to load resource"
+  // message doesn't include the host in the body text, only in the
+  // location field. Without this check, a 429 on a Plausible beacon
+  // would slip past the text-substring filter below.
+  if (url) {
+    const host = (() => { try { return new URL(url).host; } catch { return ""; } })();
+    if (EXTERNAL_NOISE_HOSTS.some((h) => host === h || host.endsWith("." + h))) {
+      return true;
+    }
+  }
   const noise = [
     "Download the React DevTools",
     "next-dev",
