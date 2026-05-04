@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi, type MockInstance } from 'vitest'
 
 describe('logger — secret redaction', () => {
   const originalEnv = process.env.NODE_ENV
   const originalLevel = process.env.LOG_LEVEL
-  let outSpy: ReturnType<typeof vi.spyOn>
-  let errSpy: ReturnType<typeof vi.spyOn>
+  let outSpy: MockInstance
+  let errSpy: MockInstance
 
   beforeEach(() => {
     // Force prod mode so the logger emits JSON (easier to assert on)
