@@ -34,7 +34,12 @@ juandiazllc.com commit.
 4. **Branch**: `claude/ai-command-bar` (or whichever branch you just pushed)
 5. **Target branch on DEUS-SHARED**: `main` (default; change only for
    special-case staging)
-6. Click the green **Run workflow** button
+6. **Optional note**: a one-line summary of *why* this sync is happening
+   (e.g. `Bundle CT — closes the last CodeQL thread`). If supplied, it
+   lands in both the DEUS-SHARED commit message and the workflow run's
+   Step Summary, so future audits can map intent → SHA without reading
+   bundle history.
+7. Click the green **Run workflow** button
 
 The job:
 - Checks out the source repo at the chosen branch.

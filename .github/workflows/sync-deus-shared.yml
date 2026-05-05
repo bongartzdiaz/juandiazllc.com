@@ -34,6 +34,11 @@ on:
         required: false
         default: "main"
         type: string
+      note:
+        description: "Optional one-line note (lands in the DEUS-SHARED commit message — useful for blame/audit)"
+        required: false
+        default: ""
+        type: string
 
 concurrency:
   # Don't let two syncs race against the same target branch.
@@ -97,18 +102,32 @@ jobs:
 
           SOURCE_SHA="${{ github.sha }}"
           SHORT_SHA="${SOURCE_SHA:0:7}"
+          NOTE="${{ github.event.inputs.note }}"
           git add -A
-          git commit -m "sync from juandiazllc.com monorepo (${SHORT_SHA})
-
-          Source: https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}/apps/philly-standalone
-          Triggered by: ${{ github.actor }} via workflow_dispatch
-          Build state at source SHA: 55/55 routes compile, 0 errors."
+          # Build the commit body — appends the operator's note when one
+          # was supplied at workflow_dispatch time so future blame on the
+          # DEUS-SHARED side has the bundle / reason inline.
+          {
+            echo "sync from juandiazllc.com monorepo (${SHORT_SHA})"
+            echo
+            echo "Source: https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}/apps/philly-standalone"
+            echo "Triggered by: ${{ github.actor }} via workflow_dispatch"
+            if [[ -n "${NOTE}" ]]; then
+              echo "Note: ${NOTE}"
+            fi
+          } > /tmp/commit-msg.txt
+          git commit -F /tmp/commit-msg.txt
           git push origin "${{ github.event.inputs.target_branch }}"
 
       - name: Summary
         if: always()
+        env:
+          NOTE: ${{ github.event.inputs.note }}
         run: |
           echo "### Sync result" >> "$GITHUB_STEP_SUMMARY"
           echo "- Source: \`${{ github.repository }}@${{ github.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Target: \`bongartzdiaz/DEUS-SHARED\` branch \`${{ github.event.inputs.target_branch }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Status: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+          if [[ -n "${NOTE}" ]]; then
+            echo "- Note: ${NOTE}" >> "$GITHUB_STEP_SUMMARY"
+          fi
