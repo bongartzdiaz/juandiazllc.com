@@ -1,6 +1,6 @@
 # Memory — pickup-tomorrow quick-reference
 
-Last touched: **2026-05-04**, end of Bundle CH.
+Last touched: **2026-05-05**, end of Bundle CV (session 2).
 
 If you are picking this project up after a break, read this file
 first, then `JOURNEY.md` for context, then `CLAUDE.md` for the full
@@ -13,16 +13,87 @@ session log.
 | Item | State |
 | ---- | ----- |
 | Current branch | `claude/ai-command-bar` |
-| Branch HEAD | `da21aac` (Bundle CH) |
+| Branch HEAD | `c7c01d7` (Bundle CV — pricing page) |
 | Production branch | `main` (NOT yet updated — PR #10 open, awaiting merge) |
 | PR #10 | <https://github.com/bongartzdiaz/juandiazllc.com/pull/10> — description rewritten to reflect launch-release scope |
-| Test counts | 588/588 standalone + 290/290 root, both green |
+| Test counts | 617/617 standalone + 290/290 root, both green |
 | Typechecks | clean on both apps |
 | `npm run audit:tenant` | clean |
 | `npm run audit:chain` | ready (run daily in production) |
-| DEUS-SHARED mirror | **stale** — not yet synced past Bundle BO |
+| `npm run check:dead` (knip) | 0 unused-files findings on both trees |
+| `npm audit --audit-level=high` | clean on both apps |
+| **CodeQL** | **0 unresolved findings on PR #10 as of CT** |
+| Lighthouse perf prep | done (Bundle CS step 5 — preloader 1200→700ms, hero reveal 1.2→0.7s, world-110m.json preload) |
+| DEUS-SHARED mirror | **stale** — never synced; needs DEUS_SHARED_PAT secret + first run |
 | Vercel production | unchanged from pre-BA — PR not merged |
 | Vercel preview | builds on every push to `claude/ai-command-bar` |
+
+---
+
+## Bundles shipped this session (2026-05-05)
+
+In dependency order:
+
+- **CI** (prior session) — JOURNEY.md + MEMORY.md established
+- **CJ–CK** (prior session) — fetchJson sweep, busyId Set
+- **CM** (prior session) — SCIM Group PUT semantics + erasure cron-overlap
+- **CN** — six commits closing the smoke-test failure cascade:
+  Supabase middleware no-op when env vars empty, Vitest 4 MockInstance
+  type fix, smoke spec slug fixes (the/-build-vs-buy-trap +
+  instruments-not-saas), `page.route('**/*', ...)` external-host block
+  in smoke (eliminates plausible/font-CDN flakes), npm `overrides`
+  pin for postcss + @hono/node-server.
+- **CO** — three new CI gates: `.github/workflows/codeql.yml` (PR +
+  push + weekly cron), `.github/workflows/dead-code.yml` (knip,
+  --no-exit-code mode), `.github/workflows/schema-drift.yml` (git-diff
+  schema vs migrations parity check).
+- **CP** — closure of 18 CodeQL findings: ReDoS bounds (scim/filter,
+  template renderer, /api/me email validator), log injection in
+  /api/csp-report (new sanitizeLogField), HTML-strip robustness on
+  email/send + tools/page, prototype-pollution defence in
+  audit.diffChanges, seed.ts password redaction; 3 false positives
+  suppressed.
+- **CQ** — mirror CP fixes to root parallel tree (lib/philly + app/
+  philly), .github/codeql/codeql-config.yml excluding js/insufficient-
+  password-hash with documented rationale, rag.ts TOCTOU fix via
+  fs.open + fh.stat + fh.readFile.
+- **CR** — drives CodeQL findings to zero: audit.ts diffChanges
+  refactor (Map → Object.fromEntries breaks the taint analysis),
+  remove localStorage secret writes from settings page (both trees),
+  encodeURIComponent on pageSlug href, scripts/** paths-ignore.
+- **CS** — review-fix pass: deceptive Save toast fixed (info-toast
+  saying "configured in this session only"), trimmed unmatched knip
+  entry patterns + paths-ignore for framework-required files,
+  rewrote csp-report sanitize regex with RegExp constructor + Unicode
+  escapes (was binary in git), 32 new unit tests for the new security
+  guards (audit.test.ts, sanitize-log-field.test.ts, +2 cases on
+  filter.test.ts), **deleted 24 dead files** (knip cleanup deferred
+  since BO), removed 3 unused deps (@types/bcryptjs, mariadb,
+  world-atlas), added 3 missing deps (geojson, @types/topojson-
+  specification, **next-intl in standalone** — was hoisting from
+  root, would have broken DEUS-SHARED's independent npm install),
+  Lighthouse perf pass (preloader, hero reveal, TopoJSON preload).
+- **CT** — close the only remaining unresolved review thread:
+  console.warn(msg, e) in csp-report → console.warn('%s', msg, e)
+  to defang format-string injection.
+- **CU** — sync-deus-shared.yml workflow gets an optional `note`
+  input; lands in the DEUS-SHARED commit message body and the source-
+  side Step Summary so future audits map intent → SHA without reading
+  bundle history.
+- **CV** — pricing page (`/[locale]/pricing`) with three priced tiers
+  (Operator €49 / Team €199 / Business €599) + Enterprise contact-us;
+  i18n on all 4 locales (~232 dict entries), getPricingFaq helper
+  with 6 Q&A per locale, footer + sitemap updated, CSS in globals.css
+  with responsive breakpoints. Tier CTAs link to /signup?plan=<tier>
+  which Bundle CY would wire up.
+
+**Deferred** (started but not landed this session):
+- Bundle CW (sales-quality demo seed) — schema mismatch on Deal
+  pipeline+stage setup; needs a careful follow-up that mirrors
+  prisma/seed.ts's pipeline creation.
+- Bundle CX (Stripe billing scaffold) — not started.
+- Bundle CY (self-service signup flow) — not started.
+- Bundle CZ (onboarding wizard at /philly/welcome) — not started.
 
 ---
 
