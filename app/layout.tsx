@@ -226,6 +226,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {PLAUSIBLE_DOMAIN ? (
           <link rel="preconnect" href={PLAUSIBLE_HOST} crossOrigin="" />
         ) : null}
+        {/* Bundle CS — preload the homepage globe's TopoJSON so its
+            fetch starts in parallel with the JS bundle parse instead
+            of waiting for hydration. ~108 KB; saves a render-blocking
+            round-trip on Hero LCP. */}
+        <link rel="preload" as="fetch" href="/world-110m.json" crossOrigin="anonymous" type="application/json" />
         {/* Feed autodiscovery — RSS for readers, JSON Feed for modern clients */}
         <link rel="alternate" type="application/rss+xml" title="Juan Diaz, LLC — Insights" href="/rss.xml" />
         <link rel="alternate" type="application/feed+json" title="Juan Diaz, LLC — Insights" href="/feed.json" />

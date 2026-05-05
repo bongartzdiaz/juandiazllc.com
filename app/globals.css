@@ -117,12 +117,17 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Cursor */
 
 /* Preloader */
-.preload { position: fixed; inset: 0; z-index: 300; background: var(--bg); display: flex; flex-direction: column; justify-content: space-between; padding: 32px 40px; transition: opacity .4s var(--ease), visibility .4s; animation: preloadFailsafe 1200ms forwards; }
+.preload { position: fixed; inset: 0; z-index: 300; background: var(--bg); display: flex; flex-direction: column; justify-content: space-between; padding: 32px 40px; transition: opacity .3s var(--ease), visibility .3s; animation: preloadFailsafe 700ms forwards; }
 .preload.done { opacity: 0; visibility: hidden; pointer-events: none; }
 /* CSS-only failsafe: if JS never fires (blocked, slow, or disabled),
-   the preloader still dismisses at 1.2s so the hero is never hidden
-   behind a dark overlay for longer than that. */
-@keyframes preloadFailsafe { 0%, 80% { } 100% { opacity: 0; visibility: hidden; pointer-events: none; } }
+   the preloader dismisses at 700ms so the hero is never hidden behind
+   a dark overlay for longer than that. Bundle CS — was 1200ms; cut
+   to 700ms for LCP recovery (~500ms perceived gain on cold loads). */
+@keyframes preloadFailsafe { 0%, 70% { } 100% { opacity: 0; visibility: hidden; pointer-events: none; } }
+@media (prefers-reduced-motion: reduce) {
+  /* Skip the boot-overlay theatrics for users who opted out of motion. */
+  .preload { animation: preloadFailsafe 100ms forwards; }
+}
 
 /* ─── Subdomain (philly + diaz) chrome ─── */
 .philly-shell { min-height: 100vh; display: flex; flex-direction: column; }
@@ -654,7 +659,7 @@ nav.top > * { pointer-events: auto; }
 .hero-title { font-family: var(--font-inter); font-weight: 400; font-size: clamp(48px, 10vw, 160px); line-height: .94; letter-spacing: -.04em; max-width: 1600px; text-shadow: 0 2px 40px rgba(3,20,15,.6); }
 .hero-title em { font-style: italic; color: var(--accent); font-weight: 300; }
 .hero-title .line { overflow: hidden; display: block; }
-.hero-title .line > span { display: block; transform: translateY(110%); transition: transform 1s var(--ease); animation: heroLineReveal 1s var(--ease) 1.2s forwards; }
+.hero-title .line > span { display: block; transform: translateY(110%); transition: transform 1s var(--ease); animation: heroLineReveal 1s var(--ease) 700ms forwards; }
 .loaded .hero-title .line > span { transform: translateY(0); animation: none; }
 .loaded .hero-title .line:nth-child(1) > span { transition-delay: .1s; }
 .loaded .hero-title .line:nth-child(2) > span { transition-delay: .2s; }
