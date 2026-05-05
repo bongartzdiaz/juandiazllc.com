@@ -54,7 +54,14 @@ export async function POST(req: NextRequest) {
       // Breadcrumb-friendly — don't spam full stack traces. Log level
       // is 'warning' because these are informational until we
       // actually enforce strict CSP.
-      console.warn(msg, e)
+      //
+      // Bundle CT — pass `msg` via the `%s` format specifier rather
+      // than as the format string itself. Otherwise any `%s` / `%d`
+      // surviving inside the sanitized fields would consume the
+      // following arg (`e`) and shift the structured report payload
+      // out of the log record. Format string is now a hardcoded
+      // literal; user-controlled values can only land in value slots.
+      console.warn('%s', msg, e)
       captureMessage(msg, 'warning')
     }
     return new NextResponse(null, { status: 204 })
