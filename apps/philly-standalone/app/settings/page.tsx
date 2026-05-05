@@ -274,7 +274,12 @@ export default function SettingsPage() {
   }
 
   const saveApiKey = (apiId: string) => {
-    addToast(`${API_DEFS.find(a => a.id === apiId)?.name} saved`, 'success')
+    // Bundle CS — Bundle CR removed the localStorage persistence path
+    // (clear-text storage of secrets). This panel is a UI draft until
+    // it's wired to /api/integrations server-side. The toast tells the
+    // operator the truth — "draft only" — instead of pretending to save.
+    const name = API_DEFS.find(a => a.id === apiId)?.name
+    addToast(`${name}: configured in this session only — wire through /api/integrations to persist`, 'info')
   }
 
   const isConnected = (apiId: string) => {

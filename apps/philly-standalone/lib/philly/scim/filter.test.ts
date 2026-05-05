@@ -71,4 +71,30 @@ describe('parseScimFilter', () => {
   it('rejects OR combinations', () => {
     expect(parseScimFilter('userName eq "a@x.com" or active eq true')).toBeNull()
   })
+
+  // Bundle CP — the `\s+` alternations in the parser are catastrophic-
+  // backtracking shapes; the length cap defangs them before any match
+  // runs. Both shape-test (returns null on overlong) and stress-test
+  // (parses in linear time on a max-length valid filter).
+  it('rejects input above MAX_FILTER_LENGTH (1024) without backtracking', () => {
+    const huge = 'a'.repeat(2000)
+    const start = performance.now()
+    const r = parseScimFilter(huge)
+    const elapsedMs = performance.now() - start
+    expect(r).toBeNull()
+    // Generous bound — under a healthy length cap this should be sub-ms.
+    expect(elapsedMs).toBeLessThan(50)
+  })
+
+  it('parses a valid filter near the length cap quickly', () => {
+    // 1023 chars total — userName + many spaces but well-formed.
+    const padding = ' '.repeat(900)
+    const filter = `userName eq "alice@example.com"${padding} and active eq true`
+    expect(filter.length).toBeLessThanOrEqual(1024)
+    const start = performance.now()
+    const r = parseScimFilter(filter)
+    const elapsedMs = performance.now() - start
+    expect(r).toEqual({ userName: 'alice@example.com', active: true })
+    expect(elapsedMs).toBeLessThan(50)
+  })
 })
