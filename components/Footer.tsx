@@ -20,6 +20,7 @@ export function Footer() {
         <Link href="/insights">{t("nav.insights")}</Link>
         <Link href="/signals">{t("nav.signals")}</Link>
         <Link href="/tools">{t("nav.tools")}</Link>
+        <Link href="/pricing">{t("nav.pricing")}</Link>
         <Link href="/contact">{t("nav.contact")}</Link>
         <Link href="/privacy">{t("footer.privacy")}</Link>
         <Link href="/impressum">{t("footer.impressum")}</Link>

@@ -47,6 +47,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/tools/peak-shift", priority: 0.75, change: "monthly" },
     { path: "/tools/deal-cycle", priority: 0.75, change: "monthly" },
     { path: "/contact", priority: 0.7, change: "monthly" },
+    { path: "/pricing", priority: 0.95, change: "monthly" },
     { path: "/privacy", priority: 0.3, change: "yearly" },
     { path: "/impressum", priority: 0.3, change: "yearly" },
   ];

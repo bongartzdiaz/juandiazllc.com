@@ -506,3 +506,117 @@ export function getHomeFaq(locale: Locale): FaqItem[] {
 export function getContactFaq(locale: Locale): FaqItem[] {
   return CONTACT_FAQ_BY_LOCALE[locale] ?? CONTACT_FAQ_BY_LOCALE.en;
 }
+
+// Bundle CV — pricing-page FAQ. Same shape as the others; answers
+// are <300 chars + lead with the definitive sentence so AI Overviews
+// can quote them cleanly.
+const PRICING_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
+  en: [
+    {
+      q: "Is there a free trial?",
+      a: "Yes — every paid plan includes a 14-day trial, no card required. You can cancel from settings before day 14 and you won't be billed.",
+    },
+    {
+      q: "Can I change plans later?",
+      a: "Yes. Upgrades take effect immediately and are pro-rated. Downgrades take effect at the end of the current billing cycle.",
+    },
+    {
+      q: "Do you offer annual billing?",
+      a: "Yes. Annual plans are billed up-front at a 17% discount (two months free). Switch from monthly to annual any time from the billing page.",
+    },
+    {
+      q: "What happens to my data if I cancel?",
+      a: "Your data is exported on request (GDPR Art. 15) and deleted within 30 days of cancellation (GDPR Art. 17). You can also self-delete from settings any time.",
+    },
+    {
+      q: "Do you have a per-seat or flat price?",
+      a: "Flat per-workspace, with a user cap per plan. We don't charge per seat — adding a teammate doesn't surprise the invoice.",
+    },
+    {
+      q: "Is GDPR compliance included?",
+      a: "Yes, on every paid plan. Encryption at rest, audit chain, RoPA, breach response, and a signed DPA on request. EU-only data residency.",
+    },
+  ],
+  nl: [
+    {
+      q: "Is er een gratis proefperiode?",
+      a: "Ja — elk betaald plan komt met een 14-daagse proefperiode, zonder creditcard. Je kunt voor dag 14 opzeggen vanuit settings en wordt niet gefactureerd.",
+    },
+    {
+      q: "Kan ik later van plan wisselen?",
+      a: "Ja. Upgrades zijn direct actief en pro-rata. Downgrades zijn actief aan het einde van de huidige factuurcyclus.",
+    },
+    {
+      q: "Bieden jullie jaarlijkse facturatie aan?",
+      a: "Ja. Jaarplannen worden vooraf gefactureerd met 17% korting (twee maanden gratis). Wissel op elk moment van maandelijks naar jaarlijks via de billing-pagina.",
+    },
+    {
+      q: "Wat gebeurt er met mijn data als ik opzeg?",
+      a: "Je data is op verzoek exporteerbaar (AVG art. 15) en wordt binnen 30 dagen na opzegging verwijderd (AVG art. 17). Je kunt ook op elk moment zelf verwijderen vanuit settings.",
+    },
+    {
+      q: "Is het per gebruiker of een vaste prijs?",
+      a: "Vast per workspace, met een gebruikerslimiet per plan. We rekenen niet per seat — een teamlid toevoegen verrast de factuur niet.",
+    },
+    {
+      q: "Is AVG-compliance inbegrepen?",
+      a: "Ja, op elk betaald plan. Encryptie at-rest, audit chain, RoPA, breach response, en een ondertekende verwerkersovereenkomst op verzoek. EU-only data residency.",
+    },
+  ],
+  de: [
+    {
+      q: "Gibt es eine kostenlose Testphase?",
+      a: "Ja — jeder kostenpflichtige Plan beinhaltet eine 14-tägige Testphase ohne Kreditkarte. Sie können vor Tag 14 in den Einstellungen kündigen und werden nicht belastet.",
+    },
+    {
+      q: "Kann ich später den Plan wechseln?",
+      a: "Ja. Upgrades sind sofort wirksam und werden anteilig berechnet. Downgrades werden zum Ende des aktuellen Abrechnungszeitraums wirksam.",
+    },
+    {
+      q: "Bieten Sie eine jährliche Abrechnung an?",
+      a: "Ja. Jahrespläne werden im Voraus mit 17% Rabatt abgerechnet (zwei Monate gratis). Sie können jederzeit von monatlich auf jährlich wechseln.",
+    },
+    {
+      q: "Was passiert mit meinen Daten, wenn ich kündige?",
+      a: "Ihre Daten können auf Anfrage exportiert werden (DSGVO Art. 15) und werden innerhalb von 30 Tagen nach Kündigung gelöscht (DSGVO Art. 17). Sie können auch jederzeit selbst löschen.",
+    },
+    {
+      q: "Ist es pro Sitz oder ein Festpreis?",
+      a: "Fest pro Workspace, mit einer Benutzerobergrenze je Plan. Wir berechnen nicht pro Sitz — ein Teammitglied hinzuzufügen überrascht die Rechnung nicht.",
+    },
+    {
+      q: "Ist DSGVO-Compliance enthalten?",
+      a: "Ja, in jedem kostenpflichtigen Plan. Verschlüsselung at-rest, Audit-Chain, RoPA, Breach Response, und ein unterzeichneter Auftragsverarbeitungsvertrag auf Anfrage. EU-only Data Residency.",
+    },
+  ],
+  es: [
+    {
+      q: "¿Hay un período de prueba gratuito?",
+      a: "Sí — cada plan de pago incluye una prueba de 14 días, sin tarjeta. Puedes cancelar antes del día 14 desde ajustes y no se te facturará.",
+    },
+    {
+      q: "¿Puedo cambiar de plan más tarde?",
+      a: "Sí. Las mejoras tienen efecto inmediato y se prorratean. Las rebajas tienen efecto al final del ciclo de facturación actual.",
+    },
+    {
+      q: "¿Ofrecen facturación anual?",
+      a: "Sí. Los planes anuales se facturan por adelantado con un 17% de descuento (dos meses gratis). Cambia de mensual a anual en cualquier momento desde la página de facturación.",
+    },
+    {
+      q: "¿Qué pasa con mis datos si cancelo?",
+      a: "Tus datos se exportan a solicitud (RGPD art. 15) y se eliminan dentro de 30 días tras la cancelación (RGPD art. 17). También puedes auto-eliminarte desde ajustes.",
+    },
+    {
+      q: "¿Es por usuario o precio fijo?",
+      a: "Fijo por workspace, con un límite de usuarios por plan. No cobramos por puesto — añadir un compañero no sorprende la factura.",
+    },
+    {
+      q: "¿Está incluido el cumplimiento RGPD?",
+      a: "Sí, en cada plan de pago. Cifrado en reposo, cadena de auditoría, RoPA, respuesta a brechas, y un acuerdo de procesador firmado bajo solicitud. Residencia de datos sólo en la UE.",
+    },
+  ],
+};
+
+export function getPricingFaq(locale: Locale): FaqItem[] {
+  return PRICING_FAQ_BY_LOCALE[locale] ?? PRICING_FAQ_BY_LOCALE.en;
+}
