@@ -87,6 +87,12 @@ model User {
   twoFactorSecret     String?   // encrypted via src/lib/crypto.ts
   twoFactorEnabled    Boolean   @default(false)
   twoFactorVerifiedAt DateTime?
+  // GDPR Art. 17 — soft-delete window. While set, the user cannot
+  // authenticate; sessions are invalidated server-side via
+  // tokensInvalidAfter. Hard-purge runs 30 days after deletedAt.
+  deletedAt           DateTime?
+  // Who initiated the delete: self (= same id) or an org admin.
+  deletedByUserId     String?
 
   organization    Organization     @relation(fields: [organizationId], references: [id])
   twoFactorRecoveryCodes TwoFactorRecoveryCode[]

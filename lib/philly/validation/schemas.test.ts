@@ -25,6 +25,9 @@ import {
   createInviteSchema,
   acceptInviteSchema,
   inviteRoleEnum,
+  deleteAccountSchema,
+  deleteUserSchema,
+  dsarScopeEnum,
 } from './schemas'
 
 // Schema coverage smoke tests. Every API route in /philly/api validates
@@ -567,5 +570,54 @@ describe('inviteRoleEnum', () => {
     expect(() => inviteRoleEnum.parse('owner')).toThrow()
     expect(() => inviteRoleEnum.parse('root')).toThrow()
     expect(() => inviteRoleEnum.parse('')).toThrow()
+  })
+})
+
+// ── GDPR — erasure ──
+
+describe('deleteAccountSchema', () => {
+  it('accepts the literal "DELETE" confirmation', () => {
+    expect(deleteAccountSchema.parse({ confirmation: 'DELETE' }).confirmation).toBe('DELETE')
+  })
+
+  it('rejects lowercase "delete" — typed-confirmation must be exact', () => {
+    expect(() => deleteAccountSchema.parse({ confirmation: 'delete' })).toThrow()
+  })
+
+  it('rejects close misses to prevent accidental deletes', () => {
+    expect(() => deleteAccountSchema.parse({ confirmation: 'DELET' })).toThrow()
+    expect(() => deleteAccountSchema.parse({ confirmation: 'DELETE ' })).toThrow()
+    expect(() => deleteAccountSchema.parse({ confirmation: '' })).toThrow()
+  })
+
+  it('rejects missing confirmation', () => {
+    expect(() => deleteAccountSchema.parse({})).toThrow()
+  })
+})
+
+describe('deleteUserSchema', () => {
+  it('accepts no body', () => {
+    expect(deleteUserSchema.parse({}).reason).toBeUndefined()
+  })
+
+  it('accepts a reason', () => {
+    expect(deleteUserSchema.parse({ reason: 'Left the company' }).reason).toBe('Left the company')
+  })
+
+  it('caps reason length to prevent payload abuse', () => {
+    expect(() => deleteUserSchema.parse({ reason: 'a'.repeat(501) })).toThrow()
+  })
+})
+
+describe('dsarScopeEnum', () => {
+  it('accepts user and org', () => {
+    expect(dsarScopeEnum.parse('user')).toBe('user')
+    expect(dsarScopeEnum.parse('org')).toBe('org')
+  })
+
+  it('rejects anything else — prevents arbitrary scope expansion', () => {
+    expect(() => dsarScopeEnum.parse('all')).toThrow()
+    expect(() => dsarScopeEnum.parse('admin')).toThrow()
+    expect(() => dsarScopeEnum.parse('global')).toThrow()
   })
 })

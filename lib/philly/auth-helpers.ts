@@ -34,14 +34,46 @@ export function jsonError(message: string, status: number) {
  * in a default 'Volitfy' org as admin; later users join the same org
  * as viewer (upgrade via admin UI).
  */
-async function resolvePhillyUser(email: string) {
+/**
+ * Sentinel thrown when a soft-deleted user tries to sign in. Caught by
+ * requireScope and turned into a 410 Gone — never auto-resurrected.
+ */
+class UserDeletedError extends Error {
+  constructor(public readonly deletedAt: Date) {
+    super('User account is in the deletion window')
+    this.name = 'UserDeletedError'
+  }
+}
+
+interface ResolvedUser {
+  id: string
+  email: string
+  role: string
+  organizationId: string
+}
+
+async function resolvePhillyUser(email: string): Promise<ResolvedUser> {
   const prisma = getAuthPrisma()
 
-  let user = await prisma.user.findUnique({
+  // Look up by email — including soft-deleted rows — so we can give a
+  // distinct error for "deleted within last 30 days" vs "never seen".
+  // We do NOT auto-resurrect: a deleted account must be re-invited by
+  // an admin to come back online.
+  const existing = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, email: true, role: true, organizationId: true },
+    select: { id: true, email: true, role: true, organizationId: true, deletedAt: true },
   })
-  if (user) return user
+  if (existing?.deletedAt) {
+    throw new UserDeletedError(existing.deletedAt)
+  }
+  if (existing) {
+    return {
+      id: existing.id,
+      email: existing.email,
+      role: existing.role,
+      organizationId: existing.organizationId,
+    }
+  }
 
   // Auto-provision: look up or create the default org.
   let org = await prisma.organization.findFirst({
@@ -59,7 +91,7 @@ async function resolvePhillyUser(email: string) {
   const userCount = await prisma.user.count()
   const role = userCount === 0 ? 'admin' : 'viewer'
 
-  user = await prisma.user.create({
+  const created = await prisma.user.create({
     data: {
       email,
       name: email.split('@')[0],
@@ -73,7 +105,7 @@ async function resolvePhillyUser(email: string) {
     select: { id: true, email: true, role: true, organizationId: true },
   })
 
-  return user
+  return created
 }
 
 /**
@@ -123,6 +155,12 @@ export async function requireScope(): Promise<AuthScope | NextResponse> {
       email: phillyUser.email,
     }
   } catch (err) {
+    if (err instanceof UserDeletedError) {
+      // 410 Gone — the resource (user account) existed but was deleted.
+      // Sign the Supabase session out client-side via the standard 401
+      // wouldn't be accurate; 410 is the AVG-correct answer.
+      return jsonError('Account deleted', 410)
+    }
     console.error('[requireScope] failed to resolve philly user', err)
     return jsonError('Auth provisioning failed', 500)
   }

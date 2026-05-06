@@ -346,3 +346,23 @@ export const acceptInviteSchema = z.object({
   password: z.string().min(12).max(200),
 })
 
+// ── GDPR — erasure (Art. 17) ──
+
+/**
+ * Self-delete confirmation. Customer must literally type "DELETE" so an
+ * accidental click can't take their account down. The string is intentionally
+ * not localized — the same word ships in all UIs.
+ */
+export const deleteAccountSchema = z.object({
+  confirmation: z.literal('DELETE'),
+})
+
+/** Admin removes a teammate. Reason is optional but encouraged. */
+export const deleteUserSchema = z.object({
+  reason: z.string().max(500).optional(),
+})
+
+// ── GDPR — DSAR scope (Art. 15) ──
+
+export const dsarScopeEnum = z.enum(['user', 'org'])
+
