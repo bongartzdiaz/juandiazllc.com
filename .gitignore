@@ -16,6 +16,13 @@ yarn-error.log*
 .idea/
 .vscode/
 .claude/
+# Bundle DB — re-include the project skill library so every Claude
+# Code session that opens this repo (local + remote sandbox) sees
+# the same set of /<skill> commands. Worktrees + caches stay ignored.
+!.claude/skills/
+!.claude/skills/**
+!.claude/commands/
+!.claude/commands/**
 
 # Playwright — browsers land in ~/.cache/ms-playwright (not in repo),
 # reports + traces + screenshots are noise that shouldn't be tracked.
