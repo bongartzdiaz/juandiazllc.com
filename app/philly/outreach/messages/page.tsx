@@ -91,7 +91,7 @@ export default function MessagesPage() {
 
   return (
     <div>
-      <Topbar title="Message Review" sub={`${messages.length} message(s) awaiting review`} />
+      <Topbar title="Message Review" sub={`${messages.length} to review`} />
 
       <div style={{ padding: '24px 28px', maxWidth: 960 }}>
         {/* Filter bar */}
@@ -159,7 +159,7 @@ export default function MessagesPage() {
 
         {loading && messages.length === 0 && (
           <div style={{ textAlign: 'center', padding: 60, color: 'var(--txt3)' }}>
-            Loading messages...
+            Loading queue
           </div>
         )}
 
@@ -168,10 +168,12 @@ export default function MessagesPage() {
             <MessageSquare size={32} style={{ marginBottom: 12, opacity: 0.4 }} />
             <div style={{ fontWeight: 600 }}>No {statusFilter.replace('_', ' ')} messages</div>
             <div style={{ marginTop: 6, fontSize: 13 }}>
-              Run <code style={{ background: 'var(--bg2)', padding: '2px 6px', borderRadius: 4 }}>
-                npm run dispatch
-              </code> to generate draft messages.
+              Run dispatch to generate drafts.
             </div>
+            <code style={{
+              display: 'inline-block', marginTop: 12, padding: '6px 12px',
+              background: 'var(--bg2)', borderRadius: 6, fontSize: 12,
+            }}>npm run dispatch</code>
           </div>
         )}
 

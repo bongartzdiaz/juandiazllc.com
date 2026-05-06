@@ -201,9 +201,9 @@ export default function LeadDetailPage() {
   if (loading && !d) {
     return (
       <div>
-        <Topbar title="Lead Detail" sub="Loading..." />
+        <Topbar title="Lead" sub="" />
         <div style={{ padding: '60px 28px', textAlign: 'center', color: 'var(--txt3)' }}>
-          Loading lead data...
+          Loading lead
         </div>
       </div>
     )
@@ -212,11 +212,13 @@ export default function LeadDetailPage() {
   if (!d) {
     return (
       <div>
-        <Topbar title="Lead Not Found" sub="" />
+        <Topbar title="Lead not found" sub="" />
         <div style={{ padding: '60px 28px', textAlign: 'center', color: 'var(--txt3)' }}>
-          Lead not found.{' '}
+          <div style={{ marginBottom: 12 }}>
+            This lead may have been deleted, or the link is wrong.
+          </div>
           <Link href="/philly/outreach/leads" style={{ color: 'var(--accent)' }}>
-            Back to leads
+            ← Back to leads
           </Link>
         </div>
       </div>

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireScope, jsonError } from "@/lib/philly/auth-helpers";
 import { liClient } from "@/lib/supabase/li-client";
+import { leadSearchQuery, leadSortFieldEnum } from "@/lib/philly/validation/schemas";
+import { logger } from "@/lib/philly/logger";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -10,9 +12,9 @@ export const runtime = "nodejs";
  *   ?status=sourced|icp_scored|assigned|connection_sent|...
  *   ?campaign=<campaign_id>
  *   ?account=<account_id>
- *   ?search=<name or company>
+ *   ?search=<name or company>      (sanitized — PostgREST delimiters stripped)
  *   ?segment=1|2|3
- *   ?sort=icp_score|created_at|status|last_reply_at
+ *   ?sort=icp_score|created_at|status|last_reply_at|...   (allowlisted)
  *   ?dir=asc|desc
  *   ?limit=50
  *   ?offset=0
@@ -27,12 +29,21 @@ export async function GET(req: NextRequest) {
   const status = url.searchParams.get("status");
   const campaign = url.searchParams.get("campaign");
   const account = url.searchParams.get("account");
-  const search = url.searchParams.get("search");
   const segment = url.searchParams.get("segment");
-  const sort = url.searchParams.get("sort") ?? "created_at";
+
+  // Allowlist sort field — anything outside the enum falls back to created_at
+  const sortRaw = url.searchParams.get("sort") ?? "created_at";
+  const sortParse = leadSortFieldEnum.safeParse(sortRaw);
+  const sort = sortParse.success ? sortParse.data : "created_at";
   const dir = url.searchParams.get("dir") === "asc" ? true : false;
-  const limit = Math.min(Number(url.searchParams.get("limit") ?? 50), 200);
-  const offset = Number(url.searchParams.get("offset") ?? 0);
+
+  const limit = Math.min(Math.max(Number(url.searchParams.get("limit") ?? 50), 1), 200);
+  const offset = Math.max(Number(url.searchParams.get("offset") ?? 0), 0);
+
+  // Sanitize search — strips PostgREST delimiters that could break out of or()
+  const searchRaw = url.searchParams.get("search");
+  const searchParse = searchRaw ? leadSearchQuery.safeParse(searchRaw) : null;
+  const search = searchParse?.success ? searchParse.data : null;
 
   let query = db
     .from("leads")
@@ -60,7 +71,10 @@ export async function GET(req: NextRequest) {
   }
 
   const { data: leads, error, count } = await query;
-  if (error) return jsonError(error.message, 500);
+  if (error) {
+    logger.error("[outreach/leads] list query failed", { error: error.message, scope: scope.userId });
+    return jsonError("Could not load leads", 500);
+  }
 
   // Enrich with company name + account slug + campaign slug
   const companyIds = [...new Set((leads ?? []).map((l: any) => l.company_id).filter(Boolean))];

@@ -18,6 +18,10 @@ import {
   updateGrantSchema,
   createPropertySchema,
   createCalendarEventSchema,
+  updateOutreachLeadSchema,
+  updateOutreachMessageSchema,
+  leadSearchQuery,
+  leadSortFieldEnum,
 } from './schemas'
 
 // Schema coverage smoke tests. Every API route in /philly/api validates
@@ -336,6 +340,142 @@ describe('createCalendarEventSchema', () => {
   it('rejects empty attendee ids', () => {
     expect(() =>
       createCalendarEventSchema.parse({ ...valid, attendeeIds: [''] }),
+    ).toThrow()
+  })
+})
+
+// ── Outreach (LinkedIn campaign pipeline) ──
+
+describe('leadSearchQuery', () => {
+  it('strips PostgREST filter delimiters that could break out of or()', () => {
+    // The injection vector: a `,` in the search string would terminate
+    // the current ilike clause and let an attacker append their own filters.
+    const out = leadSearchQuery.parse('x),status.eq.partner_signed,first_name.ilike.%(y')
+    expect(out).not.toContain(',')
+    expect(out).not.toContain('(')
+    expect(out).not.toContain(')')
+    expect(out).not.toContain('%')
+    expect(out).not.toContain('*')
+    expect(out).not.toContain('\\')
+  })
+
+  it('preserves normal alphanumeric + spaces', () => {
+    expect(leadSearchQuery.parse('Jan de Vries')).toBe('Jan de Vries')
+  })
+
+  it('trims whitespace', () => {
+    expect(leadSearchQuery.parse('  hello  ')).toBe('hello')
+  })
+
+  it('rejects strings longer than 80 chars', () => {
+    expect(() => leadSearchQuery.parse('a'.repeat(81))).toThrow()
+  })
+})
+
+describe('leadSortFieldEnum', () => {
+  it('accepts known sort columns', () => {
+    expect(leadSortFieldEnum.parse('icp_score')).toBe('icp_score')
+    expect(leadSortFieldEnum.parse('created_at')).toBe('created_at')
+  })
+
+  it('rejects arbitrary column names that could leak schema in errors', () => {
+    expect(() => leadSortFieldEnum.parse('password_hash')).toThrow()
+    expect(() => leadSortFieldEnum.parse('1; DROP TABLE leads')).toThrow()
+  })
+})
+
+describe('updateOutreachLeadSchema', () => {
+  it('accepts a single field update', () => {
+    const out = updateOutreachLeadSchema.parse({ priority: 'high' })
+    expect(out.priority).toBe('high')
+  })
+
+  it('accepts multiple fields', () => {
+    const out = updateOutreachLeadSchema.parse({
+      status: 'do_not_contact',
+      do_not_contact: true,
+      dnc_reason: 'requested via reply',
+    })
+    expect(out.do_not_contact).toBe(true)
+  })
+
+  it('rejects an empty body', () => {
+    expect(() => updateOutreachLeadSchema.parse({})).toThrow(/At least one field/)
+  })
+
+  it('rejects an unknown status value', () => {
+    expect(() =>
+      updateOutreachLeadSchema.parse({ status: 'totally_made_up' }),
+    ).toThrow()
+  })
+
+  it('rejects an out-of-range icp_segment', () => {
+    expect(() => updateOutreachLeadSchema.parse({ icp_segment: 5 })).toThrow()
+    expect(() => updateOutreachLeadSchema.parse({ icp_segment: 0 })).toThrow()
+  })
+
+  it('rejects a non-boolean do_not_contact', () => {
+    expect(() =>
+      updateOutreachLeadSchema.parse({ do_not_contact: 'yes' as unknown as boolean }),
+    ).toThrow()
+  })
+
+  it('caps note + dnc_reason length to prevent payload abuse', () => {
+    expect(() =>
+      updateOutreachLeadSchema.parse({ notes: 'a'.repeat(2001) }),
+    ).toThrow()
+    expect(() =>
+      updateOutreachLeadSchema.parse({ dnc_reason: 'b'.repeat(501) }),
+    ).toThrow()
+  })
+})
+
+describe('updateOutreachMessageSchema', () => {
+  const id = '00000000-0000-4000-8000-000000000000'
+
+  it('accepts approve with just an id', () => {
+    const out = updateOutreachMessageSchema.parse({ id, action: 'approve' })
+    expect(out.action).toBe('approve')
+  })
+
+  it('accepts reject with just an id', () => {
+    const out = updateOutreachMessageSchema.parse({ id, action: 'reject' })
+    expect(out.action).toBe('reject')
+  })
+
+  it('accepts edit with body', () => {
+    const out = updateOutreachMessageSchema.parse({ id, action: 'edit', body: 'Hi there' })
+    expect(out.action).toBe('edit')
+    if (out.action === 'edit') expect(out.body).toBe('Hi there')
+  })
+
+  it('rejects edit without body — body is what makes the edit non-trivial', () => {
+    expect(() =>
+      updateOutreachMessageSchema.parse({ id, action: 'edit' }),
+    ).toThrow()
+  })
+
+  it('rejects edit with empty body', () => {
+    expect(() =>
+      updateOutreachMessageSchema.parse({ id, action: 'edit', body: '' }),
+    ).toThrow()
+  })
+
+  it('rejects body over 2000 chars', () => {
+    expect(() =>
+      updateOutreachMessageSchema.parse({ id, action: 'edit', body: 'x'.repeat(2001) }),
+    ).toThrow()
+  })
+
+  it('rejects an unknown action', () => {
+    expect(() =>
+      updateOutreachMessageSchema.parse({ id, action: 'send' }),
+    ).toThrow()
+  })
+
+  it('rejects a non-uuid id', () => {
+    expect(() =>
+      updateOutreachMessageSchema.parse({ id: 'not-a-uuid', action: 'approve' }),
     ).toThrow()
   })
 })

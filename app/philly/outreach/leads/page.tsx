@@ -154,7 +154,7 @@ export default function LeadsListPage() {
 
   return (
     <div>
-      <Topbar title="Leads" sub={`${total} lead${total !== 1 ? 's' : ''} in pipeline`} />
+      <Topbar title="Leads" sub={`${total} in pipeline`} />
 
       <div style={{ padding: '24px 28px', maxWidth: 1400 }}>
         {/* Toolbar */}
@@ -169,7 +169,7 @@ export default function LeadsListPage() {
           }}>
             <input
               type="text"
-              placeholder="Search name, title, headline..."
+              placeholder="Search name, title, or headline"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
@@ -249,17 +249,30 @@ export default function LeadsListPage() {
         }}>
           {loading && leads.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 60, color: 'var(--txt3)' }}>
-              Loading leads...
+              Loading leads
             </div>
           ) : leads.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 60, color: 'var(--txt3)' }}>
               <Users size={32} style={{ marginBottom: 12, opacity: 0.4 }} />
-              <div style={{ fontWeight: 600 }}>No leads found</div>
-              <div style={{ marginTop: 6, fontSize: 13 }}>
-                {activeSearch || statusFilter
-                  ? 'Try adjusting your filters.'
-                  : 'Run the sourcing pipeline to populate leads.'}
-              </div>
+              {activeSearch || statusFilter ? (
+                <>
+                  <div style={{ fontWeight: 600 }}>No matches</div>
+                  <div style={{ marginTop: 6, fontSize: 13 }}>
+                    No leads match these filters. Clear them to see everything.
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontWeight: 600 }}>No leads yet</div>
+                  <div style={{ marginTop: 6, fontSize: 13 }}>
+                    Run the sourcing pipeline to populate the queue.
+                  </div>
+                  <code style={{
+                    display: 'inline-block', marginTop: 12, padding: '6px 12px',
+                    background: 'var(--bg2)', borderRadius: 6, fontSize: 12,
+                  }}>npm run source -- &lt;campaign&gt; &lt;account&gt;</code>
+                </>
+              )}
             </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>

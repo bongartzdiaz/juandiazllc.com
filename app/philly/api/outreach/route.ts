@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireScope, jsonError } from "@/lib/philly/auth-helpers";
 import { liClient } from "@/lib/supabase/li-client";
+import { logger } from "@/lib/philly/logger";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+
+const VIEWS = {
+  funnel: "v_pipeline_funnel",
+  campaigns: "v_campaign_performance",
+  accounts: "v_account_daily",
+  replies: "v_reply_breakdown",
+  costs: "v_ai_costs",
+  countries: "v_country_heatmap",
+  errors: "v_recent_errors",
+} as const;
+
+type ViewName = keyof typeof VIEWS;
 
 export async function GET(req: NextRequest) {
   const scope = await requireScope();
@@ -11,47 +24,14 @@ export async function GET(req: NextRequest) {
 
   const db = liClient();
   const url = new URL(req.url);
-  const view = url.searchParams.get("view");
+  const view = url.searchParams.get("view") as ViewName | null;
 
-  if (view === "funnel") {
-    const { data, error } = await db.from("v_pipeline_funnel").select("*");
-    if (error) return jsonError(error.message, 500);
-    return NextResponse.json({ data });
-  }
-
-  if (view === "campaigns") {
-    const { data, error } = await db.from("v_campaign_performance").select("*");
-    if (error) return jsonError(error.message, 500);
-    return NextResponse.json({ data });
-  }
-
-  if (view === "accounts") {
-    const { data, error } = await db.from("v_account_daily").select("*");
-    if (error) return jsonError(error.message, 500);
-    return NextResponse.json({ data });
-  }
-
-  if (view === "replies") {
-    const { data, error } = await db.from("v_reply_breakdown").select("*");
-    if (error) return jsonError(error.message, 500);
-    return NextResponse.json({ data });
-  }
-
-  if (view === "costs") {
-    const { data, error } = await db.from("v_ai_costs").select("*");
-    if (error) return jsonError(error.message, 500);
-    return NextResponse.json({ data });
-  }
-
-  if (view === "countries") {
-    const { data, error } = await db.from("v_country_heatmap").select("*");
-    if (error) return jsonError(error.message, 500);
-    return NextResponse.json({ data });
-  }
-
-  if (view === "errors") {
-    const { data, error } = await db.from("v_recent_errors").select("*");
-    if (error) return jsonError(error.message, 500);
+  if (view && view in VIEWS) {
+    const { data, error } = await db.from(VIEWS[view]).select("*");
+    if (error) {
+      logger.error("[outreach] view query failed", { view, error: error.message, scope: scope.userId });
+      return jsonError("Could not load dashboard data", 500);
+    }
     return NextResponse.json({ data });
   }
 

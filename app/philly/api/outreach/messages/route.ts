@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireScope, jsonError } from "@/lib/philly/auth-helpers";
+import { requireScope, requireRole, jsonError } from "@/lib/philly/auth-helpers";
 import { liClient } from "@/lib/supabase/li-client";
+import { validateBody } from "@/lib/philly/validation";
+import { updateOutreachMessageSchema } from "@/lib/philly/validation/schemas";
+import { enforceRateLimit, PRESET_MUTATION } from "@/lib/philly/rate-limit";
+import { logger } from "@/lib/philly/logger";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -21,7 +25,7 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const status = url.searchParams.get("status") ?? "pending_approval";
   const type = url.searchParams.get("type");
-  const limit = Math.min(Number(url.searchParams.get("limit") ?? 50), 200);
+  const limit = Math.min(Math.max(Number(url.searchParams.get("limit") ?? 50), 1), 200);
 
   let query = db
     .from("messages")
@@ -37,7 +41,10 @@ export async function GET(req: NextRequest) {
   if (type) query = query.eq("type", type);
 
   const { data: messages, error } = await query;
-  if (error) return jsonError(error.message, 500);
+  if (error) {
+    logger.error("[outreach/messages] list query failed", { error: error.message, scope: scope.userId });
+    return jsonError("Could not load messages", 500);
+  }
 
   // Enrich with lead + account names
   const leadIds = [...new Set((messages ?? []).map((m: any) => m.lead_id))];
@@ -75,42 +82,34 @@ export async function GET(req: NextRequest) {
 
 /**
  * PATCH /api/outreach/messages
- *   Body: { id: string, action: "approve" | "reject" | "edit", body?: string }
+ *   Body: { id: uuid, action: "approve" | "reject" }
+ *   Body: { id: uuid, action: "edit", body: string }
+ *
+ * Approve gates outbound LinkedIn DMs — operator/admin only.
  */
 export async function PATCH(req: NextRequest) {
-  const scope = await requireScope();
+  const scope = await requireRole(["admin", "manager"]);
   if (scope instanceof NextResponse) return scope;
+
+  const limited = enforceRateLimit(`outreach:messages:${scope.userId}`, PRESET_MUTATION);
+  if (limited) return limited;
+
+  const parsed = await validateBody(req, updateOutreachMessageSchema);
+  if (!parsed.success) return parsed.response;
+  const input = parsed.data;
 
   const db = liClient();
 
-  let body;
-  try {
-    body = await req.json();
-  } catch {
-    return jsonError("Invalid JSON body", 400);
-  }
-
-  const { id, action, body: newBody } = body as {
-    id?: string;
-    action?: string;
-    body?: string;
-  };
-
-  if (!id) return jsonError("Missing message id", 400);
-  if (!action || !["approve", "reject", "edit"].includes(action)) {
-    return jsonError("action must be approve, reject, or edit", 400);
-  }
-
-  // Fetch current message
+  // Confirm the message exists before mutating
   const { data: msg, error: fetchErr } = await db
     .from("messages")
     .select("id, status")
-    .eq("id", id)
+    .eq("id", input.id)
     .single();
 
   if (fetchErr || !msg) return jsonError("Message not found", 404);
 
-  if (action === "approve") {
+  if (input.action === "approve") {
     const { error } = await db
       .from("messages")
       .update({
@@ -118,38 +117,41 @@ export async function PATCH(req: NextRequest) {
         approved_by: scope.email ?? scope.userId,
         approved_at: new Date().toISOString(),
       })
-      .eq("id", id);
+      .eq("id", input.id);
 
-    if (error) return jsonError(error.message, 500);
-    return NextResponse.json({ data: { id, status: "approved" } });
+    if (error) {
+      logger.error("[outreach/messages] approve failed", { id: input.id, error: error.message, by: scope.userId });
+      return jsonError("Could not approve message", 500);
+    }
+    return NextResponse.json({ data: { id: input.id, status: "approved" } });
   }
 
-  if (action === "reject") {
+  if (input.action === "reject") {
     const { error } = await db
       .from("messages")
       .update({ status: "draft" })
-      .eq("id", id);
+      .eq("id", input.id);
 
-    if (error) return jsonError(error.message, 500);
-    return NextResponse.json({ data: { id, status: "draft" } });
-  }
-
-  if (action === "edit") {
-    if (!newBody || typeof newBody !== "string") {
-      return jsonError("body is required for edit action", 400);
+    if (error) {
+      logger.error("[outreach/messages] reject failed", { id: input.id, error: error.message, by: scope.userId });
+      return jsonError("Could not reject message", 500);
     }
-    const { error } = await db
-      .from("messages")
-      .update({
-        body: newBody,
-        char_count: newBody.length,
-        status: "pending_approval",
-      })
-      .eq("id", id);
-
-    if (error) return jsonError(error.message, 500);
-    return NextResponse.json({ data: { id, status: "pending_approval", body: newBody } });
+    return NextResponse.json({ data: { id: input.id, status: "draft" } });
   }
 
-  return jsonError("Unknown action", 400);
+  // input.action === "edit"
+  const { error } = await db
+    .from("messages")
+    .update({
+      body: input.body,
+      char_count: input.body.length,
+      status: "pending_approval",
+    })
+    .eq("id", input.id);
+
+  if (error) {
+    logger.error("[outreach/messages] edit failed", { id: input.id, error: error.message, by: scope.userId });
+    return jsonError("Could not save edit", 500);
+  }
+  return NextResponse.json({ data: { id: input.id, status: "pending_approval", body: input.body } });
 }

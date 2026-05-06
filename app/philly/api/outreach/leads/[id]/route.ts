@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireScope, jsonError } from "@/lib/philly/auth-helpers";
+import { requireScope, requireRole, jsonError } from "@/lib/philly/auth-helpers";
 import { liClient } from "@/lib/supabase/li-client";
+import { validateBody } from "@/lib/philly/validation";
+import { updateOutreachLeadSchema } from "@/lib/philly/validation/schemas";
+import { enforceRateLimit, PRESET_MUTATION } from "@/lib/philly/rate-limit";
+import { logger } from "@/lib/philly/logger";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -127,56 +131,35 @@ export async function GET(
 /**
  * PATCH /api/outreach/leads/[id]
  *
- * Update lead fields: status, priority, notes, do_not_contact, dnc_reason
+ * Update lead fields: status, priority, notes, do_not_contact, dnc_reason,
+ * icp_segment. Toggling do_not_contact = true also writes a GDPR opt_out
+ * audit event. Operator/admin only.
  */
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const scope = await requireScope();
+  const scope = await requireRole(["admin", "manager"]);
   if (scope instanceof NextResponse) return scope;
 
+  const limited = enforceRateLimit(`outreach:leads:${scope.userId}`, PRESET_MUTATION);
+  if (limited) return limited;
+
   const { id } = await params;
+
+  const parsed = await validateBody(req, updateOutreachLeadSchema);
+  if (!parsed.success) return parsed.response;
+  const input = parsed.data;
+
+  // Strip undefined keys so we never overwrite existing values with null
+  const updates: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(input)) {
+    if (value !== undefined) updates[key] = value;
+  }
+
   const db = liClient();
 
-  let body;
-  try {
-    body = await req.json();
-  } catch {
-    return jsonError("Invalid JSON body", 400);
-  }
-
-  const allowedFields = [
-    "status",
-    "priority",
-    "notes",
-    "do_not_contact",
-    "dnc_reason",
-    "icp_segment",
-  ];
-
-  const updates: Record<string, unknown> = {};
-  for (const key of allowedFields) {
-    if (key in body) updates[key] = body[key];
-  }
-
-  if (Object.keys(updates).length === 0) {
-    return jsonError("No valid fields to update", 400);
-  }
-
-  // If marking DNC, also log GDPR event
-  if (updates.do_not_contact === true) {
-    await db.from("gdpr_events").insert({
-      lead_id: id,
-      account_id: null,
-      event_type: "opt_out",
-      details: {
-        reason: updates.dnc_reason ?? "manual_dashboard",
-        by: scope.email ?? scope.userId,
-      },
-    });
-  }
-
+  // Update first; if it fails we don't write a misleading audit row
   const { data, error } = await db
     .from("leads")
     .update(updates)
@@ -184,7 +167,32 @@ export async function PATCH(
     .select("id, status, priority, do_not_contact")
     .single();
 
-  if (error) return jsonError(error.message, 500);
+  if (error) {
+    logger.error("[outreach/leads] update failed", { id, error: error.message, by: scope.userId });
+    return jsonError("Could not update lead", 500);
+  }
+
+  // After a successful DNC flip, write a GDPR audit event
+  if (updates.do_not_contact === true) {
+    const { error: gdprErr } = await db.from("gdpr_events").insert({
+      lead_id: id,
+      account_id: null,
+      event_type: "opt_out",
+      details: {
+        reason: input.dnc_reason ?? "manual_dashboard",
+        by: scope.email ?? scope.userId,
+      },
+    });
+    if (gdprErr) {
+      // Audit-row failure is logged loudly but doesn't fail the request —
+      // the lead is already DNC, blocking the response would be worse.
+      logger.error("[outreach/leads] gdpr audit insert failed", {
+        id,
+        error: gdprErr.message,
+        by: scope.userId,
+      });
+    }
+  }
 
   return NextResponse.json({ data });
 }
