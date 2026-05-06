@@ -264,3 +264,59 @@ export const createCalendarEventSchema = z.object({
   path: ['endTime'],
 })
 
+// ── Outreach (LinkedIn campaign pipeline, `li` schema) ──
+
+/** Every value the `li.leads.status` enum accepts. Keep in sync with the DB. */
+export const leadStatusEnum = z.enum([
+  'sourced', 'enriched', 'icp_scored', 'assigned',
+  'connection_sent', 'connection_accepted',
+  'first_dm_sent', 'follow_up_sent',
+  'reply_received', 'reply_classified', 'nba_sent',
+  'discovery_call_booked', 'partner_signed', 'handed_off',
+  'disqualified', 'do_not_contact', 'not_interested', 'dormant_90d',
+])
+
+export const leadPriorityEnum = z.enum(['low', 'normal', 'high', 'urgent'])
+export const messageActionEnum = z.enum(['approve', 'reject', 'edit'])
+export const leadSortFieldEnum = z.enum([
+  'icp_score', 'created_at', 'updated_at', 'status',
+  'last_reply_at', 'priority', 'connection_sent_at',
+])
+
+/**
+ * Whitelist of characters allowed in a lead-search query.
+ * Strips PostgREST filter delimiters (`,()*%\`) so user input
+ * cannot break out of the `or(...)` clause and rewrite the query.
+ */
+export const leadSearchQuery = z
+  .string()
+  .max(80)
+  .transform(s => s.replace(/[,()\\*%]/g, '').trim())
+
+export const updateOutreachLeadSchema = z.object({
+  status: leadStatusEnum.optional(),
+  priority: leadPriorityEnum.optional(),
+  notes: z.string().max(2000).optional(),
+  do_not_contact: z.boolean().optional(),
+  dnc_reason: z.string().max(500).optional(),
+  icp_segment: z.number().int().min(1).max(3).optional(),
+}).refine(obj => Object.values(obj).some(v => v !== undefined), {
+  message: 'At least one field must be provided',
+})
+
+export const updateOutreachMessageSchema = z.discriminatedUnion('action', [
+  z.object({
+    id: z.string().uuid(),
+    action: z.literal('approve'),
+  }),
+  z.object({
+    id: z.string().uuid(),
+    action: z.literal('reject'),
+  }),
+  z.object({
+    id: z.string().uuid(),
+    action: z.literal('edit'),
+    body: z.string().min(1).max(2000),
+  }),
+])
+

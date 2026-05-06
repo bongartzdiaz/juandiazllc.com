@@ -198,11 +198,11 @@ export default function OutreachPage() {
 
   return (
     <div>
-      <Topbar title="LinkedIn Outreach" sub="Pipeline analytics & account status" />
+      <Topbar title="LinkedIn Outreach" sub="Pipeline and account health" />
 
       <div style={{ padding: '24px 28px', maxWidth: 1280 }}>
         {loading && !d && (
-          <div style={{ textAlign: 'center', padding: 60, color: 'var(--txt3)' }}>Loading outreach data...</div>
+          <div style={{ textAlign: 'center', padding: 60, color: 'var(--txt3)' }}>Loading dashboard</div>
         )}
 
         {d && (
@@ -537,7 +537,7 @@ export default function OutreachPage() {
               <div style={sectionStyle}>
                 <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 14, color: 'var(--txt)' }}>
                   <AlertTriangle size={14} style={{ marginRight: 6, verticalAlign: '-2px' }} />
-                  Recent Errors (30 days)
+                  Errors (last 30 days)
                 </h3>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
@@ -582,8 +582,8 @@ export default function OutreachPage() {
                 color: 'var(--txt3)', fontSize: 14,
               }}>
                 <Send size={32} style={{ marginBottom: 12, opacity: 0.4 }} />
-                <div style={{ fontWeight: 600, marginBottom: 6 }}>No outreach data yet</div>
-                <div>Run the sourcing pipeline to start populating leads.</div>
+                <div style={{ fontWeight: 600, marginBottom: 6 }}>Nothing here yet</div>
+                <div>Once the sourcing pipeline runs, leads, campaigns, and message stats appear here.</div>
                 <code style={{
                   display: 'inline-block', marginTop: 12, padding: '8px 16px',
                   background: 'var(--bg2)', borderRadius: 8, fontSize: 12,
