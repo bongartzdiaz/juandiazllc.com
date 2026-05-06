@@ -52,6 +52,60 @@ already shipped. Strike through (`~~...~~`) when done.
       pushes to main (Vercel Preview Protection auth-walls previews,
       so PR runs were moved to main-only).
 
+## DEUS / LucenAI — multi-tenant readiness (May 2026 sprint)
+
+Pre-deploy actions for the seats / invites / GDPR / CSV-import bundles.
+
+- [ ] Run Prisma migrations against the production DB:
+  ```
+  npx prisma migrate dev --name seats_and_invites
+  npx prisma migrate dev --name user_soft_delete
+  ```
+  Or in production, `npx prisma migrate deploy` after the schema is on the production branch.
+- [ ] Add Vercel env vars (production + preview) for the philly project:
+  - `RESEND_API_KEY` — invite emails. Without this, invites are created
+    but no email is sent (UI flash banner explains the fallback).
+  - `INVITE_FROM_EMAIL` — defaults to `noreply@lucen.ai`. Verify the
+    sender domain in Resend (SPF + DKIM on the lucen.ai DNS zone).
+  - `NEXT_PUBLIC_APP_URL` — defaults to `https://app.lucen.ai`.
+    Set to whatever the live customer URL is so accept-invite links
+    resolve correctly.
+  - `STRIPE_SECRET_KEY` — health-endpoint check + future billing webhook.
+    Optional; absence is reported as "not configured", not "down".
+- [ ] Confirm legal entity for the DPA / ToS / Privacy Policy. Drafts
+      live in `_drafts/legal/*.md` with `[KvK TBD]` and `[address TBD]`
+      placeholders. "Juan Diaz LLC" reads as US-style; if it's actually
+      an NL BV / eenmanszaak, fill in the correct entity + KvK number.
+- [ ] Smoke test on staging: invite teammate → accept → seat counter
+      ticks → DSAR export downloads → soft-delete → 410 on next login.
+
+## DEUS-SHARED mirror setup
+
+`bongartzdiaz/DEUS-SHARED` is the mirror target for downstream
+distribution. Source of truth stays in `bongartzdiaz/juandiazllc.com`.
+Sync workflow lives at `.github/workflows/sync-deus-shared.yml`.
+
+- [ ] Create the target repo `bongartzdiaz/DEUS-SHARED` (private,
+      empty — no README/license/.gitignore so the first push isn't
+      a non-fast-forward conflict).
+- [ ] Generate a fine-grained PAT at
+      [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new):
+  - Resource owner: `bongartzdiaz`
+  - Repository access: only select `bongartzdiaz/DEUS-SHARED`
+  - Permissions → Repository: `Contents: Read and write`
+  - Expiration: 90 days (set a calendar reminder to rotate)
+- [ ] Add the PAT as a repo secret named `DEUS_SHARED_PAT` at
+      `Settings → Secrets and variables → Actions → New repository secret`
+      in `bongartzdiaz/juandiazllc.com`.
+- [ ] Trigger the workflow manually the first time:
+      `Actions → Sync to DEUS-SHARED → Run workflow → main`.
+      Confirm `bongartzdiaz/DEUS-SHARED` now mirrors this repo.
+- [ ] Future syncs run automatically on every push to `main`.
+
+**Rotation note:** when the PAT expires, the workflow fails with
+"DEUS_SHARED_PAT secret is not set" (or a 401 from GitHub). Generate
+a new fine-grained PAT and update the secret — same scope as above.
+
 ## Testing gaps (CLAUDE.md priority)
 
 - [ ] Zod validation schemas under `lib/philly/validation/` —
