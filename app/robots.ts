@@ -14,6 +14,7 @@ const AI_ALLOW: string[] = [
   "/sectors",
   "/insights",
   "/tools",
+  "/pricing",
   "/contact",
   "/about",
   "/now",

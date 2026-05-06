@@ -3,7 +3,7 @@ import Link from "next/link";
 import { FaqSection } from "@/components/FaqSection";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
-import { faqSchema } from "@/lib/seo/schema";
+import { faqSchema, pricingPlanSchema } from "@/lib/seo/schema";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { getPricingFaq } from "@/lib/seo/faqs";
 
@@ -63,11 +63,30 @@ export default async function PricingPage({
   ]);
   const faq = getPricingFaq(l);
 
+  // Bundle DA — pricing-tier rich-result markup so Google can render
+  // the per-plan price chip and Perplexity can quote the price line
+  // without scraping the page. Mirrors the tier table above; if you
+  // change a price, update both.
+  const pricingSchema = pricingPlanSchema({
+    locale: l,
+    productName: "Philly CRM",
+    productDescription: t("pricing.meta.desc"),
+    tiers: [
+      { id: "operator", name: t("pricing.tier.operator.name"), priceEur:  49, description: t("pricing.tier.operator.blurb") },
+      { id: "team",     name: t("pricing.tier.team.name"),     priceEur: 199, description: t("pricing.tier.team.blurb") },
+      { id: "business", name: t("pricing.tier.business.name"), priceEur: 599, description: t("pricing.tier.business.blurb") },
+    ],
+  });
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingSchema) }}
       />
       <script
         type="application/ld+json"
@@ -84,6 +103,7 @@ export default async function PricingPage({
         {TIERS.map((tier) => (
           <article
             key={tier}
+            id={`tier-${tier}`}
             className={`pricing-tier ${tier === FEATURED ? "is-featured" : ""}`}
           >
             {tier === FEATURED && (

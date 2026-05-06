@@ -215,3 +215,79 @@ export function contactPointSchema(): Record<string, unknown> {
     },
   };
 }
+
+/* Bundle DA — pricing-page schema for SaaS Rich Results.
+ * Emits a SoftwareApplication describing the Philly CRM with an
+ * AggregateOffer rolling up the priced tiers. Google needs at least
+ * `offers` (with price + priceCurrency) to render the Pricing chip
+ * in search results. We emit one Offer per tier so the rich-result
+ * test can show each plan's name/price.
+ *
+ * The Enterprise tier is NOT in the offer list because it has no
+ * fixed price; Google's validator rejects offers with null/zero
+ * price. Listing only the priced tiers keeps the markup honest. */
+export interface PricingTierInput {
+  id: string;
+  name: string;
+  /** Numeric price in EUR (e.g. 49 for €49/month). Use 0 to skip. */
+  priceEur: number;
+  description: string;
+}
+
+export function pricingPlanSchema(opts: {
+  locale: Locale;
+  productName: string;
+  productDescription: string;
+  tiers: PricingTierInput[];
+  /** Cycle for the offers — schema.org Period values. SaaS = P1M. */
+  billingCycle?: string;
+}): Record<string, unknown> {
+  const cycle = opts.billingCycle ?? "P1M";
+  const url = `${SITE}/${opts.locale}/pricing`;
+  const priced = opts.tiers.filter((t) => t.priceEur > 0);
+  const prices = priced.map((t) => t.priceEur);
+  const lowPrice = prices.length > 0 ? Math.min(...prices) : 0;
+  const highPrice = prices.length > 0 ? Math.max(...prices) : 0;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "@id": `${url}#software`,
+    name: opts.productName,
+    description: opts.productDescription,
+    url,
+    applicationCategory: "BusinessApplication",
+    applicationSubCategory: "CRM",
+    operatingSystem: "Web",
+    inLanguage: IN_LANGUAGE[opts.locale],
+    publisher: {
+      "@type": "Organization",
+      "@id": `${SITE}/#organization`,
+      name: "Juan Diaz, LLC",
+      url: SITE,
+    },
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "EUR",
+      lowPrice: lowPrice.toFixed(2),
+      highPrice: highPrice.toFixed(2),
+      offerCount: priced.length,
+      offers: priced.map((t) => ({
+        "@type": "Offer",
+        name: t.name,
+        description: t.description,
+        price: t.priceEur.toFixed(2),
+        priceCurrency: "EUR",
+        priceSpecification: {
+          "@type": "UnitPriceSpecification",
+          price: t.priceEur.toFixed(2),
+          priceCurrency: "EUR",
+          billingDuration: cycle,
+          unitText: "MONTH",
+        },
+        availability: "https://schema.org/InStock",
+        url: `${url}#tier-${t.id}`,
+      })),
+    },
+  };
+}
