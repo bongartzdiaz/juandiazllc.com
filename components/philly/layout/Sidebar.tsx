@@ -92,6 +92,12 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
     : industry === 'hospitality'
       ? [
           { icon: BedDouble, label: t('rooms'), href: '/philly/rooms' },
+          { icon: CalendarDays, label: t('reservations'), href: '/philly/reservations' },
+          { icon: HandCoins, label: t('quotes'), href: '/philly/hospitality/quotes' },
+          { icon: Mail, label: t('dripCampaigns'), href: '/philly/drip-campaigns' },
+          { icon: Globe, label: t('clientPortal'), href: '/philly/client-portal' },
+          { icon: Target, label: t('leadScores'), href: '/philly/lead-scores' },
+          { icon: ListChecks, label: t('actionPlans'), href: '/philly/action-plans' },
         ]
       : [
           { icon: Award, label: t('grants'), href: '/philly/grants' },
@@ -145,7 +151,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 15.5, fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--txt)' }}>
-              Philly<span style={{ color: 'var(--accent)' }}>.</span>
+              DEUS<span style={{ color: 'var(--accent)' }}>.</span>
             </div>
             <div style={{ fontSize: 10, color: 'var(--txt3)', letterSpacing: '0.02em' }}>{config.label}</div>
           </div>
@@ -180,7 +186,9 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
               borderRadius: 8, boxShadow: 'var(--shadow-md)',
               zIndex: 50, marginTop: 4, overflow: 'hidden',
             }}>
-              {(Object.keys(INDUSTRY_CONFIGS) as Industry[]).map(ind => {
+              {(Object.keys(INDUSTRY_CONFIGS) as Industry[])
+                .filter(ind => ind !== 'philanthropy')
+                .map(ind => {
                 const cfg = INDUSTRY_CONFIGS[ind]
                 const Icon = INDUSTRY_ICONS[ind]
                 const active = industry === ind
