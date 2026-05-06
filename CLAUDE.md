@@ -508,3 +508,96 @@ one Google + one Microsoft connection. Operator runs
 
 11 files added (5 lib, 5 routes, 1 schema diff, wizard rewrite, 4 test
 files), 1 migration pending operator-side. Bundle: `<commit-sha>`.
+
+### 2026-05-06 (cont'd) — Bundle B: Stripe billing (Checkout + Portal + webhooks)
+
+Unlocks paid trials → revenue gate for first customers. Builds on the
+existing `Subscription` schema (already shipped in the readiness sprint)
+and the `seats.ts` helper (which already reads `Subscription.seatCount`
+when status is `active` or `trialing`). My job was just keeping the
+`Subscription` row fresh via webhooks.
+
+**New library** under `lib/philly/stripe/`:
+- `client.ts` — lazy Stripe singleton, env-var-driven, `isStripeConfigured()`
+  graceful-fail (Resend pattern). API version pinned to `2025-02-24.acacia`
+  (matches installed SDK 17.7's `LatestApiVersion`).
+- `plans.ts` — plan catalogue (Starter / Professional). Price IDs live
+  in env vars (`STRIPE_PRICE_STARTER`, `STRIPE_PRICE_PROFESSIONAL`),
+  not in code — Stripe is source-of-truth for pricing. `planKeyFromPriceId()`
+  reverse-maps for the webhook handler.
+- `customer.ts` — `ensureStripeCustomer(org, billingEmail)` lazy creates
+  a Stripe Customer per Organization, idempotent.
+- `subscriptions.ts` — `upsertFromStripe(orgId, sub)` mirrors a Stripe
+  Subscription into our DB. Status mapping: trialing/active = honour
+  seatCount; past_due/unpaid = revert to free-tier (seats.ts handles
+  the fallback so customer doesn't get locked out mid-failure);
+  canceled/incomplete = audit row stays, free-tier seats. Defensive
+  read of `current_period_end` (Stripe API version drift — top-level
+  vs items[0]).
+- `webhook.ts` — `verifyWebhook(rawBody, sig, secret)` (HMAC + 5-min
+  replay-window via Stripe SDK), `dispatchEvent(event)` routes 5
+  critical events. Idempotent — Stripe retries are safe replays.
+  Soft-fail on missing metadata (return ok:true so Stripe stops
+  retrying), 500 only on real DB failures (Stripe SHOULD retry).
+
+**New API routes:**
+- `POST /philly/api/billing/checkout` — admin-only, rate-limited.
+  Creates Customer (lazy) → Checkout Session with 14-day trial,
+  EU VAT collection, billing-address-required. Returns `{ url }` for
+  client redirect.
+- `POST /philly/api/billing/portal` — Customer Portal session for
+  self-service plan/payment/invoice management.
+- `POST /philly/api/billing/webhook` — Stripe receiver, signature
+  verified, no-session bypass via `PUBLIC_PHILLY_PATHS` allowlist
+  in `lib/supabase/middleware.ts`.
+- `GET  /philly/api/billing/subscription` — current sub status + seat
+  usage for the UI. Anyone signed-in can read (no card data exposed).
+
+**Settings UI** at `app/philly/settings/billing/page.tsx`:
+- Polls `/api/billing/subscription` on mount
+- "Current plan" panel: plan name, seat usage (used/limit + active/pending),
+  next renewal date OR "no subscription" for free tier
+- "Manage subscription" button (admin-only) opens Stripe Portal
+- "Upgrade" panel (only visible on free / canceled / expired tiers):
+  side-by-side Starter / Professional cards with feature lists + "Start
+  free trial" CTAs
+- Surfaces `?session_id=…` (success) and `?canceled=1` (canceled at
+  Stripe) query params from the Checkout redirect
+- "Cancels on …" notice when `cancelAt` is set
+
+**Tests** (30 new, total now 289/289):
+- `plans.test.ts` — `planFromKey` happy + unknown, `getPriceId` env
+  var driven, `planKeyFromPriceId` reverse mapping, TRIAL_DAYS = 14
+- `webhook.test.ts` — `HANDLED_EVENTS` shape, `isHandledEvent` narrowing,
+  `verifyWebhook` 6 cases (valid, missing signature, missing secret,
+  wrong-secret, tampered body, expired timestamp), `resolveOrganizationId`
+  + `invoiceSubscriptionId` polymorphism
+- `subscriptions.test.ts` — `isHandledStatus`, `subscriptionPeriodEnd`
+  defensive read across API versions
+
+**Architecture decisions baked in:**
+- 14-day trial, no card-up-front. Anti-abuse mitigation deferred —
+  if it becomes a problem, flip via `subscription_data.trial_settings`.
+- Single line item per subscription (seats × price). Add-ons / metered
+  usage deferred. The webhook reads `items.data[0]` so multi-item
+  subs would silently use only the first — fine for now, noted for
+  when we ship usage-based billing.
+- EU VAT via `tax_id_collection: { enabled: true }` — Stripe handles
+  reverse-charge mechanics. Fine for B2B-only customers.
+- `PUBLIC_PHILLY_PATHS` allowlist gets a 2nd entry (was just `/health`).
+  Every public path is a hole — both are minimal-risk (signature-verified
+  inputs, no PII in response).
+- Refresh-after-failed-payment NOT auto-retried — Stripe's dunning emails
+  handle it. We just mirror the past_due state so the customer sees
+  it in `/settings/billing`.
+
+**Operator-side setup** documented in `MANUAL_TASKS.md`:
+- Stripe Dashboard: create Starter + Professional products
+- Webhook endpoint subscribed to 5 events, copy `whsec_…`
+- Vercel env vars: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+  `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_PROFESSIONAL`
+- Local dev: `stripe listen --forward-to localhost:3000/...`
+
+15 files added (6 lib including 3 test files, 4 routes, 1 settings UI,
+1 middleware diff, 1 webhook handler). NO new schema migrations
+needed — Subscription model was already shipped.

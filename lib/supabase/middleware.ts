@@ -50,6 +50,9 @@ export async function updateSession(request: NextRequest, requestHeaders?: Heade
   // response, rate-limit at the route level).
   const PUBLIC_PHILLY_PATHS = new Set<string>([
     "/philly/api/health",
+    // Stripe webhook — server-to-server, no Supabase session cookie.
+    // Auth is the X-Stripe-Signature header verified in the route handler.
+    "/philly/api/billing/webhook",
   ]);
   if (!user && isProtected && !PUBLIC_PHILLY_PATHS.has(path)) {
     const url = request.nextUrl.clone();

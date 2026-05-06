@@ -3,6 +3,64 @@
 Every item here is a one-time human action that unblocks code that's
 already shipped. Strike through (`~~...~~`) when done.
 
+## Stripe billing — Checkout + Customer Portal + webhooks (Bundle B, 2026-05-06)
+
+The billing routes + settings UI are wired but no charge can be
+created until Stripe products + webhook are configured. The checkout
+route returns 503 with a clear message until env vars land.
+
+### Stripe dashboard setup
+
+- [ ] Create / open a Stripe account (use Test mode while staging).
+- [ ] Products → New product. Recommended catalogue:
+  - **Starter** — €49/seat/month recurring (EUR). Note the Price ID
+    (`price_…`).
+  - **Professional** — €79/seat/month recurring (EUR). Note the Price ID.
+  - Quantity-based — leave price as "per unit" and let Checkout
+    multiply by `quantity` from the API call.
+- [ ] Customer Portal → enable: Subscriptions cancellation, Subscription
+      update (allow plan switching + quantity), Invoice history,
+      Payment method.
+
+### Webhook setup
+
+- [ ] Webhooks → Add endpoint:
+      `https://app.lucen.ai/philly/api/billing/webhook` (replace with
+      production domain).
+- [ ] Subscribe to events:
+  - `customer.subscription.created`
+  - `customer.subscription.updated`
+  - `customer.subscription.deleted`
+  - `invoice.payment_failed`
+  - `invoice.paid`
+- [ ] Copy the signing secret (`whsec_…`).
+
+### Vercel env vars
+
+- [ ] `STRIPE_SECRET_KEY` — Live or Test secret key (sk_live_… / sk_test_…)
+- [ ] `STRIPE_WEBHOOK_SECRET` — `whsec_…` from the endpoint above
+- [ ] `STRIPE_PRICE_STARTER` — Price ID for Starter
+- [ ] `STRIPE_PRICE_PROFESSIONAL` — Price ID for Professional
+- [ ] `NEXT_PUBLIC_APP_URL` — needed for Stripe success/cancel URLs
+
+### Local dev
+
+- [ ] Install Stripe CLI: <https://docs.stripe.com/stripe-cli>
+- [ ] `stripe login` (one-time)
+- [ ] `stripe listen --forward-to http://localhost:3000/philly/api/billing/webhook`
+      — outputs a temporary webhook secret. Use it in `.env.local` as
+      `STRIPE_WEBHOOK_SECRET` while developing.
+
+### Smoke test
+
+1. Visit `/philly/settings/billing` while signed in as admin.
+2. Click "Start free trial" on Professional → land on Stripe Checkout.
+3. Use card `4242 4242 4242 4242` (test mode) → submit.
+4. Land back on `/settings/billing?session_id=…` with success banner.
+5. Verify webhook fired by checking the `Subscription` row appeared in
+   the DB with `status='trialing'`.
+6. Click "Manage subscription" → land on Stripe Customer Portal.
+
 ## Calendar OAuth — Google + Microsoft (Bundle A, 2026-05-06)
 
 The wizard Step 5 + connection routes are wired but no provider can
