@@ -1,10 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireScope, requireRole, jsonError } from "@/lib/philly/auth-helpers";
-import { liClient } from "@/lib/supabase/li-client";
+import {
+  liClient,
+  type LiTimelineMessageRow,
+  type LiReplyRow,
+} from "@/lib/supabase/li-client";
 import { validateBody } from "@/lib/philly/validation";
 import { updateOutreachLeadSchema } from "@/lib/philly/validation/schemas";
 import { enforceRateLimit, PRESET_MUTATION } from "@/lib/philly/rate-limit";
 import { logger } from "@/lib/philly/logger";
+
+type TimelineEntry =
+  | {
+      kind: "message";
+      id: string;
+      type: LiTimelineMessageRow["type"];
+      status: LiTimelineMessageRow["status"];
+      body: string;
+      char_count: number | null;
+      model_used: string | null;
+      approved_at: string | null;
+      sent_at: string | null;
+      error_message: string | null;
+      timestamp: string;
+    }
+  | {
+      kind: "reply";
+      id: string;
+      classification: string | null;
+      classification_confidence: number | null;
+      body: string;
+      model_used: string | null;
+      timestamp: string;
+    };
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -84,13 +112,13 @@ export async function GET(
     ]);
 
   // Build chronological timeline from messages + replies
-  const messages: any[] = msgsRes.data ?? [];
-  const replies: any[] = repliesRes.data ?? [];
+  const messages = (msgsRes.data ?? []) as LiTimelineMessageRow[];
+  const replies = (repliesRes.data ?? []) as LiReplyRow[];
 
-  const timeline = [
-    ...messages.map((m: any) => ({
+  const timeline: TimelineEntry[] = [
+    ...messages.map((m): TimelineEntry => ({
       id: m.id,
-      kind: "message" as const,
+      kind: "message",
       type: m.type,
       status: m.status,
       body: m.body,
@@ -101,9 +129,9 @@ export async function GET(
       error_message: m.error_message,
       timestamp: m.sent_at ?? m.created_at,
     })),
-    ...replies.map((r: any) => ({
+    ...replies.map((r): TimelineEntry => ({
       id: r.id,
-      kind: "reply" as const,
+      kind: "reply",
       classification: r.classification,
       classification_confidence: r.classification_confidence,
       body: r.raw_text,

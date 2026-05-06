@@ -1,10 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireScope, requireRole, jsonError } from "@/lib/philly/auth-helpers";
-import { liClient } from "@/lib/supabase/li-client";
+import {
+  liClient,
+  type LiMessageRow,
+  type LiAccountEnrichment,
+} from "@/lib/supabase/li-client";
 import { validateBody } from "@/lib/philly/validation";
 import { updateOutreachMessageSchema } from "@/lib/philly/validation/schemas";
 import { enforceRateLimit, PRESET_MUTATION } from "@/lib/philly/rate-limit";
 import { logger } from "@/lib/philly/logger";
+
+interface MessageLeadEnrichment {
+  id: string;
+  first_name: string;
+  last_name: string;
+  company_id: string | null;
+  headline: string | null;
+  linkedin_url: string;
+}
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -40,15 +53,17 @@ export async function GET(req: NextRequest) {
 
   if (type) query = query.eq("type", type);
 
-  const { data: messages, error } = await query;
+  const { data: rawMessages, error } = await query;
   if (error) {
     logger.error("[outreach/messages] list query failed", { error: error.message, scope: scope.userId });
     return jsonError("Could not load messages", 500);
   }
 
+  const messages: LiMessageRow[] = rawMessages ?? [];
+
   // Enrich with lead + account names
-  const leadIds = [...new Set((messages ?? []).map((m: any) => m.lead_id))];
-  const accountIds = [...new Set((messages ?? []).map((m: any) => m.account_id))];
+  const leadIds = [...new Set(messages.map((m) => m.lead_id))];
+  const accountIds = [...new Set(messages.map((m) => m.account_id))];
 
   const [leadRes, accRes] = await Promise.all([
     leadIds.length > 0
@@ -59,14 +74,14 @@ export async function GET(req: NextRequest) {
       : Promise.resolve({ data: [] }),
   ]);
 
-  const leads: any[] = leadRes.data ?? [];
-  const accs: any[] = accRes.data ?? [];
+  const leads = (leadRes.data ?? []) as MessageLeadEnrichment[];
+  const accs = (accRes.data ?? []) as LiAccountEnrichment[];
   const leadMap = new Map(leads.map((l) => [l.id, l]));
   const accMap = new Map(accs.map((a) => [a.id, a]));
 
-  const enriched = (messages ?? []).map((m: any) => {
-    const lead: any = leadMap.get(m.lead_id);
-    const account: any = accMap.get(m.account_id);
+  const enriched = messages.map((m) => {
+    const lead = leadMap.get(m.lead_id);
+    const account = accMap.get(m.account_id);
     return {
       ...m,
       lead_name: lead ? `${lead.first_name} ${lead.last_name}` : "Unknown",
