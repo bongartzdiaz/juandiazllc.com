@@ -44,7 +44,14 @@ export async function updateSession(request: NextRequest, requestHeaders?: Heade
   // Only /philly/* is the gated CRM now. /app and /dashboard were the
   // old merged-monorepo routes — removed after the Option A unification.
   const isProtected = path === "/philly" || path.startsWith("/philly/");
-  if (!user && isProtected) {
+  // Public endpoints under /philly that uptime monitors / public webhooks
+  // need to reach without a session. Add sparingly — every entry here is
+  // a hole in the auth perimeter and must be self-defending (no PII in
+  // response, rate-limit at the route level).
+  const PUBLIC_PHILLY_PATHS = new Set<string>([
+    "/philly/api/health",
+  ]);
+  if (!user && isProtected && !PUBLIC_PHILLY_PATHS.has(path)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", path + (request.nextUrl.search || ""));
