@@ -3,6 +3,65 @@
 Every item here is a one-time human action that unblocks code that's
 already shipped. Strike through (`~~...~~`) when done.
 
+## Calendar OAuth — Google + Microsoft (Bundle A, 2026-05-06)
+
+The wizard Step 5 + connection routes are wired but no provider can
+actually authorise until you register the OAuth app and set credentials.
+The start route returns 503 with a clear message until the env vars
+land.
+
+### Google Calendar
+
+- [ ] Create / open a project at <https://console.cloud.google.com>.
+- [ ] APIs & Services → Library → enable **Google Calendar API**.
+- [ ] Credentials → Create credentials → **OAuth client ID** → Web
+      application. Add authorised redirect URI:
+      `https://app.lucen.ai/philly/api/calendar/oauth/callback`
+      (replace with your production domain; add `http://localhost:3000/...`
+      for local dev).
+- [ ] OAuth consent screen → set User Type to External (or Internal
+      if Workspace). Scopes:
+      `openid email profile https://www.googleapis.com/auth/calendar.readonly`.
+      Add test users until verification is complete.
+- [ ] Set Vercel env vars:
+  - `GOOGLE_OAUTH_CLIENT_ID`
+  - `GOOGLE_OAUTH_CLIENT_SECRET`
+
+### Microsoft / Outlook
+
+- [ ] Register an app at <https://entra.microsoft.com> → Identity →
+      Applications → App registrations → New registration.
+- [ ] Supported account types: choose "Accounts in any organizational
+      directory and personal Microsoft accounts" for the broadest
+      audience (matches `MS_OAUTH_TENANT=common` default), or pin to
+      a single tenant for SSO-only flows.
+- [ ] Redirect URI: Web →
+      `https://app.lucen.ai/philly/api/calendar/oauth/callback`
+- [ ] API permissions → Microsoft Graph → Delegated:
+      `User.Read`, `Calendars.Read`, `offline_access`, `openid`,
+      `profile`, `email`. Grant admin consent.
+- [ ] Certificates & secrets → New client secret. Copy the value
+      (only shown once).
+- [ ] Set Vercel env vars:
+  - `MS_OAUTH_CLIENT_ID`
+  - `MS_OAUTH_CLIENT_SECRET`
+  - `MS_OAUTH_TENANT` (optional — defaults to `common`)
+
+### Database
+
+- [ ] Run `npx prisma migrate deploy` after pulling — adds the
+      `CalendarConnection` table. Or for first-time on a live DB:
+      `npx prisma migrate dev --name calendar_connections` to create
+      the migration folder, then commit it.
+
+### Smoke test
+
+1. Visit `/philly/onboarding/calendar` while signed in.
+2. Click "Connect Google Calendar" → consent at Google → land back on
+   the wizard with a green "Google Calendar connected." badge.
+3. Click "Disconnect" → confirm → row flips to status='revoked'.
+4. Reconnect — should re-bind cleanly (upsert by `(userId, provider)`).
+
 ## Newsletter double opt-in (PR 715d102)
 
 - [ ] Run the updated migration in Supabase SQL editor (brand project):

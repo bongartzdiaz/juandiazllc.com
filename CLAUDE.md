@@ -410,3 +410,101 @@ Small deck-clear bundle while picking up after the 10-bundle DEUS sprint.
 Touched 7 files. Typecheck clean. 222/222 vitest still green (no
 test changes — pure rename + new docs). No new migrations, no env
 vars, no breaking changes.
+
+### 2026-05-06 (cont'd) — Bundle A: Calendar OAuth (Google + Microsoft)
+
+Replaces the wizard Step 5 placeholder with a real OAuth flow. Single
+biggest customer-facing feature gap from the DEUS readiness sprint.
+
+**New schema:** `CalendarConnection` (per-user, encrypted tokens via
+existing `lib/philly/crypto.ts` AES-256-GCM, scopes, status, last error,
+soft-revoke). Uniqueness on `(userId, provider)` so a user has at most
+one Google + one Microsoft connection. Operator runs
+`prisma migrate dev --name calendar_connections`.
+
+**New library** under `lib/philly/calendar/`:
+- `state.ts` — HMAC-signed CSRF state token (10-min TTL, version-pinned,
+  payload binds userId + orgId + provider + redirect, prevents OAuth
+  callback hijacking)
+- `providers.ts` — Google + Microsoft config (auth URL, token URL,
+  scope list, env-var names). `isProviderConfigured()` gracefully
+  reports "not configured" when CLIENT_ID env vars are missing —
+  503 with a clear operator message instead of a confusing OAuth error.
+- `connection.ts` — encrypted CRUD + lazy access-token refresh on
+  read (refresh-leeway 30s before expiry), soft-revoke, error marking.
+  Tokens never leave this module — the encrypted bytes are never
+  returned over the wire.
+- `token-exchange.ts` — code-for-tokens swap + provider profile
+  fetch, normalised to `{ providerAccountId, providerEmail }`.
+- `events.ts` — provider-aware list-events with normalised event
+  shape (id, title, start, end, allDay, location, attendees,
+  htmlLink, provider). Google + MS Graph param differences (`timeMin`
+  vs `$filter`, `maxResults` vs `$top`, `singleEvents` vs `$orderby`)
+  centralised in `buildEventsUrl`.
+
+**New API routes:**
+- `GET /philly/api/calendar/oauth/start?provider=google|microsoft&redirect=<path>`
+  — signs state, 302 to provider authorise URL. Open-redirect-safe
+  (only same-origin paths accepted).
+- `GET /philly/api/calendar/oauth/callback?code=…&state=…`
+  — verifies state HMAC + freshness + subject-match-current-user
+  (defends against state-replay across users), exchanges code,
+  fetches profile, upserts connection. Errors render as redirects
+  with `?error=<reason>` so users see a coherent UI mid-flow.
+- `GET /philly/api/calendar/connections` — user's own connections,
+  no secrets exposed.
+- `DELETE /philly/api/calendar/connections/[id]` — soft-revoke,
+  rate-limited (PRESET_MUTATION).
+- `GET /philly/api/calendar/external-events?provider=…&from=…&to=…&limit=…`
+  — normalised event list, rate-limited (PRESET_READ).
+
+**Wizard Step 5 rewrite** (`app/philly/onboarding/calendar/page.tsx`):
+- Polls `/api/calendar/connections` on mount
+- Shows connect-button or connected-as-email + Disconnect inline
+- Handles `?error=…` and `?connected=…` query-param feedback from
+  the OAuth callback
+- "What we read, what we don't" details panel for trust + clarity
+- All copy hardcoded English for now (pre-i18n; existing wizard
+  steps are also English-only — i18n pass is separate work)
+
+**Tests** (37 new, total now 259/259):
+- `state.test.ts` — round-trip, nonce uniqueness, malformed/tampered
+  payloads, tampered signatures, expiry, edge-of-TTL freshness, forged
+  signatures
+- `providers.test.ts` — config shape, MS_OAUTH_TENANT override,
+  Microsoft offline_access scope assertion, env-var-driven
+  configuration check, redirect-URI builder
+- `events.test.ts` — Google + Microsoft URL param construction,
+  event normalisation including all-day, missing-summary, missing
+  attendees/webLink fallbacks
+- `token-exchange.test.ts` — happy-path Google + Microsoft, all 5
+  failure modes (provider_not_configured, token_request_failed,
+  token_response_invalid, profile_request_failed,
+  profile_response_invalid), MS userPrincipalName fallback when
+  mail is null, missing expires_in handling
+
+**Operator-side setup** documented in `MANUAL_TASKS.md`:
+- Google: GCP Console → Enable Calendar API → OAuth client ID →
+  set GOOGLE_OAUTH_CLIENT_ID / GOOGLE_OAUTH_CLIENT_SECRET
+- Microsoft: Entra ID → App registration → API permissions
+  (User.Read, Calendars.Read, offline_access) → client secret →
+  set MS_OAUTH_CLIENT_ID / MS_OAUTH_CLIENT_SECRET / MS_OAUTH_TENANT
+- DB: `npx prisma migrate dev --name calendar_connections`
+
+**Architecture decisions baked in:**
+- Read-only scope MVP — adding events.create later requires re-consent
+  (Google forces incremental scope grants). Acceptable trade-off for
+  clarity; we'll bump scope when we ship two-way sync.
+- No webhook subscriptions yet (Google `watch`, Microsoft `subscriptions`).
+  Polling-based via `/external-events`. Push-sync is a follow-up bundle
+  when calendar drives in-app notifications.
+- Single primary calendar per provider per user. Multi-calendar
+  selection (e.g. "sync my work + personal") deferred — adding a
+  `calendars` JSON column to `CalendarConnection` is a forward-compatible
+  migration when we need it.
+- Refresh-on-401 is intentionally NOT done. MS rotates refresh tokens
+  on security events; auto-retry masks revocation. Surface as
+  "reconnect" in UI instead — already wired.
+
+11 files added (5 lib, 5 routes, 1 schema diff, wizard rewrite, 4 test
+files), 1 migration pending operator-side. Bundle: `<commit-sha>`.

@@ -42,7 +42,8 @@ model Organization {
   auditLogs      AuditLog[]
   savedViews     SavedView[]
   pipelines      Pipeline[]
-  calendarEvents CalendarEvent[]
+  calendarEvents      CalendarEvent[]
+  calendarConnections CalendarConnection[]
   notifications  Notification[]
   automations    AutomationRule[]
   webhooks       Webhook[]
@@ -121,6 +122,7 @@ model User {
   eventAttendees  EventAttendee[]
   reports         Report[]
   deals           Deal[]          @relation("dealOwner")
+  calendarConnections CalendarConnection[]
 }
 
 // One Subscription per Organization. Mirrors Stripe state — the source of
@@ -573,6 +575,68 @@ model Deal {
 }
 
 // ── Phase 2D: Calendar Events ──
+
+// Per-user OAuth connection to a third-party calendar provider. Tokens
+// are encrypted at rest via lib/philly/crypto.ts (AES-256-GCM with key
+// derived from INTEGRATION_SECRET / NEXTAUTH_SECRET). Each user can
+// connect at most one calendar per provider — enforced via the
+// `(userId, provider)` unique index.
+//
+// Lifecycle:
+//   1. User clicks Connect in /onboarding/calendar or /settings.
+//   2. /api/calendar/oauth/start signs a state token containing
+//      { userId, orgId, provider, redirectTo, nonce, expiresAt } and
+//      redirects to the provider's authorize endpoint.
+//   3. Provider redirects back to /api/calendar/oauth/callback with
+//      ?code=... &state=... — we verify state, exchange code for
+//      tokens, encrypt + persist a CalendarConnection.
+//   4. Token refresh happens lazily on read (see lib/philly/calendar/
+//      connection.ts → ensureFreshAccessToken). expiresAt < now+30s ⇒
+//      we exchange the refreshToken before returning the access token.
+//
+// Soft-disconnect: status='revoked' instead of row delete, so we keep
+// an audit trail for compliance reviews. Hard-delete only on user
+// account erasure (DSAR Art. 17), via the existing User cascade.
+model CalendarConnection {
+  id             String    @id @default(cuid())
+  userId         String
+  organizationId String
+  provider       String    // "google" | "microsoft"
+  // Provider-side identity — Google `email`, Microsoft `userPrincipalName`.
+  // Used to display "Connected as foo@example.com" in the UI without
+  // having to call the provider again.
+  providerAccountId String
+  providerEmail     String?
+  // Encrypted via encryptSecret() — never logged, never returned over
+  // the wire. Decryption is server-only via decryptSecret().
+  accessTokenEnc String   @db.Text
+  refreshTokenEnc String? @db.Text
+  // When the access token expires. We refresh proactively at 30s
+  // before this timestamp on read. Null means the provider didn't
+  // include `expires_in` (rare; we'll refresh on first 401).
+  expiresAt      DateTime?
+  // Space-separated scope string from the token response. Stored so
+  // we know whether to ask for re-consent when we add features that
+  // need wider scopes.
+  scopes         String    @db.Text
+  status         String    @default("active") // active, revoked, error
+  // Last error from a token refresh or API call — null on success.
+  // Used to surface "Reconnect" prompts in the UI without polluting
+  // the audit log with transient failures.
+  lastError      String?   @db.Text
+  // Throttled — updated on every successful API call, used to age
+  // out unused connections on a janitor job.
+  lastUsedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([userId, provider])
+  @@index([organizationId, provider])
+  @@index([status])
+}
 
 model CalendarEvent {
   id             String    @id @default(cuid())
