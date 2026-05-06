@@ -22,6 +22,9 @@ import {
   updateOutreachMessageSchema,
   leadSearchQuery,
   leadSortFieldEnum,
+  createInviteSchema,
+  acceptInviteSchema,
+  inviteRoleEnum,
 } from './schemas'
 
 // Schema coverage smoke tests. Every API route in /philly/api validates
@@ -477,5 +480,92 @@ describe('updateOutreachMessageSchema', () => {
     expect(() =>
       updateOutreachMessageSchema.parse({ id: 'not-a-uuid', action: 'approve' }),
     ).toThrow()
+  })
+})
+
+// ── Invites + seats ──
+
+describe('createInviteSchema', () => {
+  it('accepts a valid email + role', () => {
+    const out = createInviteSchema.parse({ email: 'jane@example.com', role: 'manager' })
+    expect(out.email).toBe('jane@example.com')
+    expect(out.role).toBe('manager')
+  })
+
+  it('defaults role to viewer', () => {
+    const out = createInviteSchema.parse({ email: 'jane@example.com' })
+    expect(out.role).toBe('viewer')
+  })
+
+  it('lowercases + trims the email so duplicates canonicalize', () => {
+    const out = createInviteSchema.parse({ email: '  Jane@Example.COM  ' })
+    expect(out.email).toBe('jane@example.com')
+  })
+
+  it('rejects malformed emails', () => {
+    expect(() => createInviteSchema.parse({ email: 'not-an-email' })).toThrow()
+    expect(() => createInviteSchema.parse({ email: '@example.com' })).toThrow()
+  })
+
+  it('rejects unknown roles — prevents privilege escalation', () => {
+    expect(() => createInviteSchema.parse({ email: 'a@b.com', role: 'superadmin' })).toThrow()
+    expect(() => createInviteSchema.parse({ email: 'a@b.com', role: 'owner' })).toThrow()
+  })
+
+  it('caps email length to prevent payload abuse', () => {
+    const oversized = 'a'.repeat(250) + '@b.com'
+    expect(() => createInviteSchema.parse({ email: oversized })).toThrow()
+  })
+})
+
+describe('acceptInviteSchema', () => {
+  const valid = {
+    token: 'a'.repeat(43),
+    name: 'Jane Doe',
+    password: 'long-strong-password-123',
+  }
+
+  it('accepts a fully-valid payload', () => {
+    const out = acceptInviteSchema.parse(valid)
+    expect(out.name).toBe('Jane Doe')
+  })
+
+  it('rejects passwords shorter than 12 chars — bank-grade minimum', () => {
+    expect(() => acceptInviteSchema.parse({ ...valid, password: 'short' })).toThrow()
+    expect(() => acceptInviteSchema.parse({ ...valid, password: 'eleven-chrs' })).toThrow()
+  })
+
+  it('rejects tokens shorter than 20 chars — prevents accidental brute-force', () => {
+    expect(() => acceptInviteSchema.parse({ ...valid, token: 'short' })).toThrow()
+  })
+
+  it('caps token length so storage never blows up', () => {
+    expect(() => acceptInviteSchema.parse({ ...valid, token: 'a'.repeat(101) })).toThrow()
+  })
+
+  it('caps name length to prevent payload abuse', () => {
+    expect(() => acceptInviteSchema.parse({ ...valid, name: 'a'.repeat(121) })).toThrow()
+  })
+
+  it('rejects an empty name', () => {
+    expect(() => acceptInviteSchema.parse({ ...valid, name: '   ' })).toThrow()
+  })
+
+  it('caps password length so we never bcrypt a 1MB payload', () => {
+    expect(() => acceptInviteSchema.parse({ ...valid, password: 'a'.repeat(201) })).toThrow()
+  })
+})
+
+describe('inviteRoleEnum', () => {
+  it('only accepts the three documented roles', () => {
+    expect(inviteRoleEnum.parse('admin')).toBe('admin')
+    expect(inviteRoleEnum.parse('manager')).toBe('manager')
+    expect(inviteRoleEnum.parse('viewer')).toBe('viewer')
+  })
+
+  it('rejects anything else — privilege-escalation guard', () => {
+    expect(() => inviteRoleEnum.parse('owner')).toThrow()
+    expect(() => inviteRoleEnum.parse('root')).toThrow()
+    expect(() => inviteRoleEnum.parse('')).toThrow()
   })
 })

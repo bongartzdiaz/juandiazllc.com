@@ -320,3 +320,29 @@ export const updateOutreachMessageSchema = z.discriminatedUnion('action', [
   }),
 ])
 
+// ── Invites + seats ──
+
+export const inviteRoleEnum = z.enum(['admin', 'manager', 'viewer'])
+
+export const createInviteSchema = z.object({
+  // trim+lowercase BEFORE email validation, so "  Jane@Example.COM  " canonicalizes
+  // and dedupe lookups don't miss whitespace-padded variants.
+  email: z
+    .string()
+    .max(254)
+    .transform(s => s.trim().toLowerCase())
+    .pipe(z.string().email()),
+  role: inviteRoleEnum.default('viewer'),
+})
+
+export const acceptInviteSchema = z.object({
+  token: z.string().min(20).max(100),
+  // trim BEFORE min-length check, so "   " is rejected as empty
+  name: z
+    .string()
+    .max(120)
+    .transform(s => s.trim())
+    .pipe(z.string().min(1, 'Name cannot be blank')),
+  password: z.string().min(12).max(200),
+})
+

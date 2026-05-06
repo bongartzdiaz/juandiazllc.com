@@ -12,9 +12,18 @@ model Organization {
   slug      String   @unique
   logoUrl   String?
   industry  String   @default("general")
+  // Default seat allowance for free / trial orgs. A Subscription overrides
+  // this when present (Subscription.seatCount is authoritative). Keeping a
+  // column on Organization gives us a sane fallback before billing is wired.
+  seatLimit Int      @default(3)
+  // Soft-delete support (GDPR right to erasure). When set, the org is
+  // hidden from auth/login flows; hard-purge runs 30 days later.
+  deletedAt DateTime?
   createdAt DateTime @default(now())
 
   users          User[]
+  subscription   Subscription?
+  invites        Invite[]
   projects       Project[]
   contacts       Contact[]
   kanbanBoards   KanbanBoard[]
@@ -95,6 +104,56 @@ model User {
   eventAttendees  EventAttendee[]
   reports         Report[]
   deals           Deal[]          @relation("dealOwner")
+}
+
+// One Subscription per Organization. Mirrors Stripe state — the source of
+// truth for billing is Stripe, this row is the cached projection we read
+// on every seat-check. Created either by Stripe webhook (`subscription.created`)
+// or, for trials, by an admin invite at signup time.
+model Subscription {
+  id                String   @id @default(cuid())
+  organizationId    String   @unique
+  plan              String   // "trial" | "starter" | "professional" | "enterprise"
+  status            String   // "active" | "trialing" | "past_due" | "canceled"
+  seatCount         Int      // billable seats — must be >= active user count
+  stripeCustomerId  String?
+  stripeSubId       String?  @unique
+  currentPeriodEnd  DateTime?
+  cancelAt          DateTime? // 30-day notice period
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+// Pending team-invite. Single-use token; expires at expiresAt. Marked
+// acceptedAt when the invitee completes signup — at that point a User row
+// is created in the same Organization with the role from this Invite.
+// We keep accepted/revoked rows for the audit trail; cleanup is by
+// retention policy, not by this table.
+model Invite {
+  id               String    @id @default(cuid())
+  organizationId   String
+  email            String
+  role             String    // "admin" | "manager" | "viewer"
+  // Cryptographically random token (32 bytes, base64url). Unique across
+  // the table — collision-resistant by construction.
+  token            String    @unique
+  invitedByUserId  String    // FK-less reference to User.id (no cascade to keep audit row alive)
+  expiresAt        DateTime
+  acceptedAt       DateTime?
+  acceptedByUserId String?
+  revokedAt        DateTime?
+  revokedByUserId  String?
+  createdAt        DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, expiresAt])
+  @@index([organizationId, email, acceptedAt, revokedAt])
+  @@index([email])
 }
 
 model TwoFactorRecoveryCode {
