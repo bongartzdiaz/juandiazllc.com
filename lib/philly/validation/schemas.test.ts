@@ -28,6 +28,9 @@ import {
   deleteAccountSchema,
   deleteUserSchema,
   dsarScopeEnum,
+  onboardingStepEnum,
+  advanceOnboardingStepSchema,
+  updateOrgDetailsSchema,
 } from './schemas'
 
 // Schema coverage smoke tests. Every API route in /philly/api validates
@@ -619,5 +622,77 @@ describe('dsarScopeEnum', () => {
     expect(() => dsarScopeEnum.parse('all')).toThrow()
     expect(() => dsarScopeEnum.parse('admin')).toThrow()
     expect(() => dsarScopeEnum.parse('global')).toThrow()
+  })
+})
+
+// ── Onboarding wizard ──
+
+describe('onboardingStepEnum', () => {
+  it('accepts the 6 documented steps', () => {
+    for (const s of ['welcome', 'org', 'team', 'contacts', 'calendar', 'done']) {
+      expect(onboardingStepEnum.parse(s)).toBe(s)
+    }
+  })
+
+  it('rejects steps outside the wizard', () => {
+    expect(() => onboardingStepEnum.parse('billing')).toThrow()
+    expect(() => onboardingStepEnum.parse('start')).toThrow()
+  })
+})
+
+describe('advanceOnboardingStepSchema', () => {
+  it('accepts each valid step', () => {
+    expect(advanceOnboardingStepSchema.parse({ step: 'team' }).step).toBe('team')
+  })
+
+  it('rejects missing step', () => {
+    expect(() => advanceOnboardingStepSchema.parse({})).toThrow()
+  })
+
+  it('rejects invalid step', () => {
+    expect(() => advanceOnboardingStepSchema.parse({ step: 'totally_made_up' })).toThrow()
+  })
+})
+
+describe('updateOrgDetailsSchema', () => {
+  const valid = {
+    name: 'Acme Real Estate',
+    industry: 'realestate' as const,
+    timeZone: 'Europe/Amsterdam',
+    defaultCurrency: 'EUR' as const,
+  }
+
+  it('accepts a valid payload', () => {
+    expect(updateOrgDetailsSchema.parse(valid).name).toBe('Acme Real Estate')
+  })
+
+  it('trims whitespace from name', () => {
+    expect(updateOrgDetailsSchema.parse({ ...valid, name: '  Acme  ' }).name).toBe('Acme')
+  })
+
+  it('rejects whitespace-only name (trim then min-1)', () => {
+    expect(() => updateOrgDetailsSchema.parse({ ...valid, name: '   ' })).toThrow()
+  })
+
+  it('caps name length to prevent payload abuse', () => {
+    expect(() => updateOrgDetailsSchema.parse({ ...valid, name: 'a'.repeat(121) })).toThrow()
+  })
+
+  it('rejects unknown industry', () => {
+    expect(() => updateOrgDetailsSchema.parse({ ...valid, industry: 'philanthropy' })).toThrow()
+  })
+
+  it('makes industry optional (welcome step pre-fills it)', () => {
+    const { industry, ...rest } = valid
+    void industry
+    expect(updateOrgDetailsSchema.parse(rest).name).toBe('Acme Real Estate')
+  })
+
+  it('rejects unsupported currency', () => {
+    expect(() => updateOrgDetailsSchema.parse({ ...valid, defaultCurrency: 'JPY' })).toThrow()
+  })
+
+  it('rejects empty time zone', () => {
+    expect(() => updateOrgDetailsSchema.parse({ ...valid, timeZone: '' })).toThrow()
   })
 })

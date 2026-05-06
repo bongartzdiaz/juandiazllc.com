@@ -19,6 +19,17 @@ model Organization {
   // Soft-delete support (GDPR right to erasure). When set, the org is
   // hidden from auth/login flows; hard-purge runs 30 days later.
   deletedAt DateTime?
+  // First-time-setup wizard state. Cursor advances welcome → org → team →
+  // contacts → calendar → done. `skipped` is a terminal-ish state for an
+  // admin who clicked "Skip" on a step that wasn't required (the banner on
+  // the dashboard nudges them back).
+  onboardingStep        String   @default("welcome")
+  onboardingCompletedAt DateTime?
+  onboardingSkippedAt   DateTime?
+  // Captured during onboarding step 2; canonical at the org level. Replaces
+  // the localStorage-only `pai-industry` for newly-onboarded orgs.
+  timeZone        String @default("Europe/Amsterdam")
+  defaultCurrency String @default("EUR") // ISO 4217
   createdAt DateTime @default(now())
 
   users          User[]

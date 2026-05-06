@@ -366,6 +366,24 @@ export const deleteUserSchema = z.object({
 
 export const dsarScopeEnum = z.enum(['user', 'org'])
 
+// ── Onboarding wizard ──
+
+export const onboardingStepEnum = z.enum([
+  'welcome', 'org', 'team', 'contacts', 'calendar', 'done',
+])
+
+export const advanceOnboardingStepSchema = z.object({
+  step: onboardingStepEnum,
+})
+
+/** Step 2 — org details. Industry can be set here OR in step 1. */
+export const updateOrgDetailsSchema = z.object({
+  name: z.string().min(1).max(120).transform(s => s.trim()).pipe(z.string().min(1)),
+  industry: z.enum(['realestate', 'hospitality']).optional(),
+  timeZone: z.string().min(1).max(60),
+  defaultCurrency: z.enum(['EUR', 'USD', 'GBP', 'CHF', 'NOK', 'SEK', 'DKK']),
+})
+
 // ── Contact import (CSV → JSON) ──
 
 /**
