@@ -8,7 +8,7 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Modal } from '@/components/philly/ui/Modal'
 import { ContactForm } from '@/components/philly/forms/ContactForm'
 import type { ContactFormData } from '@/components/philly/forms/ContactForm'
-import { Search, Mail, Phone, FolderKanban } from 'lucide-react'
+import { Search, Mail, Phone, FolderKanban, Upload } from 'lucide-react'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useApi } from '@/hooks/philly/useApi'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
@@ -271,6 +271,19 @@ export default function ContactsPage() {
               }}
             >{s === 'all' ? t('all') : t(`types.${s}` as 'types.partner')}</button>
           ))}
+          <Link
+            href="/philly/contacts/import"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5,
+              padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
+              background: 'var(--bg2)', color: 'var(--txt2)',
+              border: '1px solid var(--border)', cursor: 'pointer',
+              textDecoration: 'none', marginLeft: 'auto',
+            }}
+          >
+            <Upload size={12} />
+            Import
+          </Link>
         </div>
 
         {/* Contact cards grid */}

@@ -366,3 +366,44 @@ export const deleteUserSchema = z.object({
 
 export const dsarScopeEnum = z.enum(['user', 'org'])
 
+// ── Contact import (CSV → JSON) ──
+
+/**
+ * Contact-type values the customer's CSV may put in the `type` column.
+ * Mirrors the Contact.type defaults across both verticals (RE + hospitality).
+ */
+export const contactTypeEnum = z.enum([
+  'partner', 'beneficiary', 'stakeholder', 'donor',
+  'buyer', 'seller', 'tenant', 'landlord',
+  'guest', 'vendor', 'staff', 'investor',
+])
+
+export const leadStatusEnum_v1 = z.enum([
+  'new', 'contacted', 'qualified', 'nurture', 'hot',
+  'under_contract', 'closed', 'lost',
+])
+
+/**
+ * One inbound row. Server validates every field independently — even
+ * trusted clients can post rows that don't match the local-parse contract.
+ */
+export const importContactRowSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(200).transform(s => s.trim()),
+  email: z.preprocess(
+    (v) => (typeof v === 'string' ? v.trim().toLowerCase() : v),
+    z.union([z.literal(''), z.string().email().max(254)]).optional().default(''),
+  ),
+  phone: z.string().max(50).optional().default(''),
+  company: z.string().max(200).optional().default(''),
+  type: contactTypeEnum.optional().default('stakeholder'),
+  notes: z.string().max(2000).optional().default(''),
+  leadSource: z.string().max(100).optional().default(''),
+  leadStatus: leadStatusEnum_v1.optional(),
+})
+
+export const importContactsSchema = z.object({
+  rows: z.array(importContactRowSchema).min(1, 'At least one row is required').max(10000, 'Max 10,000 rows per import'),
+  /** Filename for the audit row — purely informational. */
+  source: z.string().max(200).optional().default('csv'),
+})
+
