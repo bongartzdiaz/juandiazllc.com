@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
+import { AUTHOR_IMAGE_PATH, AUTHOR_IMAGE_URL } from "@/lib/seo/branding";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         "Construction-trained, operator-built. Revenue engines for operators in energy, real estate and hospitality.",
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
-      images: [{ url: "/me/portrait.jpg", width: 1200, height: 1200, alt: "Juan Diaz" }],
+      images: [{ url: AUTHOR_IMAGE_PATH, width: 1200, height: 1200, alt: "Juan Diaz" }],
     },
   };
 }
@@ -32,7 +33,7 @@ const personSchema = {
   name: "Juan Stefan Bongartz Diaz",
   alternateName: "Juan Diaz",
   url: `${SITE}/about`,
-  image: `${SITE}/me/portrait.jpg`,
+  image: AUTHOR_IMAGE_URL,
   jobTitle: "Founder, Juan Diaz, LLC",
   worksFor: {
     "@type": "Organization",

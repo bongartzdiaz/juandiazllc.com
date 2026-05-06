@@ -125,10 +125,10 @@ own domain. Target for 2026:
 - **Tweakers.net** — one op-ed on AI + energy-tech. DA ~80.
 - **El Confidencial (tech section)** — autoconsumo for ES operators.
 
-**Pitch template** lives at `/docs/pitch-template.md` (TODO — not
-yet written). Angle: "I'm the operator, here's what I learned
-building X — data from N installations." Not a pitch deck, a
-field report.
+**Pitch template** lives at [`/docs/pitch-template.md`](./docs/pitch-template.md).
+Angle: "I'm the operator, here's what I learned building X — data
+from N installations." Not a pitch deck, a field report. Includes
+per-publication cheat sheets for the four Tier-1 targets above.
 
 ### Tier 2 — directory + profile links
 

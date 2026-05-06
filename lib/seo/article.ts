@@ -4,6 +4,7 @@
 // founder's bio or social profiles — instead of editing each page.
 
 import type { Locale } from "@/lib/i18n/dict";
+import { AUTHOR_IMAGE_URL, ORG_LOGO_URL } from "@/lib/seo/branding";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -29,7 +30,7 @@ export const AUTHOR_PERSON = {
   name: "Juan Stefan Bongartz Diaz",
   alternateName: "Juan Diaz",
   url: `${SITE}/about`,
-  image: `${SITE}/me/portrait.jpg`,
+  image: AUTHOR_IMAGE_URL,
   jobTitle: "Founder, Juan Diaz, LLC",
   worksFor: {
     "@type": "Organization",
@@ -47,7 +48,7 @@ export const PUBLISHER_ORG = {
   "@type": "Organization" as const,
   name: "Juan Diaz, LLC",
   url: SITE,
-  logo: { "@type": "ImageObject", url: `${SITE}/icon.svg` },
+  logo: { "@type": "ImageObject", url: ORG_LOGO_URL },
 };
 
 export interface BlogPostingInput {
@@ -78,7 +79,7 @@ export function blogPostingSchema(input: BlogPostingInput): Record<string, unkno
     publisher: PUBLISHER_ORG,
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     url,
-    image: input.image ?? `${SITE}/me/portrait.jpg`,
+    image: input.image ?? AUTHOR_IMAGE_URL,
     ...(input.tag ? { keywords: input.tag } : {}),
     ...(input.articleBody ? { articleBody: input.articleBody } : {}),
     isAccessibleForFree: true,

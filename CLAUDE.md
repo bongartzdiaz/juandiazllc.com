@@ -380,3 +380,33 @@ cross-tenant leaks.
   mid-week-1 per sprint plan; current code works on either.
 - **`li.*` multi-tenancy**: single-tenant today (operator only);
   4-step migration plan documented when surface opens to customers.
+
+### 2026-05-06 (cont'd) — Bundle C: housekeeping + memory hygiene
+
+Small deck-clear bundle while picking up after the 10-bundle DEUS sprint.
+
+- **`lib/seo/branding.ts`** (NEW) — single source of truth for
+  `AUTHOR_IMAGE_URL`, `AUTHOR_IMAGE_PATH`, `AUTHOR_IMAGE_FALLBACK_URL`,
+  `ORG_LOGO_URL`. Replaced 3 callsites (`app/[locale]/layout.tsx`,
+  `app/[locale]/about/page.tsx`, `lib/seo/article.ts`) that hardcoded
+  `${SITE}/me/portrait.jpg`. Until the operator drops a real portrait,
+  the URL still 404s — but now there's one constant to flip to the
+  fallback (`/icon-512.svg` exists today) without grepping.
+  `MANUAL_TASKS.md` brand-assets entry expanded to point at the
+  constant.
+- **`docs/pitch-template.md`** (NEW) — replaces the
+  `SEO.md:128` "TODO — not yet written" placeholder for the Tier-1
+  outreach pitch template (Solar Magazine NL, PV Magazine DE,
+  Tweakers, El Confidencial). Includes per-publication editor notes,
+  word-count targets, follow-up cadence, anti-pattern list. Used as
+  the operator playbook for backlinks → DA growth.
+- **`SEO.md`** — TODO marker removed, link points at the new doc.
+- **Memory hygiene** — extracted the LinkedIn-Outreach session block
+  from `~/.claude/projects/.../memory/MEMORY.md` (lines 7–41) into
+  its own `project_linkedin_outreach.md`. MEMORY.md is now a clean
+  index file (6 entries, all one-liners pointing at separate memory
+  files). Standard pattern going forward.
+
+Touched 7 files. Typecheck clean. 222/222 vitest still green (no
+test changes — pure rename + new docs). No new migrations, no env
+vars, no breaking changes.

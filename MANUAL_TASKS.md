@@ -36,7 +36,15 @@ already shipped. Strike through (`~~...~~`) when done.
 
 ## Brand assets (from earlier sessions)
 
-- [ ] Drop real portrait at `/public/me/portrait.jpg` (used on /about).
+- [ ] Drop real portrait at `/public/me/portrait.jpg`. Used in `Person`
+      and `Organization` JSON-LD on every page, plus the OG card on
+      `/about`. The path is centralised in `lib/seo/branding.ts`
+      (`AUTHOR_IMAGE_URL` / `AUTHOR_IMAGE_PATH`). Until the file lands,
+      the URL 404s — Google Search will skip the image but won't error;
+      OG cards on socials will render without a preview image. To
+      activate the SVG fallback (`/icon-512.svg`) in the meantime, swap
+      `AUTHOR_IMAGE_URL` to `AUTHOR_IMAGE_FALLBACK_URL` in
+      `lib/seo/branding.ts`.
 - [ ] Drop real hero image at `/public/hero.jpg` (used on home hero
       fallback layer).
 
