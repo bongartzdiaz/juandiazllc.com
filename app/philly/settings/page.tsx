@@ -707,38 +707,55 @@ export default function SettingsPage() {
           {activeSection === 'integrations' && (
             <div>
               <div style={sectionTitleStyle}>Integrations</div>
-              <div style={sectionSubStyle}>Connect external services</div>
+              <div style={sectionSubStyle}>
+                Integrations come in two flavours, on two pages.
+              </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {[
-                  { name: 'GoHighLevel', status: 'Connected', connected: true },
-                  { name: 'Supabase', status: 'Connected', connected: true },
-                  { name: 'Slack', status: 'Not connected', connected: false },
-                  { name: 'Google Analytics', status: 'Not connected', connected: false },
-                ].map(int => (
-                  <div key={int.name} style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '12px 14px', borderRadius: 10,
-                    background: 'var(--bg2)', border: '1px solid var(--border)',
-                  }}>
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 600 }}>{int.name}</div>
-                      <div style={{ fontSize: 11, color: int.connected ? 'var(--g-txt)' : 'var(--txt3)' }}>
-                        {int.status}
-                      </div>
+              {/* Personal — calendar (per-user, real). Live data is on the
+                  dedicated /settings/integrations page; we just route there
+                  so we don't fork the source of truth into two surfaces. */}
+              <div style={{
+                padding: '14px 16px', borderRadius: 12,
+                background: 'var(--bg2)', border: '1px solid var(--border)',
+                marginBottom: 10,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600 }}>Personal — calendar</div>
+                    <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 3, lineHeight: 1.5 }}>
+                      Google Calendar + Outlook connections tied to your account. Each
+                      teammate connects their own. Read-only, encrypted at rest.
                     </div>
-                    <button style={{
-                      padding: '5px 14px', borderRadius: 7,
-                      fontSize: 11, fontWeight: 600, cursor: 'pointer',
-                      background: int.connected ? 'var(--bg2)' : 'var(--accent)',
-                      color: int.connected ? 'var(--txt2)' : '#fff',
-                      border: int.connected ? '1px solid var(--border)' : 'none',
-                      fontFamily: 'inherit',
-                    }}>
-                      {int.connected ? 'Configure' : 'Connect'}
-                    </button>
                   </div>
-                ))}
+                  <a href="/philly/settings/integrations" style={{
+                    ...accentBtnStyle, textDecoration: 'none', flexShrink: 0,
+                  }}>Manage</a>
+                </div>
+              </div>
+
+              {/* Workspace — org-wide tools (Stripe, Slack, Mailchimp...). The
+                  /philly/integrations page already exists for this with a real
+                  connector catalog. */}
+              <div style={{
+                padding: '14px 16px', borderRadius: 12,
+                background: 'var(--bg2)', border: '1px solid var(--border)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600 }}>Workspace — org-wide tools</div>
+                    <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 3, lineHeight: 1.5 }}>
+                      Stripe billing, Slack, Mailchimp, QuickBooks, and other tools that
+                      connect once for the whole organization.
+                    </div>
+                  </div>
+                  <a href="/philly/integrations" style={{
+                    padding: '7px 16px', borderRadius: 8,
+                    fontSize: 12, fontWeight: 600, fontFamily: 'inherit',
+                    background: 'var(--bg2)', color: 'var(--txt2)',
+                    border: '1px solid var(--border)', textDecoration: 'none',
+                    flexShrink: 0,
+                  }}>Open</a>
+                </div>
               </div>
             </div>
           )}

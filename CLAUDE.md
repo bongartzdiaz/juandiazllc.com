@@ -601,3 +601,44 @@ when status is `active` or `trialing`). My job was just keeping the
 15 files added (6 lib including 3 test files, 4 routes, 1 settings UI,
 1 middleware diff, 1 webhook handler). NO new schema migrations
 needed — Subscription model was already shipped.
+
+### 2026-05-07 — Bundle F: per-user integrations settings surface
+
+Closes the gap between the onboarding wizard (one-time, per-user calendar
+connect) and post-onboarding management. Yesterday's Bundle A wired
+calendar OAuth through `/philly/onboarding/calendar`, which users only
+see during initial setup — nowhere to manage connections after that.
+
+- **`app/philly/settings/integrations/page.tsx`** (NEW) — dedicated
+  per-user settings surface. Polls `/api/calendar/connections`, shows
+  Google + Microsoft rows with Connect / Disconnect, surfaces `?error=`
+  / `?connected=` query-param feedback from the OAuth callback. Same
+  trust panel ("what we read, what we don't") as the wizard so the
+  promise stays consistent across surfaces.
+- **`app/philly/settings/page.tsx`** — replaced the integrations tab
+  kitchen-sink stub (which had hardcoded fake `GoHighLevel/Supabase/
+  Slack/GA` rows) with two cards: "Personal — calendar" links to
+  `/philly/settings/integrations`, "Workspace — org-wide tools" links
+  to the existing `/philly/integrations`. No more fake data.
+
+**Architecture decision**: kept the per-user surface (`/settings/integrations`)
+distinct from the per-org surface (`/philly/integrations`) because the
+underlying data models are different — `CalendarConnection` is per-user
+(every teammate connects their own calendar) while the workspace
+`Integration` model is per-org (one Stripe key, one Slack workspace).
+Forcing them onto a single page would have required either:
+- Tagging each row "personal vs workspace" — confusing UX
+- Or merging the data models — would have broken per-user calendar isolation
+
+Two surfaces, clearly labelled, is honest.
+
+**No new schema, no new API routes, no new lib code.** Pure UI completion
+on top of yesterday's Bundle A. Typecheck clean. 289/289 vitest still
+green (no tests for UI-only changes; the API was test-covered in Bundle A).
+
+### 2026-05-07 — Bundle E: confirmed already shipped
+
+Earlier session log claimed `/tools/energy-roi` was "not yet routed" —
+verified incorrect. The page (`app/[locale]/tools/energy-roi/page.tsx`)
+shipped in PR #9 (`9038b9e`), with sitemap entry + two CTAs from
+`/sectors/energy` (anchor callout + dedicated card). No work needed.
