@@ -814,3 +814,28 @@ plus a UX touch so users can see the sync is healthy.
 delegates to `push-sync.ts` which is already test-covered, and the UI
 addition is pure rendering on top of the typed response). Typecheck
 clean.
+
+### 2026-05-07 — middleware fix surfaced by preview verification
+
+While verifying Bundle D2 in a local preview I tried to call
+`POST /api/calendar/cron/renew-channels` without a session and got
+`opaqueredirect` (302 to /login) instead of the expected 401 from the
+route handler. Realised the middleware redirect happens BEFORE the
+route's own `X-Cron-Secret` check, so any external scheduler hitting
+this endpoint gets bounced. Same architectural shape as `/api/health`
+hit earlier in PR #12.
+
+This was also a latent bug in `/api/audit/prune` (shipped weeks ago,
+documented as cron-callable in its header comment, but actually
+unreachable from any non-session caller). Both routes now in
+`PUBLIC_PHILLY_PATHS`. The route-level auth check (X-Cron-Secret OR
+admin session) is unchanged — the allowlist entry just lets the
+request reach the handler.
+
+Verified post-fix: all three previously-broken endpoints now return
+401 from `requireRole` instead of 302 from middleware. 302/302 tests
+still green; no test code touched.
+
+Lesson: spin up a preview EARLIER when shipping cron-style routes —
+unit tests don't catch middleware-shape bugs because they don't
+exercise the middleware path.

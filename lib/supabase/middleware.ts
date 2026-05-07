@@ -58,6 +58,14 @@ export async function updateSession(request: NextRequest, requestHeaders?: Heade
     // (Google: X-Goog-Channel-Token, Microsoft: clientState in body).
     "/philly/api/calendar/webhook/google",
     "/philly/api/calendar/webhook/microsoft",
+    // Cron-callable routes — the X-Cron-Secret header is the auth, but
+    // the middleware can't see headers (it only checks the Supabase
+    // cookie). Without this allowlist entry, any external scheduler is
+    // bounced to /login before the route's own auth check runs.
+    // Both routes ALSO accept admin-session callers (manual-trigger
+    // path), but session-callers don't need the allowlist anyway.
+    "/philly/api/audit/prune",
+    "/philly/api/calendar/cron/renew-channels",
   ]);
   if (!user && isProtected && !PUBLIC_PHILLY_PATHS.has(path)) {
     const url = request.nextUrl.clone();
