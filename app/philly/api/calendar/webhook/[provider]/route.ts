@@ -32,15 +32,35 @@
  * works end-to-end without committing to a delta-fetch implementation.
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import crypto from 'crypto'
 import { decryptSecret } from '@/lib/philly/crypto'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { syncDeltaForChannel } from '@/lib/philly/calendar/delta-sync'
 import { logger } from '@/lib/philly/logger'
+import { enforceRateLimit, clientIp } from '@/lib/philly/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+// Per-IP rate-limit for the webhook surface. The route is on the
+// PUBLIC_PHILLY_PATHS allowlist (provider servers don't carry our
+// session cookie); the per-channel HMAC secret is the only auth.
+// Without an IP throttle, an attacker who learns the URL could flood
+// the endpoint and burn a DB lookup per request before the auth check.
+//
+// Generous capacity — Google + MS can legitimately fire dozens of
+// notifications in a second on a busy calendar. 300 burst / 10 RPS
+// fits real provider traffic with margin and still chokes brute-force
+// scanners.
+const WEBHOOK_RATE = { capacity: 300, refillPerSec: 10 } as const
+
+/** Length of the base64url-encoded shared secret we generate per
+ *  channel (32 random bytes → 43 chars). MS clientState values that
+ *  don't match this length cannot match any real secret, so we can
+ *  reject them BEFORE the DB lookup. */
+const AUTH_SECRET_LEN = 43
+const AUTH_SECRET_RE = /^[A-Za-z0-9_-]{43}$/
 
 type ProviderParam = 'google' | 'microsoft'
 
@@ -56,6 +76,12 @@ export async function POST(
   if (!isProvider(provider)) {
     return NextResponse.json({ error: 'unknown_provider' }, { status: 400 })
   }
+
+  // Per-IP rate limit. Applied BEFORE the MS validation handshake
+  // branch is fine because PRESET_READ-class capacity easily
+  // accommodates a one-shot validation request even after a flood.
+  const rateLimited = enforceRateLimit(`calendar-webhook:${clientIp(req)}`, WEBHOOK_RATE)
+  if (rateLimited) return rateLimited
 
   // Microsoft validation handshake — must be the FIRST branch since the
   // request shape is different from a real notification (text/plain body,
@@ -231,9 +257,20 @@ async function handleMicrosoft(req: NextRequest): Promise<NextResponse> {
   // MS can batch multiple notifications across DIFFERENT subscriptions
   // into a single POST (rare, but documented). Group by subscriptionId
   // so we look up each channel exactly once.
+  //
+  // PRE-DB shape filter: if a notification doesn't have a clientState
+  // matching the base64url(32-byte) shape we generated at subscribe-time,
+  // it cannot match any real secret. Drop the subscription from the
+  // lookup set entirely instead of paying for a DB query that will
+  // fail the timing-safe compare a millisecond later. This shrinks the
+  // attacker's flood-the-DB surface (audit MED F4).
   const bySubId = new Map<string, MsNotification[]>()
   for (const n of items) {
     if (!n.subscriptionId) continue
+    if (!n.clientState || !AUTH_SECRET_RE.test(n.clientState)) {
+      // Malformed clientState — skip without DB lookup.
+      continue
+    }
     const list = bySubId.get(n.subscriptionId) ?? []
     list.push(n)
     bySubId.set(n.subscriptionId, list)
@@ -273,6 +310,12 @@ async function handleMicrosoft(req: NextRequest): Promise<NextResponse> {
     // Verify EVERY notification in the group — if any clientState doesn't
     // match, treat the whole batch as suspect. Same constant-time compare
     // discipline as Google.
+    //
+    // CONTRIBUTOR NOTE: clientState is a shared HMAC-equivalent secret.
+    // Never log its value (or `expected`, or `n.clientState`) — only the
+    // channelId, which is non-sensitive. A future "easier debugging"
+    // patch that prints these would silently leak credentials into log
+    // exports.
     const allValid = group.every((n) => n.clientState && timingSafeEquals(n.clientState, expected))
     if (!allValid) {
       logger.warn('[calendar webhook ms] clientState mismatch', { channelId: channel.id })
@@ -281,38 +324,49 @@ async function handleMicrosoft(req: NextRequest): Promise<NextResponse> {
     acceptedCount += group.length
   }
 
-  // Always 202 to MS — they're strict about the 3s SLA. Anything we
-  // skipped (unknown sub, auth failure, inactive) is logged but doesn't
-  // cause a retry.
-  //
-  // Run the per-channel deltas inline but in parallel. MS's 3-second
-  // budget covers verify (already done above) + the parallel deltas;
-  // each is one calendarView/delta call (typical p95 <800ms). If we
-  // ever exceed the budget in practice, swap to Next.js `after()` so
-  // the response returns before the deltas finish.
-  const syncResults = await Promise.allSettled(
-    Array.from(byExternalId.values())
-      .filter((c) => c.status === 'active')
-      .map((c) => syncDeltaForChannel(c.id)),
-  )
-  let syncedOk = 0
-  for (const r of syncResults) {
-    if (r.status === 'fulfilled' && r.value.ok) syncedOk++
-    else if (r.status === 'rejected') {
-      logger.warn('[calendar webhook ms] sync rejected', { reason: String(r.reason).slice(0, 200) })
-    } else if (r.status === 'fulfilled' && !r.value.ok) {
-      logger.warn('[calendar webhook ms] sync failed', { error: r.value.error, status: r.value.status })
-    }
-  }
+  // Collect channels we will sync AFTER returning the response. MS has
+  // a hard 3-second SLA; doing the per-channel calendarView/delta calls
+  // inline (each ~500-800ms) blows the budget on batches of 4+.
+  // Next.js `after()` lets us return 202 immediately and run the syncs
+  // out-of-band — same idempotency posture (the sync writes are
+  // dedup'd against the syncToken / deltaLink).
+  const channelsToSync = Array.from(byExternalId.values())
+    .filter((c) => c.status === 'active')
+    .map((c) => c.id)
 
-  logger.info('[calendar webhook ms] batch processed', {
+  after(async () => {
+    if (channelsToSync.length === 0) return
+    const syncResults = await Promise.allSettled(
+      channelsToSync.map((id) => syncDeltaForChannel(id)),
+    )
+    let syncedOk = 0
+    for (const r of syncResults) {
+      if (r.status === 'fulfilled' && r.value.ok) syncedOk++
+      else if (r.status === 'rejected') {
+        logger.warn('[calendar webhook ms] sync rejected', {
+          reason: String(r.reason).slice(0, 200),
+        })
+      } else if (r.status === 'fulfilled' && !r.value.ok) {
+        logger.warn('[calendar webhook ms] sync failed', {
+          error: r.value.error,
+          status: r.value.status,
+        })
+      }
+    }
+    logger.info('[calendar webhook ms] post-response sync done', {
+      attempted: channelsToSync.length,
+      syncedOk,
+    })
+  })
+
+  logger.info('[calendar webhook ms] batch accepted', {
     total: items.length,
     accepted: acceptedCount,
     subscriptions: subIds.length,
-    syncedOk,
+    syncQueued: channelsToSync.length,
   })
   return NextResponse.json(
-    { received: true, accepted: acceptedCount, synced: syncedOk },
+    { received: true, accepted: acceptedCount, syncQueued: channelsToSync.length },
     { status: 202 },
   )
 }

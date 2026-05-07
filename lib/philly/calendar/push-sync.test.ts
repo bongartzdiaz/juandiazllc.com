@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { __internals } from './push-sync'
+import { __internals, statusToErrorCode } from './push-sync'
 
 const {
   GOOGLE_CHANNEL_TTL_MS,
@@ -93,5 +93,63 @@ describe('generateAuthSecret', () => {
   it('fits within Google channel token 256-character limit', () => {
     const secret = generateAuthSecret()
     expect(secret.length).toBeLessThanOrEqual(256)
+  })
+})
+
+describe('statusToErrorCode (lastError sanitisation, compliance F9)', () => {
+  it('buckets 4xx as provider_4xx', () => {
+    expect(statusToErrorCode(400)).toBe('provider_4xx')
+    expect(statusToErrorCode(401)).toBe('provider_4xx')
+    expect(statusToErrorCode(404)).toBe('provider_4xx')
+    expect(statusToErrorCode(429)).toBe('provider_4xx')
+    expect(statusToErrorCode(499)).toBe('provider_4xx')
+  })
+
+  it('buckets 5xx as provider_5xx', () => {
+    expect(statusToErrorCode(500)).toBe('provider_5xx')
+    expect(statusToErrorCode(502)).toBe('provider_5xx')
+    expect(statusToErrorCode(503)).toBe('provider_5xx')
+    expect(statusToErrorCode(599)).toBe('provider_5xx')
+  })
+
+  it('falls back to provider_unexpected_status outside the 4xx-5xx range', () => {
+    expect(statusToErrorCode(200)).toBe('provider_unexpected_status')
+    expect(statusToErrorCode(302)).toBe('provider_unexpected_status')
+    expect(statusToErrorCode(0)).toBe('provider_unexpected_status')
+    expect(statusToErrorCode(600)).toBe('provider_unexpected_status')
+  })
+
+  it('only emits the controlled enum bucket — never raw provider text', () => {
+    // Property test: every status maps to one of a fixed set, with no
+    // user-supplied content leaking through.
+    const allowed = new Set([
+      'provider_4xx',
+      'provider_5xx',
+      'provider_unexpected_status',
+    ])
+    for (const s of [100, 200, 301, 400, 418, 499, 500, 504, 599, 700]) {
+      expect(allowed.has(statusToErrorCode(s))).toBe(true)
+    }
+  })
+})
+
+describe('AUTH_SECRET shape (clientState pre-DB filter, audit F4b)', () => {
+  it('a real generated secret is 43 chars of base64url', () => {
+    const secret = generateAuthSecret()
+    expect(secret.length).toBe(43)
+    expect(/^[A-Za-z0-9_-]{43}$/.test(secret)).toBe(true)
+  })
+
+  it('rejects shapes that cannot match any real secret', () => {
+    const re = /^[A-Za-z0-9_-]{43}$/
+    expect(re.test('')).toBe(false)
+    expect(re.test('short')).toBe(false)
+    expect(re.test('A'.repeat(42))).toBe(false)
+    expect(re.test('A'.repeat(44))).toBe(false)
+    // 43 chars but contains an out-of-charset symbol
+    expect(re.test('A'.repeat(42) + '!')).toBe(false)
+    // 43 chars but contains '+' / '/' (standard base64, not base64url)
+    expect(re.test('A'.repeat(42) + '+')).toBe(false)
+    expect(re.test('A'.repeat(42) + '/')).toBe(false)
   })
 })

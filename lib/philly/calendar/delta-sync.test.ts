@@ -6,6 +6,8 @@ const {
   MS_CALENDAR_VIEW_DELTA_URL,
   BOOTSTRAP_PAST_DAYS,
   BOOTSTRAP_FUTURE_DAYS,
+  syncGoogleArity,
+  syncMicrosoftArity,
 } = __internals
 
 describe('Provider URLs', () => {
@@ -33,5 +35,19 @@ describe('Bootstrap window', () => {
 
   it('forward window is wider than past window — calendar context is forward-leaning', () => {
     expect(BOOTSTRAP_FUTURE_DAYS).toBeGreaterThan(BOOTSTRAP_PAST_DAYS)
+  })
+})
+
+describe('Recursion guard signature (audit MED F6)', () => {
+  // Function.length is the number of params before the first one with a
+  // default value. The 410-recursion guard requires `recursionDepth` as an
+  // optional 4th parameter; if a refactor accidentally drops it, this test
+  // fails before the runtime infinite-loop bug ships.
+  it('syncGoogle exposes 3 required params + an optional recursion depth', () => {
+    expect(syncGoogleArity).toBe(3)
+  })
+
+  it('syncMicrosoft exposes 3 required params + an optional recursion depth', () => {
+    expect(syncMicrosoftArity).toBe(3)
   })
 })

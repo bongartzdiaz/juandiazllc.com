@@ -110,6 +110,7 @@ async function syncGoogle(
   channelId: string,
   accessToken: string,
   syncToken: string | null,
+  recursionDepth: number = 0,
 ): Promise<SyncResult> {
   const url = new URL(GOOGLE_EVENTS_LIST_URL)
   if (syncToken) {
@@ -139,14 +140,20 @@ async function syncGoogle(
   }
 
   // 410 GONE → syncToken expired. Drop it and recurse for a bootstrap
-  // sync. Recursion bottoms out because we set syncToken=null.
+  // sync. Depth guard: a second 410 in the same call means something is
+  // genuinely broken (e.g. the bootstrap call itself is rejected) and we
+  // bail loud rather than loop. Recursion only ever bottoms out at depth
+  // 1; depth 2 is unreachable in correct code.
   if (res.status === 410) {
+    if (recursionDepth >= 1) {
+      return zero({ error: 'persistent_410', status: 410 })
+    }
     const prisma = getAuthPrisma()
     await prisma.calendarChannel.update({
       where: { id: channelId },
       data: { syncToken: null },
     })
-    return await syncGoogle(channelId, accessToken, null)
+    return await syncGoogle(channelId, accessToken, null, recursionDepth + 1)
   }
 
   if (!res.ok) {
@@ -205,6 +212,7 @@ async function syncMicrosoft(
   channelId: string,
   accessToken: string,
   deltaLink: string | null,
+  recursionDepth: number = 0,
 ): Promise<SyncResult> {
   // For MS, the syncToken column actually stores the full @odata.deltaLink
   // URL. On bootstrap we hit calendarView/delta directly with a date
@@ -241,14 +249,20 @@ async function syncMicrosoft(
   }
 
   // MS Graph returns 410 / 404 when the deltaLink is too old / invalid.
-  // Drop the link and recurse for a fresh bootstrap.
+  // Drop the link and recurse for a fresh bootstrap. Depth guard mirrors
+  // the Google branch — a second 410/404 means something is genuinely
+  // broken (provider-side error on the bootstrap window itself) and we
+  // bail loud rather than loop.
   if (res.status === 410 || res.status === 404) {
+    if (recursionDepth >= 1) {
+      return zero({ error: 'persistent_410', status: res.status })
+    }
     const prisma = getAuthPrisma()
     await prisma.calendarChannel.update({
       where: { id: channelId },
       data: { syncToken: null },
     })
-    return await syncMicrosoft(channelId, accessToken, null)
+    return await syncMicrosoft(channelId, accessToken, null, recursionDepth + 1)
   }
 
   if (!res.ok) {
@@ -318,10 +332,14 @@ function zero(extra: Partial<SyncResult> & { error?: string; status?: number }):
   }
 }
 
-/** Test-only — the URL/window constants. */
+/** Test-only — the URL/window constants + signature checks. */
 export const __internals = {
   GOOGLE_EVENTS_LIST_URL,
   MS_CALENDAR_VIEW_DELTA_URL,
   BOOTSTRAP_PAST_DAYS,
   BOOTSTRAP_FUTURE_DAYS,
+  // Exposed as length-only references so tests can assert the
+  // recursion guard exists without invoking a live HTTP call.
+  syncGoogleArity: syncGoogle.length,
+  syncMicrosoftArity: syncMicrosoft.length,
 }

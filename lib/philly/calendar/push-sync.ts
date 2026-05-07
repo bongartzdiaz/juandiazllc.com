@@ -20,6 +20,7 @@ import crypto from 'crypto'
 import { encryptSecret, decryptSecret } from '@/lib/philly/crypto'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { getActiveConnection } from './connection'
+import { logger } from '@/lib/philly/logger'
 import type { ProviderKey } from './providers'
 
 // Google channel TTL is documented as up to 7 days. We request 6 days so
@@ -472,14 +473,18 @@ async function renewGoogle(args: RenewGoogleArgs): Promise<RenewResult> {
       }),
     })
   } catch (err) {
-    await markRenewError(args.channelId, errorMessage(err))
-    return { ok: false, error: 'provider_request_failed', detail: errorMessage(err) }
+    const detail = errorMessage(err)
+    // Full detail goes to logger; lastError gets a controlled bucket.
+    logger.warn('[calendar push-sync google] renew network error', { channelId: args.channelId, detail })
+    await markRenewError(args.channelId, 'provider_network_error')
+    return { ok: false, error: 'provider_request_failed', detail }
   }
 
   if (!res.ok) {
     const text = await res.text().catch(() => '')
     const detail = `${res.status} ${text.slice(0, 200)}`
-    await markRenewError(args.channelId, detail)
+    logger.warn('[calendar push-sync google] renew non-ok', { channelId: args.channelId, detail })
+    await markRenewError(args.channelId, statusToErrorCode(res.status))
     return { ok: false, error: 'provider_request_failed', detail }
   }
 
@@ -537,14 +542,17 @@ async function renewMicrosoft(args: RenewMsArgs): Promise<RenewResult> {
       }),
     })
   } catch (err) {
-    await markRenewError(args.channelId, errorMessage(err))
-    return { ok: false, error: 'provider_request_failed', detail: errorMessage(err) }
+    const detail = errorMessage(err)
+    logger.warn('[calendar push-sync ms] renew network error', { channelId: args.channelId, detail })
+    await markRenewError(args.channelId, 'provider_network_error')
+    return { ok: false, error: 'provider_request_failed', detail }
   }
 
   if (!res.ok) {
     const text = await res.text().catch(() => '')
     const detail = `${res.status} ${text.slice(0, 200)}`
-    await markRenewError(args.channelId, detail)
+    logger.warn('[calendar push-sync ms] renew non-ok', { channelId: args.channelId, detail })
+    await markRenewError(args.channelId, statusToErrorCode(res.status))
     return { ok: false, error: 'provider_request_failed', detail }
   }
 
@@ -565,11 +573,31 @@ async function renewMicrosoft(args: RenewMsArgs): Promise<RenewResult> {
   return { ok: true, newExpiresAt: providerExpiry }
 }
 
-async function markRenewError(channelId: string, detail: string): Promise<void> {
+/** Controlled enum for `lastError` on a renew failure. We do NOT
+ *  store verbatim provider response bodies — Microsoft + Google 4xx
+ *  errors can echo back user emails or event IDs (compliance LOW F9).
+ *  The full text still goes to the structured logger via the calling
+ *  site, so operators don't lose debugging context. */
+export type RenewErrorCode =
+  | 'auth_secret_decrypt_failed'
+  | 'response_invalid'
+  | 'provider_network_error'
+  | 'provider_4xx'
+  | 'provider_5xx'
+  | 'provider_unexpected_status'
+
+/** Map an HTTP status to a controlled enum bucket. */
+export function statusToErrorCode(status: number): RenewErrorCode {
+  if (status >= 400 && status < 500) return 'provider_4xx'
+  if (status >= 500 && status < 600) return 'provider_5xx'
+  return 'provider_unexpected_status'
+}
+
+async function markRenewError(channelId: string, code: RenewErrorCode): Promise<void> {
   const prisma = getAuthPrisma()
   await prisma.calendarChannel.update({
     where: { id: channelId },
-    data: { lastError: `renew:${detail.slice(0, 500)}` },
+    data: { lastError: `renew:${code}` },
   })
 }
 
