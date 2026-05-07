@@ -38,6 +38,7 @@
 import { decryptSecret } from '@/lib/philly/crypto'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { getActiveConnection } from './connection'
+import { persistEvents, type NormalisedEvent } from './event-persistence'
 import type { ProviderKey } from './providers'
 
 const GOOGLE_EVENTS_LIST_URL =
@@ -97,7 +98,7 @@ export async function syncDeltaForChannel(channelId: string): Promise<SyncResult
   const channel = await prisma.calendarChannel.findUnique({
     where: { id: channelId },
     include: {
-      connection: { select: { userId: true, provider: true } },
+      connection: { select: { id: true, userId: true, organizationId: true, provider: true } },
     },
   })
   if (!channel) {
@@ -113,17 +114,35 @@ export async function syncDeltaForChannel(channelId: string): Promise<SyncResult
     return zero({ error: 'connection_unavailable' })
   }
 
-  if (provider === 'google') {
-    return await syncGoogle(channelId, conn.accessToken, channel.syncToken)
+  const ctx: SyncContext = {
+    channelId,
+    connectionId: channel.connection.id,
+    organizationId: channel.connection.organizationId,
+    userId: channel.connection.userId,
+    accessToken: conn.accessToken,
   }
-  return await syncMicrosoft(channelId, conn.accessToken, channel.syncToken)
+
+  if (provider === 'google') {
+    return await syncGoogle(ctx, channel.syncToken)
+  }
+  return await syncMicrosoft(ctx, channel.syncToken)
+}
+
+/** Per-call context for the provider-specific sync workers. Kept as
+ *  one object so the function signatures stay manageable as we add
+ *  fields (persistence, observability, etc.). */
+interface SyncContext {
+  channelId: string
+  connectionId: string
+  organizationId: string
+  userId: string
+  accessToken: string
 }
 
 // ─── Google ─────────────────────────────────────────────────────────
 
 async function syncGoogle(
-  channelId: string,
-  accessToken: string,
+  ctx: SyncContext,
   syncToken: string | null,
   recursionDepth: number = 0,
 ): Promise<SyncResult> {
@@ -149,19 +168,15 @@ async function syncGoogle(
   }
 
   const buildNextPageUrl = (pageToken: string): string => {
-    // For paging, Google requires re-supplying the original query (sync
-    // token OR window) plus the pageToken. Easiest: rebuild and add.
     const u = new URL(buildFirstPageUrl())
     u.searchParams.set('pageToken', pageToken)
     return u.toString()
   }
 
-  let added = 0
-  let updated = 0
-  let removed = 0
   let totalProcessed = 0
   let nextSyncToken: string | undefined
   let pageToken: string | undefined
+  const collected: NormalisedEvent[] = []
 
   for (let page = 0; page < MAX_PAGES; page++) {
     const target = page === 0 ? buildFirstPageUrl() : buildNextPageUrl(pageToken!)
@@ -169,26 +184,22 @@ async function syncGoogle(
     let res: Response
     try {
       res = await fetch(target, {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: { Authorization: `Bearer ${ctx.accessToken}` },
       })
     } catch (err) {
       return zero({ error: `network:${(err as Error).message?.slice(0, 100)}` })
     }
 
-    // 410 GONE → syncToken expired. Drop it and recurse for a bootstrap
-    // sync. Depth guard: a second 410 means something is genuinely
-    // broken (e.g. the bootstrap call itself is rejected) and we bail
-    // loud rather than loop. Recursion only ever bottoms out at depth 1.
     if (res.status === 410) {
       if (recursionDepth >= 1) {
         return zero({ error: 'persistent_410', status: 410 })
       }
       const prisma = getAuthPrisma()
       await prisma.calendarChannel.update({
-        where: { id: channelId },
+        where: { id: ctx.channelId },
         data: { syncToken: null },
       })
-      return await syncGoogle(channelId, accessToken, null, recursionDepth + 1)
+      return await syncGoogle(ctx, null, recursionDepth + 1)
     }
 
     if (!res.ok) {
@@ -197,7 +208,7 @@ async function syncGoogle(
 
     const json = (await res.json().catch(() => null)) as
       | {
-          items?: Array<{ status?: string; id: string }>
+          items?: GoogleEventPayload[]
           nextSyncToken?: string
           nextPageToken?: string
         }
@@ -208,15 +219,9 @@ async function syncGoogle(
 
     const items = json.items ?? []
     totalProcessed += items.length
-    // Google encodes deletions as items with `status: 'cancelled'`.
-    // Created and updated aren't differentiated in the response — we
-    // infer based on whether we've seen the event id before. Since we
-    // don't yet persist event rows, we count cancellations as `removed`
-    // and the rest as `added` for now. Bundle D4 (with persistence)
-    // will distinguish updated vs added by checking the local row.
     for (const it of items) {
-      if (it.status === 'cancelled') removed++
-      else added++
+      const norm = normaliseGoogleEvent(it)
+      if (norm) collected.push(norm)
     }
 
     if (json.nextSyncToken) {
@@ -227,18 +232,25 @@ async function syncGoogle(
       pageToken = json.nextPageToken
       continue
     }
-    // No nextPageToken AND no nextSyncToken — a Google response shape
-    // we shouldn't see (bootstrap call without orderBy can omit the
-    // sync token, but our bootstrap sets orderBy=startTime). Bail
-    // without rotating the token; next notification will retry.
     break
   }
+
+  // Persist collected events BEFORE rotating the token. If persistence
+  // fails halfway through, we want the next notification to re-sync the
+  // same window, not skip to the next checkpoint.
+  const persisted = await persistEvents({
+    connectionId: ctx.connectionId,
+    organizationId: ctx.organizationId,
+    userId: ctx.userId,
+    provider: 'google',
+    events: collected,
+  })
 
   let tokenRotated = false
   if (nextSyncToken) {
     const prisma = getAuthPrisma()
     await prisma.calendarChannel.update({
-      where: { id: channelId },
+      where: { id: ctx.channelId },
       data: {
         syncToken: nextSyncToken,
         lastError: null,
@@ -251,24 +263,56 @@ async function syncGoogle(
     ok: true,
     bootstrapped: !syncToken,
     processed: totalProcessed,
-    added,
-    updated,
-    removed,
+    added: persisted.persisted,
+    updated: 0,
+    removed: persisted.cancelled,
     tokenRotated,
+  }
+}
+
+interface GoogleEventPayload {
+  id: string
+  status?: string
+  summary?: string
+  description?: string
+  location?: string
+  htmlLink?: string
+  start?: { dateTime?: string; date?: string }
+  end?: { dateTime?: string; date?: string }
+  attendees?: Array<{ email?: string }>
+}
+
+function normaliseGoogleEvent(raw: GoogleEventPayload): NormalisedEvent | null {
+  if (!raw.id) return null
+  const start = raw.start?.dateTime ?? raw.start?.date
+  const end = raw.end?.dateTime ?? raw.end?.date
+  if (!start || !end) return null
+  const startDate = new Date(start)
+  const endDate = new Date(end)
+  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) return null
+  return {
+    externalId: raw.id,
+    title: raw.summary ?? '',
+    description: raw.description ?? '',
+    location: raw.location ?? '',
+    htmlLink: raw.htmlLink ?? '',
+    start: startDate,
+    end: endDate,
+    allDay: !raw.start?.dateTime,
+    attendeeEmails: (raw.attendees ?? [])
+      .map((a) => a.email ?? '')
+      .filter((e) => e.length > 0),
+    cancelled: raw.status === 'cancelled',
   }
 }
 
 // ─── Microsoft Graph ─────────────────────────────────────────────────
 
 async function syncMicrosoft(
-  channelId: string,
-  accessToken: string,
+  ctx: SyncContext,
   deltaLink: string | null,
   recursionDepth: number = 0,
 ): Promise<SyncResult> {
-  // For MS, the syncToken column actually stores the full @odata.deltaLink
-  // URL. On bootstrap we hit calendarView/delta directly with a date
-  // range; subsequent calls use the stored deltaLink as the URL.
   const buildFirstUrl = (): string => {
     if (deltaLink) return deltaLink
     const u = new URL(MS_CALENDAR_VIEW_DELTA_URL)
@@ -284,11 +328,10 @@ async function syncMicrosoft(
     return u.toString()
   }
 
-  let added = 0
-  let removed = 0
   let totalProcessed = 0
   let nextDeltaLink: string | undefined
   let nextLink: string | undefined
+  const collected: NormalisedEvent[] = []
 
   for (let page = 0; page < MAX_PAGES; page++) {
     const target = page === 0 ? buildFirstUrl() : nextLink!
@@ -297,9 +340,7 @@ async function syncMicrosoft(
     try {
       res = await fetch(target, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
-          // MS recommends a Prefer header to control the page size. 250
-          // matches Google; keeps both providers similar.
+          Authorization: `Bearer ${ctx.accessToken}`,
           Prefer: 'odata.maxpagesize=250',
         },
       })
@@ -307,14 +348,8 @@ async function syncMicrosoft(
       return zero({ error: `network:${(err as Error).message?.slice(0, 100)}` })
     }
 
-    // MS Graph returns 410 / 404 when the deltaLink is too old / invalid.
-    // Only meaningful on the first page (subsequent nextLinks are
-    // generated by MS for an already-validated session). Drop the link
-    // and recurse for a fresh bootstrap. Depth guard mirrors Google.
     if (res.status === 410 || res.status === 404) {
       if (page > 0) {
-        // Mid-pagination 410 — leave the existing token alone, the next
-        // notification triggers a fresh start. Don't recurse from here.
         return zero({ error: 'http_error', status: res.status })
       }
       if (recursionDepth >= 1) {
@@ -322,10 +357,10 @@ async function syncMicrosoft(
       }
       const prisma = getAuthPrisma()
       await prisma.calendarChannel.update({
-        where: { id: channelId },
+        where: { id: ctx.channelId },
         data: { syncToken: null },
       })
-      return await syncMicrosoft(channelId, accessToken, null, recursionDepth + 1)
+      return await syncMicrosoft(ctx, null, recursionDepth + 1)
     }
 
     if (!res.ok) {
@@ -334,7 +369,7 @@ async function syncMicrosoft(
 
     const json = (await res.json().catch(() => null)) as
       | {
-          value?: Array<{ id: string; '@removed'?: { reason: string } }>
+          value?: MsEventPayload[]
           '@odata.deltaLink'?: string
           '@odata.nextLink'?: string
         }
@@ -346,8 +381,8 @@ async function syncMicrosoft(
     const items = json.value ?? []
     totalProcessed += items.length
     for (const it of items) {
-      if (it['@removed']) removed++
-      else added++
+      const norm = normaliseMsEvent(it)
+      if (norm) collected.push(norm)
     }
 
     if (json['@odata.deltaLink']) {
@@ -358,16 +393,22 @@ async function syncMicrosoft(
       nextLink = json['@odata.nextLink']
       continue
     }
-    // Neither marker — shouldn't happen on a successful delta call.
-    // Bail without persisting; next notification retries.
     break
   }
+
+  const persisted = await persistEvents({
+    connectionId: ctx.connectionId,
+    organizationId: ctx.organizationId,
+    userId: ctx.userId,
+    provider: 'microsoft',
+    events: collected,
+  })
 
   let tokenRotated = false
   if (nextDeltaLink) {
     const prisma = getAuthPrisma()
     await prisma.calendarChannel.update({
-      where: { id: channelId },
+      where: { id: ctx.channelId },
       data: {
         syncToken: nextDeltaLink,
         lastError: null,
@@ -380,10 +421,62 @@ async function syncMicrosoft(
     ok: true,
     bootstrapped: !deltaLink,
     processed: totalProcessed,
-    added,
+    added: persisted.persisted,
     updated: 0,
-    removed,
+    removed: persisted.cancelled,
     tokenRotated,
+  }
+}
+
+interface MsEventPayload {
+  id: string
+  '@removed'?: { reason: string }
+  subject?: string
+  bodyPreview?: string
+  isAllDay?: boolean
+  webLink?: string
+  start?: { dateTime?: string; timeZone?: string }
+  end?: { dateTime?: string; timeZone?: string }
+  location?: { displayName?: string }
+  attendees?: Array<{ emailAddress?: { address?: string } }>
+}
+
+function normaliseMsEvent(raw: MsEventPayload): NormalisedEvent | null {
+  if (!raw.id) return null
+  if (raw['@removed']) {
+    // Tombstone — only id is reliable. start/end may be missing.
+    return {
+      externalId: raw.id,
+      title: '',
+      description: '',
+      location: '',
+      htmlLink: '',
+      start: new Date(0),
+      end: new Date(0),
+      allDay: false,
+      attendeeEmails: [],
+      cancelled: true,
+    }
+  }
+  const start = raw.start?.dateTime
+  const end = raw.end?.dateTime
+  if (!start || !end) return null
+  const startDate = new Date(start)
+  const endDate = new Date(end)
+  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) return null
+  return {
+    externalId: raw.id,
+    title: raw.subject ?? '',
+    description: raw.bodyPreview ?? '',
+    location: raw.location?.displayName ?? '',
+    htmlLink: raw.webLink ?? '',
+    start: startDate,
+    end: endDate,
+    allDay: Boolean(raw.isAllDay),
+    attendeeEmails: (raw.attendees ?? [])
+      .map((a) => a.emailAddress?.address ?? '')
+      .filter((e) => e.length > 0),
+    cancelled: false,
   }
 }
 

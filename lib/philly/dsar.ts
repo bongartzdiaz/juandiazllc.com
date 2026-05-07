@@ -13,11 +13,12 @@
 
 import type { PrismaClient } from '@prisma/client'
 
+// 1.2.0 — adds synced_calendar_events slice (push-sync persistence).
 // 1.1.0 — adds calendar_connections + calendar_channels slices.
 // Sensitive fields (encrypted tokens, authSecret, providerAccountId,
 // syncToken/deltaLink) are explicitly omitted — same pattern as
 // passwordHash + invite token in 1.0.0.
-export const DSAR_EXPORT_VERSION = '1.1.0'
+export const DSAR_EXPORT_VERSION = '1.2.0'
 
 export type DsarScope = 'user' | 'org'
 
@@ -34,6 +35,7 @@ export interface DsarManifest {
   audit_log_count: number
   calendar_connection_count: number
   calendar_channel_count: number
+  synced_calendar_event_count: number
   notice: string
 }
 
@@ -48,6 +50,7 @@ export interface DsarArchive {
   audit_log: unknown[]
   calendar_connections: unknown[]
   calendar_channels: unknown[]
+  synced_calendar_events: unknown[]
   // Org-scope extras (omitted for user-scope exports)
   team?: unknown[]
   projects?: unknown[]
@@ -211,6 +214,28 @@ export async function buildDsarArchive({
     orderBy: { createdAt: 'asc' },
   })
 
+  const syncedCalendarEvents = await prisma.syncedCalendarEvent.findMany({
+    where: scope === 'org' ? { organizationId } : { userId, organizationId },
+    select: {
+      id: true,
+      connectionId: true,
+      provider: true,
+      externalId: true,
+      title: true,
+      location: true,
+      htmlLink: true,
+      startTime: true,
+      endTime: true,
+      allDay: true,
+      matchedEmails: true,
+      cancelledAt: true,
+      syncedAt: true,
+      updatedAt: true,
+    },
+    orderBy: { startTime: 'desc' },
+    take: 5000,
+  })
+
   // ── Org-scope-only slices ──
 
   let team: unknown[] | undefined
@@ -261,6 +286,7 @@ export async function buildDsarArchive({
     audit_log_count: auditLog.length,
     calendar_connection_count: calendarConnections.length,
     calendar_channel_count: calendarChannels.length,
+    synced_calendar_event_count: syncedCalendarEvents.length,
     notice:
       'This export is generated under AVG/GDPR Art. 15 (right of access) ' +
       'and Art. 20 (data portability). Sensitive credentials (password ' +
@@ -280,6 +306,7 @@ export async function buildDsarArchive({
     audit_log: auditLog,
     calendar_connections: calendarConnections,
     calendar_channels: calendarChannels,
+    synced_calendar_events: syncedCalendarEvents,
     ...(scope === 'org' ? { team, projects, pipelines, invites } : {}),
   }
 }

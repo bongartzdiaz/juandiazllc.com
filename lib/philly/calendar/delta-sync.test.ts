@@ -57,13 +57,15 @@ describe('Pagination cap (delta-sync correctness on busy calendars)', () => {
 describe('Recursion guard signature (audit MED F6)', () => {
   // Function.length is the number of params before the first one with a
   // default value. The 410-recursion guard requires `recursionDepth` as an
-  // optional 4th parameter; if a refactor accidentally drops it, this test
+  // optional final parameter; if a refactor accidentally drops it, this test
   // fails before the runtime infinite-loop bug ships.
-  it('syncGoogle exposes 3 required params + an optional recursion depth', () => {
-    expect(syncGoogleArity).toBe(3)
+  // Bundle D4 collapsed (channelId, accessToken, ...) into a single
+  // SyncContext, so the required-param count is 2 (ctx + syncToken).
+  it('syncGoogle exposes 2 required params + an optional recursion depth', () => {
+    expect(syncGoogleArity).toBe(2)
   })
 
-  it('syncMicrosoft exposes 3 required params + an optional recursion depth', () => {
-    expect(syncMicrosoftArity).toBe(3)
+  it('syncMicrosoft exposes 2 required params + an optional recursion depth', () => {
+    expect(syncMicrosoftArity).toBe(2)
   })
 })

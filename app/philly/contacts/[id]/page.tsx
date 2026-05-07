@@ -12,6 +12,7 @@ import {
   MessageSquare, Clock, CheckCircle2, AlertCircle, Briefcase, TrendingUp,
 } from 'lucide-react'
 import { AiAttributesCard, type ContactAiAttributes } from '@/components/philly/contacts/AiAttributesCard'
+import ContactMeetings from '@/components/philly/contacts/ContactMeetings'
 
 /* ------------------------------------------------------------------
    Types
@@ -138,11 +139,12 @@ const activityIcons: Record<string, typeof Activity> = {
    Tabs
    ------------------------------------------------------------------ */
 
-type Tab = 'overview' | 'activity' | 'notes' | 'projects' | 'deals'
+type Tab = 'overview' | 'activity' | 'notes' | 'projects' | 'deals' | 'meetings'
 
 const TABS: { key: Tab; label: string; icon: typeof Activity }[] = [
   { key: 'overview', label: 'Overview', icon: User },
   { key: 'activity', label: 'Activity', icon: Activity },
+  { key: 'meetings', label: 'Meetings', icon: Calendar },
   { key: 'notes', label: 'Notes', icon: FileText },
   { key: 'projects', label: 'Projects', icon: FolderKanban },
   { key: 'deals', label: 'Deals', icon: Briefcase },
@@ -582,6 +584,13 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
               </div>
             )}
           </div>
+        )}
+
+        {/* MEETINGS — synced calendar events whose attendee list
+            includes this contact. Privacy filter is applied at sync
+            time; this tab just renders. */}
+        {activeTab === 'meetings' && (
+          <ContactMeetings contactId={id} />
         )}
 
         {/* NOTES */}

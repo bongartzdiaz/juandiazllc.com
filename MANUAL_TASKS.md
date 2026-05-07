@@ -85,6 +85,11 @@ notifications. Builds on Bundle A's OAuth integration.
 
 - [ ] Run `npx prisma migrate dev --name calendar_push_sync` (creates
       the `CalendarChannel` table). Idempotent — safe to re-run.
+- [ ] Run `npx prisma migrate dev --name synced_calendar_events`
+      (creates `SyncedCalendarEvent` table + `Organization.redactSyncedTitles`
+      column). Bundle D4 — actual event persistence. Without this
+      migration, push-sync runs but events never appear on contact
+      pages.
 - [ ] Schedule TWO calendar crons. Both use the `X-Cron-Secret: $CRON_SECRET`
       header (same env var as `/api/audit/prune`). Vercel Cron entry:
       ```json

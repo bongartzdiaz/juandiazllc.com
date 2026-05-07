@@ -106,10 +106,24 @@ DEUS uses one essential cookie to keep you logged in. This cookie is HttpOnly, S
 
 We protect Personal Data with: TLS 1.2+ in transit; AES-256 at rest for backups; argon2id password hashing; role-based access control; full audit log; principle of least privilege for staff; 24-hour breach notification commitment to Customers (72 hours to authorities under Art. 33).
 
-## 11. Updates to this notice
+## 11. Calendar integrations and Art. 9 special categories
+
+DEUS reads your Google Calendar or Microsoft 365 calendar with your explicit OAuth consent. **We deliberately limit what we persist** to keep special-category personal data (Art. 9 GDPR — health, religion, political opinion, etc.) out of the system:
+
+- We **only persist events whose attendee list intersects with at least one CRM contact in your organization.** Personal appointments without any CRM contact are counted for sync-token bookkeeping but are **not stored**.
+- We **never persist event descriptions** — they are the most likely place for clinical notes, legal-strategy memos, or other Art. 9 content.
+- We **only store attendee emails that match a CRM contact**. Strangers' emails on your meetings are dropped before persistence.
+- Customers in regulated verticals (healthcare, legal, financial) can enable **Settings → redact synced titles** so titles and locations are stored as one-way SHA-256 hashes instead of plaintext.
+- Read-only — DEUS does not write to your calendar.
+
+Token storage: OAuth access and refresh tokens are encrypted at rest using AES-256-GCM. Tokens never leave the encryption boundary unencrypted.
+
+You can disconnect a calendar at any time from **Settings → Integrations**; this revokes our OAuth grant with the provider and marks all stored events for deletion at the next prune cycle (≤24 hours).
+
+## 12. Updates to this notice
 
 We update this Privacy Policy when our practices change. The "Last updated" date at the top reflects the current version. Material changes are emailed to all Authorized Users at least 30 days before they take effect.
 
-## 12. Contact
+## 13. Contact
 
 Questions or requests: **privacy@lucen.ai**.

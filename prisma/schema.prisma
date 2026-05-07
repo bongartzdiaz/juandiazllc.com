@@ -30,6 +30,12 @@ model Organization {
   // the localStorage-only `pai-industry` for newly-onboarded orgs.
   timeZone        String @default("Europe/Amsterdam")
   defaultCurrency String @default("EUR") // ISO 4217
+  // Privacy-by-design toggle — when true, synced calendar event titles
+  // and locations are stored as a SHA-256 hash + "(redacted)" label
+  // instead of verbatim. Defensive default for medical / legal /
+  // financial verticals where Art. 9 special categories are likely
+  // to appear in user calendars.
+  redactSyncedTitles Boolean @default(false)
   createdAt DateTime @default(now())
 
   users          User[]
@@ -638,7 +644,8 @@ model CalendarConnection {
   // to explicitly clear or move the connections first. User-side
   // cascade above handles the GDPR Art. 17 erasure path.
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
-  channels     CalendarChannel[]
+  channels       CalendarChannel[]
+  syncedEvents   SyncedCalendarEvent[]
 
   @@unique([userId, provider])
   @@index([organizationId, provider])
@@ -737,6 +744,70 @@ model EventAttendee {
   @@unique([eventId, userId])
   @@index([eventId])
   @@index([userId])
+}
+
+// External calendar events synced from Google / Microsoft via push-sync.
+//
+// Distinct from `CalendarEvent` (the in-app, user-created model) so:
+//   1. delta-sync upserts never collide with user-created data
+//   2. retention + erasure can target synced events independently
+//   3. Art. 9 controls (filtering, redaction) live in one place
+//
+// PRIVACY-BY-DESIGN — only events whose attendee list intersects with
+// CRM Contacts are persisted. Events with NO CRM-contact attendee are
+// counted but not stored — keeps personal medical/political/etc.
+// appointments out of the system entirely.
+//
+// Fields deliberately OMITTED:
+//   - description: too high-risk for Art. 9 (clinical notes, therapy
+//     details, legal-strategy memos). The provider link covers users
+//     who need it.
+//   - full attendee list: only emails matching a CRM Contact are
+//     stored; non-matching attendees are dropped entirely.
+//   - color, recurrence rules, conferencing data: not in MVP scope.
+model SyncedCalendarEvent {
+  id             String   @id @default(cuid())
+  // Owning connection — one synced event row per user-connection-event.
+  // Two attendees both syncing the same meeting get DIFFERENT rows
+  // because each owns their own calendar's representation.
+  connectionId   String
+  organizationId String
+  userId         String
+  provider       String   // "google" | "microsoft"
+  // Provider-side event id. Composite key with connectionId for upsert
+  // because two providers (or two users) can re-use the same id space.
+  externalId     String
+  // Optional title. Stored verbatim by default; if the org has
+  // `redactSyncedTitles` set we store a SHA-256 hash + a generic
+  // "(redacted)" label instead (defensive default for medical / legal
+  // verticals). Description is NEVER stored.
+  title          String   @default("")
+  // Optional location (often professional — office addresses). Same
+  // redaction rule as title.
+  location       String   @default("")
+  // Provider deep-link back to the event. Lets users jump to the full
+  // record (with description, recurrence, etc.) in their own provider
+  // UI without us holding that data.
+  htmlLink       String   @default("") @db.Text
+  startTime      DateTime
+  endTime        DateTime
+  allDay         Boolean  @default(false)
+  // Comma-separated list of CRM-Contact-matched attendee emails. Only
+  // emails resolving to a Contact in the same organization are stored;
+  // non-matching attendees are not persisted. UI uses this to filter
+  // "events with this contact" on the deal page.
+  matchedEmails  String   @default("") @db.Text
+  // Soft-delete: provider tells us the event was cancelled. We keep
+  // the row briefly (for "recently cancelled" UI) before pruning.
+  cancelledAt    DateTime?
+  syncedAt       DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  connection   CalendarConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@unique([connectionId, externalId])
+  @@index([organizationId, startTime])
+  @@index([userId, startTime])
 }
 
 // ── Phase 2E: Reports ──
