@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
   LayoutDashboard, FolderKanban, Users2, BarChart3,
-  FileText, Columns3, Settings, CalendarDays, GanttChart,
+  FileText, Columns3, Settings, CalendarDays, GanttChart, HelpCircle,
   Leaf, Building2, Hotel, ChevronDown, LogOut, Shield,
   DollarSign, Bell, Zap, FileArchive, Award, Heart,
   Home, BedDouble, Eye, HandCoins, Trophy, DoorOpen, Mail, TrendingUp,
@@ -112,6 +112,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
     { icon: Webhook, label: t('webhooks'), href: '/philly/settings/webhooks' },
     { icon: Shield, label: t('auditLog'), href: '/philly/audit' },
     { icon: Settings, label: t('settings'), href: '/philly/settings' },
+    { icon: HelpCircle, label: 'Help', href: '/philly/help' },
   ]
 
   return (

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Plus_Jakarta_Sans, Red_Hat_Mono } from 'next/font/google'
 import './globals.css'
 import { ClientLayout } from '@/components/philly/layout/ClientLayout'
+import HelpDrawer from '@/components/philly/help/HelpDrawer'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
 
@@ -44,6 +45,7 @@ export default async function PhillyLayout({ children }: { children: React.React
       <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       <NextIntlClientProvider locale={locale} messages={messages}>
         <ClientLayout>{children}</ClientLayout>
+        <HelpDrawer />
       </NextIntlClientProvider>
     </div>
   )
