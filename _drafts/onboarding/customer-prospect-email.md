@@ -18,27 +18,23 @@ Ordering:
 
 ## 1 · First touch — cold-warm
 
-Subject: **The CRM I wish existed when we were running Voltara**
+Subject: **One of three slots for [their company]**
 
 Hey [first name],
 
-Quick one. You know the operator stack we both lived inside —
-spreadsheet, half-installed Pipedrive, three Slack threads, a
-calendar nobody trusts. I built the opposite of that and it's about
-to ship.
+Short one. You and I both lived inside the same operator stack —
+spreadsheets, a Pipedrive nobody finished, three Slack threads, a
+calendar nobody trusts. I built the opposite. It ships next week.
 
-It's called DEUS. It's a CRM, but built around the five phases I keep
-seeing: survey, blueprint, build, operate, scale. Per-industry
-pipelines (energy, real estate, hospitality, adjacent), real-time
-calendar push-sync to Google and Outlook, a clean billing layer,
-GDPR done properly, EU-hosted on day one.
+DEUS. Built around the five phases an operator actually runs through:
+survey, blueprint, build, operate, scale. Per-industry pipelines.
+Real-time calendar sync to Google and Outlook. Clean billing.
+GDPR done properly. EU-hosted from day one.
 
-We go live the week of the 18th of May. I'm onboarding the first
-three customers personally, half off for the first six months, no
-card up front. I want one of those slots to be you.
+I'm onboarding the first three customers personally. **50% off for
+six months, no card to start.** One of those three should be you.
 
-Worth a 20-minute look this week? I can do Wednesday or Thursday
-afternoon, your call.
+Twenty minutes this week — Wednesday or Thursday afternoon. Your call.
 
 — Juan
 
@@ -48,57 +44,42 @@ afternoon, your call.
 
 Subject: **DEUS — the first-3 details**
 
-Thanks for biting. Here's the offer in one screen so you can decide
-without three follow-up emails.
+Thanks for biting. The whole offer on one screen.
 
-**What you get on day one**
-- Per-industry pipeline seeded for [their sector — energy / real estate
-  / hospitality / adjacent ops]. Rebuild stages, rename phases, add
-  fields you want.
-- Contacts and companies, no forced "leads" labels. The same person
-  can be a prospect, a partner, an investor and a referral source —
-  tag and scope however your operation actually works.
-- Real-time calendar push-sync. Connect Google or Outlook in two
-  clicks; meetings on a deal show up next to the deal without
-  copy-paste.
-- Billing built for trust: 14-day free trial, no card up front,
-  Stripe Customer Portal so you self-serve plan and invoice changes
-  without going through me.
-- Team and seats: invite by email, single-use token, role-based
-  access (admin / manager / viewer), seat counter on the dashboard.
-- Privacy on the record: data export from Settings → Privacy in one
-  click, account deletion with a 30-day soft-delete window,
-  audit log on every privileged action. AES-256 encryption on every
-  token at rest.
+**What ships day one**
+- A pipeline seeded for [their sector]. Rebuild every stage if you want.
+- Contacts and companies. Same person can be a prospect, partner,
+  investor and referral source — tag however your operation works.
+- Real-time calendar sync. Two clicks to connect Google or Outlook.
+  Meetings on a deal appear next to the deal automatically.
+- 14-day trial, no card up front. Stripe Customer Portal for
+  self-serve plan and invoice changes.
+- Role-based access (admin / manager / viewer), seat counter, audit log.
+- One-click data export and account deletion. AES-256 token encryption.
+  EU-hosted, GDPR done properly.
 
 **The first-3 offer**
-- 50% off the published price for the first six months.
-- Direct line to me for support. EU business hours, real human, no
-  ticket queue.
-- Influence on what gets built next. The first three customers see
-  the roadmap and shape it.
-- After six months, normal pricing kicks in. Cancel any time.
+- 50% off published price for six months.
+- My mobile for support. EU hours, real human, no ticket queue.
+- Roadmap input — the first three customers see what's coming next
+  and shape the order.
+- Normal pricing from month seven. Cancel any time.
 
-**Pricing baseline**
-- Starter — €49 per seat per month, up to 10 seats. Pipeline,
-  contacts, deals, calendar.
-- Professional — €79 per seat per month, unlimited seats, advanced
-  reporting, priority support.
+**Pricing**
+- Starter — €49/seat/month, up to 10 seats.
+- Professional — €79/seat/month, unlimited seats.
 - Enterprise — talk to me.
 
-**The honest list of what's NOT in v1.0**
-- Two-way calendar sync (we read your calendar, we don't yet write
-  back). Targeting late May.
-- AI attributes on contacts (industry tags, ICP fit scores
-  auto-populated). Targeting June.
-- A full mobile experience. The web app works on phones; a native
-  app is a Q3 question.
+**Not in v1.0** (so you're not surprised)
+- Two-way calendar sync — read-only today, write-back end of May.
+- AI contact attributes — June.
+- Native mobile app — Q3.
 
 **Next step**
-Send me a 20-minute window this week. I onboard you live, you give
-me your first deal, we walk through the dashboard. If by minute 18
-you don't see a path to using this in real work, we shake hands and
-move on, no friction.
+Pick a 20-minute window this week. I onboard you live, we put your
+first real deal in, walk through the dashboard together. If you
+don't see a path to using this for real work by minute 18, we shake
+hands and move on. No friction.
 
 — Juan
 hello@lucen.ai · WhatsApp [number]
