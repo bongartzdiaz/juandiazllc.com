@@ -16,10 +16,17 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import {
-  Calendar, Check, AlertTriangle, Lock, ExternalLink, Plug, Info,
+  Calendar, Check, AlertTriangle, Lock, ExternalLink, Plug, Info, Zap,
 } from 'lucide-react'
 
 type Provider = 'google' | 'microsoft'
+
+interface Channel {
+  id: string
+  status: string
+  expiresAt: string
+  lastRenewedAt: string | null
+}
 
 interface Connection {
   id: string
@@ -30,6 +37,7 @@ interface Connection {
   connectedAt: string
   lastUsedAt: string | null
   lastError: string | null
+  channel: Channel | null
 }
 
 interface ProvMeta {
@@ -203,6 +211,30 @@ export default function IntegrationsSettings() {
                               ? 'Reconnect required'
                               : p.description}
                         </div>
+                        {/* Push-sync state, if a channel is active for this
+                            connection. Renders right under the email so the
+                            user can tell at a glance whether real-time sync
+                            is working without scrolling or expanding. */}
+                        {active?.channel && active.channel.status === 'active' && (
+                          <div style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 4,
+                            marginTop: 4, padding: '2px 7px', borderRadius: 5,
+                            fontSize: 10, fontWeight: 600,
+                            background: 'var(--g-bg)', color: 'var(--g-txt)',
+                            textTransform: 'uppercase', letterSpacing: '0.04em',
+                          }}>
+                            <Zap size={9} aria-hidden />
+                            Real-time sync · renews{' '}
+                            {formatRelativeFuture(active.channel.expiresAt)}
+                          </div>
+                        )}
+                        {active && !active.channel && (
+                          <div style={{
+                            fontSize: 10, color: 'var(--txt3)', marginTop: 4,
+                          }}>
+                            Read-only — push-sync not active
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -298,6 +330,20 @@ export default function IntegrationsSettings() {
 
 function providerLabel(p: Provider): string {
   return p === 'google' ? 'Google Calendar' : 'Outlook / Microsoft 365'
+}
+
+/** Human-friendly "expires in X" for a future ISO timestamp.
+ *  Falls back to absolute date if it's more than 7 days out. */
+function formatRelativeFuture(iso: string): string {
+  const ms = new Date(iso).getTime() - Date.now()
+  if (ms <= 0) return 'soon'
+  const minutes = Math.floor(ms / 60_000)
+  if (minutes < 60) return `in ${minutes}m`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 48) return `in ${hours}h`
+  const days = Math.floor(hours / 24)
+  if (days < 7) return `in ${days}d`
+  return new Date(iso).toLocaleDateString()
 }
 
 function humanizeError(code: string): string {

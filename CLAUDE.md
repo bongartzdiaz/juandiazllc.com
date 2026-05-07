@@ -779,3 +779,38 @@ assertions had a 1/64 collision when the random sig already ended in
 8 files added (1 schema diff, 1 lib, 1 lib test, 2 routes, 1 middleware
 diff, 1 oauth-callback diff, 1 connection-delete diff, 1 docs file +
 1 docs update). Typecheck clean.
+
+### 2026-05-07 — Bundle D2: renewal cron + push-sync status badge
+
+Closes the production gap from Bundle D — `CalendarChannel` rows expire
+after 7 days (Google) or ~70 hours (Microsoft); without a renewal cron,
+push-sync stops working silently. This bundle ships the renewal path
+plus a UX touch so users can see the sync is healthy.
+
+- **`POST /api/calendar/cron/renew-channels`** — same auth shape as
+  the existing `/api/audit/prune` cron (`X-Cron-Secret` header OR admin
+  session). Calls `listDueForRenewal()` + per-channel `renew()` loop
+  with a 200-channel batch cap so a single sweep can't go runaway.
+  Returns `{ dueTotal, processed, renewed, failed, results[] }` —
+  enough for an operator to debug a sweep without dumping per-channel
+  secrets.
+- **`GET /api/calendar/connections` extended** — adds a `channel`
+  field per connection: `{ id, status, expiresAt, lastRenewedAt }` or
+  `null`. The query joins `CalendarConnection.channels` (filtered to
+  `status='active'`, ordered desc, take 1) so the front-end gets a
+  single round-trip per render.
+- **`/philly/settings/integrations` UX** — adds a green "Real-time sync ·
+  renews in 6d" badge next to the connected-as-email row when a healthy
+  channel exists. When a connection is active but no channel is healthy
+  (subscribe failed, channel expired without renewal), shows "Read-only
+  — push-sync not active" so the user can tell what's happening
+  without reading docs. Helper `formatRelativeFuture` keeps the
+  copy short ("in 5h" → "in 3d" → absolute date if >7 days).
+
+**No new schema, no new env vars** beyond the already-existing
+`CRON_SECRET`. Cadence + cron entry documented in `MANUAL_TASKS.md`.
+
+302/302 tests still green (no new tests this bundle — the cron route
+delegates to `push-sync.ts` which is already test-covered, and the UI
+addition is pure rendering on top of the typed response). Typecheck
+clean.

@@ -60,6 +60,13 @@ export async function upsertConnection(input: UpsertInput): Promise<void> {
   })
 }
 
+export interface PublicChannel {
+  id: string
+  status: string
+  expiresAt: Date
+  lastRenewedAt: Date | null
+}
+
 export interface PublicConnection {
   id: string
   provider: ProviderKey
@@ -69,6 +76,10 @@ export interface PublicConnection {
   connectedAt: Date
   lastUsedAt: Date | null
   lastError: string | null
+  /** Push-sync channel for this connection, if one exists.
+   *  Surfaced on /settings/integrations as a "syncing in real-time"
+   *  indicator. Tokens / authSecret stay encrypted on the server. */
+  channel: PublicChannel | null
 }
 
 export async function listConnectionsForUser(userId: string): Promise<PublicConnection[]> {
@@ -85,6 +96,20 @@ export async function listConnectionsForUser(userId: string): Promise<PublicConn
       createdAt: true,
       lastUsedAt: true,
       lastError: true,
+      // Single most-recent active channel — there's at most one per
+      // (connection) by design (subscribe is idempotent). We sort by
+      // createdAt desc + take 1 in case a renewal race left a stale row.
+      channels: {
+        where: { status: 'active' },
+        orderBy: { createdAt: 'desc' },
+        take: 1,
+        select: {
+          id: true,
+          status: true,
+          expiresAt: true,
+          lastRenewedAt: true,
+        },
+      },
     },
   })
   return rows.map((r) => ({
@@ -96,6 +121,14 @@ export async function listConnectionsForUser(userId: string): Promise<PublicConn
     connectedAt: r.createdAt,
     lastUsedAt: r.lastUsedAt,
     lastError: r.lastError,
+    channel: r.channels[0]
+      ? {
+          id: r.channels[0].id,
+          status: r.channels[0].status,
+          expiresAt: r.channels[0].expiresAt,
+          lastRenewedAt: r.channels[0].lastRenewedAt,
+        }
+      : null,
   }))
 }
 

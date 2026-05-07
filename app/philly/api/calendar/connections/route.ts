@@ -32,6 +32,19 @@ export async function GET() {
       connectedAt: c.connectedAt.toISOString(),
       lastUsedAt: c.lastUsedAt?.toISOString() ?? null,
       lastError: c.lastError,
+      // Push-sync channel state (Bundle D). Lets the settings UI render
+      // a "syncing in real-time" badge with the next renewal time without
+      // a second round-trip. Null when no channel is active for this
+      // connection (e.g. provider rejected `watch`, or channel expired
+      // and renewal failed).
+      channel: c.channel
+        ? {
+            id: c.channel.id,
+            status: c.channel.status,
+            expiresAt: c.channel.expiresAt.toISOString(),
+            lastRenewedAt: c.channel.lastRenewedAt?.toISOString() ?? null,
+          }
+        : null,
     })),
   })
 }

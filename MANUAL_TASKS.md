@@ -10,10 +10,18 @@ notifications. Builds on Bundle A's OAuth integration.
 
 - [ ] Run `npx prisma migrate dev --name calendar_push_sync` (creates
       the `CalendarChannel` table). Idempotent — safe to re-run.
-- [ ] Add a renewal cron job hitting an internal renewal route — cadence
-      ~every hour. The library function is `listDueForRenewal()` →
-      `renew(channelId, webhookBaseUrl)`. The cron route + auth wrapper
-      is the next bundle (deferred so Bundle D ships smaller).
+- [ ] Schedule an hourly cron hitting `POST /philly/api/calendar/cron/renew-channels`
+      with the header `X-Cron-Secret: $CRON_SECRET`. Vercel Cron entry:
+      ```json
+      {
+        "crons": [
+          { "path": "/philly/api/calendar/cron/renew-channels", "schedule": "0 * * * *" }
+        ]
+      }
+      ```
+      External schedulers (Hetzner systemd timer, GitHub Action) work
+      identically — just send the header. Same `CRON_SECRET` env var
+      already used by `/api/audit/prune`.
 - [ ] Verify `NEXT_PUBLIC_APP_URL` is set in Vercel — this is the base
       URL we hand to providers as the webhook target. Without it,
       push-sync subscribe is a no-op (the OAuth callback logs a warning
