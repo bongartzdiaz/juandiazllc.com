@@ -153,30 +153,56 @@ def bullet_list(items):
 
 
 def make_table(data, col_widths=None, header=True, zebra=True):
+    """
+    Builds a styled table. String cells are auto-wrapped as Paragraph
+    objects so long text soft-wraps to the column width instead of
+    spilling into the next column.
+    """
+    cell_style = ParagraphStyle(
+        "Cell", parent=styles["Normal"],
+        fontName="Helvetica", fontSize=9, leading=11.5,
+        textColor=TEXT_BODY,
+    )
+    header_cell_style = ParagraphStyle(
+        "HeaderCell", parent=styles["Normal"],
+        fontName="Helvetica-Bold", fontSize=9.5, leading=12,
+        textColor=colors.white,
+    )
+
+    wrapped = []
+    for r_idx, row in enumerate(data):
+        new_row = []
+        for cell in row:
+            if isinstance(cell, str):
+                style = header_cell_style if (header and r_idx == 0) else cell_style
+                # Convert literal newlines to <br/> so multi-line cells render
+                cell_html = cell.replace("\n", "<br/>")
+                new_row.append(Paragraph(cell_html, style))
+            else:
+                new_row.append(cell)
+        wrapped.append(new_row)
+
     style_cmds = [
-        ("FONT", (0, 0), (-1, -1), "Helvetica", 9.5),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ("LINEBELOW", (0, 0), (-1, 0), 0.7, BRAND_DARK),
         ("LINEABOVE", (0, 0), (-1, 0), 0.7, BRAND_DARK),
         ("LINEBELOW", (0, -1), (-1, -1), 0.7, BRAND_DARK),
         ("LEFTPADDING", (0, 0), (-1, -1), 6),
         ("RIGHTPADDING", (0, 0), (-1, -1), 6),
-        ("TOPPADDING", (0, 0), (-1, -1), 5),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
     ]
     if header:
         style_cmds.extend([
             ("BACKGROUND", (0, 0), (-1, 0), TABLE_HEAD_BG),
-            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-            ("FONT", (0, 0), (-1, 0), "Helvetica-Bold", 9.5),
         ])
     if zebra:
-        for row_idx in range(1, len(data)):
+        for row_idx in range(1, len(wrapped)):
             if row_idx % 2 == 0:
                 style_cmds.append(
                     ("BACKGROUND", (0, row_idx), (-1, row_idx), TABLE_ALT_BG)
                 )
-    return Table(data, colWidths=col_widths, style=TableStyle(style_cmds))
+    return Table(wrapped, colWidths=col_widths, style=TableStyle(style_cmds), repeatRows=1)
 
 
 # --- Build the document ----------------------------------------------------
@@ -392,7 +418,7 @@ inv_data = [
     ["Build tools", "git, build-essential", "—",
      "Source control and native module compilation"],
 ]
-story.append(make_table(inv_data, col_widths=[3.0 * cm, 4.2 * cm, 2.0 * cm, 7.0 * cm]))
+story.append(make_table(inv_data, col_widths=[2.8 * cm, 4.6 * cm, 1.8 * cm, 7.6 * cm]))
 
 story.append(sub("Components not required"))
 story.append(bullet_list([
