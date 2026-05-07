@@ -20,6 +20,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Check, Calendar, Users, UserPlus, X, ArrowRight } from 'lucide-react'
 
 const DISMISS_KEY = 'deus-quickstart-dismissed'
@@ -38,6 +39,7 @@ interface OnboardingState {
 }
 
 export function QuickStartCards() {
+  const t = useTranslations('quickStart')
   const [hidden, setHidden] = useState(false)
   const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null)
   const [checks, setChecks] = useState<QuickStartChecks>({
@@ -162,7 +164,7 @@ export function QuickStartCards() {
     >
       <button
         type="button"
-        aria-label="Dismiss quick start"
+        aria-label={t('dismiss')}
         onClick={dismiss}
         style={{
           position: 'absolute',
@@ -180,10 +182,8 @@ export function QuickStartCards() {
         <X size={16} />
       </button>
       <header style={{ marginBottom: 16 }}>
-        <h2 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 600 }}>Quick start</h2>
-        <p style={{ margin: 0, fontSize: 13, opacity: 0.7 }}>
-          Three steps that turn DEUS from empty to useful in about ten minutes.
-        </p>
+        <h2 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 600 }}>{t('title')}</h2>
+        <p style={{ margin: 0, fontSize: 13, opacity: 0.7 }}>{t('subtitle')}</p>
       </header>
       <div
         style={{
@@ -194,27 +194,30 @@ export function QuickStartCards() {
       >
         <Card
           icon={<Calendar size={18} />}
-          title="Connect your calendar"
-          description="Meetings with your contacts show up on the contact page within seconds."
+          title={t('calendar.title')}
+          description={t('calendar.description')}
           done={checks.calendarConnected}
+          doneLabel={t('doneLabel')}
           href="/philly/settings/integrations"
-          ctaLabel="Connect"
+          ctaLabel={t('calendar.cta')}
         />
         <Card
           icon={<Users size={18} />}
-          title="Import your contacts"
-          description="Drop a CSV (up to 10 000 rows) and DEUS auto-maps the columns."
+          title={t('contacts.title')}
+          description={t('contacts.description')}
           done={checks.hasContacts}
+          doneLabel={t('doneLabel')}
           href="/philly/contacts"
-          ctaLabel="Import"
+          ctaLabel={t('contacts.cta')}
         />
         <Card
           icon={<UserPlus size={18} />}
-          title="Invite your team"
-          description="Send role-based invites by email. The recipient sets their own password."
+          title={t('team.title')}
+          description={t('team.description')}
           done={checks.hasTeammates}
+          doneLabel={t('doneLabel')}
           href="/philly/settings/team"
-          ctaLabel="Invite"
+          ctaLabel={t('team.cta')}
         />
       </div>
     </section>
@@ -226,6 +229,7 @@ function Card({
   title,
   description,
   done,
+  doneLabel,
   href,
   ctaLabel,
 }: {
@@ -233,6 +237,7 @@ function Card({
   title: string
   description: string
   done: boolean
+  doneLabel: string
   href: string
   ctaLabel: string
 }) {
@@ -271,7 +276,7 @@ function Card({
         {description}
       </p>
       {done ? (
-        <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--g, #0E6B44)' }}>Done</div>
+        <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--g, #0E6B44)' }}>{doneLabel}</div>
       ) : (
         <Link
           href={href}

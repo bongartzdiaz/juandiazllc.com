@@ -426,5 +426,39 @@
     "steps": "stappen",
     "unassigned": "Niet toegewezen",
     "mode": "Modus"
+  },
+  "quickStart": {
+    "title": "Snel starten",
+    "subtitle": "Drie stappen die DEUS in tien minuten van leeg naar nuttig brengen.",
+    "dismiss": "Snel starten verbergen",
+    "doneLabel": "Klaar",
+    "calendar": {
+      "title": "Koppel je agenda",
+      "description": "Afspraken met je contacten verschijnen binnen seconden op de contactpagina.",
+      "cta": "Koppelen"
+    },
+    "contacts": {
+      "title": "Importeer je contacten",
+      "description": "Upload een CSV (tot 10 000 regels) en DEUS koppelt de kolommen automatisch.",
+      "cta": "Importeren"
+    },
+    "team": {
+      "title": "Nodig je team uit",
+      "description": "Verstuur uitnodigingen per e-mail met een rol. De ontvanger kiest zelf een wachtwoord.",
+      "cta": "Uitnodigen"
+    }
+  },
+  "help": {
+    "label": "Hulp",
+    "openFull": "Open het volledige hulpcentrum",
+    "search": "Zoek in hulpartikelen",
+    "searchShort": "Zoeken…",
+    "back": "Terug",
+    "languageNotice": "Hulpartikelen zijn momenteel in het Engels. Mail support@lucen.ai voor hulp in het Nederlands — we antwoorden in jouw taal.",
+    "stuckTitle": "Toch vastgelopen?",
+    "stuckBody": "Mail support@lucen.ai. Echt mens, EU-kantooruren, antwoord binnen één werkdag.",
+    "stuckHint": "Vermeld wat je probeerde, wat je verwachtte, wat er gebeurde. Een screenshot helpt.",
+    "openHelp": "Hulp openen",
+    "closeHelp": "Hulp sluiten"
   }
 }

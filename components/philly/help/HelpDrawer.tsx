@@ -19,6 +19,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import {
   HELP_ARTICLES,
   searchArticles,
@@ -27,6 +28,7 @@ import {
 } from '@/lib/philly/help/articles'
 
 export default function HelpDrawer() {
+  const t = useTranslations('help')
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -67,7 +69,7 @@ export default function HelpDrawer() {
     <>
       <button
         type="button"
-        aria-label={open ? 'Close help' : 'Open help'}
+        aria-label={open ? t('closeHelp') : t('openHelp')}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         style={{
@@ -102,7 +104,7 @@ export default function HelpDrawer() {
           />
           <aside
             role="dialog"
-            aria-label="Help"
+            aria-label={t('label')}
             style={{
               position: 'fixed',
               top: 0,
@@ -128,13 +130,13 @@ export default function HelpDrawer() {
                 gap: 8,
               }}
             >
-              <div style={{ fontWeight: 600, fontSize: 15 }}>Help</div>
+              <div style={{ fontWeight: 600, fontSize: 15 }}>{t('label')}</div>
               <Link
                 href="/philly/help"
                 style={{ fontSize: 12, opacity: 0.7 }}
                 onClick={() => setOpen(false)}
               >
-                Open full help center →
+                {t('openFull')} →
               </Link>
             </header>
             <div style={{ padding: 12, borderBottom: '1px solid var(--bd, #e5e7eb)' }}>
@@ -146,7 +148,8 @@ export default function HelpDrawer() {
                   setQuery(e.target.value)
                   setActiveSlug(null)
                 }}
-                placeholder="Search…"
+                placeholder={t('searchShort')}
+                aria-label={t('search')}
                 style={{
                   width: '100%',
                   padding: '10px 12px',
@@ -200,7 +203,7 @@ export default function HelpDrawer() {
                 textAlign: 'center',
               }}
             >
-              Still stuck? <a href="mailto:support@lucen.ai">support@lucen.ai</a> — real human, EU hours.
+              {t('stuckTitle')} <a href="mailto:support@lucen.ai">support@lucen.ai</a>
             </footer>
           </aside>
         </>

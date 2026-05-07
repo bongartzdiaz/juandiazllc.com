@@ -19,6 +19,7 @@
 
 import { useMemo, useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useTranslations, useLocale } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import {
   HELP_ARTICLES,
@@ -31,6 +32,9 @@ import {
 } from '@/lib/philly/help/articles'
 
 export default function HelpPage() {
+  const t = useTranslations('help')
+  const locale = useLocale()
+  const showLanguageNotice = locale !== 'en'
   const [query, setQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState<HelpCategoryKey | null>(null)
   const [activeSlug, setActiveSlug] = useState<string | null>(null)
@@ -114,13 +118,29 @@ export default function HelpPage() {
                   </p>
                 )}
               </header>
+              {showLanguageNotice && (
+                <div
+                  role="note"
+                  style={{
+                    margin: '0 0 16px',
+                    padding: 12,
+                    borderRadius: 8,
+                    background: 'rgba(245,158,11,0.08)',
+                    border: '1px solid rgba(245,158,11,0.25)',
+                    fontSize: 13,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {t('languageNotice')}
+                </div>
+              )}
               <div style={{ marginBottom: 24 }}>
                 <input
                   type="search"
                   value={query}
                   onChange={(e) => navigate({ q: e.target.value, c: null })}
-                  placeholder="Search the help center…"
-                  aria-label="Search help articles"
+                  placeholder={t('searchShort')}
+                  aria-label={t('search')}
                   style={{
                     width: '100%',
                     padding: '12px 16px',
