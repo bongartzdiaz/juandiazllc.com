@@ -78,17 +78,8 @@ export default function HelpPage() {
   return (
     <>
       <Topbar title="Help center" sub="Answers, walkthroughs, and a real human if all else fails." />
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: '0 auto',
-          padding: '32px 24px',
-          display: 'grid',
-          gridTemplateColumns: '240px 1fr',
-          gap: 32,
-        }}
-      >
-        <aside style={{ position: 'sticky', top: 32, alignSelf: 'start' }}>
+      <div className="philly-help-grid">
+        <aside className="philly-help-sidebar">
           <h2 style={{ fontSize: 13, fontWeight: 600, opacity: 0.6, textTransform: 'uppercase', letterSpacing: 0.4, margin: '0 0 12px' }}>
             Help center
           </h2>

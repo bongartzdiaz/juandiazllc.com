@@ -18,6 +18,7 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import {
   HELP_ARTICLES,
   searchArticles,
@@ -26,10 +27,17 @@ import {
 } from '@/lib/philly/help/articles'
 
 export default function HelpDrawer() {
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [activeSlug, setActiveSlug] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Hide the floating button on the full help center — duplicate UI
+  // and the user is clearly already deep in help mode. Must compute
+  // AFTER all hooks (useEffect / useMemo below) to keep hook order
+  // stable across renders.
+  const isOnHelpPage = pathname?.startsWith('/philly/help') ?? false
 
   // Close on Escape, focus the search input when opened.
   useEffect(() => {
@@ -51,6 +59,9 @@ export default function HelpDrawer() {
     () => (query ? searchArticles(query) : HELP_ARTICLES.slice(0, 8)),
     [query],
   )
+
+  // Bail AFTER all hooks have run — see comment above.
+  if (isOnHelpPage) return null
 
   return (
     <>

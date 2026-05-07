@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { ResumeBanner } from '@/components/philly/onboarding/ResumeBanner'
+import { QuickStartCards } from '@/components/philly/onboarding/QuickStartCards'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { LiveMetricsBand } from '@/components/philly/dashboard/LiveMetricsBand'
 import { useIndustry } from '@/hooks/philly/useIndustry'
@@ -263,6 +264,7 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
       <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Booking" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
       <div style={{ padding: '18px 24px 40px' }}>
         <ResumeBanner />
+        <QuickStartCards />
         {/* Journey Bar */}
         <JourneyBar
           steps={HOS_JOURNEY}
@@ -610,6 +612,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
       <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Lead" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
       <div style={{ padding: '18px 24px 40px' }}>
         <ResumeBanner />
+        <QuickStartCards />
         {/* Journey Bar with pipeline mode toggle */}
         <div style={{ marginBottom: 16 }}>
           <div style={{ display: 'flex', gap: 4, background: 'var(--bg2)', borderRadius: 8, padding: 3, marginBottom: 8, width: 'fit-content' }}>
@@ -1070,6 +1073,7 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
       <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Contact" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
       <div style={{ padding: '18px 24px 40px' }}>
         <ResumeBanner />
+        <QuickStartCards />
         {/* Journey Bar */}
         <JourneyBar
           steps={CSR_JOURNEY}

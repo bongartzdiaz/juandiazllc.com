@@ -372,3 +372,30 @@ input::placeholder, textarea::placeholder {
   .live-metrics-band { margin: 0 16px 16px; padding: 14px 16px; }
   .lmb-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
 }
+
+/* Help center — responsive sidebar collapses below 720px */
+.philly-help-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 32px;
+}
+.philly-help-sidebar {
+  position: sticky;
+  top: 32px;
+  align-self: start;
+}
+@media (max-width: 720px) {
+  .philly-help-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 20px 16px;
+  }
+  .philly-help-sidebar {
+    position: static;
+    border-bottom: 1px solid var(--bd, #e5e7eb);
+    padding-bottom: 16px;
+  }
+}
