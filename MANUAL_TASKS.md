@@ -32,6 +32,52 @@ need to be either ported into the DEUS-SHARED structure manually, or
 a cross-repo cherry-pick — not addressed in this PR since PR #12 also
 contains brand-site bundles that belong on juandiazllc.com.
 
+## Hetzner cutover — pre-flight (Friday 2026-05-15 target)
+
+Runbook: [`docs/hetzner-cutover-runbook.md`](docs/hetzner-cutover-runbook.md).
+Migration scripts: [`scripts/migrate-to-hetzner/`](scripts/migrate-to-hetzner/)
+(01-bootstrap → 09-smoke-test, run in order).
+
+The runbook covers the full ceremony but these three items have to be
+done **at least 24 hours before** the cutover ceremony or the box
+locks us out / DNS doesn't propagate / OAuth callbacks 4xx for
+in-flight customers. Treat as blocking gates.
+
+- [ ] **DNS TTL drop — 24h before flip.** Confirm registrar (Cloudflare?
+      Namecheap?) and lower TTL to 60s on `app.juandiazllc.com` (and
+      `juandiazllc.com` if we're flipping the brand site at the same
+      time). If we forget this, we sit on a stale `A` record for the
+      rest of the day post-cutover and the rollback window narrows.
+- [ ] **Operator SSH key uploaded to Hetzner Robot BEFORE bootstrap.**
+      `01-bootstrap.sh` writes the key as the only `authorized_keys`
+      entry for `deus` and immediately disables `PasswordAuthentication`.
+      If the key isn't on the box at that point, the script locks us
+      out — no recovery short of Hetzner KVM. Generate locally
+      (`ssh-keygen -t ed25519 -f ~/.ssh/deus_operator -C "deus@<laptop>"`),
+      paste the public key into Hetzner Robot → Server → Rescue tab
+      → Activate → upload, AND export it as `DEUS_OPERATOR_KEY` for
+      the script.
+- [ ] **B2 EU bucket + OAuth callback co-existence — created before
+      Friday.** Three sub-steps that all need to land before the
+      cutover so the new box has somewhere to back up to and OAuth
+      keeps working for any user mid-session during the flip:
+  - Create Backblaze B2 bucket (region: `eu-central-003`) named
+    `deus-backups-eu`. 30-day lifecycle rule for `postgres/*` and
+    `mariadb/*` prefixes.
+  - Create scoped Application Key — bucket-only, list+read+write,
+    no master-key reuse. Stash `B2_KEY_ID` + `B2_APPLICATION_KEY`
+    for `08-backup-cron.sh`'s `/home/deus/.deus-backup-env`.
+  - Add the new Hetzner callback URLs to the existing OAuth
+    registrations (Google Cloud Console + Entra ID) AS ADDITIONAL
+    URLs — keep the Vercel/Supabase ones until cutover Monday-after.
+    Concretely, both apps need both:
+    - `https://app.juandiazllc.com/philly/api/calendar/oauth/callback`
+      (production target — the one we cut TO)
+    - `https://app.lucen.ai/philly/api/calendar/oauth/callback`
+      (whatever's currently live — the one we cut FROM)
+    Removing the old URL pre-cutover would 4xx every in-flight OAuth
+    callback for active customers.
+
 ## Calendar push-sync (Bundle D, 2026-05-07)
 
 Adds `CalendarChannel` table + provider webhooks for real-time event
