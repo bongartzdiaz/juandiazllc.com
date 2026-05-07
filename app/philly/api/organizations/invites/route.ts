@@ -7,7 +7,16 @@ import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import { logger } from '@/lib/philly/logger'
 import { logAudit } from '@/lib/philly/audit'
 import { generateInviteToken, defaultInviteExpiry, sendInviteEmail } from '@/lib/philly/invites'
-import { getSeatStatus } from '@/lib/philly/seats'
+import { getSeatStatus, getSeatStatusTx, SeatLimitError } from '@/lib/philly/seats'
+
+/** Sentinel errors so the transaction body can throw without producing
+ * a Prisma serialization-rollback that masks the real reason. */
+class DuplicatePendingInviteError extends Error {
+  constructor() { super('duplicate_pending'); this.name = 'DuplicatePendingInviteError' }
+}
+class UserAlreadyInOrgError extends Error {
+  constructor() { super('user_in_org'); this.name = 'UserAlreadyInOrgError' }
+}
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -66,50 +75,70 @@ export async function POST(req: NextRequest) {
 
   const prisma = getAuthPrisma()
 
-  // Check seat capacity (counts users + pending invites)
-  const seats = await getSeatStatus(scope.organizationId)
-  if (seats.available <= 0) {
-    return jsonError(`Seat limit reached (${seats.used}/${seats.limit}). Upgrade your plan to invite more teammates.`, 409)
-  }
-
-  // No duplicate pending invite for the same email in this org
-  const existingPending = await prisma.invite.findFirst({
-    where: {
-      organizationId: scope.organizationId,
-      email,
-      acceptedAt: null,
-      revokedAt: null,
-      expiresAt: { gt: new Date() },
-    },
-    select: { id: true },
-  })
-  if (existingPending) {
-    return jsonError('There is already a pending invite for this email.', 409)
-  }
-
-  // No invite for an email that already has a User in this org
-  const existingUser = await prisma.user.findFirst({
-    where: { email, organizationId: scope.organizationId },
-    select: { id: true },
-  })
-  if (existingUser) {
-    return jsonError('This person already has an account in this organization.', 409)
-  }
-
   const token = generateInviteToken()
   const expiresAt = defaultInviteExpiry()
 
-  const invite = await prisma.invite.create({
-    data: {
-      organizationId: scope.organizationId,
-      email,
-      role,
-      token,
-      invitedByUserId: scope.userId,
-      expiresAt,
-    },
-    select: { id: true, email: true, role: true, expiresAt: true, createdAt: true },
-  })
+  // Race-safe seat claim: count + duplicate checks + create happen in one
+  // Serializable transaction. Without this, two concurrent invites can
+  // both read "1 seat free", both pass the check, and the org ends up
+  // over-subscribed. With Serializable + concurrent insert on the Invite
+  // table, Postgres detects the conflict and rolls one back.
+  let invite: { id: string; email: string; role: string; expiresAt: Date; createdAt: Date }
+  try {
+    invite = await prisma.$transaction(async (tx) => {
+      const seats = await getSeatStatusTx(tx, scope.organizationId)
+      if (seats.available <= 0) {
+        throw new SeatLimitError(seats)
+      }
+
+      const existingPending = await tx.invite.findFirst({
+        where: {
+          organizationId: scope.organizationId,
+          email,
+          acceptedAt: null,
+          revokedAt: null,
+          expiresAt: { gt: new Date() },
+        },
+        select: { id: true },
+      })
+      if (existingPending) throw new DuplicatePendingInviteError()
+
+      const existingUser = await tx.user.findFirst({
+        where: { email, organizationId: scope.organizationId },
+        select: { id: true },
+      })
+      if (existingUser) throw new UserAlreadyInOrgError()
+
+      return tx.invite.create({
+        data: {
+          organizationId: scope.organizationId,
+          email,
+          role,
+          token,
+          invitedByUserId: scope.userId,
+          expiresAt,
+        },
+        select: { id: true, email: true, role: true, expiresAt: true, createdAt: true },
+      })
+    }, { isolationLevel: 'Serializable' })
+  } catch (err) {
+    if (err instanceof SeatLimitError) {
+      return jsonError(`Seat limit reached (${err.status.used}/${err.status.limit}). Upgrade your plan to invite more teammates.`, 409)
+    }
+    if (err instanceof DuplicatePendingInviteError) {
+      return jsonError('There is already a pending invite for this email.', 409)
+    }
+    if (err instanceof UserAlreadyInOrgError) {
+      return jsonError('This person already has an account in this organization.', 409)
+    }
+    // Postgres serialization conflict: two concurrent invites raced; the
+    // loser sees this. Surface as a retryable conflict so the caller can
+    // re-submit (UI can do this transparently).
+    if (err instanceof Error && /serializable|deadlock|conflict/i.test(err.message)) {
+      return jsonError('Concurrent change conflict. Please retry.', 409)
+    }
+    throw err
+  }
 
   // Look up org + inviter for the email body
   const [org, inviter] = await Promise.all([

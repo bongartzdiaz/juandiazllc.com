@@ -10,6 +10,17 @@
    --------------------------------------------------------------- */
 
 import { getAuthPrisma } from '@/lib/philly/auth'
+import type { Prisma } from '@prisma/client'
+
+/**
+ * Subset of PrismaClient that's safe to call from inside a $transaction
+ * callback. Both PrismaClient and the tx-bound client expose these methods
+ * with the same shape, so the seat-helper can run from either context.
+ */
+export type SeatTxClient = Pick<
+  Prisma.TransactionClient,
+  'user' | 'invite' | 'organization' | 'subscription'
+>
 
 export interface SeatStatus {
   /** Active users in the org (anyone with a session-able account). */
@@ -24,14 +35,32 @@ export interface SeatStatus {
   available: number
 }
 
-/** Returns seat usage for an organization. Cheap — three count queries. */
+/** Returns seat usage for an organization. Cheap — three count queries.
+ *
+ * For race-safe seat-claiming (where an invite is created in the same
+ * transaction), use {@link getSeatStatusTx} from inside a Serializable
+ * `prisma.$transaction` callback.
+ */
 export async function getSeatStatus(organizationId: string): Promise<SeatStatus> {
-  const prisma = getAuthPrisma()
+  return getSeatStatusTx(getAuthPrisma(), organizationId)
+}
+
+/** Same as {@link getSeatStatus} but accepts a transactional Prisma client.
+ *
+ * Pass `tx` from inside `prisma.$transaction(..., { isolationLevel:
+ * 'Serializable' })` to ensure count + create happen atomically. Without
+ * this, two concurrent invites can both read "1 seat free", both pass
+ * the check, and the org ends up oversubscribed.
+ */
+export async function getSeatStatusTx(
+  tx: SeatTxClient,
+  organizationId: string,
+): Promise<SeatStatus> {
   const now = new Date()
 
   const [users, invites, org, sub] = await Promise.all([
-    prisma.user.count({ where: { organizationId } }),
-    prisma.invite.count({
+    tx.user.count({ where: { organizationId } }),
+    tx.invite.count({
       where: {
         organizationId,
         acceptedAt: null,
@@ -39,11 +68,11 @@ export async function getSeatStatus(organizationId: string): Promise<SeatStatus>
         expiresAt: { gt: now },
       },
     }),
-    prisma.organization.findUnique({
+    tx.organization.findUnique({
       where: { id: organizationId },
       select: { seatLimit: true },
     }),
-    prisma.subscription.findUnique({
+    tx.subscription.findUnique({
       where: { organizationId },
       select: { seatCount: true, status: true },
     }),

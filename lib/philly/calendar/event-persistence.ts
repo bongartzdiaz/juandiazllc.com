@@ -219,3 +219,43 @@ export function redactedLabel(plaintext: string): string {
 }
 
 export const __internals = { redactedLabel }
+
+// ── Retention prune ─────────────────────────────────────────────────────
+
+const DEFAULT_EVENT_RETENTION_DAYS = 14
+const MIN_EVENT_RETENTION_DAYS = 1
+
+/** Resolve retention window in days from env override or default.
+ *  Env: SYNCED_EVENT_RETENTION_DAYS. Floored at MIN to prevent typo-wipe. */
+export function syncedEventRetentionDays(override?: number): number {
+  if (typeof override === 'number' && Number.isFinite(override)) {
+    return Math.max(MIN_EVENT_RETENTION_DAYS, Math.floor(override))
+  }
+  const raw = process.env.SYNCED_EVENT_RETENTION_DAYS
+  if (!raw) return DEFAULT_EVENT_RETENTION_DAYS
+  const n = Number.parseInt(raw, 10)
+  if (!Number.isFinite(n) || n < MIN_EVENT_RETENTION_DAYS) return DEFAULT_EVENT_RETENTION_DAYS
+  return n
+}
+
+/** Hard-delete SyncedCalendarEvent rows whose endTime is older than cutoff.
+ *
+ *  Retention rationale: the live calendar feed is the source of truth.
+ *  We persist a 14-day rolling window for activity-trail surfaces (deal
+ *  detail, contact timeline). Older events are reconstructed by re-syncing
+ *  on demand if needed. Storage limitation per GDPR Art. 5(1)(e).
+ *
+ *  Optional org scope for admin-triggered runs (defense-in-depth).
+ */
+export async function pruneStaleSyncedEvents(opts: {
+  cutoff: Date
+  organizationId?: string
+}): Promise<{ deleted: number }> {
+  const prisma = getAuthPrisma()
+  const where: Record<string, unknown> = {
+    endTime: { lt: opts.cutoff },
+  }
+  if (opts.organizationId) where.organizationId = opts.organizationId
+  const { count } = await prisma.syncedCalendarEvent.deleteMany({ where })
+  return { deleted: count }
+}

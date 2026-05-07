@@ -26,6 +26,10 @@ import {
   prunePruned,
   pruneRetentionDays,
 } from '@/lib/philly/calendar/push-sync'
+import {
+  pruneStaleSyncedEvents,
+  syncedEventRetentionDays,
+} from '@/lib/philly/calendar/event-persistence'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import { logAudit } from '@/lib/philly/audit'
 import type { AuthScope } from '@/lib/philly/auth-helpers'
@@ -62,7 +66,7 @@ export async function POST(req: NextRequest) {
     if (limited) return limited
   }
 
-  let body: { days?: number } = {}
+  let body: { days?: number; eventDays?: number } = {}
   try {
     body = await req.json()
   } catch {
@@ -83,13 +87,29 @@ export async function POST(req: NextRequest) {
   const ids = candidates.map((c) => c.id)
   const deleted = await prunePruned(ids)
 
+  // Also prune stale SyncedCalendarEvent rows in the same sweep (GDPR
+  // Art. 5(1)(e) — storage limitation). Cached events older than the
+  // retention window are deleted; the live provider feed remains the
+  // source of truth and we re-sync if needed. Default retention 14 days.
+  const eventDays = syncedEventRetentionDays(
+    typeof body.eventDays === 'number' ? body.eventDays : undefined,
+  )
+  const eventCutoff = new Date(Date.now() - eventDays * 24 * 60 * 60 * 1000)
+  const { deleted: eventsDeleted } = await pruneStaleSyncedEvents({
+    cutoff: eventCutoff,
+    organizationId: adminScope?.organizationId,
+  })
+
   logger.info('[calendar cron] prune sweep complete', {
     triggeredBy,
     orgScoped: adminScope?.organizationId ?? null,
     candidates: candidates.length,
     deleted,
+    eventsDeleted,
     days,
+    eventDays,
     cutoff: cutoff.toISOString(),
+    eventCutoff: eventCutoff.toISOString(),
   })
 
   // Self-audit admin-triggered runs (cron has no userId — same
@@ -102,8 +122,10 @@ export async function POST(req: NextRequest) {
       entityId: null,
       changes: {
         action: { old: null, new: 'prune_channels_sweep' },
-        deleted: { old: 0, new: deleted },
+        channelsDeleted: { old: 0, new: deleted },
+        eventsDeleted: { old: 0, new: eventsDeleted },
         days: { old: 0, new: days },
+        eventDays: { old: 0, new: eventDays },
       },
     })
   }
@@ -113,8 +135,11 @@ export async function POST(req: NextRequest) {
       triggeredBy,
       candidates: candidates.length,
       deleted,
+      eventsDeleted,
       days,
+      eventDays,
       cutoff: cutoff.toISOString(),
+      eventCutoff: eventCutoff.toISOString(),
     },
   })
 }

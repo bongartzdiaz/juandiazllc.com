@@ -129,6 +129,8 @@ model User {
   reports         Report[]
   deals           Deal[]          @relation("dealOwner")
   calendarConnections CalendarConnection[]
+
+  @@index([organizationId])
 }
 
 // One Subscription per Organization. Mirrors Stripe state — the source of
@@ -212,6 +214,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -221,6 +224,8 @@ model Session {
   expires      DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -252,6 +257,8 @@ model Project {
   contactProjects ContactProject[]
   kanbanCards     KanbanCard[]
   deals           Deal[]
+
+  @@index([organizationId])
 }
 
 model ProjectMilestone {
@@ -353,6 +360,8 @@ model KanbanBoard {
 
   organization Organization   @relation(fields: [organizationId], references: [id])
   columns      KanbanColumn[]
+
+  @@index([organizationId])
 }
 
 model KanbanColumn {
@@ -364,6 +373,8 @@ model KanbanColumn {
 
   board KanbanBoard  @relation(fields: [boardId], references: [id], onDelete: Cascade)
   cards KanbanCard[]
+
+  @@index([boardId])
 }
 
 model KanbanCard {
@@ -409,6 +420,7 @@ model CustomPage {
   blocks       PageBlock[]
 
   @@unique([organizationId, slug])
+  @@index([createdBy])
 }
 
 model PageBlock {

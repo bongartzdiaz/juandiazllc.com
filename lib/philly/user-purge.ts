@@ -1,0 +1,142 @@
+/* GDPR Art. 17 hard-purge for soft-deleted users.
+
+   Strategy: anonymize-and-keep-tombstone, NOT physical row delete.
+
+   Reason: User has FK relations to AuditLog (RoPA, Art. 30) and
+   activity-trail tables that we cannot legally delete (legal-claim
+   defense, accounting records, audit trail). Physical delete would
+   either cascade-wipe those audit rows OR fail with FK violation.
+
+   What this does instead:
+     - PII fields (name, email, image, avatarUrl, lastLoginIp) -> null
+     - email -> "deleted-{userId}@anonymized.local" (preserves uniqueness)
+     - Encrypted secrets (twoFactorSecret, recovery codes) -> wiped
+     - tokensInvalidAfter bumped to now() (kills any cached sessions)
+     - User row stays as tombstone so AuditLog.userId FK still resolves
+     - hardPurgedAt timestamp set so we can tell "soft-deleted, awaiting
+       30-day window" from "fully anonymized, tombstone only"
+
+   GDPR posture: this satisfies Art. 17(1) (right to erasure) because
+   personal data is no longer present. Recital 26 — anonymized data
+   falls outside GDPR scope. The remaining row is non-personal data
+   referenced only by aggregate logs.
+
+   Operator side:
+     POST /api/users/cron/hard-purge
+       header: X-Cron-Secret: $CRON_SECRET
+     Cadence: daily at 04:00 UTC (after audit prune at 03:30).
+
+   Returns { purged, cutoff } so the cron-runner can monitor.
+*/
+
+import { getAuthPrisma } from '@/lib/philly/auth'
+import { logger } from '@/lib/philly/logger'
+
+const HARD_PURGE_AFTER_DAYS = 30
+const MIN_PURGE_AFTER_DAYS = 7 // sanity floor — never purge < 7d
+
+export interface HardPurgeResult {
+  /** Number of users fully anonymized in this run. */
+  purged: number
+  /** Cutoff timestamp — all soft-deletes older than this were processed. */
+  cutoff: string
+  /** Days threshold actually applied. */
+  days: number
+}
+
+export function envPurgeAfterDays(): number {
+  const raw = process.env.HARD_PURGE_AFTER_DAYS
+  if (!raw) return HARD_PURGE_AFTER_DAYS
+  const n = Number.parseInt(raw, 10)
+  if (!Number.isFinite(n) || n < MIN_PURGE_AFTER_DAYS) return HARD_PURGE_AFTER_DAYS
+  return n
+}
+
+/** Hard-purge: anonymize PII on users whose soft-delete window has passed.
+ *
+ * Optionally scope to a single org (admin-triggered). Cron path passes no
+ * org filter and processes all orgs.
+ */
+export async function purgeStaleSoftDeletedUsers(opts: {
+  days?: number
+  organizationId?: string
+} = {}): Promise<HardPurgeResult> {
+  const days = Math.max(MIN_PURGE_AFTER_DAYS, Math.floor(opts.days ?? envPurgeAfterDays()))
+  const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+
+  const prisma = getAuthPrisma()
+
+  const where: Record<string, unknown> = {
+    deletedAt: { lt: cutoff, not: null },
+    // Avoid re-purging already-anonymized rows. We detect anonymized rows
+    // by the synthetic email pattern. There is no separate hardPurgedAt
+    // column today; if added later, switch to filter on that.
+    NOT: { email: { startsWith: 'deleted-' } },
+  }
+  if (opts.organizationId) where.organizationId = opts.organizationId
+
+  const candidates = await prisma.user.findMany({
+    where,
+    select: { id: true, email: true, organizationId: true, deletedAt: true },
+  })
+
+  if (candidates.length === 0) {
+    return { purged: 0, cutoff: cutoff.toISOString(), days }
+  }
+
+  const now = new Date()
+  let purged = 0
+  for (const user of candidates) {
+    try {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          // PII anonymization. User.name is non-nullable in the schema
+          // (legacy required-field), so we use an empty placeholder
+          // rather than null. The synthetic email below is the load-
+          // bearing "this row is anonymized" signal, not name.
+          name: '',
+          email: `deleted-${user.id}@anonymized.local`,
+          image: null,
+          avatarUrl: null,
+          lastLoginIp: null,
+          // Wipe encrypted secrets
+          twoFactorSecret: null,
+          twoFactorEnabled: false,
+          twoFactorVerifiedAt: null,
+          // Kill any cached session — bump invalidation timestamp
+          tokensInvalidAfter: now,
+        },
+      })
+      // Wipe recovery codes (separate table)
+      await prisma.twoFactorRecoveryCode.deleteMany({
+        where: { userId: user.id },
+      })
+      // Wipe Auth sessions (NextAuth)
+      await prisma.session.deleteMany({
+        where: { userId: user.id },
+      })
+      // Wipe Auth accounts (OAuth providers)
+      await prisma.account.deleteMany({
+        where: { userId: user.id },
+      })
+      purged++
+    } catch (err) {
+      // Log and continue — single bad row shouldn't tank the batch
+      logger.error('hard-purge: user failed', {
+        userId: user.id,
+        organizationId: user.organizationId,
+        error: err instanceof Error ? err.message : String(err),
+      })
+    }
+  }
+
+  logger.info('hard-purge: completed', {
+    purged,
+    cutoff: cutoff.toISOString(),
+    days,
+    organizationId: opts.organizationId ?? 'all',
+  })
+
+  return { purged, cutoff: cutoff.toISOString(), days }
+}

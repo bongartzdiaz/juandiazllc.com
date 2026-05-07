@@ -14,6 +14,12 @@ import { deleteAccountSchema } from '@/lib/philly/validation/schemas'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import { logger } from '@/lib/philly/logger'
 
+/** Sentinel for the last-admin guardrail — thrown inside the Serializable
+ * transaction so the count + delete happen atomically. */
+class LastAdminError extends Error {
+  constructor() { super('last_admin'); this.name = 'LastAdminError' }
+}
+
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
@@ -131,38 +137,50 @@ export async function DELETE(req: NextRequest) {
   if (!target) return jsonError('User not found', 404)
   if (target.deletedAt) return jsonError('Account already scheduled for deletion', 410)
 
-  // Last-admin guardrail
-  if (target.role === 'admin') {
-    const adminCount = await prisma.user.count({
-      where: {
-        organizationId: target.organizationId,
-        role: 'admin',
-        deletedAt: null,
-      },
-    })
-    if (adminCount <= 1) {
+  const now = new Date()
+
+  // Race-safe last-admin guard: count + delete in one Serializable
+  // transaction. Without this, two admins can simultaneously read
+  // "adminCount = 2", both pass the > 1 check, both proceed to soft-
+  // delete, ending the org with 0 admins. With Serializable, Postgres
+  // detects the conflict and rolls one back.
+  try {
+    await prisma.$transaction(async (tx) => {
+      if (target.role === 'admin') {
+        const adminCount = await tx.user.count({
+          where: {
+            organizationId: target.organizationId,
+            role: 'admin',
+            deletedAt: null,
+          },
+        })
+        if (adminCount <= 1) {
+          throw new LastAdminError()
+        }
+      }
+
+      await tx.user.update({
+        where: { id: scope.userId },
+        data: {
+          deletedAt: now,
+          deletedByUserId: scope.userId, // self-delete
+          tokensInvalidAfter: now,
+        },
+      })
+      await tx.session.deleteMany({ where: { userId: scope.userId } })
+    }, { isolationLevel: 'Serializable' })
+  } catch (err) {
+    if (err instanceof LastAdminError) {
       return jsonError(
         'You are the last admin. Promote another teammate to admin before deleting your account.',
         409,
       )
     }
+    if (err instanceof Error && /serializable|deadlock|conflict/i.test(err.message)) {
+      return jsonError('Concurrent change conflict. Please retry.', 409)
+    }
+    throw err
   }
-
-  const now = new Date()
-
-  // Soft-delete + invalidate sessions atomically. tokensInvalidAfter
-  // bumps to now so any JWT minted before this point is rejected.
-  await prisma.$transaction(async (tx) => {
-    await tx.user.update({
-      where: { id: scope.userId },
-      data: {
-        deletedAt: now,
-        deletedByUserId: scope.userId, // self-delete
-        tokensInvalidAfter: now,
-      },
-    })
-    await tx.session.deleteMany({ where: { userId: scope.userId } })
-  })
 
   await logAudit({
     scope,

@@ -67,6 +67,7 @@ export async function updateSession(request: NextRequest, requestHeaders?: Heade
     "/philly/api/audit/prune",
     "/philly/api/calendar/cron/renew-channels",
     "/philly/api/calendar/cron/prune-channels",
+    "/philly/api/users/cron/hard-purge",
   ]);
   if (!user && isProtected && !PUBLIC_PHILLY_PATHS.has(path)) {
     const url = request.nextUrl.clone();
