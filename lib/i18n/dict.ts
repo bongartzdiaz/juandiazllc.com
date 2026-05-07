@@ -128,7 +128,7 @@ const en: Dict = {
   "lang.switch": "Switch language",
 
   // Cookie banner
-  "cookie.body": "This site keeps a session cookie for sign-in, a language-preference cookie, and — if you accept — a privacy-friendly analytics ping that counts page views without a personal identifier. No ad tracking, no resale.",
+  "cookie.body": "This site keeps a session cookie for sign-in and a language-preference cookie — that's the full list. Page views are counted with cookieless Plausible Analytics: no personal identifier, no ad tracking, no resale.",
   "cookie.privacy": "privacy page",
   "cookie.decline": "Essential only",
   "cookie.accept": "Accept all",
@@ -747,7 +747,7 @@ const nl: Dict = {
   "lang.switch": "Taal wisselen",
 
   // Cookie banner
-  "cookie.body": "Deze site houdt één sessiecookie voor inloggen bij, één taalvoorkeur, en — als je accepteert — een privacyvriendelijke analytics-ping die paginaweergaven telt zonder persoonlijke identifier. Geen ad-tracking, geen doorverkoop.",
+  "cookie.body": "Deze site houdt één sessiecookie voor inloggen bij en één taalvoorkeurcookie — dat is de complete lijst. Paginaweergaven worden geteld met cookieloze Plausible Analytics: geen persoonlijke identifier, geen ad-tracking, geen doorverkoop.",
   "cookie.privacy": "privacypagina",
   "cookie.decline": "Alleen noodzakelijk",
   "cookie.accept": "Alles accepteren",
@@ -1344,7 +1344,7 @@ const de: Dict = {
   "lang.switch": "Sprache wechseln",
 
   // Cookie banner
-  "cookie.body": "Diese Seite speichert ein Session-Cookie für die Anmeldung, ein Sprachpräferenz-Cookie und — wenn Sie zustimmen — einen datenschutzfreundlichen Analytics-Ping, der Seitenaufrufe ohne persönliche Kennung zählt. Kein Ad-Tracking, kein Weiterverkauf.",
+  "cookie.body": "Diese Seite speichert ein Session-Cookie für die Anmeldung und ein Sprachpräferenz-Cookie — das ist die vollständige Liste. Seitenaufrufe werden mit cookielosem Plausible Analytics gezählt: keine persönliche Kennung, kein Ad-Tracking, kein Weiterverkauf.",
   "cookie.privacy": "Datenschutzseite",
   "cookie.decline": "Nur notwendige",
   "cookie.accept": "Alle akzeptieren",
@@ -1825,15 +1825,15 @@ const de: Dict = {
   "form.next": "Weiter",
   "form.back": "Zurück",
   "form.submit": "Gespräch buchen",
-  "form.step1.title": "Was betreibst du?",
-  "form.step1.sub": "Wähl die nächste Option — wir schärfen dann nach.",
-  "form.step2.title": "Wo stehst du im Build?",
+  "form.step1.title": "Was betreiben Sie?",
+  "form.step1.sub": "Wählen Sie die nächste Option — wir schärfen dann nach.",
+  "form.step2.title": "Wo stehen Sie im Build?",
   "form.step2.sub": "Eine Antwort. Die Tiefe kommt im Gespräch.",
   "form.step2.survey": "Umsatz leckt — wo, unklar.",
   "form.step2.blueprint": "Problem ist klar — Plan fehlt.",
   "form.step2.build": "Plan steht — muss live.",
   "form.step2.operate": "Live — muss feinjustiert und skaliert werden.",
-  "form.step3.title": "Wie erreichen wir dich?",
+  "form.step3.title": "Wie erreichen wir Sie?",
   "form.step3.sub": "Name + E-Mail. Antwort innerhalb eines Werktags.",
   "form.step3.name": "Name",
   "form.step3.email": "E-Mail",
@@ -1941,7 +1941,7 @@ const es: Dict = {
   "lang.switch": "Cambiar idioma",
 
   // Cookie banner
-  "cookie.body": "Este sitio mantiene una cookie de sesión para el inicio de sesión, una cookie de preferencia de idioma y — si acepta — un ping de analítica respetuoso con la privacidad que cuenta vistas de página sin identificador personal. Sin tracking publicitario, sin reventa.",
+  "cookie.body": "Este sitio mantiene una cookie de sesión para el inicio de sesión y una cookie de preferencia de idioma — esa es la lista completa. Las vistas de página se cuentan con Plausible Analytics sin cookies: sin identificador personal, sin tracking publicitario, sin reventa.",
   "cookie.privacy": "página de privacidad",
   "cookie.decline": "Solo esenciales",
   "cookie.accept": "Aceptar todo",

@@ -197,6 +197,28 @@ export default function IntegrationsSettings() {
                               ? 'Reconnect required'
                               : p.description}
                         </div>
+                        {/* Surface the last provider/refresh error if
+                            present. Defensive truncation prevents a
+                            stray multi-line OAuth body from blowing
+                            out the row. */}
+                        {errorRow?.lastError && (
+                          <div
+                            style={{
+                              fontSize: 10.5,
+                              color: 'var(--r-txt)',
+                              marginTop: 4,
+                              lineHeight: 1.4,
+                              wordBreak: 'break-word',
+                            }}
+                          >
+                            <AlertTriangle
+                              size={9}
+                              aria-hidden
+                              style={{ display: 'inline', marginRight: 4, verticalAlign: '-1px' }}
+                            />
+                            {humanizeLastError(errorRow.lastError)}
+                          </div>
+                        )}
                         {/* Push-sync state, if a channel is active for this
                             connection. Renders right under the email so the
                             user can tell at a glance whether real-time sync
@@ -330,6 +352,31 @@ function formatRelativeFuture(iso: string): string {
   const days = Math.floor(hours / 24)
   if (days < 7) return `in ${days}d`
   return new Date(iso).toLocaleDateString()
+}
+
+/** Translate the persisted `lastError` string (e.g. "refresh_failed:http_400",
+ *  "no_refresh_token", "access_token_decrypt_failed") into something a
+ *  signed-in admin can act on. Falls back to the raw code so we never hide
+ *  diagnostic detail outright. */
+function humanizeLastError(raw: string): string {
+  const code = raw.toLowerCase()
+  if (code.startsWith('refresh_failed:http_4')) {
+    return 'The provider rejected our refresh token (likely revoked at provider). Reconnect to re-grant access.'
+  }
+  if (code.startsWith('refresh_failed:network')) {
+    return 'Network failure while refreshing tokens. Reconnect if the issue persists for more than a few minutes.'
+  }
+  if (code.startsWith('refresh_failed')) {
+    return `Token refresh failed (${raw.slice(0, 80)}). Reconnect to retry cleanly.`
+  }
+  if (code === 'no_refresh_token') {
+    return 'No refresh token on file — reconnect once and pick "Allow offline access" so we can keep the link alive.'
+  }
+  if (code === 'access_token_decrypt_failed') {
+    return 'Stored credentials could not be decrypted (likely a key rotation). Reconnect to write fresh tokens.'
+  }
+  // Truncate at 200 chars so an unfamiliar code can't dominate the row.
+  return raw.length > 200 ? `${raw.slice(0, 197)}…` : raw
 }
 
 function humanizeError(code: string): string {

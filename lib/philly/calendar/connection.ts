@@ -26,6 +26,20 @@ import { providerConfig, type ProviderKey } from './providers'
 /** Threshold below which we proactively refresh on read. */
 const REFRESH_LEEWAY_MS = 30 * 1000
 
+/** Throttle for `lastUsedAt` writes. Every successful API call would
+ *  otherwise burn a DB write — at 15 min granularity we still get the
+ *  janitor signal we want (idle connections age out) without making
+ *  read-heavy users a write hot-path. */
+const LAST_USED_THROTTLE_MS = 15 * 60 * 1000
+
+/** Decide whether to advance `lastUsedAt`. Pulled out as a pure
+ *  function so it's straightforward to unit-test the throttle without
+ *  mocking Prisma. */
+export function shouldWriteLastUsed(now: Date, last: Date | null): boolean {
+  if (last == null) return true
+  return now.getTime() - last.getTime() > LAST_USED_THROTTLE_MS
+}
+
 export interface UpsertInput {
   userId: string
   organizationId: string
@@ -214,8 +228,19 @@ export async function getActiveConnection(
           : row.refreshTokenEnc,
         expiresAt: newExpiresAt,
         lastError: null,
+        // We're already paying for a row write; piggyback the
+        // lastUsedAt advance so we don't fire a second update below.
+        lastUsedAt: new Date(),
       },
     })
+  } else if (shouldWriteLastUsed(new Date(), row.lastUsedAt)) {
+    // No refresh needed — the throttled lastUsedAt write happens
+    // fire-and-forget so a successful read isn't gated on a DB write.
+    // A failure here is silent on purpose; lastUsedAt is a soft signal
+    // (used by the unused-connection janitor), not a correctness gate.
+    void prisma.calendarConnection
+      .update({ where: { id: row.id }, data: { lastUsedAt: new Date() } })
+      .catch(() => {})
   }
 
   return {
@@ -287,4 +312,4 @@ async function refreshAccessToken(
 }
 
 /** Test-only — exported so unit tests can patch crypto behavior cleanly. */
-export const __internals = { refreshAccessToken }
+export const __internals = { refreshAccessToken, LAST_USED_THROTTLE_MS, REFRESH_LEEWAY_MS }

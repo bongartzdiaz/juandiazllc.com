@@ -631,7 +631,13 @@ model CalendarConnection {
   updatedAt      DateTime  @updatedAt
 
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization Organization @relation(fields: [organizationId], references: [id])
+  // Organization deletion is intentionally NOT cascaded. Calendar
+  // connections belong to a User; an org delete that orphans
+  // connections is almost always a mistake. We let the FK constraint
+  // refuse the delete (Prisma default = Restrict) so the operator has
+  // to explicitly clear or move the connections first. User-side
+  // cascade above handles the GDPR Art. 17 erasure path.
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
   channels     CalendarChannel[]
 
   @@unique([userId, provider])
