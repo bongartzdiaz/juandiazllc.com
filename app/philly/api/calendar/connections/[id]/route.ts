@@ -14,6 +14,7 @@ import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
 import { revokeConnection } from '@/lib/philly/calendar/connection'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import { logger } from '@/lib/philly/logger'
+import { logAudit } from '@/lib/philly/audit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -37,6 +38,21 @@ export async function DELETE(
   logger.info('[calendar] connection revoked', {
     userId: scope.userId,
     connectionId: id,
+  })
+
+  // Audit revocation — entity=integration, action=delete. The `kind`
+  // field disambiguates calendar from other integration types when an
+  // auditor scans the log. The connection.id is the durable reference
+  // even after the row has its status flipped to 'revoked'.
+  await logAudit({
+    scope,
+    action: 'delete',
+    entity: 'integration',
+    entityId: id,
+    changes: {
+      kind: { old: 'calendar', new: 'calendar' },
+      status: { old: 'active', new: 'revoked' },
+    },
   })
 
   return NextResponse.json({ data: { id, status: 'revoked' } })

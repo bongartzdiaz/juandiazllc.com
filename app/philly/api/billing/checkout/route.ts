@@ -29,6 +29,7 @@ import { planFromKey, getPriceId, TRIAL_DAYS } from '@/lib/philly/stripe/plans'
 import { ensureStripeCustomer } from '@/lib/philly/stripe/customer'
 import { getSeatStatus } from '@/lib/philly/seats'
 import { logger } from '@/lib/philly/logger'
+import { logAudit } from '@/lib/philly/audit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -132,6 +133,25 @@ export async function POST(req: NextRequest) {
     plan: plan.key,
     seatCount,
     sessionId: session.id,
+  })
+
+  // Audit the *intent* — the actual Subscription row gets created later
+  // via webhook (customer.subscription.created). Capturing the intent
+  // here gives auditors a who-clicked-what trail even if the customer
+  // never completes Checkout (drops off, declines card, etc.). The
+  // entityId is null because no Subscription exists yet; we record the
+  // Stripe customer + session ids in `changes` for cross-reference.
+  await logAudit({
+    scope,
+    action: 'create',
+    entity: 'subscription',
+    entityId: null,
+    changes: {
+      plan: { old: null, new: plan.key },
+      seatCount: { old: null, new: seatCount },
+      stripeCustomerId: { old: null, new: customerId },
+      stripeCheckoutSessionId: { old: null, new: session.id },
+    },
   })
 
   return NextResponse.json({ data: { url: session.url } })

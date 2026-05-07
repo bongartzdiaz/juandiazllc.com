@@ -642,3 +642,32 @@ Earlier session log claimed `/tools/energy-roi` was "not yet routed" —
 verified incorrect. The page (`app/[locale]/tools/energy-roi/page.tsx`)
 shipped in PR #9 (`9038b9e`), with sitemap entry + two CTAs from
 `/sectors/energy` (anchor callout + dedicated card). No work needed.
+
+### 2026-05-07 — Bundle G: audit log on billing + calendar mutations
+
+Wired the existing `logAudit` helper (`lib/philly/audit.ts`) into the
+three new user-initiated mutation paths from yesterday's bundles:
+
+- **`POST /api/billing/checkout`** — audits the *intent* (entity=subscription,
+  action=create, entityId=null). The actual Subscription row gets created
+  later via `customer.subscription.created` webhook. Capturing the intent
+  here gives auditors a who-clicked-what trail even when the customer
+  drops off mid-Checkout (declines card, abandons tab).
+- **`GET /api/calendar/oauth/callback`** — audits the connection
+  (entity=integration, action=create). Records `{provider, providerEmail,
+  kind: 'calendar'}` in changes. We deliberately do NOT log providerAccountId,
+  scopes, or any token/refresh material — those are sensitive enough to
+  keep out of permanent record.
+- **`DELETE /api/calendar/connections/[id]`** — audits revocation
+  (entity=integration, action=delete, entityId=connection.id). Status
+  flip recorded as `{old: 'active', new: 'revoked'}`.
+
+**What's NOT audited here**: the Stripe webhook handler. Webhook events
+are server-to-server (no Supabase session, no `scope.userId`) — `AuditLog.userId`
+is required by schema. Webhook events stay in `logger.info` instead.
+If future compliance review demands user-traceable audit on webhook
+state changes, the right move is to add a synthetic system-user row
++ FK relaxation, not roll-our-own around it.
+
+3 files changed (3 routes + 1 doc). Typecheck clean. 289/289 still
+green. No new schema, no new env vars, no breaking changes.

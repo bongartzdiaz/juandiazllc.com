@@ -16,6 +16,7 @@ import { verifyState } from '@/lib/philly/calendar/state'
 import { exchangeCodeForTokens } from '@/lib/philly/calendar/token-exchange'
 import { upsertConnection } from '@/lib/philly/calendar/connection'
 import { logger } from '@/lib/philly/logger'
+import { logAudit } from '@/lib/philly/audit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -97,6 +98,28 @@ export async function GET(req: NextRequest) {
     userId: scope.userId,
     provider: state.prov,
     accountId: exchange.providerAccountId,
+  })
+
+  // Audit the connection — `integration` entity covers all third-party
+  // OAuth grants. providerEmail goes into `changes` so an auditor can
+  // see *which* account was connected without joining tables. We do NOT
+  // log the providerAccountId or any token/scope material — those are
+  // sensitive enough to keep out of a permanent record.
+  await logAudit({
+    scope: {
+      userId: scope.userId,
+      organizationId: scope.organizationId,
+      role: scope.role,
+      email: scope.email,
+    },
+    action: 'create',
+    entity: 'integration',
+    entityId: null,
+    changes: {
+      provider: { old: null, new: state.prov },
+      providerEmail: { old: null, new: exchange.providerEmail },
+      kind: { old: null, new: 'calendar' },
+    },
   })
 
   return redirect(req, state.redirect ?? DEFAULT_RETURN, {
