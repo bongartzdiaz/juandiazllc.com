@@ -36,6 +36,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { decryptSecret } from '@/lib/philly/crypto'
 import { getAuthPrisma } from '@/lib/philly/auth'
+import { syncDeltaForChannel } from '@/lib/philly/calendar/delta-sync'
 import { logger } from '@/lib/philly/logger'
 
 export const dynamic = 'force-dynamic'
@@ -166,11 +167,35 @@ async function handleGoogle(req: NextRequest): Promise<NextResponse> {
     messageNumber,
   })
 
-  // TODO: enqueue delta sync. For now we just record the trigger; the
-  // event-fetch worker is a follow-up bundle. This proves the round-trip
-  // works without committing to a sync implementation that has its own
-  // failure modes.
-  return NextResponse.json({ received: true, queued: true })
+  // Run the delta sync inline. For Google there's no documented response
+  // SLA on push notifications, so we can afford to await. The sync hits
+  // events.list (one HTTP call, typical p95 <500ms) and updates the
+  // channel's syncToken on success. Failures are logged but don't fail
+  // the webhook — Google would retry the notification, but our processing
+  // is idempotent so a repeat is a no-op.
+  //
+  // Future: when we add multi-page pagination or persistence, swap to
+  // Next.js `after()` (App Router primitive) so the handler returns
+  // before the sync finishes.
+  const syncResult = await syncDeltaForChannel(channel.id)
+  if (!syncResult.ok) {
+    logger.warn('[calendar webhook google] sync failed', {
+      channelId,
+      error: syncResult.error,
+      status: syncResult.status,
+    })
+  } else if (syncResult.processed > 0) {
+    logger.info('[calendar webhook google] sync complete', {
+      channelId,
+      processed: syncResult.processed,
+      added: syncResult.added,
+      removed: syncResult.removed,
+      bootstrapped: syncResult.bootstrapped,
+      tokenRotated: syncResult.tokenRotated,
+    })
+  }
+
+  return NextResponse.json({ received: true, synced: syncResult.ok, processed: syncResult.processed })
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -258,14 +283,38 @@ async function handleMicrosoft(req: NextRequest): Promise<NextResponse> {
 
   // Always 202 to MS — they're strict about the 3s SLA. Anything we
   // skipped (unknown sub, auth failure, inactive) is logged but doesn't
-  // cause a retry; legitimate operators will see those in logs.
-  // TODO: enqueue delta sync per-channel for the accepted batch.
+  // cause a retry.
+  //
+  // Run the per-channel deltas inline but in parallel. MS's 3-second
+  // budget covers verify (already done above) + the parallel deltas;
+  // each is one calendarView/delta call (typical p95 <800ms). If we
+  // ever exceed the budget in practice, swap to Next.js `after()` so
+  // the response returns before the deltas finish.
+  const syncResults = await Promise.allSettled(
+    Array.from(byExternalId.values())
+      .filter((c) => c.status === 'active')
+      .map((c) => syncDeltaForChannel(c.id)),
+  )
+  let syncedOk = 0
+  for (const r of syncResults) {
+    if (r.status === 'fulfilled' && r.value.ok) syncedOk++
+    else if (r.status === 'rejected') {
+      logger.warn('[calendar webhook ms] sync rejected', { reason: String(r.reason).slice(0, 200) })
+    } else if (r.status === 'fulfilled' && !r.value.ok) {
+      logger.warn('[calendar webhook ms] sync failed', { error: r.value.error, status: r.value.status })
+    }
+  }
+
   logger.info('[calendar webhook ms] batch processed', {
     total: items.length,
     accepted: acceptedCount,
     subscriptions: subIds.length,
+    syncedOk,
   })
-  return NextResponse.json({ received: true, accepted: acceptedCount }, { status: 202 })
+  return NextResponse.json(
+    { received: true, accepted: acceptedCount, synced: syncedOk },
+    { status: 202 },
+  )
 }
 
 // ──────────────────────────────────────────────────────────────────────
