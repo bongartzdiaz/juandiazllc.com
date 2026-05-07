@@ -66,6 +66,7 @@ export async function updateSession(request: NextRequest, requestHeaders?: Heade
     // path), but session-callers don't need the allowlist anyway.
     "/philly/api/audit/prune",
     "/philly/api/calendar/cron/renew-channels",
+    "/philly/api/calendar/cron/prune-channels",
   ]);
   if (!user && isProtected && !PUBLIC_PHILLY_PATHS.has(path)) {
     const url = request.nextUrl.clone();

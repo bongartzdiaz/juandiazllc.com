@@ -618,6 +618,91 @@ function errorMessage(err: unknown): string {
   return String(err).slice(0, 200)
 }
 
+// ─── Pruning (Art. 5(1)(e) storage-limitation) ───────────────────────
+//
+// CalendarChannel rows in `expired` or `error` status are residual
+// metadata once a connection is gone — they hold no live tokens and
+// no event data. Keeping them forever creates an Art. 5(1)(e)
+// retention drift for an org that prunes audit logs at 365 days but
+// keeps "calendar plumbing artefacts" indefinitely. Default 90 days.
+//
+// Hard floor of 30 days so a typo in the env var or request body
+// can't blow away a row that just expired and might still be
+// useful for a forensic "did we ever push-sync user X" question.
+
+const DEFAULT_PRUNE_RETENTION_DAYS = 90
+const MIN_PRUNE_RETENTION_DAYS = 30
+
+/** Statuses eligible for pruning. `active` is never pruned — those
+ *  are live channels and the renewal cron handles their lifecycle. */
+const PRUNABLE_STATUSES = ['expired', 'error'] as const
+
+/**
+ * Return channel ids whose status is `expired` or `error` AND whose
+ * `updatedAt` is older than the cutoff. Caller iterates and calls
+ * `prunePruned()` to delete them in batches.
+ *
+ * Pass `organizationId` to scope to a single tenant — used by the
+ * admin-triggered "Prune now" path so an admin can't sweep channels
+ * from other tenants. Cron-secret invocations omit it.
+ */
+export async function listPrunable(
+  cutoff: Date,
+  organizationId?: string,
+  limit: number = 500,
+): Promise<Array<{ id: string; provider: ProviderKey; status: string; updatedAt: Date }>> {
+  const prisma = getAuthPrisma()
+  const rows = await prisma.calendarChannel.findMany({
+    where: {
+      status: { in: PRUNABLE_STATUSES as unknown as string[] },
+      updatedAt: { lt: cutoff },
+      ...(organizationId
+        ? { connection: { organizationId } }
+        : {}),
+    },
+    select: { id: true, provider: true, status: true, updatedAt: true },
+    orderBy: { updatedAt: 'asc' },
+    take: limit,
+  })
+  return rows.map((r) => ({
+    id: r.id,
+    provider: r.provider as ProviderKey,
+    status: r.status,
+    updatedAt: r.updatedAt,
+  }))
+}
+
+/**
+ * Hard-delete by id list. Returns count actually deleted (may be less
+ * than ids.length if a concurrent caller already pruned some — fine,
+ * the operation is idempotent).
+ */
+export async function prunePruned(ids: string[]): Promise<number> {
+  if (ids.length === 0) return 0
+  const prisma = getAuthPrisma()
+  // Defensive — re-check the status filter. If a row flipped back to
+  // `active` between listPrunable and prune (renewal cron racing), we
+  // do NOT want to delete a live channel. The compound where clause
+  // makes this race-safe.
+  const result = await prisma.calendarChannel.deleteMany({
+    where: {
+      id: { in: ids },
+      status: { in: PRUNABLE_STATUSES as unknown as string[] },
+    },
+  })
+  return result.count
+}
+
+/** Floor + default for the prune retention window, with env override.
+ *  Mirrors /api/audit/prune's pattern. */
+export function pruneRetentionDays(requested?: number): number {
+  const fromEnv = Number.parseInt(process.env.CALENDAR_CHANNEL_PRUNE_DAYS ?? '', 10)
+  const base = typeof requested === 'number' && Number.isFinite(requested)
+    ? requested
+    : (Number.isFinite(fromEnv) && fromEnv > 0 ? fromEnv : DEFAULT_PRUNE_RETENTION_DAYS)
+  return Math.max(MIN_PRUNE_RETENTION_DAYS, Math.floor(base))
+}
+
 /** Test-only — exposes internals so unit tests can assert provider-specific
  *  request/response shapes without booting the full Prisma stack. */
 export const __internals = {
@@ -630,4 +715,7 @@ export const __internals = {
   MS_CALENDAR_RESOURCE,
   buildWebhookUrl,
   generateAuthSecret,
+  DEFAULT_PRUNE_RETENTION_DAYS,
+  MIN_PRUNE_RETENTION_DAYS,
+  PRUNABLE_STATUSES,
 }

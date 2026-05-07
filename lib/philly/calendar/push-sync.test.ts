@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { __internals, statusToErrorCode } from './push-sync'
+import { describe, it, expect, afterEach } from 'vitest'
+import { __internals, statusToErrorCode, pruneRetentionDays } from './push-sync'
 
 const {
   GOOGLE_CHANNEL_TTL_MS,
@@ -130,6 +130,58 @@ describe('statusToErrorCode (lastError sanitisation, compliance F9)', () => {
     for (const s of [100, 200, 301, 400, 418, 499, 500, 504, 599, 700]) {
       expect(allowed.has(statusToErrorCode(s))).toBe(true)
     }
+  })
+})
+
+describe('pruneRetentionDays (Art. 5(1)(e) storage-limitation)', () => {
+  const ORIGINAL_ENV = process.env.CALENDAR_CHANNEL_PRUNE_DAYS
+
+  afterEach(() => {
+    if (ORIGINAL_ENV === undefined) delete process.env.CALENDAR_CHANNEL_PRUNE_DAYS
+    else process.env.CALENDAR_CHANNEL_PRUNE_DAYS = ORIGINAL_ENV
+  })
+
+  it('defaults to 90 days when no override is provided', () => {
+    delete process.env.CALENDAR_CHANNEL_PRUNE_DAYS
+    expect(pruneRetentionDays()).toBe(90)
+  })
+
+  it('honours an env-var override', () => {
+    process.env.CALENDAR_CHANNEL_PRUNE_DAYS = '180'
+    expect(pruneRetentionDays()).toBe(180)
+  })
+
+  it('honours an explicit request value over the env var', () => {
+    process.env.CALENDAR_CHANNEL_PRUNE_DAYS = '180'
+    expect(pruneRetentionDays(120)).toBe(120)
+  })
+
+  it('floors below the minimum 30-day retention', () => {
+    expect(pruneRetentionDays(7)).toBe(30)
+    expect(pruneRetentionDays(0)).toBe(30)
+    expect(pruneRetentionDays(-100)).toBe(30)
+  })
+
+  it('floors a non-numeric env-var override back to default', () => {
+    process.env.CALENDAR_CHANNEL_PRUNE_DAYS = 'abc'
+    expect(pruneRetentionDays()).toBe(90)
+  })
+
+  it('floors fractional days', () => {
+    expect(pruneRetentionDays(60.9)).toBe(60)
+  })
+})
+
+describe('PRUNABLE_STATUSES (defensive list)', () => {
+  it('never includes "active" — live channels must not be pruned', () => {
+    const { PRUNABLE_STATUSES } = __internals
+    expect(PRUNABLE_STATUSES).not.toContain('active')
+  })
+
+  it('covers expired and error rows', () => {
+    const { PRUNABLE_STATUSES } = __internals
+    expect(PRUNABLE_STATUSES).toContain('expired')
+    expect(PRUNABLE_STATUSES).toContain('error')
   })
 })
 

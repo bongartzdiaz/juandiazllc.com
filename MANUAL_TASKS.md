@@ -85,18 +85,26 @@ notifications. Builds on Bundle A's OAuth integration.
 
 - [ ] Run `npx prisma migrate dev --name calendar_push_sync` (creates
       the `CalendarChannel` table). Idempotent — safe to re-run.
-- [ ] Schedule an hourly cron hitting `POST /philly/api/calendar/cron/renew-channels`
-      with the header `X-Cron-Secret: $CRON_SECRET`. Vercel Cron entry:
+- [ ] Schedule TWO calendar crons. Both use the `X-Cron-Secret: $CRON_SECRET`
+      header (same env var as `/api/audit/prune`). Vercel Cron entry:
       ```json
       {
         "crons": [
-          { "path": "/philly/api/calendar/cron/renew-channels", "schedule": "0 * * * *" }
+          { "path": "/philly/api/calendar/cron/renew-channels", "schedule": "0 * * * *" },
+          { "path": "/philly/api/calendar/cron/prune-channels", "schedule": "30 3 * * *" }
         ]
       }
       ```
+      - **renew-channels** (hourly): refreshes Google watch channels +
+        MS subscriptions before they expire (Google 7d / MS ~70h TTL).
+      - **prune-channels** (daily, 03:30 UTC): hard-deletes `expired`/
+        `error` `CalendarChannel` rows older than 90 days. Closes the
+        Art. 5(1)(e) storage-limitation gap on residual push-sync
+        metadata. Override the retention with env
+        `CALENDAR_CHANNEL_PRUNE_DAYS=N` (floor 30 days).
+
       External schedulers (Hetzner systemd timer, GitHub Action) work
-      identically — just send the header. Same `CRON_SECRET` env var
-      already used by `/api/audit/prune`.
+      identically — just send the header.
 - [ ] Verify `NEXT_PUBLIC_APP_URL` is set in Vercel — this is the base
       URL we hand to providers as the webhook target. Without it,
       push-sync subscribe is a no-op (the OAuth callback logs a warning

@@ -21,11 +21,17 @@
  *     pattern: drop deltaLink, hit `/calendarView/delta` from scratch,
  *     persist the new @odata.deltaLink.
  *
+ * Pagination:
+ *   Both providers paginate with bounded loops (MAX_PAGES). We follow
+ *   nextPageToken (Google) / @odata.nextLink (MS) until a page returns
+ *   the final delta marker (nextSyncToken / @odata.deltaLink) or the
+ *   page budget is exhausted. The delta marker only appears on the
+ *   FINAL page, so we MUST persist after the loop completes — partial
+ *   advancement would skip events. If we hit MAX_PAGES without a
+ *   delta marker, we leave the existing token untouched and the next
+ *   notification (or a renewal sweep) catches up.
+ *
  * What this module does NOT handle (yet):
- *   - Multi-page pagination (Google/MS both use nextPageToken). For the
- *     MVP we follow the first page only. With ~50 events per call,
- *     missing a page means at most 50 stale events on next sync — not
- *     correctness-breaking, just delayed. Bundle D4 adds pagination.
  *   - Calendar-not-primary (we only sync `primary` for Google, `me/events`
  *     for MS). Multi-calendar is a future model change. */
 
@@ -48,6 +54,15 @@ const BOOTSTRAP_PAST_DAYS = 14
 /** Forward window for the bootstrap fetch. Same rationale — covers
  *  upcoming meetings the user cares about, not their entire calendar. */
 const BOOTSTRAP_FUTURE_DAYS = 90
+
+/** Hard cap on pages we'll follow inside a single sync call. With
+ *  maxResults=250 per page that's 2,500 events per push notification,
+ *  which is well above realistic per-notification deltas (Google
+ *  batches changes, MS pushes one-at-a-time). The cap prevents a
+ *  pathological case (provider-side pagination bug, malicious
+ *  channel) from spinning the worker indefinitely. If we ever hit
+ *  it, the next notification or the renewal sweep picks up the rest. */
+const MAX_PAGES = 10
 
 export interface SyncResult {
   ok: boolean
@@ -112,83 +127,120 @@ async function syncGoogle(
   syncToken: string | null,
   recursionDepth: number = 0,
 ): Promise<SyncResult> {
-  const url = new URL(GOOGLE_EVENTS_LIST_URL)
-  if (syncToken) {
-    url.searchParams.set('syncToken', syncToken)
-    url.searchParams.set('singleEvents', 'true')
-  } else {
-    // Bootstrap: no syncToken yet, fetch a window. nextSyncToken comes
-    // back on the final page. Order params as Google's docs recommend
-    // when establishing a sync baseline.
-    const now = Date.now()
-    const timeMin = new Date(now - BOOTSTRAP_PAST_DAYS * 24 * 60 * 60 * 1000).toISOString()
-    const timeMax = new Date(now + BOOTSTRAP_FUTURE_DAYS * 24 * 60 * 60 * 1000).toISOString()
-    url.searchParams.set('timeMin', timeMin)
-    url.searchParams.set('timeMax', timeMax)
-    url.searchParams.set('singleEvents', 'true')
-    url.searchParams.set('orderBy', 'startTime')
-  }
-  url.searchParams.set('maxResults', '250')
-
-  let res: Response
-  try {
-    res = await fetch(url.toString(), {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
-  } catch (err) {
-    return zero({ error: `network:${(err as Error).message?.slice(0, 100)}` })
-  }
-
-  // 410 GONE → syncToken expired. Drop it and recurse for a bootstrap
-  // sync. Depth guard: a second 410 in the same call means something is
-  // genuinely broken (e.g. the bootstrap call itself is rejected) and we
-  // bail loud rather than loop. Recursion only ever bottoms out at depth
-  // 1; depth 2 is unreachable in correct code.
-  if (res.status === 410) {
-    if (recursionDepth >= 1) {
-      return zero({ error: 'persistent_410', status: 410 })
+  const buildFirstPageUrl = (): string => {
+    const url = new URL(GOOGLE_EVENTS_LIST_URL)
+    if (syncToken) {
+      url.searchParams.set('syncToken', syncToken)
+      url.searchParams.set('singleEvents', 'true')
+    } else {
+      // Bootstrap: no syncToken yet, fetch a window. nextSyncToken comes
+      // back on the final page. Order params as Google's docs recommend
+      // when establishing a sync baseline.
+      const now = Date.now()
+      const timeMin = new Date(now - BOOTSTRAP_PAST_DAYS * 24 * 60 * 60 * 1000).toISOString()
+      const timeMax = new Date(now + BOOTSTRAP_FUTURE_DAYS * 24 * 60 * 60 * 1000).toISOString()
+      url.searchParams.set('timeMin', timeMin)
+      url.searchParams.set('timeMax', timeMax)
+      url.searchParams.set('singleEvents', 'true')
+      url.searchParams.set('orderBy', 'startTime')
     }
-    const prisma = getAuthPrisma()
-    await prisma.calendarChannel.update({
-      where: { id: channelId },
-      data: { syncToken: null },
-    })
-    return await syncGoogle(channelId, accessToken, null, recursionDepth + 1)
+    url.searchParams.set('maxResults', '250')
+    return url.toString()
   }
 
-  if (!res.ok) {
-    return zero({ error: 'http_error', status: res.status })
+  const buildNextPageUrl = (pageToken: string): string => {
+    // For paging, Google requires re-supplying the original query (sync
+    // token OR window) plus the pageToken. Easiest: rebuild and add.
+    const u = new URL(buildFirstPageUrl())
+    u.searchParams.set('pageToken', pageToken)
+    return u.toString()
   }
 
-  const json = (await res.json().catch(() => null)) as
-    | { items?: Array<{ status?: string; id: string }>; nextSyncToken?: string }
-    | null
-  if (!json) {
-    return zero({ error: 'response_invalid' })
-  }
-
-  const items = json.items ?? []
   let added = 0
   let updated = 0
   let removed = 0
-  // Google encodes deletions as items with `status: 'cancelled'`. Created
-  // and updated aren't differentiated in the response — we infer based
-  // on whether we've seen the event id before. Since we don't yet
-  // persist event rows, we count cancellations as `removed` and the
-  // rest as `added` for now. Bundle D4 (with persistence) will
-  // distinguish updated vs added by checking the local row.
-  for (const it of items) {
-    if (it.status === 'cancelled') removed++
-    else added++
+  let totalProcessed = 0
+  let nextSyncToken: string | undefined
+  let pageToken: string | undefined
+
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const target = page === 0 ? buildFirstPageUrl() : buildNextPageUrl(pageToken!)
+
+    let res: Response
+    try {
+      res = await fetch(target, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+    } catch (err) {
+      return zero({ error: `network:${(err as Error).message?.slice(0, 100)}` })
+    }
+
+    // 410 GONE → syncToken expired. Drop it and recurse for a bootstrap
+    // sync. Depth guard: a second 410 means something is genuinely
+    // broken (e.g. the bootstrap call itself is rejected) and we bail
+    // loud rather than loop. Recursion only ever bottoms out at depth 1.
+    if (res.status === 410) {
+      if (recursionDepth >= 1) {
+        return zero({ error: 'persistent_410', status: 410 })
+      }
+      const prisma = getAuthPrisma()
+      await prisma.calendarChannel.update({
+        where: { id: channelId },
+        data: { syncToken: null },
+      })
+      return await syncGoogle(channelId, accessToken, null, recursionDepth + 1)
+    }
+
+    if (!res.ok) {
+      return zero({ error: 'http_error', status: res.status })
+    }
+
+    const json = (await res.json().catch(() => null)) as
+      | {
+          items?: Array<{ status?: string; id: string }>
+          nextSyncToken?: string
+          nextPageToken?: string
+        }
+      | null
+    if (!json) {
+      return zero({ error: 'response_invalid' })
+    }
+
+    const items = json.items ?? []
+    totalProcessed += items.length
+    // Google encodes deletions as items with `status: 'cancelled'`.
+    // Created and updated aren't differentiated in the response — we
+    // infer based on whether we've seen the event id before. Since we
+    // don't yet persist event rows, we count cancellations as `removed`
+    // and the rest as `added` for now. Bundle D4 (with persistence)
+    // will distinguish updated vs added by checking the local row.
+    for (const it of items) {
+      if (it.status === 'cancelled') removed++
+      else added++
+    }
+
+    if (json.nextSyncToken) {
+      nextSyncToken = json.nextSyncToken
+      break
+    }
+    if (json.nextPageToken) {
+      pageToken = json.nextPageToken
+      continue
+    }
+    // No nextPageToken AND no nextSyncToken — a Google response shape
+    // we shouldn't see (bootstrap call without orderBy can omit the
+    // sync token, but our bootstrap sets orderBy=startTime). Bail
+    // without rotating the token; next notification will retry.
+    break
   }
 
   let tokenRotated = false
-  if (json.nextSyncToken) {
+  if (nextSyncToken) {
     const prisma = getAuthPrisma()
     await prisma.calendarChannel.update({
       where: { id: channelId },
       data: {
-        syncToken: json.nextSyncToken,
+        syncToken: nextSyncToken,
         lastError: null,
       },
     })
@@ -198,7 +250,7 @@ async function syncGoogle(
   return {
     ok: true,
     bootstrapped: !syncToken,
-    processed: items.length,
+    processed: totalProcessed,
     added,
     updated,
     removed,
@@ -217,10 +269,8 @@ async function syncMicrosoft(
   // For MS, the syncToken column actually stores the full @odata.deltaLink
   // URL. On bootstrap we hit calendarView/delta directly with a date
   // range; subsequent calls use the stored deltaLink as the URL.
-  let url: string
-  if (deltaLink) {
-    url = deltaLink
-  } else {
+  const buildFirstUrl = (): string => {
+    if (deltaLink) return deltaLink
     const u = new URL(MS_CALENDAR_VIEW_DELTA_URL)
     const now = Date.now()
     u.searchParams.set(
@@ -231,75 +281,95 @@ async function syncMicrosoft(
       'endDateTime',
       new Date(now + BOOTSTRAP_FUTURE_DAYS * 24 * 60 * 60 * 1000).toISOString(),
     )
-    url = u.toString()
+    return u.toString()
   }
 
-  let res: Response
-  try {
-    res = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        // MS recommends a Prefer header to control the page size. 250
-        // matches Google; keeps both providers similar.
-        Prefer: 'odata.maxpagesize=250',
-      },
-    })
-  } catch (err) {
-    return zero({ error: `network:${(err as Error).message?.slice(0, 100)}` })
-  }
-
-  // MS Graph returns 410 / 404 when the deltaLink is too old / invalid.
-  // Drop the link and recurse for a fresh bootstrap. Depth guard mirrors
-  // the Google branch — a second 410/404 means something is genuinely
-  // broken (provider-side error on the bootstrap window itself) and we
-  // bail loud rather than loop.
-  if (res.status === 410 || res.status === 404) {
-    if (recursionDepth >= 1) {
-      return zero({ error: 'persistent_410', status: res.status })
-    }
-    const prisma = getAuthPrisma()
-    await prisma.calendarChannel.update({
-      where: { id: channelId },
-      data: { syncToken: null },
-    })
-    return await syncMicrosoft(channelId, accessToken, null, recursionDepth + 1)
-  }
-
-  if (!res.ok) {
-    return zero({ error: 'http_error', status: res.status })
-  }
-
-  const json = (await res.json().catch(() => null)) as
-    | {
-        value?: Array<{ id: string; '@removed'?: { reason: string } }>
-        '@odata.deltaLink'?: string
-        '@odata.nextLink'?: string
-      }
-    | null
-  if (!json) {
-    return zero({ error: 'response_invalid' })
-  }
-
-  const items = json.value ?? []
   let added = 0
   let removed = 0
-  for (const it of items) {
-    if (it['@removed']) removed++
-    else added++
+  let totalProcessed = 0
+  let nextDeltaLink: string | undefined
+  let nextLink: string | undefined
+
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const target = page === 0 ? buildFirstUrl() : nextLink!
+
+    let res: Response
+    try {
+      res = await fetch(target, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          // MS recommends a Prefer header to control the page size. 250
+          // matches Google; keeps both providers similar.
+          Prefer: 'odata.maxpagesize=250',
+        },
+      })
+    } catch (err) {
+      return zero({ error: `network:${(err as Error).message?.slice(0, 100)}` })
+    }
+
+    // MS Graph returns 410 / 404 when the deltaLink is too old / invalid.
+    // Only meaningful on the first page (subsequent nextLinks are
+    // generated by MS for an already-validated session). Drop the link
+    // and recurse for a fresh bootstrap. Depth guard mirrors Google.
+    if (res.status === 410 || res.status === 404) {
+      if (page > 0) {
+        // Mid-pagination 410 — leave the existing token alone, the next
+        // notification triggers a fresh start. Don't recurse from here.
+        return zero({ error: 'http_error', status: res.status })
+      }
+      if (recursionDepth >= 1) {
+        return zero({ error: 'persistent_410', status: res.status })
+      }
+      const prisma = getAuthPrisma()
+      await prisma.calendarChannel.update({
+        where: { id: channelId },
+        data: { syncToken: null },
+      })
+      return await syncMicrosoft(channelId, accessToken, null, recursionDepth + 1)
+    }
+
+    if (!res.ok) {
+      return zero({ error: 'http_error', status: res.status })
+    }
+
+    const json = (await res.json().catch(() => null)) as
+      | {
+          value?: Array<{ id: string; '@removed'?: { reason: string } }>
+          '@odata.deltaLink'?: string
+          '@odata.nextLink'?: string
+        }
+      | null
+    if (!json) {
+      return zero({ error: 'response_invalid' })
+    }
+
+    const items = json.value ?? []
+    totalProcessed += items.length
+    for (const it of items) {
+      if (it['@removed']) removed++
+      else added++
+    }
+
+    if (json['@odata.deltaLink']) {
+      nextDeltaLink = json['@odata.deltaLink']
+      break
+    }
+    if (json['@odata.nextLink']) {
+      nextLink = json['@odata.nextLink']
+      continue
+    }
+    // Neither marker — shouldn't happen on a successful delta call.
+    // Bail without persisting; next notification retries.
+    break
   }
 
-  // MS returns the next checkpoint as `@odata.deltaLink` on the FINAL
-  // page only. Earlier pages have `@odata.nextLink` instead. For MVP
-  // we follow the first page; if we got a deltaLink that means there
-  // was only one page. If we got a nextLink, we don't follow it yet —
-  // those events catch up on next notification.
   let tokenRotated = false
-  if (json['@odata.deltaLink']) {
+  if (nextDeltaLink) {
     const prisma = getAuthPrisma()
     await prisma.calendarChannel.update({
       where: { id: channelId },
       data: {
-        syncToken: json['@odata.deltaLink'],
+        syncToken: nextDeltaLink,
         lastError: null,
       },
     })
@@ -309,7 +379,7 @@ async function syncMicrosoft(
   return {
     ok: true,
     bootstrapped: !deltaLink,
-    processed: items.length,
+    processed: totalProcessed,
     added,
     updated: 0,
     removed,
@@ -338,6 +408,7 @@ export const __internals = {
   MS_CALENDAR_VIEW_DELTA_URL,
   BOOTSTRAP_PAST_DAYS,
   BOOTSTRAP_FUTURE_DAYS,
+  MAX_PAGES,
   // Exposed as length-only references so tests can assert the
   // recursion guard exists without invoking a live HTTP call.
   syncGoogleArity: syncGoogle.length,

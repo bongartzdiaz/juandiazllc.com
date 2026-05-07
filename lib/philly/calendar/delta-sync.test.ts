@@ -38,6 +38,22 @@ describe('Bootstrap window', () => {
   })
 })
 
+describe('Pagination cap (delta-sync correctness on busy calendars)', () => {
+  const { MAX_PAGES } = __internals
+
+  it('caps at a small enough number that one push notification never spins', () => {
+    // 250 events per page × MAX_PAGES = upper bound per notification.
+    // 10 pages × 250 = 2,500 events per push — well above realistic
+    // per-notification deltas, well below "infinite loop".
+    expect(MAX_PAGES).toBeGreaterThanOrEqual(2)
+    expect(MAX_PAGES).toBeLessThanOrEqual(50)
+  })
+
+  it('is at least 2 — a one-page cap is a regression to the old behaviour', () => {
+    expect(MAX_PAGES).toBeGreaterThan(1)
+  })
+})
+
 describe('Recursion guard signature (audit MED F6)', () => {
   // Function.length is the number of params before the first one with a
   // default value. The 410-recursion guard requires `recursionDepth` as an
