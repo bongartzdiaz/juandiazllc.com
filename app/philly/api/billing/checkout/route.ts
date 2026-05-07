@@ -28,6 +28,7 @@ import { getStripe, isStripeConfigured } from '@/lib/philly/stripe/client'
 import { planFromKey, getPriceId, TRIAL_DAYS } from '@/lib/philly/stripe/plans'
 import { ensureStripeCustomer } from '@/lib/philly/stripe/customer'
 import { getSeatStatus } from '@/lib/philly/seats'
+import { getAppBaseUrl } from '@/lib/philly/app-url'
 import { logger } from '@/lib/philly/logger'
 import { logAudit } from '@/lib/philly/audit'
 
@@ -86,14 +87,14 @@ export async function POST(req: NextRequest) {
   const customerId = await ensureStripeCustomer(org, billingEmail)
 
   const stripe = getStripe()
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? ''
-  if (!baseUrl) {
+  const base = getAppBaseUrl()
+  if (!base.ok) {
     return jsonError(
       'NEXT_PUBLIC_APP_URL or NEXT_PUBLIC_SITE_URL must be set for return URLs',
       503,
     )
   }
-  const trimmed = baseUrl.replace(/\/$/, '')
+  const trimmed = base.url
 
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',

@@ -6,19 +6,13 @@ import { Calendar, Lock, Check, AlertTriangle } from 'lucide-react'
 import {
   OnboardingFrame, obButtonSecondary, obButtonPrimary,
 } from '@/components/philly/onboarding/OnboardingFrame'
+import type { ConnectionDTO, ConnectionsResponse } from '@/lib/philly/calendar/types'
 
+// Same source of truth as /settings/integrations — see lib/philly/calendar/types.ts.
+// Inline interfaces drifted across the two surfaces during Bundle D2 (the
+// `channel` field landed only in settings); now both consume the shared DTO.
 type Provider = 'google' | 'microsoft'
-
-interface Connection {
-  id: string
-  provider: Provider
-  providerEmail: string | null
-  status: string
-  scopes: string[]
-  connectedAt: string
-  lastUsedAt: string | null
-  lastError: string | null
-}
+type Connection = ConnectionDTO
 
 interface ProvMeta {
   key: Provider
@@ -59,7 +53,7 @@ export default function StepCalendar() {
           if (!cancelled) setConnections([])
           return
         }
-        const json = await res.json() as { data: Connection[] }
+        const json = await res.json() as ConnectionsResponse
         if (!cancelled) setConnections(json.data ?? [])
       } catch {
         if (!cancelled) setConnections([])

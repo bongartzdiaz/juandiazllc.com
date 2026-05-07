@@ -16,6 +16,7 @@ import { verifyState } from '@/lib/philly/calendar/state'
 import { exchangeCodeForTokens } from '@/lib/philly/calendar/token-exchange'
 import { upsertConnection } from '@/lib/philly/calendar/connection'
 import { subscribe as subscribePushSync } from '@/lib/philly/calendar/push-sync'
+import { getAppBaseUrl } from '@/lib/philly/app-url'
 import { logger } from '@/lib/philly/logger'
 import { logAudit } from '@/lib/philly/audit'
 
@@ -132,12 +133,12 @@ export async function GET(req: NextRequest) {
   //
   // Webhook base URL is required — without it we can't tell the provider
   // where to deliver. Skip silently if unset (dev environments).
-  const webhookBase = process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL
-  if (webhookBase) {
+  const base = getAppBaseUrl()
+  if (base.ok) {
     const subResult = await subscribePushSync({
       userId: scope.userId,
       provider: state.prov,
-      webhookBaseUrl: webhookBase,
+      webhookBaseUrl: base.url,
     })
     if (!subResult.ok) {
       logger.warn('[calendar oauth] push-sync subscribe failed (non-fatal)', {

@@ -22,6 +22,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { listDueForRenewal, renew } from '@/lib/philly/calendar/push-sync'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { logAudit } from '@/lib/philly/audit'
+import type { AuthScope } from '@/lib/philly/auth-helpers'
 import { logger } from '@/lib/philly/logger'
 
 export const dynamic = 'force-dynamic'
@@ -41,13 +44,23 @@ export async function POST(req: NextRequest) {
   const headerSecret = req.headers.get('x-cron-secret')
 
   let triggeredBy: 'cron' | 'admin' = 'cron'
+  let adminScope: AuthScope | null = null
 
   if (cronSecret && headerSecret && headerSecret === cronSecret) {
-    // Cron path — process all orgs.
+    // Cron path — processes ALL organizations.
   } else {
     const scope = await requireRole(['admin'])
     if (scope instanceof NextResponse) return scope
     triggeredBy = 'admin'
+    adminScope = scope
+    // Rate-limit the admin path. Cron path skips because the cron
+    // secret implies trust — an attacker with the secret has worse
+    // routes to attack.
+    const limited = enforceRateLimit(
+      `cal-renew-admin:${scope.organizationId}`,
+      PRESET_MUTATION,
+    )
+    if (limited) return limited
   }
 
   const webhookBase = process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL
@@ -58,10 +71,16 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const due = await listDueForRenewal()
-  // Sanity-cap the batch so a single sweep can't go runaway. If there
-  // are more than MAX_PER_RUN due (unlikely outside disaster recovery),
-  // the next sweep picks up the rest.
+  // CRITICAL: org-scope the selector when an admin triggers the sweep.
+  // Without this, an admin in tenant A could induce a renewal storm
+  // against every other tenant's calendar channels — the route would
+  // gladly call Google/Microsoft on every connection in the database
+  // up to MAX_PER_RUN. Cron path passes undefined to process all orgs.
+  const due = await listDueForRenewal(
+    new Date(),
+    adminScope?.organizationId,
+  )
+  // Sanity-cap the batch so a single sweep can't go runaway.
   const batch = due.slice(0, MAX_PER_RUN)
 
   const results: RenewItem[] = []
@@ -86,11 +105,30 @@ export async function POST(req: NextRequest) {
 
   logger.info('[calendar cron] renew sweep complete', {
     triggeredBy,
+    orgScoped: adminScope?.organizationId ?? null,
     dueTotal: due.length,
     processed: batch.length,
     renewed: renewedCount,
     failed: failedCount,
   })
+
+  // Self-audit admin-triggered runs. Cron has no userId so we can't
+  // audit those (AuditLog.userId is required) — they live in logger
+  // output only. Same trade-off as /api/audit/prune.
+  if (triggeredBy === 'admin' && adminScope) {
+    await logAudit({
+      scope: adminScope,
+      action: 'update',
+      entity: 'integration',
+      entityId: null,
+      changes: {
+        action: { old: null, new: 'renew_channels_sweep' },
+        renewed: { old: 0, new: renewedCount },
+        failed: { old: 0, new: failedCount },
+        processed: { old: 0, new: batch.length },
+      },
+    })
+  }
 
   return NextResponse.json({
     data: {
@@ -99,7 +137,6 @@ export async function POST(req: NextRequest) {
       processed: batch.length,
       renewed: renewedCount,
       failed: failedCount,
-      // Per-channel results — useful for debugging, no PII / secrets.
       results,
     },
   })

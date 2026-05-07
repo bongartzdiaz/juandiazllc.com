@@ -839,3 +839,55 @@ still green; no test code touched.
 Lesson: spin up a preview EARLIER when shipping cron-style routes —
 unit tests don't catch middleware-shape bugs because they don't
 exercise the middleware path.
+
+### 2026-05-07 — Bundle AF: audit fixes (HIGH × 2, MEDIUM × 4, LOW × 2)
+
+Followup to `/audit-full` — addressed 8 of 11 findings. The remaining
+3 (lastUsedAt schema-drift, CalendarConnection.organization onDelete,
+lastError UI rendering) are LOW-impact follow-ups documented in the
+audit report; not blocking.
+
+**HIGH severity (cross-tenant safety in renew-channels):**
+- F1: `cron/renew-channels` admin path was processing channels across
+  ALL organizations because `listDueForRenewal()` had no scope filter.
+  Added optional `organizationId` parameter; admin path passes
+  `scope.organizationId`, cron path omits to process all orgs.
+- F2: Same route had no rate limit on the admin path. Added
+  `PRESET_MUTATION` for the admin trigger; cron skips (secret implies
+  trust). Plus self-audit for admin runs (mirrors /api/audit/prune).
+
+**MEDIUM (compliance + contracts):**
+- F3: Stripe Customer Portal access now writes an audit row. The portal
+  enables cancel/payment-method/tax-id changes; downstream Stripe
+  webhooks fire as `customer.subscription.deleted` etc. but those are
+  server-to-server with no userId. This row ties the resulting state
+  changes back to the admin who clicked the button.
+- F4: Admin-triggered renew-channels sweep now writes an audit row
+  (renewedCount, failedCount, processed). Mirrors prune route's pattern.
+- F6: Hoisted `ConnectionDTO` / `ChannelDTO` / `ConnectionsResponse`
+  into `lib/philly/calendar/types.ts`. Both UIs that consume the
+  endpoint (wizard + integrations settings) now import from there
+  instead of declaring their own inline interfaces. The wizard had
+  drifted (missing `channel` field added in Bundle D2) — fixed.
+- F7: Created `lib/philly/app-url.ts → getAppBaseUrl()` helper. Stripe
+  checkout, Stripe portal, and calendar OAuth subscribe all use it
+  now. Portal route gained the missing fail-fast on missing env (was
+  silently composing a relative URL Stripe rejected with an opaque
+  error) and the missing `session.url` null-check.
+
+**LOW (polish):**
+- F9: Removed duplicate `'user'` from `AuditEntity` union.
+- F10: Gated `access_type=offline` and `prompt=consent` behind
+  `provider === 'google'` check. They were unconditionally set for
+  both providers; harmless on MS but misleading to read.
+
+**Skipped this round (LOW, follow-up):**
+- F5 (lastUsedAt soft-promise — needs throttled write logic)
+- F8 (CalendarConnection.organization missing onDelete)
+- F11 (lastError declared but never rendered)
+
+7 files touched: 5 routes, 2 new lib helpers, 1 audit-helper diff,
+1 Prisma-schema-comment will be addressed in F8 follow-up. Typecheck
+clean. Tests: 301 pass + 1 pre-existing flake in crypto.test.ts
+(documented in readiness-sprint session log; passes in isolation,
+fails when interleaved — not introduced by this work).

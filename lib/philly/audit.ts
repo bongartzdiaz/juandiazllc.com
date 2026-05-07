@@ -66,7 +66,6 @@ export type AuditEntity =
   | 'openHouseVisit'
   | 'pipeline'
   | 'pipelineStage'
-  | 'user'
   | 'organization'
   | 'auditLog'
 

@@ -17,7 +17,9 @@ import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import { getStripe, isStripeConfigured } from '@/lib/philly/stripe/client'
+import { getAppBaseUrl } from '@/lib/philly/app-url'
 import { logger } from '@/lib/philly/logger'
+import { logAudit } from '@/lib/philly/audit'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -43,17 +45,48 @@ export async function POST() {
   }
 
   const stripe = getStripe()
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? ''
-  const trimmed = baseUrl.replace(/\/$/, '')
+  const base = getAppBaseUrl()
+  if (!base.ok) {
+    // Same fail-fast as checkout — without a valid base, Stripe rejects
+    // a relative return_url with an opaque API error and the user sees
+    // a 5xx with no actionable message.
+    return jsonError(
+      'NEXT_PUBLIC_APP_URL or NEXT_PUBLIC_SITE_URL must be set for return URLs',
+      503,
+    )
+  }
 
   const session = await stripe.billingPortal.sessions.create({
     customer: sub.stripeCustomerId,
-    return_url: `${trimmed}/philly/settings/billing`,
+    return_url: `${base.url}/philly/settings/billing`,
   })
+
+  if (!session.url) {
+    logger.error('[billing] portal session has no url', { sessionId: session.id })
+    return jsonError('Portal session creation failed', 502)
+  }
 
   logger.info('[billing] portal session created', {
     orgId: scope.organizationId,
     customerId: sub.stripeCustomerId,
+  })
+
+  // Audit Customer Portal access. The portal lets the admin cancel the
+  // subscription, swap payment methods, change tax IDs, and download
+  // invoices — all SOC2 / GDPR-relevant actions. Stripe webhooks fire
+  // for the resulting state changes (subscription.deleted, etc.) but
+  // those are server-to-server with no userId. This row ties the
+  // Stripe-side action back to the admin who opened the portal.
+  await logAudit({
+    scope,
+    action: 'update',
+    entity: 'subscription',
+    entityId: null,
+    changes: {
+      action: { old: null, new: 'open_billing_portal' },
+      stripeCustomerId: { old: null, new: sub.stripeCustomerId },
+      portalSessionId: { old: null, new: session.id },
+    },
   })
 
   return NextResponse.json({ data: { url: session.url } })

@@ -71,9 +71,20 @@ export async function GET(req: NextRequest) {
     response_type: 'code',
     scope: cfg.scopes.join(' '),
     state,
-    access_type: 'offline', // Google: required for refresh_token
-    prompt: 'consent', // Google: force re-consent so we always get refresh_token
   })
+
+  // Google-specific authorize-URL params. `access_type=offline` is what
+  // makes Google return a refresh_token at all (without it, only an
+  // access_token comes back and we can't refresh later). `prompt=consent`
+  // forces Google to re-show the consent screen even on subsequent grants
+  // — this is the only reliable way to guarantee we get a refresh_token
+  // for a returning user. Microsoft uses the `offline_access` scope (in
+  // microsoftConfig.scopes already) and treats `prompt=consent` differently;
+  // setting these for MS is harmless but misleading to read, so gate them.
+  if (provider === 'google') {
+    authParams.set('access_type', 'offline')
+    authParams.set('prompt', 'consent')
+  }
 
   return NextResponse.redirect(`${cfg.authUrl}?${authParams.toString()}`)
 }

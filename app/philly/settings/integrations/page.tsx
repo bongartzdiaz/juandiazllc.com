@@ -18,27 +18,13 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import {
   Calendar, Check, AlertTriangle, Lock, ExternalLink, Plug, Info, Zap,
 } from 'lucide-react'
+import type { ConnectionDTO, ConnectionsResponse } from '@/lib/philly/calendar/types'
 
+// Local aliases — kept narrow so the rendering code below reads cleanly.
+// The narrowing of `provider` from string to the union literal happens
+// at the API boundary in the route's TS type.
 type Provider = 'google' | 'microsoft'
-
-interface Channel {
-  id: string
-  status: string
-  expiresAt: string
-  lastRenewedAt: string | null
-}
-
-interface Connection {
-  id: string
-  provider: Provider
-  providerEmail: string | null
-  status: string
-  scopes: string[]
-  connectedAt: string
-  lastUsedAt: string | null
-  lastError: string | null
-  channel: Channel | null
-}
+type Connection = ConnectionDTO
 
 interface ProvMeta {
   key: Provider
@@ -109,7 +95,7 @@ export default function IntegrationsSettings() {
           if (!cancelled) setConnections([])
           return
         }
-        const json = await res.json() as { data: Connection[] }
+        const json = await res.json() as ConnectionsResponse
         if (!cancelled) setConnections(json.data ?? [])
       } catch {
         if (!cancelled) setConnections([])

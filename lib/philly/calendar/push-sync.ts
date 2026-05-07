@@ -348,16 +348,28 @@ async function stopMicrosoft(accessToken: string, subscriptionId: string): Promi
 /**
  * Channels expiring within the buffer window. Used by the renewal cron.
  * Caller iterates and calls renew() for each.
+ *
+ * Pass `organizationId` to scope to a single tenant — used by the
+ * admin-triggered "Renew now" path so an admin can't sweep channels
+ * belonging to other organizations. Cron-secret invocations omit it
+ * to process all orgs.
  */
-export async function listDueForRenewal(now: Date = new Date()): Promise<
-  Array<{ id: string; provider: ProviderKey; expiresAt: Date }>
-> {
+export async function listDueForRenewal(
+  now: Date = new Date(),
+  organizationId?: string,
+): Promise<Array<{ id: string; provider: ProviderKey; expiresAt: Date }>> {
   const prisma = getAuthPrisma()
   const cutoff = new Date(now.getTime() + RENEWAL_BUFFER_MS)
   const rows = await prisma.calendarChannel.findMany({
     where: {
       status: 'active',
       expiresAt: { lt: cutoff },
+      // When scoped, join through the connection to filter by org.
+      // The connection rows store organizationId directly so we don't
+      // need to widen CalendarChannel's selectable surface.
+      ...(organizationId
+        ? { connection: { organizationId } }
+        : {}),
     },
     select: { id: true, provider: true, expiresAt: true },
     orderBy: { expiresAt: 'asc' },
