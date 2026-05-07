@@ -3,6 +3,35 @@
 Every item here is a one-time human action that unblocks code that's
 already shipped. Strike through (`~~...~~`) when done.
 
+## Repo strategy — DEUS-SHARED is now primary for CRM (2026-05-07)
+
+Decision: future CRM (DEUS) work moves to `bongartzdiaz/DEUS-SHARED`.
+The unified `bongartzdiaz/juandiazllc.com` repo continues as the home
+of the brand site (`app/[locale]/*`, marketing pages). The two
+codebases are no longer mirrored — DEUS-SHARED is the source of truth
+for the CRM.
+
+**What changed:**
+- `.github/workflows/sync-deus-shared.yml` (the auto-mirror we shipped
+  in `f51057b`) has been removed. It never had its `DEUS_SHARED_PAT`
+  secret set, so it never ran — but it would have force-pushed
+  juandiazllc.com over DEUS-SHARED's distinct CRM-only structure,
+  which is now wrong.
+- The pre-existing "Sync Bot" mechanism that was extracting
+  philly-standalone into DEUS-SHARED (last sync 2026-04-29) is
+  separate from our workflow. It's externally managed; turn it off
+  outside this repo if it's still active.
+
+**Next session: clone DEUS-SHARED.**
+```
+git clone https://github.com/bongartzdiaz/DEUS-SHARED.git
+```
+The structure is flat (`app/`, `components/`, `prisma/`, `lib/` at
+root — no `/philly/` prefix). Today's CRM-side code in PR #12 will
+need to be either ported into the DEUS-SHARED structure manually, or
+a cross-repo cherry-pick — not addressed in this PR since PR #12 also
+contains brand-site bundles that belong on juandiazllc.com.
+
 ## Calendar push-sync (Bundle D, 2026-05-07)
 
 Adds `CalendarChannel` table + provider webhooks for real-time event
