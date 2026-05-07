@@ -129,6 +129,23 @@ export default async function StatusPage() {
                       background: c.ok ? '#10b981' : c.critical ? '#dc2626' : '#f59e0b',
                     }}
                   />
+                  {/* Screen-reader equivalent of the colour dot — WCAG 1.4.1
+                      "use of colour" (don't rely on colour alone). */}
+                  <span
+                    style={{
+                      position: 'absolute',
+                      width: 1,
+                      height: 1,
+                      padding: 0,
+                      margin: -1,
+                      overflow: 'hidden',
+                      clip: 'rect(0,0,0,0)',
+                      whiteSpace: 'nowrap',
+                      border: 0,
+                    }}
+                  >
+                    {c.ok ? 'Operational' : c.critical ? 'Down' : 'Degraded'}:
+                  </span>
                   <span style={{ fontWeight: 500, textTransform: 'capitalize' }}>
                     {labelFor(c.name)}
                   </span>

@@ -62,21 +62,25 @@ export async function GET(
   const range = url.searchParams.get('range') ?? 'upcoming'
   const now = new Date()
 
-  const where = {
-    organizationId: scope.organizationId,
-    cancelledAt: null,
-    // Stored as comma-separated lowercased emails; substring match is
-    // safe because emails contain `@` and `,` is the only separator.
-    matchedEmails: { contains: contact.email.toLowerCase() },
-    ...(range === 'upcoming'
-      ? { endTime: { gte: now } }
-      : range === 'past'
-        ? { endTime: { lt: now } }
-        : {}),
-  }
+  const targetEmail = contact.email.toLowerCase()
 
-  const meetings = await prisma.syncedCalendarEvent.findMany({
-    where,
+  // DB-side substring narrows the candidate set fast. We then
+  // post-filter in JS for an EXACT comma-delimited match — substring
+  // alone produces false positives for contacts whose email is a
+  // substring of another (e.g. 'a@x.com' would falsely match
+  // 'aa@x.com'). Bumping the take to 2x guards against post-filter
+  // dropping enough to fall below the display cap.
+  const candidates = await prisma.syncedCalendarEvent.findMany({
+    where: {
+      organizationId: scope.organizationId,
+      cancelledAt: null,
+      matchedEmails: { contains: targetEmail },
+      ...(range === 'upcoming'
+        ? { endTime: { gte: now } }
+        : range === 'past'
+          ? { endTime: { lt: now } }
+          : {}),
+    },
     select: {
       id: true,
       provider: true,
@@ -89,8 +93,17 @@ export async function GET(
       matchedEmails: true,
     },
     orderBy: range === 'past' ? { startTime: 'desc' } : { startTime: 'asc' },
-    take: MAX_RESULTS,
+    take: MAX_RESULTS * 2,
   })
+
+  const meetings = candidates
+    .filter((m) => {
+      // matchedEmails is a comma-separated list of lowercase emails.
+      // Exact membership = split + includes.
+      const emails = m.matchedEmails ? m.matchedEmails.split(',') : []
+      return emails.includes(targetEmail)
+    })
+    .slice(0, MAX_RESULTS)
 
   return NextResponse.json({ data: { meetings } })
 }

@@ -152,7 +152,8 @@ export function QuickStartCards() {
 
   return (
     <section
-      aria-label="Quick start"
+      aria-label={t('title')}
+      aria-live="polite"
       style={{
         margin: '0 0 24px',
         padding: 20,

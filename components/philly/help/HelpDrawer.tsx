@@ -34,6 +34,8 @@ export default function HelpDrawer() {
   const [query, setQuery] = useState('')
   const [activeSlug, setActiveSlug] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const toggleRef = useRef<HTMLButtonElement>(null)
+  const previousOpen = useRef(false)
 
   // Hide the floating button on the full help center — duplicate UI
   // and the user is clearly already deep in help mode. Must compute
@@ -41,9 +43,20 @@ export default function HelpDrawer() {
   // stable across renders.
   const isOnHelpPage = pathname?.startsWith('/philly/help') ?? false
 
-  // Close on Escape, focus the search input when opened.
+  // Close on Escape, focus the search input when opened, return focus
+  // to the toggle button on close (WCAG 2.4.3 — focus order).
   useEffect(() => {
-    if (!open) return
+    if (!open) {
+      // Closing transition — return focus to the toggle if we just
+      // closed (avoid stealing focus on first mount when previousOpen
+      // was already false).
+      if (previousOpen.current) {
+        toggleRef.current?.focus()
+      }
+      previousOpen.current = false
+      return
+    }
+    previousOpen.current = true
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false)
     }
@@ -68,6 +81,7 @@ export default function HelpDrawer() {
   return (
     <>
       <button
+        ref={toggleRef}
         type="button"
         aria-label={open ? t('closeHelp') : t('openHelp')}
         aria-expanded={open}
@@ -104,6 +118,7 @@ export default function HelpDrawer() {
           />
           <aside
             role="dialog"
+            aria-modal="true"
             aria-label={t('label')}
             style={{
               position: 'fixed',
