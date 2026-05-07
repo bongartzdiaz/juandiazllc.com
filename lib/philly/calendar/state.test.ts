@@ -46,8 +46,10 @@ describe('signState / verifyState', () => {
   it('rejects a tampered payload (signature mismatch)', () => {
     const token = signState(baseInput)
     const [payload, sig] = token.split('.')
-    // Flip a bit in the payload — sig won't match anymore.
-    const tampered = `${payload.slice(0, -1)}X.${sig}`
+    // Same anti-flake guard as the tampered-signature test below — pick
+    // a replacement char guaranteed different from the original last char.
+    const replacement = payload.endsWith('X') ? 'Y' : 'X'
+    const tampered = `${payload.slice(0, -1)}${replacement}.${sig}`
     const result = verifyState(tampered)
     expect(result.ok).toBe(false)
     expect(result.error).toBe('bad-signature')
@@ -56,7 +58,12 @@ describe('signState / verifyState', () => {
   it('rejects a tampered signature', () => {
     const token = signState(baseInput)
     const [payload, sig] = token.split('.')
-    const tampered = `${payload}.${sig.slice(0, -1)}X`
+    // Force a different last character — base64url uses [A-Za-z0-9_-]
+    // and the original sig has uniform distribution, so picking 'X' or
+    // 'Y' based on the existing last char guarantees a real change
+    // (vs. flaky 1-in-64 collision when the last char was already 'X').
+    const replacement = sig.endsWith('X') ? 'Y' : 'X'
+    const tampered = `${payload}.${sig.slice(0, -1)}${replacement}`
     const result = verifyState(tampered)
     expect(result.ok).toBe(false)
     expect(result.error).toBe('bad-signature')

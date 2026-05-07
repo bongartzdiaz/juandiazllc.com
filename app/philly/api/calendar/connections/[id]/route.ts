@@ -12,7 +12,9 @@
 import { NextResponse } from 'next/server'
 import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
 import { revokeConnection } from '@/lib/philly/calendar/connection'
+import { unsubscribe as unsubscribePushSync } from '@/lib/philly/calendar/push-sync'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { getAuthPrisma } from '@/lib/philly/auth'
 import { logger } from '@/lib/philly/logger'
 import { logAudit } from '@/lib/philly/audit'
 
@@ -32,12 +34,34 @@ export async function DELETE(
   const limited = enforceRateLimit(`cal-disconnect:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
+  // Tear down push-sync channels FIRST, while the OAuth tokens are still
+  // valid — once the connection is marked revoked, getActiveConnection
+  // returns null and we lose the ability to call the provider's stop
+  // endpoint cleanly. Best-effort: any failures here are logged but don't
+  // block the disconnect.
+  const prisma = getAuthPrisma()
+  const channels = await prisma.calendarChannel.findMany({
+    where: { connection: { id, userId: scope.userId }, status: 'active' },
+    select: { id: true },
+  })
+  for (const ch of channels) {
+    const r = await unsubscribePushSync(ch.id)
+    if (!r.ok) {
+      logger.warn('[calendar] push-sync unsubscribe failed (non-fatal)', {
+        channelId: ch.id,
+        error: r.error,
+        detail: r.detail,
+      })
+    }
+  }
+
   const ok = await revokeConnection(id, scope.userId)
   if (!ok) return jsonError('Calendar connection not found', 404)
 
   logger.info('[calendar] connection revoked', {
     userId: scope.userId,
     connectionId: id,
+    channelsTornDown: channels.length,
   })
 
   // Audit revocation — entity=integration, action=delete. The `kind`

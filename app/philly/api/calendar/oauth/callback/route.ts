@@ -15,6 +15,7 @@ import { requireScope } from '@/lib/philly/auth-helpers'
 import { verifyState } from '@/lib/philly/calendar/state'
 import { exchangeCodeForTokens } from '@/lib/philly/calendar/token-exchange'
 import { upsertConnection } from '@/lib/philly/calendar/connection'
+import { subscribe as subscribePushSync } from '@/lib/philly/calendar/push-sync'
 import { logger } from '@/lib/philly/logger'
 import { logAudit } from '@/lib/philly/audit'
 
@@ -121,6 +122,39 @@ export async function GET(req: NextRequest) {
       kind: { old: null, new: 'calendar' },
     },
   })
+
+  // Best-effort push-sync subscribe. If it fails (provider rejects watch,
+  // webhook URL unreachable, scope insufficient), the OAuth connection
+  // still succeeds — we want the user to land on the wizard with the
+  // happy "Connected as foo@bar" UI even if push-sync is broken. They
+  // can retry push-sync later via a manual route or the renewal cron
+  // will pick it up.
+  //
+  // Webhook base URL is required — without it we can't tell the provider
+  // where to deliver. Skip silently if unset (dev environments).
+  const webhookBase = process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL
+  if (webhookBase) {
+    const subResult = await subscribePushSync({
+      userId: scope.userId,
+      provider: state.prov,
+      webhookBaseUrl: webhookBase,
+    })
+    if (!subResult.ok) {
+      logger.warn('[calendar oauth] push-sync subscribe failed (non-fatal)', {
+        userId: scope.userId,
+        provider: state.prov,
+        error: subResult.error,
+        detail: subResult.detail,
+      })
+    } else {
+      logger.info('[calendar oauth] push-sync subscribed', {
+        userId: scope.userId,
+        provider: state.prov,
+        channelId: subResult.channelId,
+        expiresAt: subResult.expiresAt.toISOString(),
+      })
+    }
+  }
 
   return redirect(req, state.redirect ?? DEFAULT_RETURN, {
     connected: state.prov,

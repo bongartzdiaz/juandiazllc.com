@@ -671,3 +671,111 @@ state changes, the right move is to add a synthetic system-user row
 
 3 files changed (3 routes + 1 doc). Typecheck clean. 289/289 still
 green. No new schema, no new env vars, no breaking changes.
+
+### 2026-05-07 — Bundle D: calendar push-sync (Google `watch` + MS Graph subscriptions)
+
+Replaces poll-only calendar reads (`/api/calendar/external-events`) with
+provider-pushed notifications. Calendar changes propagate to DEUS in
+seconds instead of waiting for the next poll. Builds on Bundle A's
+OAuth foundation; uses the same `CalendarConnection` rows for tokens.
+
+**Research first** (used `/research` skill — findings persisted to
+`docs/calendar-push-sync.md` for future contributors). Key APIs +
+gotchas:
+- Google `watch`: TTL up to 7 days, no auto-renewal — must create new
+  + stop old. Webhook is push-then-pull (empty body, headers carry
+  channel id + token). `X-Goog-Resource-State='sync'` is the bootstrap
+  notification — ignore.
+- MS Graph subscriptions: TTL **4230 minutes (~70 hours)** — much
+  shorter. Renew via PATCH. Validation handshake on first contact:
+  POST `?validationToken=…` with `text/plain`, must respond plain text
+  + 200 within **10 seconds**. Notifications: 3-second hard SLA, queue
+  + 202 immediately.
+
+**New schema**: `CalendarChannel` (per-CalendarConnection, encrypted
+authSecret, externalId, expiresAt, lastMessageNum, syncToken, status).
+`@@unique([provider, externalId])` so the webhook can look up the
+right channel by what the provider sends. `@@index([expiresAt, status])`
+for the renewal cron's selector. Run `prisma migrate dev --name
+calendar_push_sync` to apply.
+
+**New library** (`lib/philly/calendar/push-sync.ts`):
+- `subscribe()` — provider-aware. Generates a 32-byte random authSecret,
+  calls Google `events.watch` or MS `POST /subscriptions`, persists a
+  `CalendarChannel` row. Idempotent — returns the existing active
+  channel if one exists.
+- `renew()` — Google: new `watch` + stop old (overlap intentional, per
+  Google's docs). MS: `PATCH /subscriptions/{id}` with new
+  `expirationDateTime`.
+- `unsubscribe()` — best-effort tear-down. Tells the provider to stop
+  via Google's `/channels/stop` or MS's `DELETE /subscriptions/{id}`.
+  Marks the row `expired` regardless of provider response — the
+  channel will time out upstream within its TTL anyway.
+- `listDueForRenewal()` — selector for the cron, returns channels with
+  `expiresAt < NOW + 12h` and `status='active'`.
+
+**New webhook receiver** (`app/philly/api/calendar/webhook/[provider]/route.ts`):
+- Single route, dynamic param distinguishes Google vs MS.
+- MS validation handshake is the FIRST branch (text/plain query-param
+  echo). Must precede the JSON body parse — handshake requests don't
+  have JSON.
+- Google handler: verify `X-Goog-Channel-Token` against decrypted
+  authSecret using `crypto.timingSafeEqual`, ignore bootstrap `sync`
+  state, dedupe via `lastMessageNum` (refuse `<= stored`).
+- MS handler: `value` array can batch notifications across DIFFERENT
+  subscriptions in one POST — group by `subscriptionId`, verify
+  `clientState` per group via timing-safe compare.
+- Both return 2xx fast. Today the actual delta-fetch is just a TODO
+  marker — proves the round-trip works without committing to a sync
+  implementation. Event-fetch worker is a follow-up bundle.
+
+**Wired into existing flows**:
+- `app/philly/api/calendar/oauth/callback/route.ts` — after
+  `upsertConnection`, calls `subscribePushSync()` best-effort. Failure
+  is non-fatal (user still gets a working OAuth connection).
+- `app/philly/api/calendar/connections/[id]/route.ts` DELETE — tears
+  down active channels FIRST (while OAuth tokens are still valid),
+  then revokes the connection. Channel stops happen synchronously
+  before the row flip.
+
+**Middleware allowlist** — added two paths to `PUBLIC_PHILLY_PATHS`
+(`/philly/api/calendar/webhook/google`, `/philly/api/calendar/webhook/microsoft`).
+Joins `/health` and `/billing/webhook` as the only auth-exempt /philly
+paths. Per-channel encrypted authSecret is the auth.
+
+**Tests**: 13 new in `push-sync.test.ts` covering TTL constants vs
+provider docs, URL builders, base64url-secret length + uniqueness +
+provider-limit fits. **289 → 302/302 green.** Also fixed a flaky test
+inherited from Bundle A's `state.test.ts` — the tampered-signature
+assertions had a 1/64 collision when the random sig already ended in
+'X'. Replaced with a guaranteed-different replacement char.
+
+**Architecture decisions baked in**:
+- Schema: separate `CalendarChannel` table (not extending `CalendarConnection`)
+  so OAuth state and push-sync state have independent lifecycles. A
+  channel can fail without invalidating tokens, and vice versa.
+- TTL choices: 6 days (Google) and 4200 minutes (MS) — both leave
+  buffer vs the documented caps for clock skew + retry on transient
+  failure.
+- Renewal buffer: 12 hours — comfortably ahead of MS's 70-hour TTL,
+  reasonable for daily Google renewals.
+- AuthSecret: 32-byte base64url → 43 chars. Fits within Google's 256
+  and MS's 128 character limits with room.
+- Bootstrap "sync" notification: ignore via early return — only `exists`
+  state triggers downstream.
+- MS 3-second SLA: handler does verify + bookkeeping, returns 202
+  Accepted. Actual sync work is a TODO — no synchronous work in the
+  handler.
+- Webhook deduplication: at-the-edge via `lastMessageNum` (Google
+  only — MS doesn't expose an equivalent). Sync-level idempotency
+  (event upsert by external id) is the second layer when the actual
+  fetch lands.
+
+**Operator setup** documented in `MANUAL_TASKS.md`:
+- `prisma migrate dev --name calendar_push_sync`
+- `NEXT_PUBLIC_APP_URL` must be set (otherwise subscribe is no-op)
+- Renewal cron job (deferred — `listDueForRenewal()` selector is ready)
+
+8 files added (1 schema diff, 1 lib, 1 lib test, 2 routes, 1 middleware
+diff, 1 oauth-callback diff, 1 connection-delete diff, 1 docs file +
+1 docs update). Typecheck clean.

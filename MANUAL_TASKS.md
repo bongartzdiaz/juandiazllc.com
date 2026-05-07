@@ -3,6 +3,33 @@
 Every item here is a one-time human action that unblocks code that's
 already shipped. Strike through (`~~...~~`) when done.
 
+## Calendar push-sync (Bundle D, 2026-05-07)
+
+Adds `CalendarChannel` table + provider webhooks for real-time event
+notifications. Builds on Bundle A's OAuth integration.
+
+- [ ] Run `npx prisma migrate dev --name calendar_push_sync` (creates
+      the `CalendarChannel` table). Idempotent — safe to re-run.
+- [ ] Add a renewal cron job hitting an internal renewal route — cadence
+      ~every hour. The library function is `listDueForRenewal()` →
+      `renew(channelId, webhookBaseUrl)`. The cron route + auth wrapper
+      is the next bundle (deferred so Bundle D ships smaller).
+- [ ] Verify `NEXT_PUBLIC_APP_URL` is set in Vercel — this is the base
+      URL we hand to providers as the webhook target. Without it,
+      push-sync subscribe is a no-op (the OAuth callback logs a warning
+      but doesn't fail).
+- [ ] Microsoft only: register `notificationUrl` and (optionally)
+      `lifecycleNotificationUrl` in your Entra app's Authentication
+      panel if your tenant policy requires explicit URL allowlisting.
+      Most tenants don't.
+- [ ] Smoke test: connect a calendar via the wizard, verify a
+      `CalendarChannel` row appears with `status='active'`. Add an event
+      in your provider's UI and watch logs for
+      `[calendar webhook google] notification accepted` or
+      `[calendar webhook ms] batch processed`.
+
+
+
 ## Stripe billing — Checkout + Customer Portal + webhooks (Bundle B, 2026-05-06)
 
 The billing routes + settings UI are wired but no charge can be

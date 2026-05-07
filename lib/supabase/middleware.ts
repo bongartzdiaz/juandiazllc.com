@@ -53,6 +53,11 @@ export async function updateSession(request: NextRequest, requestHeaders?: Heade
     // Stripe webhook — server-to-server, no Supabase session cookie.
     // Auth is the X-Stripe-Signature header verified in the route handler.
     "/philly/api/billing/webhook",
+    // Calendar push-sync webhooks — Google + Microsoft both POST here
+    // without a session. Auth is the encrypted per-channel authSecret
+    // (Google: X-Goog-Channel-Token, Microsoft: clientState in body).
+    "/philly/api/calendar/webhook/google",
+    "/philly/api/calendar/webhook/microsoft",
   ]);
   if (!user && isProtected && !PUBLIC_PHILLY_PATHS.has(path)) {
     const url = request.nextUrl.clone();

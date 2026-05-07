@@ -632,10 +632,70 @@ model CalendarConnection {
 
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization Organization @relation(fields: [organizationId], references: [id])
+  channels     CalendarChannel[]
 
   @@unique([userId, provider])
   @@index([organizationId, provider])
   @@index([status])
+}
+
+// Per-CalendarConnection push-sync registration with the provider.
+// Google calls these "channels", Microsoft calls them "subscriptions" —
+// we use a single neutral term. Lives separately from CalendarConnection
+// so OAuth state and push-sync state have independent lifecycles
+// (a channel can fail without invalidating the OAuth tokens, and vice
+// versa). See docs/calendar-push-sync.md for the architectural rationale.
+//
+// Idempotency: providers can deliver the same notification twice. We
+// dedupe at two layers — `lastMessageNum` (Google's monotonic counter)
+// and the upstream upsert that the actual event sync uses. Even if a
+// notification fires the sync twice, the DB state is the same.
+//
+// Renewal: Google channels live 7 days, Microsoft subscriptions ~70
+// hours. A cron job (TODO) finds rows where expiresAt < NOW + buffer
+// and renews them — Google by creating a new channel + stopping the
+// old one, Microsoft by PATCH /subscriptions/{id}.
+model CalendarChannel {
+  id             String    @id @default(cuid())
+  connectionId   String
+  provider       String    // mirrors connection.provider — denormalized for index
+  // Google: channel id we generated and sent in `watch`. MS: subscriptionId
+  // returned by /subscriptions. Unique per provider — used by webhook to
+  // look up which connection owns this notification.
+  externalId     String
+  // Google only — opaque resource id returned by `watch`. Required to call
+  // /channels/stop. Null on MS (DELETE /subscriptions/{id} uses externalId).
+  resourceId     String?
+  // MS only — the subscribed resource path (e.g. "me/events"). Stored so
+  // an auditor can see what was watched without joining tables.
+  resource       String?
+  // Encrypted via lib/philly/crypto.ts — Google's `token` (echoed back as
+  // X-Goog-Channel-Token) and MS's `clientState` (echoed in every
+  // notification body). Generated as 32-byte base64url random at create
+  // time. Verified on every webhook delivery before we trust the payload.
+  authSecretEnc  String    @db.Text
+  // Provider-specific delta marker. Google: events.list syncToken.
+  // Microsoft: calendarView/delta deltaLink. Null on first run; populated
+  // after the first successful sync. Provider can invalidate (Google 410);
+  // we drop and re-bootstrap on the next notification.
+  syncToken      String?   @db.Text
+  expiresAt      DateTime
+  lastRenewedAt  DateTime?
+  // Google's monotonic message counter. We refuse to process a notification
+  // whose number is <= this value — that's a duplicate redelivery. MS
+  // doesn't have an equivalent (different idempotency strategy via
+  // notification id ring-buffer if needed).
+  lastMessageNum Int?
+  status         String    @default("active") // active | expired | error
+  lastError      String?   @db.Text
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  connection CalendarConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, externalId])
+  @@index([expiresAt, status])
+  @@index([connectionId])
 }
 
 model CalendarEvent {
