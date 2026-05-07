@@ -7,11 +7,11 @@ import { Logo } from "./Logo";
 export function Nav() {
   const t = useT();
   return (
-    <nav className="top" aria-label="Primary">
+    <nav className="top" aria-label={t("nav.aria.primary")}>
       <Link
         href="/"
         className="brand"
-        aria-label="Juan Diaz, LLC — home"
+        aria-label={t("nav.aria.brand")}
         style={{ color: "var(--accent)", gap: 12 }}
       >
         <Logo size={26} animated />

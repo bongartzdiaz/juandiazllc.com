@@ -5,6 +5,7 @@ import { geoOrthographic, geoPath, geoGraticule, geoCentroid } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Feature, FeatureCollection, Geometry, GeoJsonProperties } from "geojson";
 import type { Topology, GeometryCollection } from "topojson-specification";
+import { useT } from "@/lib/i18n/useT";
 
 // Interactive earth — every country is a clickable path. On click we
 // animate the projection's rotate() + scale() to fly to the country,
@@ -39,6 +40,7 @@ const FEATURED: Record<string, { eyebrow: string; body: string }> = {
 };
 
 export function Globe() {
+  const t = useT();
   const svgRef = useRef<SVGSVGElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 640, h: 640 });
@@ -230,7 +232,7 @@ export function Globe() {
         className="globe-svg"
         viewBox={`0 0 ${size.w} ${size.h}`}
         role="img"
-        aria-label="Interactive earth globe — drag to rotate, click a country to zoom in"
+        aria-label={t("globe.aria.label")}
       >
         <defs>
           <radialGradient id="oceanGrad" cx="38%" cy="34%" r="68%">
@@ -313,16 +315,16 @@ export function Globe() {
       {/* Info panel — appears on country click */}
       {selected && (
         <div className="country-panel" role="dialog" aria-label={selected.properties?.name}>
-          <button className="country-close" onClick={flyHome} aria-label="Close">
+          <button className="country-close" onClick={flyHome} aria-label={t("globe.btn.close")}>
             <span aria-hidden="true">×</span>
           </button>
-          <div className="country-eyebrow">{featured?.eyebrow ?? "Signal"}</div>
+          <div className="country-eyebrow">{featured?.eyebrow ?? t("globe.eyebrow.fallback")}</div>
           <h3 className="country-name">{selected.properties?.name}</h3>
           <p className="country-body">
-            {featured?.body ?? "Exploring opportunities here — tap another country, or close to return to orbit."}
+            {featured?.body ?? t("globe.body.fallback")}
           </p>
           <button className="country-back" onClick={flyHome}>
-            Back to orbit <span className="arr">→</span>
+            {t("globe.btn.back")} <span className="arr">→</span>
           </button>
         </div>
       )}

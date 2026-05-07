@@ -12,7 +12,7 @@ export function Hero() {
   const t = useT();
 
   return (
-    <header className="hero" aria-label="Hero">
+    <header className="hero" aria-label={t("hero.aria.label")}>
       <div className="hero-stage" aria-hidden="true">
         <div className="milky-way">
           <div className="mw-core" />
