@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Building2, Hotel, Loader2 } from 'lucide-react'
 import {
   OnboardingFrame, obButtonPrimary,
@@ -21,9 +22,27 @@ const cardActive: React.CSSProperties = {
 
 export default function StepWelcome() {
   const router = useRouter()
+  const t = useTranslations('wizard.welcome')
+  const tc = useTranslations('wizard.common')
   const [pick, setPick] = useState<'realestate' | 'hospitality' | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [firstName, setFirstName] = useState<string | null>(null)
+
+  // Fetch the user's first name so the hero can say "Welcome to DEUS, {firstName}".
+  // Falls back to the no-name variant if /api/me fails or returns no name.
+  useEffect(() => {
+    fetch('/philly/api/me')
+      .then(r => r.json())
+      .then(j => {
+        const name = j?.data?.name as string | undefined
+        if (name && name.trim()) {
+          const first = name.trim().split(/\s+/)[0]
+          if (first) setFirstName(first)
+        }
+      })
+      .catch(() => { /* fall through to no-name title */ })
+  }, [])
 
   const proceed = async () => {
     if (!pick) return
@@ -55,13 +74,13 @@ export default function StepWelcome() {
       })
       if (!advance.ok) {
         const j = await advance.json().catch(() => ({}))
-        setError(j.error ?? 'Could not save. Try again.')
+        setError(j.error ?? tc('saveError'))
         setSubmitting(false)
         return
       }
       router.push('/philly/onboarding/org')
     } catch {
-      setError('Network error. Try again.')
+      setError(tc('networkError'))
       setSubmitting(false)
     }
   }
@@ -69,8 +88,8 @@ export default function StepWelcome() {
   return (
     <OnboardingFrame
       step="welcome"
-      title="Welcome to DEUS"
-      sub="Five short steps to get your team and contacts in. Skip anything you want to do later."
+      title={firstName ? t('heroTitle', { firstName }) : t('heroTitleNoName')}
+      sub={t('heroSub')}
       footer={
         <button
           type="button"
@@ -79,7 +98,7 @@ export default function StepWelcome() {
           style={{ ...obButtonPrimary, opacity: pick && !submitting ? 1 : 0.5 }}
         >
           {submitting ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : null}
-          Continue
+          {tc('continue')}
         </button>
       }
     >
@@ -99,10 +118,10 @@ export default function StepWelcome() {
         >
           <Building2 size={20} style={{ color: 'var(--accent)' }} aria-hidden="true" />
           <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--txt)' }}>
-            Real estate
+            {t('reCardTitle')}
           </div>
           <div style={{ fontSize: 12, color: 'var(--txt2)', lineHeight: 1.45 }}>
-            Brokerage, property management, agent teams. Deals, properties, and showings.
+            {t('reCardBody')}
           </div>
         </button>
 
@@ -114,10 +133,10 @@ export default function StepWelcome() {
         >
           <Hotel size={20} style={{ color: 'var(--accent)' }} aria-hidden="true" />
           <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--txt)' }}>
-            Hospitality
+            {t('hospCardTitle')}
           </div>
           <div style={{ fontSize: 12, color: 'var(--txt2)', lineHeight: 1.45 }}>
-            Hotels, restaurants, venues. Reservations, rooms, and quotes.
+            {t('hospCardBody')}
           </div>
         </button>
       </div>

@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Upload, UserPlus } from 'lucide-react'
 import {
   OnboardingFrame, obButtonSecondary, obHelperStyle,
@@ -17,6 +18,7 @@ const cardStyle: React.CSSProperties = {
 
 export default function StepContacts() {
   const router = useRouter()
+  const t = useTranslations('wizard.contacts')
 
   const advance = async () => {
     await fetch('/philly/api/onboarding/step', {
@@ -35,11 +37,11 @@ export default function StepContacts() {
   return (
     <OnboardingFrame
       step="contacts"
-      title="Add your contacts"
-      sub="Bring in your existing contacts so deals connect to real people from day one."
+      title={t('heading')}
+      sub={t('sub')}
       footer={
         <button type="button" onClick={skip} style={obButtonSecondary}>
-          Skip — I'll add contacts later
+          {t('skip')}
         </button>
       }
     >
@@ -50,9 +52,9 @@ export default function StepContacts() {
           onClick={() => { void advance() }}
         >
           <Upload size={18} style={{ color: 'var(--accent)' }} aria-hidden="true" />
-          <div style={{ fontWeight: 600, fontSize: 14 }}>Upload a CSV</div>
+          <div style={{ fontWeight: 600, fontSize: 14 }}>{t('cardATitle')}</div>
           <div style={{ fontSize: 12, color: 'var(--txt2)', lineHeight: 1.45 }}>
-            We auto-map name, email, phone, and company. Preview before saving.
+            {t('cardABody')}
           </div>
         </Link>
 
@@ -62,15 +64,15 @@ export default function StepContacts() {
           onClick={() => { void advance() }}
         >
           <UserPlus size={18} style={{ color: 'var(--accent)' }} aria-hidden="true" />
-          <div style={{ fontWeight: 600, fontSize: 14 }}>Add them manually</div>
+          <div style={{ fontWeight: 600, fontSize: 14 }}>{t('cardBTitle')}</div>
           <div style={{ fontSize: 12, color: 'var(--txt2)', lineHeight: 1.45 }}>
-            Open a blank contact form and add them one by one as you go.
+            {t('cardBBody')}
           </div>
         </Link>
       </div>
 
       <div style={{ ...obHelperStyle, marginTop: 14 }}>
-        Up to 10,000 rows per file.
+        {t('tip')}
       </div>
     </OnboardingFrame>
   )

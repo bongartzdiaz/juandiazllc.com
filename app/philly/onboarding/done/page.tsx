@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Sparkles, BookOpen, Shield, ArrowRight } from 'lucide-react'
 import {
   OnboardingFrame, obButtonPrimary,
@@ -17,6 +18,7 @@ const cardStyle: React.CSSProperties = {
 
 export default function StepDone() {
   const router = useRouter()
+  const t = useTranslations('wizard.done')
 
   // Defensive: if the user lands here without /complete being called, fire it
   // so the audit row + completed-timestamp land. Idempotent on the server.
@@ -32,11 +34,11 @@ export default function StepDone() {
   return (
     <OnboardingFrame
       step="done"
-      title="You're set up!"
-      sub="Three quick things you can do now from the dashboard."
+      title={t('heroTitle')}
+      sub={t('heroSub')}
       footer={
         <button type="button" onClick={goToDashboard} style={obButtonPrimary}>
-          Go to dashboard
+          {t('primaryCta')}
           <ArrowRight size={14} />
         </button>
       }
@@ -45,9 +47,9 @@ export default function StepDone() {
         <Link href="/philly/ai" style={cardStyle}>
           <Sparkles size={18} style={{ color: 'var(--accent)', flexShrink: 0, marginTop: 2 }} aria-hidden="true" />
           <div>
-            <div style={{ fontWeight: 600, fontSize: 14 }}>Run an AI insight</div>
+            <div style={{ fontWeight: 600, fontSize: 14 }}>{t('card1Title')}</div>
             <div style={{ fontSize: 12, color: 'var(--txt2)', lineHeight: 1.45, marginTop: 2 }}>
-              Pick any deal and ask DEUS for next steps. Runs locally on our server.
+              {t('card1Body')}
             </div>
           </div>
         </Link>
@@ -55,9 +57,9 @@ export default function StepDone() {
         <Link href="/onboarding/first-day-deus" style={cardStyle}>
           <BookOpen size={18} style={{ color: 'var(--accent)', flexShrink: 0, marginTop: 2 }} aria-hidden="true" />
           <div>
-            <div style={{ fontWeight: 600, fontSize: 14 }}>Read the 5-page walkthrough</div>
+            <div style={{ fontWeight: 600, fontSize: 14 }}>{t('card2Title')}</div>
             <div style={{ fontSize: 12, color: 'var(--txt2)', lineHeight: 1.45, marginTop: 2 }}>
-              A short tour of every screen you&apos;ll use this week.
+              {t('card2Body')}
             </div>
           </div>
         </Link>
@@ -65,9 +67,9 @@ export default function StepDone() {
         <Link href="/philly/audit" style={cardStyle}>
           <Shield size={18} style={{ color: 'var(--accent)', flexShrink: 0, marginTop: 2 }} aria-hidden="true" />
           <div>
-            <div style={{ fontWeight: 600, fontSize: 14 }}>Tour the audit log</div>
+            <div style={{ fontWeight: 600, fontSize: 14 }}>{t('card3Title')}</div>
             <div style={{ fontSize: 12, color: 'var(--txt2)', lineHeight: 1.45, marginTop: 2 }}>
-              Every change in DEUS is recorded. See who did what, when.
+              {t('card3Body')}
             </div>
           </div>
         </Link>

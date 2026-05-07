@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Calendar, Lock, Check, AlertTriangle } from 'lucide-react'
 import {
   OnboardingFrame, obButtonSecondary, obButtonPrimary,
@@ -14,23 +15,32 @@ import type { ConnectionDTO, ConnectionsResponse } from '@/lib/philly/calendar/t
 type Provider = 'google' | 'microsoft'
 type Connection = ConnectionDTO
 
-interface ProvMeta {
-  key: Provider
-  label: string
-  detail: string
-}
-const PROVIDERS: ProvMeta[] = [
-  { key: 'google',    label: 'Connect Google Calendar', detail: 'Gmail, Workspace, Google accounts' },
-  { key: 'microsoft', label: 'Connect Outlook',         detail: 'Microsoft 365, Outlook.com, Exchange' },
-]
-
 export default function StepCalendar() {
   const router = useRouter()
   const params = useSearchParams()
+  const t = useTranslations('wizard.calendar')
   const [connections, setConnections] = useState<Connection[] | null>(null)
   const [busy, setBusy] = useState<Provider | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [justConnected, setJustConnected] = useState<Provider | null>(null)
+
+  const PROVIDERS: Array<{ key: Provider; label: string; detail: string }> = [
+    { key: 'google',    label: t('googleBtn'),  detail: t('googleDetail') },
+    { key: 'microsoft', label: t('outlookBtn'), detail: t('outlookDetail') },
+  ]
+
+  const providerName = (p: Provider): string =>
+    p === 'google' ? t('googleProviderName') : t('outlookProviderName')
+
+  const humanizeError = (code: string): string => {
+    if (code === 'access_denied') return t('errAccessDenied')
+    if (code.startsWith('state_')) return t('errStateExpired')
+    if (code.startsWith('token_provider_not_configured')) return t('errProviderNotConfigured')
+    if (code.startsWith('token_')) return t('errTokenRejected')
+    if (code === 'session_lost') return t('errSessionLost')
+    if (code === 'missing_params') return t('errMissingParams')
+    return t('errGeneric', { code })
+  }
 
   // Surface query-param feedback from the OAuth callback redirect.
   useEffect(() => {
@@ -40,6 +50,7 @@ export default function StepCalendar() {
     if (connected === 'google' || connected === 'microsoft') {
       setJustConnected(connected)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params])
 
   // Pull current connections so we can render connected-state badges
@@ -89,7 +100,7 @@ export default function StepCalendar() {
   }
 
   const disconnect = async (id: string) => {
-    if (!confirm('Disconnect this calendar? You can reconnect from Settings later.')) return
+    if (!confirm(t('disconnectConfirm'))) return
     const res = await fetch(`/philly/api/calendar/connections/${id}`, { method: 'DELETE' })
     if (res.ok) {
       setConnections((curr) =>
@@ -104,15 +115,15 @@ export default function StepCalendar() {
   return (
     <OnboardingFrame
       step="calendar"
-      title="Connect your calendar"
-      sub="Meetings sync into DEUS, and time on each deal is tracked automatically."
+      title={t('heading')}
+      sub={t('sub')}
       footer={
         <>
           <button type="button" onClick={advance} style={obButtonPrimary}>
-            Continue
+            {t('continueCta')}
           </button>
           <button type="button" onClick={skip} style={obButtonSecondary}>
-            Skip — I&apos;ll connect later
+            {t('skip')}
           </button>
         </>
       }
@@ -127,7 +138,7 @@ export default function StepCalendar() {
       {justConnected && (
         <div role="status" style={successBoxStyle}>
           <Check size={14} aria-hidden />
-          <span>{providerLabel(justConnected)} connected.</span>
+          <span>{t('providerConnected', { provider: providerName(justConnected) })}</span>
         </div>
       )}
 
@@ -139,7 +150,7 @@ export default function StepCalendar() {
               <div key={p.key} style={connectedRowStyle}>
                 <Check size={16} style={{ color: 'var(--ok)' }} aria-hidden />
                 <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-                  <span style={{ fontWeight: 600 }}>{p.label.replace(/^Connect /, '')}</span>
+                  <span style={{ fontWeight: 600 }}>{providerName(p.key)}</span>
                   {active.providerEmail && (
                     <span style={{ fontSize: 11, color: 'var(--txt2)' }}>
                       {active.providerEmail}
@@ -151,7 +162,7 @@ export default function StepCalendar() {
                   onClick={() => disconnect(active.id)}
                   style={{ ...obButtonSecondary, padding: '4px 10px', fontSize: 11 }}
                 >
-                  Disconnect
+                  {t('disconnect')}
                 </button>
               </div>
             )
@@ -177,7 +188,7 @@ export default function StepCalendar() {
               <Lock
                 size={12}
                 style={{ marginLeft: 'auto', color: 'var(--txt3)' }}
-                aria-label="OAuth secured"
+                aria-label={t('lockAria')}
               />
             </button>
           )
@@ -185,31 +196,15 @@ export default function StepCalendar() {
       </div>
 
       <details style={{ marginTop: 16, fontSize: 12, color: 'var(--txt2)' }}>
-        <summary style={{ cursor: 'pointer', fontWeight: 600 }}>What we read, what we don&apos;t</summary>
+        <summary style={{ cursor: 'pointer', fontWeight: 600 }}>{t('trustToggle')}</summary>
         <ul style={{ margin: '8px 0 0 18px', padding: 0, lineHeight: 1.7 }}>
-          <li>Read-only scope: events from your primary calendar in a 14-day window.</li>
-          <li>We never read other people&apos;s shared calendars or your free-busy preferences.</li>
-          <li>Tokens are encrypted at rest. You can disconnect any time from Settings.</li>
+          <li>{t('trustBullet1')}</li>
+          <li>{t('trustBullet2')}</li>
+          <li>{t('trustBullet3')}</li>
         </ul>
       </details>
     </OnboardingFrame>
   )
-}
-
-function providerLabel(p: Provider): string {
-  return p === 'google' ? 'Google Calendar' : 'Outlook / Microsoft 365'
-}
-
-function humanizeError(code: string): string {
-  if (code === 'access_denied') return 'You declined the calendar permission. No data was changed.'
-  if (code.startsWith('state_')) return 'The connection link expired. Click Connect again.'
-  if (code.startsWith('token_provider_not_configured')) {
-    return 'Calendar provider is not configured yet — your operator needs to add OAuth credentials.'
-  }
-  if (code.startsWith('token_')) return 'The provider rejected the connection. Please try again.'
-  if (code === 'session_lost') return 'Your session ended mid-flow. Sign in again to retry.'
-  if (code === 'missing_params') return 'The callback was malformed. Click Connect to retry.'
-  return `Connection failed (${code}).`
 }
 
 const errorBoxStyle: React.CSSProperties = {

@@ -460,5 +460,132 @@
     "stuckHint": "Include what you tried, what you expected, what happened. Screenshots help.",
     "openHelp": "Open help",
     "closeHelp": "Close help"
+  },
+  "wizard": {
+    "frame": {
+      "stepIndicator": "Step {current} of {total}",
+      "closeAria": "Close setup and return to dashboard",
+      "footerByline": "DEUS by LucenAI",
+      "footerPrivacy": "Privacy"
+    },
+    "common": {
+      "continue": "Continue",
+      "networkError": "Network error. Try again.",
+      "saveError": "Could not save. Try again.",
+      "removeRowAria": "Remove row"
+    },
+    "welcome": {
+      "heroTitle": "Welcome to DEUS, {firstName}",
+      "heroTitleNoName": "Welcome to DEUS",
+      "heroSub": "Five short steps to get your team and contacts in. Skip anything you want to do later.",
+      "reCardTitle": "Real estate",
+      "reCardBody": "Brokerage, property management, agent teams. Deals, properties, and showings.",
+      "hospCardTitle": "Hospitality",
+      "hospCardBody": "Hotels, restaurants, venues. Reservations, rooms, and quotes."
+    },
+    "org": {
+      "heading": "About your organization",
+      "sub": "We need a few basics to set up dates, deals, and reports correctly.",
+      "companyNameLabel": "Company name",
+      "companyNamePlaceholder": "e.g. Bongartz Diaz Real Estate",
+      "timeZoneLabel": "Time zone",
+      "timeZoneHelper": "We auto-detect from your browser. Change if needed.",
+      "currencyLabel": "Default currency",
+      "currencyHelper": "Used for deal values and reports. You can override per deal.",
+      "primaryCta": "Save and continue",
+      "validationEmptyName": "Enter your company name.",
+      "validationInvalidTz": "Pick a time zone."
+    },
+    "team": {
+      "heading": "Invite your team",
+      "sub": "Your plan starts with 3 seats. Add up to 5 invites here, or skip and do it later.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "teammate@example.com",
+      "roleLabel": "Role",
+      "roleViewer": "Viewer",
+      "roleManager": "Manager",
+      "roleAdmin": "Admin",
+      "tooltipAdmin": "Full access, including billing and team management.",
+      "tooltipManager": "Full access except billing.",
+      "tooltipViewer": "Read-only access to contacts, deals, and reports.",
+      "primaryCtaContinue": "Continue",
+      "primaryCtaSendOne": "Send {count} invite",
+      "primaryCtaSendMany": "Send {count} invites",
+      "secondarySkip": "Skip — I'll invite later",
+      "addAnother": "Add another",
+      "inlineSuccess": "Sent to {email}",
+      "inlineErrorDup": "Already in your team",
+      "inlineErrorGeneric": "Could not send",
+      "inlineErrorNetwork": "Network error",
+      "seatCounter": "{used} of {limit} seats used",
+      "counterHelper": "Counts you, your teammates, and pending invites."
+    },
+    "contacts": {
+      "heading": "Add your contacts",
+      "sub": "Bring in your existing contacts so deals connect to real people from day one.",
+      "cardATitle": "Upload a CSV",
+      "cardABody": "We auto-map name, email, phone, and company. Preview before saving.",
+      "cardBTitle": "Add them manually",
+      "cardBBody": "Open a blank contact form and add them one by one as you go.",
+      "skip": "Skip — I'll add contacts later",
+      "tip": "Up to 10,000 rows per file."
+    },
+    "calendar": {
+      "heading": "Connect your calendar",
+      "sub": "Meetings sync both ways, and time spent on a deal is tracked automatically.",
+      "googleBtn": "Connect Google Calendar",
+      "googleDetail": "Gmail, Workspace, Google accounts",
+      "outlookBtn": "Connect Outlook",
+      "outlookDetail": "Microsoft 365, Outlook.com, Exchange",
+      "googleProviderName": "Google Calendar",
+      "outlookProviderName": "Outlook / Microsoft 365",
+      "providerConnected": "{provider} connected.",
+      "disconnect": "Disconnect",
+      "disconnectConfirm": "Disconnect this calendar? You can reconnect from Settings later.",
+      "lockAria": "OAuth secured",
+      "skip": "Skip — I'll connect later",
+      "continueCta": "Continue",
+      "popupBlocked": "Your browser blocked the popup. Allow popups for app.lucen.ai and try again.",
+      "retry": "Try again",
+      "errAccessDenied": "You declined the calendar permission. No data was changed.",
+      "errStateExpired": "The connection link expired. Click Connect again.",
+      "errProviderNotConfigured": "Calendar provider is not configured yet — your operator needs to add OAuth credentials.",
+      "errTokenRejected": "The provider rejected the connection. Please try again.",
+      "errSessionLost": "Your session ended mid-flow. Sign in again to retry.",
+      "errMissingParams": "The callback was malformed. Click Connect to retry.",
+      "errGeneric": "Connection failed ({code}).",
+      "trustToggle": "What we read, what we don't",
+      "trustBullet1": "Read-only scope: events from your primary calendar in a 14-day window.",
+      "trustBullet2": "We never read other people's shared calendars or your free-busy preferences.",
+      "trustBullet3": "Tokens are encrypted at rest. You can disconnect any time from Settings."
+    },
+    "done": {
+      "heroTitle": "You're set up!",
+      "heroSub": "Three quick things you can do now from the dashboard.",
+      "card1Title": "Run an AI insight",
+      "card1Body": "Pick any deal and ask DEUS for next steps. Runs locally on our server.",
+      "card2Title": "Read the 5-page walkthrough",
+      "card2Body": "A short tour of every screen you'll use this week.",
+      "card3Title": "Tour the audit log",
+      "card3Body": "Every change in DEUS is recorded. See who did what, when.",
+      "primaryCta": "Go to dashboard",
+      "toast": "Setup complete — welcome to DEUS"
+    },
+    "resume": {
+      "bannerTitle": "Finish your DEUS setup",
+      "bannerBody": "You're {n} steps in. Resume to invite your team and import contacts.",
+      "primary": "Resume setup",
+      "dismiss": "Hide for today"
+    },
+    "emptyState": {
+      "heading": "Your admin handles setup",
+      "body": "Only the organization admin runs the setup wizard. Once they finish, you'll have full access to contacts, deals, and the rest of DEUS.",
+      "primaryCta": "Back to dashboard"
+    },
+    "toast": {
+      "saveSuccess": "Saved",
+      "skipConfirm": "Skipped — you can finish later",
+      "stepCompleted": "Step saved"
+    }
   }
 }

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { X } from 'lucide-react'
 import type { OnboardingStep } from '@/lib/philly/onboarding'
 import { stepProgress } from '@/lib/philly/onboarding'
@@ -53,6 +54,7 @@ interface Props {
  */
 export function OnboardingFrame({ step, title, sub, children, footer }: Props) {
   const router = useRouter()
+  const t = useTranslations('wizard.frame')
   const progress = stepProgress(step)
   const pct = Math.round((progress.current / progress.total) * 100)
 
@@ -61,7 +63,7 @@ export function OnboardingFrame({ step, title, sub, children, footer }: Props) {
   return (
     <div style={wrapStyle}>
       <div style={headerStyle}>
-        <span>Step {progress.current} of {progress.total}</span>
+        <span>{t('stepIndicator', { current: progress.current, total: progress.total })}</span>
         <div style={progressBarStyle} aria-hidden="true">
           <div style={{
             width: `${pct}%`, height: '100%',
@@ -72,7 +74,7 @@ export function OnboardingFrame({ step, title, sub, children, footer }: Props) {
           type="button"
           onClick={close}
           style={closeBtn}
-          aria-label="Close setup and return to dashboard"
+          aria-label={t('closeAria')}
         >
           <X size={16} />
         </button>
@@ -104,7 +106,7 @@ export function OnboardingFrame({ step, title, sub, children, footer }: Props) {
         textAlign: 'center', fontSize: 11, color: 'var(--txt3)',
         marginTop: 24,
       }}>
-        DEUS by LucenAI · <Link href="/legal/privacy" style={{ color: 'inherit' }}>Privacy</Link>
+        {t('footerByline')} · <Link href="/legal/privacy" style={{ color: 'inherit' }}>{t('footerPrivacy')}</Link>
       </div>
     </div>
   )

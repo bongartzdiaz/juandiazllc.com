@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Loader2 } from 'lucide-react'
 import {
   OnboardingFrame, obButtonPrimary, obInputStyle, obLabelStyle, obHelperStyle,
@@ -12,6 +13,8 @@ type Currency = typeof CURRENCIES[number]
 
 export default function StepOrg() {
   const router = useRouter()
+  const t = useTranslations('wizard.org')
+  const tc = useTranslations('wizard.common')
   const [name, setName] = useState('')
   const [timeZone, setTimeZone] = useState('Europe/Amsterdam')
   const [currency, setCurrency] = useState<Currency>('EUR')
@@ -34,7 +37,7 @@ export default function StepOrg() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim()) {
-      setError('Enter your company name.')
+      setError(t('validationEmptyName'))
       return
     }
     setSubmitting(true)
@@ -47,7 +50,7 @@ export default function StepOrg() {
       })
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
-        setError(j.error ?? 'Could not save. Try again.')
+        setError(j.error ?? tc('saveError'))
         setSubmitting(false)
         return
       }
@@ -58,7 +61,7 @@ export default function StepOrg() {
       })
       router.push('/philly/onboarding/team')
     } catch {
-      setError('Network error. Try again.')
+      setError(tc('networkError'))
       setSubmitting(false)
     }
   }
@@ -66,8 +69,8 @@ export default function StepOrg() {
   return (
     <OnboardingFrame
       step="org"
-      title="About your organization"
-      sub="We need a few basics to set up dates, deals, and reports correctly."
+      title={t('heading')}
+      sub={t('sub')}
       footer={
         <button
           type="submit"
@@ -76,7 +79,7 @@ export default function StepOrg() {
           style={{ ...obButtonPrimary, opacity: submitting ? 0.6 : 1 }}
         >
           {submitting ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : null}
-          Save and continue
+          {t('primaryCta')}
         </button>
       }
     >
@@ -89,13 +92,13 @@ export default function StepOrg() {
 
       <form id="org-form" onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <div>
-          <label htmlFor="org-name" style={obLabelStyle}>Company name</label>
+          <label htmlFor="org-name" style={obLabelStyle}>{t('companyNameLabel')}</label>
           <input
             id="org-name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Bongartz Diaz Real Estate"
+            placeholder={t('companyNamePlaceholder')}
             required
             autoFocus
             style={obInputStyle}
@@ -103,7 +106,7 @@ export default function StepOrg() {
         </div>
 
         <div>
-          <label htmlFor="org-tz" style={obLabelStyle}>Time zone</label>
+          <label htmlFor="org-tz" style={obLabelStyle}>{t('timeZoneLabel')}</label>
           <input
             id="org-tz"
             type="text"
@@ -122,11 +125,11 @@ export default function StepOrg() {
             <option value="America/New_York" />
             <option value="America/Los_Angeles" />
           </datalist>
-          <div style={obHelperStyle}>We auto-detect from your browser. Change if needed.</div>
+          <div style={obHelperStyle}>{t('timeZoneHelper')}</div>
         </div>
 
         <div>
-          <label htmlFor="org-cur" style={obLabelStyle}>Default currency</label>
+          <label htmlFor="org-cur" style={obLabelStyle}>{t('currencyLabel')}</label>
           <select
             id="org-cur"
             value={currency}
@@ -135,7 +138,7 @@ export default function StepOrg() {
           >
             {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
-          <div style={obHelperStyle}>Used for deal values and reports. You can override per deal.</div>
+          <div style={obHelperStyle}>{t('currencyHelper')}</div>
         </div>
       </form>
     </OnboardingFrame>

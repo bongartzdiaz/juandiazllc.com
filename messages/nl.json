@@ -460,5 +460,132 @@
     "stuckHint": "Vermeld wat je probeerde, wat je verwachtte, wat er gebeurde. Een screenshot helpt.",
     "openHelp": "Hulp openen",
     "closeHelp": "Hulp sluiten"
+  },
+  "wizard": {
+    "frame": {
+      "stepIndicator": "Stap {current} van {total}",
+      "closeAria": "Setup sluiten en terug naar dashboard",
+      "footerByline": "DEUS by LucenAI",
+      "footerPrivacy": "Privacy"
+    },
+    "common": {
+      "continue": "Doorgaan",
+      "networkError": "Netwerkfout. Probeer opnieuw.",
+      "saveError": "Opslaan mislukt. Probeer opnieuw.",
+      "removeRowAria": "Rij verwijderen"
+    },
+    "welcome": {
+      "heroTitle": "Welkom bij DEUS, {firstName}",
+      "heroTitleNoName": "Welkom bij DEUS",
+      "heroSub": "Vijf korte stappen om je team en contacten in te richten. Sla over wat je later wilt doen.",
+      "reCardTitle": "Vastgoed",
+      "reCardBody": "Makelaardij, vastgoedbeheer, agentteams. Deals, panden en bezichtigingen.",
+      "hospCardTitle": "Hospitality",
+      "hospCardBody": "Hotels, restaurants, locaties. Reserveringen, kamers en offertes."
+    },
+    "org": {
+      "heading": "Over je organisatie",
+      "sub": "We hebben wat basisgegevens nodig om datums, deals en rapportages goed in te stellen.",
+      "companyNameLabel": "Bedrijfsnaam",
+      "companyNamePlaceholder": "bv. Bongartz Diaz Real Estate",
+      "timeZoneLabel": "Tijdzone",
+      "timeZoneHelper": "We detecteren dit automatisch via je browser. Pas aan als nodig.",
+      "currencyLabel": "Standaardvaluta",
+      "currencyHelper": "Gebruikt voor dealwaarden en rapportages. Je kunt dit per deal overschrijven.",
+      "primaryCta": "Opslaan en doorgaan",
+      "validationEmptyName": "Vul je bedrijfsnaam in.",
+      "validationInvalidTz": "Kies een tijdzone."
+    },
+    "team": {
+      "heading": "Nodig je team uit",
+      "sub": "Je plan start met 3 seats. Voeg hier maximaal 5 uitnodigingen toe, of sla over en doe het later.",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "collega@voorbeeld.com",
+      "roleLabel": "Rol",
+      "roleViewer": "Viewer",
+      "roleManager": "Manager",
+      "roleAdmin": "Admin",
+      "tooltipAdmin": "Volledige toegang, inclusief facturatie en teambeheer.",
+      "tooltipManager": "Volledige toegang behalve facturatie.",
+      "tooltipViewer": "Alleen-lezen toegang tot contacten, deals en rapportages.",
+      "primaryCtaContinue": "Doorgaan",
+      "primaryCtaSendOne": "Stuur {count} uitnodiging",
+      "primaryCtaSendMany": "Stuur {count} uitnodigingen",
+      "secondarySkip": "Sla over — ik nodig later uit",
+      "addAnother": "Voeg er nog een toe",
+      "inlineSuccess": "Verzonden naar {email}",
+      "inlineErrorDup": "Zit al in je team",
+      "inlineErrorGeneric": "Versturen mislukt",
+      "inlineErrorNetwork": "Netwerkfout",
+      "seatCounter": "{used} van {limit} seats gebruikt",
+      "counterHelper": "Telt jou, je teamleden en openstaande uitnodigingen."
+    },
+    "contacts": {
+      "heading": "Voeg je contacten toe",
+      "sub": "Importeer je bestaande contacten zodat deals vanaf de eerste dag aan echte mensen hangen.",
+      "cardATitle": "Upload een CSV",
+      "cardABody": "We koppelen naam, e-mail, telefoon en bedrijf automatisch. Voorbeeld zien voordat je opslaat.",
+      "cardBTitle": "Handmatig toevoegen",
+      "cardBBody": "Open een leeg contactformulier en voeg ze één voor één toe terwijl je bezig bent.",
+      "skip": "Sla over — contacten kan ik later toevoegen",
+      "tip": "Tot 10.000 regels per bestand."
+    },
+    "calendar": {
+      "heading": "Koppel je agenda",
+      "sub": "Afspraken synchroniseren in beide richtingen en tijd op een deal wordt automatisch bijgehouden.",
+      "googleBtn": "Koppel Google Agenda",
+      "googleDetail": "Gmail, Workspace, Google-accounts",
+      "outlookBtn": "Koppel Outlook",
+      "outlookDetail": "Microsoft 365, Outlook.com, Exchange",
+      "googleProviderName": "Google Agenda",
+      "outlookProviderName": "Outlook / Microsoft 365",
+      "providerConnected": "{provider} gekoppeld.",
+      "disconnect": "Ontkoppelen",
+      "disconnectConfirm": "Deze agenda ontkoppelen? Je kunt later opnieuw koppelen vanuit Instellingen.",
+      "lockAria": "OAuth-beveiligd",
+      "skip": "Sla over — ik koppel later",
+      "continueCta": "Doorgaan",
+      "popupBlocked": "Je browser heeft de popup geblokkeerd. Sta popups toe voor app.lucen.ai en probeer opnieuw.",
+      "retry": "Opnieuw proberen",
+      "errAccessDenied": "Je hebt de agendatoestemming geweigerd. Er is niets gewijzigd.",
+      "errStateExpired": "De koppellink is verlopen. Klik opnieuw op Koppelen.",
+      "errProviderNotConfigured": "De agendaprovider is nog niet ingesteld — je beheerder moet OAuth-credentials toevoegen.",
+      "errTokenRejected": "De provider heeft de koppeling geweigerd. Probeer het opnieuw.",
+      "errSessionLost": "Je sessie is halverwege verlopen. Log opnieuw in om door te gaan.",
+      "errMissingParams": "De callback was onvolledig. Klik op Koppelen om opnieuw te proberen.",
+      "errGeneric": "Koppeling mislukt ({code}).",
+      "trustToggle": "Wat we lezen en wat we niet lezen",
+      "trustBullet1": "Alleen-lezen: afspraken uit je primaire agenda in een venster van 14 dagen.",
+      "trustBullet2": "We lezen nooit de gedeelde agenda's van anderen of je vrij/bezet-voorkeuren.",
+      "trustBullet3": "Tokens zijn versleuteld opgeslagen. Je kunt op elk moment ontkoppelen vanuit Instellingen."
+    },
+    "done": {
+      "heroTitle": "Je bent klaar!",
+      "heroSub": "Drie snelle dingen die je nu kunt doen vanaf het dashboard.",
+      "card1Title": "Vraag AI om inzicht",
+      "card1Body": "Kies een deal en vraag DEUS naar de volgende stappen. Draait lokaal op onze server.",
+      "card2Title": "Lees de rondleiding van 5 pagina's",
+      "card2Body": "Een korte tour door elk scherm dat je deze week gaat gebruiken.",
+      "card3Title": "Bekijk de audit log",
+      "card3Body": "Elke wijziging in DEUS wordt vastgelegd. Zie wie wat deed, en wanneer.",
+      "primaryCta": "Naar dashboard",
+      "toast": "Setup voltooid — welkom bij DEUS"
+    },
+    "resume": {
+      "bannerTitle": "Maak je DEUS-setup af",
+      "bannerBody": "Je bent {n} stappen ver. Ga verder om je team uit te nodigen en contacten te importeren.",
+      "primary": "Setup hervatten",
+      "dismiss": "Verberg voor vandaag"
+    },
+    "emptyState": {
+      "heading": "Je beheerder regelt de setup",
+      "body": "Alleen de organisatiebeheerder doorloopt de setup-wizard. Zodra die klaar is, heb je volledige toegang tot contacten, deals en de rest van DEUS.",
+      "primaryCta": "Terug naar dashboard"
+    },
+    "toast": {
+      "saveSuccess": "Opgeslagen",
+      "skipConfirm": "Overgeslagen — je kunt het later afmaken",
+      "stepCompleted": "Stap opgeslagen"
+    }
   }
 }

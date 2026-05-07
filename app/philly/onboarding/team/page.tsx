@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Loader2, Plus, X, CheckCircle2, AlertCircle } from 'lucide-react'
 import {
   OnboardingFrame, obButtonPrimary, obButtonSecondary,
@@ -18,21 +19,23 @@ interface Row {
   message?: string
 }
 
-const ROLE_TIPS: Record<Role, string> = {
-  admin: 'Full access, including billing and team management.',
-  manager: 'Full access except billing.',
-  viewer: 'Read-only access to contacts, deals, and reports.',
-}
-
 const MAX_ROWS = 5
 
 export default function StepTeam() {
   const router = useRouter()
+  const t = useTranslations('wizard.team')
+  const tc = useTranslations('wizard.common')
   const [rows, setRows] = useState<Row[]>([
     { id: 1, email: '', role: 'viewer', status: 'idle' },
   ])
   const [submitting, setSubmitting] = useState(false)
   const [seats, setSeats] = useState<{ used: number; limit: number } | null>(null)
+
+  const ROLE_TIPS: Record<Role, string> = {
+    admin: t('tooltipAdmin'),
+    manager: t('tooltipManager'),
+    viewer: t('tooltipViewer'),
+  }
 
   useEffect(() => {
     fetch('/philly/api/organizations/invites')
@@ -86,12 +89,12 @@ export default function StepTeam() {
         })
         const json = await res.json().catch(() => ({}))
         if (!res.ok) {
-          update(row.id, { status: 'err', message: json.error ?? 'Could not send' })
+          update(row.id, { status: 'err', message: json.error ?? t('inlineErrorGeneric') })
         } else {
-          update(row.id, { status: 'ok', message: `Sent to ${row.email.trim()}` })
+          update(row.id, { status: 'ok', message: t('inlineSuccess', { email: row.email.trim() }) })
         }
       } catch {
-        update(row.id, { status: 'err', message: 'Network error' })
+        update(row.id, { status: 'err', message: t('inlineErrorNetwork') })
       }
     }
     setSubmitting(false)
@@ -104,13 +107,17 @@ export default function StepTeam() {
     void advance()
   }
 
-  const primaryLabel = validRows.length > 0 ? `Send ${validRows.length} invite${validRows.length === 1 ? '' : 's'}` : 'Continue'
+  const primaryLabel = validRows.length === 0
+    ? t('primaryCtaContinue')
+    : validRows.length === 1
+      ? t('primaryCtaSendOne', { count: validRows.length })
+      : t('primaryCtaSendMany', { count: validRows.length })
 
   return (
     <OnboardingFrame
       step="team"
-      title="Invite your team"
-      sub="Your plan starts with 3 seats. Add up to 5 invites here, or skip and do it later."
+      title={t('heading')}
+      sub={t('sub')}
       footer={
         <>
           <button
@@ -128,7 +135,7 @@ export default function StepTeam() {
             disabled={submitting}
             style={obButtonSecondary}
           >
-            Skip — I'll invite later
+            {t('secondarySkip')}
           </button>
         </>
       }
@@ -138,9 +145,9 @@ export default function StepTeam() {
           fontSize: 12, color: 'var(--txt2)', marginBottom: 12,
           padding: '8px 12px', background: 'var(--bg2)', borderRadius: 8,
         }}>
-          <strong>{seats.used} of {seats.limit} seats used</strong>
+          <strong>{t('seatCounter', { used: seats.used, limit: seats.limit })}</strong>
           <div style={{ ...obHelperStyle, marginTop: 2 }}>
-            Counts you, your teammates, and pending invites.
+            {t('counterHelper')}
           </div>
         </div>
       )}
@@ -152,12 +159,12 @@ export default function StepTeam() {
             gap: 8, alignItems: 'start',
           }}>
             <div>
-              <label style={{ ...obLabelStyle, fontSize: 11 }}>Email</label>
+              <label style={{ ...obLabelStyle, fontSize: 11 }}>{t('emailLabel')}</label>
               <input
                 type="email"
                 value={row.email}
                 onChange={(e) => update(row.id, { email: e.target.value, status: 'idle' })}
-                placeholder="teammate@example.com"
+                placeholder={t('emailPlaceholder')}
                 disabled={submitting || row.status === 'ok'}
                 style={obInputStyle}
                 autoComplete="off"
@@ -174,7 +181,7 @@ export default function StepTeam() {
               )}
             </div>
             <div>
-              <label style={{ ...obLabelStyle, fontSize: 11 }}>Role</label>
+              <label style={{ ...obLabelStyle, fontSize: 11 }}>{t('roleLabel')}</label>
               <select
                 value={row.role}
                 onChange={(e) => update(row.id, { role: e.target.value as Role })}
@@ -182,16 +189,16 @@ export default function StepTeam() {
                 style={obInputStyle}
                 title={ROLE_TIPS[row.role]}
               >
-                <option value="viewer">Viewer</option>
-                <option value="manager">Manager</option>
-                <option value="admin">Admin</option>
+                <option value="viewer">{t('roleViewer')}</option>
+                <option value="manager">{t('roleManager')}</option>
+                <option value="admin">{t('roleAdmin')}</option>
               </select>
             </div>
             <button
               type="button"
               onClick={() => removeRow(row.id)}
               disabled={submitting || rows.length === 1}
-              aria-label="Remove row"
+              aria-label={tc('removeRowAria')}
               style={{
                 background: 'transparent', border: 'none', cursor: 'pointer',
                 color: 'var(--txt3)', padding: 6, borderRadius: 6,
@@ -214,7 +221,7 @@ export default function StepTeam() {
           }}
         >
           <Plus size={12} />
-          Add another
+          {t('addAnother')}
         </button>
       )}
     </OnboardingFrame>
