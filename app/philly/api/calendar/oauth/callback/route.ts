@@ -62,7 +62,8 @@ export async function GET(req: NextRequest) {
   if (scope instanceof NextResponse) {
     // No session in callback context — surface a friendly redirect
     // rather than a 401 JSON. User can re-sign-in and try again.
-    return redirect(req, '/philly/login', { next: DEFAULT_RETURN, error: 'session_lost' })
+    // Login route is /login (not /philly/login — see middleware allowlist)
+    return redirect(req, '/login', { next: DEFAULT_RETURN, error: 'session_lost' })
   }
   if (scope.userId !== state.sub || scope.organizationId !== state.oid) {
     logger.warn('[calendar oauth] state subject mismatch', {

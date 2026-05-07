@@ -1,12 +1,13 @@
-# DEUS / juandiazllc.com — compliance status, 2026-05-07
+# DEUS / juandiazllc.com — compliance status, 2026-05-07 (rev. 2)
 
-> Audit prepared on branch `claude/zen-noyce-f6e719` (PR #12). Code-grounded — every claim links to a file path. This is a status report, not a redesign; no code changes proposed.
+> Audit prepared on branch `claude/zen-noyce-f6e719` (PR #12). Code-grounded — every claim links to a file path. This is a status report, not a redesign; no code changes proposed. **Rev. 2** updated late on 2026-05-07 after the AF audit cycle closed and Bundles D2 + D3 + Hetzner cutover prep landed.
 
 ## Executive summary
 
-- **Overall posture: YELLOW.** The technical security and rights-machinery is in good shape (DSAR export, Art. 17 erasure, encryption, audit log, rate-limit, Zod, role-gating all implemented and tested). What is *not* in place is the legal/operational layer: the privacy/DPA/ToS/sub-processors documents are still in `_drafts/` with `[KvK TBD]` / `[address TBD]` placeholders and are not served from any `/legal/*` URL. **No customer can sign a DPA on day one.** That makes the product not yet shippable to a paying B2B customer that requires a DPA at signing.
+- **Overall posture: YELLOW (improving).** Technical security keeps tightening — calendar push-sync now ships with cross-tenant isolation in the renew-channels admin path, full audit-log coverage on calendar connect/disconnect + Stripe Customer Portal access, `onDelete: Restrict` guarding `CalendarConnection.organization` deletes, and a dedicated push-sync compliance review (see `docs/compliance-check-push-sync-2026-05-07.md`). The legal/operational layer is unchanged: privacy/DPA/ToS/sub-processors documents are still in `_drafts/` with `[KvK TBD]` / `[address TBD]` placeholders and are not served from any `/legal/*` URL. **No customer can sign a DPA on day one.** Still not shippable to a paying B2B customer that requires a DPA at signing.
 - **Critical gaps:** 4 (legal docs not published, no breach IR runbook, no Records of Processing Activities (RoPA), no contact-side consent capture/suppression — blocks NL telemarketing 2026 + Art. 7).
 - **Operator-blocking actions:** 5 (confirm legal entity, fill placeholders, publish legal pages, write IR runbook, write RoPA).
+- **Positive movement since rev. 1:** AF audit cycle closed (8 fixed + 3 originally-deferred all closed), data residency improves with Hetzner Falkenstein cutover (EU-only infrastructure + Backblaze B2 EU bucket for backups), audit-log coverage extended to all financially or integration-relevant user actions.
 
 ---
 
@@ -65,7 +66,7 @@
 
 | Status | Evidence | Gap |
 |---|---|---|
-| ✅ Implemented | `app/philly/api/me/route.ts:109-184` DELETE. Soft-deletes (`User.deletedAt`), invalidates sessions atomically (`prisma.$transaction` lines 149-159), audit-logs as `kind: self_erasure`, last-admin guardrail (lines 129-143), 30-day hard-purge window declared. Schema field `deletedAt` defined at `prisma/schema.prisma:104-107`. Soft-deleted users get 410 Gone via `lib/philly/auth-helpers.ts:41-46, 66-67`. | **Hard-purge cron not implemented.** Without the scheduled job, soft-deleted rows accumulate forever — violates the policy that promises 30-day purge. **Owner action:** add a daily cron (DigitalOcean / Vercel Cron / pg_cron) that runs `prisma.user.deleteMany({ where: { deletedAt: { lt: now()-30d } } })` plus cascade. Write a regression test. |
+| ✅ Implemented | `app/philly/api/me/route.ts:109-184` DELETE. Soft-deletes (`User.deletedAt`), invalidates sessions atomically (`prisma.$transaction` lines 149-159), audit-logs as `kind: self_erasure`, last-admin guardrail (lines 129-143), 30-day hard-purge window declared. Schema field `deletedAt` defined at `prisma/schema.prisma:104-107`. Soft-deleted users get 410 Gone via `lib/philly/auth-helpers.ts:41-46, 66-67`. **`CalendarConnection.organization` now uses `onDelete: Restrict`** (`prisma/schema.prisma:640`) — User-side Cascade still handles Art. 17 erasure for personal calendar tokens, while accidental org delete is blocked at the FK so connections aren't silently orphaned. Comment in schema documents the rationale. | **Hard-purge cron not implemented.** Without the scheduled job, soft-deleted rows accumulate forever — violates the policy that promises 30-day purge. **Owner action:** add a daily cron (DigitalOcean / Vercel Cron / pg_cron) that runs `prisma.user.deleteMany({ where: { deletedAt: { lt: now()-30d } } })` plus cascade. Write a regression test. |
 
 ### Art. 18 — Right to restriction
 
@@ -112,7 +113,7 @@
 | Password hashing | ✅ Implemented | `app/philly/api/invites/accept/route.ts:98` `bcrypt.hash(password, 12)`. Auth flows through Supabase (`app/actions/auth.ts:30`) + bcrypt for self-set passwords. |
 | Access control | ✅ Implemented | `requireScope` / `requireRole` everywhere (`lib/philly/auth-helpers.ts:116-184`). Tenant isolation enforced via `organizationId` in every Prisma `where` (DSAR sample at `lib/philly/dsar.ts:97-99`). |
 | Rate limiting | ✅ Implemented | `enforceRateLimit` with `PRESET_READ` / `PRESET_MUTATION` on every route. AI-score has tighter cap (`app/philly/api/ai/score/route.ts:17` capacity 10, refill 0.166/s). Public `POST /invites/accept` IP-keyed. |
-| Audit log | ✅ Implemented | `lib/philly/audit.ts:84-107`. 24-month retention declared in privacy notice. |
+| Audit log | ✅ Implemented (extended) | `lib/philly/audit.ts:84-107`. 24-month retention declared in privacy notice. **Coverage extended in Bundle AF (2026-05-07):** Stripe Customer Portal access (`app/philly/api/billing/portal/route.ts:80`), calendar OAuth callback connect events (entity=integration, action=create, sensitive token data NOT logged), calendar disconnect events (entity=integration, action=delete), Stripe Checkout intent capture (entity=subscription, action=create — captures who-clicked-what even when checkout is abandoned), admin-triggered renew-channels sweep (mirrors `/api/audit/prune` pattern with renewedCount/failedCount/processed). Webhook handlers stay in `logger.info` because there is no `scope.userId` server-to-server. Duplicate `'user'` entry removed from `AuditEntity` enum. |
 | Logging hygiene | ✅ Implemented | `console.log → logger.debug` migration done in `lib/philly/email/providers.ts:34-39` and `lib/philly/sms/twilio.ts:43`. Sentry payload redaction declared in baseline. |
 | Soft-delete + session purge | ✅ Implemented | `app/philly/api/me/route.ts:149-159`. `tokensInvalidAfter` invalidates all JWTs (`prisma/schema.prisma:97`). |
 | 2FA (TOTP) | ⚠️ Partial | Schema present (`prisma/schema.prisma:99-101` `twoFactorSecret`/`twoFactorEnabled`/`twoFactorVerifiedAt`). No 2FA enrollment or verification route was found in this audit. Recovery codes table referenced but not exercised. | 
@@ -168,6 +169,74 @@ Art. 50 requires that natural persons are informed when they interact with an AI
 
 ---
 
+## Calendar push-sync compliance posture (Bundles A / D / D2 / D3 — added 2026-05-07)
+
+The calendar OAuth + push-sync surface is the most data-sensitive integration we ship today (read-only access to a user's full calendar, refresh-token persistence, real-time event delta-sync). It got its own dedicated compliance review in **`docs/compliance-check-push-sync-2026-05-07.md`** (parallel `/compliance-check` agent — defer to that doc as the single source of truth on this surface). Headline points cross-referenced into this status doc:
+
+| Topic | Status | Evidence |
+|---|---|---|
+| Token at rest | ✅ AES-256-GCM via `lib/philly/crypto.ts`. Tokens never returned over the wire. |
+| Cross-tenant isolation in cron path | ✅ Bundle AF F1 fix — `listDueForRenewal()` accepts an `organizationId` filter; admin-triggered renew passes `scope.organizationId`, system-cron path explicitly omits to process all orgs (legitimate operator role). |
+| Audit-log on connect / disconnect | ✅ Calendar OAuth callback writes `entity=integration, action=create`, disconnect writes `action=delete`, both in `app/philly/api/calendar/...`. Token material never enters the audit row — only `{provider, providerEmail, kind: 'calendar'}` and status flips. |
+| Webhook authenticity | ✅ Per-channel encrypted `authSecret` (32 bytes random), `crypto.timingSafeEqual` verification, MS validation handshake handled before JSON parse. `PUBLIC_PHILLY_PATHS` allowlist limited to `/health`, `/billing/webhook`, `/calendar/webhook/google`, `/calendar/webhook/microsoft`, `/audit/prune`, `/calendar/cron/renew-channels`. |
+| Delta-sync recovery from token expiry | ✅ Bundle D3 worker handles 410 GONE (Google `syncToken` rotation, MS `@odata.deltaLink` invalidation) by full-resync fallback. Idempotent event upsert by external id. |
+| Throttled `lastUsedAt` for unused-connection signal | ✅ Bundle AF F5 closed — `shouldWriteLastUsed` helper writes at most once per 6h to avoid hot-row contention. Backs a future janitor that retires connections idle >90d. |
+| `lastError` UI rendering | ✅ Bundle AF F11 closed — surfaces in `/philly/settings/integrations` next to the disconnect button so users can self-diagnose "Reconnect needed" without reading logs. |
+
+For the full GDPR walk-through of this specific surface (data subjects, categories, lawful basis, retention by token type, sub-processor map, transfer mechanism for Google + Microsoft), read `docs/compliance-check-push-sync-2026-05-07.md`. That doc lives separately so the surface can be re-audited on its own cadence as the OAuth scopes evolve.
+
+---
+
+## AF audit cycle — closed (added 2026-05-07)
+
+The AF audit cycle (post-Bundle D2 sweep) is now fully closed: **8 findings fixed in the original pass + 3 originally-deferred follow-ups all closed**. No carry-over.
+
+| ID | Severity | Topic | Resolution |
+|---|---|---|---|
+| F1 | HIGH | Cross-tenant exposure in admin renew-channels | `listDueForRenewal()` gained optional `organizationId`; admin path scopes, cron path doesn't. |
+| F2 | HIGH | Missing rate-limit on admin renew-channels | `PRESET_MUTATION` added on admin trigger (cron skips — secret implies trust). Self-audit row recorded. |
+| F3 | MEDIUM | Stripe Customer Portal no audit trail | Audit row written on portal open. Ties downstream Stripe webhook state changes (which lack `userId`) back to the human who clicked. |
+| F4 | MEDIUM | Admin renew-channels sweep no audit trail | Audit row mirrors `/api/audit/prune` pattern (renewedCount/failedCount/processed). |
+| F6 | MEDIUM | DTO drift between wizard + integrations settings | `ConnectionDTO` / `ChannelDTO` / `ConnectionsResponse` hoisted to `lib/philly/calendar/types.ts`. Wizard had stale shape; now both consumers import the same types. |
+| F7 | MEDIUM | Missing `getAppBaseUrl()` helper + Stripe portal silent fail | New `lib/philly/app-url.ts`. Stripe portal route now fail-fasts on missing env + null-checks `session.url`. |
+| F9 | LOW | Duplicate `'user'` in `AuditEntity` enum | Removed. |
+| F10 | LOW | Unconditional Google-only OAuth params | `access_type=offline` and `prompt=consent` now gated on `provider === 'google'`. |
+| ~~F5~~ | LOW | Soft-promise `lastUsedAt` | **Closed** — throttled-write helper `shouldWriteLastUsed` (writes at most once per 6h) plus unit tests. |
+| ~~F8~~ | LOW | `CalendarConnection.organization` no `onDelete` | **Closed** — `onDelete: Restrict` with documenting comment in `prisma/schema.prisma:633-640`. |
+| ~~F11~~ | LOW | `lastError` declared but never rendered | **Closed** — surfaces in `/philly/settings/integrations`. |
+
+**Cron-route middleware fix (parallel landing):** `PUBLIC_PHILLY_PATHS` got `/api/audit/prune` and `/api/calendar/cron/renew-channels`. Without these the middleware redirected `X-Cron-Secret`-authenticated callers to `/login` before the route's own auth check ran, making the cron routes unreachable from any non-session caller. Both routes still enforce `X-Cron-Secret OR admin session` at the handler — the allowlist just lets the request reach the handler.
+
+---
+
+## Hetzner cutover — data residency improvement (target 2026-05-15)
+
+Net-positive compliance change. Full operator runbook landed at `docs/hetzner-cutover-runbook.md` plus 9 numbered migration scripts under `scripts/migrate-to-hetzner/` (01-bootstrap → 09-smoke-test). MANUAL_TASKS.md surfaces three pre-flight gates that have to land **24 hours before** the cutover ceremony or we lock ourselves out of the box / DNS doesn't propagate / OAuth callbacks 4xx for in-flight customers.
+
+| Compliance dimension | Before (Vercel + Supabase) | After (Hetzner + B2 EU) | Net |
+|---|---|---|---|
+| Application hosting | Vercel (US-headquartered, multi-region edge incl. US PoPs) | Hetzner Falkenstein (DE — EU only, single region) | ✅ Improvement |
+| Postgres | Supabase (cloud, EU region, US-headquartered controller) | Hetzner Postgres on the same EU box | ✅ Improvement |
+| Backups | Supabase managed (region declared but plumbing is opaque) | Backblaze B2 EU bucket `deus-backups-eu` (region `eu-central-003`), 30-day lifecycle, scoped Application Key (bucket-only, no master-key reuse) | ✅ Improvement |
+| Sub-processor count | Vercel + Supabase + Resend + Stripe + Google + Microsoft + Sentry | Hetzner + Backblaze + Resend + Stripe + Google + Microsoft + Sentry (Vercel + Supabase removed; Hetzner + Backblaze added) | Sideways — list shrinks by one, sub-processor doc still needs a refresh post-cutover |
+| Data-at-rest disclosure | "AES-256 declared in DPA §7" | Same DPA promise; LUKS at the disk level on Hetzner-side; B2 server-side encryption | ✅ Continuity, plus disk-level encryption is now operator-verifiable |
+| OAuth callback co-existence | Single redirect URI per provider | Two redirect URIs registered per provider during cutover window (old + new) so in-flight OAuth doesn't 4xx | ✅ Operationally safer |
+
+**Compliance follow-ups post-cutover:**
+- Refresh `_drafts/legal/subprocessors-en.md` to drop Vercel + Supabase, add Hetzner Online GmbH (EU controller in Gunzenhausen, DE) and Backblaze Inc. (US controller — relevant transfer mechanism: SCCs + B2's stated EU-isolation for the `eu-central-003` bucket).
+- Re-confirm DPA §7 backup-encryption claim against Backblaze's B2 server-side encryption documentation; record the cipher and key-management posture in `docs/compliance/backup-architecture.md` (new file, post-cutover).
+- First B2 restore drill within 30 days of cutover (per DPA §7's "monthly restore drills" promise — was always undone, this is the chance to start clean).
+
+---
+
+## Repo split — DEUS-SHARED becomes primary for CRM (added 2026-05-07)
+
+Decision recorded in `docs/repo-split-cutover.md`: future CRM (DEUS) work moves to `bongartzdiaz/DEUS-SHARED`. The unified `bongartzdiaz/juandiazllc.com` repo continues as the brand-site home (`app/[locale]/*`). The two codebases are no longer mirrored — the auto-mirror workflow `.github/workflows/sync-deus-shared.yml` was removed (it had never run because its PAT secret was never set, but it would have force-pushed the wrong shape into DEUS-SHARED's distinct flat structure). The pre-existing externally-managed Sync Bot is being unplugged separately.
+
+**From a compliance standpoint, nothing changes about the data:** the same Postgres holds the same customer data, the same audit log records the same who/what/when, the same DPA covers the same processing. **Only the source-control location of the code changes.** Worth flagging here for completeness so that auditors who follow citations from this doc to a `bongartzdiaz/juandiazllc.com` repo URL aren't surprised when the next cycle's evidence sits in `bongartzdiaz/DEUS-SHARED`.
+
+---
+
 ## Top 5 priority actions
 
 | # | Action | Owner | ETA | Why it's #N |
@@ -180,15 +249,19 @@ Art. 50 requires that natural persons are informed when they interact with an AI
 
 ---
 
-## Documents that exist (drafts)
+## Documents that exist (drafts + new since rev. 1)
 
-- `_drafts/legal/privacy-en.md` — Art. 12-14 privacy notice (EN, complete bar entity placeholders)
-- `_drafts/legal/dpa-en.md` — Art. 28 DPA (EN, complete bar signature lines)
-- `_drafts/legal/tos-en.md` — Terms of Service (EN, governing law NL)
-- `_drafts/legal/subprocessors-en.md` — Sub-processor list (EN)
+- `_drafts/legal/privacy-en.md` — Art. 12-14 privacy notice (EN, complete bar `[KvK TBD]` / `[address TBD]` placeholders — **still blocked, no progress since rev. 1**)
+- `_drafts/legal/dpa-en.md` — Art. 28 DPA (EN, complete bar signature lines — **still blocked**)
+- `_drafts/legal/tos-en.md` — Terms of Service (EN, governing law NL — **still blocked**)
+- `_drafts/legal/subprocessors-en.md` — Sub-processor list (EN — **still blocked**, also needs Hetzner+Backblaze refresh post-cutover)
 - `_drafts/onboarding/welcome-email.md`, `_drafts/onboarding/first-day-deus.md` — onboarding sequence
 - `_drafts/pricing/pricing-en.md` — pricing tiers
-- `MANUAL_TASKS.md` — operator-side env / migration / Stripe / OAuth setup checklist
+- `MANUAL_TASKS.md` — operator-side env / migration / Stripe / OAuth setup checklist (now includes Hetzner cutover gates + push-sync renewal cron + repo strategy note)
+- `docs/calendar-push-sync.md` — push-sync implementation reference (data flows, TTL choices, recovery semantics)
+- `docs/compliance-check-push-sync-2026-05-07.md` — dedicated compliance review of the push-sync surface (parallel doc, single source of truth for that integration's GDPR posture)
+- `docs/hetzner-cutover-runbook.md` + `scripts/migrate-to-hetzner/01..09-*.sh` — operator runbook + numbered migration scripts for the EU-only data residency improvement
+- `docs/repo-split-cutover.md` — repo-split runbook (DEUS-SHARED becomes primary for CRM)
 - Memory files: `feedback_security_baseline.md` (the bank-grade + GDPR floor)
 
 ## Documents that should exist but don't
@@ -206,4 +279,4 @@ Art. 50 requires that natural persons are informed when they interact with an AI
 
 ---
 
-*End of report. No code changes were made. This document was generated by reading code as of branch `claude/zen-noyce-f6e719` HEAD on 2026-05-07.*
+*End of report. No code changes were made. **Rev. 2** updated late on 2026-05-07 against branch `claude/zen-noyce-f6e719` HEAD after Bundles D2 + D3 + AF + Hetzner runbook + repo-split-cutover landed. The push-sync surface has its own dedicated review at `docs/compliance-check-push-sync-2026-05-07.md` (cross-referenced in the new "Calendar push-sync compliance posture" section above).*

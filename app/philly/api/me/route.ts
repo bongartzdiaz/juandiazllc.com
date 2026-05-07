@@ -56,6 +56,12 @@ export async function PATCH(req: NextRequest) {
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
 
+  // Rate-limit profile mutations — same posture as DELETE below.
+  // Without this, an authenticated attacker (or a buggy client loop)
+  // could thrash the user's email/locale/avatarUrl without bound.
+  const rateLimit = enforceRateLimit(`me-patch:${scope.userId}`, PRESET_MUTATION)
+  if (rateLimit) return rateLimit
+
   let body: Record<string, unknown>
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
 

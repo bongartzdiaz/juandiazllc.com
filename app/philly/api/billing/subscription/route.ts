@@ -11,6 +11,7 @@ import { NextResponse } from 'next/server'
 import { requireScope } from '@/lib/philly/auth-helpers'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { getSeatStatus } from '@/lib/philly/seats'
+import type { SubscriptionResponse, SubscriptionStatus } from '@/lib/philly/stripe/types'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -35,12 +36,12 @@ export async function GET() {
     getSeatStatus(scope.organizationId),
   ])
 
-  return NextResponse.json({
+  const body: SubscriptionResponse = {
     data: {
       subscription: sub
         ? {
             plan: sub.plan,
-            status: sub.status,
+            status: sub.status as SubscriptionStatus,
             seatCount: sub.seatCount,
             currentPeriodEnd: sub.currentPeriodEnd?.toISOString() ?? null,
             cancelAt: sub.cancelAt?.toISOString() ?? null,
@@ -49,5 +50,6 @@ export async function GET() {
         : null,
       seats,
     },
-  })
+  }
+  return NextResponse.json(body)
 }

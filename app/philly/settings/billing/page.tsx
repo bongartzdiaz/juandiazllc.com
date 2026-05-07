@@ -6,27 +6,15 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import {
   CreditCard, AlertCircle, CheckCircle2, Sparkles, ArrowUpRight, Clock,
 } from 'lucide-react'
+import type {
+  SubscriptionData,
+  SeatStatus,
+  SubscriptionResponse,
+} from '@/lib/philly/stripe/types'
 
-interface SubscriptionData {
-  plan: string
-  status: 'trialing' | 'active' | 'past_due' | 'unpaid' | 'canceled' | 'incomplete' | 'incomplete_expired'
-  seatCount: number
-  currentPeriodEnd: string | null
-  cancelAt: string | null
-  createdAt: string
-}
-
-interface SeatStatus {
-  usersUsed: number
-  invitesPending: number
-  used: number
-  limit: number
-  available: number
-}
-
-interface ApiResp {
-  data: { subscription: SubscriptionData | null; seats: SeatStatus }
-}
+// Hoisted to lib/philly/stripe/types.ts so the route + this UI stay
+// aligned via TypeScript instead of drifting silently.
+type ApiResp = SubscriptionResponse
 
 interface PlanCard {
   key: 'starter' | 'professional'

@@ -13,7 +13,11 @@
 
 import type { PrismaClient } from '@prisma/client'
 
-export const DSAR_EXPORT_VERSION = '1.0.0'
+// 1.1.0 — adds calendar_connections + calendar_channels slices.
+// Sensitive fields (encrypted tokens, authSecret, providerAccountId,
+// syncToken/deltaLink) are explicitly omitted — same pattern as
+// passwordHash + invite token in 1.0.0.
+export const DSAR_EXPORT_VERSION = '1.1.0'
 
 export type DsarScope = 'user' | 'org'
 
@@ -28,6 +32,8 @@ export interface DsarManifest {
   deal_count: number
   activity_count: number
   audit_log_count: number
+  calendar_connection_count: number
+  calendar_channel_count: number
   notice: string
 }
 
@@ -40,6 +46,8 @@ export interface DsarArchive {
   notes: unknown[]
   activities: unknown[]
   audit_log: unknown[]
+  calendar_connections: unknown[]
+  calendar_channels: unknown[]
   // Org-scope extras (omitted for user-scope exports)
   team?: unknown[]
   projects?: unknown[]
@@ -159,6 +167,50 @@ export async function buildDsarArchive({
     take: 5000, // hard cap — full log available via separate request to privacy@
   })
 
+  // Calendar push-sync surface (Bundle D). User-scope = the user's own
+  // connections; org-scope = every teammate's connection in the org.
+  // Sensitive fields are omitted on purpose — same posture as
+  // passwordHash and invite token:
+  //   - accessTokenEnc / refreshTokenEnc — encrypted credentials
+  //   - authSecretEnc — server-generated webhook secret
+  //   - providerAccountId — provider-side internal ID, not the user's email
+  //   - syncToken — opaque provider cursor, no informational value to the
+  //     data subject and could leak provider implementation detail
+  const calendarConnections = await prisma.calendarConnection.findMany({
+    where: scope === 'org' ? { organizationId } : { userId, organizationId },
+    select: {
+      id: true,
+      userId: true,
+      provider: true,
+      providerEmail: true,
+      scopes: true,
+      status: true,
+      lastError: true,
+      lastUsedAt: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+    orderBy: { createdAt: 'asc' },
+  })
+
+  const calendarChannels = await prisma.calendarChannel.findMany({
+    where: scope === 'org'
+      ? { connection: { organizationId } }
+      : { connection: { userId, organizationId } },
+    select: {
+      id: true,
+      connectionId: true,
+      provider: true,
+      status: true,
+      expiresAt: true,
+      lastRenewedAt: true,
+      lastError: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+    orderBy: { createdAt: 'asc' },
+  })
+
   // ── Org-scope-only slices ──
 
   let team: unknown[] | undefined
@@ -207,6 +259,8 @@ export async function buildDsarArchive({
     deal_count: deals.length,
     activity_count: activities.length,
     audit_log_count: auditLog.length,
+    calendar_connection_count: calendarConnections.length,
+    calendar_channel_count: calendarChannels.length,
     notice:
       'This export is generated under AVG/GDPR Art. 15 (right of access) ' +
       'and Art. 20 (data portability). Sensitive credentials (password ' +
@@ -224,6 +278,8 @@ export async function buildDsarArchive({
     notes,
     activities,
     audit_log: auditLog,
+    calendar_connections: calendarConnections,
+    calendar_channels: calendarChannels,
     ...(scope === 'org' ? { team, projects, pipelines, invites } : {}),
   }
 }
