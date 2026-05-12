@@ -15,7 +15,9 @@
     "postinstall": "prisma generate",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:deploy": "prisma migrate deploy"
+    "db:deploy": "prisma migrate deploy",
+    "regen:pricing": "node scripts/regenerate-pricing.mjs",
+    "regen:pricing:check": "node scripts/regenerate-pricing.mjs --check"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.71",

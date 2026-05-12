@@ -38,12 +38,18 @@ type Tier = {
 // CTAs land on /contact in beta-phase (Juan hand-onboards customers
 // 1-5 via the contact form). When /signup flow ships post-customer-#1,
 // switch starter/pro/business to "/signup?plan=<key>".
+//
+// TIERS prices + minSeats are regenerated from `_drafts/pricing/pricing-tiers.csv`
+// via `npm run regen:pricing`. ctaHref values are hand-controlled (per-tier
+// destination is a UX decision, not data). Edit pricing in the CSV, not here.
+// <BEGIN GENERATED:TIERS>
 const TIERS: Tier[] = [
   { key: "starter", monthlyPrice: "€40", annualPrice: "€32", minSeats: 3, ctaHref: "/contact?interest=starter" },
   { key: "pro", monthlyPrice: "€69", annualPrice: "€55", minSeats: 5, ctaHref: "/contact?interest=pro" },
   { key: "business", monthlyPrice: "€99", annualPrice: "€79", minSeats: 10, ctaHref: "/contact?interest=business" },
   { key: "enterprise", monthlyPrice: null, annualPrice: null, minSeats: 15, ctaHref: "mailto:hello@lucen.ai?subject=DEUS%20Enterprise%20enquiry" },
 ];
+// <END GENERATED:TIERS>
 
 // TODO(Juan): pick the tier that carries the "Most popular" badge.
 // Default = "pro" (industry-norm). Switch to "business" to nudge upmarket.
@@ -53,6 +59,9 @@ type Cell = string | boolean;
 type FeatureRow = { label: string; starter: Cell; pro: Cell; business: Cell; enterprise: Cell };
 type FeatureSection = { titleKey: string; rows: FeatureRow[] };
 
+// FEATURE_TABLE is regenerated from `_drafts/pricing/pricing-tiers.csv`
+// via `npm run regen:pricing`. Do not edit by hand — edit the CSV.
+// <BEGIN GENERATED:FEATURE_TABLE>
 const FEATURE_TABLE: FeatureSection[] = [
   {
     titleKey: "pricing.sec.core",
@@ -79,7 +88,7 @@ const FEATURE_TABLE: FeatureSection[] = [
     titleKey: "pricing.sec.email",
     rows: [
       { label: "Email templates", starter: "5", pro: "50", business: "Unlimited", enterprise: "Unlimited" },
-      { label: "Custom SMTP (your domain)", starter: false, pro: true, business: true, enterprise: true },
+      { label: "Custom SMTP (send via your domain)", starter: false, pro: true, business: true, enterprise: true },
     ],
   },
   {
@@ -127,14 +136,14 @@ const FEATURE_TABLE: FeatureSection[] = [
       { label: "CSV import (up to 10k rows)", starter: true, pro: true, business: true, enterprise: true },
       { label: "Outbound webhooks", starter: false, pro: true, business: true, enterprise: true },
       { label: "REST API access", starter: false, pro: true, business: true, enterprise: true },
-      { label: "Custom integrations", starter: false, pro: false, business: false, enterprise: true },
+      { label: "Custom integrations (built for you)", starter: false, pro: false, business: false, enterprise: true },
     ],
   },
   {
     titleKey: "pricing.sec.support",
     rows: [
-      { label: "Email support (24h response)", starter: true, pro: false, business: false, enterprise: false },
-      { label: "Priority email (4h business hours)", starter: false, pro: true, business: true, enterprise: false },
+      { label: "Email support (24 hour response)", starter: true, pro: false, business: false, enterprise: false },
+      { label: "Priority email (4 hour business hours)", starter: false, pro: true, business: true, enterprise: false },
       { label: "Private Slack channel", starter: false, pro: false, business: true, enterprise: true },
       { label: "Phone support", starter: false, pro: false, business: false, enterprise: true },
       { label: "Uptime SLA", starter: false, pro: false, business: "99.5%", enterprise: "99.95%" },
@@ -146,10 +155,18 @@ const FEATURE_TABLE: FeatureSection[] = [
       { label: "Contacts", starter: "5,000", pro: "50,000", business: "Unlimited", enterprise: "Unlimited" },
       { label: "Deals", starter: "1,000", pro: "25,000", business: "Unlimited", enterprise: "Unlimited" },
       { label: "Storage", starter: "5 GB", pro: "50 GB", business: "500 GB", enterprise: "Custom" },
-      { label: "API requests / month", starter: false, pro: "10,000", business: "100,000", enterprise: "Custom" },
+      { label: "API requests per month", starter: false, pro: "10,000", business: "100,000", enterprise: "Custom" },
+    ],
+  },
+  {
+    titleKey: "pricing.sec.infrastructure",
+    rows: [
+      { label: "Shared multi-tenant (Hetzner Falkenstein)", starter: true, pro: true, business: true, enterprise: false },
+      { label: "Dedicated server", starter: false, pro: false, business: false, enterprise: true },
     ],
   },
 ];
+// <END GENERATED:FEATURE_TABLE>
 
 function renderCell(cell: Cell): string {
   if (cell === true) return "✓";
