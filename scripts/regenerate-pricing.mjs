@@ -103,6 +103,59 @@ const CATEGORY_TO_KEY = {
   Infrastructure: "pricing.sec.infrastructure",
 };
 
+// CSV category → shorter slug used in feature-label i18n keys.
+// Same mapping as above, but only the last segment.
+const CATEGORY_TO_SLUG = {
+  "Core CRM": "core",
+  Calendar: "calendar",
+  Email: "email",
+  AI: "ai",
+  Security: "security",
+  Compliance: "compliance",
+  Branding: "branding",
+  Integrations: "integrations",
+  Support: "support",
+  Limits: "limits",
+  Infrastructure: "infrastructure",
+};
+
+// Feature label → key-safe camelCase slug.
+//   "Contacts" → "contacts"
+//   "Custom fields" → "customFields"
+//   "AI lead scoring" → "aiLeadScoring"
+//   "Two-factor authentication" → "twoFactorAuthentication"
+//   "SSO (SAML 2.0)" → "sso" (parens stripped)
+//   "Custom SMTP (send via your domain)" → "customSmtp"
+//   "GDPR-compliant by default" → "gdprCompliantByDefault"
+function labelToSlug(label) {
+  // Strip parenthesised clarifications — they don't add meaning to the key.
+  const stripped = label.replace(/\s*\([^)]*\)/g, "");
+  // Split on non-alphanumeric, drop empties, camelCase
+  const words = stripped
+    .split(/[^a-zA-Z0-9]+/)
+    .filter((w) => w.length > 0);
+  if (words.length === 0) {
+    throw new Error(`Cannot derive slug from label: "${label}"`);
+  }
+  return words
+    .map((w, i) =>
+      i === 0
+        ? w.toLowerCase()
+        : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+    )
+    .join("");
+}
+
+// Full i18n key for a feature-label cell.
+//   featureKey("Core CRM", "Custom fields") → "pricing.feat.core.customFields"
+function featureKey(category, label) {
+  const sectionSlug = CATEGORY_TO_SLUG[category];
+  if (!sectionSlug) {
+    throw new Error(`No section slug for category "${category}"`);
+  }
+  return `pricing.feat.${sectionSlug}.${labelToSlug(label)}`;
+}
+
 // Categories that are NOT feature-table sections (skipped from
 // FEATURE_TABLE + Markdown tables). These rows are pricing metadata.
 const META_CATEGORIES = new Set(["Pricing"]);
@@ -210,9 +263,9 @@ function generateFeatureTableConstant(sections) {
     lines.push(`    titleKey: "${titleKey}",`);
     lines.push("    rows: [");
     for (const row of section.rows) {
-      const label = row.Feature.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+      const lblKey = featureKey(section.category, row.Feature);
       lines.push(
-        `      { label: "${label}", starter: ${cellToTs(
+        `      { labelKey: "${lblKey}", starter: ${cellToTs(
           row.Starter
         )}, pro: ${cellToTs(row.Professional)}, business: ${cellToTs(
           row.Business

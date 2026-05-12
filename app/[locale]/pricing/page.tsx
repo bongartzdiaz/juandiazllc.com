@@ -56,7 +56,11 @@ const TIERS: Tier[] = [
 const MOST_POPULAR_TIER: TierKey = "pro";
 
 type Cell = string | boolean;
-type FeatureRow = { label: string; starter: Cell; pro: Cell; business: Cell; enterprise: Cell };
+// labelKey is a `pricing.feat.<section>.<slug>` i18n key — see regen
+// script for slug derivation. Localised in lib/i18n/dict.ts per locale.
+// Cell values (e.g. "10 per entity", "Unlimited") stay raw for v1 —
+// they're data, not UI text.
+type FeatureRow = { labelKey: string; starter: Cell; pro: Cell; business: Cell; enterprise: Cell };
 type FeatureSection = { titleKey: string; rows: FeatureRow[] };
 
 // FEATURE_TABLE is regenerated from `_drafts/pricing/pricing-tiers.csv`
@@ -66,103 +70,103 @@ const FEATURE_TABLE: FeatureSection[] = [
   {
     titleKey: "pricing.sec.core",
     rows: [
-      { label: "Contacts", starter: true, pro: true, business: true, enterprise: true },
-      { label: "Deals and pipelines", starter: true, pro: true, business: true, enterprise: true },
-      { label: "Tasks and reminders", starter: true, pro: true, business: true, enterprise: true },
-      { label: "Notes and file attachments", starter: true, pro: true, business: true, enterprise: true },
-      { label: "Custom fields", starter: "10 per entity", pro: "50 per entity", business: "Unlimited", enterprise: "Unlimited" },
-      { label: "Bulk operations", starter: false, pro: true, business: true, enterprise: true },
-      { label: "Saved views and filters", starter: "5", pro: "Unlimited", business: "Unlimited", enterprise: "Unlimited" },
+      { labelKey: "pricing.feat.core.contacts", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.core.dealsAndPipelines", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.core.tasksAndReminders", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.core.notesAndFileAttachments", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.core.customFields", starter: "10 per entity", pro: "50 per entity", business: "Unlimited", enterprise: "Unlimited" },
+      { labelKey: "pricing.feat.core.bulkOperations", starter: false, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.core.savedViewsAndFilters", starter: "5", pro: "Unlimited", business: "Unlimited", enterprise: "Unlimited" },
     ],
   },
   {
     titleKey: "pricing.sec.calendar",
     rows: [
-      { label: "Google Calendar sync", starter: true, pro: true, business: true, enterprise: true },
-      { label: "Microsoft 365 Calendar sync", starter: true, pro: true, business: true, enterprise: true },
-      { label: "Real-time push sync", starter: false, pro: true, business: true, enterprise: true },
-      { label: "Meeting links on contact pages", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.calendar.googleCalendarSync", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.calendar.microsoft365CalendarSync", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.calendar.realTimePushSync", starter: false, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.calendar.meetingLinksOnContactPages", starter: true, pro: true, business: true, enterprise: true },
     ],
   },
   {
     titleKey: "pricing.sec.email",
     rows: [
-      { label: "Email templates", starter: "5", pro: "50", business: "Unlimited", enterprise: "Unlimited" },
-      { label: "Custom SMTP (send via your domain)", starter: false, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.email.emailTemplates", starter: "5", pro: "50", business: "Unlimited", enterprise: "Unlimited" },
+      { labelKey: "pricing.feat.email.customSmtp", starter: false, pro: true, business: true, enterprise: true },
     ],
   },
   {
     titleKey: "pricing.sec.ai",
     rows: [
-      { label: "AI lead scoring", starter: false, pro: true, business: true, enterprise: true },
-      { label: "AI contact attributes (auto-fill)", starter: false, pro: true, business: true, enterprise: true },
-      { label: "AI deal summaries", starter: false, pro: false, business: true, enterprise: true },
-      { label: "AI task suggestions", starter: false, pro: false, business: true, enterprise: true },
+      { labelKey: "pricing.feat.ai.aiLeadScoring", starter: false, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.ai.aiContactAttributes", starter: false, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.ai.aiDealSummaries", starter: false, pro: false, business: true, enterprise: true },
+      { labelKey: "pricing.feat.ai.aiTaskSuggestions", starter: false, pro: false, business: true, enterprise: true },
     ],
   },
   {
     titleKey: "pricing.sec.security",
     rows: [
-      { label: "Two-factor authentication", starter: true, pro: true, business: true, enterprise: true },
-      { label: "Role-based access control", starter: true, pro: true, business: true, enterprise: true },
-      { label: "Audit log retention", starter: "30 days", pro: "1 year", business: "Unlimited", enterprise: "Unlimited" },
-      { label: "IP allowlist", starter: false, pro: false, business: true, enterprise: true },
-      { label: "SSO (SAML 2.0)", starter: false, pro: false, business: true, enterprise: true },
+      { labelKey: "pricing.feat.security.twoFactorAuthentication", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.security.roleBasedAccessControl", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.security.auditLogRetention", starter: "30 days", pro: "1 year", business: "Unlimited", enterprise: "Unlimited" },
+      { labelKey: "pricing.feat.security.ipAllowlist", starter: false, pro: false, business: true, enterprise: true },
+      { labelKey: "pricing.feat.security.sso", starter: false, pro: false, business: true, enterprise: true },
     ],
   },
   {
     titleKey: "pricing.sec.compliance",
     rows: [
-      { label: "GDPR-compliant by default", starter: true, pro: true, business: true, enterprise: true },
-      { label: "EU-only data residency", starter: true, pro: true, business: true, enterprise: true },
-      { label: "DPA available on signup", starter: true, pro: true, business: true, enterprise: true },
-      { label: "DSAR export (JSON)", starter: true, pro: true, business: true, enterprise: true },
-      { label: "Country-of-choice data residency", starter: false, pro: false, business: false, enterprise: true },
-      { label: "Custom DPA negotiation", starter: false, pro: false, business: false, enterprise: true },
+      { labelKey: "pricing.feat.compliance.gdprCompliantByDefault", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.compliance.euOnlyDataResidency", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.compliance.dpaAvailableOnSignup", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.compliance.dsarExport", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.compliance.countryOfChoiceDataResidency", starter: false, pro: false, business: false, enterprise: true },
+      { labelKey: "pricing.feat.compliance.customDpaNegotiation", starter: false, pro: false, business: false, enterprise: true },
     ],
   },
   {
     titleKey: "pricing.sec.branding",
     rows: [
-      { label: "Custom logo", starter: false, pro: true, business: true, enterprise: true },
-      { label: "Custom colours and theme", starter: false, pro: false, business: true, enterprise: true },
-      { label: "White-label (no DEUS branding)", starter: false, pro: false, business: false, enterprise: true },
-      { label: "Custom domain", starter: false, pro: false, business: false, enterprise: true },
+      { labelKey: "pricing.feat.branding.customLogo", starter: false, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.branding.customColoursAndTheme", starter: false, pro: false, business: true, enterprise: true },
+      { labelKey: "pricing.feat.branding.whiteLabel", starter: false, pro: false, business: false, enterprise: true },
+      { labelKey: "pricing.feat.branding.customDomain", starter: false, pro: false, business: false, enterprise: true },
     ],
   },
   {
     titleKey: "pricing.sec.integrations",
     rows: [
-      { label: "CSV import (up to 10k rows)", starter: true, pro: true, business: true, enterprise: true },
-      { label: "Outbound webhooks", starter: false, pro: true, business: true, enterprise: true },
-      { label: "REST API access", starter: false, pro: true, business: true, enterprise: true },
-      { label: "Custom integrations (built for you)", starter: false, pro: false, business: false, enterprise: true },
+      { labelKey: "pricing.feat.integrations.csvImport", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.integrations.outboundWebhooks", starter: false, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.integrations.restApiAccess", starter: false, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.integrations.customIntegrations", starter: false, pro: false, business: false, enterprise: true },
     ],
   },
   {
     titleKey: "pricing.sec.support",
     rows: [
-      { label: "Email support (24 hour response)", starter: true, pro: false, business: false, enterprise: false },
-      { label: "Priority email (4 hour business hours)", starter: false, pro: true, business: true, enterprise: false },
-      { label: "Private Slack channel", starter: false, pro: false, business: true, enterprise: true },
-      { label: "Phone support", starter: false, pro: false, business: false, enterprise: true },
-      { label: "Uptime SLA", starter: false, pro: false, business: "99.5%", enterprise: "99.95%" },
+      { labelKey: "pricing.feat.support.emailSupport", starter: true, pro: false, business: false, enterprise: false },
+      { labelKey: "pricing.feat.support.priorityEmail", starter: false, pro: true, business: true, enterprise: false },
+      { labelKey: "pricing.feat.support.privateSlackChannel", starter: false, pro: false, business: true, enterprise: true },
+      { labelKey: "pricing.feat.support.phoneSupport", starter: false, pro: false, business: false, enterprise: true },
+      { labelKey: "pricing.feat.support.uptimeSla", starter: false, pro: false, business: "99.5%", enterprise: "99.95%" },
     ],
   },
   {
     titleKey: "pricing.sec.limits",
     rows: [
-      { label: "Contacts", starter: "5,000", pro: "50,000", business: "Unlimited", enterprise: "Unlimited" },
-      { label: "Deals", starter: "1,000", pro: "25,000", business: "Unlimited", enterprise: "Unlimited" },
-      { label: "Storage", starter: "5 GB", pro: "50 GB", business: "500 GB", enterprise: "Custom" },
-      { label: "API requests per month", starter: false, pro: "10,000", business: "100,000", enterprise: "Custom" },
+      { labelKey: "pricing.feat.limits.contacts", starter: "5,000", pro: "50,000", business: "Unlimited", enterprise: "Unlimited" },
+      { labelKey: "pricing.feat.limits.deals", starter: "1,000", pro: "25,000", business: "Unlimited", enterprise: "Unlimited" },
+      { labelKey: "pricing.feat.limits.storage", starter: "5 GB", pro: "50 GB", business: "500 GB", enterprise: "Custom" },
+      { labelKey: "pricing.feat.limits.apiRequestsPerMonth", starter: false, pro: "10,000", business: "100,000", enterprise: "Custom" },
     ],
   },
   {
     titleKey: "pricing.sec.infrastructure",
     rows: [
-      { label: "Shared multi-tenant (Hetzner Falkenstein)", starter: true, pro: true, business: true, enterprise: false },
-      { label: "Dedicated server", starter: false, pro: false, business: false, enterprise: true },
+      { labelKey: "pricing.feat.infrastructure.sharedMultiTenant", starter: true, pro: true, business: true, enterprise: false },
+      { labelKey: "pricing.feat.infrastructure.dedicatedServer", starter: false, pro: false, business: false, enterprise: true },
     ],
   },
 ];
@@ -370,7 +374,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
                 <tbody>
                   {section.rows.map((row, i) => (
                     <tr key={i} style={{ borderBottom: "1px solid var(--line-soft, var(--line))" }}>
-                      <td style={{ padding: "10px 8px", color: "var(--text)" }}>{row.label}</td>
+                      <td style={{ padding: "10px 8px", color: "var(--text)" }}>{t(row.labelKey)}</td>
                       <td style={{ padding: "10px 8px", textAlign: "center", color: "var(--muted)" }}>{renderCell(row.starter)}</td>
                       <td
                         style={{
