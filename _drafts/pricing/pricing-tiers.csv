@@ -1,0 +1,52 @@
+Category,Feature,Starter,Professional,Business,Enterprise
+Pricing,Price per seat per month (monthly billing),€40,€69,€99,Contact us
+Pricing,Price per seat per month (annual billing -20%),€32,€55,€79,Contact us
+Pricing,Minimum seats,3,5,10,15
+Pricing,Free trial (no credit card),14 days,14 days,14 days,Custom
+Core CRM,Contacts,✓,✓,✓,✓
+Core CRM,Deals and pipelines,✓,✓,✓,✓
+Core CRM,Tasks and reminders,✓,✓,✓,✓
+Core CRM,Notes and file attachments,✓,✓,✓,✓
+Core CRM,Custom fields,10 per entity,50 per entity,Unlimited,Unlimited
+Core CRM,Bulk operations,,✓,✓,✓
+Core CRM,Saved views and filters,5,Unlimited,Unlimited,Unlimited
+Calendar,Google Calendar sync,✓,✓,✓,✓
+Calendar,Microsoft 365 Calendar sync,✓,✓,✓,✓
+Calendar,Real-time push sync,,✓,✓,✓
+Calendar,Meeting links on contact pages,✓,✓,✓,✓
+Email,Email templates,5,50,Unlimited,Unlimited
+Email,Custom SMTP (send via your domain),,✓,✓,✓
+AI,AI lead scoring,,✓,✓,✓
+AI,AI contact attributes (auto-fill),,✓,✓,✓
+AI,AI deal summaries,,,✓,✓
+AI,AI task suggestions,,,✓,✓
+Security,Two-factor authentication,✓,✓,✓,✓
+Security,Role-based access control,✓,✓,✓,✓
+Security,Audit log retention,30 days,1 year,Unlimited,Unlimited
+Security,IP allowlist,,,✓,✓
+Security,SSO (SAML 2.0),,,✓,✓
+Compliance,GDPR-compliant by default,✓,✓,✓,✓
+Compliance,EU-only data residency,✓,✓,✓,✓
+Compliance,DPA available on signup,✓,✓,✓,✓
+Compliance,DSAR export (JSON),✓,✓,✓,✓
+Compliance,Country-of-choice data residency,,,,✓
+Compliance,Custom DPA negotiation,,,,✓
+Branding,Custom logo,,✓,✓,✓
+Branding,Custom colours and theme,,,✓,✓
+Branding,White-label (no DEUS branding),,,,✓
+Branding,Custom domain,,,,✓
+Integrations,CSV import (up to 10k rows),✓,✓,✓,✓
+Integrations,Outbound webhooks,,✓,✓,✓
+Integrations,REST API access,,✓,✓,✓
+Integrations,Custom integrations (built for you),,,,✓
+Support,Email support (24 hour response),✓,,,
+Support,Priority email (4 hour business hours),,✓,✓,
+Support,Private Slack channel,,,✓,✓
+Support,Phone support,,,,✓
+Support,Uptime SLA,,,99.5%,99.95%
+Limits,Contacts,5000,50000,Unlimited,Unlimited
+Limits,Deals,1000,25000,Unlimited,Unlimited
+Limits,Storage,5 GB,50 GB,500 GB,Custom
+Limits,API requests per month,,10000,100000,Custom
+Infrastructure,Shared multi-tenant (Hetzner Falkenstein),✓,✓,✓,
+Infrastructure,Dedicated server,,,,✓
