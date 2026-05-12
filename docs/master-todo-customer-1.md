@@ -1,8 +1,10 @@
 # Master TODO — pad naar customer #1 (Di 2026-05-19)
 
-Stand: na sessie 2026-05-08e (28 commits geshipped, pricing volledig
-4-talig, alle customer-#1 docs af). Vandaag is Do 2026-05-08. Customer
-#1 over **11 dagen**.
+Stand: na sessie 2026-05-08f (**30 commits** geshipped, pricing
+volledig 4-talig, alle customer-#1 docs af, vooruit-bake batch
+inclusief welkomstmail NL+EN, side letter NL, support-templates,
+deliverability-checklist). Vandaag is Do 2026-05-08. Customer #1
+over **11 dagen**.
 
 Onderverdeling per **tijdvenster** + **eigenaar**. Niet per categorie.
 Beweeg van boven naar onder; alles boven jouw huidige tijd is af of
@@ -18,9 +20,18 @@ loopt vandaag.
       execution-plan, audit-script, rehearsal-runbook)
 - ✅ Pricing-page LIVE in 4 locales, 100% native vertaald
 - ✅ Pricing regen-pipeline (CSV → TS + Markdown)
-- ✅ Side-letter draft (€99 lifetime lock template)
+- ✅ Side-letter draft EN (€99 lifetime lock template)
+- ✅ **Side-letter NL-vertaling** (commit 98cca0d) — jurist-review nodig
+- ✅ **Welkomstmail Mail A NL+EN** (commit 98cca0d, TODOs in te vullen
+      maandag-vóór-21:00)
+- ✅ **Welkomstmail Mail B NL+EN** (commit 98cca0d, uitstel-pad)
+- ✅ **10 support email-templates NL+EN** (commit 98cca0d, week-1 t/m
+      maand-1 ready-to-tweak)
+- ✅ **Email deliverability checklist** (commit 98cca0d, 9-dag warm-up
+      plan starting vrijdag)
 - ✅ Hetzner cutover-runbook + rollback-condities
 - ✅ Vrijdag execution-plan + preview-audit-script
+- ✅ Master-todo (dit document)
 
 ---
 
@@ -42,10 +53,17 @@ loopt vandaag.
 | 2 | 90 min audit per `docs/preview-audit-script-2026-05-09.md` | binnen 4u | Juan |
 | 3 | Issue-log invullen tijdens elke fase | doorlopend | Juan |
 | 4 | 12:00–12:30: pricing-beslissing definitief | 30 min | Juan |
-| 5 | 12:30–13:00: customer-mail concept (Mail A go vs Mail B uitstel) | 30 min | Juan |
+| 5 | 12:30–13:00: Mail A vs Mail B keuze (op basis van issue-count) | 30 min | Juan |
 | 6 | Beslis: "Most popular"-tier — Pro (huidig) of Business? | 5 min | Juan |
 | 7 | Hash 1-regel update | 2 min | Juan |
-| 8 | **Niet 's avonds verder werken** | — | Juan |
+| 8 | **🔴 13:00–14:00 KRITISCH: DNS-setup hello@lucen.ai per `docs/email-deliverability-checklist.md`** sectie 1 (SPF + 2× DKIM + DMARC). Resend dashboard domain-verify. | 60 min | Juan |
+| 9 | 14:00 baseline mail-tester.com test (verwacht 8-9; tegen do 9-10 na warm-up) | 10 min | Juan |
+| 10 | **Niet 's avonds verder werken** | — | Juan |
+
+**Waarom DNS vrijdag, niet later:** customer #1 welkomstmail moet
+maandag 18 mei 21:00 niet in spam landen. Resend SPF/DKIM/DMARC
+heeft 9-dagen warm-up nodig voor sender-reputation. Setup vrijdag
+= klaar maandag. Setup zaterdag of later = te krap.
 
 **Issue-triage matrix:**
 - 0 KRIT + HIGH → Mail A (go pad)
@@ -59,11 +77,12 @@ loopt vandaag.
 | # | Actie | Tijd | Eigenaar |
 |---|---|---|---|
 | 1 | Legal entity beslissen: confirmeer Juan Diaz LLC of NL-BV | 30 min | Juan |
-| 2 | KvK + adres invullen in 4 _drafts/legal/ docs | 15 min | Juan |
-| 3 | Side letter naar bedrijfsjurist sturen voor review (€150-300) | 10 min | Juan |
+| 2 | KvK + adres invullen in 5 _drafts/legal/ docs (incl. side letter NL) | 15 min | Juan |
+| 3 | Side letter EN+NL naar bedrijfsjurist sturen voor review (€150-300) | 10 min | Juan |
 | 4 | Backup-restore drill (1 uur) — bewijs dat je data terug kunt halen | 1u | Juan |
 | 5 | Hetzner GEX44 status checken — provisioned + SSH-key in Robot | 15 min | Juan |
 | 6 | DNS-TTL voor cutover-records verlagen naar 300s | 10 min | Juan |
+| 7 | Per deliverability-checklist sectie 5: stuur 4-5 warm-up mails (test naar Gmail/Outlook + reply) | 20 min | Juan |
 
 ---
 
@@ -71,13 +90,14 @@ loopt vandaag.
 
 | # | Actie | Tijd | Eigenaar |
 |---|---|---|---|
-| 1 | Side letter terug van jurist, redlines verwerken | 1-2u | Juan |
+| 1 | Side letter EN+NL terug van jurist, redlines verwerken | 1-2u | Juan |
 | 2 | LinkedIn launch-post finetuning (NL+EN concept klaar) | 30 min | Juan |
 | 3 | DEUS-SHARED PR #1 mergen (Hash review) | 10 min | Hash |
 | 4 | PR #12 mergen wanneer pricing-keuze definitief | 5 min | Juan |
-| 5 | Welkomstmail customer #1 finaliseren | 30 min | Juan |
+| 5 | Welkomstmail Mail A invullen TODOs (Calendly, phone, klant-naam) | 10 min | Juan |
 | 6 | "Most popular"-tier-vlip implementeren als beslist (1-regel-change) | 5 min | Juan |
 | 7 | Mail naar legal entity-prospect (BV-oprichting) als nog niet | 1u | Juan |
+| 8 | Daily warm-up mails per deliverability-checklist | 5 min/dag | Juan |
 
 ---
 
@@ -92,6 +112,8 @@ loopt vandaag.
 | 5 | Status-pagina op "Scheduled maintenance Friday 21:00" | 5 min | Juan |
 | 6 | Hash SMS-bereikbaarheid bevestigd voor cutover-venster | 2 min | Juan |
 | 7 | Alle env vars in `MANUAL_TASKS.md` afgevinkt | 15 min | Juan |
+| 8 | mail-tester.com test op welkomstmail-content: score ≥9/10 | 10 min | Juan |
+| 9 | Welkomstmail naar 3 inbox-types (Gmail/Outlook/corporate) — moet in inbox, niet spam | 10 min | Juan |
 
 ---
 
@@ -122,9 +144,10 @@ krijgt NIETS over het cutover-venster (irrelevante details).
 | # | Actie | Tijd | Eigenaar |
 |---|---|---|---|
 | 1 | Smoke-test productie-omgeving (login, deal-create, OAuth) | 1u | Juan |
-| 2 | Welkomstmail naar customer #1 finaliseren | 30 min | Juan |
-| 3 | First-10-FAQ link in welkomstmail | 5 min | Juan |
+| 2 | Welkomstmail Mail A: laatste TODOs invullen (Calendly + phone + klant-naam) | 10 min | Juan |
+| 3 | Side letter NL: laatste check + PDF maken | 15 min | Juan |
 | 4 | Customer-#1 contact-info bevestigd (telefoon, email) | 5 min | Juan |
+| 5 | Final mail-tester.com test (target ≥9 want maandag avond send) | 10 min | Juan |
 
 ---
 
@@ -226,15 +249,20 @@ Vier beslissingen die **vóór** een specifieke datum moeten vallen:
 - `docs/launch-execution-plan-2026-05-09.md` ← VRIJDAG
 - `docs/preview-audit-script-2026-05-09.md` ← VRIJDAG
 - `docs/customer-1-onboarding-rehearsal.md` ← VRIJDAG context
+- `docs/email-deliverability-checklist.md` ← **VR 13:00 START**
 - `docs/hetzner-cutover-runbook.md` ← VR 15 MEI 21:00
 - `docs/customer-1-first-day-script.md` ← DI 19 MEI 09:00
 - `_drafts/operator/support-runbook-first-30d.md` ← 19 MEI t/m 18 JUN
+- `_drafts/operator/support-email-templates.md` ← 19 MEI t/m doorlopend
 
-### Customer-facing (klant zie)
-- `_drafts/onboarding/welcome-email.md` ← MA 18 MEI 21:00
-- `_drafts/onboarding/first-questions-customer-en.md` ← in welkomstmail
+### Customer-facing (klant ziet)
+- `_drafts/onboarding/welcome-email-mail-a.md` ← MA 18 MEI 21:00 (go-pad)
+- `_drafts/onboarding/welcome-email-mail-b.md` ← MA 18 MEI 21:00 (uitstel-pad)
+- `_drafts/onboarding/welcome-email.md` ← (oude versie, vervangen door mail-a/b)
+- `_drafts/onboarding/first-questions-customer-en.md` ← link in welkomstmail
 - `app/[locale]/pricing/page.tsx` ← live op site
-- `_drafts/legal/beta-side-letter-en.md` ← lawyer-review
+- `_drafts/legal/beta-side-letter-en.md` ← jurist-review
+- `_drafts/legal/beta-side-letter-nl.md` ← jurist-review + voor NL-klant
 
 ### Strategy + data
 - `_drafts/pricing/pricing-tiers.csv` ← bron-of-truth, in Sheets
