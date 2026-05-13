@@ -1,0 +1,474 @@
+{
+  "nav": {
+    "core": "Core",
+    "tools": "Tools",
+    "system": "System",
+    "dashboard": "Panel",
+    "projects": "Proyectos",
+    "contacts": "Contactos",
+    "impact": "Impacto",
+    "market": "Market",
+    "reports": "Informes",
+    "dealsBoard": "Deals Board",
+    "deals": "Deals",
+    "calendar": "Calendar",
+    "timeline": "Timeline",
+    "documents": "Documents",
+    "properties": "Properties",
+    "showings": "Showings",
+    "offers": "Offers",
+    "openHouses": "Open Houses",
+    "commissions": "Commissions",
+    "dripCampaigns": "Drip Campaigns",
+    "marketAnalytics": "Market Analytics",
+    "rooms": "Habitaciones",
+    "grants": "Grants",
+    "volunteers": "Volunteers",
+    "donors": "Donors",
+    "webhooks": "Webhooks",
+    "notifications": "Notifications",
+    "automations": "Automations",
+    "auditLog": "Audit Log",
+    "settings": "Ajustes",
+    "kanban": "Kanban",
+    "pages": "Páginas",
+    "aiInsights": "AI Insights",
+    "aiScoring": "Lead Scoring",
+    "aiAsk": "Ask AI",
+    "reservations": "Reservas",
+    "board": "Board",
+    "inbox": "Inbox",
+    "templates": "Templates",
+    "actionPlans": "Action Plans",
+    "transactions": "Transactions",
+    "leadScores": "Lead Scores",
+    "scoringRules": "Scoring Rules",
+    "leadRouting": "Lead Routing",
+    "dialer": "Power Dialer",
+    "referrals": "Referrals",
+    "soi": "SOI",
+    "cma": "CMA Reports",
+    "clientPortal": "Client Portal",
+    "eSignatures": "E-Signatures",
+    "email": "Email",
+    "sms": "SMS",
+    "integrations": "Integrations"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "subtitle": "Tu impacto de un vistazo",
+    "totalProjects": "Proyectos totales",
+    "activeProjects": "Proyectos activos",
+    "peopleHelped": "Personas ayudadas",
+    "co2Reduced": "CO2 reducido",
+    "moneyDonated": "Total donado",
+    "sdgCoverage": "Cobertura ODS",
+    "recentActivity": "Actividad reciente",
+    "impactOverview": "Resumen de impacto",
+    "editDashboard": "Editar panel",
+    "addWidget": "Añadir widget"
+  },
+  "projects": {
+    "title": "Proyectos",
+    "titleRE": "Properties",
+    "titleHOS": "Venues & Rooms",
+    "subtitle": "Gestiona tus iniciativas de RSC",
+    "subtitleRE": "Manage your portfolio",
+    "subtitleHOS": "Manage your properties",
+    "newProject": "Nuevo Proyecto",
+    "newProjectRE": "New Property",
+    "newProjectHOS": "New Room",
+    "searchPlaceholder": "Search projects...",
+    "searchPlaceholderRE": "Search properties...",
+    "searchPlaceholderHOS": "Search rooms & venues...",
+    "gridView": "Grid view",
+    "listView": "List view",
+    "all": "All",
+    "createdSuccess": "Project created successfully",
+    "createFailed": "Failed to create project",
+    "status": {
+      "planned": "Planificado",
+      "active": "Activo",
+      "completed": "Completado",
+      "paused": "Pausado"
+    },
+    "fields": {
+      "title": "Título del proyecto",
+      "description": "Descripción",
+      "category": "Categoría",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de fin",
+      "budget": "Presupuesto",
+      "sdgGoals": "Objetivos ODS",
+      "status": "Estado"
+    }
+  },
+  "contacts": {
+    "title": "Contactos",
+    "subtitle": "Socios, donantes y partes interesadas",
+    "subtitleRE": "Buyers, sellers & investors",
+    "subtitleHOS": "Guests, vendors & partners",
+    "newContact": "Nuevo Contacto",
+    "searchPlaceholder": "Search contacts...",
+    "all": "All",
+    "createdSuccess": "Contact created successfully",
+    "createFailed": "Failed to create contact",
+    "types": {
+      "partner": "Socio",
+      "beneficiary": "Beneficiario",
+      "stakeholder": "Parte interesada",
+      "donor": "Donante",
+      "buyer": "Buyer",
+      "seller": "Seller",
+      "tenant": "Tenant",
+      "landlord": "Landlord",
+      "investor": "Investor",
+      "guest": "Guest",
+      "vendor": "Vendor",
+      "staff": "Staff"
+    },
+    "fields": {
+      "name": "Nombre",
+      "email": "Correo",
+      "phone": "Teléfono",
+      "company": "Empresa",
+      "type": "Tipo",
+      "notes": "Notas"
+    }
+  },
+  "deals": {
+    "title": "Deals",
+    "subtitle": "Track and manage your deal pipeline",
+    "totalValue": "Total Value",
+    "openDeals": "Open Deals",
+    "won": "Won",
+    "avgProbability": "Avg Probability",
+    "allPipelines": "All Pipelines",
+    "allStatuses": "All Statuses",
+    "deal": "Deal",
+    "stage": "Stage",
+    "value": "Value",
+    "probability": "Prob.",
+    "contact": "Contact",
+    "status": "Status",
+    "noneFound": "No deals found. Create a pipeline first.",
+    "open": "Open",
+    "lost": "Lost"
+  },
+  "properties": {
+    "title": "Properties",
+    "subtitle": "Manage your real estate listings",
+    "totalProperties": "Total Properties",
+    "portfolioValue": "Portfolio Value",
+    "available": "Available",
+    "totalViewings": "Total Viewings",
+    "searchPlaceholder": "Search properties..."
+  },
+  "showings": {
+    "title": "Visitas",
+    "subtitle": "Programa y sigue visitas a inmuebles",
+    "totalShowings": "Total Showings",
+    "scheduled": "Scheduled",
+    "completed": "Completed",
+    "avgRating": "Avg Rating",
+    "property": "Property",
+    "dateTime": "Date/Time",
+    "agent": "Agent",
+    "contact": "Contact",
+    "rating": "Rating",
+    "status": "Status",
+    "noneYet": "No showings scheduled yet.",
+    "cancelled": "Cancelled",
+    "noShow": "No Show"
+  },
+  "offers": {
+    "title": "Ofertas",
+    "subtitle": "Sigue las ofertas de compradores y contraofertas",
+    "totalOfferValue": "Total Offer Value",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "acceptRate": "Accept Rate",
+    "buyer": "Buyer",
+    "amount": "Amount",
+    "date": "Date",
+    "status": "Status",
+    "noneYet": "No offers yet.",
+    "rejected": "Rejected",
+    "countered": "Countered",
+    "withdrawn": "Withdrawn",
+    "expired": "Expired"
+  },
+  "openHouses": {
+    "title": "Jornadas de puertas abiertas",
+    "subtitle": "Programa y gestiona jornadas de puertas abiertas",
+    "totalEvents": "Total Events",
+    "upcoming": "Upcoming",
+    "totalVisitors": "Total Visitors",
+    "avgVisitors": "Avg Visitors",
+    "property": "Property",
+    "date": "Date",
+    "time": "Time",
+    "host": "Host",
+    "visitors": "Visitors",
+    "noneYet": "No open houses scheduled."
+  },
+  "commissions": {
+    "title": "Comisiones",
+    "subtitle": "Seguimiento de comisiones y clasificación del equipo",
+    "ytdTeamGci": "YTD Team GCI",
+    "totalNet": "Total Net",
+    "pendingPayouts": "Pending Payouts",
+    "teamMembers": "Team Members",
+    "teamLeaderboard": "Team Leaderboard",
+    "commissionRecords": "Commission Records",
+    "rank": "#",
+    "agent": "Agent",
+    "deals": "Deals",
+    "won": "Won",
+    "month": "Month",
+    "volume": "Volume",
+    "ytdGci": "YTD GCI",
+    "convRate": "Conv %",
+    "noTeamData": "No team data yet.",
+    "type": "Type / Notes",
+    "gross": "Gross",
+    "splitPct": "Split %",
+    "net": "Net",
+    "status": "Status",
+    "noRecords": "No commission records.",
+    "paid": "Paid",
+    "voided": "Voided"
+  },
+  "dripCampaigns": {
+    "title": "Drip Campaigns",
+    "subtitle": "Automated email and SMS sequences",
+    "totalCampaigns": "Total Campaigns",
+    "active": "Active",
+    "totalSteps": "Total Steps",
+    "types": "Types",
+    "allTypes": "All Types",
+    "allStatuses": "All Statuses",
+    "paused": "Paused",
+    "draft": "Draft",
+    "completed": "Completed",
+    "noSteps": "No steps configured",
+    "noneFound": "No campaigns found.",
+    "buyerNurture": "Buyer Nurture",
+    "sellerNurture": "Seller Nurture",
+    "newListing": "New Listing",
+    "openHouseFollowUp": "Open House Follow-up",
+    "homeAnniversary": "Home Anniversary",
+    "referralRequest": "Referral Request",
+    "justSold": "Just Sold",
+    "marketUpdate": "Market Update"
+  },
+  "marketAnalytics": {
+    "title": "Market Analytics",
+    "subtitle": "Real estate market data and trends",
+    "medianPrice": "Median Price",
+    "avgDaysOnMarket": "Avg Days on Market",
+    "ytdClosedSales": "YTD Closed Sales",
+    "avgInventory": "Avg Inventory",
+    "filterByZip": "Filter by ZIP...",
+    "zip": "ZIP",
+    "month": "Month",
+    "dom": "DOM",
+    "active": "Active",
+    "closed": "Closed",
+    "new": "New",
+    "sqft": "$/SqFt",
+    "inventory": "Inventory",
+    "noData": "No market data available. Add data via API.",
+    "hotMarket": "Hot Market (<3 mo inventory)",
+    "balanced": "Balanced (3-6 mo)",
+    "coolMarket": "Cool Market (>6 mo)"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unread": "unread",
+    "markAllRead": "Mark all as read",
+    "noneYet": "No notifications yet."
+  },
+  "automations": {
+    "title": "Automatizaciones",
+    "subtitle": "Reglas basadas en eventos para automatizar flujos de trabajo",
+    "totalRules": "Total Rules",
+    "active": "Active",
+    "totalRuns": "Total Runs"
+  },
+  "audit": {
+    "title": "Audit Log",
+    "subtitle": "Track all system changes"
+  },
+  "documents": {
+    "title": "Documents",
+    "subtitle": "Manage files and documents"
+  },
+  "impact": {
+    "title": "Impacto",
+    "subtitle": "Mide lo que importa",
+    "totalImpact": "Impacto total",
+    "byProject": "Por proyecto",
+    "sdgAlignment": "Alineación con ODS",
+    "trends": "Tendencias"
+  },
+  "kanban": {
+    "title": "Kanban",
+    "subtitle": "Gestión visual de proyectos",
+    "newBoard": "Nuevo tablero",
+    "addColumn": "Añadir columna",
+    "addCard": "Añadir tarjeta"
+  },
+  "rooms": {
+    "title": "Rooms",
+    "subtitle": "Manage hotel rooms and availability"
+  },
+  "grants": {
+    "title": "Subvenciones",
+    "subtitle": "Sigue solicitudes de subvención y financiación"
+  },
+  "volunteers": {
+    "title": "Voluntarios",
+    "subtitle": "Gestiona el equipo de voluntarios y horas"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account and preferences",
+    "language": "Language",
+    "theme": "Theme",
+    "profile": "Profile",
+    "organization": "Organization",
+    "preferences": "Preferences",
+    "apiKeys": "API Keys",
+    "goals": "Goals",
+    "integrations": "Integrations",
+    "units": "Units & Currency",
+    "unitSystem": "Measurement System",
+    "metric": "Metric (m², km, °C)",
+    "imperial": "Imperial (sqft, mi, °F)",
+    "currency": "Currency",
+    "currencyDefault": "Default currency for all monetary values"
+  },
+  "inbox": {
+    "title": "Bandeja de entrada",
+    "subtitle": "Bandeja unificada para correo, SMS, WhatsApp y teléfono"
+  },
+  "templates": {
+    "title": "Templates",
+    "subtitle": "Email and SMS template library"
+  },
+  "actionPlans": {
+    "title": "Action Plans",
+    "subtitle": "Automated action sequences"
+  },
+  "transactions": {
+    "title": "Transactions",
+    "subtitle": "Track real estate transactions"
+  },
+  "leadScores": {
+    "title": "Lead Scores",
+    "subtitle": "Contact scoring dashboard"
+  },
+  "scoringRules": {
+    "title": "Scoring Rules",
+    "subtitle": "Configure lead scoring rules"
+  },
+  "leadRouting": {
+    "title": "Lead Routing",
+    "subtitle": "Route leads to agents"
+  },
+  "dialer": {
+    "title": "Marcador automático",
+    "subtitle": "Cola de llamadas, listas de marcación e historial"
+  },
+  "referrals": {
+    "title": "Referencias",
+    "subtitle": "Sigue las comisiones de referencias y socios"
+  },
+  "soi": {
+    "title": "Sphere of Influence",
+    "subtitle": "Manage your SOI categories"
+  },
+  "cma": {
+    "title": "CMA Reports",
+    "subtitle": "Comparative market analysis"
+  },
+  "clientPortal": {
+    "title": "Client Portal",
+    "subtitle": "Manage client portal access"
+  },
+  "eSignatures": {
+    "title": "Firmas electrónicas",
+    "subtitle": "Sigue y solicita firmas en contratos"
+  },
+  "welcome": {
+    "stepLabel": "Paso {n} de {total}",
+    "step1": {
+      "eyebrow": "Bienvenido",
+      "title": "Configuremos tu workspace.",
+      "ledeNew": "Dos minutos y estás dentro. Creamos tu workspace y empezamos tu prueba de 14 días.",
+      "ledeExisting": "Parece que aún no tienes una organización — vamos a solucionarlo.",
+      "planLabel": "Plan seleccionado",
+      "changePlan": "Cambiar",
+      "cta": "Empezar"
+    },
+    "step2": {
+      "eyebrow": "Tu workspace",
+      "title": "Nombre + vertical",
+      "lede": "Puedes cambiar ambos más tarde en /philly/settings. La vertical oculta los módulos que no usarás — elige el que esté más cerca de tu día a día.",
+      "nameLabel": "Nombre del workspace",
+      "namePlaceholder": "Acme Energia SL",
+      "verticalLabel": "Vertical",
+      "ctaCreate": "Crear workspace",
+      "ctaBack": "Atrás",
+      "ctaCreating": "Creando…",
+      "errorEmptyName": "Por favor, introduce un nombre de workspace.",
+      "errorFailed": "Fallido ({status}) — inténtalo de nuevo.",
+      "errorNetwork": "Error de red"
+    },
+    "step3": {
+      "eyebrow": "Workspace listo",
+      "title": "{name} está activo.",
+      "lede": "Estás registrado como admin. Tu prueba {plan} de 14 días acaba de empezar — sin tarjeta. Conecta Stripe Checkout cuando quieras continuar más allá del día 14.",
+      "ctaOpen": "Abrir dashboard",
+      "ctaCheckout": "Iniciar Stripe checkout",
+      "workspaceUrlLabel": "URL del workspace",
+      "slugLabel": "Slug"
+    },
+    "industries": {
+      "general": "General",
+      "realestate": "Inmobiliario",
+      "hospitality": "Hostelería",
+      "energy": "Energía",
+      "csr": "Impacto / RSC"
+    },
+    "alerts": {
+      "stripeNotConfigured": "Stripe checkout aún no está configurado en este despliegue ({status}). La prueba sigue funcionando; operaciones conectará los price-IDs.",
+      "checkoutNetworkError": "Error de red al iniciar checkout. Inténtalo de nuevo desde /philly/settings."
+    }
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Añadir",
+    "search": "Buscar...",
+    "filter": "Filtrar",
+    "noResults": "No se encontraron resultados",
+    "loading": "Cargando...",
+    "viewAll": "Ver todo",
+    "back": "Atrás",
+    "allStatuses": "All Statuses",
+    "created": "Created",
+    "signOut": "Sign out",
+    "live": "LIVE",
+    "sync": "Sync",
+    "syncing": "Syncing...",
+    "done": "Done",
+    "step": "step",
+    "steps": "steps",
+    "unassigned": "Unassigned",
+    "mode": "Mode"
+  }
+}
