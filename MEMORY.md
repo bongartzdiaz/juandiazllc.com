@@ -1,6 +1,6 @@
 # Memory — pickup-tomorrow quick-reference
 
-Last touched: **2026-05-06**, end of Bundle CZ (session 3).
+Last touched: **2026-05-07**, end of Bundle DL (session 4).
 
 If you are picking this project up after a break, read this file
 first, then `JOURNEY.md` for context, then `CLAUDE.md` for the full
@@ -13,7 +13,7 @@ session log.
 | Item | State |
 | ---- | ----- |
 | Current branch | `claude/ai-command-bar` |
-| Branch HEAD | `a56c3ce` (Bundle CZ — onboarding wizard) |
+| Branch HEAD | `dd1e519` (Bundle DL — root /philly 4-locale parity) |
 | Production branch | `main` (NOT yet updated — PR #10 open, awaiting merge) |
 | PR #10 | <https://github.com/bongartzdiaz/juandiazllc.com/pull/10> — description rewritten to reflect launch-release scope |
 | Test counts | 617/617 standalone + 290/290 root, both green |
@@ -29,6 +29,75 @@ session log.
 | Vercel preview | builds on every push to `claude/ai-command-bar` |
 
 ---
+
+## Bundles shipped session 4 (2026-05-07)
+
+Closed every remaining launch-readiness gap I could solve from a
+remote sandbox. Self-service flow → onboarding → billing →
+monitoring → retention → email-confirm → demo seed → 4-locale
+parity. Everything left on the launch path is operator-side
+(secrets, legal review, backup drill, first-customer flip).
+
+- **DG** — welcome wizard mirrored to `apps/philly-standalone/app/
+  welcome/page.tsx`. Same state machine as root, URL paths adapted
+  (`/api/onboarding/create-org`, `/login?next=/welcome`, no
+  `/pricing` link — partner deploys host their own pricing). CSS
+  copied to standalone's globals.css.
+- **DH** — Supabase email-confirmation landing page at
+  `app/[locale]/auth/confirm`. Signup action now branches on
+  `data.session`: present → /philly/welcome; null (confirmation
+  required) → /auth/confirm?email=. emailRedirectTo routes through
+  /auth/callback first so the code is exchanged before the welcome
+  wizard loads. 4-locale i18n via confirm.* namespace + new
+  `.auth-checklist` CSS (numbered counter bullets).
+- **DI** — demo seed extended from 2 → 7 deals across all 6 stages.
+  Existing Pipeline + stages from pre-CW seed were correct; the
+  "Bundle CW retry" was unblocked once I read the existing setup.
+  Sales walkthrough now shows a realistic spread with one closed-
+  won + one closed-lost.
+- **DJ** — Subscription registered in `lib/gdpr/pii-registry.ts`
+  with 7-year (2557d) retention per NL Wet IB art. 52 fiscal
+  bookkeeping. NOT in `MODEL_TO_CLIENT` of `retention.ts` because
+  Stripe is the source of truth and CASCADE FK on Organization
+  handles Art. 17. retention.test.ts updated to recognize the
+  intentional exemption (same pattern as the existing User skip).
+- **DK** — synthetic-prod.yml gained a `probe-stripe-webhook` step.
+  POSTs to `PROD_STRIPE_WEBHOOK_URL` with empty body; expects HTTP
+  400 (Missing Stripe-Signature) as the success criterion. Anything
+  else (404, 500, timeout) pages Slack via the existing
+  SLACK_ALERTS_WEBHOOK. STRIPE-SETUP.md grew a "Synthetic
+  monitoring" section.
+- **DL** — root /philly now supports en/nl/de/es (was en+nl only).
+  New `messages/de.json` + `messages/es.json` (474 lines each) —
+  shared namespaces (21 of 37) pull translated strings from
+  apps/philly-standalone/messages/de.json + es.json; root-only
+  namespaces (16) fall back to English with next-intl's standard
+  fallback chain. `i18n/philly/request.ts` updated to accept the
+  four-locale union (matches standalone's shape exactly).
+  Operator follow-up: run `npm run i18n:fill` (DeepL passthrough)
+  against the 16 EN-fallback namespaces when the operator is
+  ready to commit to translations.
+
+### Session 4 bundle order recap
+
+DA (SEO audit + fixes) → DB (skills committed) → DC (root billing
+mirror) → DD (welcome wizard i18n) → DE (DEUS-SHARED readiness +
+13 Next.js HIGH CVEs closed) → DF (Stripe operator runbook) →
+DG (welcome standalone mirror) → DH (email confirm landing) →
+DI (demo seed extended) → DJ (subscription retention) →
+DK (Stripe webhook synthetic probe) → DL (root 4-locale parity).
+
+### Verification at HEAD `dd1e519`
+
+| Check | Standalone | Root |
+| ----- | ---------- | ---- |
+| Tests | 630/630 ✅ | 303/303 ✅ |
+| Typecheck | clean ✅ | clean ✅ |
+| `npm audit --audit-level=high` | 0 vulns | 0 vulns (3 moderate Hono via @prisma/dev — pinned in overrides) |
+| `audit:tenant` | clean | n/a |
+| CodeQL | 0 findings | 0 findings |
+| knip | 0 unused files | 0 unused files |
+| 4-locale parity | ✅ all 4 | ✅ all 4 (16 namespaces EN-fallback) |
 
 ## Bundles shipped session 3 (2026-05-06)
 
