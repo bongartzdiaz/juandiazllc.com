@@ -1,6 +1,6 @@
 # Memory — pickup-tomorrow quick-reference
 
-Last touched: **2026-05-05**, end of Bundle CV (session 2).
+Last touched: **2026-05-06**, end of Bundle CZ (session 3).
 
 If you are picking this project up after a break, read this file
 first, then `JOURNEY.md` for context, then `CLAUDE.md` for the full
@@ -13,7 +13,7 @@ session log.
 | Item | State |
 | ---- | ----- |
 | Current branch | `claude/ai-command-bar` |
-| Branch HEAD | `c7c01d7` (Bundle CV — pricing page) |
+| Branch HEAD | `a56c3ce` (Bundle CZ — onboarding wizard) |
 | Production branch | `main` (NOT yet updated — PR #10 open, awaiting merge) |
 | PR #10 | <https://github.com/bongartzdiaz/juandiazllc.com/pull/10> — description rewritten to reflect launch-release scope |
 | Test counts | 617/617 standalone + 290/290 root, both green |
@@ -30,7 +30,80 @@ session log.
 
 ---
 
-## Bundles shipped this session (2026-05-05)
+## Bundles shipped session 3 (2026-05-06)
+
+The launch-readiness branch now contains a complete pricing → signup
+→ onboarding → dashboard self-service loop, the personal skill
+library is committed to the repo, and one more SEO + format-string
+finding was closed.
+
+- **DA** — SEO audit + fixes: `/pricing` added to robots.ts AI_ALLOW
+  (was missing despite priority 0.95 in sitemap — AI Overviews would
+  have skipped it); new `pricingPlanSchema()` helper emits
+  SoftwareApplication + AggregateOffer + per-tier Offer with EUR
+  prices, billing duration P1M, InStock — wired into the pricing
+  page so Google Rich Results show the price chip + Perplexity can
+  quote tiers without scraping.
+- **DB** — installed 114 personal skills into `.claude/skills/` so
+  every Claude Code session in this repo (local + remote sandbox)
+  sees the same `/<skill>` commands. .gitignore now targets
+  `.claude/worktrees/` etc. specifically rather than blanket-
+  ignoring `.claude/`. Skill set includes /audit-full, /audit-site,
+  /brainstorm, /writing, /research, /seo-audit-page, /lighthouse-fix,
+  /code-review, /ui-form, /auth-flow, /landing-page, /calc-page,
+  /perf-audit, /a11y-audit, /memory-audit, /vault-*, ~100 more.
+- **CT** — closed the last CodeQL thread: console.warn('%s', msg, e)
+  in csp-report instead of console.warn(msg, e) — defang printf
+  format-string injection.
+- **CU** — sync-deus-shared.yml gained an optional `note` input
+  that lands in both the DEUS-SHARED commit body AND the workflow
+  Step Summary, so future audits map intent → SHA.
+- **CV** — pricing page (`/[locale]/pricing`) with 3 tiers (Operator
+  €49 / Team €199 / Business €599) + Enterprise contact-us, ~232
+  dict entries across 4 locales, getPricingFaq helper.
+- **CX** — Stripe billing scaffold: Subscription Prisma model +
+  migration 20260506000000_subscription; `lib/philly/billing/plans.ts`
+  registry (operator/team/business → env-driven Stripe price IDs +
+  per-plan limits + feature set); `lib/philly/billing/stripe.ts`
+  lazy client + isStripeConfigured(); `POST /api/billing/checkout`
+  creates Customer + Checkout session (or routes to Billing Portal
+  for active subs) with 14-day trial + auto-tax + promo codes;
+  `POST /api/webhooks/stripe` verifies signature + idempotent UPSERT
+  on `checkout.session.completed` /
+  `customer.subscription.{created,updated,deleted}`. Stripe 22's
+  move of current_period_* to SubscriptionItem handled via helpers.
+  Standalone-only — root-side parallel is a follow-up.
+- **CY** — self-service signup at `/[locale]/signup?plan=<slug>`.
+  `app/actions/signup.ts` server action mirroring signInWithPassword
+  shape; bounded ReDoS-safe email regex; consent NEVER pre-checked
+  (GDPR Art. 7); Supabase auth.signUp with user metadata
+  { full_name, plan, signup_locale }; redirect to /philly/welcome.
+  `signup.*` namespace × 4 locales (~20 keys each). robots noindex.
+- **CZ** — onboarding wizard at `/philly/welcome` (root-side only).
+  Three-step state machine: welcome+plan → orgName+industry →
+  confirm. `/philly/api/onboarding/create-org` route: Supabase-only
+  auth check (Prisma User doesn't exist yet — that's what we're
+  creating); 409 if email already in an org; rate-limited 5/hr per
+  Supabase user. Auto-slug with collision retry. Sentinel
+  passwordHash 'supabase-auth' on User row. Welcome page step 3
+  has "Start Stripe Checkout" CTA that routes to /api/billing/
+  checkout — known limitation: root-side billing route doesn't
+  exist yet, the alert handles the 404 gracefully.
+
+**Self-service loop now closed:** pricing CTA → signup → welcome
+wizard → dashboard. Stripe Checkout hand-off works in standalone;
+root mirror is the next bundle.
+
+**Open for next session:**
+- Mirror Bundle CX billing routes into root `/app/api/billing/` so
+  /philly/welcome step 3's Stripe Checkout CTA actually works in
+  production
+- Welcome wizard i18n (currently English-only)
+- Bundle CW retry — demo seed needs pipeline/stage setup
+- Operator setup: STRIPE_* env vars + Webhook endpoint registration
+  in Stripe Dashboard (4 event types)
+
+## Bundles shipped session 2 (2026-05-05)
 
 In dependency order:
 
