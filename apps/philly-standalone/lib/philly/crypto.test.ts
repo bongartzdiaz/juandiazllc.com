@@ -37,8 +37,19 @@ describe('crypto — AES-256-GCM secret encryption', () => {
   it('returns null on tampered ciphertext (GCM auth tag)', () => {
     const ct = encryptSecret('hello') ?? ''
     const parts = ct.split('.')
-    // Flip one character in the middle part
-    const tampered = [parts[0], parts[1].slice(0, -1) + (parts[1].endsWith('A') ? 'B' : 'A'), parts[2]].join('.')
+    // Bundle DE — flip a middle character of the ciphertext part.
+    // The previous version flipped the LAST char which, for short
+    // plaintexts where base64url's tail encodes only padding bits,
+    // could leave the decoded bytes unchanged ~3% of runs (A↔B in
+    // the padding-bit positions). Flipping a middle char always
+    // changes real data bits, so GCM's auth tag detects it deterministically.
+    const middle = Math.floor(parts[1].length / 2)
+    const flipped = parts[1][middle] === 'A' ? 'B' : 'A'
+    const tampered = [
+      parts[0],
+      parts[1].slice(0, middle) + flipped + parts[1].slice(middle + 1),
+      parts[2],
+    ].join('.')
     expect(decryptSecret(tampered)).toBeNull()
   })
 

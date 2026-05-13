@@ -28,9 +28,13 @@ export function stripe(): Stripe {
     // integration sent a request. API version is omitted intentionally
     // so the installed SDK's pinned version is used — Stripe 22's
     // default is 2026-04-22.dahlia and that's what the types expect.
+    //
+    // Bundle DE — `url` reads from the deployment's own SITE_URL env
+    // var so DEUS-SHARED partner deploys identify as themselves to
+    // Stripe support, not as juandiazllc.com.
     appInfo: {
       name: 'Philly CRM',
-      url: 'https://juandiazllc.com',
+      url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://philly-crm.local',
     },
   })
   return _client

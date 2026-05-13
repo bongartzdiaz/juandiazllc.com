@@ -50,6 +50,11 @@ const EXEMPT_PATHS = new Set<string>([
   // Public webhook receivers — auth is per-provider HMAC.
   'app/api/webhooks/inbound/[provider]/route.ts',
   'app/api/sms/webhook/route.ts',
+  // Bundle DE — Stripe webhook signature-verified via
+  // stripe.webhooks.constructEvent(body, sig, STRIPE_WEBHOOK_SECRET).
+  // organizationId comes from event.metadata + Stripe handles tenant
+  // routing on its side — no session-based gate applies here.
+  'app/api/webhooks/stripe/route.ts',
   // OAuth callback — runs before a session can exist.
   'app/api/integrations/oauth/callback/route.ts',
   // CSP report endpoint — public, no auth.

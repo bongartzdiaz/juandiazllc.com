@@ -36,7 +36,16 @@ import {
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://juandiazllc.com'
+// Bundle DE — resolve the site URL from the incoming request when
+// NEXT_PUBLIC_SITE_URL is unset, instead of falling back to a
+// hardcoded production URL. A DEUS-SHARED partner deploy that
+// forgets to set the env var would otherwise redirect Stripe back
+// to juandiazllc.com mid-checkout, dropping the user on the wrong
+// domain. `req.nextUrl.origin` resolves to whatever proxy/host
+// served the request.
+function siteUrlFrom(req: NextRequest): string {
+  return process.env.NEXT_PUBLIC_SITE_URL ?? req.nextUrl.origin
+}
 
 export async function POST(req: NextRequest) {
   const scope = await requireScope()
@@ -75,7 +84,7 @@ export async function POST(req: NextRequest) {
     if (org.subscription && ['active', 'trialing', 'past_due'].includes(org.subscription.status)) {
       const portal = await stripe().billingPortal.sessions.create({
         customer: org.subscription.stripeCustomerId,
-        return_url: `${SITE_URL}/philly/settings`,
+        return_url: `${siteUrlFrom(req)}/philly/settings`,
       })
       return NextResponse.json({ url: portal.url, mode: 'portal' })
     }
@@ -99,8 +108,8 @@ export async function POST(req: NextRequest) {
       mode: 'subscription',
       customer: customerId,
       line_items: [{ price: stripePriceIdForPlan(plan as PlanSlug), quantity: 1 }],
-      success_url: `${SITE_URL}/philly/welcome?checkout=success&plan=${plan}`,
-      cancel_url:  `${SITE_URL}/pricing?checkout=cancelled`,
+      success_url: `${siteUrlFrom(req)}/philly/welcome?checkout=success&plan=${plan}`,
+      cancel_url:  `${siteUrlFrom(req)}/pricing?checkout=cancelled`,
       // 14-day free trial matches the pricing-page FAQ + the lede.
       subscription_data: {
         trial_period_days: 14,
