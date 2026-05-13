@@ -261,6 +261,34 @@ export const PII_REGISTRY: ReadonlyArray<PiiModel> = [
       { name: 'changes', description: 'Field-level diff (JSON)', sensitivity: 'basic' },
     ],
   },
+  {
+    // Bundle DJ — billing-record retention. Subscription mirrors
+    // Stripe's view of the org's plan + status; it's a financial
+    // record under NL fiscal-bookkeeping obligation (Wet IB / Awb
+    // requires 7 years for VAT-relevant records). Not in
+    // MODEL_TO_CLIENT in lib/gdpr/retention.ts intentionally — Stripe
+    // is the source of truth and we don't auto-prune on a 7-year
+    // cycle; the row CASCADE-deletes with the Organization when the
+    // tenant is erased, which handles the Art. 17 path. This entry
+    // exists so the RoPA + privacy notice surface the policy.
+    model: 'Subscription',
+    subject: 'operator',
+    lawfulBasis: 'legal_obligation',
+    purpose:
+      'Billing-record mirror of the org’s Stripe subscription state — plan, status, period dates. Required for VAT bookkeeping (NL Wet IB art. 52, 7-year retention) and dispute resolution. Source of truth lives in Stripe.',
+    retentionDays: 2557, // 7 years from createdAt (NL fiscal record-keeping)
+    emailField: null,
+    ownerField: null,
+    fields: [
+      { name: 'stripeCustomerId', description: 'Stripe Customer ID — pseudonymous, links to org billing in Stripe Dashboard', sensitivity: 'basic' },
+      { name: 'stripeSubscriptionId', description: 'Stripe Subscription ID — opaque billing-record identifier', sensitivity: 'basic' },
+      { name: 'plan', description: 'Selected plan slug (operator/team/business)', sensitivity: 'basic' },
+      { name: 'status', description: 'Subscription status (active/trialing/canceled/etc.)', sensitivity: 'basic' },
+      { name: 'currentPeriodStart', description: 'Current billing cycle start', sensitivity: 'basic' },
+      { name: 'currentPeriodEnd', description: 'Current billing cycle end', sensitivity: 'basic' },
+      { name: 'trialEndsAt', description: 'Trial expiration timestamp', sensitivity: 'basic' },
+    ],
+  },
 ] as const
 
 /**

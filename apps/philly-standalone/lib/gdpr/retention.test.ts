@@ -48,6 +48,10 @@ describe('runRetentionPurge', () => {
       // Skip User — runRetentionPurge does not own User deletion;
       // the deletion-grace flow does.
       if (entry.model === 'User') continue
+      // Bundle DJ — Subscription is in the registry for RoPA + privacy-
+      // notice documentation only. Stripe owns the source of truth and
+      // the row CASCADE-deletes with the Organization; no auto-prune.
+      if (entry.model === 'Subscription') continue
       const captured = capture.byModel[entry.model]
       expect(captured, `expected ${entry.model} to be queried`).toBeDefined()
       const expected = new Date(now.getTime() - entry.retentionDays * MS_PER_DAY)
