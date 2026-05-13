@@ -87,18 +87,24 @@ export async function signUpWithPassword(
     };
   }
 
+  // Bundle DH — branch on whether Supabase issued a session (email
+  // confirmation disabled in the project) or not (email confirmation
+  // enabled — the user must click a link before they can sign in).
+  // The previous version redirected straight to /philly/welcome
+  // regardless, which 401'd in the email-confirmation case because
+  // the create-org route requires an authenticated session.
+  let needsEmailConfirmation = false
   try {
     const supabase = await createClient();
-    // emailRedirectTo: where Supabase sends the user after they click
-    // the confirmation email. Always lands on /philly/welcome with the
-    // chosen plan in the query string so the onboarding wizard can
-    // pick it up.
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
-    const { error } = await supabase.auth.signUp({
+    // emailRedirectTo routes through /auth/callback so the code can
+    // be exchanged for a session before the user lands on /philly/welcome.
+    const next = `/philly/welcome?plan=${plan}&new=1`;
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${siteUrl}/philly/welcome?plan=${plan}`,
+        emailRedirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(next)}`,
         // User-metadata is replicated into the Supabase auth user's
         // raw_user_meta_data column and surfaces in the JWT. Bundle CZ
         // reads this to pre-fill the onboarding wizard.
@@ -111,13 +117,15 @@ export async function signUpWithPassword(
       // user-friendly enough for the form-error area.
       return { status: "err", message: error.message };
     }
+    // No session = email confirmation flow. data.user exists with an
+    // unconfirmed email; data.session is null until they click the link.
+    needsEmailConfirmation = !data.session;
   } catch {
     return { status: "err", message: "Network error. Try again in a moment." };
   }
 
-  // Redirect to the onboarding wizard. If email confirmation is
-  // required by the Supabase project, the user is logged out here
-  // and the welcome page asks them to check their inbox first.
-  // Bundle CZ handles both code paths.
+  if (needsEmailConfirmation) {
+    redirect(`/${locale}/auth/confirm?email=${encodeURIComponent(email)}`);
+  }
   redirect(`/${locale}/philly/welcome?plan=${plan}&new=1`);
 }

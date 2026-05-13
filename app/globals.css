@@ -2476,3 +2476,23 @@ em { color: var(--accent); font-style: italic; font-weight: 300; letter-spacing:
 }
 .auth-consent a { color: var(--accent); text-decoration: underline; }
 .auth-consent a:hover { color: var(--text); }
+
+/* Bundle DH — email-confirm landing-page checklist */
+.auth-checklist {
+  list-style: none; padding: 0; margin: 16px 0 20px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.auth-checklist li {
+  position: relative; padding-left: 26px;
+  font-size: 13px; color: var(--text); line-height: 1.55;
+}
+.auth-checklist li::before {
+  content: counter(li);
+  counter-increment: li;
+  position: absolute; left: 0; top: 0;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(94,255,177,.12); border: 1px solid var(--accent);
+  color: var(--accent); font-family: var(--font-mono); font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+}
+.auth-checklist { counter-reset: li; }

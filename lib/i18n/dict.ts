@@ -829,6 +829,20 @@ const en: Dict = {
   "signup.creating": "Creating your workspace…",
   "signup.haveAccount": "Already have an account?",
   "signup.signInLink": "Sign in instead",
+
+  // Bundle DH — email confirmation landing
+  "confirm.meta.title": "Check your email — Philly CRM",
+  "confirm.meta.desc": "Confirm your email address to finish signing up.",
+  "confirm.eyebrow": "Almost there",
+  "confirm.title": "Check your inbox.",
+  "confirm.lede": "We just sent you a confirmation link. Click it to activate your workspace — your 14-day trial starts the moment you do.",
+  "confirm.sentToLabel": "Sent to",
+  "confirm.checklistLabel": "What to do next",
+  "confirm.step1": "Open the email from no-reply@…",
+  "confirm.step2": "Click the confirmation link",
+  "confirm.step3": "You'll land back here and the workspace wizard takes over",
+  "confirm.troubleQuestion": "Didn't get the email?",
+  "confirm.contactLink": "Contact us",
 };
 
 const nl: Dict = {
@@ -1610,6 +1624,20 @@ const nl: Dict = {
   "signup.creating": "Workspace aanmaken…",
   "signup.haveAccount": "Heb je al een account?",
   "signup.signInLink": "Log dan in",
+
+  // Bundle DH — email confirmation landing
+  "confirm.meta.title": "Check je inbox — Philly CRM",
+  "confirm.meta.desc": "Bevestig je e-mailadres om de aanmelding af te ronden.",
+  "confirm.eyebrow": "Bijna klaar",
+  "confirm.title": "Check je inbox.",
+  "confirm.lede": "We hebben je net een bevestigingslink gestuurd. Klik erop om je workspace te activeren — je 14-daagse proef start zodra je dat doet.",
+  "confirm.sentToLabel": "Verstuurd naar",
+  "confirm.checklistLabel": "Wat nu",
+  "confirm.step1": "Open de e-mail van no-reply@…",
+  "confirm.step2": "Klik op de bevestigingslink",
+  "confirm.step3": "Je komt hier terug en de workspace-wizard neemt het over",
+  "confirm.troubleQuestion": "E-mail niet ontvangen?",
+  "confirm.contactLink": "Neem contact op",
 };
 
 const de: Dict = {
@@ -2391,6 +2419,20 @@ const de: Dict = {
   "signup.creating": "Workspace wird erstellt…",
   "signup.haveAccount": "Haben Sie bereits ein Konto?",
   "signup.signInLink": "Stattdessen anmelden",
+
+  // Bundle DH — email confirmation landing
+  "confirm.meta.title": "E-Mail prüfen — Philly CRM",
+  "confirm.meta.desc": "Bestätigen Sie Ihre E-Mail-Adresse, um die Anmeldung abzuschließen.",
+  "confirm.eyebrow": "Fast geschafft",
+  "confirm.title": "Prüfen Sie Ihren Posteingang.",
+  "confirm.lede": "Wir haben Ihnen einen Bestätigungslink gesendet. Klicken Sie darauf, um Ihren Workspace zu aktivieren — Ihre 14-tägige Testphase startet, sobald Sie das tun.",
+  "confirm.sentToLabel": "Gesendet an",
+  "confirm.checklistLabel": "Was als Nächstes",
+  "confirm.step1": "Öffnen Sie die E-Mail von no-reply@…",
+  "confirm.step2": "Klicken Sie auf den Bestätigungslink",
+  "confirm.step3": "Sie landen wieder hier und der Workspace-Wizard übernimmt",
+  "confirm.troubleQuestion": "E-Mail nicht erhalten?",
+  "confirm.contactLink": "Kontakt aufnehmen",
 };
 
 const es: Dict = {
@@ -3172,6 +3214,20 @@ const es: Dict = {
   "signup.creating": "Creando tu workspace…",
   "signup.haveAccount": "¿Ya tienes cuenta?",
   "signup.signInLink": "Inicia sesión",
+
+  // Bundle DH — email confirmation landing
+  "confirm.meta.title": "Revisa tu email — Philly CRM",
+  "confirm.meta.desc": "Confirma tu dirección de email para terminar el registro.",
+  "confirm.eyebrow": "Casi listo",
+  "confirm.title": "Revisa tu bandeja de entrada.",
+  "confirm.lede": "Acabamos de enviarte un enlace de confirmación. Haz clic para activar tu workspace — tu prueba de 14 días empieza en cuanto lo hagas.",
+  "confirm.sentToLabel": "Enviado a",
+  "confirm.checklistLabel": "Qué hacer ahora",
+  "confirm.step1": "Abre el email de no-reply@…",
+  "confirm.step2": "Haz clic en el enlace de confirmación",
+  "confirm.step3": "Vuelves aquí y el asistente de workspace toma el relevo",
+  "confirm.troubleQuestion": "¿No has recibido el email?",
+  "confirm.contactLink": "Contáctanos",
 };
 
 export const DICT: Record<Locale, Dict> = { en, nl, de, es };
