@@ -52,6 +52,42 @@ model Organization {
   smsMessages        SmsMessage[]
   integrations       Integration[]
   propertyTaxonomy   PropertyTaxonomy?
+
+  // Bundle DC — billing. One Stripe subscription per org, optional
+  // (demo + Enterprise-contract tenants have no Stripe sub). Mirror
+  // of apps/philly-standalone/prisma/schema.prisma:Subscription.
+  subscription Subscription?
+}
+
+// Bundle DC — Stripe subscription mirror. Source of truth is Stripe;
+// we cache just enough locally to gate feature access + show plan/
+// status in the CRM without a round-trip on every request. Webhook
+// at /api/webhooks/stripe keeps this in lockstep with Stripe events.
+model Subscription {
+  id                   String   @id @default(cuid())
+  organizationId       String   @unique
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  stripeCustomerId     String   @unique
+  stripeSubscriptionId String?  @unique
+  stripePriceId        String?
+
+  // 'operator' | 'team' | 'business' — matches pricing.tier.<slug>.*
+  plan                 String
+  // Stripe status: 'trialing' | 'active' | 'past_due' | 'canceled'
+  // | 'incomplete' | 'incomplete_expired' | 'unpaid' | 'paused'.
+  status               String
+
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean  @default(false)
+  trialEndsAt          DateTime?
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([status])
+  @@index([currentPeriodEnd])
 }
 
 model User {
