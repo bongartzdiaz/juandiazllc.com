@@ -80,6 +80,44 @@ model Organization {
   //   re-authentication).
   ipAllowlist               String? @db.Text
   sessionIdleTimeoutMinutes Int?
+
+  // Bundle CX — billing. One subscription per org, optional (e.g. demo
+  // tenants and Enterprise-contract orgs have no Stripe subscription).
+  subscription Subscription?
+}
+
+// Bundle CX — Stripe subscription mirror. We don't store invoice
+// history here (Stripe is the source of truth for receipts); we
+// store just enough to gate feature access + show plan/status in
+// the CRM. Subscription lifecycle events arrive via the webhook
+// route at /api/webhooks/stripe.
+model Subscription {
+  id                   String   @id @default(cuid())
+  organizationId       String   @unique
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  stripeCustomerId     String   @unique
+  stripeSubscriptionId String?  @unique
+  stripePriceId        String?
+
+  // 'operator' | 'team' | 'business' — matches the pricing.* keys
+  // in lib/i18n/dict.ts on the marketing side.
+  plan                 String
+
+  // Stripe values: 'trialing' | 'active' | 'past_due' | 'canceled' |
+  // 'incomplete' | 'incomplete_expired' | 'unpaid' | 'paused'.
+  status               String
+
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean  @default(false)
+  trialEndsAt          DateTime?
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([status])
+  @@index([currentPeriodEnd])
 }
 
 model User {

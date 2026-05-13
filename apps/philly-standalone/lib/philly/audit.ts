@@ -73,6 +73,7 @@ export type AuditEntity =
   | 'featureFlag'
   | 'scimGroup'
   | 'dripEnrollment'
+  | 'subscription'
 
 interface LogAuditParams {
   scope: AuthScope
