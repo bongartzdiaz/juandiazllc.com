@@ -512,7 +512,19 @@ final pre-flip sanity in 9 sections.
 5. Per-customer SSO wiring per `docs/operations/SSO-SETUP.md`.
 6. Per-customer SCIM tokens per `docs/operations/SCIM-SETUP.md`
    (issue `ApiKey` row with `scopes: ["scim:users"]`).
-7. After every bundle push, mirror the standalone CRM into the
+7. Stripe billing wired per `docs/operations/STRIPE-SETUP.md`:
+   - Three Products in Stripe Dashboard (Operator / Team / Business)
+     with EUR monthly prices matching `pricing.tier.*`.
+   - Five env vars in production: `STRIPE_SECRET_KEY`,
+     `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_OPERATOR`,
+     `STRIPE_PRICE_TEAM`, `STRIPE_PRICE_BUSINESS`.
+   - Webhook endpoint registered at `/api/webhooks/stripe` with
+     four event types subscribed (`checkout.session.completed` +
+     `customer.subscription.{created,updated,deleted}`).
+   - Stripe Tax enabled in dashboard (Checkout picks up automatically).
+   - End-to-end test-mode subscription run before going live (see
+     STRIPE-SETUP.md §A-C).
+8. After every bundle push, mirror the standalone CRM into the
    `bongartzdiaz/DEUS-SHARED` repo per
    `docs/operations/MIRROR-SYNC.md`. One-button workflow run on
    `juandiazllc.com` Actions tab; sync is required before any

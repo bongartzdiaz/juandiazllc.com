@@ -44,6 +44,11 @@ lives.
 | 2.6 | PII backfill run on existing data | `npm run pii:backfill && npm run pii:backfill-notes && npm run pii:backfill-hashes` — dry-run first, then apply, capture stdout for audit | HARD |
 | 2.7 | Backfill counters verified: rows-encrypted == rows-expected | Compare CLI output count to `prisma.contact.count()` | HARD |
 | 2.8 | Spot-check: pick 3 random Contact rows, confirm email/phone/notes columns are ciphertext (not plaintext), and the backfill helper successfully decrypts them | `npm run pii:verify` (if added) or manual decrypt with the helper | HARD |
+| 2.9 | **Stripe billing secrets set** — `STRIPE_SECRET_KEY` (live key, not test), `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_OPERATOR`, `STRIPE_PRICE_TEAM`, `STRIPE_PRICE_BUSINESS` | `vercel env ls production \| grep STRIPE_` — five entries, all set | HARD |
+| 2.10 | Stripe webhook endpoint registered + reachable | Stripe Dashboard → Developers → Webhooks → endpoint shows recent 200s from `customer.subscription.*` test events | HARD |
+| 2.11 | All four required Stripe webhook events subscribed (`checkout.session.completed` + `customer.subscription.{created,updated,deleted}`) | Endpoint detail page → Events tab lists all four | HARD |
+| 2.12 | End-to-end test-mode subscription run: signup → checkout → cancel → re-subscribe; each event hit the webhook with 200 | Stripe Dashboard event log + local `Subscription` row updates verified per `STRIPE-SETUP.md` §A-C | HARD |
+| 2.13 | Stripe Tax enabled in dashboard (or external tax provider documented) | Dashboard → Tax → Status shows ✓ enabled in target jurisdictions | SOFT |
 
 ---
 
