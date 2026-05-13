@@ -924,5 +924,51 @@
       "cancelFailed": "Cancelación fallida ({status})",
       "networkError": "Error de red"
     }
+  },
+  "welcome": {
+    "stepLabel": "Paso {n} de {total}",
+    "step1": {
+      "eyebrow": "Bienvenido",
+      "title": "Configuremos tu workspace.",
+      "ledeNew": "Dos minutos y estás dentro. Creamos tu workspace y empezamos tu prueba de 14 días.",
+      "ledeExisting": "Parece que aún no tienes una organización — vamos a solucionarlo.",
+      "planLabel": "Plan seleccionado",
+      "changePlan": "Cambiar",
+      "cta": "Empezar"
+    },
+    "step2": {
+      "eyebrow": "Tu workspace",
+      "title": "Nombre + vertical",
+      "lede": "Puedes cambiar ambos más tarde en /philly/settings. La vertical oculta los módulos que no usarás — elige el que esté más cerca de tu día a día.",
+      "nameLabel": "Nombre del workspace",
+      "namePlaceholder": "Acme Energia SL",
+      "verticalLabel": "Vertical",
+      "ctaCreate": "Crear workspace",
+      "ctaBack": "Atrás",
+      "ctaCreating": "Creando…",
+      "errorEmptyName": "Por favor, introduce un nombre de workspace.",
+      "errorFailed": "Fallido ({status}) — inténtalo de nuevo.",
+      "errorNetwork": "Error de red"
+    },
+    "step3": {
+      "eyebrow": "Workspace listo",
+      "title": "{name} está activo.",
+      "lede": "Estás registrado como admin. Tu prueba {plan} de 14 días acaba de empezar — sin tarjeta. Conecta Stripe Checkout cuando quieras continuar más allá del día 14.",
+      "ctaOpen": "Abrir dashboard",
+      "ctaCheckout": "Iniciar Stripe checkout",
+      "workspaceUrlLabel": "URL del workspace",
+      "slugLabel": "Slug"
+    },
+    "industries": {
+      "general": "General",
+      "realestate": "Inmobiliario",
+      "hospitality": "Hostelería",
+      "energy": "Energía",
+      "csr": "Impacto / RSC"
+    },
+    "alerts": {
+      "stripeNotConfigured": "Stripe checkout aún no está configurado en este despliegue ({status}). La prueba sigue funcionando; operaciones conectará los price-IDs.",
+      "checkoutNetworkError": "Error de red al iniciar checkout. Inténtalo de nuevo desde /philly/settings."
+    }
   }
 }

@@ -401,6 +401,52 @@
     "title": "E-Signatures",
     "subtitle": "Track document signatures"
   },
+  "welcome": {
+    "stepLabel": "Step {n} of {total}",
+    "step1": {
+      "eyebrow": "Welcome",
+      "title": "Let's set up your workspace.",
+      "ledeNew": "Two minutes and you're in. We'll create your workspace, then start your 14-day trial.",
+      "ledeExisting": "Looks like you don't have an organization yet — let's fix that.",
+      "planLabel": "Selected plan",
+      "changePlan": "Change",
+      "cta": "Get started"
+    },
+    "step2": {
+      "eyebrow": "Your workspace",
+      "title": "Name + vertical",
+      "lede": "You can change both later under /philly/settings. The vertical hides modules you won't use — pick the one closest to your day-to-day.",
+      "nameLabel": "Workspace name",
+      "namePlaceholder": "Acme Energie BV",
+      "verticalLabel": "Vertical",
+      "ctaCreate": "Create workspace",
+      "ctaBack": "Back",
+      "ctaCreating": "Creating…",
+      "errorEmptyName": "Please enter a workspace name.",
+      "errorFailed": "Failed ({status}) — try again.",
+      "errorNetwork": "Network error"
+    },
+    "step3": {
+      "eyebrow": "Workspace ready",
+      "title": "{name} is live.",
+      "lede": "You're signed in as admin. Your 14-day {plan} trial just started — no card required. Wire up Stripe Checkout when you're ready to keep going past day 14.",
+      "ctaOpen": "Open dashboard",
+      "ctaCheckout": "Start Stripe checkout",
+      "workspaceUrlLabel": "Workspace URL",
+      "slugLabel": "Slug"
+    },
+    "industries": {
+      "general": "General",
+      "realestate": "Real estate",
+      "hospitality": "Hospitality",
+      "energy": "Energy",
+      "csr": "Impact / CSR"
+    },
+    "alerts": {
+      "stripeNotConfigured": "Stripe checkout not configured on this deployment yet ({status}). You can keep using the trial; ops will wire the price IDs.",
+      "checkoutNetworkError": "Network error starting checkout. Try again from /philly/settings."
+    }
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",

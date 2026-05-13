@@ -924,5 +924,51 @@
       "cancelFailed": "Annuleren mislukt ({status})",
       "networkError": "Netwerkfout"
     }
+  },
+  "welcome": {
+    "stepLabel": "Stap {n} van {total}",
+    "step1": {
+      "eyebrow": "Welkom",
+      "title": "Laten we je workspace instellen.",
+      "ledeNew": "Twee minuten en je bent binnen. We maken je workspace aan en starten je 14-daagse proef.",
+      "ledeExisting": "Je hebt nog geen organisatie — dat gaan we nu fixen.",
+      "planLabel": "Gekozen plan",
+      "changePlan": "Wijzig",
+      "cta": "Beginnen"
+    },
+    "step2": {
+      "eyebrow": "Jouw workspace",
+      "title": "Naam + branche",
+      "lede": "Beide kun je later aanpassen onder /philly/settings. De branche verbergt modules die je niet gebruikt — kies wat het dichtst bij je dagelijkse werk staat.",
+      "nameLabel": "Workspace-naam",
+      "namePlaceholder": "Acme Energie BV",
+      "verticalLabel": "Branche",
+      "ctaCreate": "Workspace aanmaken",
+      "ctaBack": "Terug",
+      "ctaCreating": "Aanmaken…",
+      "errorEmptyName": "Vul een workspace-naam in.",
+      "errorFailed": "Mislukt ({status}) — probeer opnieuw.",
+      "errorNetwork": "Netwerkfout"
+    },
+    "step3": {
+      "eyebrow": "Workspace klaar",
+      "title": "{name} staat live.",
+      "lede": "Je bent ingelogd als admin. Je 14-daagse {plan}-proef loopt nu — geen creditcard nodig. Koppel Stripe Checkout zodra je voorbij dag 14 wilt doorgaan.",
+      "ctaOpen": "Dashboard openen",
+      "ctaCheckout": "Start Stripe checkout",
+      "workspaceUrlLabel": "Workspace-URL",
+      "slugLabel": "Slug"
+    },
+    "industries": {
+      "general": "Algemeen",
+      "realestate": "Vastgoed",
+      "hospitality": "Horeca",
+      "energy": "Energie",
+      "csr": "Impact / MVO"
+    },
+    "alerts": {
+      "stripeNotConfigured": "Stripe checkout is nog niet ingesteld op deze deployment ({status}). De proef werkt door; operations gaat de price-IDs aansluiten.",
+      "checkoutNetworkError": "Netwerkfout bij het starten van checkout. Probeer opnieuw vanuit /philly/settings."
+    }
   }
 }

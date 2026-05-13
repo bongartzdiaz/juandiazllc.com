@@ -1,6 +1,7 @@
 'use client'
 
 /* Bundle CZ — onboarding wizard.
+ * Bundle DD — fully i18n'd via next-intl welcome.* namespace.
  *
  * First-time-tenant setup at /philly/welcome. Three steps:
  *   1. Welcome + plan badge (read from ?plan=)
@@ -15,8 +16,9 @@
  * No <Topbar> here — the welcome page is intentionally chrome-free
  * so the wizard owns the viewport. */
 
-import { useState, useEffect, useMemo, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { Building2, Briefcase, Home, Hotel, Zap, Heart, CheckCircle2, ArrowRight, AlertCircle } from 'lucide-react'
 
@@ -29,16 +31,19 @@ const PLAN_NAMES: Record<Plan, string> = {
   business: 'Business',
 }
 
-const INDUSTRIES = [
-  { id: 'general',      label: 'General',            icon: Briefcase },
-  { id: 'realestate',   label: 'Real estate',        icon: Home },
-  { id: 'hospitality',  label: 'Hospitality',        icon: Hotel },
-  { id: 'energy',       label: 'Energy',             icon: Zap },
-  { id: 'csr',          label: 'Impact / CSR',       icon: Heart },
-] as const
-type IndustryId = typeof INDUSTRIES[number]['id']
+// Industry IDs are stable across locales; labels resolve via t('industries.<id>').
+const INDUSTRY_IDS = ['general', 'realestate', 'hospitality', 'energy', 'csr'] as const
+type IndustryId = typeof INDUSTRY_IDS[number]
+const INDUSTRY_ICONS: Record<IndustryId, typeof Briefcase> = {
+  general:     Briefcase,
+  realestate:  Home,
+  hospitality: Hotel,
+  energy:      Zap,
+  csr:         Heart,
+}
 
 function WelcomeContent() {
+  const t = useTranslations('welcome')
   const params = useSearchParams()
   const router = useRouter()
 
@@ -47,7 +52,6 @@ function WelcomeContent() {
     ? (planParam as Plan)
     : 'team'
 
-  // Step 1: welcome, 2: org-form, 3: done.
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [orgName, setOrgName] = useState('')
   const [industry, setIndustry] = useState<IndustryId>('general')
@@ -55,15 +59,12 @@ function WelcomeContent() {
   const [error, setError] = useState<string | null>(null)
   const [created, setCreated] = useState<{ name: string; slug: string } | null>(null)
 
-  // Bundle CZ — if the user got here directly (no Supabase session)
-  // we still let the page render the friendly UI; the POST will return
-  // 401 and we'll redirect to /login at that point.
   const isNewSignup = params.get('new') === '1'
 
   async function handleCreate() {
     if (busy) return
     if (!orgName.trim()) {
-      setError('Please enter a workspace name.')
+      setError(t('step2.errorEmptyName'))
       return
     }
     setBusy(true); setError(null)
@@ -79,22 +80,40 @@ function WelcomeContent() {
       }
       const json = await res.json().catch(() => ({}))
       if (!res.ok) {
-        setError(json?.error ?? `Failed (${res.status}) — try again.`)
+        setError(json?.error ?? t('step2.errorFailed', { status: res.status }))
         return
       }
       setCreated({ name: json.organization.name, slug: json.organization.slug })
       setStep(3)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Network error')
+      setError(err instanceof Error ? err.message : t('step2.errorNetwork'))
     } finally {
       setBusy(false)
+    }
+  }
+
+  async function startCheckout() {
+    try {
+      const res = await fetch('/api/billing/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      })
+      if (!res.ok) {
+        alert(t('alerts.stripeNotConfigured', { status: res.status }))
+        return
+      }
+      const json = await res.json()
+      if (json.url) window.location.href = json.url
+    } catch {
+      alert(t('alerts.checkoutNetworkError'))
     }
   }
 
   return (
     <div className="welcome-wrap">
       <div className="welcome-card">
-        <div className="welcome-progress" aria-label={`Step ${step} of 3`}>
+        <div className="welcome-progress" aria-label={t('stepLabel', { n: step, total: 3 })}>
           {[1, 2, 3].map((n) => (
             <span key={n} className={`welcome-dot ${n <= step ? 'is-on' : ''}`} />
           ))}
@@ -102,20 +121,18 @@ function WelcomeContent() {
 
         {step === 1 && (
           <>
-            <div className="welcome-eyebrow">Welcome</div>
-            <h1>Let's set up your workspace.</h1>
+            <div className="welcome-eyebrow">{t('step1.eyebrow')}</div>
+            <h1>{t('step1.title')}</h1>
             <p className="welcome-lede">
-              {isNewSignup
-                ? "Two minutes and you're in. We'll create your workspace, then start your 14-day trial."
-                : "Looks like you don't have an organization yet — let's fix that."}
+              {isNewSignup ? t('step1.ledeNew') : t('step1.ledeExisting')}
             </p>
             <div className="welcome-plan-badge">
-              <span className="welcome-plan-label">Selected plan</span>
+              <span className="welcome-plan-label">{t('step1.planLabel')}</span>
               <span className="welcome-plan-value">{PLAN_NAMES[plan]}</span>
-              <Link href="/pricing" className="welcome-plan-change">Change</Link>
+              <Link href="/pricing" className="welcome-plan-change">{t('step1.changePlan')}</Link>
             </div>
             <button className="welcome-cta" onClick={() => setStep(2)}>
-              <span>Get started</span>
+              <span>{t('step1.cta')}</span>
               <ArrowRight size={16} />
             </button>
           </>
@@ -123,21 +140,18 @@ function WelcomeContent() {
 
         {step === 2 && (
           <>
-            <div className="welcome-eyebrow">Your workspace</div>
-            <h1>Name + vertical</h1>
-            <p className="welcome-lede">
-              You can change both later under /philly/settings. The vertical hides modules
-              you won't use — pick the one closest to your day-to-day.
-            </p>
+            <div className="welcome-eyebrow">{t('step2.eyebrow')}</div>
+            <h1>{t('step2.title')}</h1>
+            <p className="welcome-lede">{t('step2.lede')}</p>
 
             <div className="welcome-field">
-              <label htmlFor="orgName">Workspace name</label>
+              <label htmlFor="orgName">{t('step2.nameLabel')}</label>
               <input
                 id="orgName"
                 type="text"
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
-                placeholder="Acme Energie BV"
+                placeholder={t('step2.namePlaceholder')}
                 maxLength={120}
                 autoFocus
                 disabled={busy}
@@ -145,20 +159,23 @@ function WelcomeContent() {
             </div>
 
             <div className="welcome-field">
-              <label>Vertical</label>
+              <label>{t('step2.verticalLabel')}</label>
               <div className="welcome-industry-grid">
-                {INDUSTRIES.map(({ id, label, icon: Icon }) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setIndustry(id)}
-                    className={`welcome-industry ${industry === id ? 'is-on' : ''}`}
-                    disabled={busy}
-                  >
-                    <Icon size={18} />
-                    <span>{label}</span>
-                  </button>
-                ))}
+                {INDUSTRY_IDS.map((id) => {
+                  const Icon = INDUSTRY_ICONS[id]
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setIndustry(id)}
+                      className={`welcome-industry ${industry === id ? 'is-on' : ''}`}
+                      disabled={busy}
+                    >
+                      <Icon size={18} />
+                      <span>{t(`industries.${id}`)}</span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
@@ -171,10 +188,10 @@ function WelcomeContent() {
 
             <div className="welcome-actions">
               <button className="welcome-cta-secondary" onClick={() => setStep(1)} disabled={busy}>
-                Back
+                {t('step2.ctaBack')}
               </button>
               <button className="welcome-cta" onClick={handleCreate} disabled={busy}>
-                <span>{busy ? 'Creating…' : 'Create workspace'}</span>
+                <span>{busy ? t('step2.ctaCreating') : t('step2.ctaCreate')}</span>
                 <ArrowRight size={16} />
               </button>
             </div>
@@ -184,54 +201,35 @@ function WelcomeContent() {
         {step === 3 && created && (
           <>
             <div className="welcome-eyebrow welcome-eyebrow-success">
-              <CheckCircle2 size={14} /> Workspace ready
+              <CheckCircle2 size={14} /> {t('step3.eyebrow')}
             </div>
-            <h1>{created.name} is live.</h1>
+            <h1>{t('step3.title', { name: created.name })}</h1>
             <p className="welcome-lede">
-              You're signed in as admin. Your 14-day {PLAN_NAMES[plan]} trial just started —
-              no card required. Wire up Stripe Checkout when you're ready to keep going past day 14.
+              {t('step3.lede', { plan: PLAN_NAMES[plan] })}
             </p>
 
             <div className="welcome-next-steps">
               <Link href="/philly" className="welcome-cta">
-                <span>Open dashboard</span>
+                <span>{t('step3.ctaOpen')}</span>
                 <ArrowRight size={16} />
               </Link>
               <button
                 className="welcome-cta-secondary"
-                onClick={() => startCheckout(plan)}
+                onClick={startCheckout}
                 disabled={busy}
               >
-                <Building2 size={14} /> Start Stripe checkout
+                <Building2 size={14} /> {t('step3.ctaCheckout')}
               </button>
             </div>
 
             <p className="welcome-hint">
-              Workspace URL: <code>/philly</code> · Slug: <code>{created.slug}</code>
+              {t('step3.workspaceUrlLabel')}: <code>/philly</code> · {t('step3.slugLabel')}: <code>{created.slug}</code>
             </p>
           </>
         )}
       </div>
     </div>
   )
-}
-
-async function startCheckout(plan: Plan) {
-  try {
-    const res = await fetch('/api/billing/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan }),
-    })
-    if (!res.ok) {
-      alert(`Stripe checkout not configured on this deployment yet (${res.status}). You can keep using the trial; ops will wire the price IDs.`)
-      return
-    }
-    const json = await res.json()
-    if (json.url) window.location.href = json.url
-  } catch {
-    alert('Network error starting checkout. Try again from /philly/settings.')
-  }
 }
 
 export default function WelcomePage() {

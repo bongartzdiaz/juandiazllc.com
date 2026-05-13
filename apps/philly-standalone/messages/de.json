@@ -924,5 +924,51 @@
       "cancelFailed": "Stornieren fehlgeschlagen ({status})",
       "networkError": "Netzwerkfehler"
     }
+  },
+  "welcome": {
+    "stepLabel": "Schritt {n} von {total}",
+    "step1": {
+      "eyebrow": "Willkommen",
+      "title": "Lassen Sie uns Ihren Workspace einrichten.",
+      "ledeNew": "Zwei Minuten und Sie sind drin. Wir erstellen Ihren Workspace und starten Ihre 14-tägige Testphase.",
+      "ledeExisting": "Sie haben noch keine Organisation — das richten wir jetzt ein.",
+      "planLabel": "Gewählter Plan",
+      "changePlan": "Ändern",
+      "cta": "Loslegen"
+    },
+    "step2": {
+      "eyebrow": "Ihr Workspace",
+      "title": "Name + Branche",
+      "lede": "Beides können Sie später unter /philly/settings anpassen. Die Branche blendet Module aus, die Sie nicht nutzen — wählen Sie das, was Ihrem Tagesgeschäft am nächsten kommt.",
+      "nameLabel": "Workspace-Name",
+      "namePlaceholder": "Acme Energie GmbH",
+      "verticalLabel": "Branche",
+      "ctaCreate": "Workspace erstellen",
+      "ctaBack": "Zurück",
+      "ctaCreating": "Wird erstellt…",
+      "errorEmptyName": "Bitte geben Sie einen Workspace-Namen ein.",
+      "errorFailed": "Fehlgeschlagen ({status}) — bitte erneut versuchen.",
+      "errorNetwork": "Netzwerkfehler"
+    },
+    "step3": {
+      "eyebrow": "Workspace bereit",
+      "title": "{name} ist live.",
+      "lede": "Sie sind als Admin angemeldet. Ihre 14-tägige {plan}-Testphase läuft — keine Kreditkarte erforderlich. Stripe Checkout einbinden, sobald Sie über Tag 14 hinaus weitermachen möchten.",
+      "ctaOpen": "Dashboard öffnen",
+      "ctaCheckout": "Stripe Checkout starten",
+      "workspaceUrlLabel": "Workspace-URL",
+      "slugLabel": "Slug"
+    },
+    "industries": {
+      "general": "Allgemein",
+      "realestate": "Immobilien",
+      "hospitality": "Gastgewerbe",
+      "energy": "Energie",
+      "csr": "Impact / CSR"
+    },
+    "alerts": {
+      "stripeNotConfigured": "Stripe Checkout ist auf diesem Deployment noch nicht konfiguriert ({status}). Die Testphase läuft weiter; Operations richtet die Price-IDs ein.",
+      "checkoutNetworkError": "Netzwerkfehler beim Starten des Checkouts. Versuchen Sie es erneut aus /philly/settings."
+    }
   }
 }
