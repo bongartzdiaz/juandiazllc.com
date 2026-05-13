@@ -13,6 +13,9 @@ name: Synthetic production probe
 # Operator setup (one-time):
 #   - PROD_HEALTH_URL_ROOT       → repo variable, e.g. "https://juandiazllc.com/api/health"
 #   - PROD_HEALTH_URL_STANDALONE → repo variable, e.g. "https://app.juandiazllc.com/api/health"
+#   - PROD_STRIPE_WEBHOOK_URL    → repo variable, e.g. "https://juandiazllc.com/api/webhooks/stripe"
+#                                  (Bundle DK — probes that the sig-verify path is reachable
+#                                  by POSTing with no body and expecting 400)
 #   - SLACK_ALERTS_WEBHOOK       → repo secret; same webhook the app uses
 #
 # When any URL is unset the corresponding step is skipped. When the
@@ -68,13 +71,42 @@ jobs:
             exit 1
           fi
 
+      # Bundle DK — Stripe webhook reachability + sig-verify path probe.
+      # A correctly-deployed endpoint returns 400 "Missing Stripe-Signature
+      # header" for a bare POST. Anything else (404 = not deployed, 500 =
+      # crashed, timeout = edge problem) means the billing flow is broken
+      # even though /api/health may still report green.
+      #
+      # The probe deliberately sends no body + no signature. Stripe's own
+      # webhook deliveries are unaffected.
+      #
+      # Operator setup: set PROD_STRIPE_WEBHOOK_URL repo variable to the
+      # production endpoint URL (e.g. https://juandiazllc.com/api/webhooks/stripe).
+      - name: Probe Stripe webhook endpoint
+        if: ${{ vars.PROD_STRIPE_WEBHOOK_URL != '' }}
+        id: probe-stripe-webhook
+        run: |
+          set +e
+          URL="${{ vars.PROD_STRIPE_WEBHOOK_URL }}"
+          BODY=$(curl -sS --max-time 10 -X POST -o /tmp/stripe.json -w "%{http_code}" "$URL")
+          echo "status=$BODY" >> "$GITHUB_OUTPUT"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          # 400 is the expected "Missing Stripe-Signature header" response.
+          # Anything else is a failure mode worth paging on.
+          if [ "$BODY" != "400" ]; then
+            echo "::error::Stripe webhook probe returned $BODY (expected 400 'Missing Stripe-Signature')"
+            exit 1
+          fi
+
       - name: Notify Slack on failure
         if: failure() && env.SLACK_ALERTS_WEBHOOK != ''
         env:
           ROOT_URL: ${{ vars.PROD_HEALTH_URL_ROOT }}
           STANDALONE_URL: ${{ vars.PROD_HEALTH_URL_STANDALONE }}
+          STRIPE_URL: ${{ vars.PROD_STRIPE_WEBHOOK_URL }}
           ROOT_STATUS: ${{ steps.probe-root.outputs.status }}
           STANDALONE_STATUS: ${{ steps.probe-standalone.outputs.status }}
+          STRIPE_STATUS: ${{ steps.probe-stripe-webhook.outputs.status }}
         run: |
           PAYLOAD=$(cat <<EOF
           {
@@ -83,10 +115,11 @@ jobs:
               {
                 "color": "#7c1d6f",
                 "title": "Production health probe failed",
-                "text": "GitHub Actions probe could not reach /api/health from the GH-hosted runner.",
+                "text": "GitHub Actions probe could not reach a production endpoint from the GH-hosted runner.",
                 "fields": [
                   { "title": "root", "value": "${ROOT_URL:-not-set} → ${ROOT_STATUS:-unset}", "short": false },
                   { "title": "standalone", "value": "${STANDALONE_URL:-not-set} → ${STANDALONE_STATUS:-unset}", "short": false },
+                  { "title": "stripe webhook", "value": "${STRIPE_URL:-not-set} → ${STRIPE_STATUS:-unset} (expected 400)", "short": false },
                   { "title": "run", "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}", "short": false }
                 ]
               }

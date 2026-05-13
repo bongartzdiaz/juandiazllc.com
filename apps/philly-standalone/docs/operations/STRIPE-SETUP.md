@@ -163,6 +163,30 @@ Once test mode works end-to-end:
    a real card you control (any €1 product) and refund yourself
    to confirm the round-trip.
 
+## Synthetic monitoring (Bundle DK)
+
+Once the webhook endpoint is registered in Stripe and reachable
+in production, wire the GitHub-Actions synthetic probe so a
+deploy that breaks the route pages you within 15 minutes.
+
+In the `juandiazllc.com` repo settings → **Variables** → **Actions**,
+add one repo variable:
+
+| Name | Value |
+| ---- | ----- |
+| `PROD_STRIPE_WEBHOOK_URL` | `https://<your-domain>/api/webhooks/stripe` |
+
+The `.github/workflows/synthetic-prod.yml` cron (already running
+every 15 minutes for `/api/health` probes) will now also POST to
+the webhook URL with an empty body and expect **HTTP 400** —
+which is the "Missing Stripe-Signature header" response from our
+own code. Any other status (404 not deployed, 500 crash, timeout,
+TLS error) pages the on-call Slack channel via the existing
+`SLACK_ALERTS_WEBHOOK`.
+
+Stripe's own webhook deliveries are not affected — the probe
+sends a bare POST with no `Stripe-Signature` header.
+
 ## Troubleshooting
 
 **Checkout 503 "Billing is not configured on this deployment"**
