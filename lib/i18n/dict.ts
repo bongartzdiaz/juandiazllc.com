@@ -807,6 +807,28 @@ const en: Dict = {
   "pricing.shared.f5": "EU-only data residency (Frankfurt + Amsterdam)",
   "pricing.shared.f6": "Four-locale UI (en / nl / de / es)",
   "pricing.faq.title": "Pricing FAQ",
+
+  // Bundle CY — signup page
+  "signup.meta.title": "Sign up — Philly CRM",
+  "signup.meta.desc": "Start your 14-day free trial. No card required. Cancel any time from settings.",
+  "signup.eyebrow": "Start your trial",
+  "signup.title.a": "Set up your",
+  "signup.title.b": "workspace",
+  "signup.lede": "Two minutes to a working CRM. 14 days free, no card required, full GDPR + audit chain on every paid plan.",
+  "signup.planLabel": "Selected plan",
+  "signup.changePlan": "Change",
+  "signup.name": "Your name",
+  "signup.name.placeholder": "Sanne van der Linden",
+  "signup.email": "Work email",
+  "signup.password": "Password",
+  "signup.password.hint": "At least 8 characters. Use a password manager — we'll never ask you to share it.",
+  "signup.consent": "I agree to the {terms} and the {privacy}. I understand my data is encrypted at rest and stored in the EU.",
+  "signup.consent.termsLink": "terms",
+  "signup.consent.privacyLink": "privacy policy",
+  "signup.submit": "Start free trial",
+  "signup.creating": "Creating your workspace…",
+  "signup.haveAccount": "Already have an account?",
+  "signup.signInLink": "Sign in instead",
 };
 
 const nl: Dict = {
@@ -1566,6 +1588,28 @@ const nl: Dict = {
   "pricing.shared.f5": "EU-only data residency (Frankfurt + Amsterdam)",
   "pricing.shared.f6": "Vier-talen UI (en / nl / de / es)",
   "pricing.faq.title": "FAQ over prijzen",
+
+  // Bundle CY — signup page
+  "signup.meta.title": "Aanmelden — Philly CRM",
+  "signup.meta.desc": "Start je 14-daagse gratis proefperiode. Zonder creditcard. Op elk moment opzegbaar.",
+  "signup.eyebrow": "Start je proef",
+  "signup.title.a": "Stel je",
+  "signup.title.b": "workspace in",
+  "signup.lede": "Twee minuten naar een werkende CRM. 14 dagen gratis, geen creditcard, volledige AVG + audit chain op elk betaald plan.",
+  "signup.planLabel": "Gekozen plan",
+  "signup.changePlan": "Wijzig",
+  "signup.name": "Jouw naam",
+  "signup.name.placeholder": "Sanne van der Linden",
+  "signup.email": "Zakelijke e-mail",
+  "signup.password": "Wachtwoord",
+  "signup.password.hint": "Minimaal 8 karakters. Gebruik een wachtwoordmanager — we vragen je nooit om het te delen.",
+  "signup.consent": "Ik ga akkoord met de {terms} en het {privacy}. Ik begrijp dat mijn data versleuteld at-rest is en in de EU wordt opgeslagen.",
+  "signup.consent.termsLink": "algemene voorwaarden",
+  "signup.consent.privacyLink": "privacybeleid",
+  "signup.submit": "Start gratis proef",
+  "signup.creating": "Workspace aanmaken…",
+  "signup.haveAccount": "Heb je al een account?",
+  "signup.signInLink": "Log dan in",
 };
 
 const de: Dict = {
@@ -2325,6 +2369,28 @@ const de: Dict = {
   "pricing.shared.f5": "EU-only Data Residency (Frankfurt + Amsterdam)",
   "pricing.shared.f6": "Vier-Sprachen-UI (en / nl / de / es)",
   "pricing.faq.title": "Preis-FAQ",
+
+  // Bundle CY — signup page
+  "signup.meta.title": "Anmelden — Philly CRM",
+  "signup.meta.desc": "Starten Sie Ihre 14-tägige kostenlose Testphase. Keine Kreditkarte erforderlich. Jederzeit kündbar in den Einstellungen.",
+  "signup.eyebrow": "Testphase starten",
+  "signup.title.a": "Richten Sie Ihren",
+  "signup.title.b": "Workspace ein",
+  "signup.lede": "Zwei Minuten zu einer funktionierenden CRM. 14 Tage kostenlos, keine Kreditkarte, vollständige DSGVO + Audit-Chain in jedem kostenpflichtigen Plan.",
+  "signup.planLabel": "Gewählter Plan",
+  "signup.changePlan": "Ändern",
+  "signup.name": "Ihr Name",
+  "signup.name.placeholder": "Sanne van der Linden",
+  "signup.email": "Geschäftliche E-Mail",
+  "signup.password": "Passwort",
+  "signup.password.hint": "Mindestens 8 Zeichen. Verwenden Sie einen Passwort-Manager — wir werden Sie nie bitten, es zu teilen.",
+  "signup.consent": "Ich stimme den {terms} und der {privacy} zu. Ich verstehe, dass meine Daten at-rest verschlüsselt und in der EU gespeichert werden.",
+  "signup.consent.termsLink": "AGB",
+  "signup.consent.privacyLink": "Datenschutzerklärung",
+  "signup.submit": "Kostenlose Testphase starten",
+  "signup.creating": "Workspace wird erstellt…",
+  "signup.haveAccount": "Haben Sie bereits ein Konto?",
+  "signup.signInLink": "Stattdessen anmelden",
 };
 
 const es: Dict = {
@@ -3084,6 +3150,28 @@ const es: Dict = {
   "pricing.shared.f5": "Residencia de datos sólo UE (Frankfurt + Amsterdam)",
   "pricing.shared.f6": "UI en cuatro idiomas (en / nl / de / es)",
   "pricing.faq.title": "FAQ de precios",
+
+  // Bundle CY — signup page
+  "signup.meta.title": "Registrarse — Philly CRM",
+  "signup.meta.desc": "Empieza tu prueba gratis de 14 días. Sin tarjeta. Cancela cuando quieras desde ajustes.",
+  "signup.eyebrow": "Empieza tu prueba",
+  "signup.title.a": "Configura tu",
+  "signup.title.b": "workspace",
+  "signup.lede": "Dos minutos hasta un CRM funcionando. 14 días gratis, sin tarjeta, RGPD + cadena de auditoría completa en cada plan de pago.",
+  "signup.planLabel": "Plan seleccionado",
+  "signup.changePlan": "Cambiar",
+  "signup.name": "Tu nombre",
+  "signup.name.placeholder": "Sanne van der Linden",
+  "signup.email": "Email profesional",
+  "signup.password": "Contraseña",
+  "signup.password.hint": "Mínimo 8 caracteres. Usa un gestor de contraseñas — nunca te pediremos compartirla.",
+  "signup.consent": "Acepto los {terms} y la {privacy}. Entiendo que mis datos se cifran en reposo y se almacenan en la UE.",
+  "signup.consent.termsLink": "términos",
+  "signup.consent.privacyLink": "política de privacidad",
+  "signup.submit": "Empezar prueba gratis",
+  "signup.creating": "Creando tu workspace…",
+  "signup.haveAccount": "¿Ya tienes cuenta?",
+  "signup.signInLink": "Inicia sesión",
 };
 
 export const DICT: Record<Locale, Dict> = { en, nl, de, es };

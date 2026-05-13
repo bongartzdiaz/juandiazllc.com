@@ -29,6 +29,7 @@ const PRIVATE_DISALLOW: string[] = [
   "/philly/",
   "/api/",
   "/login",
+  "/signup",
   "/app",
   "/dashboard",
   "/_next/",
