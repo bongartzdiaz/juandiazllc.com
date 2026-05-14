@@ -46,7 +46,7 @@ const STACK: Array<{ sectionKey: string; items: Item[] }> = [
   {
     sectionKey: "uses.sec.operator",
     items: [
-      { name: "Philly", noteKey: "uses.op.philly", url: "/work/philly" },
+      { name: "DEUS", noteKey: "uses.op.philly", url: "/work/philly" },
       { name: "GoHighLevel", noteKey: "uses.op.ghl" },
       { name: "DM Champ", noteKey: "uses.op.dmchamp" },
       { name: "n8n (self-hosted)", noteKey: "uses.op.n8n" },

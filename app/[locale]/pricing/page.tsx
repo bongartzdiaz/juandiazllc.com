@@ -69,7 +69,7 @@ export default async function PricingPage({
   // change a price, update both.
   const pricingSchema = pricingPlanSchema({
     locale: l,
-    productName: "Philly CRM",
+    productName: "DEUS",
     productDescription: t("pricing.meta.desc"),
     tiers: [
       { id: "operator", name: t("pricing.tier.operator.name"), priceEur:  49, description: t("pricing.tier.operator.blurb") },

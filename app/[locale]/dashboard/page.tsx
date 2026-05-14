@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const l = assertLocale(locale);
   return {
     title: "Dashboard",
-    description: "Juan Diaz, LLC — Philly dashboard.",
+    description: "Juan Diaz, LLC — DEUS dashboard.",
     alternates: buildAlternates(l, "/dashboard"),
     robots: { index: false, follow: false },
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },

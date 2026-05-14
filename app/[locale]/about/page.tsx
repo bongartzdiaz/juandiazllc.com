@@ -61,7 +61,7 @@ const personSchema = {
     url: SITE,
   },
   description:
-    "Construction-management-trained operator turned systems-builder. Founder of Juan Diaz, LLC and multiple operator-focused ventures including Philly CRM, Voltafy and Help Mij Besparen. Builds revenue engines for operators in energy, real estate, hospitality and adjacent industries.",
+    "Construction-management-trained operator turned systems-builder. Founder of Juan Diaz, LLC and multiple operator-focused ventures including DEUS, Voltafy and Help Mij Besparen. Builds revenue engines for operators in energy, real estate, hospitality and adjacent industries.",
   knowsAbout: [
     "Revenue operations",
     "CRM design",
