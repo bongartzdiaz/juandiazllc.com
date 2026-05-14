@@ -1,0 +1,13 @@
+Scenario,Team Size (seats),Recommended Tier,Commitment,Monthly Total (EUR),Annual Total (EUR),Savings vs Monthly (EUR),Notes
+Solo agent testing,1,Operator,Monthly,40.00,480.00,0,Entry point. Convert to annual after 30 days of active use.
+Solo agent committed,1,Operator,Annual,28.00,336.00,144,Anchor offer. €144/year saved = pays for an MLS subscription.
+2-agent partnership,2,Operator (2x),Annual,56.00,672.00,288,Stay on Operator until 3rd hire — cheaper than Team minimum.
+3-agent micro-team,3,Team,Monthly,210.00,2520.00,0,Trial month to test team features before annual lock-in.
+3-agent micro-team committed,3,Team,Annual,147.00,1764.00,756,Saves ~1 seat/year. Common closing offer.
+5-agent boutique,5,Team,Annual,245.00,2940.00,1260,Team scales to ~9 seats before Business makes sense.
+8-agent brokerage,8,Team,Annual,392.00,4704.00,2016,Stay on Team unless API/SSO/white-label needed.
+10-agent brokerage,10,Business,Monthly,1100.00,13200.00,0,Trial month to verify white-label setup before commit.
+10-agent brokerage committed,10,Business,Annual,770.00,9240.00,3960,Business floor. Includes white-label + CMA + market analytics.
+15-agent firm,15,Business,Annual,1155.00,13860.00,5940,Sweet spot for Business tier.
+25-agent firm,25,Enterprise,Annual,Contact sales,Contact sales,Contact sales,Volume discount + custom DPIA negotiable.
+50+ multi-office,50+,Enterprise,Annual,Contact sales,Contact sales,Contact sales,Dedicated CSM + 99.9% SLA + custom integrations.

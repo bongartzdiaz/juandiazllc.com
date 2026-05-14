@@ -1,0 +1,14 @@
+Tier,Min Seats,Commitment,Effective Price/Seat/Month (EUR),Discount %,Upfront Billed Per Seat (EUR),Annual Cost @ Min Seats (EUR),Best For,Stripe Price ID
+Operator,1,Monthly,40.00,0%,40.00,480.00,Solo agent / freelancer broker,price_operator_monthly
+Operator,1,Quarterly (3 mo),36.00,10%,108.00,432.00,Solo agent committing to test-drive,price_operator_quarterly
+Operator,1,Semi-Annual (6 mo),32.80,18%,196.80,393.60,Solo agent stabilising on platform,price_operator_semiannual
+Operator,1,Annual (12 mo),28.00,30%,336.00,336.00,Solo agent fully committed,price_operator_annual
+Team,3,Monthly,70.00,0%,70.00,2520.00,Small brokerage 3-9 agents,price_team_monthly
+Team,3,Quarterly (3 mo),63.00,10%,189.00,2268.00,Small brokerage piloting,price_team_quarterly
+Team,3,Semi-Annual (6 mo),57.40,18%,344.40,2066.40,Small brokerage scaling,price_team_semiannual
+Team,3,Annual (12 mo),49.00,30%,588.00,1764.00,Small brokerage fully committed,price_team_annual
+Business,10,Monthly,110.00,0%,110.00,13200.00,Mid-market firm 10+ agents (white-label),price_business_monthly
+Business,10,Quarterly (3 mo),99.00,10%,297.00,11880.00,Mid-market piloting white-label,price_business_quarterly
+Business,10,Semi-Annual (6 mo),90.20,18%,541.20,10824.00,Mid-market scaling,price_business_semiannual
+Business,10,Annual (12 mo),77.00,30%,924.00,9240.00,Mid-market fully committed,price_business_annual
+Enterprise,25,Custom,Custom (contact),Custom,Custom,Custom,50+ agents / multi-office / compliance,price_enterprise_custom
