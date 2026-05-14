@@ -1,4 +1,4 @@
-"""Build DEUS-SHARED-Pricing-Workbook.xlsx — multi-tab professional pricing reference."""
+"""Build DEUS-Pricing-Workbook.xlsx — multi-tab professional pricing reference."""
 
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
@@ -6,7 +6,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl.formatting.rule import ColorScaleRule
 from pathlib import Path
 
-OUT = Path(__file__).parent / "DEUS-SHARED-Pricing-Workbook.xlsx"
+OUT = Path(__file__).parent / "DEUS-Pricing-Workbook.xlsx"
 
 ARIAL = "Arial"
 HEADER_FILL = PatternFill("solid", start_color="1F3A5F")
@@ -62,7 +62,7 @@ wb.remove(wb.active)
 # Sheet 1: Price Book
 # ---------------------------------------------------------------------------
 ws = wb.create_sheet("Price Book")
-add_title(ws, "DEUS-SHARED Price Book")
+add_title(ws, "DEUS Price Book")
 ws["A2"] = "All amounts in EUR, excluding VAT. Annual prices billed upfront."
 ws["A2"].font = NOTE_FONT
 
@@ -520,7 +520,7 @@ auto_width(ws, {"A": 32, "B": 90})
 # Sheet 0: Cover / TOC (insert first)
 # ---------------------------------------------------------------------------
 cover = wb.create_sheet("Cover", 0)
-cover["A1"] = "DEUS-SHARED Pricing Workbook"
+cover["A1"] = "DEUS Pricing Workbook"
 cover["A1"].font = Font(name=ARIAL, size=20, bold=True, color="1F3A5F")
 cover["A2"] = "Real Estate CRM and Dashboard"
 cover["A2"].font = Font(name=ARIAL, size=12, italic=True, color="666666")
