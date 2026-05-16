@@ -176,10 +176,25 @@ export function contactPointSchema(): Record<string, unknown> {
       "@type": "Organization",
       name: "Juan Diaz, LLC",
       url: SITE,
+      telephone: "+31653142656",
       contactPoint: [
         {
           "@type": "ContactPoint",
           contactType: "sales",
+          telephone: "+31653142656",
+          availableLanguage: ["English", "Dutch", "German", "Spanish"],
+          areaServed: ["US", "NL", "DE", "ES"],
+          hoursAvailable: {
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            opens: "09:00",
+            closes: "18:00",
+          },
+        },
+        {
+          "@type": "ContactPoint",
+          contactType: "customer support",
+          telephone: "+31653142656",
           availableLanguage: ["English", "Dutch", "German", "Spanish"],
           areaServed: ["US", "NL", "DE", "ES"],
         },
