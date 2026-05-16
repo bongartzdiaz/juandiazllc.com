@@ -39,7 +39,7 @@ export function Footer() {
           </a>
           {" · "}
           <a
-            href="https://wa.me/31653142656"
+            href="https://wa.me/message/GUH2NLTZM6LTK1"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="WhatsApp +31 6 5314 2656"

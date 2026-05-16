@@ -99,7 +99,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
               </span>
             </a>
             <a
-              href="https://wa.me/31653142656"
+              href="https://wa.me/message/GUH2NLTZM6LTK1"
               target="_blank"
               rel="noopener noreferrer"
               style={{
