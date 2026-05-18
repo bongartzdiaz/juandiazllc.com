@@ -240,54 +240,54 @@
     "voided": "Voided"
   },
   "dripCampaigns": {
-    "title": "Drip Campaigns",
-    "subtitle": "Automated email and SMS sequences",
-    "totalCampaigns": "Total Campaigns",
-    "active": "Active",
-    "totalSteps": "Total Steps",
-    "types": "Types",
-    "allTypes": "All Types",
-    "allStatuses": "All Statuses",
-    "paused": "Paused",
-    "draft": "Draft",
-    "completed": "Completed",
-    "noSteps": "No steps configured",
-    "noneFound": "No campaigns found.",
-    "buyerNurture": "Buyer Nurture",
-    "sellerNurture": "Seller Nurture",
-    "newListing": "New Listing",
-    "openHouseFollowUp": "Open House Follow-up",
-    "homeAnniversary": "Home Anniversary",
-    "referralRequest": "Referral Request",
-    "justSold": "Just Sold",
-    "marketUpdate": "Market Update"
+    "title": "Drip-Kampagnen",
+    "subtitle": "Automatisierte E-Mail- und SMS-Sequenzen",
+    "totalCampaigns": "Kampagnen gesamt",
+    "active": "Aktiv",
+    "totalSteps": "Schritte gesamt",
+    "types": "Typen",
+    "allTypes": "Alle Typen",
+    "allStatuses": "Alle Status",
+    "paused": "Pausiert",
+    "draft": "Entwurf",
+    "completed": "Abgeschlossen",
+    "noSteps": "Keine Schritte konfiguriert",
+    "noneFound": "Keine Kampagnen gefunden.",
+    "buyerNurture": "Käufer-Nurturing",
+    "sellerNurture": "Verkäufer-Nurturing",
+    "newListing": "Neue Immobilie",
+    "openHouseFollowUp": "Open-House-Nachfassen",
+    "homeAnniversary": "Wohnsitz-Jubiläum",
+    "referralRequest": "Empfehlungsanfrage",
+    "justSold": "Gerade verkauft",
+    "marketUpdate": "Markt-Update"
   },
   "marketAnalytics": {
-    "title": "Market Analytics",
-    "subtitle": "Real estate market data and trends",
-    "medianPrice": "Median Price",
-    "avgDaysOnMarket": "Avg Days on Market",
-    "ytdClosedSales": "YTD Closed Sales",
-    "avgInventory": "Avg Inventory",
-    "filterByZip": "Filter by ZIP...",
-    "zip": "ZIP",
-    "month": "Month",
+    "title": "Marktanalyse",
+    "subtitle": "Immobilienmarktdaten und -trends",
+    "medianPrice": "Medianpreis",
+    "avgDaysOnMarket": "Ø Tage am Markt",
+    "ytdClosedSales": "Abgeschlossene Verkäufe (seit Jahresbeginn)",
+    "avgInventory": "Ø Bestand",
+    "filterByZip": "Nach PLZ filtern...",
+    "zip": "PLZ",
+    "month": "Monat",
     "dom": "DOM",
-    "active": "Active",
-    "closed": "Closed",
-    "new": "New",
-    "sqft": "$/SqFt",
-    "inventory": "Inventory",
-    "noData": "No market data available. Add data via API.",
-    "hotMarket": "Hot Market (<3 mo inventory)",
-    "balanced": "Balanced (3-6 mo)",
-    "coolMarket": "Cool Market (>6 mo)"
+    "active": "Aktiv",
+    "closed": "Abgeschlossen",
+    "new": "Neu",
+    "sqft": "€/m²",
+    "inventory": "Bestand",
+    "noData": "Keine Marktdaten verfügbar. Daten über API hinzufügen.",
+    "hotMarket": "Heißer Markt (<3 Monate Bestand)",
+    "balanced": "Ausgeglichen (3-6 Monate)",
+    "coolMarket": "Kühler Markt (>6 Monate)"
   },
   "notifications": {
-    "title": "Notifications",
-    "unread": "unread",
-    "markAllRead": "Mark all as read",
-    "noneYet": "No notifications yet."
+    "title": "Benachrichtigungen",
+    "unread": "ungelesen",
+    "markAllRead": "Alle als gelesen markieren",
+    "noneYet": "Noch keine Benachrichtigungen."
   },
   "automations": {
     "title": "Automatisierungen",
@@ -297,12 +297,12 @@
     "totalRuns": "Total Runs"
   },
   "audit": {
-    "title": "Audit Log",
-    "subtitle": "Track all system changes"
+    "title": "Audit-Protokoll",
+    "subtitle": "Alle Systemänderungen verfolgen"
   },
   "documents": {
-    "title": "Documents",
-    "subtitle": "Manage files and documents"
+    "title": "Dokumente",
+    "subtitle": "Dateien und Dokumente verwalten"
   },
   "impact": {
     "title": "Wirkung",
@@ -320,8 +320,8 @@
     "addCard": "Karte hinzufügen"
   },
   "rooms": {
-    "title": "Rooms",
-    "subtitle": "Manage hotel rooms and availability"
+    "title": "Zimmer",
+    "subtitle": "Hotelzimmer und Verfügbarkeit verwalten"
   },
   "grants": {
     "title": "Förderungen",
@@ -332,50 +332,50 @@
     "subtitle": "Freiwilligenteam und Stunden verwalten"
   },
   "settings": {
-    "title": "Settings",
-    "subtitle": "Manage your account and preferences",
-    "language": "Language",
-    "theme": "Theme",
-    "profile": "Profile",
-    "organization": "Organization",
-    "preferences": "Preferences",
-    "apiKeys": "API Keys",
-    "goals": "Goals",
-    "integrations": "Integrations",
-    "units": "Units & Currency",
-    "unitSystem": "Measurement System",
-    "metric": "Metric (m², km, °C)",
+    "title": "Einstellungen",
+    "subtitle": "Konto und Einstellungen verwalten",
+    "language": "Sprache",
+    "theme": "Design",
+    "profile": "Profil",
+    "organization": "Organisation",
+    "preferences": "Präferenzen",
+    "apiKeys": "API-Schlüssel",
+    "goals": "Ziele",
+    "integrations": "Integrationen",
+    "units": "Einheiten & Währung",
+    "unitSystem": "Maßsystem",
+    "metric": "Metrisch (m², km, °C)",
     "imperial": "Imperial (sqft, mi, °F)",
-    "currency": "Currency",
-    "currencyDefault": "Default currency for all monetary values"
+    "currency": "Währung",
+    "currencyDefault": "Standardwährung für alle Geldbeträge"
   },
   "inbox": {
     "title": "Posteingang",
     "subtitle": "Vereinheitlichter Posteingang für E-Mail, SMS, WhatsApp und Telefon"
   },
   "templates": {
-    "title": "Templates",
-    "subtitle": "Email and SMS template library"
+    "title": "Vorlagen",
+    "subtitle": "E-Mail- und SMS-Vorlagenbibliothek"
   },
   "actionPlans": {
-    "title": "Action Plans",
-    "subtitle": "Automated action sequences"
+    "title": "Aktionspläne",
+    "subtitle": "Automatisierte Aktionssequenzen"
   },
   "transactions": {
-    "title": "Transactions",
-    "subtitle": "Track real estate transactions"
+    "title": "Transaktionen",
+    "subtitle": "Immobilientransaktionen verfolgen"
   },
   "leadScores": {
-    "title": "Lead Scores",
-    "subtitle": "Contact scoring dashboard"
+    "title": "Lead-Scores",
+    "subtitle": "Kontakt-Scoring-Dashboard"
   },
   "scoringRules": {
-    "title": "Scoring Rules",
-    "subtitle": "Configure lead scoring rules"
+    "title": "Scoring-Regeln",
+    "subtitle": "Lead-Scoring-Regeln konfigurieren"
   },
   "leadRouting": {
-    "title": "Lead Routing",
-    "subtitle": "Route leads to agents"
+    "title": "Lead-Routing",
+    "subtitle": "Leads an Makler weiterleiten"
   },
   "dialer": {
     "title": "Power Dialer",
@@ -386,16 +386,16 @@
     "subtitle": "Empfehlungsprovisionen und Partner verfolgen"
   },
   "soi": {
-    "title": "Sphere of Influence",
-    "subtitle": "Manage your SOI categories"
+    "title": "Einflusssphäre",
+    "subtitle": "SOI-Kategorien verwalten"
   },
   "cma": {
-    "title": "CMA Reports",
-    "subtitle": "Comparative market analysis"
+    "title": "CMA-Berichte",
+    "subtitle": "Vergleichende Marktanalyse"
   },
   "clientPortal": {
-    "title": "Client Portal",
-    "subtitle": "Manage client portal access"
+    "title": "Kundenportal",
+    "subtitle": "Kundenportal-Zugriff verwalten"
   },
   "eSignatures": {
     "title": "E-Signaturen",
