@@ -1,0 +1,25 @@
+# Pre-push: typecheck + tests in both trees. Slow (~60-90s) but rare.
+# Skip if SKIP_HUSKY_PUSH=1 (escape hatch for hotfix branches).
+if [ "$SKIP_HUSKY_PUSH" = "1" ]; then
+  echo "→ SKIP_HUSKY_PUSH=1 set, skipping pre-push checks"
+  exit 0
+fi
+
+set -e
+
+echo "→ root typecheck"
+npm run typecheck
+
+echo "→ root tests"
+npm test
+
+# Standalone tree — only run if its node_modules exist; otherwise a
+# developer who hasn't installed the standalone shouldn't be blocked.
+if [ -d "apps/philly-standalone/node_modules" ]; then
+  echo "→ standalone typecheck"
+  (cd apps/philly-standalone && npm run typecheck)
+  echo "→ standalone tests"
+  (cd apps/philly-standalone && npm test)
+else
+  echo "→ skipping apps/philly-standalone (node_modules not installed locally)"
+fi
