@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "audit:tenant": "tsx scripts/audit-tenant-isolation.ts",
     "audit:chain": "tsx scripts/verify-audit-chain.ts",
+    "launch:check": "tsx scripts/check-launch-readiness.ts",
     "check:dead": "knip --no-exit-code",
     "check:dead:strict": "knip",
     "db:slow": "tsx scripts/db-slow-queries.ts",
