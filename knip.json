@@ -28,5 +28,21 @@
   ],
   "ignoreBinaries": [
     "sentry-cli"
-  ]
+  ],
+  "rules": {
+    "files": "error",
+    "binaries": "error",
+    "dependencies": "warn",
+    "devDependencies": "warn",
+    "optionalPeerDependencies": "warn",
+    "unlisted": "warn",
+    "unresolved": "warn",
+    "exports": "warn",
+    "types": "warn",
+    "nsExports": "warn",
+    "nsTypes": "warn",
+    "enumMembers": "warn",
+    "classMembers": "warn",
+    "duplicates": "warn"
+  }
 }
