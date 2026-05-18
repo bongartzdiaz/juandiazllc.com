@@ -22,6 +22,8 @@
     "check:dead": "knip --no-exit-code",
     "check:dead:strict": "knip",
     "analyze": "ANALYZE=true prisma generate && ANALYZE=true next build --no-turbopack",
+    "check:bundle-size": "node scripts/check-bundle-size.mjs",
+    "check:bundle-size:update": "node scripts/check-bundle-size.mjs --update",
     "db:deploy": "prisma migrate deploy"
   },
   "dependencies": {
