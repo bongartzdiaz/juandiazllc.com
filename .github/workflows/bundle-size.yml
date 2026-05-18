@@ -1,0 +1,54 @@
+name: Bundle-size budget
+
+# Fails any PR that grows .next/static/ by more than the threshold in
+# `bundle-size-baseline.json` (default 10% per section: total, js, css, other).
+#
+# If the growth is intentional (e.g., shipping a new feature that adds
+# a real library), update the baseline in the same PR:
+#   npm run check:bundle-size:update
+#   git add bundle-size-baseline.json
+#   git commit -m "chore: bump bundle-size baseline (justify in body)"
+#
+# Per-route precision is not yet possible with Next 16's Turbopack
+# (no app-build-manifest.json). When Turbopack's first-party analyzer
+# matures, this workflow can be tightened to gate per-route.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  budget:
+    name: Check .next/static/ size
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install deps
+        run: npm ci
+      - name: Build
+        # Use the standard turbopack build — matches what production
+        # actually ships. Skipping the analyzer (which forces webpack
+        # mode and roughly doubles build time).
+        env:
+          # Build needs a value for these even though they're not
+          # exercised; routes that touch them are dynamic and don't
+          # execute at build time.
+          DATABASE_URL: "mysql://placeholder:placeholder@localhost:3306/placeholder"
+          NEXTAUTH_SECRET: "ci-placeholder"
+          NEXT_PUBLIC_SUPABASE_URL: "http://localhost:54321"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "ci-placeholder"
+        run: npm run build
+      - name: Check bundle-size budget
+        run: npm run check:bundle-size

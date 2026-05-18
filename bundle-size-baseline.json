@@ -1,0 +1,12 @@
+{
+  "measuredAt": "2026-05-18",
+  "note": "Snapshot of `.next/static/` after `next build`. Update by running `node scripts/check-bundle-size.mjs --update` after deliberately changing bundle content. The CI gate fails any PR that grows any section more than the configured threshold percent.",
+  "thresholdPct": 10,
+  "sizes": {
+    "total": 6310736,
+    "js": 5516182,
+    "css": 161552,
+    "other": 633002
+  },
+  "fileCount": 137
+}
