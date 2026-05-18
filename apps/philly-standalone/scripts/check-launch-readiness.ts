@@ -25,7 +25,7 @@
  */
 
 import { execSync } from 'node:child_process';
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, type Dirent } from 'node:fs';
 import { join, relative } from 'node:path';
 
 type Status = 'PASS' | 'FAIL' | 'WARN' | 'MANUAL' | 'SKIP';
@@ -49,6 +49,14 @@ const ROOT = process.cwd();
 const REPO_ROOT = ROOT.endsWith('philly-standalone')
   ? join(ROOT, '..', '..')
   : ROOT;
+
+// Detect whether we're in the monorepo (apps/philly-standalone/ inside
+// juandiazllc.com) or a standalone extract (DEUS-SHARED mirror, partner
+// deploy clone). Several checks behave differently in each context — the
+// monorepo has .github/workflows at REPO_ROOT and a working git repo;
+// the standalone extract usually has neither.
+const IS_STANDALONE_EXTRACT = !existsSync(join(REPO_ROOT, '.github', 'workflows'));
+const HAS_GIT = existsSync(join(REPO_ROOT, '.git')) || existsSync(join(ROOT, '.git'));
 
 const results: CheckResult[] = [];
 
@@ -76,6 +84,28 @@ function fileContains(path: string, needle: string | RegExp): boolean {
   if (!existsSync(path)) return false;
   const content = readFileSync(path, 'utf8');
   return needle instanceof RegExp ? needle.test(content) : content.includes(needle);
+}
+
+/**
+ * Recursively enumerate files under `dir`, skipping noise dirs like
+ * node_modules, .next, .git. Used when git is unavailable (standalone
+ * extract or partner-deploy clone without git history).
+ */
+function walkFiles(dir: string, baseForRelative: string = dir, out: string[] = []): string[] {
+  const SKIP_DIRS = new Set(['node_modules', '.next', '.git', 'dist', 'build', '.turbo', 'coverage']);
+  let entries: Dirent[];
+  try {
+    entries = readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return out;
+  }
+  for (const e of entries) {
+    if (SKIP_DIRS.has(e.name)) continue;
+    const full = join(dir, e.name);
+    if (e.isDirectory()) walkFiles(full, baseForRelative, out);
+    else if (e.isFile()) out.push(relative(baseForRelative, full).replace(/\\/g, '/'));
+  }
+  return out;
 }
 
 function safeExec(cmd: string, cwd = ROOT): { ok: boolean; stdout: string; stderr: string } {
@@ -133,23 +163,27 @@ check('1.4', 'Code state', 'audit:tenant clean', () => {
 });
 
 check('1.7', 'Code state', 'No leftover [TO FILL] markers outside docs/legal/', () => {
-  // Use `git ls-files` to enumerate tracked files (cross-platform safe;
-  // pathspec exclusions with `:!` are flaky on Windows git-bash).
-  // Then filter in Node and grep the contents.
-  const ls = safeExec('git ls-files');
-  if (!ls.ok) {
-    return { status: 'FAIL', detail: 'git ls-files failed', reference: 'GO-LIVE-CHECKLIST §1.7' };
+  // Prefer `git ls-files` when git is available (faster, respects .gitignore).
+  // Fall back to a filesystem walk for standalone extracts (DEUS-SHARED
+  // mirror, partner deploy clones) where there's no git history.
+  let candidates: string[];
+  const gitList = HAS_GIT ? safeExec('git ls-files') : { ok: false, stdout: '', stderr: '' };
+  if (gitList.ok) {
+    candidates = gitList.stdout.split('\n').filter(Boolean);
+  } else {
+    candidates = walkFiles(ROOT);
   }
-  const candidates = ls.stdout
-    .split('\n')
-    .filter(Boolean)
+  candidates = candidates
     .filter((f) => /\.(ts|tsx|md)$/.test(f))
     // Exclude both legal AND operations docs: §1.7's intent is "code paths
     // the customer will touch". The operations runbooks legitimately mention
     // the `[TO FILL:` pattern when describing the marker convention, and
     // GO-LIVE-CHECKLIST.md itself has sign-off lines that stay unfilled
     // until launch.
-    .filter((f) => !f.startsWith('docs/legal/') && !f.startsWith('docs/operations/'));
+    .filter((f) => !f.startsWith('docs/legal/') && !f.startsWith('docs/operations/'))
+    // Exclude this script itself — it contains `[TO FILL:` as the literal
+    // needle of its own grep, which would always self-trigger.
+    .filter((f) => f !== 'scripts/check-launch-readiness.ts');
   const offenders: string[] = [];
   for (const f of candidates) {
     if (fileContains(join(ROOT, f), '[TO FILL:')) offenders.push(f);
@@ -240,11 +274,18 @@ check('3.legal', 'Legal', 'docs/legal/ documents are present', () => {
 });
 
 check('3.legal.fillins', 'Legal', '[TO FILL:] markers in legal docs remain', () => {
-  const ls = safeExec('git ls-files docs/legal');
-  if (!ls.ok) {
-    return { status: 'FAIL', detail: 'git ls-files docs/legal failed' };
+  // Enumerate docs/legal/*.md via git when available, filesystem otherwise.
+  const legalDir = join(ROOT, 'docs', 'legal');
+  if (!existsSync(legalDir)) {
+    return { status: 'SKIP', detail: 'docs/legal/ does not exist in this extract' };
   }
-  const files = ls.stdout.split('\n').filter((f) => f.endsWith('.md'));
+  let files: string[];
+  const gitList = HAS_GIT ? safeExec('git ls-files docs/legal') : { ok: false, stdout: '', stderr: '' };
+  if (gitList.ok) {
+    files = gitList.stdout.split('\n').filter((f) => f.endsWith('.md'));
+  } else {
+    files = walkFiles(legalDir, ROOT).filter((f) => f.endsWith('.md'));
+  }
   let totalMarkers = 0;
   for (const f of files) {
     if (!existsSync(join(ROOT, f))) continue;
@@ -265,6 +306,14 @@ check('3.legal.fillins', 'Legal', '[TO FILL:] markers in legal docs remain', () 
 /* ── §4 Mirror sync (DEUS-SHARED) ────────────────────────────── */
 
 check('4.mirror.workflow', 'Mirror', 'sync-deus-shared workflow exists on the deployed branch', () => {
+  // Only meaningful in the monorepo context — partner deploys (standalone
+  // extracts) ARE the mirror, so they don't ship the sync workflow itself.
+  if (IS_STANDALONE_EXTRACT) {
+    return {
+      status: 'SKIP',
+      detail: 'standalone extract / partner deploy — sync workflow lives in upstream monorepo, not here',
+    };
+  }
   const path = join(REPO_ROOT, '.github/workflows/sync-deus-shared.yml');
   if (!existsSync(path)) {
     return {
@@ -277,6 +326,12 @@ check('4.mirror.workflow', 'Mirror', 'sync-deus-shared workflow exists on the de
 });
 
 check('4.mirror.token', 'Mirror', 'DEUS_SHARED_PAT secret reachable (manual)', () => {
+  if (IS_STANDALONE_EXTRACT) {
+    return {
+      status: 'SKIP',
+      detail: 'standalone extract / partner deploy — DEUS_SHARED_PAT is only meaningful upstream',
+    };
+  }
   return {
     status: 'MANUAL',
     detail: 'DEUS_SHARED_PAT must be set as a repository secret on bongartzdiaz/juandiazllc.com. Verify via gh secret list or in the repo Settings → Secrets and variables.',
