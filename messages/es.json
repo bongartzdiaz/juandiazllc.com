@@ -240,54 +240,54 @@
     "voided": "Voided"
   },
   "dripCampaigns": {
-    "title": "Drip Campaigns",
-    "subtitle": "Automated email and SMS sequences",
-    "totalCampaigns": "Total Campaigns",
-    "active": "Active",
-    "totalSteps": "Total Steps",
-    "types": "Types",
-    "allTypes": "All Types",
-    "allStatuses": "All Statuses",
-    "paused": "Paused",
-    "draft": "Draft",
-    "completed": "Completed",
-    "noSteps": "No steps configured",
-    "noneFound": "No campaigns found.",
-    "buyerNurture": "Buyer Nurture",
-    "sellerNurture": "Seller Nurture",
-    "newListing": "New Listing",
-    "openHouseFollowUp": "Open House Follow-up",
-    "homeAnniversary": "Home Anniversary",
-    "referralRequest": "Referral Request",
-    "justSold": "Just Sold",
-    "marketUpdate": "Market Update"
+    "title": "Campañas Drip",
+    "subtitle": "Secuencias automatizadas de correo y SMS",
+    "totalCampaigns": "Total de campañas",
+    "active": "Activa",
+    "totalSteps": "Total de pasos",
+    "types": "Tipos",
+    "allTypes": "Todos los tipos",
+    "allStatuses": "Todos los estados",
+    "paused": "Pausada",
+    "draft": "Borrador",
+    "completed": "Completada",
+    "noSteps": "Sin pasos configurados",
+    "noneFound": "No se encontraron campañas.",
+    "buyerNurture": "Nutrición de Compradores",
+    "sellerNurture": "Nutrición de Vendedores",
+    "newListing": "Nuevo Listado",
+    "openHouseFollowUp": "Seguimiento de Open House",
+    "homeAnniversary": "Aniversario de Casa",
+    "referralRequest": "Solicitud de Referencia",
+    "justSold": "Recién Vendida",
+    "marketUpdate": "Actualización del Mercado"
   },
   "marketAnalytics": {
-    "title": "Market Analytics",
-    "subtitle": "Real estate market data and trends",
-    "medianPrice": "Median Price",
-    "avgDaysOnMarket": "Avg Days on Market",
-    "ytdClosedSales": "YTD Closed Sales",
-    "avgInventory": "Avg Inventory",
-    "filterByZip": "Filter by ZIP...",
-    "zip": "ZIP",
-    "month": "Month",
+    "title": "Análisis de Mercado",
+    "subtitle": "Datos y tendencias del mercado inmobiliario",
+    "medianPrice": "Precio Mediano",
+    "avgDaysOnMarket": "Días Promedio en el Mercado",
+    "ytdClosedSales": "Ventas Cerradas del Año",
+    "avgInventory": "Inventario Promedio",
+    "filterByZip": "Filtrar por CP...",
+    "zip": "CP",
+    "month": "Mes",
     "dom": "DOM",
-    "active": "Active",
-    "closed": "Closed",
-    "new": "New",
-    "sqft": "$/SqFt",
-    "inventory": "Inventory",
-    "noData": "No market data available. Add data via API.",
-    "hotMarket": "Hot Market (<3 mo inventory)",
-    "balanced": "Balanced (3-6 mo)",
-    "coolMarket": "Cool Market (>6 mo)"
+    "active": "Activas",
+    "closed": "Cerradas",
+    "new": "Nuevas",
+    "sqft": "€/m²",
+    "inventory": "Inventario",
+    "noData": "No hay datos de mercado disponibles. Añade datos mediante API.",
+    "hotMarket": "Mercado Caliente (<3 meses de inventario)",
+    "balanced": "Equilibrado (3-6 meses)",
+    "coolMarket": "Mercado Frío (>6 meses)"
   },
   "notifications": {
-    "title": "Notifications",
-    "unread": "unread",
-    "markAllRead": "Mark all as read",
-    "noneYet": "No notifications yet."
+    "title": "Notificaciones",
+    "unread": "no leídas",
+    "markAllRead": "Marcar todas como leídas",
+    "noneYet": "Aún no hay notificaciones."
   },
   "automations": {
     "title": "Automatizaciones",
@@ -297,12 +297,12 @@
     "totalRuns": "Total Runs"
   },
   "audit": {
-    "title": "Audit Log",
-    "subtitle": "Track all system changes"
+    "title": "Registro de Auditoría",
+    "subtitle": "Rastrear todos los cambios del sistema"
   },
   "documents": {
-    "title": "Documents",
-    "subtitle": "Manage files and documents"
+    "title": "Documentos",
+    "subtitle": "Gestionar archivos y documentos"
   },
   "impact": {
     "title": "Impacto",
@@ -320,8 +320,8 @@
     "addCard": "Añadir tarjeta"
   },
   "rooms": {
-    "title": "Rooms",
-    "subtitle": "Manage hotel rooms and availability"
+    "title": "Habitaciones",
+    "subtitle": "Gestionar habitaciones de hotel y disponibilidad"
   },
   "grants": {
     "title": "Subvenciones",
@@ -332,50 +332,50 @@
     "subtitle": "Gestiona el equipo de voluntarios y horas"
   },
   "settings": {
-    "title": "Settings",
-    "subtitle": "Manage your account and preferences",
-    "language": "Language",
-    "theme": "Theme",
-    "profile": "Profile",
-    "organization": "Organization",
-    "preferences": "Preferences",
-    "apiKeys": "API Keys",
-    "goals": "Goals",
-    "integrations": "Integrations",
-    "units": "Units & Currency",
-    "unitSystem": "Measurement System",
-    "metric": "Metric (m², km, °C)",
+    "title": "Ajustes",
+    "subtitle": "Gestiona tu cuenta y preferencias",
+    "language": "Idioma",
+    "theme": "Tema",
+    "profile": "Perfil",
+    "organization": "Organización",
+    "preferences": "Preferencias",
+    "apiKeys": "Claves API",
+    "goals": "Objetivos",
+    "integrations": "Integraciones",
+    "units": "Unidades y Moneda",
+    "unitSystem": "Sistema de Medida",
+    "metric": "Métrico (m², km, °C)",
     "imperial": "Imperial (sqft, mi, °F)",
-    "currency": "Currency",
-    "currencyDefault": "Default currency for all monetary values"
+    "currency": "Moneda",
+    "currencyDefault": "Moneda predeterminada para todos los valores monetarios"
   },
   "inbox": {
     "title": "Bandeja de entrada",
     "subtitle": "Bandeja unificada para correo, SMS, WhatsApp y teléfono"
   },
   "templates": {
-    "title": "Templates",
-    "subtitle": "Email and SMS template library"
+    "title": "Plantillas",
+    "subtitle": "Biblioteca de plantillas de correo y SMS"
   },
   "actionPlans": {
-    "title": "Action Plans",
-    "subtitle": "Automated action sequences"
+    "title": "Planes de Acción",
+    "subtitle": "Secuencias de acción automatizadas"
   },
   "transactions": {
-    "title": "Transactions",
-    "subtitle": "Track real estate transactions"
+    "title": "Transacciones",
+    "subtitle": "Rastrear transacciones inmobiliarias"
   },
   "leadScores": {
-    "title": "Lead Scores",
-    "subtitle": "Contact scoring dashboard"
+    "title": "Puntuaciones de Leads",
+    "subtitle": "Panel de puntuación de contactos"
   },
   "scoringRules": {
-    "title": "Scoring Rules",
-    "subtitle": "Configure lead scoring rules"
+    "title": "Reglas de Puntuación",
+    "subtitle": "Configurar reglas de puntuación de leads"
   },
   "leadRouting": {
-    "title": "Lead Routing",
-    "subtitle": "Route leads to agents"
+    "title": "Enrutamiento de Leads",
+    "subtitle": "Dirigir leads a agentes"
   },
   "dialer": {
     "title": "Marcador automático",
@@ -386,16 +386,16 @@
     "subtitle": "Sigue las comisiones de referencias y socios"
   },
   "soi": {
-    "title": "Sphere of Influence",
-    "subtitle": "Manage your SOI categories"
+    "title": "Esfera de Influencia",
+    "subtitle": "Gestionar categorías de SOI"
   },
   "cma": {
-    "title": "CMA Reports",
-    "subtitle": "Comparative market analysis"
+    "title": "Informes CMA",
+    "subtitle": "Análisis comparativo de mercado"
   },
   "clientPortal": {
-    "title": "Client Portal",
-    "subtitle": "Manage client portal access"
+    "title": "Portal del Cliente",
+    "subtitle": "Gestionar acceso al portal del cliente"
   },
   "eSignatures": {
     "title": "Firmas electrónicas",
