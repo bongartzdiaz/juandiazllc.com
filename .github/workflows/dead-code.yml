@@ -1,10 +1,12 @@
 name: Dead-code (knip)
 
 # Bundle CO — surface unused files / exports / dependencies via knip.
-# Runs in --no-exit-code mode for now so existing dead code (~16
-# files + 3 deps in root, similar in standalone) doesn't block PRs.
-# Once we clean the pile, flip both jobs to `check:dead:strict` to
-# enforce zero new findings.
+# Flipped to `check:dead:strict` after the file count reached 0 in
+# both root and standalone. Rules in each knip.json gate ONLY on
+# unused-files and unused-binaries (the regression class that hurts);
+# unused exports/types/deps stay warn-level (visible in CI logs but
+# non-blocking) because cleaning the historical pile across 158+
+# exported types in root + 197 in standalone is its own project.
 #
 # Complements the manual `git grep` cleanups that landed in
 # bundles BO/AY/AN by catching regressions automatically.
@@ -34,7 +36,7 @@ jobs:
       - name: Install deps
         run: npm ci
       - name: Knip
-        run: npm run check:dead
+        run: npm run check:dead:strict
 
   knip-standalone:
     name: knip (apps/philly-standalone)
@@ -52,4 +54,4 @@ jobs:
       - name: Install deps
         run: npm ci
       - name: Knip
-        run: npm run check:dead
+        run: npm run check:dead:strict
