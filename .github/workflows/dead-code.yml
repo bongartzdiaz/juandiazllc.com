@@ -12,10 +12,15 @@ name: Dead-code (knip)
 # bundles BO/AY/AN by catching regressions automatically.
 
 on:
+  # Also run against claude/ai-command-bar — the long-running feature
+  # branch where session work lands. Without this, regressions in any
+  # of these gates would only surface after PR #10 merges into main,
+  # by which point they've accumulated. Reverting back to main-only
+  # is one commit if CI minutes become a concern.
   push:
-    branches: [main]
+    branches: [main, claude/ai-command-bar]
   pull_request:
-    branches: [main]
+    branches: [main, claude/ai-command-bar]
   workflow_dispatch:
 
 concurrency:

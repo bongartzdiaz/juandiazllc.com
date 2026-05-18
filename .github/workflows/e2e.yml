@@ -14,10 +14,13 @@ name: E2E smoke (Playwright)
 # The two complement each other without overlap.
 
 on:
+  # Also run against claude/ai-command-bar — see note in
+  # dead-code.yml. The memory-leak probe + a11y/smoke suite catch
+  # hydration regressions early instead of at main-merge time.
   push:
-    branches: [main]
+    branches: [main, claude/ai-command-bar]
   pull_request:
-    branches: [main]
+    branches: [main, claude/ai-command-bar]
   workflow_dispatch:
 
 # Cancel in-flight runs when a newer commit lands on the same PR.

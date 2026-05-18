@@ -14,10 +14,13 @@ name: Bundle-size budget
 # matures, this workflow can be tightened to gate per-route.
 
 on:
+  # Also run against claude/ai-command-bar — see note in
+  # dead-code.yml. Keeps bundle-budget enforcement live during
+  # feature-branch development, not just at main-merge time.
   push:
-    branches: [main]
+    branches: [main, claude/ai-command-bar]
   pull_request:
-    branches: [main]
+    branches: [main, claude/ai-command-bar]
   workflow_dispatch:
 
 concurrency:
