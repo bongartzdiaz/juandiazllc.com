@@ -42,11 +42,20 @@ export async function POST(req: NextRequest) {
     // object under "csp-report". Normalize both.
     const events = normalize(parsed)
     for (const e of events) {
-      const msg = `[csp] ${e.directive ?? 'unknown'} blocked ${e.blockedUri ?? '?'} on ${e.documentUri ?? '?'}`
-      // Breadcrumb-friendly — don't spam full stack traces. Log level
-      // is 'warning' because these are informational until we
-      // actually enforce strict CSP.
-      console.warn(msg, e)
+      // CSP report payloads are POSTed by the user's browser; a hostile
+      // page can supply arbitrary blockedUri/documentUri/directive values
+      // aimed at log forging (newlines, control chars, fake record
+      // separators). Sanitize before constructing the log entry.
+      // Closes CodeQL: js/log-injection + js/tainted-format-string.
+      // Mirrors apps/philly-standalone/app/api/csp-report/route.ts.
+      const directive = sanitizeLogField(e.directive ?? 'unknown', 64)
+      const blockedUri = sanitizeLogField(e.blockedUri ?? '?', 256)
+      const documentUri = sanitizeLogField(e.documentUri ?? '?', 256)
+      const msg = `[csp] ${directive} blocked ${blockedUri} on ${documentUri}`
+      // Pass `msg` as a `%s` value rather than the format string itself;
+      // any `%s`/`%d` that survives sanitization can only land in value
+      // slots, not control formatting.
+      console.warn('%s', msg, e)
       captureMessage(msg, 'warning')
     }
     return new NextResponse(null, { status: 204 })
@@ -101,4 +110,15 @@ function str(v: unknown): string | undefined {
 }
 function num(v: unknown): number | undefined {
   return typeof v === 'number' ? v : undefined
+}
+
+// Built with String.fromCharCode so the source file stays plain UTF-8
+// (avoids git flagging the file as binary when literal C0 control
+// bytes get committed). Same pattern as the standalone helper at
+// apps/philly-standalone/app/api/csp-report/route.ts (Bundle CS).
+const _C0_RANGE = Array.from({ length: 0x20 }, (_, i) => String.fromCharCode(i)).join('')
+const CONTROL_CHAR_RE = new RegExp('[' + _C0_RANGE + String.fromCharCode(0x7f) + ']', 'g')
+export function sanitizeLogField(value: unknown, maxLen: number): string {
+  const s = typeof value === 'string' ? value : String(value)
+  return s.replace(CONTROL_CHAR_RE, ' ').slice(0, maxLen)
 }

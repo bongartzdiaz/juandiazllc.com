@@ -53,7 +53,11 @@ async function main() {
       organizationId: org.id,
     },
   })
-  console.log(`  admin: ${admin.email} / ${ADMIN_PASSWORD}`)
+  // CodeQL: js/clear-text-logging — never log the password value, even
+  // in seed scripts. Developer already knows it (they set the env var);
+  // printing it back risks leaking it to CI logs if the script ever
+  // runs in CI. Mirrors apps/philly-standalone/prisma/seed.ts.
+  console.log(`  admin: ${admin.email} / [password set from SEED_ADMIN_PASSWORD env var]`)
 
   // 3. Sample contacts
   const contactSeed = [
@@ -310,7 +314,8 @@ async function main() {
 
   console.log('\nSeed complete.')
   console.log(`\nLogin:  ${ADMIN_EMAIL}`)
-  console.log(`Pass:   ${ADMIN_PASSWORD}\n`)
+  // CodeQL: js/clear-text-logging — see comment above.
+  console.log(`Pass:   [set in SEED_ADMIN_PASSWORD env var]\n`)
 }
 
 main()

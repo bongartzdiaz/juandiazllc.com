@@ -68,6 +68,11 @@ export async function PATCH(req: NextRequest) {
   if (typeof body.name === 'string' && body.name.trim()) data.name = body.name.trim()
   if (typeof body.email === 'string' && body.email.trim()) {
     const email = body.email.trim().toLowerCase()
+    // RFC 5321 caps email addresses at 254 chars. Bound the input length
+    // BEFORE running the regex so an attacker can't trigger polynomial
+    // backtracking with a 100 KB string of '!@.' patterns
+    // (CodeQL js/polynomial-redos — bounded inputs are fast).
+    if (email.length > 254) return jsonError('Invalid email', 400)
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return jsonError('Invalid email', 400)
     data.email = email
   }

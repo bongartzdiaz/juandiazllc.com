@@ -118,7 +118,7 @@ export default function PageEdit() {
       if (!r.ok) throw new Error(j?.error ?? 'Failed to save')
       setDirty(false)
       if (j.data?.slug && j.data.slug !== slug) {
-        router.replace(`/philly/pages/${j.data.slug}/edit`)
+        router.replace(`/philly/pages/${encodeURIComponent(j.data.slug)}/edit`)
       } else {
         // refresh state with server IDs
         setPage(j.data)
@@ -144,7 +144,7 @@ export default function PageEdit() {
 
   return (
     <>
-      <Topbar title={`Editing: ${title || 'Untitled'}`} sub={`/pages/${pageSlug}`} />
+      <Topbar title={`Editing: ${title || 'Untitled'}`} sub={`/pages/${encodeURIComponent(pageSlug)}`} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Toolbar */}
         <div style={{
@@ -159,7 +159,7 @@ export default function PageEdit() {
               <ArrowLeft size={12} /> All pages
             </Link>
             <span style={{ color: 'var(--txt3)', fontSize: 12 }}>/</span>
-            <Link href={`/pages/${pageSlug}`} style={{
+            <Link href={`/pages/${encodeURIComponent(pageSlug)}`} style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
               color: 'var(--txt3)', fontSize: 12, fontWeight: 500, textDecoration: 'none',
             }}>

@@ -117,5 +117,18 @@ export async function sendEmail(
 }
 
 function stripHtml(html: string): string {
-  return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+  // CodeQL: js/incomplete-multi-character-sanitization — a single pass
+  // of /<[^>]+>/g can leave partial tags when input contains overlapping
+  // brackets like '<<script>X</script>'. Loop until stable, then strip
+  // any stray angle brackets that might remain (e.g., '<x without close).
+  // This output is used as the plain-text alternative of HTML emails;
+  // it's NOT rendered as HTML downstream, so the regression isn't a
+  // live XSS — but defense-in-depth keeps a future re-use safe.
+  let prev = ''
+  let result = html
+  while (result !== prev) {
+    prev = result
+    result = result.replace(/<[^>]+>/g, '')
+  }
+  return result.replace(/[<>]/g, '').replace(/\s+/g, ' ').trim()
 }
