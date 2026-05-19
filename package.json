@@ -24,6 +24,7 @@
     "analyze": "ANALYZE=true prisma generate && ANALYZE=true next build --no-turbopack",
     "check:bundle-size": "node scripts/check-bundle-size.mjs",
     "check:bundle-size:update": "node scripts/check-bundle-size.mjs --update",
+    "check:env-drift": "tsx scripts/check-env-drift.ts",
     "db:deploy": "prisma migrate deploy"
   },
   "dependencies": {

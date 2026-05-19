@@ -1,0 +1,43 @@
+name: Env drift (.env.example)
+
+# Fails any PR that adds a `process.env.X` reference in source without
+# also declaring X in .env.example. Prevents the regression class PR #23
+# discovered: operators setting up a fresh deployment never learn about
+# vars the code silently expects.
+#
+# Mirror of the [2.envExampleDrift] check that lives in
+# apps/philly-standalone/scripts/check-launch-readiness.ts (the standalone
+# tree has its own machinery via `npm run launch:check`). This workflow
+# is for the root tree.
+#
+# To fix a failure:
+#   - add the offending var to .env.example with a placeholder + comment, OR
+#   - add it to ENV_EXAMPLE_IGNORE in scripts/check-env-drift.ts if it's
+#     a runtime/platform-set var.
+
+on:
+  push:
+    branches: [main, claude/ai-command-bar]
+  pull_request:
+    branches: [main, claude/ai-command-bar]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  drift:
+    name: Check root .env.example drift
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install deps
+        run: npm ci
+      - name: Run drift check
+        run: npm run check:env-drift
