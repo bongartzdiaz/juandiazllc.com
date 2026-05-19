@@ -249,6 +249,87 @@ check('2.PII', 'Secrets', 'PII backfill scripts exist and are executable', () =>
   return { status: 'PASS', detail: `${scripts.length}/${scripts.length} scripts present` };
 });
 
+// Vars the runtime / host sets for us; never belong in .env.example.
+const ENV_EXAMPLE_IGNORE = new Set([
+  // Node / Next.js runtime
+  'NODE_ENV',
+  'NEXT_RUNTIME',
+  // Vercel platform
+  'NEXT_PUBLIC_VERCEL_ENV',
+  // Dev-only escape hatch — deliberately undocumented in .env.example
+  // so it doesn't ship to prod by accident. See ClientLayout.tsx's
+  // ProtectedShell bypass.
+  'NEXT_PUBLIC_BYPASS_AUTH',
+]);
+
+check('2.envExampleDrift', 'Secrets', '.env.example covers every code-referenced env var', () => {
+  // Symmetric to the bug PR #23 surfaced: code reads `process.env.X` but
+  // X isn't declared in .env.example, so a new operator setting up a
+  // tenant doesn't know it needs to set X. This check enumerates every
+  // `process.env.IDENT` in non-test source, intersects with the names
+  // declared as `IDENT=` in .env.example, and flags the gap.
+  //
+  // Test files (*.test.ts/tsx) are excluded because they reference
+  // env vars purely as test fixtures (ENCRYPTION_KEY, INTEGRATION_SECRET_V2,
+  // etc.) — those are set per-test, not in .env.example.
+  const envExample = join(ROOT, '.env.example');
+  if (!existsSync(envExample)) {
+    return { status: 'FAIL', detail: '.env.example does not exist', reference: 'GO-LIVE-CHECKLIST §2' };
+  }
+  const declared = new Set(
+    readFileSync(envExample, 'utf8')
+      .split('\n')
+      .map((l) => l.match(/^([A-Z][A-Z0-9_]+)=/)?.[1])
+      .filter((x): x is string => Boolean(x)),
+  );
+
+  // Walk source for process.env.* references. Skip tests + the script
+  // itself (which contains the regex as a string).
+  const SCAN_DIRS = ['app', 'lib', 'hooks', 'components', 'i18n', 'scripts'];
+  const SCAN_FILES_AT_ROOT = ['proxy.ts', 'instrumentation.ts', 'next.config.mjs'];
+  const referenced = new Set<string>();
+  const ENV_RE = /process\.env\.([A-Z][A-Z0-9_]+)/g;
+  function scan(p: string) {
+    if (!existsSync(p)) return;
+    const stat = statSync(p);
+    if (stat.isDirectory()) {
+      for (const entry of walkFiles(p, p)) {
+        if (/\.(test|spec)\.(ts|tsx)$/.test(entry)) continue;
+        if (!/\.(ts|tsx|mjs)$/.test(entry)) continue;
+        const full = join(p, entry);
+        // Don't scan this script — its source contains the regex literal.
+        if (full.endsWith(`scripts${require('node:path').sep}check-launch-readiness.ts`)) continue;
+        const content = readFileSync(full, 'utf8');
+        let m: RegExpExecArray | null;
+        while ((m = ENV_RE.exec(content))) referenced.add(m[1]);
+      }
+    } else if (stat.isFile()) {
+      const content = readFileSync(p, 'utf8');
+      let m: RegExpExecArray | null;
+      while ((m = ENV_RE.exec(content))) referenced.add(m[1]);
+    }
+  }
+  for (const d of SCAN_DIRS) scan(join(ROOT, d));
+  for (const f of SCAN_FILES_AT_ROOT) scan(join(ROOT, f));
+
+  const missing = [...referenced]
+    .filter((v) => !declared.has(v))
+    .filter((v) => !ENV_EXAMPLE_IGNORE.has(v))
+    .sort();
+
+  if (missing.length === 0) {
+    return {
+      status: 'PASS',
+      detail: `${referenced.size} env vars referenced; all ${referenced.size - ENV_EXAMPLE_IGNORE.size} non-ignored ones declared in .env.example`,
+    };
+  }
+  return {
+    status: 'FAIL',
+    detail: `${missing.length} env var(s) referenced in code but missing from .env.example: ${missing.join(', ')}. Add them with a placeholder + comment explaining purpose, or add to ENV_EXAMPLE_IGNORE if they're runtime-set.`,
+    reference: 'GO-LIVE-CHECKLIST §2',
+  };
+});
+
 check('2.STRIPE.live', 'Secrets', 'Stripe webhook setup runbook documented', () => {
   const path = join(ROOT, 'docs/operations/STRIPE-SETUP.md');
   if (!existsSync(path)) {
