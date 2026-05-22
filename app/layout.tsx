@@ -6,6 +6,7 @@ import { Preloader } from "@/components/Preloader";
 import { GlobalEffects } from "@/components/GlobalEffects";
 import { BackToTop } from "@/components/BackToTop";
 import { Analytics } from "@/components/Analytics";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { WebVitalsReporter } from "@/components/WebVitalsReporter";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 import { LOCALES, DEFAULT_LOCALE } from "@/lib/i18n/dict";
@@ -191,6 +192,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <GlobalEffects />
           <BackToTop />
           <Analytics />
+          <VercelAnalytics />
           <WebVitalsReporter />
         </LocaleProvider>
       </body>
