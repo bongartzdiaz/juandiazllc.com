@@ -3,7 +3,14 @@ name: Sync Philly standalone → DEUS-SHARED
 # Runs inside GitHub Actions (not your laptop), syncs the extracted
 # Philly CRM at apps/philly-standalone/ into the DEUS-SHARED repo.
 #
-# Trigger: manual via GitHub's web UI / mobile app. Never auto-runs.
+# Triggers:
+#   - push to main (auto)  — every merge to main automatically mirrors
+#     to DEUS-SHARED. Maintains the "phily == DEUS-SHARED" invariant
+#     without operator action. Failures alert Slack via SLACK_ALERTS_WEBHOOK.
+#   - workflow_dispatch (manual) — keep the manual trigger for:
+#     · re-syncing after a PAT refresh
+#     · syncing a non-main branch (e.g., target_branch=staging)
+#     · adding an audit note inline
 #
 # Setup (one-time, ~2 minutes, all on mobile):
 #   1. Create a fine-grained PAT:
@@ -19,14 +26,16 @@ name: Sync Philly standalone → DEUS-SHARED
 #      Secrets and variables → Actions → "New repository secret"
 #      - Name: DEUS_SHARED_PAT
 #      - Value: (paste the token)
-#   3. Run the workflow:
-#      github.com/bongartzdiaz/juandiazllc.com → Actions tab →
-#      "Sync Philly standalone → DEUS-SHARED" → "Run workflow" →
-#      branch: claude/ai-command-bar → green "Run workflow" button
+#   3. (Optional — for failure alerts) confirm SLACK_ALERTS_WEBHOOK secret
+#      is set on this repo. Same webhook db-slow-queries.yml and
+#      synthetic-prod.yml use; safe to share.
 #
-# After setup, every future sync is just step 3 — one button click.
+# After setup, merges to main auto-sync. Manual runs are still
+# available from Actions tab when needed.
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       target_branch:
@@ -41,14 +50,19 @@ on:
         type: string
 
 concurrency:
-  # Don't let two syncs race against the same target branch.
-  group: sync-deus-shared-${{ github.event.inputs.target_branch }}
+  # Don't let two syncs race against the same target branch. The fallback
+  # to "main" handles push events (no inputs).
+  group: sync-deus-shared-${{ github.event.inputs.target_branch || 'main' }}
   cancel-in-progress: false
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      # Single source of truth — derives the target branch from inputs
+      # when manually dispatched, falls back to "main" on push.
+      TARGET_BRANCH: ${{ github.event.inputs.target_branch || 'main' }}
     steps:
       - name: Checkout monorepo (this repo)
         uses: actions/checkout@v4
@@ -66,7 +80,6 @@ jobs:
           git clone "https://x-access-token:${PAT}@github.com/bongartzdiaz/DEUS-SHARED.git" /tmp/target
           cd /tmp/target
           # Check out (or create) the target branch.
-          TARGET_BRANCH="${{ github.event.inputs.target_branch }}"
           if git show-ref --quiet "refs/remotes/origin/${TARGET_BRANCH}"; then
             git checkout "${TARGET_BRANCH}"
           else
@@ -103,6 +116,7 @@ jobs:
           SOURCE_SHA="${{ github.sha }}"
           SHORT_SHA="${SOURCE_SHA:0:7}"
           NOTE="${{ github.event.inputs.note }}"
+          TRIGGER="${{ github.event_name }}"  # 'push' or 'workflow_dispatch'
           git add -A
           # Build the commit body — appends the operator's note when one
           # was supplied at workflow_dispatch time so future blame on the
@@ -111,13 +125,46 @@ jobs:
             echo "sync from juandiazllc.com monorepo (${SHORT_SHA})"
             echo
             echo "Source: https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}/apps/philly-standalone"
-            echo "Triggered by: ${{ github.actor }} via workflow_dispatch"
+            echo "Triggered by: ${{ github.actor }} via ${TRIGGER}"
             if [[ -n "${NOTE}" ]]; then
               echo "Note: ${NOTE}"
             fi
           } > /tmp/commit-msg.txt
           git commit -F /tmp/commit-msg.txt
-          git push origin "${{ github.event.inputs.target_branch }}"
+          git push origin "${TARGET_BRANCH}"
+
+      - name: Notify Slack on failure
+        if: failure() && env.SLACK_ALERTS_WEBHOOK != ''
+        env:
+          SLACK_ALERTS_WEBHOOK: ${{ secrets.SLACK_ALERTS_WEBHOOK }}
+        run: |
+          # Silent-broken-mirror is the failure mode we're guarding against.
+          # If the sync fails (PAT expired, DEUS-SHARED branch protection,
+          # network), surface it loudly so phily != DEUS-SHARED is caught
+          # within minutes instead of at next launch:check.
+          PAYLOAD=$(cat <<EOF
+          {
+            "text": ":rotating_light: *DEUS-SHARED sync failed*",
+            "attachments": [
+              {
+                "color": "#7c1d6f",
+                "title": "Sync from juandiazllc.com → DEUS-SHARED failed",
+                "text": "The mirror is now drifted from upstream. phily != DEUS-SHARED until this is fixed.",
+                "fields": [
+                  { "title": "trigger", "value": "${{ github.event_name }}", "short": true },
+                  { "title": "actor", "value": "${{ github.actor }}", "short": true },
+                  { "title": "source sha", "value": "${{ github.sha }}", "short": false },
+                  { "title": "target branch", "value": "${TARGET_BRANCH}", "short": true },
+                  { "title": "run", "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}", "short": false }
+                ]
+              }
+            ]
+          }
+          EOF
+          )
+          curl -sS -X POST -H "content-type: application/json" \
+            --data "$PAYLOAD" \
+            "$SLACK_ALERTS_WEBHOOK" || true
 
       - name: Summary
         if: always()
@@ -126,7 +173,8 @@ jobs:
         run: |
           echo "### Sync result" >> "$GITHUB_STEP_SUMMARY"
           echo "- Source: \`${{ github.repository }}@${{ github.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Target: \`bongartzdiaz/DEUS-SHARED\` branch \`${{ github.event.inputs.target_branch }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Target: \`bongartzdiaz/DEUS-SHARED\` branch \`${TARGET_BRANCH}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Trigger: \`${{ github.event_name }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Status: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
           if [[ -n "${NOTE}" ]]; then
             echo "- Note: ${NOTE}" >> "$GITHUB_STEP_SUMMARY"
