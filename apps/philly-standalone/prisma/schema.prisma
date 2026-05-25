@@ -14,57 +14,58 @@ model Organization {
   industry  String   @default("general")
   createdAt DateTime @default(now())
 
-  users          User[]
-  projects       Project[]
-  contacts       Contact[]
-  kanbanBoards   KanbanBoard[]
-  customPages    CustomPage[]
-  auditLogs      AuditLog[]
-  savedViews     SavedView[]
-  pipelines      Pipeline[]
-  calendarEvents CalendarEvent[]
-  notifications  Notification[]
-  automations    AutomationRule[]
-  webhooks       Webhook[]
-  apiKeys        ApiKey[]
-  templates      Template[]
-  documents      Document[]
-  properties     Property[]
-  rooms          Room[]
-  grants         Grant[]
-  donorProfiles  DonorProfile[]
-  volunteers     Volunteer[]
-  mlsFeeds       MlsFeed[]
-  listingAlerts  ListingAlert[]
-  conversations  Conversation[]
-  leadScores       LeadScore[]
-  scoringRules     ScoringRule[]
-  leadRoutingRules LeadRoutingRule[]
-  callLogs         CallLog[]
-  dialerLists      DialerList[]
-  actionPlans      ActionPlan[]
-  transactions     Transaction[]
-  referrals          Referral[]
-  soiCategories      SoiCategory[]
-  cmaReports         CmaReport[]
-  clientPortalAccess ClientPortalAccess[]
-  emailAccounts      EmailAccount[]
-  smsMessages        SmsMessage[]
-  integrations       Integration[]
-  propertyTaxonomy   PropertyTaxonomy?
+  users                  User[]
+  projects               Project[]
+  contacts               Contact[]
+  kanbanBoards           KanbanBoard[]
+  customPages            CustomPage[]
+  auditLogs              AuditLog[]
+  savedViews             SavedView[]
+  pipelines              Pipeline[]
+  calendarEvents         CalendarEvent[]
+  notifications          Notification[]
+  automations            AutomationRule[]
+  webhooks               Webhook[]
+  apiKeys                ApiKey[]
+  templates              Template[]
+  documents              Document[]
+  properties             Property[]
+  rooms                  Room[]
+  grants                 Grant[]
+  donorProfiles          DonorProfile[]
+  volunteers             Volunteer[]
+  mlsFeeds               MlsFeed[]
+  listingAlerts          ListingAlert[]
+  conversations          Conversation[]
+  leadScores             LeadScore[]
+  scoringRules           ScoringRule[]
+  leadRoutingRules       LeadRoutingRule[]
+  callLogs               CallLog[]
+  dialerLists            DialerList[]
+  actionPlans            ActionPlan[]
+  transactions           Transaction[]
+  referrals              Referral[]
+  soiCategories          SoiCategory[]
+  cmaReports             CmaReport[]
+  clientPortalAccess     ClientPortalAccess[]
+  emailAccounts          EmailAccount[]
+  smsMessages            SmsMessage[]
+  integrations           Integration[]
+  propertyTaxonomy       PropertyTaxonomy?
   // Multi-org: every user that belongs to this organization is
   // represented by a Membership row. A user's User.organizationId is
   // their primary/home org; membership in additional orgs is purely
   // through this table.
-  memberships        Membership[]
-  gdprErasureLogs    GdprErasureLog[]
-  gdprExportLogs     GdprExportLog[]
-  gdprConsentRecords GdprConsentRecord[]
+  memberships            Membership[]
+  gdprErasureLogs        GdprErasureLog[]
+  gdprExportLogs         GdprExportLog[]
+  gdprConsentRecords     GdprConsentRecord[]
   assistantConversations AssistantConversation[]
   assistantMemories      AssistantMemory[]
-  featureFlags       FeatureFlag[]
-  scimGroups         ScimGroup[]
-  dripEnrollments    DripEnrollment[]
+  featureFlags           FeatureFlag[]
+  orgFeatureOverrides    OrgFeatureOverride[]
+  scimGroups             ScimGroup[]
+  dripEnrollments        DripEnrollment[]
 
   // Enterprise — per-org access controls. NULL on both = no
   // restrictions (default). Both can be set via the admin Security
@@ -92,70 +93,79 @@ model Organization {
 // the CRM. Subscription lifecycle events arrive via the webhook
 // route at /api/webhooks/stripe.
 model Subscription {
-  id                   String   @id @default(cuid())
-  organizationId       String   @unique
-  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  id             String       @id @default(cuid())
+  organizationId String       @unique
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  stripeCustomerId     String   @unique
-  stripeSubscriptionId String?  @unique
+  stripeCustomerId     String  @unique
+  stripeSubscriptionId String? @unique
   stripePriceId        String?
 
   // 'operator' | 'team' | 'business' — matches the pricing.* keys
   // in lib/i18n/dict.ts on the marketing side.
-  plan                 String
+  plan String
 
   // Stripe values: 'trialing' | 'active' | 'past_due' | 'canceled' |
   // 'incomplete' | 'incomplete_expired' | 'unpaid' | 'paused'.
-  status               String
+  status String
 
-  currentPeriodStart   DateTime?
-  currentPeriodEnd     DateTime?
-  cancelAtPeriodEnd    Boolean  @default(false)
-  trialEndsAt          DateTime?
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean   @default(false)
+  trialEndsAt        DateTime?
 
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([status])
   @@index([currentPeriodEnd])
 }
 
 model User {
-  id             String    @id @default(cuid())
-  email          String    @unique
-  emailVerified  DateTime?
-  name           String
-  passwordHash   String
-  role           String    @default("viewer") // admin, manager, viewer
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  emailVerified       DateTime?
+  name                String
+  passwordHash        String
+  role                String    @default("viewer") // admin, manager, viewer, superAdmin
+  // role notes:
+  //   - viewer      : read-only org member
+  //   - manager     : mutation rights within own org
+  //   - admin       : full org-level rights (settings, billing, users)
+  //   - superAdmin  : PLATFORM-LEVEL — Juan / lucenai.eu staff. Bypasses
+  //     org boundaries via auth-helpers.ts requireSuperAdmin(). Used by
+  //     the two-level feature-toggle UX (lib/philly/features/resolve.ts)
+  //     to write OrgFeatureOverride rows that force a feature ON/OFF
+  //     for a specific org, bypassing the plan-tier check when needed.
   // Per-user dashboard-section allow-list. Null = full access
   // (superadmin / legacy users). Array of slugs from
   // lib/philly/sections.ts = strict allow-list. `role === 'admin'`
   // bypasses this regardless (admins can't lock themselves out).
-  dashboardSections Json?
-  locale         String    @default("en")
-  avatarUrl      String?
-  image          String?
-  organizationId String
-  createdAt      DateTime  @default(now())
+  dashboardSections   Json?
+  locale              String    @default("en")
+  avatarUrl           String?
+  image               String?
+  organizationId      String
+  createdAt           DateTime  @default(now())
   // Security: brute-force lockout
-  failedLoginCount   Int       @default(0)
-  lockedUntil        DateTime?
-  lastLoginAt        DateTime?
-  lastLoginIp        String?
+  failedLoginCount    Int       @default(0)
+  lockedUntil         DateTime?
+  lastLoginAt         DateTime?
+  lastLoginIp         String?
   // Updated on every authenticated request via touchActivity() in
   // requireScope. Used by the per-org sessionIdleTimeoutMinutes
   // policy to force re-authentication on stale sessions.
-  lastActivityAt     DateTime?
+  lastActivityAt      DateTime?
   // Security: global session invalidation — any JWT issued before this
   // timestamp is rejected. Bump this to log the user out on all devices.
-  tokensInvalidAfter DateTime?
+  tokensInvalidAfter  DateTime?
   // GDPR Art. 17 — when set, account is scheduled for deletion at this
   // timestamp. Reads/writes from this user are blocked once set; the
   // retention cron hard-deletes the row when `now() >= deletionScheduledAt`.
   deletionScheduledAt DateTime?
   deletionRequestedAt DateTime?
   // TOTP two-factor auth
-  twoFactorSecret     String?   // encrypted via src/lib/crypto.ts
+  twoFactorSecret     String? // encrypted via src/lib/crypto.ts
   twoFactorEnabled    Boolean   @default(false)
   twoFactorVerifiedAt DateTime?
   // SCIM externalId — the IdP's stable identifier for this user
@@ -164,42 +174,45 @@ model User {
   // email. Null when the user wasn't SCIM-provisioned.
   // Bundle BQ; RFC 7644 §3.4 (filter by externalId).
   scimExternalId      String?
-  @@index([organizationId, scimExternalId])
 
-  organization    Organization     @relation(fields: [organizationId], references: [id])
+  organization               Organization            @relation(fields: [organizationId], references: [id])
   // Multi-org membership. organizationId above is the user's "home"
   // (primary) org — the one they were originally created in. The
   // Membership rows enumerate every org they belong to with the role
   // and section-allow-list per org. The active org for a given
   // request is resolved by lib/philly/auth-helpers.ts from a cookie
   // (`philly-active-org`), falling back to organizationId when unset.
-  memberships     Membership[]
-  scimGroupMemberships ScimGroupMembership[]
-  twoFactorRecoveryCodes TwoFactorRecoveryCode[]
-  dashboardLayout DashboardLayout?
-  kanbanCards     KanbanCard[]     @relation("assignee")
-  customPages     CustomPage[]
-  accounts        Account[]
-  sessions        Session[]
-  auditLogs       AuditLog[]
-  contactNotes    ContactNote[]
-  activities      Activity[]
-  savedViews      SavedView[]
-  notifications   Notification[]
-  automationLogs  AutomationLog[]
-  eventAttendees  EventAttendee[]
-  reports         Report[]
-  deals           Deal[]          @relation("dealOwner")
-  assistantConversations AssistantConversation[]
-  assistantMemories      AssistantMemory[]
+  memberships                Membership[]
+  scimGroupMemberships       ScimGroupMembership[]
+  twoFactorRecoveryCodes     TwoFactorRecoveryCode[]
+  dashboardLayout            DashboardLayout?
+  kanbanCards                KanbanCard[]            @relation("assignee")
+  customPages                CustomPage[]
+  accounts                   Account[]
+  sessions                   Session[]
+  auditLogs                  AuditLog[]
+  contactNotes               ContactNote[]
+  activities                 Activity[]
+  savedViews                 SavedView[]
+  notifications              Notification[]
+  automationLogs             AutomationLog[]
+  eventAttendees             EventAttendee[]
+  reports                    Report[]
+  deals                      Deal[]                  @relation("dealOwner")
+  assistantConversations     AssistantConversation[]
+  assistantMemories          AssistantMemory[]
+  // Bundle DEUS — super-admin actions. NULL for non-superAdmin users.
+  orgFeatureOverridesCreated OrgFeatureOverride[]    @relation("OrgFeatureOverrideCreator")
+
+  @@index([organizationId, scimExternalId])
 }
 
 model TwoFactorRecoveryCode {
-  id         String    @id @default(cuid())
-  userId     String
-  codeHash   String                      // bcrypt hash of the one-time code
-  usedAt     DateTime?
-  createdAt  DateTime  @default(now())
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String // bcrypt hash of the one-time code
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -300,17 +313,17 @@ model Contact {
   createdAt      DateTime @default(now())
 
   // RE Lead fields
-  leadScore       Int      @default(0)    // 0-100 behavioral score
-  leadSource      String   @default("")   // website, zillow, realtor_com, referral, open_house, facebook, google, cold_call, sphere
-  leadStatus      String   @default("new") // new, contacted, qualified, nurture, hot, under_contract, closed, lost
-  preferredMethod String   @default("email") // email, phone, text, whatsapp
-  preApproved     Boolean  @default(false)
-  preApprovalAmt  Int      @default(0)    // cents
-  buyerPriceMin   Int?     // cents
-  buyerPriceMax   Int?     // cents
+  leadScore       Int       @default(0) // 0-100 behavioral score
+  leadSource      String    @default("") // website, zillow, realtor_com, referral, open_house, facebook, google, cold_call, sphere
+  leadStatus      String    @default("new") // new, contacted, qualified, nurture, hot, under_contract, closed, lost
+  preferredMethod String    @default("email") // email, phone, text, whatsapp
+  preApproved     Boolean   @default(false)
+  preApprovalAmt  Int       @default(0) // cents
+  buyerPriceMin   Int? // cents
+  buyerPriceMax   Int? // cents
   buyerBeds       Int?
   buyerBaths      Int?
-  buyerAreas      String   @default("") // comma-separated zip codes or neighborhoods
+  buyerAreas      String    @default("") // comma-separated zip codes or neighborhoods
   lastContactedAt DateTime?
   nextFollowUpAt  DateTime?
   assignedToId    String?
@@ -318,19 +331,19 @@ model Contact {
   // AI-derived attributes (Attio-style) — filled by lib/philly/ai/contact-attributes
   // on contact create and on-demand refresh via /api/contacts/[id]/ai-attributes.
   // Deterministic scoring still lives in LeadScore; these are LLM-inferred.
-  aiIndustry             String?   // e.g. "Residential solar", "SaaS — devtools"
-  aiIcpFit               Int?      // 0-100 match against ideal customer profile
-  aiSummary              String?   @db.Text // one-paragraph narrative summary
-  aiAttributesStatus     String?   // "pending" | "ready" | "error" (null = never run)
-  aiAttributesUpdatedAt  DateTime?
-  aiAttributesError      String?   @db.Text // last error message if status=error
+  aiIndustry            String? // e.g. "Residential solar", "SaaS — devtools"
+  aiIcpFit              Int? // 0-100 match against ideal customer profile
+  aiSummary             String?   @db.Text // one-paragraph narrative summary
+  aiAttributesStatus    String? // "pending" | "ready" | "error" (null = never run)
+  aiAttributesUpdatedAt DateTime?
+  aiAttributesError     String?   @db.Text // last error message if status=error
 
   // Bundle AG — manual ordering for the contacts list. NULL means
   // "use createdAt fallback"; explicit values sort lower-first. The
   // reorder endpoint writes monotonically increasing integers from
   // a base of (createdAt epoch ms) so insertions don't require a
   // global rewrite.
-  displayOrder           BigInt?
+  displayOrder BigInt?
 
   organization    Organization     @relation(fields: [organizationId], references: [id])
   contactProjects ContactProject[]
@@ -458,8 +471,8 @@ model AuditLog {
   id             String   @id @default(cuid())
   organizationId String
   userId         String
-  action         String   // create, update, delete
-  entity         String   // project, contact, kanbanCard, etc.
+  action         String // create, update, delete
+  entity         String // project, contact, kanbanCard, etc.
   entityId       String?
   changes        String   @default("{}") @db.LongText // JSON diff {field: {old, new}}
   createdAt      DateTime @default(now())
@@ -502,7 +515,7 @@ model Activity {
   organizationId String?
   contactId      String?
   userId         String?
-  type           String   // note, email, call, meeting, task, deal_update, status_change
+  type           String // note, email, call, meeting, task, deal_update, status_change
   title          String
   description    String   @default("") @db.Text
   metadata       String   @default("{}") @db.LongText // JSON extra data
@@ -521,11 +534,11 @@ model SavedView {
   id             String   @id @default(cuid())
   organizationId String
   userId         String?
-  entity         String   // contacts, projects, deals
+  entity         String // contacts, projects, deals
   name           String
-  filtersJson    String   @default("[]") @db.LongText  // JSON filter rules
-  columnsJson    String   @default("[]") @db.LongText  // visible columns
-  sortJson       String   @default("{}") @db.LongText  // sort config
+  filtersJson    String   @default("[]") @db.LongText // JSON filter rules
+  columnsJson    String   @default("[]") @db.LongText // visible columns
+  sortJson       String   @default("{}") @db.LongText // sort config
   isDefault      Boolean  @default(false)
   isShared       Boolean  @default(false)
   createdAt      DateTime @default(now())
@@ -570,49 +583,49 @@ model PipelineStage {
 /// is (pipelineId, displayOrder) so reorder queries stay cheap inside one
 /// pipeline.
 model Deal {
-  id          String    @id @default(cuid())
-  pipelineId  String
-  stageId     String
-  contactId   String?
-  projectId   String?
-  propertyId  String?
-  ownerId     String?
-  title       String
-  valueCents  Int       @default(0)
-  currency    String    @default("USD")
-  probability Int       @default(50) // 0-100
-  status      String    @default("open") // open, won, lost
-  dealType    String    @default("buy") // buy, sell, rent, lease, dual
+  id            String    @id @default(cuid())
+  pipelineId    String
+  stageId       String
+  contactId     String?
+  projectId     String?
+  propertyId    String?
+  ownerId       String?
+  title         String
+  valueCents    Int       @default(0)
+  currency      String    @default("USD")
+  probability   Int       @default(50) // 0-100
+  status        String    @default("open") // open, won, lost
+  dealType      String    @default("buy") // buy, sell, rent, lease, dual
   expectedClose DateTime?
   actualClose   DateTime?
-  notes       String    @default("") @db.Text
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  notes         String    @default("") @db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   // Commission tracking
-  commissionPct     Float  @default(3.0)   // agent commission %
-  commissionCents   Int    @default(0)     // calculated commission
-  brokerSplitPct    Float  @default(30.0)  // brokerage split %
-  teamSplitPct      Float  @default(0)     // team lead split %
-  referralFeePct    Float  @default(0)     // referral fee %
-  netCommissionCents Int   @default(0)     // after all splits
-  earnestMoneyCents Int    @default(0)
+  commissionPct      Float @default(3.0) // agent commission %
+  commissionCents    Int   @default(0) // calculated commission
+  brokerSplitPct     Float @default(30.0) // brokerage split %
+  teamSplitPct       Float @default(0) // team lead split %
+  referralFeePct     Float @default(0) // referral fee %
+  netCommissionCents Int   @default(0) // after all splits
+  earnestMoneyCents  Int   @default(0)
 
   // Transaction management
-  inspectionDate     DateTime?
-  appraisalDate      DateTime?
-  titleDate          DateTime?
-  finalWalkDate      DateTime?
-  closingDate        DateTime?
-  contingenciesJson  String  @default("[]") @db.LongText // JSON array of {name, status, dueDate}
-  closingChecklistJson String @default("[]") @db.LongText // JSON array of {task, done, dueDate}
+  inspectionDate       DateTime?
+  appraisalDate        DateTime?
+  titleDate            DateTime?
+  finalWalkDate        DateTime?
+  closingDate          DateTime?
+  contingenciesJson    String    @default("[]") @db.LongText // JSON array of {name, status, dueDate}
+  closingChecklistJson String    @default("[]") @db.LongText // JSON array of {task, done, dueDate}
 
   // Manual ordering for the deals LIST view (Bundle AL). NULL falls
   // back to createdAt-desc; explicit values sort lower-first.
-  displayOrder       BigInt?
+  displayOrder BigInt?
 
   // Source tracking
-  leadSource  String @default("")
+  leadSource String @default("")
 
   pipeline Pipeline      @relation(fields: [pipelineId], references: [id])
   stage    PipelineStage @relation(fields: [stageId], references: [id])
@@ -632,18 +645,18 @@ model Deal {
 // ── Phase 2D: Calendar Events ──
 
 model CalendarEvent {
-  id             String    @id @default(cuid())
+  id             String   @id @default(cuid())
   organizationId String
   title          String
-  description    String    @default("") @db.Text
+  description    String   @default("") @db.Text
   startTime      DateTime
   endTime        DateTime
-  allDay         Boolean   @default(false)
-  location       String    @default("")
-  color          String    @default("#3B82F6")
-  recurrence     String?   // RRULE string or null
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  allDay         Boolean  @default(false)
+  location       String   @default("")
+  color          String   @default("#3B82F6")
+  recurrence     String? // RRULE string or null
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   organization Organization    @relation(fields: [organizationId], references: [id])
   attendees    EventAttendee[]
@@ -652,11 +665,11 @@ model CalendarEvent {
 }
 
 model EventAttendee {
-  id       String @id @default(cuid())
-  eventId  String
-  userId   String?
-  email    String @default("")
-  status   String @default("pending") // pending, accepted, declined
+  id      String  @id @default(cuid())
+  eventId String
+  userId  String?
+  email   String  @default("")
+  status  String  @default("pending") // pending, accepted, declined
 
   event CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
   user  User?         @relation(fields: [userId], references: [id])
@@ -673,7 +686,7 @@ model Report {
   organizationId String?
   userId         String
   title          String
-  type           String   // quarterly, financial, sdg, impact, custom
+  type           String // quarterly, financial, sdg, impact, custom
   status         String   @default("generating") // generating, ready, failed
   configJson     String   @default("{}") @db.LongText
   resultHtml     String?  @db.LongText
@@ -690,7 +703,7 @@ model Notification {
   id             String   @id @default(cuid())
   organizationId String
   userId         String
-  type           String   // info, warning, success, error
+  type           String // info, warning, success, error
   title          String
   message        String   @default("") @db.Text
   link           String?
@@ -710,9 +723,9 @@ model AutomationRule {
   id             String   @id @default(cuid())
   organizationId String
   name           String
-  trigger        String   // onEntityCreate, onFieldChange, onStageChange, onSchedule, onDateApproach
+  trigger        String // onEntityCreate, onFieldChange, onStageChange, onSchedule, onDateApproach
   triggerConfig  String   @default("{}") @db.LongText
-  actionType     String   // sendEmail, sendSMS, createTask, updateField, moveStage, createNotification, callWebhook
+  actionType     String // sendEmail, sendSMS, createTask, updateField, moveStage, createNotification, callWebhook
   actionConfig   String   @default("{}") @db.LongText
   enabled        Boolean  @default(true)
   createdAt      DateTime @default(now())
@@ -727,7 +740,7 @@ model AutomationLog {
   id        String   @id @default(cuid())
   ruleId    String
   userId    String?
-  status    String   // success, failure
+  status    String // success, failure
   input     String   @default("{}") @db.LongText
   output    String   @default("{}") @db.LongText
   error     String?  @db.Text
@@ -746,7 +759,7 @@ model Template {
   id             String   @id @default(cuid())
   organizationId String
   name           String
-  type           String   // email, sms, whatsapp, report
+  type           String // email, sms, whatsapp, report
   subject        String   @default("")
   body           String   @db.LongText
   variables      String   @default("[]") @db.LongText // JSON array of merge field names
@@ -769,7 +782,7 @@ model Webhook {
   enabled        Boolean  @default(true)
   createdAt      DateTime @default(now())
 
-  organization Organization     @relation(fields: [organizationId], references: [id])
+  organization Organization      @relation(fields: [organizationId], references: [id])
   deliveries   WebhookDelivery[]
 
   @@index([organizationId])
@@ -796,7 +809,7 @@ model ApiKey {
   organizationId String
   name           String
   keyHash        String    @unique
-  prefix         String    // first 8 chars for identification
+  prefix         String // first 8 chars for identification
   permissions    String    @default("read") // read, write, admin
   // Bundle R — scope grants beyond legacy `permissions`. JSON array
   // of strings, e.g. ["scim:users"]. Legacy "permissions"-only keys
@@ -838,34 +851,34 @@ model Property {
   updatedAt      DateTime @updatedAt
 
   // RE-specific fields
-  listingAgentId  String?
-  listingDate     DateTime?
-  expirationDate  DateTime?
-  daysOnMarket    Int       @default(0)
-  mlsNumber       String    @default("")
-  hoaCents        Int       @default(0)
-  taxCents        Int       @default(0)
-  lotSqft         Int?
-  parkingSpaces   Int?
-  stories         Int?
-  propertyStyle   String    @default("") // colonial, ranch, contemporary, etc.
-  virtualTourUrl  String    @default("")
-  listPriceCents  Int       @default(0)  // original list price (priceCents = current)
-  pricePerSqft    Int       @default(0)  // cents
+  listingAgentId String?
+  listingDate    DateTime?
+  expirationDate DateTime?
+  daysOnMarket   Int       @default(0)
+  mlsNumber      String    @default("")
+  hoaCents       Int       @default(0)
+  taxCents       Int       @default(0)
+  lotSqft        Int?
+  parkingSpaces  Int?
+  stories        Int?
+  propertyStyle  String    @default("") // colonial, ranch, contemporary, etc.
+  virtualTourUrl String    @default("")
+  listPriceCents Int       @default(0) // original list price (priceCents = current)
+  pricePerSqft   Int       @default(0) // cents
 
   // DEUS / Cyprus MLS fields
-  listingType   String  @default("sale")    // sale | rent
-  subtype       String  @default("")        // e.g. detached_house, apartment, penthouse, plot, office, ...
-  district      String  @default("")        // paphos | limassol | larnaca | nicosia | famagusta
-  town          String  @default("")        // finer sub-area within district
-  isBankOwned   Boolean @default(false)
-  isResale      Boolean @default(false)
+  listingType String  @default("sale") // sale | rent
+  subtype     String  @default("") // e.g. detached_house, apartment, penthouse, plot, office, ...
+  district    String  @default("") // paphos | limassol | larnaca | nicosia | famagusta
+  town        String  @default("") // finer sub-area within district
+  isBankOwned Boolean @default(false)
+  isResale    Boolean @default(false)
 
   // Bundle BR — manual reorder column. Mirrors Contact.displayOrder
   // (Bundle AG) and Deal.displayOrder (Bundle AL). NULL = unsorted
   // (server's default order wins). The grid renders ascending; the
   // /api/properties/reorder endpoint writes 1..N inside a transaction.
-  displayOrder  BigInt?
+  displayOrder BigInt?
 
   organization Organization @relation(fields: [organizationId], references: [id])
   viewings     Viewing[]
@@ -882,17 +895,17 @@ model Property {
 }
 
 model Showing {
-  id          String    @id @default(cuid())
-  propertyId  String
-  agentId     String?
-  contactId   String?
-  date        DateTime
-  duration    Int       @default(30) // minutes
-  status      String    @default("scheduled") // scheduled, confirmed, completed, cancelled, no_show
-  feedback    String    @default("") @db.Text
-  rating      Int?      // 1-5 buyer interest level
-  notes       String    @default("") @db.Text
-  createdAt   DateTime  @default(now())
+  id         String   @id @default(cuid())
+  propertyId String
+  agentId    String?
+  contactId  String?
+  date       DateTime
+  duration   Int      @default(30) // minutes
+  status     String   @default("scheduled") // scheduled, confirmed, completed, cancelled, no_show
+  feedback   String   @default("") @db.Text
+  rating     Int? // 1-5 buyer interest level
+  notes      String   @default("") @db.Text
+  createdAt  DateTime @default(now())
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
@@ -919,19 +932,19 @@ model Viewing {
 // ── Phase 6B: Hospitality ──
 
 model Room {
-  id             String   @id @default(cuid())
-  organizationId String
-  name           String
-  type           String   @default("standard") // standard, deluxe, suite, villa
-  status         String   @default("available") // available, occupied, maintenance, blocked
-  floor          Int      @default(1)
-  capacity       Int      @default(2)
-  priceCentsNight Int     @default(0)
-  amenities      String   @default("[]") @db.LongText // JSON array
-  images         String   @default("[]") @db.LongText
-  createdAt      DateTime @default(now())
+  id              String   @id @default(cuid())
+  organizationId  String
+  name            String
+  type            String   @default("standard") // standard, deluxe, suite, villa
+  status          String   @default("available") // available, occupied, maintenance, blocked
+  floor           Int      @default(1)
+  capacity        Int      @default(2)
+  priceCentsNight Int      @default(0)
+  amenities       String   @default("[]") @db.LongText // JSON array
+  images          String   @default("[]") @db.LongText
+  createdAt       DateTime @default(now())
 
-  organization Organization  @relation(fields: [organizationId], references: [id])
+  organization Organization       @relation(fields: [organizationId], references: [id])
   reservations Reservation[]
   housekeeping HousekeepingTask[]
 
@@ -939,17 +952,17 @@ model Room {
 }
 
 model Reservation {
-  id          String   @id @default(cuid())
-  roomId      String
-  guestName   String
-  guestEmail  String   @default("")
-  guestPhone  String   @default("")
-  checkIn     DateTime
-  checkOut    DateTime
-  status      String   @default("confirmed") // inquiry, confirmed, checked_in, checked_out, cancelled
-  totalCents  Int      @default(0)
-  notes       String   @default("") @db.Text
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  roomId     String
+  guestName  String
+  guestEmail String   @default("")
+  guestPhone String   @default("")
+  checkIn    DateTime
+  checkOut   DateTime
+  status     String   @default("confirmed") // inquiry, confirmed, checked_in, checked_out, cancelled
+  totalCents Int      @default(0)
+  notes      String   @default("") @db.Text
+  createdAt  DateTime @default(now())
 
   room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
 
@@ -996,17 +1009,17 @@ model Grant {
 }
 
 model DonorProfile {
-  id             String   @id @default(cuid())
-  organizationId String
-  contactId      String?
-  totalGivenCents Int     @default(0)
-  lastGiftDate   DateTime?
-  firstGiftDate  DateTime?
-  giftCount      Int      @default(0)
-  avgGiftCents   Int      @default(0)
-  tier           String   @default("new") // new, recurring, major, lapsed
-  notes          String   @default("") @db.Text
-  createdAt      DateTime @default(now())
+  id              String    @id @default(cuid())
+  organizationId  String
+  contactId       String?
+  totalGivenCents Int       @default(0)
+  lastGiftDate    DateTime?
+  firstGiftDate   DateTime?
+  giftCount       Int       @default(0)
+  avgGiftCents    Int       @default(0)
+  tier            String    @default("new") // new, recurring, major, lapsed
+  notes           String    @default("") @db.Text
+  createdAt       DateTime  @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1054,7 +1067,7 @@ model Document {
   mimeType       String   @default("")
   sizeBytes      Int      @default(0)
   url            String
-  entityType     String?  // project, contact, deal, property, room
+  entityType     String? // project, contact, deal, property, room
   entityId       String?
   uploadedBy     String?
   createdAt      DateTime @default(now())
@@ -1068,23 +1081,23 @@ model Document {
 // ── Real Estate: Offers ──
 
 model Offer {
-  id          String    @id @default(cuid())
-  propertyId  String
-  dealId      String?
-  contactId   String?   // buyer
-  amountCents Int       @default(0)
-  status      String    @default("pending") // pending, countered, accepted, rejected, expired, withdrawn
-  expiresAt   DateTime?
-  counterJson String    @default("[]") @db.LongText // JSON [{amount, date, by}]
-  contingencies String  @default("[]") @db.LongText // JSON [{type, status, dueDate}]
-  earnestCents Int      @default(0)
-  closingCostsCents Int @default(0)
-  inspectionDays Int    @default(10)
-  financingType String  @default("conventional") // conventional, fha, va, cash, other
-  notes       String    @default("") @db.Text
-  submittedAt DateTime  @default(now())
-  respondedAt DateTime?
-  createdAt   DateTime  @default(now())
+  id                String    @id @default(cuid())
+  propertyId        String
+  dealId            String?
+  contactId         String? // buyer
+  amountCents       Int       @default(0)
+  status            String    @default("pending") // pending, countered, accepted, rejected, expired, withdrawn
+  expiresAt         DateTime?
+  counterJson       String    @default("[]") @db.LongText // JSON [{amount, date, by}]
+  contingencies     String    @default("[]") @db.LongText // JSON [{type, status, dueDate}]
+  earnestCents      Int       @default(0)
+  closingCostsCents Int       @default(0)
+  inspectionDays    Int       @default(10)
+  financingType     String    @default("conventional") // conventional, fha, va, cash, other
+  notes             String    @default("") @db.Text
+  submittedAt       DateTime  @default(now())
+  respondedAt       DateTime?
+  createdAt         DateTime  @default(now())
 
   property Property @relation(fields: [propertyId], references: [id])
   deal     Deal?    @relation(fields: [dealId], references: [id])
@@ -1108,7 +1121,7 @@ model OpenHouse {
   status      String   @default("scheduled") // scheduled, active, completed, cancelled
   createdAt   DateTime @default(now())
 
-  property Property          @relation(fields: [propertyId], references: [id])
+  property Property         @relation(fields: [propertyId], references: [id])
   visitors OpenHouseVisit[]
 
   @@index([propertyId, date])
@@ -1160,30 +1173,30 @@ model DripCampaign {
 // at lastStepIndex + 1, then advances. Done when lastStepIndex
 // reaches the end of stepsJson.
 model DripEnrollment {
-  id             String    @id @default(cuid())
-  campaignId     String
-  contactId      String
-  organizationId String
+  id              String    @id @default(cuid())
+  campaignId      String
+  contactId       String
+  organizationId  String
   /// active | paused | done | cancelled
-  status         String    @default("active")
+  status          String    @default("active")
   /// 0-based index of the LAST delivered step. -1 means nothing
   /// delivered yet (the first step is at index 0). The cron picks
   /// up step[lastStepIndex + 1] when nextDueAt fires.
-  lastStepIndex  Int       @default(-1)
+  lastStepIndex   Int       @default(-1)
   /// When the next step should fire. NULL means the enrollment is
   /// complete or paused.
-  nextDueAt      DateTime?
+  nextDueAt       DateTime?
   /// Timestamp of the last successful send — used for audit + the
   /// "lastDelivered" UI column.
   lastDeliveredAt DateTime?
   /// If the last send attempt failed (provider error), we record the
   /// reason here so the operator can debug. Cleared on next success.
-  lastError      String?   @db.Text
+  lastError       String?   @db.Text
   /// How many delivery attempts have happened total. Useful for the
   /// admin UI + for retries that don't bump lastStepIndex.
-  attemptCount   Int       @default(0)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  attemptCount    Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   campaign     DripCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   // Bundle CC audit fix — closing the FK gap so a Contact erasure
@@ -1200,18 +1213,18 @@ model DripEnrollment {
 // ── Real Estate: Agent Performance / Commission Tracker ──
 
 model CommissionRecord {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   organizationId String
   agentId        String
   dealId         String?
-  type           String   @default("closing") // closing, referral, bonus, adjustment
-  grossCents     Int      @default(0)
-  splitPct       Float    @default(100)
-  netCents       Int      @default(0)
+  type           String    @default("closing") // closing, referral, bonus, adjustment
+  grossCents     Int       @default(0)
+  splitPct       Float     @default(100)
+  netCents       Int       @default(0)
   paidAt         DateTime?
-  status         String   @default("pending") // pending, approved, paid
-  notes          String   @default("") @db.Text
-  createdAt      DateTime @default(now())
+  status         String    @default("pending") // pending, approved, paid
+  notes          String    @default("") @db.Text
+  createdAt      DateTime  @default(now())
 
   @@index([organizationId, agentId])
   @@index([agentId, createdAt])
@@ -1238,19 +1251,19 @@ model AgentGoal {
 // ── Real Estate: Market Analytics / CMA ──
 
 model MarketSnapshot {
-  id             String   @id @default(cuid())
-  organizationId String
-  zipCode        String
-  month          Int
-  year           Int
-  medianPriceCents  Int   @default(0)
-  avgDaysOnMarket   Int   @default(0)
-  activeListings    Int   @default(0)
-  closedSales       Int   @default(0)
-  newListings       Int   @default(0)
-  avgPricePerSqft   Int   @default(0)  // cents
-  inventoryMonths   Float @default(0)
-  createdAt         DateTime @default(now())
+  id               String   @id @default(cuid())
+  organizationId   String
+  zipCode          String
+  month            Int
+  year             Int
+  medianPriceCents Int      @default(0)
+  avgDaysOnMarket  Int      @default(0)
+  activeListings   Int      @default(0)
+  closedSales      Int      @default(0)
+  newListings      Int      @default(0)
+  avgPricePerSqft  Int      @default(0) // cents
+  inventoryMonths  Float    @default(0)
+  createdAt        DateTime @default(now())
 
   @@unique([organizationId, zipCode, year, month])
   @@index([organizationId, zipCode])
@@ -1259,19 +1272,19 @@ model MarketSnapshot {
 // ── Real Estate: MLS/IDX Sync ──
 
 model MlsFeed {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   organizationId String
-  name           String   // "BRIGHT MLS", "CRMLS", etc.
-  provider       String   @default("rets") // rets, reso_web_api, idx_broker, manual
-  apiUrl         String   @default("")
-  apiKey         String   @default("")
+  name           String // "BRIGHT MLS", "CRMLS", etc.
+  provider       String    @default("rets") // rets, reso_web_api, idx_broker, manual
+  apiUrl         String    @default("")
+  apiKey         String    @default("")
   lastSyncAt     DateTime?
-  syncInterval   Int      @default(360) // minutes
-  status         String   @default("active") // active, paused, error
-  totalImported  Int      @default(0)
-  errorLog       String   @default("") @db.Text
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  syncInterval   Int       @default(360) // minutes
+  status         String    @default("active") // active, paused, error
+  totalImported  Int       @default(0)
+  errorLog       String    @default("") @db.Text
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1279,18 +1292,18 @@ model MlsFeed {
 }
 
 model ListingAlert {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   organizationId String
   contactId      String
-  name           String   // "John's dream home alert"
-  criteria       String   @default("{}") @db.LongText // JSON: { minPrice, maxPrice, beds, baths, zipCodes, types }
-  frequency      String   @default("daily") // instant, daily, weekly
-  channel        String   @default("email") // email, sms, both
-  enabled        Boolean  @default(true)
+  name           String // "John's dream home alert"
+  criteria       String    @default("{}") @db.LongText // JSON: { minPrice, maxPrice, beds, baths, zipCodes, types }
+  frequency      String    @default("daily") // instant, daily, weekly
+  channel        String    @default("email") // email, sms, both
+  enabled        Boolean   @default(true)
   lastSentAt     DateTime?
-  matchCount     Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  matchCount     Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1301,17 +1314,17 @@ model ListingAlert {
 // ── Inbox / Conversations ──
 
 model Conversation {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   organizationId String
   contactId      String
-  channel        String   @default("email") // email, sms, whatsapp
-  subject        String   @default("")
-  status         String   @default("open") // open, closed, snoozed
-  assignedTo     String?  // userId
+  channel        String    @default("email") // email, sms, whatsapp
+  subject        String    @default("")
+  status         String    @default("open") // open, closed, snoozed
+  assignedTo     String? // userId
   lastMessageAt  DateTime?
-  unreadCount    Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  unreadCount    Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   messages     Message[]
   organization Organization @relation(fields: [organizationId], references: [id])
@@ -1322,20 +1335,20 @@ model Conversation {
 }
 
 model Message {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   conversationId String
-  direction      String   @default("outbound") // inbound, outbound
-  channel        String   @default("email") // email, sms, whatsapp
-  fromAddress    String   @default("")
-  toAddress      String   @default("")
-  subject        String   @default("")
-  body           String   @default("") @db.LongText
-  bodyHtml       String   @default("") @db.LongText
-  status         String   @default("sent") // draft, queued, sent, delivered, failed, received
-  externalId     String   @default("") // provider message ID
-  metadata       String   @default("{}") @db.LongText
+  direction      String    @default("outbound") // inbound, outbound
+  channel        String    @default("email") // email, sms, whatsapp
+  fromAddress    String    @default("")
+  toAddress      String    @default("")
+  subject        String    @default("")
+  body           String    @default("") @db.LongText
+  bodyHtml       String    @default("") @db.LongText
+  status         String    @default("sent") // draft, queued, sent, delivered, failed, received
+  externalId     String    @default("") // provider message ID
+  metadata       String    @default("{}") @db.LongText
   readAt         DateTime?
-  createdAt      DateTime @default(now())
+  createdAt      DateTime  @default(now())
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
@@ -1345,17 +1358,17 @@ model Message {
 // ── Lead Scoring Engine ──
 
 model LeadScore {
-  id             String   @id @default(cuid())
-  organizationId String
-  contactId      String   @unique
-  score          Int      @default(0) // 0-100
-  grade          String   @default("D") // A, B, C, D, F
-  behaviorScore  Int      @default(0) // engagement-based
-  demographicScore Int    @default(0) // profile completeness
-  lastActivity   DateTime?
-  scoreHistory   String   @default("[]") @db.LongText // JSON array of { date, score, reason }
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id               String    @id @default(cuid())
+  organizationId   String
+  contactId        String    @unique
+  score            Int       @default(0) // 0-100
+  grade            String    @default("D") // A, B, C, D, F
+  behaviorScore    Int       @default(0) // engagement-based
+  demographicScore Int       @default(0) // profile completeness
+  lastActivity     DateTime?
+  scoreHistory     String    @default("[]") @db.LongText // JSON array of { date, score, reason }
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1367,9 +1380,9 @@ model ScoringRule {
   id             String   @id @default(cuid())
   organizationId String
   name           String
-  event          String   // page_view, email_open, call_completed, showing_attended, offer_made, etc.
+  event          String // page_view, email_open, call_completed, showing_attended, offer_made, etc.
   points         Int      @default(5)
-  decay          Boolean  @default(false)  // points decay over time
+  decay          Boolean  @default(false) // points decay over time
   decayDays      Int      @default(90)
   enabled        Boolean  @default(true)
   createdAt      DateTime @default(now())
@@ -1414,19 +1427,19 @@ model ActionPlan {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  enrollments ActionPlanEnrollment[]
-  organization Organization @relation(fields: [organizationId], references: [id])
+  enrollments  ActionPlanEnrollment[]
+  organization Organization           @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId])
 }
 
 model ActionPlanEnrollment {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   planId       String
   contactId    String
-  currentStep  Int      @default(0)
-  status       String   @default("active") // active, paused, completed, removed
-  startedAt    DateTime @default(now())
+  currentStep  Int       @default(0)
+  status       String    @default("active") // active, paused, completed, removed
+  startedAt    DateTime  @default(now())
   completedAt  DateTime?
   nextActionAt DateTime?
 
@@ -1439,26 +1452,26 @@ model ActionPlanEnrollment {
 // ── Transactions & E-Signatures ──
 
 model Transaction {
-  id             String   @id @default(cuid())
-  organizationId String
-  dealId         String?
-  propertyId     String?
-  type           String   @default("purchase") // purchase, sale, lease, rental
-  status         String   @default("pending") // pending, in_progress, completed, cancelled
-  closingDate    DateTime?
-  contractDate   DateTime?
-  escrowNumber   String   @default("")
-  titleCompany   String   @default("")
-  buyerAgentId   String?
-  sellerAgentId  String?
-  buyerContactId String?
+  id              String    @id @default(cuid())
+  organizationId  String
+  dealId          String?
+  propertyId      String?
+  type            String    @default("purchase") // purchase, sale, lease, rental
+  status          String    @default("pending") // pending, in_progress, completed, cancelled
+  closingDate     DateTime?
+  contractDate    DateTime?
+  escrowNumber    String    @default("")
+  titleCompany    String    @default("")
+  buyerAgentId    String?
+  sellerAgentId   String?
+  buyerContactId  String?
   sellerContactId String?
-  salePrice      Int      @default(0) // cents
-  earnestMoney   Int      @default(0) // cents
-  notes          String   @default("") @db.Text
-  checklistJson  String   @default("[]") @db.LongText // JSON array of checklist items
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  salePrice       Int       @default(0) // cents
+  earnestMoney    Int       @default(0) // cents
+  notes           String    @default("") @db.Text
+  checklistJson   String    @default("[]") @db.LongText // JSON array of checklist items
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   signatures   ESignature[]
   organization Organization @relation(fields: [organizationId], references: [id])
@@ -1469,18 +1482,18 @@ model Transaction {
 }
 
 model ESignature {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   transactionId String
   documentName  String
   signerName    String
   signerEmail   String
-  status        String   @default("pending") // pending, sent, viewed, signed, declined, expired
+  status        String    @default("pending") // pending, sent, viewed, signed, declined, expired
   sentAt        DateTime?
   viewedAt      DateTime?
   signedAt      DateTime?
-  externalId    String   @default("") // DocuSign/HelloSign envelope ID
-  provider      String   @default("manual") // manual, docusign, hellosign, pandadoc
-  createdAt     DateTime @default(now())
+  externalId    String    @default("") // DocuSign/HelloSign envelope ID
+  provider      String    @default("manual") // manual, docusign, hellosign, pandadoc
+  createdAt     DateTime  @default(now())
 
   transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
 
@@ -1490,22 +1503,22 @@ model ESignature {
 // ── Power Dialer + Call Tracking ──
 
 model CallLog {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   organizationId String
   agentId        String
   contactId      String?
-  direction      String   @default("outbound") // inbound, outbound
-  phoneNumber    String   @default("")
-  status         String   @default("completed") // ringing, in_progress, completed, missed, voicemail, failed
-  duration       Int      @default(0) // seconds
-  outcome        String   @default("") // connected, no_answer, busy, voicemail, wrong_number
-  notes          String   @default("") @db.Text
-  recordingUrl   String   @default("")
-  disposition    String   @default("") // follow_up, qualified, not_interested, callback, appointment_set
+  direction      String    @default("outbound") // inbound, outbound
+  phoneNumber    String    @default("")
+  status         String    @default("completed") // ringing, in_progress, completed, missed, voicemail, failed
+  duration       Int       @default(0) // seconds
+  outcome        String    @default("") // connected, no_answer, busy, voicemail, wrong_number
+  notes          String    @default("") @db.Text
+  recordingUrl   String    @default("")
+  disposition    String    @default("") // follow_up, qualified, not_interested, callback, appointment_set
   callbackAt     DateTime?
-  startedAt      DateTime @default(now())
+  startedAt      DateTime  @default(now())
   endedAt        DateTime?
-  createdAt      DateTime @default(now())
+  createdAt      DateTime  @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1523,7 +1536,7 @@ model DialerList {
   dialedCount    Int      @default(0)
   connectedCount Int      @default(0)
   status         String   @default("active") // active, paused, completed
-  assignedTo     String?  // agentId
+  assignedTo     String? // agentId
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -1535,18 +1548,18 @@ model DialerList {
 // ── SOI / Referral Tracking ──
 
 model Referral {
-  id             String   @id @default(cuid())
-  organizationId String
-  referrerId     String   // contact who referred
-  referredId     String   // contact who was referred
-  dealId         String?  // linked deal if any
-  status         String   @default("pending") // pending, contacted, converted, closed, lost
-  commissionPct  Float    @default(0) // referral fee percentage
-  commissionCents Int     @default(0)
-  notes          String   @default("") @db.Text
-  referredAt     DateTime @default(now())
-  convertedAt    DateTime?
-  createdAt      DateTime @default(now())
+  id              String    @id @default(cuid())
+  organizationId  String
+  referrerId      String // contact who referred
+  referredId      String // contact who was referred
+  dealId          String? // linked deal if any
+  status          String    @default("pending") // pending, contacted, converted, closed, lost
+  commissionPct   Float     @default(0) // referral fee percentage
+  commissionCents Int       @default(0)
+  notes           String    @default("") @db.Text
+  referredAt      DateTime  @default(now())
+  convertedAt     DateTime?
+  createdAt       DateTime  @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1558,7 +1571,7 @@ model Referral {
 model SoiCategory {
   id             String   @id @default(cuid())
   organizationId String
-  name           String   // A-list, B-list, C-list, Past Client, Vendor, etc.
+  name           String // A-list, B-list, C-list, Past Client, Vendor, etc.
   touchFrequency Int      @default(30) // days between touches
   color          String   @default("#3b82f6")
   contactCount   Int      @default(0)
@@ -1572,25 +1585,25 @@ model SoiCategory {
 // ── CMA Report Builder ──
 
 model CmaReport {
-  id             String   @id @default(cuid())
-  organizationId String
-  agentId        String
-  contactId      String?
-  propertyId     String?
-  subjectAddress String   @default("")
-  subjectCity    String   @default("")
-  subjectZip     String   @default("")
-  subjectBeds    Int?
-  subjectBaths   Int?
-  subjectSqft    Int?
-  estimatedValue Int      @default(0) // cents
-  comparablesJson String  @default("[]") @db.LongText // JSON array of comps
-  adjustmentsJson String  @default("{}") @db.LongText // JSON adjustments
-  reportHtml     String   @default("") @db.LongText
-  status         String   @default("draft") // draft, finalized, sent
-  sentAt         DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id              String    @id @default(cuid())
+  organizationId  String
+  agentId         String
+  contactId       String?
+  propertyId      String?
+  subjectAddress  String    @default("")
+  subjectCity     String    @default("")
+  subjectZip      String    @default("")
+  subjectBeds     Int?
+  subjectBaths    Int?
+  subjectSqft     Int?
+  estimatedValue  Int       @default(0) // cents
+  comparablesJson String    @default("[]") @db.LongText // JSON array of comps
+  adjustmentsJson String    @default("{}") @db.LongText // JSON adjustments
+  reportHtml      String    @default("") @db.LongText
+  status          String    @default("draft") // draft, finalized, sent
+  sentAt          DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1602,15 +1615,15 @@ model CmaReport {
 // ── Client Portal ──
 
 model ClientPortalAccess {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   organizationId String
   contactId      String
-  token          String   @unique @default(cuid())
-  permissions    String   @default("{}") @db.LongText // JSON: { viewListings, viewDocuments, viewTimeline, submitFeedback }
-  enabled        Boolean  @default(true)
+  token          String    @unique @default(cuid())
+  permissions    String    @default("{}") @db.LongText // JSON: { viewListings, viewDocuments, viewTimeline, submitFeedback }
+  enabled        Boolean   @default(true)
   lastLoginAt    DateTime?
   expiresAt      DateTime?
-  createdAt      DateTime @default(now())
+  createdAt      DateTime  @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1622,28 +1635,28 @@ model ClientPortalAccess {
 // ── Email Integration ──
 
 model EmailAccount {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   organizationId String
   userId         String
-  provider       String   @default("smtp") // smtp, gmail, outlook
+  provider       String    @default("smtp") // smtp, gmail, outlook
   email          String
-  displayName    String   @default("")
-  smtpHost       String   @default("")
-  smtpPort       Int      @default(587)
-  imapHost       String   @default("")
-  imapPort       Int      @default(993)
-  username       String   @default("")
-  encryptedPass  String   @default("") @db.Text
-  accessToken    String?  @db.Text
-  refreshToken   String?  @db.Text
+  displayName    String    @default("")
+  smtpHost       String    @default("")
+  smtpPort       Int       @default(587)
+  imapHost       String    @default("")
+  imapPort       Int       @default(993)
+  username       String    @default("")
+  encryptedPass  String    @default("") @db.Text
+  accessToken    String?   @db.Text
+  refreshToken   String?   @db.Text
   tokenExpiry    DateTime?
-  syncEnabled    Boolean  @default(true)
+  syncEnabled    Boolean   @default(true)
   lastSyncAt     DateTime?
-  status         String   @default("active") // active, error, disconnected
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  status         String    @default("active") // active, error, disconnected
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  organization Organization @relation(fields: [organizationId], references: [id])
+  organization Organization  @relation(fields: [organizationId], references: [id])
   emails       Email[]
   threads      EmailThread[]
 
@@ -1656,20 +1669,20 @@ model EmailAccount {
 // touching every Email row. `providerThreadId` is the raw id the provider
 // gave us (Gmail: `threadId` on messages; IMAP: we derive from References).
 model EmailThread {
-  id                String   @id @default(cuid())
-  accountId         String
-  providerThreadId  String   @db.VarChar(255)
-  contactId         String?
-  subject           String   @default("")
-  snippet           String   @default("") @db.Text
-  participants      String   @default("[]") @db.Text // JSON string[] of email addrs
-  messageCount      Int      @default(0)
-  unreadCount       Int      @default(0)
-  lastMessageAt     DateTime?
-  lastSyncedAt      DateTime?
-  labels            String   @default("[]") @db.Text // JSON string[] (Gmail labels)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               String    @id @default(cuid())
+  accountId        String
+  providerThreadId String    @db.VarChar(255)
+  contactId        String?
+  subject          String    @default("")
+  snippet          String    @default("") @db.Text
+  participants     String    @default("[]") @db.Text // JSON string[] of email addrs
+  messageCount     Int       @default(0)
+  unreadCount      Int       @default(0)
+  lastMessageAt    DateTime?
+  lastSyncedAt     DateTime?
+  labels           String    @default("[]") @db.Text // JSON string[] (Gmail labels)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   account  EmailAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
   messages Email[]
@@ -1681,29 +1694,29 @@ model EmailThread {
 }
 
 model Email {
-  id             String   @id @default(cuid())
-  accountId      String
-  threadRowId    String?  // FK → EmailThread.id (optional during migration)
-  contactId      String?
-  messageId      String?  @db.VarChar(512) // RFC Message-ID
-  threadId       String?  // Provider thread id (Gmail threadId). Kept for dedupe + back-compat.
-  direction      String   @default("outbound") // inbound, outbound
-  fromAddress    String
-  toAddresses    String   @db.Text // JSON array
-  ccAddresses    String   @default("[]") @db.Text
-  bccAddresses   String   @default("[]") @db.Text
-  subject        String   @default("")
-  snippet        String   @default("") @db.Text
-  bodyHtml       String?  @db.LongText
-  bodyText       String?  @db.LongText
-  labels         String   @default("[]") @db.Text // JSON string[] (Gmail labels or IMAP flags)
-  status         String   @default("draft") // draft, queued, sent, delivered, bounced, failed, received
-  openedAt       DateTime?
-  clickedAt      DateTime?
-  bouncedAt      DateTime?
-  sentAt         DateTime?
-  receivedAt     DateTime?
-  createdAt      DateTime @default(now())
+  id           String    @id @default(cuid())
+  accountId    String
+  threadRowId  String? // FK → EmailThread.id (optional during migration)
+  contactId    String?
+  messageId    String?   @db.VarChar(512) // RFC Message-ID
+  threadId     String? // Provider thread id (Gmail threadId). Kept for dedupe + back-compat.
+  direction    String    @default("outbound") // inbound, outbound
+  fromAddress  String
+  toAddresses  String    @db.Text // JSON array
+  ccAddresses  String    @default("[]") @db.Text
+  bccAddresses String    @default("[]") @db.Text
+  subject      String    @default("")
+  snippet      String    @default("") @db.Text
+  bodyHtml     String?   @db.LongText
+  bodyText     String?   @db.LongText
+  labels       String    @default("[]") @db.Text // JSON string[] (Gmail labels or IMAP flags)
+  status       String    @default("draft") // draft, queued, sent, delivered, bounced, failed, received
+  openedAt     DateTime?
+  clickedAt    DateTime?
+  bouncedAt    DateTime?
+  sentAt       DateTime?
+  receivedAt   DateTime?
+  createdAt    DateTime  @default(now())
 
   account EmailAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
   thread  EmailThread? @relation(fields: [threadRowId], references: [id], onDelete: SetNull)
@@ -1721,21 +1734,21 @@ model Email {
 // ── SMS / WhatsApp ──
 
 model SmsMessage {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   organizationId String
   contactId      String?
-  direction      String   @default("outbound") // inbound, outbound
-  channel        String   @default("sms") // sms, whatsapp
+  direction      String    @default("outbound") // inbound, outbound
+  channel        String    @default("sms") // sms, whatsapp
   fromNumber     String
   toNumber       String
-  body           String   @db.Text
-  status         String   @default("queued") // queued, sent, delivered, failed, received
-  providerSid    String?  // Twilio SID
+  body           String    @db.Text
+  status         String    @default("queued") // queued, sent, delivered, failed, received
+  providerSid    String? // Twilio SID
   errorCode      String?
   errorMessage   String?
   sentAt         DateTime?
   deliveredAt    DateTime?
-  createdAt      DateTime @default(now())
+  createdAt      DateTime  @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1747,19 +1760,19 @@ model SmsMessage {
 // ── Integration / OAuth ──
 
 model Integration {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   organizationId String
-  provider       String   // google, microsoft, slack, stripe, mailchimp, etc.
+  provider       String // google, microsoft, slack, stripe, mailchimp, etc.
   name           String
-  status         String   @default("disconnected") // connected, disconnected, error
-  accessToken    String?  @db.Text
-  refreshToken   String?  @db.Text
+  status         String    @default("disconnected") // connected, disconnected, error
+  accessToken    String?   @db.Text
+  refreshToken   String?   @db.Text
   tokenExpiry    DateTime?
-  scopes         String   @default("[]") @db.Text // JSON array
-  metadata       String   @default("{}") @db.Text // provider-specific config
+  scopes         String    @default("[]") @db.Text // JSON array
+  metadata       String    @default("{}") @db.Text // provider-specific config
   lastSyncAt     DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
 
@@ -1767,27 +1780,29 @@ model Integration {
   @@index([organizationId])
 }
 
-/* ---------------- Property Taxonomy (per-organization) ----------------
-   Each org can customize districts, property types, subtypes, and flags.
-   All JSON fields store the same shapes as the Cyprus defaults in
-   src/lib/constants/cyprus-property.ts so the UI can consume either. */
+/**
+ * ---------------- Property Taxonomy (per-organization) ----------------
+ * Each org can customize districts, property types, subtypes, and flags.
+ * All JSON fields store the same shapes as the Cyprus defaults in
+ * src/lib/constants/cyprus-property.ts so the UI can consume either.
+ */
 model PropertyTaxonomy {
-  id             String   @id @default(cuid())
-  organizationId String   @unique
+  id             String @id @default(cuid())
+  organizationId String @unique
   // Country context (just metadata for UI — e.g. "Cyprus", "Netherlands")
-  countryLabel   String   @default("Cyprus")
+  countryLabel   String @default("Cyprus")
 
   // All JSON — array<{value,label}> or map<type, array<{value,label}>>
-  districts      String   @default("[]") @db.LongText
-  propertyTypes  String   @default("[]") @db.LongText
-  subtypes       String   @default("{}") @db.LongText // keyed by propertyType value
-  listingTypes   String   @default("[]") @db.LongText
-  flags          String   @default("[]") @db.LongText // array<{key,label}>
+  districts     String @default("[]") @db.LongText
+  propertyTypes String @default("[]") @db.LongText
+  subtypes      String @default("{}") @db.LongText // keyed by propertyType value
+  listingTypes  String @default("[]") @db.LongText
+  flags         String @default("[]") @db.LongText // array<{key,label}>
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId])
 }
@@ -1804,24 +1819,24 @@ model PropertyTaxonomy {
 /// triggered (self-export or admin-led). Retain for 6 years to
 /// match standard contractual claim windows.
 model GdprExportLog {
-  id                String   @id @default(cuid())
-  organizationId    String
+  id               String   @id @default(cuid())
+  organizationId   String
   /// Operator who triggered the export. Null for cron / system.
-  actorUserId       String?
+  actorUserId      String?
   /// Sha-256 of lowercased email of the data subject the export was about.
   /// Equal to actorUserId's email hash for self-exports.
-  subjectEmailHash  String
+  subjectEmailHash String
   /// 'self' (operator exported their own data) | 'admin' (operator
   /// exported a contact's data on the contact's request).
-  channel           String
+  channel          String
   /// Number of rows included in the export, by model — JSON.
   /// Example: {"User":1,"Contact":3,"Reservation":12}
-  rowCounts         String   @db.Text
+  rowCounts        String   @db.Text
   /// IP of the actor at export time, for forensics.
-  actorIp           String?
-  createdAt         DateTime @default(now())
+  actorIp          String?
+  createdAt        DateTime @default(now())
 
-  organization      Organization @relation(fields: [organizationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId, createdAt])
   @@index([subjectEmailHash])
@@ -1833,23 +1848,23 @@ model GdprExportLog {
 /// (by hashing their email and looking up this table) without us
 /// retaining the email.
 model GdprErasureLog {
-  id                String   @id @default(cuid())
-  organizationId    String
-  actorUserId       String?
-  subjectEmailHash  String
+  id               String   @id @default(cuid())
+  organizationId   String
+  actorUserId      String?
+  subjectEmailHash String
   /// 'self' (user deleted own account) | 'admin' (admin erased a
   /// contact's data on request) | 'retention' (auto-purge by cron).
-  channel           String
+  channel          String
   /// Comma-separated list of Prisma model names erased.
-  modelsErased      String   @db.Text
+  modelsErased     String   @db.Text
   /// Number of rows erased per model — JSON, e.g. {"Contact":2,"Message":17}
-  rowCounts         String   @db.Text
+  rowCounts        String   @db.Text
   /// Optional human-readable note (e.g. ticket number).
-  reason            String?  @db.Text
-  actorIp           String?
-  createdAt         DateTime @default(now())
+  reason           String?  @db.Text
+  actorIp          String?
+  createdAt        DateTime @default(now())
 
-  organization      Organization @relation(fields: [organizationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId, createdAt])
   @@index([subjectEmailHash])
@@ -1859,23 +1874,23 @@ model GdprErasureLog {
 /// consent. Volunteer signups, marketing opt-in, etc. Append-only;
 /// withdrawal is recorded as a new row with `withdrawn = true`.
 model GdprConsentRecord {
-  id                String   @id @default(cuid())
-  organizationId    String
+  id               String   @id @default(cuid())
+  organizationId   String
   /// Sha-256 of lowercased email of the data subject.
-  subjectEmailHash  String
+  subjectEmailHash String
   /// Stable identifier for the processing activity, matching a key in
   /// lib/gdpr/ropa.ts. Examples: 'volunteer_roster', 'marketing_email'.
-  purpose           String
-  granted           Boolean  @default(true)
-  withdrawn         Boolean  @default(false)
+  purpose          String
+  granted          Boolean  @default(true)
+  withdrawn        Boolean  @default(false)
   /// Free text capturing what was shown to the data subject when they
   /// gave consent. Required for proof-of-consent under Art. 7.
-  noticeShown       String?  @db.Text
-  ipAddress         String?
-  userAgent         String?  @db.Text
-  createdAt         DateTime @default(now())
+  noticeShown      String?  @db.Text
+  ipAddress        String?
+  userAgent        String?  @db.Text
+  createdAt        DateTime @default(now())
 
-  organization      Organization @relation(fields: [organizationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId, subjectEmailHash])
   @@index([purpose, createdAt])
@@ -1897,8 +1912,8 @@ model AssistantConversation {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  organization Organization @relation(fields: [organizationId], references: [id])
-  user         User         @relation(fields: [userId], references: [id])
+  organization Organization    @relation(fields: [organizationId], references: [id])
+  user         User            @relation(fields: [userId], references: [id])
   turns        AssistantTurn[]
 
   @@index([organizationId, userId, updatedAt])
@@ -1907,7 +1922,7 @@ model AssistantConversation {
 model AssistantTurn {
   id               String   @id @default(cuid())
   conversationId   String
-  role             String   // 'user' | 'assistant' | 'system'
+  role             String // 'user' | 'assistant' | 'system'
   content          String   @db.LongText
   /// JSON array of {slug, score} for KB chunks the assistant retrieved
   /// for this turn. Surfaced as citations in the UI.
@@ -1943,7 +1958,6 @@ model AssistantMemory {
   @@unique([userId, key])
   @@index([organizationId, userId])
 }
-
 
 // ── Multi-org membership (Bundle G) ───────────────────────────────
 //
@@ -2013,6 +2027,56 @@ model FeatureFlag {
   @@index([key])
 }
 
+// Two-level feature-toggle UX — super-admin layer.
+// ────────────────────────────────────────────────────────────────
+// FeatureFlag (above) is the GLOBAL kill-switch + the CLIENT-ADMIN
+// opt-out layer (lib/philly/features.ts → orgFlag / globalFlag in
+// the resolve() input). This table is the SUPER-ADMIN layer: rows
+// here record Juan / lucenai.eu staff explicitly forcing a feature
+// ON or OFF for a specific org, with mandatory `reason` text and
+// `createdById` tying the action to a User for audit.
+//
+// Precedence (encoded in lib/philly/features/resolve.ts):
+//   1. state='FORCED_OFF' beats everything (terminal off)
+//   2. state='FORCED_ON' beats plan-tier check (preview features),
+//      orgFlag (client opt-out), and globalFlag (global kill-switch)
+//   3. state='INHERIT' is equivalent to no row — fall through to
+//      plan / globalFlag / orgFlag / default
+//
+// `state` is a String (not a Prisma enum) for consistency with
+// existing User.role / AuditLog.action conventions. Allowed values
+// are enforced by lib/philly/validation/schemas.ts + the API route's
+// zod schema. The TS-side enum lives at lib/philly/features/resolve.ts
+// as SuperAdminOverride.
+//
+// `feature` matches a FEATURES.*.key value from
+// lib/philly/features.ts. Compound-unique on (organizationId,
+// feature) so an org can have at most one override per feature.
+model OrgFeatureOverride {
+  id             String   @id @default(cuid())
+  organizationId String
+  /// Feature key from FEATURES const (lib/philly/features.ts).
+  feature        String
+  /// INHERIT | FORCED_ON | FORCED_OFF — see lib/philly/features/resolve.ts.
+  state          String   @default("INHERIT")
+  /// Why super-admin made this change. Mandatory at the route layer
+  /// (min 10 chars). Lands in AuditLog.changes for compliance.
+  reason         String   @db.Text
+  /// User.id of the super-admin who created the row. The user MUST
+  /// have role='superAdmin' at the time of write (enforced at the
+  /// route layer; not at the DB level — see PR-2b API route).
+  createdById    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy    User         @relation("OrgFeatureOverrideCreator", fields: [createdById], references: [id])
+
+  @@unique([organizationId, feature])
+  @@index([feature])
+  @@index([createdById])
+}
+
 // ScimGroup — IdP group surfaced via SCIM 2.0 (RFC 7643 §4.2).
 // Operators set `role` / `dashboardSections` on the group via the
 // admin UI (or directly in DB). When an IdP sends a member-add
@@ -2026,7 +2090,7 @@ model FeatureFlag {
 //
 // Bundle BW; closes the SSO-SETUP.md "Groups outstanding" gap.
 model ScimGroup {
-  id                String                @id @default(cuid())
+  id                String   @id @default(cuid())
   organizationId    String
   scimExternalId    String?
   displayName       String
@@ -2038,10 +2102,10 @@ model ScimGroup {
   /// section ids, or null = full access). Null on the group
   /// means "don't override the user's per-org sections".
   dashboardSections Json?
-  createdAt         DateTime              @default(now())
-  updatedAt         DateTime              @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  organization Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   members      ScimGroupMembership[]
 
   @@unique([organizationId, displayName])
