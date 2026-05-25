@@ -348,3 +348,50 @@ export async function requireSection(
   }
   return scope
 }
+
+/**
+ * Guards a PLATFORM-LEVEL endpoint (super-admin only).
+ *
+ * Distinct from `requireRole(['admin'])` because super-admin is the
+ * platform-owner role (Juan / lucenai.eu staff), NOT an org-level
+ * admin. The two-level feature-toggle UX has super-admin actions that
+ * cross org boundaries — they can force-on a Business-tier feature for
+ * an Operator-tier customer's org. Org-level 'admin' rights MUST NOT
+ * grant this capability.
+ *
+ * MFA enforcement: super-admin requires MFA UNCONDITIONALLY — no env
+ * override. Bypassing org boundaries warrants the strictest auth
+ * surface available; if the operator hasn't enrolled TOTP, the answer
+ * is "go enroll", not "let it slide in dev." Tests that need to mock
+ * around this should mock requireSuperAdmin directly.
+ *
+ * Returns AuthScope on success (where scope.role === 'superAdmin'
+ * and scope.organizationId is the super-admin's OWN home org — NOT
+ * the target org being managed). Callers MUST take the target orgId
+ * from the URL path, never from the scope.
+ *
+ * Returns NextResponse with:
+ *   401 — not signed in (forwarded from requireScope)
+ *   403 — role !== 'superAdmin'
+ *   409 + { code: 'NEEDS_2FA' } — super-admin without MFA enrolled
+ */
+export async function requireSuperAdmin(): Promise<AuthScope | NextResponse> {
+  const scope = await requireScope()
+  if (scope instanceof NextResponse) return scope
+
+  if (scope.role !== 'superAdmin') {
+    return jsonError('Forbidden — super-admin only', 403)
+  }
+
+  if (!scope.mfaEnrolled) {
+    return NextResponse.json(
+      {
+        error: 'Super-admin must enroll TOTP 2FA before using platform endpoints',
+        code: 'NEEDS_2FA',
+      },
+      { status: 409 },
+    )
+  }
+
+  return scope
+}

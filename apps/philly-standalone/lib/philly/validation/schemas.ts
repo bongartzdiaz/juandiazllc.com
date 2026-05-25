@@ -264,3 +264,17 @@ export const createCalendarEventSchema = z.object({
   path: ['endTime'],
 })
 
+// ── Super-admin feature-toggle override (PR-2b) ──
+//
+// Body shape for PUT /api/admin/orgs/[orgId]/features/[key]. The
+// reason field is MANDATORY (min 10 chars) so every cross-org
+// super-admin action has a human-readable justification in the
+// AuditLog hash-chain. The state enum mirrors SuperAdminOverride
+// in lib/philly/features/resolve.ts — keep them in lockstep.
+export const setOrgFeatureOverrideSchema = z.object({
+  state: z.enum(['INHERIT', 'FORCED_ON', 'FORCED_OFF']),
+  reason: trimmedString.pipe(
+    z.string().min(10, 'Reason must be at least 10 characters').max(2000, 'Reason too long'),
+  ),
+})
+

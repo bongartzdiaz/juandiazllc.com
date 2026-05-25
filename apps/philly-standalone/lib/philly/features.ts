@@ -19,6 +19,10 @@
    --------------------------------------------------------------- */
 
 import type { PrismaClient } from '@prisma/client'
+// Late import (function-scoped) to avoid the features → adapter → features
+// cycle at module-init time. Both files export and import at runtime;
+// the cycle is harmless because the symbol is only DEREFERENCED inside
+// function bodies, not at top-level.
 
 /** Stable feature keys. Add a new entry here when wiring a new flag.
  *  Keys are kebab-case strings; the const value is the canonical id
@@ -134,9 +138,22 @@ export function clearFeatureCache(): void {
 /* ---------- Reads ---------- */
 
 /**
- * Whether a feature is enabled for the given org. Resolves through
- * the cache, then the org-specific row, then the global row, then
- * the code-side default.
+ * Whether a feature is enabled for the given org.
+ *
+ * Org-scoped calls (orgId set): route through the two-level resolver
+ *   at `lib/philly/features/adapter.ts` which checks (in precedence
+ *   order): super-admin override → plan tier → global flag → org flag
+ *   → code default. PR-2b wired this so super-admin FORCED_OFF actually
+ *   gates downstream callers. Caches the resolved boolean for 60s.
+ *
+ * Global / orgless calls (orgId nullish): legacy path — just the
+ *   global FeatureFlag row + code-side default. No plan-tier or
+ *   override concept applies without an org context.
+ *
+ * Returns just `boolean` for backward-compat with the dozens of
+ * existing callers; the {enabled, source} tuple is available via
+ * isFeatureEnabledForOrg() directly when the caller needs the source
+ * (e.g., to show the user WHY a feature is off).
  */
 export async function isFeatureEnabled(
   prisma: PrismaClient,
@@ -155,24 +172,24 @@ export async function isFeatureEnabled(
   const now = Date.now()
   if (hit && hit.expiresAt > now) return hit.value
 
-  let resolved: boolean = def.enabledByDefault
+  let resolved: boolean
 
-  // Single query that returns both the org-specific row (if any) and
-  // the global default — let the DB pick once.
-  type Row = { organizationId: string | null; enabled: boolean }
-  const rows = (await prisma.featureFlag.findMany({
-    where: {
-      key,
-      OR: [{ organizationId: null }, { organizationId: orgId ?? '__no_org__' }],
-    },
-    select: { organizationId: true, enabled: true },
-  })) as Row[]
-
-  const orgRow = orgId ? rows.find(r => r.organizationId === orgId) : null
-  const globalRow = rows.find(r => r.organizationId === null)
-
-  if (orgRow) resolved = orgRow.enabled
-  else if (globalRow) resolved = globalRow.enabled
+  if (orgId) {
+    // Org-scoped → two-level resolver (plan + override + flags + default).
+    // Function-local import breaks the module-init cycle.
+    const { isFeatureEnabledForOrg } = await import('./features/adapter')
+    const result = await isFeatureEnabledForOrg(prisma, orgId, key)
+    resolved = result.enabled
+  } else {
+    // Global lookup: just the global FeatureFlag row + code-side default.
+    type Row = { organizationId: string | null; enabled: boolean }
+    const rows = (await prisma.featureFlag.findMany({
+      where: { key, organizationId: null },
+      select: { organizationId: true, enabled: true },
+    })) as Row[]
+    const globalRow = rows[0]
+    resolved = globalRow ? globalRow.enabled : def.enabledByDefault
+  }
 
   cache.set(ck, { value: resolved, expiresAt: now + CACHE_TTL_MS })
   return resolved
