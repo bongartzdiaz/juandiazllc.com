@@ -420,12 +420,94 @@ check('4.mirror.token', 'Mirror', 'DEUS_SHARED_PAT secret reachable (manual)', (
   };
 });
 
+check('4.mirror.dryrun', 'Mirror', 'Pre-sync dry-run script exists + operator knows to run it', () => {
+  // Sync-mirror audit script — operator MUST run `npm run audit:sync-mirror`
+  // BEFORE triggering sync-deus-shared.yml workflow_dispatch. The script
+  // reproduces the GitHub Actions rsync logic locally and verifies the
+  // result builds + tests pass. Without this, the workflow can publish
+  // broken code to the mirror (and partner deploys notice it).
+  const path = join(ROOT, 'scripts/audit-sync-mirror.ts');
+  if (!existsSync(path)) {
+    return {
+      status: 'FAIL',
+      detail: 'scripts/audit-sync-mirror.ts missing — without it the operator has no way to pre-flight the sync.',
+      reference: 'PRE-LAUNCH-AUDIT.md §1',
+    };
+  }
+  return {
+    status: 'MANUAL',
+    detail: 'Run `npm run audit:sync-mirror` from apps/philly-standalone/ BEFORE triggering sync-deus-shared.yml. Expect 7/7 steps pass (or 3/3 if --skip-build). Any failure blocks the publish.',
+    reference: 'PRE-LAUNCH-AUDIT.md §1',
+  };
+});
+
 /* ── §5 Backup-restore drill ─────────────────────────────────── */
 
 check('5.backup-doc', 'Backups', 'BACKUP-RESTORE.md runbook present', () => {
   const path = join(ROOT, 'docs/operations/BACKUP-RESTORE.md');
   if (!existsSync(path)) return { status: 'FAIL', detail: 'BACKUP-RESTORE.md missing' };
   return { status: 'MANUAL', detail: 'Run the drill described in BACKUP-RESTORE.md and capture sign-off.' };
+});
+
+/* ── §6 Data-flow sync invariants (hermetic tests pin them) ──── */
+
+check('6.dataflow.webhook', 'Data flows', 'Stripe webhook → Subscription test exists', () => {
+  // The webhook handler is the ONLY way Stripe state syncs into the
+  // Subscription table. Without a test, a regression here silently
+  // breaks customer subscriptions post-payment.
+  const path = join(ROOT, 'app/api/webhooks/stripe/route.test.ts');
+  if (!existsSync(path)) {
+    return {
+      status: 'FAIL',
+      detail: 'app/api/webhooks/stripe/route.test.ts missing — the data-sync path between Stripe and our DB has no hermetic coverage.',
+      reference: 'PRE-LAUNCH-AUDIT.md §2',
+    };
+  }
+  return { status: 'PASS', detail: 'webhook → Subscription invariants pinned (11 cases incl. signature, idempotency, unknown events, exception path)' };
+});
+
+check('6.dataflow.crossorg', 'Data flows', 'Cross-org isolation test exists', () => {
+  const path = join(ROOT, 'lib/security/cross-org.test.ts');
+  if (!existsSync(path)) {
+    return {
+      status: 'FAIL',
+      detail: 'lib/security/cross-org.test.ts missing — without it, tenant isolation has only static-analysis coverage.',
+      reference: 'PRE-LAUNCH-AUDIT.md §2',
+    };
+  }
+  return { status: 'PASS', detail: 'cross-org isolation invariants pinned (11 cases across GET/list/PATCH/DELETE × scope mismatch)' };
+});
+
+check('6.dataflow.auditchain', 'Data flows', 'Audit-chain integrity test exists', () => {
+  const path = join(ROOT, 'lib/philly/audit-chain.test.ts');
+  if (!existsSync(path)) {
+    return {
+      status: 'FAIL',
+      detail: 'lib/philly/audit-chain.test.ts missing — audit-log tamper detection has no test coverage.',
+      reference: 'PRE-LAUNCH-AUDIT.md §2',
+    };
+  }
+  return { status: 'PASS', detail: 'audit-chain hash linking + verification pinned' };
+});
+
+check('6.dataflow.gaps', 'Data flows', 'Known untested data-flow paths documented', () => {
+  // Surfaced by PRE-LAUNCH-AUDIT: no tests for SCIM provisioning,
+  // no tests for drip-dispatcher race conditions, no first-login
+  // Supabase Auth → Philly User provisioning test. These are
+  // acknowledged out-of-scope for the audit PR; see PRE-LAUNCH-AUDIT.md
+  // for the deferral rationale and the follow-up tasks.
+  const path = join(ROOT, 'docs/operations/PRE-LAUNCH-AUDIT.md');
+  if (!existsSync(path)) {
+    return {
+      status: 'FAIL',
+      detail: 'PRE-LAUNCH-AUDIT.md missing — known gaps must be documented or the audit is invisible.',
+    };
+  }
+  return {
+    status: 'MANUAL',
+    detail: '3 known data-flow gaps: SCIM provisioning, drip dispatcher race, first-login User provisioning. Each tracked as a follow-up in PRE-LAUNCH-AUDIT.md §3.',
+    reference: 'PRE-LAUNCH-AUDIT.md §2',
+  };
 });
 
 /* ── Summary ─────────────────────────────────────────────────── */

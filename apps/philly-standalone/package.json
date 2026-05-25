@@ -13,6 +13,8 @@
     "test:watch": "vitest",
     "audit:tenant": "tsx scripts/audit-tenant-isolation.ts",
     "audit:chain": "tsx scripts/verify-audit-chain.ts",
+    "audit:sync-mirror": "tsx scripts/audit-sync-mirror.ts",
+    "audit:sync-mirror:fast": "tsx scripts/audit-sync-mirror.ts --skip-build",
     "launch:check": "tsx scripts/check-launch-readiness.ts",
     "check:dead": "knip --no-exit-code",
     "check:dead:strict": "knip",
