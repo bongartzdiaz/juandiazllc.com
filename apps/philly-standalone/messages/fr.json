@@ -1471,6 +1471,28 @@
       "import": "{count, plural, one {Importer # contact} other {Importer # contacts}}",
       "acceptsFormats": "Accepte les fichiers .csv et .xlsx",
       "xlsxParseFailed": "Impossible de lire ce fichier Excel — vérifiez qu’il s’agit d’un .xlsx valide."
+    },
+    "mapping": {
+      "heading": "Associer les colonnes",
+      "hint": "Nous avons détecté automatiquement la correspondance la plus probable pour chaque champ. Ajustez si nécessaire.",
+      "name": "Colonne Nom",
+      "email": "Colonne E-mail",
+      "phone": "Colonne Téléphone",
+      "company": "Colonne Entreprise",
+      "notes": "Colonne Notes",
+      "noColumn": "— ignorer —",
+      "submit": "{count, plural, one {Importer # contact} other {Importer # contacts}}",
+      "importing": "Importation…",
+      "missingName": "Choisissez une colonne pour Nom pour continuer."
+    },
+    "result": {
+      "heading": "Importation terminée",
+      "summary": "{created} sur {total} importés",
+      "skippedDuplicate": "{count, plural, one {# doublon ignoré} other {# doublons ignorés}}",
+      "failedValidation": "{count, plural, one {# ligne en échec de validation} other {# lignes en échec de validation}}",
+      "networkError": "Erreur réseau — veuillez réessayer",
+      "authError": "Non autorisé — seuls les managers peuvent importer des contacts",
+      "close": "Terminé"
     }
   },
   "reports": {

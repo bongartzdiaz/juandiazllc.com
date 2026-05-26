@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { Upload, CheckCircle, FileText, X } from 'lucide-react'
+import { autoMapHeaders, type AutoMapResult } from '@/lib/philly/import/auto-map'
 
 interface Props {
   open: boolean
@@ -49,10 +50,23 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
   // the variable names keep the historical `csv` prefix for diff stability).
   const [csvFile, setCsvFile] = useState<File | null>(null)
   const [csvPreview, setCsvPreview] = useState<string[][]>([])
+  const [csvAllRows, setCsvAllRows] = useState<string[][]>([])  // FULL parsed rows for actual import (not just preview)
   const [csvHeaders, setCsvHeaders] = useState<string[]>([])
   const [xlsxError, setXlsxError] = useState<string | null>(null)
   const [dragging, setDragging] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  // Column-mapping state — auto-detected after parsing; operator overrides
+  // via the dropdowns rendered above the preview table.
+  const [mapping, setMapping] = useState<AutoMapResult>({})
+  const [importing, setImporting] = useState(false)
+  const [importResult, setImportResult] = useState<{
+    total: number
+    created: number
+    skippedDuplicate: number
+    failedValidation: number
+  } | null>(null)
+  const [importError, setImportError] = useState<string | null>(null)
 
   const sources = sourcesByIndustry[industry] || sourcesByIndustry.philanthropy
   // Localised entity label — keyed by industry. Real-estate → "Lead",
@@ -62,7 +76,9 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
 
   const resetForm = useCallback(() => {
     setName(''); setEmail(''); setPhone(''); setSource(''); setCompany(''); setNotes('')
-    setErrors({}); setCsvFile(null); setCsvPreview([]); setCsvHeaders([]); setXlsxError(null); setSuccess(false); setTab('manual')
+    setErrors({}); setCsvFile(null); setCsvPreview([]); setCsvAllRows([]); setCsvHeaders([])
+    setXlsxError(null); setMapping({}); setImporting(false); setImportResult(null); setImportError(null)
+    setSuccess(false); setTab('manual')
   }, [])
 
   const handleClose = useCallback(() => {
@@ -92,10 +108,12 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
     if (lines.length === 0) return
     const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''))
     setCsvHeaders(headers)
-    const rows = lines.slice(1, 6).map(line =>
+    const allRows = lines.slice(1).map(line =>
       line.split(',').map(c => c.trim().replace(/^"|"$/g, ''))
     )
-    setCsvPreview(rows)
+    setCsvAllRows(allRows)
+    setCsvPreview(allRows.slice(0, 5))
+    setMapping(autoMapHeaders(headers))
   }
 
   // Dynamic import keeps the ~270KB `read-excel-file` module out of the
@@ -115,11 +133,13 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
       if (rows.length === 0) return
       const headers = rows[0].map(h => String(h ?? '').trim())
       setCsvHeaders(headers)
-      // Up to 5 preview rows, every cell coerced to string for the table.
-      const preview: string[][] = rows.slice(1, 6).map(row =>
+      // ALL data rows, every cell coerced to string for uniform server-side handling.
+      const allRows: string[][] = rows.slice(1).map(row =>
         row.map(cell => (cell === null || cell === undefined ? '' : String(cell)))
       )
-      setCsvPreview(preview)
+      setCsvAllRows(allRows)
+      setCsvPreview(allRows.slice(0, 5))
+      setMapping(autoMapHeaders(headers))
     } catch {
       // Surface a localised parse error and clear the file picker so the
       // operator can try a different file. We deliberately swallow the
@@ -127,7 +147,50 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
       setCsvFile(null)
       setCsvHeaders([])
       setCsvPreview([])
+      setCsvAllRows([])
+      setMapping({})
       setXlsxError(t('csv.xlsxParseFailed'))
+    }
+  }
+
+  // Submit the parsed rows to /api/contacts/import with the operator's mapping.
+  // Returns the import counts so the modal can render the result panel.
+  const submitImport = async () => {
+    if (!mapping.name) return  // UI gates the button on this — defensive check
+    setImporting(true)
+    setImportError(null)
+    try {
+      // Convert rows-as-arrays → rows-as-objects keyed by header so the
+      // server-side mapping can look up cells by header string. This is the
+      // contract /api/contacts/import expects.
+      const rowObjects = csvAllRows.map(row => {
+        const obj: Record<string, string> = {}
+        for (let i = 0; i < csvHeaders.length; i++) {
+          obj[csvHeaders[i]] = row[i] ?? ''
+        }
+        return obj
+      })
+      const res = await fetch('/api/contacts/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rows: rowObjects, mapping }),
+      })
+      if (res.status === 403 || res.status === 401) {
+        setImportError(t('result.authError'))
+        return
+      }
+      if (!res.ok) {
+        setImportError(t('result.networkError'))
+        return
+      }
+      const json = await res.json()
+      setImportResult(json.data)
+      // Fire the legacy onAdd so dashboard widgets refresh (existing behaviour).
+      onAdd?.({ csv: !csvFile?.name.toLowerCase().endsWith('.xlsx'), xlsx: csvFile?.name.toLowerCase().endsWith('.xlsx'), rows: json.data.created, file: csvFile?.name })
+    } catch {
+      setImportError(t('result.networkError'))
+    } finally {
+      setImporting(false)
     }
   }
 
@@ -285,7 +348,10 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
                       <div style={{ fontSize: 11, color: 'var(--txt3)' }}>{formatFileSize(csvFile.size)}</div>
                     </div>
                     <button
-                      onClick={() => { setCsvFile(null); setCsvPreview([]); setCsvHeaders([]) }}
+                      onClick={() => {
+                        setCsvFile(null); setCsvPreview([]); setCsvAllRows([])
+                        setCsvHeaders([]); setMapping({}); setImportResult(null); setImportError(null)
+                      }}
                       style={{
                         width: 24, height: 24, borderRadius: 6, background: 'var(--r-bg)',
                         border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
@@ -326,26 +392,77 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
                     </div>
                   )}
 
+                  {/* Column-mapping UI — populated by autoMapHeaders, manually
+                      overridable via the dropdowns. Each dropdown lists every
+                      header in the file plus a "skip" option. */}
+                  {importResult ? (
+                    <div style={{ padding: '16px 12px', background: 'var(--g-bg)', border: '1px solid var(--g-border)', borderRadius: 8, marginBottom: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                        <CheckCircle size={18} color="var(--g)" />
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--g-txt)' }}>{t('result.heading')}</div>
+                      </div>
+                      <div style={{ fontSize: 12.5, color: 'var(--txt2)', marginBottom: 4 }}>
+                        {t('result.summary', { created: importResult.created, total: importResult.total })}
+                      </div>
+                      {importResult.skippedDuplicate > 0 && (
+                        <div style={{ fontSize: 11.5, color: 'var(--txt3)' }}>
+                          {t('result.skippedDuplicate', { count: importResult.skippedDuplicate })}
+                        </div>
+                      )}
+                      {importResult.failedValidation > 0 && (
+                        <div style={{ fontSize: 11.5, color: 'var(--r-txt)' }}>
+                          {t('result.failedValidation', { count: importResult.failedValidation })}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div style={{ marginBottom: 12, padding: '10px 12px', background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 8 }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>{t('mapping.heading')}</div>
+                      <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 10 }}>{t('mapping.hint')}</div>
+                      {(['name', 'email', 'phone', 'company', 'notes'] as const).map(field => (
+                        <div key={field} style={{ display: 'grid', gridTemplateColumns: '90px 1fr', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                          <label style={{ fontSize: 11.5, color: 'var(--txt2)' }}>{t(`mapping.${field}`)}</label>
+                          <select
+                            value={mapping[field] ?? ''}
+                            onChange={e => setMapping(m => ({ ...m, [field]: e.target.value || undefined }))}
+                            style={{ ...inputStyle, fontSize: 12, padding: '6px 10px', cursor: 'pointer' }}
+                          >
+                            <option value="">{t('mapping.noColumn')}</option>
+                            {csvHeaders.map(h => <option key={h} value={h}>{h}</option>)}
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {importError && (
+                    <div style={{ fontSize: 11.5, color: 'var(--r)', marginBottom: 10, fontWeight: 600 }}>{importError}</div>
+                  )}
                   <button
+                    disabled={importing || !mapping.name || !!importResult}
                     onClick={() => {
-                      const isXlsx = csvFile.name.toLowerCase().endsWith('.xlsx')
-                      onAdd?.({
-                        csv: !isXlsx,         // back-compat — true when source was CSV
-                        xlsx: isXlsx,
-                        format: isXlsx ? 'xlsx' : 'csv',
-                        rows: csvPreview.length,
-                        file: csvFile.name,
-                      })
-                      setSuccess(true)
-                      setTimeout(() => { handleClose() }, 1500)
+                      if (importResult) {
+                        setSuccess(true)
+                        setTimeout(() => { handleClose() }, 800)
+                      } else {
+                        void submitImport()
+                      }
                     }}
                     style={{
                       width: '100%', padding: '10px 0', fontSize: 13, fontWeight: 600,
-                      background: 'var(--accent)', color: 'var(--accent-txt)', border: 'none',
-                      borderRadius: 8, cursor: 'pointer',
+                      background: importing || !mapping.name ? 'var(--accent-border)' : 'var(--accent)',
+                      color: 'var(--accent-txt)', border: 'none',
+                      borderRadius: 8,
+                      cursor: importing || !mapping.name ? 'not-allowed' : 'pointer',
+                      opacity: !mapping.name && !importResult ? 0.6 : 1,
                     }}
                   >
-                    {t('csv.import', { count: csvPreview.length })}
+                    {importResult
+                      ? t('result.close')
+                      : importing
+                        ? t('mapping.importing')
+                        : !mapping.name
+                          ? t('mapping.missingName')
+                          : t('mapping.submit', { count: csvAllRows.length })}
                   </button>
                 </>
               )}

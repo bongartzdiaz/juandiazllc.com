@@ -1471,6 +1471,28 @@
       "import": "{count, plural, one {Importar # contacto} other {Importar # contactos}}",
       "acceptsFormats": "Acepta archivos .csv y .xlsx",
       "xlsxParseFailed": "No se pudo leer este archivo Excel — comprueba que sea un .xlsx válido."
+    },
+    "mapping": {
+      "heading": "Asignar columnas",
+      "hint": "Detectamos automáticamente la coincidencia más probable para cada campo. Ajústalo si es necesario.",
+      "name": "Columna de nombre",
+      "email": "Columna de correo",
+      "phone": "Columna de teléfono",
+      "company": "Columna de empresa",
+      "notes": "Columna de notas",
+      "noColumn": "— omitir —",
+      "submit": "{count, plural, one {Importar # contacto} other {Importar # contactos}}",
+      "importing": "Importando…",
+      "missingName": "Elige una columna de Nombre para continuar."
+    },
+    "result": {
+      "heading": "Importación completada",
+      "summary": "{created} de {total} importados",
+      "skippedDuplicate": "{count, plural, one {# duplicado omitido} other {# duplicados omitidos}}",
+      "failedValidation": "{count, plural, one {# fila no superó la validación} other {# filas no superaron la validación}}",
+      "networkError": "Error de red — inténtalo de nuevo",
+      "authError": "No permitido — solo los managers pueden importar contactos",
+      "close": "Listo"
     }
   },
   "reports": {

@@ -1471,6 +1471,28 @@
       "import": "{count, plural, one {# Kontakt importieren} other {# Kontakte importieren}}",
       "acceptsFormats": "Akzeptiert .csv- und .xlsx-Dateien",
       "xlsxParseFailed": "Diese Excel-Datei konnte nicht gelesen werden — bitte stellen Sie sicher, dass es sich um eine gültige .xlsx-Datei handelt."
+    },
+    "mapping": {
+      "heading": "Spalten zuordnen",
+      "hint": "Wir haben für jedes Feld die wahrscheinlichste Übereinstimmung automatisch erkannt. Bei Bedarf anpassen.",
+      "name": "Namensspalte",
+      "email": "E-Mail-Spalte",
+      "phone": "Telefonspalte",
+      "company": "Unternehmensspalte",
+      "notes": "Notizenspalte",
+      "noColumn": "— überspringen —",
+      "submit": "{count, plural, one {# Kontakt importieren} other {# Kontakte importieren}}",
+      "importing": "Wird importiert…",
+      "missingName": "Wählen Sie eine Namensspalte aus, um fortzufahren."
+    },
+    "result": {
+      "heading": "Import abgeschlossen",
+      "summary": "{created} von {total} importiert",
+      "skippedDuplicate": "{count, plural, one {# Duplikat übersprungen} other {# Duplikate übersprungen}}",
+      "failedValidation": "{count, plural, one {# Zeile fehlgeschlagen} other {# Zeilen fehlgeschlagen}}",
+      "networkError": "Netzwerkfehler — bitte erneut versuchen",
+      "authError": "Nicht erlaubt — nur Manager dürfen Kontakte importieren",
+      "close": "Fertig"
     }
   },
   "reports": {

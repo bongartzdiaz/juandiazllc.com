@@ -1471,6 +1471,28 @@
       "import": "{count, plural, one {# contact importeren} other {# contacten importeren}}",
       "acceptsFormats": "Accepteert .csv- en .xlsx-bestanden",
       "xlsxParseFailed": "Dit Excel-bestand kon niet worden gelezen — controleer of het een geldig .xlsx-bestand is."
+    },
+    "mapping": {
+      "heading": "Kolommen koppelen",
+      "hint": "We hebben automatisch de waarschijnlijkste match voor elk veld gedetecteerd. Pas indien nodig aan.",
+      "name": "Naamkolom",
+      "email": "E-mailkolom",
+      "phone": "Telefoonkolom",
+      "company": "Bedrijfskolom",
+      "notes": "Notitiekolom",
+      "noColumn": "— overslaan —",
+      "submit": "{count, plural, one {# contact importeren} other {# contacten importeren}}",
+      "importing": "Bezig met importeren…",
+      "missingName": "Kies een kolom voor Naam om door te gaan."
+    },
+    "result": {
+      "heading": "Import voltooid",
+      "summary": "{created} van {total} geïmporteerd",
+      "skippedDuplicate": "{count, plural, one {# duplicaat overgeslagen} other {# duplicaten overgeslagen}}",
+      "failedValidation": "{count, plural, one {# rij faalde op validatie} other {# rijen faalden op validatie}}",
+      "networkError": "Netwerkfout — probeer het opnieuw",
+      "authError": "Niet toegestaan — alleen managers kunnen contacten importeren",
+      "close": "Klaar"
     }
   },
   "reports": {

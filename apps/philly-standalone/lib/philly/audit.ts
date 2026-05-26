@@ -1,14 +1,18 @@
 /* ---------------------------------------------------------------
    Audit logging helper
-   - Records create / update / delete actions across all entities
+   - Records create / update / delete / import actions across all entities
    - Call after every successful mutation in API routes
+   - `import` is the bulk-create action used by import pipelines
+     (CSV / XLSX). One audit row per import batch; metadataJson carries
+     the row counts so the audit page can render the import summary
+     without re-counting from Contact rows.
    --------------------------------------------------------------- */
 
 import { getAuthPrisma } from '@/lib/philly/auth'
 import type { AuthScope } from '@/lib/philly/auth-helpers'
 import { computeAuditHash } from '@/lib/philly/audit-chain'
 
-export type AuditAction = 'create' | 'update' | 'delete'
+export type AuditAction = 'create' | 'update' | 'delete' | 'import'
 
 export type AuditEntity =
   | 'project'
