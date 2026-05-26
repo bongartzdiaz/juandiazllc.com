@@ -89,6 +89,15 @@ const EXEMPT_PATHS = new Set<string>([
   // here.
   'app/api/scim/v2/ServiceProviderConfig/route.ts',
   'app/api/scim/v2/ResourceTypes/route.ts',
+  // Super-admin org-list endpoint — gated by requireSuperAdmin (platform-
+  // wide scope). The whole point of this route is to return EVERY org's
+  // summary, so the per-row organizationId filter the audit looks for
+  // doesn't apply. /api/admin/orgs/[orgId]/* routes also write across
+  // orgs by design (e.g. setting an OrgFeatureOverride for someone else's
+  // org) but those carry the orgId via the URL so the audit's text-scan
+  // for "organizationId" passes incidentally — only the list endpoint
+  // needs explicit exemption.
+  'app/api/admin/orgs/route.ts',
 ])
 
 interface Finding {
@@ -124,17 +133,24 @@ async function audit(): Promise<Finding[]> {
     //     row to { organizationId, scopes }. Bundle CD added so
     //     SCIM Groups + Groups/[id] don't surface as false positives
     //     after Bundle BW.
+    //   - requireSuperAdmin — STRONGER than requireScope; the scope
+    //     is "platform-wide" rather than "one org". Super-admin routes
+    //     (/api/admin/orgs/*) deliberately write to OrgFeatureOverride
+    //     rows for OTHER orgs, so the per-row organizationId filter
+    //     wouldn't apply. Recognised here so PR-2b routes don't show
+    //     as false positives.
     const hasAuthGuard =
       /\brequireScope\b/.test(src) ||
       /\brequireRole\b/.test(src) ||
       /\brequireSection\b/.test(src) ||
-      /\bauthScimRequest\b/.test(src)
+      /\bauthScimRequest\b/.test(src) ||
+      /\brequireSuperAdmin\b/.test(src)
 
     if (!hasAuthGuard) {
       findings.push({
         path: rel,
         reason:
-          'no recognised auth gate (requireScope / requireRole / requireSection / authScimRequest)',
+          'no recognised auth gate (requireScope / requireRole / requireSection / authScimRequest / requireSuperAdmin)',
       })
       continue
     }

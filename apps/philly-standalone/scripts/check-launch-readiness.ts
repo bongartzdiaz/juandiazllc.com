@@ -260,6 +260,13 @@ const ENV_EXAMPLE_IGNORE = new Set([
   // so it doesn't ship to prod by accident. See ClientLayout.tsx's
   // ProtectedShell bypass.
   'NEXT_PUBLIC_BYPASS_AUTH',
+  // Operator CLI-only — set inline on the command line when running
+  // the super-admin scripts (npm run grant:super-admin / revoke:super-admin
+  // / seed:super-admins). Never read at runtime by the web app, so
+  // declaring them in .env.example would mislead operators into setting
+  // a global that does nothing. See scripts/grant-super-admin.ts header.
+  'GRANTOR_EMAIL',
+  'REVOKE_TO_ROLE',
 ]);
 
 check('2.envExampleDrift', 'Secrets', '.env.example covers every code-referenced env var', () => {
