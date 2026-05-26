@@ -903,6 +903,24 @@
       "resetToDefault": "Naar standaard hersteld",
       "featureEnabled": "Functie ingeschakeld",
       "featureDisabled": "Functie uitgeschakeld"
+    },
+    "supportReason": "Reden van support: {reason}",
+    "lockSupport": "Beheerd door support",
+    "lockPlatform": "Platform gepauzeerd",
+    "upgradeCTA": "Upgrade om in te schakelen",
+    "confirmDisable": {
+      "title": "{key} uitschakelen?",
+      "body": "Hiermee zet je de functie UIT voor je organisatie. Je kunt hem op elk moment via deze pagina weer aanzetten.",
+      "impactLoading": "Impact wordt gecontroleerd…",
+      "noImpact": "Op dit moment zijn er geen actieve gebruikers of integraties die deze functie nodig hebben.",
+      "confirm": "Functie uitschakelen",
+      "cancel": "Annuleren",
+      "saving": "Uitschakelen…"
+    },
+    "impact": {
+      "drip-campaigns": "{count, plural, one {# klant zit momenteel in een drip-campagne. Deze klant ontvangt geen geplande e-mails meer.} other {# klanten zitten momenteel in drip-campagnes. Deze klanten ontvangen geen geplande e-mails meer.}}",
+      "webhooks": "{count, plural, one {# actieve webhook-koppeling stopt met events leveren aan je integratie.} other {# actieve webhook-koppelingen stoppen met events leveren aan je integraties.}}",
+      "scim": "{count, plural, one {# IdP-groep ontvangt geen SCIM-updates meer. Je identity provider kan retries proberen, maar langere uitval veroorzaakt drift.} other {# IdP-groepen ontvangen geen SCIM-updates meer. Je identity provider kan retries proberen, maar langere uitval veroorzaakt drift.}}"
     }
   },
   "scimGroups": {

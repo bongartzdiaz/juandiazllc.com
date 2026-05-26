@@ -18,7 +18,14 @@ import {
   listFeatures,
   type FeatureKey,
 } from '@/lib/philly/features'
+import { isFeatureEnabledForOrg } from '@/lib/philly/features/adapter'
+import type { SuperAdminOverride } from '@/lib/philly/features/resolve'
 import { z } from 'zod'
+
+function normalizeOverride(value: string | undefined): SuperAdminOverride {
+  if (value === 'FORCED_ON' || value === 'FORCED_OFF') return value
+  return 'INHERIT'
+}
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -37,13 +44,42 @@ export async function GET() {
 
   const prisma = getAuthPrisma()
   const catalogue = listFeatures()
+
+  // PR-4: extend the per-feature response to include the resolved
+  // SOURCE (8-variant ResolveReason) and any super-admin OVERRIDE
+  // row for this org. The client-admin UI uses `source` to decide
+  // whether to render a toggle (in-plan + no super-admin override),
+  // a read-only "Set by support" lock (super-admin override), or an
+  // upgrade CTA (plan-not-included).
+  const overrideRows = await prisma.orgFeatureOverride.findMany({
+    where: { organizationId: scope.organizationId },
+    select: { feature: true, state: true, reason: true },
+  })
+  const overrideByKey = new Map(overrideRows.map(r => [r.feature, r]))
+
   const states = await Promise.all(
-    catalogue.map(async f => ({
-      key: f.key,
-      description: f.description,
-      enabledByDefault: f.enabledByDefault,
-      enabled: await isFeatureEnabled(prisma, scope.organizationId, f.key as FeatureKey),
-    })),
+    catalogue.map(async f => {
+      const key = f.key as FeatureKey
+      const resolved = await isFeatureEnabledForOrg(prisma, scope.organizationId, key)
+      const override = overrideByKey.get(key)
+      return {
+        key,
+        description: f.description,
+        enabledByDefault: f.enabledByDefault,
+        enabled: resolved.enabled,
+        source: resolved.source,
+        // Client-admin sees the OVERRIDE STATE + REASON so the read-only
+        // lock can render "Set by support: <reason>". The createdById /
+        // createdAt are super-admin metadata — NOT exposed at this
+        // level (client doesn't need to know which super-admin acted).
+        override: override
+          ? {
+              state: normalizeOverride(override.state),
+              reason: override.reason,
+            }
+          : null,
+      }
+    }),
   )
 
   return NextResponse.json({ data: states })

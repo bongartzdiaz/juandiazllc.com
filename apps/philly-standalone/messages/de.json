@@ -903,6 +903,24 @@
       "resetToDefault": "Auf Standard zurückgesetzt",
       "featureEnabled": "Funktion aktiviert",
       "featureDisabled": "Funktion deaktiviert"
+    },
+    "supportReason": "Begründung des Supports: {reason}",
+    "lockSupport": "Vom Support gesetzt",
+    "lockPlatform": "Plattform pausiert",
+    "upgradeCTA": "Upgrade zum Aktivieren",
+    "confirmDisable": {
+      "title": "{key} deaktivieren?",
+      "body": "Damit wird die Funktion für Ihre Organisation AUSGESCHALTET. Sie können sie jederzeit über diese Seite wieder einschalten.",
+      "impactLoading": "Auswirkung wird geprüft…",
+      "noImpact": "Aktuell sind keine aktiven Benutzer oder Integrationen von dieser Funktion abhängig.",
+      "confirm": "Funktion deaktivieren",
+      "cancel": "Abbrechen",
+      "saving": "Wird deaktiviert…"
+    },
+    "impact": {
+      "drip-campaigns": "{count, plural, one {# Kunde ist aktuell in einer Drip-Kampagne. Er erhält keine geplanten E-Mails mehr.} other {# Kunden sind aktuell in Drip-Kampagnen. Sie erhalten keine geplanten E-Mails mehr.}}",
+      "webhooks": "{count, plural, one {# aktives Webhook-Abonnement stellt die Event-Auslieferung an Ihre Integration ein.} other {# aktive Webhook-Abonnements stellen die Event-Auslieferung an Ihre Integrationen ein.}}",
+      "scim": "{count, plural, one {# IdP-Gruppe erhält keine SCIM-Updates mehr. Ihr Identity Provider kann Retries durchführen, längere Ausfälle führen jedoch zu Sync-Drift.} other {# IdP-Gruppen erhalten keine SCIM-Updates mehr. Ihr Identity Provider kann Retries durchführen, längere Ausfälle führen jedoch zu Sync-Drift.}}"
     }
   },
   "scimGroups": {

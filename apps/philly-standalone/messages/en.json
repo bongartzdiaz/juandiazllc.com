@@ -903,6 +903,24 @@
       "resetToDefault": "Reset to default",
       "featureEnabled": "Feature enabled",
       "featureDisabled": "Feature disabled"
+    },
+    "supportReason": "Reason from support: {reason}",
+    "lockSupport": "Set by support",
+    "lockPlatform": "Platform-paused",
+    "upgradeCTA": "Upgrade to enable",
+    "confirmDisable": {
+      "title": "Disable {key}?",
+      "body": "This switches the feature OFF for your organisation. You can re-enable it any time from this page.",
+      "impactLoading": "Checking the impact…",
+      "noImpact": "No active users or integrations depend on this feature right now.",
+      "confirm": "Disable feature",
+      "cancel": "Cancel",
+      "saving": "Disabling…"
+    },
+    "impact": {
+      "drip-campaigns": "{count, plural, one {# customer is currently enrolled in a drip campaign. They will stop receiving scheduled emails.} other {# customers are currently enrolled in drip campaigns. They will stop receiving scheduled emails.}}",
+      "webhooks": "{count, plural, one {# active webhook subscription will stop delivering events to your integration.} other {# active webhook subscriptions will stop delivering events to your integrations.}}",
+      "scim": "{count, plural, one {# IdP-managed group will stop receiving SCIM updates. Your identity provider may queue and retry, but extended downtime can cause sync drift.} other {# IdP-managed groups will stop receiving SCIM updates. Your identity provider may queue and retry, but extended downtime can cause sync drift.}}"
     }
   },
   "scimGroups": {

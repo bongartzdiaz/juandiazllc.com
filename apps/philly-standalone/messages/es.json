@@ -903,6 +903,24 @@
       "resetToDefault": "Restablecido al predeterminado",
       "featureEnabled": "Función activada",
       "featureDisabled": "Función desactivada"
+    },
+    "supportReason": "Motivo del soporte: {reason}",
+    "lockSupport": "Establecido por soporte",
+    "lockPlatform": "Plataforma en pausa",
+    "upgradeCTA": "Actualiza para activar",
+    "confirmDisable": {
+      "title": "¿Desactivar {key}?",
+      "body": "Esto APAGA la función para tu organización. Puedes volver a activarla en cualquier momento desde esta página.",
+      "impactLoading": "Comprobando el impacto…",
+      "noImpact": "Actualmente no hay usuarios activos ni integraciones que dependan de esta función.",
+      "confirm": "Desactivar función",
+      "cancel": "Cancelar",
+      "saving": "Desactivando…"
+    },
+    "impact": {
+      "drip-campaigns": "{count, plural, one {# cliente está inscrito en una campaña drip. Dejará de recibir los correos programados.} other {# clientes están inscritos en campañas drip. Dejarán de recibir los correos programados.}}",
+      "webhooks": "{count, plural, one {# suscripción de webhook activa dejará de entregar eventos a tu integración.} other {# suscripciones de webhook activas dejarán de entregar eventos a tus integraciones.}}",
+      "scim": "{count, plural, one {# grupo gestionado por el IdP dejará de recibir actualizaciones SCIM. Tu proveedor de identidad puede reintentar, pero una interrupción prolongada provoca drift de sincronización.} other {# grupos gestionados por el IdP dejarán de recibir actualizaciones SCIM. Tu proveedor de identidad puede reintentar, pero una interrupción prolongada provoca drift de sincronización.}}"
     }
   },
   "scimGroups": {
