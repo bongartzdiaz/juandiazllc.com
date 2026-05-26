@@ -914,6 +914,115 @@
       "G": "G (plus basse)"
     }
   },
+  "help": {
+    "title": "Aide & FAQ",
+    "subtitle": "Réponses aux questions que les prospects posent avant de s'inscrire.",
+    "searchPlaceholder": "Rechercher dans la FAQ…",
+    "categoriesAriaLabel": "Filtrer par catégorie",
+    "allCategories": "Toutes",
+    "noResults": "Aucune question ne correspond à votre recherche. Essayez un autre mot-clé, ou contactez le support ci-dessous.",
+    "stillStuck": "Bloqué ? Écrivez-nous — nous répondons généralement dans la journée ouvrée.",
+    "contactSupport": "Contacter le support",
+    "categories": {
+      "pricing": "Tarifs & facturation",
+      "migration": "Migration & onboarding",
+      "features": "Fonctionnalités",
+      "compliance": "Conformité & données",
+      "support": "Support & contrats"
+    },
+    "faqs": {
+      "pricing": {
+        "tiers": {
+          "q": "Comment fonctionne la tarification DEUS ?",
+          "a": "Trois forfaits fixes par organisation — aucun coût par agent. Operator (49 €/mois) pour les agents seuls et les agences de 1 à 3 personnes. Team (199 €/mois, 10 agents inclus) pour le mid-market. Business (599 €/mois, agents illimités) pour les agences de 20+ agents.\n\nComparaison avec Whise : à 10 agents vous y payez 890 €/mois pour le tier Expert. DEUS coûte 199 € — 8 292 € d'économies par an."
+        },
+        "change-tier": {
+          "q": "Puis-je changer de forfait plus tard ?",
+          "a": "Oui, immédiatement. Les upgrades sont calculés au prorata du jour ; les downgrades prennent effet au cycle de facturation suivant. Vous n'êtes jamais bloqué dans un forfait supérieur."
+        },
+        "annual-discount": {
+          "q": "Proposez-vous une facturation annuelle ou des remises ?",
+          "a": "Oui — la facturation annuelle offre 15 % de remise sur tous les forfaits. Les design partners (3 premières agences BE/FR) bénéficient de 6 mois gratuits en échange d'un retour hebdomadaire, puis tarifs standards."
+        },
+        "payment-methods": {
+          "q": "Quels moyens de paiement acceptez-vous ?",
+          "a": "Carte bancaire, prélèvement SEPA et virement bancaire (contrats annuels uniquement). Toute la facturation passe par Stripe. La TVA est gérée automatiquement par pays UE."
+        }
+      },
+      "migration": {
+        "from-whise": {
+          "q": "Comment migrer depuis Whise ?",
+          "a": "Pour les design partners, le fondateur gère personnellement la migration — généralement dans les 48 heures suivant l'envoi de votre export Whise. Nous importons contacts, biens, affaires, comptes agents et historique des notes. Les intégrations e-mail et campagnes drip actives sont reconnectées lors d'un appel de suivi.\n\nPour les clients post-lancement, nous fournissons un importeur en self-service plus un appel d'onboarding."
+        },
+        "data-import": {
+          "q": "Quelles données pouvez-vous importer de mon CRM actuel ?",
+          "a": "Contacts (avec champs personnalisés), biens, affaires/transactions, annonces (avec photos), comptes agents, historique d'activité et fils d'e-mails quand le format le permet. Nous avons importé depuis Whise, Realworks, Pipedrive, HubSpot et plusieurs outils locaux NL/BE/FR."
+        },
+        "onboarding-time": {
+          "q": "Combien de temps prend l'onboarding ?",
+          "a": "Une agence de 5 agents est pleinement opérationnelle en 1 à 2 jours. Une agence de 20 agents : 3 à 5 jours, formation d'équipe incluse. La majorité c'est VOTRE revue des données importées, pas notre travail technique."
+        },
+        "training": {
+          "q": "Proposez-vous de la formation ?",
+          "a": "Oui — incluse dans tous les forfaits payants. Formation collective en direct (90 min, enregistrée) plus guides écrits en 5 langues. Nous travaillons aussi en pair-screen avec chaque propriétaire d'agence la première semaine pour détecter les frictions de workflow."
+        }
+      },
+      "features": {
+        "funda-integration": {
+          "q": "DEUS s'intègre-t-il avec Funda, Immoweb, ImmoScout24 ?",
+          "a": "Les intégrations Funda + Immoweb sont en ligne (sprint 2 du lancement immobilier UE). ImmoScout24 (DE), Idealista (ES), SeLoger (FR) et Logic-Immo (FR) sont sur la roadmap publique, priorisés selon le premier client payant par marché."
+        },
+        "ai-features": {
+          "q": "Quelles fonctionnalités IA sont incluses ?",
+          "a": "Trois capacités IA dans chaque forfait (pas derrière un paywall) :\n• Enrichissement de contacts par IA — Claude Haiku déduit le secteur, le score ICP-fit et le résumé du contact\n• Scoring IA des leads — score 0–100 par contact basé sur le comportement\n• Barre de commande IA — recherche et actions en langage naturel à travers le CRM\n\nAucun frais IA par message. Nous absorbons le coût du modèle dans votre abonnement."
+        },
+        "whatsapp": {
+          "q": "Comment fonctionne le click-to-chat WhatsApp ?",
+          "a": "Chaque contact avec un numéro international valide reçoit un bouton WhatsApp sur sa page de détail. Cliquez → choisissez parmi 5 modèles pré-construits (suivi portes ouvertes, confirmation de visite, mise à jour d'offre, demande de documents, prise de contact) → WhatsApp s'ouvre avec le message pré-rempli et personnalisé.\n\nUn futur sprint ajoutera l'API WhatsApp Business complète (envoi + réception dans DEUS)."
+        },
+        "template-customization": {
+          "q": "Puis-je personnaliser les modèles WhatsApp / e-mail / drip ?",
+          "a": "Modèles e-mail + drip : oui, entièrement modifiables par organisation. Modèles WhatsApp : actuellement 5 défauts système ; la personnalisation par organisation est prévue pour le sprint 4. Dites-nous si vous en avez besoin plus tôt."
+        }
+      },
+      "compliance": {
+        "gdpr": {
+          "q": "DEUS est-il conforme RGPD ?",
+          "a": "Oui, by design. Concrètement :\n• Article 15 (accès) : export des données en un clic\n• Article 17 (effacement) : fenêtre de suppression de 30 jours avec vérification\n• Article 30 (registre des activités de traitement) : registre vivant dans /settings/gdpr\n• Chiffrement AES-256-GCM at-rest pour les données personnelles\n• Journal d'audit chaîné SHA-256 (anti-falsification)\n• DPA signé sur demande\n\nChaque action touchant des données personnelles est enregistrée avec l'acteur, l'horodatage et le diff de modification."
+        },
+        "data-residency": {
+          "q": "Où mes données sont-elles stockées ?",
+          "a": "Région UE de Supabase (Francfort ou Amsterdam selon le projet). Aucune donnée ne quitte l'UE. Les sauvegardes restent également en UE. Nous n'utilisons jamais de base de données, log-shipper ou analytics hébergé aux USA pour les données client."
+        },
+        "export-data": {
+          "q": "Puis-je exporter toutes mes données si j'annule ?",
+          "a": "Oui — à tout moment, y compris après annulation (fenêtre de grâce de 7 jours). Export JSON en un clic de chaque ligne et fichier que nous détenons à votre sujet. Le format d'export est documenté pour vous permettre d'importer vers un autre CRM."
+        },
+        "retention": {
+          "q": "Quelle est la politique de conservation des données ?",
+          "a": "Données client actives : conservées tant que votre abonnement est actif. Après annulation : fenêtre de grâce de 7 jours pour l'export, puis suppression. Journaux d'audit : conservés 7 ans selon les normes de conformité UE, même après suppression de compte (obligation légale). Les données personnelles dans les journaux d'audit sont hashées (non stockées) après la fenêtre de grâce."
+        }
+      },
+      "support": {
+        "contract-length": {
+          "q": "Quelle est la durée du contrat ?",
+          "a": "Mensuel par défaut — aucun engagement minimum, annulation à tout moment. Les contrats annuels offrent 15 % de remise et la prévisibilité que certaines agences préfèrent. Pas de contrats de 3 ans."
+        },
+        "support-included": {
+          "q": "Quel support est inclus ?",
+          "a": "Forfait Operator : support e-mail, réponse sous 1 jour ouvré.\nForfait Team : e-mail + chat, réponse sous 4 heures ouvrées.\nForfait Business : e-mail + chat + appels vidéo planifiés, réponse sous 1 heure ouvrée pendant les heures UE.\n\nDesign partners : accès direct WhatsApp/Signal au fondateur, réponse sous 1 heure tout jour ouvré."
+        },
+        "cancel-anytime": {
+          "q": "Puis-je annuler à tout moment ?",
+          "a": "Oui. Forfaits mensuels : annulez depuis /settings/billing, prise d'effet à la fin de la période en cours. Forfaits annuels : annulation possible à tout moment, pas de renouvellement automatique en fin de terme. Nous ne conservons pas le moyen de paiement après annulation."
+        },
+        "design-partner": {
+          "q": "Que signifie être design partner ?",
+          "a": "Les 3 premières agences belges (5–20 agents) bénéficient de 6 mois gratuits sur le forfait Team en échange de :\n• 30 minutes d'appel hebdomadaire avec le fondateur pour le feedback produit\n• L'autorisation d'utiliser votre nom + un témoignage après le mois 3\n• La volonté de tester les fonctionnalités 1–2 semaines avant la sortie générale\n\nEn retour vous obtenez : influence sur la roadmap, ligne directe avec le fondateur, et 1 194 € de Team tier gratuit. Après le mois 6 vous continuez aux tarifs standards ou partez librement."
+        }
+      }
+    }
+  },
   "whatsapp": {
     "buttonAriaLabel": "Ouvrir le chat WhatsApp avec {name}",
     "menuAriaLabel": "Choisir un modèle WhatsApp",

@@ -914,6 +914,115 @@
       "G": "G (lowest)"
     }
   },
+  "help": {
+    "title": "Help & FAQ",
+    "subtitle": "Answers to the questions prospects ask before signing up.",
+    "searchPlaceholder": "Search the FAQ…",
+    "categoriesAriaLabel": "Filter by category",
+    "allCategories": "All",
+    "noResults": "No questions match your search. Try a different keyword, or contact support below.",
+    "stillStuck": "Still stuck? Drop us a line — we usually reply within a working day.",
+    "contactSupport": "Email support",
+    "categories": {
+      "pricing": "Pricing & billing",
+      "migration": "Migration & onboarding",
+      "features": "Features",
+      "compliance": "Compliance & data",
+      "support": "Support & contracts"
+    },
+    "faqs": {
+      "pricing": {
+        "tiers": {
+          "q": "How does DEUS pricing work?",
+          "a": "Three flat per-organisation tiers — no per-agent fees. Operator (€49/month) for solo agents and 1–3 person offices. Team (€199/month, includes 10 agents) for the mid-market wedge. Business (€599/month, unlimited agents) for 20+ agent firms.\n\nCompare with Whise: at 10 agents you'd pay them €890/month for Expert tier. DEUS costs €199 — €8,292 cheaper per year."
+        },
+        "change-tier": {
+          "q": "Can I change tiers later?",
+          "a": "Yes, instantly. Upgrades are prorated to the day; downgrades take effect at the next billing cycle. We never lock you into a higher tier."
+        },
+        "annual-discount": {
+          "q": "Do you offer annual billing or discounts?",
+          "a": "Yes — annual billing saves 15% across all tiers. Design partners (first 3 BE/FR agencies) get 6 months free in exchange for weekly feedback, then standard pricing applies."
+        },
+        "payment-methods": {
+          "q": "What payment methods do you accept?",
+          "a": "Credit card, SEPA direct debit, and bank transfer (annual contracts only). All billing runs through Stripe. VAT is automatically handled per EU country."
+        }
+      },
+      "migration": {
+        "from-whise": {
+          "q": "How do I migrate from Whise?",
+          "a": "For design partners, the founder personally handles the migration — usually within 48 hours of you sending the Whise export. We import contacts, properties, deals, agent records, and historic notes. Email integrations and active drip campaigns are re-wired on a follow-up call.\n\nFor non-design-partner customers post-launch, we provide a self-service importer + onboarding call."
+        },
+        "data-import": {
+          "q": "What data can you import from my current CRM?",
+          "a": "Contacts (with custom fields), properties, deals/transactions, listings (with photos), agent accounts, activity history, and email threads where the format supports it. We've imported from Whise, Realworks, Pipedrive, HubSpot, and several local NL/BE/FR tools."
+        },
+        "onboarding-time": {
+          "q": "How long does onboarding take?",
+          "a": "A 5-agent agency is fully running in 1–2 days. A 20-agent agency: 3–5 days including team training. Most of that is YOUR review of the imported data, not our technical work."
+        },
+        "training": {
+          "q": "Do you offer training?",
+          "a": "Yes — included in all paid tiers. Live group training (90 min, recorded) plus written guides in 5 languages. We also pair-screen with each agency owner for the first week to spot any workflow friction."
+        }
+      },
+      "features": {
+        "funda-integration": {
+          "q": "Does DEUS integrate with Funda, Immoweb, ImmoScout24?",
+          "a": "Funda + Immoweb integrations are live (sprint 2 of EU real-estate launch). ImmoScout24 (DE), Idealista (ES), SeLoger (FR), and Logic-Immo (FR) are on the public roadmap, prioritised by first paying customer in each market."
+        },
+        "ai-features": {
+          "q": "What AI features are included?",
+          "a": "Three AI capabilities bundled in every tier (not paywalled):\n• AI contact enrichment — Claude Haiku derives industry, ICP-fit score, and contact summary\n• AI lead scoring — 0–100 score per contact based on behavior\n• AI command bar — natural language search + actions across the CRM\n\nNo per-message AI fees. We absorb the model cost in your subscription."
+        },
+        "whatsapp": {
+          "q": "How does the WhatsApp click-to-chat work?",
+          "a": "Every contact with a valid international phone number gets a WhatsApp button on their detail page. Click it → pick from 5 pre-built templates (open-house follow-up, viewing confirmation, offer update, document request, intro) → WhatsApp opens with the message pre-filled and personalised.\n\nFuture sprint adds full WhatsApp Business API (send + receive inside DEUS)."
+        },
+        "template-customization": {
+          "q": "Can I customise the WhatsApp / email / drip templates?",
+          "a": "Email + drip templates: yes, fully editable per organisation. WhatsApp templates: currently 5 system defaults; per-organisation customisation is planned for sprint 4. Tell us if you need it sooner."
+        }
+      },
+      "compliance": {
+        "gdpr": {
+          "q": "Is DEUS GDPR-compliant?",
+          "a": "Yes, by design. Concretely:\n• Article 15 (access): one-click data export\n• Article 17 (erasure): 30-day deletion window with verifier\n• Article 30 (records of processing): living register in /settings/gdpr\n• AES-256-GCM at-rest encryption for PII\n• SHA-256 hash-chained audit log (tamper-evident)\n• Signed DPA available on request\n\nEvery action that touches personal data is recorded with the actor, timestamp, and change diff."
+        },
+        "data-residency": {
+          "q": "Where is my data stored?",
+          "a": "Supabase EU region (Frankfurt or Amsterdam, depending on the project). No data leaves the EU. Backups are EU-stored too. We never use a US-hosted database, log shipper, or analytics provider for customer data."
+        },
+        "export-data": {
+          "q": "Can I export all my data if I cancel?",
+          "a": "Yes — at any time, including post-cancellation (7-day grace window). One-click JSON export of every row + file we hold about you. The export format is documented so you can self-import to another CRM."
+        },
+        "retention": {
+          "q": "What's the data retention policy?",
+          "a": "Active customer data: retained while your subscription is active. After cancellation: 7-day grace window for export, then deleted. Audit logs: retained for 7 years per EU compliance norms, even after account deletion (legal requirement). Personal data inside audit logs is hashed-not-stored after the cancellation grace window."
+        }
+      },
+      "support": {
+        "contract-length": {
+          "q": "What's the contract length?",
+          "a": "Monthly is the default — no minimum term, cancel anytime. Annual contracts get 15% off and the predictability some agencies prefer. No 3-year contracts."
+        },
+        "support-included": {
+          "q": "What support is included?",
+          "a": "Operator tier: email support, response within 1 working day.\nTeam tier: email + chat, response within 4 working hours.\nBusiness tier: email + chat + scheduled video calls, response within 1 working hour during EU office hours.\n\nDesign partners: WhatsApp/Signal direct access to the founder, response within 1 hour any working day."
+        },
+        "cancel-anytime": {
+          "q": "Can I cancel anytime?",
+          "a": "Yes. Monthly plans: cancel from /settings/billing, takes effect at end of current period. Annual plans: cancel anytime, no auto-renewal at term end. We do not retain payment method after cancellation."
+        },
+        "design-partner": {
+          "q": "What does it mean to be a design partner?",
+          "a": "First 3 Belgian agencies (5–20 agents) get 6 months free Team tier in exchange for:\n• A 30-minute weekly call with the founder for product feedback\n• Permission to use your name + a testimonial after month 3\n• Willingness to try features 1–2 weeks before general release\n\nIn return you get: roadmap influence, direct line to the founder, and €1,194 worth of free Team tier. After month 6 you continue at standard pricing or churn freely."
+        }
+      }
+    }
+  },
   "whatsapp": {
     "buttonAriaLabel": "Open WhatsApp chat with {name}",
     "menuAriaLabel": "Choose a WhatsApp message template",

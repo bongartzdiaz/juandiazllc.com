@@ -914,6 +914,115 @@
       "G": "G (laagste)"
     }
   },
+  "help": {
+    "title": "Help & FAQ",
+    "subtitle": "Antwoorden op de vragen die prospects stellen vóór ze zich aanmelden.",
+    "searchPlaceholder": "Zoek in de FAQ…",
+    "categoriesAriaLabel": "Filter op categorie",
+    "allCategories": "Alle",
+    "noResults": "Geen vragen gevonden. Probeer een ander zoekwoord, of neem hieronder contact op.",
+    "stillStuck": "Vastgelopen? Stuur ons een berichtje — meestal antwoord binnen één werkdag.",
+    "contactSupport": "Mail support",
+    "categories": {
+      "pricing": "Prijzen & facturatie",
+      "migration": "Migratie & onboarding",
+      "features": "Functies",
+      "compliance": "Compliance & data",
+      "support": "Support & contracten"
+    },
+    "faqs": {
+      "pricing": {
+        "tiers": {
+          "q": "Hoe werkt de DEUS prijsstructuur?",
+          "a": "Drie vlakke per-organisatie tiers — geen kosten per makelaar. Operator (€49/maand) voor solo-makelaars en kantoren van 1–3 personen. Team (€199/maand, inclusief 10 makelaars) voor het mid-market segment. Business (€599/maand, onbeperkt makelaars) voor kantoren met 20+ makelaars.\n\nVergelijk met Whise: bij 10 makelaars betaal je daar €890/maand voor de Expert-tier. DEUS kost €199 — €8.292 goedkoper per jaar."
+        },
+        "change-tier": {
+          "q": "Kan ik later van tier wisselen?",
+          "a": "Ja, direct. Upgrades worden naar de dag pro rata berekend; downgrades gaan in bij de volgende factuurperiode. We binden je niet aan een hogere tier."
+        },
+        "annual-discount": {
+          "q": "Bieden jullie jaarlijkse facturatie of kortingen?",
+          "a": "Ja — jaarlijkse facturatie levert 15% korting op over alle tiers. Design partners (eerste 3 BE/FR kantoren) krijgen 6 maanden gratis in ruil voor wekelijkse feedback, daarna standaard prijzen."
+        },
+        "payment-methods": {
+          "q": "Welke betaalmethoden accepteren jullie?",
+          "a": "Creditcard, SEPA-incasso en bankoverschrijving (alleen bij jaarcontracten). Alle facturatie loopt via Stripe. BTW wordt automatisch per EU-land verwerkt."
+        }
+      },
+      "migration": {
+        "from-whise": {
+          "q": "Hoe migreer ik vanuit Whise?",
+          "a": "Voor design partners doet de oprichter de migratie persoonlijk — meestal binnen 48 uur nadat je de Whise-export hebt aangeleverd. We importeren contacten, panden, deals, makelaar-accounts en historische notities. Email-integraties en lopende drip-campagnes worden in een vervolgcall opnieuw aangesloten.\n\nVoor klanten na launch leveren we een self-service importer plus onboarding-call."
+        },
+        "data-import": {
+          "q": "Welke data kunnen jullie uit mijn huidige CRM importeren?",
+          "a": "Contacten (met aangepaste velden), panden, deals/transacties, listings (met foto's), makelaar-accounts, activiteitenhistorie en email-conversaties waar het formaat dat ondersteunt. We hebben geïmporteerd vanuit Whise, Realworks, Pipedrive, HubSpot en diverse lokale NL/BE/FR tools."
+        },
+        "onboarding-time": {
+          "q": "Hoe lang duurt onboarding?",
+          "a": "Een kantoor met 5 makelaars draait volledig in 1–2 dagen. Een kantoor met 20 makelaars: 3–5 dagen inclusief teamtraining. Het grootste deel daarvan is JULLIE review van de geïmporteerde data, niet ons technische werk."
+        },
+        "training": {
+          "q": "Bieden jullie training?",
+          "a": "Ja — inbegrepen in alle betaalde tiers. Live groepstraining (90 min, opgenomen) plus geschreven handleidingen in 5 talen. We pair-screenen ook met elke kantooreigenaar de eerste week om eventuele workflow-frictie eruit te halen."
+        }
+      },
+      "features": {
+        "funda-integration": {
+          "q": "Integreert DEUS met Funda, Immoweb, ImmoScout24?",
+          "a": "Funda + Immoweb integraties zijn live (sprint 2 van de EU-vastgoed launch). ImmoScout24 (DE), Idealista (ES), SeLoger (FR) en Logic-Immo (FR) staan op de publieke roadmap, geprioriteerd op basis van eerste betalende klant per markt."
+        },
+        "ai-features": {
+          "q": "Welke AI-functies zijn inbegrepen?",
+          "a": "Drie AI-capaciteiten in elke tier (niet achter een paywall):\n• AI contact-verrijking — Claude Haiku leidt branche, ICP-fit score en contact-samenvatting af\n• AI lead-scoring — 0–100 score per contact op basis van gedrag\n• AI commandobalk — natuurlijke-taal zoeken + acties door het hele CRM\n\nGeen kosten per AI-bericht. Wij absorberen de model-kosten in je abonnement."
+        },
+        "whatsapp": {
+          "q": "Hoe werkt de WhatsApp click-to-chat?",
+          "a": "Elk contact met een geldig internationaal telefoonnummer krijgt een WhatsApp-knop op de detailpagina. Klik → kies uit 5 vooraf gebouwde sjablonen (open-huis follow-up, bezichtiging bevestigen, bod-update, documenten opvragen, kennismaking) → WhatsApp opent met het bericht voor-ingevuld en gepersonaliseerd.\n\nIn een toekomstige sprint komt de volledige WhatsApp Business API (verzenden + ontvangen binnen DEUS) erbij."
+        },
+        "template-customization": {
+          "q": "Kan ik de WhatsApp / email / drip sjablonen aanpassen?",
+          "a": "Email + drip sjablonen: ja, volledig per organisatie bewerkbaar. WhatsApp sjablonen: momenteel 5 systeem-defaults; per-organisatie aanpassing staat gepland voor sprint 4. Laat het weten als je het eerder nodig hebt."
+        }
+      },
+      "compliance": {
+        "gdpr": {
+          "q": "Is DEUS GDPR/AVG-conform?",
+          "a": "Ja, by design. Concreet:\n• Artikel 15 (toegang): één klik data-export\n• Artikel 17 (vergetelheid): 30-dagen verwijdervenster met verifier\n• Artikel 30 (register van verwerkingsactiviteiten): levend register in /settings/gdpr\n• AES-256-GCM encryptie at-rest voor PII\n• SHA-256 hash-gekoppelde audit-log (tamper-evident)\n• Ondertekende DPA op aanvraag\n\nElke actie die persoonsgegevens raakt wordt vastgelegd met actor, tijdstempel en wijzigingsdiff."
+        },
+        "data-residency": {
+          "q": "Waar wordt mijn data opgeslagen?",
+          "a": "Supabase EU-regio (Frankfurt of Amsterdam, afhankelijk van het project). Geen data verlaat de EU. Backups worden ook in de EU opgeslagen. We gebruiken nooit een in de VS gehoste database, log-shipper of analytics-provider voor klantdata."
+        },
+        "export-data": {
+          "q": "Kan ik al mijn data exporteren als ik opzeg?",
+          "a": "Ja — op elk moment, ook na opzegging (7 dagen grace-periode). Eén klik JSON-export van elk rij en bestand dat we van je bewaren. Het export-formaat is gedocumenteerd zodat je zelf naar een ander CRM kunt importeren."
+        },
+        "retention": {
+          "q": "Wat is het databewaarbeleid?",
+          "a": "Actieve klantdata: bewaard zolang je abonnement actief is. Na opzegging: 7 dagen grace-periode voor export, daarna verwijderd. Audit-logs: 7 jaar bewaard volgens EU-compliancenormen, ook na account-verwijdering (wettelijke verplichting). Persoonsgegevens binnen audit-logs worden gehasht (niet opgeslagen) na de grace-periode."
+        }
+      },
+      "support": {
+        "contract-length": {
+          "q": "Wat is de contractduur?",
+          "a": "Maandelijks is de default — geen minimumtermijn, opzeggen kan altijd. Jaarcontracten leveren 15% korting + de voorspelbaarheid die sommige kantoren prefereren. Geen 3-jaarcontracten."
+        },
+        "support-included": {
+          "q": "Welke support is inbegrepen?",
+          "a": "Operator tier: email support, antwoord binnen 1 werkdag.\nTeam tier: email + chat, antwoord binnen 4 werkuren.\nBusiness tier: email + chat + ingeplande video-calls, antwoord binnen 1 werkuur tijdens EU-kantooruren.\n\nDesign partners: WhatsApp/Signal directe toegang tot de oprichter, antwoord binnen 1 uur op elke werkdag."
+        },
+        "cancel-anytime": {
+          "q": "Kan ik op elk moment opzeggen?",
+          "a": "Ja. Maandabonnementen: opzeggen vanuit /settings/billing, gaat in aan het einde van de lopende periode. Jaarabonnementen: opzeggen kan altijd, geen automatische verlenging aan het einde van de termijn. We bewaren geen betaalmethode na opzegging."
+        },
+        "design-partner": {
+          "q": "Wat houdt het in om design partner te zijn?",
+          "a": "De eerste 3 Belgische kantoren (5–20 makelaars) krijgen 6 maanden gratis Team-tier in ruil voor:\n• 30 minuten wekelijkse call met de oprichter voor product-feedback\n• Toestemming om jullie naam + een testimonial te gebruiken na maand 3\n• Bereidheid om functies 1–2 weken voor algemene release te testen\n\nIn ruil krijgen jullie: invloed op de roadmap, directe lijn naar de oprichter, en €1.194 aan gratis Team-tier. Na maand 6 ga je verder tegen standaard prijzen of stop je vrij."
+        }
+      }
+    }
+  },
   "whatsapp": {
     "buttonAriaLabel": "Open WhatsApp-chat met {name}",
     "menuAriaLabel": "Kies een WhatsApp-template",

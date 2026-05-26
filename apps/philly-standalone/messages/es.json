@@ -914,6 +914,115 @@
       "G": "G (más baja)"
     }
   },
+  "help": {
+    "title": "Ayuda y FAQ",
+    "subtitle": "Respuestas a las preguntas que los prospectos hacen antes de registrarse.",
+    "searchPlaceholder": "Buscar en la FAQ…",
+    "categoriesAriaLabel": "Filtrar por categoría",
+    "allCategories": "Todas",
+    "noResults": "Ninguna pregunta coincide con tu búsqueda. Prueba otra palabra clave o contacta con soporte abajo.",
+    "stillStuck": "¿Atascado? Escríbenos — solemos responder dentro de un día laboral.",
+    "contactSupport": "Contactar soporte",
+    "categories": {
+      "pricing": "Precios y facturación",
+      "migration": "Migración y onboarding",
+      "features": "Funcionalidades",
+      "compliance": "Cumplimiento y datos",
+      "support": "Soporte y contratos"
+    },
+    "faqs": {
+      "pricing": {
+        "tiers": {
+          "q": "¿Cómo funciona la tarificación de DEUS?",
+          "a": "Tres planes fijos por organización — sin coste por agente. Operator (49 €/mes) para agentes en solitario y oficinas de 1–3 personas. Team (199 €/mes, 10 agentes incluidos) para el segmento mid-market. Business (599 €/mes, agentes ilimitados) para agencias de 20+ agentes.\n\nComparación con Whise: con 10 agentes les pagas 890 €/mes por el plan Expert. DEUS cuesta 199 € — 8.292 € de ahorro al año."
+        },
+        "change-tier": {
+          "q": "¿Puedo cambiar de plan más adelante?",
+          "a": "Sí, al instante. Los upgrades se prorratean al día; los downgrades entran en vigor en el siguiente ciclo de facturación. Nunca te bloqueamos en un plan superior."
+        },
+        "annual-discount": {
+          "q": "¿Ofrecen facturación anual o descuentos?",
+          "a": "Sí — la facturación anual ahorra un 15 % en todos los planes. Los design partners (primeras 3 agencias BE/FR) reciben 6 meses gratis a cambio de feedback semanal, luego precios estándar."
+        },
+        "payment-methods": {
+          "q": "¿Qué métodos de pago aceptan?",
+          "a": "Tarjeta de crédito, débito SEPA y transferencia bancaria (solo contratos anuales). Toda la facturación pasa por Stripe. El IVA se gestiona automáticamente por país UE."
+        }
+      },
+      "migration": {
+        "from-whise": {
+          "q": "¿Cómo migro desde Whise?",
+          "a": "Para los design partners, el fundador realiza la migración personalmente — normalmente en 48 horas tras recibir tu export de Whise. Importamos contactos, inmuebles, operaciones, cuentas de agentes y el historial de notas. Las integraciones de correo y las campañas drip activas se reconectan en una llamada de seguimiento.\n\nPara clientes post-lanzamiento ofrecemos un importador self-service más una llamada de onboarding."
+        },
+        "data-import": {
+          "q": "¿Qué datos pueden importar de mi CRM actual?",
+          "a": "Contactos (con campos personalizados), inmuebles, operaciones/transacciones, anuncios (con fotos), cuentas de agentes, historial de actividad y conversaciones de correo cuando el formato lo permite. Hemos importado desde Whise, Realworks, Pipedrive, HubSpot y varias herramientas locales NL/BE/FR."
+        },
+        "onboarding-time": {
+          "q": "¿Cuánto tarda el onboarding?",
+          "a": "Una agencia de 5 agentes está totalmente operativa en 1–2 días. Una agencia de 20 agentes: 3–5 días, incluyendo la formación del equipo. La mayoría es TU revisión de los datos importados, no nuestro trabajo técnico."
+        },
+        "training": {
+          "q": "¿Ofrecen formación?",
+          "a": "Sí — incluida en todos los planes de pago. Formación grupal en vivo (90 min, grabada) más guías escritas en 5 idiomas. También trabajamos en pair-screen con cada propietario de agencia la primera semana para detectar fricciones de workflow."
+        }
+      },
+      "features": {
+        "funda-integration": {
+          "q": "¿DEUS se integra con Funda, Immoweb, ImmoScout24?",
+          "a": "Las integraciones Funda + Immoweb están operativas (sprint 2 del lanzamiento inmobiliario UE). ImmoScout24 (DE), Idealista (ES), SeLoger (FR) y Logic-Immo (FR) están en la roadmap pública, priorizadas según el primer cliente de pago por mercado."
+        },
+        "ai-features": {
+          "q": "¿Qué funcionalidades de IA están incluidas?",
+          "a": "Tres capacidades IA en todos los planes (no detrás de un paywall):\n• Enriquecimiento de contactos por IA — Claude Haiku deduce sector, score ICP-fit y resumen del contacto\n• Lead scoring IA — score 0–100 por contacto basado en comportamiento\n• Barra de comandos IA — búsqueda y acciones en lenguaje natural en todo el CRM\n\nSin coste IA por mensaje. Absorbemos el coste del modelo en tu suscripción."
+        },
+        "whatsapp": {
+          "q": "¿Cómo funciona el click-to-chat de WhatsApp?",
+          "a": "Cada contacto con un número internacional válido recibe un botón WhatsApp en su página de detalle. Haz clic → elige entre 5 plantillas pre-construidas (seguimiento jornada de puertas abiertas, confirmación de visita, actualización de oferta, solicitud de documentos, presentación) → WhatsApp se abre con el mensaje pre-rellenado y personalizado.\n\nUn sprint futuro añadirá la API completa de WhatsApp Business (enviar + recibir dentro de DEUS)."
+        },
+        "template-customization": {
+          "q": "¿Puedo personalizar las plantillas de WhatsApp / correo / drip?",
+          "a": "Plantillas de correo y drip: sí, totalmente editables por organización. Plantillas WhatsApp: actualmente 5 defaults del sistema; la personalización por organización está planificada para el sprint 4. Avísanos si lo necesitas antes."
+        }
+      },
+      "compliance": {
+        "gdpr": {
+          "q": "¿DEUS cumple con el RGPD?",
+          "a": "Sí, by design. Concretamente:\n• Artículo 15 (acceso): exportación de datos en un clic\n• Artículo 17 (supresión): ventana de eliminación de 30 días con verificador\n• Artículo 30 (registro de actividades de tratamiento): registro vivo en /settings/gdpr\n• Cifrado AES-256-GCM en reposo para datos personales\n• Registro de auditoría encadenado por SHA-256 (anti-manipulación)\n• Acuerdo de tratamiento de datos firmado bajo petición\n\nCada acción que afecta a datos personales se registra con actor, marca de tiempo y diff de cambios."
+        },
+        "data-residency": {
+          "q": "¿Dónde se almacenan mis datos?",
+          "a": "Región UE de Supabase (Frankfurt o Amsterdam según el proyecto). Ningún dato sale de la UE. Los backups también se almacenan en UE. Nunca usamos una base de datos, log-shipper o proveedor de analytics alojado en EE.UU. para datos de cliente."
+        },
+        "export-data": {
+          "q": "¿Puedo exportar todos mis datos si cancelo?",
+          "a": "Sí — en cualquier momento, incluso tras cancelar (ventana de gracia de 7 días). Exportación JSON en un clic de cada fila y archivo que tenemos sobre ti. El formato de exportación está documentado para que puedas importar a otro CRM tú mismo."
+        },
+        "retention": {
+          "q": "¿Cuál es la política de retención de datos?",
+          "a": "Datos de cliente activos: conservados mientras tu suscripción esté activa. Tras cancelar: ventana de gracia de 7 días para exportar, luego eliminados. Logs de auditoría: conservados 7 años según las normas de cumplimiento UE, incluso tras eliminar la cuenta (obligación legal). Los datos personales dentro de los logs de auditoría se hashean (no se almacenan) tras la ventana de gracia."
+        }
+      },
+      "support": {
+        "contract-length": {
+          "q": "¿Cuál es la duración del contrato?",
+          "a": "Mensual por defecto — sin compromiso mínimo, cancelable en cualquier momento. Los contratos anuales ofrecen 15 % de descuento y la previsibilidad que algunas agencias prefieren. Sin contratos de 3 años."
+        },
+        "support-included": {
+          "q": "¿Qué soporte está incluido?",
+          "a": "Plan Operator: soporte por correo, respuesta en 1 día laboral.\nPlan Team: correo + chat, respuesta en 4 horas laborales.\nPlan Business: correo + chat + videollamadas programadas, respuesta en 1 hora laboral durante el horario de oficina UE.\n\nDesign partners: acceso directo WhatsApp/Signal al fundador, respuesta en 1 hora en cualquier día laboral."
+        },
+        "cancel-anytime": {
+          "q": "¿Puedo cancelar en cualquier momento?",
+          "a": "Sí. Planes mensuales: cancela desde /settings/billing, surte efecto al final del periodo actual. Planes anuales: cancelable en cualquier momento, sin renovación automática al final del término. No conservamos el método de pago tras cancelar."
+        },
+        "design-partner": {
+          "q": "¿Qué significa ser design partner?",
+          "a": "Las 3 primeras agencias belgas (5–20 agentes) reciben 6 meses gratis del plan Team a cambio de:\n• Llamada semanal de 30 minutos con el fundador para feedback de producto\n• Permiso para usar tu nombre + un testimonio tras el mes 3\n• Disposición para probar funcionalidades 1–2 semanas antes del lanzamiento general\n\nA cambio obtienes: influencia en la roadmap, línea directa con el fundador y 1.194 € de plan Team gratis. Tras el mes 6 continúas a precios estándar o cancelas libremente."
+        }
+      }
+    }
+  },
   "whatsapp": {
     "buttonAriaLabel": "Abrir chat de WhatsApp con {name}",
     "menuAriaLabel": "Elegir una plantilla de WhatsApp",

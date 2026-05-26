@@ -914,6 +914,115 @@
       "G": "G (niedrigste)"
     }
   },
+  "help": {
+    "title": "Hilfe & FAQ",
+    "subtitle": "Antworten auf die Fragen, die Interessenten vor der Anmeldung stellen.",
+    "searchPlaceholder": "FAQ durchsuchen…",
+    "categoriesAriaLabel": "Nach Kategorie filtern",
+    "allCategories": "Alle",
+    "noResults": "Keine Fragen passen zu Ihrer Suche. Versuchen Sie ein anderes Stichwort oder kontaktieren Sie den Support unten.",
+    "stillStuck": "Steckt fest? Schreiben Sie uns — wir antworten in der Regel innerhalb eines Arbeitstags.",
+    "contactSupport": "Support kontaktieren",
+    "categories": {
+      "pricing": "Preise & Abrechnung",
+      "migration": "Migration & Onboarding",
+      "features": "Funktionen",
+      "compliance": "Compliance & Daten",
+      "support": "Support & Verträge"
+    },
+    "faqs": {
+      "pricing": {
+        "tiers": {
+          "q": "Wie funktioniert die DEUS-Preisgestaltung?",
+          "a": "Drei flache Tarife pro Organisation — keine Gebühren pro Agent. Operator (49 €/Monat) für Einzelagenten und Büros mit 1–3 Personen. Team (199 €/Monat, 10 Agenten inklusive) für das Mid-Market-Segment. Business (599 €/Monat, unbegrenzte Agenten) für Büros ab 20 Agenten.\n\nVergleich mit Whise: Bei 10 Agenten zahlen Sie dort 890 €/Monat für den Expert-Tarif. DEUS kostet 199 € — 8.292 € günstiger pro Jahr."
+        },
+        "change-tier": {
+          "q": "Kann ich später den Tarif wechseln?",
+          "a": "Ja, sofort. Upgrades werden taggenau anteilig berechnet; Downgrades treten zum nächsten Abrechnungszyklus in Kraft. Wir binden Sie nie an einen höheren Tarif."
+        },
+        "annual-discount": {
+          "q": "Bieten Sie jährliche Abrechnung oder Rabatte?",
+          "a": "Ja — jährliche Abrechnung spart 15 % über alle Tarife. Design-Partner (erste 3 BE/FR-Agenturen) erhalten 6 Monate gratis gegen wöchentliches Feedback, danach Standardpreise."
+        },
+        "payment-methods": {
+          "q": "Welche Zahlungsmethoden akzeptieren Sie?",
+          "a": "Kreditkarte, SEPA-Lastschrift und Banküberweisung (nur Jahresverträge). Die gesamte Abrechnung läuft über Stripe. Die Mehrwertsteuer wird automatisch pro EU-Land verarbeitet."
+        }
+      },
+      "migration": {
+        "from-whise": {
+          "q": "Wie migriere ich von Whise?",
+          "a": "Für Design-Partner führt der Gründer die Migration persönlich durch — in der Regel innerhalb von 48 Stunden, nachdem Sie den Whise-Export geschickt haben. Wir importieren Kontakte, Immobilien, Deals, Agenten-Konten und Notizen-Historie. E-Mail-Integrationen und aktive Drip-Kampagnen werden in einem Folge-Call neu verkabelt.\n\nFür Kunden nach dem Launch bieten wir einen Self-Service-Importer plus Onboarding-Call."
+        },
+        "data-import": {
+          "q": "Welche Daten können Sie aus meinem aktuellen CRM importieren?",
+          "a": "Kontakte (mit benutzerdefinierten Feldern), Immobilien, Deals/Transaktionen, Inserate (mit Fotos), Agenten-Konten, Aktivitätshistorie und E-Mail-Threads, wo das Format es unterstützt. Wir haben aus Whise, Realworks, Pipedrive, HubSpot und mehreren lokalen NL/BE/FR-Tools importiert."
+        },
+        "onboarding-time": {
+          "q": "Wie lange dauert das Onboarding?",
+          "a": "Eine 5-Agenten-Agentur läuft in 1–2 Tagen vollständig. Eine 20-Agenten-Agentur: 3–5 Tage inklusive Team-Schulung. Der Großteil davon ist IHRE Überprüfung der importierten Daten, nicht unsere technische Arbeit."
+        },
+        "training": {
+          "q": "Bieten Sie Schulungen an?",
+          "a": "Ja — in allen kostenpflichtigen Tarifen enthalten. Live-Gruppenschulung (90 Min., aufgezeichnet) plus schriftliche Leitfäden in 5 Sprachen. Wir machen außerdem Pair-Screen mit jedem Agenturinhaber in der ersten Woche, um Workflow-Reibungen aufzuspüren."
+        }
+      },
+      "features": {
+        "funda-integration": {
+          "q": "Integriert sich DEUS mit Funda, Immoweb, ImmoScout24?",
+          "a": "Funda + Immoweb-Integrationen sind live (Sprint 2 des EU-Immobilien-Launches). ImmoScout24 (DE), Idealista (ES), SeLoger (FR) und Logic-Immo (FR) stehen auf der öffentlichen Roadmap, priorisiert nach erstem zahlenden Kunden pro Markt."
+        },
+        "ai-features": {
+          "q": "Welche KI-Funktionen sind enthalten?",
+          "a": "Drei KI-Funktionen in jedem Tarif (nicht hinter einer Paywall):\n• KI-Kontaktanreicherung — Claude Haiku leitet Branche, ICP-Fit-Score und Kontaktzusammenfassung ab\n• KI-Lead-Scoring — Score 0–100 pro Kontakt basierend auf Verhalten\n• KI-Befehlsleiste — Suche und Aktionen in natürlicher Sprache im gesamten CRM\n\nKeine KI-Kosten pro Nachricht. Wir absorbieren die Modellkosten in Ihrem Abonnement."
+        },
+        "whatsapp": {
+          "q": "Wie funktioniert das WhatsApp-Click-to-Chat?",
+          "a": "Jeder Kontakt mit einer gültigen internationalen Telefonnummer erhält eine WhatsApp-Schaltfläche auf seiner Detailseite. Klicken → wählen Sie aus 5 vorgefertigten Vorlagen (Tag-der-offenen-Tür-Nachfass, Besichtigungsbestätigung, Angebots-Update, Dokumentenanforderung, Vorstellung) → WhatsApp öffnet sich mit der personalisierten Nachricht.\n\nEin zukünftiger Sprint fügt die vollständige WhatsApp Business API hinzu (Senden + Empfangen in DEUS)."
+        },
+        "template-customization": {
+          "q": "Kann ich die WhatsApp- / E-Mail- / Drip-Vorlagen anpassen?",
+          "a": "E-Mail- und Drip-Vorlagen: ja, vollständig pro Organisation bearbeitbar. WhatsApp-Vorlagen: derzeit 5 System-Defaults; organisationsspezifische Anpassung ist für Sprint 4 geplant. Sagen Sie uns Bescheid, wenn Sie es früher benötigen."
+        }
+      },
+      "compliance": {
+        "gdpr": {
+          "q": "Ist DEUS DSGVO-konform?",
+          "a": "Ja, by design. Konkret:\n• Artikel 15 (Auskunft): Datenexport mit einem Klick\n• Artikel 17 (Löschung): 30-Tage-Löschfenster mit Verifizierer\n• Artikel 30 (Verzeichnis von Verarbeitungstätigkeiten): lebendes Register in /settings/gdpr\n• AES-256-GCM-Verschlüsselung at-rest für personenbezogene Daten\n• SHA-256 hashverkettetes Audit-Log (manipulationssicher)\n• Unterschriebene AVV auf Anfrage\n\nJede Aktion, die personenbezogene Daten betrifft, wird mit Akteur, Zeitstempel und Änderungsdiff aufgezeichnet."
+        },
+        "data-residency": {
+          "q": "Wo werden meine Daten gespeichert?",
+          "a": "Supabase EU-Region (Frankfurt oder Amsterdam, je nach Projekt). Keine Daten verlassen die EU. Backups sind ebenfalls EU-gespeichert. Wir nutzen niemals eine in den USA gehostete Datenbank, einen Log-Shipper oder einen Analytics-Anbieter für Kundendaten."
+        },
+        "export-data": {
+          "q": "Kann ich alle meine Daten exportieren, wenn ich kündige?",
+          "a": "Ja — jederzeit, auch nach Kündigung (7-tägige Karenzzeit). JSON-Export jeder Zeile und Datei, die wir über Sie speichern, mit einem Klick. Das Export-Format ist dokumentiert, damit Sie selbst in ein anderes CRM importieren können."
+        },
+        "retention": {
+          "q": "Was ist die Datenspeicherrichtlinie?",
+          "a": "Aktive Kundendaten: gespeichert, solange Ihr Abonnement aktiv ist. Nach Kündigung: 7-tägige Karenzzeit für Export, danach gelöscht. Audit-Logs: 7 Jahre gespeichert gemäß EU-Compliance-Normen, auch nach Kontolöschung (gesetzliche Pflicht). Personenbezogene Daten in Audit-Logs werden gehasht (nicht gespeichert) nach der Karenzzeit."
+        }
+      },
+      "support": {
+        "contract-length": {
+          "q": "Wie lang ist die Vertragslaufzeit?",
+          "a": "Monatlich ist Standard — keine Mindestlaufzeit, jederzeit kündbar. Jahresverträge bieten 15 % Rabatt + die Planungssicherheit, die manche Agenturen bevorzugen. Keine 3-Jahres-Verträge."
+        },
+        "support-included": {
+          "q": "Welcher Support ist enthalten?",
+          "a": "Operator-Tarif: E-Mail-Support, Antwort innerhalb 1 Arbeitstag.\nTeam-Tarif: E-Mail + Chat, Antwort innerhalb 4 Arbeitsstunden.\nBusiness-Tarif: E-Mail + Chat + geplante Videocalls, Antwort innerhalb 1 Arbeitsstunde während EU-Bürozeiten.\n\nDesign-Partner: WhatsApp/Signal direkter Zugang zum Gründer, Antwort innerhalb 1 Stunde an jedem Arbeitstag."
+        },
+        "cancel-anytime": {
+          "q": "Kann ich jederzeit kündigen?",
+          "a": "Ja. Monatsabos: Kündigung aus /settings/billing, tritt zum Ende der aktuellen Periode in Kraft. Jahresabos: jederzeit kündbar, keine automatische Verlängerung zum Laufzeitende. Wir behalten die Zahlungsmethode nach Kündigung nicht."
+        },
+        "design-partner": {
+          "q": "Was bedeutet es, Design-Partner zu sein?",
+          "a": "Die ersten 3 belgischen Agenturen (5–20 Agenten) erhalten 6 Monate kostenlosen Team-Tarif im Austausch für:\n• Wöchentlicher 30-Minuten-Call mit dem Gründer für Produktfeedback\n• Erlaubnis, Ihren Namen + ein Testimonial nach Monat 3 zu verwenden\n• Bereitschaft, Funktionen 1–2 Wochen vor dem allgemeinen Release zu testen\n\nIm Gegenzug erhalten Sie: Einfluss auf die Roadmap, direkte Leitung zum Gründer und 1.194 € kostenlosen Team-Tarif. Nach Monat 6 setzen Sie zu Standardpreisen fort oder kündigen frei."
+        }
+      }
+    }
+  },
   "whatsapp": {
     "buttonAriaLabel": "WhatsApp-Chat mit {name} öffnen",
     "menuAriaLabel": "WhatsApp-Vorlage auswählen",
