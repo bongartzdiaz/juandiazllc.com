@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useBreakpoint } from '@/hooks/philly/useBreakpoint'
 import { LayoutDashboard, Users2, Columns3, CalendarDays, Sparkles } from 'lucide-react'
+import { isNavItemActive } from './Sidebar'
 import type { LucideIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -22,7 +23,12 @@ export function MobileNav() {
 
   if (!isMobile) return null
 
-  const path = pathname.replace(/^\/(en|nl)/, '') || '/'
+  // 2026-05-26 bugfix: strip all 5 supported locales, not just en/nl.
+  // Mirrors the Sidebar.tsx fix so mobile + desktop nav agree on
+  // which tab is "active" — see Sidebar.test.ts for the regression
+  // test suite covering both surfaces.
+  const stripped = pathname.replace(/^\/(en|nl|de|es|fr)(\/|$)/, '/')
+  const path = stripped === '' ? '/' : stripped
 
   const TABS: Tab[] = [
     { icon: LayoutDashboard, label: t('dashboard'), href: '/' },
@@ -47,7 +53,7 @@ export function MobileNav() {
       }}
     >
       {TABS.map(tab => {
-        const active = path === tab.href || (tab.href !== '/' && path.startsWith(tab.href))
+        const active = isNavItemActive(path, tab.href)
         const Icon = tab.icon
         return (
           <Link

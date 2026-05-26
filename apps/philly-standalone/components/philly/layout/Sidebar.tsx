@@ -36,9 +36,52 @@ const INDUSTRY_ICONS: Record<Industry, LucideIcon> = {
   hospitality: Hotel,
 }
 
+/**
+ * Strip any supported-locale URL prefix from the pathname.
+ *
+ * Background: i18n/request.ts uses COOKIE-based locale resolution, so
+ * pathnames are typically unprefixed (`/contacts`, `/settings`). But
+ * any historical URL-prefixed routes (e.g., `/en/contacts` from
+ * shared marketing links) still need locale-stripping so active-state
+ * detection works.
+ *
+ * 2026-05-26 bugfix: prior regex was `/^\/(en|nl)/` — only handled 2
+ * of our 5 supported locales. A DE/ES/FR user clicking a /de/contacts
+ * link would see NOTHING highlighted in the sidebar.
+ *
+ * The `/(\/|$)/` boundary prevents accidental matches on routes like
+ * `/english-class-thing` where the first segment starts with `en`.
+ */
+const LOCALE_PREFIX = /^\/(en|nl|de|es|fr)(\/|$)/
+
+/**
+ * Is `currentPath` an active match for `itemHref`?
+ *
+ * Exact match for the dashboard (href='/'); prefix-with-boundary
+ * match for everything else (so `/settings` is active on
+ * `/settings/features` but NOT on `/settingsX` if that ever exists).
+ *
+ * 2026-05-26 bugfix: prior logic was
+ *   `path === item.href || (item.href !== '/' && path.startsWith(item.href))`
+ * which had the same boundary problem — `path.startsWith('/setting')`
+ * would match `/settings`. Also it was correct for dashboard non-active
+ * but Juan reported dashboard highlighting on non-dashboard pages, which
+ * the test suite below now pins.
+ */
+export function isNavItemActive(currentPath: string, itemHref: string): boolean {
+  if (itemHref === '/') {
+    // Dashboard is active ONLY on the literal root path. No prefix match.
+    return currentPath === '/'
+  }
+  return currentPath === itemHref || currentPath.startsWith(itemHref + '/')
+}
+
 export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
   const pathname = usePathname()
-  const path = pathname.replace(/^\/(en|nl)/, '') || '/'
+  // Strip locale prefix (handles all 5 supported locales) then default to '/'
+  // when the strip leaves an empty string (e.g., pathname was '/en' or '/de').
+  const stripped = pathname.replace(LOCALE_PREFIX, '/')
+  const path = stripped === '' ? '/' : stripped
   const { industry, config, setIndustry, orgLocked } = useIndustry()
   const [showSwitcher, setShowSwitcher] = useState(false)
   const session = useSupabaseUser()
@@ -306,7 +349,7 @@ function NavGroup({
       {items.map(item => (
         <NavItem
           key={item.href}
-          active={path === item.href || (item.href !== '/' && path.startsWith(item.href))}
+          active={isNavItemActive(path, item.href)}
           {...item}
           onClick={onNavigate}
         />
