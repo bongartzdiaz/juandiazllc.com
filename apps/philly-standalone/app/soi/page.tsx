@@ -8,6 +8,7 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { X, Trash2, Edit2 } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 
 interface SoiCategory {
   id: string
@@ -43,6 +44,9 @@ export default function SoiPage() {
   const [addError, setAddError] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const t = useTranslations('soi')
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const { addToast } = useToast()
 
   function openEdit(c: SoiCategory) {
@@ -54,7 +58,14 @@ export default function SoiPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this category?')) return
+    const ok = await confirm({
+      title: tConfirms('deleteGeneric.title', { entityType: tConfirms('entities.category') }),
+      body: tConfirms('deleteGeneric.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     try {
       const res = await fetch(`/api/soi?id=${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

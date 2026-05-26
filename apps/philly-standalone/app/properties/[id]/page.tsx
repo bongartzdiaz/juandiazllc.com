@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 
 interface Property {
   id: string
@@ -81,6 +82,9 @@ const OFFER_STATUS_COLORS: Record<string, { bg: string; txt: string }> = {
 export default function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const t = useTranslations('properties')
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const router = useRouter()
   const { addToast } = useToast()
 
@@ -194,7 +198,14 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   }
 
   async function handleDelete() {
-    if (!confirm('Delete this property? This cannot be undone.')) return
+    const ok = await confirm({
+      title: tConfirms('deleteGeneric.title', { entityType: tConfirms('entities.property') }),
+      body: tConfirms('deleteGeneric.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     try {
       const res = await fetch(`/api/properties/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

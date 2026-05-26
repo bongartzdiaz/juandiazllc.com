@@ -8,6 +8,7 @@ import { Modal } from '@/components/philly/ui/Modal'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 
 const SDG_COLORS: Record<number, string> = {
   1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21',
@@ -650,6 +651,9 @@ function CardDetailDrawer({
   columns: KanbanColumn[]
   onClose: () => void
 }) {
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   useEffect(() => {
     if (!card) return
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -818,7 +822,14 @@ function CardDetailDrawer({
           </button>
           <button
             onClick={async () => {
-              if (!confirm('Delete this card?')) return
+              const ok = await confirm({
+                title: tConfirms('deleteGeneric.title', { entityType: tConfirms('entities.card') }),
+                body: tConfirms('deleteGeneric.body'),
+                confirmLabel: tCommon('delete'),
+                cancelLabel: tCommon('cancel'),
+                danger: true,
+              })
+              if (!ok) return
               await fetch(`/api/kanban/cards/${card.id}`, { method: 'DELETE' }).catch(() => {})
               onClose()
             }}

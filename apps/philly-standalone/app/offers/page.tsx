@@ -10,6 +10,7 @@ import { Filter, Plus, Trash2, CheckCircle2, XCircle, RefreshCw, Edit2, DollarSi
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { fetchJson } from '@/lib/philly/fetch-json'
 
 interface Offer {
@@ -94,6 +95,9 @@ export default function OffersPage() {
   const [selected, setSelected] = useState<Offer | null>(null)
 
   const t = useTranslations('offers')
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const { addToast } = useToast()
 
   useEffect(() => {
@@ -201,7 +205,14 @@ export default function OffersPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this offer?')) return
+    const ok = await confirm({
+      title: tConfirms('deleteGeneric.title', { entityType: tConfirms('entities.offer') }),
+      body: tConfirms('deleteGeneric.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     try {
       const res = await fetch(`/api/offers/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

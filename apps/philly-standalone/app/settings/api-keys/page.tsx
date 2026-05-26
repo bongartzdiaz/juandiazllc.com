@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Key, Plus, Trash2, Copy, Check, RefreshCw, AlertCircle } from 'lucide-react'
 
@@ -27,6 +29,9 @@ export default function ApiKeysPage() {
   const [copied, setCopied] = useState(false)
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
 
   const load = useCallback(() => {
     setLoading(true)
@@ -73,7 +78,14 @@ export default function ApiKeysPage() {
   }
 
   const rotate = async (id: string) => {
-    if (!confirm('Rotate this API key? The current key will stop working immediately — update integrations.')) return
+    const ok = await confirm({
+      title: tConfirms('rotateApiKey.title'),
+      body: tConfirms('rotateApiKey.body'),
+      confirmLabel: tCommon('replace'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     const res = await fetch(`/api/api-keys/${id}/rotate`, { method: 'POST' })
     const json = await res.json().catch(() => ({}))
     if (res.ok) {
@@ -85,7 +97,14 @@ export default function ApiKeysPage() {
   }
 
   const del = async (id: string) => {
-    if (!confirm('Revoke this API key? Apps using it will stop working immediately.')) return
+    const ok = await confirm({
+      title: tConfirms('revokeApiKey.title'),
+      body: tConfirms('revokeApiKey.body'),
+      confirmLabel: tCommon('revoke'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     await fetch(`/api/api-keys/${id}`, { method: 'DELETE' })
     load()
   }

@@ -701,7 +701,12 @@
       "deal": "deal",
       "card": "card",
       "routingRule": "routing rule",
-      "offer": "offer"
+      "offer": "offer",
+      "page": "page",
+      "property": "property",
+      "scoringRule": "scoring rule",
+      "category": "category",
+      "transaction": "transaction"
     },
     "deleteActionPlan": {
       "title": "Delete this action plan?",
@@ -743,6 +748,30 @@
     "replaceTaxonomyPreset": {
       "title": "Replace current taxonomy with \"{preset}\" preset?",
       "body": "This will overwrite all districts, types, subtypes, listing labels, and flag labels."
+    },
+    "deleteRoom": {
+      "title": "Delete this room?",
+      "body": "Reservations will be lost."
+    },
+    "rotateApiKey": {
+      "title": "Rotate this API key?",
+      "body": "The current key will stop working immediately — update integrations."
+    },
+    "revokeApiKey": {
+      "title": "Revoke this API key?",
+      "body": "Apps using it will stop working immediately."
+    },
+    "rotateWebhookSecret": {
+      "title": "Rotate the signing secret?",
+      "body": "Existing integrations will break until updated."
+    },
+    "deleteWebhook": {
+      "title": "Delete this webhook?",
+      "body": "Events will no longer be delivered."
+    },
+    "gdprErase": {
+      "title": "Permanently erase all data for {email}?",
+      "body": "This cannot be undone."
     }
   },
   "keyboard": {

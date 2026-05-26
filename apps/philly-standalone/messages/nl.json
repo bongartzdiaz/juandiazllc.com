@@ -701,7 +701,12 @@
       "deal": "deal",
       "card": "kaart",
       "routingRule": "routing-regel",
-      "offer": "bod"
+      "offer": "bod",
+      "page": "pagina",
+      "property": "woning",
+      "scoringRule": "scoreregel",
+      "category": "categorie",
+      "transaction": "transactie"
     },
     "deleteActionPlan": {
       "title": "Dit actieplan verwijderen?",
@@ -743,6 +748,30 @@
     "replaceTaxonomyPreset": {
       "title": "Huidige taxonomie vervangen door \"{preset}\"-preset?",
       "body": "Dit overschrijft alle districten, types, subtypes, advertentielabels en vlaglabels."
+    },
+    "deleteRoom": {
+      "title": "Deze kamer verwijderen?",
+      "body": "Reserveringen gaan verloren."
+    },
+    "rotateApiKey": {
+      "title": "Deze API-sleutel roteren?",
+      "body": "De huidige sleutel stopt onmiddellijk met werken — werk integraties bij."
+    },
+    "revokeApiKey": {
+      "title": "Deze API-sleutel intrekken?",
+      "body": "Apps die de sleutel gebruiken stoppen onmiddellijk met werken."
+    },
+    "rotateWebhookSecret": {
+      "title": "Het signing-secret roteren?",
+      "body": "Bestaande integraties stoppen met werken totdat ze worden bijgewerkt."
+    },
+    "deleteWebhook": {
+      "title": "Deze webhook verwijderen?",
+      "body": "Er worden geen events meer afgeleverd."
+    },
+    "gdprErase": {
+      "title": "Alle gegevens van {email} permanent verwijderen?",
+      "body": "Dit kan niet ongedaan worden gemaakt."
     }
   },
   "keyboard": {

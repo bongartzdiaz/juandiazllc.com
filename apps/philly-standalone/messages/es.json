@@ -701,7 +701,12 @@
       "deal": "trato",
       "card": "tarjeta",
       "routingRule": "regla de enrutamiento",
-      "offer": "oferta"
+      "offer": "oferta",
+      "page": "página",
+      "property": "propiedad",
+      "scoringRule": "regla de puntuación",
+      "category": "categoría",
+      "transaction": "transacción"
     },
     "deleteActionPlan": {
       "title": "¿Eliminar este plan de acción?",
@@ -743,6 +748,30 @@
     "replaceTaxonomyPreset": {
       "title": "¿Reemplazar la taxonomía actual con el preset «{preset}»?",
       "body": "Esto sobrescribirá todos los distritos, tipos, subtipos, etiquetas de anuncios y etiquetas de banderas."
+    },
+    "deleteRoom": {
+      "title": "¿Eliminar esta habitación?",
+      "body": "Se perderán las reservas."
+    },
+    "rotateApiKey": {
+      "title": "¿Rotar esta clave de API?",
+      "body": "La clave actual dejará de funcionar inmediatamente: actualiza las integraciones."
+    },
+    "revokeApiKey": {
+      "title": "¿Revocar esta clave de API?",
+      "body": "Las aplicaciones que la usan dejarán de funcionar inmediatamente."
+    },
+    "rotateWebhookSecret": {
+      "title": "¿Rotar el secreto de firma?",
+      "body": "Las integraciones existentes fallarán hasta que se actualicen."
+    },
+    "deleteWebhook": {
+      "title": "¿Eliminar este webhook?",
+      "body": "Ya no se entregarán eventos."
+    },
+    "gdprErase": {
+      "title": "¿Borrar permanentemente todos los datos de {email}?",
+      "body": "Esta acción no se puede deshacer."
     }
   },
   "keyboard": {

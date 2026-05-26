@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
@@ -25,6 +27,9 @@ export default function PagesListPage() {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
   const router = useRouter()
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
 
   interface PagesResponse { data: PageRow[] }
   const pagesQuery = useApi<PagesResponse>('/pages')
@@ -57,7 +62,14 @@ export default function PagesListPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this page? This cannot be undone.')) return
+    const ok = await confirm({
+      title: tConfirms('deleteGeneric.title', { entityType: tConfirms('entities.page') }),
+      body: tConfirms('deleteGeneric.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     const r = await fetch(`/api/pages/${id}`, { method: 'DELETE' })
     if (r.ok) fetchData()
   }

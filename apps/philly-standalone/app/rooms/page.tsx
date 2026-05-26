@@ -10,6 +10,7 @@ import { Filter, Plus, Trash2, Edit2 } from 'lucide-react'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 
 interface Room {
   id: string
@@ -37,6 +38,9 @@ const emptyForm = {
 
 export default function RoomsPage() {
   const t = useTranslations('rooms')
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const { addToast } = useToast()
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState('')
@@ -97,7 +101,14 @@ export default function RoomsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this room? Reservations will be lost.')) return
+    const ok = await confirm({
+      title: tConfirms('deleteRoom.title'),
+      body: tConfirms('deleteRoom.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     try {
       const res = await fetch(`/api/rooms/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

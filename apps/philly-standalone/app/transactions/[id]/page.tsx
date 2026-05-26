@@ -12,6 +12,7 @@ import {
 import { useToast } from '@/hooks/philly/useToast'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 
 interface ESignature {
   id: string
@@ -93,6 +94,9 @@ const DEFAULT_CHECKLIST: ChecklistItem[] = [
 export default function TransactionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const t = useTranslations('transactions')
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const router = useRouter()
   const { addToast } = useToast()
 
@@ -182,7 +186,14 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
   }
 
   async function handleDelete() {
-    if (!confirm('Delete this transaction? This cannot be undone.')) return
+    const ok = await confirm({
+      title: tConfirms('deleteGeneric.title', { entityType: tConfirms('entities.transaction') }),
+      body: tConfirms('deleteGeneric.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     try {
       const res = await fetch(`/api/transactions/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

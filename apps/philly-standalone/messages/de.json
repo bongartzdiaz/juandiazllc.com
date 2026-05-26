@@ -701,7 +701,12 @@
       "deal": "Deal",
       "card": "Karte",
       "routingRule": "Routing-Regel",
-      "offer": "Angebot"
+      "offer": "Angebot",
+      "page": "Seite",
+      "property": "Immobilie",
+      "scoringRule": "Scoring-Regel",
+      "category": "Kategorie",
+      "transaction": "Transaktion"
     },
     "deleteActionPlan": {
       "title": "Diesen Aktionsplan löschen?",
@@ -743,6 +748,30 @@
     "replaceTaxonomyPreset": {
       "title": "Aktuelle Taxonomie durch „{preset}“-Voreinstellung ersetzen?",
       "body": "Dies überschreibt alle Bezirke, Typen, Untertypen, Inserate-Labels und Flag-Labels."
+    },
+    "deleteRoom": {
+      "title": "Diesen Raum löschen?",
+      "body": "Reservierungen gehen verloren."
+    },
+    "rotateApiKey": {
+      "title": "Diesen API-Schlüssel rotieren?",
+      "body": "Der aktuelle Schlüssel funktioniert sofort nicht mehr — bitte Integrationen aktualisieren."
+    },
+    "revokeApiKey": {
+      "title": "Diesen API-Schlüssel widerrufen?",
+      "body": "Apps, die ihn verwenden, funktionieren sofort nicht mehr."
+    },
+    "rotateWebhookSecret": {
+      "title": "Das Signaturgeheimnis rotieren?",
+      "body": "Bestehende Integrationen brechen ab, bis sie aktualisiert werden."
+    },
+    "deleteWebhook": {
+      "title": "Diesen Webhook löschen?",
+      "body": "Es werden keine Events mehr zugestellt."
+    },
+    "gdprErase": {
+      "title": "Alle Daten von {email} dauerhaft löschen?",
+      "body": "Dies kann nicht rückgängig gemacht werden."
     }
   },
   "keyboard": {

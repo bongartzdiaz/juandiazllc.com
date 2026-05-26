@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useMemo, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
@@ -90,6 +92,9 @@ export default function CalendarPage() {
   const [form, setForm] = useState<EventFormState>(emptyForm)
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
 
   const year = currentDate.getFullYear()
   const month = currentDate.getMonth()
@@ -229,7 +234,14 @@ export default function CalendarPage() {
 
   const deleteEvent = async () => {
     if (!editingId) return
-    if (!confirm('Delete this event?')) return
+    const ok = await confirm({
+      title: tConfirms('deleteGeneric.title', { entityType: tConfirms('entities.event') }),
+      body: tConfirms('deleteGeneric.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     setSubmitting(true)
     try {
       const res = await fetch(`/api/calendar/${editingId}`, { method: 'DELETE' })

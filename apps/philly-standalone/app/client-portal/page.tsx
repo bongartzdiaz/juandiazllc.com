@@ -12,6 +12,7 @@ import {
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 
 interface Permissions {
   viewListings?: boolean
@@ -73,6 +74,9 @@ export default function ClientPortalPage() {
   const [selectedPerms, setSelectedPerms] = useState<Permissions>({})
 
   const t = useTranslations('clientPortal')
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const { addToast } = useToast()
 
   useEffect(() => {
@@ -138,7 +142,14 @@ export default function ClientPortalPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Revoke this portal access? The client will no longer be able to log in.')) return
+    const ok = await confirm({
+      title: tConfirms('revokePortalAccess.title'),
+      body: tConfirms('revokePortalAccess.body'),
+      confirmLabel: tCommon('revoke'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     try {
       const res = await fetch(`/api/client-portal/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

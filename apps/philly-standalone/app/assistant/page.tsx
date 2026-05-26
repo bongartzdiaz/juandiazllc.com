@@ -5,6 +5,8 @@
    Conversations persist server-side; sidebar lists them. */
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Send, MessageSquare, Trash2, AlertCircle, ExternalLink } from 'lucide-react'
 
@@ -42,6 +44,9 @@ export default function AssistantPage() {
   const [error, setError] = useState<string | null>(null)
   const [memories, setMemories] = useState<Memory[]>([])
   const scrollRef = useRef<HTMLDivElement>(null)
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
 
   // Load conversation list on mount
   const loadList = useCallback(async () => {
@@ -86,13 +91,20 @@ export default function AssistantPage() {
   }, [])
 
   const deleteConversation = useCallback(async (id: string) => {
-    if (!confirm('Delete this conversation? This cannot be undone.')) return
+    const ok = await confirm({
+      title: tConfirms('deleteGeneric.title', { entityType: tConfirms('entities.conversation') }),
+      body: tConfirms('deleteGeneric.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     const res = await fetch(`/api/assistant/conversations/${id}`, { method: 'DELETE' })
     if (res.ok) {
       if (activeId === id) startNew()
       loadList()
     }
-  }, [activeId, loadList, startNew])
+  }, [activeId, loadList, startNew, confirm, tConfirms, tCommon])
 
   // Auto-scroll to bottom on new content
   useEffect(() => {

@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Webhook, Plus, Trash2, Copy, Check, RefreshCw, ChevronDown, ChevronRight, Info } from 'lucide-react'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
@@ -67,6 +69,9 @@ export default function WebhooksPage() {
 
   const [expanded, setExpanded] = useState<string | null>(null)
   const [details, setDetails] = useState<Record<string, WebhookDetail>>({})
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
 
   const load = useCallback(() => {
     setLoading(true)
@@ -103,7 +108,14 @@ export default function WebhooksPage() {
   }
 
   const rotate = async (id: string) => {
-    if (!confirm('Rotate the signing secret? Existing integrations will break until updated.')) return
+    const ok = await confirm({
+      title: tConfirms('rotateWebhookSecret.title'),
+      body: tConfirms('rotateWebhookSecret.body'),
+      confirmLabel: tCommon('replace'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     const res = await fetch(`/api/webhooks/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -117,7 +129,14 @@ export default function WebhooksPage() {
   }
 
   const del = async (id: string) => {
-    if (!confirm('Delete this webhook? Events will no longer be delivered.')) return
+    const ok = await confirm({
+      title: tConfirms('deleteWebhook.title'),
+      body: tConfirms('deleteWebhook.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     await fetch(`/api/webhooks/${id}`, { method: 'DELETE' })
     load()
   }

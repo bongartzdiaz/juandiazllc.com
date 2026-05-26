@@ -10,14 +10,13 @@
    useConfirm() pattern looks like `await confirm({ title: ... })` —
    passes an object, never a string literal.
 
-   2026-05-26 baseline: 20 leaks remain in app/ + components/ (8 pages
-   + 1 settings + 1 GDPR component, see KNOWN_LEAKS below). They are
-   tolerated until follow-up PR. New leaks (file not in the list) fail
-   this audit immediately.
+   2026-05-26: PERMANENT GATE. The original 20-leak allowlist has been
+   fully cleared. Any new confirm() leak fails CI immediately — there
+   is no grace period and no per-file exception. If you legitimately
+   need to bypass (you won't), discuss with the operator first.
 
    Run via:
-     npm run audit:confirm-leak       # report mode
-     npm run audit:confirm-leak --ci  # exit 1 on any leak (after grace period) */
+     npm run audit:confirm-leak       # any leak → exit 1 */
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'fs'
 import { join, relative, sep } from 'path'
@@ -26,45 +25,10 @@ const ROOT = process.cwd()
 const SCAN_DIRS = [join(ROOT, 'app'), join(ROOT, 'components')]
 const SCAN_EXT = new Set(['.ts', '.tsx'])
 
-// Allowed string-literal confirm() leaks (followup work).
-// As each file is migrated to useConfirm(), remove its entry here.
-// When the array is empty → audit is "clean," remove this allowlist
-// and make the audit a permanent CI gate.
-const KNOWN_LEAKS: ReadonlySet<string> = new Set([
-  // First wave — discovered by single-quote audit grep on 2026-05-26.
-  'app/action-plans/page.tsx',
-  'app/assistant/page.tsx',
-  'app/calendar/page.tsx',
-  'app/client-portal/page.tsx',
-  'app/cma/page.tsx',
-  'app/deals/[id]/page.tsx',
-  'app/dialer/page.tsx',
-  'app/email/page.tsx',
-  'app/grants/page.tsx',
-  'app/inbox/page.tsx',
-  'app/kanban/page.tsx',
-  'app/lead-routing/page.tsx',
-  'app/lead-scoring/page.tsx',
-  'app/offers/page.tsx',
-  'app/properties/page.tsx',
-  'app/realtime-test/page.tsx',
-  'app/settings/api-keys/page.tsx',
-  'app/showings/page.tsx',
-  'app/sms/page.tsx',
-  // Second wave — surfaced by this very audit script's stricter regex
-  // (also catches single-quote calls in components/, not just app/).
-  'app/pages/page.tsx',
-  'app/properties/[id]/page.tsx',
-  'app/rooms/page.tsx',
-  'app/scoring-rules/page.tsx',
-  'app/settings/webhooks/page.tsx',
-  'app/soi/page.tsx',
-  'app/transactions/[id]/page.tsx',
-  'components/philly/gdpr/GdprActions.tsx',
-  // ↑ This is the highest-risk leak in the allowlist: a GDPR data-erasure
-  // confirm. If shown in English to a German DPO, they'd reasonably refuse
-  // to deploy DEUS. Priority for the follow-up PR.
-])
+// Permanent gate as of 2026-05-26 — no allowlist, no exceptions.
+// The original 20-leak baseline was cleared in a single sweep. Any new
+// confirm() leak fails this audit immediately.
+const KNOWN_LEAKS: ReadonlySet<string> = new Set()
 
 interface Leak {
   file: string

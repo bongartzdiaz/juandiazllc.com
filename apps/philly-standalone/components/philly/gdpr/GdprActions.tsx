@@ -4,6 +4,8 @@
    Posts to /api/admin/gdpr/data-subject-{export,erasure}. */
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 
 type Mode = 'export' | 'erasure'
 
@@ -13,6 +15,9 @@ export function GdprActions() {
   const [reason, setReason] = useState('')
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState<{ ok: boolean; msg: string } | null>(null)
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -38,7 +43,14 @@ export function GdprActions() {
         URL.revokeObjectURL(url)
         setFeedback({ ok: true, msg: 'Export downloaded.' })
       } else {
-        if (!confirm(`Permanently erase all data for ${email}? This cannot be undone.`)) {
+        const ok = await confirm({
+          title: tConfirms('gdprErase.title', { email }),
+          body: tConfirms('gdprErase.body'),
+          confirmLabel: tCommon('delete'),
+          cancelLabel: tCommon('cancel'),
+          danger: true,
+        })
+        if (!ok) {
           setBusy(false)
           return
         }

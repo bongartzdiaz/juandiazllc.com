@@ -6,6 +6,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { Play, Pause, X, Users, Zap, Trash2 } from 'lucide-react'
 
 interface LeadRoutingRule {
@@ -63,6 +64,9 @@ export default function LeadRoutingPage() {
   const [saving, setSaving] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
   const t = useTranslations('leadRouting')
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
 
   const closeAddModal = () => {
     setShowAdd(false)
@@ -117,7 +121,14 @@ export default function LeadRoutingPage() {
   }
 
   const deleteRule = async (id: string) => {
-    if (!confirm('Delete this routing rule?')) return
+    const ok = await confirm({
+      title: tConfirms('deleteGeneric.title', { entityType: tConfirms('entities.routingRule') }),
+      body: tConfirms('deleteGeneric.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     try {
       const res = await fetch(`/api/lead-routing?id=${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) fetchData()

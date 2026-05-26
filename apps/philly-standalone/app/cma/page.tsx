@@ -8,6 +8,7 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Filter, MapPin, Bed, Bath, Maximize, BarChart3, Trash2, Edit2, Send, Eye } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 
 interface CMA {
   id: string
@@ -58,6 +59,9 @@ export default function CmaPage() {
   const [addError, setAddError] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const t = useTranslations('cma')
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const { addToast } = useToast()
 
   const closeAddModal = () => {
@@ -95,7 +99,14 @@ export default function CmaPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this CMA report?')) return
+    const ok = await confirm({
+      title: tConfirms('deleteGeneric.title', { entityType: tConfirms('entities.cmaReport') }),
+      body: tConfirms('deleteGeneric.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     try {
       const res = await fetch(`/api/cma?id=${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

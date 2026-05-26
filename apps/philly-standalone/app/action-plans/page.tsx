@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
@@ -57,6 +58,9 @@ export default function ActionPlansPage() {
   const [addError, setAddError] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState('')
   const t = useTranslations('actionPlans')
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
 
   // SWR-backed fetch — dedupes, revalidates on focus, plays nice with the
   // SSE subscription below so optimistic updates still feel instant.
@@ -91,7 +95,14 @@ export default function ActionPlansPage() {
   }
 
   const deletePlan = async (id: string) => {
-    if (!confirm('Delete this action plan? Enrollments will be lost.')) return
+    const ok = await confirm({
+      title: tConfirms('deleteActionPlan.title'),
+      body: tConfirms('deleteActionPlan.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     try {
       const res = await fetch(`/api/action-plans?id=${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) fetchPlans()
