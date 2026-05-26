@@ -914,6 +914,34 @@
       "G": "G (plus basse)"
     }
   },
+  "whatsapp": {
+    "buttonAriaLabel": "Ouvrir le chat WhatsApp avec {name}",
+    "menuAriaLabel": "Choisir un modèle WhatsApp",
+    "pickTemplate": "Choisir un modèle",
+    "disabledReason": "WhatsApp nécessite un numéro international (avec +indicatif pays)",
+    "templates": {
+      "open-house-followup": {
+        "label": "Suivi journée portes ouvertes",
+        "body": "Bonjour {name}, merci pour votre visite aujourd'hui. Des questions sur le bien — je reste à disposition !"
+      },
+      "viewing-confirmation": {
+        "label": "Confirmer la visite",
+        "body": "Bonjour {name}, je confirme notre visite demain. À demain !"
+      },
+      "offer-update": {
+        "label": "Mise à jour de votre offre",
+        "body": "Bonjour {name}, j'ai du nouveau concernant votre offre — pouvons-nous nous appeler ?"
+      },
+      "document-request": {
+        "label": "Demander des documents",
+        "body": "Bonjour {name}, pourriez-vous m'envoyer les documents demandés au plus vite ? Merci !"
+      },
+      "intro": {
+        "label": "Prise de contact",
+        "body": "Bonjour {name}, je vous contacte de l'agence. Avez-vous un instant ?"
+      }
+    }
+  },
   "features": {
     "title": "Drapeaux de fonctionnalités",
     "subtitle": "Interrupteurs par organisation — aucun redéploiement requis",

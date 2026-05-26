@@ -914,6 +914,34 @@
       "G": "G (lowest)"
     }
   },
+  "whatsapp": {
+    "buttonAriaLabel": "Open WhatsApp chat with {name}",
+    "menuAriaLabel": "Choose a WhatsApp message template",
+    "pickTemplate": "Pick a template",
+    "disabledReason": "WhatsApp requires an international phone number (with +country code)",
+    "templates": {
+      "open-house-followup": {
+        "label": "Open-house follow-up",
+        "body": "Hi {name}, thanks for visiting the open house today. Any questions on the property — happy to help!"
+      },
+      "viewing-confirmation": {
+        "label": "Viewing confirmation",
+        "body": "Hi {name}, just confirming our viewing tomorrow. See you there!"
+      },
+      "offer-update": {
+        "label": "Offer status update",
+        "body": "Hi {name}, I have an update on your offer — could we hop on a quick call?"
+      },
+      "document-request": {
+        "label": "Request documents",
+        "body": "Hi {name}, could you share the requested documents at your earliest convenience? Thanks!"
+      },
+      "intro": {
+        "label": "Introduction",
+        "body": "Hi {name}, I'm reaching out from the agency. Got a moment to chat?"
+      }
+    }
+  },
   "features": {
     "title": "Feature flags",
     "subtitle": "Per-org runtime kill-switches — no redeploy required",

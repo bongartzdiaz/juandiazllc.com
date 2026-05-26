@@ -914,6 +914,34 @@
       "G": "G (más baja)"
     }
   },
+  "whatsapp": {
+    "buttonAriaLabel": "Abrir chat de WhatsApp con {name}",
+    "menuAriaLabel": "Elegir una plantilla de WhatsApp",
+    "pickTemplate": "Elige una plantilla",
+    "disabledReason": "WhatsApp requiere un número internacional (con +código de país)",
+    "templates": {
+      "open-house-followup": {
+        "label": "Seguimiento jornada de puertas abiertas",
+        "body": "Hola {name}, gracias por venir a la jornada hoy. ¿Alguna pregunta sobre el inmueble? Encantado de ayudarte."
+      },
+      "viewing-confirmation": {
+        "label": "Confirmar visita",
+        "body": "Hola {name}, te confirmo nuestra visita mañana. ¡Nos vemos!"
+      },
+      "offer-update": {
+        "label": "Actualización de tu oferta",
+        "body": "Hola {name}, tengo novedades sobre tu oferta — ¿podemos hablar un momento?"
+      },
+      "document-request": {
+        "label": "Solicitar documentos",
+        "body": "Hola {name}, ¿podrías enviarme los documentos solicitados cuanto antes? ¡Gracias!"
+      },
+      "intro": {
+        "label": "Presentación",
+        "body": "Hola {name}, te contacto desde la agencia. ¿Tienes un momento?"
+      }
+    }
+  },
   "features": {
     "title": "Feature flags",
     "subtitle": "Kill-switches por organización en tiempo de ejecución — sin redeploy",

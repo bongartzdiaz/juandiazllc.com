@@ -914,6 +914,34 @@
       "G": "G (laagste)"
     }
   },
+  "whatsapp": {
+    "buttonAriaLabel": "Open WhatsApp-chat met {name}",
+    "menuAriaLabel": "Kies een WhatsApp-template",
+    "pickTemplate": "Kies een sjabloon",
+    "disabledReason": "WhatsApp vereist een internationaal telefoonnummer (met +landcode)",
+    "templates": {
+      "open-house-followup": {
+        "label": "Open-huis follow-up",
+        "body": "Hi {name}, bedankt voor je bezoek aan het open huis vandaag. Vragen over de woning — laat het me weten!"
+      },
+      "viewing-confirmation": {
+        "label": "Bezichtiging bevestigen",
+        "body": "Hi {name}, ik bevestig onze bezichtiging morgen. Tot dan!"
+      },
+      "offer-update": {
+        "label": "Update over je bod",
+        "body": "Hi {name}, ik heb een update over je bod — kunnen we even bellen?"
+      },
+      "document-request": {
+        "label": "Documenten opvragen",
+        "body": "Hi {name}, kun je de gevraagde documenten zo snel mogelijk doorsturen? Bedankt!"
+      },
+      "intro": {
+        "label": "Kennismaking",
+        "body": "Hi {name}, ik neem contact op vanuit het kantoor. Heb je even tijd?"
+      }
+    }
+  },
   "features": {
     "title": "Feature flags",
     "subtitle": "Per-organisatie kill-switches — geen redeploy nodig",

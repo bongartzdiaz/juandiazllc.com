@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { AiAttributesCard, type ContactAiAttributes } from '@/components/philly/contacts/AiAttributesCard'
 import { EmailThreadList } from '@/components/philly/contacts/EmailThreadList'
+import { WhatsAppButton } from '@/components/philly/contacts/WhatsAppButton'
 
 /* ------------------------------------------------------------------
    Types
@@ -376,8 +377,11 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                     </span>
                   )}
                   {contact.phone && (
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12.5, color: 'var(--txt2)' }}>
-                      <Phone size={12} color="var(--txt3)" /> {contact.phone}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: 'var(--txt2)' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Phone size={12} color="var(--txt3)" /> {contact.phone}
+                      </span>
+                      <WhatsAppButton phone={contact.phone} contactName={contact.name} />
                     </span>
                   )}
                   {contact.company && (

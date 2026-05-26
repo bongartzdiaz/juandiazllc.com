@@ -914,6 +914,34 @@
       "G": "G (niedrigste)"
     }
   },
+  "whatsapp": {
+    "buttonAriaLabel": "WhatsApp-Chat mit {name} öffnen",
+    "menuAriaLabel": "WhatsApp-Vorlage auswählen",
+    "pickTemplate": "Vorlage wählen",
+    "disabledReason": "WhatsApp benötigt eine internationale Telefonnummer (mit +Ländervorwahl)",
+    "templates": {
+      "open-house-followup": {
+        "label": "Tag der offenen Tür — Nachfass",
+        "body": "Hallo {name}, danke für Ihren Besuch beim Tag der offenen Tür. Fragen zur Immobilie — ich helfe gerne!"
+      },
+      "viewing-confirmation": {
+        "label": "Besichtigung bestätigen",
+        "body": "Hallo {name}, ich bestätige unsere Besichtigung morgen. Bis dann!"
+      },
+      "offer-update": {
+        "label": "Status Ihres Angebots",
+        "body": "Hallo {name}, ich habe ein Update zu Ihrem Angebot — können wir kurz telefonieren?"
+      },
+      "document-request": {
+        "label": "Unterlagen anfordern",
+        "body": "Hallo {name}, könnten Sie die angefragten Unterlagen baldmöglichst zusenden? Danke!"
+      },
+      "intro": {
+        "label": "Vorstellung",
+        "body": "Hallo {name}, ich melde mich aus der Agentur. Haben Sie kurz Zeit?"
+      }
+    }
+  },
   "features": {
     "title": "Feature-Flags",
     "subtitle": "Per-Org-Laufzeit-Kill-Switches — kein Redeploy erforderlich",
