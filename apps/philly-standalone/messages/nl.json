@@ -880,6 +880,40 @@
       "loadFailed": "Laden van gegevens mislukt"
     }
   },
+  "leadSource": {
+    "website": "Website",
+    "referral": "Doorverwijzing",
+    "open_house": "Open huis",
+    "facebook": "Facebook",
+    "google": "Google",
+    "cold_call": "Koude acquisitie",
+    "sphere": "Eigen netwerk",
+    "email_campaign": "E-mailcampagne",
+    "funda": "Funda",
+    "immoscout24": "ImmoScout24",
+    "idealista": "Idealista",
+    "seloger": "SeLoger",
+    "logic_immo": "Logic-Immo",
+    "immoweb": "Immoweb"
+  },
+  "propertyEpc": {
+    "label": "Energielabel",
+    "help": "EU energieprestatiecertificaat — verplicht op woningadvertenties sinds 2021.",
+    "expiresAt": "Certificaat verloopt",
+    "expiresAtHelp": "Energiecertificaten zijn 10 jaar geldig. Advertenties mogen geen verlopen certificaat tonen.",
+    "noRating": "Nog geen label",
+    "grades": {
+      "A++": "A++ (hoogste klasse)",
+      "A+": "A+",
+      "A": "A",
+      "B": "B",
+      "C": "C",
+      "D": "D",
+      "E": "E",
+      "F": "F",
+      "G": "G (laagste)"
+    }
+  },
   "features": {
     "title": "Feature flags",
     "subtitle": "Per-organisatie kill-switches — geen redeploy nodig",

@@ -880,6 +880,40 @@
       "loadFailed": "Daten konnten nicht geladen werden"
     }
   },
+  "leadSource": {
+    "website": "Website",
+    "referral": "Empfehlung",
+    "open_house": "Tag der offenen Tür",
+    "facebook": "Facebook",
+    "google": "Google",
+    "cold_call": "Kaltakquise",
+    "sphere": "Persönliches Netzwerk",
+    "email_campaign": "E-Mail-Kampagne",
+    "funda": "Funda",
+    "immoscout24": "ImmoScout24",
+    "idealista": "Idealista",
+    "seloger": "SeLoger",
+    "logic_immo": "Logic-Immo",
+    "immoweb": "Immoweb"
+  },
+  "propertyEpc": {
+    "label": "Energieausweis",
+    "help": "EU-Energieausweis — seit 2021 für Wohnimmobilien-Inserate verpflichtend.",
+    "expiresAt": "Ausweis läuft ab",
+    "expiresAtHelp": "Energieausweise sind 10 Jahre gültig. Inserate dürfen keinen abgelaufenen Ausweis zeigen.",
+    "noRating": "Noch nicht bewertet",
+    "grades": {
+      "A++": "A++ (höchste Stufe)",
+      "A+": "A+",
+      "A": "A",
+      "B": "B",
+      "C": "C",
+      "D": "D",
+      "E": "E",
+      "F": "F",
+      "G": "G (niedrigste)"
+    }
+  },
   "features": {
     "title": "Feature-Flags",
     "subtitle": "Per-Org-Laufzeit-Kill-Switches — kein Redeploy erforderlich",

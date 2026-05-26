@@ -1,20 +1,23 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 
-/* Bundle AW — extended from { en, nl } to all four supported
+/* Bundle AW — extended from { en, nl } to all five supported
    locales. The dashboard now matches the marketing site's locale
-   coverage (en + nl + de + es). next-intl middleware reads the
-   `pai-locale` cookie; switchLocale writes it + reloads so the
-   server picks it up on next render. */
-export type Locale = 'en' | 'nl' | 'de' | 'es'
+   coverage (en + nl + de + es + fr). FR added in EU real-estate
+   sprint 1 (2026-05-26) for the EU wedge — Funda + ImmoScout24 cover
+   NL/DE but agencies expanding to BE/FR need a native FR option.
+   next-intl middleware reads the `pai-locale` cookie; switchLocale
+   writes it + reloads so the server picks it up on next render. */
+export type Locale = 'en' | 'nl' | 'de' | 'es' | 'fr'
 
-export const SUPPORTED_LOCALES: readonly Locale[] = ['en', 'nl', 'de', 'es']
+export const SUPPORTED_LOCALES: readonly Locale[] = ['en', 'nl', 'de', 'es', 'fr']
 
 export const LOCALE_LABELS: Record<Locale, string> = {
   en: 'English',
   nl: 'Nederlands',
   de: 'Deutsch',
   es: 'Español',
+  fr: 'Français',
 }
 
 const COOKIE_NAME = 'pai-locale'

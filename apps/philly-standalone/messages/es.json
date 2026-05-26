@@ -880,6 +880,40 @@
       "loadFailed": "No se pudieron cargar los datos"
     }
   },
+  "leadSource": {
+    "website": "Sitio web",
+    "referral": "Recomendación",
+    "open_house": "Jornada de puertas abiertas",
+    "facebook": "Facebook",
+    "google": "Google",
+    "cold_call": "Llamada en frío",
+    "sphere": "Red personal",
+    "email_campaign": "Campaña de correo",
+    "funda": "Funda",
+    "immoscout24": "ImmoScout24",
+    "idealista": "Idealista",
+    "seloger": "SeLoger",
+    "logic_immo": "Logic-Immo",
+    "immoweb": "Immoweb"
+  },
+  "propertyEpc": {
+    "label": "Certificado energético",
+    "help": "Certificado de Eficiencia Energética UE — obligatorio en anuncios residenciales desde 2021.",
+    "expiresAt": "Caducidad del certificado",
+    "expiresAtHelp": "Los certificados energéticos son válidos 10 años. Los anuncios no pueden mostrar un certificado caducado.",
+    "noRating": "Sin calificación",
+    "grades": {
+      "A++": "A++ (máxima)",
+      "A+": "A+",
+      "A": "A",
+      "B": "B",
+      "C": "C",
+      "D": "D",
+      "E": "E",
+      "F": "F",
+      "G": "G (más baja)"
+    }
+  },
   "features": {
     "title": "Feature flags",
     "subtitle": "Kill-switches por organización en tiempo de ejecución — sin redeploy",

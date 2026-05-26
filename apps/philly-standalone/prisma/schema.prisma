@@ -314,7 +314,7 @@ model Contact {
 
   // RE Lead fields
   leadScore       Int       @default(0) // 0-100 behavioral score
-  leadSource      String    @default("") // website, zillow, realtor_com, referral, open_house, facebook, google, cold_call, sphere
+  leadSource      String    @default("") // canonical list in lib/philly/contacts/lead-sources.ts — EU pivot 2026-05-26 moved from US-only (zillow/realtor_com) to EU-portal coverage (funda, immoscout24, idealista, seloger, logic_immo, immoweb) + universal sources (website, referral, open_house, facebook, google, cold_call, sphere, email_campaign)
   leadStatus      String    @default("new") // new, contacted, qualified, nurture, hot, under_contract, closed, lost
   preferredMethod String    @default("email") // email, phone, text, whatsapp
   preApproved     Boolean   @default(false)
@@ -862,6 +862,18 @@ model Property {
   parkingSpaces  Int?
   stories        Int?
   propertyStyle  String    @default("") // colonial, ranch, contemporary, etc.
+
+  // EU pivot 2026-05-26 — energy certification fields.
+  // MANDATORY display in EU listings since 2021 (Funda / ImmoScout24
+  // require it, agencies fined for missing it). Grades A++ through G
+  // per the EU Energy Performance of Buildings Directive (EPBD).
+  // Country-specific names: NL "energielabel", DE "Energieausweis",
+  // FR "DPE", ES "Certificado Energético", BE "EPC" / "PEB".
+  //
+  // Nullable on existing data so the migration is non-breaking.
+  // UI conditionally shows these only when org.industry === 'real_estate'.
+  epcRating      String? // A++, A+, A, B, C, D, E, F, G
+  epcExpiresAt   DateTime? // certificates expire after 10 years per EPBD
   virtualTourUrl String    @default("")
   listPriceCents Int       @default(0) // original list price (priceCents = current)
   pricePerSqft   Int       @default(0) // cents

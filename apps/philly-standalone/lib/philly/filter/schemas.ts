@@ -9,6 +9,7 @@
    --------------------------------------------------------------- */
 
 import { hashEmail, hashPhone, looksLikeEmailQuery, looksLikePhoneQuery } from '../blind-index'
+import { LEAD_SOURCES as DEAL_LEAD_SOURCES } from '../contacts/lead-sources'
 import type { FilterEntitySchema, FilterRule } from './types'
 
 const CONTACT_TYPES_PHIL = ['partner', 'donor', 'stakeholder', 'beneficiary'] as const
@@ -101,10 +102,9 @@ export const CONTACT_FILTER_SCHEMA: FilterEntitySchema = {
 
 const DEAL_STATUSES = ['open', 'won', 'lost'] as const
 const DEAL_TYPES = ['buy', 'sell', 'rent', 'lease', 'dual'] as const
-const DEAL_LEAD_SOURCES = [
-  'website', 'zillow', 'realtor_com', 'referral', 'open_house',
-  'facebook', 'google', 'cold_call', 'sphere',
-] as const
+// DEAL_LEAD_SOURCES is imported from lib/philly/contacts/lead-sources
+// (see file header) — EU pivot 2026-05-26 moved this list out of here
+// so adding a new portal is a one-line edit shared by every consumer.
 
 export const DEAL_FILTER_SCHEMA: FilterEntitySchema = {
   entity: 'deal',
