@@ -1011,5 +1011,71 @@
       "stripeNotConfigured": "Stripe checkout aún no está configurado en este despliegue ({status}). La prueba sigue funcionando; operaciones conectará los price-IDs.",
       "checkoutNetworkError": "Error de red al iniciar checkout. Inténtalo de nuevo desde /philly/settings."
     }
+  },
+  "adminOrgs": {
+    "title": "Organizaciones",
+    "subtitle": "Vista a nivel de plataforma — selecciona una organización para gestionar sus overrides de funciones.",
+    "searchPlaceholder": "Buscar por nombre o slug…",
+    "columnName": "Nombre",
+    "columnSlug": "Slug",
+    "columnPlan": "Plan",
+    "columnOverrides": "Overrides activos",
+    "columnActions": "Acciones",
+    "viewFeatures": "Ver funciones",
+    "loading": "Cargando organizaciones…",
+    "errorLoading": "No se pudieron cargar las organizaciones. Intenta recargar la página.",
+    "empty": "Ninguna organización coincide con la búsqueda.",
+    "noPlan": "sin suscripción",
+    "overrideCount": "{count, plural, one {# override} other {# overrides}}",
+    "paginationHint": "Mostrando {shown} de {total} organizaciones. Refina la búsqueda para ver más."
+  },
+  "adminFeatures": {
+    "title": "Overrides de funciones",
+    "subtitle": "Overrides de plataforma por organización. Cada cambio se registra en el audit-log con un motivo obligatorio.",
+    "backToOrgs": "Todas las organizaciones",
+    "loading": "Cargando funciones…",
+    "errorLoading": "No se pudieron cargar las funciones de esta organización. Intenta recargar la página.",
+    "planNote": "Esta organización está en el plan {plan}. Las funciones fuera de ese plan pueden activarse aquí de forma forzada para preview / early-access.",
+    "setOverride": "Establecer override",
+    "setOverrideAriaLabel": "Establecer override para {feature}",
+    "overrideReason": "Motivo: {reason}",
+    "state": {
+      "INHERIT": {
+        "label": "Heredar",
+        "help": "Eliminar el override. Cae sobre la cascada plan / global / organización / valor por defecto."
+      },
+      "FORCED_ON": {
+        "label": "Forzar activo",
+        "help": "Forzar la función ACTIVA para esta organización. Se salta la comprobación de plan (modo preview)."
+      },
+      "FORCED_OFF": {
+        "label": "Forzar inactivo",
+        "help": "Forzar la función INACTIVA para esta organización. Gana sobre el resto de flags, incluyendo la activación por el admin de la organización."
+      }
+    },
+    "source": {
+      "enabled": "Activada",
+      "super-admin-forced-on": "Forzada activa (plataforma)",
+      "super-admin-forced-on-out-of-plan": "Forzada activa (preview)",
+      "super-admin-forced-off": "Forzada inactiva (plataforma)",
+      "plan-not-included": "No incluida en el plan",
+      "global-disabled": "Desactivada globalmente",
+      "client-admin-disabled": "Desactivada por la organización",
+      "default-disabled": "Inactiva (por defecto)"
+    },
+    "dialog": {
+      "title": "Establecer override para {feature}",
+      "newState": "Nuevo estado",
+      "reason": "Motivo",
+      "reasonPlaceholder": "Describe por qué realizas este cambio. Visible para los administradores de la organización y registrado en el audit-log.",
+      "reasonHint": "Mínimo 10 caracteres. Se usa para cumplimiento y traspaso entre operadores.",
+      "submit": "Confirmar cambio",
+      "saving": "Guardando…",
+      "cancel": "Cancelar"
+    },
+    "toasts": {
+      "saved": "Override guardado.",
+      "saveFailed": "No se pudo guardar el override."
+    }
   }
 }

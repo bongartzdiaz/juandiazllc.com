@@ -1011,5 +1011,71 @@
       "stripeNotConfigured": "Stripe checkout is nog niet ingesteld op deze deployment ({status}). De proef werkt door; operations gaat de price-IDs aansluiten.",
       "checkoutNetworkError": "Netwerkfout bij het starten van checkout. Probeer opnieuw vanuit /philly/settings."
     }
+  },
+  "adminOrgs": {
+    "title": "Organisaties",
+    "subtitle": "Platform-overzicht — kies een organisatie om de functie-overrides te beheren.",
+    "searchPlaceholder": "Zoeken op naam of slug…",
+    "columnName": "Naam",
+    "columnSlug": "Slug",
+    "columnPlan": "Plan",
+    "columnOverrides": "Actieve overrides",
+    "columnActions": "Acties",
+    "viewFeatures": "Functies bekijken",
+    "loading": "Organisaties laden…",
+    "errorLoading": "Kon de organisaties niet laden. Probeer de pagina opnieuw te laden.",
+    "empty": "Geen organisaties gevonden voor deze zoekopdracht.",
+    "noPlan": "geen abonnement",
+    "overrideCount": "{count, plural, one {# override} other {# overrides}}",
+    "paginationHint": "Toont {shown} van de {total} organisaties. Verfijn de zoekopdracht voor meer resultaten."
+  },
+  "adminFeatures": {
+    "title": "Functie-overrides",
+    "subtitle": "Per-organisatie platform-overrides. Elke wijziging wordt vastgelegd in de audit-log met een verplichte reden.",
+    "backToOrgs": "Alle organisaties",
+    "loading": "Functies laden…",
+    "errorLoading": "Kon de functies van deze organisatie niet laden. Probeer de pagina opnieuw te laden.",
+    "planNote": "Deze organisatie zit op het {plan}-plan. Functies buiten dit plan kunnen hier alsnog geforceerd worden ingeschakeld voor preview / early-access.",
+    "setOverride": "Override instellen",
+    "setOverrideAriaLabel": "Override instellen voor {feature}",
+    "overrideReason": "Reden: {reason}",
+    "state": {
+      "INHERIT": {
+        "label": "Erven",
+        "help": "Verwijder de override. Valt terug op de plan-, globale-, organisatie- en code-default cascade."
+      },
+      "FORCED_ON": {
+        "label": "Forceer aan",
+        "help": "Forceer de functie AAN voor deze organisatie. Negeert plan-tier checks (preview-modus)."
+      },
+      "FORCED_OFF": {
+        "label": "Forceer uit",
+        "help": "Forceer de functie UIT voor deze organisatie. Wint van alle andere instellingen, ook van de organisatie-admin."
+      }
+    },
+    "source": {
+      "enabled": "Ingeschakeld",
+      "super-admin-forced-on": "Geforceerd aan (platform)",
+      "super-admin-forced-on-out-of-plan": "Geforceerd aan (preview)",
+      "super-admin-forced-off": "Geforceerd uit (platform)",
+      "plan-not-included": "Niet in plan",
+      "global-disabled": "Globaal uitgeschakeld",
+      "client-admin-disabled": "Door organisatie uitgezet",
+      "default-disabled": "Uit (standaard)"
+    },
+    "dialog": {
+      "title": "Override instellen voor {feature}",
+      "newState": "Nieuwe status",
+      "reason": "Reden",
+      "reasonPlaceholder": "Beschrijf waarom je deze wijziging maakt. Zichtbaar voor de admins van de organisatie en vastgelegd in de audit-log.",
+      "reasonHint": "Minimaal 10 tekens. Gebruikt voor compliance en overdracht tussen operators.",
+      "submit": "Wijziging bevestigen",
+      "saving": "Opslaan…",
+      "cancel": "Annuleren"
+    },
+    "toasts": {
+      "saved": "Override opgeslagen.",
+      "saveFailed": "Kon de override niet opslaan."
+    }
   }
 }

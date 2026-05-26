@@ -1011,5 +1011,71 @@
       "stripeNotConfigured": "Stripe Checkout ist auf diesem Deployment noch nicht konfiguriert ({status}). Die Testphase läuft weiter; Operations richtet die Price-IDs ein.",
       "checkoutNetworkError": "Netzwerkfehler beim Starten des Checkouts. Versuchen Sie es erneut aus /philly/settings."
     }
+  },
+  "adminOrgs": {
+    "title": "Organisationen",
+    "subtitle": "Plattformweite Übersicht — wählen Sie eine Organisation, um deren Feature-Overrides zu verwalten.",
+    "searchPlaceholder": "Nach Name oder Slug suchen…",
+    "columnName": "Name",
+    "columnSlug": "Slug",
+    "columnPlan": "Plan",
+    "columnOverrides": "Aktive Overrides",
+    "columnActions": "Aktionen",
+    "viewFeatures": "Funktionen anzeigen",
+    "loading": "Organisationen werden geladen…",
+    "errorLoading": "Organisationen konnten nicht geladen werden. Bitte aktualisieren Sie die Seite.",
+    "empty": "Keine Organisationen für diese Suche gefunden.",
+    "noPlan": "kein Abonnement",
+    "overrideCount": "{count, plural, one {# Override} other {# Overrides}}",
+    "paginationHint": "Es werden {shown} von {total} Organisationen angezeigt. Verfeinern Sie die Suche, um mehr zu sehen."
+  },
+  "adminFeatures": {
+    "title": "Feature-Overrides",
+    "subtitle": "Plattform-Overrides pro Organisation. Jede Änderung wird mit einer Pflicht-Begründung im Audit-Log protokolliert.",
+    "backToOrgs": "Alle Organisationen",
+    "loading": "Funktionen werden geladen…",
+    "errorLoading": "Die Funktionen dieser Organisation konnten nicht geladen werden. Bitte aktualisieren Sie die Seite.",
+    "planNote": "Diese Organisation nutzt den {plan}-Plan. Funktionen außerhalb dieses Plans können hier dennoch für Preview / Early-Access aktiviert werden.",
+    "setOverride": "Override setzen",
+    "setOverrideAriaLabel": "Override für {feature} setzen",
+    "overrideReason": "Begründung: {reason}",
+    "state": {
+      "INHERIT": {
+        "label": "Erben",
+        "help": "Override entfernen. Fällt auf die Plan-, Global-, Organisations- und Code-Default-Kaskade zurück."
+      },
+      "FORCED_ON": {
+        "label": "Erzwingen: an",
+        "help": "Funktion für diese Organisation AN erzwingen. Umgeht die Plan-Stufen-Prüfung (Preview-Modus)."
+      },
+      "FORCED_OFF": {
+        "label": "Erzwingen: aus",
+        "help": "Funktion für diese Organisation AUS erzwingen. Schlägt alle anderen Flags inkl. der Organisations-Admin-Aktivierung."
+      }
+    },
+    "source": {
+      "enabled": "Aktiviert",
+      "super-admin-forced-on": "Erzwungen aktiv (Plattform)",
+      "super-admin-forced-on-out-of-plan": "Erzwungen aktiv (Preview)",
+      "super-admin-forced-off": "Erzwungen aus (Plattform)",
+      "plan-not-included": "Nicht im Plan",
+      "global-disabled": "Global deaktiviert",
+      "client-admin-disabled": "Durch Organisation deaktiviert",
+      "default-disabled": "Aus (Standard)"
+    },
+    "dialog": {
+      "title": "Override für {feature} setzen",
+      "newState": "Neuer Zustand",
+      "reason": "Begründung",
+      "reasonPlaceholder": "Beschreiben Sie, warum Sie diese Änderung vornehmen. Sichtbar für die Administratoren der Organisation und im Audit-Log protokolliert.",
+      "reasonHint": "Mindestens 10 Zeichen. Wird für Compliance und Operator-Übergaben verwendet.",
+      "submit": "Änderung bestätigen",
+      "saving": "Wird gespeichert…",
+      "cancel": "Abbrechen"
+    },
+    "toasts": {
+      "saved": "Override gespeichert.",
+      "saveFailed": "Override konnte nicht gespeichert werden."
+    }
   }
 }

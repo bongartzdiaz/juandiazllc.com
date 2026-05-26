@@ -1011,5 +1011,71 @@
       "stripeNotConfigured": "Stripe checkout not configured on this deployment yet ({status}). You can keep using the trial; ops will wire the price IDs.",
       "checkoutNetworkError": "Network error starting checkout. Try again from /philly/settings."
     }
+  },
+  "adminOrgs": {
+    "title": "Organizations",
+    "subtitle": "Platform-wide view — select an org to manage its feature overrides.",
+    "searchPlaceholder": "Search by name or slug…",
+    "columnName": "Name",
+    "columnSlug": "Slug",
+    "columnPlan": "Plan",
+    "columnOverrides": "Active overrides",
+    "columnActions": "Actions",
+    "viewFeatures": "View features",
+    "loading": "Loading organizations…",
+    "errorLoading": "Could not load organizations. Try refreshing the page.",
+    "empty": "No organizations match this search.",
+    "noPlan": "no subscription",
+    "overrideCount": "{count, plural, one {# override} other {# overrides}}",
+    "paginationHint": "Showing {shown} of {total} organizations. Refine your search to see more."
+  },
+  "adminFeatures": {
+    "title": "Feature overrides",
+    "subtitle": "Per-organization platform overrides. Every change is audit-logged with a mandatory reason.",
+    "backToOrgs": "All organizations",
+    "loading": "Loading features…",
+    "errorLoading": "Could not load this organization's features. Try refreshing the page.",
+    "planNote": "This organization is on the {plan} plan. Features outside that plan can still be force-enabled here for preview / early-access.",
+    "setOverride": "Set override",
+    "setOverrideAriaLabel": "Set override for {feature}",
+    "overrideReason": "Reason: {reason}",
+    "state": {
+      "INHERIT": {
+        "label": "Inherit",
+        "help": "Remove the override. Falls back to the plan, global, org-admin and code-default cascade."
+      },
+      "FORCED_ON": {
+        "label": "Force on",
+        "help": "Force the feature ON for this org. Bypasses plan-tier checks (preview-feature mode)."
+      },
+      "FORCED_OFF": {
+        "label": "Force off",
+        "help": "Force the feature OFF for this org. Beats all other flags including client-admin enable."
+      }
+    },
+    "source": {
+      "enabled": "Enabled",
+      "super-admin-forced-on": "Force-enabled (platform)",
+      "super-admin-forced-on-out-of-plan": "Force-enabled (preview)",
+      "super-admin-forced-off": "Force-disabled (platform)",
+      "plan-not-included": "Not in plan",
+      "global-disabled": "Globally disabled",
+      "client-admin-disabled": "Org-disabled",
+      "default-disabled": "Disabled (default)"
+    },
+    "dialog": {
+      "title": "Set override for {feature}",
+      "newState": "New state",
+      "reason": "Reason",
+      "reasonPlaceholder": "Describe why you are making this change. Visible to the organization's administrators and recorded in the audit log.",
+      "reasonHint": "Minimum 10 characters. Used for compliance and operator-to-operator handoff.",
+      "submit": "Confirm change",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    },
+    "toasts": {
+      "saved": "Override saved.",
+      "saveFailed": "Could not save the override."
+    }
   }
 }
