@@ -42,7 +42,7 @@ export default function NotFound() {
         on the left, or jump back to the dashboard.
       </p>
       <Link
-        href="/dashboard"
+        href="/"
         style={{
           marginTop: 8,
           padding: '8px 18px',

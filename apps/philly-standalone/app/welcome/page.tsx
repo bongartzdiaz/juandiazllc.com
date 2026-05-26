@@ -75,7 +75,10 @@ function WelcomeContent() {
         body: JSON.stringify({ name: orgName.trim(), industry }),
       })
       if (res.status === 401) {
-        router.push('/login?next=/welcome')
+        // 2026-05-26 fix: there's no /login page — Supabase Auth UI
+        // is reached via the root route's middleware redirect. Send
+        // the user back to root and let the auth flow re-engage.
+        router.push('/')
         return
       }
       const json = await res.json().catch(() => ({}))

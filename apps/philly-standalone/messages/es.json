@@ -1155,6 +1155,76 @@
       "networkError": "Error de red"
     }
   },
+  "billing": {
+    "title": "Facturación y suscripción",
+    "subtitle": "Gestiona tu suscripción de DEUS — cambia de plan, ve el estado, compara lo incluido.",
+    "currentBadge": "Plan actual",
+    "currentPlanBanner": "Estás en el plan {plan} ({status}).",
+    "noSubscriptionBanner": "Aún no tienes una suscripción activa. Elige un plan abajo para empezar.",
+    "perMonth": "mes",
+    "ctaCurrent": "Plan actual",
+    "ctaStart": "Empezar con este plan",
+    "ctaUpgrade": "Mejorar",
+    "ctaDowngrade": "Bajar de plan",
+    "ctaSwitch": "Cambiar a este plan",
+    "ctaLoading": "Abriendo checkout…",
+    "vatNote": "Precios sin IVA. El IVA se añade automáticamente en el checkout según tu país de facturación.",
+    "cancelAnytimeNote": "Cancela cuando quieras desde esta página — los planes mensuales se cancelan al final del periodo, sin penalización.",
+    "statuses": {
+      "active": "activa",
+      "trialing": "prueba gratis",
+      "past_due": "pago atrasado",
+      "cancelled": "cancelada",
+      "unknown": "desconocida"
+    },
+    "toasts": {
+      "notConfigured": "La facturación aún no está configurada en este despliegue. Contacta con soporte para activar Stripe Checkout.",
+      "checkoutFailed": "Checkout fallido ({status}). Inténtalo de nuevo o contacta con soporte.",
+      "unexpectedResponse": "Respuesta inesperada del sistema de facturación. Recarga e inténtalo de nuevo.",
+      "networkError": "Error de red — comprueba tu conexión e inténtalo de nuevo."
+    },
+    "plans": {
+      "operator": {
+        "name": "Operator",
+        "tagline": "Para agentes en solitario y oficinas de hasta 3 personas.",
+        "features": [
+          "Hasta 3 cuentas de usuario",
+          "Hasta 2.000 contactos",
+          "CRM esencial + cumplimiento RGPD",
+          "Registro de auditoría + cifrado AES-256-GCM",
+          "Soporte estándar por correo"
+        ]
+      },
+      "team": {
+        "name": "Team",
+        "tagline": "El punto dulce del mid-market — mejor relación calidad-precio para agencias de 5-20 agentes.",
+        "features": [
+          "Hasta 10 cuentas de usuario (fijo — sin coste por agente)",
+          "Hasta 25.000 contactos",
+          "Todo lo de Operator, además de:",
+          "Enriquecimiento de contactos por IA + scoring + barra de comandos",
+          "Webhooks salientes + acceso API",
+          "Campañas drip + filtrado avanzado",
+          "Aprovisionamiento de usuarios SCIM",
+          "Soporte por correo + chat (respuesta en 4h)"
+        ]
+      },
+      "business": {
+        "name": "Business",
+        "tagline": "Para agencias de 20+ agentes que necesitan cumplimiento empresarial + soporte dedicado.",
+        "features": [
+          "Cuentas de usuario ilimitadas",
+          "Contactos ilimitados",
+          "Todo lo de Team, además de:",
+          "Aprovisionamiento de grupos SCIM",
+          "Lista IP permitida + caducidad de sesión por inactividad",
+          "Acuerdo DPA firmado + contacto CS dedicado",
+          "Respuesta en 1h durante horario UE",
+          "Acceso WhatsApp/Signal directo al fundador"
+        ]
+      }
+    }
+  },
   "welcome": {
     "stepLabel": "Paso {n} de {total}",
     "step1": {

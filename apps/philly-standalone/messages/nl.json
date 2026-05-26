@@ -1155,6 +1155,76 @@
       "networkError": "Netwerkfout"
     }
   },
+  "billing": {
+    "title": "Facturatie & abonnement",
+    "subtitle": "Beheer je DEUS-abonnement — wissel van plan, bekijk status, zie wat is inbegrepen.",
+    "currentBadge": "Huidig plan",
+    "currentPlanBanner": "Je zit op het {plan}-plan ({status}).",
+    "noSubscriptionBanner": "Je hebt nog geen actief abonnement. Kies hieronder een plan om te starten.",
+    "perMonth": "maand",
+    "ctaCurrent": "Huidig plan",
+    "ctaStart": "Start met dit plan",
+    "ctaUpgrade": "Upgraden",
+    "ctaDowngrade": "Downgraden",
+    "ctaSwitch": "Wissel naar dit plan",
+    "ctaLoading": "Checkout openen…",
+    "vatNote": "Prijzen exclusief btw. Btw wordt automatisch toegevoegd bij checkout op basis van je factureringsland.",
+    "cancelAnytimeNote": "Op elk moment opzegbaar vanaf deze pagina — maandplannen gaan in aan het einde van de periode, geen boete.",
+    "statuses": {
+      "active": "actief",
+      "trialing": "gratis proef",
+      "past_due": "betaling achterstallig",
+      "cancelled": "geannuleerd",
+      "unknown": "onbekend"
+    },
+    "toasts": {
+      "notConfigured": "Facturatie is nog niet geconfigureerd op deze deployment. Neem contact op met support om Stripe Checkout in te schakelen.",
+      "checkoutFailed": "Checkout mislukt ({status}). Probeer opnieuw of neem contact op met support.",
+      "unexpectedResponse": "Onverwacht antwoord van facturatie. Ververs en probeer opnieuw.",
+      "networkError": "Netwerkfout — controleer je verbinding en probeer opnieuw."
+    },
+    "plans": {
+      "operator": {
+        "name": "Operator",
+        "tagline": "Voor solo-makelaars en kantoren tot 3 personen.",
+        "features": [
+          "Tot 3 gebruikersaccounts",
+          "Tot 2.000 contacten",
+          "Core CRM + GDPR-compliance",
+          "Audit-log + AES-256-GCM encryptie",
+          "Standaard e-mailsupport"
+        ]
+      },
+      "team": {
+        "name": "Team",
+        "tagline": "De mid-market sweet spot — beste prijs voor kantoren met 5-20 makelaars.",
+        "features": [
+          "Tot 10 gebruikersaccounts (flat — geen prijs per makelaar)",
+          "Tot 25.000 contacten",
+          "Alles uit Operator, plus:",
+          "AI contact-verrijking + lead scoring + commandobalk",
+          "Uitgaande webhooks + API-toegang",
+          "Drip-campagnes + geavanceerd filteren",
+          "SCIM gebruikersprovisioning",
+          "E-mail + chat support (4 uur reactie)"
+        ]
+      },
+      "business": {
+        "name": "Business",
+        "tagline": "Voor kantoren met 20+ makelaars die enterprise compliance + dedicated support nodig hebben.",
+        "features": [
+          "Onbeperkt gebruikersaccounts",
+          "Onbeperkt contacten",
+          "Alles uit Team, plus:",
+          "SCIM groepsprovisioning",
+          "IP-allowlist + sessie idle-timeout",
+          "Ondertekende DPA + dedicated CS-contact",
+          "1 uur reactie tijdens EU-kantooruren",
+          "Directe WhatsApp/Signal toegang tot oprichter"
+        ]
+      }
+    }
+  },
   "welcome": {
     "stepLabel": "Stap {n} van {total}",
     "step1": {

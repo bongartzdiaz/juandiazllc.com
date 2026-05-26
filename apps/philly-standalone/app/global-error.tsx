@@ -98,7 +98,7 @@ export default function GlobalError({
               Try again
             </button>
             <a
-              href="/dashboard"
+              href="/"
               style={{
                 padding: '10px 18px',
                 borderRadius: 8,

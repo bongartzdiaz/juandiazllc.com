@@ -1155,6 +1155,76 @@
       "networkError": "Netzwerkfehler"
     }
   },
+  "billing": {
+    "title": "Abrechnung & Abonnement",
+    "subtitle": "Verwalten Sie Ihr DEUS-Abonnement — Tarif wechseln, Status sehen, Leistungen vergleichen.",
+    "currentBadge": "Aktueller Tarif",
+    "currentPlanBanner": "Sie sind im {plan}-Tarif ({status}).",
+    "noSubscriptionBanner": "Sie haben noch kein aktives Abonnement. Wählen Sie unten einen Tarif, um zu starten.",
+    "perMonth": "Monat",
+    "ctaCurrent": "Aktueller Tarif",
+    "ctaStart": "Mit diesem Tarif starten",
+    "ctaUpgrade": "Upgraden",
+    "ctaDowngrade": "Downgraden",
+    "ctaSwitch": "Zu diesem Tarif wechseln",
+    "ctaLoading": "Checkout wird geöffnet…",
+    "vatNote": "Preise exkl. MwSt. Die MwSt. wird beim Checkout automatisch je nach Rechnungsland berechnet.",
+    "cancelAnytimeNote": "Jederzeit über diese Seite kündbar — Monatstarife enden zum Periodenende, ohne Strafgebühr.",
+    "statuses": {
+      "active": "aktiv",
+      "trialing": "kostenlose Testphase",
+      "past_due": "Zahlung überfällig",
+      "cancelled": "gekündigt",
+      "unknown": "unbekannt"
+    },
+    "toasts": {
+      "notConfigured": "Abrechnung ist auf diesem Deployment noch nicht konfiguriert. Kontaktieren Sie den Support, um Stripe Checkout zu aktivieren.",
+      "checkoutFailed": "Checkout fehlgeschlagen ({status}). Versuchen Sie es erneut oder kontaktieren Sie den Support.",
+      "unexpectedResponse": "Unerwartete Antwort vom Abrechnungssystem. Bitte aktualisieren und erneut versuchen.",
+      "networkError": "Netzwerkfehler — prüfen Sie Ihre Verbindung und versuchen Sie es erneut."
+    },
+    "plans": {
+      "operator": {
+        "name": "Operator",
+        "tagline": "Für Einzelmakler und Büros mit bis zu 3 Personen.",
+        "features": [
+          "Bis zu 3 Benutzerkonten",
+          "Bis zu 2.000 Kontakte",
+          "Core-CRM + DSGVO-Compliance",
+          "Audit-Log + AES-256-GCM-Verschlüsselung",
+          "Standard-E-Mail-Support"
+        ]
+      },
+      "team": {
+        "name": "Team",
+        "tagline": "Der Mid-Market-Sweet-Spot — bestes Preis-Leistungs-Verhältnis für Agenturen mit 5–20 Maklern.",
+        "features": [
+          "Bis zu 10 Benutzerkonten (pauschal — keine Gebühr pro Makler)",
+          "Bis zu 25.000 Kontakte",
+          "Alles aus Operator, zusätzlich:",
+          "KI-Kontaktanreicherung + Lead-Scoring + Befehlsleiste",
+          "Ausgehende Webhooks + API-Zugriff",
+          "Drip-Kampagnen + erweiterte Filterung",
+          "SCIM-Benutzerprovisionierung",
+          "E-Mail + Chat-Support (4 Std. Reaktion)"
+        ]
+      },
+      "business": {
+        "name": "Business",
+        "tagline": "Für Agenturen mit 20+ Maklern, die Enterprise-Compliance + dedizierten Support benötigen.",
+        "features": [
+          "Unbegrenzte Benutzerkonten",
+          "Unbegrenzte Kontakte",
+          "Alles aus Team, zusätzlich:",
+          "SCIM-Gruppenprovisionierung",
+          "IP-Allowlist + Sitzungs-Idle-Timeout",
+          "Unterschriebene AVV + dedizierter CS-Kontakt",
+          "1 Std. Reaktion während EU-Bürozeiten",
+          "Direkter WhatsApp/Signal-Zugang zum Gründer"
+        ]
+      }
+    }
+  },
   "welcome": {
     "stepLabel": "Schritt {n} von {total}",
     "step1": {

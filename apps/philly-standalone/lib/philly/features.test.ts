@@ -12,20 +12,60 @@ import {
 
 type Row = { organizationId: string | null; enabled: boolean; key: string }
 
-function fakePrisma(rows: Row[] = []) {
-  const findMany = vi.fn(async ({ where }: { where: { key: string; OR: Array<{ organizationId: string | null }> } }) => {
-    const orgIds = where.OR.map(o => o.organizationId)
+/**
+ * Mocks the three Prisma tables `isFeatureEnabled` reads:
+ *   - featureFlag (the original flag table — the test's primary subject)
+ *   - subscription (added by PR-2b — defaults to 'business' plan so the
+ *     resolver's plan-tier check passes; this preserves test intent of
+ *     testing FeatureFlag behavior, not plan-tier behavior)
+ *   - orgFeatureOverride (added by PR-2b super-admin layer — defaults
+ *     to null so no override is applied)
+ *
+ * Variants that test plan-tier or super-admin-override paths can pass
+ * custom `subscriptionPlan` / `override` overrides.
+ */
+function fakePrisma(
+  rows: Row[] = [],
+  options: { subscriptionPlan?: string | null; override?: { state: string } | null } = {},
+) {
+  const { subscriptionPlan = 'business', override = null } = options
+
+  // Handle BOTH query shapes:
+  //   - { key, OR: [{ organizationId: null }, { organizationId: orgId }] }
+  //     (adapter.ts path — when orgId is set)
+  //   - { key, organizationId: null }
+  //     (legacy global-only path — when orgId is nullish)
+  type FindManyArgs = {
+    where: {
+      key: string
+      OR?: Array<{ organizationId: string | null }>
+      organizationId?: string | null
+    }
+  }
+  const findMany = vi.fn(async ({ where }: FindManyArgs) => {
+    const orgIds = where.OR
+      ? where.OR.map(o => o.organizationId)
+      : [where.organizationId === undefined ? null : where.organizationId]
     return rows.filter(r => r.key === where.key && orgIds.includes(r.organizationId))
   })
   const upsert = vi.fn(async () => ({}))
   const deleteMany = vi.fn(async () => ({ count: 1 }))
+  const subscriptionFindUnique = vi.fn(async () =>
+    subscriptionPlan === null ? null : { plan: subscriptionPlan },
+  )
+  const overrideFindUnique = vi.fn(async () => override)
+
   return {
     prisma: {
       featureFlag: { findMany, upsert, deleteMany },
+      subscription: { findUnique: subscriptionFindUnique },
+      orgFeatureOverride: { findUnique: overrideFindUnique },
     },
     findMany,
     upsert,
     deleteMany,
+    subscriptionFindUnique,
+    overrideFindUnique,
   }
 }
 
@@ -54,13 +94,21 @@ describe('features', () => {
       expect(enabled).toBe(false)
     })
 
-    it('prefers the org-specific row over the global default', async () => {
+    it('global kill-switch beats org-level enable (PR-2b rule 4)', async () => {
+      // Behavior change from PR-2b: in the original Bundle BD code,
+      // an org-specific enable=true would win over a global=false.
+      // In the two-level resolver, globalFlag=false is a platform-level
+      // KILL-SWITCH that beats any org-level opt-in. Rationale: when
+      // the platform owner globally disables a feature (e.g., third-
+      // party API outage), client-admin enable should not override —
+      // otherwise the client's request fails confusingly anyway.
+      // See lib/philly/features/resolve.test.ts rule 4 tests.
       const { prisma } = fakePrisma([
         { organizationId: null, enabled: false, key: FEATURES.WEBHOOKS.key },
         { organizationId: 'org_1', enabled: true, key: FEATURES.WEBHOOKS.key },
       ])
       const enabled = await isFeatureEnabled(prisma as never, 'org_1', FEATURES.WEBHOOKS.key)
-      expect(enabled).toBe(true)
+      expect(enabled).toBe(false) // global kill-switch wins
     })
 
     it('falls through to global when org row is for a different org', async () => {

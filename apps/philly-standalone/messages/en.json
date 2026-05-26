@@ -1155,6 +1155,76 @@
       "networkError": "Network error"
     }
   },
+  "billing": {
+    "title": "Billing & subscription",
+    "subtitle": "Manage your DEUS subscription — change plans, view status, see what's included.",
+    "currentBadge": "Current plan",
+    "currentPlanBanner": "You are on the {plan} plan ({status}).",
+    "noSubscriptionBanner": "You don't have an active subscription yet. Pick a plan below to get started.",
+    "perMonth": "month",
+    "ctaCurrent": "Current plan",
+    "ctaStart": "Start with this plan",
+    "ctaUpgrade": "Upgrade",
+    "ctaDowngrade": "Downgrade",
+    "ctaSwitch": "Switch to this plan",
+    "ctaLoading": "Opening checkout…",
+    "vatNote": "Prices exclude VAT. VAT is added automatically at checkout based on your billing country.",
+    "cancelAnytimeNote": "Cancel any time from this page — monthly plans take effect at end of period, no penalty.",
+    "statuses": {
+      "active": "active",
+      "trialing": "free trial",
+      "past_due": "payment overdue",
+      "cancelled": "cancelled",
+      "unknown": "unknown"
+    },
+    "toasts": {
+      "notConfigured": "Billing isn't configured on this deployment yet. Contact support to enable Stripe Checkout.",
+      "checkoutFailed": "Checkout failed ({status}). Try again or contact support.",
+      "unexpectedResponse": "Unexpected response from billing. Try refreshing and starting again.",
+      "networkError": "Network error — check your connection and try again."
+    },
+    "plans": {
+      "operator": {
+        "name": "Operator",
+        "tagline": "For solo agents and offices up to 3 people.",
+        "features": [
+          "Up to 3 user accounts",
+          "Up to 2,000 contacts",
+          "Core CRM + GDPR compliance",
+          "Audit log + AES-256-GCM encryption",
+          "Standard email support"
+        ]
+      },
+      "team": {
+        "name": "Team",
+        "tagline": "The mid-market sweet spot — best value for 5-20 agent agencies.",
+        "features": [
+          "Up to 10 user accounts (flat — no per-agent fee)",
+          "Up to 25,000 contacts",
+          "Everything in Operator, plus:",
+          "AI contact enrichment + lead scoring + command bar",
+          "Outbound webhooks + API access",
+          "Drip campaigns + advanced filtering",
+          "SCIM user provisioning",
+          "Email + chat support (4hr response)"
+        ]
+      },
+      "business": {
+        "name": "Business",
+        "tagline": "For 20+ agent firms that need enterprise compliance + dedicated support.",
+        "features": [
+          "Unlimited user accounts",
+          "Unlimited contacts",
+          "Everything in Team, plus:",
+          "SCIM group provisioning",
+          "IP allow-list + session idle timeout",
+          "Signed DPA + dedicated CS contact",
+          "1hr response during EU office hours",
+          "Direct WhatsApp/Signal access to founder"
+        ]
+      }
+    }
+  },
   "welcome": {
     "stepLabel": "Step {n} of {total}",
     "step1": {

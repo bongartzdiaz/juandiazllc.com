@@ -1155,6 +1155,76 @@
       "networkError": "Network error"
     }
   },
+  "billing": {
+    "title": "Facturation & abonnement",
+    "subtitle": "Gérez votre abonnement DEUS — changer de forfait, voir le statut, comparer les inclusions.",
+    "currentBadge": "Forfait actuel",
+    "currentPlanBanner": "Vous êtes sur le forfait {plan} ({status}).",
+    "noSubscriptionBanner": "Vous n'avez pas encore d'abonnement actif. Choisissez un forfait ci-dessous pour commencer.",
+    "perMonth": "mois",
+    "ctaCurrent": "Forfait actuel",
+    "ctaStart": "Commencer avec ce forfait",
+    "ctaUpgrade": "Mettre à niveau",
+    "ctaDowngrade": "Rétrograder",
+    "ctaSwitch": "Passer à ce forfait",
+    "ctaLoading": "Ouverture du checkout…",
+    "vatNote": "Prix hors TVA. La TVA est ajoutée automatiquement au checkout selon votre pays de facturation.",
+    "cancelAnytimeNote": "Résiliable à tout moment depuis cette page — les forfaits mensuels s'arrêtent à la fin de la période, sans pénalité.",
+    "statuses": {
+      "active": "actif",
+      "trialing": "essai gratuit",
+      "past_due": "paiement en retard",
+      "cancelled": "résilié",
+      "unknown": "inconnu"
+    },
+    "toasts": {
+      "notConfigured": "La facturation n'est pas encore configurée sur ce déploiement. Contactez le support pour activer Stripe Checkout.",
+      "checkoutFailed": "Échec du checkout ({status}). Réessayez ou contactez le support.",
+      "unexpectedResponse": "Réponse inattendue du système de facturation. Actualisez et réessayez.",
+      "networkError": "Erreur réseau — vérifiez votre connexion et réessayez."
+    },
+    "plans": {
+      "operator": {
+        "name": "Operator",
+        "tagline": "Pour les agents en solo et les agences jusqu'à 3 personnes.",
+        "features": [
+          "Jusqu'à 3 comptes utilisateurs",
+          "Jusqu'à 2 000 contacts",
+          "CRM essentiel + conformité RGPD",
+          "Journal d'audit + chiffrement AES-256-GCM",
+          "Support standard par e-mail"
+        ]
+      },
+      "team": {
+        "name": "Team",
+        "tagline": "Le sweet spot du mid-market — meilleur rapport qualité-prix pour les agences de 5–20 agents.",
+        "features": [
+          "Jusqu'à 10 comptes utilisateurs (forfait fixe — pas de coût par agent)",
+          "Jusqu'à 25 000 contacts",
+          "Tout d'Operator, en plus :",
+          "Enrichissement de contacts par IA + scoring + barre de commande",
+          "Webhooks sortants + accès API",
+          "Campagnes drip + filtrage avancé",
+          "Provisionnement d'utilisateurs SCIM",
+          "Support e-mail + chat (réponse en 4 h)"
+        ]
+      },
+      "business": {
+        "name": "Business",
+        "tagline": "Pour les agences de 20+ agents nécessitant une conformité entreprise + un support dédié.",
+        "features": [
+          "Comptes utilisateurs illimités",
+          "Contacts illimités",
+          "Tout de Team, en plus :",
+          "Provisionnement de groupes SCIM",
+          "Liste IP autorisée + expiration de session par inactivité",
+          "DPA signé + contact CS dédié",
+          "Réponse en 1 h pendant les heures UE",
+          "Accès WhatsApp/Signal direct au fondateur"
+        ]
+      }
+    }
+  },
   "welcome": {
     "stepLabel": "Étape {n} sur {total}",
     "step1": {
