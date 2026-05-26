@@ -681,7 +681,67 @@
     "openFullPage": "Open full page",
     "applyFilter": "Apply filter",
     "clearAll": "Clear all",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "disconnect": "Disconnect",
+    "revoke": "Revoke",
+    "replace": "Replace"
+  },
+  "confirms": {
+    "deleteGeneric": {
+      "title": "Delete this {entityType}?",
+      "body": "This cannot be undone."
+    },
+    "entities": {
+      "document": "document",
+      "conversation": "conversation",
+      "event": "event",
+      "cmaReport": "CMA report",
+      "deal": "deal",
+      "card": "card",
+      "routingRule": "routing rule",
+      "offer": "offer"
+    },
+    "deleteActionPlan": {
+      "title": "Delete this action plan?",
+      "body": "Enrollments will be lost."
+    },
+    "revokePortalAccess": {
+      "title": "Revoke this portal access?",
+      "body": "The client will no longer be able to log in."
+    },
+    "deleteRule": {
+      "title": "Delete rule \"{name}\"?"
+    },
+    "deleteCampaign": {
+      "title": "Delete \"{name}\"?",
+      "body": "This cannot be undone."
+    },
+    "deleteTemplate": {
+      "title": "Delete template \"{name}\"?"
+    },
+    "deletePipeline": {
+      "title": "Delete pipeline \"{name}\"?",
+      "body": "This cannot be undone."
+    },
+    "deleteStage": {
+      "title": "Delete stage \"{name}\"?"
+    },
+    "bulkDeleteDocuments": {
+      "title": "{count, plural, one {Delete # document?} other {Delete # documents?}}",
+      "body": "This cannot be undone."
+    },
+    "disconnectIntegration": {
+      "title": "Disconnect {name}?",
+      "body": "You can reconnect any time from this page."
+    },
+    "revokeIntegration": {
+      "title": "Revoke & remove {name}?",
+      "body": "This will:\n• Attempt to revoke access with {name}\n• Permanently delete stored tokens\n• Remove this integration record\n\nYou will need to re-authorize to reconnect."
+    },
+    "replaceTaxonomyPreset": {
+      "title": "Replace current taxonomy with \"{preset}\" preset?",
+      "body": "This will overwrite all districts, types, subtypes, listing labels, and flag labels."
+    }
   },
   "keyboard": {
     "title": "Keyboard shortcuts",

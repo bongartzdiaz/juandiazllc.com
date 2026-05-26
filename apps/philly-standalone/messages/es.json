@@ -681,7 +681,67 @@
     "openFullPage": "Abrir página completa",
     "applyFilter": "Aplicar filtro",
     "clearAll": "Borrar todo",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "disconnect": "Desconectar",
+    "revoke": "Revocar",
+    "replace": "Reemplazar"
+  },
+  "confirms": {
+    "deleteGeneric": {
+      "title": "¿Eliminar este {entityType}?",
+      "body": "Esta acción no se puede deshacer."
+    },
+    "entities": {
+      "document": "documento",
+      "conversation": "conversación",
+      "event": "evento",
+      "cmaReport": "informe ECM",
+      "deal": "trato",
+      "card": "tarjeta",
+      "routingRule": "regla de enrutamiento",
+      "offer": "oferta"
+    },
+    "deleteActionPlan": {
+      "title": "¿Eliminar este plan de acción?",
+      "body": "Las inscripciones se perderán."
+    },
+    "revokePortalAccess": {
+      "title": "¿Revocar este acceso al portal?",
+      "body": "El cliente ya no podrá iniciar sesión."
+    },
+    "deleteRule": {
+      "title": "¿Eliminar la regla «{name}»?"
+    },
+    "deleteCampaign": {
+      "title": "¿Eliminar «{name}»?",
+      "body": "Esta acción no se puede deshacer."
+    },
+    "deleteTemplate": {
+      "title": "¿Eliminar la plantilla «{name}»?"
+    },
+    "deletePipeline": {
+      "title": "¿Eliminar la pipeline «{name}»?",
+      "body": "Esta acción no se puede deshacer."
+    },
+    "deleteStage": {
+      "title": "¿Eliminar la etapa «{name}»?"
+    },
+    "bulkDeleteDocuments": {
+      "title": "{count, plural, one {¿Eliminar # documento?} other {¿Eliminar # documentos?}}",
+      "body": "Esta acción no se puede deshacer."
+    },
+    "disconnectIntegration": {
+      "title": "¿Desconectar {name}?",
+      "body": "Puedes volver a conectarte en cualquier momento desde esta página."
+    },
+    "revokeIntegration": {
+      "title": "¿Revocar y eliminar {name}?",
+      "body": "Esto:\n• Intentará revocar el acceso con {name}\n• Eliminará permanentemente los tokens almacenados\n• Eliminará este registro de integración\n\nTendrás que volver a autorizar para reconectar."
+    },
+    "replaceTaxonomyPreset": {
+      "title": "¿Reemplazar la taxonomía actual con el preset «{preset}»?",
+      "body": "Esto sobrescribirá todos los distritos, tipos, subtipos, etiquetas de anuncios y etiquetas de banderas."
+    }
   },
   "keyboard": {
     "title": "Atajos de teclado",

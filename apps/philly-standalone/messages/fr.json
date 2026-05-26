@@ -681,7 +681,67 @@
     "openFullPage": "Ouvrir en pleine page",
     "applyFilter": "Appliquer le filtre",
     "clearAll": "Tout effacer",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "disconnect": "Déconnecter",
+    "revoke": "Révoquer",
+    "replace": "Remplacer"
+  },
+  "confirms": {
+    "deleteGeneric": {
+      "title": "Supprimer ce {entityType} ?",
+      "body": "Cette action est irréversible."
+    },
+    "entities": {
+      "document": "document",
+      "conversation": "conversation",
+      "event": "événement",
+      "cmaReport": "rapport ECM",
+      "deal": "affaire",
+      "card": "carte",
+      "routingRule": "règle de routage",
+      "offer": "offre"
+    },
+    "deleteActionPlan": {
+      "title": "Supprimer ce plan d'action ?",
+      "body": "Les inscriptions seront perdues."
+    },
+    "revokePortalAccess": {
+      "title": "Révoquer cet accès portail ?",
+      "body": "Le client ne pourra plus se connecter."
+    },
+    "deleteRule": {
+      "title": "Supprimer la règle « {name} » ?"
+    },
+    "deleteCampaign": {
+      "title": "Supprimer « {name} » ?",
+      "body": "Cette action est irréversible."
+    },
+    "deleteTemplate": {
+      "title": "Supprimer le modèle « {name} » ?"
+    },
+    "deletePipeline": {
+      "title": "Supprimer la pipeline « {name} » ?",
+      "body": "Cette action est irréversible."
+    },
+    "deleteStage": {
+      "title": "Supprimer l'étape « {name} » ?"
+    },
+    "bulkDeleteDocuments": {
+      "title": "{count, plural, one {Supprimer # document ?} other {Supprimer # documents ?}}",
+      "body": "Cette action est irréversible."
+    },
+    "disconnectIntegration": {
+      "title": "Déconnecter {name} ?",
+      "body": "Vous pouvez vous reconnecter à tout moment depuis cette page."
+    },
+    "revokeIntegration": {
+      "title": "Révoquer et supprimer {name} ?",
+      "body": "Ceci va :\n• Tenter de révoquer l'accès auprès de {name}\n• Supprimer définitivement les tokens stockés\n• Supprimer cet enregistrement d'intégration\n\nVous devrez ré-autoriser pour reconnecter."
+    },
+    "replaceTaxonomyPreset": {
+      "title": "Remplacer la taxonomie actuelle par le preset « {preset} » ?",
+      "body": "Cela écrasera tous les districts, types, sous-types, libellés d'annonces et libellés de drapeaux."
+    }
   },
   "keyboard": {
     "title": "Keyboard shortcuts",

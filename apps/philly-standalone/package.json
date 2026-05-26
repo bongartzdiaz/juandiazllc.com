@@ -14,6 +14,7 @@
     "audit:tenant": "tsx scripts/audit-tenant-isolation.ts",
     "audit:chain": "tsx scripts/verify-audit-chain.ts",
     "audit:dead-links": "tsx scripts/audit-dead-links.ts",
+    "audit:confirm-leak": "tsx scripts/audit-confirm-leak.ts",
     "audit:sync-mirror": "tsx scripts/audit-sync-mirror.ts",
     "audit:sync-mirror:fast": "tsx scripts/audit-sync-mirror.ts --skip-build",
     "launch:check": "tsx scripts/check-launch-readiness.ts",

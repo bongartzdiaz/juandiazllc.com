@@ -681,7 +681,67 @@
     "openFullPage": "Volledige pagina openen",
     "applyFilter": "Filter toepassen",
     "clearAll": "Alles wissen",
-    "signOut": "Uitloggen"
+    "signOut": "Uitloggen",
+    "disconnect": "Loskoppelen",
+    "revoke": "Intrekken",
+    "replace": "Vervangen"
+  },
+  "confirms": {
+    "deleteGeneric": {
+      "title": "Deze {entityType} verwijderen?",
+      "body": "Dit kan niet ongedaan worden gemaakt."
+    },
+    "entities": {
+      "document": "document",
+      "conversation": "conversatie",
+      "event": "afspraak",
+      "cmaReport": "ECM-rapport",
+      "deal": "deal",
+      "card": "kaart",
+      "routingRule": "routing-regel",
+      "offer": "bod"
+    },
+    "deleteActionPlan": {
+      "title": "Dit actieplan verwijderen?",
+      "body": "Inschrijvingen gaan verloren."
+    },
+    "revokePortalAccess": {
+      "title": "Deze portal-toegang intrekken?",
+      "body": "De klant kan niet meer inloggen."
+    },
+    "deleteRule": {
+      "title": "Regel \"{name}\" verwijderen?"
+    },
+    "deleteCampaign": {
+      "title": "\"{name}\" verwijderen?",
+      "body": "Dit kan niet ongedaan worden gemaakt."
+    },
+    "deleteTemplate": {
+      "title": "Sjabloon \"{name}\" verwijderen?"
+    },
+    "deletePipeline": {
+      "title": "Pipeline \"{name}\" verwijderen?",
+      "body": "Dit kan niet ongedaan worden gemaakt."
+    },
+    "deleteStage": {
+      "title": "Fase \"{name}\" verwijderen?"
+    },
+    "bulkDeleteDocuments": {
+      "title": "{count, plural, one {# document verwijderen?} other {# documenten verwijderen?}}",
+      "body": "Dit kan niet ongedaan worden gemaakt."
+    },
+    "disconnectIntegration": {
+      "title": "{name} loskoppelen?",
+      "body": "Je kunt op elk moment opnieuw verbinden vanaf deze pagina."
+    },
+    "revokeIntegration": {
+      "title": "{name} intrekken en verwijderen?",
+      "body": "Dit zal:\n• Proberen de toegang in te trekken bij {name}\n• Opgeslagen tokens permanent verwijderen\n• Dit integratie-record verwijderen\n\nJe moet opnieuw autoriseren om te verbinden."
+    },
+    "replaceTaxonomyPreset": {
+      "title": "Huidige taxonomie vervangen door \"{preset}\"-preset?",
+      "body": "Dit overschrijft alle districten, types, subtypes, advertentielabels en vlaglabels."
+    }
   },
   "keyboard": {
     "title": "Sneltoetsen",

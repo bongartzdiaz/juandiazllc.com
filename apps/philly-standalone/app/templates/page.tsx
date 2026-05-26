@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useToast } from '@/hooks/philly/useToast'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
 import { FileText, Mail, MessageSquare, Phone, Edit3, Trash2, Eye, Filter } from 'lucide-react'
@@ -82,7 +83,10 @@ export default function TemplatesPage() {
   const [previewRawBody, setPreviewRawBody] = useState('')
 
   const t = useTranslations('templates')
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
   const { addToast } = useToast()
+  const confirm = useConfirm()
 
   // Live updates when templates are created/updated/deleted
   useEntitySubscription('template', fetchData)
@@ -146,7 +150,13 @@ export default function TemplatesPage() {
   }
 
   const del = async (tpl: Template) => {
-    if (!confirm(`Delete template "${tpl.name}"?`)) return
+    const ok = await confirm({
+      title: tConfirms('deleteTemplate.title', { name: tpl.name }),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     const res = await fetch(`/api/templates/${tpl.id}`, { method: 'DELETE' })
     if (res.ok) {
       addToast('Template deleted', 'success')

@@ -8,6 +8,7 @@ import { SWRConfig } from 'swr'
 import { IndustryProvider } from '@/hooks/philly/useIndustry'
 import { ToastProvider } from '@/hooks/philly/useToast'
 import { ToastContainer } from '@/components/philly/ui/Toast'
+import { ConfirmProvider } from '@/hooks/philly/useConfirm'
 import { Sidebar } from './Sidebar'
 import { MobileNav } from './MobileNav'
 import { SectionGuard } from './SectionGuard'
@@ -45,8 +46,10 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     >
       <IndustryProvider>
         <ToastProvider>
-          <ProtectedShell>{children}</ProtectedShell>
-          <ToastContainer />
+          <ConfirmProvider>
+            <ProtectedShell>{children}</ProtectedShell>
+            <ToastContainer />
+          </ConfirmProvider>
         </ToastProvider>
       </IndustryProvider>
     </SWRConfig>

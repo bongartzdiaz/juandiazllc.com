@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { useToast } from '@/hooks/philly/useToast'
+import { useConfirm } from '@/hooks/philly/useConfirm'
+import { useTranslations } from 'next-intl'
 import { Plus, Trash2, Save, MapPin, Tag, Home, Flag as FlagIcon, RotateCcw } from 'lucide-react'
 import { PRESETS } from '@/lib/philly/constants/property-presets'
 
@@ -134,6 +136,9 @@ export default function PropertyTaxonomyPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const { addToast } = useToast()
+  const confirm = useConfirm()
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
 
   useEffect(() => {
     fetch('/api/properties/taxonomy')
@@ -143,10 +148,17 @@ export default function PropertyTaxonomyPage() {
       .finally(() => setLoading(false))
   }, [addToast])
 
-  const applyPreset = (presetId: string) => {
+  const applyPreset = async (presetId: string) => {
     const p = PRESETS.find(x => x.id === presetId)
     if (!p) return
-    if (!confirm(`Replace current taxonomy with "${p.countryLabel}" preset?\n\nThis will overwrite all districts, types, subtypes, listing labels, and flag labels.`)) return
+    const ok = await confirm({
+      title: tConfirms('replaceTaxonomyPreset.title', { preset: p.countryLabel }),
+      body: tConfirms('replaceTaxonomyPreset.body'),
+      confirmLabel: tCommon('replace'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     setTax({
       countryLabel: p.countryLabel,
       districts: p.districts,

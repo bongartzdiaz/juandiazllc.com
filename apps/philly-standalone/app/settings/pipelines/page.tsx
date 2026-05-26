@@ -10,7 +10,9 @@ import {
   Layers, ChevronUp, ChevronDown, ArrowLeft,
 } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useApi } from '@/hooks/philly/useApi'
+import { useTranslations } from 'next-intl'
 
 interface Stage {
   id: string
@@ -44,6 +46,9 @@ const INDUSTRY_LABELS: Record<string, string> = {
 
 export default function PipelineAdminPage() {
   const { addToast } = useToast()
+  const confirm = useConfirm()
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   interface PipelinesResponse { data: Pipeline[] }
@@ -122,7 +127,14 @@ export default function PipelineAdminPage() {
       addToast(`Cannot delete — ${dealCount} deal${dealCount > 1 ? 's' : ''} in this pipeline`, 'error')
       return
     }
-    if (!confirm(`Delete pipeline "${p.name}"? This cannot be undone.`)) return
+    const ok = await confirm({
+      title: tConfirms('deletePipeline.title', { name: p.name }),
+      body: tConfirms('deletePipeline.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     try {
       const res = await fetch(`/api/pipelines/${p.id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
@@ -181,7 +193,13 @@ export default function PipelineAdminPage() {
 
   async function deleteStage(stage: Stage) {
     if (!selectedId) return
-    if (!confirm(`Delete stage "${stage.name}"?`)) return
+    const ok = await confirm({
+      title: tConfirms('deleteStage.title', { name: stage.name }),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     try {
       const res = await fetch(`/api/pipelines/${selectedId}/stages/${stage.id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

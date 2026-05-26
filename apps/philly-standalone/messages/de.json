@@ -681,7 +681,67 @@
     "openFullPage": "Vollständige Seite öffnen",
     "applyFilter": "Filter anwenden",
     "clearAll": "Alle löschen",
-    "signOut": "Abmelden"
+    "signOut": "Abmelden",
+    "disconnect": "Trennen",
+    "revoke": "Widerrufen",
+    "replace": "Ersetzen"
+  },
+  "confirms": {
+    "deleteGeneric": {
+      "title": "{entityType} löschen?",
+      "body": "Dies kann nicht rückgängig gemacht werden."
+    },
+    "entities": {
+      "document": "Dokument",
+      "conversation": "Konversation",
+      "event": "Termin",
+      "cmaReport": "ECM-Bericht",
+      "deal": "Deal",
+      "card": "Karte",
+      "routingRule": "Routing-Regel",
+      "offer": "Angebot"
+    },
+    "deleteActionPlan": {
+      "title": "Diesen Aktionsplan löschen?",
+      "body": "Anmeldungen gehen verloren."
+    },
+    "revokePortalAccess": {
+      "title": "Diesen Portal-Zugang widerrufen?",
+      "body": "Der Kunde kann sich nicht mehr anmelden."
+    },
+    "deleteRule": {
+      "title": "Regel „{name}“ löschen?"
+    },
+    "deleteCampaign": {
+      "title": "„{name}“ löschen?",
+      "body": "Dies kann nicht rückgängig gemacht werden."
+    },
+    "deleteTemplate": {
+      "title": "Vorlage „{name}“ löschen?"
+    },
+    "deletePipeline": {
+      "title": "Pipeline „{name}“ löschen?",
+      "body": "Dies kann nicht rückgängig gemacht werden."
+    },
+    "deleteStage": {
+      "title": "Phase „{name}“ löschen?"
+    },
+    "bulkDeleteDocuments": {
+      "title": "{count, plural, one {# Dokument löschen?} other {# Dokumente löschen?}}",
+      "body": "Dies kann nicht rückgängig gemacht werden."
+    },
+    "disconnectIntegration": {
+      "title": "{name} trennen?",
+      "body": "Sie können jederzeit über diese Seite erneut verbinden."
+    },
+    "revokeIntegration": {
+      "title": "{name} widerrufen und entfernen?",
+      "body": "Dies wird:\n• Versuchen, den Zugriff bei {name} zu widerrufen\n• Gespeicherte Tokens dauerhaft löschen\n• Diesen Integrations-Datensatz entfernen\n\nSie müssen erneut autorisieren, um die Verbindung wiederherzustellen."
+    },
+    "replaceTaxonomyPreset": {
+      "title": "Aktuelle Taxonomie durch „{preset}“-Voreinstellung ersetzen?",
+      "body": "Dies überschreibt alle Bezirke, Typen, Untertypen, Inserate-Labels und Flag-Labels."
+    }
   },
   "keyboard": {
     "title": "Tastaturkürzel",

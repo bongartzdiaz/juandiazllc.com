@@ -7,6 +7,7 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useApi } from '@/hooks/philly/useApi'
 import {
   Filter, Mail, Play, Pause, Plus, Trash2, Edit2, GripVertical, X,
@@ -65,7 +66,10 @@ export default function DripCampaignsPage() {
   const [typeFilter, setTypeFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const t = useTranslations('dripCampaigns')
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
   const { addToast } = useToast()
+  const confirm = useConfirm()
 
   const params = new URLSearchParams()
   if (typeFilter) params.set('type', typeFilter)
@@ -172,7 +176,14 @@ export default function DripCampaignsPage() {
   }
 
   async function handleDelete(c: DripCampaign) {
-    if (!confirm(`Delete "${c.name}"? This cannot be undone.`)) return
+    const ok = await confirm({
+      title: tConfirms('deleteCampaign.title', { name: c.name }),
+      body: tConfirms('deleteCampaign.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     try {
       const res = await fetch(`/api/drip-campaigns/${c.id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

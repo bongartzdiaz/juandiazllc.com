@@ -8,6 +8,7 @@ import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { DataTable, type DataTableColumn } from '@/components/philly/ui/DataTable'
 import { FilterBuilder, QuickSearch, applyFilter, emptyFilter, type FilterField, type FilterGroup } from '@/components/philly/ui/FilterBuilder'
 import { FileUpload } from '@/components/philly/ui/FileUpload'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import {
   FileText, FileImage, FileSpreadsheet, FileArchive, File as FileIcon,
   Download, ExternalLink, Upload, Trash2, X,
@@ -67,7 +68,10 @@ const FILTER_FIELDS: FilterField[] = [
 
 export default function DocumentsPage() {
   const t = useTranslations('documents')
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
   const { addToast } = useToast()
+  const confirm = useConfirm()
   const [filter, setFilter] = useState<FilterGroup>(emptyFilter())
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<string[]>([])
@@ -104,7 +108,14 @@ export default function DocumentsPage() {
   const linkedCount = docs.filter(d => !!d.entityType).length
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this document?')) return
+    const ok = await confirm({
+      title: tConfirms('deleteGeneric.title', { entityType: tConfirms('entities.document') }),
+      body: tConfirms('deleteGeneric.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     try {
       const res = await fetch(`/api/documents/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
@@ -119,7 +130,14 @@ export default function DocumentsPage() {
 
   async function handleBulkDelete() {
     if (selected.length === 0) return
-    if (!confirm(`Delete ${selected.length} document${selected.length > 1 ? 's' : ''}? This cannot be undone.`)) return
+    const ok = await confirm({
+      title: tConfirms('bulkDeleteDocuments.title', { count: selected.length }),
+      body: tConfirms('bulkDeleteDocuments.body'),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     const ids = [...selected]
     let succeeded = 0
     let failed = 0

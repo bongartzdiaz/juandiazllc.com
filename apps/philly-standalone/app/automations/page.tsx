@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useToast } from '@/hooks/philly/useToast'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import {
   Zap, Play, Pause, Clock, CheckCircle2, XCircle,
@@ -140,7 +141,10 @@ export default function AutomationsPage() {
   const [saving, setSaving] = useState(false)
 
   const t = useTranslations('automations')
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
   const { addToast } = useToast()
+  const confirm = useConfirm()
 
   // SWR-backed fetch: shared cache across the dashboard, revalidates on
   // focus, and the SSE subscription below funnels into the same refetch.
@@ -228,7 +232,13 @@ export default function AutomationsPage() {
   }
 
   const del = async (rule: AutomationRule) => {
-    if (!confirm(`Delete rule "${rule.name}"?`)) return
+    const ok = await confirm({
+      title: tConfirms('deleteRule.title', { name: rule.name }),
+      confirmLabel: tCommon('delete'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     const res = await fetch(`/api/automations/${rule.id}`, { method: 'DELETE' })
     if (res.ok) {
       addToast('Rule deleted', 'success')

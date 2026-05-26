@@ -5,6 +5,8 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
+import { useTranslations } from 'next-intl'
 import {
   Plug, Search, Filter, Check, X, ExternalLink, AlertCircle,
   Calendar, MessageSquare, CreditCard, FileText, Megaphone, Zap,
@@ -90,6 +92,9 @@ function formatRelative(dateStr: string | null): string {
 export default function IntegrationsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const confirm = useConfirm()
+  const tConfirms = useTranslations('confirms')
+  const tCommon = useTranslations('common')
 
   interface CatalogResponse { data: CatalogItem[] }
   interface IntegrationsResponse { data: Integration[] }
@@ -229,7 +234,14 @@ export default function IntegrationsPage() {
   }
 
   const handleDisconnect = async (record: Integration, item: CatalogItem) => {
-    if (!confirm(`Disconnect ${item.name}?`)) return
+    const ok = await confirm({
+      title: tConfirms('disconnectIntegration.title', { name: item.name }),
+      body: tConfirms('disconnectIntegration.body'),
+      confirmLabel: tCommon('disconnect'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     setBusy(item.id)
     try {
       await fetch('/api/integrations', {
@@ -247,7 +259,14 @@ export default function IntegrationsPage() {
   }
 
   const handleRevoke = async (record: Integration, item: CatalogItem) => {
-    if (!confirm(`Revoke & remove ${item.name}?\n\nThis will:\n• Attempt to revoke access with ${item.name}\n• Permanently delete stored tokens\n• Remove this integration record\n\nYou will need to re-authorize to reconnect.`)) return
+    const ok = await confirm({
+      title: tConfirms('revokeIntegration.title', { name: item.name }),
+      body: tConfirms('revokeIntegration.body', { name: item.name }),
+      confirmLabel: tCommon('revoke'),
+      cancelLabel: tCommon('cancel'),
+      danger: true,
+    })
+    if (!ok) return
     setBusy(item.id)
     try {
       const res = await fetch(`/api/integrations/${record.id}`, { method: 'DELETE' })
