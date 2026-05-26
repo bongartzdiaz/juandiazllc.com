@@ -83,7 +83,7 @@ const SUPER_ADMIN_SCOPE = {
   userId: 'user_super_001',
   organizationId: 'org_super_home',   // super-admin's HOME org — NOT the target
   role: 'superAdmin',
-  email: 'juan@kompasagency.nl',
+  email: 'juan@philanthropyai.eu',
   dashboardSections: null,
   mfaEnrolled: true,
 }

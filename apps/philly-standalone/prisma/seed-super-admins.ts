@@ -6,7 +6,7 @@
    already-promoted users.
 
    Run via:
-     SUPER_ADMIN_EMAILS=juan@kompasagency.nl npm run seed:super-admins
+     SUPER_ADMIN_EMAILS=juan@philanthropyai.eu npm run seed:super-admins
 
    Or as part of a fuller seed flow:
      npm run seed && npm run seed:super-admins

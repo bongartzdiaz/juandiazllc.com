@@ -25,7 +25,7 @@
 Set `SUPER_ADMIN_EMAILS` in Vercel (or `.env.local` for dev):
 
 ```
-SUPER_ADMIN_EMAILS=juan@kompasagency.nl,roy@lucenai.eu
+SUPER_ADMIN_EMAILS=juan@philanthropyai.eu,roy@lucenai.eu
 ```
 
 Then run:
@@ -44,10 +44,10 @@ Behavior when an email has no matching User row:
 
 ```bash
 # Self-grant (bootstrap — when there are zero super-admins yet)
-npx tsx scripts/grant-super-admin.ts juan@kompasagency.nl
+npx tsx scripts/grant-super-admin.ts juan@philanthropyai.eu
 
 # Subsequent grants (audit trail shows who promoted whom)
-GRANTOR_EMAIL=juan@kompasagency.nl \
+GRANTOR_EMAIL=juan@philanthropyai.eu \
   npx tsx scripts/grant-super-admin.ts new-staff@lucenai.eu
 ```
 
@@ -59,7 +59,7 @@ If both scripts above are broken (e.g., during the DEUS-SHARED extraction migrat
 
 ```sql
 -- Grant
-UPDATE User SET role='superAdmin' WHERE email='juan@kompasagency.nl';
+UPDATE User SET role='superAdmin' WHERE email='juan@philanthropyai.eu';
 
 -- Record the audit row manually (CRITICAL: maintains hash chain integrity)
 -- (Better: get the scripts working again before resorting to this.)
@@ -78,7 +78,7 @@ REVOKE_TO_ROLE=viewer \
   npx tsx scripts/revoke-super-admin.ts contractor@external.com
 
 # With explicit actor (audit trail)
-GRANTOR_EMAIL=juan@kompasagency.nl \
+GRANTOR_EMAIL=juan@philanthropyai.eu \
   npx tsx scripts/revoke-super-admin.ts old-staff@lucenai.eu
 ```
 

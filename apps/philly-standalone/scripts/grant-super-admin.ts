@@ -2,7 +2,7 @@
    ──────────────────────────────────────────────────────────────────
    Usage:
      npx tsx scripts/grant-super-admin.ts <email>
-     npx tsx scripts/grant-super-admin.ts juan@kompasagency.nl
+     npx tsx scripts/grant-super-admin.ts juan@philanthropyai.eu
 
    Optional env:
      GRANTOR_EMAIL  — who is performing the grant (lands in AuditLog).
@@ -12,10 +12,10 @@
 
    Examples:
      # Bootstrap (first super-admin, self-grant):
-     npx tsx scripts/grant-super-admin.ts juan@kompasagency.nl
+     npx tsx scripts/grant-super-admin.ts juan@philanthropyai.eu
 
      # Subsequent grant (Juan promotes a new staff member):
-     GRANTOR_EMAIL=juan@kompasagency.nl \
+     GRANTOR_EMAIL=juan@philanthropyai.eu \
        npx tsx scripts/grant-super-admin.ts new-staff@lucenai.eu
 
    Idempotent: re-running on an already-superAdmin user is a no-op

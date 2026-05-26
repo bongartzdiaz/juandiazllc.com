@@ -106,7 +106,7 @@ function makeState(users: MockUser[]): MockState {
 // Fixture factories — call to get a fresh object every test.
 const juan = (): MockUser => ({
   id: 'user_juan_001',
-  email: 'juan@kompasagency.nl',
+  email: 'juan@philanthropyai.eu',
   role: 'admin',
   organizationId: 'org_juan_001',
   twoFactorEnabled: true,
@@ -121,7 +121,7 @@ const newStaff = (): MockUser => ({
 })
 
 // Stable identifiers (independent of fixture mutation).
-const JUAN_EMAIL = 'juan@kompasagency.nl'
+const JUAN_EMAIL = 'juan@philanthropyai.eu'
 const JUAN_ID = 'user_juan_001'
 const JUAN_ORG_ID = 'org_juan_001'
 const NEW_STAFF_EMAIL = 'new-staff@lucenai.eu'
