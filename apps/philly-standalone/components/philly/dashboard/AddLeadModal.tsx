@@ -45,10 +45,12 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
   const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // CSV state
+  // File-import state (CSV + XLSX share the same preview/headers data path —
+  // the variable names keep the historical `csv` prefix for diff stability).
   const [csvFile, setCsvFile] = useState<File | null>(null)
   const [csvPreview, setCsvPreview] = useState<string[][]>([])
   const [csvHeaders, setCsvHeaders] = useState<string[]>([])
+  const [xlsxError, setXlsxError] = useState<string | null>(null)
   const [dragging, setDragging] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -60,7 +62,7 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
 
   const resetForm = useCallback(() => {
     setName(''); setEmail(''); setPhone(''); setSource(''); setCompany(''); setNotes('')
-    setErrors({}); setCsvFile(null); setCsvPreview([]); setCsvHeaders([]); setSuccess(false); setTab('manual')
+    setErrors({}); setCsvFile(null); setCsvPreview([]); setCsvHeaders([]); setXlsxError(null); setSuccess(false); setTab('manual')
   }, [])
 
   const handleClose = useCallback(() => {
@@ -96,12 +98,53 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
     setCsvPreview(rows)
   }
 
+  // Dynamic import keeps the ~270KB `read-excel-file` module out of the
+  // initial page bundle — only fetched when the operator actually picks
+  // an .xlsx file.
+  const parseXlsx = async (file: File) => {
+    try {
+      // Subpath import — the package only exposes /browser, /node, /universal,
+      // /web-worker exports (no bare default).
+      //
+      // Use `readSheet` (named export) rather than the `readXlsxFile` default —
+      // the default returns Sheet[] (all sheets, each as `{ sheet, data }`),
+      // whereas `readSheet` returns SheetData directly for the first sheet,
+      // which is what we want for a contacts import.
+      const mod = await import('read-excel-file/browser')
+      const rows = await mod.readSheet(file)
+      if (rows.length === 0) return
+      const headers = rows[0].map(h => String(h ?? '').trim())
+      setCsvHeaders(headers)
+      // Up to 5 preview rows, every cell coerced to string for the table.
+      const preview: string[][] = rows.slice(1, 6).map(row =>
+        row.map(cell => (cell === null || cell === undefined ? '' : String(cell)))
+      )
+      setCsvPreview(preview)
+    } catch {
+      // Surface a localised parse error and clear the file picker so the
+      // operator can try a different file. We deliberately swallow the
+      // raw library error here to keep the UI deterministic.
+      setCsvFile(null)
+      setCsvHeaders([])
+      setCsvPreview([])
+      setXlsxError(t('csv.xlsxParseFailed'))
+    }
+  }
+
   const handleFile = (file: File) => {
-    if (!file.name.endsWith('.csv')) return
+    const lower = file.name.toLowerCase()
+    const isCsv = lower.endsWith('.csv')
+    const isXlsx = lower.endsWith('.xlsx')
+    if (!isCsv && !isXlsx) return
     setCsvFile(file)
-    const reader = new FileReader()
-    reader.onload = (e) => { parseCsv(e.target?.result as string) }
-    reader.readAsText(file)
+    setXlsxError(null)
+    if (isCsv) {
+      const reader = new FileReader()
+      reader.onload = (e) => { parseCsv(e.target?.result as string) }
+      reader.readAsText(file)
+    } else {
+      void parseXlsx(file)
+    }
   }
 
   const handleDrop = (e: React.DragEvent) => {
@@ -218,9 +261,14 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
                   <div style={{ fontSize: 12, color: 'var(--txt3)' }}>
                     {t('csv.or')} <span style={{ color: 'var(--accent)', fontWeight: 600, cursor: 'pointer' }}>{t('csv.browse')}</span>
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 8 }}>{t('csv.acceptsCsvOnly')}</div>
+                  <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 8 }}>{t('csv.acceptsFormats')}</div>
+                  {xlsxError && (
+                    <div style={{ fontSize: 11, color: 'var(--r)', marginTop: 8, fontWeight: 600 }}>
+                      {xlsxError}
+                    </div>
+                  )}
                   <input
-                    ref={fileRef} type="file" accept=".csv" style={{ display: 'none' }}
+                    ref={fileRef} type="file" accept=".csv,.xlsx" style={{ display: 'none' }}
                     onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
                   />
                 </div>
@@ -280,7 +328,14 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
 
                   <button
                     onClick={() => {
-                      onAdd?.({ csv: true, rows: csvPreview.length, file: csvFile.name })
+                      const isXlsx = csvFile.name.toLowerCase().endsWith('.xlsx')
+                      onAdd?.({
+                        csv: !isXlsx,         // back-compat — true when source was CSV
+                        xlsx: isXlsx,
+                        format: isXlsx ? 'xlsx' : 'csv',
+                        rows: csvPreview.length,
+                        file: csvFile.name,
+                      })
                       setSuccess(true)
                       setTimeout(() => { handleClose() }, 1500)
                     }}

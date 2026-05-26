@@ -1438,7 +1438,7 @@
     "subtitle": "Handmatig toevoegen of importeren uit CSV",
     "tabs": {
       "manual": "Handmatig invoeren",
-      "csv": "CSV-upload"
+      "csv": "CSV / Excel"
     },
     "fields": {
       "name": "Naam",
@@ -1467,8 +1467,10 @@
       "dropPrompt": "Sleep uw CSV-bestand hierheen",
       "or": "of",
       "browse": "Bestanden bladeren",
-      "acceptsCsvOnly": "Alleen .csv-bestanden toegestaan",
-      "import": "{count, plural, one {# contact importeren} other {# contacten importeren}}"
+      "acceptsCsvOnly": "Accepteert .csv- en .xlsx-bestanden",
+      "import": "{count, plural, one {# contact importeren} other {# contacten importeren}}",
+      "acceptsFormats": "Accepteert .csv- en .xlsx-bestanden",
+      "xlsxParseFailed": "Dit Excel-bestand kon niet worden gelezen — controleer of het een geldig .xlsx-bestand is."
     }
   },
   "reports": {

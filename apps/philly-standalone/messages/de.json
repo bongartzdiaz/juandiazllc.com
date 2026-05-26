@@ -1438,7 +1438,7 @@
     "subtitle": "Manuell hinzufügen oder aus CSV importieren",
     "tabs": {
       "manual": "Manuelle Eingabe",
-      "csv": "CSV-Upload"
+      "csv": "CSV / Excel"
     },
     "fields": {
       "name": "Name",
@@ -1467,8 +1467,10 @@
       "dropPrompt": "CSV-Datei hier ablegen",
       "or": "oder",
       "browse": "Dateien durchsuchen",
-      "acceptsCsvOnly": "Nur .csv-Dateien zulässig",
-      "import": "{count, plural, one {# Kontakt importieren} other {# Kontakte importieren}}"
+      "acceptsCsvOnly": "Akzeptiert .csv- und .xlsx-Dateien",
+      "import": "{count, plural, one {# Kontakt importieren} other {# Kontakte importieren}}",
+      "acceptsFormats": "Akzeptiert .csv- und .xlsx-Dateien",
+      "xlsxParseFailed": "Diese Excel-Datei konnte nicht gelesen werden — bitte stellen Sie sicher, dass es sich um eine gültige .xlsx-Datei handelt."
     }
   },
   "reports": {
