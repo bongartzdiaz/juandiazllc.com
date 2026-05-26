@@ -1032,7 +1032,7 @@
     "step2": {
       "eyebrow": "Your workspace",
       "title": "Name + vertical",
-      "lede": "You can change both later under /philly/settings. The vertical hides modules you won't use — pick the one closest to your day-to-day.",
+      "lede": "You can change both later under /settings. The vertical hides modules you won't use — pick the one closest to your day-to-day.",
       "nameLabel": "Workspace name",
       "namePlaceholder": "Acme Energie BV",
       "verticalLabel": "Vertical",
@@ -1061,7 +1061,7 @@
     },
     "alerts": {
       "stripeNotConfigured": "Stripe checkout not configured on this deployment yet ({status}). You can keep using the trial; ops will wire the price IDs.",
-      "checkoutNetworkError": "Network error starting checkout. Try again from /philly/settings."
+      "checkoutNetworkError": "Network error starting checkout. Try again from /settings."
     }
   },
   "adminOrgs": {

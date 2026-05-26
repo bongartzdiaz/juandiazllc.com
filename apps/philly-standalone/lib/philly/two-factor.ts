@@ -18,7 +18,14 @@ import { getAuthPrisma } from './auth'
 // RFC 6238 defaults: 30s step, 6 digits. epochTolerance=30 tolerates ±30s clock drift.
 const TOTP_EPOCH_TOLERANCE = 30
 
-export const TWO_FACTOR_ISSUER = 'Philly Dashboard'
+// Brand shown in authenticator apps (Google Authenticator, Authy, 1Password) when
+// users enroll TOTP. Customer-visible — keep aligned with the public DEUS brand.
+// 2026-05-26: rebranded from "Philly Dashboard" to "DEUS".
+//
+// Caveat: users who previously enrolled under "Philly Dashboard" will keep that
+// name in their authenticator app until they re-enroll. Pre-launch this affects
+// only the dev/seed user; production rollout doesn't need a forced re-enroll.
+export const TWO_FACTOR_ISSUER = 'DEUS'
 
 /** Generate a new TOTP secret (base32, stored encrypted). */
 export function generateTwoFactorSecret(): string {

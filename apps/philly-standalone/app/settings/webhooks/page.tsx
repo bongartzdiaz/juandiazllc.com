@@ -172,8 +172,8 @@ export default function WebhooksPage() {
         }}>
           <Info size={14} style={{ color: 'var(--accent-txt)', marginTop: 2, flexShrink: 0 }} />
           <div style={{ fontSize: 12, color: 'var(--accent-txt)', lineHeight: 1.5 }}>
-            Philly will POST a JSON body with an HMAC-SHA256 signature in the{' '}
-            <code style={{ fontFamily: 'var(--font-red-hat-mono), monospace', fontSize: 11.5 }}>X-Philly-Signature</code>{' '}
+            DEUS will POST a JSON body with an HMAC-SHA256 signature in the{' '}
+            <code style={{ fontFamily: 'var(--font-red-hat-mono), monospace', fontSize: 11.5 }}>X-DEUS-Signature</code>{' '}
             header to your URL. Verify the signature using the webhook&apos;s signing secret.
           </div>
         </div>

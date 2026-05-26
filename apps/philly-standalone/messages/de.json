@@ -1032,7 +1032,7 @@
     "step2": {
       "eyebrow": "Ihr Workspace",
       "title": "Name + Branche",
-      "lede": "Beides können Sie später unter /philly/settings anpassen. Die Branche blendet Module aus, die Sie nicht nutzen — wählen Sie das, was Ihrem Tagesgeschäft am nächsten kommt.",
+      "lede": "Beides können Sie später unter /settings anpassen. Die Branche blendet Module aus, die Sie nicht nutzen — wählen Sie das, was Ihrem Tagesgeschäft am nächsten kommt.",
       "nameLabel": "Workspace-Name",
       "namePlaceholder": "Acme Energie GmbH",
       "verticalLabel": "Branche",
@@ -1061,7 +1061,7 @@
     },
     "alerts": {
       "stripeNotConfigured": "Stripe Checkout ist auf diesem Deployment noch nicht konfiguriert ({status}). Die Testphase läuft weiter; Operations richtet die Price-IDs ein.",
-      "checkoutNetworkError": "Netzwerkfehler beim Starten des Checkouts. Versuchen Sie es erneut aus /philly/settings."
+      "checkoutNetworkError": "Netzwerkfehler beim Starten des Checkouts. Versuchen Sie es erneut aus /settings."
     }
   },
   "adminOrgs": {

@@ -48,10 +48,10 @@ export async function POST(_req: NextRequest, ctx: Ctx) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'Philly-Webhook/1.0 (retry)',
-        'X-Philly-Signature': `sha256=${signature}`,
-        'X-Philly-Retry': 'true',
-        'X-Philly-Original-Delivery': deliveryId,
+        'User-Agent': 'DEUS-Webhook/1.0 (retry)',
+        'X-DEUS-Signature': `sha256=${signature}`,
+        'X-DEUS-Retry': 'true',
+        'X-DEUS-Original-Delivery': deliveryId,
       },
       body,
     })

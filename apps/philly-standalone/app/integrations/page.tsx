@@ -267,7 +267,7 @@ export default function IntegrationsPage() {
 
   return (
     <>
-      <Topbar title="Integrations" sub="Connect your favorite tools to Philly" />
+      <Topbar title="Integrations" sub="Connect your favorite tools to DEUS" />
       <div style={{ padding: '18px 24px 40px' }}>
 
         {/* OAuth result banner */}
@@ -310,7 +310,7 @@ export default function IntegrationsPage() {
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--txt)' }}>
-              Connect your favorite tools to Philly
+              Connect your favorite tools to DEUS
             </div>
             <div style={{ fontSize: 12, color: 'var(--txt3)', marginTop: 3 }}>
               {catalog.length} integrations available. {integrations.filter(i => i.status === 'connected').length} connected.

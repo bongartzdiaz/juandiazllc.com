@@ -1032,7 +1032,7 @@
     "step2": {
       "eyebrow": "Tu workspace",
       "title": "Nombre + vertical",
-      "lede": "Puedes cambiar ambos más tarde en /philly/settings. La vertical oculta los módulos que no usarás — elige el que esté más cerca de tu día a día.",
+      "lede": "Puedes cambiar ambos más tarde en /settings. La vertical oculta los módulos que no usarás — elige el que esté más cerca de tu día a día.",
       "nameLabel": "Nombre del workspace",
       "namePlaceholder": "Acme Energia SL",
       "verticalLabel": "Vertical",
@@ -1061,7 +1061,7 @@
     },
     "alerts": {
       "stripeNotConfigured": "Stripe checkout aún no está configurado en este despliegue ({status}). La prueba sigue funcionando; operaciones conectará los price-IDs.",
-      "checkoutNetworkError": "Error de red al iniciar checkout. Inténtalo de nuevo desde /philly/settings."
+      "checkoutNetworkError": "Error de red al iniciar checkout. Inténtalo de nuevo desde /settings."
     }
   },
   "adminOrgs": {

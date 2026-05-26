@@ -27,11 +27,16 @@ function sign(body: string, secret: string): string {
 }
 
 async function postOnce(url: string, body: string, signature: string | null): Promise<Response> {
+  // Customer-facing wire format — rebranded 2026-05-26.
+  // Pre-launch (zero customers using webhooks yet), so renaming
+  // X-Philly-Signature → X-DEUS-Signature cleanly is safe. If we'd
+  // had paying customers integrating against the old header, we'd
+  // emit BOTH headers for a 6-month deprecation window. Not needed.
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'User-Agent': 'Philly-Webhook/1.0',
+    'User-Agent': 'DEUS-Webhook/1.0',
   }
-  if (signature) headers['X-Philly-Signature'] = `sha256=${signature}`
+  if (signature) headers['X-DEUS-Signature'] = `sha256=${signature}`
   return fetch(url, { method: 'POST', headers, body })
 }
 

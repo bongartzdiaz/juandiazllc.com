@@ -22,8 +22,13 @@ const redHatMono = Red_Hat_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Philly Dashboard — Business Platform',
-  description: 'CRM and operations platform for impact-driven businesses',
+  // Customer-facing brand 2026-05-26 rebrand: DEUS sold via lucenai.eu.
+  // Internal identifiers (className 'philly-root', localStorage 'pai-theme',
+  // file paths under lib/philly/*) deliberately unchanged here — those
+  // belong to the PR-Extract phase-5 internal rename, not the customer
+  // branding pass. See memory/deus_extraction_plan.md.
+  title: 'DEUS — Modern European CRM',
+  description: 'Real estate, CSR and hospitality CRM for European agencies. GDPR-native. AI included. Flat per-org pricing.',
 }
 
 // Boot script — runs before hydration to set data-theme on <html> from

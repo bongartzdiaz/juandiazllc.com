@@ -29,15 +29,15 @@ it **once** in the response. Copy it; you can't read it again
 (the stored value is encrypted at rest with AES-256-GCM).
 
 Use this secret on your endpoint to verify the
-`X-Philly-Signature` header.
+`X-DEUS-Signature` header.
 
 ## Verifying inbound delivery
 
 Each delivery POSTs JSON with:
 
-- `X-Philly-Signature: sha256=<hex hmac>` — the HMAC of the
+- `X-DEUS-Signature: sha256=<hex hmac>` — the HMAC of the
   raw body, keyed by your webhook secret
-- `User-Agent: Philly-Webhook/1.0`
+- `User-Agent: DEUS-Webhook/1.0`
 - `Content-Type: application/json`
 
 Body:

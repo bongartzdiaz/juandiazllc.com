@@ -1032,7 +1032,7 @@
     "step2": {
       "eyebrow": "Jouw workspace",
       "title": "Naam + branche",
-      "lede": "Beide kun je later aanpassen onder /philly/settings. De branche verbergt modules die je niet gebruikt — kies wat het dichtst bij je dagelijkse werk staat.",
+      "lede": "Beide kun je later aanpassen onder /settings. De branche verbergt modules die je niet gebruikt — kies wat het dichtst bij je dagelijkse werk staat.",
       "nameLabel": "Workspace-naam",
       "namePlaceholder": "Acme Energie BV",
       "verticalLabel": "Branche",
@@ -1061,7 +1061,7 @@
     },
     "alerts": {
       "stripeNotConfigured": "Stripe checkout is nog niet ingesteld op deze deployment ({status}). De proef werkt door; operations gaat de price-IDs aansluiten.",
-      "checkoutNetworkError": "Netwerkfout bij het starten van checkout. Probeer opnieuw vanuit /philly/settings."
+      "checkoutNetworkError": "Netwerkfout bij het starten van checkout. Probeer opnieuw vanuit /settings."
     }
   },
   "adminOrgs": {
