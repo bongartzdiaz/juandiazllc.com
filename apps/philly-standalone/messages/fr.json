@@ -145,29 +145,29 @@
   },
   "kanban": {
     "title": "Kanban",
-    "subtitle": "Visual project management",
-    "newBoard": "New Board",
-    "addColumn": "Add Column",
-    "addCard": "Add Card"
+    "subtitle": "Gestion visuelle des projets",
+    "newBoard": "Nouveau tableau",
+    "addColumn": "Ajouter une colonne",
+    "addCard": "Ajouter une carte"
   },
   "deals": {
     "toasts": {
-      "applied": "Applied \"{name}\"",
-      "created": "Deal created",
-      "moved": "Deal moved",
-      "moveFailed": "Move failed",
-      "marked": "Marked {status}",
-      "updateFailed": "Update failed",
-      "deleted": "Deal deleted",
-      "deleteFailed": "Delete failed",
-      "reordered": "Deals reordered",
-      "reorderFailed": "Reorder failed",
-      "noContact": "No contact linked",
-      "contactCopied": "Contact copied",
-      "copyFailed": "Copy failed"
+      "applied": "« {name} » appliquée",
+      "created": "Affaire créée",
+      "moved": "Affaire déplacée",
+      "moveFailed": "Échec du déplacement",
+      "marked": "Marquée {status}",
+      "updateFailed": "Échec de la mise à jour",
+      "deleted": "Affaire supprimée",
+      "deleteFailed": "Échec de la suppression",
+      "reordered": "Affaires réordonnées",
+      "reorderFailed": "Échec du réordonnancement",
+      "noContact": "Aucun contact lié",
+      "contactCopied": "Contact copié",
+      "copyFailed": "Échec de la copie"
     },
     "confirms": {
-      "delete": "Delete this deal? This cannot be undone."
+      "delete": "Supprimer cette affaire ? Cette action est irréversible."
     }
   },
   "properties": {
@@ -185,24 +185,24 @@
   },
   "automations": {
     "title": "Automations",
-    "subtitle": "Trigger-based rules to automate workflows"
+    "subtitle": "Règles basées sur déclencheurs pour automatiser les flux"
   },
   "grants": {
     "title": "Grants",
-    "subtitle": "Track grant applications and funding",
-    "newGrant": "Add Grant",
-    "editGrant": "Edit Grant",
+    "subtitle": "Suivi des demandes de subventions et des financements",
+    "newGrant": "Ajouter une subvention",
+    "editGrant": "Modifier la subvention",
     "kpis": {
-      "total": "Total Grants",
+      "total": "Total des subventions",
       "funded": "Funded",
       "pending": "Pending",
       "active": "Active"
     },
     "filters": {
-      "all": "All Statuses",
+      "all": "Tous les statuts",
       "prospect": "Prospect",
       "applied": "Applied",
-      "under_review": "Under review",
+      "under_review": "En cours d’examen",
       "approved": "Approved",
       "awarded": "Awarded",
       "active": "Active",
@@ -212,96 +212,96 @@
       "rejected": "Rejected"
     },
     "fields": {
-      "title": "Grant Title",
-      "amount": "Amount (USD)",
+      "title": "Intitulé de la subvention",
+      "amount": "Montant (USD)",
       "funder": "Funder",
       "status": "Status",
-      "appliedDate": "Applied Date",
-      "awardedDate": "Awarded Date",
-      "startDate": "Start Date",
-      "endDate": "End Date",
+      "appliedDate": "Date de candidature",
+      "awardedDate": "Date d’attribution",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
       "description": "Description",
       "requirements": "Requirements"
     },
     "placeholders": {
-      "title": "Community Housing Fund",
+      "title": "Fonds pour le logement communautaire",
       "amount": "50000",
-      "funder": "Foundation name",
-      "description": "Grant purpose and scope…",
-      "requirements": "Reporting deadlines, deliverables…"
+      "funder": "Nom de la fondation",
+      "description": "Objet et portée de la subvention…",
+      "requirements": "Échéances de reporting, livrables…"
     },
     "toasts": {
-      "titleRequired": "Title required",
-      "funderRequired": "Funder required",
-      "invalidAmount": "Invalid amount",
-      "saveFailed": "Save failed",
-      "updated": "Grant updated",
-      "added": "Grant added",
-      "deleted": "Grant deleted",
-      "deleteFailed": "Delete failed",
-      "networkError": "Network error"
+      "titleRequired": "Intitulé requis",
+      "funderRequired": "Bailleur requis",
+      "invalidAmount": "Montant invalide",
+      "saveFailed": "Échec de l’enregistrement",
+      "updated": "Subvention mise à jour",
+      "added": "Subvention ajoutée",
+      "deleted": "Subvention supprimée",
+      "deleteFailed": "Échec de la suppression",
+      "networkError": "Erreur réseau"
     },
     "confirms": {
-      "delete": "Delete this grant?"
+      "delete": "Supprimer cette subvention ?"
     }
   },
   "commissions": {
     "title": "Commissions",
-    "subtitle": "Commission tracking and team leaderboard",
+    "subtitle": "Suivi des commissions et classement de l’équipe",
     "toasts": {
-      "selectAgent": "Select an agent",
-      "positiveGross": "Enter a positive gross amount",
-      "splitRange": "Split must be 0-100",
-      "saveFailed": "Save failed",
-      "added": "Commission added",
-      "marked": "Marked {status}",
-      "updateFailed": "Update failed",
-      "deleted": "Commission deleted",
-      "deleteFailed": "Delete failed",
-      "networkError": "Network error"
+      "selectAgent": "Sélectionnez un agent",
+      "positiveGross": "Saisissez un montant brut positif",
+      "splitRange": "Le partage doit être entre 0 et 100",
+      "saveFailed": "Échec de l’enregistrement",
+      "added": "Commission ajoutée",
+      "marked": "Marquée {status}",
+      "updateFailed": "Échec de la mise à jour",
+      "deleted": "Commission supprimée",
+      "deleteFailed": "Échec de la suppression",
+      "networkError": "Erreur réseau"
     },
     "confirms": {
-      "delete": "Delete this commission record?"
+      "delete": "Supprimer cette commission ?"
     }
   },
   "eSignatures": {
     "title": "E-Signatures",
-    "subtitle": "Track and request signatures on contracts",
+    "subtitle": "Suivez et demandez des signatures sur les contrats",
     "toasts": {
-      "selectTransaction": "Select a transaction",
-      "documentNameRequired": "Document name required",
-      "signerEmailRequired": "Signer email required",
+      "selectTransaction": "Sélectionnez une transaction",
+      "documentNameRequired": "Nom du document requis",
+      "signerEmailRequired": "E-mail du signataire requis",
       "saveFailed": "Failed",
-      "created": "Signature request created",
-      "marked": "Marked {status}",
-      "updateFailed": "Update failed",
+      "created": "Demande de signature créée",
+      "marked": "Marquée {status}",
+      "updateFailed": "Échec de la mise à jour",
       "deleted": "Deleted",
-      "deleteFailed": "Delete failed",
-      "networkError": "Network error"
+      "deleteFailed": "Échec de la suppression",
+      "networkError": "Erreur réseau"
     },
     "confirms": {
-      "delete": "Delete this signature request?"
+      "delete": "Supprimer cette demande de signature ?"
     }
   },
   "referrals": {
     "title": "Referrals",
-    "subtitle": "Track referral commissions and partners",
+    "subtitle": "Suivez les commissions et partenaires de recommandation",
     "toasts": {
-      "marked": "Marked {status}",
-      "updateFailed": "Update failed",
-      "deleted": "Referral deleted",
-      "networkError": "Network error",
-      "loadFailed": "Failed to load contacts"
+      "marked": "Marquée {status}",
+      "updateFailed": "Échec de la mise à jour",
+      "deleted": "Recommandation supprimée",
+      "networkError": "Erreur réseau",
+      "loadFailed": "Impossible de charger les contacts"
     },
     "confirms": {
-      "delete": "Delete this referral?"
+      "delete": "Supprimer cette recommandation ?"
     }
   },
   "housekeeping": {
     "title": "Housekeeping",
-    "subtitle": "Cleaning, inspection, maintenance, turnover",
-    "newTask": "Add Task",
-    "dropHere": "Drop tasks here",
+    "subtitle": "Nettoyage, inspection, maintenance, rotation",
+    "newTask": "Ajouter une tâche",
+    "dropHere": "Déposer les tâches ici",
     "kpis": {
       "total": "Total",
       "pending": "Pending",
@@ -310,7 +310,7 @@
     },
     "statuses": {
       "pending": "Pending",
-      "in_progress": "In progress",
+      "in_progress": "En cours",
       "completed": "Completed"
     },
     "types": {
@@ -326,7 +326,7 @@
       "urgent": "Urgent"
     },
     "filters": {
-      "allRooms": "Select a room…"
+      "allRooms": "Sélectionnez une chambre…"
     },
     "fields": {
       "room": "Room",
@@ -336,40 +336,40 @@
     },
     "actions": {
       "cancel": "Cancel",
-      "save": "Save task"
+      "save": "Enregistrer la tâche"
     },
     "toasts": {
-      "selectRoom": "Select a room",
-      "saveFailed": "Save failed",
-      "added": "Task added",
-      "moved": "Marked {status}",
-      "updateFailed": "Update failed",
-      "networkError": "Network error"
+      "selectRoom": "Sélectionnez une chambre",
+      "saveFailed": "Échec de l’enregistrement",
+      "added": "Tâche ajoutée",
+      "moved": "Marquée {status}",
+      "updateFailed": "Échec de la mise à jour",
+      "networkError": "Erreur réseau"
     }
   },
   "reservations": {
     "title": "Reservations",
-    "subtitle": "Bookings, check-ins, and revenue",
-    "newReservation": "Add Reservation",
-    "noResults": "No reservations yet.",
+    "subtitle": "Réservations, arrivées, départs et revenus",
+    "newReservation": "Ajouter une réservation",
+    "noResults": "Aucune réservation pour l’instant.",
     "kpis": {
       "total": "Total",
       "upcoming": "Upcoming",
-      "checkedIn": "Checked In",
+      "checkedIn": "Arrivés",
       "revenue": "Revenue"
     },
     "filters": {
-      "all": "All Statuses",
-      "allRooms": "Select a room…",
+      "all": "Tous les statuts",
+      "allRooms": "Sélectionnez une chambre…",
       "inquiry": "Inquiry",
       "confirmed": "Confirmed",
-      "checked_in": "Checked in",
-      "checked_out": "Checked out",
+      "checked_in": "Arrivé",
+      "checked_out": "Parti",
       "cancelled": "Cancelled"
     },
     "fields": {
       "room": "Room",
-      "guest": "Guest name",
+      "guest": "Nom du client",
       "email": "Email",
       "phone": "Phone",
       "checkIn": "Check-in",
@@ -378,77 +378,77 @@
       "notes": "Notes"
     },
     "actions": {
-      "checkIn": "Mark checked in",
-      "checkOut": "Mark checked out",
-      "cancel": "Cancel reservation",
+      "checkIn": "Marquer comme arrivé",
+      "checkOut": "Marquer comme parti",
+      "cancel": "Annuler la réservation",
       "cancelForm": "Cancel",
-      "save": "Save reservation"
+      "save": "Enregistrer la réservation"
     },
     "toasts": {
-      "selectRoom": "Select a room",
-      "guestNameRequired": "Guest name required",
-      "datesRequired": "Check-in and check-out are required",
-      "checkoutAfterCheckin": "Check-out must be after check-in",
-      "saveFailed": "Save failed",
-      "created": "Reservation created",
-      "updated": "Reservation updated",
-      "marked": "Marked {status}",
-      "updateFailed": "Update failed",
-      "networkError": "Network error"
+      "selectRoom": "Sélectionnez une chambre",
+      "guestNameRequired": "Nom du client requis",
+      "datesRequired": "Les dates d’arrivée et de départ sont requises",
+      "checkoutAfterCheckin": "Le départ doit être après l’arrivée",
+      "saveFailed": "Échec de l’enregistrement",
+      "created": "Réservation créée",
+      "updated": "Réservation mise à jour",
+      "marked": "Marquée {status}",
+      "updateFailed": "Échec de la mise à jour",
+      "networkError": "Erreur réseau"
     }
   },
   "showings": {
     "title": "Showings",
-    "subtitle": "Schedule and track property showings",
+    "subtitle": "Planifiez et suivez les visites de biens",
     "toasts": {
-      "selectProperty": "Select a property",
-      "pickDate": "Pick a date",
-      "saveFailed": "Save failed",
-      "scheduled": "Showing scheduled",
-      "updated": "Showing updated",
-      "marked": "Marked {status}",
-      "updateFailed": "Update failed",
-      "feedbackSaved": "Feedback saved",
-      "deleted": "Showing deleted",
-      "deleteFailed": "Delete failed",
-      "networkError": "Network error"
+      "selectProperty": "Sélectionnez un bien",
+      "pickDate": "Choisissez une date",
+      "saveFailed": "Échec de l’enregistrement",
+      "scheduled": "Visite planifiée",
+      "updated": "Visite mise à jour",
+      "marked": "Marquée {status}",
+      "updateFailed": "Échec de la mise à jour",
+      "feedbackSaved": "Retour enregistré",
+      "deleted": "Visite supprimée",
+      "deleteFailed": "Échec de la suppression",
+      "networkError": "Erreur réseau"
     },
     "confirms": {
-      "delete": "Delete this showing?"
+      "delete": "Supprimer cette visite ?"
     }
   },
   "openHouses": {
-    "title": "Open Houses",
-    "subtitle": "Schedule and manage open house events",
+    "title": "Journées portes ouvertes",
+    "subtitle": "Planifiez et gérez les journées portes ouvertes",
     "toasts": {
-      "selectProperty": "Select a property",
-      "pickDate": "Pick a date",
-      "endAfterStart": "End time must be after start",
-      "saveFailed": "Save failed",
-      "scheduled": "Open house scheduled",
-      "updated": "Open house updated",
-      "cancelled": "Open house cancelled",
-      "deleteFailed": "Delete failed",
-      "networkError": "Network error",
-      "loadFailed": "Failed to load properties"
+      "selectProperty": "Sélectionnez un bien",
+      "pickDate": "Choisissez une date",
+      "endAfterStart": "L’heure de fin doit être après le début",
+      "saveFailed": "Échec de l’enregistrement",
+      "scheduled": "Journée portes ouvertes planifiée",
+      "updated": "Journée portes ouvertes mise à jour",
+      "cancelled": "Journée portes ouvertes annulée",
+      "deleteFailed": "Échec de la suppression",
+      "networkError": "Erreur réseau",
+      "loadFailed": "Impossible de charger les biens"
     },
     "confirms": {
-      "cancel": "Cancel this open house? This cannot be undone."
+      "cancel": "Annuler cette journée portes ouvertes ? Cette action est irréversible."
     }
   },
   "volunteers": {
     "title": "Volunteers",
-    "subtitle": "Manage volunteer team and hours",
-    "newVolunteer": "Add Volunteer",
-    "editVolunteer": "Edit Volunteer",
+    "subtitle": "Gérez l’équipe de bénévoles et leurs heures",
+    "newVolunteer": "Ajouter un bénévole",
+    "editVolunteer": "Modifier le bénévole",
     "kpis": {
-      "total": "Total Volunteers",
+      "total": "Total des bénévoles",
       "active": "Active",
-      "totalHours": "Total Hours",
-      "avgHours": "Avg Hours / Volunteer"
+      "totalHours": "Total des heures",
+      "avgHours": "Heures moy. / bénévole"
     },
     "filters": {
-      "all": "All Statuses",
+      "all": "Tous les statuts",
       "active": "Active",
       "inactive": "Inactive",
       "onboarding": "Onboarding"
@@ -460,56 +460,56 @@
       "status": "Status",
       "skills": "Skills",
       "notes": "Notes",
-      "activityLogs": "Activity Logs"
+      "activityLogs": "Journaux d’activité"
     },
     "toasts": {
-      "nameRequired": "Name required",
-      "saveFailed": "Save failed",
-      "updated": "Volunteer updated",
-      "added": "Volunteer added",
-      "removed": "Volunteer removed",
-      "deleteFailed": "Delete failed",
-      "networkError": "Network error"
+      "nameRequired": "Nom requis",
+      "saveFailed": "Échec de l’enregistrement",
+      "updated": "Bénévole mis à jour",
+      "added": "Bénévole ajouté",
+      "removed": "Bénévole retiré",
+      "deleteFailed": "Échec de la suppression",
+      "networkError": "Erreur réseau"
     },
     "confirms": {
-      "remove": "Remove this volunteer?"
+      "remove": "Retirer ce bénévole ?"
     }
   },
   "dialer": {
-    "title": "Power Dialer",
-    "subtitle": "Call queue, dialer lists, and call history",
+    "title": "Composeur automatique",
+    "subtitle": "File d’appel, listes de composition et historique des appels",
     "tabs": {
-      "callLog": "Call Log",
-      "dialerLists": "Dialer Lists"
+      "callLog": "Journal d’appels",
+      "dialerLists": "Listes de composition"
     },
     "add": {
       "list": "List",
-      "logCall": "Log Call"
+      "logCall": "Enregistrer un appel"
     },
     "kpis": {
-      "totalCalls": "Total Calls",
+      "totalCalls": "Total des appels",
       "outbound": "Outbound",
-      "avgDuration": "Avg Duration",
+      "avgDuration": "Durée moyenne",
       "callbacks": "Callbacks",
-      "totalLists": "Total Lists",
+      "totalLists": "Total des listes",
       "active": "Active",
-      "totalContacts": "Total Contacts"
+      "totalContacts": "Total des contacts"
     },
     "columns": {
-      "phoneNumber": "Phone Number",
+      "phoneNumber": "Numéro de téléphone",
       "direction": "Direction",
       "duration": "Duration",
       "outcome": "Outcome",
-      "startedAt": "Started At",
+      "startedAt": "Démarré à",
       "notes": "Notes"
     },
     "filters": {
-      "allOutcomes": "All Outcomes"
+      "allOutcomes": "Tous les résultats"
     },
     "outcomes": {
       "connected": "Connected",
       "voicemail": "Voicemail",
-      "no_answer": "No answer",
+      "no_answer": "Sans réponse",
       "busy": "Busy",
       "callback": "Callback"
     },
@@ -520,73 +520,73 @@
     },
     "states": {
       "loading": "Loading...",
-      "noCalls": "No calls found.",
-      "noLists": "No dialer lists yet."
+      "noCalls": "Aucun appel trouvé.",
+      "noLists": "Aucune liste de composition."
     },
     "list": {
       "contacts": "Contacts",
       "remaining": "Remaining",
-      "assignedTo": "Assigned To",
+      "assignedTo": "Attribué à",
       "unassigned": "Unassigned"
     },
     "actions": {
-      "dialNext": "Dial Next",
+      "dialNext": "Appeler le suivant",
       "reset": "Reset",
-      "resetTitle": "Reset position to first contact",
+      "resetTitle": "Réinitialiser au premier contact",
       "close": "Close"
     },
     "fields": {
       "name": "Name",
-      "assignedTo": "Assigned To",
-      "phoneNumber": "Phone Number",
+      "assignedTo": "Attribué à",
+      "phoneNumber": "Numéro de téléphone",
       "outcome": "Outcome",
-      "durationSec": "Duration (sec)",
+      "durationSec": "Durée (sec)",
       "notes": "Notes"
     },
     "placeholders": {
-      "listName": "e.g. Hot Leads Q2",
-      "agentName": "Agent name",
-      "callNotes": "Call summary, next steps…"
+      "listName": "ex. Prospects chauds T2",
+      "agentName": "Nom de l’agent",
+      "callNotes": "Résumé de l’appel, prochaines étapes…"
     },
     "addList": {
-      "aria": "Add dialer list",
-      "title": "Add Dialer List",
-      "subtitle": "Create a new dialer list",
-      "submit": "Add List",
+      "aria": "Ajouter une liste de composition",
+      "title": "Ajouter une liste",
+      "subtitle": "Créer une nouvelle liste de composition",
+      "submit": "Ajouter la liste",
       "creating": "Creating…"
     },
     "callModal": {
-      "aria": "Log call",
-      "titleDial": "Dial Next Contact",
-      "titleLog": "Log Call",
-      "contactOf": "Contact {index} of {total}",
-      "manualLog": "Manually log a call",
-      "loadingContact": "Loading contact…",
-      "unnamed": "Unnamed contact",
-      "noPhone": "No phone on file",
-      "notFound": "Contact not found.",
+      "aria": "Enregistrer l’appel",
+      "titleDial": "Appeler le prochain contact",
+      "titleLog": "Enregistrer l’appel",
+      "contactOf": "Contact {index} sur {total}",
+      "manualLog": "Enregistrer un appel manuellement",
+      "loadingContact": "Chargement du contact…",
+      "unnamed": "Contact sans nom",
+      "noPhone": "Aucun téléphone enregistré",
+      "notFound": "Contact introuvable.",
       "logging": "Logging…",
-      "logCall": "Log Call",
-      "logAndAdvance": "Log Call & Advance"
+      "logCall": "Enregistrer l’appel",
+      "logAndAdvance": "Enregistrer et passer au suivant"
     },
     "toasts": {
-      "emptyList": "This list has no contacts.",
-      "loadContactFailed": "Failed to load contact.",
-      "phoneRequired": "Phone number is required.",
-      "invalidDuration": "Duration must be a non-negative number.",
-      "logFailed": "Failed to log call.",
-      "nameRequired": "Name is required.",
-      "createListFailed": "Failed to create list."
+      "emptyList": "Cette liste ne contient aucun contact.",
+      "loadContactFailed": "Impossible de charger le contact.",
+      "phoneRequired": "Le numéro de téléphone est requis.",
+      "invalidDuration": "La durée doit être un nombre positif ou nul.",
+      "logFailed": "Échec de l’enregistrement de l’appel.",
+      "nameRequired": "Le nom est requis.",
+      "createListFailed": "Échec de la création de la liste."
     }
   },
   "inbox": {
     "title": "Inbox",
-    "subtitle": "Unified inbox across email, SMS, WhatsApp, and phone",
+    "subtitle": "Boîte de réception unifiée : e-mail, SMS, WhatsApp et téléphone",
     "add": {
       "conversation": "Conversation"
     },
     "kpis": {
-      "total": "Total Conversations",
+      "total": "Total des conversations",
       "open": "Open",
       "closed": "Closed",
       "channels": "Channels"
@@ -597,8 +597,8 @@
       "time": "Time"
     },
     "filters": {
-      "allStatuses": "All Statuses",
-      "allChannels": "All Channels"
+      "allStatuses": "Tous les statuts",
+      "allChannels": "Tous les canaux"
     },
     "statuses": {
       "open": "Open",
@@ -613,30 +613,30 @@
     },
     "states": {
       "loading": "Loading...",
-      "noConversations": "No conversations found.",
-      "noMessagesYet": "No messages yet",
-      "unknownContact": "Unknown contact",
-      "noSubject": "No subject",
-      "selectConversation": "Select a conversation to read messages and reply.",
-      "loadingMessages": "Loading messages...",
-      "noMessagesPrompt": "No messages yet — write a reply below to start the thread.",
+      "noConversations": "Aucune conversation trouvée.",
+      "noMessagesYet": "Aucun message",
+      "unknownContact": "Contact inconnu",
+      "noSubject": "Sans objet",
+      "selectConversation": "Sélectionnez une conversation pour lire les messages et répondre.",
+      "loadingMessages": "Chargement des messages...",
+      "noMessagesPrompt": "Aucun message — rédigez une réponse ci-dessous pour démarrer le fil.",
       "contactShort": "Contact {id}"
     },
     "time": {
-      "justNow": "just now",
-      "mAgo": "{count}m ago",
-      "hAgo": "{count}h ago",
-      "dAgo": "{count}d ago"
+      "justNow": "à l’instant",
+      "mAgo": "il y a {count} min",
+      "hAgo": "il y a {count} h",
+      "dAgo": "il y a {count} j"
     },
     "thread": {
       "you": "You",
       "contact": "Contact"
     },
     "actions": {
-      "backToInbox": "Back to inbox"
+      "backToInbox": "Retour à la boîte"
     },
     "reply": {
-      "placeholder": "Reply via {channel}…  (⌘/Ctrl+Enter to send)",
+      "placeholder": "Répondre via {channel}…  (⌘/Ctrl+Entrée pour envoyer)",
       "send": "Send",
       "sending": "Sending"
     },
@@ -644,26 +644,26 @@
       "contact": "Contact",
       "channel": "Channel",
       "subject": "Subject",
-      "firstMessage": "First message (optional)"
+      "firstMessage": "Premier message (facultatif)"
     },
     "placeholders": {
-      "selectContact": "Select a contact…",
-      "subject": "Conversation subject",
-      "firstMessage": "Send an initial outbound message…"
+      "selectContact": "Sélectionnez un contact…",
+      "subject": "Objet de la conversation",
+      "firstMessage": "Envoyer un message initial sortant…"
     },
     "addModal": {
-      "aria": "New conversation",
-      "title": "New Conversation",
-      "subtitle": "Start a new conversation thread",
-      "submit": "Create Conversation",
+      "aria": "Nouvelle conversation",
+      "title": "Nouvelle conversation",
+      "subtitle": "Démarrer un nouveau fil de conversation",
+      "submit": "Créer la conversation",
       "creating": "Creating…"
     },
     "toasts": {
-      "selectContact": "Select a contact",
-      "subjectRequired": "Subject is required",
-      "createFailed": "Failed to create",
-      "sendFailed": "Failed to send",
-      "loadMessagesFailed": "Couldn't load this conversation"
+      "selectContact": "Sélectionnez un contact",
+      "subjectRequired": "L’objet est requis",
+      "createFailed": "Échec de la création",
+      "sendFailed": "Échec de l’envoi",
+      "loadMessagesFailed": "Impossible de charger cette conversation"
     }
   },
   "common": {
@@ -775,11 +775,11 @@
     }
   },
   "keyboard": {
-    "title": "Keyboard shortcuts",
-    "subtitle": "Press ? on any page",
+    "title": "Raccourcis clavier",
+    "subtitle": "Appuyez sur ? sur n’importe quelle page",
     "navigationHeading": "Navigation",
     "actionsHeading": "Actions",
-    "footnote": "Two-key shortcuts (e.g. g c) — press them in sequence within ~1 second. Shortcuts are suppressed while you're typing in an input, so you don't have to worry about clobbering a search field.",
+    "footnote": "Raccourcis à deux touches (ex. g c) — appuyez en séquence dans la seconde. Les raccourcis sont désactivés pendant que vous tapez dans un champ, pour ne pas écraser une recherche.",
     "nav": {
       "home": "Home",
       "contacts": "Contacts",
@@ -789,73 +789,73 @@
       "insights": "Insights",
       "notifications": "Notifications",
       "settings": "Settings",
-      "audit": "Audit log"
+      "audit": "Journal d’audit"
     },
     "actions": {
-      "focusSearch": "Focus search on current page",
-      "showCheatSheet": "Show this cheat sheet",
-      "closeModal": "Close any open modal",
-      "openPalette": "Open command palette (search + AI)",
-      "openPaletteAi": "Open command palette in AI mode",
-      "nextRow": "Next row (deals list, properties, transactions)",
-      "prevRow": "Previous row",
-      "openRow": "Open focused row"
+      "focusSearch": "Focaliser la recherche de la page actuelle",
+      "showCheatSheet": "Afficher cette aide-mémoire",
+      "closeModal": "Fermer toute fenêtre modale ouverte",
+      "openPalette": "Ouvrir la palette de commandes (recherche + IA)",
+      "openPaletteAi": "Ouvrir la palette de commandes en mode IA",
+      "nextRow": "Ligne suivante (affaires, biens, transactions)",
+      "prevRow": "Ligne précédente",
+      "openRow": "Ouvrir la ligne sélectionnée"
     }
   },
   "bulk": {
-    "selected": "{count} selected",
-    "exportCsv": "Export CSV",
-    "changeType": "Change type",
+    "selected": "{count} sélectionné(s)",
+    "exportCsv": "Exporter CSV",
+    "changeType": "Changer le type",
     "delete": "Delete",
-    "clearSelection": "Clear selection"
+    "clearSelection": "Effacer la sélection"
   },
   "views": {
     "label": "Views",
-    "noneYet": "No saved views yet — save your current filters as one",
-    "saveCurrent": "Save current",
-    "namePlaceholder": "Name this view…",
-    "shareWithOrg": "Make this view available to everyone in the org",
-    "saved": "Saved view \"{name}\"",
-    "applied": "Applied \"{name}\"",
-    "renamed": "View renamed",
-    "deletePrompt": "Delete view \"{name}\"?",
-    "deleted": "View deleted",
-    "deleteFailed": "Delete failed",
-    "renameFailed": "Rename failed",
-    "saveFailed": "Failed to save view"
+    "noneYet": "Aucune vue enregistrée — enregistrez vos filtres actuels en tant que vue",
+    "saveCurrent": "Enregistrer",
+    "namePlaceholder": "Nommez cette vue…",
+    "shareWithOrg": "Rendre cette vue disponible à tous dans l’organisation",
+    "saved": "Vue « {name} » enregistrée",
+    "applied": "« {name} » appliquée",
+    "renamed": "Vue renommée",
+    "deletePrompt": "Supprimer la vue « {name} » ?",
+    "deleted": "Vue supprimée",
+    "deleteFailed": "Échec de la suppression",
+    "renameFailed": "Échec du renommage",
+    "saveFailed": "Échec de l’enregistrement de la vue"
   },
   "columns": {
     "title": "Columns",
-    "showHide": "Show / hide columns",
+    "showHide": "Afficher / masquer les colonnes",
     "always": "Always",
-    "resetDefaults": "Reset to defaults"
+    "resetDefaults": "Rétablir par défaut"
   },
   "filter": {
-    "title": "Advanced filter",
-    "subtitlePrefix": "{entity} list",
+    "title": "Filtre avancé",
+    "subtitlePrefix": "Liste {entity}",
     "matchAll": "All",
     "matchAny": "Any",
-    "matchOf": "of the following:",
+    "matchOf": "des critères suivants :",
     "matchPrefix": "Match",
-    "addRule": "Add rule",
-    "removeRule": "Remove rule",
-    "noValueNeeded": "(no value needed)",
+    "addRule": "Ajouter une règle",
+    "removeRule": "Supprimer la règle",
+    "noValueNeeded": "(aucune valeur requise)",
     "valuePlaceholder": "value",
     "rangeFrom": "from",
     "rangeTo": "to",
-    "selectPlaceholder": "— select —",
-    "footnote": "Filters apply on the server. Email and phone use exact-match only (the values are encrypted at rest); use Contains on Name or Company for partial searches.",
+    "selectPlaceholder": "— sélectionner —",
+    "footnote": "Les filtres s’appliquent côté serveur. E-mail et téléphone n’acceptent que la correspondance exacte (les valeurs sont chiffrées au repos) ; utilisez Contient sur Nom ou Entreprise pour les recherches partielles.",
     "label": "Filters",
-    "labelWithCount": "Filters: {count}",
+    "labelWithCount": "Filtres : {count}",
     "ruleCount": "{count, plural, one {# rule} other {# rules}}",
     "operator": {
       "contains": "contains",
       "eq": "equals",
-      "neq": "does not equal",
-      "starts_with": "starts with",
-      "ends_with": "ends with",
-      "is_empty": "is empty",
-      "is_not_empty": "is not empty",
+      "neq": "différent de",
+      "starts_with": "commence par",
+      "ends_with": "se termine par",
+      "is_empty": "est vide",
+      "is_not_empty": "n’est pas vide",
       "gt": ">",
       "gte": "≥",
       "lt": "<",
@@ -865,22 +865,22 @@
       "after": "after",
       "on": "on",
       "is": "is",
-      "isNot": "is not",
-      "in": "is any of",
-      "not_in": "is none of",
-      "is_true": "is true",
-      "is_false": "is false"
+      "isNot": "n’est pas",
+      "in": "est l’un de",
+      "not_in": "n’est aucun de",
+      "is_true": "est vrai",
+      "is_false": "est faux"
     }
   },
   "quickview": {
     "loading": "Loading…",
-    "notFound": "{entity} not found",
-    "addedOn": "added {date}",
-    "listedOn": "listed {date}",
-    "openedOn": "opened {date}",
-    "linkedProject": "Linked project",
-    "linkedCount": "Linked ({count})",
-    "more": "+{count} more",
+    "notFound": "{entity} introuvable",
+    "addedOn": "ajouté le {date}",
+    "listedOn": "listé le {date}",
+    "openedOn": "ouvert le {date}",
+    "linkedProject": "Projet lié",
+    "linkedCount": "Liés ({count})",
+    "more": "+{count} de plus",
     "notes": "Notes",
     "description": "Description",
     "deal": {
@@ -888,14 +888,14 @@
       "probability": "Probability",
       "owner": "Owner",
       "contact": "Contact",
-      "expectedClose": "Expected close",
-      "actualClose": "Actual close",
+      "expectedClose": "Clôture prévue",
+      "actualClose": "Clôture réelle",
       "unassigned": "Unassigned"
     },
     "property": {
       "price": "Price",
       "perMonth": "/mo",
-      "hoa": "+ €{amount} HOA",
+      "hoa": "+ {amount} € de charges",
       "bed": "Bed",
       "bath": "Bath",
       "area": "m²",
@@ -903,18 +903,18 @@
       "viewings": "Viewings",
       "showings": "Showings",
       "offers": "Offers",
-      "openHouses": "Open houses",
+      "openHouses": "Journées portes ouvertes",
       "valuation": "Valuation",
-      "forSale": "For sale",
-      "forRent": "For rent",
+      "forSale": "À vendre",
+      "forRent": "À louer",
       "bank": "BANK",
       "resale": "RESALE"
     },
     "contact": {
       "industry": "Industry",
-      "icpFit": "ICP Fit",
-      "aiBadge": "AI generated",
-      "aiHeading": "AI Intelligence",
+      "icpFit": "Adéquation ICP",
+      "aiBadge": "Généré par IA",
+      "aiHeading": "Intelligence IA",
       "via": "via {source}",
       "email": "Email",
       "phone": "Phone",
@@ -1016,7 +1016,7 @@
     "contactSupport": "Contacter le support",
     "categories": {
       "pricing": "Tarifs & facturation",
-      "migration": "Migration & onboarding",
+      "migration": "Migration & démarrage",
       "features": "Fonctionnalités",
       "compliance": "Conformité & données",
       "support": "Support & contrats"
@@ -1186,49 +1186,49 @@
     }
   },
   "scimGroups": {
-    "title": "SCIM groups",
-    "subtitle": "Map IdP groups to platform roles + dashboard sections",
-    "heading": "SCIM groups",
-    "descriptionPart1": "When an IdP (Okta, Azure AD, etc.) provisions a user via ",
-    "descriptionPart2": ", the new member's organization-membership is upserted to the role and dashboard sections you set below. Removing a member never auto-reverts — if you need to demote a user, do it manually from ",
+    "title": "Groupes SCIM",
+    "subtitle": "Mappez les groupes IdP aux rôles plateforme et sections du tableau de bord",
+    "heading": "Groupes SCIM",
+    "descriptionPart1": "Lorsqu’un IdP (Okta, Azure AD, etc.) provisionne un utilisateur via ",
+    "descriptionPart2": ", l’appartenance à l’organisation du nouveau membre est définie selon le rôle et les sections du tableau de bord configurés ci-dessous. Le retrait d’un membre n’est jamais auto-annulé — pour rétrograder un utilisateur, faites-le manuellement depuis ",
     "descriptionPart3": ".",
-    "info": "Role sets Membership.role; leave it on none to skip the role mapping entirely. Sections override the per-user dashboard allow-list — choose custom to pick specific surfaces, or full access to clear the override (members fall back to their personal sections).",
+    "info": "Le rôle définit Membership.role ; laissez-le sur aucun pour ignorer le mappage. Les sections remplacent la liste autorisée par utilisateur — choisissez personnalisé pour sélectionner des surfaces précises, ou accès complet pour supprimer la surcharge (les membres reviennent à leurs sections personnelles).",
     "loading": "Loading…",
-    "emptyPart1": "No SCIM groups yet. Once your IdP provisions a group via ",
-    "emptyPart2": ", it will appear here.",
+    "emptyPart1": "Aucun groupe SCIM. Lorsque votre IdP provisionnera un groupe via ",
+    "emptyPart2": ", il apparaîtra ici.",
     "members": "{count, plural, one {# member} other {# members}}",
     "role": "Role",
-    "roleNone": "— none (skip role mapping) —",
-    "dashboardSections": "Dashboard sections",
-    "fullAccess": "Full access",
+    "roleNone": "— aucun (ignorer le mappage de rôle) —",
+    "dashboardSections": "Sections du tableau de bord",
+    "fullAccess": "Accès complet",
     "custom": "Custom",
-    "personalAllowlist": "Members keep their personal section allow-list (User.dashboardSections).",
+    "personalAllowlist": "Les membres conservent leur liste autorisée personnelle (User.dashboardSections).",
     "discard": "Discard",
     "saveLabel": "Save ({count, plural, one {# member} other {# members}})",
     "saving": "Saving…",
     "toasts": {
       "saved": "Saved",
       "savedWithUpdate": "Saved — {count, plural, one {# existing member updated} other {# existing members updated}}",
-      "updateFailed": "Update failed ({status})",
-      "networkError": "Network error"
+      "updateFailed": "Échec de la mise à jour ({status})",
+      "networkError": "Erreur réseau"
     }
   },
   "dripEnrollment": {
-    "title": "Enrollments — {name}",
-    "subtitle": "{count} enrolled · {steps, plural, one {# step} other {# steps}} per contact",
-    "searchPlaceholder": "Search contacts to enroll…",
-    "loadingContacts": "Loading contacts…",
-    "noMatches": "No matches.",
-    "noContactsYet": "No contacts in this organisation yet.",
+    "title": "Inscriptions — {name}",
+    "subtitle": "{count} inscrit(s) · {steps, plural, one {# étape} other {# étapes}} par contact",
+    "searchPlaceholder": "Rechercher des contacts à inscrire…",
+    "loadingContacts": "Chargement des contacts…",
+    "noMatches": "Aucune correspondance.",
+    "noContactsYet": "Aucun contact dans cette organisation.",
     "enrolled": "Enrolled",
     "enroll": "Enroll",
-    "currentEnrollments": "Current enrollments ({count})",
-    "loadingEnrollments": "Loading enrollments…",
-    "noneEnrolled": "No one enrolled yet. Use the picker above to enroll your first contact.",
-    "step": "Step {n} / {total}",
-    "noSendsYet": "no sends yet",
-    "lastSent": "last sent {ago}",
-    "next": "next {when}",
+    "currentEnrollments": "Inscriptions en cours ({count})",
+    "loadingEnrollments": "Chargement des inscriptions…",
+    "noneEnrolled": "Aucun inscrit pour l’instant. Utilisez le sélecteur ci-dessus pour inscrire votre premier contact.",
+    "step": "Étape {n} / {total}",
+    "noSendsYet": "aucun envoi pour l’instant",
+    "lastSent": "dernier envoi {ago}",
+    "next": "suivant {when}",
     "attempts": "{count, plural, one {# attempt} other {# attempts}}",
     "status": {
       "active": "active",
@@ -1236,14 +1236,14 @@
       "done": "done",
       "cancelled": "cancelled"
     },
-    "cancelTitle": "Cancel enrollment",
-    "cancelConfirm": "Cancel this enrollment? The contact will not receive any further steps.",
+    "cancelTitle": "Annuler l’inscription",
+    "cancelConfirm": "Annuler cette inscription ? Le contact ne recevra plus d’étapes.",
     "toasts": {
       "enrolled": "Enrolled",
-      "cancelled": "Enrollment cancelled",
-      "enrollFailed": "Enroll failed ({status})",
-      "cancelFailed": "Cancel failed ({status})",
-      "networkError": "Network error"
+      "cancelled": "Inscription annulée",
+      "enrollFailed": "Échec de l’inscription ({status})",
+      "cancelFailed": "Échec de l’annulation ({status})",
+      "networkError": "Erreur réseau"
     }
   },
   "billing": {
