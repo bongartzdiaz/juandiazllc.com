@@ -1,69 +1,22 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { BarChart3, Target, DollarSign, Users, Download, FileText, TrendingUp, Globe, Loader2, TableProperties } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
 import { exportToCSV } from '@/lib/philly/export'
 
+// Template *visuals* — strings come from i18n via the templateId.
+// Each entry's id maps to messages/<locale>.json `reports.templates.<id>.{title,description}`.
 const REPORT_TEMPLATES = [
-  {
-    id: 'quarterly',
-    title: 'Quarterly Impact',
-    description: 'Comprehensive overview of project outcomes, KPIs, and beneficiary reach for the quarter.',
-    icon: BarChart3,
-    color: 'var(--accent)',
-    colorBg: 'var(--accent-bg)',
-    colorBorder: 'var(--accent-border)',
-  },
-  {
-    id: 'sdg',
-    title: 'SDG Alignment',
-    description: 'Analysis of portfolio alignment with UN Sustainable Development Goals and contribution metrics.',
-    icon: Target,
-    color: 'var(--g)',
-    colorBg: 'var(--g-bg)',
-    colorBorder: 'var(--g-border)',
-  },
-  {
-    id: 'financial',
-    title: 'Financial Overview',
-    description: 'Budget allocation, expenditure tracking, ROI analysis, and funding utilization rates.',
-    icon: DollarSign,
-    color: 'var(--o)',
-    colorBg: 'var(--o-bg)',
-    colorBorder: 'var(--o-border)',
-  },
-  {
-    id: 'stakeholder',
-    title: 'Stakeholder Summary',
-    description: 'Executive summary tailored for board presentations with key highlights and recommendations.',
-    icon: Users,
-    color: 'var(--b)',
-    colorBg: 'var(--b-bg)',
-    colorBorder: 'var(--b-border)',
-  },
-  {
-    id: 'performance',
-    title: 'Performance Trends',
-    description: 'Year-over-year performance analysis with growth metrics, trend identification, and forecasting.',
-    icon: TrendingUp,
-    color: 'var(--p)',
-    colorBg: 'var(--p-bg)',
-    colorBorder: 'var(--p-border)',
-  },
-  {
-    id: 'regional',
-    title: 'Regional Breakdown',
-    description: 'Geographic distribution of projects, regional impact scores, and cross-border collaboration insights.',
-    icon: Globe,
-    color: 'var(--y)',
-    colorBg: 'var(--y-bg)',
-    colorBorder: 'var(--y-border)',
-  },
-]
-
-const TYPE_LABELS: Record<string, string> = Object.fromEntries(REPORT_TEMPLATES.map(t => [t.id, t.title]))
+  { id: 'quarterly',   icon: BarChart3,  color: 'var(--accent)', colorBg: 'var(--accent-bg)', colorBorder: 'var(--accent-border)' },
+  { id: 'sdg',         icon: Target,     color: 'var(--g)',      colorBg: 'var(--g-bg)',      colorBorder: 'var(--g-border)' },
+  { id: 'financial',   icon: DollarSign, color: 'var(--o)',      colorBg: 'var(--o-bg)',      colorBorder: 'var(--o-border)' },
+  { id: 'stakeholder', icon: Users,      color: 'var(--b)',      colorBg: 'var(--b-bg)',      colorBorder: 'var(--b-border)' },
+  { id: 'performance', icon: TrendingUp, color: 'var(--p)',      colorBg: 'var(--p-bg)',      colorBorder: 'var(--p-border)' },
+  { id: 'regional',    icon: Globe,      color: 'var(--y)',      colorBg: 'var(--y-bg)',      colorBorder: 'var(--y-border)' },
+] as const
 
 const statusStyles: Record<string, { bg: string; txt: string; border: string }> = {
   ready: { bg: 'var(--g-bg)', txt: 'var(--g-txt)', border: 'var(--g-border)' },
@@ -123,11 +76,18 @@ function downloadReportHTML(report: ApiReport) {
 }
 
 export default function ReportsPage() {
+  const t = useTranslations('reports')
   const [reports, setReports] = useState<ApiReport[]>([])
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState<string | null>(null)
   const { addToast } = useToast()
   const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Localised type labels — built from i18n at render time so they stay in sync
+  // with the active locale.
+  const typeLabels: Record<string, string> = Object.fromEntries(
+    REPORT_TEMPLATES.map(tmpl => [tmpl.id, t(`templates.${tmpl.id}.title`)])
+  )
 
   const fetchReports = useCallback(async () => {
     try {
@@ -162,21 +122,21 @@ export default function ReportsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: `${tmpl.title} - ${todayString()}`,
+          title: `${typeLabels[tmpl.id] ?? tmpl.id} - ${todayString()}`,
           type: tmpl.id,
         }),
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) {
-        addToast(json.error ?? 'Failed to start report', 'error')
+        addToast(json.error ?? t('toasts.startFailed'), 'error')
         return
       }
-      addToast('Report queued — generating…', 'success')
+      addToast(t('toasts.queued'), 'success')
       // Optimistic insert; polling will reconcile
       if (json.data) setReports(prev => [json.data as ApiReport, ...prev.filter(r => r.id !== json.data.id)])
       else fetchReports()
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Failed to start report', 'error')
+      addToast(err instanceof Error ? err.message : t('toasts.startFailed'), 'error')
     } finally {
       setGenerating(null)
     }
@@ -184,33 +144,33 @@ export default function ReportsPage() {
 
   function handleDownload(report: ApiReport) {
     if (report.status !== 'ready') {
-      addToast('Report is still generating — try again in a moment', 'info')
+      addToast(t('toasts.notReady'), 'info')
       return
     }
     downloadReportHTML(report)
-    addToast(`Downloading ${report.title}`, 'info')
+    addToast(t('toasts.downloading', { title: report.title }), 'info')
   }
 
   function handleExportCSV() {
     const data = reports.map(r => ({
       title: r.title,
-      type: TYPE_LABELS[r.type] ?? r.type,
+      type: typeLabels[r.type] ?? r.type,
       generated: r.createdAt.slice(0, 10),
       status: r.status,
     }))
-    if (data.length === 0) { addToast('No reports to export', 'info'); return }
+    if (data.length === 0) { addToast(t('toasts.noneToExport'), 'info'); return }
     exportToCSV(data, 'reports')
-    addToast('CSV exported', 'success')
+    addToast(t('toasts.csvExported'), 'success')
   }
 
   return (
     <>
-      <Topbar title="Reports" sub="Generate impact reports" />
+      <Topbar title={t('title')} sub={t('subtitle')} />
 
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Report template cards */}
         <div style={{ marginBottom: 24 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>Report Templates</div>
+          <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>{t('templatesHeader')}</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
             {REPORT_TEMPLATES.map(tmpl => {
               const Icon = tmpl.icon
@@ -229,9 +189,9 @@ export default function ReportsPage() {
                   }}>
                     <Icon size={18} color={tmpl.color} />
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>{tmpl.title}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600 }}>{t(`templates.${tmpl.id}.title`)}</div>
                   <div style={{ fontSize: 11.5, color: 'var(--txt3)', lineHeight: 1.45, flex: 1 }}>
-                    {tmpl.description}
+                    {t(`templates.${tmpl.id}.description`)}
                   </div>
                   <button
                     disabled={isGenerating || generating !== null}
@@ -253,7 +213,7 @@ export default function ReportsPage() {
                     ) : (
                       <FileText size={12} />
                     )}
-                    {isGenerating ? 'Queueing...' : 'Generate'}
+                    {isGenerating ? t('queueing') : t('generate')}
                   </button>
                 </div>
               )
@@ -264,7 +224,7 @@ export default function ReportsPage() {
         {/* Recent Reports table */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-            <div style={{ fontSize: 13, fontWeight: 600 }}>Recent Reports</div>
+            <div style={{ fontSize: 13, fontWeight: 600 }}>{t('recentHeader')}</div>
             <button
               onClick={handleExportCSV}
               style={{
@@ -274,7 +234,7 @@ export default function ReportsPage() {
                 background: 'var(--bg2)', color: 'var(--txt2)',
                 border: '1px solid var(--border)', fontFamily: 'inherit',
               }}>
-              <TableProperties size={11} /> Export All CSV
+              <TableProperties size={11} /> {t('exportAllCsv')}
             </button>
           </div>
           <div style={{
@@ -284,21 +244,21 @@ export default function ReportsPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {['Report Name', 'Type', 'Generated', 'Status', 'Actions'].map(h => (
-                    <th key={h} style={{
+                  {(['name','type','generated','status','actions'] as const).map(col => (
+                    <th key={col} style={{
                       padding: '10px 14px', textAlign: 'left', fontSize: 10.5,
                       fontWeight: 600, textTransform: 'uppercase', color: 'var(--txt3)',
                       letterSpacing: '0.05em',
-                    }}>{h}</th>
+                    }}>{t(`columns.${col}`)}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={5} style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading…</td></tr>
+                  <tr><td colSpan={5} style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('loading')}</td></tr>
                 ) : reports.length === 0 ? (
                   <tr><td colSpan={5} style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-                    No reports yet — click <strong>Generate</strong> on any template above to create one.
+                    {t('empty')}
                   </td></tr>
                 ) : reports.map(r => {
                   const ss = statusStyles[r.status] || statusStyles.draft
@@ -306,7 +266,7 @@ export default function ReportsPage() {
                   return (
                     <tr key={r.id} style={{ borderBottom: '1px solid var(--border)' }}>
                       <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600 }}>{r.title}</td>
-                      <td style={{ padding: '12px 14px', fontSize: 12, color: 'var(--txt2)' }}>{TYPE_LABELS[r.type] ?? r.type}</td>
+                      <td style={{ padding: '12px 14px', fontSize: 12, color: 'var(--txt2)' }}>{typeLabels[r.type] ?? r.type}</td>
                       <td className="mono" style={{ padding: '12px 14px', fontSize: 12, color: 'var(--txt2)' }}>
                         {new Date(r.createdAt).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
                       </td>
@@ -333,12 +293,12 @@ export default function ReportsPage() {
                             border: '1px solid var(--border)', fontFamily: 'inherit',
                             opacity: isReady ? 1 : 0.6,
                           }}>
-                          <Download size={11} /> HTML
+                          <Download size={11} /> {t('actions.html')}
                         </button>
                         <button
                           onClick={() => {
-                            exportToCSV([{ title: r.title, type: TYPE_LABELS[r.type] ?? r.type, generated: r.createdAt.slice(0, 10), status: r.status }], r.title.replace(/\s+/g, '-').toLowerCase())
-                            addToast('CSV exported', 'success')
+                            exportToCSV([{ title: r.title, type: typeLabels[r.type] ?? r.type, generated: r.createdAt.slice(0, 10), status: r.status }], r.title.replace(/\s+/g, '-').toLowerCase())
+                            addToast(t('toasts.csvExported'), 'success')
                           }}
                           style={{
                             display: 'inline-flex', alignItems: 'center', gap: 5,
@@ -347,7 +307,7 @@ export default function ReportsPage() {
                             background: 'var(--bg2)', color: 'var(--txt2)',
                             border: '1px solid var(--border)', fontFamily: 'inherit',
                           }}>
-                          <TableProperties size={11} /> CSV
+                          <TableProperties size={11} /> {t('actions.csv')}
                         </button>
                       </td>
                     </tr>

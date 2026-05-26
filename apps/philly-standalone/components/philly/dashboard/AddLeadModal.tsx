@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { Upload, CheckCircle, FileText, X } from 'lucide-react'
 
@@ -30,6 +31,8 @@ function formatFileSize(bytes: number): string {
 }
 
 export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
+  const t = useTranslations('addLead')
+
   const [tab, setTab] = useState<'manual' | 'csv'>('manual')
   const [success, setSuccess] = useState(false)
 
@@ -50,7 +53,10 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
   const fileRef = useRef<HTMLInputElement>(null)
 
   const sources = sourcesByIndustry[industry] || sourcesByIndustry.philanthropy
-  const entityLabel = industry === 'hospitality' ? 'Booking' : industry === 'realestate' ? 'Lead' : 'Contact'
+  // Localised entity label — keyed by industry. Real-estate → "Lead",
+  // hospitality → "Booking", everything else → "Contact".
+  const entityKey = industry === 'hospitality' ? 'booking' : industry === 'realestate' ? 'lead' : 'contact'
+  const entityLabel = t(`entity.${entityKey}`)
 
   const resetForm = useCallback(() => {
     setName(''); setEmail(''); setPhone(''); setSource(''); setCompany(''); setNotes('')
@@ -64,9 +70,9 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
 
   const validateManual = (): boolean => {
     const e: Record<string, string> = {}
-    if (!name.trim()) e.name = 'Name is required'
-    if (!phone.trim()) e.phone = 'Phone is required'
-    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Invalid email format'
+    if (!name.trim()) e.name = t('errors.nameRequired')
+    if (!phone.trim()) e.phone = t('errors.phoneRequired')
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = t('errors.invalidEmail')
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -113,68 +119,68 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
   })
 
   return (
-    <Modal open={open} onClose={handleClose} title={`Add ${entityLabel}`} subtitle="Add manually or import from CSV" size="sm">
+    <Modal open={open} onClose={handleClose} title={t('title', { entity: entityLabel })} subtitle={t('subtitle')} size="sm">
       {success ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0', gap: 12 }}>
           <CheckCircle size={40} color="var(--g)" />
-          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--g-txt)' }}>Added successfully</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--g-txt)' }}>{t('success')}</div>
         </div>
       ) : (
         <>
           {/* Tabs */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-            <button style={tabStyle(tab === 'manual')} onClick={() => setTab('manual')}>Manual Entry</button>
-            <button style={tabStyle(tab === 'csv')} onClick={() => setTab('csv')}>CSV Upload</button>
+            <button style={tabStyle(tab === 'manual')} onClick={() => setTab('manual')}>{t('tabs.manual')}</button>
+            <button style={tabStyle(tab === 'csv')} onClick={() => setTab('csv')}>{t('tabs.csv')}</button>
           </div>
 
           {tab === 'manual' ? (
             <>
-              <FormField label="Name" required>
+              <FormField label={t('fields.name')} required>
                 <input
                   style={{ ...inputStyle, borderColor: errors.name ? 'var(--r)' : 'var(--border)' }}
                   value={name} onChange={e => setName(e.target.value)}
-                  placeholder="Full name"
+                  placeholder={t('placeholders.name')}
                 />
                 {errors.name && <span style={{ fontSize: 11, color: 'var(--r)', marginTop: 3, display: 'block' }}>{errors.name}</span>}
               </FormField>
 
-              <FormField label="Email">
+              <FormField label={t('fields.email')}>
                 <input
                   style={{ ...inputStyle, borderColor: errors.email ? 'var(--r)' : 'var(--border)' }}
                   type="email" value={email} onChange={e => setEmail(e.target.value)}
-                  placeholder="email@example.com"
+                  placeholder={t('placeholders.email')}
                 />
                 {errors.email && <span style={{ fontSize: 11, color: 'var(--r)', marginTop: 3, display: 'block' }}>{errors.email}</span>}
               </FormField>
 
-              <FormField label="Phone" required>
+              <FormField label={t('fields.phone')} required>
                 <input
                   style={{ ...inputStyle, borderColor: errors.phone ? 'var(--r)' : 'var(--border)' }}
                   type="tel" value={phone} onChange={e => setPhone(e.target.value)}
-                  placeholder="+1 (555) 000-0000"
+                  placeholder={t('placeholders.phone')}
                 />
                 {errors.phone && <span style={{ fontSize: 11, color: 'var(--r)', marginTop: 3, display: 'block' }}>{errors.phone}</span>}
               </FormField>
 
-              <FormField label="Source">
+              <FormField label={t('fields.source')}>
                 <select
                   style={{ ...inputStyle, cursor: 'pointer' }}
                   value={source} onChange={e => setSource(e.target.value)}
                 >
-                  <option value="">Select source...</option>
+                  <option value="">{t('placeholders.source')}</option>
                   {sources.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </FormField>
 
-              <FormField label="Company">
-                <input style={inputStyle} value={company} onChange={e => setCompany(e.target.value)} placeholder="Company name" />
+              <FormField label={t('fields.company')}>
+                <input style={inputStyle} value={company} onChange={e => setCompany(e.target.value)} placeholder={t('placeholders.company')} />
               </FormField>
 
-              <FormField label="Notes">
+              <FormField label={t('fields.notes')}>
                 <textarea
                   style={{ ...inputStyle, minHeight: 72, resize: 'vertical' }}
                   value={notes} onChange={e => setNotes(e.target.value)}
-                  placeholder="Additional notes..."
+                  placeholder={t('placeholders.notes')}
                 />
               </FormField>
 
@@ -187,7 +193,7 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
                   transition: 'opacity 150ms',
                 }}
               >
-                Add {entityLabel}
+                {t('submit', { entity: entityLabel })}
               </button>
             </>
           ) : (
@@ -207,12 +213,12 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
                 >
                   <Upload size={28} color="var(--txt3)" style={{ marginBottom: 10 }} />
                   <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4 }}>
-                    Drag and drop your CSV file here
+                    {t('csv.dropPrompt')}
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--txt3)' }}>
-                    or <span style={{ color: 'var(--accent)', fontWeight: 600, cursor: 'pointer' }}>Browse files</span>
+                    {t('csv.or')} <span style={{ color: 'var(--accent)', fontWeight: 600, cursor: 'pointer' }}>{t('csv.browse')}</span>
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 8 }}>Accepts .csv files only</div>
+                  <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 8 }}>{t('csv.acceptsCsvOnly')}</div>
                   <input
                     ref={fileRef} type="file" accept=".csv" style={{ display: 'none' }}
                     onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
@@ -284,7 +290,7 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
                       borderRadius: 8, cursor: 'pointer',
                     }}
                   >
-                    Import {csvPreview.length} contacts
+                    {t('csv.import', { count: csvPreview.length })}
                   </button>
                 </>
               )}

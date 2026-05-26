@@ -127,11 +127,13 @@
       "emailCopied": "E-mail gekopieerd",
       "noPhone": "Geen telefoonnummer bekend",
       "phoneCopied": "Telefoonnummer gekopieerd",
-      "copyFailed": "Kopiëren mislukt"
+      "copyFailed": "Kopiëren mislukt",
+      "viewApplied": "\"{name}\" toegepast"
     },
     "confirms": {
       "bulkDelete": "{count, plural, one {# contact verwijderen?} other {# contacten verwijderen?}} Dit kan niet ongedaan worden gemaakt."
-    }
+    },
+    "newContactSubtitle": "Voeg een nieuwe contactpersoon toe aan uw directory"
   },
   "impact": {
     "title": "Impact",
@@ -1395,6 +1397,105 @@
     "toasts": {
       "saved": "Override opgeslagen.",
       "saveFailed": "Kon de override niet opslaan."
+    }
+  },
+  "addLead": {
+    "entity": {
+      "lead": "Lead",
+      "contact": "Contact",
+      "booking": "Boeking"
+    },
+    "title": "{entity} toevoegen",
+    "subtitle": "Handmatig toevoegen of importeren uit CSV",
+    "tabs": {
+      "manual": "Handmatig invoeren",
+      "csv": "CSV-upload"
+    },
+    "fields": {
+      "name": "Naam",
+      "email": "E-mail",
+      "phone": "Telefoon",
+      "source": "Bron",
+      "company": "Bedrijf",
+      "notes": "Notities"
+    },
+    "placeholders": {
+      "name": "Volledige naam",
+      "email": "email@voorbeeld.nl",
+      "phone": "+31 6 1234 5678",
+      "source": "Selecteer bron…",
+      "company": "Bedrijfsnaam",
+      "notes": "Aanvullende notities…"
+    },
+    "errors": {
+      "nameRequired": "Naam is verplicht",
+      "phoneRequired": "Telefoon is verplicht",
+      "invalidEmail": "Ongeldig e-mailadres"
+    },
+    "submit": "{entity} toevoegen",
+    "success": "Succesvol toegevoegd",
+    "csv": {
+      "dropPrompt": "Sleep uw CSV-bestand hierheen",
+      "or": "of",
+      "browse": "Bestanden bladeren",
+      "acceptsCsvOnly": "Alleen .csv-bestanden toegestaan",
+      "import": "{count, plural, one {# contact importeren} other {# contacten importeren}}"
+    }
+  },
+  "reports": {
+    "title": "Rapporten",
+    "subtitle": "Impactrapporten genereren",
+    "templatesHeader": "Rapportsjablonen",
+    "recentHeader": "Recente rapporten",
+    "exportAllCsv": "Alles exporteren als CSV",
+    "generate": "Genereren",
+    "queueing": "In wachtrij…",
+    "loading": "Laden…",
+    "empty": "Nog geen rapporten — klik op Genereren bij een sjabloon hierboven om er een aan te maken.",
+    "columns": {
+      "name": "Rapportnaam",
+      "type": "Type",
+      "generated": "Gegenereerd",
+      "status": "Status",
+      "actions": "Acties"
+    },
+    "actions": {
+      "html": "HTML",
+      "csv": "CSV"
+    },
+    "templates": {
+      "quarterly": {
+        "title": "Kwartaalimpact",
+        "description": "Volledig overzicht van projectresultaten, KPI’s en bereikte begunstigden voor het kwartaal."
+      },
+      "sdg": {
+        "title": "SDG-afstemming",
+        "description": "Analyse van portfolio-afstemming met de Duurzame Ontwikkelingsdoelen van de VN en bijdrage-statistieken."
+      },
+      "financial": {
+        "title": "Financieel overzicht",
+        "description": "Budgetverdeling, uitgavenregistratie, ROI-analyse en gebruik van financiering."
+      },
+      "stakeholder": {
+        "title": "Stakeholder-samenvatting",
+        "description": "Managementsamenvatting voor bestuurspresentaties met hoogtepunten en aanbevelingen."
+      },
+      "performance": {
+        "title": "Prestatietrends",
+        "description": "Jaar-op-jaar prestatieanalyse met groeicijfers, trendsignalering en prognoses."
+      },
+      "regional": {
+        "title": "Regionale uitsplitsing",
+        "description": "Geografische verdeling van projecten, regionale impactscores en grensoverschrijdende samenwerking."
+      }
+    },
+    "toasts": {
+      "startFailed": "Kon rapport niet starten",
+      "queued": "Rapport in wachtrij — bezig met genereren…",
+      "notReady": "Rapport wordt nog gegenereerd — probeer het zo opnieuw",
+      "downloading": "{title} downloaden",
+      "noneToExport": "Geen rapporten om te exporteren",
+      "csvExported": "CSV geëxporteerd"
     }
   }
 }

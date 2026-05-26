@@ -127,11 +127,13 @@
       "emailCopied": "E-mail copié",
       "noPhone": "Aucun téléphone enregistré",
       "phoneCopied": "Téléphone copié",
-      "copyFailed": "Échec de la copie"
+      "copyFailed": "Échec de la copie",
+      "viewApplied": "« {name} » appliquée"
     },
     "confirms": {
       "bulkDelete": "{count, plural, one {Supprimer # contact ?} other {Supprimer # contacts ?}} Cette action est irréversible."
-    }
+    },
+    "newContactSubtitle": "Ajoutez un nouveau contact à votre annuaire"
   },
   "impact": {
     "title": "Impact",
@@ -1395,6 +1397,105 @@
     "toasts": {
       "saved": "Dérogation enregistrée.",
       "saveFailed": "Impossible d'enregistrer la dérogation."
+    }
+  },
+  "addLead": {
+    "entity": {
+      "lead": "Lead",
+      "contact": "Contact",
+      "booking": "Réservation"
+    },
+    "title": "Ajouter {entity}",
+    "subtitle": "Ajouter manuellement ou importer depuis un CSV",
+    "tabs": {
+      "manual": "Saisie manuelle",
+      "csv": "Importer CSV"
+    },
+    "fields": {
+      "name": "Nom",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "source": "Source",
+      "company": "Entreprise",
+      "notes": "Notes"
+    },
+    "placeholders": {
+      "name": "Nom complet",
+      "email": "email@exemple.fr",
+      "phone": "+33 6 12 34 56 78",
+      "source": "Sélectionner une source…",
+      "company": "Nom de l’entreprise",
+      "notes": "Notes complémentaires…"
+    },
+    "errors": {
+      "nameRequired": "Le nom est obligatoire",
+      "phoneRequired": "Le téléphone est obligatoire",
+      "invalidEmail": "Format d’e-mail invalide"
+    },
+    "submit": "Ajouter {entity}",
+    "success": "Ajouté avec succès",
+    "csv": {
+      "dropPrompt": "Glissez-déposez votre fichier CSV ici",
+      "or": "ou",
+      "browse": "Parcourir les fichiers",
+      "acceptsCsvOnly": "Seuls les fichiers .csv sont acceptés",
+      "import": "{count, plural, one {Importer # contact} other {Importer # contacts}}"
+    }
+  },
+  "reports": {
+    "title": "Rapports",
+    "subtitle": "Générer des rapports d’impact",
+    "templatesHeader": "Modèles de rapport",
+    "recentHeader": "Rapports récents",
+    "exportAllCsv": "Tout exporter en CSV",
+    "generate": "Générer",
+    "queueing": "En file d’attente…",
+    "loading": "Chargement…",
+    "empty": "Aucun rapport pour le moment — cliquez sur Générer sur un modèle ci-dessus pour en créer un.",
+    "columns": {
+      "name": "Nom du rapport",
+      "type": "Type",
+      "generated": "Généré le",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "actions": {
+      "html": "HTML",
+      "csv": "CSV"
+    },
+    "templates": {
+      "quarterly": {
+        "title": "Impact trimestriel",
+        "description": "Vue d’ensemble complète des résultats de projet, KPI et bénéficiaires atteints pour le trimestre."
+      },
+      "sdg": {
+        "title": "Alignement ODD",
+        "description": "Analyse de l’alignement du portefeuille sur les Objectifs de développement durable et indicateurs de contribution."
+      },
+      "financial": {
+        "title": "Vue financière",
+        "description": "Répartition budgétaire, suivi des dépenses, analyse du ROI et taux d’utilisation des financements."
+      },
+      "stakeholder": {
+        "title": "Synthèse pour les parties prenantes",
+        "description": "Résumé exécutif adapté aux présentations au conseil, avec faits saillants et recommandations."
+      },
+      "performance": {
+        "title": "Tendances de performance",
+        "description": "Analyse annuelle avec indicateurs de croissance, identification des tendances et prévisions."
+      },
+      "regional": {
+        "title": "Répartition régionale",
+        "description": "Distribution géographique des projets, scores d’impact régionaux et collaborations transfrontalières."
+      }
+    },
+    "toasts": {
+      "startFailed": "Impossible de lancer le rapport",
+      "queued": "Rapport en file d’attente — génération en cours…",
+      "notReady": "Le rapport est encore en cours de génération — réessayez dans un instant",
+      "downloading": "Téléchargement de {title}",
+      "noneToExport": "Aucun rapport à exporter",
+      "csvExported": "CSV exporté"
     }
   }
 }

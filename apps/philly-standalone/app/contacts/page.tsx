@@ -195,7 +195,7 @@ export default function ContactsPage() {
     } else {
       setFilterSpec(null)
     }
-    addToast(`Applied "${view.name}"`, 'success')
+    addToast(t('toasts.viewApplied', { name: view.name }), 'success')
   }, [setFilters, addToast])
 
   /* Live data for the default (philanthropy) view comes from the API.
@@ -710,8 +710,8 @@ export default function ContactsPage() {
       <Modal
         open={showAdd}
         onClose={() => setShowAdd(false)}
-        title="New Contact"
-        subtitle="Add a new contact to your directory"
+        title={t('newContact')}
+        subtitle={t('newContactSubtitle')}
         size="md"
       >
         <ContactForm

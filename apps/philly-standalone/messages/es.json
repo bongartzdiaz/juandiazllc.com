@@ -127,11 +127,13 @@
       "emailCopied": "Correo copiado",
       "noPhone": "Sin teléfono registrado",
       "phoneCopied": "Teléfono copiado",
-      "copyFailed": "Copia fallida"
+      "copyFailed": "Copia fallida",
+      "viewApplied": "Se aplicó \"{name}\""
     },
     "confirms": {
       "bulkDelete": "{count, plural, one {¿Eliminar # contacto?} other {¿Eliminar # contactos?}} Esta acción no se puede deshacer."
-    }
+    },
+    "newContactSubtitle": "Añade un nuevo contacto a tu directorio"
   },
   "impact": {
     "title": "Impacto",
@@ -1395,6 +1397,105 @@
     "toasts": {
       "saved": "Override guardado.",
       "saveFailed": "No se pudo guardar el override."
+    }
+  },
+  "addLead": {
+    "entity": {
+      "lead": "Lead",
+      "contact": "Contacto",
+      "booking": "Reserva"
+    },
+    "title": "Añadir {entity}",
+    "subtitle": "Añadir manualmente o importar desde CSV",
+    "tabs": {
+      "manual": "Entrada manual",
+      "csv": "Cargar CSV"
+    },
+    "fields": {
+      "name": "Nombre",
+      "email": "Correo electrónico",
+      "phone": "Teléfono",
+      "source": "Origen",
+      "company": "Empresa",
+      "notes": "Notas"
+    },
+    "placeholders": {
+      "name": "Nombre completo",
+      "email": "correo@ejemplo.es",
+      "phone": "+34 600 000 000",
+      "source": "Seleccionar origen…",
+      "company": "Nombre de la empresa",
+      "notes": "Notas adicionales…"
+    },
+    "errors": {
+      "nameRequired": "El nombre es obligatorio",
+      "phoneRequired": "El teléfono es obligatorio",
+      "invalidEmail": "Formato de correo no válido"
+    },
+    "submit": "Añadir {entity}",
+    "success": "Añadido correctamente",
+    "csv": {
+      "dropPrompt": "Arrastra y suelta tu archivo CSV aquí",
+      "or": "o",
+      "browse": "Buscar archivos",
+      "acceptsCsvOnly": "Solo se admiten archivos .csv",
+      "import": "{count, plural, one {Importar # contacto} other {Importar # contactos}}"
+    }
+  },
+  "reports": {
+    "title": "Informes",
+    "subtitle": "Generar informes de impacto",
+    "templatesHeader": "Plantillas de informes",
+    "recentHeader": "Informes recientes",
+    "exportAllCsv": "Exportar todo a CSV",
+    "generate": "Generar",
+    "queueing": "En cola…",
+    "loading": "Cargando…",
+    "empty": "Aún no hay informes — haz clic en Generar en cualquier plantilla de arriba para crear uno.",
+    "columns": {
+      "name": "Nombre del informe",
+      "type": "Tipo",
+      "generated": "Generado",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "actions": {
+      "html": "HTML",
+      "csv": "CSV"
+    },
+    "templates": {
+      "quarterly": {
+        "title": "Impacto trimestral",
+        "description": "Visión integral de los resultados de proyectos, KPIs y alcance de beneficiarios del trimestre."
+      },
+      "sdg": {
+        "title": "Alineación con los ODS",
+        "description": "Análisis de la alineación del portafolio con los Objetivos de Desarrollo Sostenible y métricas de contribución."
+      },
+      "financial": {
+        "title": "Resumen financiero",
+        "description": "Asignación presupuestaria, seguimiento de gastos, análisis de ROI y tasas de uso de la financiación."
+      },
+      "stakeholder": {
+        "title": "Resumen para stakeholders",
+        "description": "Resumen ejecutivo para presentaciones de junta con destacados y recomendaciones."
+      },
+      "performance": {
+        "title": "Tendencias de rendimiento",
+        "description": "Análisis interanual con métricas de crecimiento, identificación de tendencias y previsiones."
+      },
+      "regional": {
+        "title": "Desglose regional",
+        "description": "Distribución geográfica de proyectos, puntuaciones regionales de impacto y colaboración transfronteriza."
+      }
+    },
+    "toasts": {
+      "startFailed": "No se pudo iniciar el informe",
+      "queued": "Informe en cola — generando…",
+      "notReady": "El informe aún se está generando — inténtalo en un momento",
+      "downloading": "Descargando {title}",
+      "noneToExport": "No hay informes para exportar",
+      "csvExported": "CSV exportado"
     }
   }
 }

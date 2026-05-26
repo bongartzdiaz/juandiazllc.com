@@ -127,11 +127,13 @@
       "emailCopied": "E-Mail kopiert",
       "noPhone": "Keine Telefonnummer hinterlegt",
       "phoneCopied": "Telefonnummer kopiert",
-      "copyFailed": "Kopieren fehlgeschlagen"
+      "copyFailed": "Kopieren fehlgeschlagen",
+      "viewApplied": "„{name}\" angewendet"
     },
     "confirms": {
       "bulkDelete": "{count, plural, one {# Kontakt löschen?} other {# Kontakte löschen?}} Dies kann nicht rückgängig gemacht werden."
-    }
+    },
+    "newContactSubtitle": "Einen neuen Kontakt zum Verzeichnis hinzufügen"
   },
   "impact": {
     "title": "Wirkung",
@@ -1395,6 +1397,105 @@
     "toasts": {
       "saved": "Override gespeichert.",
       "saveFailed": "Override konnte nicht gespeichert werden."
+    }
+  },
+  "addLead": {
+    "entity": {
+      "lead": "Lead",
+      "contact": "Kontakt",
+      "booking": "Buchung"
+    },
+    "title": "{entity} hinzufügen",
+    "subtitle": "Manuell hinzufügen oder aus CSV importieren",
+    "tabs": {
+      "manual": "Manuelle Eingabe",
+      "csv": "CSV-Upload"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "source": "Quelle",
+      "company": "Unternehmen",
+      "notes": "Notizen"
+    },
+    "placeholders": {
+      "name": "Vollständiger Name",
+      "email": "email@beispiel.de",
+      "phone": "+49 30 12345678",
+      "source": "Quelle wählen…",
+      "company": "Firmenname",
+      "notes": "Zusätzliche Notizen…"
+    },
+    "errors": {
+      "nameRequired": "Name ist erforderlich",
+      "phoneRequired": "Telefon ist erforderlich",
+      "invalidEmail": "Ungültiges E-Mail-Format"
+    },
+    "submit": "{entity} hinzufügen",
+    "success": "Erfolgreich hinzugefügt",
+    "csv": {
+      "dropPrompt": "CSV-Datei hier ablegen",
+      "or": "oder",
+      "browse": "Dateien durchsuchen",
+      "acceptsCsvOnly": "Nur .csv-Dateien zulässig",
+      "import": "{count, plural, one {# Kontakt importieren} other {# Kontakte importieren}}"
+    }
+  },
+  "reports": {
+    "title": "Berichte",
+    "subtitle": "Wirkungsberichte erstellen",
+    "templatesHeader": "Berichtsvorlagen",
+    "recentHeader": "Aktuelle Berichte",
+    "exportAllCsv": "Alle als CSV exportieren",
+    "generate": "Erstellen",
+    "queueing": "In Warteschlange…",
+    "loading": "Wird geladen…",
+    "empty": "Noch keine Berichte — klicken Sie oben bei einer Vorlage auf Erstellen, um einen anzulegen.",
+    "columns": {
+      "name": "Berichtname",
+      "type": "Typ",
+      "generated": "Erstellt am",
+      "status": "Status",
+      "actions": "Aktionen"
+    },
+    "actions": {
+      "html": "HTML",
+      "csv": "CSV"
+    },
+    "templates": {
+      "quarterly": {
+        "title": "Quartalsbericht zur Wirkung",
+        "description": "Umfassende Übersicht über Projektergebnisse, KPIs und erreichte Begünstigte im Quartal."
+      },
+      "sdg": {
+        "title": "SDG-Ausrichtung",
+        "description": "Analyse der Portfolio-Ausrichtung auf die UN-Nachhaltigkeitsziele und Beitragskennzahlen."
+      },
+      "financial": {
+        "title": "Finanzübersicht",
+        "description": "Budgetverteilung, Ausgabenkontrolle, ROI-Analyse und Auslastung der Mittel."
+      },
+      "stakeholder": {
+        "title": "Stakeholder-Zusammenfassung",
+        "description": "Executive Summary für Vorstandspräsentationen mit Highlights und Empfehlungen."
+      },
+      "performance": {
+        "title": "Leistungstrends",
+        "description": "Jahresvergleichsanalyse mit Wachstumskennzahlen, Trenderkennung und Prognosen."
+      },
+      "regional": {
+        "title": "Regionale Aufschlüsselung",
+        "description": "Geografische Verteilung der Projekte, regionale Wirkungswerte und grenzüberschreitende Zusammenarbeit."
+      }
+    },
+    "toasts": {
+      "startFailed": "Bericht konnte nicht gestartet werden",
+      "queued": "Bericht in Warteschlange — wird erstellt…",
+      "notReady": "Bericht wird noch erstellt — bitte gleich erneut versuchen",
+      "downloading": "{title} wird heruntergeladen",
+      "noneToExport": "Keine Berichte zum Exportieren",
+      "csvExported": "CSV exportiert"
     }
   }
 }

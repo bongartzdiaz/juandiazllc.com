@@ -127,11 +127,13 @@
       "emailCopied": "Email copied",
       "noPhone": "No phone on file",
       "phoneCopied": "Phone copied",
-      "copyFailed": "Copy failed"
+      "copyFailed": "Copy failed",
+      "viewApplied": "Applied \"{name}\""
     },
     "confirms": {
       "bulkDelete": "{count, plural, one {Delete # contact?} other {Delete # contacts?}} This cannot be undone."
-    }
+    },
+    "newContactSubtitle": "Add a new contact to your directory"
   },
   "impact": {
     "title": "Impact",
@@ -1395,6 +1397,105 @@
     "toasts": {
       "saved": "Override saved.",
       "saveFailed": "Could not save the override."
+    }
+  },
+  "addLead": {
+    "entity": {
+      "lead": "Lead",
+      "contact": "Contact",
+      "booking": "Booking"
+    },
+    "title": "Add {entity}",
+    "subtitle": "Add manually or import from CSV",
+    "tabs": {
+      "manual": "Manual Entry",
+      "csv": "CSV Upload"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "source": "Source",
+      "company": "Company",
+      "notes": "Notes"
+    },
+    "placeholders": {
+      "name": "Full name",
+      "email": "email@example.com",
+      "phone": "+1 (555) 000-0000",
+      "source": "Select source…",
+      "company": "Company name",
+      "notes": "Additional notes…"
+    },
+    "errors": {
+      "nameRequired": "Name is required",
+      "phoneRequired": "Phone is required",
+      "invalidEmail": "Invalid email format"
+    },
+    "submit": "Add {entity}",
+    "success": "Added successfully",
+    "csv": {
+      "dropPrompt": "Drag and drop your CSV file here",
+      "or": "or",
+      "browse": "Browse files",
+      "acceptsCsvOnly": "Accepts .csv files only",
+      "import": "{count, plural, one {Import # contact} other {Import # contacts}}"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Generate impact reports",
+    "templatesHeader": "Report Templates",
+    "recentHeader": "Recent Reports",
+    "exportAllCsv": "Export All CSV",
+    "generate": "Generate",
+    "queueing": "Queueing…",
+    "loading": "Loading…",
+    "empty": "No reports yet — click Generate on any template above to create one.",
+    "columns": {
+      "name": "Report Name",
+      "type": "Type",
+      "generated": "Generated",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "actions": {
+      "html": "HTML",
+      "csv": "CSV"
+    },
+    "templates": {
+      "quarterly": {
+        "title": "Quarterly Impact",
+        "description": "Comprehensive overview of project outcomes, KPIs, and beneficiary reach for the quarter."
+      },
+      "sdg": {
+        "title": "SDG Alignment",
+        "description": "Analysis of portfolio alignment with UN Sustainable Development Goals and contribution metrics."
+      },
+      "financial": {
+        "title": "Financial Overview",
+        "description": "Budget allocation, expenditure tracking, ROI analysis, and funding utilization rates."
+      },
+      "stakeholder": {
+        "title": "Stakeholder Summary",
+        "description": "Executive summary tailored for board presentations with key highlights and recommendations."
+      },
+      "performance": {
+        "title": "Performance Trends",
+        "description": "Year-over-year performance analysis with growth metrics, trend identification, and forecasting."
+      },
+      "regional": {
+        "title": "Regional Breakdown",
+        "description": "Geographic distribution of projects, regional impact scores, and cross-border collaboration insights."
+      }
+    },
+    "toasts": {
+      "startFailed": "Failed to start report",
+      "queued": "Report queued — generating…",
+      "notReady": "Report is still generating — try again in a moment",
+      "downloading": "Downloading {title}",
+      "noneToExport": "No reports to export",
+      "csvExported": "CSV exported"
     }
   }
 }
