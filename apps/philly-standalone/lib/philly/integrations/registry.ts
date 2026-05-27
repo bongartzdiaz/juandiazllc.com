@@ -8,6 +8,7 @@ import { MailchimpConnector } from './connectors/mailchimp'
 import { GoogleConnector } from './connectors/google'
 import { MicrosoftConnector } from './connectors/microsoft'
 import { QuickbooksConnector } from './connectors/quickbooks'
+import { FundaConnector } from './connectors/funda'
 
 const connectors: BaseConnector[] = [
   new StripeConnector(),
@@ -16,6 +17,10 @@ const connectors: BaseConnector[] = [
   new GoogleConnector(),
   new MicrosoftConnector(),
   new QuickbooksConnector(),
+  // EU portal connectors (category: 'portal') — region-filtered in the
+  // /integrations UI so a US-only org doesn't see Funda. Added 2026-05-27
+  // as scaffolding for task #12; not yet wired to credentials.
+  new FundaConnector(),
 ]
 
 export function listConnectors() {
