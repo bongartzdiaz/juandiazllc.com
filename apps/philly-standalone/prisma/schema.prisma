@@ -892,18 +892,62 @@ model Property {
   // /api/properties/reorder endpoint writes 1..N inside a transaction.
   displayOrder BigInt?
 
-  organization Organization @relation(fields: [organizationId], references: [id])
-  viewings     Viewing[]
-  deals        Deal[]
-  offers       Offer[]
-  openHouses   OpenHouse[]
-  showings     Showing[]
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  viewings       Viewing[]
+  deals          Deal[]
+  offers         Offer[]
+  openHouses     OpenHouse[]
+  showings       Showing[]
+  portalListings PortalListing[]
 
   @@index([organizationId, status])
   @@index([organizationId, mlsNumber])
   @@index([organizationId, listingType, district])
   @@index([organizationId, displayOrder])
   @@index([organizationId, type, subtype])
+}
+
+/// EU portal publish targets. One Property row can have multiple
+/// PortalListing rows (publish the same property to Funda + IS24 +
+/// Immoweb in one click) — each row carries the portal's external
+/// id so re-publish is idempotent and unpublish is exact.
+///
+/// Added 2026-05-27 along with the Funda + IS24 connector scaffolds
+/// (tasks #12, #14). The actual publish-route in
+/// app/api/properties/[id]/publish/route.ts upserts on
+/// (organizationId, propertyId, portal) so a second publish updates
+/// the existing row instead of creating a duplicate.
+model PortalListing {
+  id             String   @id @default(cuid())
+  organizationId String
+  propertyId     String
+  /// 'funda' | 'immoscout24' | 'immoweb' | 'idealista' | 'seloger'
+  portal         String
+  /// The portal's own listing id — Funda's listingId, IS24's exposeId.
+  externalId     String
+  /// Public-facing URL on the portal once published.
+  externalUrl    String?
+  /// 'draft' | 'published' | 'pulled' | 'rejected'
+  status         String    @default("draft")
+  /// When the most recent sync to/from the portal succeeded.
+  lastSyncAt     DateTime?
+  /// If the last operation failed, the localised error code (e.g.
+  /// FUNDA_EPC_REQUIRED) for the operator to see in the UI.
+  lastError      String?   @db.Text
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  /// Globally-unique on (portal, externalId) — Funda assigns one id
+  /// per listing, IS24 same. This is how we dedupe webhook events
+  /// back to a Property.
+  @@unique([portal, externalId])
+  /// Upsert key for the publish route — one row per
+  /// (org, property, portal) combination.
+  @@unique([organizationId, propertyId, portal])
+  @@index([organizationId, portal])
+  @@index([propertyId])
 }
 
 model Showing {

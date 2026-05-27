@@ -1550,5 +1550,58 @@
       "noneToExport": "No hay informes para exportar",
       "csvExported": "CSV exportado"
     }
+  },
+  "portalPublish": {
+    "heading": "Publicar en portal",
+    "hint": "Validamos las reglas del portal antes de enviar nada.",
+    "portals": {
+      "funda": "Funda (NL)",
+      "immoscout24": "ImmoScout24 (DE)"
+    },
+    "action": {
+      "publish": "Publicar",
+      "unpublish": "Despublicar",
+      "republish": "Volver a publicar"
+    },
+    "status": {
+      "draft": "Borrador",
+      "published": "Publicado",
+      "pulled": "Retirado",
+      "rejected": "Rechazado"
+    },
+    "toasts": {
+      "publishing": "Publicando…",
+      "published": "Publicado en {portal}",
+      "unpublished": "Retirado de {portal}",
+      "notConfigured": "Credenciales del portal aún no configuradas para esta organización.",
+      "networkError": "Error de red — inténtalo de nuevo",
+      "authError": "No permitido — solo los managers pueden publicar en portales"
+    },
+    "errors": {
+      "FUNDA_EPC_REQUIRED": "Funda requiere energielabel (EPC). Añádelo en la página del inmueble.",
+      "FUNDA_EPC_EXPIRED": "EPC caducado. Renueva el certificado antes de publicar.",
+      "FUNDA_POSTAL_CODE_INVALID": "El código postal no es un código NL válido (esperado 1234 AB).",
+      "FUNDA_COUNTRY_NOT_NL": "Funda solo acepta listados NL.",
+      "FUNDA_PRICE_MISSING": "El precio de venta es obligatorio.",
+      "FUNDA_PHOTOS_TOO_FEW": "Se requieren al menos 4 fotos para Funda.",
+      "FUNDA_PHOTOS_TOO_MANY": "Máximo 30 fotos para Funda. Reduce antes de publicar.",
+      "FUNDA_DESCRIPTION_MISSING": "La descripción es obligatoria.",
+      "FUNDA_ADDRESS_INCOMPLETE": "Dirección, ciudad y código postal son todos obligatorios.",
+      "FUNDA_NOT_CONFIGURED": "Faltan las credenciales de socio de Funda — contacta con el admin.",
+      "FUNDA_PUBLISH_FAILED": "Publicación en Funda fallida: {detail}",
+      "FUNDA_UNPUBLISH_FAILED": "Despublicación en Funda fallida: {detail}",
+      "IS24_ENERGY_CERTIFICATE_REQUIRED": "ImmoScout24 requiere Energieausweis.",
+      "IS24_ENERGY_CERTIFICATE_EXPIRED": "Energieausweis caducado. Renueva antes de publicar.",
+      "IS24_POSTCODE_INVALID": "PLZ no válido (se esperan 5 dígitos).",
+      "IS24_COUNTRY_NOT_DE": "ImmoScout24 solo acepta listados DE.",
+      "IS24_PRICE_MISSING": "El precio de venta es obligatorio.",
+      "IS24_PHOTOS_TOO_FEW": "Se requieren al menos 3 fotos para ImmoScout24.",
+      "IS24_PHOTOS_TOO_MANY": "Máximo 25 fotos para ImmoScout24. Reduce antes de publicar.",
+      "IS24_DESCRIPTION_MISSING": "La descripción es obligatoria.",
+      "IS24_ADDRESS_INCOMPLETE": "Calle, ciudad y PLZ son todos obligatorios.",
+      "IS24_NOT_CONFIGURED": "Faltan las credenciales de socio de ImmoScout24 — contacta con el admin.",
+      "IS24_PUBLISH_FAILED": "Publicación en ImmoScout24 fallida: {detail}",
+      "IS24_UNPUBLISH_FAILED": "Despublicación en ImmoScout24 fallida: {detail}"
+    }
   }
 }

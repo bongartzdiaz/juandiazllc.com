@@ -1550,5 +1550,58 @@
       "noneToExport": "Keine Berichte zum Exportieren",
       "csvExported": "CSV exportiert"
     }
+  },
+  "portalPublish": {
+    "heading": "Auf Portal veröffentlichen",
+    "hint": "Wir prüfen die Portalregeln, bevor wir etwas senden.",
+    "portals": {
+      "funda": "Funda (NL)",
+      "immoscout24": "ImmoScout24 (DE)"
+    },
+    "action": {
+      "publish": "Veröffentlichen",
+      "unpublish": "Zurückziehen",
+      "republish": "Erneut veröffentlichen"
+    },
+    "status": {
+      "draft": "Entwurf",
+      "published": "Veröffentlicht",
+      "pulled": "Zurückgezogen",
+      "rejected": "Abgelehnt"
+    },
+    "toasts": {
+      "publishing": "Wird veröffentlicht…",
+      "published": "Auf {portal} veröffentlicht",
+      "unpublished": "Von {portal} entfernt",
+      "notConfigured": "Portal-Zugangsdaten für diese Organisation noch nicht konfiguriert.",
+      "networkError": "Netzwerkfehler — bitte erneut versuchen",
+      "authError": "Nicht erlaubt — nur Manager dürfen auf Portalen veröffentlichen"
+    },
+    "errors": {
+      "FUNDA_EPC_REQUIRED": "Funda verlangt ein energielabel (EPC). Auf der Objektseite ergänzen.",
+      "FUNDA_EPC_EXPIRED": "EPC abgelaufen. Vor der Veröffentlichung erneuern.",
+      "FUNDA_POSTAL_CODE_INVALID": "Postleitzahl ist keine gültige NL-Postcode (erwartet 1234 AB).",
+      "FUNDA_COUNTRY_NOT_NL": "Funda akzeptiert nur NL-Anzeigen.",
+      "FUNDA_PRICE_MISSING": "Angebotspreis ist erforderlich.",
+      "FUNDA_PHOTOS_TOO_FEW": "Mindestens 4 Fotos für Funda erforderlich.",
+      "FUNDA_PHOTOS_TOO_MANY": "Maximal 30 Fotos für Funda. Vor der Veröffentlichung reduzieren.",
+      "FUNDA_DESCRIPTION_MISSING": "Beschreibung ist erforderlich.",
+      "FUNDA_ADDRESS_INCOMPLETE": "Adresse, Stadt und Postleitzahl sind alle erforderlich.",
+      "FUNDA_NOT_CONFIGURED": "Funda-Partner-Zugangsdaten fehlen — Plattform-Admin kontaktieren.",
+      "FUNDA_PUBLISH_FAILED": "Veröffentlichung auf Funda fehlgeschlagen: {detail}",
+      "FUNDA_UNPUBLISH_FAILED": "Zurückziehen bei Funda fehlgeschlagen: {detail}",
+      "IS24_ENERGY_CERTIFICATE_REQUIRED": "ImmoScout24 verlangt einen Energieausweis.",
+      "IS24_ENERGY_CERTIFICATE_EXPIRED": "Energieausweis abgelaufen. Vor der Veröffentlichung erneuern.",
+      "IS24_POSTCODE_INVALID": "PLZ ist ungültig (5 Ziffern erwartet).",
+      "IS24_COUNTRY_NOT_DE": "ImmoScout24 akzeptiert nur DE-Anzeigen.",
+      "IS24_PRICE_MISSING": "Angebotspreis ist erforderlich.",
+      "IS24_PHOTOS_TOO_FEW": "Mindestens 3 Fotos für ImmoScout24 erforderlich.",
+      "IS24_PHOTOS_TOO_MANY": "Maximal 25 Fotos für ImmoScout24. Vor der Veröffentlichung reduzieren.",
+      "IS24_DESCRIPTION_MISSING": "Beschreibung ist erforderlich.",
+      "IS24_ADDRESS_INCOMPLETE": "Straße, Stadt und PLZ sind alle erforderlich.",
+      "IS24_NOT_CONFIGURED": "ImmoScout24-Partner-Zugangsdaten fehlen — Plattform-Admin kontaktieren.",
+      "IS24_PUBLISH_FAILED": "Veröffentlichung auf ImmoScout24 fehlgeschlagen: {detail}",
+      "IS24_UNPUBLISH_FAILED": "Zurückziehen bei ImmoScout24 fehlgeschlagen: {detail}"
+    }
   }
 }
