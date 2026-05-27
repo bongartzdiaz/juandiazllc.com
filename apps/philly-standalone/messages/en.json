@@ -133,7 +133,49 @@
     "confirms": {
       "bulkDelete": "{count, plural, one {Delete # contact?} other {Delete # contacts?}} This cannot be undone."
     },
-    "newContactSubtitle": "Add a new contact to your directory"
+    "newContactSubtitle": "Add a new contact to your directory",
+    "masterProfile": {
+      "tabs": {
+        "insights": "Insights",
+        "drip": "Campaigns",
+        "communications": "Communications"
+      },
+      "insights": {
+        "heading": "AI insights",
+        "icpFit": "ICP fit",
+        "leadScore": "Lead score",
+        "industry": "Industry",
+        "summary": "AI summary",
+        "noData": "No AI insights yet. Click \"Re-run AI\" to generate.",
+        "runAi": "Re-run AI",
+        "updatedAt": "Updated {date}"
+      },
+      "drip": {
+        "heading": "Drip campaigns",
+        "noEnrollments": "Not enrolled in any campaigns yet.",
+        "stepProgress": "Step {current} of {total}",
+        "nextDue": "Next: {when}",
+        "lastSent": "Last sent: {when}",
+        "neverSent": "Never sent",
+        "status": {
+          "active": "Active",
+          "paused": "Paused",
+          "done": "Done",
+          "cancelled": "Cancelled"
+        }
+      },
+      "comms": {
+        "heading": "Communications",
+        "noCommunications": "No emails, calls or messages yet.",
+        "type": {
+          "email": "Email",
+          "call": "Call",
+          "conversation": "Conversation"
+        },
+        "unread": "Unread",
+        "loadError": "Could not load communications"
+      }
+    }
   },
   "impact": {
     "title": "Impact",

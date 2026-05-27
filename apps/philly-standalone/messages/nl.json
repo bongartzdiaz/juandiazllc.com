@@ -133,7 +133,49 @@
     "confirms": {
       "bulkDelete": "{count, plural, one {# contact verwijderen?} other {# contacten verwijderen?}} Dit kan niet ongedaan worden gemaakt."
     },
-    "newContactSubtitle": "Voeg een nieuwe contactpersoon toe aan uw directory"
+    "newContactSubtitle": "Voeg een nieuwe contactpersoon toe aan uw directory",
+    "masterProfile": {
+      "tabs": {
+        "insights": "Inzichten",
+        "drip": "Campagnes",
+        "communications": "Communicatie"
+      },
+      "insights": {
+        "heading": "AI-inzichten",
+        "icpFit": "ICP-fit",
+        "leadScore": "Leadscore",
+        "industry": "Branche",
+        "summary": "AI-samenvatting",
+        "noData": "Nog geen AI-inzichten. Klik op \"AI opnieuw uitvoeren\" om te genereren.",
+        "runAi": "AI opnieuw uitvoeren",
+        "updatedAt": "Bijgewerkt {date}"
+      },
+      "drip": {
+        "heading": "Drip-campagnes",
+        "noEnrollments": "Nog niet ingeschreven voor campagnes.",
+        "stepProgress": "Stap {current} van {total}",
+        "nextDue": "Volgende: {when}",
+        "lastSent": "Laatst verzonden: {when}",
+        "neverSent": "Nooit verzonden",
+        "status": {
+          "active": "Actief",
+          "paused": "Gepauzeerd",
+          "done": "Klaar",
+          "cancelled": "Geannuleerd"
+        }
+      },
+      "comms": {
+        "heading": "Communicatie",
+        "noCommunications": "Nog geen e-mails, oproepen of berichten.",
+        "type": {
+          "email": "E-mail",
+          "call": "Oproep",
+          "conversation": "Gesprek"
+        },
+        "unread": "Ongelezen",
+        "loadError": "Communicatie kon niet worden geladen"
+      }
+    }
   },
   "impact": {
     "title": "Impact",

@@ -133,7 +133,49 @@
     "confirms": {
       "bulkDelete": "{count, plural, one {# Kontakt löschen?} other {# Kontakte löschen?}} Dies kann nicht rückgängig gemacht werden."
     },
-    "newContactSubtitle": "Einen neuen Kontakt zum Verzeichnis hinzufügen"
+    "newContactSubtitle": "Einen neuen Kontakt zum Verzeichnis hinzufügen",
+    "masterProfile": {
+      "tabs": {
+        "insights": "Erkenntnisse",
+        "drip": "Kampagnen",
+        "communications": "Kommunikation"
+      },
+      "insights": {
+        "heading": "KI-Erkenntnisse",
+        "icpFit": "ICP-Passung",
+        "leadScore": "Lead-Score",
+        "industry": "Branche",
+        "summary": "KI-Zusammenfassung",
+        "noData": "Noch keine KI-Erkenntnisse. Klicken Sie auf \"KI erneut ausführen\", um zu generieren.",
+        "runAi": "KI erneut ausführen",
+        "updatedAt": "Aktualisiert {date}"
+      },
+      "drip": {
+        "heading": "Drip-Kampagnen",
+        "noEnrollments": "Noch nicht in Kampagnen eingeschrieben.",
+        "stepProgress": "Schritt {current} von {total}",
+        "nextDue": "Nächste: {when}",
+        "lastSent": "Zuletzt gesendet: {when}",
+        "neverSent": "Noch nie gesendet",
+        "status": {
+          "active": "Aktiv",
+          "paused": "Pausiert",
+          "done": "Fertig",
+          "cancelled": "Storniert"
+        }
+      },
+      "comms": {
+        "heading": "Kommunikation",
+        "noCommunications": "Noch keine E-Mails, Anrufe oder Nachrichten.",
+        "type": {
+          "email": "E-Mail",
+          "call": "Anruf",
+          "conversation": "Konversation"
+        },
+        "unread": "Ungelesen",
+        "loadError": "Kommunikation konnte nicht geladen werden"
+      }
+    }
   },
   "impact": {
     "title": "Wirkung",

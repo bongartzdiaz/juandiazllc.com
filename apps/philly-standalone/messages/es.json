@@ -133,7 +133,49 @@
     "confirms": {
       "bulkDelete": "{count, plural, one {¿Eliminar # contacto?} other {¿Eliminar # contactos?}} Esta acción no se puede deshacer."
     },
-    "newContactSubtitle": "Añade un nuevo contacto a tu directorio"
+    "newContactSubtitle": "Añade un nuevo contacto a tu directorio",
+    "masterProfile": {
+      "tabs": {
+        "insights": "Información",
+        "drip": "Campañas",
+        "communications": "Comunicaciones"
+      },
+      "insights": {
+        "heading": "Información de IA",
+        "icpFit": "Ajuste ICP",
+        "leadScore": "Puntuación de lead",
+        "industry": "Sector",
+        "summary": "Resumen de IA",
+        "noData": "Aún no hay información de IA. Haz clic en \"Ejecutar IA\" para generar.",
+        "runAi": "Ejecutar IA",
+        "updatedAt": "Actualizado {date}"
+      },
+      "drip": {
+        "heading": "Campañas drip",
+        "noEnrollments": "Aún no inscrito en ninguna campaña.",
+        "stepProgress": "Paso {current} de {total}",
+        "nextDue": "Próximo: {when}",
+        "lastSent": "Último envío: {when}",
+        "neverSent": "Nunca enviado",
+        "status": {
+          "active": "Activo",
+          "paused": "En pausa",
+          "done": "Completado",
+          "cancelled": "Cancelado"
+        }
+      },
+      "comms": {
+        "heading": "Comunicaciones",
+        "noCommunications": "Aún no hay correos, llamadas o mensajes.",
+        "type": {
+          "email": "Correo",
+          "call": "Llamada",
+          "conversation": "Conversación"
+        },
+        "unread": "Sin leer",
+        "loadError": "No se pudieron cargar las comunicaciones"
+      }
+    }
   },
   "impact": {
     "title": "Impacto",

@@ -133,7 +133,49 @@
     "confirms": {
       "bulkDelete": "{count, plural, one {Supprimer # contact ?} other {Supprimer # contacts ?}} Cette action est irréversible."
     },
-    "newContactSubtitle": "Ajoutez un nouveau contact à votre annuaire"
+    "newContactSubtitle": "Ajoutez un nouveau contact à votre annuaire",
+    "masterProfile": {
+      "tabs": {
+        "insights": "Analyses",
+        "drip": "Campagnes",
+        "communications": "Communications"
+      },
+      "insights": {
+        "heading": "Analyses IA",
+        "icpFit": "Adéquation ICP",
+        "leadScore": "Score du lead",
+        "industry": "Secteur",
+        "summary": "Résumé IA",
+        "noData": "Aucune analyse IA pour l’instant. Cliquez sur « Relancer l’IA » pour générer.",
+        "runAi": "Relancer l’IA",
+        "updatedAt": "Mis à jour le {date}"
+      },
+      "drip": {
+        "heading": "Campagnes drip",
+        "noEnrollments": "Pas encore inscrit à une campagne.",
+        "stepProgress": "Étape {current} sur {total}",
+        "nextDue": "Suivante : {when}",
+        "lastSent": "Dernier envoi : {when}",
+        "neverSent": "Jamais envoyé",
+        "status": {
+          "active": "Actif",
+          "paused": "En pause",
+          "done": "Terminé",
+          "cancelled": "Annulé"
+        }
+      },
+      "comms": {
+        "heading": "Communications",
+        "noCommunications": "Aucun e-mail, appel ou message pour l’instant.",
+        "type": {
+          "email": "E-mail",
+          "call": "Appel",
+          "conversation": "Conversation"
+        },
+        "unread": "Non lu",
+        "loadError": "Impossible de charger les communications"
+      }
+    }
   },
   "impact": {
     "title": "Impact",

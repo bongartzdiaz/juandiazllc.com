@@ -14,6 +14,10 @@ import {
 import { AiAttributesCard, type ContactAiAttributes } from '@/components/philly/contacts/AiAttributesCard'
 import { EmailThreadList } from '@/components/philly/contacts/EmailThreadList'
 import { WhatsAppButton } from '@/components/philly/contacts/WhatsAppButton'
+import { InsightsTab } from '@/components/philly/contacts/InsightsTab'
+import { DripEnrollmentsTab } from '@/components/philly/contacts/DripEnrollmentsTab'
+import { CommunicationsTab } from '@/components/philly/contacts/CommunicationsTab'
+import { Sparkles, Send, Headphones } from 'lucide-react'
 
 /* ------------------------------------------------------------------
    Types
@@ -140,12 +144,15 @@ const activityIcons: Record<string, typeof Activity> = {
    Tabs
    ------------------------------------------------------------------ */
 
-type Tab = 'overview' | 'activity' | 'notes' | 'projects' | 'deals' | 'emails'
+type Tab = 'overview' | 'activity' | 'notes' | 'projects' | 'deals' | 'emails' | 'insights' | 'drip' | 'comms'
 
 const TABS: { key: Tab; label: string; icon: typeof Activity }[] = [
   { key: 'overview', label: 'Overview', icon: User },
+  { key: 'insights', label: 'Insights', icon: Sparkles },
   { key: 'activity', label: 'Activity', icon: Activity },
+  { key: 'comms', label: 'Communications', icon: Headphones },
   { key: 'emails', label: 'Emails', icon: Mail },
+  { key: 'drip', label: 'Campaigns', icon: Send },
   { key: 'notes', label: 'Notes', icon: FileText },
   { key: 'projects', label: 'Projects', icon: FolderKanban },
   { key: 'deals', label: 'Deals', icon: Briefcase },
@@ -752,6 +759,32 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
               </div>
             )}
           </div>
+        )}
+
+        {/* INSIGHTS — Klant Master Profile (added 2026-05-27) */}
+        {activeTab === 'insights' && contact && (
+          <InsightsTab
+            contactId={id}
+            insights={{
+              aiIndustry: contact.aiIndustry ?? null,
+              aiIcpFit: contact.aiIcpFit ?? null,
+              aiSummary: contact.aiSummary ?? null,
+              aiAttributesStatus: contact.aiAttributesStatus ?? null,
+              aiAttributesUpdatedAt: contact.aiAttributesUpdatedAt ?? null,
+              leadScore: (contact as { leadScore?: number }).leadScore ?? 0,
+            }}
+            onRefreshed={() => contactQuery.refetch()}
+          />
+        )}
+
+        {/* DRIP CAMPAIGNS — Klant Master Profile (added 2026-05-27) */}
+        {activeTab === 'drip' && (
+          <DripEnrollmentsTab contactId={id} />
+        )}
+
+        {/* COMMUNICATIONS — Klant Master Profile (added 2026-05-27) */}
+        {activeTab === 'comms' && (
+          <CommunicationsTab contactId={id} />
         )}
 
         {/* DEALS */}
