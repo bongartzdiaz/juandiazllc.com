@@ -12,6 +12,11 @@ model Organization {
   slug      String   @unique
   logoUrl   String?
   industry  String   @default("general")
+  /// ISO 4217 currency code for money formatting in reports + invoices +
+  /// portal publish payloads. Default EUR for the EU-pivot baseline;
+  /// operators can change via Settings → Organization. Added 2026-05-27
+  /// alongside the professional-reports overhaul.
+  currency  String   @default("EUR")
   createdAt DateTime @default(now())
 
   users                  User[]

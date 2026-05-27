@@ -1,11 +1,16 @@
 ﻿/* GET  /api/reports — list user's reports
-   POST /api/reports — generate a new report */
+   POST /api/reports — generate a new report
+   ───────────────────────────────────────────────────────────────────
+   Generation uses lib/philly/reports/generator.ts — branded shell +
+   per-type templates + org currency. The inline barebones generator
+   that used to live in this file was replaced 2026-05-27. */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { generateReport as buildReportHtml, REPORT_TYPES, type ReportType } from '@/lib/philly/reports/generator'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -38,6 +43,11 @@ export async function POST(req: NextRequest) {
 
   if (!body.title?.trim()) return jsonError('title is required', 400)
   if (!body.type) return jsonError('type is required', 400)
+  // Validate against the closed set of report types — protects against
+  // typos in stale UI clients + means the generator dispatch is total.
+  if (!REPORT_TYPES.includes(body.type as ReportType)) {
+    return jsonError(`Unknown report type: ${body.type}`, 400)
+  }
 
   const prisma = getAuthPrisma()
 
@@ -54,71 +64,78 @@ export async function POST(req: NextRequest) {
   })
 
   // Generate report content asynchronously
-  generateReport(report.id, scope.organizationId, body.type)
+  void generateAndPersist(report.id, scope.organizationId, body.type as ReportType, body.title.trim())
 
   return NextResponse.json({ data: report }, { status: 201 })
 }
 
-async function generateReport(reportId: string, orgId: string, type: string) {
+/** Generate the report HTML via the templated generator + persist
+ *  to the Report row. Fire-and-forget — the POST handler returns the
+ *  Report row immediately in `generating` status; the UI polls until
+ *  status flips to `ready` or `failed`.
+ *
+ *  i18n: strings are passed in from a server-side next-intl resolver
+ *  per report type. For now we use English defaults baked into the
+ *  templates; a future PR wires the Acceptlanguage / org default locale
+ *  via next-intl's server-side getTranslations(). */
+async function generateAndPersist(
+  reportId: string,
+  organizationId: string,
+  type: ReportType,
+  title: string,
+) {
+  const prisma = getAuthPrisma()
   try {
-    const prisma = getAuthPrisma()
-
-    // Gather data based on report type
-    let html = '<div style="font-family: system-ui; padding: 24px;">'
-
-    if (type === 'quarterly' || type === 'impact') {
-      const projects = await prisma.project.findMany({
-        where: { organizationId: orgId },
-        include: { milestones: true, _count: { select: { impactMetrics: true } } },
-      })
-
-      const metrics = await prisma.impactMetric.findMany({
-        where: { project: { organizationId: orgId } },
-      })
-
-      const totals: Record<string, number> = {}
-      for (const m of metrics) {
-        totals[m.metricType] = (totals[m.metricType] ?? 0) + m.value
-      }
-
-      html += `<h1>${type === 'quarterly' ? 'Quarterly' : 'Impact'} Report</h1>`
-      html += `<p>Generated: ${new Date().toLocaleDateString()}</p>`
-      html += `<h2>Projects Overview</h2>`
-      html += `<p>Total: ${projects.length} | Active: ${projects.filter((p: any) => p.status === 'active').length} | Completed: ${projects.filter((p: any) => p.status === 'completed').length}</p>`
-      html += `<h2>Impact Totals</h2><table border="1" cellpadding="8" style="border-collapse: collapse;">`
-      html += `<tr><th>Metric</th><th>Total</th></tr>`
-      for (const [k, v] of Object.entries(totals)) {
-        html += `<tr><td>${k}</td><td>${v.toLocaleString()}</td></tr>`
-      }
-      html += `</table>`
-    } else if (type === 'financial') {
-      const projects = await prisma.project.findMany({
-        where: { organizationId: orgId },
-        select: { title: true, budgetCents: true, spentCents: true, status: true },
-      })
-
-      const totalBudget = projects.reduce((s: any, p: any) => s + p.budgetCents, 0)
-      const totalSpent = projects.reduce((s: any, p: any) => s + p.spentCents, 0)
-
-      html += `<h1>Financial Report</h1>`
-      html += `<p>Total Budget: $${(totalBudget / 100).toLocaleString()} | Total Spent: $${(totalSpent / 100).toLocaleString()} | Utilization: ${totalBudget ? Math.round((totalSpent / totalBudget) * 100) : 0}%</p>`
-      html += `<table border="1" cellpadding="8" style="border-collapse: collapse;"><tr><th>Project</th><th>Budget</th><th>Spent</th><th>%</th></tr>`
-      for (const p of projects) {
-        html += `<tr><td>${p.title}</td><td>$${(p.budgetCents / 100).toLocaleString()}</td><td>$${(p.spentCents / 100).toLocaleString()}</td><td>${p.budgetCents ? Math.round((p.spentCents / p.budgetCents) * 100) : 0}%</td></tr>`
-      }
-      html += `</table>`
-    } else {
-      html += `<h1>${type} Report</h1><p>Report type "${type}" generated successfully.</p>`
+    // English strings inline — non-blocking on the i18n wire-up. Each
+    // template falls back to these keys if a string is missing.
+    const strings: Record<string, string> = {
+      // common
+      totalProjects: 'Total projects', totalBudget: 'Total budget',
+      totalSpent: 'Total spent', remaining: 'Remaining', utilization: 'Utilization',
+      active: 'active', completed: 'completed',
+      projectBreakdown: 'Project breakdown', noProjects: 'No projects in this period.',
+      impactTotals: 'Impact totals',
+      colProject: 'Project', colStatus: 'Status', colBudget: 'Budget',
+      colSpent: 'Spent', colUtil: 'Util.', colRemaining: 'Remaining',
+      colMetric: 'Metric', colTotal: 'Total',
+      // financial extras
+      healthBreakdown: 'Portfolio health', onTrack: 'On track',
+      underutilised: 'Under-utilised', overBudget: 'Over budget',
+      // sdg
+      sdgsCovered: 'SDGs covered', outOfSeventeen: 'of the 17 UN goals',
+      coverageByGoal: 'Coverage by goal', noSdgData: 'No SDG data on file. Tag projects with SDGs to populate this report.',
+      colGoal: 'Goal', colLabel: 'Label', colProjects: 'Projects', colShare: 'Share',
+      // stakeholder
+      highlights: 'Highlights this period', noHighlights: 'No curated highlights — set them in Settings → Reports.',
+      topProjects: 'Top projects', colImpact: 'Impact summary',
+      // performance
+      dealsClosed: 'Deals closed', totalValue: 'Total value', avgDeal: 'Avg deal size',
+      monthlyTrend: 'Monthly trend', noClosedDeals: 'No closed deals in this period.',
+      colMonth: 'Month', colDeals: 'Deals', colValue: 'Value', colTrend: 'Trend',
+      pipelineByStage: 'Pipeline by stage', colStage: 'Stage', colCount: 'Count',
+      // regional
+      countries: 'Countries', cities: 'Cities', byCountry: 'By country',
+      byCity: 'By city', colCountry: 'Country', colCity: 'City', colContacts: 'Contacts',
+      noRegionalData: 'No regional data on file. Tag projects with country/city to populate.',
+      cityRowsCappedAt: '+ {n} more cities',
     }
+    const shellStrings = { footer: 'Generated by DEUS · Confidential' }
 
-    html += '</div>'
+    const html = await buildReportHtml({
+      type,
+      prisma,
+      organizationId,
+      locale: 'en-IE',
+      strings,
+      shellStrings,
+      title,
+    })
 
     await prisma.report.update({
       where: { id: reportId },
       data: { status: 'ready', resultHtml: html },
     })
   } catch (err) {
-    const prisma = getAuthPrisma()
     await prisma.report.update({
       where: { id: reportId },
       data: { status: 'failed' },
