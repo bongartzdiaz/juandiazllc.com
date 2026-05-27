@@ -9,6 +9,7 @@ import { GoogleConnector } from './connectors/google'
 import { MicrosoftConnector } from './connectors/microsoft'
 import { QuickbooksConnector } from './connectors/quickbooks'
 import { FundaConnector } from './connectors/funda'
+import { ImmoScout24Connector } from './connectors/immoscout24'
 
 const connectors: BaseConnector[] = [
   new StripeConnector(),
@@ -18,9 +19,11 @@ const connectors: BaseConnector[] = [
   new MicrosoftConnector(),
   new QuickbooksConnector(),
   // EU portal connectors (category: 'portal') — region-filtered in the
-  // /integrations UI so a US-only org doesn't see Funda. Added 2026-05-27
-  // as scaffolding for task #12; not yet wired to credentials.
+  // /integrations UI so a US-only org doesn't see them. Added 2026-05-27
+  // as scaffolding for tasks #12 (Funda, NL) + #14 (IS24, DE); not yet
+  // wired to credentials.
   new FundaConnector(),
+  new ImmoScout24Connector(),
 ]
 
 export function listConnectors() {
