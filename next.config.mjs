@@ -13,9 +13,10 @@ const nextConfig = {
   poweredByHeader: false,
   devIndicators: false,
   experimental: {
-    // three removed — the WebGL globe was replaced by a CSS+SVG (d3-geo)
-    // globe; three is no longer imported anywhere.
-    optimizePackageImports: ['lucide-react', 'recharts'],
+    // three is still used by components/LoginScene.tsx via a dynamic
+    // import("three") for the WebGL login background — code-split to the
+    // /login route only, so it never ships on marketing pages.
+    optimizePackageImports: ['three', 'lucide-react', 'recharts'],
   },
 };
 
