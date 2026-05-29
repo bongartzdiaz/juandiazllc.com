@@ -73,6 +73,20 @@ export function jsonError(message: string, status: number) {
  * unrelated companies signing up would share a tenant. Onboarding
  * is the deliberate fix.
  */
+/** True only when the inbound request targets a local dev host. Third gate
+ *  on the NEXT_PUBLIC_BYPASS_AUTH escape hatch (alongside NODE_ENV + the
+ *  explicit flag) so it can never fire on a deployed host. Mirrors
+ *  isLocalhost() in lib/supabase/middleware.ts. */
+async function isLocalhostRequest(): Promise<boolean> {
+  try {
+    const h = await headers()
+    const host = (h.get('host') ?? '').split(':')[0].toLowerCase()
+    return host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '0.0.0.0'
+  } catch {
+    return false
+  }
+}
+
 async function resolvePhillyUser(email: string) {
   const prisma = getAuthPrisma()
 
@@ -106,6 +120,37 @@ async function resolvePhillyUser(email: string) {
  * Philly User row yet.
  */
 export async function requireScope(): Promise<AuthScope | NextResponse> {
+  // Dev-only escape hatch: NEXT_PUBLIC_BYPASS_AUTH=1 in .env.local
+  // resolves the seeded admin (SEED_ADMIN_EMAIL) directly from Prisma
+  // and short-circuits the Supabase auth check. Mirrors the same flag
+  // honored by lib/supabase/middleware.ts + ClientLayout.tsx.
+  //
+  // Triple-gated (NODE_ENV + explicit flag + localhost host) so this can
+  // never fire on a deployed host even if NODE_ENV is mis-set. The host
+  // check matches the same guard in lib/supabase/middleware.ts.
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    process.env.NEXT_PUBLIC_BYPASS_AUTH === '1' &&
+    await isLocalhostRequest()
+  ) {
+    const bypassEmail = process.env.SEED_ADMIN_EMAIL ?? 'juan@philanthropyai.eu'
+    try {
+      const phillyUser = await resolvePhillyUser(bypassEmail)
+      if (phillyUser?.organizationId) {
+        return {
+          userId: phillyUser.id,
+          organizationId: phillyUser.organizationId,
+          role: phillyUser.role ?? 'admin',
+          email: phillyUser.email,
+          mfaEnrolled: true,
+          dashboardSections: parseDashboardSections(phillyUser.dashboardSections),
+        }
+      }
+    } catch {
+      // Fall through to the regular path on any error.
+    }
+  }
+
   const supabase = await createClient()
   const {
     data: { user: supabaseUser },
