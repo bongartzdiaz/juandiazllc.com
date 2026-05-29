@@ -94,6 +94,7 @@ export default function CalendarPage() {
   const [formError, setFormError] = useState<string | null>(null)
   const tConfirms = useTranslations('confirms')
   const tCommon = useTranslations('common')
+  const t = useTranslations('calendar')
   const confirm = useConfirm()
 
   const year = currentDate.getFullYear()
@@ -305,7 +306,7 @@ export default function CalendarPage() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
               <button
                 type="button"
-                aria-label="Previous month"
+                aria-label={t('prevMonth')}
                 onClick={() => setCurrentDate(new Date(year, month - 1, 1))}
                 style={{
                   width: 32, height: 32, borderRadius: 8, background: 'var(--bg2)',
@@ -316,7 +317,7 @@ export default function CalendarPage() {
               <div style={{ fontSize: 16, fontWeight: 600 }}>{MONTHS[month]} {year}</div>
               <button
                 type="button"
-                aria-label="Next month"
+                aria-label={t('nextMonth')}
                 onClick={() => setCurrentDate(new Date(year, month + 1, 1))}
                 style={{
                   width: 32, height: 32, borderRadius: 8, background: 'var(--bg2)',
@@ -450,7 +451,7 @@ export default function CalendarPage() {
                 <div style={{
                   fontSize: 12, fontWeight: 600, color: 'var(--txt3)',
                   marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em',
-                }}>Upcoming</div>
+                }}>{t('upcoming')}</div>
                 {upcoming.length === 0 && (
                   <div style={{ fontSize: 12, color: 'var(--txt3)', padding: '8px 0' }}>
                     No upcoming events
@@ -502,7 +503,7 @@ export default function CalendarPage() {
               type="text"
               value={form.title}
               onChange={e => setForm({ ...form, title: e.target.value })}
-              placeholder="Event title"
+              placeholder={t('form.titlePlaceholder')}
               style={{
                 width: '100%', padding: '9px 11px', fontSize: 13,
                 background: 'var(--bg2)', border: '1px solid var(--border)',
@@ -555,7 +556,7 @@ export default function CalendarPage() {
               type="text"
               value={form.location}
               onChange={e => setForm({ ...form, location: e.target.value })}
-              placeholder="Optional"
+              placeholder={t('form.optional')}
               style={{
                 width: '100%', padding: '9px 11px', fontSize: 13,
                 background: 'var(--bg2)', border: '1px solid var(--border)',
@@ -568,7 +569,7 @@ export default function CalendarPage() {
             <textarea
               value={form.description}
               onChange={e => setForm({ ...form, description: e.target.value })}
-              placeholder="Optional"
+              placeholder={t('form.optional')}
               rows={3}
               style={{
                 width: '100%', padding: '9px 11px', fontSize: 13,
@@ -635,7 +636,7 @@ export default function CalendarPage() {
                   cursor: submitting ? 'not-allowed' : 'pointer',
                   opacity: submitting ? 0.5 : 1,
                 }}
-              >Cancel</button>
+              >{t('form.cancel')}</button>
               <button
                 type="submit"
                 disabled={submitting}

@@ -88,16 +88,24 @@ export default function ESignaturesPage() {
 
   // Bundle AJ — column visibility prefs.
   const esigColumns = useColumnPrefs('pai-esignatures-columns-v1', ESIG_DEFAULTS)
+  const t = useTranslations('eSignatures')
+  const localizedColumns = useMemo<ColumnDef[]>(() => [
+    { id: 'document', label: t('columns.document'), required: true },
+    { id: 'signer', label: t('columns.signer') },
+    { id: 'transaction', label: t('columns.transaction') },
+    { id: 'provider', label: t('columns.provider') },
+    { id: 'status', label: t('columns.status') },
+    { id: 'signed', label: t('columns.signed') },
+  ], [t])
   const visibleEsigColumns = useMemo(
-    () => ESIG_COLUMNS.filter((c) => c.required || esigColumns.visible.has(c.id)),
-    [esigColumns.visible],
+    () => localizedColumns.filter((c) => c.required || esigColumns.visible.has(c.id)),
+    [esigColumns.visible, localizedColumns],
   )
   const esigGridTemplate = useMemo(
     () => visibleEsigColumns.map((c) => ESIG_WIDTHS[c.id]).join(' '),
     [visibleEsigColumns],
   )
 
-  const t = useTranslations('eSignatures')
   const { addToast } = useToast()
 
   useEffect(() => {
@@ -174,22 +182,22 @@ export default function ESignaturesPage() {
       <Topbar title={t('title')} sub={t('subtitle')} />
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="folder" label="Total Signatures" value={String(total)} />
-          <KpiCard icon="target" label="Pending" value={String(pending)} />
-          <KpiCard icon="trending-up" label="Signed" value={String(signed)} />
-          <KpiCard icon="chart" label="Completion Rate" value={`${completionRate}%`} />
+          <KpiCard icon="folder" label={t('kpis.total')} value={String(total)} />
+          <KpiCard icon="target" label={t('kpis.pending')} value={String(pending)} />
+          <KpiCard icon="trending-up" label={t('kpis.signed')} value={String(signed)} />
+          <KpiCard icon="chart" label={t('kpis.completionRate')} value={`${completionRate}%`} />
         </div>
 
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
           <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
             options={[
-              { value: '', label: 'All Statuses' },
-              { value: 'pending', label: 'Pending' },
-              { value: 'sent', label: 'Sent' },
-              { value: 'viewed', label: 'Viewed' },
-              { value: 'signed', label: 'Signed' },
-              { value: 'declined', label: 'Declined' },
-              { value: 'expired', label: 'Expired' },
+              { value: '', label: t('filters.all') },
+              { value: 'pending', label: t('filters.pending') },
+              { value: 'sent', label: t('filters.sent') },
+              { value: 'viewed', label: t('filters.viewed') },
+              { value: 'signed', label: t('filters.signed') },
+              { value: 'declined', label: t('filters.declined') },
+              { value: 'expired', label: t('filters.expired') },
             ]} />
           <div style={{ flex: 1 }} />
           <button onClick={() => setShowAdd(true)} style={{
@@ -199,13 +207,13 @@ export default function ESignaturesPage() {
             border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
             fontFamily: 'inherit', boxShadow: 'var(--shadow-sm)',
           }}>
-            <Plus size={13} /> Request Signature
+            <Plus size={13} /> {t('list.requestSignature')}
           </button>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
           <ColumnPicker
-            columns={ESIG_COLUMNS}
+            columns={localizedColumns}
             visible={esigColumns.visible}
             onToggle={esigColumns.toggle}
             onReset={esigColumns.reset}
@@ -221,10 +229,10 @@ export default function ESignaturesPage() {
             {visibleEsigColumns.map((c) => <span key={c.id}>{c.label}</span>)}
           </div>
           {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
           ) : sigs.length === 0 ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-              No signature requests yet. Click Request Signature to start.
+              {t('list.empty')}
             </div>
           ) : sigs.map((sig, idx) => {
             const sc = STATUS_COLORS[sig.status] ?? { bg: 'var(--bg2)', txt: 'var(--txt3)', border: 'var(--border)' }
@@ -267,7 +275,7 @@ export default function ESignaturesPage() {
       <Modal
         open={!!selected}
         onClose={() => setSelected(null)}
-        title={selected?.documentName ?? 'Signature'}
+        title={selected?.documentName ?? t('detail.fallbackTitle')}
         subtitle={selected ? `${selected.signerName} · ${selected.signerEmail}` : ''}
         size="md"
       >
@@ -291,17 +299,17 @@ export default function ESignaturesPage() {
 
             {/* Timeline */}
             <div style={{ padding: 14, background: 'var(--bg2)', borderRadius: 10 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 10 }}>Timeline</div>
-              <TimelineRow icon={Plus} label="Created" date={selected.createdAt} />
-              <TimelineRow icon={Send} label="Sent" date={selected.sentAt} />
-              <TimelineRow icon={Eye} label="Viewed" date={selected.viewedAt} />
-              <TimelineRow icon={CheckCircle2} label="Signed" date={selected.signedAt} />
+              <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 10 }}>{t('detail.timeline')}</div>
+              <TimelineRow icon={Plus} label={t('detail.created')} date={selected.createdAt} />
+              <TimelineRow icon={Send} label={t('detail.sent')} date={selected.sentAt} />
+              <TimelineRow icon={Eye} label={t('detail.viewed')} date={selected.viewedAt} />
+              <TimelineRow icon={CheckCircle2} label={t('detail.signed')} date={selected.signedAt} />
             </div>
 
             {/* Transaction link */}
             {selected.transaction && (
               <div style={{ padding: 12, background: 'var(--bg2)', borderRadius: 10 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>Transaction</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>{t('detail.transaction')}</div>
                 <a href={`/transactions/${selected.transaction.id}`} style={{ fontSize: 13, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>
                   {selected.transaction.escrowNumber} →
                 </a>
@@ -313,22 +321,22 @@ export default function ESignaturesPage() {
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {selected.status === 'pending' && (
                   <StatusBtn onClick={() => changeStatus(selected.id, 'sent')} bg="var(--accent)" color="#fff">
-                    <Send size={12} /> Mark Sent
+                    <Send size={12} /> {t('detail.markSent')}
                   </StatusBtn>
                 )}
                 {(selected.status === 'sent' || selected.status === 'pending') && (
                   <StatusBtn onClick={() => changeStatus(selected.id, 'viewed')} bg="transparent" color="var(--accent-txt)" border="var(--accent-border)">
-                    <Eye size={12} /> Mark Viewed
+                    <Eye size={12} /> {t('detail.markViewed')}
                   </StatusBtn>
                 )}
                 <StatusBtn onClick={() => changeStatus(selected.id, 'signed')} bg="var(--g)" color="#fff">
-                  <CheckCircle2 size={12} /> Mark Signed
+                  <CheckCircle2 size={12} /> {t('detail.markSigned')}
                 </StatusBtn>
                 <StatusBtn onClick={() => changeStatus(selected.id, 'declined')} bg="transparent" color="var(--r-txt)" border="var(--r-border)">
-                  <X size={12} /> Declined
+                  <X size={12} /> {t('detail.declined')}
                 </StatusBtn>
                 <StatusBtn onClick={() => changeStatus(selected.id, 'pending')} bg="transparent" color="var(--txt2)" border="var(--border)">
-                  <RefreshCw size={12} /> Reset
+                  <RefreshCw size={12} /> {t('detail.reset')}
                 </StatusBtn>
               </div>
             )}
@@ -341,7 +349,7 @@ export default function ESignaturesPage() {
                 border: '1px solid var(--r-border)', fontSize: 12, fontWeight: 600,
                 cursor: 'pointer', fontFamily: 'inherit',
               }}>
-                <Trash2 size={12} /> Delete
+                <Trash2 size={12} /> {t('detail.delete')}
               </button>
             </div>
           </div>
@@ -352,33 +360,33 @@ export default function ESignaturesPage() {
       <Modal
         open={showAdd}
         onClose={() => { if (!saving) setShowAdd(false) }}
-        title="Request Signature"
-        subtitle="Send a document for electronic signature"
+        title={t('request.title')}
+        subtitle={t('request.subtitle')}
         size="md"
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <FormField label="Transaction">
+          <FormField label={t('request.transaction')}>
             <select value={addTxId} onChange={e => setAddTxId(e.target.value)} style={inputStyle}>
-              <option value="">Select transaction…</option>
-              {transactions.map(t => (
-                <option key={t.id} value={t.id}>
-                  {t.escrowNumber || `Transaction ${t.id.slice(0, 8)}`}{t.titleCompany ? ` — ${t.titleCompany}` : ''}
+              <option value="">{t('request.selectTransaction')}</option>
+              {transactions.map(tx => (
+                <option key={tx.id} value={tx.id}>
+                  {tx.escrowNumber || t('request.transactionFallback', { id: tx.id.slice(0, 8) })}{tx.titleCompany ? ` — ${tx.titleCompany}` : ''}
                 </option>
               ))}
             </select>
           </FormField>
-          <FormField label="Document Name">
+          <FormField label={t('request.documentName')}>
             <input value={addDocName} onChange={e => setAddDocName(e.target.value)} placeholder="Purchase Agreement" style={inputStyle} />
           </FormField>
-          <FormField label="Signer Name">
+          <FormField label={t('request.signerName')}>
             <input value={addSignerName} onChange={e => setAddSignerName(e.target.value)} placeholder="Jane Doe" style={inputStyle} />
           </FormField>
-          <FormField label="Signer Email">
+          <FormField label={t('request.signerEmail')}>
             <input type="email" value={addSignerEmail} onChange={e => setAddSignerEmail(e.target.value)} placeholder="jane@example.com" style={inputStyle} />
           </FormField>
-          <FormField label="Provider">
+          <FormField label={t('request.provider')}>
             <select value={addProvider} onChange={e => setAddProvider(e.target.value)} style={inputStyle}>
-              <option value="manual">Manual</option>
+              <option value="manual">{t('request.manual')}</option>
               <option value="docusign">DocuSign</option>
               <option value="hellosign">HelloSign / Dropbox Sign</option>
               <option value="pandadoc">PandaDoc</option>
@@ -391,13 +399,13 @@ export default function ESignaturesPage() {
               background: 'var(--bg2)', color: 'var(--txt2)',
               border: '1px solid var(--border)', fontSize: 12, fontWeight: 600,
               cursor: 'pointer', fontFamily: 'inherit',
-            }}>Cancel</button>
+            }}>{t('request.cancel')}</button>
             <button onClick={handleAddSignature} disabled={saving} style={{
               padding: '9px 18px', borderRadius: 8,
               background: 'var(--accent)', color: '#fff', border: 'none',
               fontSize: 12, fontWeight: 600, cursor: saving ? 'wait' : 'pointer',
               fontFamily: 'inherit', opacity: saving ? 0.7 : 1,
-            }}>{saving ? 'Creating…' : 'Send Request'}</button>
+            }}>{saving ? t('request.creating') : t('request.submit')}</button>
           </div>
         </div>
       </Modal>

@@ -95,6 +95,7 @@ export default function IntegrationsPage() {
   const confirm = useConfirm()
   const tConfirms = useTranslations('confirms')
   const tCommon = useTranslations('common')
+  const t = useTranslations('integrations')
 
   interface CatalogResponse { data: CatalogItem[] }
   interface IntegrationsResponse { data: Integration[] }
@@ -286,7 +287,7 @@ export default function IntegrationsPage() {
 
   return (
     <>
-      <Topbar title="Integrations" sub="Connect your favorite tools to DEUS" />
+      <Topbar title={t('title')} sub={t('subtitle')} />
       <div style={{ padding: '18px 24px 40px' }}>
 
         {/* OAuth result banner */}
@@ -371,7 +372,7 @@ export default function IntegrationsPage() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search integrations..."
+              placeholder={t('searchPlaceholder')}
               style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', outline: 'none', width: '100%' }}
             />
           </div>
@@ -469,7 +470,7 @@ export default function IntegrationsPage() {
                         color: isConnected ? 'var(--g-txt)' : hasError ? 'var(--r-txt)' : 'var(--txt3)',
                         width: 'fit-content',
                       }}>
-                        {isConnected ? <><Check size={10} /> Connected</> : hasError ? <><AlertCircle size={10} /> Error</> : <>Not Connected</>}
+                        {isConnected ? <><Check size={10} /> {t('status.connected')}</> : hasError ? <><AlertCircle size={10} /> {t('status.error')}</> : <>{t('status.notConnected')}</>}
                       </span>
                       {isConnected && record?.lastSyncAt && (
                         <span style={{

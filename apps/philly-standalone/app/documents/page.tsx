@@ -47,24 +47,26 @@ function formatBytes(bytes: number): string {
   return `${size.toFixed(i === 0 ? 0 : 1)} ${units[i]}`
 }
 
-const FILTER_FIELDS: FilterField[] = [
-  { key: 'name', label: 'Name', type: 'text' },
-  { key: 'type', label: 'Type', type: 'select', options: [
-    { value: 'file', label: 'File' },
-    { value: 'image', label: 'Image' },
-    { value: 'pdf', label: 'PDF' },
-    { value: 'spreadsheet', label: 'Spreadsheet' },
-  ]},
-  { key: 'mimeType', label: 'MIME type', type: 'text' },
-  { key: 'sizeBytes', label: 'Size (bytes)', type: 'number' },
-  { key: 'entityType', label: 'Linked to', type: 'select', options: [
-    { value: 'project', label: 'Project' },
-    { value: 'contact', label: 'Contact' },
-    { value: 'deal', label: 'Deal' },
-    { value: 'property', label: 'Property' },
-    { value: 'room', label: 'Room' },
-  ]},
-]
+function buildFilterFields(t: (k: string) => string): FilterField[] {
+  return [
+    { key: 'name', label: t('filterFields.name'), type: 'text' },
+    { key: 'type', label: t('filterFields.type'), type: 'select', options: [
+      { value: 'file', label: t('filterFields.file') },
+      { value: 'image', label: t('filterFields.image') },
+      { value: 'pdf', label: t('filterFields.pdf') },
+      { value: 'spreadsheet', label: t('filterFields.spreadsheet') },
+    ]},
+    { key: 'mimeType', label: t('filterFields.mimeType'), type: 'text' },
+    { key: 'sizeBytes', label: t('filterFields.size'), type: 'number' },
+    { key: 'entityType', label: t('filterFields.linkedTo'), type: 'select', options: [
+      { value: 'project', label: t('filterFields.project') },
+      { value: 'contact', label: t('filterFields.contact') },
+      { value: 'deal', label: t('filterFields.deal') },
+      { value: 'property', label: t('filterFields.property') },
+      { value: 'room', label: t('filterFields.room') },
+    ]},
+  ]
+}
 
 export default function DocumentsPage() {
   const t = useTranslations('documents')
@@ -119,13 +121,13 @@ export default function DocumentsPage() {
     try {
       const res = await fetch(`/api/documents/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
-        addToast('Document deleted', 'success')
+        addToast(t('toasts.deleted'), 'success')
         setSelected(s => s.filter(x => x !== id))
         fetchDocs()
       } else {
-        addToast('Delete failed', 'error')
+        addToast(t('toasts.deleteFailed'), 'error')
       }
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
   }
 
   async function handleBulkDelete() {
@@ -148,8 +150,8 @@ export default function DocumentsPage() {
         else failed++
       } catch { failed++ }
     }))
-    if (succeeded > 0) addToast(`Deleted ${succeeded} document${succeeded > 1 ? 's' : ''}`, 'success')
-    if (failed > 0) addToast(`${failed} failed to delete`, 'error')
+    if (succeeded > 0) addToast(t('toasts.bulkDeleted', { count: succeeded, s: succeeded > 1 ? 's' : '' }), 'success')
+    if (failed > 0) addToast(t('toasts.bulkFailed', { count: failed }), 'error')
     setSelected([])
     fetchDocs()
   }
@@ -171,18 +173,18 @@ export default function DocumentsPage() {
         }),
       })
       const j = await r.json()
-      if (!r.ok) throw new Error(j?.error ?? 'Failed to upload')
+      if (!r.ok) throw new Error(j?.error ?? t('upload.failedUpload'))
       setShowUpload(false)
       setUpName(''); setUpUrl(''); setUpMime(''); setUpSize(0); setUpEntity('')
       fetchDocs()
     } catch (e) {
-      setUpErr(e instanceof Error ? e.message : 'Failed')
+      setUpErr(e instanceof Error ? e.message : t('upload.failed'))
     } finally { setUpBusy(false) }
   }
 
   const columns: DataTableColumn<Doc>[] = [
     {
-      key: 'name', label: 'Name', sortable: true,
+      key: 'name', label: t('columns.name'), sortable: true,
       accessor: (d) => {
         const Icon = ICON_BY_TYPE(d.mimeType, d.type)
         return (
@@ -193,30 +195,30 @@ export default function DocumentsPage() {
         )
       },
     },
-    { key: 'type', label: 'Type', sortable: true, width: 110 },
-    { key: 'mimeType', label: 'MIME', mono: true, width: 180 },
+    { key: 'type', label: t('columns.type'), sortable: true, width: 110 },
+    { key: 'mimeType', label: t('columns.mime'), mono: true, width: 180 },
     {
-      key: 'sizeBytes', label: 'Size', sortable: true, mono: true, align: 'right', width: 100,
+      key: 'sizeBytes', label: t('columns.size'), sortable: true, mono: true, align: 'right', width: 100,
       accessor: (d) => formatBytes(d.sizeBytes),
     },
     {
-      key: 'entityType', label: 'Linked', width: 120,
+      key: 'entityType', label: t('columns.linked'), width: 120,
       accessor: (d) => d.entityType
         ? <span style={{ padding: '2px 7px', borderRadius: 5, background: 'var(--b-bg)', color: 'var(--b-txt)', fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase' }}>{d.entityType}</span>
         : <span style={{ color: 'var(--txt3)' }}>—</span>,
     },
     {
-      key: 'createdAt', label: 'Uploaded', sortable: true, mono: true, width: 120,
+      key: 'createdAt', label: t('columns.uploaded'), sortable: true, mono: true, width: 120,
       accessor: (d) => new Date(d.createdAt).toLocaleDateString(),
     },
     {
       key: 'actions', label: '', width: 80, align: 'right',
       accessor: (d) => (
         <span style={{ display: 'inline-flex', gap: 5 }} onClick={e => e.stopPropagation()}>
-          <a href={d.url} target="_blank" rel="noopener noreferrer" title="Open" style={iconLinkStyle}>
+          <a href={d.url} target="_blank" rel="noopener noreferrer" title={t('card.open')} style={iconLinkStyle}>
             <ExternalLink size={12} />
           </a>
-          <a href={d.url} download title="Download" style={iconLinkStyle}>
+          <a href={d.url} download title={t('card.download')} style={iconLinkStyle}>
             <Download size={12} />
           </a>
         </span>
@@ -226,17 +228,17 @@ export default function DocumentsPage() {
 
   return (
     <>
-      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => setShowUpload(true)} addLabel="Upload" />
+      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => setShowUpload(true)} addLabel={t('addLabel')} />
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="folder" label="Total Documents" value={String(docs.length)} />
-          <KpiCard icon="chart" label="Total Size" value={formatBytes(totalSize)} />
-          <KpiCard icon="award" label="Linked" value={String(linkedCount)} />
-          <KpiCard icon="inbox" label="Images" value={String(imageCount)} />
+          <KpiCard icon="folder" label={t('kpis.total')} value={String(docs.length)} />
+          <KpiCard icon="chart" label={t('kpis.totalSize')} value={formatBytes(totalSize)} />
+          <KpiCard icon="award" label={t('kpis.linked')} value={String(linkedCount)} />
+          <KpiCard icon="inbox" label={t('kpis.images')} value={String(imageCount)} />
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
-          <QuickSearch value={search} onChange={setSearch} placeholder="Search name or MIME…" />
+          <QuickSearch value={search} onChange={setSearch} placeholder={t('search')} />
           <button
             onClick={() => setShowFilter(s => !s)}
             style={{
@@ -247,7 +249,7 @@ export default function DocumentsPage() {
               fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
             }}
           >
-            {filter.rules.length > 0 ? `Filters (${filter.rules.length})` : 'Filters'}
+            {filter.rules.length > 0 ? t('filtersWithCount', { count: filter.rules.length }) : t('filters')}
           </button>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 4, padding: 3, background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 7 }}>
             <button
@@ -258,7 +260,7 @@ export default function DocumentsPage() {
                 color: view === 'grid' ? 'var(--txt)' : 'var(--txt3)',
                 fontSize: 11.5, fontWeight: 600, cursor: 'pointer',
               }}
-            >Grid</button>
+            >{t('view.grid')}</button>
             <button
               onClick={() => setView('table')}
               style={{
@@ -267,13 +269,13 @@ export default function DocumentsPage() {
                 color: view === 'table' ? 'var(--txt)' : 'var(--txt3)',
                 fontSize: 11.5, fontWeight: 600, cursor: 'pointer',
               }}
-            >Table</button>
+            >{t('view.table')}</button>
           </div>
         </div>
 
         {showFilter && (
           <div style={{ marginBottom: 12 }}>
-            <FilterBuilder fields={FILTER_FIELDS} value={filter} onChange={setFilter} />
+            <FilterBuilder fields={buildFilterFields(t)} value={filter} onChange={setFilter} />
           </div>
         )}
 
@@ -284,7 +286,7 @@ export default function DocumentsPage() {
             background: 'var(--accent-bg)', border: '1px solid var(--accent-border)',
           }}>
             <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--accent-txt)' }}>
-              {selected.length} selected
+              {t('selection.countSelected', { count: selected.length })}
             </span>
             <button
               onClick={() => setSelected([])}
@@ -296,7 +298,7 @@ export default function DocumentsPage() {
                 cursor: 'pointer', fontFamily: 'inherit',
               }}
             >
-              <X size={10} /> Clear
+              <X size={10} /> {t('selection.clear')}
             </button>
             <div style={{ flex: 1 }} />
             <button
@@ -309,22 +311,22 @@ export default function DocumentsPage() {
                 cursor: 'pointer', fontFamily: 'inherit',
               }}
             >
-              <Trash2 size={11} /> Delete {selected.length}
+              <Trash2 size={11} /> {t('selection.deleteCount', { count: selected.length })}
             </button>
           </div>
         )}
 
         {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)' }}>Loading…</div>
+          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)' }}>{t('list.loading')}</div>
         ) : filtered.length === 0 ? (
           <div style={{
             padding: 60, textAlign: 'center', background: 'var(--panel)',
             border: '1px dashed var(--border)', borderRadius: 12,
           }}>
             <FileText size={32} color="var(--txt3)" style={{ margin: '0 auto 10px' }} />
-            <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>No documents</div>
+            <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{t('list.emptyHeading')}</div>
             <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 14 }}>
-              {docs.length === 0 ? 'Upload your first document to get started.' : 'No documents match your filters.'}
+              {docs.length === 0 ? t('list.uploadFirst') : t('list.noMatch')}
             </div>
             {docs.length === 0 && (
               <button
@@ -335,7 +337,7 @@ export default function DocumentsPage() {
                   fontSize: 13, cursor: 'pointer',
                   display: 'inline-flex', alignItems: 'center', gap: 6,
                 }}
-              ><Upload size={12} /> Upload first document</button>
+              ><Upload size={12} /> {t('list.uploadFirstBtn')}</button>
             )}
           </div>
         ) : view === 'grid' ? (
@@ -380,14 +382,14 @@ export default function DocumentsPage() {
                   )}
                   <div style={{ display: 'flex', gap: 5, marginTop: 'auto' }} onClick={e => e.stopPropagation()}>
                     <a href={d.url} target="_blank" rel="noopener noreferrer" style={{ ...iconLinkStyle, flex: 1, padding: '5px 0', justifyContent: 'center' }}>
-                      <ExternalLink size={11} /> Open
+                      <ExternalLink size={11} /> {t('card.open')}
                     </a>
                     <a href={d.url} download style={{ ...iconLinkStyle, flex: 1, padding: '5px 0', justifyContent: 'center' }}>
-                      <Download size={11} /> Save
+                      <Download size={11} /> {t('card.save')}
                     </a>
                     <button
                       onClick={() => handleDelete(d.id)}
-                      title="Delete"
+                      title={t('card.delete')}
                       style={{
                         ...iconLinkStyle,
                         padding: '5px 9px', justifyContent: 'center',
@@ -414,7 +416,7 @@ export default function DocumentsPage() {
         )}
       </div>
 
-      <Modal open={showUpload} onClose={() => setShowUpload(false)} title="Upload Document" subtitle="Drag & drop a file or add by URL">
+      <Modal open={showUpload} onClose={() => setShowUpload(false)} title={t('upload.title')} subtitle={t('upload.subtitle')}>
         <div style={{ marginBottom: 14 }}>
           <FileUpload
             onUploaded={() => { fetchDocs() }}
@@ -425,50 +427,50 @@ export default function DocumentsPage() {
           textTransform: 'uppercase', letterSpacing: '0.06em',
           margin: '4px 0 8px', textAlign: 'center',
         }}>
-          — or add by URL —
+          {t('upload.separator')}
         </div>
-        <FormField label="Name" required>
+        <FormField label={t('upload.name')} required>
           <input value={upName} onChange={e => setUpName(e.target.value)} style={inputStyle} autoFocus />
         </FormField>
-        <FormField label="File URL" required>
+        <FormField label={t('upload.fileUrl')} required>
           <input value={upUrl} onChange={e => setUpUrl(e.target.value)} className="mono" style={{ ...inputStyle, fontSize: 11.5 }} placeholder="https://…" />
         </FormField>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          <FormField label="Type">
+          <FormField label={t('upload.type')}>
             <select value={upType} onChange={e => setUpType(e.target.value)} style={inputStyle}>
-              <option value="file">File</option>
-              <option value="image">Image</option>
-              <option value="pdf">PDF</option>
-              <option value="spreadsheet">Spreadsheet</option>
+              <option value="file">{t('filterFields.file')}</option>
+              <option value="image">{t('filterFields.image')}</option>
+              <option value="pdf">{t('filterFields.pdf')}</option>
+              <option value="spreadsheet">{t('filterFields.spreadsheet')}</option>
             </select>
           </FormField>
-          <FormField label="Link to">
+          <FormField label={t('upload.linkTo')}>
             <select value={upEntity} onChange={e => setUpEntity(e.target.value)} style={inputStyle}>
-              <option value="">None</option>
-              <option value="project">Project</option>
-              <option value="contact">Contact</option>
-              <option value="deal">Deal</option>
-              <option value="property">Property</option>
-              <option value="room">Room</option>
+              <option value="">{t('upload.none')}</option>
+              <option value="project">{t('filterFields.project')}</option>
+              <option value="contact">{t('filterFields.contact')}</option>
+              <option value="deal">{t('filterFields.deal')}</option>
+              <option value="property">{t('filterFields.property')}</option>
+              <option value="room">{t('filterFields.room')}</option>
             </select>
           </FormField>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          <FormField label="MIME Type">
+          <FormField label={t('upload.mimeType')}>
             <input value={upMime} onChange={e => setUpMime(e.target.value)} className="mono" style={{ ...inputStyle, fontSize: 11.5 }} placeholder="application/pdf" />
           </FormField>
-          <FormField label="Size (bytes)">
+          <FormField label={t('upload.sizeBytes')}>
             <input type="number" value={upSize} onChange={e => setUpSize(Number(e.target.value))} style={inputStyle} />
           </FormField>
         </div>
         {upErr && <div style={{ color: 'var(--r-txt)', fontSize: 12, marginBottom: 8 }}>{upErr}</div>}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 6 }}>
-          <button onClick={() => setShowUpload(false)} style={cancelBtn}>Cancel</button>
+          <button onClick={() => setShowUpload(false)} style={cancelBtn}>{t('upload.cancel')}</button>
           <button onClick={handleUpload} disabled={upBusy || !upName.trim() || !upUrl.trim()} style={{
             ...primaryBtn,
             opacity: !upName.trim() || !upUrl.trim() ? 0.5 : 1,
             cursor: upBusy ? 'wait' : 'pointer',
-          }}>{upBusy ? 'Uploading…' : 'Upload'}</button>
+          }}>{upBusy ? t('upload.uploading') : t('upload.submit')}</button>
         </div>
       </Modal>
     </>

@@ -82,6 +82,7 @@ const OFFER_STATUS_COLORS: Record<string, { bg: string; txt: string }> = {
 export default function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const t = useTranslations('properties')
+  const tpr = useTranslations('propertyDetail')
   const tConfirms = useTranslations('confirms')
   const tCommon = useTranslations('common')
   const confirm = useConfirm()
@@ -101,9 +102,9 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
     try {
       const res = await fetch(`/api/properties/${id}`)
       const json = await res.json()
-      if (!res.ok) { setError(json.error ?? 'Property not found'); return }
+      if (!res.ok) { setError(json.error ?? tpr('toasts.notFound')); return }
       setProperty(json.data ?? null)
-    } catch { setError('Failed to load property') }
+    } catch { setError(tpr('toasts.loadFailed')) }
     finally { setLoading(false) }
   }, [id])
 
@@ -153,12 +154,12 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
     const patch: Record<string, unknown> = {}
     switch (editField) {
       case 'title':
-        if (!editValue.trim()) { addToast('Title required', 'error'); return }
+        if (!editValue.trim()) { addToast(tpr('toasts.titleRequired'), 'error'); return }
         patch.title = editValue.trim()
         break
       case 'priceCents': {
         const n = Math.round(parseFloat(editValue) * 100)
-        if (!isFinite(n) || n < 0) { addToast('Invalid price', 'error'); return }
+        if (!isFinite(n) || n < 0) { addToast(tpr('toasts.invalidPrice'), 'error'); return }
         patch.priceCents = n
         break
       }
@@ -168,7 +169,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
       case 'yearBuilt': {
         if (editValue === '') { patch[editField] = null; break }
         const n = parseInt(editValue, 10)
-        if (isNaN(n) || n < 0) { addToast('Invalid number', 'error'); return }
+        if (isNaN(n) || n < 0) { addToast(tpr('toasts.invalidNumber'), 'error'); return }
         patch[editField] = n
         break
       }
@@ -190,11 +191,11 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
         body: JSON.stringify(patch),
       })
       const j = await res.json().catch(() => ({}))
-      if (!res.ok) { addToast(j.error ?? 'Save failed', 'error'); return }
-      addToast('Saved', 'success')
+      if (!res.ok) { addToast(j.error ?? tpr('toasts.saveFailed'), 'error'); return }
+      addToast(tpr('toasts.saved'), 'success')
       setEditField(null)
       fetchProperty()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(tpr('toasts.networkError'), 'error') }
   }
 
   async function handleDelete() {
@@ -209,18 +210,18 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
     try {
       const res = await fetch(`/api/properties/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
-        addToast('Property deleted', 'success')
+        addToast(tpr('toasts.deleted'), 'success')
         router.push('/properties')
       } else {
         const j = await res.json().catch(() => ({}))
-        addToast(j.error ?? 'Delete failed', 'error')
+        addToast(j.error ?? tpr('toasts.deleteFailed'), 'error')
       }
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(tpr('toasts.networkError'), 'error') }
   }
 
   return (
     <>
-      <Topbar title={property?.title ?? 'Property Detail'} sub={fullAddress || 'Loading...'} />
+      <Topbar title={property?.title ?? tpr('titleFallback')} sub={fullAddress || tpr('loading')} />
       <div style={{ padding: '18px 24px 40px' }}>
 
         <Link href="/properties" style={{
@@ -229,16 +230,16 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
           textDecoration: 'none', marginBottom: 16,
         }}>
           <ArrowLeft size={14} />
-          Back to Properties
+          {tpr('backToProperties')}
         </Link>
 
         {loading ? (
           <div style={{ padding: 60, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-            Loading property...
+            {tpr('loading')}
           </div>
         ) : error || !property ? (
           <div style={{ padding: 60, textAlign: 'center', color: 'var(--r-txt)', fontSize: 13 }}>
-            {error || 'Property not found.'}
+            {error || tpr('empty.notFound')}
           </div>
         ) : (
           <>
@@ -258,7 +259,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                       cursor: 'pointer', display: 'inline-block',
                       letterSpacing: '-0.02em',
                     }}
-                    title="Click to edit"
+                    title={tpr('hints.clickToEdit')}
                   >
                     {property.title}
                   </h1>
@@ -269,10 +270,10 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 {editField === 'status' ? (
                   <select autoFocus value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveEdit}
                     style={{ ...inputStyle, width: 150 }}>
-                    <option value="available">Available</option>
-                    <option value="under_contract">Under Contract</option>
-                    <option value="sold">Sold</option>
-                    <option value="rented">Rented</option>
+                    <option value="available">{tpr('statuses.available')}</option>
+                    <option value="under_contract">{tpr('statuses.underContract')}</option>
+                    <option value="sold">{tpr('statuses.sold')}</option>
+                    <option value="rented">{tpr('statuses.rented')}</option>
                   </select>
                 ) : (
                   <span
@@ -282,7 +283,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                       textTransform: 'uppercase', background: sc.bg, color: sc.txt,
                       cursor: 'pointer',
                     }}
-                    title="Click to change"
+                    title={tpr('hints.clickToChange')}
                   >
                     {property.status.replace('_', ' ')}
                   </span>
@@ -290,10 +291,10 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 {editField === 'type' ? (
                   <select autoFocus value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveEdit}
                     style={{ ...inputStyle, width: 140 }}>
-                    <option value="residential">Residential</option>
-                    <option value="commercial">Commercial</option>
-                    <option value="land">Land</option>
-                    <option value="industrial">Industrial</option>
+                    <option value="residential">{tpr('types.residential')}</option>
+                    <option value="commercial">{tpr('types.commercial')}</option>
+                    <option value="land">{tpr('types.land')}</option>
+                    <option value="industrial">{tpr('types.industrial')}</option>
                   </select>
                 ) : (
                   <span
@@ -303,7 +304,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                       textTransform: 'uppercase', background: tc.bg, color: tc.txt,
                       cursor: 'pointer',
                     }}
-                    title="Click to change"
+                    title={tpr('hints.clickToChange')}
                   >
                     {property.type}
                   </span>
@@ -318,17 +319,17 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
               background: 'var(--bg2)', border: '1px solid var(--border)',
             }}>
               <Link href={`/showings`} style={actionBtn('var(--accent)')}>
-                <Calendar size={13} /> Schedule Showing
+                <Calendar size={13} /> {tpr('actions.scheduleShowing')}
               </Link>
               <Link href={`/open-houses`} style={actionBtn('var(--p)')}>
-                <Home size={13} /> Schedule Open House
+                <Home size={13} /> {tpr('actions.scheduleOpenHouse')}
               </Link>
               <Link href={`/offers`} style={actionBtn('var(--g)')}>
-                <DollarSign size={13} /> Submit Offer
+                <DollarSign size={13} /> {tpr('actions.submitOffer')}
               </Link>
               <div style={{ flex: 1 }} />
               <button onClick={handleDelete} style={outlineBtn('var(--r-txt)', 'var(--r-border)')}>
-                <Trash2 size={12} /> Delete
+                <Trash2 size={12} /> {tpr('actions.delete')}
               </button>
             </div>
 
@@ -342,11 +343,11 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                   padding: 20, borderRadius: 14, border: '1px solid var(--border)',
                   background: 'var(--panel)', boxShadow: 'var(--shadow-sm)',
                 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)', marginBottom: 12 }}>Property Details</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)', marginBottom: 12 }}>{tpr('sections.propertyDetails')}</div>
 
                   <div style={{ marginBottom: 18 }}>
                     <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 4 }}>
-                      Price
+                      {tpr('fields.price')}
                     </div>
                     {editField === 'priceCents' ? (
                       <InlineEdit value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} type="number" />
@@ -355,7 +356,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                         onClick={() => startEdit('priceCents', (property.priceCents / 100).toString())}
                         className="mono"
                         style={{ fontSize: 26, fontWeight: 700, color: 'var(--txt)', cursor: 'pointer' }}
-                        title="Click to edit"
+                        title={tpr('hints.clickToEdit')}
                       >
                         ${(property.priceCents / 100).toLocaleString()}
                       </div>
@@ -363,14 +364,14 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px 22px' }}>
-                    <EditableField label="Address" field="address" value={property.address} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} />
-                    <EditableField label="City" field="city" value={property.city} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} />
-                    <EditableField label="State" field="state" value={property.state} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} />
-                    <EditableField label="Zip" field="zipCode" value={property.zipCode} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} />
-                    <EditableField label="Bedrooms" field="bedrooms" value={property.bedrooms != null ? String(property.bedrooms) : ''} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} type="number" />
-                    <EditableField label="Bathrooms" field="bathrooms" value={property.bathrooms != null ? String(property.bathrooms) : ''} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} type="number" />
-                    <EditableField label="Square Feet" field="sqft" value={property.sqft != null ? String(property.sqft) : ''} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} type="number" />
-                    <EditableField label="Year Built" field="yearBuilt" value={property.yearBuilt != null ? String(property.yearBuilt) : ''} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} type="number" />
+                    <EditableField label={tpr('fields.address')} field="address" value={property.address} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} clickToEditTitle={tpr('hints.clickToEdit')} />
+                    <EditableField label={tpr('fields.city')} field="city" value={property.city} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} clickToEditTitle={tpr('hints.clickToEdit')} />
+                    <EditableField label={tpr('fields.state')} field="state" value={property.state} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} clickToEditTitle={tpr('hints.clickToEdit')} />
+                    <EditableField label={tpr('fields.zip')} field="zipCode" value={property.zipCode} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} clickToEditTitle={tpr('hints.clickToEdit')} />
+                    <EditableField label={tpr('fields.bedrooms')} field="bedrooms" value={property.bedrooms != null ? String(property.bedrooms) : ''} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} type="number" clickToEditTitle={tpr('hints.clickToEdit')} />
+                    <EditableField label={tpr('fields.bathrooms')} field="bathrooms" value={property.bathrooms != null ? String(property.bathrooms) : ''} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} type="number" clickToEditTitle={tpr('hints.clickToEdit')} />
+                    <EditableField label={tpr('fields.squareFeet')} field="sqft" value={property.sqft != null ? String(property.sqft) : ''} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} type="number" clickToEditTitle={tpr('hints.clickToEdit')} />
+                    <EditableField label={tpr('fields.yearBuilt')} field="yearBuilt" value={property.yearBuilt != null ? String(property.yearBuilt) : ''} editField={editField} editValue={editValue} setEditValue={setEditValue} startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} type="number" clickToEditTitle={tpr('hints.clickToEdit')} />
                   </div>
 
                   {fullAddress && (
@@ -393,15 +394,15 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>
-                      Showings ({showings.length})
+                      {tpr('sections.showings')} ({showings.length})
                     </span>
                     <Link href="/showings" style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent)', textDecoration: 'none' }}>
-                      View all →
+                      {tpr('actions.viewAll')}
                     </Link>
                   </div>
                   {showings.length === 0 ? (
                     <div style={{ padding: 20, textAlign: 'center', color: 'var(--txt3)', fontSize: 12, background: 'var(--bg2)', borderRadius: 8 }}>
-                      No showings scheduled.
+                      {tpr('empty.noShowings')}
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -441,36 +442,36 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
                 {/* Stats */}
-                <SideCard title="Stats">
+                <SideCard title={tpr('sections.stats')}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {property.bedrooms != null && <StatRow icon={<BedDouble size={13} />} label="Bedrooms" value={String(property.bedrooms)} />}
-                    {property.bathrooms != null && <StatRow icon={<Bath size={13} />} label="Bathrooms" value={String(property.bathrooms)} />}
-                    {property.sqft != null && <StatRow icon={<Ruler size={13} />} label="Square Feet" value={property.sqft.toLocaleString()} />}
-                    <StatRow icon={<Eye size={13} />} label="Viewings" value={String(property._count?.viewings ?? 0)} />
-                    <StatRow icon={<Calendar size={13} />} label="Open Houses" value={String(property._count?.openHouses ?? 0)} />
-                    <StatRow icon={<Briefcase size={13} />} label="Offers" value={String(property._count?.offers ?? 0)} />
+                    {property.bedrooms != null && <StatRow icon={<BedDouble size={13} />} label={tpr('fields.bedrooms')} value={String(property.bedrooms)} />}
+                    {property.bathrooms != null && <StatRow icon={<Bath size={13} />} label={tpr('fields.bathrooms')} value={String(property.bathrooms)} />}
+                    {property.sqft != null && <StatRow icon={<Ruler size={13} />} label={tpr('fields.squareFeet')} value={property.sqft.toLocaleString()} />}
+                    <StatRow icon={<Eye size={13} />} label={tpr('fields.viewings')} value={String(property._count?.viewings ?? 0)} />
+                    <StatRow icon={<Calendar size={13} />} label={tpr('fields.openHouses')} value={String(property._count?.openHouses ?? 0)} />
+                    <StatRow icon={<Briefcase size={13} />} label={tpr('fields.offers')} value={String(property._count?.offers ?? 0)} />
                   </div>
                 </SideCard>
 
                 {/* Listed */}
-                <SideCard title="Listed">
+                <SideCard title={tpr('sections.listed')}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>
                     {new Date(property.createdAt).toLocaleDateString('en-US', {
                       year: 'numeric', month: 'short', day: 'numeric',
                     })}
                   </div>
                   <div style={{ fontSize: 10, color: 'var(--txt3)', marginTop: 4 }}>
-                    {Math.floor((Date.now() - new Date(property.createdAt).getTime()) / 86400000)} days on market
+                    {tpr('hints.daysOnMarket', { days: Math.floor((Date.now() - new Date(property.createdAt).getTime()) / 86400000) })}
                   </div>
                 </SideCard>
 
                 {/* Offers */}
                 <SideCard
-                  title={`Offers (${offers.length})`}
-                  action={<Link href="/offers" style={{ fontSize: 11, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>View all →</Link>}
+                  title={`${tpr('sections.offers')} (${offers.length})`}
+                  action={<Link href="/offers" style={{ fontSize: 11, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>{tpr('actions.viewAll')}</Link>}
                 >
                   {offers.length === 0 ? (
-                    <div style={{ fontSize: 11, color: 'var(--txt3)', padding: '6px 0' }}>No offers yet.</div>
+                    <div style={{ fontSize: 11, color: 'var(--txt3)', padding: '6px 0' }}>{tpr('empty.noOffers')}</div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {offers.slice(0, 5).map(o => {
@@ -509,11 +510,11 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 background: 'var(--panel)', boxShadow: 'var(--shadow-sm)',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>Description</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>{tpr('sections.description')}</span>
                   {editField !== 'description' && (
                     <button onClick={() => startEdit('description', property.description)}
                       style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 11, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <Edit2 size={11} /> Edit
+                      <Edit2 size={11} /> {tpr('actions.edit')}
                     </button>
                   )}
                 </div>
@@ -524,16 +525,16 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                       style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.6 }}
                     />
                     <div style={{ display: 'flex', gap: 8, marginTop: 10, justifyContent: 'flex-end' }}>
-                      <button onClick={cancelEdit} style={outlineBtn('var(--txt2)', 'var(--border)')}>Cancel</button>
+                      <button onClick={cancelEdit} style={outlineBtn('var(--txt2)', 'var(--border)')}>{tpr('actions.cancel')}</button>
                       <button onClick={saveEdit} style={{
                         padding: '7px 14px', borderRadius: 8, background: 'var(--accent)', color: '#fff',
                         border: 'none', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-                      }}>Save</button>
+                      }}>{tpr('actions.save')}</button>
                     </div>
                   </>
                 ) : (
                   <div style={{ fontSize: 13, lineHeight: 1.65, color: 'var(--txt2)', whiteSpace: 'pre-wrap' }}>
-                    {property.description || 'No description.'}
+                    {property.description || tpr('empty.noDescription')}
                   </div>
                 )}
               </div>
@@ -616,12 +617,13 @@ function iconBtn(bg: string, color: string, border?: string): React.CSSPropertie
 }
 
 function EditableField({
-  label, field, value, editField, editValue, setEditValue, startEdit, onSave, onCancel, type,
+  label, field, value, editField, editValue, setEditValue, startEdit, onSave, onCancel, type, clickToEditTitle,
 }: {
   label: string; field: string; value: string;
   editField: string | null; editValue: string; setEditValue: (v: string) => void;
   startEdit: (f: string, v: unknown) => void; onSave: () => void; onCancel: () => void;
   type?: string;
+  clickToEditTitle?: string;
 }) {
   return (
     <div>
@@ -634,7 +636,7 @@ function EditableField({
         <div
           onClick={() => startEdit(field, value)}
           style={{ fontSize: 13, color: 'var(--txt)', fontWeight: 500, cursor: 'pointer', minHeight: 18 }}
-          title="Click to edit"
+          title={clickToEditTitle ?? 'Click to edit'}
         >
           {value || <span style={{ color: 'var(--txt3)', fontStyle: 'italic' }}>—</span>}
         </div>

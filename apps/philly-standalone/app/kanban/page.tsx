@@ -281,9 +281,9 @@ export default function KanbanPage() {
   return (
     <>
       <Topbar
-        title={isHOS ? 'Reservations' : isRE ? 'Deals' : t('title')}
-        sub={isHOS ? 'Manage bookings' : isRE ? 'Track your transactions' : t('subtitle')}
-        addLabel={isHOS ? 'New Booking' : isRE ? 'New Deal' : 'New Board'}
+        title={isHOS ? t('hospitality.title') : isRE ? t('realestate.title') : t('title')}
+        sub={isHOS ? t('hospitality.subtitle') : isRE ? t('realestate.subtitle') : t('subtitle')}
+        addLabel={isHOS ? t('hospitality.addLabel') : isRE ? t('realestate.addLabel') : t('newBoard')}
       />
 
       <div style={{ padding: '18px 24px 40px' }}>
@@ -294,12 +294,11 @@ export default function KanbanPage() {
             background: 'var(--y-bg)', border: '1px solid var(--y-border)',
             color: 'var(--y-txt)', fontSize: 12.5, lineHeight: 1.5,
           }}>
-            <strong>Preview mode:</strong> the cards shown below are sample data.
-            Your organization has no kanban boards yet — head to
-            {' '}<a href="/deals" style={{ color: 'inherit', textDecoration: 'underline' }}>Deals</a>
-            {' '}or
-            {' '}<a href="/projects" style={{ color: 'inherit', textDecoration: 'underline' }}>Projects</a>
-            {' '}to start tracking real work.
+            <strong>{t('preview.label')}</strong> {t('preview.body')}
+            {' '}<a href="/deals" style={{ color: 'inherit', textDecoration: 'underline' }}>{t('preview.dealsLink')}</a>
+            {' '}{t('preview.or')}
+            {' '}<a href="/projects" style={{ color: 'inherit', textDecoration: 'underline' }}>{t('preview.projectsLink')}</a>
+            {' '}{t('preview.suffix')}
           </div>
         )}
 
@@ -314,7 +313,7 @@ export default function KanbanPage() {
                 color: reMode === m ? 'var(--txt)' : 'var(--txt3)',
                 boxShadow: reMode === m ? 'var(--shadow-sm)' : 'none',
               }}>
-                {m === 'sales' ? 'Sales Pipeline' : 'Rental Pipeline'}
+                {m === 'sales' ? t('realestate.salesPipeline') : t('realestate.rentalPipeline')}
               </button>
             ))}
           </div>
@@ -476,15 +475,15 @@ export default function KanbanPage() {
               padding: '24px 28px', width: 420, maxHeight: '80vh', overflowY: 'auto',
             }}
           >
-            <div id="kanban-add-card-title" style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>Add Card</div>
+            <div id="kanban-add-card-title" style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{t('addCardModal.title')}</div>
             <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>
-              Add a new card to {columns.find(c => c.id === addCardColumn)?.title ?? 'column'}
+              {t('addCardModal.subtitle', { column: columns.find(c => c.id === addCardColumn)?.title ?? t('addCardModal.columnFallback') })}
             </div>
             <form onSubmit={async (e) => {
               e.preventDefault()
               if (addCardLoading) return
               if (!addTitle.trim()) {
-                setAddCardError('Title is required')
+                setAddCardError(t('addCardModal.titleRequired'))
                 return
               }
               setAddCardLoading(true)
@@ -503,7 +502,7 @@ export default function KanbanPage() {
                 })
                 const json = await res.json().catch(() => ({}))
                 if (!res.ok) {
-                  setAddCardError(json?.error ?? json?.message ?? `Failed to create card (${res.status})`)
+                  setAddCardError(json?.error ?? json?.message ?? t('addCardModal.genericFailed', { status: res.status }))
                   return
                 }
                 setShowAddCard(false)
@@ -514,19 +513,19 @@ export default function KanbanPage() {
                 setAddCardError(null)
                 fetchBoards()
               } catch (err) {
-                setAddCardError(err instanceof Error ? err.message : 'Network error')
+                setAddCardError(err instanceof Error ? err.message : t('addCardModal.networkError'))
               } finally {
                 setAddCardLoading(false)
               }
             }} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Title *</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('addCardModal.titleLabel')}</label>
                 <input
                   value={addTitle}
                   onChange={e => setAddTitle(e.target.value)}
                   required
                   autoFocus
-                  placeholder="Card title"
+                  placeholder={t('addCardModal.titlePlaceholder')}
                   style={{
                     width: '100%', padding: '8px 12px', borderRadius: 8,
                     border: '1px solid var(--border)', background: 'var(--bg2)',
@@ -535,12 +534,12 @@ export default function KanbanPage() {
                 />
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Description</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('addCardModal.descriptionLabel')}</label>
                 <textarea
                   value={addDesc}
                   onChange={e => setAddDesc(e.target.value)}
                   rows={3}
-                  placeholder="Optional description"
+                  placeholder={t('addCardModal.descriptionPlaceholder')}
                   style={{
                     width: '100%', padding: '8px 12px', borderRadius: 8,
                     border: '1px solid var(--border)', background: 'var(--bg2)',
@@ -550,7 +549,7 @@ export default function KanbanPage() {
                 />
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Priority</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('addCardModal.priorityLabel')}</label>
                 <select
                   value={addPriority}
                   onChange={e => setAddPriority(e.target.value as 'low' | 'medium' | 'high')}
@@ -560,17 +559,17 @@ export default function KanbanPage() {
                     fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
                   }}
                 >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
+                  <option value="low">{t('priorities.low')}</option>
+                  <option value="medium">{t('priorities.medium')}</option>
+                  <option value="high">{t('priorities.high')}</option>
                 </select>
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Assignee</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('addCardModal.assigneeLabel')}</label>
                 <input
                   value={addAssignee}
                   onChange={e => setAddAssignee(e.target.value)}
-                  placeholder="Assignee ID or name"
+                  placeholder={t('addCardModal.assigneePlaceholder')}
                   style={{
                     width: '100%', padding: '8px 12px', borderRadius: 8,
                     border: '1px solid var(--border)', background: 'var(--bg2)',
@@ -596,7 +595,7 @@ export default function KanbanPage() {
                     cursor: 'pointer',
                   }}
                 >
-                  Cancel
+                  {t('addCardModal.cancel')}
                 </button>
                 <button
                   type="submit"
@@ -609,7 +608,7 @@ export default function KanbanPage() {
                     opacity: addCardLoading || !addTitle.trim() ? 0.5 : 1,
                   }}
                 >
-                  {addCardLoading ? 'Adding...' : 'Add Card'}
+                  {addCardLoading ? t('addCardModal.submitting') : t('addCardModal.submit')}
                 </button>
               </div>
             </form>
@@ -622,7 +621,7 @@ export default function KanbanPage() {
         open={isRE && selectedCard !== null}
         onClose={() => setSelectedCard(null)}
         title={selectedCard?.title || ''}
-        subtitle={selectedCard?.dealType === 'sale' ? 'Sales Deal' : selectedCard?.dealType === 'rental' ? 'Rental Deal' : ''}
+        subtitle={selectedCard?.dealType === 'sale' ? t('realestate.salesDeal') : selectedCard?.dealType === 'rental' ? t('realestate.rentalDeal') : ''}
         size="sm"
       >
         {selectedCard && <DealModal card={selectedCard} reMode={reMode} isRE={isRE} onClose={() => setSelectedCard(null)} />}
@@ -651,6 +650,7 @@ function CardDetailDrawer({
   columns: KanbanColumn[]
   onClose: () => void
 }) {
+  const t = useTranslations('kanban')
   const tConfirms = useTranslations('confirms')
   const tCommon = useTranslations('common')
   const confirm = useConfirm()
@@ -700,13 +700,13 @@ function CardDetailDrawer({
             </div>
             {currentColumn && (
               <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 3 }}>
-                in {currentColumn.title}
+                {t('drawer.in')} {currentColumn.title}
               </div>
             )}
           </div>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t('drawer.close')}
             style={{
               width: 28, height: 28, borderRadius: 7, flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -726,13 +726,13 @@ function CardDetailDrawer({
               fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 6,
               background: ps.bg, color: ps.txt, border: `1px solid ${ps.border}`,
               textTransform: 'uppercase', letterSpacing: '0.04em',
-            }}>{card.priority}</span>
+            }}>{t(`priorities.${card.priority}` as 'priorities.low')}</span>
           </div>
 
           {/* Description */}
           {card.description && (
             <div style={{ marginBottom: 18 }}>
-              <DrawerLabel>Description</DrawerLabel>
+              <DrawerLabel>{t('drawer.description')}</DrawerLabel>
               <div style={{ fontSize: 12.5, color: 'var(--txt2)', lineHeight: 1.5 }}>
                 {card.description}
               </div>
@@ -741,15 +741,15 @@ function CardDetailDrawer({
 
           {/* Meta grid */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 18 }}>
-            <MetaRow icon={User} label="Assignee" value={card.assignee || 'Unassigned'} />
-            <MetaRow icon={Calendar} label="Due Date" value={card.dueDate} mono />
-            <MetaRow icon={Columns3} label="Status" value={currentColumn?.title ?? '—'} />
+            <MetaRow icon={User} label={t('drawer.assignee')} value={card.assignee || t('drawer.unassigned')} />
+            <MetaRow icon={Calendar} label={t('drawer.dueDate')} value={card.dueDate} mono />
+            <MetaRow icon={Columns3} label={t('drawer.status')} value={currentColumn?.title ?? '—'} />
           </div>
 
           {/* SDGs (philanthropy) */}
           {card.sdgs.length > 0 && (
             <div style={{ marginBottom: 18 }}>
-              <DrawerLabel>SDG Tags</DrawerLabel>
+              <DrawerLabel>{t('drawer.sdgTags')}</DrawerLabel>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {card.sdgs.map(s => (
                   <span key={s} style={{
@@ -767,7 +767,7 @@ function CardDetailDrawer({
 
           {/* Move to column */}
           <div style={{ marginBottom: 18 }}>
-            <DrawerLabel>Move to Column</DrawerLabel>
+            <DrawerLabel>{t('drawer.moveToColumn')}</DrawerLabel>
             <select
               defaultValue={currentColumn?.id ?? ''}
               onChange={async (e) => {
@@ -781,11 +781,11 @@ function CardDetailDrawer({
                   })
                   if (!res.ok) {
                     const j = await res.json().catch(() => ({}))
-                    throw new Error(j.error ?? `Move failed (${res.status})`)
+                    throw new Error(j.error ?? `${t('drawer.moveFailed')} (${res.status})`)
                   }
                   onClose()
                 } catch (err) {
-                  const msg = err instanceof Error ? err.message : 'Move failed'
+                  const msg = err instanceof Error ? err.message : t('drawer.moveFailed')
                   alert(msg)
                 }
               }}
@@ -809,7 +809,7 @@ function CardDetailDrawer({
           display: 'flex', gap: 8, flexShrink: 0,
         }}>
           <button
-            onClick={() => alert('Edit — hook up to edit flow')}
+            onClick={() => alert(t('drawer.editPlaceholder'))}
             style={{
               flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               padding: '8px 14px', borderRadius: 8,
@@ -818,7 +818,7 @@ function CardDetailDrawer({
               cursor: 'pointer', fontFamily: 'inherit',
             }}
           >
-            <Pencil size={12} /> Edit
+            <Pencil size={12} /> {t('drawer.edit')}
           </button>
           <button
             onClick={async () => {
@@ -841,7 +841,7 @@ function CardDetailDrawer({
               cursor: 'pointer', fontFamily: 'inherit',
             }}
           >
-            <Trash2 size={12} /> Delete
+            <Trash2 size={12} /> {t('drawer.delete')}
           </button>
         </div>
       </div>
@@ -886,6 +886,7 @@ function MetaRow({
 }
 
 function DealModal({ card: selectedCard, reMode, isRE }: { card: KanbanCard; reMode: 'sales' | 'rental'; isRE: boolean; onClose: () => void }) {
+  const t = useTranslations('kanban')
   const allColumns = reMode === 'sales' ? RE_SALES_COLUMNS : RE_RENTAL_COLUMNS
   const stages = selectedCard.dealType === 'sale' ? SALES_STAGES : RENTAL_STAGES
   const stageMap = selectedCard.dealType === 'sale' ? SALES_STAGE_MAP : RENTAL_STAGE_MAP
@@ -903,7 +904,7 @@ function DealModal({ card: selectedCard, reMode, isRE }: { card: KanbanCard; reM
                   display: 'flex', alignItems: 'center', gap: 10,
                 }}>
                   <div>
-                    <div style={{ fontSize: 10, color: 'var(--txt3)', marginBottom: 2 }}>Deal Value</div>
+                    <div style={{ fontSize: 10, color: 'var(--txt3)', marginBottom: 2 }}>{t('realestate.dealValue')}</div>
                     <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--accent)' }}>
                       {formatDealValue(selectedCard.dealValue, selectedCard.dealType)}
                     </div>
@@ -915,7 +916,7 @@ function DealModal({ card: selectedCard, reMode, isRE }: { card: KanbanCard; reM
                     border: `1px solid ${selectedCard.dealType === 'sale' ? 'var(--g-border)' : 'var(--p-border)'}`,
                     textTransform: 'uppercase', letterSpacing: '0.5px',
                   }}>
-                    {selectedCard.dealType === 'sale' ? 'Sale' : 'Rental'}
+                    {selectedCard.dealType === 'sale' ? t('realestate.sale') : t('realestate.rental')}
                   </span>
                 </div>
               )}
@@ -932,7 +933,7 @@ function DealModal({ card: selectedCard, reMode, isRE }: { card: KanbanCard; reM
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>{selectedCard.assignee}</div>
                 <div>
-                  <div style={{ fontSize: 10, color: 'var(--txt3)', marginBottom: 2 }}>Assignee</div>
+                  <div style={{ fontSize: 10, color: 'var(--txt3)', marginBottom: 2 }}>{t('realestate.assignee')}</div>
                   <div style={{ fontSize: 13, fontWeight: 600 }}>{selectedCard.assignee}</div>
                 </div>
               </div>
@@ -941,7 +942,7 @@ function DealModal({ card: selectedCard, reMode, isRE }: { card: KanbanCard; reM
             {/* Deal Timeline */}
             {isRE && (
               <div style={{ marginBottom: 4 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 10, color: 'var(--txt2)' }}>Deal Progress</div>
+                <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 10, color: 'var(--txt2)' }}>{t('realestate.dealProgress')}</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 0, overflowX: 'auto', padding: '4px 0' }}>
                   {stages.map((stage, i) => {
                     const isCompleted = i < currentStageIndex
@@ -988,7 +989,7 @@ function DealModal({ card: selectedCard, reMode, isRE }: { card: KanbanCard; reM
             {/* Document checklist */}
             {selectedCard.documents && selectedCard.documents.length > 0 && (
               <div>
-                <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>Document Checklist</div>
+                <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>{t('realestate.documentChecklist')}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {selectedCard.documents.map((doc, i) => (
                     <div key={i} style={{
@@ -1039,7 +1040,7 @@ function DealModal({ card: selectedCard, reMode, isRE }: { card: KanbanCard; reM
 
             {selectedCard.documents && selectedCard.documents.length === 0 && (
               <div style={{ fontSize: 12, color: 'var(--txt3)', fontStyle: 'italic' }}>
-                No documents attached yet.
+                {t('realestate.noDocuments')}
               </div>
             )}
           </div>

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { LiveMetricsBand } from '@/components/philly/dashboard/LiveMetricsBand'
@@ -223,14 +224,21 @@ export default function DashboardPage() {
         onClose={() => setAddLeadOpen(false)}
         industry={industry}
         onAdd={async (data) => {
-          if (data.csv) return  // CSV import not yet wired to API
-          try {
-            await fetch('/api/contacts', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(data),
-            })
-          } catch { /* handled by modal */ }
+          // CSV/XLSX import reports its own result panel inside the modal —
+          // nothing to POST here.
+          if (data.csv || data.xlsx) return
+          // Propagate failure: do NOT swallow. The modal awaits this and only
+          // shows the success state when it resolves — a 4xx/5xx or network
+          // error throws here, the modal catches it and renders an error
+          // instead of a false "Success!". (Bug found in live audit 2026-05-29.)
+          const res = await fetch('/api/contacts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          })
+          if (!res.ok) {
+            throw new Error(`create contact failed: ${res.status}`)
+          }
         }}
       />
     </>
@@ -256,17 +264,18 @@ type KpiStore = ReturnType<typeof useKpiStore>
 // ══════════════════════════════════════════
 function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
   const router = useRouter()
+  const tDash = useTranslations('dashboard')
 
   return (
     <>
-      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Booking" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
+      <Topbar title={tDash('title')} sub={tDash('subtitle.hospitality')} addLabel="Booking" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Journey Bar */}
         <JourneyBar
           steps={HOS_JOURNEY}
           summaryItems={HOS_SUMMARY}
-          title="Guest Journey"
-          subtitle="Current period overview"
+          title={tDash('widgets.guestJourneyTitle')}
+          subtitle={tDash('widgets.guestJourneySub')}
           period={journeyPeriod}
           onPeriodChange={setJourneyPeriod}
         />
@@ -295,7 +304,7 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
                 <Euro size={14} color="var(--accent)" />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Revenue Breakdown</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.revenueBreakdown')}</div>
                 <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Room + F&B revenue monthly</div>
               </div>
             </div>
@@ -334,8 +343,8 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
                 <Users size={14} color="var(--accent)" />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Occupancy Trend</div>
-                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Monthly occupancy rate</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.occupancyTrend')}</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{tDash('widgets.occupancyTrendSub')}</div>
               </div>
             </div>
             <div style={{ height: 250 }}>
@@ -379,14 +388,14 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
                 }}>
                   <BedDouble size={14} color="var(--accent)" />
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Rooms & Venues</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.roomsVenues')}</div>
               </div>
               <button onClick={() => router.push('/rooms')} style={{
                 fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none',
                 cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4,
                 fontFamily: 'inherit',
               }}>
-                View All <ArrowRight size={12} />
+                {tDash('widgets.viewAll')} <ArrowRight size={12} />
               </button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -444,7 +453,7 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
               }}>
                 <Clock size={14} color="var(--txt3)" />
               </div>
-              <div style={{ fontSize: 14, fontWeight: 600 }}>Recent Activity</div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.recentActivity')}</div>
             </div>
             {HOS_ACTIVITY.map((a, i) => (
               <div key={i} style={{
@@ -461,7 +470,7 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
               marginTop: 14, padding: '12px', borderRadius: 8,
               background: 'var(--bg2)', border: '1px solid var(--border)',
             }}>
-              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt3)', marginBottom: 8 }}>QUICK STATS</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt3)', marginBottom: 8 }}>{tDash('widgets.quickStats')}</div>
               {[
                 { label: 'Avg Stay', value: '2.8 nights', icon: Calendar },
                 { label: 'Repeat Guests', value: '34%', icon: Users },
@@ -497,8 +506,8 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
                 <Users size={14} color="var(--accent)" />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Occupancy Gauge</div>
-                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Current occupancy rate</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.occupancyGauge')}</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{tDash('widgets.occupancyGaugeSub')}</div>
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -546,7 +555,7 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
                 <Star size={14} color="var(--accent)" />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Guest Review Breakdown</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.guestReviews')}</div>
                 <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>189 total reviews</div>
               </div>
             </div>
@@ -597,15 +606,24 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
 // ══════════════════════════════════════════
 function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
   const router = useRouter()
+  const tDash = useTranslations('dashboard')
+  const tJourney = useTranslations('journey')
   const [pipelineMode, setPipelineMode] = useState<'sales' | 'rental'>('sales')
   const totalRevenue = RE_MONTHLY.reduce((s, m) => s + m.revenue, 0)
   const totalClosed = RE_MONTHLY.reduce((s, m) => s + m.closed, 0)
   const activeListings = RE_PROPERTIES.filter(p => p.status === 'active').length
   const avgDaysOnMarket = Math.round(RE_PROPERTIES.filter(p => p.daysOnMarket > 0).reduce((s, p) => s + p.daysOnMarket, 0) / RE_PROPERTIES.filter(p => p.daysOnMarket > 0).length)
 
+  // Translate the journey step labels via the `journey.<stage>` namespace
+  // — the stages array's hardcoded English labels are overwritten at render
+  // time. Stages keep their stable `stage` literal as the i18n key so a
+  // future schema change doesn't drift.
+  const localiseSteps = (steps: typeof RE_SALES_JOURNEY) =>
+    steps.map(s => ({ ...s, label: tJourney(s.stage as 'enquiry') }))
+
   return (
     <>
-      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Lead" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
+      <Topbar title={tDash('title')} sub={tDash('subtitle.realestate')} addLabel="Lead" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Journey Bar with pipeline mode toggle */}
         <div style={{ marginBottom: 16 }}>
@@ -619,15 +637,15 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
                 boxShadow: pipelineMode === m ? 'var(--shadow-sm)' : 'none',
                 fontFamily: 'inherit',
               }}>
-                {m === 'sales' ? 'Sales Pipeline' : 'Rental Pipeline'}
+                {tDash(`tabs.${m}`)}
               </button>
             ))}
           </div>
           <JourneyBar
-            steps={pipelineMode === 'sales' ? RE_SALES_JOURNEY : RE_RENTAL_JOURNEY}
+            steps={localiseSteps(pipelineMode === 'sales' ? RE_SALES_JOURNEY : RE_RENTAL_JOURNEY)}
             summaryItems={RE_SUMMARY}
-            title={pipelineMode === 'sales' ? 'Sales Pipeline' : 'Rental Pipeline'}
-            subtitle={pipelineMode === 'sales' ? '7-stage deal flow' : '5-stage rental flow'}
+            title={tDash(`tabs.${pipelineMode}`)}
+            subtitle={tDash(`stageFlow.${pipelineMode}`)}
             period={journeyPeriod}
             onPeriodChange={setJourneyPeriod}
           />
@@ -726,8 +744,8 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
                 <Euro size={14} color="var(--accent)" />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Revenue & Closings</div>
-                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Monthly performance</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.revenueAndClosings')}</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{tDash('widgets.monthlyPerformanceSub')}</div>
               </div>
             </div>
             <div style={{ height: 250 }}>
@@ -762,8 +780,8 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
                 <Building2 size={14} color="var(--b)" />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Listings vs Closings</div>
-                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Monthly market activity</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.listingsVsClosings')}</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{tDash('widgets.listingsVsClosingsSub')}</div>
               </div>
             </div>
             <div style={{ height: 250 }}>
@@ -803,14 +821,14 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
                 }}>
                   <Building2 size={14} color="var(--accent)" />
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Properties</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.properties')}</div>
               </div>
               <button onClick={() => router.push('/properties')} style={{
                 fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none',
                 cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4,
                 fontFamily: 'inherit',
               }}>
-                View All <ArrowRight size={12} />
+                {tDash('widgets.viewAll')} <ArrowRight size={12} />
               </button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -871,7 +889,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
               }}>
                 <Clock size={14} color="var(--txt3)" />
               </div>
-              <div style={{ fontSize: 14, fontWeight: 600 }}>Recent Activity</div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.recentActivity')}</div>
             </div>
             {RE_ACTIVITY.map((a, i) => (
               <div key={i} style={{
@@ -888,7 +906,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
               marginTop: 14, padding: '12px', borderRadius: 8,
               background: 'var(--bg2)', border: '1px solid var(--border)',
             }}>
-              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt3)', marginBottom: 8 }}>QUICK STATS</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt3)', marginBottom: 8 }}>{tDash('widgets.quickStats')}</div>
               {[
                 { label: 'Avg Commission', value: '€11.2K', icon: Euro },
                 { label: 'Showings This Week', value: '14', icon: Calendar },
@@ -924,8 +942,8 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
                 <Euro size={14} color="var(--accent)" />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Revenue by Type</div>
-                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Breakdown by property type</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.revenueByType')}</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{tDash('widgets.revenueByTypeSub')}</div>
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -959,7 +977,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
                   transform: 'translate(-50%, -50%)', textAlign: 'center',
                 }}>
                   <div className="mono" style={{ fontSize: 20, fontWeight: 700, color: 'var(--txt)' }}>€8.1M</div>
-                  <div style={{ fontSize: 10, color: 'var(--txt3)' }}>Total</div>
+                  <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{tDash('widgets.total')}</div>
                 </div>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginTop: 12 }}>
@@ -986,8 +1004,8 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
                 <TrendingUp size={14} color="var(--accent)" />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Revenue Forecast</div>
-                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Actual vs projected revenue</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.revenueForecast')}</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{tDash('widgets.revenueForecastSub')}</div>
               </div>
             </div>
             <div style={{ height: 220 }}>
@@ -1031,11 +1049,11 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 8 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                 <div style={{ width: 16, height: 2, background: 'var(--g)', borderRadius: 1 }} />
-                <span style={{ fontSize: 11, color: 'var(--txt2)' }}>Actual</span>
+                <span style={{ fontSize: 11, color: 'var(--txt2)' }}>{tDash('widgets.actual')}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                 <div style={{ width: 16, height: 2, background: 'var(--accent)', borderRadius: 1, borderTop: '1px dashed var(--accent)' }} />
-                <span style={{ fontSize: 11, color: 'var(--txt2)' }}>Forecast</span>
+                <span style={{ fontSize: 11, color: 'var(--txt2)' }}>{tDash('widgets.forecast')}</span>
               </div>
             </div>
           </div>
@@ -1062,16 +1080,17 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
 // ══════════════════════════════════════════
 function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
   const router = useRouter()
+  const tDash = useTranslations('dashboard')
   return (
     <>
-      <Topbar title={config.dashboardTitle} sub={config.dashboardSub} addLabel="Contact" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
+      <Topbar title={tDash('title')} sub={tDash('subtitle.philanthropy')} addLabel="Contact" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Journey Bar */}
         <JourneyBar
           steps={CSR_JOURNEY}
           summaryItems={CSR_SUMMARY}
-          title="Impact Journey"
-          subtitle="Project lifecycle overview"
+          title={tDash('widgets.impactJourneyTitle')}
+          subtitle={tDash('widgets.impactJourneySub')}
           period={journeyPeriod}
           onPeriodChange={setJourneyPeriod}
         />
@@ -1096,8 +1115,8 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
                 <Globe2 size={14} color="var(--accent)" />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Impact Overview</div>
-                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Cumulative impact over time</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.impactOverview')}</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{tDash('widgets.impactOverviewSub')}</div>
               </div>
             </div>
             <div style={{ height: 220 }}>
@@ -1131,7 +1150,7 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
               <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--bg2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Clock size={14} color="var(--txt3)" />
               </div>
-              <div style={{ fontSize: 14, fontWeight: 600 }}>Recent Activity</div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.recentActivity')}</div>
             </div>
             {CSR_ACTIVITY.map((a, i) => (
               <div key={i} style={{ padding: '10px 0', borderBottom: i < CSR_ACTIVITY.length - 1 ? '1px solid var(--border)' : 'none' }}>
@@ -1153,9 +1172,9 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
                 <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <FolderKanban size={14} color="var(--accent)" />
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Projects</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.projects')}</div>
               </div>
-              <button onClick={() => router.push('/projects')} style={{ fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'inherit' }}>View All <ArrowRight size={12} /></button>
+              <button onClick={() => router.push('/projects')} style={{ fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'inherit' }}>{tDash('widgets.viewAll')} <ArrowRight size={12} /></button>
             </div>
             {CSR_PROJECTS.map(p => {
               const sc = statusColors[p.status] || statusColors.planned
@@ -1197,7 +1216,7 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
                 <Leaf size={14} color="var(--accent)" />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>SDG Coverage</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.sdgCoverage')}</div>
                 <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>8 of 17 goals addressed</div>
               </div>
             </div>
@@ -1210,7 +1229,7 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
               })}
             </div>
             <div style={{ marginTop: 18 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 10 }}>Monthly Donations</div>
+              <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 10 }}>{tDash('widgets.monthlyDonations')}</div>
               <div style={{ height: 120 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={CSR_MONTHLY}>
@@ -1239,8 +1258,8 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
                 <Globe2 size={14} color="var(--accent)" />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>SDG Distribution</div>
-                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Impact allocation by focus area</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.sdgDistribution')}</div>
+                <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{tDash('widgets.sdgDistributionSub')}</div>
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -1274,7 +1293,7 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
                   transform: 'translate(-50%, -50%)', textAlign: 'center',
                 }}>
                   <div className="mono" style={{ fontSize: 20, fontWeight: 700, color: 'var(--txt)' }}>100%</div>
-                  <div style={{ fontSize: 10, color: 'var(--txt3)' }}>Allocated</div>
+                  <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{tDash('widgets.allocated')}</div>
                 </div>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginTop: 12 }}>
@@ -1301,7 +1320,7 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
                 <TrendingUp size={14} color="var(--accent)" />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>Impact Forecast</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.impactForecast')}</div>
                 <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>People helped - actual vs projected</div>
               </div>
             </div>
@@ -1346,11 +1365,11 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 8 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                 <div style={{ width: 16, height: 2, background: 'var(--g)', borderRadius: 1 }} />
-                <span style={{ fontSize: 11, color: 'var(--txt2)' }}>Actual</span>
+                <span style={{ fontSize: 11, color: 'var(--txt2)' }}>{tDash('widgets.actual')}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                 <div style={{ width: 16, height: 2, background: 'var(--accent)', borderRadius: 1, borderTop: '1px dashed var(--accent)' }} />
-                <span style={{ fontSize: 11, color: 'var(--txt2)' }}>Forecast</span>
+                <span style={{ fontSize: 11, color: 'var(--txt2)' }}>{tDash('widgets.forecast')}</span>
               </div>
             </div>
           </div>

@@ -112,7 +112,7 @@ export default function ActionPlansPage() {
   const createPlan = async () => {
     if (saving) return
     if (!addName.trim()) {
-      setAddError('Name is required')
+      setAddError(t('errors.nameRequired'))
       return
     }
     setSaving(true)
@@ -142,7 +142,7 @@ export default function ActionPlansPage() {
       setShowAdd(false)
       fetchPlans()
     } catch (err) {
-      setAddError(err instanceof Error ? err.message : 'Network error')
+      setAddError(err instanceof Error ? err.message : t('errors.networkError'))
     } finally {
       setSaving(false)
     }
@@ -158,34 +158,34 @@ export default function ActionPlansPage() {
 
   return (
     <>
-      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => { setAddError(null); setShowAdd(true) }} addLabel="Plan" />
+      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => { setAddError(null); setShowAdd(true) }} addLabel={t('addLabel')} />
       <div style={{ padding: '18px 24px 40px' }}>
 
         {/* KPI Row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="folder" label="Total Plans" value={String(total || plans.length)} />
-          <KpiCard icon="zap" label="Active" value={String(activePlans)} />
-          <KpiCard icon="users" label="Total Enrollments" value={String(totalEnrollments)} />
+          <KpiCard icon="folder" label={t('kpis.total')} value={String(total || plans.length)} />
+          <KpiCard icon="zap" label={t('kpis.active')} value={String(activePlans)} />
+          <KpiCard icon="users" label={t('kpis.enrollments')} value={String(totalEnrollments)} />
         </div>
 
         {/* Filter */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
           <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
             options={[
-              { value: '', label: 'All Statuses' },
-              { value: 'active', label: 'Active' },
-              { value: 'paused', label: 'Paused' },
-              { value: 'archived', label: 'Archived' },
+              { value: '', label: t('filters.all') },
+              { value: 'active', label: t('filters.active') },
+              { value: 'paused', label: t('filters.paused') },
+              { value: 'archived', label: t('filters.archived') },
             ]} />
         </div>
 
         {/* Plan Cards */}
         {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
         ) : plans.length === 0 ? (
           <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13, background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)' }}>
             <ListChecks size={32} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-            No action plans yet.
+            {t('list.empty')}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -220,7 +220,7 @@ export default function ActionPlansPage() {
                     padding: '3px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
                     background: 'var(--bg2)', color: 'var(--txt2)',
                   }}>
-                    {TRIGGER_LABELS[plan.triggerEvent] ?? plan.triggerEvent}
+                    {(() => { try { return t(`triggers.${plan.triggerEvent}` as any) } catch { return plan.triggerEvent } })()}
                   </span>
                   <div style={{ fontSize: 10, color: 'var(--txt3)', display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}>
                     <ListChecks size={10} /> {steps.length} step{steps.length !== 1 ? 's' : ''}
@@ -235,9 +235,9 @@ export default function ActionPlansPage() {
                     fontSize: 10, fontWeight: 600, cursor: 'pointer',
                     fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4,
                   }}>
-                    {plan.status === 'active' ? <><Pause size={10} /> Active</> : <><Play size={10} /> Paused</>}
+                    {plan.status === 'active' ? <><Pause size={10} /> {t('statusLabels.active')}</> : <><Play size={10} /> {t('statusLabels.paused')}</>}
                   </button>
-                  <button onClick={() => deletePlan(plan.id)} title="Delete" style={{
+                  <button onClick={() => deletePlan(plan.id)} title={t('actions.delete')} style={{
                     width: 28, height: 28, borderRadius: 6,
                     border: '1px solid var(--border)', background: 'transparent',
                     color: 'var(--r-txt)', cursor: 'pointer',
@@ -273,35 +273,35 @@ export default function ActionPlansPage() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-              <div id="action-plan-add-title" style={{ fontSize: 16, fontWeight: 700, color: 'var(--txt)' }}>Add Action Plan</div>
-              <button onClick={closeAddModal} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--txt3)', padding: 2, display: 'flex' }}>
+              <div id="action-plan-add-title" style={{ fontSize: 16, fontWeight: 700, color: 'var(--txt)' }}>{t('modal.title')}</div>
+              <button onClick={closeAddModal} aria-label={t('modal.close')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--txt3)', padding: 2, display: 'flex' }}>
                 <X size={16} />
               </button>
             </div>
-            <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>Create a new action plan</div>
+            <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>{t('modal.subtitle')}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
-                <label style={labelStyle}>Name</label>
-                <input value={addName} onChange={e => setAddName(e.target.value)} placeholder="e.g. New Lead Onboarding" style={inputStyle} />
+                <label style={labelStyle}>{t('modal.name')}</label>
+                <input value={addName} onChange={e => setAddName(e.target.value)} placeholder={t('modal.namePlaceholder')} style={inputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Description</label>
-                <textarea value={addDescription} onChange={e => setAddDescription(e.target.value)} placeholder="Describe this action plan..." rows={3} style={{
+                <label style={labelStyle}>{t('modal.description')}</label>
+                <textarea value={addDescription} onChange={e => setAddDescription(e.target.value)} placeholder={t('modal.descriptionPlaceholder')} rows={3} style={{
                   ...inputStyle, resize: 'vertical',
                 }} />
               </div>
               <div>
-                <label style={labelStyle}>Trigger Event</label>
+                <label style={labelStyle}>{t('modal.triggerEvent')}</label>
                 <select value={addTrigger} onChange={e => setAddTrigger(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
-                  {TRIGGER_OPTIONS.map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                  {TRIGGER_OPTIONS.map(([k]) => <option key={k} value={k}>{(() => { try { return t(`triggers.${k}` as any) } catch { return TRIGGER_LABELS[k] } })()}</option>)}
                 </select>
               </div>
               <div>
-                <label style={labelStyle}>Status</label>
+                <label style={labelStyle}>{t('modal.status')}</label>
                 <select value={addStatus} onChange={e => setAddStatus(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
-                  <option value="active">Active</option>
-                  <option value="paused">Paused</option>
-                  <option value="archived">Archived</option>
+                  <option value="active">{t('filters.active')}</option>
+                  <option value="paused">{t('filters.paused')}</option>
+                  <option value="archived">{t('filters.archived')}</option>
                 </select>
               </div>
             </div>
@@ -318,7 +318,7 @@ export default function ActionPlansPage() {
               background: 'var(--accent)', color: '#fff',
               fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit', opacity: saving ? 0.6 : 1,
-            }}>{saving ? 'Saving...' : 'Add Plan'}</button>
+            }}>{saving ? t('modal.saving') : t('modal.submit')}</button>
           </div>
         </div>
       )}

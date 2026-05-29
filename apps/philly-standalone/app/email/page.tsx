@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useApi } from '@/hooks/philly/useApi'
@@ -40,6 +41,7 @@ const labelStyle: React.CSSProperties = {
 }
 
 export default function EmailPage() {
+  const t = useTranslations('email')
   const accountsQuery = useApi<{ data: EmailAccount[] }>('/email/accounts')
   const accounts = accountsQuery.data?.data ?? []
   const loading = accountsQuery.loading
@@ -82,15 +84,15 @@ export default function EmailPage() {
   const selected = accounts.find(a => a.id === selectedId) ?? null
 
   const timeAgo = (dateStr: string | null) => {
-    if (!dateStr) return 'never'
+    if (!dateStr) return t('accounts.timeAgo.never')
     const diff = Date.now() - new Date(dateStr).getTime()
     const mins = Math.floor(diff / 60000)
-    if (mins < 1) return 'just now'
-    if (mins < 60) return `${mins}m ago`
+    if (mins < 1) return t('accounts.timeAgo.justNow')
+    if (mins < 60) return t('accounts.timeAgo.minutes', { n: mins })
     const hrs = Math.floor(mins / 60)
-    if (hrs < 24) return `${hrs}h ago`
+    if (hrs < 24) return t('accounts.timeAgo.hours', { n: hrs })
     const days = Math.floor(hrs / 24)
-    return `${days}d ago`
+    return t('accounts.timeAgo.days', { n: days })
   }
 
   const closeAddModal = () => {
@@ -106,7 +108,7 @@ export default function EmailPage() {
   const handleCreateAccount = async () => {
     if (addSubmitting) return
     if (!addEmail) {
-      setAddError('Email is required')
+      setAddError(t('addModal.emailRequired'))
       return
     }
     setAddSubmitting(true)
@@ -123,7 +125,7 @@ export default function EmailPage() {
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) {
-        setAddError(json?.error ?? json?.message ?? `Failed (${res.status})`)
+        setAddError(json?.error ?? json?.message ?? t('addModal.genericFailed', { status: res.status }))
         return
       }
       setAddProvider('smtp')
@@ -133,7 +135,7 @@ export default function EmailPage() {
       setShowAdd(false)
       fetchAccounts()
     } catch (err) {
-      setAddError(err instanceof Error ? err.message : 'Network error')
+      setAddError(err instanceof Error ? err.message : t('addModal.networkError'))
     } finally {
       setAddSubmitting(false)
     }
@@ -142,7 +144,7 @@ export default function EmailPage() {
   const handleSend = async () => {
     if (cmpSending) return
     if (!selected || !cmpTo || !cmpSubject) {
-      setSendError('To and Subject are required')
+      setSendError(t('compose.toSubjectRequired'))
       return
     }
     setCmpSending(true)
@@ -162,7 +164,7 @@ export default function EmailPage() {
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) {
-        setSendError(json?.error ?? json?.message ?? `Failed (${res.status})`)
+        setSendError(json?.error ?? json?.message ?? t('sendErrors.genericFailed', { status: res.status }))
         return
       }
       setCmpTo(''); setCmpCc(''); setCmpBcc('')
@@ -171,7 +173,7 @@ export default function EmailPage() {
       setSendError(null)
       setShowCompose(false)
     } catch (err) {
-      setSendError(err instanceof Error ? err.message : 'Network error')
+      setSendError(err instanceof Error ? err.message : t('sendErrors.networkError'))
     } finally {
       setCmpSending(false)
     }
@@ -179,14 +181,14 @@ export default function EmailPage() {
 
   return (
     <>
-      <Topbar title="Email" sub="Manage accounts and send messages" onAdd={() => setShowAdd(true)} addLabel="Connect Account" />
+      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => setShowAdd(true)} addLabel={t('connectAccount')} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPI Row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="mail" label="Total Accounts" value={String(accounts.length)} />
-          <KpiCard icon="check-circle" label="Connected" value={String(connectedCount)} />
-          <KpiCard icon="inbox" label="Messages Today" value="0" />
-          <KpiCard icon="clock" label="Pending" value="0" />
+          <KpiCard icon="mail" label={t('kpi.totalAccounts')} value={String(accounts.length)} />
+          <KpiCard icon="check-circle" label={t('kpi.connected')} value={String(connectedCount)} />
+          <KpiCard icon="inbox" label={t('kpi.messagesToday')} value="0" />
+          <KpiCard icon="clock" label={t('kpi.pending')} value="0" />
         </div>
 
         {/* Two-column layout */}
@@ -202,10 +204,10 @@ export default function EmailPage() {
               fontSize: 10, fontWeight: 600, textTransform: 'uppercase',
               letterSpacing: '0.06em', color: 'var(--txt3)',
             }}>
-              <span>Accounts</span>
+              <span>{t('accounts.sectionTitle')}</span>
               <button
                 onClick={fetchAccounts}
-                title="Refresh"
+                title={t('accounts.refresh')}
                 style={{
                   background: 'none', border: 'none', padding: 4,
                   color: 'var(--txt3)', cursor: 'pointer', display: 'flex',
@@ -214,11 +216,11 @@ export default function EmailPage() {
             </div>
 
             {loading ? (
-              <div style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+              <div style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('accounts.loading')}</div>
             ) : accounts.length === 0 ? (
               <div style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
                 <Mail size={28} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-                <div style={{ marginBottom: 12 }}>No email accounts connected</div>
+                <div style={{ marginBottom: 12 }}>{t('accounts.emptyTitle')}</div>
                 <button
                   onClick={() => setShowAdd(true)}
                   style={{
@@ -227,7 +229,7 @@ export default function EmailPage() {
                     fontSize: 12, fontWeight: 600, cursor: 'pointer',
                     fontFamily: 'inherit',
                   }}
-                >Connect one</button>
+                >{t('accounts.emptyAction')}</button>
               </div>
             ) : accounts.map((acc, idx) => {
               const info = PROVIDER_INFO[acc.provider] ?? { label: acc.provider, color: '#6b7280' }
@@ -283,7 +285,7 @@ export default function EmailPage() {
                       fontFamily: 'var(--font-red-hat-mono), monospace',
                       display: 'inline-flex', alignItems: 'center', gap: 3, marginTop: 3,
                     }}>
-                      <Clock size={9} /> sync {timeAgo(acc.lastSyncAt)}
+                      <Clock size={9} /> {t('accounts.syncPrefix')} {timeAgo(acc.lastSyncAt)}
                     </div>
                   </div>
                 </div>
@@ -301,12 +303,12 @@ export default function EmailPage() {
             }}>
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>
-                  {selected ? selected.email : 'No account selected'}
+                  {selected ? selected.email : t('compose.noAccount')}
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--txt3)' }}>
                   {selected
-                    ? `Send from ${PROVIDER_INFO[selected.provider]?.label ?? selected.provider}`
-                    : 'Connect an account to start sending'}
+                    ? t('compose.sendFrom', { provider: PROVIDER_INFO[selected.provider]?.label ?? selected.provider })
+                    : t('compose.connectPrompt')}
                 </div>
               </div>
               <button
@@ -322,7 +324,7 @@ export default function EmailPage() {
                   fontFamily: 'inherit',
                 }}
               >
-                <Plus size={13} /> Compose
+                <Plus size={13} /> {t('compose.button')}
               </button>
             </div>
 
@@ -334,10 +336,10 @@ export default function EmailPage() {
             }}>
               <Mail size={36} style={{ margin: '0 auto 14px', opacity: 0.25 }} />
               <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--txt2)', marginBottom: 6 }}>
-                Email thread view coming soon
+                {t('thread.comingSoonTitle')}
               </div>
               <div style={{ fontSize: 12, color: 'var(--txt3)', maxWidth: 380, margin: '0 auto' }}>
-                Inbound and outbound messages will appear here once the mailbox sync endpoint is live.
+                {t('thread.comingSoonBody')}
               </div>
             </div>
           </div>
@@ -364,10 +366,10 @@ export default function EmailPage() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
               <div>
-                <div id="email-account-add-title" style={{ fontSize: 16, fontWeight: 700 }}>Connect Email Account</div>
-                <div style={{ fontSize: 12, color: 'var(--txt3)', marginTop: 2 }}>Add a mailbox to send and receive messages</div>
+                <div id="email-account-add-title" style={{ fontSize: 16, fontWeight: 700 }}>{t('addModal.title')}</div>
+                <div style={{ fontSize: 12, color: 'var(--txt3)', marginTop: 2 }}>{t('addModal.subtitle')}</div>
               </div>
-              <button onClick={closeAddModal} aria-label="Close" style={{
+              <button onClick={closeAddModal} aria-label={t('addModal.close')} style={{
                 background: 'none', border: 'none', color: 'var(--txt3)',
                 cursor: 'pointer', padding: 2, display: 'flex',
               }}><X size={16} /></button>
@@ -375,7 +377,7 @@ export default function EmailPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 14 }}>
               <div>
-                <label style={labelStyle}>Provider</label>
+                <label style={labelStyle}>{t('addModal.provider')}</label>
                 <select
                   value={addProvider}
                   onChange={e => setAddProvider(e.target.value as 'smtp' | 'gmail' | 'outlook')}
@@ -387,21 +389,21 @@ export default function EmailPage() {
                 </select>
               </div>
               <div>
-                <label style={labelStyle}>Email Address</label>
+                <label style={labelStyle}>{t('addModal.emailLabel')}</label>
                 <input
                   type="email"
                   value={addEmail}
                   onChange={e => setAddEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder={t('addModal.emailPlaceholder')}
                   style={inputStyle}
                 />
               </div>
               <div>
-                <label style={labelStyle}>Display Name</label>
+                <label style={labelStyle}>{t('addModal.displayName')}</label>
                 <input
                   value={addDisplayName}
                   onChange={e => setAddDisplayName(e.target.value)}
-                  placeholder="Optional — shown on outgoing mail"
+                  placeholder={t('addModal.displayNamePlaceholder')}
                   style={inputStyle}
                 />
               </div>
@@ -426,7 +428,7 @@ export default function EmailPage() {
                 cursor: (!addEmail || addSubmitting) ? 'not-allowed' : 'pointer',
                 fontFamily: 'inherit',
               }}
-            >{addSubmitting ? 'Connecting...' : 'Connect Account'}</button>
+            >{addSubmitting ? t('addModal.submitting') : t('addModal.submit')}</button>
           </div>
         </div>
       )}
@@ -451,12 +453,12 @@ export default function EmailPage() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
               <div>
-                <div id="email-compose-title" style={{ fontSize: 16, fontWeight: 700 }}>New Message</div>
+                <div id="email-compose-title" style={{ fontSize: 16, fontWeight: 700 }}>{t('compose.title')}</div>
                 <div style={{ fontSize: 12, color: 'var(--txt3)', marginTop: 2 }}>
-                  From <span style={{ fontFamily: 'var(--font-red-hat-mono), monospace', color: 'var(--txt2)' }}>{selected.email}</span>
+                  {t('compose.fromLabel')} <span style={{ fontFamily: 'var(--font-red-hat-mono), monospace', color: 'var(--txt2)' }}>{selected.email}</span>
                 </div>
               </div>
-              <button onClick={closeComposeModal} aria-label="Close" style={{
+              <button onClick={closeComposeModal} aria-label={t('addModal.close')} style={{
                 background: 'none', border: 'none', color: 'var(--txt3)',
                 cursor: 'pointer', padding: 2, display: 'flex',
               }}><X size={16} /></button>
@@ -464,11 +466,11 @@ export default function EmailPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 14 }}>
               <div>
-                <label style={labelStyle}>To</label>
+                <label style={labelStyle}>{t('compose.to')}</label>
                 <input
                   value={cmpTo}
                   onChange={e => setCmpTo(e.target.value)}
-                  placeholder="recipient@example.com"
+                  placeholder={t('compose.toPlaceholder')}
                   style={inputStyle}
                 />
               </div>
@@ -481,36 +483,36 @@ export default function EmailPage() {
                     color: 'var(--txt3)', fontSize: 11, fontWeight: 600,
                     cursor: 'pointer', padding: 0, fontFamily: 'inherit',
                   }}
-                >+ Add Cc / Bcc</button>
+                >{t('compose.addCcBcc')}</button>
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <div>
-                    <label style={labelStyle}>Cc</label>
+                    <label style={labelStyle}>{t('compose.cc')}</label>
                     <input value={cmpCc} onChange={e => setCmpCc(e.target.value)} style={inputStyle} />
                   </div>
                   <div>
-                    <label style={labelStyle}>Bcc</label>
+                    <label style={labelStyle}>{t('compose.bcc')}</label>
                     <input value={cmpBcc} onChange={e => setCmpBcc(e.target.value)} style={inputStyle} />
                   </div>
                 </div>
               )}
 
               <div>
-                <label style={labelStyle}>Subject</label>
+                <label style={labelStyle}>{t('compose.subject')}</label>
                 <input
                   value={cmpSubject}
                   onChange={e => setCmpSubject(e.target.value)}
-                  placeholder="Subject line"
+                  placeholder={t('compose.subjectPlaceholder')}
                   style={inputStyle}
                 />
               </div>
 
               <div>
-                <label style={labelStyle}>Message</label>
+                <label style={labelStyle}>{t('compose.message')}</label>
                 <textarea
                   value={cmpBody}
                   onChange={e => setCmpBody(e.target.value)}
-                  placeholder="Write your message..."
+                  placeholder={t('compose.messagePlaceholder')}
                   rows={10}
                   style={{ ...inputStyle, resize: 'vertical', minHeight: 180, lineHeight: 1.5 }}
                 />
@@ -530,7 +532,7 @@ export default function EmailPage() {
             }}>
               <button
                 disabled
-                title="Attachments coming soon"
+                title={t('compose.attachTooltip')}
                 style={{
                   background: 'none', border: '1px solid var(--border)',
                   color: 'var(--txt3)', fontSize: 11, padding: '7px 12px',
@@ -538,7 +540,7 @@ export default function EmailPage() {
                   cursor: 'not-allowed', fontFamily: 'inherit',
                 }}
               >
-                <Paperclip size={12} /> Attach
+                <Paperclip size={12} /> {t('compose.attach')}
               </button>
 
               <button
@@ -554,7 +556,7 @@ export default function EmailPage() {
                   fontFamily: 'inherit',
                 }}
               >
-                <Send size={13} /> {cmpSending ? 'Sending...' : 'Send'}
+                <Send size={13} /> {cmpSending ? t('compose.sending') : t('compose.send')}
               </button>
             </div>
           </div>

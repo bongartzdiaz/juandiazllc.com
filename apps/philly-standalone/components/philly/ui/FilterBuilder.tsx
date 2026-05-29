@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Plus, X, Filter as FilterIcon, Search } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export type FilterOperator =
   | 'eq' | 'neq'
@@ -117,6 +118,8 @@ interface FilterBuilderProps {
 }
 
 export function FilterBuilder({ fields, value, onChange, compact }: FilterBuilderProps) {
+  const t = useTranslations('forms.filterBuilder')
+  const tf = useTranslations('filterFields')
   const addRule = () => {
     const field = fields[0]
     if (!field) return
@@ -149,7 +152,7 @@ export function FilterBuilder({ fields, value, onChange, compact }: FilterBuilde
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <FilterIcon size={13} color="var(--txt3)" />
           <span style={{ fontSize: 11.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
-            Filters
+            {t('header')}
           </span>
           {value.rules.length > 0 && (
             <select
@@ -161,8 +164,8 @@ export function FilterBuilder({ fields, value, onChange, compact }: FilterBuilde
                 fontSize: 11, fontWeight: 600, color: 'var(--txt2)',
               }}
             >
-              <option value="and">Match ALL</option>
-              <option value="or">Match ANY</option>
+              <option value="and">{t('matchAll')}</option>
+              <option value="or">{t('matchAny')}</option>
             </select>
           )}
         </div>
@@ -174,13 +177,13 @@ export function FilterBuilder({ fields, value, onChange, compact }: FilterBuilde
               background: 'var(--bg2)', color: 'var(--txt3)',
               fontSize: 11, fontWeight: 600, cursor: 'pointer',
             }}
-          >Clear all</button>
+          >{t('clearAll')}</button>
         )}
       </div>
 
       {value.rules.length === 0 ? (
         <div style={{ fontSize: 12, color: 'var(--txt3)', padding: '6px 0 10px' }}>
-          No filters. Click <b>+ Add filter</b> below to narrow results.
+          {t('empty')}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -189,6 +192,7 @@ export function FilterBuilder({ fields, value, onChange, compact }: FilterBuilde
               key={rule.id}
               rule={rule}
               fields={fields}
+              tf={tf}
               onChange={patch => updateRule(rule.id, patch)}
               onRemove={() => removeRule(rule.id)}
             />
@@ -205,22 +209,32 @@ export function FilterBuilder({ fields, value, onChange, compact }: FilterBuilde
           display: 'inline-flex', alignItems: 'center', gap: 5,
         }}
       >
-        <Plus size={11} /> Add filter
+        <Plus size={11} /> {t('addFilter')}
       </button>
     </div>
   )
 }
 
-function RuleRow({ rule, fields, onChange, onRemove }: {
+function RuleRow({ rule, fields, tf, onChange, onRemove }: {
   rule: FilterRule
   fields: FilterField[]
+  tf: ReturnType<typeof useTranslations>
   onChange: (patch: Partial<FilterRule>) => void
   onRemove: () => void
 }) {
+  const t = useTranslations('forms.filterBuilder')
   const field = fields.find(f => f.key === rule.field) ?? fields[0]
   const operators = OPERATORS_BY_TYPE[field.type]
   const needsValue = !['isEmpty', 'isNotEmpty'].includes(rule.operator)
   const isBetween = rule.operator === 'between'
+
+  // Translate a field label by its stable `key` (== schema field id), falling
+  // back to the English `label` baked into the schema when no i18n key exists.
+  const fieldLabel = (f: FilterField) => (tf.has(f.key) ? tf(f.key) : f.label)
+  // Translate an enum option by its `value` under filterFields.options.<value>,
+  // falling back to the English label from the schema.
+  const optLabel = (o: { value: string; label: string }) =>
+    (tf.has(`options.${o.value}`) ? tf(`options.${o.value}`) : o.label)
 
   return (
     <div style={{ display: 'flex', gap: 5, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -232,14 +246,14 @@ function RuleRow({ rule, fields, onChange, onRemove }: {
         }}
         style={selectStyle}
       >
-        {fields.map(f => <option key={f.key} value={f.key}>{f.label}</option>)}
+        {fields.map(f => <option key={f.key} value={f.key}>{fieldLabel(f)}</option>)}
       </select>
       <select
         value={rule.operator}
         onChange={e => onChange({ operator: e.target.value as FilterOperator, value: '' })}
         style={selectStyle}
       >
-        {operators.map(op => <option key={op} value={op}>{OPERATOR_LABELS[op]}</option>)}
+        {operators.map(op => <option key={op} value={op}>{t.has(`operators.${op}`) ? t(`operators.${op}`) : OPERATOR_LABELS[op]}</option>)}
       </select>
 
       {needsValue && !isBetween && field.type === 'select' && (
@@ -249,7 +263,7 @@ function RuleRow({ rule, fields, onChange, onRemove }: {
           style={selectStyle}
         >
           <option value="">—</option>
-          {field.options?.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+          {field.options?.map(o => <option key={o.value} value={o.value}>{optLabel(o)}</option>)}
         </select>
       )}
       {needsValue && !isBetween && field.type === 'boolean' && (
@@ -267,7 +281,7 @@ function RuleRow({ rule, fields, onChange, onRemove }: {
           type={field.type === 'number' ? 'number' : 'text'}
           value={String(rule.value ?? '')}
           onChange={e => onChange({ value: field.type === 'number' ? Number(e.target.value) : e.target.value })}
-          placeholder="value"
+          placeholder={t('valuePlaceholder')}
           style={inputStyle}
         />
       )}
@@ -288,10 +302,10 @@ function RuleRow({ rule, fields, onChange, onRemove }: {
               const current = Array.isArray(rule.value) ? rule.value : ['', '']
               onChange({ value: [e.target.value, String(current[1] ?? '')] as [string, string] })
             }}
-            placeholder="from"
+            placeholder={t('rangeFrom')}
             style={{ ...inputStyle, width: 110 }}
           />
-          <span style={{ fontSize: 11, color: 'var(--txt3)' }}>and</span>
+          <span style={{ fontSize: 11, color: 'var(--txt3)' }}>{t('rangeAnd')}</span>
           <input
             type={field.type === 'date' ? 'date' : 'number'}
             value={Array.isArray(rule.value) ? String(rule.value[1] ?? '') : ''}
@@ -299,7 +313,7 @@ function RuleRow({ rule, fields, onChange, onRemove }: {
               const current = Array.isArray(rule.value) ? rule.value : ['', '']
               onChange({ value: [String(current[0] ?? ''), e.target.value] as [string, string] })
             }}
-            placeholder="to"
+            placeholder={t('rangeTo')}
             style={{ ...inputStyle, width: 110 }}
           />
         </>

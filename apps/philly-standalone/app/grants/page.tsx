@@ -283,7 +283,7 @@ export default function GrantsPage() {
                   <Euro size={18} style={{ color: 'var(--accent)' }} />
                 </div>
                 <div>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Grant Amount</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{t('detail.grantAmount')}</div>
                   <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: 'var(--txt)', marginTop: 2 }}>
                     ${(g.amountCents / 100).toLocaleString()}
                   </div>
@@ -291,10 +291,10 @@ export default function GrantsPage() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <DetailTile icon={Building2} label="Funder" value={g.funder || '-'} />
-                <DetailTile icon={CheckCircle2} label="Applied" value={fmtDate(g.appliedDate)} />
-                <DetailTile icon={CheckCircle2} label="Awarded" value={fmtDate(g.awardedDate)} />
-                <DetailTile icon={CalIcon} label="Period" value={`${fmtDate(g.startDate)} → ${fmtDate(g.endDate)}`} />
+                <DetailTile icon={Building2} label={t('detail.funder')} value={g.funder || '-'} />
+                <DetailTile icon={CheckCircle2} label={t('detail.applied')} value={fmtDate(g.appliedDate)} />
+                <DetailTile icon={CheckCircle2} label={t('detail.awarded')} value={fmtDate(g.awardedDate)} />
+                <DetailTile icon={CalIcon} label={t('detail.period')} value={`${fmtDate(g.startDate)} → ${fmtDate(g.endDate)}`} />
               </div>
 
               <div style={{ display: 'flex', gap: 8, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
@@ -308,7 +308,7 @@ export default function GrantsPage() {
                     fontFamily: 'inherit',
                   }}
                 >
-                  <Trash2 size={12} /> Delete
+                  <Trash2 size={12} /> {t('detail.delete')}
                 </button>
                 <div style={{ flex: 1 }} />
                 <button
@@ -321,7 +321,7 @@ export default function GrantsPage() {
                     fontFamily: 'inherit',
                   }}
                 >
-                  <Edit2 size={12} /> Edit
+                  <Edit2 size={12} /> {t('detail.edit')}
                 </button>
                 <button
                   onClick={() => setSelected(null)}
@@ -332,7 +332,7 @@ export default function GrantsPage() {
                     fontFamily: 'inherit',
                   }}
                 >
-                  Close
+                  {t('detail.close')}
                 </button>
               </div>
             </div>
@@ -345,50 +345,50 @@ export default function GrantsPage() {
         open={showForm}
         onClose={() => { if (!saving) setShowForm(false) }}
         title={editingId ? t('editGrant') : t('newGrant')}
-        subtitle={editingId ? 'Update grant details' : 'Track a grant from application to award'}
+        subtitle={editingId ? t('form.updateSubtitle') : t('form.newSubtitle')}
         size="md"
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
-            <FormField label="Grant Title">
-              <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Community Housing Fund" style={inputStyle} />
+            <FormField label={t('fields.title')}>
+              <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder={t('placeholders.title')} style={inputStyle} />
             </FormField>
-            <FormField label="Amount ($)">
-              <input type="number" min="0" step="1000" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} placeholder="50000" style={inputStyle} />
+            <FormField label={t('fields.amount')}>
+              <input type="number" min="0" step="1000" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} placeholder={t('placeholders.amount')} style={inputStyle} />
             </FormField>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
-            <FormField label="Funder">
-              <input value={form.funder} onChange={e => setForm({ ...form, funder: e.target.value })} placeholder="Foundation name" style={inputStyle} />
+            <FormField label={t('fields.funder')}>
+              <input value={form.funder} onChange={e => setForm({ ...form, funder: e.target.value })} placeholder={t('placeholders.funder')} style={inputStyle} />
             </FormField>
-            <FormField label="Status">
+            <FormField label={t('fields.status')}>
               <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} style={inputStyle}>
-                {Object.keys(STATUS_COLORS).map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
+                {Object.keys(STATUS_COLORS).map(s => <option key={s} value={s}>{(() => { try { return t(`filters.${s}` as any) } catch { return s.replace('_', ' ') } })()}</option>)}
               </select>
             </FormField>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <FormField label="Applied Date">
+            <FormField label={t('fields.appliedDate')}>
               <input type="date" value={form.appliedDate} onChange={e => setForm({ ...form, appliedDate: e.target.value })} style={inputStyle} />
             </FormField>
-            <FormField label="Awarded Date">
+            <FormField label={t('fields.awardedDate')}>
               <input type="date" value={form.awardedDate} onChange={e => setForm({ ...form, awardedDate: e.target.value })} style={inputStyle} />
             </FormField>
-            <FormField label="Start Date">
+            <FormField label={t('fields.startDate')}>
               <input type="date" value={form.startDate} onChange={e => setForm({ ...form, startDate: e.target.value })} style={inputStyle} />
             </FormField>
-            <FormField label="End Date">
+            <FormField label={t('fields.endDate')}>
               <input type="date" value={form.endDate} onChange={e => setForm({ ...form, endDate: e.target.value })} style={inputStyle} />
             </FormField>
           </div>
-          <FormField label="Description">
+          <FormField label={t('fields.description')}>
             <textarea rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-              placeholder="Grant purpose and scope…"
+              placeholder={t('placeholders.description')}
               style={{ ...inputStyle, resize: 'vertical' }} />
           </FormField>
-          <FormField label="Requirements / Reporting">
+          <FormField label={t('fields.requirements')}>
             <textarea rows={2} value={form.requirements} onChange={e => setForm({ ...form, requirements: e.target.value })}
-              placeholder="Reporting deadlines, deliverables…"
+              placeholder={t('placeholders.requirements')}
               style={{ ...inputStyle, resize: 'vertical' }} />
           </FormField>
 
@@ -398,13 +398,13 @@ export default function GrantsPage() {
               background: 'var(--bg2)', color: 'var(--txt2)',
               border: '1px solid var(--border)', fontSize: 12, fontWeight: 600,
               cursor: 'pointer', fontFamily: 'inherit',
-            }}>Cancel</button>
+            }}>{t('form.cancel')}</button>
             <button onClick={submitForm} disabled={saving} style={{
               padding: '9px 18px', borderRadius: 8,
               background: 'var(--accent)', color: '#fff', border: 'none',
               fontSize: 12, fontWeight: 600, cursor: saving ? 'wait' : 'pointer',
               fontFamily: 'inherit', opacity: saving ? 0.7 : 1,
-            }}>{saving ? 'Saving…' : editingId ? 'Save changes' : 'Add Grant'}</button>
+            }}>{saving ? t('form.saving') : editingId ? t('form.saveChanges') : t('newGrant')}</button>
           </div>
         </div>
       </Modal>

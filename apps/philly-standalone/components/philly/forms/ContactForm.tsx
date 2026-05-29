@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { FormField } from '@/components/philly/ui/Modal'
 import { useIndustry } from '@/hooks/philly/useIndustry'
+import { useTranslations } from 'next-intl'
 
 interface ContactFormProps {
   onSubmit: (data: ContactFormData) => void
@@ -23,6 +24,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export function ContactForm({ onSubmit, onCancel, initial }: ContactFormProps) {
   const { config } = useIndustry()
+  const t = useTranslations('forms.contact')
 
   const [form, setForm] = useState<ContactFormData>({
     name: initial?.name ?? '',
@@ -74,7 +76,7 @@ export function ContactForm({ onSubmit, onCancel, initial }: ContactFormProps) {
       <FormField label="Name" required>
         <input
           style={inputStyle}
-          placeholder="Full name"
+          placeholder={t('fullName')}
           value={form.name}
           onChange={e => update('name', e.target.value)}
           aria-invalid={errors.name ? 'true' : undefined}
@@ -123,7 +125,7 @@ export function ContactForm({ onSubmit, onCancel, initial }: ContactFormProps) {
       <FormField label="Company">
         <input
           style={inputStyle}
-          placeholder="Organization or company"
+          placeholder={t('company')}
           value={form.company}
           onChange={e => update('company', e.target.value)}
         />
@@ -132,7 +134,7 @@ export function ContactForm({ onSubmit, onCancel, initial }: ContactFormProps) {
       <FormField label="Notes">
         <textarea
           style={{ ...inputStyle, minHeight: 80, resize: 'vertical' }}
-          placeholder="Additional notes..."
+          placeholder={t('notes')}
           value={form.notes}
           onChange={e => update('notes', e.target.value)}
         />

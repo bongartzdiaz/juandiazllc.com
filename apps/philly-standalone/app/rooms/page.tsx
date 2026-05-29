@@ -75,9 +75,9 @@ export default function RoomsPage() {
   }
 
   async function submitForm() {
-    if (!form.name.trim()) { addToast('Name required', 'error'); return }
+    if (!form.name.trim()) { addToast(t('toasts.nameRequired'), 'error'); return }
     const priceCentsNight = Math.round((parseFloat(form.price) || 0) * 100)
-    if (priceCentsNight < 0) { addToast('Invalid price', 'error'); return }
+    if (priceCentsNight < 0) { addToast(t('toasts.invalidPrice'), 'error'); return }
     setSaving(true)
     try {
       const payload = {
@@ -92,11 +92,11 @@ export default function RoomsPage() {
         ? await fetch(`/api/rooms/${editingId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
         : await fetch('/api/rooms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       const j = await res.json().catch(() => ({}))
-      if (!res.ok) { addToast(j.error ?? 'Save failed', 'error'); return }
-      addToast(editingId ? 'Room updated' : 'Room added', 'success')
+      if (!res.ok) { addToast(j.error ?? t('toasts.saveFailed'), 'error'); return }
+      addToast(editingId ? t('toasts.updated') : t('toasts.created'), 'success')
       setShowForm(false)
       fetchData()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
     finally { setSaving(false) }
   }
 
@@ -112,11 +112,11 @@ export default function RoomsPage() {
     try {
       const res = await fetch(`/api/rooms/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
-        addToast('Room deleted', 'success')
+        addToast(t('toasts.deleted'), 'success')
         setSelectedRoom(null)
         fetchData()
-      } else { addToast('Delete failed', 'error') }
-    } catch { addToast('Network error', 'error') }
+      } else { addToast(t('toasts.deleteFailed'), 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
   }
 
   // Live-refresh on any room mutation in the org
@@ -131,21 +131,21 @@ export default function RoomsPage() {
       <Topbar title={t('title')} sub={t('subtitle')} />
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="folder" label="Total Rooms" value={String(total)} />
-          <KpiCard icon="target" label="Available" value={String(available)} />
-          <KpiCard icon="users" label="Occupied" value={String(occupied)} />
-          <KpiCard icon="zap" label="Maintenance" value={String(maintenance)} />
+          <KpiCard icon="folder" label={t('kpi.totalRooms')} value={String(total)} />
+          <KpiCard icon="target" label={t('kpi.available')} value={String(available)} />
+          <KpiCard icon="users" label={t('kpi.occupied')} value={String(occupied)} />
+          <KpiCard icon="zap" label={t('kpi.maintenance')} value={String(maintenance)} />
         </div>
 
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
             <Filter size={13} style={{ color: 'var(--txt3)' }} />
             <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
-              <option value="">All Statuses</option>
-              <option value="available">Available</option>
-              <option value="occupied">Occupied</option>
-              <option value="maintenance">Maintenance</option>
-              <option value="blocked">Blocked</option>
+              <option value="">{t('filters.allStatuses')}</option>
+              <option value="available">{t('statuses.available')}</option>
+              <option value="occupied">{t('statuses.occupied')}</option>
+              <option value="maintenance">{t('statuses.maintenance')}</option>
+              <option value="blocked">{t('statuses.blocked')}</option>
             </select>
           </div>
           <div style={{ flex: 1 }} />
@@ -156,31 +156,31 @@ export default function RoomsPage() {
             border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
             fontFamily: 'inherit', boxShadow: 'var(--shadow-sm)',
           }}>
-            <Plus size={13} /> Add Room
+            <Plus size={13} /> {t('addRoom')}
           </button>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
           {loading ? (
-            <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+            <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('loading')}</div>
           ) : rooms.length === 0 ? (
-            <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13, background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)' }}>No rooms found.</div>
+            <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13, background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)' }}>{t('empty')}</div>
           ) : rooms.map(room => {
             const sc = STATUS_COLORS[room.status] ?? { bg: 'var(--bg2)', txt: 'var(--txt2)' }
             return (
               <div key={room.id} className="card-hover" onClick={() => setSelectedRoom(room)} style={{ padding: '14px 16px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--panel)', boxShadow: 'var(--shadow-sm)', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--txt)' }}>{room.name}</div>
-                  <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 9, fontWeight: 600, textTransform: 'uppercase', background: sc.bg, color: sc.txt }}>{room.status}</span>
+                  <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 9, fontWeight: 600, textTransform: 'uppercase', background: sc.bg, color: sc.txt }}>{t(`statuses.${room.status}` as 'statuses.available')}</span>
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 6 }}>
-                  {room.type} | Floor {room.floor} | Cap. {room.capacity}
+                  {t(`types.${room.type}` as 'types.standard')} | {t('meta.floor')} {room.floor} | {t('meta.capacity')} {room.capacity}
                 </div>
                 <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--txt)', fontFamily: "var(--font-red-hat-mono), monospace" }}>
-                  ${(room.priceCentsNight / 100).toFixed(0)}<span style={{ fontSize: 10, fontWeight: 400, color: 'var(--txt3)' }}>/night</span>
+                  ${(room.priceCentsNight / 100).toFixed(0)}<span style={{ fontSize: 10, fontWeight: 400, color: 'var(--txt3)' }}>{t('perNight')}</span>
                 </div>
                 <div style={{ fontSize: 10, color: 'var(--txt3)', marginTop: 6 }}>
-                  {room._count.reservations} reservations | {room._count.housekeeping} tasks
+                  {room._count.reservations} {t('meta.reservations')} | {room._count.housekeeping} {t('meta.tasks')}
                 </div>
               </div>
             )
@@ -193,7 +193,7 @@ export default function RoomsPage() {
         open={!!selectedRoom}
         onClose={() => setSelectedRoom(null)}
         title={selectedRoom?.name ?? ''}
-        subtitle={selectedRoom ? `${selectedRoom.type} · Floor ${selectedRoom.floor}` : ''}
+        subtitle={selectedRoom ? `${t(`types.${selectedRoom.type}` as 'types.standard')} · ${t('detail.floor')} ${selectedRoom.floor}` : ''}
         size="md"
       >
         {selectedRoom && (() => {
@@ -202,29 +202,29 @@ export default function RoomsPage() {
           return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                <span style={{ padding: '3px 10px', borderRadius: 6, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', background: sc.bg, color: sc.txt }}>{r.status}</span>
-                <span style={{ padding: '3px 10px', borderRadius: 6, fontSize: 10, fontWeight: 600, background: 'var(--bg2)', color: 'var(--txt2)' }}>{r.type}</span>
+                <span style={{ padding: '3px 10px', borderRadius: 6, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', background: sc.bg, color: sc.txt }}>{t(`statuses.${r.status}` as 'statuses.available')}</span>
+                <span style={{ padding: '3px 10px', borderRadius: 6, fontSize: 10, fontWeight: 600, background: 'var(--bg2)', color: 'var(--txt2)' }}>{t(`types.${r.type}` as 'types.standard')}</span>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div style={{ padding: 12, background: 'var(--bg2)', borderRadius: 10 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Price</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{t('detail.price')}</div>
                   <div className="mono" style={{ fontSize: 18, fontWeight: 700, color: 'var(--txt)', marginTop: 4 }}>
-                    ${(r.priceCentsNight / 100).toFixed(0)}<span style={{ fontSize: 11, color: 'var(--txt3)' }}>/night</span>
+                    ${(r.priceCentsNight / 100).toFixed(0)}<span style={{ fontSize: 11, color: 'var(--txt3)' }}>{t('perNight')}</span>
                   </div>
                 </div>
                 <div style={{ padding: 12, background: 'var(--bg2)', borderRadius: 10 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Capacity</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{t('detail.capacity')}</div>
                   <div className="mono" style={{ fontSize: 18, fontWeight: 700, color: 'var(--txt)', marginTop: 4 }}>
-                    {r.capacity}<span style={{ fontSize: 11, color: 'var(--txt3)' }}> guests</span>
+                    {r.capacity}<span style={{ fontSize: 11, color: 'var(--txt3)' }}>{t('detail.guests')}</span>
                   </div>
                 </div>
                 <div style={{ padding: 12, background: 'var(--bg2)', borderRadius: 10 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Reservations</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{t('detail.reservations')}</div>
                   <div className="mono" style={{ fontSize: 18, fontWeight: 700, color: 'var(--txt)', marginTop: 4 }}>{r._count.reservations}</div>
                 </div>
                 <div style={{ padding: 12, background: 'var(--bg2)', borderRadius: 10 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Housekeeping</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{t('detail.housekeeping')}</div>
                   <div className="mono" style={{ fontSize: 18, fontWeight: 700, color: 'var(--txt)', marginTop: 4 }}>{r._count.housekeeping}</div>
                 </div>
               </div>
@@ -237,7 +237,7 @@ export default function RoomsPage() {
                   border: '1px solid var(--r-border)', fontSize: 12, fontWeight: 600,
                   cursor: 'pointer', fontFamily: 'inherit',
                 }}>
-                  <Trash2 size={12} /> Delete
+                  <Trash2 size={12} /> {t('actions.delete')}
                 </button>
                 <div style={{ flex: 1 }} />
                 <button onClick={() => openEdit(r)} style={{
@@ -246,7 +246,7 @@ export default function RoomsPage() {
                   background: 'var(--accent)', color: '#fff', border: 'none',
                   fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
                 }}>
-                  <Edit2 size={12} /> Edit
+                  <Edit2 size={12} /> {t('actions.edit')}
                 </button>
               </div>
             </div>
@@ -258,41 +258,41 @@ export default function RoomsPage() {
       <Modal
         open={showForm}
         onClose={() => { if (!saving) setShowForm(false) }}
-        title={editingId ? 'Edit Room' : 'Add Room'}
-        subtitle={editingId ? 'Update room details' : 'Register a new room'}
+        title={editingId ? t('editRoom') : t('addRoom')}
+        subtitle={editingId ? t('editSubtitle') : t('addSubtitle')}
         size="md"
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
-            <FormField label="Room Name / Number">
-              <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Suite 201" style={inputStyle} />
+            <FormField label={t('form.name')}>
+              <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder={t('form.namePlaceholder')} style={inputStyle} />
             </FormField>
-            <FormField label="Type">
+            <FormField label={t('form.type')}>
               <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={inputStyle}>
-                <option value="standard">Standard</option>
-                <option value="deluxe">Deluxe</option>
-                <option value="suite">Suite</option>
-                <option value="family">Family</option>
-                <option value="dorm">Dorm</option>
+                <option value="standard">{t('types.standard')}</option>
+                <option value="deluxe">{t('types.deluxe')}</option>
+                <option value="suite">{t('types.suite')}</option>
+                <option value="family">{t('types.family')}</option>
+                <option value="dorm">{t('types.dorm')}</option>
               </select>
             </FormField>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 10 }}>
-            <FormField label="Floor">
+            <FormField label={t('form.floor')}>
               <input type="number" min="0" value={form.floor} onChange={e => setForm({ ...form, floor: e.target.value })} style={inputStyle} />
             </FormField>
-            <FormField label="Capacity">
+            <FormField label={t('form.capacity')}>
               <input type="number" min="1" value={form.capacity} onChange={e => setForm({ ...form, capacity: e.target.value })} style={inputStyle} />
             </FormField>
-            <FormField label="Price ($/night)">
+            <FormField label={t('form.price')}>
               <input type="number" min="0" step="5" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} style={inputStyle} />
             </FormField>
-            <FormField label="Status">
+            <FormField label={t('form.status')}>
               <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} style={inputStyle}>
-                <option value="available">Available</option>
-                <option value="occupied">Occupied</option>
-                <option value="maintenance">Maintenance</option>
-                <option value="blocked">Blocked</option>
+                <option value="available">{t('statuses.available')}</option>
+                <option value="occupied">{t('statuses.occupied')}</option>
+                <option value="maintenance">{t('statuses.maintenance')}</option>
+                <option value="blocked">{t('statuses.blocked')}</option>
               </select>
             </FormField>
           </div>
@@ -303,13 +303,13 @@ export default function RoomsPage() {
               background: 'var(--bg2)', color: 'var(--txt2)',
               border: '1px solid var(--border)', fontSize: 12, fontWeight: 600,
               cursor: 'pointer', fontFamily: 'inherit',
-            }}>Cancel</button>
+            }}>{t('actions.cancel')}</button>
             <button onClick={submitForm} disabled={saving} style={{
               padding: '9px 18px', borderRadius: 8,
               background: 'var(--accent)', color: '#fff', border: 'none',
               fontSize: 12, fontWeight: 600, cursor: saving ? 'wait' : 'pointer',
               fontFamily: 'inherit', opacity: saving ? 0.7 : 1,
-            }}>{saving ? 'Saving…' : editingId ? 'Save changes' : 'Add Room'}</button>
+            }}>{saving ? t('actions.saving') : editingId ? t('actions.save') : t('addRoom')}</button>
           </div>
         </div>
       </Modal>

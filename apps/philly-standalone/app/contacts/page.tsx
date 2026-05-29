@@ -503,7 +503,7 @@ export default function ContactsPage() {
           <button
             type="button"
             onClick={handleExportAllVisible}
-            aria-label="Export all visible contacts to CSV"
+            aria-label={t('a11y.exportCsv')}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
               padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
@@ -518,7 +518,7 @@ export default function ContactsPage() {
             <button
               type="button"
               onClick={() => setFilterOpen(true)}
-              aria-label="Open advanced filter builder"
+              aria-label={t('a11y.openAdvanced')}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5,
                 padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,

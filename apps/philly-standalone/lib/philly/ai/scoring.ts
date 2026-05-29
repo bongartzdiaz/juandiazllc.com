@@ -17,7 +17,13 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 export type LeadTier = 'hot' | 'warm' | 'nurture' | 'cold' | 'dormant'
 
 export interface LeadSignal {
+  /** English fallback. */
   label: string
+  /** Stable i18n key under the `aiScoring.signals` namespace. The rendering
+   *  client component does `tx.has(labelKey) ? tx(labelKey, labelParams) : label`. */
+  labelKey?: string
+  /** ICU params for interpolated signal labels (e.g. `{ n: 5 }`). */
+  labelParams?: Record<string, number>
   points: number
   positive: boolean
 }
@@ -78,69 +84,69 @@ function scoreContact(input: {
   /* === Recency === */
   if (input.lastContactedAt) {
     const daysSince = (Date.now() - input.lastContactedAt.getTime()) / DAY
-    if (daysSince <= 3) signals.push({ label: 'Contacted in last 3 days', points: 18, positive: true })
-    else if (daysSince <= 7) signals.push({ label: 'Contacted this week', points: 12, positive: true })
-    else if (daysSince <= 30) signals.push({ label: 'Contacted this month', points: 6, positive: true })
-    else if (daysSince <= 90) signals.push({ label: 'Contacted in last 90 days', points: 2, positive: true })
-    else signals.push({ label: `Stale: not contacted in ${Math.floor(daysSince)} days`, points: -10, positive: false })
+    if (daysSince <= 3) signals.push({ label: 'Contacted in last 3 days', labelKey: 'signals.contactedLast3d', points: 18, positive: true })
+    else if (daysSince <= 7) signals.push({ label: 'Contacted this week', labelKey: 'signals.contactedThisWeek', points: 12, positive: true })
+    else if (daysSince <= 30) signals.push({ label: 'Contacted this month', labelKey: 'signals.contactedThisMonth', points: 6, positive: true })
+    else if (daysSince <= 90) signals.push({ label: 'Contacted in last 90 days', labelKey: 'signals.contactedLast90d', points: 2, positive: true })
+    else signals.push({ label: `Stale: not contacted in ${Math.floor(daysSince)} days`, labelKey: 'signals.stale', labelParams: { n: Math.floor(daysSince) }, points: -10, positive: false })
   } else {
-    signals.push({ label: 'Never contacted', points: -8, positive: false })
+    signals.push({ label: 'Never contacted', labelKey: 'signals.neverContacted', points: -8, positive: false })
   }
 
   /* === Engagement volume === */
   if (input.activities7d >= 3) {
-    signals.push({ label: `${input.activities7d} activities this week`, points: 15, positive: true })
+    signals.push({ label: `${input.activities7d} activities this week`, labelKey: 'signals.activitiesThisWeek', labelParams: { n: input.activities7d }, points: 15, positive: true })
   } else if (input.activities7d >= 1) {
-    signals.push({ label: `${input.activities7d} activity this week`, points: 8, positive: true })
+    signals.push({ label: `${input.activities7d} activity this week`, labelKey: 'signals.activityThisWeek', labelParams: { n: input.activities7d }, points: 8, positive: true })
   }
   if (input.activities30d >= 10) {
-    signals.push({ label: `${input.activities30d} activities this month`, points: 10, positive: true })
+    signals.push({ label: `${input.activities30d} activities this month`, labelKey: 'signals.activitiesThisMonth', labelParams: { n: input.activities30d }, points: 10, positive: true })
   }
   if (input.notes >= 5) {
-    signals.push({ label: `${input.notes} notes on file`, points: 6, positive: true })
+    signals.push({ label: `${input.notes} notes on file`, labelKey: 'signals.notesOnFile', labelParams: { n: input.notes }, points: 6, positive: true })
   }
 
   /* === Buyer readiness (RE) === */
   if (input.preApproved) {
-    signals.push({ label: 'Pre-approved for mortgage', points: 20, positive: true })
+    signals.push({ label: 'Pre-approved for mortgage', labelKey: 'signals.preApproved', points: 20, positive: true })
   }
   if (input.buyerPriceMin && input.buyerPriceMax) {
-    signals.push({ label: 'Defined price range', points: 8, positive: true })
+    signals.push({ label: 'Defined price range', labelKey: 'signals.priceRange', points: 8, positive: true })
   }
   if (input.buyerAreas && input.buyerAreas.trim().length > 0) {
-    signals.push({ label: 'Target areas specified', points: 5, positive: true })
+    signals.push({ label: 'Target areas specified', labelKey: 'signals.targetAreas', points: 5, positive: true })
   }
 
   /* === Contact completeness === */
   if (input.email && input.phone) {
-    signals.push({ label: 'Full contact details', points: 4, positive: true })
+    signals.push({ label: 'Full contact details', labelKey: 'signals.fullContactDetails', points: 4, positive: true })
   } else if (!input.email && !input.phone) {
-    signals.push({ label: 'No contact details', points: -12, positive: false })
+    signals.push({ label: 'No contact details', labelKey: 'signals.noContactDetails', points: -12, positive: false })
   } else if (!input.email) {
-    signals.push({ label: 'Missing email', points: -4, positive: false })
+    signals.push({ label: 'Missing email', labelKey: 'signals.missingEmail', points: -4, positive: false })
   } else if (!input.phone) {
-    signals.push({ label: 'Missing phone', points: -3, positive: false })
+    signals.push({ label: 'Missing phone', labelKey: 'signals.missingPhone', points: -3, positive: false })
   }
 
   /* === Showings === */
   if (input.showingsAttended >= 3) {
-    signals.push({ label: `Attended ${input.showingsAttended} showings`, points: 14, positive: true })
+    signals.push({ label: `Attended ${input.showingsAttended} showings`, labelKey: 'signals.attendedShowings', labelParams: { n: input.showingsAttended }, points: 14, positive: true })
   } else if (input.showingsAttended >= 1) {
-    signals.push({ label: `Attended ${input.showingsAttended} showing`, points: 8, positive: true })
+    signals.push({ label: `Attended ${input.showingsAttended} showing`, labelKey: 'signals.attendedShowing', labelParams: { n: input.showingsAttended }, points: 8, positive: true })
   }
   if (input.showingsWithFeedback >= 1) {
-    signals.push({ label: 'Provided showing feedback', points: 6, positive: true })
+    signals.push({ label: 'Provided showing feedback', labelKey: 'signals.providedFeedback', points: 6, positive: true })
   }
   if (input.showingsMissed >= 2) {
-    signals.push({ label: `${input.showingsMissed} no-shows`, points: -10, positive: false })
+    signals.push({ label: `${input.showingsMissed} no-shows`, labelKey: 'signals.noShows', labelParams: { n: input.showingsMissed }, points: -10, positive: false })
   }
 
   /* === Deal pipeline === */
   if (input.openDeals >= 1) {
-    signals.push({ label: `${input.openDeals} open deal(s)`, points: 15, positive: true })
+    signals.push({ label: `${input.openDeals} open deal(s)`, labelKey: 'signals.openDeals', labelParams: { n: input.openDeals }, points: 15, positive: true })
   }
   if (input.wonDeals >= 1) {
-    signals.push({ label: `${input.wonDeals} won deal(s) — loyal client`, points: 10, positive: true })
+    signals.push({ label: `${input.wonDeals} won deal(s) — loyal client`, labelKey: 'signals.wonDeals', labelParams: { n: input.wonDeals }, points: 10, positive: true })
   }
 
   /* === Lead status === */

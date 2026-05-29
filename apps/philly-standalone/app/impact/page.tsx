@@ -142,16 +142,16 @@ export default function ImpactPage() {
   if (isHOS) {
     return (
       <>
-        <Topbar title="Analytics" sub="Performance & guest insights" />
+        <Topbar title={t('hospitality.title')} sub={t('hospitality.subtitle')} />
 
         <div style={{ padding: '18px 24px 40px' }}>
           {/* KPIs */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
-            <KpiCard label="Occupancy Rate" value="78%" delta="+4% vs last month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={80} />
-            <KpiCard label="RevPAR" value="€142" delta="+€12 vs avg" deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={130} />
-            <KpiCard label="ADR" value="€185" delta="Avg Daily Rate" deltaDir="neu" icon="chart" accentColor="var(--b)" delay={180} />
-            <KpiCard label="Avg Review" value="4.6/5" delta="189 reviews total" deltaDir="up" icon="heart" accentColor="var(--o)" delay={230} />
-            <KpiCard label="F&B Revenue" value="€18K" delta="+8% this month" deltaDir="up" icon="zap" accentColor="var(--p)" delay={280} />
+            <KpiCard label={t('hospitality.occupancyRate')} value="78%" delta="+4% vs last month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={80} />
+            <KpiCard label={t('hospitality.revpar')} value="€142" delta="+€12 vs avg" deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={130} />
+            <KpiCard label={t('hospitality.adr')} value="€185" delta={t('hospitality.adrSub')} deltaDir="neu" icon="chart" accentColor="var(--b)" delay={180} />
+            <KpiCard label={t('hospitality.avgReview')} value="4.6/5" delta="189 reviews total" deltaDir="up" icon="heart" accentColor="var(--o)" delay={230} />
+            <KpiCard label={t('hospitality.fbRevenue')} value="€18K" delta="+8% this month" deltaDir="up" icon="zap" accentColor="var(--p)" delay={280} />
           </div>
 
           {/* Room Type Performance */}
@@ -160,7 +160,7 @@ export default function ImpactPage() {
             borderRadius: 12, padding: '16px', marginBottom: 14,
             boxShadow: 'var(--shadow-sm)',
           }}>
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Room Type Performance</div>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>{t('hospitality.roomTypePerformance')}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {HOS_ROOM_TYPES.map(rt => (
                 <div key={rt.type}>
@@ -187,13 +187,13 @@ export default function ImpactPage() {
               background: 'var(--panel)', border: '1px solid var(--border)',
               borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
             }}>
-              <div style={{ padding: '14px 16px 0', fontSize: 13, fontWeight: 600 }}>Revenue by Room Type</div>
+              <div style={{ padding: '14px 16px 0', fontSize: 13, fontWeight: 600 }}>{t('hospitality.revenueByRoomType')}</div>
               <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 8 }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    {['Room Type', 'Occupancy %', 'ADR', 'Revenue', 'Reviews'].map(h => (
+                    {[t('hospitality.cols.roomType'), t('hospitality.cols.occupancyPct'), t('hospitality.cols.adr'), t('hospitality.cols.revenue'), t('hospitality.cols.reviews')].map(h => (
                       <th key={h} style={{
-                        padding: '8px 14px', textAlign: h === 'Room Type' ? 'left' : 'right',
+                        padding: '8px 14px', textAlign: h === t('hospitality.cols.roomType') ? 'left' : 'right',
                         fontSize: 10.5, fontWeight: 600, textTransform: 'uppercase',
                         color: 'var(--txt3)', letterSpacing: '0.05em',
                       }}>{h}</th>
@@ -211,7 +211,7 @@ export default function ImpactPage() {
                     </tr>
                   ))}
                   <tr style={{ background: 'var(--bg2)' }}>
-                    <td style={{ padding: '10px 14px', fontSize: 12, fontWeight: 700 }}>Total</td>
+                    <td style={{ padding: '10px 14px', fontSize: 12, fontWeight: 700 }}>{t('hospitality.total')}</td>
                     <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>{Math.round(HOS_ROOM_TYPES.reduce((s, r) => s + r.occupancy, 0) / HOS_ROOM_TYPES.length)}%</td>
                     <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>€{Math.round(HOS_ROOM_TYPES.reduce((s, r) => s + r.adr, 0) / HOS_ROOM_TYPES.length)}</td>
                     <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>€{(HOS_ROOM_TYPES.reduce((s, r) => s + r.revenue, 0) / 1000).toFixed(1)}K</td>
@@ -227,7 +227,7 @@ export default function ImpactPage() {
               borderRadius: 12, padding: '16px', boxShadow: 'var(--shadow-sm)',
               display: 'flex', flexDirection: 'column',
             }}>
-              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Occupancy & Revenue Trend (12 months)</div>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>{t('hospitality.occupancyTrend')}</div>
               <div style={{ flex: 1, minHeight: 260 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={HOS_TREND_DATA} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
@@ -251,7 +251,7 @@ export default function ImpactPage() {
                       }}
                       formatter={(v, name) => [
                         name === 'occupancy' ? `${v}%` : `€${(Number(v) / 1000).toFixed(0)}K`,
-                        name === 'occupancy' ? 'Occupancy' : 'Revenue',
+                        name === 'occupancy' ? t('hospitality.occupancy') : t('hospitality.revenue'),
                       ]}
                     />
                     <Area type="monotone" dataKey="occupancy" name="occupancy" stroke="#0D7377" fill="url(#gradOcc)" strokeWidth={2} />
@@ -269,17 +269,17 @@ export default function ImpactPage() {
   if (isRE) {
     return (
       <>
-        <Topbar title="Market" sub="Market analytics & performance" />
+        <Topbar title={t('realEstate.title')} sub={t('realEstate.subtitle')} />
 
         <div style={{ padding: '18px 24px 40px' }}>
           {/* KPIs */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10, marginBottom: 18 }}>
-            <KpiCard label="Avg Price/sqm" value="€4,200" delta="+8% vs last quarter" deltaDir="up" icon="dollar-sign" accentColor="var(--accent)" delay={80} />
-            <KpiCard label="Total Volume" value="€8.2M" delta="+1.4M this month" deltaDir="up" icon="chart" accentColor="var(--g)" delay={130} />
-            <KpiCard label="Days on Market" value="22" delta="-3 vs avg" deltaDir="up" icon="calendar" accentColor="var(--b)" delay={180} />
-            <KpiCard label="Listings Active" value="18" delta="+4 new this week" deltaDir="up" icon="folder" accentColor="var(--o)" delay={230} />
-            <KpiCard label="Conversion Rate" value="26.5%" delta="+2.1pp vs Q4" deltaDir="up" icon="zap" accentColor="var(--p)" delay={280} />
-            <KpiCard label="Commission Earned" value="€258K" delta="+22% YTD" deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={330} />
+            <KpiCard label={t('realEstate.avgPricePerSqm')} value="€4,200" delta="+8% vs last quarter" deltaDir="up" icon="dollar-sign" accentColor="var(--accent)" delay={80} />
+            <KpiCard label={t('realEstate.totalVolume')} value="€8.2M" delta="+1.4M this month" deltaDir="up" icon="chart" accentColor="var(--g)" delay={130} />
+            <KpiCard label={t('realEstate.daysOnMarket')} value="22" delta="-3 vs avg" deltaDir="up" icon="calendar" accentColor="var(--b)" delay={180} />
+            <KpiCard label={t('realEstate.listingsActive')} value="18" delta="+4 new this week" deltaDir="up" icon="folder" accentColor="var(--o)" delay={230} />
+            <KpiCard label={t('realEstate.conversionRate')} value="26.5%" delta="+2.1pp vs Q4" deltaDir="up" icon="zap" accentColor="var(--p)" delay={280} />
+            <KpiCard label={t('realEstate.commissionEarned')} value="€258K" delta="+22% YTD" deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={330} />
           </div>
 
           {/* Property Type Breakdown */}
@@ -288,7 +288,7 @@ export default function ImpactPage() {
             borderRadius: 12, padding: '16px', marginBottom: 14,
             boxShadow: 'var(--shadow-sm)',
           }}>
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Property Type Breakdown</div>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>{t('realEstate.propertyBreakdown')}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {RE_PROPERTY_TYPES.map(pt => (
                 <div key={pt.type}>
@@ -314,7 +314,7 @@ export default function ImpactPage() {
             borderRadius: 12, padding: '16px', marginBottom: 14,
             boxShadow: 'var(--shadow-sm)',
           }}>
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Sales vs Rentals</div>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>{t('realEstate.salesVsRentals')}</div>
             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr 1fr', gap: 0 }}>
               {/* Header row */}
               <div style={{ padding: '8px 0', borderBottom: '1px solid var(--border)' }} />
@@ -322,18 +322,18 @@ export default function ImpactPage() {
                 padding: '8px 14px', textAlign: 'right', fontSize: 11, fontWeight: 700,
                 textTransform: 'uppercase', letterSpacing: '0.05em',
                 color: 'var(--accent)', borderBottom: '1px solid var(--border)',
-              }}>Sales</div>
+              }}>{t('realEstate.sales')}</div>
               <div style={{
                 padding: '8px 14px', textAlign: 'right', fontSize: 11, fontWeight: 700,
                 textTransform: 'uppercase', letterSpacing: '0.05em',
                 color: 'var(--p)', borderBottom: '1px solid var(--border)',
-              }}>Rentals</div>
+              }}>{t('realEstate.rentals')}</div>
               {/* Data rows */}
               {([
-                ['Deals', String(RE_DEAL_BREAKDOWN.sales.count), String(RE_DEAL_BREAKDOWN.rentals.count)],
-                ['Volume', RE_DEAL_BREAKDOWN.sales.volume, RE_DEAL_BREAKDOWN.rentals.volume],
-                ['Avg Days', String(RE_DEAL_BREAKDOWN.sales.avgDays), String(RE_DEAL_BREAKDOWN.rentals.avgDays)],
-                ['Commission', RE_DEAL_BREAKDOWN.sales.commission, RE_DEAL_BREAKDOWN.rentals.commission],
+                [t('realEstate.deals'), String(RE_DEAL_BREAKDOWN.sales.count), String(RE_DEAL_BREAKDOWN.rentals.count)],
+                [t('realEstate.volume'), RE_DEAL_BREAKDOWN.sales.volume, RE_DEAL_BREAKDOWN.rentals.volume],
+                [t('realEstate.avgDays'), String(RE_DEAL_BREAKDOWN.sales.avgDays), String(RE_DEAL_BREAKDOWN.rentals.avgDays)],
+                [t('realEstate.commission'), RE_DEAL_BREAKDOWN.sales.commission, RE_DEAL_BREAKDOWN.rentals.commission],
               ] as const).map(([label, sVal, rVal]) => (
                 <Fragment key={label}>
                   <div style={{
@@ -360,13 +360,13 @@ export default function ImpactPage() {
               background: 'var(--panel)', border: '1px solid var(--border)',
               borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
             }}>
-              <div style={{ padding: '14px 16px 0', fontSize: 13, fontWeight: 600 }}>Market Comparison</div>
+              <div style={{ padding: '14px 16px 0', fontSize: 13, fontWeight: 600 }}>{t('realEstate.marketComparison')}</div>
               <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 8 }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    {['Area', 'Avg Price', 'Volume', 'DOM', 'Trend'].map(h => (
+                    {[t('realEstate.area'), t('realEstate.avgPrice'), t('realEstate.volume'), t('realEstate.dom'), t('realEstate.trend')].map(h => (
                       <th key={h} style={{
-                        padding: '8px 14px', textAlign: h === 'Area' ? 'left' : 'right',
+                        padding: '8px 14px', textAlign: h === t('realEstate.area') ? 'left' : 'right',
                         fontSize: 10.5, fontWeight: 600, textTransform: 'uppercase',
                         color: 'var(--txt3)', letterSpacing: '0.05em',
                       }}>{h}</th>
@@ -398,7 +398,7 @@ export default function ImpactPage() {
               borderRadius: 12, padding: '16px', boxShadow: 'var(--shadow-sm)',
               display: 'flex', flexDirection: 'column',
             }}>
-              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Price Trend (12 months)</div>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>{t('realEstate.priceTrend')}</div>
               <div style={{ flex: 1, minHeight: 260 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={RE_PRICE_TREND} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
@@ -452,11 +452,11 @@ export default function ImpactPage() {
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPIs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 18 }}>
-          <KpiCard label="CO2 Reduced" value="4.5t" delta="+18% vs last quarter" deltaDir="up" icon="leaf" accentColor="var(--g)" delay={80} />
-          <KpiCard label="People Helped" value="1,100" delta="+240 this month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={130} />
-          <KpiCard label="Trees Planted" value="2,340" delta="On track for 3K goal" deltaDir="up" icon="tree" accentColor="var(--g)" delay={180} />
-          <KpiCard label="Water Saved" value="45kL" delta="+12% vs target" deltaDir="up" icon="water" accentColor="var(--b)" delay={230} />
-          <KpiCard label="Energy Saved" value="890 MWh" delta="Renewable transition" deltaDir="neu" icon="zap" accentColor="var(--o)" delay={280} />
+          <KpiCard label={t('philanthropy.co2Reduced')} value="4.5t" delta="+18% vs last quarter" deltaDir="up" icon="leaf" accentColor="var(--g)" delay={80} />
+          <KpiCard label={t('philanthropy.peopleHelped')} value="1,100" delta="+240 this month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={130} />
+          <KpiCard label={t('philanthropy.treesPlanted')} value="2,340" delta="On track for 3K goal" deltaDir="up" icon="tree" accentColor="var(--g)" delay={180} />
+          <KpiCard label={t('philanthropy.waterSaved')} value="45kL" delta="+12% vs target" deltaDir="up" icon="water" accentColor="var(--b)" delay={230} />
+          <KpiCard label={t('philanthropy.energySaved')} value="890 MWh" delta="Renewable transition" deltaDir="neu" icon="zap" accentColor="var(--o)" delay={280} />
         </div>
 
         {/* SDG Alignment */}
@@ -465,7 +465,7 @@ export default function ImpactPage() {
           borderRadius: 12, padding: '16px', marginBottom: 14,
           boxShadow: 'var(--shadow-sm)',
         }}>
-          <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>SDG Alignment</div>
+          <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>{t('philanthropy.sdgAlignment')}</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
             {SDG_GOALS.map(sdg => {
               const active = ACTIVE_SDGS.has(sdg.id)
@@ -499,13 +499,13 @@ export default function ImpactPage() {
             background: 'var(--panel)', border: '1px solid var(--border)',
             borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)',
           }}>
-            <div style={{ padding: '14px 16px 0', fontSize: 13, fontWeight: 600 }}>Impact by Project</div>
+            <div style={{ padding: '14px 16px 0', fontSize: 13, fontWeight: 600 }}>{t('philanthropy.impactByProject')}</div>
             <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 8 }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {['Project', 'CO2 (kg)', 'People', 'Trees', 'Donated'].map(h => (
+                  {[t('philanthropy.cols.project'), t('philanthropy.cols.co2'), t('philanthropy.cols.people'), t('philanthropy.cols.trees'), t('philanthropy.cols.donated')].map(h => (
                     <th key={h} style={{
-                      padding: '8px 14px', textAlign: h === 'Project' ? 'left' : 'right',
+                      padding: '8px 14px', textAlign: h === t('philanthropy.cols.project') ? 'left' : 'right',
                       fontSize: 10.5, fontWeight: 600, textTransform: 'uppercase',
                       color: 'var(--txt3)', letterSpacing: '0.05em',
                     }}>{h}</th>
@@ -524,7 +524,7 @@ export default function ImpactPage() {
                 ))}
                 {/* Totals row */}
                 <tr style={{ background: 'var(--bg2)' }}>
-                  <td style={{ padding: '10px 14px', fontSize: 12, fontWeight: 700 }}>Total</td>
+                  <td style={{ padding: '10px 14px', fontSize: 12, fontWeight: 700 }}>{t('philanthropy.total')}</td>
                   <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>{totals.co2Kg.toLocaleString()}</td>
                   <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>{totals.peopleHelped.toLocaleString()}</td>
                   <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>{totals.trees.toLocaleString()}</td>
@@ -540,7 +540,7 @@ export default function ImpactPage() {
             borderRadius: 12, padding: '16px', boxShadow: 'var(--shadow-sm)',
             display: 'flex', flexDirection: 'column',
           }}>
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Impact Trend (12 months)</div>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>{t('philanthropy.impactTrend')}</div>
             <div style={{ flex: 1, minHeight: 260 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={TREND_DATA} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>

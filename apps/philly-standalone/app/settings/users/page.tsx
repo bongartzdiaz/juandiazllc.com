@@ -16,6 +16,7 @@
    --------------------------------------------------------------- */
 
 import { useState, useEffect, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { useToast } from '@/hooks/philly/useToast'
 import { useMySections } from '@/hooks/philly/useMySections'
@@ -57,15 +58,9 @@ const secondaryBtn: React.CSSProperties = {
   border: '1px solid var(--border)',
 }
 
-const GROUP_LABEL: Record<SectionGroup, string> = {
-  primary: 'Primary',
-  tools: 'Tools',
-  industry: 'Industry',
-  system: 'System',
-}
-
 export default function UsersSettingsPage() {
   const { addToast } = useToast()
+  const t = useTranslations('settingsUsers')
   const { role: myRole, loading: meLoading } = useMySections()
   const [users, setUsers] = useState<TeamUser[]>([])
   const [loading, setLoading] = useState(true)
@@ -80,7 +75,7 @@ export default function UsersSettingsPage() {
       const res = await fetch('/api/users', { cache: 'no-store' })
       const j = await res.json().catch(() => ({}))
       if (res.ok) setUsers(j.users ?? [])
-      else addToast(j.error ?? 'Failed to load users', 'error')
+      else addToast(j.error ?? t('toasts.loadFailed'), 'error')
     } finally {
       setLoading(false)
     }
@@ -90,7 +85,7 @@ export default function UsersSettingsPage() {
 
   return (
     <>
-      <Topbar title="Team & Permissions" sub="Control who sees what inside the dashboard" />
+      <Topbar title={t('title')} sub={t('subtitle')} />
 
       <div style={{ padding: '18px 24px 40px' }}>
         {!meLoading && !isAdmin && (
@@ -101,8 +96,7 @@ export default function UsersSettingsPage() {
             fontSize: 12, color: 'var(--txt2)',
           }}>
             <ShieldAlert size={14} />
-            Only administrators can invite teammates or change permissions.
-            You&apos;re viewing this list in read-only mode.
+            {t('readOnlyNotice')}
           </div>
         )}
 
@@ -115,22 +109,22 @@ export default function UsersSettingsPage() {
             padding: '14px 18px', borderBottom: '1px solid var(--border)',
           }}>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 600 }}>Team</div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>{t('team')}</div>
               <div style={{ fontSize: 11, color: 'var(--txt3)' }}>
-                {users.length} member{users.length === 1 ? '' : 's'}
+                {t('memberCount', { count: users.length, s: users.length === 1 ? '' : 's' })}
               </div>
             </div>
             {isAdmin && (
               <button onClick={() => setInviting(true)} style={primaryBtn}>
-                <UserPlus size={13} /> Invite
+                <UserPlus size={13} /> {t('invite')}
               </button>
             )}
           </div>
 
           {loading ? (
-            <div style={{ padding: 24, fontSize: 12, color: 'var(--txt3)' }}>Loading…</div>
+            <div style={{ padding: 24, fontSize: 12, color: 'var(--txt3)' }}>{t('loading')}</div>
           ) : users.length === 0 ? (
-            <div style={{ padding: 24, fontSize: 12, color: 'var(--txt3)' }}>No users yet.</div>
+            <div style={{ padding: 24, fontSize: 12, color: 'var(--txt3)' }}>{t('noUsers')}</div>
           ) : (
             <div>
               {users.map((u) => (
@@ -164,16 +158,21 @@ export default function UsersSettingsPage() {
   )
 }
 
-function sectionsSummary(list: string[] | null): string {
-  if (list === null) return 'All sections'
-  if (list.length === 0) return 'No sections'
-  if (list.length <= 3) return list.join(', ')
-  return `${list.slice(0, 3).join(', ')} +${list.length - 3}`
+function useSectionsSummary() {
+  const t = useTranslations('settingsUsers')
+  return (list: string[] | null): string => {
+    if (list === null) return t('sectionsSummary.allSections')
+    if (list.length === 0) return t('sectionsSummary.noSections')
+    if (list.length <= 3) return list.join(', ')
+    return `${list.slice(0, 3).join(', ')} +${list.length - 3}`
+  }
 }
 
 function UserRow({
   user, canEdit, onEdit,
 }: { user: TeamUser; canEdit: boolean; onEdit: () => void }) {
+  const t = useTranslations('settingsUsers')
+  const sectionsSummary = useSectionsSummary()
   const initials = (user.name || user.email || 'U').slice(0, 2).toUpperCase()
   const lastLogin = user.lastLoginAt
     ? new Date(user.lastLoginAt).toLocaleDateString()
@@ -210,7 +209,7 @@ function UserRow({
       <div style={{ fontSize: 11, color: 'var(--txt3)' }}>{lastLogin}</div>
       {canEdit ? (
         <button onClick={onEdit} style={{ ...secondaryBtn, padding: '5px 12px', fontSize: 11 }}>
-          Edit
+          {t('edit')}
         </button>
       ) : <span />}
     </div>
@@ -226,6 +225,13 @@ function SectionPicker({
   onChange: (v: string[] | null) => void
   disabled?: boolean
 }) {
+  const t = useTranslations('settingsUsers')
+  const groupLabels: Record<SectionGroup, string> = {
+    primary: t('groups.primary'),
+    tools: t('groups.tools'),
+    industry: t('groups.industry'),
+    system: t('groups.system'),
+  }
   const allAccess = value === null
   const selected = useMemo(() => new Set(value ?? []), [value])
   const grouped = useMemo(() => {
@@ -260,7 +266,7 @@ function SectionPicker({
             checked={allAccess}
             onChange={(e) => onChange(e.target.checked ? null : [])}
           />
-          Full access to every section
+          {t('picker.fullAccess')}
         </label>
         {!allAccess && (
           <button
@@ -269,7 +275,7 @@ function SectionPicker({
             disabled={disabled}
             style={{ ...secondaryBtn, fontSize: 11, padding: '4px 10px' }}
           >
-            Reset to full access
+            {t('picker.resetFull')}
           </button>
         )}
       </div>
@@ -286,7 +292,7 @@ function SectionPicker({
             <div style={{
               fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
               letterSpacing: '0.08em', color: 'var(--txt3)', marginBottom: 6,
-            }}>{GROUP_LABEL[g]}</div>
+            }}>{groupLabels[g]}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               {grouped[g].map((s) => (
                 <label key={s.slug} style={{
@@ -316,6 +322,7 @@ function InviteModal({
   onClose, onCreated,
 }: { onClose: () => void; onCreated: () => void }) {
   const { addToast } = useToast()
+  const t = useTranslations('settingsUsers')
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [role, setRole] = useState<Role>('viewer')
@@ -324,7 +331,7 @@ function InviteModal({
 
   const submit = async () => {
     if (submitting) return
-    if (!email.trim()) { addToast('Email is required', 'error'); return }
+    if (!email.trim()) { addToast(t('toasts.emailRequired'), 'error'); return }
     setSubmitting(true)
     try {
       const res = await fetch('/api/users', {
@@ -339,11 +346,11 @@ function InviteModal({
       })
       const j = await res.json().catch(() => ({}))
       if (!res.ok) {
-        addToast(j.error ?? 'Failed to invite user', 'error')
+        addToast(j.error ?? t('toasts.inviteFailed'), 'error')
         return
       }
-      if (j.inviteSent) addToast(`Invited ${email}`, 'success')
-      else addToast(`Created ${email} (invite email skipped — check Supabase config)`, 'info')
+      if (j.inviteSent) addToast(t('toasts.invited', { email }), 'success')
+      else addToast(t('toasts.created', { email }), 'info')
       onCreated()
     } finally {
       setSubmitting(false)
@@ -351,10 +358,10 @@ function InviteModal({
   }
 
   return (
-    <Modal title="Invite teammate" onClose={onClose}>
+    <Modal title={t('invModal.title')} onClose={onClose}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <div>
-          <label style={label}>Email</label>
+          <label style={label}>{t('invModal.email')}</label>
           <input
             type="email"
             value={email}
@@ -364,7 +371,7 @@ function InviteModal({
           />
         </div>
         <div>
-          <label style={label}>Name (optional)</label>
+          <label style={label}>{t('invModal.nameOptional')}</label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -373,7 +380,7 @@ function InviteModal({
           />
         </div>
         <div>
-          <label style={label}>Role</label>
+          <label style={label}>{t('invModal.role')}</label>
           <select value={role} onChange={(e) => setRole(e.target.value as Role)} style={{ ...input, cursor: 'pointer' }}>
             {ROLES.map((r) => (
               <option key={r} value={r} style={{ textTransform: 'capitalize' }}>{r}</option>
@@ -381,25 +388,25 @@ function InviteModal({
           </select>
           {role === 'admin' && (
             <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 4 }}>
-              Admins bypass the section allow-list and can manage other users.
+              {t('invModal.adminBypass')}
             </div>
           )}
         </div>
         <div>
-          <label style={label}>Dashboard sections</label>
+          <label style={label}>{t('invModal.dashboardSections')}</label>
           <SectionPicker value={sections} onChange={setSections} disabled={role === 'admin'} />
           {role === 'admin' && (
             <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 4 }}>
-              Admins always see every section — the allow-list is ignored.
+              {t('invModal.adminAlways')}
             </div>
           )}
         </div>
       </div>
 
       <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 18 }}>
-        <button onClick={onClose} style={secondaryBtn}>Cancel</button>
+        <button onClick={onClose} style={secondaryBtn}>{t('invModal.cancel')}</button>
         <button onClick={submit} disabled={submitting} style={{ ...primaryBtn, opacity: submitting ? 0.6 : 1 }}>
-          {submitting ? 'Sending…' : 'Send invite'}
+          {submitting ? t('invModal.sending') : t('invModal.send')}
         </button>
       </div>
     </Modal>
@@ -412,6 +419,7 @@ function EditModal({
   user, onClose, onSaved,
 }: { user: TeamUser; onClose: () => void; onSaved: () => void }) {
   const { addToast } = useToast()
+  const t = useTranslations('settingsUsers')
   const [role, setRole] = useState<Role>(user.role)
   const [sections, setSections] = useState<string[] | null>(user.dashboardSections)
   const [saving, setSaving] = useState(false)
@@ -431,10 +439,10 @@ function EditModal({
       })
       const j = await res.json().catch(() => ({}))
       if (!res.ok) {
-        addToast(j.error ?? 'Failed to save', 'error')
+        addToast(j.error ?? t('toasts.saveFailed'), 'error')
         return
       }
-      addToast(`Updated ${user.email}`, 'success')
+      addToast(t('toasts.updated', { email: user.email }), 'success')
       onSaved()
     } finally {
       setSaving(false)
@@ -442,10 +450,10 @@ function EditModal({
   }
 
   return (
-    <Modal title={`Edit ${user.name || user.email}`} onClose={onClose}>
+    <Modal title={t('editModal.titleFn', { name: user.name || user.email })} onClose={onClose}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <div>
-          <label style={label}>Role</label>
+          <label style={label}>{t('invModal.role')}</label>
           <select value={role} onChange={(e) => setRole(e.target.value as Role)} style={{ ...input, cursor: 'pointer' }}>
             {ROLES.map((r) => (
               <option key={r} value={r} style={{ textTransform: 'capitalize' }}>{r}</option>
@@ -453,20 +461,20 @@ function EditModal({
           </select>
         </div>
         <div>
-          <label style={label}>Dashboard sections</label>
+          <label style={label}>{t('invModal.dashboardSections')}</label>
           <SectionPicker value={sections} onChange={setSections} disabled={role === 'admin'} />
           {role === 'admin' && (
             <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 4 }}>
-              Admins always see every section — the allow-list is ignored.
+              {t('invModal.adminAlways')}
             </div>
           )}
         </div>
       </div>
 
       <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 18 }}>
-        <button onClick={onClose} style={secondaryBtn}>Cancel</button>
+        <button onClick={onClose} style={secondaryBtn}>{t('invModal.cancel')}</button>
         <button onClick={submit} disabled={saving} style={{ ...primaryBtn, opacity: saving ? 0.6 : 1 }}>
-          <Check size={13} /> {saving ? 'Saving…' : 'Save changes'}
+          <Check size={13} /> {saving ? t('editModal.saving') : t('editModal.saveChanges')}
         </button>
       </div>
     </Modal>
@@ -476,6 +484,7 @@ function EditModal({
 function Modal({
   title, children, onClose,
 }: { title: string; children: React.ReactNode; onClose: () => void }) {
+  const t = useTranslations('settingsUsers')
   return (
     <div
       onClick={onClose}
@@ -500,7 +509,7 @@ function Modal({
           <button onClick={onClose} style={{
             background: 'none', border: 'none', cursor: 'pointer',
             color: 'var(--txt3)', padding: 4, display: 'flex',
-          }} aria-label="Close">
+          }} aria-label={t('close')} title={t('close')}>
             <X size={16} />
           </button>
         </div>

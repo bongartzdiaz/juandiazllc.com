@@ -54,7 +54,11 @@
   },
   "dashboard": {
     "title": "Tableau de bord",
-    "subtitle": "Votre impact en un coup d'œil",
+    "subtitle": {
+      "philanthropy": "Votre impact en un coup d'œil",
+      "realestate": "Votre portefeuille en un coup d’œil",
+      "hospitality": "Vos opérations en un coup d’œil"
+    },
     "totalProjects": "Projets totaux",
     "activeProjects": "Projets actifs",
     "peopleHelped": "Personnes aidées",
@@ -64,7 +68,125 @@
     "recentActivity": "Activité récente",
     "impactOverview": "Vue d'ensemble de l'impact",
     "editDashboard": "Modifier le tableau de bord",
-    "addWidget": "Ajouter un widget"
+    "addWidget": "Ajouter un widget",
+    "tabs": {
+      "sales": "Pipeline ventes",
+      "rental": "Pipeline locations"
+    },
+    "stageFlow": {
+      "sales": "Flux en 7 étapes",
+      "rental": "Flux location en 5 étapes"
+    },
+    "widgets": {
+      "guestJourneyTitle": "Parcours client",
+      "guestJourneySub": "Aperçu de la période en cours",
+      "impactJourneyTitle": "Parcours d’impact",
+      "impactJourneySub": "Aperçu du cycle de vie du projet",
+      "revenueBreakdown": "Répartition des revenus",
+      "occupancyTrend": "Tendance d’occupation",
+      "occupancyTrendSub": "Taux d’occupation mensuel",
+      "occupancyGauge": "Jauge d’occupation",
+      "occupancyGaugeSub": "Taux d’occupation actuel",
+      "guestReviews": "Avis des clients",
+      "recentActivity": "Activité récente",
+      "quickStats": "STATS RAPIDES",
+      "monthlyPerformance": "Performance mensuelle",
+      "listingsVsClosings": "Annonces vs ventes",
+      "listingsVsClosingsSub": "Activité mensuelle du marché",
+      "properties": "Biens",
+      "revenueByType": "Revenus par type",
+      "revenueByTypeSub": "Répartition par type de bien",
+      "revenueForecast": "Prévision de revenus",
+      "revenueForecastSub": "Réel vs prévu",
+      "impactOverview": "Aperçu de l’impact",
+      "impactOverviewSub": "Impact cumulé dans le temps",
+      "projects": "Projets",
+      "viewAll": "Tout afficher",
+      "sdgCoverage": "Couverture ODD",
+      "monthlyDonations": "Dons mensuels",
+      "sdgDistribution": "Répartition ODD",
+      "sdgDistributionSub": "Allocation d’impact par domaine",
+      "impactForecast": "Prévision d’impact",
+      "actual": "Réel",
+      "forecast": "Prévision",
+      "total": "Total",
+      "allocated": "Alloué",
+      "roomsVenues": "Chambres et salles",
+      "revenueAndClosings": "Revenus et ventes",
+      "monthlyPerformanceSub": "Performance mensuelle"
+    },
+    "alerts": {
+      "title": "Alertes",
+      "viewAll": "Voir toutes"
+    },
+    "funnel": {
+      "title": "Entonnoir de conversion",
+      "overall": "Conversion globale",
+      "re": {
+        "lead": "Prospect",
+        "viewing": "Visite",
+        "offer": "Offre",
+        "agreement": "Accord",
+        "closed": "Clôturé"
+      },
+      "hos": {
+        "search": "Recherche",
+        "booking": "Réservation",
+        "checkin": "Enregistrement",
+        "stay": "Séjour",
+        "review": "Avis"
+      },
+      "csr": {
+        "awareness": "Notoriété",
+        "interest": "Intérêt",
+        "proposal": "Proposition",
+        "active": "Actif",
+        "completed": "Terminé"
+      }
+    },
+    "goals": {
+      "title": "Objectifs",
+      "status": {
+        "onTrack": "Sur la bonne voie",
+        "atRisk": "À risque",
+        "behind": "En retard"
+      },
+      "re": {
+        "listings": "Annonces",
+        "dealsClosed": "Affaires conclues",
+        "commission": "Commission",
+        "viewings": "Visites",
+        "leads": "Prospects"
+      },
+      "hos": {
+        "occupancy": "Occupation",
+        "revpar": "RevPAR",
+        "satisfaction": "Satisfaction",
+        "bookings": "Réservations",
+        "fnbRevenue": "Revenus F&B"
+      },
+      "csr": {
+        "projects": "Projets",
+        "peopleHelped": "Personnes aidées",
+        "co2": "CO2 réduit",
+        "donations": "Dons"
+      }
+    },
+    "leadSource": {
+      "source": "Source",
+      "count": "Nombre",
+      "total": "Total"
+    },
+    "kpiDetail": {
+      "breakdown": "Répartition",
+      "insights": "Aperçus",
+      "recent": "Récent"
+    },
+    "aiAttrs": {
+      "industry": "Secteur",
+      "summary": "Résumé",
+      "refreshAria": "Actualiser les attributs IA"
+    }
   },
   "projects": {
     "title": "Projets",
@@ -74,7 +196,11 @@
       "planned": "Planifié",
       "active": "Actif",
       "completed": "Terminé",
-      "paused": "En pause"
+      "paused": "En pause",
+      "pending": "En attente",
+      "sold": "Vendu",
+      "maintenance": "Maintenance",
+      "reserved": "Réservé"
     },
     "fields": {
       "title": "Titre du projet",
@@ -94,7 +220,21 @@
     },
     "confirms": {
       "delete": "Supprimer « {title} » ? Cette action est irréversible."
-    }
+    },
+    "all": "Tous",
+    "titleRE": "Annonces",
+    "subtitleRE": "Gérez vos annonces immobilières",
+    "titleHOS": "Événements",
+    "subtitleHOS": "Gérez vos événements et réservations",
+    "searchPlaceholder": "Rechercher des projets…",
+    "searchPlaceholderRE": "Rechercher des annonces…",
+    "searchPlaceholderHOS": "Rechercher des événements…",
+    "gridView": "Vue grille",
+    "listView": "Vue liste",
+    "newProjectRE": "Nouvelle annonce",
+    "newProjectHOS": "Nouvel événement",
+    "createFailed": "Impossible de créer le projet",
+    "createdSuccess": "Projet créé"
   },
   "contacts": {
     "title": "Contacts",
@@ -104,7 +244,16 @@
       "partner": "Partenaire",
       "beneficiary": "Bénéficiaire",
       "stakeholder": "Partie prenante",
-      "donor": "Donateur"
+      "donor": "Donateur",
+      "buyer": "Acheteur",
+      "seller": "Vendeur",
+      "tenant": "Locataire",
+      "investor": "Investisseur",
+      "landlord": "Propriétaire",
+      "guest": "Client",
+      "vendor": "Fournisseur",
+      "staff": "Personnel",
+      "info": "Information"
     },
     "fields": {
       "name": "Nom",
@@ -175,7 +324,17 @@
         "unread": "Non lu",
         "loadError": "Impossible de charger les communications"
       }
-    }
+    },
+    "a11y": {
+      "exportCsv": "Exporter tous les contacts visibles vers CSV",
+      "openAdvanced": "Ouvrir le filtre avancé"
+    },
+    "all": "Tous",
+    "searchPlaceholder": "Rechercher des contacts…",
+    "subtitleRE": "Acheteurs, vendeurs et investisseurs",
+    "subtitleHOS": "Clients, fournisseurs et personnel",
+    "createFailed": "Impossible de créer le contact",
+    "createdSuccess": "Contact créé"
   },
   "impact": {
     "title": "Impact",
@@ -183,14 +342,148 @@
     "totalImpact": "Impact total",
     "byProject": "Par projet",
     "sdgAlignment": "Alignement ODD",
-    "trends": "Tendances"
+    "trends": "Tendances",
+    "realEstate": {
+      "title": "Marché",
+      "subtitle": "Analyses de marché et performance",
+      "avgPricePerSqm": "Prix moyen/m²",
+      "totalVolume": "Volume total",
+      "daysOnMarket": "Jours sur le marché",
+      "listingsActive": "Annonces actives",
+      "conversionRate": "Taux de conversion",
+      "commissionEarned": "Commission gagnée",
+      "propertyBreakdown": "Répartition par type de bien",
+      "salesVsRentals": "Ventes vs locations",
+      "sales": "Ventes",
+      "rentals": "Locations",
+      "deals": "Affaires",
+      "volume": "Volume",
+      "avgDays": "Jours moyens",
+      "commission": "Commission",
+      "marketComparison": "Comparaison de marché",
+      "area": "Zone",
+      "avgPrice": "Prix moyen",
+      "dom": "DOM",
+      "trend": "Tendance",
+      "priceTrend": "Tendance des prix (12 mois)"
+    },
+    "hospitality": {
+      "title": "Analyses",
+      "subtitle": "Performance et insights clients",
+      "occupancyRate": "Taux d'occupation",
+      "revpar": "RevPAR",
+      "adr": "ADR",
+      "adrSub": "Tarif journalier moyen",
+      "avgReview": "Avis moyen",
+      "fbRevenue": "Revenus F&B",
+      "roomTypePerformance": "Performance par type de chambre",
+      "revenueByRoomType": "Revenus par type de chambre",
+      "occupancyTrend": "Tendance d'occupation et de revenus (12 mois)",
+      "cols": {
+        "roomType": "Type de chambre",
+        "occupancyPct": "% Occupation",
+        "adr": "ADR",
+        "revenue": "Revenus",
+        "reviews": "Avis"
+      },
+      "total": "Total",
+      "occupancy": "Occupation",
+      "revenue": "Revenus"
+    },
+    "philanthropy": {
+      "co2Reduced": "CO2 réduit",
+      "peopleHelped": "Personnes aidées",
+      "treesPlanted": "Arbres plantés",
+      "waterSaved": "Eau économisée",
+      "energySaved": "Énergie économisée",
+      "sdgAlignment": "Alignement ODD",
+      "impactByProject": "Impact par projet",
+      "impactTrend": "Tendance d'impact (12 mois)",
+      "cols": {
+        "project": "Projet",
+        "co2": "CO2 (kg)",
+        "people": "Personnes",
+        "trees": "Arbres",
+        "donated": "Donné"
+      },
+      "total": "Total"
+    }
   },
   "kanban": {
     "title": "Kanban",
     "subtitle": "Gestion visuelle des projets",
     "newBoard": "Nouveau tableau",
     "addColumn": "Ajouter une colonne",
-    "addCard": "Ajouter une carte"
+    "addCard": "Ajouter une carte",
+    "hospitality": {
+      "title": "Réservations",
+      "subtitle": "Gérer les réservations",
+      "addLabel": "Nouvelle réservation"
+    },
+    "realestate": {
+      "title": "Affaires",
+      "subtitle": "Suivez vos transactions",
+      "addLabel": "Nouvelle affaire",
+      "salesPipeline": "Pipeline de vente",
+      "rentalPipeline": "Pipeline de location",
+      "dealValue": "Valeur de l’affaire",
+      "assignee": "Assigné à",
+      "sale": "Vente",
+      "rental": "Location",
+      "dealProgress": "Progression de l’affaire",
+      "salesDeal": "Affaire de vente",
+      "rentalDeal": "Affaire de location",
+      "documentChecklist": "Liste des documents",
+      "noDocuments": "Aucun document joint pour l’instant.",
+      "docsCount": "{done}/{total} docs"
+    },
+    "preview": {
+      "label": "Mode aperçu :",
+      "body": "les cartes ci-dessous sont des données d’exemple. Ton organisation n’a pas encore de tableaux kanban — rends-toi sur",
+      "dealsLink": "Affaires",
+      "or": "ou",
+      "projectsLink": "Projets",
+      "suffix": "pour suivre du travail réel."
+    },
+    "drawer": {
+      "in": "dans",
+      "description": "Description",
+      "assignee": "Assigné à",
+      "dueDate": "Date d’échéance",
+      "status": "Statut",
+      "sdgTags": "Tags ODD",
+      "moveToColumn": "Déplacer vers la colonne",
+      "unassigned": "Non assigné",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "close": "Fermer",
+      "moveFailed": "Échec du déplacement",
+      "editPlaceholder": "Modifier — branche le flux d’édition"
+    },
+    "addCardModal": {
+      "title": "Ajouter une carte",
+      "subtitle": "Ajouter une nouvelle carte à {column}",
+      "columnFallback": "colonne",
+      "titleLabel": "Titre *",
+      "titlePlaceholder": "Titre de la carte",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Description optionnelle",
+      "priorityLabel": "Priorité",
+      "assigneeLabel": "Assigné à",
+      "assigneePlaceholder": "ID ou nom du responsable",
+      "cancel": "Annuler",
+      "submit": "Ajouter la carte",
+      "submitting": "Ajout…",
+      "titleRequired": "Titre requis",
+      "genericFailed": "Impossible de créer la carte ({status})",
+      "networkError": "Erreur réseau"
+    },
+    "priorities": {
+      "low": "Basse",
+      "medium": "Moyenne",
+      "high": "Haute",
+      "urgent": "Urgente"
+    }
   },
   "deals": {
     "toasts": {
@@ -210,7 +503,46 @@
     },
     "confirms": {
       "delete": "Supprimer cette affaire ? Cette action est irréversible."
-    }
+    },
+    "title": "Affaires",
+    "subtitle": "Votre pipeline commercial en un coup d’œil",
+    "addLabel": "Affaire",
+    "filters": {
+      "search": "Rechercher des affaires…",
+      "clearSearch": "Effacer la recherche",
+      "openAdvanced": "Ouvrir le filtre avancé",
+      "clearAdvanced": "Effacer le filtre avancé",
+      "allPipelines": "Tous les pipelines",
+      "allStatuses": "Tous les statuts"
+    },
+    "pipelines": {
+      "empty": "Aucun pipeline"
+    },
+    "form": {
+      "notesPlaceholder": "Contexte, prochaines étapes…",
+      "cancel": "Annuler"
+    },
+    "statuses": {
+      "open": "Ouverte",
+      "won": "Gagnée",
+      "lost": "Perdue"
+    },
+    "view": {
+      "board": "Tableau",
+      "list": "Liste"
+    },
+    "empty": {
+      "title": "Aucun pipeline pour le moment",
+      "hint": "Créez d’abord un pipeline via l’API (POST /api/pipelines)."
+    },
+    "advanced": {
+      "label": "Filtre avancé",
+      "withCount": "Filtre avancé ({n, plural, one {# règle} other {# règles}})",
+      "clear": "Effacer"
+    },
+    "value": "Valeur",
+    "stage": "Étape",
+    "probability": "Probabilité"
   },
   "properties": {
     "toasts": {
@@ -219,51 +551,280 @@
       "deleteFailed": "Échec de la suppression",
       "noAddress": "Aucune adresse enregistrée",
       "addressCopied": "Adresse copiée",
-      "copyFailed": "Échec de la copie"
+      "copyFailed": "Échec de la copie",
+      "taxonomyLoadFailed": "Impossible de charger la taxonomie des biens"
     },
     "confirms": {
       "delete": "Supprimer « {title} » ? Cette action est irréversible."
+    },
+    "title": "Biens",
+    "subtitle": "Votre portefeuille en un coup d’œil",
+    "addLabel": "Bien",
+    "kpis": {
+      "totalProperties": "Total des biens",
+      "portfolioValue": "Valeur du portefeuille",
+      "available": "Disponibles",
+      "totalViewings": "Total des visites"
+    },
+    "filters": {
+      "searchPlaceholder": "Rechercher titre, adresse, ville…",
+      "allLocations": "Tous les emplacements",
+      "allTypes": "Tous les types",
+      "allStatuses": "Tous les statuts",
+      "customize": "Personnaliser les filtres",
+      "clear": "Effacer les filtres",
+      "openAdvanced": "Ouvrir le filtre avancé",
+      "clearAdvanced": "Effacer le filtre avancé",
+      "allLocationsNamed": "Tous les {name}",
+      "allSubtypes": "Tous les sous-types"
+    },
+    "statuses": {
+      "available": "Disponible",
+      "under_contract": "Sous compromis",
+      "sold": "Vendu",
+      "rented": "Loué"
+    },
+    "form": {
+      "title": "Ajouter un bien",
+      "listingType": "Type d’annonce",
+      "propertyTitle": "Titre",
+      "district": "Quartier",
+      "selectDistrict": "— Sélectionner —",
+      "address": "Adresse",
+      "subtype": "Sous-type",
+      "bedrooms": "Chambres",
+      "bathrooms": "Salles de bain",
+      "sqm": "m²",
+      "bankOwned": "Bien bancaire",
+      "resale": "Revente",
+      "saving": "Enregistrement…",
+      "submit": "Ajouter un bien"
+    },
+    "contextMenu": {
+      "open": "Ouvrir",
+      "quickView": "Aperçu",
+      "valuation": "Évaluation",
+      "copyAddress": "Copier l’adresse",
+      "delete": "Supprimer"
+    },
+    "taxonomy": {
+      "types": {
+        "residential": "Maisons",
+        "apartment": "Appartements",
+        "land": "Terrain",
+        "commercial": "Commercial"
+      },
+      "listingTypes": {
+        "sale": "À vendre",
+        "rent": "À louer"
+      },
+      "subtypes": {
+        "detached_house": "Maison individuelle",
+        "semi_detached_house": "Maison jumelée",
+        "link_detached_house": "Maison mitoyenne d’angle",
+        "bungalow": "Bungalow",
+        "semi_detached_bungalow": "Bungalow jumelé",
+        "link_detached_bungalow": "Bungalow mitoyen",
+        "town_house": "Maison de ville",
+        "end_town_house": "Maison de ville d’angle",
+        "penthouse": "Penthouse",
+        "entire_floor_apartment": "Appartement à étage complet",
+        "ground_floor_apartment": "Appartement en rez-de-chaussée",
+        "maisonette": "Duplex",
+        "plot": "Parcelle",
+        "apartment": "Appartement",
+        "apartment_building": "Immeuble d’appartements",
+        "bar": "Bar",
+        "block_of_flats": "Immeuble collectif",
+        "business_park": "Parc d’affaires",
+        "cafe": "Café",
+        "childcare_facility": "Crèche",
+        "commercial_building": "Immeuble commercial",
+        "communal_development": "Projet collectif",
+        "convenience_store": "Supérette",
+        "data_center": "Centre de données",
+        "distribution_warehouse": "Entrepôt de distribution",
+        "factory": "Usine",
+        "farm": "Ferme",
+        "garage": "Garage",
+        "guest_house": "Maison d’hôtes",
+        "hair_dresser_barber_shop": "Coiffeur / Barbier",
+        "health_care_facility": "Établissement de santé",
+        "heavy_industrial": "Industrie lourde",
+        "high_street_retail_property": "Local commercial en centre-ville",
+        "hotel": "Hôtel",
+        "hotel_apartments": "Appartements hôteliers",
+        "industrial_building": "Bâtiment industriel",
+        "industrial_development": "Projet industriel",
+        "industrial_park": "Parc industriel",
+        "leisure_facility": "Établissement de loisirs",
+        "marine_property": "Bien maritime",
+        "mill": "Moulin",
+        "mixed_use_property": "Bien à usage mixte",
+        "nightclub": "Boîte de nuit",
+        "office": "Bureau",
+        "out_of_town_retail_property": "Local commercial en périphérie",
+        "petrol_station": "Station-service",
+        "place_of_worship": "Lieu de culte",
+        "post_office": "Bureau de poste",
+        "pub": "Pub",
+        "research_and_development_center": "Centre de recherche et développement",
+        "residential_development": "Projet résidentiel",
+        "restaurant": "Restaurant",
+        "science_park": "Parc scientifique",
+        "serviced_office": "Bureau équipé",
+        "shop": "Boutique",
+        "shopping_center": "Centre commercial",
+        "shopping_mall": "Centre commercial",
+        "showroom": "Salle d’exposition",
+        "storage": "Stockage",
+        "trade_counter": "Comptoir de vente en gros",
+        "warehouse": "Entrepôt",
+        "workshop": "Atelier"
+      }
     }
   },
   "automations": {
-    "title": "Automations",
-    "subtitle": "Règles basées sur déclencheurs pour automatiser les flux"
+    "title": "Automatisations",
+    "subtitle": "Règles basées sur déclencheurs pour automatiser les flux",
+    "addLabel": "Règle",
+    "kpis": {
+      "total": "Total des règles",
+      "active": "Actives",
+      "totalRuns": "Total des exécutions"
+    },
+    "triggers": {
+      "onEntityCreate": "Entité créée",
+      "onEntityDelete": "Entité supprimée",
+      "onFieldChange": "Champ modifié",
+      "onStageChange": "Étape de l'affaire modifiée",
+      "onSchedule": "Planifié (cron)"
+    },
+    "actions": {
+      "sendEmail": "Envoyer un e-mail",
+      "sendSMS": "Envoyer SMS / WhatsApp",
+      "createNotification": "Créer une notification",
+      "updateField": "Mettre à jour le champ",
+      "moveStage": "Déplacer l'étape de l'affaire",
+      "callWebhook": "Appeler le webhook"
+    },
+    "list": {
+      "loading": "Chargement...",
+      "empty": "Aucune règle d'automatisation pour le moment.",
+      "when": "Quand",
+      "then": "Alors",
+      "runs": "exécutions",
+      "disable": "Désactiver",
+      "enable": "Activer",
+      "active": "Actif",
+      "paused": "En pause",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    },
+    "logs": {
+      "loading": "Chargement des exécutions...",
+      "empty": "Aucune exécution pour le moment."
+    },
+    "editor": {
+      "titleNew": "Nouvelle règle d'automatisation",
+      "titleEdit": "Modifier la règle",
+      "subtitle": "Configurer un déclencheur et une action",
+      "ruleName": "Nom de la règle",
+      "ruleNamePlaceholder": "ex. Accueillir les nouveaux leads",
+      "whenTrigger": "Quand (déclencheur)",
+      "thenAction": "Alors (action)",
+      "triggerType": "Type de déclencheur",
+      "actionType": "Type d'action",
+      "entity": "Entité",
+      "anyEntity": "N'importe quelle entité",
+      "any": "N'importe lequel",
+      "fieldName": "Nom du champ",
+      "fromOptional": "De (facultatif)",
+      "toOptional": "À (facultatif)",
+      "cron": "Expression cron",
+      "accountId": "ID du compte",
+      "to": "À",
+      "subject": "Objet",
+      "bodyMerge": "Corps (champs de fusion pris en charge)",
+      "phoneNumber": "Numéro de téléphone",
+      "channel": "Canal",
+      "body": "Corps",
+      "titleField": "Titre",
+      "titlePlaceholder": "Nouveau lead attribué",
+      "linkOptional": "Lien (facultatif)",
+      "field": "Champ",
+      "value": "Valeur",
+      "stageId": "ID d'étape",
+      "url": "URL",
+      "payload": "Charge utile (JSON, facultatif)",
+      "enabled": "Activée",
+      "enabledOn": "La règle s'exécutera sur les événements correspondants",
+      "enabledOff": "La règle est en pause",
+      "mergeHint": "Champs de fusion : {fields}",
+      "cancel": "Annuler",
+      "saving": "Enregistrement...",
+      "saveChanges": "Enregistrer",
+      "createRule": "Créer la règle"
+    },
+    "summary": {
+      "whenCreated": "Quand {entity} est créé(e)",
+      "whenDeleted": "Quand {entity} est supprimé(e)",
+      "whenFieldChange": "Quand {entity}.{field} change",
+      "whenStageChange": "Quand une étape d'affaire change",
+      "every": "Toutes les {cron}",
+      "sendEmailTo": "Envoyer un e-mail à {to}",
+      "sendSmsTo": "Envoyer {channel} à {to}",
+      "notify": "Notifier : {title}",
+      "setField": "Définir {field} = {value}",
+      "moveToStage": "Passer à l'étape {stage}",
+      "postWebhook": "POST {url}"
+    },
+    "toasts": {
+      "nameRequired": "Le nom est requis",
+      "payloadJson": "La charge utile doit être un JSON valide",
+      "saveFailed": "Échec de l'enregistrement",
+      "updated": "Règle mise à jour",
+      "created": "Règle créée",
+      "deleted": "Règle supprimée",
+      "deleteFailed": "Échec de la suppression",
+      "toggleFailed": "Échec de la bascule"
+    }
   },
   "grants": {
-    "title": "Grants",
+    "title": "Subventions",
     "subtitle": "Suivi des demandes de subventions et des financements",
     "newGrant": "Ajouter une subvention",
     "editGrant": "Modifier la subvention",
     "kpis": {
       "total": "Total des subventions",
-      "funded": "Funded",
-      "pending": "Pending",
-      "active": "Active"
+      "funded": "Financées",
+      "pending": "En attente",
+      "active": "Actives"
     },
     "filters": {
       "all": "Tous les statuts",
       "prospect": "Prospect",
-      "applied": "Applied",
+      "applied": "Déposées",
       "under_review": "En cours d’examen",
-      "approved": "Approved",
-      "awarded": "Awarded",
-      "active": "Active",
+      "approved": "Approuvées",
+      "awarded": "Attribuées",
+      "active": "Actives",
       "reporting": "Reporting",
-      "closed": "Closed",
-      "completed": "Completed",
-      "rejected": "Rejected"
+      "closed": "Clôturées",
+      "completed": "Terminées",
+      "rejected": "Refusées"
     },
     "fields": {
       "title": "Intitulé de la subvention",
       "amount": "Montant (USD)",
-      "funder": "Funder",
-      "status": "Status",
+      "funder": "Bailleur de fonds",
+      "status": "Statut",
       "appliedDate": "Date de candidature",
       "awardedDate": "Date d’attribution",
       "startDate": "Date de début",
       "endDate": "Date de fin",
       "description": "Description",
-      "requirements": "Requirements"
+      "requirements": "Exigences"
     },
     "placeholders": {
       "title": "Fonds pour le logement communautaire",
@@ -285,6 +846,23 @@
     },
     "confirms": {
       "delete": "Supprimer cette subvention ?"
+    },
+    "detail": {
+      "grantAmount": "Montant de la subvention",
+      "funder": "Bailleur",
+      "applied": "Demandée",
+      "awarded": "Octroyée",
+      "period": "Période",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "close": "Fermer"
+    },
+    "form": {
+      "updateSubtitle": "Mettre à jour les détails de la subvention",
+      "newSubtitle": "Suivre une subvention de la demande à l'attribution",
+      "cancel": "Annuler",
+      "saving": "Enregistrement…",
+      "saveChanges": "Enregistrer"
     }
   },
   "commissions": {
@@ -300,33 +878,159 @@
       "updateFailed": "Échec de la mise à jour",
       "deleted": "Commission supprimée",
       "deleteFailed": "Échec de la suppression",
-      "networkError": "Erreur réseau"
+      "networkError": "Erreur réseau",
+      "leaderboardLoadFailed": "Échec du chargement du classement"
     },
     "confirms": {
       "delete": "Supprimer cette commission ?"
+    },
+    "kpis": {
+      "ytdGci": "GCI équipe YTD",
+      "totalNet": "Net total",
+      "pendingPayouts": "Paiements en attente",
+      "teamMembers": "Membres de l'équipe"
+    },
+    "tabs": {
+      "leaderboard": "Classement de l'équipe",
+      "records": "Enregistrements de commissions"
+    },
+    "leaderboard": {
+      "hash": "#",
+      "agent": "Agent",
+      "deals": "Affaires",
+      "won": "Gagnées",
+      "month": "Mois",
+      "volume": "Volume",
+      "ytdGci": "GCI YTD",
+      "convPct": "Conv. %",
+      "empty": "Aucune donnée d'équipe pour le moment."
+    },
+    "filters": {
+      "all": "Tous les statuts",
+      "pending": "En attente",
+      "paid": "Payée",
+      "voided": "Annulée"
+    },
+    "addCommission": "Ajouter une commission",
+    "columns": {
+      "typeNotes": "Type / Notes",
+      "gross": "Brut",
+      "splitPct": "% Partage",
+      "net": "Net",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "list": {
+      "loading": "Chargement...",
+      "empty": "Aucun enregistrement de commission. Cliquez sur Ajouter une commission."
+    },
+    "actions": {
+      "markPaid": "Marquer comme payée",
+      "void": "Annuler",
+      "delete": "Supprimer"
+    },
+    "modal": {
+      "title": "Ajouter une commission",
+      "subtitle": "Enregistrer un versement de commission",
+      "agent": "Agent",
+      "selectAgent": "Sélectionner un agent…",
+      "type": "Type",
+      "typeClosing": "Clôture",
+      "typeReferral": "Recommandation",
+      "typeRental": "Location",
+      "typeBonus": "Prime",
+      "typeOther": "Autre",
+      "grossAmount": "Montant brut ($)",
+      "splitPct": "% Partage",
+      "dealId": "ID de l'affaire (facultatif)",
+      "dealIdPlaceholder": "Lier à une affaire",
+      "notes": "Notes (facultatif)",
+      "netPayout": "Paiement net : ${amount}",
+      "cancel": "Annuler",
+      "saving": "Enregistrement…",
+      "submit": "Ajouter la commission"
     }
   },
   "eSignatures": {
-    "title": "E-Signatures",
+    "title": "Signatures électroniques",
     "subtitle": "Suivez et demandez des signatures sur les contrats",
     "toasts": {
       "selectTransaction": "Sélectionnez une transaction",
       "documentNameRequired": "Nom du document requis",
       "signerEmailRequired": "E-mail du signataire requis",
-      "saveFailed": "Failed",
+      "saveFailed": "Échec",
       "created": "Demande de signature créée",
       "marked": "Marquée {status}",
       "updateFailed": "Échec de la mise à jour",
-      "deleted": "Deleted",
+      "deleted": "Supprimée",
       "deleteFailed": "Échec de la suppression",
       "networkError": "Erreur réseau"
     },
     "confirms": {
       "delete": "Supprimer cette demande de signature ?"
+    },
+    "addLabel": "Signature",
+    "kpis": {
+      "total": "Total des signatures",
+      "pending": "En attente",
+      "signed": "Signées",
+      "completionRate": "Taux d'achèvement"
+    },
+    "filters": {
+      "all": "Tous les statuts",
+      "pending": "En attente",
+      "sent": "Envoyée",
+      "viewed": "Vue",
+      "signed": "Signée",
+      "declined": "Refusée",
+      "expired": "Expirée"
+    },
+    "columns": {
+      "document": "Document",
+      "signer": "Signataire",
+      "transaction": "Transaction",
+      "provider": "Fournisseur",
+      "status": "Statut",
+      "signed": "Signée"
+    },
+    "list": {
+      "loading": "Chargement...",
+      "empty": "Aucune demande de signature pour le moment. Cliquez sur Demander une signature pour commencer.",
+      "requestSignature": "Demander une signature"
+    },
+    "detail": {
+      "fallbackTitle": "Signature",
+      "timeline": "Chronologie",
+      "created": "Créée",
+      "sent": "Envoyée",
+      "viewed": "Vue",
+      "signed": "Signée",
+      "transaction": "Transaction",
+      "markSent": "Marquer comme envoyée",
+      "markViewed": "Marquer comme vue",
+      "markSigned": "Marquer comme signée",
+      "declined": "Refusée",
+      "reset": "Réinitialiser",
+      "delete": "Supprimer"
+    },
+    "request": {
+      "title": "Demander une signature",
+      "subtitle": "Envoyer un document pour signature électronique",
+      "transaction": "Transaction",
+      "selectTransaction": "Sélectionnez une transaction…",
+      "transactionFallback": "Transaction {id}",
+      "documentName": "Nom du document",
+      "signerName": "Nom du signataire",
+      "signerEmail": "E-mail du signataire",
+      "provider": "Fournisseur",
+      "manual": "Manuel",
+      "cancel": "Annuler",
+      "creating": "Création…",
+      "submit": "Envoyer la demande"
     }
   },
   "referrals": {
-    "title": "Referrals",
+    "title": "Recommandations",
     "subtitle": "Suivez les commissions et partenaires de recommandation",
     "toasts": {
       "marked": "Marquée {status}",
@@ -340,44 +1044,44 @@
     }
   },
   "housekeeping": {
-    "title": "Housekeeping",
+    "title": "Entretien",
     "subtitle": "Nettoyage, inspection, maintenance, rotation",
     "newTask": "Ajouter une tâche",
     "dropHere": "Déposer les tâches ici",
     "kpis": {
       "total": "Total",
-      "pending": "Pending",
+      "pending": "En attente",
       "urgent": "Urgent",
-      "completed": "Completed"
+      "completed": "Terminé"
     },
     "statuses": {
-      "pending": "Pending",
+      "pending": "En attente",
       "in_progress": "En cours",
-      "completed": "Completed"
+      "completed": "Terminé"
     },
     "types": {
-      "cleaning": "Cleaning",
+      "cleaning": "Nettoyage",
       "inspection": "Inspection",
       "maintenance": "Maintenance",
-      "turnover": "Turnover"
+      "turnover": "Remise en état"
     },
     "priorities": {
-      "low": "Low",
-      "medium": "Medium",
-      "high": "High",
-      "urgent": "Urgent"
+      "low": "Faible",
+      "medium": "Moyenne",
+      "high": "Élevée",
+      "urgent": "Urgente"
     },
     "filters": {
       "allRooms": "Sélectionnez une chambre…"
     },
     "fields": {
-      "room": "Room",
+      "room": "Chambre",
       "type": "Type",
-      "priority": "Priority",
+      "priority": "Priorité",
       "notes": "Notes"
     },
     "actions": {
-      "cancel": "Cancel",
+      "cancel": "Annuler",
       "save": "Enregistrer la tâche"
     },
     "toasts": {
@@ -390,32 +1094,32 @@
     }
   },
   "reservations": {
-    "title": "Reservations",
+    "title": "Réservations",
     "subtitle": "Réservations, arrivées, départs et revenus",
     "newReservation": "Ajouter une réservation",
     "noResults": "Aucune réservation pour l’instant.",
     "kpis": {
       "total": "Total",
-      "upcoming": "Upcoming",
+      "upcoming": "À venir",
       "checkedIn": "Arrivés",
-      "revenue": "Revenue"
+      "revenue": "Chiffre d’affaires"
     },
     "filters": {
       "all": "Tous les statuts",
       "allRooms": "Sélectionnez une chambre…",
-      "inquiry": "Inquiry",
-      "confirmed": "Confirmed",
+      "inquiry": "Demande",
+      "confirmed": "Confirmée",
       "checked_in": "Arrivé",
       "checked_out": "Parti",
-      "cancelled": "Cancelled"
+      "cancelled": "Annulée"
     },
     "fields": {
-      "room": "Room",
+      "room": "Chambre",
       "guest": "Nom du client",
-      "email": "Email",
-      "phone": "Phone",
-      "checkIn": "Check-in",
-      "checkOut": "Check-out",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "checkIn": "Arrivée",
+      "checkOut": "Départ",
       "total": "Total (USD)",
       "notes": "Notes"
     },
@@ -423,7 +1127,7 @@
       "checkIn": "Marquer comme arrivé",
       "checkOut": "Marquer comme parti",
       "cancel": "Annuler la réservation",
-      "cancelForm": "Cancel",
+      "cancelForm": "Annuler",
       "save": "Enregistrer la réservation"
     },
     "toasts": {
@@ -440,7 +1144,7 @@
     }
   },
   "showings": {
-    "title": "Showings",
+    "title": "Visites",
     "subtitle": "Planifiez et suivez les visites de biens",
     "toasts": {
       "selectProperty": "Sélectionnez un bien",
@@ -479,28 +1183,28 @@
     }
   },
   "volunteers": {
-    "title": "Volunteers",
+    "title": "Bénévoles",
     "subtitle": "Gérez l’équipe de bénévoles et leurs heures",
     "newVolunteer": "Ajouter un bénévole",
     "editVolunteer": "Modifier le bénévole",
     "kpis": {
       "total": "Total des bénévoles",
-      "active": "Active",
+      "active": "Actifs",
       "totalHours": "Total des heures",
       "avgHours": "Heures moy. / bénévole"
     },
     "filters": {
       "all": "Tous les statuts",
-      "active": "Active",
-      "inactive": "Inactive",
-      "onboarding": "Onboarding"
+      "active": "Actifs",
+      "inactive": "Inactifs",
+      "onboarding": "Intégration"
     },
     "fields": {
-      "name": "Name",
-      "email": "Email",
-      "phone": "Phone",
-      "status": "Status",
-      "skills": "Skills",
+      "name": "Nom",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "status": "Statut",
+      "skills": "Compétences",
       "notes": "Notes",
       "activityLogs": "Journaux d’activité"
     },
@@ -525,23 +1229,23 @@
       "dialerLists": "Listes de composition"
     },
     "add": {
-      "list": "List",
+      "list": "Liste",
       "logCall": "Enregistrer un appel"
     },
     "kpis": {
       "totalCalls": "Total des appels",
-      "outbound": "Outbound",
+      "outbound": "Sortants",
       "avgDuration": "Durée moyenne",
-      "callbacks": "Callbacks",
+      "callbacks": "Rappels",
       "totalLists": "Total des listes",
-      "active": "Active",
+      "active": "Actifs",
       "totalContacts": "Total des contacts"
     },
     "columns": {
       "phoneNumber": "Numéro de téléphone",
       "direction": "Direction",
-      "duration": "Duration",
-      "outcome": "Outcome",
+      "duration": "Durée",
+      "outcome": "Résultat",
       "startedAt": "Démarré à",
       "notes": "Notes"
     },
@@ -549,39 +1253,39 @@
       "allOutcomes": "Tous les résultats"
     },
     "outcomes": {
-      "connected": "Connected",
-      "voicemail": "Voicemail",
+      "connected": "Connecté",
+      "voicemail": "Messagerie vocale",
       "no_answer": "Sans réponse",
-      "busy": "Busy",
-      "callback": "Callback"
+      "busy": "Occupé",
+      "callback": "Rappel"
     },
     "statuses": {
-      "active": "Active",
-      "completed": "Completed",
-      "paused": "Paused"
+      "active": "Actif",
+      "completed": "Terminé",
+      "paused": "En pause"
     },
     "states": {
-      "loading": "Loading...",
+      "loading": "Chargement…",
       "noCalls": "Aucun appel trouvé.",
       "noLists": "Aucune liste de composition."
     },
     "list": {
       "contacts": "Contacts",
-      "remaining": "Remaining",
+      "remaining": "Restants",
       "assignedTo": "Attribué à",
-      "unassigned": "Unassigned"
+      "unassigned": "Non attribué"
     },
     "actions": {
       "dialNext": "Appeler le suivant",
-      "reset": "Reset",
+      "reset": "Réinitialiser",
       "resetTitle": "Réinitialiser au premier contact",
-      "close": "Close"
+      "close": "Fermer"
     },
     "fields": {
-      "name": "Name",
+      "name": "Nom",
       "assignedTo": "Attribué à",
       "phoneNumber": "Numéro de téléphone",
-      "outcome": "Outcome",
+      "outcome": "Résultat",
       "durationSec": "Durée (sec)",
       "notes": "Notes"
     },
@@ -595,7 +1299,7 @@
       "title": "Ajouter une liste",
       "subtitle": "Créer une nouvelle liste de composition",
       "submit": "Ajouter la liste",
-      "creating": "Creating…"
+      "creating": "Création…"
     },
     "callModal": {
       "aria": "Enregistrer l’appel",
@@ -607,7 +1311,7 @@
       "unnamed": "Contact sans nom",
       "noPhone": "Aucun téléphone enregistré",
       "notFound": "Contact introuvable.",
-      "logging": "Logging…",
+      "logging": "Enregistrement…",
       "logCall": "Enregistrer l’appel",
       "logAndAdvance": "Enregistrer et passer au suivant"
     },
@@ -622,39 +1326,40 @@
     }
   },
   "inbox": {
-    "title": "Inbox",
+    "title": "Boîte de réception",
     "subtitle": "Boîte de réception unifiée : e-mail, SMS, WhatsApp et téléphone",
     "add": {
       "conversation": "Conversation"
     },
     "kpis": {
       "total": "Total des conversations",
-      "open": "Open",
-      "closed": "Closed",
-      "channels": "Channels"
+      "open": "Ouvertes",
+      "closed": "Fermées",
+      "channels": "Canaux"
     },
     "columns": {
       "conversation": "Conversation",
-      "channel": "Channel",
-      "time": "Time"
+      "channel": "Canal",
+      "time": "Heure"
     },
     "filters": {
       "allStatuses": "Tous les statuts",
       "allChannels": "Tous les canaux"
     },
     "statuses": {
-      "open": "Open",
-      "closed": "Closed",
-      "archived": "Archived"
+      "open": "Ouverte",
+      "closed": "Fermée",
+      "archived": "Archivée",
+      "pending": "En attente"
     },
     "channels": {
       "email": "Email",
       "sms": "SMS",
       "whatsapp": "WhatsApp",
-      "phone": "Phone"
+      "phone": "Téléphone"
     },
     "states": {
-      "loading": "Loading...",
+      "loading": "Chargement…",
       "noConversations": "Aucune conversation trouvée.",
       "noMessagesYet": "Aucun message",
       "unknownContact": "Contact inconnu",
@@ -671,7 +1376,7 @@
       "dAgo": "il y a {count} j"
     },
     "thread": {
-      "you": "You",
+      "you": "Vous",
       "contact": "Contact"
     },
     "actions": {
@@ -679,13 +1384,13 @@
     },
     "reply": {
       "placeholder": "Répondre via {channel}…  (⌘/Ctrl+Entrée pour envoyer)",
-      "send": "Send",
-      "sending": "Sending"
+      "send": "Envoyer",
+      "sending": "Envoi en cours"
     },
     "fields": {
       "contact": "Contact",
-      "channel": "Channel",
-      "subject": "Subject",
+      "channel": "Canal",
+      "subject": "Objet",
       "firstMessage": "Premier message (facultatif)"
     },
     "placeholders": {
@@ -698,7 +1403,7 @@
       "title": "Nouvelle conversation",
       "subtitle": "Démarrer un nouveau fil de conversation",
       "submit": "Créer la conversation",
-      "creating": "Creating…"
+      "creating": "Création…"
     },
     "toasts": {
       "selectContact": "Sélectionnez un contact",
@@ -728,7 +1433,12 @@
     "signOut": "Se déconnecter",
     "disconnect": "Déconnecter",
     "revoke": "Révoquer",
-    "replace": "Remplacer"
+    "replace": "Remplacer",
+    "live": "En direct",
+    "sync": "Synchroniser",
+    "syncing": "Synchronisation…",
+    "created": "Créé",
+    "done": "Terminé"
   },
   "confirms": {
     "deleteGeneric": {
@@ -823,14 +1533,14 @@
     "actionsHeading": "Actions",
     "footnote": "Raccourcis à deux touches (ex. g c) — appuyez en séquence dans la seconde. Les raccourcis sont désactivés pendant que vous tapez dans un champ, pour ne pas écraser une recherche.",
     "nav": {
-      "home": "Home",
+      "home": "Accueil",
       "contacts": "Contacts",
-      "deals": "Deals",
-      "properties": "Properties",
-      "projects": "Projects",
-      "insights": "Insights",
+      "deals": "Affaires",
+      "properties": "Biens",
+      "projects": "Projets",
+      "insights": "Analyses",
       "notifications": "Notifications",
-      "settings": "Settings",
+      "settings": "Paramètres",
       "audit": "Journal d’audit"
     },
     "actions": {
@@ -848,11 +1558,11 @@
     "selected": "{count} sélectionné(s)",
     "exportCsv": "Exporter CSV",
     "changeType": "Changer le type",
-    "delete": "Delete",
+    "delete": "Supprimer",
     "clearSelection": "Effacer la sélection"
   },
   "views": {
-    "label": "Views",
+    "label": "Vues",
     "noneYet": "Aucune vue enregistrée — enregistrez vos filtres actuels en tant que vue",
     "saveCurrent": "Enregistrer",
     "namePlaceholder": "Nommez cette vue…",
@@ -867,32 +1577,32 @@
     "saveFailed": "Échec de l’enregistrement de la vue"
   },
   "columns": {
-    "title": "Columns",
+    "title": "Colonnes",
     "showHide": "Afficher / masquer les colonnes",
-    "always": "Always",
+    "always": "Toujours",
     "resetDefaults": "Rétablir par défaut"
   },
   "filter": {
     "title": "Filtre avancé",
     "subtitlePrefix": "Liste {entity}",
-    "matchAll": "All",
-    "matchAny": "Any",
+    "matchAll": "Tous",
+    "matchAny": "N’importe lequel",
     "matchOf": "des critères suivants :",
-    "matchPrefix": "Match",
+    "matchPrefix": "Correspond à",
     "addRule": "Ajouter une règle",
     "removeRule": "Supprimer la règle",
     "noValueNeeded": "(aucune valeur requise)",
-    "valuePlaceholder": "value",
-    "rangeFrom": "from",
-    "rangeTo": "to",
+    "valuePlaceholder": "valeur",
+    "rangeFrom": "de",
+    "rangeTo": "à",
     "selectPlaceholder": "— sélectionner —",
     "footnote": "Les filtres s’appliquent côté serveur. E-mail et téléphone n’acceptent que la correspondance exacte (les valeurs sont chiffrées au repos) ; utilisez Contient sur Nom ou Entreprise pour les recherches partielles.",
-    "label": "Filters",
+    "label": "Filtres",
     "labelWithCount": "Filtres : {count}",
     "ruleCount": "{count, plural, one {# rule} other {# rules}}",
     "operator": {
-      "contains": "contains",
-      "eq": "equals",
+      "contains": "contient",
+      "eq": "égal à",
       "neq": "différent de",
       "starts_with": "commence par",
       "ends_with": "se termine par",
@@ -902,11 +1612,11 @@
       "gte": "≥",
       "lt": "<",
       "lte": "≤",
-      "between": "between",
-      "before": "before",
-      "after": "after",
-      "on": "on",
-      "is": "is",
+      "between": "entre",
+      "before": "avant",
+      "after": "après",
+      "on": "le",
+      "is": "est",
       "isNot": "n’est pas",
       "in": "est l’un de",
       "not_in": "n’est aucun de",
@@ -915,7 +1625,7 @@
     }
   },
   "quickview": {
-    "loading": "Loading…",
+    "loading": "Chargement…",
     "notFound": "{entity} introuvable",
     "addedOn": "ajouté le {date}",
     "listedOn": "listé le {date}",
@@ -926,41 +1636,41 @@
     "notes": "Notes",
     "description": "Description",
     "deal": {
-      "value": "Value",
-      "probability": "Probability",
-      "owner": "Owner",
+      "value": "Valeur",
+      "probability": "Probabilité",
+      "owner": "Responsable",
       "contact": "Contact",
       "expectedClose": "Clôture prévue",
       "actualClose": "Clôture réelle",
-      "unassigned": "Unassigned"
+      "unassigned": "Non attribué"
     },
     "property": {
-      "price": "Price",
-      "perMonth": "/mo",
+      "price": "Prix",
+      "perMonth": "/mois",
       "hoa": "+ {amount} € de charges",
-      "bed": "Bed",
-      "bath": "Bath",
+      "bed": "Ch.",
+      "bath": "SdB",
       "area": "m²",
-      "built": "Built",
-      "viewings": "Viewings",
-      "showings": "Showings",
-      "offers": "Offers",
+      "built": "Construit",
+      "viewings": "Visites",
+      "showings": "Visites",
+      "offers": "Offres",
       "openHouses": "Journées portes ouvertes",
-      "valuation": "Valuation",
+      "valuation": "Estimation",
       "forSale": "À vendre",
       "forRent": "À louer",
       "bank": "BANK",
-      "resale": "RESALE"
+      "resale": "REVENTE"
     },
     "contact": {
-      "industry": "Industry",
+      "industry": "Secteur",
       "icpFit": "Adéquation ICP",
       "aiBadge": "Généré par IA",
       "aiHeading": "Intelligence IA",
       "via": "via {source}",
-      "email": "Email",
-      "phone": "Phone",
-      "company": "Company",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "company": "Entreprise",
       "type": "Type"
     }
   },
@@ -1219,7 +1929,27 @@
       "noImpact": "Aucun utilisateur actif ni intégration ne dépend de cette fonctionnalité actuellement.",
       "confirm": "Désactiver la fonctionnalité",
       "cancel": "Annuler",
-      "saving": "Désactivation…"
+      "saving": "Désactivation…",
+      "heading": "Indicateurs de fonctionnalités",
+      "subtitle": "Coupe-circuits en temps réel par organisation — sans redéploiement",
+      "description": "Chaque interrupteur ci-dessous est un coupe-circuit par organisation. Désactivez-en un pour couper immédiatement cette fonctionnalité dans toute l’organisation — sans redéploiement ni modification de code. Les changements prennent effet en ~60 secondes (le TTL du cache en mémoire). Chaque modification est enregistrée dans le journal d’audit.",
+      "info": "Modifier un indicateur ici définit une dérogation par organisation. Le bouton « Réinitialiser par défaut » supprime la dérogation et revient à la valeur globale par défaut (ou à la valeur par défaut du code s’il n’y en a pas de globale).",
+      "empty": "Aucun indicateur de fonctionnalité catalogué.",
+      "loading": "Chargement…",
+      "enabledLabel": "ACTIVÉ",
+      "disabledLabel": "DÉSACTIVÉ",
+      "lockPlatform": "Suspendu par la plateforme",
+      "lockSupport": "Défini par le support",
+      "supportReason": "Motif du support : {reason}",
+      "upgradeCTA": "Passez à l’offre supérieure pour activer",
+      "toggleAriaLabel": "Basculer {key}",
+      "toasts": {
+        "featureDisabled": "Fonctionnalité désactivée",
+        "featureEnabled": "Fonctionnalité activée",
+        "networkError": "Erreur réseau",
+        "resetToDefault": "Réinitialisé par défaut",
+        "updateFailed": "Échec de la mise à jour ({status})"
+      }
     },
     "impact": {
       "drip-campaigns": "{count, plural, one {# client est actuellement inscrit dans une campagne drip. Il ne recevra plus les e-mails programmés.} other {# clients sont actuellement inscrits dans des campagnes drip. Ils ne recevront plus les e-mails programmés.}}",
@@ -1235,22 +1965,22 @@
     "descriptionPart2": ", l’appartenance à l’organisation du nouveau membre est définie selon le rôle et les sections du tableau de bord configurés ci-dessous. Le retrait d’un membre n’est jamais auto-annulé — pour rétrograder un utilisateur, faites-le manuellement depuis ",
     "descriptionPart3": ".",
     "info": "Le rôle définit Membership.role ; laissez-le sur aucun pour ignorer le mappage. Les sections remplacent la liste autorisée par utilisateur — choisissez personnalisé pour sélectionner des surfaces précises, ou accès complet pour supprimer la surcharge (les membres reviennent à leurs sections personnelles).",
-    "loading": "Loading…",
+    "loading": "Chargement…",
     "emptyPart1": "Aucun groupe SCIM. Lorsque votre IdP provisionnera un groupe via ",
     "emptyPart2": ", il apparaîtra ici.",
     "members": "{count, plural, one {# member} other {# members}}",
-    "role": "Role",
+    "role": "Rôle",
     "roleNone": "— aucun (ignorer le mappage de rôle) —",
     "dashboardSections": "Sections du tableau de bord",
     "fullAccess": "Accès complet",
-    "custom": "Custom",
+    "custom": "Personnalisé",
     "personalAllowlist": "Les membres conservent leur liste autorisée personnelle (User.dashboardSections).",
-    "discard": "Discard",
-    "saveLabel": "Save ({count, plural, one {# member} other {# members}})",
-    "saving": "Saving…",
+    "discard": "Annuler",
+    "saveLabel": "Enregistrer ({count, plural, one {# membre} other {# membres}})",
+    "saving": "Enregistrement…",
     "toasts": {
-      "saved": "Saved",
-      "savedWithUpdate": "Saved — {count, plural, one {# existing member updated} other {# existing members updated}}",
+      "saved": "Enregistré",
+      "savedWithUpdate": "Enregistré — {count, plural, one {# membre existant mis à jour} other {# membres existants mis à jour}}",
       "updateFailed": "Échec de la mise à jour ({status})",
       "networkError": "Erreur réseau"
     }
@@ -1262,8 +1992,8 @@
     "loadingContacts": "Chargement des contacts…",
     "noMatches": "Aucune correspondance.",
     "noContactsYet": "Aucun contact dans cette organisation.",
-    "enrolled": "Enrolled",
-    "enroll": "Enroll",
+    "enrolled": "Inscrit",
+    "enroll": "Inscrire",
     "currentEnrollments": "Inscriptions en cours ({count})",
     "loadingEnrollments": "Chargement des inscriptions…",
     "noneEnrolled": "Aucun inscrit pour l’instant. Utilisez le sélecteur ci-dessus pour inscrire votre premier contact.",
@@ -1273,15 +2003,15 @@
     "next": "suivant {when}",
     "attempts": "{count, plural, one {# attempt} other {# attempts}}",
     "status": {
-      "active": "active",
-      "paused": "paused",
-      "done": "done",
-      "cancelled": "cancelled"
+      "active": "actif",
+      "paused": "en pause",
+      "done": "terminé",
+      "cancelled": "annulé"
     },
     "cancelTitle": "Annuler l’inscription",
     "cancelConfirm": "Annuler cette inscription ? Le contact ne recevra plus d’étapes.",
     "toasts": {
-      "enrolled": "Enrolled",
+      "enrolled": "Inscrit",
       "cancelled": "Inscription annulée",
       "enrollFailed": "Échec de l’inscription ({status})",
       "cancelFailed": "Échec de l’annulation ({status})",
@@ -1318,7 +2048,7 @@
     },
     "plans": {
       "operator": {
-        "name": "Operator",
+        "name": "Opérateur",
         "tagline": "Pour les agents en solo et les agences jusqu'à 3 personnes.",
         "features": [
           "Jusqu'à 3 comptes utilisateurs",
@@ -1329,7 +2059,7 @@
         ]
       },
       "team": {
-        "name": "Team",
+        "name": "Équipe",
         "tagline": "Le sweet spot du mid-market — meilleur rapport qualité-prix pour les agences de 5–20 agents.",
         "features": [
           "Jusqu'à 10 comptes utilisateurs (forfait fixe — pas de coût par agent)",
@@ -1343,7 +2073,7 @@
         ]
       },
       "business": {
-        "name": "Business",
+        "name": "Entreprise",
         "tagline": "Pour les agences de 20+ agents nécessitant une conformité entreprise + un support dédié.",
         "features": [
           "Comptes utilisateurs illimités",
@@ -1472,7 +2202,7 @@
   },
   "addLead": {
     "entity": {
-      "lead": "Lead",
+      "lead": "Prospect",
       "contact": "Contact",
       "booking": "Réservation"
     },
@@ -1501,7 +2231,8 @@
     "errors": {
       "nameRequired": "Le nom est obligatoire",
       "phoneRequired": "Le téléphone est obligatoire",
-      "invalidEmail": "Format d’e-mail invalide"
+      "invalidEmail": "Format d’e-mail invalide",
+      "submitFailed": "Échec de l’enregistrement — vérifiez les informations et réessayez."
     },
     "submit": "Ajouter {entity}",
     "success": "Ajouté avec succès",
@@ -1535,7 +2266,8 @@
       "networkError": "Erreur réseau — veuillez réessayer",
       "authError": "Non autorisé — seuls les managers peuvent importer des contacts",
       "close": "Terminé"
-    }
+    },
+    "submitting": "Enregistrement…"
   },
   "reports": {
     "title": "Rapports",
@@ -1644,6 +2376,1792 @@
       "IS24_NOT_CONFIGURED": "Identifiants partenaire ImmoScout24 manquants — contactez l’admin.",
       "IS24_PUBLISH_FAILED": "Publication sur ImmoScout24 échouée : {detail}",
       "IS24_UNPUBLISH_FAILED": "Dépublication sur ImmoScout24 échouée : {detail}"
+    }
+  },
+  "journey": {
+    "enquiry": "Demande",
+    "viewing": "Visite",
+    "reservation": "Réservation",
+    "searches": "Recherches",
+    "agreement": "Accord",
+    "transfer": "Transfert",
+    "commission": "Commission",
+    "payment": "Paiement",
+    "keys": "Clés"
+  },
+  "kpi": {
+    "activeListings": "Annonces actives",
+    "dealsClosed": "Transactions conclues",
+    "commission": "Commission",
+    "commissionYtd": "Commission cumul annuel",
+    "avgDaysOnMarket": "Jours moy. sur le marché",
+    "avgDaysToClose": "Jours moy. avant clôture",
+    "totalViewings": "Visites totales",
+    "activeRentals": "Locations actives",
+    "thisMonth": "+{n} ce mois-ci",
+    "ytdTotal": "Total YTD",
+    "lastQuarter": "vs trimestre précédent",
+    "belowAverage": "En dessous de la moyenne",
+    "ongoingLeases": "Baux en cours",
+    "revenueClosings": "Revenus et clôtures",
+    "monthlyPerformance": "Performance mensuelle",
+    "listingsVsClosings": "Annonces vs clôtures",
+    "monthlyMarketActivity": "Activité mensuelle du marché",
+    "goal": "Objectif : {n}"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérez votre compte, organisation et intégrations",
+    "nav": {
+      "profile": "Profil",
+      "organization": "Organisation",
+      "preferences": "Préférences",
+      "apiKeys": "Clés API",
+      "goals": "Objectifs",
+      "integrations": "Intégrations"
+    },
+    "sections": {
+      "profile": {
+        "title": "Profil",
+        "sub": "Gérez vos informations personnelles"
+      },
+      "organization": {
+        "title": "Organisation",
+        "sub": "Configurez les détails de votre organisation"
+      },
+      "preferences": {
+        "title": "Préférences",
+        "sub": "Personnalisez votre expérience"
+      },
+      "apiKeys": {
+        "title": "Clés API",
+        "sub": "Configurez les intégrations API pour les services externes"
+      },
+      "goals": {
+        "title": "Objectifs",
+        "sub": "Définissez des objectifs de performance pour votre équipe"
+      },
+      "integrations": {
+        "title": "Intégrations",
+        "sub": "Connectez des services externes"
+      }
+    },
+    "fields": {
+      "fullName": "Nom complet",
+      "email": "E-mail",
+      "role": "Rôle",
+      "organizationName": "Nom de l’organisation",
+      "industry": "Secteur",
+      "language": "Langue",
+      "theme": "Thème",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "current": "Actuel",
+      "target": "Objectif"
+    },
+    "actions": {
+      "save": "Enregistrer",
+      "saveChanges": "Enregistrer les modifications",
+      "saving": "Enregistrement…",
+      "saveGoals": "Enregistrer les objectifs",
+      "configure": "Configurer",
+      "connect": "Connecter",
+      "show": "Afficher",
+      "hide": "Masquer"
+    },
+    "status": {
+      "loading": "Chargement…",
+      "connected": "Connecté",
+      "notConfigured": "Non configuré",
+      "notConnected": "Non connecté",
+      "adminOnly": "Seuls les administrateurs peuvent modifier les informations de l’organisation."
+    },
+    "theme": {
+      "light": "Clair",
+      "dark": "Sombre"
+    },
+    "language": {
+      "english": "Anglais",
+      "dutch": "Nederlands"
+    },
+    "industries": {
+      "general": "Général",
+      "nonprofit": "Association / ONG",
+      "foundation": "Fondation",
+      "csr": "RSE d’entreprise",
+      "government": "Gouvernement",
+      "education": "Éducation",
+      "healthcare": "Santé",
+      "realestate": "Immobilier",
+      "hospitality": "Hôtellerie"
+    },
+    "periods": {
+      "daily": "Quotidien",
+      "weekly": "Hebdomadaire",
+      "monthly": "Mensuel",
+      "yearly": "Annuel",
+      "custom": "Personnalisé"
+    },
+    "goalsList": {
+      "listings": "Biens ajoutés",
+      "deals": "Affaires conclues",
+      "commission": "Objectif de commission",
+      "viewings": "Visites programmées",
+      "leads": "Nouveaux leads",
+      "projects": "Projets terminés",
+      "people": "Personnes aidées",
+      "co2": "CO2 réduit",
+      "donations": "Dons collectés",
+      "partners": "Partenaires intégrés",
+      "occupancy": "Taux d’occupation",
+      "revpar": "Objectif RevPAR",
+      "satisfaction": "Satisfaction des clients",
+      "bookings": "Réservations",
+      "fnb": "Revenus F&B"
+    },
+    "api": {
+      "gohighlevel": {
+        "name": "GoHighLevel CRM",
+        "description": "Connectez votre pipeline GHL"
+      },
+      "meta": {
+        "name": "Meta Ads",
+        "description": "Campagnes publicitaires Facebook/Instagram"
+      },
+      "googleads": {
+        "name": "Google Ads",
+        "description": "Campagnes Google Search & Display"
+      },
+      "supabase": {
+        "name": "Supabase",
+        "description": "Connexion à la base de données"
+      },
+      "stripe": {
+        "name": "Stripe",
+        "description": "Traitement des paiements"
+      },
+      "twilio": {
+        "name": "Twilio",
+        "description": "Messagerie SMS et WhatsApp"
+      },
+      "fieldLabels": {
+        "apiKey": "Clé API",
+        "locationId": "ID d’emplacement",
+        "accessToken": "Jeton d’accès",
+        "accountId": "ID du compte",
+        "clientId": "ID client",
+        "clientSecret": "Secret client",
+        "url": "URL du projet",
+        "anonKey": "Clé anonyme",
+        "secretKey": "Clé secrète",
+        "accountSid": "Account SID",
+        "authToken": "Jeton d’authentification"
+      }
+    },
+    "integrationsList": {
+      "gohighlevel": "GoHighLevel",
+      "supabase": "Supabase",
+      "slack": "Slack",
+      "googleAnalytics": "Google Analytics"
+    },
+    "toasts": {
+      "nameRequired": "Le nom est obligatoire",
+      "orgNameRequired": "Le nom de l’organisation est obligatoire",
+      "failedSaveProfile": "Échec de l’enregistrement du profil",
+      "profileSaved": "Profil enregistré",
+      "failedSaveOrg": "Échec de l’enregistrement de l’organisation",
+      "orgSaved": "Organisation enregistrée",
+      "goalsSaved": "Objectifs enregistrés",
+      "apiDraftNotice": "configuré uniquement dans cette session — connectez via /api/integrations pour conserver"
+    }
+  },
+  "liveBand": {
+    "ariaLabel": "Indicateurs en direct de l’organisation",
+    "liveYourOrg": "En direct — votre organisation",
+    "fetching": "En direct — récupération des indicateurs…",
+    "unavailable": "Indicateurs en direct indisponibles",
+    "unavailableHint": "Widgets de démonstration affichés ci-dessous. Vérifiez votre connexion ou les journaux d’API.",
+    "updatedAgo": "Mis à jour {ago}",
+    "contacts": "Contacts",
+    "openDeals": "Affaires ouvertes",
+    "won30d": "Gagnées (30j)",
+    "closedTx": "Transactions clôturées",
+    "deltaLast30d": "+{n} sur les 30 derniers jours",
+    "noNewLast30d": "aucune nouvelle sur les 30 derniers jours",
+    "pipelineValue": "{value} pipeline",
+    "revenueValue": "{value} revenus",
+    "gmvValue": "{value} GMV"
+  },
+  "integrations": {
+    "title": "Intégrations",
+    "subtitle": "Connectez vos outils préférés à DEUS",
+    "searchPlaceholder": "Rechercher des intégrations…",
+    "status": {
+      "connected": "Connecté",
+      "error": "Erreur",
+      "notConnected": "Non connecté"
+    }
+  },
+  "forms": {
+    "contact": {
+      "fullName": "Nom complet",
+      "company": "Organisation ou entreprise",
+      "notes": "Notes complémentaires…"
+    },
+    "filterBuilder": {
+      "matchAll": "Correspondre à TOUS",
+      "matchAny": "Correspondre à UN",
+      "clearAll": "Tout effacer",
+      "operators": {
+        "eq": "est",
+        "neq": "n’est pas",
+        "contains": "contient",
+        "ncontains": "ne contient pas",
+        "startsWith": "commence par",
+        "endsWith": "finit par",
+        "in": "dans",
+        "nin": "pas dans",
+        "isEmpty": "est vide",
+        "isNotEmpty": "n’est pas vide",
+        "between": "entre"
+      },
+      "header": "Filtres",
+      "empty": "Aucun filtre pour l’instant. Ajoutez-en un ci-dessous pour affiner.",
+      "addFilter": "Ajouter un filtre",
+      "valuePlaceholder": "valeur",
+      "rangeFrom": "de",
+      "rangeTo": "à",
+      "rangeAnd": "et"
+    }
+  },
+  "layout": {
+    "topbarAria": {
+      "openNav": "Ouvrir le menu de navigation",
+      "openPalette": "Ouvrir la palette de commandes"
+    },
+    "sidebar": {
+      "active": "Actif"
+    },
+    "orgSwitcher": {
+      "switchAria": "Changer d’organisation",
+      "currentAria": "Actuel"
+    }
+  },
+  "rooms": {
+    "title": "Chambres",
+    "subtitle": "Inventaire et disponibilité",
+    "kpi": {
+      "totalRooms": "Total chambres",
+      "available": "Disponibles",
+      "occupied": "Occupées",
+      "maintenance": "Maintenance"
+    },
+    "filters": {
+      "allStatuses": "Tous les statuts"
+    },
+    "statuses": {
+      "available": "Disponible",
+      "occupied": "Occupée",
+      "maintenance": "Maintenance",
+      "blocked": "Bloquée"
+    },
+    "types": {
+      "standard": "Standard",
+      "deluxe": "Deluxe",
+      "suite": "Suite",
+      "family": "Familiale",
+      "dorm": "Dortoir"
+    },
+    "addRoom": "Ajouter une chambre",
+    "editRoom": "Modifier la chambre",
+    "addSubtitle": "Enregistrer une nouvelle chambre",
+    "editSubtitle": "Mettre à jour les détails",
+    "empty": "Aucune chambre trouvée.",
+    "loading": "Chargement…",
+    "perNight": "/nuit",
+    "meta": {
+      "floor": "Étage",
+      "capacity": "Cap.",
+      "reservations": "réservations",
+      "tasks": "tâches"
+    },
+    "detail": {
+      "price": "Prix",
+      "capacity": "Capacité",
+      "reservations": "Réservations",
+      "housekeeping": "Ménage",
+      "guests": " personnes",
+      "floor": "Étage"
+    },
+    "actions": {
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…"
+    },
+    "form": {
+      "name": "Nom / Numéro de chambre",
+      "namePlaceholder": "Suite 201",
+      "type": "Type",
+      "floor": "Étage",
+      "capacity": "Capacité",
+      "price": "Prix ($/nuit)",
+      "status": "Statut"
+    },
+    "toasts": {
+      "nameRequired": "Nom requis",
+      "invalidPrice": "Prix invalide",
+      "saveFailed": "Échec de l’enregistrement",
+      "updated": "Chambre mise à jour",
+      "created": "Chambre ajoutée",
+      "deleted": "Chambre supprimée",
+      "deleteFailed": "Échec de la suppression",
+      "networkError": "Erreur réseau"
+    }
+  },
+  "email": {
+    "title": "E-mail",
+    "subtitle": "Gérez les comptes et envoyez des messages",
+    "connectAccount": "Connecter un compte",
+    "kpi": {
+      "totalAccounts": "Total comptes",
+      "connected": "Connectés",
+      "messagesToday": "Messages aujourd’hui",
+      "pending": "En attente"
+    },
+    "accounts": {
+      "sectionTitle": "Comptes",
+      "refresh": "Actualiser",
+      "loading": "Chargement…",
+      "emptyTitle": "Aucun compte e-mail connecté",
+      "emptyAction": "En connecter un",
+      "syncPrefix": "synchro",
+      "timeAgo": {
+        "never": "jamais",
+        "justNow": "à l’instant",
+        "minutes": "il y a {n}min",
+        "hours": "il y a {n}h",
+        "days": "il y a {n}j"
+      }
+    },
+    "compose": {
+      "noAccount": "Aucun compte sélectionné",
+      "sendFrom": "Envoyer depuis {provider}",
+      "connectPrompt": "Connecte un compte pour commencer à envoyer",
+      "button": "Composer",
+      "title": "Nouveau message",
+      "fromLabel": "De",
+      "to": "À",
+      "toPlaceholder": "destinataire@exemple.com",
+      "addCcBcc": "+ Ajouter Cc / Cci",
+      "cc": "Cc",
+      "bcc": "Cci",
+      "subject": "Objet",
+      "subjectPlaceholder": "Objet du message",
+      "message": "Message",
+      "messagePlaceholder": "Rédige ton message…",
+      "attach": "Joindre",
+      "attachTooltip": "Pièces jointes bientôt disponibles",
+      "send": "Envoyer",
+      "sending": "Envoi…",
+      "toSubjectRequired": "Destinataire et objet sont requis"
+    },
+    "thread": {
+      "comingSoonTitle": "Vue des conversations à venir",
+      "comingSoonBody": "Les messages entrants et sortants apparaîtront ici dès que la synchronisation de la boîte aux lettres sera active."
+    },
+    "addModal": {
+      "title": "Connecter un compte e-mail",
+      "subtitle": "Ajoute une boîte aux lettres pour envoyer et recevoir des messages",
+      "close": "Fermer",
+      "provider": "Fournisseur",
+      "emailLabel": "Adresse e-mail",
+      "emailPlaceholder": "toi@exemple.com",
+      "displayName": "Nom affiché",
+      "displayNamePlaceholder": "Optionnel — affiché sur le courrier sortant",
+      "submit": "Connecter le compte",
+      "submitting": "Connexion…",
+      "emailRequired": "Adresse e-mail requise",
+      "genericFailed": "Échec ({status})",
+      "networkError": "Erreur réseau"
+    },
+    "sendErrors": {
+      "genericFailed": "Échec ({status})",
+      "networkError": "Erreur réseau"
+    }
+  },
+  "dealDetail": {
+    "backToDeals": "Retour aux affaires",
+    "titleFallback": "Détail de l’affaire",
+    "noPipeline": "Aucun pipeline",
+    "sections": {
+      "dealInfo": "Informations sur l’affaire",
+      "commission": "Commission",
+      "probability": "Probabilité",
+      "notes": "Notes"
+    },
+    "fields": {
+      "expectedClose": "Clôture prévue",
+      "dealType": "Type d’affaire",
+      "pipeline": "Pipeline",
+      "created": "Créé le",
+      "actualClose": "Clôture réelle",
+      "rate": "Taux",
+      "amount": "Montant",
+      "brokerSplit": "Répartition courtier"
+    },
+    "dealTypes": {
+      "standard": "Standard",
+      "sale": "Vente",
+      "rental": "Location",
+      "grant": "Subvention",
+      "reservation": "Réservation",
+      "other": "Autre"
+    },
+    "actions": {
+      "markWon": "Marquer comme gagné",
+      "markLost": "Marquer comme perdu",
+      "reopen": "Rouvrir",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "cancel": "Annuler",
+      "saveNotes": "Enregistrer les notes",
+      "saving": "Enregistrement…"
+    },
+    "sideCards": {
+      "contact": "Contact",
+      "owner": "Propriétaire",
+      "project": "Projet",
+      "stage": "Étape",
+      "weightedValue": "Valeur pondérée",
+      "pipelineAge": "Ancienneté dans le pipeline"
+    },
+    "empty": {
+      "noContact": "Aucun contact lié",
+      "unassigned": "Non attribué",
+      "noNotes": "Aucune note pour l’instant. Clique sur Modifier pour ajouter."
+    },
+    "hints": {
+      "clickToEdit": "Clique pour modifier"
+    },
+    "units": {
+      "days": "jours"
+    },
+    "toasts": {
+      "markedWon": "Marqué comme gagné",
+      "markedLost": "Marqué comme perdu",
+      "reopened": "Affaire rouverte",
+      "stageUpdated": "Étape mise à jour",
+      "saved": "Enregistré",
+      "deleted": "Affaire supprimée",
+      "deleteFailed": "Échec de la suppression",
+      "updateFailed": "Échec de la mise à jour",
+      "networkError": "Erreur réseau",
+      "titleRequired": "Titre requis",
+      "invalidValue": "Valeur non valide",
+      "rangeZeroToHundred": "Doit être entre 0 et 100",
+      "notFound": "Affaire introuvable",
+      "loadFailed": "Impossible de charger l’affaire"
+    },
+    "common": {
+      "loading": "Chargement..."
+    }
+  },
+  "transactionDetail": {
+    "backToTransactions": "Retour aux transactions",
+    "titleFallback": "Détail de la transaction",
+    "escrowFallback": "Aucun n° de séquestre",
+    "noTitleCompany": "Aucun notaire",
+    "notFound": "Introuvable.",
+    "sections": {
+      "financial": "Détails financiers",
+      "closingChecklist": "Liste de clôture",
+      "notes": "Notes",
+      "summary": "Résumé",
+      "signatures": "Signatures",
+      "linked": "Lié"
+    },
+    "fields": {
+      "salePrice": "Prix de vente",
+      "earnestMoney": "Acompte",
+      "escrowNumber": "Numéro de séquestre",
+      "titleCompany": "Notaire",
+      "contractDate": "Date du contrat",
+      "closingDate": "Date de clôture",
+      "earnest": "Acompte",
+      "signatures": "Signatures",
+      "daysOpen": "Jours ouverts",
+      "documentName": "Nom du document",
+      "signerName": "Nom du signataire",
+      "signerEmail": "E-mail du signataire"
+    },
+    "statuses": {
+      "pending": "En attente",
+      "inProgress": "En cours",
+      "closing": "Clôture",
+      "completed": "Terminée",
+      "cancelled": "Annulée"
+    },
+    "types": {
+      "purchase": "Achat",
+      "sale": "Vente",
+      "lease": "Bail",
+      "rental": "Location"
+    },
+    "actions": {
+      "requestSignature": "Demander une signature",
+      "request": "Demander",
+      "delete": "Supprimer",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "edit": "Modifier",
+      "viewDeal": "Voir l’affaire →",
+      "viewProperty": "Voir le bien →",
+      "sendSignatureRequest": "Envoyer la demande de signature",
+      "sending": "Envoi…"
+    },
+    "modal": {
+      "title": "Demander une signature",
+      "subtitle": "Envoyer un document pour signature électronique",
+      "documentPlaceholder": "Compromis de vente",
+      "signerNamePlaceholder": "Jean Dupont",
+      "signerEmailPlaceholder": "jean@exemple.fr"
+    },
+    "checklist": {
+      "defaultItems": {
+        "inspection": "Inspection programmée",
+        "appraisal": "Expertise commandée",
+        "loanApproval": "Accord de prêt reçu",
+        "titleSearch": "Recherche de titre effectuée",
+        "insurance": "Assurance souscrite",
+        "walkthrough": "Visite finale",
+        "closingDocs": "Documents de clôture signés"
+      }
+    },
+    "empty": {
+      "noSignatures": "Aucune demande de signature.",
+      "noNotes": "Aucune note. Clique sur Modifier pour ajouter."
+    },
+    "hints": {
+      "clickToEdit": "Clique pour modifier"
+    },
+    "toasts": {
+      "saved": "Enregistré",
+      "saveFailed": "Échec de l’enregistrement",
+      "updateFailed": "Échec de la mise à jour",
+      "networkError": "Erreur réseau",
+      "invalidAmount": "Montant non valide",
+      "deleted": "Transaction supprimée",
+      "deleteFailed": "Échec de la suppression",
+      "allFieldsRequired": "Tous les champs sont obligatoires",
+      "signatureCreated": "Demande de signature créée",
+      "signatureFailed": "Échec de la demande de signature"
+    },
+    "common": {
+      "loading": "Chargement..."
+    }
+  },
+  "projectDetail": {
+    "titleFallback": "Projet",
+    "notFound": "Projet introuvable",
+    "backToProjects": "Retour aux projets",
+    "tabs": {
+      "overview": "Vue d’ensemble",
+      "milestones": "Jalons",
+      "impact": "Impact",
+      "contacts": "Contacts",
+      "deals": "Affaires"
+    },
+    "statuses": {
+      "planned": "Planifié",
+      "active": "Actif",
+      "completed": "Terminé",
+      "paused": "En pause"
+    },
+    "sections": {
+      "projectDetails": "Détails du projet",
+      "milestoneProgress": "Progression des jalons",
+      "budgetBurn": "Consommation du budget",
+      "addMilestone": "Ajouter un jalon",
+      "recordImpact": "Enregistrer un impact",
+      "impactRecords": "Enregistrements d’impact",
+      "linkedContacts": "Contacts liés",
+      "linkedDeals": "Affaires liées"
+    },
+    "stats": {
+      "progress": "Progression",
+      "budget": "Budget",
+      "impactEntries": "Entrées d’impact",
+      "daysActive": "Jours actifs",
+      "records": "enregistrements",
+      "totalDuration": "durée totale",
+      "soFar": "jusqu’à présent",
+      "totalPipeline": "Pipeline total",
+      "weighted": "Pondéré",
+      "won": "Gagnées",
+      "open": "Ouvertes",
+      "milestonesSummary": "{done}/{total} jalons",
+      "burnPercent": "{burn}% dépensé",
+      "milestonesCompleted": "{done} jalons sur {total} terminés",
+      "budgetSpent": "€{spent} dépensés sur €{budget}"
+    },
+    "milestones": {
+      "titlePlaceholder": "Titre du jalon",
+      "addBtn": "Ajouter",
+      "emptyHint": "Aucun jalon pour l’instant. Ajoute ton premier ci-dessus.",
+      "markPending": "Marquer comme en attente",
+      "markCompleted": "Marquer comme terminé",
+      "deleteAria": "Supprimer le jalon",
+      "overdueLabel": "en retard",
+      "completedLabel": "terminé le {date}"
+    },
+    "impact": {
+      "valuePlaceholder": "Valeur",
+      "notesPlaceholder": "Notes (facultatif)",
+      "recordBtn": "Enregistrer",
+      "emptyHint": "Aucun impact enregistré. Saisis ta première métrique ci-dessus.",
+      "types": {
+        "co2_kg": "CO2 réduit",
+        "people_helped": "Personnes aidées",
+        "trees_planted": "Arbres plantés",
+        "money_donated": "Argent donné",
+        "water_liters": "Eau économisée",
+        "energy_kwh": "Énergie produite",
+        "custom": "Personnalisé"
+      }
+    },
+    "contacts": {
+      "emptyHint": "Aucun contact lié pour l’instant."
+    },
+    "deals": {
+      "openBoard": "Ouvrir le tableau des affaires →",
+      "emptyHint": "Aucune affaire liée à ce projet pour l’instant."
+    },
+    "budgetPlaceholder": "Budget (€)",
+    "toasts": {
+      "updated": "Projet mis à jour",
+      "somethingWrong": "Une erreur est survenue",
+      "milestoneAdded": "Jalon ajouté",
+      "milestoneRemoved": "Jalon supprimé",
+      "impactRecorded": "Impact enregistré",
+      "positiveValueRequired": "Saisis une valeur positive",
+      "failedUpdateProject": "Échec de la mise à jour du projet",
+      "failedAddMilestone": "Échec de l’ajout du jalon",
+      "failedUpdateMilestone": "Échec de la mise à jour du jalon",
+      "failedDeleteMilestone": "Échec de la suppression du jalon",
+      "failedAddMetric": "Échec de l’ajout de la métrique"
+    }
+  },
+  "propertyDetail": {
+    "titleFallback": "Détail du bien",
+    "backToProperties": "Retour aux biens",
+    "sections": {
+      "propertyDetails": "Détails du bien",
+      "showings": "Visites",
+      "stats": "Statistiques",
+      "listed": "En ligne",
+      "offers": "Offres",
+      "description": "Description"
+    },
+    "fields": {
+      "price": "Prix",
+      "address": "Adresse",
+      "city": "Ville",
+      "state": "Région",
+      "zip": "Code postal",
+      "bedrooms": "Chambres",
+      "bathrooms": "Salles de bain",
+      "squareFeet": "Surface",
+      "yearBuilt": "Année de construction",
+      "viewings": "Visites",
+      "openHouses": "Portes ouvertes",
+      "offers": "Offres"
+    },
+    "statuses": {
+      "available": "Disponible",
+      "underContract": "Sous compromis",
+      "sold": "Vendu",
+      "rented": "Loué"
+    },
+    "types": {
+      "residential": "Résidentiel",
+      "commercial": "Commercial",
+      "land": "Terrain",
+      "industrial": "Industriel"
+    },
+    "actions": {
+      "scheduleShowing": "Planifier une visite",
+      "scheduleOpenHouse": "Planifier des portes ouvertes",
+      "submitOffer": "Soumettre une offre",
+      "delete": "Supprimer",
+      "viewAll": "Tout voir →",
+      "edit": "Modifier",
+      "cancel": "Annuler",
+      "save": "Enregistrer"
+    },
+    "empty": {
+      "notFound": "Bien introuvable.",
+      "noShowings": "Aucune visite programmée.",
+      "noOffers": "Aucune offre pour l’instant.",
+      "noDescription": "Aucune description."
+    },
+    "hints": {
+      "clickToEdit": "Clique pour modifier",
+      "clickToChange": "Clique pour changer",
+      "daysOnMarket": "{days} jours sur le marché"
+    },
+    "loading": "Chargement du bien...",
+    "toasts": {
+      "titleRequired": "Titre requis",
+      "invalidPrice": "Prix non valide",
+      "invalidNumber": "Nombre non valide",
+      "saved": "Enregistré",
+      "saveFailed": "Échec de l’enregistrement",
+      "networkError": "Erreur réseau",
+      "deleted": "Bien supprimé",
+      "deleteFailed": "Échec de la suppression",
+      "notFound": "Bien introuvable",
+      "loadFailed": "Impossible de charger le bien"
+    }
+  },
+  "commandPalette": {
+    "placeholder": "Rechercher pages, contacts, projets...",
+    "askAi": "Demander à l’IA",
+    "askAiAria": "Demander à l’IA",
+    "askAiTitle": "Demander à l’IA (Cmd+Shift+K)",
+    "searching": "Recherche…",
+    "noResults": "Aucun résultat",
+    "navigate": "naviguer",
+    "select": "sélectionner",
+    "resultsOne": "{count} résultat",
+    "resultsOther": "{count} résultats",
+    "categories": {
+      "pages": "Pages",
+      "tools": "Outils",
+      "realEstate": "Immobilier",
+      "hospitality": "Hôtellerie",
+      "philanthropy": "Philanthropie",
+      "system": "Système",
+      "actions": "Actions",
+      "settings": "Paramètres",
+      "contacts": "Contacts",
+      "projects": "Projets",
+      "properties": "Biens"
+    },
+    "contactFallback": "Contact",
+    "items": {
+      "dashboard": {
+        "label": "Tableau de bord",
+        "description": "Vue d’ensemble et KPI"
+      },
+      "projects": {
+        "label": "Projets",
+        "description": "Gérer les projets"
+      },
+      "properties": {
+        "label": "Biens",
+        "description": "Gérer les biens"
+      },
+      "contacts": {
+        "label": "Contacts",
+        "description": "Personnes et organisations"
+      },
+      "impact": {
+        "label": "Impact",
+        "description": "Indicateurs d’impact"
+      },
+      "market": {
+        "label": "Marché",
+        "description": "Analytique du marché"
+      },
+      "reports": {
+        "label": "Rapports",
+        "description": "Générer et consulter les rapports"
+      },
+      "kanban": {
+        "label": "Tableau",
+        "description": "Tableau de pipeline"
+      },
+      "dealsBoard": {
+        "label": "Tableau des deals",
+        "description": "Tableau de pipeline"
+      },
+      "reservations": {
+        "label": "Réservations",
+        "description": "Tableau de pipeline"
+      },
+      "deals": {
+        "label": "Affaires",
+        "description": "Pipeline de deals"
+      },
+      "calendar": {
+        "label": "Calendrier",
+        "description": "Jalons et événements"
+      },
+      "timeline": {
+        "label": "Chronologie",
+        "description": "Vue Gantt des tâches"
+      },
+      "documents": {
+        "label": "Documents",
+        "description": "Gérer les fichiers et documents"
+      },
+      "inbox": {
+        "label": "Boîte de réception",
+        "description": "Conversations et messages"
+      },
+      "email": {
+        "label": "E-mail",
+        "description": "Campagnes e-mail"
+      },
+      "sms": {
+        "label": "SMS",
+        "description": "Messagerie SMS"
+      },
+      "templates": {
+        "label": "Modèles",
+        "description": "Modèles d’e-mail et SMS"
+      },
+      "pages": {
+        "label": "Pages",
+        "description": "Pages personnalisées"
+      },
+      "ai": {
+        "label": "Aperçus IA",
+        "description": "Analyse propulsée par l’IA"
+      },
+      "propertiesRe": {
+        "label": "Biens",
+        "description": "Annonces immobilières"
+      },
+      "showings": {
+        "label": "Visites",
+        "description": "Visites de biens"
+      },
+      "offers": {
+        "label": "Offres",
+        "description": "Offres sur les biens"
+      },
+      "openHouses": {
+        "label": "Portes ouvertes",
+        "description": "Événements portes ouvertes"
+      },
+      "commissions": {
+        "label": "Commissions",
+        "description": "Classement de l’équipe"
+      },
+      "dripCampaigns": {
+        "label": "Campagnes drip",
+        "description": "Séquences automatisées"
+      },
+      "marketAnalytics": {
+        "label": "Analytique du marché",
+        "description": "Tendances du marché"
+      },
+      "transactions": {
+        "label": "Transactions",
+        "description": "Transactions immobilières"
+      },
+      "actionPlans": {
+        "label": "Plans d’action",
+        "description": "Séquences d’actions automatisées"
+      },
+      "leadScores": {
+        "label": "Scoring des leads",
+        "description": "Scoring des contacts"
+      },
+      "leadRouting": {
+        "label": "Routage des leads",
+        "description": "Acheminer les leads vers les agents"
+      },
+      "dialer": {
+        "label": "Numéroteur",
+        "description": "Journaux d’appels et numérotation"
+      },
+      "referrals": {
+        "label": "Recommandations",
+        "description": "Commissions de recommandation"
+      },
+      "soi": {
+        "label": "Sphère d’influence",
+        "description": "Catégories SOI"
+      },
+      "cma": {
+        "label": "Rapports CMA",
+        "description": "Analyse comparative du marché"
+      },
+      "clientPortal": {
+        "label": "Portail client",
+        "description": "Accès au portail client"
+      },
+      "eSignatures": {
+        "label": "Signatures électroniques",
+        "description": "Signatures de documents"
+      },
+      "rooms": {
+        "label": "Chambres",
+        "description": "Gérer les chambres et la disponibilité"
+      },
+      "grants": {
+        "label": "Subventions",
+        "description": "Demandes de subvention et financement"
+      },
+      "donors": {
+        "label": "Donateurs",
+        "description": "Tableau de bord scoring donateurs"
+      },
+      "volunteers": {
+        "label": "Bénévoles",
+        "description": "Équipe bénévole et heures"
+      },
+      "notifications": {
+        "label": "Notifications",
+        "description": "Toutes les notifications"
+      },
+      "automations": {
+        "label": "Automatisations",
+        "description": "Automatiser les workflows"
+      },
+      "integrations": {
+        "label": "Intégrations",
+        "description": "Applications connectées"
+      },
+      "webhooks": {
+        "label": "Webhooks",
+        "description": "Webhooks sortants"
+      },
+      "pipelines": {
+        "label": "Pipelines",
+        "description": "Configurer les pipelines et étapes"
+      },
+      "security": {
+        "label": "Sécurité",
+        "description": "Liste d’IP autorisées et délai d’inactivité"
+      },
+      "features": {
+        "label": "Indicateurs de fonctionnalités",
+        "description": "Kill-switches par organisation sans redéploiement"
+      },
+      "scimGroups": {
+        "label": "Groupes SCIM",
+        "description": "Mapper les groupes IdP vers rôles et sections"
+      },
+      "audit": {
+        "label": "Journal d’audit",
+        "description": "Piste d’audit système"
+      },
+      "settings": {
+        "label": "Paramètres",
+        "description": "Préférences de l’app"
+      },
+      "newProject": {
+        "label": "Nouveau projet",
+        "description": "Créer un nouveau projet"
+      },
+      "newProperty": {
+        "label": "Nouveau bien",
+        "description": "Créer un nouveau bien"
+      },
+      "newRoom": {
+        "label": "Nouvelle chambre",
+        "description": "Créer une nouvelle chambre"
+      },
+      "newContact": {
+        "label": "Nouveau contact",
+        "description": "Ajouter un nouveau contact"
+      },
+      "exportData": {
+        "label": "Exporter les données",
+        "description": "Télécharger les données actuelles en CSV"
+      },
+      "toDark": {
+        "label": "Passer en mode sombre",
+        "description": "Actuellement {theme}"
+      },
+      "toLight": {
+        "label": "Passer en mode clair",
+        "description": "Actuellement {theme}"
+      },
+      "toCsr": {
+        "label": "Basculer en CSR",
+        "description": "Mode philanthropie et CSR"
+      },
+      "toRe": {
+        "label": "Basculer en immobilier",
+        "description": "Mode immobilier"
+      },
+      "toHos": {
+        "label": "Basculer en hospitality",
+        "description": "Mode hospitality"
+      }
+    }
+  },
+  "audit": {
+    "title": "Journal d'audit",
+    "subtitle": "Historique d'activité complet de votre espace de travail",
+    "filters": {
+      "allEntities": "Toutes les entités",
+      "allActions": "Toutes les actions",
+      "create": "Créer",
+      "update": "Modifier",
+      "delete": "Supprimer",
+      "allTime": "Tout l'historique",
+      "last24h": "Dernières 24 heures",
+      "last7d": "7 derniers jours",
+      "last30d": "30 derniers jours"
+    },
+    "columns": {
+      "timestamp": "Horodatage",
+      "action": "Action",
+      "entity": "Entité",
+      "changes": "Modifications",
+      "user": "Utilisateur"
+    },
+    "empty": "Aucun journal d'audit trouvé.",
+    "loading": "Chargement des journaux d'audit...",
+    "diff": {
+      "noDetails": "Aucun détail au niveau du champ enregistré.",
+      "field": "Champ",
+      "before": "Avant",
+      "after": "Après",
+      "entityId": "id de l'entité",
+      "noDetailsShort": "Aucun détail"
+    }
+  },
+  "transactions": {
+    "title": "Transactions",
+    "subtitle": "Closings, contrats et séquestre",
+    "addLabel": "Transaction",
+    "kpis": {
+      "total": "Total des transactions",
+      "active": "Actives",
+      "totalVolume": "Volume total",
+      "pendingClose": "Closing en attente"
+    },
+    "filters": {
+      "allStatuses": "Tous les statuts",
+      "pending": "En attente",
+      "active": "Actives",
+      "closing": "En closing",
+      "closed": "Clôturée",
+      "cancelled": "Annulée",
+      "allTypes": "Tous les types",
+      "purchase": "Achat",
+      "sale": "Vente",
+      "lease": "Location",
+      "refinance": "Refinancement"
+    },
+    "columns": {
+      "transaction": "Transaction",
+      "type": "Type",
+      "salePrice": "Prix de vente",
+      "status": "Statut",
+      "closingDate": "Date de closing",
+      "signatures": "Signatures"
+    },
+    "list": {
+      "loading": "Chargement...",
+      "empty": "Aucune transaction trouvée.",
+      "noEscrow": "Sans n° séquestre"
+    },
+    "modal": {
+      "title": "Ajouter une transaction",
+      "subtitle": "Créer une nouvelle transaction",
+      "close": "Fermer",
+      "type": "Type",
+      "escrowNumber": "Numéro de séquestre",
+      "titleCompany": "Société de titre",
+      "salePrice": "Prix de vente ($)",
+      "earnestMoney": "Acompte ($)",
+      "closingDate": "Date de closing",
+      "notes": "Notes",
+      "saving": "Enregistrement...",
+      "submit": "Ajouter une transaction"
+    },
+    "errors": {
+      "networkError": "Erreur réseau"
+    }
+  },
+  "sms": {
+    "title": "SMS et WhatsApp",
+    "subtitle": "Envoyer et suivre les messages SMS et WhatsApp",
+    "addLabel": "Envoyer un message",
+    "kpis": {
+      "total": "Total des messages",
+      "delivered": "Livrés",
+      "failed": "Échoués",
+      "queued": "En file d'attente"
+    },
+    "filters": {
+      "searchPlaceholder": "Rechercher par numéro...",
+      "allChannels": "Tous les canaux",
+      "allStatuses": "Tous les statuts",
+      "queued": "En file d'attente",
+      "sent": "Envoyés",
+      "delivered": "Livrés",
+      "failed": "Échoués",
+      "clear": "Effacer les filtres"
+    },
+    "direction": {
+      "to": "à",
+      "from": "de"
+    },
+    "list": {
+      "loading": "Chargement...",
+      "empty": "Aucun message trouvé."
+    },
+    "relative": {
+      "justNow": "à l'instant"
+    },
+    "modal": {
+      "title": "Envoyer un message",
+      "subtitle": "Envoyer un nouveau message SMS ou WhatsApp",
+      "close": "Fermer",
+      "channel": "Canal",
+      "toNumber": "Vers le numéro",
+      "message": "Message",
+      "messagePlaceholder": "Saisissez votre message...",
+      "overLimit": "Le message dépasse 160 caractères — il sera divisé en plusieurs SMS.",
+      "sending": "Envoi...",
+      "submit": "Envoyer le message"
+    },
+    "errors": {
+      "networkError": "Erreur réseau"
+    }
+  },
+  "actionPlans": {
+    "title": "Plans d'action",
+    "subtitle": "Séquences automatisées déclenchées par des événements",
+    "addLabel": "Plan",
+    "kpis": {
+      "total": "Total des plans",
+      "active": "Actifs",
+      "enrollments": "Total des inscriptions"
+    },
+    "filters": {
+      "all": "Tous les statuts",
+      "active": "Actif",
+      "paused": "En pause",
+      "archived": "Archivé"
+    },
+    "list": {
+      "loading": "Chargement...",
+      "empty": "Aucun plan d'action pour le moment."
+    },
+    "triggers": {
+      "manual": "Manuel",
+      "new_lead": "Nouveau lead",
+      "stage_change": "Changement d'étape",
+      "date_trigger": "Déclencheur de date"
+    },
+    "modal": {
+      "title": "Ajouter un plan d'action",
+      "subtitle": "Créer un nouveau plan d'action",
+      "close": "Fermer",
+      "name": "Nom",
+      "namePlaceholder": "ex. Onboarding de nouveau lead",
+      "description": "Description",
+      "descriptionPlaceholder": "Décrire ce plan d'action...",
+      "triggerEvent": "Événement déclencheur",
+      "status": "Statut",
+      "saving": "Enregistrement...",
+      "submit": "Ajouter le plan"
+    },
+    "statusLabels": {
+      "active": "Actif",
+      "paused": "En pause"
+    },
+    "actions": {
+      "delete": "Supprimer"
+    },
+    "errors": {
+      "nameRequired": "Le nom est requis",
+      "networkError": "Erreur réseau"
+    }
+  },
+  "documents": {
+    "title": "Documents",
+    "subtitle": "Fichiers liés aux projets, contacts et affaires",
+    "addLabel": "Téléverser",
+    "kpis": {
+      "total": "Total des documents",
+      "totalSize": "Taille totale",
+      "linked": "Liés",
+      "images": "Images"
+    },
+    "search": "Rechercher par nom ou MIME…",
+    "filters": "Filtres",
+    "filtersWithCount": "Filtres ({count})",
+    "view": {
+      "grid": "Grille",
+      "table": "Tableau"
+    },
+    "selection": {
+      "countSelected": "{count} sélectionnés",
+      "clear": "Effacer",
+      "deleteCount": "Supprimer {count}"
+    },
+    "list": {
+      "loading": "Chargement…",
+      "emptyHeading": "Aucun document",
+      "uploadFirst": "Téléversez votre premier document pour commencer.",
+      "noMatch": "Aucun document ne correspond aux filtres.",
+      "uploadFirstBtn": "Téléverser le premier document"
+    },
+    "card": {
+      "open": "Ouvrir",
+      "save": "Enregistrer",
+      "download": "Télécharger",
+      "delete": "Supprimer"
+    },
+    "columns": {
+      "name": "Nom",
+      "type": "Type",
+      "mime": "MIME",
+      "size": "Taille",
+      "linked": "Lié",
+      "uploaded": "Téléversé"
+    },
+    "filterFields": {
+      "name": "Nom",
+      "type": "Type",
+      "mimeType": "Type MIME",
+      "size": "Taille (octets)",
+      "linkedTo": "Lié à",
+      "file": "Fichier",
+      "image": "Image",
+      "pdf": "PDF",
+      "spreadsheet": "Tableur",
+      "project": "Projet",
+      "contact": "Contact",
+      "deal": "Affaire",
+      "property": "Bien",
+      "room": "Chambre"
+    },
+    "upload": {
+      "title": "Téléverser un document",
+      "subtitle": "Glissez un fichier ou ajoutez par URL",
+      "separator": "— ou ajouter par URL —",
+      "name": "Nom",
+      "fileUrl": "URL du fichier",
+      "type": "Type",
+      "linkTo": "Lier à",
+      "none": "Aucun",
+      "mimeType": "Type MIME",
+      "sizeBytes": "Taille (octets)",
+      "cancel": "Annuler",
+      "uploading": "Téléversement…",
+      "submit": "Téléverser",
+      "failed": "Échoué",
+      "failedUpload": "Échec du téléversement"
+    },
+    "toasts": {
+      "deleted": "Document supprimé",
+      "deleteFailed": "Échec de la suppression",
+      "networkError": "Erreur réseau",
+      "bulkDeleted": "{count} document(s) supprimé(s)",
+      "bulkFailed": "Échec de suppression pour {count}"
+    }
+  },
+  "templates": {
+    "title": "Modèles",
+    "subtitle": "Modèles d'e-mail et SMS avec champs de fusion",
+    "addLabel": "Modèle",
+    "filters": {
+      "all": "Tous",
+      "email": "E-mail",
+      "sms": "SMS",
+      "letter": "Lettre"
+    },
+    "list": {
+      "loading": "Chargement...",
+      "empty": "Aucun modèle trouvé.",
+      "updated": "Mis à jour le {date}",
+      "preview": "Aperçu",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    },
+    "editor": {
+      "titleNew": "Nouveau modèle",
+      "titleEdit": "Modifier le modèle",
+      "subtitle": "Utilisez {field} pour les champs de fusion",
+      "name": "Nom",
+      "namePlaceholder": "E-mail de bienvenue",
+      "type": "Type",
+      "subject": "Objet",
+      "body": "Corps",
+      "cancel": "Annuler",
+      "saving": "Enregistrement...",
+      "saveChanges": "Enregistrer les modifications",
+      "create": "Créer le modèle"
+    },
+    "preview": {
+      "title": "Aperçu du modèle",
+      "subtitle": "Rendu avec contexte d'exemple",
+      "raw": "Brut",
+      "rendered": "Rendu",
+      "sampleContext": "Contexte d'exemple :",
+      "rendering": "Rendu en cours...",
+      "previewFailed": "Échec de l'aperçu"
+    },
+    "toasts": {
+      "nameRequired": "Le nom est requis",
+      "bodyRequired": "Le corps est requis",
+      "saveFailed": "Échec de l'enregistrement",
+      "updated": "Modèle mis à jour",
+      "created": "Modèle créé",
+      "deleted": "Modèle supprimé",
+      "deleteFailed": "Échec de la suppression"
+    }
+  },
+  "scoringRules": {
+    "title": "Règles de scoring",
+    "subtitle": "Attribuer des points pour les événements d'engagement",
+    "addLabel": "Règle",
+    "kpis": {
+      "total": "Total des règles",
+      "active": "Règles actives",
+      "totalPoints": "Total des points possibles"
+    },
+    "list": {
+      "loading": "Chargement...",
+      "empty": "Aucune règle de scoring pour le moment.",
+      "decaysIn": "Diminue dans {days}j",
+      "active": "Actif",
+      "paused": "En pause",
+      "delete": "Supprimer"
+    },
+    "modal": {
+      "title": "Ajouter une règle de scoring",
+      "subtitle": "Créer une nouvelle règle de scoring",
+      "close": "Fermer",
+      "name": "Nom",
+      "namePlaceholder": "ex. E-mail ouvert",
+      "event": "Événement",
+      "eventPlaceholder": "ex. email_open",
+      "points": "Points",
+      "enableDecay": "Activer la diminution des points",
+      "decayDays": "Jours de diminution",
+      "enabled": "Activée",
+      "saving": "Enregistrement...",
+      "submit": "Ajouter la règle"
+    },
+    "errors": {
+      "nameEventRequired": "Le nom et l'événement sont requis",
+      "networkError": "Erreur réseau"
+    }
+  },
+  "dripCampaigns": {
+    "title": "Campagnes de drip",
+    "subtitle": "Séquences de nurturing automatisées multi-étapes",
+    "kpis": {
+      "total": "Total des campagnes",
+      "active": "Actives",
+      "totalSteps": "Total des étapes",
+      "enrolled": "Inscrits"
+    },
+    "filters": {
+      "allTypes": "Tous les types",
+      "allStatuses": "Tous les statuts",
+      "active": "Actif",
+      "paused": "En pause",
+      "archived": "Archivé"
+    },
+    "types": {
+      "buyer": "Nurture acheteur",
+      "seller": "Nurture vendeur",
+      "nurture": "Nurture général",
+      "post_close": "Post-closing",
+      "sphere": "Sphère d'influence",
+      "open_house": "Suivi journée portes ouvertes"
+    },
+    "newCampaign": "Nouvelle campagne",
+    "list": {
+      "loading": "Chargement...",
+      "empty": "Aucune campagne trouvée. Cliquez sur Nouvelle campagne pour en créer une.",
+      "noSteps": "Aucune étape configurée",
+      "moreSteps": "+{count} de plus",
+      "stepCount": "{count} étape(s)",
+      "created": "Créée le {date}",
+      "manageEnrollments": "Gérer les inscriptions",
+      "pause": "Mettre en pause",
+      "activate": "Activer",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    },
+    "form": {
+      "titleNew": "Nouvelle campagne de drip",
+      "titleEdit": "Modifier la campagne",
+      "subtitle": "Séquence de touches automatisées",
+      "campaignName": "Nom de la campagne",
+      "campaignNamePlaceholder": "ex. Séquence de bienvenue acheteur",
+      "type": "Type",
+      "status": "Statut",
+      "sequenceSteps": "Étapes de séquence ({count})",
+      "addStep": "Ajouter une étape",
+      "step": "Étape {n}",
+      "sendAfter": "Envoyer après",
+      "day": "jour",
+      "days": "jours",
+      "removeStep": "Supprimer l'étape",
+      "subjectPlaceholder": "Ligne d'objet",
+      "emailBodyPlaceholder": "Corps de l'e-mail…",
+      "messagePlaceholder": "Message {channel}…",
+      "chars": "{n} caractères",
+      "emptySteps": "Aucune étape pour le moment. Cliquez sur Ajouter une étape pour commencer à construire la séquence.",
+      "cancel": "Annuler",
+      "saving": "Enregistrement…",
+      "saveChanges": "Enregistrer",
+      "createCampaign": "Créer la campagne"
+    },
+    "toasts": {
+      "nameRequired": "Le nom est requis",
+      "addStep": "Ajoutez au moins une étape",
+      "stepBody": "Toutes les étapes ont besoin d'un corps",
+      "dayInvalid": "Le jour doit être 0 ou plus",
+      "saveFailed": "Échec de l'enregistrement",
+      "updated": "Campagne mise à jour",
+      "created": "Campagne créée",
+      "networkError": "Erreur réseau",
+      "statusChanged": "Campagne {status}",
+      "updateFailed": "Échec de la mise à jour",
+      "deleted": "Campagne supprimée",
+      "deleteFailed": "Échec de la suppression"
+    }
+  },
+  "settingsUsers": {
+    "title": "Équipe et permissions",
+    "subtitle": "Contrôlez qui voit quoi dans le tableau de bord",
+    "readOnlyNotice": "Seuls les administrateurs peuvent inviter des coéquipiers ou modifier les permissions. Vous consultez cette liste en lecture seule.",
+    "team": "Équipe",
+    "memberCount": "{count} membre(s)",
+    "invite": "Inviter",
+    "loading": "Chargement…",
+    "noUsers": "Aucun utilisateur pour le moment.",
+    "edit": "Modifier",
+    "sectionsSummary": {
+      "allSections": "Toutes les sections",
+      "noSections": "Aucune section"
+    },
+    "groups": {
+      "primary": "Principal",
+      "tools": "Outils",
+      "industry": "Secteur",
+      "system": "Système"
+    },
+    "picker": {
+      "fullAccess": "Accès complet à toutes les sections",
+      "resetFull": "Réinitialiser à l'accès complet"
+    },
+    "invModal": {
+      "title": "Inviter un coéquipier",
+      "email": "E-mail",
+      "nameOptional": "Nom (facultatif)",
+      "role": "Rôle",
+      "adminBypass": "Les administrateurs contournent la liste des sections autorisées et peuvent gérer d'autres utilisateurs.",
+      "dashboardSections": "Sections du tableau de bord",
+      "adminAlways": "Les administrateurs voient toujours toutes les sections — la liste autorisée est ignorée.",
+      "cancel": "Annuler",
+      "sending": "Envoi…",
+      "send": "Envoyer l'invitation"
+    },
+    "editModal": {
+      "titleFn": "Modifier {name}",
+      "saving": "Enregistrement…",
+      "saveChanges": "Enregistrer"
+    },
+    "close": "Fermer",
+    "toasts": {
+      "loadFailed": "Échec du chargement des utilisateurs",
+      "emailRequired": "L'e-mail est requis",
+      "inviteFailed": "Échec de l'invitation de l'utilisateur",
+      "invited": "{email} invité",
+      "created": "{email} créé (e-mail d'invitation ignoré)",
+      "saveFailed": "Échec de l'enregistrement",
+      "updated": "{email} mis à jour"
+    }
+  },
+  "calendar": {
+    "title": "Calendrier",
+    "subtitle": "Rendez-vous et échéances",
+    "newEvent": "Nouvel événement",
+    "selectDate": "Sélectionnez une date",
+    "loading": "Chargement…",
+    "noEventsOnDate": "Aucun événement à cette date",
+    "addEventToDay": "+ Ajouter un événement à ce jour",
+    "upcoming": "À venir",
+    "noUpcoming": "Aucun événement à venir",
+    "allDay": "Toute la journée",
+    "prevMonth": "Mois précédent",
+    "nextMonth": "Mois suivant",
+    "eventCount": "{count} événement(s)",
+    "days": {
+      "Mon": "Lun",
+      "Tue": "Mar",
+      "Wed": "Mer",
+      "Thu": "Jeu",
+      "Fri": "Ven",
+      "Sat": "Sam",
+      "Sun": "Dim"
+    },
+    "months": {
+      "January": "Janvier",
+      "February": "Février",
+      "March": "Mars",
+      "April": "Avril",
+      "May": "Mai",
+      "June": "Juin",
+      "July": "Juillet",
+      "August": "Août",
+      "September": "Septembre",
+      "October": "Octobre",
+      "November": "Novembre",
+      "December": "Décembre"
+    },
+    "colors": {
+      "Blue": "Bleu",
+      "Green": "Vert",
+      "Amber": "Ambre",
+      "Red": "Rouge",
+      "Violet": "Violet"
+    },
+    "form": {
+      "titleNew": "Nouvel événement",
+      "titleEdit": "Modifier l'événement",
+      "subtitleNew": "Ajouter un nouveau rendez-vous, échéance ou jalon",
+      "subtitleEdit": "Mettre à jour ou supprimer cet événement",
+      "title": "Titre",
+      "titlePlaceholder": "Titre de l'événement",
+      "start": "Début",
+      "end": "Fin",
+      "allDay": "Toute la journée",
+      "allDayHelp": "L'événement dure toute la journée",
+      "location": "Lieu",
+      "optional": "Facultatif",
+      "description": "Description",
+      "color": "Couleur",
+      "delete": "Supprimer",
+      "cancel": "Annuler",
+      "saving": "Enregistrement…",
+      "save": "Enregistrer",
+      "create": "Créer"
+    },
+    "errors": {
+      "titleRequired": "Le titre est requis",
+      "timesRequired": "Les heures de début et de fin sont requises",
+      "endAfterStart": "L'heure de fin doit être après l'heure de début",
+      "saveFailed": "Échec de l'enregistrement",
+      "deleteFailed": "Échec de la suppression"
+    }
+  },
+  "propertyTaxonomy": {
+    "title": "Taxonomie des biens",
+    "subtitle": "Configurez emplacements, types, sous-types et drapeaux de filtres pour votre agence",
+    "loading": "Chargement…",
+    "presets": {
+      "title": "Préréglages par pays",
+      "help": "Appliquez un préréglage pays comme point de départ, puis ajustez ci-dessous. Chaque client peut avoir sa propre taxonomie."
+    },
+    "country": {
+      "title": "Libellé du pays",
+      "help": "Affiché dans les listes déroulantes de filtres et le formulaire Ajouter un bien (ex. « Tout Chypre », « Tous les Pays-Bas »)."
+    },
+    "districts": {
+      "title": "Districts / Régions",
+      "entries": "{count} entrées",
+      "placeholder": "ex. Paphos"
+    },
+    "listingTypes": {
+      "title": "Types d'annonces",
+      "valuesNote": "Les valeurs doivent rester",
+      "help": "Seules les libellés sont traduisibles (ex. « À vendre » / « À louer »). Ne changez pas la colonne value — la base de données l'utilise.",
+      "placeholder": "ex. À vendre"
+    },
+    "propertyTypes": {
+      "title": "Types de biens de premier niveau",
+      "count": "{count} types",
+      "placeholder": "ex. Maisons"
+    },
+    "subtypes": {
+      "title": "Sous-types par type de bien",
+      "help": "Affichés comme menu déroulant en cascade lorsque l'utilisateur sélectionne un type principal.",
+      "empty": "Ajoutez d'abord au moins un type principal de bien.",
+      "addSubtype": "Ajouter un sous-type {label}"
+    },
+    "flags": {
+      "title": "Drapeaux de filtre",
+      "keysNote": "Les clés doivent être",
+      "help": "Seul le libellé est modifiable. Supprimez une ligne pour masquer cette case dans la barre de filtres.",
+      "restoreBankOwned": "Restaurer Propriété bancaire",
+      "restoreResale": "Restaurer Revente",
+      "bankOwned": "Biens appartenant à la banque",
+      "resale": "Biens de revente"
+    },
+    "list": {
+      "noneYet": "Aucun pour le moment — ajoutez-en un ci-dessous.",
+      "remove": "Supprimer",
+      "add": "Ajouter",
+      "addNew": "Ajouter...",
+      "displayLabel": "Libellé affiché",
+      "internalValue": "valeur_interne"
+    },
+    "save": "Enregistrer la taxonomie",
+    "saving": "Enregistrement…",
+    "toasts": {
+      "loadFailed": "Échec du chargement de la taxonomie",
+      "saved": "Taxonomie enregistrée",
+      "saveFailed": "Échec de l'enregistrement"
+    }
+  },
+  "leadScores": {
+    "title": "Scores de leads",
+    "subtitle": "Scoring comportemental et démographique avec lettres",
+    "kpis": {
+      "total": "Total des leads scorés",
+      "avg": "Score moyen",
+      "gradeA": "Nombre Grade A",
+      "gradeB": "Nombre Grade B"
+    },
+    "filters": {
+      "all": "Tous les grades",
+      "gradeA": "Note A",
+      "gradeB": "Note B",
+      "gradeC": "Note C",
+      "gradeD": "Note D",
+      "gradeF": "Note F"
+    },
+    "columns": {
+      "contact": "Contact",
+      "score": "Score",
+      "grade": "Note",
+      "progress": "Progression",
+      "behavior": "Comportement",
+      "demo": "Score démo",
+      "lastActivity": "Dernière activité",
+      "actions": "Actions"
+    },
+    "list": {
+      "loading": "Chargement...",
+      "empty": "Aucun score de lead trouvé.",
+      "view": "Voir",
+      "contactFallback": "Contact {id}"
+    }
+  },
+  "aiScoring": {
+    "toasts": {
+      "loadFailed": "Impossible de charger les scores IA"
+    },
+    "signals": {
+      "contactedLast3d": "Contacté ces 3 derniers jours",
+      "contactedThisWeek": "Contacté cette semaine",
+      "contactedThisMonth": "Contacté ce mois-ci",
+      "contactedLast90d": "Contacté ces 90 derniers jours",
+      "stale": "Inactif : pas de contact depuis {n} jours",
+      "neverContacted": "Jamais contacté",
+      "activitiesThisWeek": "{n} activités cette semaine",
+      "activityThisWeek": "{n} activité cette semaine",
+      "activitiesThisMonth": "{n} activités ce mois-ci",
+      "notesOnFile": "{n} notes enregistrées",
+      "preApproved": "Prêt hypothécaire pré-approuvé",
+      "priceRange": "Fourchette de prix définie",
+      "targetAreas": "Zones cibles précisées",
+      "fullContactDetails": "Coordonnées complètes",
+      "noContactDetails": "Aucune coordonnée",
+      "missingEmail": "E-mail manquant",
+      "missingPhone": "Téléphone manquant",
+      "attendedShowings": "{n} visites effectuées",
+      "attendedShowing": "{n} visite effectuée",
+      "providedFeedback": "A laissé un retour sur la visite",
+      "noShows": "{n} absences",
+      "openDeals": "{n} affaire(s) ouverte(s)",
+      "wonDeals": "{n} affaire(s) gagnée(s) — client fidèle"
+    }
+  },
+  "cma": {
+    "title": "Analyse comparative de marché",
+    "subtitle": "Évaluez les biens à partir de comparables fondés sur les données"
+  },
+  "leadRouting": {
+    "title": "Routage des leads",
+    "subtitle": "Affectez automatiquement les leads entrants au bon agent"
+  },
+  "marketAnalytics": {
+    "title": "Analyse de marché",
+    "subtitle": "Suivez les tendances et la performance du marché local"
+  },
+  "clientPortal": {
+    "title": "Portail client",
+    "subtitle": "Donnez aux clients un accès sécurisé à leurs annonces et documents"
+  },
+  "soi": {
+    "title": "Sphère d’influence",
+    "subtitle": "Organisez votre réseau et restez en contact régulièrement"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Restez informé de l’activité de votre espace de travail",
+    "unread": "non lues"
+  },
+  "filterFields": {
+    "options": {
+      "pending": "En attente",
+      "ready": "Prêt",
+      "error": "Erreur"
+    },
+    "name": "Nom",
+    "company": "Société",
+    "type": "Type",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "createdAt": "Créé le",
+    "aiIcpFit": "Adéquation ICP",
+    "aiAttributesStatus": "Statut IA",
+    "title": "Titre",
+    "status": "Statut",
+    "dealType": "Type",
+    "valueCents": "Valeur (centimes)",
+    "probability": "Probabilité",
+    "expectedClose": "Clôture prévue",
+    "leadSource": "Source du lead",
+    "pipelineId": "Pipeline",
+    "stageId": "Étape",
+    "contactId": "Contact",
+    "propertyId": "Bien",
+    "ownerId": "Responsable",
+    "listingType": "Type d’annonce",
+    "district": "District",
+    "town": "Localité",
+    "city": "Ville",
+    "state": "Région",
+    "priceCents": "Prix (centimes)",
+    "bedrooms": "Chambres",
+    "bathrooms": "Salles de bain",
+    "sqft": "Surface",
+    "yearBuilt": "Année de construction",
+    "listingDate": "Mis en vente",
+    "mlsNumber": "N° MLS",
+    "bankOwned": "Propriété bancaire",
+    "isResale": "Revente"
+  },
+  "aiInsights": {
+    "metric": {
+      "openValue": "Valeur ouverte",
+      "winRate": "Taux de réussite",
+      "stalled": "À l’arrêt",
+      "newContacts": "Nouveaux contacts",
+      "noEmail": "Sans e-mail",
+      "upcoming": "À venir"
+    },
+    "action": {
+      "viewDeals": "Voir les affaires",
+      "openPipeline": "Ouvrir le pipeline",
+      "reviewProjects": "Examiner les projets",
+      "viewContacts": "Voir les contacts",
+      "filterContacts": "Filtrer les contacts",
+      "openListings": "Ouvrir les annonces",
+      "viewSchedule": "Voir le planning",
+      "reviewShowings": "Examiner les visites"
     }
   }
 }

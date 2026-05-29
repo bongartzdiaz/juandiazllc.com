@@ -17,13 +17,13 @@ import { useTranslations } from 'next-intl'
 /* ── Nav ─────────────────────────────────────────────── */
 
 const NAV_ITEMS = [
-  { id: 'profile', label: 'Profile', icon: User },
-  { id: 'organization', label: 'Organization', icon: Building2 },
-  { id: 'preferences', label: 'Preferences', icon: Sliders },
-  { id: 'apikeys', label: 'API Keys', icon: KeyRound },
-  { id: 'goals', label: 'Goals', icon: Target },
-  { id: 'integrations', label: 'Integrations', icon: Plug },
-]
+  { id: 'profile', navKey: 'profile', icon: User },
+  { id: 'organization', navKey: 'organization', icon: Building2 },
+  { id: 'preferences', navKey: 'preferences', icon: Sliders },
+  { id: 'apikeys', navKey: 'apiKeys', icon: KeyRound },
+  { id: 'goals', navKey: 'goals', icon: Target },
+  { id: 'integrations', navKey: 'integrations', icon: Plug },
+] as const
 
 /* ── Shared styles ───────────────────────────────────── */
 
@@ -57,89 +57,86 @@ const accentBtnStyle: React.CSSProperties = {
 
 /* ── API config definitions ──────────────────────────── */
 
-interface ApiField { key: string; label: string; placeholder: string }
-interface ApiDef { id: string; name: string; description: string; fields: ApiField[] }
+interface ApiField { key: string; labelKey: string; placeholder: string }
+interface ApiDef { id: string; fields: ApiField[] }
 
 const API_DEFS: ApiDef[] = [
   {
-    id: 'gohighlevel', name: 'GoHighLevel CRM',
-    description: 'Connect your GHL pipeline',
+    id: 'gohighlevel',
     fields: [
-      { key: 'apiKey', label: 'API Key', placeholder: 'ghl_api_...' },
-      { key: 'locationId', label: 'Location ID', placeholder: 'loc_...' },
+      { key: 'apiKey', labelKey: 'apiKey', placeholder: 'ghl_api_...' },
+      { key: 'locationId', labelKey: 'locationId', placeholder: 'loc_...' },
     ],
   },
   {
-    id: 'meta', name: 'Meta Ads',
-    description: 'Facebook/Instagram ad campaigns',
+    id: 'meta',
     fields: [
-      { key: 'accessToken', label: 'Access Token', placeholder: 'EAA...' },
-      { key: 'accountId', label: 'Account ID', placeholder: 'act_123456789' },
+      { key: 'accessToken', labelKey: 'accessToken', placeholder: 'EAA...' },
+      { key: 'accountId', labelKey: 'accountId', placeholder: 'act_123456789' },
     ],
   },
   {
-    id: 'googleads', name: 'Google Ads',
-    description: 'Google search & display campaigns',
+    id: 'googleads',
     fields: [
-      { key: 'clientId', label: 'Client ID', placeholder: 'xxxxx.apps.googleusercontent.com' },
-      { key: 'clientSecret', label: 'Client Secret', placeholder: 'GOCSPX-...' },
+      { key: 'clientId', labelKey: 'clientId', placeholder: 'xxxxx.apps.googleusercontent.com' },
+      { key: 'clientSecret', labelKey: 'clientSecret', placeholder: 'GOCSPX-...' },
     ],
   },
   {
-    id: 'supabase', name: 'Supabase',
-    description: 'Database connection',
+    id: 'supabase',
     fields: [
-      { key: 'url', label: 'Project URL', placeholder: 'https://xxx.supabase.co' },
-      { key: 'anonKey', label: 'Anon Key', placeholder: 'eyJhbGciOi...' },
+      { key: 'url', labelKey: 'url', placeholder: 'https://xxx.supabase.co' },
+      { key: 'anonKey', labelKey: 'anonKey', placeholder: 'eyJhbGciOi...' },
     ],
   },
   {
-    id: 'stripe', name: 'Stripe',
-    description: 'Payment processing',
+    id: 'stripe',
     fields: [
-      { key: 'secretKey', label: 'Secret Key', placeholder: 'sk_live_...' },
+      { key: 'secretKey', labelKey: 'secretKey', placeholder: 'sk_live_...' },
     ],
   },
   {
-    id: 'twilio', name: 'Twilio',
-    description: 'SMS & WhatsApp messaging',
+    id: 'twilio',
     fields: [
-      { key: 'accountSid', label: 'Account SID', placeholder: 'AC...' },
-      { key: 'authToken', label: 'Auth Token', placeholder: 'auth_token...' },
+      { key: 'accountSid', labelKey: 'accountSid', placeholder: 'AC...' },
+      { key: 'authToken', labelKey: 'authToken', placeholder: 'auth_token...' },
     ],
   },
 ]
 
 /* ── Goals config per industry ───────────────────────── */
 
-interface GoalDef { key: string; label: string; unit: string; demoValue: number; defaultTarget: number }
+interface GoalDef { key: string; unit: string; demoValue: number; defaultTarget: number }
 
 const GOALS_BY_INDUSTRY: Record<Industry, GoalDef[]> = {
   realestate: [
-    { key: 'listings', label: 'Listings Added', unit: '#', demoValue: 4, defaultTarget: 10 },
-    { key: 'deals', label: 'Deals Closed', unit: '#', demoValue: 2, defaultTarget: 5 },
-    { key: 'commission', label: 'Commission Target', unit: '\u20AC', demoValue: 18500, defaultTarget: 35000 },
-    { key: 'viewings', label: 'Viewings Booked', unit: '#', demoValue: 12, defaultTarget: 20 },
-    { key: 'leads', label: 'New Leads', unit: '#', demoValue: 28, defaultTarget: 50 },
+    { key: 'listings', unit: '#', demoValue: 4, defaultTarget: 10 },
+    { key: 'deals', unit: '#', demoValue: 2, defaultTarget: 5 },
+    { key: 'commission', unit: '\u20AC', demoValue: 18500, defaultTarget: 35000 },
+    { key: 'viewings', unit: '#', demoValue: 12, defaultTarget: 20 },
+    { key: 'leads', unit: '#', demoValue: 28, defaultTarget: 50 },
   ],
   philanthropy: [
-    { key: 'projects', label: 'Projects Completed', unit: '#', demoValue: 3, defaultTarget: 6 },
-    { key: 'people', label: 'People Helped', unit: '#', demoValue: 420, defaultTarget: 1000 },
-    { key: 'co2', label: 'CO2 Reduced', unit: 'kg', demoValue: 1200, defaultTarget: 5000 },
-    { key: 'donations', label: 'Donations Raised', unit: '\u20AC', demoValue: 14000, defaultTarget: 25000 },
-    { key: 'partners', label: 'Partners Onboarded', unit: '#', demoValue: 2, defaultTarget: 8 },
+    { key: 'projects', unit: '#', demoValue: 3, defaultTarget: 6 },
+    { key: 'people', unit: '#', demoValue: 420, defaultTarget: 1000 },
+    { key: 'co2', unit: 'kg', demoValue: 1200, defaultTarget: 5000 },
+    { key: 'donations', unit: '\u20AC', demoValue: 14000, defaultTarget: 25000 },
+    { key: 'partners', unit: '#', demoValue: 2, defaultTarget: 8 },
   ],
   hospitality: [
-    { key: 'occupancy', label: 'Occupancy Rate', unit: '%', demoValue: 72, defaultTarget: 85 },
-    { key: 'revpar', label: 'RevPAR Target', unit: '\u20AC', demoValue: 95, defaultTarget: 120 },
-    { key: 'satisfaction', label: 'Guest Satisfaction', unit: '/5', demoValue: 4.2, defaultTarget: 4.5 },
-    { key: 'bookings', label: 'Bookings', unit: '#', demoValue: 148, defaultTarget: 200 },
-    { key: 'fnb', label: 'F&B Revenue', unit: '\u20AC', demoValue: 32000, defaultTarget: 45000 },
+    { key: 'occupancy', unit: '%', demoValue: 72, defaultTarget: 85 },
+    { key: 'revpar', unit: '\u20AC', demoValue: 95, defaultTarget: 120 },
+    { key: 'satisfaction', unit: '/5', demoValue: 4.2, defaultTarget: 4.5 },
+    { key: 'bookings', unit: '#', demoValue: 148, defaultTarget: 200 },
+    { key: 'fnb', unit: '\u20AC', demoValue: 32000, defaultTarget: 45000 },
   ],
 }
 
 const PERIODS = ['Daily', 'Weekly', 'Monthly', 'Yearly', 'Custom'] as const
 type Period = (typeof PERIODS)[number]
+const PERIOD_KEYS: Record<Period, string> = {
+  Daily: 'daily', Weekly: 'weekly', Monthly: 'monthly', Yearly: 'yearly', Custom: 'custom',
+}
 
 /* ── Component ───────────────────────────────────────── */
 
@@ -180,7 +177,7 @@ export default function SettingsPage() {
 
   const saveProfile = async () => {
     if (profileSaving) return
-    if (!profileName.trim()) { addToast('Name is required', 'error'); return }
+    if (!profileName.trim()) { addToast(t('toasts.nameRequired'), 'error'); return }
     setProfileSaving(true)
     try {
       const res = await fetch('/api/me', {
@@ -190,12 +187,12 @@ export default function SettingsPage() {
       })
       const j = await res.json().catch(() => ({}))
       if (!res.ok) {
-        addToast(j.error ?? 'Failed to save profile', 'error')
+        addToast(j.error ?? t('toasts.failedSaveProfile'), 'error')
         return
       }
-      addToast('Profile saved', 'success')
+      addToast(t('toasts.profileSaved'), 'success')
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Failed to save profile', 'error')
+      addToast(err instanceof Error ? err.message : t('toasts.failedSaveProfile'), 'error')
     } finally {
       setProfileSaving(false)
     }
@@ -227,7 +224,7 @@ export default function SettingsPage() {
 
   const saveOrg = async () => {
     if (orgSaving) return
-    if (!orgName.trim()) { addToast('Organization name is required', 'error'); return }
+    if (!orgName.trim()) { addToast(t('toasts.orgNameRequired'), 'error'); return }
     setOrgSaving(true)
     try {
       const res = await fetch('/api/organization', {
@@ -237,12 +234,12 @@ export default function SettingsPage() {
       })
       const j = await res.json().catch(() => ({}))
       if (!res.ok) {
-        addToast(j.error ?? 'Failed to save organization', 'error')
+        addToast(j.error ?? t('toasts.failedSaveOrg'), 'error')
         return
       }
-      addToast('Organization saved', 'success')
+      addToast(t('toasts.orgSaved'), 'success')
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Failed to save organization', 'error')
+      addToast(err instanceof Error ? err.message : t('toasts.failedSaveOrg'), 'error')
     } finally {
       setOrgSaving(false)
     }
@@ -278,8 +275,8 @@ export default function SettingsPage() {
     // (clear-text storage of secrets). This panel is a UI draft until
     // it's wired to /api/integrations server-side. The toast tells the
     // operator the truth — "draft only" — instead of pretending to save.
-    const name = API_DEFS.find(a => a.id === apiId)?.name
-    addToast(`${name}: configured in this session only — wire through /api/integrations to persist`, 'info')
+    const name = t(`api.${apiId}.name`)
+    addToast(`${name}: ${t('toasts.apiDraftNotice')}`, 'info')
   }
 
   const isConnected = (apiId: string) => {
@@ -316,7 +313,7 @@ export default function SettingsPage() {
 
   const saveGoals = () => {
     localStorage.setItem('pai-goals', JSON.stringify(goalTargets))
-    addToast('Goals saved', 'success')
+    addToast(t('toasts.goalsSaved'), 'success')
   }
 
   /* ── Render ──────────────────────── */
@@ -347,7 +344,7 @@ export default function SettingsPage() {
                 transition: 'background 0.12s',
               }}>
                 <Icon size={14} />
-                {item.label}
+                {t(`nav.${item.navKey}`)}
               </button>
             )
           })}
@@ -362,11 +359,11 @@ export default function SettingsPage() {
           {/* ── Profile ─────────────────── */}
           {activeSection === 'profile' && (
             <div>
-              <div style={sectionTitleStyle}>Profile</div>
-              <div style={sectionSubStyle}>Manage your personal information</div>
+              <div style={sectionTitleStyle}>{t('sections.profile.title')}</div>
+              <div style={sectionSubStyle}>{t('sections.profile.sub')}</div>
 
               {profileLoading ? (
-                <div style={{ padding: 20, fontSize: 12, color: 'var(--txt3)' }}>Loading…</div>
+                <div style={{ padding: 20, fontSize: 12, color: 'var(--txt3)' }}>{t('status.loading')}</div>
               ) : (
                 <>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20, marginBottom: 20 }}>
@@ -378,15 +375,15 @@ export default function SettingsPage() {
                     }}>{(profileName || 'U').slice(0, 2).toUpperCase()}</div>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
                       <div>
-                        <label style={labelStyle}>Full Name</label>
+                        <label style={labelStyle}>{t('fields.fullName')}</label>
                         <input value={profileName} onChange={e => setProfileName(e.target.value)} style={inputStyle} />
                       </div>
                       <div>
-                        <label style={labelStyle}>Email</label>
+                        <label style={labelStyle}>{t('fields.email')}</label>
                         <input value={profileEmail} onChange={e => setProfileEmail(e.target.value)} type="email" style={inputStyle} />
                       </div>
                       <div>
-                        <label style={labelStyle}>Role</label>
+                        <label style={labelStyle}>{t('fields.role')}</label>
                         <div style={{
                           padding: '8px 12px', borderRadius: 8,
                           background: 'var(--bg2)', border: '1px solid var(--border)',
@@ -401,7 +398,7 @@ export default function SettingsPage() {
                     disabled={profileSaving}
                     style={{ ...accentBtnStyle, opacity: profileSaving ? 0.6 : 1, cursor: profileSaving ? 'not-allowed' : 'pointer' }}
                   >
-                    {profileSaving ? 'Saving…' : 'Save Changes'}
+                    {profileSaving ? t('actions.saving') : t('actions.saveChanges')}
                   </button>
                 </>
               )}
@@ -411,30 +408,30 @@ export default function SettingsPage() {
           {/* ── Organization ────────────── */}
           {activeSection === 'organization' && (
             <div>
-              <div style={sectionTitleStyle}>Organization</div>
-              <div style={sectionSubStyle}>Configure your organization details</div>
+              <div style={sectionTitleStyle}>{t('sections.organization.title')}</div>
+              <div style={sectionSubStyle}>{t('sections.organization.sub')}</div>
 
               {orgLoading ? (
-                <div style={{ padding: 20, fontSize: 12, color: 'var(--txt3)' }}>Loading…</div>
+                <div style={{ padding: 20, fontSize: 12, color: 'var(--txt3)' }}>{t('status.loading')}</div>
               ) : (
                 <>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 400 }}>
                     <div>
-                      <label style={labelStyle}>Organization Name</label>
+                      <label style={labelStyle}>{t('fields.organizationName')}</label>
                       <input value={orgName} onChange={e => setOrgName(e.target.value)} style={inputStyle} />
                     </div>
                     <div>
-                      <label style={labelStyle}>Industry</label>
+                      <label style={labelStyle}>{t('fields.industry')}</label>
                       <select value={orgIndustry} onChange={e => setOrgIndustry(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
-                        <option value="general">General</option>
-                        <option value="nonprofit">Non-Profit / NGO</option>
-                        <option value="foundation">Foundation</option>
-                        <option value="csr">Corporate CSR</option>
-                        <option value="government">Government</option>
-                        <option value="education">Education</option>
-                        <option value="healthcare">Healthcare</option>
-                        <option value="realestate">Real Estate</option>
-                        <option value="hospitality">Hospitality</option>
+                        <option value="general">{t('industries.general')}</option>
+                        <option value="nonprofit">{t('industries.nonprofit')}</option>
+                        <option value="foundation">{t('industries.foundation')}</option>
+                        <option value="csr">{t('industries.csr')}</option>
+                        <option value="government">{t('industries.government')}</option>
+                        <option value="education">{t('industries.education')}</option>
+                        <option value="healthcare">{t('industries.healthcare')}</option>
+                        <option value="realestate">{t('industries.realestate')}</option>
+                        <option value="hospitality">{t('industries.hospitality')}</option>
                       </select>
                     </div>
                   </div>
@@ -444,10 +441,10 @@ export default function SettingsPage() {
                     disabled={orgSaving}
                     style={{ ...accentBtnStyle, marginTop: 18, opacity: orgSaving ? 0.6 : 1, cursor: orgSaving ? 'not-allowed' : 'pointer' }}
                   >
-                    {orgSaving ? 'Saving…' : 'Save Changes'}
+                    {orgSaving ? t('actions.saving') : t('actions.saveChanges')}
                   </button>
                   <div style={{ marginTop: 8, fontSize: 11, color: 'var(--txt3)' }}>
-                    Only administrators can update organization details.
+                    {t('status.adminOnly')}
                   </div>
                 </>
               )}
@@ -457,13 +454,13 @@ export default function SettingsPage() {
           {/* ── Preferences ─────────────── */}
           {activeSection === 'preferences' && (
             <div>
-              <div style={sectionTitleStyle}>Preferences</div>
-              <div style={sectionSubStyle}>Customize your experience</div>
+              <div style={sectionTitleStyle}>{t('sections.preferences.title')}</div>
+              <div style={sectionSubStyle}>{t('sections.preferences.sub')}</div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 400 }}>
                 {/* Language toggle */}
                 <div>
-                  <label style={labelStyle}>Language</label>
+                  <label style={labelStyle}>{t('fields.language')}</label>
                   <div style={{ display: 'flex', gap: 6 }}>
                     {(['en', 'nl'] as const).map(l => (
                       <button key={l} onClick={() => setLang(l)} style={{
@@ -484,7 +481,7 @@ export default function SettingsPage() {
 
                 {/* Theme toggle */}
                 <div>
-                  <label style={labelStyle}>Theme</label>
+                  <label style={labelStyle}>{t('fields.theme')}</label>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button onClick={() => { if (theme === 'dark') toggle() }} style={{
                       display: 'flex', alignItems: 'center', gap: 5,
@@ -496,7 +493,7 @@ export default function SettingsPage() {
                       fontFamily: 'inherit',
                     }}>
                       <Sun size={12} />
-                      Light
+                      {t('theme.light')}
                     </button>
                     <button onClick={() => { if (theme === 'light') toggle() }} style={{
                       display: 'flex', alignItems: 'center', gap: 5,
@@ -508,7 +505,7 @@ export default function SettingsPage() {
                       fontFamily: 'inherit',
                     }}>
                       <Moon size={12} />
-                      Dark
+                      {t('theme.dark')}
                     </button>
                   </div>
                 </div>
@@ -519,8 +516,8 @@ export default function SettingsPage() {
           {/* ── API Keys ────────────────── */}
           {activeSection === 'apikeys' && (
             <div>
-              <div style={sectionTitleStyle}>API Keys</div>
-              <div style={sectionSubStyle}>Configure API integrations for external services</div>
+              <div style={sectionTitleStyle}>{t('sections.apiKeys.title')}</div>
+              <div style={sectionSubStyle}>{t('sections.apiKeys.sub')}</div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {API_DEFS.map(api => {
@@ -539,17 +536,17 @@ export default function SettingsPage() {
                               background: connected ? '#22c55e' : 'var(--txt3)',
                               display: 'inline-block', flexShrink: 0,
                             }} />
-                            <span style={{ fontSize: 13, fontWeight: 600 }}>{api.name}</span>
+                            <span style={{ fontSize: 13, fontWeight: 600 }}>{t(`api.${api.id}.name`)}</span>
                             <span style={{
                               fontSize: 10, fontWeight: 500, padding: '2px 7px', borderRadius: 6,
                               background: connected ? 'rgba(34,197,94,.12)' : 'var(--panel)',
                               color: connected ? '#16a34a' : 'var(--txt3)',
                             }}>
-                              {connected ? 'Connected' : 'Not configured'}
+                              {connected ? t('status.connected') : t('status.notConfigured')}
                             </span>
                           </div>
                           <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 2, paddingLeft: 16 }}>
-                            {api.description}
+                            {t(`api.${api.id}.description`)}
                           </div>
                         </div>
                       </div>
@@ -561,7 +558,7 @@ export default function SettingsPage() {
                           const visible = visibleFields[uid] ?? false
                           return (
                             <div key={uid}>
-                              <label style={{ ...labelStyle, marginBottom: 3 }}>{field.label}</label>
+                              <label style={{ ...labelStyle, marginBottom: 3 }}>{t(`api.fieldLabels.${field.labelKey}`)}</label>
                               <div style={{ position: 'relative' }}>
                                 <input
                                   type={visible ? 'text' : 'password'}
@@ -578,7 +575,7 @@ export default function SettingsPage() {
                                     color: 'var(--txt3)', padding: 2, display: 'flex',
                                   }}
                                   tabIndex={-1}
-                                  aria-label={visible ? 'Hide' : 'Show'}
+                                  aria-label={visible ? t('actions.hide') : t('actions.show')}
                                 >
                                   {visible ? <EyeOff size={14} /> : <Eye size={14} />}
                                 </button>
@@ -592,7 +589,7 @@ export default function SettingsPage() {
                       <div style={{ marginTop: 12 }}>
                         <button onClick={() => saveApiKey(api.id)} style={{
                           ...accentBtnStyle, fontSize: 11, padding: '6px 14px',
-                        }}>Save</button>
+                        }}>{t('actions.save')}</button>
                       </div>
                     </div>
                   )
@@ -604,8 +601,8 @@ export default function SettingsPage() {
           {/* ── Goals ───────────────────── */}
           {activeSection === 'goals' && (
             <div>
-              <div style={sectionTitleStyle}>Goals</div>
-              <div style={sectionSubStyle}>Set performance targets for your team</div>
+              <div style={sectionTitleStyle}>{t('sections.goals.title')}</div>
+              <div style={sectionSubStyle}>{t('sections.goals.sub')}</div>
 
               {/* Period tabs */}
               <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
@@ -618,7 +615,7 @@ export default function SettingsPage() {
                     border: goalPeriod === p ? 'none' : '1px solid var(--border)',
                     fontFamily: 'inherit', transition: 'background 0.12s',
                   }}>
-                    {p}
+                    {t(`periods.${PERIOD_KEYS[p]}`)}
                   </button>
                 ))}
               </div>
@@ -627,7 +624,7 @@ export default function SettingsPage() {
               {goalPeriod === 'Custom' && (
                 <div style={{ display: 'flex', gap: 12, marginBottom: 16, maxWidth: 360 }}>
                   <div style={{ flex: 1 }}>
-                    <label style={labelStyle}>Start Date</label>
+                    <label style={labelStyle}>{t('fields.startDate')}</label>
                     <input
                       type="date"
                       value={customRange.start}
@@ -636,7 +633,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <label style={labelStyle}>End Date</label>
+                    <label style={labelStyle}>{t('fields.endDate')}</label>
                     <input
                       type="date"
                       value={customRange.end}
@@ -660,7 +657,7 @@ export default function SettingsPage() {
                       background: 'var(--bg2)', border: '1px solid var(--border)',
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                        <div style={{ fontSize: 13, fontWeight: 600 }}>{g.label}</div>
+                        <div style={{ fontSize: 13, fontWeight: 600 }}>{t(`goalsList.${g.key}`)}</div>
                         <div style={{ fontSize: 11, color: 'var(--txt3)' }}>
                           {g.unit === '\u20AC' && '\u20AC'}{currentValue}{g.unit === '%' && '%'}{g.unit === '/5' && '/5'}{g.unit === 'kg' && ' kg'}
                           {' / '}
@@ -684,7 +681,7 @@ export default function SettingsPage() {
                       {/* Inputs row */}
                       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                         <div style={{ flex: 1 }}>
-                          <label style={{ ...labelStyle, marginBottom: 3 }}>Current</label>
+                          <label style={{ ...labelStyle, marginBottom: 3 }}>{t('fields.current')}</label>
                           <input
                             type="number"
                             value={currentValue}
@@ -693,7 +690,7 @@ export default function SettingsPage() {
                           />
                         </div>
                         <div style={{ flex: 1 }}>
-                          <label style={{ ...labelStyle, marginBottom: 3 }}>Target</label>
+                          <label style={{ ...labelStyle, marginBottom: 3 }}>{t('fields.target')}</label>
                           <input
                             type="number"
                             value={target}
@@ -708,7 +705,7 @@ export default function SettingsPage() {
               </div>
 
               <div style={{ marginTop: 18 }}>
-                <button onClick={saveGoals} style={accentBtnStyle}>Save Goals</button>
+                <button onClick={saveGoals} style={accentBtnStyle}>{t('actions.saveGoals')}</button>
               </div>
             </div>
           )}
@@ -716,25 +713,25 @@ export default function SettingsPage() {
           {/* ── Integrations ────────────── */}
           {activeSection === 'integrations' && (
             <div>
-              <div style={sectionTitleStyle}>Integrations</div>
-              <div style={sectionSubStyle}>Connect external services</div>
+              <div style={sectionTitleStyle}>{t('sections.integrations.title')}</div>
+              <div style={sectionSubStyle}>{t('sections.integrations.sub')}</div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {[
-                  { name: 'GoHighLevel', status: 'Connected', connected: true },
-                  { name: 'Supabase', status: 'Connected', connected: true },
-                  { name: 'Slack', status: 'Not connected', connected: false },
-                  { name: 'Google Analytics', status: 'Not connected', connected: false },
+                  { key: 'gohighlevel', connected: true },
+                  { key: 'supabase', connected: true },
+                  { key: 'slack', connected: false },
+                  { key: 'googleAnalytics', connected: false },
                 ].map(int => (
-                  <div key={int.name} style={{
+                  <div key={int.key} style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     padding: '12px 14px', borderRadius: 10,
                     background: 'var(--bg2)', border: '1px solid var(--border)',
                   }}>
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 600 }}>{int.name}</div>
+                      <div style={{ fontSize: 13, fontWeight: 600 }}>{t(`integrationsList.${int.key}`)}</div>
                       <div style={{ fontSize: 11, color: int.connected ? 'var(--g-txt)' : 'var(--txt3)' }}>
-                        {int.status}
+                        {int.connected ? t('status.connected') : t('status.notConnected')}
                       </div>
                     </div>
                     <button style={{
@@ -745,7 +742,7 @@ export default function SettingsPage() {
                       border: int.connected ? '1px solid var(--border)' : 'none',
                       fontFamily: 'inherit',
                     }}>
-                      {int.connected ? 'Configure' : 'Connect'}
+                      {int.connected ? t('actions.configure') : t('actions.connect')}
                     </button>
                   </div>
                 ))}

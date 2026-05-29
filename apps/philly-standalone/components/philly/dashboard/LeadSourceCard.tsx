@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import { PieChart as PieIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import {
   ResponsiveContainer,
   PieChart,
@@ -56,6 +57,7 @@ function getSources(industry: string): Source[] {
 }
 
 export function LeadSourceCard({ industry }: { industry: string; themeKey: string }) {
+  const t = useTranslations('dashboard.leadSource')
   const sources = useMemo(() => getSources(industry), [industry])
   const total = useMemo(() => sources.reduce((s, src) => s + src.count, 0), [sources])
 
@@ -141,8 +143,8 @@ export function LeadSourceCard({ industry }: { industry: string; themeKey: strin
             borderBottom: '1px solid var(--border)',
             marginBottom: 4,
           }}>
-            <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Source</span>
-            <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Count</span>
+            <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{t('source')}</span>
+            <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>{t('count')}</span>
             <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>%</span>
             <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Conv.</span>
           </div>
@@ -180,7 +182,7 @@ export function LeadSourceCard({ industry }: { industry: string; themeKey: strin
             display: 'grid', gridTemplateColumns: '1fr 50px 40px 50px',
             gap: 4, padding: '6px 0 0 0',
           }}>
-            <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--txt)' }}>Total</span>
+            <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--txt)' }}>{t('total')}</span>
             <span className="mono" style={{ fontSize: 11, fontWeight: 700, color: 'var(--txt)', textAlign: 'right' }}>
               {total.toLocaleString('nl-NL')}
             </span>

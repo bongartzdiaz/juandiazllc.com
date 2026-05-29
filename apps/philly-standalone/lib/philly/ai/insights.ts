@@ -19,8 +19,11 @@ export interface Insight {
   category: InsightCategory
   title: string
   detail: string
-  metric?: { label: string; value: string | number }
-  action?: { label: string; href: string }
+  /** `label` is the English fallback; `labelKey` is the i18n key under the
+   *  `aiInsights` namespace. The rendering client component does
+   *  `tx.has(labelKey) ? tx(labelKey) : label`. */
+  metric?: { label: string; labelKey?: string; value: string | number }
+  action?: { label: string; labelKey?: string; href: string }
   /** 0–100. Higher means we're more certain this insight matters. */
   confidence: number
 }
@@ -142,8 +145,8 @@ function deriveInsights(m: Awaited<ReturnType<typeof gather>>): Insight[] {
       category: 'pipeline',
       title: `${fmtMoney(m.openDealValueCents)} in open pipeline`,
       detail: `${m.dealsOpen} open deal${m.dealsOpen === 1 ? '' : 's'} across all pipelines. Average value ${fmtMoney(m.openDealValueCents / Math.max(1, m.dealsOpen))}.`,
-      metric: { label: 'Open value', value: fmtMoney(m.openDealValueCents) },
-      action: { label: 'View deals', href: '/deals' },
+      metric: { label: 'Open value', labelKey: 'metric.openValue', value: fmtMoney(m.openDealValueCents) },
+      action: { label: 'View deals', labelKey: 'action.viewDeals', href: '/deals' },
       confidence: 95,
     })
   }
@@ -161,8 +164,8 @@ function deriveInsights(m: Awaited<ReturnType<typeof gather>>): Insight[] {
         winRate >= 50 ? 'Strong conversion — your qualification is working.' :
         'Healthy baseline. Look for bottlenecks in the mid-stages.'
       }`,
-      metric: { label: 'Win rate', value: `${winRate}%` },
-      action: { label: 'Open pipeline', href: '/deals' },
+      metric: { label: 'Win rate', labelKey: 'metric.winRate', value: `${winRate}%` },
+      action: { label: 'Open pipeline', labelKey: 'action.openPipeline', href: '/deals' },
       confidence: total >= 5 ? 90 : 60,
     })
   }
@@ -175,8 +178,8 @@ function deriveInsights(m: Awaited<ReturnType<typeof gather>>): Insight[] {
       category: 'risk',
       title: `${m.projectsStalled} active project${m.projectsStalled === 1 ? '' : 's'} not updated in 30 days`,
       detail: 'Either close them out or bump status to keep the dashboard honest. Stale data erodes trust fast.',
-      metric: { label: 'Stalled', value: m.projectsStalled },
-      action: { label: 'Review projects', href: '/projects' },
+      metric: { label: 'Stalled', labelKey: 'metric.stalled', value: m.projectsStalled },
+      action: { label: 'Review projects', labelKey: 'action.reviewProjects', href: '/projects' },
       confidence: 85,
     })
   }
@@ -190,8 +193,8 @@ function deriveInsights(m: Awaited<ReturnType<typeof gather>>): Insight[] {
       category: 'opportunity',
       title: `${m.contactsLast7d} new contacts this week`,
       detail: `That's +${pct}% of your total contact base in 7 days. Make sure intake routing and follow-up assignments can keep up.`,
-      metric: { label: 'New contacts', value: m.contactsLast7d },
-      action: { label: 'View contacts', href: '/contacts' },
+      metric: { label: 'New contacts', labelKey: 'metric.newContacts', value: m.contactsLast7d },
+      action: { label: 'View contacts', labelKey: 'action.viewContacts', href: '/contacts' },
       confidence: 90,
     })
   } else if (m.contacts > 20 && m.contactsLast7d === 0) {
@@ -215,8 +218,8 @@ function deriveInsights(m: Awaited<ReturnType<typeof gather>>): Insight[] {
         category: 'data-quality',
         title: `${pct}% of contacts missing email`,
         detail: `${m.contactsNoEmail} contacts can't be reached via email campaigns. Enrich or archive them.`,
-        metric: { label: 'No email', value: m.contactsNoEmail },
-        action: { label: 'Filter contacts', href: '/contacts' },
+        metric: { label: 'No email', labelKey: 'metric.noEmail', value: m.contactsNoEmail },
+        action: { label: 'Filter contacts', labelKey: 'action.filterContacts', href: '/contacts' },
         confidence: 95,
       })
     }
@@ -230,7 +233,7 @@ function deriveInsights(m: Awaited<ReturnType<typeof gather>>): Insight[] {
       category: 'opportunity',
       title: `${m.propertiesAvailable} available listing${m.propertiesAvailable === 1 ? '' : 's'}, 0 showings booked`,
       detail: 'Listings without upcoming showings rarely convert. Push a mailing burst or drop price on slow-movers.',
-      action: { label: 'Open listings', href: '/properties' },
+      action: { label: 'Open listings', labelKey: 'action.openListings', href: '/properties' },
       confidence: 80,
     })
   } else if (m.showingsUpcoming >= 5) {
@@ -240,8 +243,8 @@ function deriveInsights(m: Awaited<ReturnType<typeof gather>>): Insight[] {
       category: 'productivity',
       title: `${m.showingsUpcoming} showings scheduled`,
       detail: 'Heavy viewing week. Make sure confirmation SMS and follow-up templates are loaded.',
-      metric: { label: 'Upcoming', value: m.showingsUpcoming },
-      action: { label: 'View schedule', href: '/showings' },
+      metric: { label: 'Upcoming', labelKey: 'metric.upcoming', value: m.showingsUpcoming },
+      action: { label: 'View schedule', labelKey: 'action.viewSchedule', href: '/showings' },
       confidence: 90,
     })
   }
@@ -253,7 +256,7 @@ function deriveInsights(m: Awaited<ReturnType<typeof gather>>): Insight[] {
       category: 'data-quality',
       title: `${m.showingsCompletedNoFeedback} completed showings without feedback`,
       detail: 'Feedback is the best signal for re-targeting. Add a post-showing prompt to the flow.',
-      action: { label: 'Review showings', href: '/showings' },
+      action: { label: 'Review showings', labelKey: 'action.reviewShowings', href: '/showings' },
       confidence: 85,
     })
   }

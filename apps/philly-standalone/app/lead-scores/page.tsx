@@ -76,9 +76,19 @@ export default function LeadScoresPage() {
 
   // Bundle AJ — column visibility prefs.
   const lsColumns = useColumnPrefs('pai-lead-scores-columns-v1', LS_DEFAULTS)
+  const localizedColumns = useMemo<ColumnDef[]>(() => [
+    { id: 'contact', label: t('columns.contact'), required: true },
+    { id: 'score', label: t('columns.score') },
+    { id: 'grade', label: t('columns.grade') },
+    { id: 'progress', label: t('columns.progress') },
+    { id: 'behavior', label: t('columns.behavior') },
+    { id: 'demo', label: t('columns.demo') },
+    { id: 'lastActivity', label: t('columns.lastActivity') },
+    { id: 'actions', label: t('columns.actions'), required: true },
+  ], [t])
   const visibleLsColumns = useMemo(
-    () => LS_COLUMNS.filter((c) => c.required || lsColumns.visible.has(c.id)),
-    [lsColumns.visible],
+    () => localizedColumns.filter((c) => c.required || lsColumns.visible.has(c.id)),
+    [lsColumns.visible, localizedColumns],
   )
   const lsGridTemplate = useMemo(
     () => visibleLsColumns.map((c) => LS_WIDTHS[c.id]).join(' '),
@@ -96,10 +106,10 @@ export default function LeadScoresPage() {
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPI Row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="target" label="Total Leads Scored" value={String(totalScored)} />
-          <KpiCard icon="trending-up" label="Avg Score" value={String(avgScore)} />
-          <KpiCard icon="award" label="Grade A Count" value={String(gradeACount)} />
-          <KpiCard icon="bar-chart" label="Grade B Count" value={String(gradeBCount)} />
+          <KpiCard icon="target" label={t('kpis.total')} value={String(totalScored)} />
+          <KpiCard icon="trending-up" label={t('kpis.avg')} value={String(avgScore)} />
+          <KpiCard icon="award" label={t('kpis.gradeA')} value={String(gradeACount)} />
+          <KpiCard icon="bar-chart" label={t('kpis.gradeB')} value={String(gradeBCount)} />
         </div>
 
         {/* Filter */}
@@ -107,12 +117,12 @@ export default function LeadScoresPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
             <Filter size={13} style={{ color: 'var(--txt3)' }} />
             <select value={gradeFilter} onChange={e => { setGradeFilter(e.target.value); setPage(1) }} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
-              <option value="">All Grades</option>
-              <option value="A">Grade A</option>
-              <option value="B">Grade B</option>
-              <option value="C">Grade C</option>
-              <option value="D">Grade D</option>
-              <option value="F">Grade F</option>
+              <option value="">{t('filters.all')}</option>
+              <option value="A">{t('filters.gradeA')}</option>
+              <option value="B">{t('filters.gradeB')}</option>
+              <option value="C">{t('filters.gradeC')}</option>
+              <option value="D">{t('filters.gradeD')}</option>
+              <option value="F">{t('filters.gradeF')}</option>
             </select>
           </div>
         </div>
@@ -120,7 +130,7 @@ export default function LeadScoresPage() {
         {/* Table */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
           <ColumnPicker
-            columns={LS_COLUMNS}
+            columns={localizedColumns}
             visible={lsColumns.visible}
             onToggle={lsColumns.toggle}
             onReset={lsColumns.reset}
@@ -132,15 +142,15 @@ export default function LeadScoresPage() {
             {visibleLsColumns.map((c) => <span key={c.id}>{c.label}</span>)}
           </div>
           {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
           ) : scores.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No lead scores found.</div>
+            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.empty')}</div>
           ) : scores.map((record, idx) => (
             <div key={record.id} style={{ display: 'grid', gridTemplateColumns: lsGridTemplate, gap: 12, padding: '10px 16px', borderBottom: idx < scores.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent' }}>
               {visibleLsColumns.map((c) => {
                 if (c.id === 'contact') return (
                   <div key="contact">
-                    <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{record.contact?.name ?? `Contact ${record.contactId.slice(0, 8)}`}</div>
+                    <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{record.contact?.name ?? t('list.contactFallback', { id: record.contactId.slice(0, 8) })}</div>
                     <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{record.contact?.email ?? new Date(record.createdAt).toLocaleDateString()}</div>
                   </div>
                 )
@@ -162,7 +172,7 @@ export default function LeadScoresPage() {
                     <button
                       onClick={() => router.push(`/contacts/${record.contactId}`)}
                       style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 10, fontWeight: 600, color: 'var(--accent)', cursor: 'pointer', fontFamily: 'inherit' }}
-                    >View</button>
+                    >{t('list.view')}</button>
                   </div>
                 )
                 return <span key={c.id} />

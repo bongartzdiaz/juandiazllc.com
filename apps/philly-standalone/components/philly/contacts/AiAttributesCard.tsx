@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Sparkles, RefreshCw, AlertTriangle, Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 // Attio-style AI attributes card. Renders industry, ICP-fit score,
 // and summary for a contact. The data is generated server-side by
@@ -31,6 +32,7 @@ function fitColor(score: number): string {
 }
 
 export function AiAttributesCard({ contactId, attrs, onUpdated }: Props) {
+  const t = useTranslations('dashboard.aiAttrs')
   const [busy, setBusy] = useState(false)
   const [localError, setLocalError] = useState<string | null>(null)
 
@@ -130,7 +132,7 @@ export function AiAttributesCard({ contactId, attrs, onUpdated }: Props) {
             cursor: busy ? 'not-allowed' : 'pointer',
             opacity: busy ? 0.6 : 1,
           }}
-          aria-label="Refresh AI attributes"
+          aria-label={t('refreshAria')}
         >
           {busy ? <Loader2 size={12} className="spin" /> : <RefreshCw size={12} />}
           Refresh
@@ -166,12 +168,12 @@ export function AiAttributesCard({ contactId, attrs, onUpdated }: Props) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px', gap: 20, alignItems: 'start' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div>
-              <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 4 }}>Industry</div>
+              <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 4 }}>{t('industry')}</div>
               <div style={{ fontSize: 14, fontWeight: 500 }}>{attrs.aiIndustry ?? '—'}</div>
             </div>
             {attrs.aiSummary && (
               <div>
-                <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 4 }}>Summary</div>
+                <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 4 }}>{t('summary')}</div>
                 <div style={{ fontSize: 13, color: 'var(--txt2)', lineHeight: 1.6 }}>
                   {attrs.aiSummary}
                 </div>

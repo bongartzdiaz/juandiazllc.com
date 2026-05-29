@@ -182,14 +182,14 @@ export default function AutomationsPage() {
   }
 
   const save = async () => {
-    if (!fName.trim()) { addToast('Name is required', 'error'); return }
+    if (!fName.trim()) { addToast(t('toasts.nameRequired'), 'error'); return }
     setSaving(true)
 
     // For callWebhook, payload is a JSON string — parse to object before send
     const actCfgSend: Record<string, unknown> = { ...fActCfg }
     if (fAction === 'callWebhook' && typeof fActCfg.payload === 'string' && fActCfg.payload.trim()) {
       try { actCfgSend.payload = JSON.parse(fActCfg.payload) }
-      catch { addToast('Payload must be valid JSON', 'error'); setSaving(false); return }
+      catch { addToast(t('toasts.payloadJson'), 'error'); setSaving(false); return }
     }
 
     const payload = {
@@ -217,15 +217,15 @@ export default function AutomationsPage() {
       }
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
-        addToast(j.error ?? 'Save failed', 'error')
+        addToast(j.error ?? t('toasts.saveFailed'), 'error')
         return
       }
-      addToast(editing ? 'Rule updated' : 'Rule created', 'success')
+      addToast(editing ? t('toasts.updated') : t('toasts.created'), 'success')
       setEditorOpen(false)
       resetForm()
       load()
     } catch {
-      addToast('Save failed', 'error')
+      addToast(t('toasts.saveFailed'), 'error')
     } finally {
       setSaving(false)
     }
@@ -241,10 +241,10 @@ export default function AutomationsPage() {
     if (!ok) return
     const res = await fetch(`/api/automations/${rule.id}`, { method: 'DELETE' })
     if (res.ok) {
-      addToast('Rule deleted', 'success')
+      addToast(t('toasts.deleted'), 'success')
       load()
     } else {
-      addToast('Delete failed', 'error')
+      addToast(t('toasts.deleteFailed'), 'error')
     }
   }
 
@@ -259,7 +259,7 @@ export default function AutomationsPage() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       load()
     } catch {
-      addToast('Toggle failed', 'error')
+      addToast(t('toasts.toggleFailed'), 'error')
     }
   }
 
@@ -284,22 +284,22 @@ export default function AutomationsPage() {
         title={t('title')}
         sub={t('subtitle')}
         onAdd={openNew}
-        addLabel="Rule"
+        addLabel={t('addLabel')}
       />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Stat cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
-          <StatCard icon={Zap} label="Total Rules" value={rules.length} />
-          <StatCard icon={Play} label="Active" value={rules.filter(r => r.enabled).length} />
-          <StatCard icon={CheckCircle2} label="Total Runs" value={rules.reduce((s, r) => s + (r._count?.automationLogs ?? 0), 0)} />
+          <StatCard icon={Zap} label={t('kpis.total')} value={rules.length} />
+          <StatCard icon={Play} label={t('kpis.active')} value={rules.filter(r => r.enabled).length} />
+          <StatCard icon={CheckCircle2} label={t('kpis.totalRuns')} value={rules.reduce((s, r) => s + (r._count?.automationLogs ?? 0), 0)} />
         </div>
 
         {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
         ) : rules.length === 0 ? (
           <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13, background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)' }}>
             <Zap size={32} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-            No automation rules yet.
+            {t('list.empty')}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -322,9 +322,9 @@ export default function AutomationsPage() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--txt)' }}>{rule.name}</div>
                       <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 3, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                        <span><strong style={{ color: 'var(--txt2)' }}>When</strong> {triggerSummary(rule)}</span>
+                        <span><strong style={{ color: 'var(--txt2)' }}>{t('list.when')}</strong> {triggerSummary(rule)}</span>
                         <span>→</span>
-                        <span><strong style={{ color: 'var(--txt2)' }}>Then</strong> {actionSummary(rule)}</span>
+                        <span><strong style={{ color: 'var(--txt2)' }}>{t('list.then')}</strong> {actionSummary(rule)}</span>
                       </div>
                     </div>
                     <button
@@ -338,9 +338,9 @@ export default function AutomationsPage() {
                       }}
                     >
                       {expanded ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
-                      <Clock size={10} /> {rule._count?.automationLogs ?? 0} runs
+                      <Clock size={10} /> {rule._count?.automationLogs ?? 0} {t('list.runs')}
                     </button>
-                    <button onClick={() => toggle(rule)} title={rule.enabled ? 'Disable' : 'Enable'} style={{
+                    <button onClick={() => toggle(rule)} title={rule.enabled ? t('list.disable') : t('list.enable')} style={{
                       padding: '6px 10px', borderRadius: 6,
                       border: '1px solid var(--border)',
                       background: rule.enabled ? 'var(--g-bg)' : 'var(--bg2)',
@@ -348,18 +348,18 @@ export default function AutomationsPage() {
                       fontSize: 10, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
                       display: 'inline-flex', alignItems: 'center', gap: 4,
                     }}>
-                      {rule.enabled ? <><Pause size={10} /> Active</> : <><Play size={10} /> Paused</>}
+                      {rule.enabled ? <><Pause size={10} /> {t('list.active')}</> : <><Play size={10} /> {t('list.paused')}</>}
                     </button>
-                    <IconBtn onClick={() => openEdit(rule)} title="Edit"><Edit3 size={13} /></IconBtn>
-                    <IconBtn onClick={() => del(rule)} title="Delete" danger><Trash2 size={13} /></IconBtn>
+                    <IconBtn onClick={() => openEdit(rule)} title={t('list.edit')}><Edit3 size={13} /></IconBtn>
+                    <IconBtn onClick={() => del(rule)} title={t('list.delete')} danger><Trash2 size={13} /></IconBtn>
                   </div>
 
                   {expanded && (
                     <div style={{ padding: '0 18px 14px', borderTop: '1px solid var(--border)' }}>
                       {logs === 'loading' ? (
-                        <div style={{ padding: '12px 0', fontSize: 12, color: 'var(--txt3)' }}>Loading runs...</div>
+                        <div style={{ padding: '12px 0', fontSize: 12, color: 'var(--txt3)' }}>{t('logs.loading')}</div>
                       ) : (logs as AutomationLog[]).length === 0 ? (
-                        <div style={{ padding: '12px 0', fontSize: 12, color: 'var(--txt3)' }}>No runs yet.</div>
+                        <div style={{ padding: '12px 0', fontSize: 12, color: 'var(--txt3)' }}>{t('logs.empty')}</div>
                       ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingTop: 10 }}>
                           {(logs as AutomationLog[]).map(log => (
@@ -401,76 +401,76 @@ export default function AutomationsPage() {
       <Modal
         open={editorOpen}
         onClose={() => setEditorOpen(false)}
-        title={editing ? 'Edit Rule' : 'New Automation Rule'}
-        subtitle="Configure a trigger and an action"
+        title={editing ? t('editor.titleEdit') : t('editor.titleNew')}
+        subtitle={t('editor.subtitle')}
         size="lg"
       >
-        <FormField label="Rule name" required>
-          <input value={fName} onChange={e => setFName(e.target.value)} placeholder="e.g. Welcome new leads" style={inputStyle} />
+        <FormField label={t('editor.ruleName')} required>
+          <input value={fName} onChange={e => setFName(e.target.value)} placeholder={t('editor.ruleNamePlaceholder')} style={inputStyle} />
         </FormField>
 
         {/* WHEN */}
-        <SectionLabel text="When (trigger)" />
-        <FormField label="Trigger type">
+        <SectionLabel text={t('editor.whenTrigger')} />
+        <FormField label={t('editor.triggerType')}>
           <select value={fTrigger} onChange={e => { setFTrigger(e.target.value); setFTrigCfg({}) }} style={{ ...inputStyle, cursor: 'pointer' }}>
-            {TRIGGERS.map(t => <option key={t.v} value={t.v}>{t.label}</option>)}
+            {TRIGGERS.map(tr => <option key={tr.v} value={tr.v}>{(() => { try { return t(`triggers.${tr.v}` as any) } catch { return tr.label } })()}</option>)}
           </select>
         </FormField>
         {(fTrigger === 'onEntityCreate' || fTrigger === 'onEntityDelete') && (
-          <FormField label="Entity">
+          <FormField label={t('editor.entity')}>
             <select value={fTrigCfg.entity ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, entity: e.target.value || undefined })} style={{ ...inputStyle, cursor: 'pointer' }}>
-              <option value="">Any entity</option>
+              <option value="">{t('editor.anyEntity')}</option>
               {ENTITIES.map(en => <option key={en} value={en}>{en}</option>)}
             </select>
           </FormField>
         )}
         {fTrigger === 'onFieldChange' && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <FormField label="Entity">
+            <FormField label={t('editor.entity')}>
               <select value={fTrigCfg.entity ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, entity: e.target.value || undefined })} style={{ ...inputStyle, cursor: 'pointer' }}>
-                <option value="">Any</option>
+                <option value="">{t('editor.any')}</option>
                 {ENTITIES.map(en => <option key={en} value={en}>{en}</option>)}
               </select>
             </FormField>
-            <FormField label="Field name">
+            <FormField label={t('editor.fieldName')}>
               <input value={fTrigCfg.field ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, field: e.target.value || undefined })} placeholder="status" style={monoStyle} />
             </FormField>
-            <FormField label="From (optional)">
+            <FormField label={t('editor.fromOptional')}>
               <input value={fTrigCfg.from ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, from: e.target.value || undefined })} placeholder="new" style={monoStyle} />
             </FormField>
-            <FormField label="To (optional)">
+            <FormField label={t('editor.toOptional')}>
               <input value={fTrigCfg.to ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, to: e.target.value || undefined })} placeholder="won" style={monoStyle} />
             </FormField>
           </div>
         )}
         {fTrigger === 'onSchedule' && (
-          <FormField label="Cron expression">
+          <FormField label={t('editor.cron')}>
             <input value={fTrigCfg.cron ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, cron: e.target.value || undefined })} placeholder="0 9 * * 1" style={monoStyle} />
           </FormField>
         )}
 
         {/* THEN */}
-        <SectionLabel text="Then (action)" />
-        <FormField label="Action type">
+        <SectionLabel text={t('editor.thenAction')} />
+        <FormField label={t('editor.actionType')}>
           <select value={fAction} onChange={e => { setFAction(e.target.value); setFActCfg({}) }} style={{ ...inputStyle, cursor: 'pointer' }}>
-            {ACTIONS.map(a => <option key={a.v} value={a.v}>{a.label}</option>)}
+            {ACTIONS.map(a => <option key={a.v} value={a.v}>{(() => { try { return t(`actions.${a.v}` as any) } catch { return a.label } })()}</option>)}
           </select>
         </FormField>
 
         {fAction === 'sendEmail' && (
           <>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <FormField label="Account ID" required>
+              <FormField label={t('editor.accountId')} required>
                 <input value={fActCfg.accountId ?? ''} onChange={e => setFActCfg({ ...fActCfg, accountId: e.target.value })} placeholder="email account id" style={monoStyle} />
               </FormField>
-              <FormField label="To" required>
+              <FormField label={t('editor.to')} required>
                 <input value={fActCfg.to ?? ''} onChange={e => setFActCfg({ ...fActCfg, to: e.target.value })} placeholder="{{email}}" style={monoStyle} />
               </FormField>
             </div>
-            <FormField label="Subject">
+            <FormField label={t('editor.subject')}>
               <input value={fActCfg.subject ?? ''} onChange={e => setFActCfg({ ...fActCfg, subject: e.target.value })} placeholder="Hi {{first_name}}" style={monoStyle} />
             </FormField>
-            <FormField label="Body (supports merge fields)">
+            <FormField label={t('editor.bodyMerge')}>
               <textarea value={fActCfg.body ?? ''} onChange={e => setFActCfg({ ...fActCfg, body: e.target.value })} rows={6} placeholder="Hi {{first_name}}, ..." style={{ ...monoStyle, resize: 'vertical' }} />
             </FormField>
             <MergeHint />
@@ -480,17 +480,17 @@ export default function AutomationsPage() {
         {fAction === 'sendSMS' && (
           <>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 180px', gap: 12 }}>
-              <FormField label="Phone number" required>
+              <FormField label={t('editor.phoneNumber')} required>
                 <input value={fActCfg.toNumber ?? ''} onChange={e => setFActCfg({ ...fActCfg, toNumber: e.target.value })} placeholder="{{phone}}" style={monoStyle} />
               </FormField>
-              <FormField label="Channel">
+              <FormField label={t('editor.channel')}>
                 <select value={fActCfg.channel ?? 'sms'} onChange={e => setFActCfg({ ...fActCfg, channel: e.target.value as 'sms' | 'whatsapp' })} style={{ ...inputStyle, cursor: 'pointer' }}>
                   <option value="sms">SMS</option>
                   <option value="whatsapp">WhatsApp</option>
                 </select>
               </FormField>
             </div>
-            <FormField label="Body">
+            <FormField label={t('editor.body')}>
               <textarea value={fActCfg.body ?? ''} onChange={e => setFActCfg({ ...fActCfg, body: e.target.value })} rows={4} placeholder="Hi {{first_name}}, ..." style={{ ...monoStyle, resize: 'vertical' }} />
             </FormField>
             <MergeHint />
@@ -499,13 +499,13 @@ export default function AutomationsPage() {
 
         {fAction === 'createNotification' && (
           <>
-            <FormField label="Title" required>
-              <input value={fActCfg.title ?? ''} onChange={e => setFActCfg({ ...fActCfg, title: e.target.value })} placeholder="New lead assigned" style={inputStyle} />
+            <FormField label={t('editor.titleField')} required>
+              <input value={fActCfg.title ?? ''} onChange={e => setFActCfg({ ...fActCfg, title: e.target.value })} placeholder={t('editor.titlePlaceholder')} style={inputStyle} />
             </FormField>
-            <FormField label="Body">
+            <FormField label={t('editor.body')}>
               <textarea value={fActCfg.body ?? ''} onChange={e => setFActCfg({ ...fActCfg, body: e.target.value })} rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
             </FormField>
-            <FormField label="Link (optional)">
+            <FormField label={t('editor.linkOptional')}>
               <input value={fActCfg.link ?? ''} onChange={e => setFActCfg({ ...fActCfg, link: e.target.value })} placeholder="/contacts/{{__entityId}}" style={monoStyle} />
             </FormField>
           </>
@@ -513,27 +513,27 @@ export default function AutomationsPage() {
 
         {fAction === 'updateField' && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <FormField label="Field" required>
+            <FormField label={t('editor.field')} required>
               <input value={fActCfg.field ?? ''} onChange={e => setFActCfg({ ...fActCfg, field: e.target.value })} placeholder="status" style={monoStyle} />
             </FormField>
-            <FormField label="Value" required>
+            <FormField label={t('editor.value')} required>
               <input value={String(fActCfg.value ?? '')} onChange={e => setFActCfg({ ...fActCfg, value: e.target.value })} placeholder="qualified" style={monoStyle} />
             </FormField>
           </div>
         )}
 
         {fAction === 'moveStage' && (
-          <FormField label="Stage ID" required>
+          <FormField label={t('editor.stageId')} required>
             <input value={fActCfg.stageId ?? ''} onChange={e => setFActCfg({ ...fActCfg, stageId: e.target.value })} placeholder="stage_xyz" style={monoStyle} />
           </FormField>
         )}
 
         {fAction === 'callWebhook' && (
           <>
-            <FormField label="URL" required>
+            <FormField label={t('editor.url')} required>
               <input value={fActCfg.url ?? ''} onChange={e => setFActCfg({ ...fActCfg, url: e.target.value })} placeholder="https://hooks.example.com/abc" style={monoStyle} />
             </FormField>
-            <FormField label="Payload (JSON, optional)">
+            <FormField label={t('editor.payload')}>
               <textarea
                 value={typeof fActCfg.payload === 'string' ? fActCfg.payload : JSON.stringify(fActCfg.payload ?? {}, null, 2)}
                 onChange={e => setFActCfg({ ...fActCfg, payload: e.target.value })}
@@ -553,10 +553,10 @@ export default function AutomationsPage() {
         }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600, color: 'var(--txt2)' }}>
             <input type="checkbox" checked={fEnabled} onChange={e => setFEnabled(e.target.checked)} />
-            Enabled
+            {t('editor.enabled')}
           </label>
           <span style={{ fontSize: 11, color: 'var(--txt3)' }}>
-            {fEnabled ? 'Rule will run on matching events' : 'Rule is paused'}
+            {fEnabled ? t('editor.enabledOn') : t('editor.enabledOff')}
           </span>
         </div>
 
@@ -565,13 +565,13 @@ export default function AutomationsPage() {
             padding: '8px 16px', borderRadius: 8, border: '1px solid var(--border)',
             background: 'var(--bg2)', color: 'var(--txt2)',
             fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-          }}>Cancel</button>
+          }}>{t('editor.cancel')}</button>
           <button onClick={save} disabled={saving} style={{
             padding: '8px 18px', borderRadius: 8, border: 'none',
             background: 'var(--accent)', color: '#fff',
             fontSize: 12, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
             fontFamily: 'inherit', opacity: saving ? 0.6 : 1,
-          }}>{saving ? 'Saving...' : (editing ? 'Save Changes' : 'Create Rule')}</button>
+          }}>{saving ? t('editor.saving') : (editing ? t('editor.saveChanges') : t('editor.createRule'))}</button>
         </div>
       </Modal>
     </>

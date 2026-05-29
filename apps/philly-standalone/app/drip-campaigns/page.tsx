@@ -126,11 +126,11 @@ export default function DripCampaignsPage() {
   }
 
   async function submitForm() {
-    if (!formName.trim()) { addToast('Name is required', 'error'); return }
-    if (formSteps.length === 0) { addToast('Add at least one step', 'error'); return }
+    if (!formName.trim()) { addToast(t('toasts.nameRequired'), 'error'); return }
+    if (formSteps.length === 0) { addToast(t('toasts.addStep'), 'error'); return }
     for (const s of formSteps) {
-      if (!s.body.trim()) { addToast('All steps need a body', 'error'); return }
-      if (s.day < 0) { addToast('Day must be 0 or more', 'error'); return }
+      if (!s.body.trim()) { addToast(t('toasts.stepBody'), 'error'); return }
+      if (s.day < 0) { addToast(t('toasts.dayInvalid'), 'error'); return }
     }
 
     setSaving(true)
@@ -151,12 +151,12 @@ export default function DripCampaignsPage() {
             body: JSON.stringify(payload),
           })
       const j = await res.json().catch(() => ({}))
-      if (!res.ok) { addToast(j.error ?? 'Save failed', 'error'); return }
-      addToast(editingId ? 'Campaign updated' : 'Campaign created', 'success')
+      if (!res.ok) { addToast(j.error ?? t('toasts.saveFailed'), 'error'); return }
+      addToast(editingId ? t('toasts.updated') : t('toasts.created'), 'success')
       setShowForm(false)
       fetchCampaigns()
     } catch {
-      addToast('Network error', 'error')
+      addToast(t('toasts.networkError'), 'error')
     } finally {
       setSaving(false)
     }
@@ -169,10 +169,10 @@ export default function DripCampaignsPage() {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),
       })
-      if (!res.ok) { addToast('Update failed', 'error'); return }
-      addToast(`Campaign ${nextStatus}`, 'success')
+      if (!res.ok) { addToast(t('toasts.updateFailed'), 'error'); return }
+      addToast(t('toasts.statusChanged', { status: nextStatus }), 'success')
       fetchCampaigns()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
   }
 
   async function handleDelete(c: DripCampaign) {
@@ -187,10 +187,10 @@ export default function DripCampaignsPage() {
     try {
       const res = await fetch(`/api/drip-campaigns/${c.id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
-        addToast('Campaign deleted', 'success')
+        addToast(t('toasts.deleted'), 'success')
         fetchCampaigns()
-      } else { addToast('Delete failed', 'error') }
-    } catch { addToast('Network error', 'error') }
+      } else { addToast(t('toasts.deleteFailed'), 'error') }
+    } catch { addToast(t('toasts.networkError'), 'error') }
   }
 
   return (
@@ -198,18 +198,18 @@ export default function DripCampaignsPage() {
       <Topbar title={t('title')} sub={t('subtitle')} />
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="zap" label="Total Campaigns" value={String(campaigns.length)} />
-          <KpiCard icon="trending-up" label="Active" value={String(active)} />
-          <KpiCard icon="target" label="Total Steps" value={String(totalSteps)} />
-          <KpiCard icon="users" label="Enrolled" value={String(campaigns.reduce((s, c) => s + (c.enrolledCount || 0), 0))} />
+          <KpiCard icon="zap" label={t('kpis.total')} value={String(campaigns.length)} />
+          <KpiCard icon="trending-up" label={t('kpis.active')} value={String(active)} />
+          <KpiCard icon="target" label={t('kpis.totalSteps')} value={String(totalSteps)} />
+          <KpiCard icon="users" label={t('kpis.enrolled')} value={String(campaigns.reduce((s, c) => s + (c.enrolledCount || 0), 0))} />
         </div>
 
         {/* Filters + Add */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
           <FilterSelect value={typeFilter} onChange={setTypeFilter}
-            options={[{ value: '', label: 'All Types' }, ...Object.entries(TYPE_LABELS).map(([v, l]) => ({ value: v, label: l }))]} />
+            options={[{ value: '', label: t('filters.allTypes') }, ...Object.keys(TYPE_LABELS).map((v) => ({ value: v, label: (() => { try { return t(`types.${v}` as any) } catch { return TYPE_LABELS[v] } })() }))]} />
           <FilterSelect value={statusFilter} onChange={setStatusFilter}
-            options={[{ value: '', label: 'All Statuses' }, { value: 'active', label: 'Active' }, { value: 'paused', label: 'Paused' }, { value: 'archived', label: 'Archived' }]} />
+            options={[{ value: '', label: t('filters.allStatuses') }, { value: 'active', label: t('filters.active') }, { value: 'paused', label: t('filters.paused') }, { value: 'archived', label: t('filters.archived') }]} />
           <div style={{ flex: 1 }} />
           <button onClick={openCreate} style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
@@ -218,16 +218,16 @@ export default function DripCampaignsPage() {
             border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
             fontFamily: 'inherit', boxShadow: 'var(--shadow-sm)',
           }}>
-            <Plus size={13} /> New Campaign
+            <Plus size={13} /> {t('newCampaign')}
           </button>
         </div>
 
         {/* Campaign Cards */}
         {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
         ) : filtered.length === 0 ? (
           <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13, background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)' }}>
-            No campaigns found. Click New Campaign to create one.
+            {t('list.empty')}
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
@@ -245,7 +245,7 @@ export default function DripCampaignsPage() {
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--txt)', marginBottom: 2, wordBreak: 'break-word' }}>{campaign.name}</div>
-                      <div style={{ fontSize: 11, color: 'var(--txt3)' }}>{TYPE_LABELS[campaign.type] ?? campaign.type}</div>
+                      <div style={{ fontSize: 11, color: 'var(--txt3)' }}>{(() => { try { return t(`types.${campaign.type}` as any) } catch { return TYPE_LABELS[campaign.type] ?? campaign.type } })()}</div>
                     </div>
                     <span style={{
                       padding: '3px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
@@ -272,13 +272,13 @@ export default function DripCampaignsPage() {
                         </div>
                       )
                     }) : (
-                      <span style={{ fontSize: 10, color: 'var(--txt3)' }}>No steps configured</span>
+                      <span style={{ fontSize: 10, color: 'var(--txt3)' }}>{t('list.noSteps')}</span>
                     )}
                     {steps.length > 6 && (
-                      <span style={{ fontSize: 10, color: 'var(--txt3)' }}>+{steps.length - 6} more</span>
+                      <span style={{ fontSize: 10, color: 'var(--txt3)' }}>{t('list.moreSteps', { count: steps.length - 6 })}</span>
                     )}
                     <span style={{ fontSize: 10, color: 'var(--txt3)', marginLeft: 4 }}>
-                      {steps.length} step{steps.length !== 1 ? 's' : ''}
+                      {t('list.stepCount', { count: steps.length, s: steps.length !== 1 ? 's' : '' })}
                     </span>
                   </div>
 
@@ -288,25 +288,25 @@ export default function DripCampaignsPage() {
                     gap: 6,
                   }}>
                     <span style={{ fontSize: 10, color: 'var(--txt3)' }}>
-                      Created {new Date(campaign.createdAt).toLocaleDateString()}
+                      {t('list.created', { date: new Date(campaign.createdAt).toLocaleDateString() })}
                     </span>
                     <div style={{ display: 'flex', gap: 4 }}>
                       <button
                         onClick={() => setEnrollTarget({ id: campaign.id, name: campaign.name, steps: steps.length })}
-                        title="Manage enrollments"
-                        aria-label="Manage enrollments"
+                        title={t('list.manageEnrollments')}
+                        aria-label={t('list.manageEnrollments')}
                         style={miniBtn}
                       >
                         <Users size={11} />
                       </button>
-                      <button onClick={() => toggleStatus(campaign)} title={campaign.status === 'active' ? 'Pause' : 'Activate'}
+                      <button onClick={() => toggleStatus(campaign)} title={campaign.status === 'active' ? t('list.pause') : t('list.activate')}
                         style={miniBtn}>
                         {campaign.status === 'active' ? <Pause size={11} /> : <Play size={11} />}
                       </button>
-                      <button onClick={() => openEdit(campaign)} title="Edit" style={miniBtn}>
+                      <button onClick={() => openEdit(campaign)} title={t('list.edit')} style={miniBtn}>
                         <Edit2 size={11} />
                       </button>
-                      <button onClick={() => handleDelete(campaign)} title="Delete"
+                      <button onClick={() => handleDelete(campaign)} title={t('list.delete')}
                         style={{ ...miniBtn, color: 'var(--r-txt)' }}>
                         <Trash2 size={11} />
                       </button>
@@ -323,25 +323,25 @@ export default function DripCampaignsPage() {
       <Modal
         open={showForm}
         onClose={() => { if (!saving) setShowForm(false) }}
-        title={editingId ? 'Edit Campaign' : 'New Drip Campaign'}
-        subtitle="Sequence of automated touches"
+        title={editingId ? t('form.titleEdit') : t('form.titleNew')}
+        subtitle={t('form.subtitle')}
         size="lg"
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 10 }}>
-            <FormField label="Campaign Name">
-              <input value={formName} onChange={e => setFormName(e.target.value)} placeholder="e.g. Buyer Welcome Sequence" style={inputStyle} />
+            <FormField label={t('form.campaignName')}>
+              <input value={formName} onChange={e => setFormName(e.target.value)} placeholder={t('form.campaignNamePlaceholder')} style={inputStyle} />
             </FormField>
-            <FormField label="Type">
+            <FormField label={t('form.type')}>
               <select value={formType} onChange={e => setFormType(e.target.value)} style={inputStyle}>
-                {Object.entries(TYPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                {Object.keys(TYPE_LABELS).map((v) => <option key={v} value={v}>{(() => { try { return t(`types.${v}` as any) } catch { return TYPE_LABELS[v] } })()}</option>)}
               </select>
             </FormField>
-            <FormField label="Status">
+            <FormField label={t('form.status')}>
               <select value={formStatus} onChange={e => setFormStatus(e.target.value)} style={inputStyle}>
-                <option value="active">Active</option>
-                <option value="paused">Paused</option>
-                <option value="archived">Archived</option>
+                <option value="active">{t('filters.active')}</option>
+                <option value="paused">{t('filters.paused')}</option>
+                <option value="archived">{t('filters.archived')}</option>
               </select>
             </FormField>
           </div>
@@ -350,7 +350,7 @@ export default function DripCampaignsPage() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--txt2)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Sequence Steps ({formSteps.length})
+                {t('form.sequenceSteps', { count: formSteps.length })}
               </span>
               <button onClick={addStep} style={{
                 display: 'inline-flex', alignItems: 'center', gap: 4,
@@ -359,7 +359,7 @@ export default function DripCampaignsPage() {
                 border: 'none', fontSize: 11, fontWeight: 600, cursor: 'pointer',
                 fontFamily: 'inherit',
               }}>
-                <Plus size={11} /> Add Step
+                <Plus size={11} /> {t('form.addStep')}
               </button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 420, overflowY: 'auto', padding: '2px 4px' }}>
@@ -373,10 +373,10 @@ export default function DripCampaignsPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                       <GripVertical size={13} style={{ color: 'var(--txt3)' }} />
                       <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--txt2)', marginRight: 4 }}>
-                        Step {i + 1}
+                        {t('form.step', { n: i + 1 })}
                       </span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <span style={{ fontSize: 10, color: 'var(--txt3)' }}>Send after</span>
+                        <span style={{ fontSize: 10, color: 'var(--txt3)' }}>{t('form.sendAfter')}</span>
                         <input
                           type="number"
                           min="0"
@@ -384,7 +384,7 @@ export default function DripCampaignsPage() {
                           onChange={e => updateStep(i, { day: parseInt(e.target.value) || 0 })}
                           style={{ ...inputStyle, width: 60, padding: '4px 8px', fontSize: 12 }}
                         />
-                        <span style={{ fontSize: 10, color: 'var(--txt3)' }}>day{step.day !== 1 ? 's' : ''}</span>
+                        <span style={{ fontSize: 10, color: 'var(--txt3)' }}>{step.day !== 1 ? t('form.days') : t('form.day')}</span>
                       </div>
                       <div style={{ flex: 1 }} />
                       <div style={{ display: 'flex', gap: 4 }}>
@@ -413,7 +413,7 @@ export default function DripCampaignsPage() {
                       </div>
                       <button
                         onClick={() => removeStep(i)}
-                        title="Remove step"
+                        title={t('form.removeStep')}
                         style={{
                           width: 24, height: 24, borderRadius: 6,
                           background: 'transparent', border: '1px solid var(--border)',
@@ -426,28 +426,28 @@ export default function DripCampaignsPage() {
                     </div>
                     {step.channel === 'email' && (
                       <input
-                        placeholder="Subject line"
+                        placeholder={t('form.subjectPlaceholder')}
                         value={step.subject ?? ''}
                         onChange={e => updateStep(i, { subject: e.target.value })}
                         style={{ ...inputStyle, marginBottom: 6, fontSize: 12 }}
                       />
                     )}
                     <textarea
-                      placeholder={step.channel === 'email' ? 'Email body…' : `${step.channel.toUpperCase()} message…`}
+                      placeholder={step.channel === 'email' ? t('form.emailBodyPlaceholder') : t('form.messagePlaceholder', { channel: step.channel.toUpperCase() })}
                       value={step.body}
                       onChange={e => updateStep(i, { body: e.target.value })}
                       rows={3}
                       style={{ ...inputStyle, resize: 'vertical', fontSize: 12, lineHeight: 1.5 }}
                     />
                     <div style={{ fontSize: 9, color: 'var(--txt3)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 5 }}>
-                      <ChIcon size={9} /> {step.body.length} chars
+                      <ChIcon size={9} /> {t('form.chars', { n: step.body.length })}
                     </div>
                   </div>
                 )
               })}
               {formSteps.length === 0 && (
                 <div style={{ padding: 20, textAlign: 'center', color: 'var(--txt3)', fontSize: 12 }}>
-                  No steps yet. Click Add Step to start building the sequence.
+                  {t('form.emptySteps')}
                 </div>
               )}
             </div>
@@ -459,14 +459,14 @@ export default function DripCampaignsPage() {
               background: 'var(--bg2)', color: 'var(--txt2)',
               border: '1px solid var(--border)', fontSize: 12, fontWeight: 600,
               cursor: 'pointer', fontFamily: 'inherit',
-            }}>Cancel</button>
+            }}>{t('form.cancel')}</button>
             <button onClick={submitForm} disabled={saving} style={{
               padding: '9px 18px', borderRadius: 8,
               background: 'var(--accent)', color: '#fff', border: 'none',
               fontSize: 12, fontWeight: 600, cursor: saving ? 'wait' : 'pointer',
               fontFamily: 'inherit', opacity: saving ? 0.7 : 1,
             }}>
-              {saving ? 'Saving…' : editingId ? 'Save changes' : 'Create campaign'}
+              {saving ? t('form.saving') : editingId ? t('form.saveChanges') : t('form.createCampaign')}
             </button>
           </div>
         </div>

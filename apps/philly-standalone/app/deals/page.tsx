@@ -587,7 +587,7 @@ export default function DealsPage() {
 
   return (
     <>
-      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => setShowAdd(true)} addLabel="Deal" />
+      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => setShowAdd(true)} addLabel={t('addLabel')} />
       <div style={{ padding: '18px 24px 40px' }}>
 
         {/* KPI Row */}
@@ -613,7 +613,7 @@ export default function DealsPage() {
             <input
               value={search}
               onChange={e => setFilters({ q: e.target.value })}
-              placeholder="Search deals…"
+              placeholder={t('filters.search')}
               style={{
                 flex: 1, background: 'none', border: 'none',
                 fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit',
@@ -621,7 +621,7 @@ export default function DealsPage() {
               }}
             />
             {search && (
-              <button onClick={() => setFilters({ q: '' })} aria-label="Clear search"
+              <button onClick={() => setFilters({ q: '' })} aria-label={t('filters.clearSearch')}
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--txt3)', display: 'flex' }}>
                 <X size={12} />
               </button>
@@ -633,7 +633,7 @@ export default function DealsPage() {
             value={selectedPipeline}
             onChange={v => { setFilters({ pipelineId: v }); setPage(1) }}
             options={[
-              { value: '', label: 'All Pipelines' },
+              { value: '', label: t('filters.allPipelines') },
               ...pipelines.map(p => ({ value: p.id, label: p.name })),
             ]}
           />
@@ -642,10 +642,10 @@ export default function DealsPage() {
             value={statusFilter}
             onChange={v => { setFilters({ status: v }); setPage(1) }}
             options={[
-              { value: '', label: 'All Statuses' },
-              { value: 'open', label: 'Open' },
-              { value: 'won', label: 'Won' },
-              { value: 'lost', label: 'Lost' },
+              { value: '', label: t('filters.allStatuses') },
+              { value: 'open', label: t('statuses.open') },
+              { value: 'won', label: t('statuses.won') },
+              { value: 'lost', label: t('statuses.lost') },
             ]}
           />
 
@@ -656,8 +656,8 @@ export default function DealsPage() {
             marginLeft: 'auto',
           }}>
             {[
-              { key: 'board', icon: LayoutGrid, label: 'Board' },
-              { key: 'list',  icon: ListIcon,   label: 'List'  },
+              { key: 'board', icon: LayoutGrid, label: t('view.board') },
+              { key: 'list',  icon: ListIcon,   label: t('view.list')  },
             ].map(v => {
               const active = view === v.key
               const Icon = v.icon
@@ -684,10 +684,10 @@ export default function DealsPage() {
             borderRadius: 12, padding: 40, textAlign: 'center', boxShadow: 'var(--shadow-sm)',
           }}>
             <div style={{ fontSize: 13, color: 'var(--txt2)', marginBottom: 8 }}>
-              No pipelines yet
+              {t('empty.title')}
             </div>
             <div style={{ fontSize: 12, color: 'var(--txt3)' }}>
-              Create a pipeline via the API first (POST /api/pipelines).
+              {t('empty.hint')}
             </div>
           </div>
         )}
@@ -698,7 +698,7 @@ export default function DealsPage() {
             <button
               type="button"
               onClick={() => setFilterOpen(true)}
-              aria-label="Open advanced filter builder"
+              aria-label={t('filters.openAdvanced')}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5,
                 padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
@@ -710,14 +710,14 @@ export default function DealsPage() {
             >
               <Filter size={12} />
               {filterSpec
-                ? `Advanced filter (${filterSpec.rules.length} rule${filterSpec.rules.length === 1 ? '' : 's'})`
-                : 'Advanced filter'}
+                ? t('advanced.withCount', { n: filterSpec.rules.length })
+                : t('advanced.label')}
             </button>
             {filterSpec && (
               <button
                 type="button"
                 onClick={() => setFilterSpec(null)}
-                aria-label="Clear advanced filter"
+                aria-label={t('filters.clearAdvanced')}
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 5,
                   padding: '5px 10px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
@@ -726,7 +726,7 @@ export default function DealsPage() {
                 }}
               >
                 <X size={12} />
-                Clear
+                {t('advanced.clear')}
               </button>
             )}
           </div>
@@ -1145,7 +1145,7 @@ export default function DealsPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <Field label="Pipeline *">
                   <select value={addPipelineId} onChange={e => setAddPipelineId(e.target.value)} style={fieldInputStyle}>
-                    {pipelines.length === 0 && <option value="">No pipelines</option>}
+                    {pipelines.length === 0 && <option value="">{t('pipelines.empty')}</option>}
                     {pipelines.map(p => (
                       <option key={p.id} value={p.id}>{p.name}</option>
                     ))}
@@ -1207,7 +1207,7 @@ export default function DealsPage() {
               <Field label="Notes">
                 <textarea
                   value={addNotes} onChange={e => setAddNotes(e.target.value)}
-                  rows={3} placeholder="Context, next steps…"
+                  rows={3} placeholder={t('form.notesPlaceholder')}
                   style={{ ...fieldInputStyle, resize: 'vertical', lineHeight: 1.5 }}
                 />
               </Field>
@@ -1229,7 +1229,7 @@ export default function DealsPage() {
                   background: 'var(--bg2)', color: 'var(--txt2)', border: '1px solid var(--border)',
                   cursor: 'pointer', fontFamily: 'inherit',
                 }}
-              >Cancel</button>
+              >{t('form.cancel')}</button>
               <button
                 onClick={handleAddDeal} disabled={saving}
                 style={{

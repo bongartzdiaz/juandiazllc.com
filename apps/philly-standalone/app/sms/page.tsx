@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
@@ -78,6 +79,7 @@ const selectStyle: React.CSSProperties = {
 }
 
 export default function SmsPage() {
+  const t = useTranslations('sms')
   const [messages, setMessages] = useState<SmsMessage[]>([])
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
@@ -140,7 +142,7 @@ export default function SmsPage() {
     const now = new Date()
     const diff = now.getTime() - d.getTime()
     const mins = Math.floor(diff / 60000)
-    if (mins < 1) return 'just now'
+    if (mins < 1) return t('relative.justNow')
     if (mins < 60) return `${mins}m ago`
     const hrs = Math.floor(mins / 60)
     if (hrs < 24) return `${hrs}h ago`
@@ -176,7 +178,7 @@ export default function SmsPage() {
       setShowSend(false)
       fetchMessages()
     } catch (err) {
-      setSendError(err instanceof Error ? err.message : 'Network error')
+      setSendError(err instanceof Error ? err.message : t('errors.networkError'))
     } finally {
       setSending(false)
     }
@@ -189,18 +191,18 @@ export default function SmsPage() {
   return (
     <>
       <Topbar
-        title="SMS & WhatsApp"
-        sub="Send and track SMS and WhatsApp messages"
+        title={t('title')}
+        sub={t('subtitle')}
         onAdd={() => setShowSend(true)}
-        addLabel="Send Message"
+        addLabel={t('addLabel')}
       />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPI Row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="message-square" label="Total Messages" value={String(totalMessages)} />
-          <KpiCard icon="check-circle" label="Delivered" value={String(deliveredCount)} />
-          <KpiCard icon="x-circle" label="Failed" value={String(failedCount)} />
-          <KpiCard icon="clock" label="Queued" value={String(queuedCount)} />
+          <KpiCard icon="message-square" label={t('kpis.total')} value={String(totalMessages)} />
+          <KpiCard icon="check-circle" label={t('kpis.delivered')} value={String(deliveredCount)} />
+          <KpiCard icon="x-circle" label={t('kpis.failed')} value={String(failedCount)} />
+          <KpiCard icon="clock" label={t('kpis.queued')} value={String(queuedCount)} />
         </div>
 
         {/* Filters */}
@@ -210,7 +212,7 @@ export default function SmsPage() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search by number..."
+              placeholder={t('filters.searchPlaceholder')}
               style={{
                 background: 'none',
                 border: 'none',
@@ -233,7 +235,7 @@ export default function SmsPage() {
               }}
               style={selectStyle}
             >
-              <option value="">All Channels</option>
+              <option value="">{t('filters.allChannels')}</option>
               <option value="sms">SMS</option>
               <option value="whatsapp">WhatsApp</option>
             </select>
@@ -249,11 +251,11 @@ export default function SmsPage() {
               }}
               style={selectStyle}
             >
-              <option value="">All Statuses</option>
-              <option value="queued">Queued</option>
-              <option value="sent">Sent</option>
-              <option value="delivered">Delivered</option>
-              <option value="failed">Failed</option>
+              <option value="">{t('filters.allStatuses')}</option>
+              <option value="queued">{t('filters.queued')}</option>
+              <option value="sent">{t('filters.sent')}</option>
+              <option value="delivered">{t('filters.delivered')}</option>
+              <option value="failed">{t('filters.failed')}</option>
             </select>
           </div>
 
@@ -276,7 +278,7 @@ export default function SmsPage() {
                 fontFamily: 'inherit',
               }}
             >
-              Clear filters
+              {t('filters.clear')}
             </button>
           )}
         </div>
@@ -292,11 +294,11 @@ export default function SmsPage() {
           }}
         >
           {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
           ) : filteredMessages.length === 0 ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
               <MessageSquare size={32} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-              No messages found.
+              {t('list.empty')}
             </div>
           ) : (
             filteredMessages.map((msg, idx) => {
@@ -385,7 +387,7 @@ export default function SmsPage() {
                           fontWeight: 600,
                         }}
                       >
-                        {isOutbound ? 'to' : 'from'}
+                        {isOutbound ? t('direction.to') : t('direction.from')}
                       </span>
                     </div>
                     <div
@@ -478,7 +480,7 @@ export default function SmsPage() {
                 marginBottom: 4,
               }}
             >
-              <div id="sms-send-title" style={{ fontSize: 16, fontWeight: 700 }}>Send Message</div>
+              <div id="sms-send-title" style={{ fontSize: 16, fontWeight: 700 }}>{t('modal.title')}</div>
               <button
                 onClick={() => setShowSend(false)}
                 style={{
@@ -489,13 +491,13 @@ export default function SmsPage() {
                   padding: 2,
                   display: 'flex',
                 }}
-                aria-label="Close"
+                aria-label={t('modal.close')}
               >
                 <X size={16} />
               </button>
             </div>
             <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>
-              Send a new SMS or WhatsApp message
+              {t('modal.subtitle')}
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -509,7 +511,7 @@ export default function SmsPage() {
                     display: 'block',
                   }}
                 >
-                  Channel
+                  {t('modal.channel')}
                 </label>
                 <div style={{ display: 'flex', gap: 6 }}>
                   {(['sms', 'whatsapp'] as const).map(ch => {
@@ -555,7 +557,7 @@ export default function SmsPage() {
                     display: 'block',
                   }}
                 >
-                  To Number
+                  {t('modal.toNumber')}
                 </label>
                 <input
                   type="tel"
@@ -585,7 +587,7 @@ export default function SmsPage() {
                       color: 'var(--txt2)',
                     }}
                   >
-                    Message
+                    {t('modal.message')}
                   </label>
                   {sendChannel === 'sms' && (
                     <span
@@ -602,7 +604,7 @@ export default function SmsPage() {
                 <textarea
                   value={sendBody}
                   onChange={e => setSendBody(e.target.value)}
-                  placeholder="Type your message..."
+                  placeholder={t('modal.messagePlaceholder')}
                   rows={5}
                   style={{
                     ...inputStyle,
@@ -619,7 +621,7 @@ export default function SmsPage() {
                       marginTop: 4,
                     }}
                   >
-                    Message exceeds 160 characters — it will be split into multiple SMS.
+                    {t('modal.overLimit')}
                   </div>
                 )}
               </div>
@@ -663,7 +665,7 @@ export default function SmsPage() {
               }}
             >
               <Send size={13} />
-              {sending ? 'Sending...' : 'Send Message'}
+              {sending ? t('modal.sending') : t('modal.submit')}
             </button>
           </div>
         </div>

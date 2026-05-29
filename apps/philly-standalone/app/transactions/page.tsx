@@ -84,9 +84,17 @@ export default function TransactionsPage() {
 
   // Bundle AH — column visibility prefs.
   const txnColumns = useColumnPrefs('pai-transactions-columns-v1', TXN_DEFAULTS)
+  const localizedColumns = useMemo<ColumnDef[]>(() => [
+    { id: 'transaction', label: t('columns.transaction'), required: true },
+    { id: 'type', label: t('columns.type') },
+    { id: 'salePrice', label: t('columns.salePrice') },
+    { id: 'status', label: t('columns.status') },
+    { id: 'closingDate', label: t('columns.closingDate') },
+    { id: 'signatures', label: t('columns.signatures') },
+  ], [t])
   const visibleTxnColumns = useMemo(
-    () => TXN_COLUMNS.filter((c) => c.required || txnColumns.visible.has(c.id)),
-    [txnColumns.visible],
+    () => localizedColumns.filter((c) => c.required || txnColumns.visible.has(c.id)),
+    [txnColumns.visible, localizedColumns],
   )
   const txnGridTemplate = useMemo(
     () => visibleTxnColumns.map((c) => TXN_WIDTHS[c.id]).join(' '),
@@ -127,7 +135,7 @@ export default function TransactionsPage() {
       setShowAdd(false)
       fetchData()
     } catch (err) {
-      setAddError(err instanceof Error ? err.message : 'Network error')
+      setAddError(err instanceof Error ? err.message : t('errors.networkError'))
     } finally {
       setSaving(false)
     }
@@ -171,28 +179,28 @@ export default function TransactionsPage() {
 
   return (
     <>
-      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => setShowAdd(true)} addLabel="Transaction" />
+      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => setShowAdd(true)} addLabel={t('addLabel')} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPI Row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="file-text" label="Total Transactions" value={String(total)} />
-          <KpiCard icon="target" label="Active" value={String(activeCount)} />
-          <KpiCard icon="dollar-sign" label="Total Volume" value={`$${(totalVolume / 100).toLocaleString()}`} />
-          <KpiCard icon="calendar" label="Pending Close" value={String(pendingClose)} />
+          <KpiCard icon="file-text" label={t('kpis.total')} value={String(total)} />
+          <KpiCard icon="target" label={t('kpis.active')} value={String(activeCount)} />
+          <KpiCard icon="dollar-sign" label={t('kpis.totalVolume')} value={`$${(totalVolume / 100).toLocaleString()}`} />
+          <KpiCard icon="calendar" label={t('kpis.pendingClose')} value={String(pendingClose)} />
         </div>
 
         {/* Filters */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
           <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
-            options={[{ value: '', label: 'All Statuses' }, { value: 'pending', label: 'Pending' }, { value: 'active', label: 'Active' }, { value: 'closing', label: 'Closing' }, { value: 'closed', label: 'Closed' }, { value: 'cancelled', label: 'Cancelled' }]} />
+            options={[{ value: '', label: t('filters.allStatuses') }, { value: 'pending', label: t('filters.pending') }, { value: 'active', label: t('filters.active') }, { value: 'closing', label: t('filters.closing') }, { value: 'closed', label: t('filters.closed') }, { value: 'cancelled', label: t('filters.cancelled') }]} />
           <FilterSelect value={typeFilter} onChange={v => { setTypeFilter(v); setPage(1) }}
-            options={[{ value: '', label: 'All Types' }, { value: 'purchase', label: 'Purchase' }, { value: 'sale', label: 'Sale' }, { value: 'lease', label: 'Lease' }, { value: 'refinance', label: 'Refinance' }]} />
+            options={[{ value: '', label: t('filters.allTypes') }, { value: 'purchase', label: t('filters.purchase') }, { value: 'sale', label: t('filters.sale') }, { value: 'lease', label: t('filters.lease') }, { value: 'refinance', label: t('filters.refinance') }]} />
         </div>
 
         {/* Table */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
           <ColumnPicker
-            columns={TXN_COLUMNS}
+            columns={localizedColumns}
             visible={txnColumns.visible}
             onToggle={txnColumns.toggle}
             onReset={txnColumns.reset}
@@ -204,9 +212,9 @@ export default function TransactionsPage() {
             {visibleTxnColumns.map((c) => <span key={c.id}>{c.label}</span>)}
           </div>
           {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
           ) : transactions.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No transactions found.</div>
+            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.empty')}</div>
           ) : transactions.map((txn, idx) => (
             <div key={txn.id}
               ref={(el) => {
@@ -231,7 +239,7 @@ export default function TransactionsPage() {
               {visibleTxnColumns.map((c) => {
                 if (c.id === 'transaction') return (
                   <div key="transaction">
-                    <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{txn.escrowNumber || 'No Escrow #'}</div>
+                    <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{txn.escrowNumber || t('list.noEscrow')}</div>
                     <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{txn.titleCompany || '-'}</div>
                   </div>
                 )
@@ -279,28 +287,28 @@ export default function TransactionsPage() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-              <div id="transaction-add-title" style={{ fontSize: 16, fontWeight: 700 }}>Add Transaction</div>
-              <button onClick={closeAddModal} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--txt3)', padding: 4 }}>
+              <div id="transaction-add-title" style={{ fontSize: 16, fontWeight: 700 }}>{t('modal.title')}</div>
+              <button onClick={closeAddModal} aria-label={t('modal.close')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--txt3)', padding: 4 }}>
                 <X size={16} />
               </button>
             </div>
-            <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>Create a new transaction</div>
+            <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>{t('modal.subtitle')}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Type</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.type')}</label>
                 <select value={addType} onChange={e => setAddType(e.target.value)} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
                 }}>
-                  <option value="purchase">Purchase</option>
-                  <option value="sale">Sale</option>
-                  <option value="lease">Lease</option>
-                  <option value="refinance">Refinance</option>
+                  <option value="purchase">{t('filters.purchase')}</option>
+                  <option value="sale">{t('filters.sale')}</option>
+                  <option value="lease">{t('filters.lease')}</option>
+                  <option value="refinance">{t('filters.refinance')}</option>
                 </select>
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Escrow Number</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.escrowNumber')}</label>
                 <input value={addEscrow} onChange={e => setAddEscrow(e.target.value)} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
@@ -308,7 +316,7 @@ export default function TransactionsPage() {
                 }} />
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Title Company</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.titleCompany')}</label>
                 <input value={addTitleCompany} onChange={e => setAddTitleCompany(e.target.value)} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
@@ -316,7 +324,7 @@ export default function TransactionsPage() {
                 }} />
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Sale Price ($)</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.salePrice')}</label>
                 <input type="number" step="1000" min="0" value={addSalePrice} onChange={e => setAddSalePrice(e.target.value)} placeholder="500000" style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
@@ -324,7 +332,7 @@ export default function TransactionsPage() {
                 }} />
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Earnest Money ($)</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.earnestMoney')}</label>
                 <input type="number" step="500" min="0" value={addEarnest} onChange={e => setAddEarnest(e.target.value)} placeholder="5000" style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
@@ -332,7 +340,7 @@ export default function TransactionsPage() {
                 }} />
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Closing Date</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.closingDate')}</label>
                 <input type="date" value={addClosingDate} onChange={e => setAddClosingDate(e.target.value)} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
@@ -340,7 +348,7 @@ export default function TransactionsPage() {
                 }} />
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Notes</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.notes')}</label>
                 <textarea value={addNotes} onChange={e => setAddNotes(e.target.value)} rows={3} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
@@ -361,7 +369,7 @@ export default function TransactionsPage() {
               background: 'var(--accent)', color: '#fff',
               fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit', opacity: saving ? 0.6 : 1,
-            }}>{saving ? 'Saving...' : 'Add Transaction'}</button>
+            }}>{saving ? t('modal.saving') : t('modal.submit')}</button>
           </div>
         </div>
       )}

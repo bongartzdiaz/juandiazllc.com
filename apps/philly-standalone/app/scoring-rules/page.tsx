@@ -60,7 +60,7 @@ export default function ScoringRulesPage() {
   const handleAddRule = async () => {
     if (saving) return
     if (!addName.trim() || !addEvent.trim()) {
-      setAddError('Name and Event are required')
+      setAddError(t('errors.nameEventRequired'))
       return
     }
     setSaving(true)
@@ -89,7 +89,7 @@ export default function ScoringRulesPage() {
       setShowAdd(false)
       fetchData()
     } catch (err) {
-      setAddError(err instanceof Error ? err.message : 'Network error')
+      setAddError(err instanceof Error ? err.message : t('errors.networkError'))
     } finally {
       setSaving(false)
     }
@@ -128,23 +128,23 @@ export default function ScoringRulesPage() {
 
   return (
     <>
-      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => setShowAdd(true)} addLabel="Rule" />
+      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => setShowAdd(true)} addLabel={t('addLabel')} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* KPI Row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="zap" label="Total Rules" value={String(total)} />
-          <KpiCard icon="trending-up" label="Active Rules" value={String(activeRules.length)} />
-          <KpiCard icon="target" label="Total Points Possible" value={String(totalPointsPossible)} />
+          <KpiCard icon="zap" label={t('kpis.total')} value={String(total)} />
+          <KpiCard icon="trending-up" label={t('kpis.active')} value={String(activeRules.length)} />
+          <KpiCard icon="target" label={t('kpis.totalPoints')} value={String(totalPointsPossible)} />
         </div>
 
         {/* Card List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
           ) : rules.length === 0 ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13, background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)' }}>
               <Zap size={32} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-              No scoring rules yet.
+              {t('list.empty')}
             </div>
           ) : rules.map(rule => (
             <div key={rule.id} style={{
@@ -169,7 +169,7 @@ export default function ScoringRulesPage() {
                   }}>{rule.event}</span>
                   {rule.decay && (
                     <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 10, color: 'var(--txt3)' }}>
-                      <Clock size={9} /> Decays in {rule.decayDays}d
+                      <Clock size={9} /> {t('list.decaysIn', { days: rule.decayDays })}
                     </span>
                   )}
                 </div>
@@ -186,9 +186,9 @@ export default function ScoringRulesPage() {
                 fontSize: 10, fontWeight: 600, cursor: 'pointer',
                 fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4,
               }}>
-                {rule.enabled ? <><Pause size={10} /> Active</> : <><Play size={10} /> Paused</>}
+                {rule.enabled ? <><Pause size={10} /> {t('list.active')}</> : <><Play size={10} /> {t('list.paused')}</>}
               </button>
-              <button onClick={() => deleteRule(rule.id)} title="Delete" style={{
+              <button onClick={() => deleteRule(rule.id)} title={t('list.delete')} style={{
                 width: 28, height: 28, borderRadius: 6,
                 border: '1px solid var(--border)', background: 'transparent',
                 color: 'var(--r-txt)', cursor: 'pointer',
@@ -222,38 +222,38 @@ export default function ScoringRulesPage() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-              <div id="scoring-rule-add-title" style={{ fontSize: 16, fontWeight: 700 }}>Add Scoring Rule</div>
-              <button onClick={closeAddModal} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--txt3)', padding: 2, display: 'flex' }}>
+              <div id="scoring-rule-add-title" style={{ fontSize: 16, fontWeight: 700 }}>{t('modal.title')}</div>
+              <button onClick={closeAddModal} aria-label={t('modal.close')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--txt3)', padding: 2, display: 'flex' }}>
                 <X size={16} />
               </button>
             </div>
-            <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>Create a new scoring rule</div>
+            <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>{t('modal.subtitle')}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Name</label>
-                <input value={addName} onChange={e => setAddName(e.target.value)} placeholder="e.g. Email opened" style={inputStyle} />
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.name')}</label>
+                <input value={addName} onChange={e => setAddName(e.target.value)} placeholder={t('modal.namePlaceholder')} style={inputStyle} />
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Event</label>
-                <input value={addEvent} onChange={e => setAddEvent(e.target.value)} placeholder="e.g. email_open" style={inputStyle} />
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.event')}</label>
+                <input value={addEvent} onChange={e => setAddEvent(e.target.value)} placeholder={t('modal.eventPlaceholder')} style={inputStyle} />
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Points</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.points')}</label>
                 <input type="number" value={addPoints} onChange={e => setAddPoints(e.target.value)} placeholder="10" style={inputStyle} />
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <input type="checkbox" id="decay-check" checked={addDecay} onChange={e => setAddDecay(e.target.checked)} style={{ width: 16, height: 16, accentColor: 'var(--accent)', cursor: 'pointer' }} />
-                <label htmlFor="decay-check" style={{ fontSize: 12, color: 'var(--txt2)', cursor: 'pointer' }}>Enable point decay</label>
+                <label htmlFor="decay-check" style={{ fontSize: 12, color: 'var(--txt2)', cursor: 'pointer' }}>{t('modal.enableDecay')}</label>
               </div>
               {addDecay && (
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Decay Days</label>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.decayDays')}</label>
                   <input type="number" value={addDecayDays} onChange={e => setAddDecayDays(e.target.value)} placeholder="30" style={inputStyle} />
                 </div>
               )}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <input type="checkbox" id="enabled-check" checked={addEnabled} onChange={e => setAddEnabled(e.target.checked)} style={{ width: 16, height: 16, accentColor: 'var(--accent)', cursor: 'pointer' }} />
-                <label htmlFor="enabled-check" style={{ fontSize: 12, color: 'var(--txt2)', cursor: 'pointer' }}>Enabled</label>
+                <label htmlFor="enabled-check" style={{ fontSize: 12, color: 'var(--txt2)', cursor: 'pointer' }}>{t('modal.enabled')}</label>
               </div>
             </div>
             {addError && (
@@ -269,7 +269,7 @@ export default function ScoringRulesPage() {
               background: 'var(--accent)', color: '#fff',
               fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit', opacity: saving ? 0.6 : 1,
-            }}>{saving ? 'Saving...' : 'Add Rule'}</button>
+            }}>{saving ? t('modal.saving') : t('modal.submit')}</button>
           </div>
         </div>
       )}

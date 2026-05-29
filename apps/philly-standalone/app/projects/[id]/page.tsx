@@ -92,14 +92,15 @@ const statusColors: Record<string, { bg: string; txt: string; border: string; do
   paused:    { bg: 'var(--o-bg)',      txt: 'var(--o-txt)',      border: 'var(--o-border)',      dot: 'var(--o)' },
 }
 
+/** Impact type catalog. Labels are translated at render time via tp('impact.types.<key>'). */
 const IMPACT_TYPES = [
-  { key: 'co2_kg',         label: 'CO2 Reduced',     unit: 'kg',     icon: Sparkles },
-  { key: 'people_helped',  label: 'People Helped',   unit: 'people', icon: Users },
-  { key: 'trees_planted',  label: 'Trees Planted',   unit: 'trees',  icon: Sparkles },
-  { key: 'money_donated',  label: 'Money Donated',   unit: 'EUR',    icon: DollarSign },
-  { key: 'water_liters',   label: 'Water Saved',     unit: 'L',      icon: Sparkles },
-  { key: 'energy_kwh',     label: 'Energy Generated', unit: 'kWh',   icon: Sparkles },
-  { key: 'custom',         label: 'Custom',          unit: '',       icon: Target },
+  { key: 'co2_kg',         unit: 'kg',     icon: Sparkles },
+  { key: 'people_helped',  unit: 'people', icon: Users },
+  { key: 'trees_planted',  unit: 'trees',  icon: Sparkles },
+  { key: 'money_donated',  unit: 'EUR',    icon: DollarSign },
+  { key: 'water_liters',   unit: 'L',      icon: Sparkles },
+  { key: 'energy_kwh',     unit: 'kWh',    icon: Sparkles },
+  { key: 'custom',         unit: '',       icon: Target },
 ]
 
 /* ------------------------------------------------------------------
@@ -118,8 +119,12 @@ function parseSdgs(raw: number[] | string): number[] {
   catch { return [] }
 }
 
-function getImpactLabel(type: string): string {
-  return IMPACT_TYPES.find(t => t.key === type)?.label || type.replace(/_/g, ' ')
+function getImpactLabel(type: string, tp: (k: string) => string): string {
+  const known = IMPACT_TYPES.find(t => t.key === type)
+  if (known) {
+    try { return tp(`impact.types.${known.key}`) } catch { /* fallthrough */ }
+  }
+  return type.replace(/_/g, ' ')
 }
 
 function formatImpactValue(type: string, value: number, unit: string): string {
@@ -144,12 +149,12 @@ function daysBetween(start: string, end: string | null): number {
 
 type Tab = 'overview' | 'milestones' | 'impact' | 'contacts' | 'deals'
 
-const TABS: { key: Tab; label: string; icon: typeof Target }[] = [
-  { key: 'overview',   label: 'Overview',   icon: FolderKanban },
-  { key: 'milestones', label: 'Milestones', icon: CheckCircle2 },
-  { key: 'impact',     label: 'Impact',     icon: TrendingUp },
-  { key: 'contacts',   label: 'Contacts',   icon: Users },
-  { key: 'deals',      label: 'Deals',      icon: Briefcase },
+const TABS: { key: Tab; icon: typeof Target }[] = [
+  { key: 'overview',   icon: FolderKanban },
+  { key: 'milestones', icon: CheckCircle2 },
+  { key: 'impact',     icon: TrendingUp },
+  { key: 'contacts',   icon: Users },
+  { key: 'deals',      icon: Briefcase },
 ]
 
 interface ProjectDeal {
@@ -171,6 +176,7 @@ interface ProjectDeal {
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const t = useTranslations('projects')
+  const tp = useTranslations('projectDetail')
   const tCommon = useTranslations('common')
   const { addToast } = useToast()
 
@@ -225,15 +231,15 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: 'Failed' }))
-        throw new Error(err.error || 'Failed to update project')
+        throw new Error(err.error || tp('toasts.failedUpdateProject'))
       }
-      addToast('Project updated', 'success')
+      addToast(tp('toasts.updated'), 'success')
       setEditing(false)
       projectQuery.refetch()
     } catch (e: unknown) {
-      addToast(e instanceof Error ? e.message : 'Something went wrong', 'error')
+      addToast(e instanceof Error ? e.message : tp('toasts.somethingWrong'), 'error')
     }
-  }, [id, editTitle, editDescription, editCategory, editStatus, editBudget, editStart, editEnd, addToast, projectQuery])
+  }, [id, editTitle, editDescription, editCategory, editStatus, editBudget, editStart, editEnd, addToast, projectQuery, tp])
 
   /* ---- Milestones ---- */
   const [newMsTitle, setNewMsTitle] = useState('')
@@ -254,18 +260,18 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: 'Failed' }))
-        throw new Error(err.error || 'Failed to add milestone')
+        throw new Error(err.error || tp('toasts.failedAddMilestone'))
       }
-      addToast('Milestone added', 'success')
+      addToast(tp('toasts.milestoneAdded'), 'success')
       setNewMsTitle('')
       setNewMsDate('')
       projectQuery.refetch()
     } catch (e: unknown) {
-      addToast(e instanceof Error ? e.message : 'Something went wrong', 'error')
+      addToast(e instanceof Error ? e.message : tp('toasts.somethingWrong'), 'error')
     } finally {
       setAddingMs(false)
     }
-  }, [id, newMsTitle, newMsDate, addToast, projectQuery])
+  }, [id, newMsTitle, newMsDate, addToast, projectQuery, tp])
 
   const handleToggleMilestone = useCallback(async (ms: Milestone) => {
     const next = ms.status === 'completed' ? 'pending' : 'completed'
@@ -275,23 +281,23 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: next }),
       })
-      if (!res.ok) throw new Error('Failed to update milestone')
+      if (!res.ok) throw new Error(tp('toasts.failedUpdateMilestone'))
       projectQuery.refetch()
     } catch (e: unknown) {
-      addToast(e instanceof Error ? e.message : 'Something went wrong', 'error')
+      addToast(e instanceof Error ? e.message : tp('toasts.somethingWrong'), 'error')
     }
-  }, [id, addToast, projectQuery])
+  }, [id, addToast, projectQuery, tp])
 
   const handleDeleteMilestone = useCallback(async (msId: string) => {
     try {
       const res = await fetch(`/api/projects/${id}/milestones/${msId}`, { method: 'DELETE' })
-      if (!res.ok && res.status !== 204) throw new Error('Failed to delete milestone')
-      addToast('Milestone removed', 'success')
+      if (!res.ok && res.status !== 204) throw new Error(tp('toasts.failedDeleteMilestone'))
+      addToast(tp('toasts.milestoneRemoved'), 'success')
       projectQuery.refetch()
     } catch (e: unknown) {
-      addToast(e instanceof Error ? e.message : 'Something went wrong', 'error')
+      addToast(e instanceof Error ? e.message : tp('toasts.somethingWrong'), 'error')
     }
-  }, [id, addToast, projectQuery])
+  }, [id, addToast, projectQuery, tp])
 
   /* ---- Impact metrics ---- */
   const [newMetricType, setNewMetricType] = useState('co2_kg')
@@ -302,7 +308,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const handleAddMetric = useCallback(async () => {
     const v = Number(newMetricValue)
     if (!Number.isFinite(v) || v <= 0) {
-      addToast('Enter a positive value', 'error')
+      addToast(tp('toasts.positiveValueRequired'), 'error')
       return
     }
     setAddingMetric(true)
@@ -320,18 +326,18 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: 'Failed' }))
-        throw new Error(err.error || 'Failed to add metric')
+        throw new Error(err.error || tp('toasts.failedAddMetric'))
       }
-      addToast('Impact recorded', 'success')
+      addToast(tp('toasts.impactRecorded'), 'success')
       setNewMetricValue('')
       setNewMetricNotes('')
       projectQuery.refetch()
     } catch (e: unknown) {
-      addToast(e instanceof Error ? e.message : 'Something went wrong', 'error')
+      addToast(e instanceof Error ? e.message : tp('toasts.somethingWrong'), 'error')
     } finally {
       setAddingMetric(false)
     }
-  }, [id, newMetricType, newMetricValue, newMetricNotes, addToast, projectQuery])
+  }, [id, newMetricType, newMetricValue, newMetricNotes, addToast, projectQuery, tp])
 
   /* ---- Derived stats ---- */
   const stats = useMemo(() => {
@@ -351,7 +357,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   if (projectQuery.loading) {
     return (
       <>
-        <Topbar title="Project" sub={tCommon('loading')} />
+        <Topbar title={tp('titleFallback')} sub={tCommon('loading')} />
         <div style={{ padding: '60px 24px', textAlign: 'center', color: 'var(--txt3)', fontSize: 14 }}>
           {tCommon('loading')}
         </div>
@@ -362,13 +368,13 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   if (!project || !stats) {
     return (
       <>
-        <Topbar title="Project" sub="Not found" />
+        <Topbar title={tp('titleFallback')} sub={tp('notFound')} />
         <div style={{ padding: '60px 24px', textAlign: 'center' }}>
-          <div style={{ fontSize: 14, color: 'var(--txt3)', marginBottom: 16 }}>Project not found</div>
+          <div style={{ fontSize: 14, color: 'var(--txt3)', marginBottom: 16 }}>{tp('notFound')}</div>
           <Link href="/projects" style={{
             fontSize: 13, fontWeight: 600, color: 'var(--accent)', textDecoration: 'none',
           }}>
-            Back to Projects
+            {tp('backToProjects')}
           </Link>
         </div>
       </>
@@ -390,7 +396,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           textDecoration: 'none', marginBottom: 16,
         }}>
           <ArrowLeft size={14} />
-          {tCommon('back')} to {t('title')}
+          {tp('backToProjects')}
         </Link>
 
         {/* ---- Header card ---- */}
@@ -450,15 +456,15 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                       background: 'var(--bg2)', fontSize: 12, fontFamily: 'inherit',
                     }}
                   >
-                    <option value="planned">Planned</option>
-                    <option value="active">Active</option>
-                    <option value="completed">Completed</option>
-                    <option value="paused">Paused</option>
+                    <option value="planned">{tp('statuses.planned')}</option>
+                    <option value="active">{tp('statuses.active')}</option>
+                    <option value="completed">{tp('statuses.completed')}</option>
+                    <option value="paused">{tp('statuses.paused')}</option>
                   </select>
                   <input
                     type="number" min={0} step={100}
                     value={editBudget} onChange={e => setEditBudget(e.target.value)}
-                    placeholder="Budget (€)"
+                    placeholder={tp('budgetPlaceholder')}
                     style={{
                       padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border)',
                       background: 'var(--bg2)', fontSize: 12,
@@ -573,7 +579,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                 transition: 'all 0.15s ease',
               }}>
                 <Icon size={13} />
-                {tab.label}
+                {tp(`tabs.${tab.key}`)}
                 {count !== null && count > 0 && (
                   <span className="mono" style={{
                     fontSize: 10, padding: '1px 6px', borderRadius: 10,
@@ -594,10 +600,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             {/* Quick stats row */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
               {[
-                { label: 'Progress', value: `${stats.progress}%`, sub: `${stats.doneMs}/${stats.totalMs} milestones`, icon: CheckCircle2, color: stats.progress >= 80 ? 'var(--g)' : stats.progress >= 50 ? 'var(--accent)' : 'var(--y)' },
-                { label: 'Budget', value: `€${(stats.budget / 1000).toFixed(0)}K`, sub: `${stats.burn}% spent`, icon: DollarSign, color: 'var(--accent)' },
-                { label: 'Impact Entries', value: project.impactMetrics.length, sub: 'records', icon: TrendingUp, color: 'var(--g)' },
-                { label: 'Days Active', value: stats.days, sub: project.endDate ? 'total duration' : 'so far', icon: Clock, color: 'var(--p)' },
+                { label: tp('stats.progress'), value: `${stats.progress}%`, sub: tp('stats.milestonesSummary', { done: stats.doneMs, total: stats.totalMs }), icon: CheckCircle2, color: stats.progress >= 80 ? 'var(--g)' : stats.progress >= 50 ? 'var(--accent)' : 'var(--y)' },
+                { label: tp('stats.budget'), value: `€${(stats.budget / 1000).toFixed(0)}K`, sub: tp('stats.burnPercent', { burn: stats.burn }), icon: DollarSign, color: 'var(--accent)' },
+                { label: tp('stats.impactEntries'), value: project.impactMetrics.length, sub: tp('stats.records'), icon: TrendingUp, color: 'var(--g)' },
+                { label: tp('stats.daysActive'), value: stats.days, sub: project.endDate ? tp('stats.totalDuration') : tp('stats.soFar'), icon: Clock, color: 'var(--p)' },
               ].map(s => (
                 <div key={s.label} style={{
                   background: 'var(--panel)', border: '1px solid var(--border)',
@@ -629,7 +635,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                 boxShadow: 'var(--shadow-sm)',
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600 }}>Milestone Progress</div>
+                  <div style={{ fontSize: 13, fontWeight: 600 }}>{tp('sections.milestoneProgress')}</div>
                   <div className="mono" style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>
                     {stats.progress}%
                   </div>
@@ -642,7 +648,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                   }} />
                 </div>
                 <div style={{ fontSize: 11.5, color: 'var(--txt3)', marginTop: 8 }}>
-                  {stats.doneMs} of {stats.totalMs} milestones completed
+                  {tp('stats.milestonesCompleted', { done: stats.doneMs, total: stats.totalMs })}
                 </div>
               </div>
 
@@ -652,7 +658,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                 boxShadow: 'var(--shadow-sm)',
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600 }}>Budget Burn</div>
+                  <div style={{ fontSize: 13, fontWeight: 600 }}>{tp('sections.budgetBurn')}</div>
                   <div className="mono" style={{ fontSize: 13, fontWeight: 700, color: stats.burn > 100 ? 'var(--r)' : 'var(--txt)' }}>
                     {stats.burn}%
                   </div>
@@ -665,7 +671,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                   }} />
                 </div>
                 <div style={{ fontSize: 11.5, color: 'var(--txt3)', marginTop: 8 }}>
-                  €{stats.spent.toLocaleString()} of €{stats.budget.toLocaleString()} spent
+                  {tp('stats.budgetSpent', { spent: stats.spent.toLocaleString(), budget: stats.budget.toLocaleString() })}
                 </div>
               </div>
             </div>
@@ -676,7 +682,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               borderRadius: 12, padding: '20px 24px',
               boxShadow: 'var(--shadow-sm)',
             }}>
-              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>Project Details</div>
+              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>{tp('sections.projectDetails')}</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 {[
                   { icon: Tag,      label: t('fields.category'), value: project.category },
@@ -735,12 +741,12 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               borderRadius: 12, padding: '14px 18px',
               boxShadow: 'var(--shadow-sm)',
             }}>
-              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Add Milestone</div>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>{tp('sections.addMilestone')}</div>
               <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr auto', gap: 8 }}>
                 <input
                   value={newMsTitle}
                   onChange={e => setNewMsTitle(e.target.value)}
-                  placeholder="Milestone title"
+                  placeholder={tp('milestones.titlePlaceholder')}
                   style={{
                     padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)',
                     background: 'var(--bg2)', fontSize: 13, fontFamily: 'inherit',
@@ -767,7 +773,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                     fontFamily: 'inherit', opacity: addingMs ? 0.6 : 1,
                   }}
                 >
-                  <Plus size={13} /> Add
+                  <Plus size={13} /> {tp('milestones.addBtn')}
                 </button>
               </div>
             </div>
@@ -779,11 +785,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               boxShadow: 'var(--shadow-sm)',
             }}>
               <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>
-                Milestones ({project.milestones.length})
+                {tp('tabs.milestones')} ({project.milestones.length})
               </div>
               {project.milestones.length === 0 ? (
                 <div style={{ fontSize: 13, color: 'var(--txt3)', padding: '20px 0', textAlign: 'center' }}>
-                  No milestones yet. Add your first one above.
+                  {tp('milestones.emptyHint')}
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -798,7 +804,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                       }}>
                         <button
                           onClick={() => handleToggleMilestone(m)}
-                          aria-label={done ? 'Mark pending' : 'Mark completed'}
+                          aria-label={done ? tp('milestones.markPending') : tp('milestones.markCompleted')}
                           style={{
                             background: 'transparent', border: 'none', cursor: 'pointer',
                             padding: 0, flexShrink: 0, color: done ? 'var(--g)' : 'var(--txt3)',
@@ -820,18 +826,18 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                               fontWeight: overdue ? 600 : 400,
                             }}>
                               <Calendar size={10} /> {formatDate(m.dueDate)}
-                              {overdue && ' · overdue'}
+                              {overdue && ` · ${tp('milestones.overdueLabel')}`}
                             </span>
                             {m.completedAt && (
                               <span style={{ fontSize: 11, color: 'var(--g-txt)' }}>
-                                completed {formatDate(m.completedAt)}
+                                {tp('milestones.completedLabel', { date: formatDate(m.completedAt) })}
                               </span>
                             )}
                           </div>
                         </div>
                         <button
                           onClick={() => handleDeleteMilestone(m.id)}
-                          aria-label="Delete milestone"
+                          aria-label={tp('milestones.deleteAria')}
                           style={{
                             background: 'transparent', border: 'none', cursor: 'pointer',
                             padding: 6, borderRadius: 6, color: 'var(--txt3)',
@@ -858,7 +864,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               borderRadius: 12, padding: '14px 18px',
               boxShadow: 'var(--shadow-sm)',
             }}>
-              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Record Impact</div>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>{tp('sections.recordImpact')}</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 2fr auto', gap: 8 }}>
                 <select
                   value={newMetricType}
@@ -869,14 +875,14 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                   }}
                 >
                   {IMPACT_TYPES.map(it => (
-                    <option key={it.key} value={it.key}>{it.label}</option>
+                    <option key={it.key} value={it.key}>{tp(`impact.types.${it.key}`)}</option>
                   ))}
                 </select>
                 <input
                   type="number" min={0} step="any"
                   value={newMetricValue}
                   onChange={e => setNewMetricValue(e.target.value)}
-                  placeholder="Value"
+                  placeholder={tp('impact.valuePlaceholder')}
                   style={{
                     padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)',
                     background: 'var(--bg2)', fontSize: 13, fontFamily: 'inherit',
@@ -885,7 +891,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                 <input
                   value={newMetricNotes}
                   onChange={e => setNewMetricNotes(e.target.value)}
-                  placeholder="Notes (optional)"
+                  placeholder={tp('impact.notesPlaceholder')}
                   style={{
                     padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)',
                     background: 'var(--bg2)', fontSize: 13, fontFamily: 'inherit',
@@ -903,7 +909,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                     fontFamily: 'inherit', opacity: addingMetric ? 0.6 : 1,
                   }}
                 >
-                  <Plus size={13} /> Record
+                  <Plus size={13} /> {tp('impact.recordBtn')}
                 </button>
               </div>
             </div>
@@ -925,7 +931,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                       boxShadow: 'var(--shadow-sm)',
                     }}>
                       <div style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 4 }}>
-                        {getImpactLabel(type)}
+                        {getImpactLabel(type, tp)}
                       </div>
                       <div className="mono" style={{ fontSize: 20, fontWeight: 700 }}>
                         {formatImpactValue(type, agg.value, agg.unit)}
@@ -943,11 +949,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               boxShadow: 'var(--shadow-sm)',
             }}>
               <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>
-                Impact Records ({project.impactMetrics.length})
+                {tp('sections.impactRecords')} ({project.impactMetrics.length})
               </div>
               {project.impactMetrics.length === 0 ? (
                 <div style={{ fontSize: 13, color: 'var(--txt3)', padding: '20px 0', textAlign: 'center' }}>
-                  No impact recorded yet. Log your first metric above.
+                  {tp('impact.emptyHint')}
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -967,7 +973,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>
-                          {getImpactLabel(m.metricType)}
+                          {getImpactLabel(m.metricType, tp)}
                         </div>
                         {m.notes && (
                           <div style={{ fontSize: 11.5, color: 'var(--txt3)', marginTop: 2, lineHeight: 1.5 }}>
@@ -997,11 +1003,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             boxShadow: 'var(--shadow-sm)',
           }}>
             <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>
-              Linked Contacts ({project.contactProjects.length})
+              {tp('sections.linkedContacts')} ({project.contactProjects.length})
             </div>
             {project.contactProjects.length === 0 ? (
               <div style={{ fontSize: 13, color: 'var(--txt3)', padding: '20px 0', textAlign: 'center' }}>
-                No contacts linked yet.
+                {tp('contacts.emptyHint')}
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -1048,10 +1054,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             {/* Deal KPI strip */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
               {[
-                { label: 'Total Pipeline', value: `$${Math.round(deals.filter(d => d.status === 'open').reduce((s, d) => s + d.valueCents, 0) / 100).toLocaleString()}`, color: 'var(--accent)' },
-                { label: 'Weighted', value: `$${Math.round(deals.filter(d => d.status === 'open').reduce((s, d) => s + (d.valueCents * d.probability) / 100, 0) / 100).toLocaleString()}`, color: 'var(--p)' },
-                { label: 'Won', value: String(deals.filter(d => d.status === 'won').length), color: 'var(--g)' },
-                { label: 'Open', value: String(deals.filter(d => d.status === 'open').length), color: 'var(--b-txt)' },
+                { label: tp('stats.totalPipeline'), value: `$${Math.round(deals.filter(d => d.status === 'open').reduce((s, d) => s + d.valueCents, 0) / 100).toLocaleString()}`, color: 'var(--accent)' },
+                { label: tp('stats.weighted'), value: `$${Math.round(deals.filter(d => d.status === 'open').reduce((s, d) => s + (d.valueCents * d.probability) / 100, 0) / 100).toLocaleString()}`, color: 'var(--p)' },
+                { label: tp('stats.won'), value: String(deals.filter(d => d.status === 'won').length), color: 'var(--g)' },
+                { label: tp('stats.open'), value: String(deals.filter(d => d.status === 'open').length), color: 'var(--b-txt)' },
               ].map(k => (
                 <div key={k.label} style={{
                   background: 'var(--panel)', border: '1px solid var(--border)',
@@ -1073,12 +1079,12 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               boxShadow: 'var(--shadow-sm)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                <span style={{ fontSize: 14, fontWeight: 600 }}>Linked Deals ({deals.length})</span>
+                <span style={{ fontSize: 14, fontWeight: 600 }}>{tp('sections.linkedDeals')} ({deals.length})</span>
                 <Link href="/deals" style={{
                   fontSize: 11, fontWeight: 600, color: 'var(--accent)',
                   textDecoration: 'none',
                 }}>
-                  Open deals board →
+                  {tp('deals.openBoard')}
                 </Link>
               </div>
               {dealsQuery.loading ? (
@@ -1087,7 +1093,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                 </div>
               ) : deals.length === 0 ? (
                 <div style={{ fontSize: 13, color: 'var(--txt3)', padding: '20px 0', textAlign: 'center' }}>
-                  No deals linked to this project yet.
+                  {tp('deals.emptyHint')}
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

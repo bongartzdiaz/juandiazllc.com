@@ -217,15 +217,32 @@ export default function PropertiesPage() {
     return m
   }, [taxonomy])
 
+  // Translate a taxonomy option by its stable `value` code. The taxonomy API
+  // serves English labels baked into lib/philly/constants — those never went
+  // through i18n, so e.g. the property-type filter showed "Houses/Apartments"
+  // even in FR/NL/DE/ES. This looks up properties.taxonomy.<kind>.<value> and
+  // falls back to the English label when a key is missing, so the dropdown is
+  // never blank. (Districts stay as-is — they're proper nouns.)
+  const taxLabel = useCallback(
+    (kind: 'types' | 'subtypes' | 'listingTypes', value: string, fallback: string) => {
+      if (!value) return fallback
+      const key = `taxonomy.${kind}.${value}`
+      return t.has(key) ? t(key) : fallback
+    },
+    [t],
+  )
+
   const subtypeOptions = useMemo(() => {
-    if (!type || !taxonomy) return [{ value: '', label: 'All Subtypes' }]
-    return [{ value: '', label: 'All Subtypes' }, ...(taxonomy.subtypes[type] ?? [])]
-  }, [type, taxonomy])
+    const all = { value: '', label: t('filters.allSubtypes') }
+    if (!type || !taxonomy) return [all]
+    return [all, ...(taxonomy.subtypes[type] ?? [])]
+  }, [type, taxonomy, t])
 
   const addSubtypeOptions = useMemo(() => {
-    if (!taxonomy) return [{ value: '', label: 'All Subtypes' }]
-    return [{ value: '', label: 'All Subtypes' }, ...(taxonomy.subtypes[addType] ?? [])]
-  }, [addType, taxonomy])
+    const all = { value: '', label: t('filters.allSubtypes') }
+    if (!taxonomy) return [all]
+    return [all, ...(taxonomy.subtypes[addType] ?? [])]
+  }, [addType, taxonomy, t])
 
   // Fetch taxonomy once on mount
   useEffect(() => {
@@ -371,13 +388,13 @@ export default function PropertiesPage() {
 
   return (
     <>
-      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => setShowAdd(true)} addLabel="Property" />
+      <Topbar title={t('title')} sub={t('subtitle')} onAdd={() => setShowAdd(true)} addLabel={t('addLabel')} />
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="folder" label="Total Properties" value={String(total)} />
-          <KpiCard icon="dollar-sign" label="Portfolio Value" value={`€${(totalValue / 100).toLocaleString()}`} />
-          <KpiCard icon="target" label="Available" value={String(available)} />
-          <KpiCard icon="chart" label="Total Viewings" value={String(properties.reduce((s, p) => s + p._count.viewings, 0))} />
+          <KpiCard icon="folder" label={t('kpis.totalProperties')} value={String(total)} />
+          <KpiCard icon="dollar-sign" label={t('kpis.portfolioValue')} value={`€${(totalValue / 100).toLocaleString()}`} />
+          <KpiCard icon="target" label={t('kpis.available')} value={String(available)} />
+          <KpiCard icon="chart" label={t('kpis.totalViewings')} value={String(properties.reduce((s, p) => s + p._count.viewings, 0))} />
         </div>
 
         {/* Listing type tabs — For Sale / For Rent */}
@@ -398,7 +415,7 @@ export default function PropertiesPage() {
                 boxShadow: listingType === lt.value ? 'var(--shadow-sm)' : 'none',
                 fontFamily: 'inherit',
               }}
-            >{lt.label}</button>
+            >{taxLabel('listingTypes', lt.value, lt.label)}</button>
           ))}
         </div>
 
@@ -409,7 +426,7 @@ export default function PropertiesPage() {
             <input
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(1) }}
-              placeholder="Search title, address, city, town..."
+              placeholder={t('filters.searchPlaceholder')}
               style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', outline: 'none', width: '100%' }}
             />
           </div>
@@ -417,7 +434,7 @@ export default function PropertiesPage() {
           <div style={selectBarStyle}>
             <MapPin size={13} style={{ color: 'var(--txt3)' }} />
             <select value={district} onChange={e => { setDistrict(e.target.value); setPage(1) }} style={selectStyle}>
-              <option value="">All {taxonomy?.countryLabel ?? 'Locations'}</option>
+              <option value="">{taxonomy?.countryLabel ? t('filters.allLocationsNamed', { name: taxonomy.countryLabel }) : t('filters.allLocations')}</option>
               {districts.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
             </select>
           </div>
@@ -425,15 +442,15 @@ export default function PropertiesPage() {
           <div style={selectBarStyle}>
             <Tag size={13} style={{ color: 'var(--txt3)' }} />
             <select value={type} onChange={e => { setType(e.target.value); setPage(1) }} style={selectStyle}>
-              <option value="">All Types</option>
-              {propertyTypes.map(pt => <option key={pt.value} value={pt.value}>{pt.label}</option>)}
+              <option value="">{t('filters.allTypes')}</option>
+              {propertyTypes.map(pt => <option key={pt.value} value={pt.value}>{taxLabel('types', pt.value, pt.label)}</option>)}
             </select>
           </div>
 
           {type && (
             <div style={selectBarStyle}>
               <select value={subtype} onChange={e => { setSubtype(e.target.value); setPage(1) }} style={selectStyle}>
-                {subtypeOptions.map(s => <option key={s.value || 'all'} value={s.value}>{s.label}</option>)}
+                {subtypeOptions.map(s => <option key={s.value || 'all'} value={s.value}>{taxLabel('subtypes', s.value, s.label)}</option>)}
               </select>
             </div>
           )}
@@ -441,11 +458,11 @@ export default function PropertiesPage() {
           <div style={selectBarStyle}>
             <Filter size={13} style={{ color: 'var(--txt3)' }} />
             <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} style={selectStyle}>
-              <option value="">All Statuses</option>
-              <option value="available">Available</option>
-              <option value="under_contract">Under Contract</option>
-              <option value="sold">Sold</option>
-              <option value="rented">Rented</option>
+              <option value="">{t('filters.allStatuses')}</option>
+              <option value="available">{t('statuses.available')}</option>
+              <option value="under_contract">{t('statuses.under_contract')}</option>
+              <option value="sold">{t('statuses.sold')}</option>
+              <option value="rented">{t('statuses.rented')}</option>
             </select>
           </div>
         </div>
@@ -482,7 +499,7 @@ export default function PropertiesPage() {
               border: '1px solid var(--border)', background: 'var(--panel)',
               fontSize: 11, color: 'var(--txt3)', textDecoration: 'none',
             }}
-          >Customize filters</Link>
+          >{t('filters.customize')}</Link>
           {(district || type || subtype || statusFilter || bankOwned || resaleOnly || search) && (
             <button
               onClick={resetFilters}
@@ -492,7 +509,7 @@ export default function PropertiesPage() {
                 fontSize: 11, color: 'var(--txt2)', cursor: 'pointer',
                 fontFamily: 'inherit',
               }}
-            >Clear filters</button>
+            >{t('filters.clear')}</button>
           )}
         </div>
 
@@ -501,7 +518,7 @@ export default function PropertiesPage() {
           <button
             type="button"
             onClick={() => setFilterOpen(true)}
-            aria-label="Open advanced filter builder"
+            aria-label={t('filters.openAdvanced')}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
               padding: '5px 12px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
@@ -520,7 +537,7 @@ export default function PropertiesPage() {
             <button
               type="button"
               onClick={() => setFilterSpec(null)}
-              aria-label="Clear advanced filter"
+              aria-label={t('filters.clearAdvanced')}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5,
                 padding: '5px 10px', borderRadius: 7, fontSize: 11.5, fontWeight: 600,
@@ -637,7 +654,7 @@ export default function PropertiesPage() {
                     )}
                     {prop.subtype && (
                       <span style={{ padding: '2px 7px', borderRadius: 5, fontSize: 9, fontWeight: 600, background: 'var(--bg2)', color: 'var(--txt2)' }}>
-                        {subtypeLabel[prop.subtype] ?? prop.subtype}
+                        {taxLabel('subtypes', prop.subtype, subtypeLabel[prop.subtype] ?? prop.subtype)}
                       </span>
                     )}
                     {prop.isBankOwned && (
@@ -691,11 +708,11 @@ export default function PropertiesPage() {
               padding: '24px 28px', width: 480, maxHeight: '85vh', overflowY: 'auto',
             }}
           >
-            <div id="property-add-title" style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>Add Property</div>
+            <div id="property-add-title" style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{t('form.title')}</div>
             <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>Create a new {taxonomy?.countryLabel ?? ''} property listing</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Listing Type</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.listingType')}</label>
                 <div style={{ display: 'flex', gap: 6 }}>
                   {listingTypes.map(lt => (
                     <button key={lt.value} onClick={() => setAddListingType(lt.value as 'sale' | 'rent')} style={{
@@ -704,21 +721,21 @@ export default function PropertiesPage() {
                       background: addListingType === lt.value ? 'var(--accent-bg)' : 'var(--bg2)',
                       color: addListingType === lt.value ? 'var(--accent-txt)' : 'var(--txt2)',
                       fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-                    }}>{lt.label}</button>
+                    }}>{taxLabel('listingTypes', lt.value, lt.label)}</button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Title</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.propertyTitle')}</label>
                 <input value={addTitle} onChange={e => setAddTitle(e.target.value)} style={inputStyle} />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>District</label>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.district')}</label>
                   <select value={addDistrict} onChange={e => setAddDistrict(e.target.value)} style={inputStyle}>
-                    <option value="">— Select —</option>
+                    <option value="">{t('form.selectDistrict')}</option>
                     {districts.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
                   </select>
                 </div>
@@ -729,7 +746,7 @@ export default function PropertiesPage() {
               </div>
 
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Address</label>
+                <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.address')}</label>
                 <input value={addAddress} onChange={e => setAddAddress(e.target.value)} style={inputStyle} />
               </div>
               <div>
@@ -741,13 +758,13 @@ export default function PropertiesPage() {
                 <div>
                   <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Type</label>
                   <select value={addType} onChange={e => setAddType(e.target.value)} style={inputStyle}>
-                    {propertyTypes.map(pt => <option key={pt.value} value={pt.value}>{pt.label}</option>)}
+                    {propertyTypes.map(pt => <option key={pt.value} value={pt.value}>{taxLabel('types', pt.value, pt.label)}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Subtype</label>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.subtype')}</label>
                   <select value={addSubtype} onChange={e => setAddSubtype(e.target.value)} style={inputStyle}>
-                    {addSubtypeOptions.map(s => <option key={s.value || 'all'} value={s.value}>{s.label}</option>)}
+                    {addSubtypeOptions.map(s => <option key={s.value || 'all'} value={s.value}>{taxLabel('subtypes', s.value, s.label)}</option>)}
                   </select>
                 </div>
               </div>
@@ -761,15 +778,15 @@ export default function PropertiesPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Bedrooms</label>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.bedrooms')}</label>
                   <input type="number" value={addBedrooms} onChange={e => setAddBedrooms(e.target.value)} style={inputStyle} />
                 </div>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Bathrooms</label>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.bathrooms')}</label>
                   <input type="number" value={addBathrooms} onChange={e => setAddBathrooms(e.target.value)} style={inputStyle} />
                 </div>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Sqm</label>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.sqm')}</label>
                   <input type="number" value={addSqft} onChange={e => setAddSqft(e.target.value)} style={inputStyle} />
                 </div>
               </div>
@@ -778,13 +795,13 @@ export default function PropertiesPage() {
                 {flags.find(f => f.key === 'isBankOwned') && (
                   <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--txt2)', cursor: 'pointer' }}>
                     <input type="checkbox" checked={addBankOwned} onChange={e => setAddBankOwned(e.target.checked)} style={{ accentColor: 'var(--accent)', cursor: 'pointer' }} />
-                    {flags.find(f => f.key === 'isBankOwned')?.label ?? 'Bank Owned'}
+                    {flags.find(f => f.key === 'isBankOwned')?.label ?? t('form.bankOwned')}
                   </label>
                 )}
                 {flags.find(f => f.key === 'isResale') && (
                   <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--txt2)', cursor: 'pointer' }}>
                     <input type="checkbox" checked={addResale} onChange={e => setAddResale(e.target.checked)} style={{ accentColor: 'var(--accent)', cursor: 'pointer' }} />
-                    {flags.find(f => f.key === 'isResale')?.label ?? 'Resale'}
+                    {flags.find(f => f.key === 'isResale')?.label ?? t('form.resale')}
                   </label>
                 )}
               </div>
@@ -802,7 +819,7 @@ export default function PropertiesPage() {
               background: 'var(--accent)', color: '#fff',
               fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit', opacity: saving ? 0.6 : 1,
-            }}>{saving ? 'Saving...' : 'Add Property'}</button>
+            }}>{saving ? t('form.saving') : t('form.submit')}</button>
           </div>
         </div>
       )}
@@ -822,14 +839,14 @@ export default function PropertiesPage() {
         if (!p) return null
         const fullAddress = [p.address, p.town, p.city].filter(Boolean).join(', ')
         const items: ContextMenuItem[] = [
-          { kind: 'action', label: 'Open', icon: ExternalLink, shortcut: 'Enter',
+          { kind: 'action', label: t('contextMenu.open'), icon: ExternalLink, shortcut: 'Enter',
             onClick: () => router.push(`/properties/${p.id}`) },
-          { kind: 'action', label: 'Quick view', icon: Eye,
+          { kind: 'action', label: t('contextMenu.quickView'), icon: Eye,
             onClick: () => setQuickViewId(p.id) },
-          { kind: 'action', label: 'Valuation', icon: Calculator,
+          { kind: 'action', label: t('contextMenu.valuation'), icon: Calculator,
             onClick: () => router.push(`/properties/${p.id}/valuation`) },
           { kind: 'separator' },
-          { kind: 'action', label: 'Copy address', icon: Copy,
+          { kind: 'action', label: t('contextMenu.copyAddress'), icon: Copy,
             disabled: !fullAddress,
             onClick: () => {
               if (!fullAddress) { addToast(t('toasts.noAddress'), 'error'); return }
@@ -839,7 +856,7 @@ export default function PropertiesPage() {
               )
             } },
           { kind: 'separator' },
-          { kind: 'action', label: 'Delete', icon: Trash2, destructive: true,
+          { kind: 'action', label: t('contextMenu.delete'), icon: Trash2, destructive: true,
             onClick: async () => {
               if (!confirm(t('confirms.delete', { title: p.title }))) return
               try {

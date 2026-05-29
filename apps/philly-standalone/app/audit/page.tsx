@@ -109,7 +109,7 @@ export default function AuditLogPage() {
                 outline: 'none',
               }}
             >
-              <option value="">All entities</option>
+              <option value="">{t('filters.allEntities')}</option>
               {ENTITY_OPTIONS.map(([value, label]) => (
                 <option key={value} value={value}>{label}</option>
               ))}
@@ -132,10 +132,10 @@ export default function AuditLogPage() {
                 outline: 'none',
               }}
             >
-              <option value="">All actions</option>
-              <option value="create">Create</option>
-              <option value="update">Update</option>
-              <option value="delete">Delete</option>
+              <option value="">{t('filters.allActions')}</option>
+              <option value="create">{t('filters.create')}</option>
+              <option value="update">{t('filters.update')}</option>
+              <option value="delete">{t('filters.delete')}</option>
             </select>
           </div>
 
@@ -155,10 +155,10 @@ export default function AuditLogPage() {
                 outline: 'none',
               }}
             >
-              <option value="">All time</option>
-              <option value="1d">Last 24 hours</option>
-              <option value="7d">Last 7 days</option>
-              <option value="30d">Last 30 days</option>
+              <option value="">{t('filters.allTime')}</option>
+              <option value="1d">{t('filters.last24h')}</option>
+              <option value="7d">{t('filters.last7d')}</option>
+              <option value="30d">{t('filters.last30d')}</option>
             </select>
           </div>
         </div>
@@ -179,21 +179,21 @@ export default function AuditLogPage() {
             letterSpacing: '0.06em', color: 'var(--txt3)',
           }}>
             <span aria-hidden />
-            <span>Timestamp</span>
-            <span>Action</span>
-            <span>Entity</span>
-            <span>Changes</span>
-            <span>User</span>
+            <span>{t('columns.timestamp')}</span>
+            <span>{t('columns.action')}</span>
+            <span>{t('columns.entity')}</span>
+            <span>{t('columns.changes')}</span>
+            <span>{t('columns.user')}</span>
           </div>
 
           {/* Rows */}
           {loading ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-              Loading audit logs...
+              {t('loading')}
             </div>
           ) : logs.length === 0 ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-              No audit logs found.
+              {t('empty')}
             </div>
           ) : (
             logs.map((log, idx) => {
@@ -286,7 +286,7 @@ export default function AuditLogPage() {
                       <ChangesDiff changesStr={log.changes} />
                       {log.entityId && (
                         <div style={{ marginTop: 10, color: 'var(--txt3)', fontSize: 10.5 }}>
-                          entity id: <span style={{ color: 'var(--txt2)' }}>{log.entityId}</span>
+                          {t('diff.entityId')}: <span style={{ color: 'var(--txt2)' }}>{log.entityId}</span>
                         </div>
                       )}
                     </div>
@@ -321,6 +321,7 @@ function formatChanges(changesStr: string): string {
 }
 
 function ChangesDiff({ changesStr }: { changesStr: string }) {
+  const t = useTranslations('audit')
   let changes: Record<string, { old: unknown; new: unknown }> | null = null
   try {
     const parsed = JSON.parse(changesStr || '{}')
@@ -331,7 +332,7 @@ function ChangesDiff({ changesStr }: { changesStr: string }) {
 
   const keys = changes ? Object.keys(changes) : []
   if (keys.length === 0) {
-    return <span style={{ color: 'var(--txt3)' }}>No field-level details recorded.</span>
+    return <span style={{ color: 'var(--txt3)' }}>{t('diff.noDetails')}</span>
   }
 
   const render = (v: unknown) => {
@@ -349,9 +350,9 @@ function ChangesDiff({ changesStr }: { changesStr: string }) {
       border: '1px solid var(--border)', borderRadius: 8,
       padding: '10px 14px',
     }}>
-      <div style={{ color: 'var(--txt3)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '.06em' }}>Field</div>
-      <div style={{ color: 'var(--r-txt)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '.06em' }}>Before</div>
-      <div style={{ color: 'var(--g-txt)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '.06em' }}>After</div>
+      <div style={{ color: 'var(--txt3)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '.06em' }}>{t('diff.field')}</div>
+      <div style={{ color: 'var(--r-txt)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '.06em' }}>{t('diff.before')}</div>
+      <div style={{ color: 'var(--g-txt)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '.06em' }}>{t('diff.after')}</div>
       {keys.map((k) => (
         <Fragment key={k}>
           <div style={{ color: 'var(--txt)', fontWeight: 500 }}>{k}</div>

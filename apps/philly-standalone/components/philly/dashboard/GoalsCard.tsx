@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Target, Check, AlertTriangle, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface Goal {
   label: string
@@ -50,10 +51,12 @@ function formatValue(val: number, goal: Goal): string {
   return `${p}${val.toLocaleString('nl-NL')}${s}`
 }
 
-function getStatus(pct: number): { label: string; color: string; bg: string; Icon: typeof Check } {
-  if (pct >= 85) return { label: 'On Track', color: 'var(--g-txt)', bg: 'var(--g-bg)', Icon: Check }
-  if (pct >= 60) return { label: 'At Risk', color: 'var(--y-txt)', bg: 'var(--y-bg)', Icon: AlertTriangle }
-  return { label: 'Behind', color: 'var(--r-txt)', bg: 'var(--r-bg)', Icon: X }
+// Status labels live in i18n now; this helper returns a stable status KEY so
+// the component can call t(`status.${key}`) at render time.
+function getStatus(pct: number): { key: 'onTrack' | 'atRisk' | 'behind'; color: string; bg: string; Icon: typeof Check } {
+  if (pct >= 85) return { key: 'onTrack', color: 'var(--g-txt)', bg: 'var(--g-bg)', Icon: Check }
+  if (pct >= 60) return { key: 'atRisk', color: 'var(--y-txt)', bg: 'var(--y-bg)', Icon: AlertTriangle }
+  return { key: 'behind', color: 'var(--r-txt)', bg: 'var(--r-bg)', Icon: X }
 }
 
 function progressColor(pct: number): string {
@@ -65,6 +68,7 @@ function progressColor(pct: number): string {
 const STORAGE_KEY = 'pai-goals'
 
 export function GoalsCard({ industry }: { industry: string }) {
+  const t = useTranslations('dashboard.goals')
   const defaults = useMemo(() => getDefaultGoals(industry), [industry])
   const [goals, setGoals] = useState<Goal[]>(defaults)
   const [editingIdx, setEditingIdx] = useState<number | null>(null)
@@ -132,7 +136,7 @@ export function GoalsCard({ industry }: { industry: string }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Target size={15} color="var(--txt2)" />
-          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em' }}>Goals</span>
+          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em' }}>{t('title')}</span>
         </div>
         <span className="mono" style={{ fontSize: 11, color: 'var(--txt3)', fontWeight: 500 }}>
           {daysRemaining} days remaining
@@ -157,7 +161,7 @@ export function GoalsCard({ industry }: { industry: string }) {
                     borderRadius: 4, background: status.bg, color: status.color,
                     textTransform: 'uppercase', letterSpacing: '0.03em',
                   }}>
-                    {status.label}
+                    {t(`status.${status.key}`)}
                   </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>

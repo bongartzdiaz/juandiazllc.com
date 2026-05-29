@@ -88,6 +88,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
   const { role, dashboardSections, loading: sectionsLoading } = useMySections()
   const t = useTranslations('nav')
   const tc = useTranslations('common')
+  const tSide = useTranslations('layout.sidebar')
 
   // Hide any nav item whose section slug is not in the user's allow-list.
   // Items whose URL doesn't map to a known section (e.g. deep utility
@@ -189,8 +190,9 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
         }}>
           <div style={{
             width: 34, height: 34, borderRadius: 10,
-            // Industry-tinted brandmark: each industry uses its own accent paired
-            // with the universal --accent. Keeps it on-brand without hex literals.
+            // DEUS brandmark on industry-tinted gradient chip. The SVG
+            // mark (broken-circle "d" monogram) replaces the previous
+            // generic Lucide icon. 2026-05-27 brand-pass v2.
             background: industry === 'realestate'
               ? 'linear-gradient(135deg, var(--b) 0%, var(--accent) 100%)'
               : industry === 'hospitality'
@@ -198,15 +200,32 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
                 : 'linear-gradient(135deg, var(--accent) 0%, var(--g) 100%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: 'var(--shadow-sm)',
+            color: '#fff',
           }}>
-            {/* Icon is always white — the gradient is always saturated regardless of theme. */}
-            <LogoIcon size={17} color="#fff" strokeWidth={2.5} />
+            <img
+              src="/brand/deus-mark.svg"
+              alt="DEUS"
+              width={22}
+              height={22}
+              style={{ filter: 'brightness(0) invert(1)' }}
+            />
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 15.5, fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--txt)' }}>
-              Philly<span style={{ color: 'var(--accent)' }}>.</span>
+            <div style={{
+              fontSize: 15.5,
+              fontWeight: 700,
+              letterSpacing: '0.06em',
+              color: 'var(--txt)',
+              fontFamily: 'var(--font-red-hat-mono), "Red Hat Mono", monospace',
+            }}>
+              DEUS
             </div>
-            <div style={{ fontSize: 10, color: 'var(--txt3)', letterSpacing: '0.02em' }}>{config.label}</div>
+            <div style={{
+              fontSize: 10,
+              color: 'var(--txt3)',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+            }}>{config.label}</div>
           </div>
         </div>
 
@@ -261,7 +280,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
                   >
                     <Icon size={14} />
                     {cfg.label}
-                    {active && <span style={{ marginLeft: 'auto', fontSize: 10 }}>Active</span>}
+                    {active && <span style={{ marginLeft: 'auto', fontSize: 10 }}>{tSide('active')}</span>}
                   </button>
                 )
               })}

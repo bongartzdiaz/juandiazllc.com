@@ -81,19 +81,22 @@ function parseChecklist(json: string): ChecklistItem[] {
   } catch { return [] }
 }
 
-const DEFAULT_CHECKLIST: ChecklistItem[] = [
-  { label: 'Inspection scheduled', done: false },
-  { label: 'Appraisal ordered', done: false },
-  { label: 'Loan approval received', done: false },
-  { label: 'Title search completed', done: false },
-  { label: 'Insurance obtained', done: false },
-  { label: 'Final walkthrough', done: false },
-  { label: 'Closing documents signed', done: false },
-]
+function buildDefaultChecklist(tt: (k: string) => string): ChecklistItem[] {
+  return [
+    { label: tt('checklist.defaultItems.inspection'), done: false },
+    { label: tt('checklist.defaultItems.appraisal'), done: false },
+    { label: tt('checklist.defaultItems.loanApproval'), done: false },
+    { label: tt('checklist.defaultItems.titleSearch'), done: false },
+    { label: tt('checklist.defaultItems.insurance'), done: false },
+    { label: tt('checklist.defaultItems.walkthrough'), done: false },
+    { label: tt('checklist.defaultItems.closingDocs'), done: false },
+  ]
+}
 
 export default function TransactionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const t = useTranslations('transactions')
+  const tt = useTranslations('transactionDetail')
   const tConfirms = useTranslations('confirms')
   const tCommon = useTranslations('common')
   const confirm = useConfirm()
@@ -122,6 +125,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
   })
   useEntitySubscription('eSignature', fetchTx)
 
+  const DEFAULT_CHECKLIST = buildDefaultChecklist(tt)
   const checklist = tx ? parseChecklist(tx.checklistJson) : []
   const displayChecklist = checklist.length > 0 ? checklist : DEFAULT_CHECKLIST
   const completedCount = displayChecklist.filter(c => c.done).length
@@ -147,7 +151,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
       case 'salePrice':
       case 'earnestMoney': {
         const n = Math.round(parseFloat(editValue) * 100)
-        if (!isFinite(n) || n < 0) { addToast('Invalid amount', 'error'); return }
+        if (!isFinite(n) || n < 0) { addToast(tt('toasts.invalidAmount'), 'error'); return }
         patch[editField] = n
         break
       }
@@ -163,11 +167,11 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
         body: JSON.stringify(patch),
       })
       const j = await res.json().catch(() => ({}))
-      if (!res.ok) { addToast(j.error ?? 'Save failed', 'error'); return }
-      addToast('Saved', 'success')
+      if (!res.ok) { addToast(j.error ?? tt('toasts.saveFailed'), 'error'); return }
+      addToast(tt('toasts.saved'), 'success')
       setEditField(null)
       fetchTx()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(tt('toasts.networkError'), 'error') }
   }
 
   async function toggleChecklist(idx: number) {
@@ -180,9 +184,9 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ checklistJson: JSON.stringify(current) }),
       })
-      if (!res.ok) { addToast('Update failed', 'error'); return }
+      if (!res.ok) { addToast(tt('toasts.updateFailed'), 'error'); return }
       fetchTx()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(tt('toasts.networkError'), 'error') }
   }
 
   async function handleDelete() {
@@ -197,18 +201,18 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
     try {
       const res = await fetch(`/api/transactions/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {
-        addToast('Transaction deleted', 'success')
+        addToast(tt('toasts.deleted'), 'success')
         router.push('/transactions')
       } else {
         const j = await res.json().catch(() => ({}))
-        addToast(j.error ?? 'Delete failed', 'error')
+        addToast(j.error ?? tt('toasts.deleteFailed'), 'error')
       }
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(tt('toasts.networkError'), 'error') }
   }
 
   async function submitSignature() {
     if (!sigDocName.trim() || !sigName.trim() || !sigEmail.trim()) {
-      addToast('All fields required', 'error')
+      addToast(tt('toasts.allFieldsRequired'), 'error')
       return
     }
     setSigSaving(true)
@@ -224,12 +228,12 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
         }),
       })
       const j = await res.json().catch(() => ({}))
-      if (!res.ok) { addToast(j.error ?? 'Failed to request signature', 'error'); return }
-      addToast('Signature request created', 'success')
+      if (!res.ok) { addToast(j.error ?? tt('toasts.signatureFailed'), 'error'); return }
+      addToast(tt('toasts.signatureCreated'), 'success')
       setShowAddSig(false)
       setSigDocName(''); setSigName(''); setSigEmail('')
       fetchTx()
-    } catch { addToast('Network error', 'error') }
+    } catch { addToast(tt('toasts.networkError'), 'error') }
     finally { setSigSaving(false) }
   }
 
@@ -238,8 +242,8 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
   return (
     <>
       <Topbar
-        title={tx?.escrowNumber || 'Transaction Detail'}
-        sub={tx?.titleCompany || 'Loading...'}
+        title={tx?.escrowNumber || tt('titleFallback')}
+        sub={tx?.titleCompany || tt('common.loading')}
       />
       <div style={{ padding: '18px 24px 40px' }}>
 
@@ -248,13 +252,13 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
           fontSize: 12, fontWeight: 600, color: 'var(--accent)',
           textDecoration: 'none', marginBottom: 16,
         }}>
-          <ArrowLeft size={14} /> Back to Transactions
+          <ArrowLeft size={14} /> {tt('backToTransactions')}
         </Link>
 
         {loading ? (
-          <div style={{ padding: 60, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          <div style={{ padding: 60, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{tt('common.loading')}</div>
         ) : error || !tx ? (
-          <div style={{ padding: 60, textAlign: 'center', color: 'var(--r-txt)', fontSize: 13 }}>{error || 'Not found.'}</div>
+          <div style={{ padding: 60, textAlign: 'center', color: 'var(--r-txt)', fontSize: 13 }}>{error || tt('notFound')}</div>
         ) : (
           <>
             {/* Header */}
@@ -264,21 +268,21 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
             }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0, color: 'var(--txt)', letterSpacing: '-0.02em' }}>
-                  {tx.escrowNumber || 'No Escrow #'}
+                  {tx.escrowNumber || tt('escrowFallback')}
                 </h1>
                 <div style={{ fontSize: 12, color: 'var(--txt3)', marginTop: 4 }}>
-                  {tx.titleCompany || 'No title company'}
+                  {tx.titleCompany || tt('noTitleCompany')}
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 {editField === 'status' ? (
                   <select autoFocus value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveEdit}
                     style={{ ...inputStyle, width: 150 }}>
-                    <option value="pending">Pending</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="closing">Closing</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
+                    <option value="pending">{tt('statuses.pending')}</option>
+                    <option value="in_progress">{tt('statuses.inProgress')}</option>
+                    <option value="closing">{tt('statuses.closing')}</option>
+                    <option value="completed">{tt('statuses.completed')}</option>
+                    <option value="cancelled">{tt('statuses.cancelled')}</option>
                   </select>
                 ) : (
                   <span
@@ -293,10 +297,10 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                 {editField === 'type' ? (
                   <select autoFocus value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveEdit}
                     style={{ ...inputStyle, width: 130 }}>
-                    <option value="purchase">Purchase</option>
-                    <option value="sale">Sale</option>
-                    <option value="lease">Lease</option>
-                    <option value="rental">Rental</option>
+                    <option value="purchase">{tt('types.purchase')}</option>
+                    <option value="sale">{tt('types.sale')}</option>
+                    <option value="lease">{tt('types.lease')}</option>
+                    <option value="rental">{tt('types.rental')}</option>
                   </select>
                 ) : (
                   <span
@@ -324,11 +328,11 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                 border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 fontFamily: 'inherit',
               }}>
-                <PenTool size={13} /> Request Signature
+                <PenTool size={13} /> {tt('actions.requestSignature')}
               </button>
               <div style={{ flex: 1 }} />
               <button onClick={handleDelete} style={outlineBtn('var(--r-txt)', 'var(--r-border)')}>
-                <Trash2 size={12} /> Delete
+                <Trash2 size={12} /> {tt('actions.delete')}
               </button>
             </div>
 
@@ -343,52 +347,52 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                   padding: 20, borderRadius: 14, border: '1px solid var(--border)',
                   background: 'var(--panel)', boxShadow: 'var(--shadow-sm)',
                 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: 'var(--txt)' }}>Financial Details</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: 'var(--txt)' }}>{tt('sections.financial')}</div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 24px' }}>
                     <div>
-                      <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>Sale Price</div>
+                      <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>{tt('fields.salePrice')}</div>
                       {editField === 'salePrice' ? (
                         <InlineEdit value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} type="number" big />
                       ) : (
                         <div onClick={() => startEdit('salePrice', (tx.salePrice / 100).toString())}
                           className="mono"
                           style={{ fontSize: 22, fontWeight: 700, color: 'var(--accent)', cursor: 'pointer' }}
-                          title="Click to edit"
+                          title={tt('hints.clickToEdit')}
                         >
                           ${(tx.salePrice / 100).toLocaleString()}
                         </div>
                       )}
                     </div>
                     <div>
-                      <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>Earnest Money</div>
+                      <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>{tt('fields.earnestMoney')}</div>
                       {editField === 'earnestMoney' ? (
                         <InlineEdit value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} type="number" big />
                       ) : (
                         <div onClick={() => startEdit('earnestMoney', (tx.earnestMoney / 100).toString())}
                           className="mono"
                           style={{ fontSize: 22, fontWeight: 700, color: 'var(--txt)', cursor: 'pointer' }}
-                          title="Click to edit"
+                          title={tt('hints.clickToEdit')}
                         >
                           ${(tx.earnestMoney / 100).toLocaleString()}
                         </div>
                       )}
                     </div>
 
-                    <EditableField label="Escrow Number" field="escrowNumber" value={tx.escrowNumber}
+                    <EditableField label={tt('fields.escrowNumber')} field="escrowNumber" value={tx.escrowNumber}
                       editField={editField} editValue={editValue} setEditValue={setEditValue}
-                      startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} />
-                    <EditableField label="Title Company" field="titleCompany" value={tx.titleCompany}
+                      startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} clickToEditTitle={tt('hints.clickToEdit')} />
+                    <EditableField label={tt('fields.titleCompany')} field="titleCompany" value={tx.titleCompany}
                       editField={editField} editValue={editValue} setEditValue={setEditValue}
-                      startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} />
+                      startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} clickToEditTitle={tt('hints.clickToEdit')} />
 
-                    <EditableField label="Contract Date" field="contractDate"
+                    <EditableField label={tt('fields.contractDate')} field="contractDate"
                       value={tx.contractDate ? new Date(tx.contractDate).toISOString().slice(0, 10) : ''}
                       display={tx.contractDate ? new Date(tx.contractDate).toLocaleDateString() : '—'}
                       type="date"
                       editField={editField} editValue={editValue} setEditValue={setEditValue}
-                      startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} />
-                    <EditableField label="Closing Date" field="closingDate"
+                      startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} clickToEditTitle={tt('hints.clickToEdit')} />
+                    <EditableField label={tt('fields.closingDate')} field="closingDate"
                       value={tx.closingDate ? new Date(tx.closingDate).toISOString().slice(0, 10) : ''}
                       display={tx.closingDate ? new Date(tx.closingDate).toLocaleDateString() : '—'}
                       type="date"
@@ -404,7 +408,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>
-                      Closing Checklist ({completedCount}/{displayChecklist.length})
+                      {tt('sections.closingChecklist')} ({completedCount}/{displayChecklist.length})
                     </span>
                     <span className="mono" style={{
                       fontSize: 11, fontWeight: 700,
@@ -452,12 +456,12 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>
-                      <FileText size={14} style={{ verticalAlign: -2, marginRight: 6 }} /> Notes
+                      <FileText size={14} style={{ verticalAlign: -2, marginRight: 6 }} /> {tt('sections.notes')}
                     </span>
                     {editField !== 'notes' && (
                       <button onClick={() => startEdit('notes', tx.notes)}
                         style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 11, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <Edit2 size={11} /> Edit
+                        <Edit2 size={11} /> {tt('actions.edit')}
                       </button>
                     )}
                   </div>
@@ -467,13 +471,13 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                         style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.6 }}
                       />
                       <div style={{ display: 'flex', gap: 8, marginTop: 10, justifyContent: 'flex-end' }}>
-                        <button onClick={cancelEdit} style={outlineBtn('var(--txt2)', 'var(--border)')}>Cancel</button>
-                        <button onClick={saveEdit} style={primaryBtn}>Save</button>
+                        <button onClick={cancelEdit} style={outlineBtn('var(--txt2)', 'var(--border)')}>{tt('actions.cancel')}</button>
+                        <button onClick={saveEdit} style={primaryBtn}>{tt('actions.save')}</button>
                       </div>
                     </>
                   ) : (
                     <div style={{ fontSize: 13, lineHeight: 1.65, color: 'var(--txt2)', whiteSpace: 'pre-wrap', minHeight: 40 }}>
-                      {tx.notes?.trim() || 'No notes. Click Edit to add.'}
+                      {tx.notes?.trim() || tt('empty.noNotes')}
                     </div>
                   )}
                 </div>
@@ -483,28 +487,28 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
                 {/* Summary tiles */}
-                <SideCard title="Summary">
+                <SideCard title={tt('sections.summary')}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <StatRow icon={<DollarSign size={13} />} label="Sale Price" value={`$${(tx.salePrice / 100).toLocaleString()}`} />
-                    <StatRow icon={<DollarSign size={13} />} label="Earnest" value={`$${(tx.earnestMoney / 100).toLocaleString()}`} />
-                    <StatRow icon={<PenTool size={13} />} label="Signatures" value={String(tx._count?.signatures ?? 0)} />
-                    <StatRow icon={<Calendar size={13} />} label="Days Open" value={String(Math.max(1, Math.floor((Date.now() - new Date(tx.createdAt).getTime()) / 86400000)))} />
+                    <StatRow icon={<DollarSign size={13} />} label={tt('fields.salePrice')} value={`$${(tx.salePrice / 100).toLocaleString()}`} />
+                    <StatRow icon={<DollarSign size={13} />} label={tt('fields.earnest')} value={`$${(tx.earnestMoney / 100).toLocaleString()}`} />
+                    <StatRow icon={<PenTool size={13} />} label={tt('fields.signatures')} value={String(tx._count?.signatures ?? 0)} />
+                    <StatRow icon={<Calendar size={13} />} label={tt('fields.daysOpen')} value={String(Math.max(1, Math.floor((Date.now() - new Date(tx.createdAt).getTime()) / 86400000)))} />
                   </div>
                 </SideCard>
 
                 {/* Signatures */}
                 <SideCard
-                  title={`Signatures (${tx.signatures?.length ?? 0})`}
+                  title={`${tt('sections.signatures')} (${tx.signatures?.length ?? 0})`}
                   action={<button onClick={() => setShowAddSig(true)} style={{
                     background: 'transparent', border: 'none', color: 'var(--accent)',
                     fontSize: 11, fontWeight: 600, cursor: 'pointer',
                     display: 'flex', alignItems: 'center', gap: 3, fontFamily: 'inherit',
                   }}>
-                    <Plus size={11} /> Request
+                    <Plus size={11} /> {tt('actions.request')}
                   </button>}
                 >
                   {!tx.signatures?.length ? (
-                    <div style={{ fontSize: 11, color: 'var(--txt3)', padding: '6px 0' }}>No signature requests yet.</div>
+                    <div style={{ fontSize: 11, color: 'var(--txt3)', padding: '6px 0' }}>{tt('empty.noSignatures')}</div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {tx.signatures.map(sig => {
@@ -535,7 +539,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
 
                 {/* Linked deal/property */}
                 {(tx.dealId || tx.propertyId) && (
-                  <SideCard title="Linked">
+                  <SideCard title={tt('sections.linked')}>
                     {tx.dealId && (
                       <Link href={`/deals/${tx.dealId}`} style={{
                         display: 'flex', alignItems: 'center', gap: 8,
@@ -545,7 +549,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                       }}>
                         <Building2 size={13} style={{ color: 'var(--accent)' }} />
                         <span style={{ fontSize: 12, color: 'var(--accent)', fontWeight: 600 }}>
-                          View Deal →
+                          {tt('actions.viewDeal')}
                         </span>
                       </Link>
                     )}
@@ -557,7 +561,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                       }}>
                         <Building2 size={13} style={{ color: 'var(--accent)' }} />
                         <span style={{ fontSize: 12, color: 'var(--accent)', fontWeight: 600 }}>
-                          View Property →
+                          {tt('actions.viewProperty')}
                         </span>
                       </Link>
                     )}
@@ -585,23 +589,23 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
             padding: '24px 28px', width: 420, maxWidth: '90vw',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-              <div style={{ fontSize: 16, fontWeight: 700 }}>Request Signature</div>
+              <div style={{ fontSize: 16, fontWeight: 700 }}>{tt('modal.title')}</div>
               <button onClick={() => setShowAddSig(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--txt3)' }}>
                 <X size={16} />
               </button>
             </div>
             <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 16 }}>
-              Send a document for electronic signature
+              {tt('modal.subtitle')}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <FieldLabel label="Document Name">
-                <input value={sigDocName} onChange={e => setSigDocName(e.target.value)} placeholder="Purchase Agreement" style={inputStyle} />
+              <FieldLabel label={tt('fields.documentName')}>
+                <input value={sigDocName} onChange={e => setSigDocName(e.target.value)} placeholder={tt('modal.documentPlaceholder')} style={inputStyle} />
               </FieldLabel>
-              <FieldLabel label="Signer Name">
-                <input value={sigName} onChange={e => setSigName(e.target.value)} placeholder="John Smith" style={inputStyle} />
+              <FieldLabel label={tt('fields.signerName')}>
+                <input value={sigName} onChange={e => setSigName(e.target.value)} placeholder={tt('modal.signerNamePlaceholder')} style={inputStyle} />
               </FieldLabel>
-              <FieldLabel label="Signer Email">
-                <input type="email" value={sigEmail} onChange={e => setSigEmail(e.target.value)} placeholder="john@example.com" style={inputStyle} />
+              <FieldLabel label={tt('fields.signerEmail')}>
+                <input type="email" value={sigEmail} onChange={e => setSigEmail(e.target.value)} placeholder={tt('modal.signerEmailPlaceholder')} style={inputStyle} />
               </FieldLabel>
             </div>
             <button onClick={submitSignature} disabled={sigSaving} style={{
@@ -612,7 +616,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
               fontSize: 13, fontWeight: 600, cursor: sigSaving ? 'wait' : 'pointer',
               fontFamily: 'inherit',
             }}>
-              {sigSaving ? 'Sending…' : 'Send Signature Request'}
+              {sigSaving ? tt('actions.sending') : tt('actions.sendSignatureRequest')}
             </button>
           </div>
         </div>
@@ -693,12 +697,13 @@ function iconBtn(bg: string, color: string, border?: string): React.CSSPropertie
 }
 
 function EditableField({
-  label, field, value, display, editField, editValue, setEditValue, startEdit, onSave, onCancel, type,
+  label, field, value, display, editField, editValue, setEditValue, startEdit, onSave, onCancel, type, clickToEditTitle,
 }: {
   label: string; field: string; value: string; display?: string;
   editField: string | null; editValue: string; setEditValue: (v: string) => void;
   startEdit: (f: string, v: unknown) => void; onSave: () => void; onCancel: () => void;
   type?: string;
+  clickToEditTitle?: string;
 }) {
   return (
     <div>
@@ -711,7 +716,7 @@ function EditableField({
         <div
           onClick={() => startEdit(field, value)}
           style={{ fontSize: 13, color: 'var(--txt)', fontWeight: 500, cursor: 'pointer', minHeight: 18 }}
-          title="Click to edit"
+          title={clickToEditTitle ?? 'Click to edit'}
         >
           {display ?? value ?? <span style={{ color: 'var(--txt3)', fontStyle: 'italic' }}>—</span>}
         </div>

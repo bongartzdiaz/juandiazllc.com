@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Sparkles, RefreshCw, AlertTriangle, CheckCircle2, Info, ArrowRight } from 'lucide-react'
@@ -185,6 +186,15 @@ function SeverityChip({
 function InsightDetailRow({ insight }: { insight: Insight }) {
   const tok = SEV_TOKENS[insight.severity]
   const Icon = tok.icon
+  // Localize metric/action labels by their stable i18n key, falling back to
+  // the English label baked into the insight when the key is absent.
+  const tx = useTranslations('aiInsights')
+  const metricLabel = insight.metric
+    ? (insight.metric.labelKey && tx.has(insight.metric.labelKey) ? tx(insight.metric.labelKey) : insight.metric.label)
+    : ''
+  const actionLabel = insight.action
+    ? (insight.action.labelKey && tx.has(insight.action.labelKey) ? tx(insight.action.labelKey) : insight.action.label)
+    : ''
   return (
     <div style={{
       background: 'var(--panel)', border: '1px solid var(--border)',
@@ -212,7 +222,7 @@ function InsightDetailRow({ insight }: { insight: Insight }) {
               fontFamily: 'var(--font-mono, monospace)',
               padding: '4px 10px', background: tok.bg, borderRadius: 8,
             }}>
-              {insight.metric.label}: {insight.metric.value}
+              {metricLabel}: {insight.metric.value}
             </div>
           )}
         </div>
@@ -224,7 +234,7 @@ function InsightDetailRow({ insight }: { insight: Insight }) {
             fontSize: 12, color: 'var(--accent)', textDecoration: 'none', marginTop: 10,
             display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 600,
           }}>
-            {insight.action.label} <ArrowRight size={12} />
+            {actionLabel} <ArrowRight size={12} />
           </Link>
         )}
       </div>

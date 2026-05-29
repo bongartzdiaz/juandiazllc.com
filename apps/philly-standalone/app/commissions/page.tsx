@@ -94,9 +94,17 @@ export default function CommissionsPage() {
 
   // Bundle BS — column visibility prefs.
   const commissionColumns = useColumnPrefs('pai-commissions-columns-v1', COMMISSION_DEFAULTS)
+  const localizedColumns = useMemo<ColumnDef[]>(() => [
+    { id: 'type', label: t('columns.typeNotes'), required: true },
+    { id: 'gross', label: t('columns.gross') },
+    { id: 'split', label: t('columns.splitPct') },
+    { id: 'net', label: t('columns.net') },
+    { id: 'status', label: t('columns.status') },
+    { id: 'actions', label: t('columns.actions'), required: true },
+  ], [t])
   const visibleCommissionColumns = useMemo(
-    () => COMMISSION_COLUMNS.filter((c) => c.required || commissionColumns.visible.has(c.id)),
-    [commissionColumns.visible],
+    () => localizedColumns.filter((c) => c.required || commissionColumns.visible.has(c.id)),
+    [commissionColumns.visible, localizedColumns],
   )
   const commissionGridTemplate = useMemo(
     () => visibleCommissionColumns.map((c) => COMMISSION_WIDTHS[c.id]).join(' '),
@@ -177,31 +185,31 @@ export default function CommissionsPage() {
       <Topbar title={t('title')} sub={t('subtitle')} />
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="dollar-sign" label="YTD Team GCI" value={`$${(lbTotalCommission / 100).toLocaleString()}`} />
-          <KpiCard icon="trending-up" label="Total Net" value={`$${(totalNet / 100).toLocaleString()}`} />
-          <KpiCard icon="target" label="Pending Payouts" value={String(pendingCount)} />
-          <KpiCard icon="users" label="Team Members" value={String(leaderboard.length)} />
+          <KpiCard icon="dollar-sign" label={t('kpis.ytdGci')} value={`$${(lbTotalCommission / 100).toLocaleString()}`} />
+          <KpiCard icon="trending-up" label={t('kpis.totalNet')} value={`$${(totalNet / 100).toLocaleString()}`} />
+          <KpiCard icon="target" label={t('kpis.pendingPayouts')} value={String(pendingCount)} />
+          <KpiCard icon="users" label={t('kpis.teamMembers')} value={String(leaderboard.length)} />
         </div>
 
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 4, marginBottom: 16, borderBottom: '1px solid var(--border)', paddingBottom: 0 }}>
-          {(['leaderboard', 'commissions'] as const).map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{
-              padding: '8px 18px', fontSize: 12, fontWeight: tab === t ? 600 : 500,
-              color: tab === t ? 'var(--accent)' : 'var(--txt3)',
-              background: 'none', border: 'none', borderBottom: tab === t ? '2px solid var(--accent)' : '2px solid transparent',
+          {(['leaderboard', 'commissions'] as const).map(tabKey => (
+            <button key={tabKey} onClick={() => setTab(tabKey)} style={{
+              padding: '8px 18px', fontSize: 12, fontWeight: tab === tabKey ? 600 : 500,
+              color: tab === tabKey ? 'var(--accent)' : 'var(--txt3)',
+              background: 'none', border: 'none', borderBottom: tab === tabKey ? '2px solid var(--accent)' : '2px solid transparent',
               cursor: 'pointer', fontFamily: 'inherit', textTransform: 'capitalize',
-            }}>{t === 'leaderboard' ? 'Team Leaderboard' : 'Commission Records'}</button>
+            }}>{tabKey === 'leaderboard' ? t('tabs.leaderboard') : t('tabs.records')}</button>
           ))}
         </div>
 
         {tab === 'leaderboard' ? (
           <div style={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '40px 1fr 80px 80px 80px 100px 100px 80px', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
-              <span>#</span><span>Agent</span><span>Deals</span><span>Won</span><span>Month</span><span>Volume</span><span>YTD GCI</span><span>Conv %</span>
+              <span>{t('leaderboard.hash')}</span><span>{t('leaderboard.agent')}</span><span>{t('leaderboard.deals')}</span><span>{t('leaderboard.won')}</span><span>{t('leaderboard.month')}</span><span>{t('leaderboard.volume')}</span><span>{t('leaderboard.ytdGci')}</span><span>{t('leaderboard.convPct')}</span>
             </div>
             {leaderboard.length === 0 ? (
-              <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No team data yet.</div>
+              <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('leaderboard.empty')}</div>
             ) : leaderboard.map((entry, idx) => (
               <div key={entry.id} style={{ display: 'grid', gridTemplateColumns: '40px 1fr 80px 80px 80px 100px 100px 80px', gap: 12, padding: '10px 16px', borderBottom: idx < leaderboard.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -248,10 +256,10 @@ export default function CommissionsPage() {
             {/* Commission Records */}
             <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
               <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
-                options={[{ value: '', label: 'All Statuses' }, { value: 'pending', label: 'Pending' }, { value: 'paid', label: 'Paid' }, { value: 'voided', label: 'Voided' }]} />
+                options={[{ value: '', label: t('filters.all') }, { value: 'pending', label: t('filters.pending') }, { value: 'paid', label: t('filters.paid') }, { value: 'voided', label: t('filters.voided') }]} />
               <div style={{ flex: 1 }} />
               <ColumnPicker
-                columns={COMMISSION_COLUMNS}
+                columns={localizedColumns}
                 visible={commissionColumns.visible}
                 onToggle={commissionColumns.toggle}
                 onReset={commissionColumns.reset}
@@ -264,7 +272,7 @@ export default function CommissionsPage() {
                 border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 fontFamily: 'inherit', boxShadow: 'var(--shadow-sm)',
               }}>
-                <Plus size={13} /> Add Commission
+                <Plus size={13} /> {t('addCommission')}
               </button>
             </div>
             <div style={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
@@ -272,9 +280,9 @@ export default function CommissionsPage() {
                 {visibleCommissionColumns.map((c) => <span key={c.id}>{c.label}</span>)}
               </div>
               {loading ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
               ) : records.length === 0 ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No commission records. Click Add Commission.</div>
+                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.empty')}</div>
               ) : records.map((rec, idx) => (
                 <div key={rec.id} style={{ display: 'grid', gridTemplateColumns: commissionGridTemplate, gap: 12, padding: '10px 16px', borderBottom: idx < records.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent' }}>
                   {visibleCommissionColumns.map((c) => {
@@ -300,15 +308,15 @@ export default function CommissionsPage() {
                       <div key="actions" style={{ display: 'flex', gap: 4 }}>
                         {rec.status === 'pending' && (
                           <>
-                            <button onClick={() => changeStatus(rec.id, 'paid')} title="Mark paid" style={miniBtn('var(--g-txt)')}>
+                            <button onClick={() => changeStatus(rec.id, 'paid')} title={t('actions.markPaid')} style={miniBtn('var(--g-txt)')}>
                               <CheckCircle2 size={11} />
                             </button>
-                            <button onClick={() => changeStatus(rec.id, 'voided')} title="Void" style={miniBtn('var(--txt3)')}>
+                            <button onClick={() => changeStatus(rec.id, 'voided')} title={t('actions.void')} style={miniBtn('var(--txt3)')}>
                               <XCircle size={11} />
                             </button>
                           </>
                         )}
-                        <button onClick={() => handleDelete(rec.id)} title="Delete" style={miniBtn('var(--r-txt)')}>
+                        <button onClick={() => handleDelete(rec.id)} title={t('actions.delete')} style={miniBtn('var(--r-txt)')}>
                           <Trash2 size={11} />
                         </button>
                       </div>
@@ -326,40 +334,40 @@ export default function CommissionsPage() {
       <Modal
         open={showAdd}
         onClose={() => { if (!saving) setShowAdd(false) }}
-        title="Add Commission"
-        subtitle="Record a commission payout"
+        title={t('modal.title')}
+        subtitle={t('modal.subtitle')}
         size="md"
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <FormField label="Agent">
+            <FormField label={t('modal.agent')}>
               <select value={form.agentId} onChange={e => setForm({ ...form, agentId: e.target.value })} style={inputStyle}>
-                <option value="">Select agent…</option>
+                <option value="">{t('modal.selectAgent')}</option>
                 {leaderboard.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
             </FormField>
-            <FormField label="Type">
+            <FormField label={t('modal.type')}>
               <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={inputStyle}>
-                <option value="closing">Closing</option>
-                <option value="referral">Referral</option>
-                <option value="rental">Rental</option>
-                <option value="bonus">Bonus</option>
-                <option value="other">Other</option>
+                <option value="closing">{t('modal.typeClosing')}</option>
+                <option value="referral">{t('modal.typeReferral')}</option>
+                <option value="rental">{t('modal.typeRental')}</option>
+                <option value="bonus">{t('modal.typeBonus')}</option>
+                <option value="other">{t('modal.typeOther')}</option>
               </select>
             </FormField>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
-            <FormField label="Gross Amount ($)">
+            <FormField label={t('modal.grossAmount')}>
               <input type="number" min="0" step="100" value={form.gross} onChange={e => setForm({ ...form, gross: e.target.value })} placeholder="15000" style={inputStyle} />
             </FormField>
-            <FormField label="Split %">
+            <FormField label={t('modal.splitPct')}>
               <input type="number" min="0" max="100" value={form.splitPct} onChange={e => setForm({ ...form, splitPct: e.target.value })} style={inputStyle} />
             </FormField>
           </div>
-          <FormField label="Deal ID (optional)">
-            <input value={form.dealId} onChange={e => setForm({ ...form, dealId: e.target.value })} placeholder="Link to a deal" style={inputStyle} />
+          <FormField label={t('modal.dealId')}>
+            <input value={form.dealId} onChange={e => setForm({ ...form, dealId: e.target.value })} placeholder={t('modal.dealIdPlaceholder')} style={inputStyle} />
           </FormField>
-          <FormField label="Notes (optional)">
+          <FormField label={t('modal.notes')}>
             <textarea rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
               style={{ ...inputStyle, resize: 'vertical' }} />
           </FormField>
@@ -369,9 +377,7 @@ export default function CommissionsPage() {
               padding: 10, borderRadius: 8, background: 'var(--bg2)',
               fontSize: 12, color: 'var(--txt2)', textAlign: 'center',
             }}>
-              Net payout: <strong className="mono" style={{ color: 'var(--g-txt)' }}>
-                ${Math.round((parseFloat(form.gross) || 0) * (parseFloat(form.splitPct) || 100) / 100).toLocaleString()}
-              </strong>
+              {t('modal.netPayout', { amount: Math.round((parseFloat(form.gross) || 0) * (parseFloat(form.splitPct) || 100) / 100).toLocaleString() })}
             </div>
           )}
 
@@ -381,13 +387,13 @@ export default function CommissionsPage() {
               background: 'var(--bg2)', color: 'var(--txt2)',
               border: '1px solid var(--border)', fontSize: 12, fontWeight: 600,
               cursor: 'pointer', fontFamily: 'inherit',
-            }}>Cancel</button>
+            }}>{t('modal.cancel')}</button>
             <button onClick={submitForm} disabled={saving} style={{
               padding: '9px 18px', borderRadius: 8,
               background: 'var(--accent)', color: '#fff', border: 'none',
               fontSize: 12, fontWeight: 600, cursor: saving ? 'wait' : 'pointer',
               fontFamily: 'inherit', opacity: saving ? 0.7 : 1,
-            }}>{saving ? 'Saving…' : 'Add Commission'}</button>
+            }}>{saving ? t('modal.saving') : t('modal.submit')}</button>
           </div>
         </div>
       </Modal>

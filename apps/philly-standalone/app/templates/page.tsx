@@ -110,8 +110,8 @@ export default function TemplatesPage() {
   }
 
   const save = async () => {
-    if (!fName.trim()) { addToast('Name is required', 'error'); return }
-    if (!fBody.trim()) { addToast('Body is required', 'error'); return }
+    if (!fName.trim()) { addToast(t('toasts.nameRequired'), 'error'); return }
+    if (!fBody.trim()) { addToast(t('toasts.bodyRequired'), 'error'); return }
     setSaving(true)
     try {
       const payload: Record<string, unknown> = {
@@ -136,14 +136,14 @@ export default function TemplatesPage() {
       }
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
-        addToast(j.error ?? 'Save failed', 'error')
+        addToast(j.error ?? t('toasts.saveFailed'), 'error')
         return
       }
-      addToast(editing ? 'Template updated' : 'Template created', 'success')
+      addToast(editing ? t('toasts.updated') : t('toasts.created'), 'success')
       setEditorOpen(false)
       fetchData()
     } catch {
-      addToast('Save failed', 'error')
+      addToast(t('toasts.saveFailed'), 'error')
     } finally {
       setSaving(false)
     }
@@ -159,17 +159,17 @@ export default function TemplatesPage() {
     if (!ok) return
     const res = await fetch(`/api/templates/${tpl.id}`, { method: 'DELETE' })
     if (res.ok) {
-      addToast('Template deleted', 'success')
+      addToast(t('toasts.deleted'), 'success')
       fetchData()
     } else {
-      addToast('Delete failed', 'error')
+      addToast(t('toasts.deleteFailed'), 'error')
     }
   }
 
   const preview = async (tpl: Template) => {
     setPreviewRawSubject(tpl.subject ?? '')
     setPreviewRawBody(tpl.body ?? '')
-    setPreviewSubject('Rendering...')
+    setPreviewSubject(t('preview.rendering'))
     setPreviewBody('')
     setPreviewOpen(true)
     try {
@@ -184,27 +184,27 @@ export default function TemplatesPage() {
         setPreviewBody(j.data.body ?? '')
       } else {
         setPreviewSubject('')
-        setPreviewBody(j.error ?? 'Preview failed')
+        setPreviewBody(j.error ?? t('preview.previewFailed'))
       }
     } catch {
       setPreviewSubject('')
-      setPreviewBody('Preview failed')
+      setPreviewBody(t('preview.previewFailed'))
     }
   }
 
   return (
     <>
-      <Topbar title={t('title')} sub="Email and SMS templates with merge fields" onAdd={openNew} addLabel="Template" />
+      <Topbar title={t('title')} sub={t('subtitle')} onAdd={openNew} addLabel={t('addLabel')} />
       <div style={{ padding: '18px 24px 40px' }}>
         {/* Type chips */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center' }}>
           <Filter size={13} style={{ color: 'var(--txt3)' }} />
           {[
-            { v: '', label: 'All' },
-            { v: 'email', label: 'Email' },
-            { v: 'sms', label: 'SMS' },
+            { v: '', label: t('filters.all') },
+            { v: 'email', label: t('filters.email') },
+            { v: 'sms', label: t('filters.sms') },
             { v: 'whatsapp', label: 'WhatsApp' },
-            { v: 'letter', label: 'Letter' },
+            { v: 'letter', label: t('filters.letter') },
           ].map(c => {
             const active = typeFilter === c.v
             return (
@@ -221,11 +221,11 @@ export default function TemplatesPage() {
 
         {/* List */}
         {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
         ) : templates.length === 0 ? (
           <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13, background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)' }}>
             <FileText size={32} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-            No templates found.
+            {t('list.empty')}
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 12 }}>
@@ -280,12 +280,12 @@ export default function TemplatesPage() {
                     marginTop: 'auto', paddingTop: 8, borderTop: '1px solid var(--border)',
                   }}>
                     <span style={{ fontSize: 10, color: 'var(--txt3)' }}>
-                      Updated {new Date(tpl.updatedAt ?? tpl.createdAt).toLocaleDateString()}
+                      {t('list.updated', { date: new Date(tpl.updatedAt ?? tpl.createdAt).toLocaleDateString() })}
                     </span>
                     <div style={{ display: 'flex', gap: 4 }}>
-                      <IconBtn onClick={() => preview(tpl)} title="Preview"><Eye size={13} /></IconBtn>
-                      <IconBtn onClick={() => openEdit(tpl)} title="Edit"><Edit3 size={13} /></IconBtn>
-                      <IconBtn onClick={() => del(tpl)} title="Delete" danger><Trash2 size={13} /></IconBtn>
+                      <IconBtn onClick={() => preview(tpl)} title={t('list.preview')}><Eye size={13} /></IconBtn>
+                      <IconBtn onClick={() => openEdit(tpl)} title={t('list.edit')}><Edit3 size={13} /></IconBtn>
+                      <IconBtn onClick={() => del(tpl)} title={t('list.delete')} danger><Trash2 size={13} /></IconBtn>
                     </div>
                   </div>
                 </div>
@@ -299,27 +299,27 @@ export default function TemplatesPage() {
       <Modal
         open={editorOpen}
         onClose={() => setEditorOpen(false)}
-        title={editing ? 'Edit Template' : 'New Template'}
-        subtitle="Use {{field}} for merge fields"
+        title={editing ? t('editor.titleEdit') : t('editor.titleNew')}
+        subtitle={t('editor.subtitle', { field: '{{field}}' })}
         size="md"
       >
-        <FormField label="Name" required>
-          <input value={fName} onChange={e => setFName(e.target.value)} placeholder="Welcome email" style={inputStyle} />
+        <FormField label={t('editor.name')} required>
+          <input value={fName} onChange={e => setFName(e.target.value)} placeholder={t('editor.namePlaceholder')} style={inputStyle} />
         </FormField>
-        <FormField label="Type" required>
+        <FormField label={t('editor.type')} required>
           <select value={fType} onChange={e => setFType(e.target.value as 'email' | 'sms' | 'whatsapp' | 'letter')} style={{ ...inputStyle, cursor: 'pointer' }}>
-            <option value="email">Email</option>
-            <option value="sms">SMS</option>
+            <option value="email">{t('filters.email')}</option>
+            <option value="sms">{t('filters.sms')}</option>
             <option value="whatsapp">WhatsApp</option>
-            <option value="letter">Letter</option>
+            <option value="letter">{t('filters.letter')}</option>
           </select>
         </FormField>
         {fType === 'email' && (
-          <FormField label="Subject">
+          <FormField label={t('editor.subject')}>
             <input value={fSubject} onChange={e => setFSubject(e.target.value)} placeholder="Welcome, {{first_name}}" style={inputStyle} />
           </FormField>
         )}
-        <FormField label="Body" required>
+        <FormField label={t('editor.body')} required>
           <textarea
             value={fBody}
             onChange={e => setFBody(e.target.value)}
@@ -333,13 +333,13 @@ export default function TemplatesPage() {
             padding: '8px 16px', borderRadius: 8, border: '1px solid var(--border)',
             background: 'var(--bg2)', color: 'var(--txt2)',
             fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-          }}>Cancel</button>
+          }}>{t('editor.cancel')}</button>
           <button onClick={save} disabled={saving} style={{
             padding: '8px 18px', borderRadius: 8, border: 'none',
             background: 'var(--accent)', color: '#fff',
             fontSize: 12, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
             fontFamily: 'inherit', opacity: saving ? 0.6 : 1,
-          }}>{saving ? 'Saving...' : (editing ? 'Save Changes' : 'Create Template')}</button>
+          }}>{saving ? t('editor.saving') : (editing ? t('editor.saveChanges') : t('editor.create'))}</button>
         </div>
       </Modal>
 
@@ -347,13 +347,13 @@ export default function TemplatesPage() {
       <Modal
         open={previewOpen}
         onClose={() => setPreviewOpen(false)}
-        title="Template Preview"
-        subtitle="Rendered with sample context"
+        title={t('preview.title')}
+        subtitle={t('preview.subtitle')}
         size="lg"
       >
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>Raw</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>{t('preview.raw')}</div>
             {previewRawSubject && (
               <div style={{ marginBottom: 8, padding: '6px 10px', background: 'var(--bg2)', borderRadius: 6, fontSize: 12, fontWeight: 600, color: 'var(--txt2)' }}>
                 {previewRawSubject}
@@ -368,7 +368,7 @@ export default function TemplatesPage() {
             }}>{previewRawBody}</pre>
           </div>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>Rendered</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>{t('preview.rendered')}</div>
             {previewSubject && (
               <div style={{ marginBottom: 8, padding: '6px 10px', background: 'var(--g-bg)', borderRadius: 6, fontSize: 12, fontWeight: 600, color: 'var(--g-txt)' }}>
                 {previewSubject}
@@ -383,7 +383,7 @@ export default function TemplatesPage() {
           </div>
         </div>
         <div style={{ marginTop: 12, padding: 10, background: 'var(--bg2)', borderRadius: 8, fontSize: 11, color: 'var(--txt3)' }}>
-          Sample context: {Object.keys(SAMPLE_CTX).map(k => <code key={k} style={{ fontFamily: 'var(--font-red-hat-mono), monospace', marginRight: 6 }}>{k}</code>)}
+          {t('preview.sampleContext')} {Object.keys(SAMPLE_CTX).map(k => <code key={k} style={{ fontFamily: 'var(--font-red-hat-mono), monospace', marginRight: 6 }}>{k}</code>)}
         </div>
       </Modal>
     </>

@@ -11,6 +11,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { Building2, Check, ChevronDown } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface OrgEntry {
   id: string
@@ -25,6 +26,7 @@ interface OrgList {
 }
 
 export function OrgSwitcher() {
+  const t = useTranslations('layout.orgSwitcher')
   const [data, setData] = useState<OrgList | null>(null)
   const [open, setOpen] = useState(false)
   const [switching, setSwitching] = useState<string | null>(null)
@@ -91,7 +93,7 @@ export function OrgSwitcher() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        aria-label="Switch organization"
+        aria-label={t('switchAria')}
         aria-expanded={open}
         style={{
           display: 'inline-flex',
@@ -183,7 +185,7 @@ export function OrgSwitcher() {
                 >
                   {o.role}
                 </span>
-                {isActive && <Check size={12} aria-label="Current" />}
+                {isActive && <Check size={12} aria-label={t('currentAria')} />}
               </button>
             )
           })}

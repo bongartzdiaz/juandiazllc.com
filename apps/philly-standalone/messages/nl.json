@@ -30,7 +30,7 @@
     "eSignatures": "E-handtekeningen",
     "email": "E-mail",
     "grants": "Subsidies",
-    "inbox": "Inbox",
+    "inbox": "Postvak",
     "integrations": "Integraties",
     "leadRouting": "Lead-routering",
     "leadScores": "Lead-scores",
@@ -47,14 +47,18 @@
     "system": "Systeem",
     "templates": "Sjablonen",
     "timeline": "Tijdlijn",
-    "tools": "Tools",
+    "tools": "Hulpmiddelen",
     "transactions": "Transacties",
     "volunteers": "Vrijwilligers",
     "webhooks": "Webhooks"
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Jouw impact in een oogopslag",
+    "subtitle": {
+      "philanthropy": "Jouw impact in een oogopslag",
+      "realestate": "Uw portfolio in één oogopslag",
+      "hospitality": "Uw operaties in één oogopslag"
+    },
     "totalProjects": "Totaal Projecten",
     "activeProjects": "Actieve Projecten",
     "peopleHelped": "Mensen Geholpen",
@@ -64,7 +68,125 @@
     "recentActivity": "Recente Activiteit",
     "impactOverview": "Impact Overzicht",
     "editDashboard": "Dashboard Bewerken",
-    "addWidget": "Widget Toevoegen"
+    "addWidget": "Widget Toevoegen",
+    "tabs": {
+      "sales": "Verkoop-pipeline",
+      "rental": "Verhuur-pipeline"
+    },
+    "stageFlow": {
+      "sales": "Deal-flow in 7 stappen",
+      "rental": "Verhuur-flow in 5 stappen"
+    },
+    "widgets": {
+      "guestJourneyTitle": "Gastenreis",
+      "guestJourneySub": "Overzicht huidige periode",
+      "impactJourneyTitle": "Impactreis",
+      "impactJourneySub": "Projectlevenscyclus overzicht",
+      "revenueBreakdown": "Omzetverdeling",
+      "occupancyTrend": "Bezettingstrend",
+      "occupancyTrendSub": "Maandelijkse bezettingsgraad",
+      "occupancyGauge": "Bezettingsmeter",
+      "occupancyGaugeSub": "Huidige bezettingsgraad",
+      "guestReviews": "Gastenrecensies",
+      "recentActivity": "Recente activiteit",
+      "quickStats": "SNELLE STATS",
+      "monthlyPerformance": "Maandelijkse prestaties",
+      "listingsVsClosings": "Aanbod vs verkopen",
+      "listingsVsClosingsSub": "Maandelijkse marktactiviteit",
+      "properties": "Objecten",
+      "revenueByType": "Omzet per type",
+      "revenueByTypeSub": "Verdeling per objecttype",
+      "revenueForecast": "Omzetprognose",
+      "revenueForecastSub": "Werkelijk vs verwacht",
+      "impactOverview": "Impactoverzicht",
+      "impactOverviewSub": "Cumulatieve impact in de tijd",
+      "projects": "Projecten",
+      "viewAll": "Alles bekijken",
+      "sdgCoverage": "SDG-dekking",
+      "monthlyDonations": "Maandelijkse donaties",
+      "sdgDistribution": "SDG-verdeling",
+      "sdgDistributionSub": "Impactallocatie per focusgebied",
+      "impactForecast": "Impactprognose",
+      "actual": "Werkelijk",
+      "forecast": "Prognose",
+      "total": "Totaal",
+      "allocated": "Toegewezen",
+      "roomsVenues": "Kamers & Zalen",
+      "revenueAndClosings": "Omzet & afsluitingen",
+      "monthlyPerformanceSub": "Maandelijkse prestaties"
+    },
+    "alerts": {
+      "title": "Meldingen",
+      "viewAll": "Alle meldingen"
+    },
+    "funnel": {
+      "title": "Conversie-trechter",
+      "overall": "Totale conversie",
+      "re": {
+        "lead": "Lead",
+        "viewing": "Bezichtiging",
+        "offer": "Bod",
+        "agreement": "Overeenkomst",
+        "closed": "Afgesloten"
+      },
+      "hos": {
+        "search": "Zoekopdracht",
+        "booking": "Boeking",
+        "checkin": "Inchecken",
+        "stay": "Verblijf",
+        "review": "Beoordeling"
+      },
+      "csr": {
+        "awareness": "Bekendheid",
+        "interest": "Interesse",
+        "proposal": "Voorstel",
+        "active": "Actief",
+        "completed": "Afgerond"
+      }
+    },
+    "goals": {
+      "title": "Doelen",
+      "status": {
+        "onTrack": "Op koers",
+        "atRisk": "Risico",
+        "behind": "Achterstand"
+      },
+      "re": {
+        "listings": "Aanbod",
+        "dealsClosed": "Deals gesloten",
+        "commission": "Commissie",
+        "viewings": "Bezichtigingen",
+        "leads": "Leads"
+      },
+      "hos": {
+        "occupancy": "Bezetting",
+        "revpar": "RevPAR",
+        "satisfaction": "Tevredenheid",
+        "bookings": "Boekingen",
+        "fnbRevenue": "F&B-omzet"
+      },
+      "csr": {
+        "projects": "Projecten",
+        "peopleHelped": "Geholpen",
+        "co2": "CO2 bespaard",
+        "donations": "Donaties"
+      }
+    },
+    "leadSource": {
+      "source": "Bron",
+      "count": "Aantal",
+      "total": "Totaal"
+    },
+    "kpiDetail": {
+      "breakdown": "Verdeling",
+      "insights": "Inzichten",
+      "recent": "Recent"
+    },
+    "aiAttrs": {
+      "industry": "Branche",
+      "summary": "Samenvatting",
+      "refreshAria": "AI-attributen vernieuwen"
+    }
   },
   "projects": {
     "title": "Projecten",
@@ -74,7 +196,11 @@
       "planned": "Gepland",
       "active": "Actief",
       "completed": "Voltooid",
-      "paused": "Gepauzeerd"
+      "paused": "Gepauzeerd",
+      "pending": "In behandeling",
+      "sold": "Verkocht",
+      "maintenance": "Onderhoud",
+      "reserved": "Gereserveerd"
     },
     "fields": {
       "title": "Projecttitel",
@@ -94,7 +220,21 @@
     },
     "confirms": {
       "delete": "\"{title}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
-    }
+    },
+    "all": "Alle",
+    "titleRE": "Aanbod",
+    "subtitleRE": "Beheer je vastgoedaanbod",
+    "titleHOS": "Evenementen",
+    "subtitleHOS": "Beheer je evenementen & boekingen",
+    "searchPlaceholder": "Zoek projecten…",
+    "searchPlaceholderRE": "Zoek aanbod…",
+    "searchPlaceholderHOS": "Zoek evenementen…",
+    "gridView": "Rasterweergave",
+    "listView": "Lijstweergave",
+    "newProjectRE": "Nieuw aanbod",
+    "newProjectHOS": "Nieuw evenement",
+    "createFailed": "Project kon niet worden aangemaakt",
+    "createdSuccess": "Project aangemaakt"
   },
   "contacts": {
     "title": "Contacten",
@@ -103,8 +243,17 @@
     "types": {
       "partner": "Partner",
       "beneficiary": "Begunstigde",
-      "stakeholder": "Stakeholder",
-      "donor": "Donateur"
+      "stakeholder": "Belanghebbende",
+      "donor": "Donateur",
+      "buyer": "Koper",
+      "seller": "Verkoper",
+      "tenant": "Huurder",
+      "investor": "Investeerder",
+      "landlord": "Verhuurder",
+      "guest": "Gast",
+      "vendor": "Leverancier",
+      "staff": "Personeel",
+      "info": "Informatie"
     },
     "fields": {
       "name": "Naam",
@@ -175,7 +324,17 @@
         "unread": "Ongelezen",
         "loadError": "Communicatie kon niet worden geladen"
       }
-    }
+    },
+    "a11y": {
+      "exportCsv": "Alle zichtbare contacten naar CSV exporteren",
+      "openAdvanced": "Geavanceerde filter openen"
+    },
+    "all": "Alle",
+    "searchPlaceholder": "Zoek contacten…",
+    "subtitleRE": "Kopers, verkopers & investeerders",
+    "subtitleHOS": "Gasten, leveranciers & personeel",
+    "createFailed": "Contact kon niet worden aangemaakt",
+    "createdSuccess": "Contact aangemaakt"
   },
   "impact": {
     "title": "Impact",
@@ -183,14 +342,148 @@
     "totalImpact": "Totale Impact",
     "byProject": "Per Project",
     "sdgAlignment": "SDG Afstemming",
-    "trends": "Trends"
+    "trends": "Trends",
+    "realEstate": {
+      "title": "Markt",
+      "subtitle": "Marktanalyses en prestaties",
+      "avgPricePerSqm": "Gem. prijs/m²",
+      "totalVolume": "Totaalvolume",
+      "daysOnMarket": "Dagen op de markt",
+      "listingsActive": "Actieve aanbiedingen",
+      "conversionRate": "Conversieratio",
+      "commissionEarned": "Verdiende commissie",
+      "propertyBreakdown": "Verdeling per objecttype",
+      "salesVsRentals": "Verkoop versus verhuur",
+      "sales": "Verkoop",
+      "rentals": "Verhuur",
+      "deals": "Deals",
+      "volume": "Volume",
+      "avgDays": "Gem. dagen",
+      "commission": "Commissie",
+      "marketComparison": "Marktvergelijking",
+      "area": "Gebied",
+      "avgPrice": "Gem. prijs",
+      "dom": "DOM",
+      "trend": "Trend",
+      "priceTrend": "Prijstrend (12 maanden)"
+    },
+    "hospitality": {
+      "title": "Analyses",
+      "subtitle": "Prestaties en gastinzichten",
+      "occupancyRate": "Bezettingsgraad",
+      "revpar": "RevPAR",
+      "adr": "ADR",
+      "adrSub": "Gem. dagprijs",
+      "avgReview": "Gem. review",
+      "fbRevenue": "F&B-omzet",
+      "roomTypePerformance": "Prestaties per kamertype",
+      "revenueByRoomType": "Omzet per kamertype",
+      "occupancyTrend": "Bezetting & omzettrend (12 maanden)",
+      "cols": {
+        "roomType": "Kamertype",
+        "occupancyPct": "Bezetting %",
+        "adr": "ADR",
+        "revenue": "Omzet",
+        "reviews": "Reviews"
+      },
+      "total": "Totaal",
+      "occupancy": "Bezetting",
+      "revenue": "Omzet"
+    },
+    "philanthropy": {
+      "co2Reduced": "CO2 verminderd",
+      "peopleHelped": "Mensen geholpen",
+      "treesPlanted": "Bomen geplant",
+      "waterSaved": "Water bespaard",
+      "energySaved": "Energie bespaard",
+      "sdgAlignment": "SDG-afstemming",
+      "impactByProject": "Impact per project",
+      "impactTrend": "Impacttrend (12 maanden)",
+      "cols": {
+        "project": "Project",
+        "co2": "CO2 (kg)",
+        "people": "Mensen",
+        "trees": "Bomen",
+        "donated": "Gedoneerd"
+      },
+      "total": "Totaal"
+    }
   },
   "kanban": {
     "title": "Kanban",
     "subtitle": "Visueel projectbeheer",
     "newBoard": "Nieuw Bord",
     "addColumn": "Kolom Toevoegen",
-    "addCard": "Kaart Toevoegen"
+    "addCard": "Kaart Toevoegen",
+    "hospitality": {
+      "title": "Reserveringen",
+      "subtitle": "Beheer boekingen",
+      "addLabel": "Nieuwe boeking"
+    },
+    "realestate": {
+      "title": "Deals",
+      "subtitle": "Volg je transacties",
+      "addLabel": "Nieuwe deal",
+      "salesPipeline": "Verkooppijplijn",
+      "rentalPipeline": "Verhuurpijplijn",
+      "dealValue": "Dealwaarde",
+      "assignee": "Toegewezen aan",
+      "sale": "Verkoop",
+      "rental": "Verhuur",
+      "dealProgress": "Voortgang deal",
+      "salesDeal": "Verkoopdeal",
+      "rentalDeal": "Verhuurdeal",
+      "documentChecklist": "Documentenchecklist",
+      "noDocuments": "Nog geen documenten toegevoegd.",
+      "docsCount": "{done}/{total} docs"
+    },
+    "preview": {
+      "label": "Voorbeeldweergave:",
+      "body": "de onderstaande kaarten zijn voorbeeldgegevens. Je organisatie heeft nog geen kanbanborden — ga naar",
+      "dealsLink": "Deals",
+      "or": "of",
+      "projectsLink": "Projecten",
+      "suffix": "om echt werk bij te houden."
+    },
+    "drawer": {
+      "in": "in",
+      "description": "Beschrijving",
+      "assignee": "Toegewezen aan",
+      "dueDate": "Deadline",
+      "status": "Status",
+      "sdgTags": "SDG-tags",
+      "moveToColumn": "Verplaats naar kolom",
+      "unassigned": "Niet toegewezen",
+      "edit": "Bewerken",
+      "delete": "Verwijderen",
+      "close": "Sluiten",
+      "moveFailed": "Verplaatsen mislukt",
+      "editPlaceholder": "Bewerken — koppel aan bewerkflow"
+    },
+    "addCardModal": {
+      "title": "Kaart toevoegen",
+      "subtitle": "Voeg een nieuwe kaart toe aan {column}",
+      "columnFallback": "kolom",
+      "titleLabel": "Titel *",
+      "titlePlaceholder": "Titel van de kaart",
+      "descriptionLabel": "Beschrijving",
+      "descriptionPlaceholder": "Optionele beschrijving",
+      "priorityLabel": "Prioriteit",
+      "assigneeLabel": "Toegewezen aan",
+      "assigneePlaceholder": "Gebruikers-ID of naam",
+      "cancel": "Annuleren",
+      "submit": "Kaart toevoegen",
+      "submitting": "Toevoegen…",
+      "titleRequired": "Titel is verplicht",
+      "genericFailed": "Kaart aanmaken mislukt ({status})",
+      "networkError": "Netwerkfout"
+    },
+    "priorities": {
+      "low": "Laag",
+      "medium": "Gemiddeld",
+      "high": "Hoog",
+      "urgent": "Urgent"
+    }
   },
   "deals": {
     "toasts": {
@@ -210,7 +503,46 @@
     },
     "confirms": {
       "delete": "Deze deal verwijderen? Dit kan niet ongedaan worden gemaakt."
-    }
+    },
+    "title": "Deals",
+    "subtitle": "Uw verkooppijplijn in één oogopslag",
+    "addLabel": "Deal",
+    "filters": {
+      "search": "Zoek deals…",
+      "clearSearch": "Zoekopdracht wissen",
+      "openAdvanced": "Geavanceerde filter openen",
+      "clearAdvanced": "Geavanceerde filter wissen",
+      "allPipelines": "Alle pijplijnen",
+      "allStatuses": "Alle statussen"
+    },
+    "pipelines": {
+      "empty": "Geen pijplijnen"
+    },
+    "form": {
+      "notesPlaceholder": "Context, vervolgstappen…",
+      "cancel": "Annuleren"
+    },
+    "statuses": {
+      "open": "Open",
+      "won": "Gewonnen",
+      "lost": "Verloren"
+    },
+    "view": {
+      "board": "Bord",
+      "list": "Lijst"
+    },
+    "empty": {
+      "title": "Nog geen pijplijnen",
+      "hint": "Maak eerst een pijplijn aan via de API (POST /api/pipelines)."
+    },
+    "advanced": {
+      "label": "Geavanceerd filter",
+      "withCount": "Geavanceerd filter ({n, plural, one {# regel} other {# regels}})",
+      "clear": "Wissen"
+    },
+    "value": "Waarde",
+    "stage": "Fase",
+    "probability": "Waarschijnlijkheid"
   },
   "properties": {
     "toasts": {
@@ -219,15 +551,244 @@
       "deleteFailed": "Verwijderen mislukt",
       "noAddress": "Geen adres bekend",
       "addressCopied": "Adres gekopieerd",
-      "copyFailed": "Kopiëren mislukt"
+      "copyFailed": "Kopiëren mislukt",
+      "taxonomyLoadFailed": "Vastgoedtaxonomie kon niet worden geladen"
     },
     "confirms": {
       "delete": "\"{title}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    },
+    "title": "Objecten",
+    "subtitle": "Uw portefeuille in één oogopslag",
+    "addLabel": "Object",
+    "kpis": {
+      "totalProperties": "Totaal objecten",
+      "portfolioValue": "Portefeuillewaarde",
+      "available": "Beschikbaar",
+      "totalViewings": "Totaal bezichtigingen"
+    },
+    "filters": {
+      "searchPlaceholder": "Zoek op titel, adres, stad, plaats…",
+      "allLocations": "Alle locaties",
+      "allTypes": "Alle types",
+      "allStatuses": "Alle statussen",
+      "customize": "Filters aanpassen",
+      "clear": "Filters wissen",
+      "openAdvanced": "Geavanceerde filter openen",
+      "clearAdvanced": "Geavanceerde filter wissen",
+      "allLocationsNamed": "Alle {name}",
+      "allSubtypes": "Alle subtypes"
+    },
+    "statuses": {
+      "available": "Beschikbaar",
+      "under_contract": "Onder voorbehoud",
+      "sold": "Verkocht",
+      "rented": "Verhuurd"
+    },
+    "form": {
+      "title": "Object toevoegen",
+      "listingType": "Type aanbod",
+      "propertyTitle": "Titel",
+      "district": "Wijk",
+      "selectDistrict": "— Kies —",
+      "address": "Adres",
+      "subtype": "Subtype",
+      "bedrooms": "Slaapkamers",
+      "bathrooms": "Badkamers",
+      "sqm": "m²",
+      "bankOwned": "Bank-eigendom",
+      "resale": "Bestaande bouw",
+      "saving": "Opslaan…",
+      "submit": "Object toevoegen"
+    },
+    "contextMenu": {
+      "open": "Openen",
+      "quickView": "Snelle weergave",
+      "valuation": "Taxatie",
+      "copyAddress": "Adres kopiëren",
+      "delete": "Verwijderen"
+    },
+    "taxonomy": {
+      "types": {
+        "residential": "Woningen",
+        "apartment": "Appartementen",
+        "land": "Grond",
+        "commercial": "Commercieel"
+      },
+      "listingTypes": {
+        "sale": "Te koop",
+        "rent": "Te huur"
+      },
+      "subtypes": {
+        "detached_house": "Vrijstaande woning",
+        "semi_detached_house": "Halfvrijstaande woning",
+        "link_detached_house": "Geschakelde woning",
+        "bungalow": "Bungalow",
+        "semi_detached_bungalow": "Halfvrijstaande bungalow",
+        "link_detached_bungalow": "Geschakelde bungalow",
+        "town_house": "Herenhuis",
+        "end_town_house": "Hoekherenhuis",
+        "penthouse": "Penthouse",
+        "entire_floor_apartment": "Volledige verdieping",
+        "ground_floor_apartment": "Benedenwoning",
+        "maisonette": "Maisonnette",
+        "plot": "Perceel",
+        "apartment": "Appartement",
+        "apartment_building": "Appartementencomplex",
+        "bar": "Bar",
+        "block_of_flats": "Flatgebouw",
+        "business_park": "Bedrijvenpark",
+        "cafe": "Café",
+        "childcare_facility": "Kinderopvang",
+        "commercial_building": "Bedrijfspand",
+        "communal_development": "Gemeenschappelijk project",
+        "convenience_store": "Buurtwinkel",
+        "data_center": "Datacenter",
+        "distribution_warehouse": "Distributiemagazijn",
+        "factory": "Fabriek",
+        "farm": "Boerderij",
+        "garage": "Garage",
+        "guest_house": "Pension",
+        "hair_dresser_barber_shop": "Kapsalon / Barbier",
+        "health_care_facility": "Zorginstelling",
+        "heavy_industrial": "Zware industrie",
+        "high_street_retail_property": "Winkelpand in winkelstraat",
+        "hotel": "Hotel",
+        "hotel_apartments": "Hotelappartementen",
+        "industrial_building": "Industrieel pand",
+        "industrial_development": "Industrieel project",
+        "industrial_park": "Industriepark",
+        "leisure_facility": "Recreatievoorziening",
+        "marine_property": "Maritiem vastgoed",
+        "mill": "Molen",
+        "mixed_use_property": "Multifunctioneel pand",
+        "nightclub": "Nachtclub",
+        "office": "Kantoor",
+        "out_of_town_retail_property": "Winkelpand buiten centrum",
+        "petrol_station": "Tankstation",
+        "place_of_worship": "Religieus gebouw",
+        "post_office": "Postkantoor",
+        "pub": "Café",
+        "research_and_development_center": "Onderzoeks- en ontwikkelcentrum",
+        "residential_development": "Woningbouwproject",
+        "restaurant": "Restaurant",
+        "science_park": "Sciencepark",
+        "serviced_office": "Flexkantoor",
+        "shop": "Winkel",
+        "shopping_center": "Winkelcentrum",
+        "shopping_mall": "Winkelcentrum",
+        "showroom": "Showroom",
+        "storage": "Opslag",
+        "trade_counter": "Groothandelsbalie",
+        "warehouse": "Magazijn",
+        "workshop": "Werkplaats"
+      }
     }
   },
   "automations": {
     "title": "Automatiseringen",
-    "subtitle": "Trigger-gebaseerde regels om workflows te automatiseren"
+    "subtitle": "Trigger-gebaseerde regels om workflows te automatiseren",
+    "addLabel": "Regel",
+    "kpis": {
+      "total": "Totaal aantal regels",
+      "active": "Actief",
+      "totalRuns": "Totaal aantal uitvoeringen"
+    },
+    "triggers": {
+      "onEntityCreate": "Entiteit aangemaakt",
+      "onEntityDelete": "Entiteit verwijderd",
+      "onFieldChange": "Veld gewijzigd",
+      "onStageChange": "Dealfase gewijzigd",
+      "onSchedule": "Volgens schema (cron)"
+    },
+    "actions": {
+      "sendEmail": "E-mail versturen",
+      "sendSMS": "SMS / WhatsApp versturen",
+      "createNotification": "Melding aanmaken",
+      "updateField": "Veld bijwerken",
+      "moveStage": "Dealfase verplaatsen",
+      "callWebhook": "Webhook aanroepen"
+    },
+    "list": {
+      "loading": "Laden...",
+      "empty": "Nog geen automatiseringsregels.",
+      "when": "Wanneer",
+      "then": "Dan",
+      "runs": "uitvoeringen",
+      "disable": "Uitschakelen",
+      "enable": "Inschakelen",
+      "active": "Actief",
+      "paused": "Gepauzeerd",
+      "edit": "Bewerken",
+      "delete": "Verwijderen"
+    },
+    "logs": {
+      "loading": "Uitvoeringen laden...",
+      "empty": "Nog geen uitvoeringen."
+    },
+    "editor": {
+      "titleNew": "Nieuwe automatiseringsregel",
+      "titleEdit": "Regel bewerken",
+      "subtitle": "Configureer een trigger en een actie",
+      "ruleName": "Regelnaam",
+      "ruleNamePlaceholder": "bijv. Nieuwe leads verwelkomen",
+      "whenTrigger": "Wanneer (trigger)",
+      "thenAction": "Dan (actie)",
+      "triggerType": "Triggertype",
+      "actionType": "Actietype",
+      "entity": "Entiteit",
+      "anyEntity": "Elke entiteit",
+      "any": "Elke",
+      "fieldName": "Veldnaam",
+      "fromOptional": "Van (optioneel)",
+      "toOptional": "Naar (optioneel)",
+      "cron": "Cron-expressie",
+      "accountId": "Account-ID",
+      "to": "Naar",
+      "subject": "Onderwerp",
+      "bodyMerge": "Inhoud (ondersteunt samenvoegvelden)",
+      "phoneNumber": "Telefoonnummer",
+      "channel": "Kanaal",
+      "body": "Inhoud",
+      "titleField": "Titel",
+      "titlePlaceholder": "Nieuwe lead toegewezen",
+      "linkOptional": "Link (optioneel)",
+      "field": "Veld",
+      "value": "Waarde",
+      "stageId": "Fase-ID",
+      "url": "URL",
+      "payload": "Payload (JSON, optioneel)",
+      "enabled": "Ingeschakeld",
+      "enabledOn": "De regel wordt uitgevoerd bij overeenkomende events",
+      "enabledOff": "Regel is gepauzeerd",
+      "mergeHint": "Samenvoegvelden: {fields}",
+      "cancel": "Annuleren",
+      "saving": "Opslaan...",
+      "saveChanges": "Wijzigingen opslaan",
+      "createRule": "Regel aanmaken"
+    },
+    "summary": {
+      "whenCreated": "Wanneer {entity} wordt aangemaakt",
+      "whenDeleted": "Wanneer {entity} wordt verwijderd",
+      "whenFieldChange": "Wanneer {entity}.{field} wijzigt",
+      "whenStageChange": "Wanneer een dealfase wijzigt",
+      "every": "Elke {cron}",
+      "sendEmailTo": "E-mail versturen naar {to}",
+      "sendSmsTo": "{channel} versturen naar {to}",
+      "notify": "Melding: {title}",
+      "setField": "Stel {field} = {value} in",
+      "moveToStage": "Verplaats naar fase {stage}",
+      "postWebhook": "POST {url}"
+    },
+    "toasts": {
+      "nameRequired": "Naam is verplicht",
+      "payloadJson": "Payload moet geldige JSON zijn",
+      "saveFailed": "Opslaan mislukt",
+      "updated": "Regel bijgewerkt",
+      "created": "Regel aangemaakt",
+      "deleted": "Regel verwijderd",
+      "deleteFailed": "Verwijderen mislukt",
+      "toggleFailed": "Omschakelen mislukt"
+    }
   },
   "grants": {
     "title": "Subsidies",
@@ -285,6 +846,23 @@
     },
     "confirms": {
       "delete": "Deze subsidie verwijderen?"
+    },
+    "detail": {
+      "grantAmount": "Subsidiebedrag",
+      "funder": "Financier",
+      "applied": "Aangevraagd",
+      "awarded": "Toegekend",
+      "period": "Periode",
+      "delete": "Verwijderen",
+      "edit": "Bewerken",
+      "close": "Sluiten"
+    },
+    "form": {
+      "updateSubtitle": "Werk subsidiedetails bij",
+      "newSubtitle": "Volg een subsidie van aanvraag tot toekenning",
+      "cancel": "Annuleren",
+      "saving": "Opslaan…",
+      "saveChanges": "Wijzigingen opslaan"
     }
   },
   "commissions": {
@@ -300,10 +878,77 @@
       "updateFailed": "Bijwerken mislukt",
       "deleted": "Commissie verwijderd",
       "deleteFailed": "Verwijderen mislukt",
-      "networkError": "Netwerkfout"
+      "networkError": "Netwerkfout",
+      "leaderboardLoadFailed": "Laden van ranglijst mislukt"
     },
     "confirms": {
       "delete": "Deze commissie verwijderen?"
+    },
+    "kpis": {
+      "ytdGci": "GCI team YTD",
+      "totalNet": "Totaal netto",
+      "pendingPayouts": "Openstaande uitbetalingen",
+      "teamMembers": "Teamleden"
+    },
+    "tabs": {
+      "leaderboard": "Teamranglijst",
+      "records": "Commissiegegevens"
+    },
+    "leaderboard": {
+      "hash": "#",
+      "agent": "Makelaar",
+      "deals": "Deals",
+      "won": "Gewonnen",
+      "month": "Maand",
+      "volume": "Volume",
+      "ytdGci": "YTD GCI",
+      "convPct": "Conv. %",
+      "empty": "Nog geen teamgegevens."
+    },
+    "filters": {
+      "all": "Alle statussen",
+      "pending": "In afwachting",
+      "paid": "Betaald",
+      "voided": "Geannuleerd"
+    },
+    "addCommission": "Commissie toevoegen",
+    "columns": {
+      "typeNotes": "Type / Notities",
+      "gross": "Bruto",
+      "splitPct": "Verdeling %",
+      "net": "Netto",
+      "status": "Status",
+      "actions": "Acties"
+    },
+    "list": {
+      "loading": "Laden...",
+      "empty": "Geen commissiegegevens. Klik op Commissie toevoegen."
+    },
+    "actions": {
+      "markPaid": "Markeer als betaald",
+      "void": "Annuleren",
+      "delete": "Verwijderen"
+    },
+    "modal": {
+      "title": "Commissie toevoegen",
+      "subtitle": "Leg een commissie-uitbetaling vast",
+      "agent": "Makelaar",
+      "selectAgent": "Selecteer makelaar…",
+      "type": "Type",
+      "typeClosing": "Sluiting",
+      "typeReferral": "Verwijzing",
+      "typeRental": "Verhuur",
+      "typeBonus": "Bonus",
+      "typeOther": "Overig",
+      "grossAmount": "Brutobedrag ($)",
+      "splitPct": "Verdeling %",
+      "dealId": "Deal-ID (optioneel)",
+      "dealIdPlaceholder": "Koppel aan een deal",
+      "notes": "Notities (optioneel)",
+      "netPayout": "Netto-uitbetaling: ${amount}",
+      "cancel": "Annuleren",
+      "saving": "Opslaan…",
+      "submit": "Commissie toevoegen"
     }
   },
   "eSignatures": {
@@ -323,6 +968,65 @@
     },
     "confirms": {
       "delete": "Dit handtekeningverzoek verwijderen?"
+    },
+    "addLabel": "Handtekening",
+    "kpis": {
+      "total": "Totaal aantal handtekeningen",
+      "pending": "In afwachting",
+      "signed": "Ondertekend",
+      "completionRate": "Voltooiingspercentage"
+    },
+    "filters": {
+      "all": "Alle statussen",
+      "pending": "In afwachting",
+      "sent": "Verzonden",
+      "viewed": "Bekeken",
+      "signed": "Ondertekend",
+      "declined": "Geweigerd",
+      "expired": "Verlopen"
+    },
+    "columns": {
+      "document": "Document",
+      "signer": "Ondertekenaar",
+      "transaction": "Transactie",
+      "provider": "Provider",
+      "status": "Status",
+      "signed": "Ondertekend"
+    },
+    "list": {
+      "loading": "Laden...",
+      "empty": "Nog geen handtekeningverzoeken. Klik op Handtekening aanvragen om te starten.",
+      "requestSignature": "Handtekening aanvragen"
+    },
+    "detail": {
+      "fallbackTitle": "Handtekening",
+      "timeline": "Tijdlijn",
+      "created": "Aangemaakt",
+      "sent": "Verzonden",
+      "viewed": "Bekeken",
+      "signed": "Ondertekend",
+      "transaction": "Transactie",
+      "markSent": "Markeer als verzonden",
+      "markViewed": "Markeer als bekeken",
+      "markSigned": "Markeer als ondertekend",
+      "declined": "Geweigerd",
+      "reset": "Resetten",
+      "delete": "Verwijderen"
+    },
+    "request": {
+      "title": "Handtekening aanvragen",
+      "subtitle": "Verstuur een document voor elektronische ondertekening",
+      "transaction": "Transactie",
+      "selectTransaction": "Selecteer een transactie…",
+      "transactionFallback": "Transactie {id}",
+      "documentName": "Documentnaam",
+      "signerName": "Naam ondertekenaar",
+      "signerEmail": "E-mail ondertekenaar",
+      "provider": "Provider",
+      "manual": "Handmatig",
+      "cancel": "Annuleren",
+      "creating": "Aanmaken…",
+      "submit": "Verzoek versturen"
     }
   },
   "referrals": {
@@ -622,7 +1326,7 @@
     }
   },
   "inbox": {
-    "title": "Inbox",
+    "title": "Postvak",
     "subtitle": "Geünificeerde inbox voor e-mail, sms, WhatsApp en telefoon",
     "add": {
       "conversation": "Gesprek"
@@ -645,7 +1349,8 @@
     "statuses": {
       "open": "Open",
       "closed": "Gesloten",
-      "archived": "Gearchiveerd"
+      "archived": "Gearchiveerd",
+      "pending": "In afwachting"
     },
     "channels": {
       "email": "E-mail",
@@ -728,7 +1433,12 @@
     "signOut": "Uitloggen",
     "disconnect": "Loskoppelen",
     "revoke": "Intrekken",
-    "replace": "Vervangen"
+    "replace": "Vervangen",
+    "live": "Live",
+    "sync": "Synchroniseren",
+    "syncing": "Bezig met synchroniseren…",
+    "created": "Aangemaakt",
+    "done": "Klaar"
   },
   "confirms": {
     "deleteGeneric": {
@@ -878,7 +1588,7 @@
     "matchAll": "Alle",
     "matchAny": "Een",
     "matchOf": "van het volgende:",
-    "matchPrefix": "Match",
+    "matchPrefix": "Voldoet aan",
     "addRule": "Regel toevoegen",
     "removeRule": "Regel verwijderen",
     "noValueNeeded": "(geen waarde nodig)",
@@ -943,7 +1653,7 @@
       "area": "m²",
       "built": "Bouwjaar",
       "viewings": "Bezichtigingen",
-      "showings": "Showings",
+      "showings": "Bezichtigingen",
       "offers": "Biedingen",
       "openHouses": "Open dagen",
       "valuation": "Taxatie",
@@ -1192,7 +1902,7 @@
     "info": "Een flag hier omzetten plaatst een per-organisatie override. De \"Reset naar standaard\"-knop verwijdert de override en valt terug op de globale standaard (of de code-zijde standaard als er geen globale is ingesteld).",
     "loading": "Laden…",
     "empty": "Geen feature flags geregistreerd.",
-    "orgOverride": "Org override",
+    "orgOverride": "Org-override",
     "codeDefault": "Code-standaard: {state}",
     "enabled": "ingeschakeld",
     "disabled": "uitgeschakeld",
@@ -1219,7 +1929,27 @@
       "noImpact": "Op dit moment zijn er geen actieve gebruikers of integraties die deze functie nodig hebben.",
       "confirm": "Functie uitschakelen",
       "cancel": "Annuleren",
-      "saving": "Uitschakelen…"
+      "saving": "Uitschakelen…",
+      "heading": "Functievlaggen",
+      "subtitle": "Runtime-killswitches per organisatie — geen redeploy nodig",
+      "description": "Elke schakelaar hieronder is een killswitch per organisatie. Zet er één uit om die functie direct in deze organisatie uit te schakelen — geen redeploy, geen codewijziging. Wijzigingen worden binnen ~60 seconden actief (de TTL van de in-memory cache). Elke wijziging wordt vastgelegd in het auditlogboek.",
+      "info": "Een vlag hier omzetten stelt een override per organisatie in. De knop \"Terugzetten naar standaard\" verwijdert de override en valt terug op de globale standaard (of de code-standaard als er geen globale is ingesteld).",
+      "empty": "Geen functievlaggen gecatalogiseerd.",
+      "loading": "Laden…",
+      "enabledLabel": "AAN",
+      "disabledLabel": "UIT",
+      "lockPlatform": "Platform-gepauzeerd",
+      "lockSupport": "Ingesteld door support",
+      "supportReason": "Reden van support: {reason}",
+      "upgradeCTA": "Upgrade om in te schakelen",
+      "toggleAriaLabel": "{key} schakelen",
+      "toasts": {
+        "featureDisabled": "Functie uitgeschakeld",
+        "featureEnabled": "Functie ingeschakeld",
+        "networkError": "Netwerkfout",
+        "resetToDefault": "Teruggezet naar standaard",
+        "updateFailed": "Bijwerken mislukt ({status})"
+      }
     },
     "impact": {
       "drip-campaigns": "{count, plural, one {# klant zit momenteel in een drip-campagne. Deze klant ontvangt geen geplande e-mails meer.} other {# klanten zitten momenteel in drip-campagnes. Deze klanten ontvangen geen geplande e-mails meer.}}",
@@ -1243,7 +1973,7 @@
     "roleNone": "— geen (rol-mapping overslaan) —",
     "dashboardSections": "Dashboard-secties",
     "fullAccess": "Volledige toegang",
-    "custom": "Custom",
+    "custom": "Aangepast",
     "personalAllowlist": "Leden behouden hun persoonlijke sectie-allowlist (User.dashboardSections).",
     "discard": "Annuleren",
     "saveLabel": "Opslaan ({count, plural, one {# lid} other {# leden}})",
@@ -1388,7 +2118,7 @@
       "title": "{name} staat live.",
       "lede": "Je bent ingelogd als admin. Je 14-daagse {plan}-proef loopt nu — geen creditcard nodig. Koppel Stripe Checkout zodra je voorbij dag 14 wilt doorgaan.",
       "ctaOpen": "Dashboard openen",
-      "ctaCheckout": "Start Stripe checkout",
+      "ctaCheckout": "Start Stripe-afrekenen",
       "workspaceUrlLabel": "Workspace-URL",
       "slugLabel": "Slug"
     },
@@ -1501,7 +2231,8 @@
     "errors": {
       "nameRequired": "Naam is verplicht",
       "phoneRequired": "Telefoon is verplicht",
-      "invalidEmail": "Ongeldig e-mailadres"
+      "invalidEmail": "Ongeldig e-mailadres",
+      "submitFailed": "Opslaan mislukt — controleer de gegevens en probeer opnieuw."
     },
     "submit": "{entity} toevoegen",
     "success": "Succesvol toegevoegd",
@@ -1535,7 +2266,8 @@
       "networkError": "Netwerkfout — probeer het opnieuw",
       "authError": "Niet toegestaan — alleen managers kunnen contacten importeren",
       "close": "Klaar"
-    }
+    },
+    "submitting": "Opslaan…"
   },
   "reports": {
     "title": "Rapporten",
@@ -1644,6 +2376,1792 @@
       "IS24_NOT_CONFIGURED": "ImmoScout24-partnergegevens ontbreken — neem contact op met de platform-admin.",
       "IS24_PUBLISH_FAILED": "Publicatie naar ImmoScout24 mislukt: {detail}",
       "IS24_UNPUBLISH_FAILED": "Depublicatie op ImmoScout24 mislukt: {detail}"
+    }
+  },
+  "journey": {
+    "enquiry": "Aanvraag",
+    "viewing": "Bezichtiging",
+    "reservation": "Reservering",
+    "searches": "Onderzoek",
+    "agreement": "Overeenkomst",
+    "transfer": "Overdracht",
+    "commission": "Commissie",
+    "payment": "Betaling",
+    "keys": "Sleutels"
+  },
+  "kpi": {
+    "activeListings": "Actieve woningen",
+    "dealsClosed": "Gesloten deals",
+    "commission": "Commissie",
+    "commissionYtd": "Commissie YTD",
+    "avgDaysOnMarket": "Gem. dagen op markt",
+    "avgDaysToClose": "Gem. dagen tot sluiting",
+    "totalViewings": "Totale bezichtigingen",
+    "activeRentals": "Actieve verhuringen",
+    "thisMonth": "+{n} deze maand",
+    "ytdTotal": "YTD totaal",
+    "lastQuarter": "vs vorig kwartaal",
+    "belowAverage": "Onder gemiddelde",
+    "ongoingLeases": "Lopende huurcontracten",
+    "revenueClosings": "Omzet & sluitingen",
+    "monthlyPerformance": "Maandprestaties",
+    "listingsVsClosings": "Woningen vs sluitingen",
+    "monthlyMarketActivity": "Maandelijkse marktactiviteit",
+    "goal": "Doel: {n}"
+  },
+  "settings": {
+    "title": "Instellingen",
+    "subtitle": "Beheer uw account, organisatie en integraties",
+    "nav": {
+      "profile": "Profiel",
+      "organization": "Organisatie",
+      "preferences": "Voorkeuren",
+      "apiKeys": "API-sleutels",
+      "goals": "Doelen",
+      "integrations": "Integraties"
+    },
+    "sections": {
+      "profile": {
+        "title": "Profiel",
+        "sub": "Beheer uw persoonlijke gegevens"
+      },
+      "organization": {
+        "title": "Organisatie",
+        "sub": "Configureer uw organisatiegegevens"
+      },
+      "preferences": {
+        "title": "Voorkeuren",
+        "sub": "Pas uw ervaring aan"
+      },
+      "apiKeys": {
+        "title": "API-sleutels",
+        "sub": "Configureer API-integraties voor externe diensten"
+      },
+      "goals": {
+        "title": "Doelen",
+        "sub": "Stel prestatiedoelen in voor uw team"
+      },
+      "integrations": {
+        "title": "Integraties",
+        "sub": "Verbind externe diensten"
+      }
+    },
+    "fields": {
+      "fullName": "Volledige naam",
+      "email": "E-mail",
+      "role": "Rol",
+      "organizationName": "Organisatienaam",
+      "industry": "Branche",
+      "language": "Taal",
+      "theme": "Thema",
+      "startDate": "Startdatum",
+      "endDate": "Einddatum",
+      "current": "Huidig",
+      "target": "Doel"
+    },
+    "actions": {
+      "save": "Opslaan",
+      "saveChanges": "Wijzigingen opslaan",
+      "saving": "Opslaan…",
+      "saveGoals": "Doelen opslaan",
+      "configure": "Configureren",
+      "connect": "Verbinden",
+      "show": "Tonen",
+      "hide": "Verbergen"
+    },
+    "status": {
+      "loading": "Laden…",
+      "connected": "Verbonden",
+      "notConfigured": "Niet geconfigureerd",
+      "notConnected": "Niet verbonden",
+      "adminOnly": "Alleen beheerders kunnen organisatiegegevens bijwerken."
+    },
+    "theme": {
+      "light": "Licht",
+      "dark": "Donker"
+    },
+    "language": {
+      "english": "English",
+      "dutch": "Nederlands"
+    },
+    "industries": {
+      "general": "Algemeen",
+      "nonprofit": "Non-profit / NGO",
+      "foundation": "Stichting",
+      "csr": "Bedrijfs-MVO",
+      "government": "Overheid",
+      "education": "Onderwijs",
+      "healthcare": "Gezondheidszorg",
+      "realestate": "Vastgoed",
+      "hospitality": "Horeca"
+    },
+    "periods": {
+      "daily": "Dagelijks",
+      "weekly": "Wekelijks",
+      "monthly": "Maandelijks",
+      "yearly": "Jaarlijks",
+      "custom": "Aangepast"
+    },
+    "goalsList": {
+      "listings": "Toegevoegde objecten",
+      "deals": "Gesloten deals",
+      "commission": "Commissiedoel",
+      "viewings": "Geplande bezichtigingen",
+      "leads": "Nieuwe leads",
+      "projects": "Afgeronde projecten",
+      "people": "Geholpen mensen",
+      "co2": "CO2-reductie",
+      "donations": "Opgehaalde donaties",
+      "partners": "Aangesloten partners",
+      "occupancy": "Bezettingsgraad",
+      "revpar": "RevPAR-doel",
+      "satisfaction": "Gasttevredenheid",
+      "bookings": "Boekingen",
+      "fnb": "F&B-omzet"
+    },
+    "api": {
+      "gohighlevel": {
+        "name": "GoHighLevel CRM",
+        "description": "Verbind uw GHL-pijplijn"
+      },
+      "meta": {
+        "name": "Meta Ads",
+        "description": "Facebook/Instagram advertentiecampagnes"
+      },
+      "googleads": {
+        "name": "Google Ads",
+        "description": "Google zoek- en displaycampagnes"
+      },
+      "supabase": {
+        "name": "Supabase",
+        "description": "Databaseverbinding"
+      },
+      "stripe": {
+        "name": "Stripe",
+        "description": "Betalingsverwerking"
+      },
+      "twilio": {
+        "name": "Twilio",
+        "description": "SMS- en WhatsApp-berichten"
+      },
+      "fieldLabels": {
+        "apiKey": "API-sleutel",
+        "locationId": "Locatie-ID",
+        "accessToken": "Toegangstoken",
+        "accountId": "Account-ID",
+        "clientId": "Client-ID",
+        "clientSecret": "Client-geheim",
+        "url": "Project-URL",
+        "anonKey": "Anonieme sleutel",
+        "secretKey": "Geheime sleutel",
+        "accountSid": "Account SID",
+        "authToken": "Authenticatietoken"
+      }
+    },
+    "integrationsList": {
+      "gohighlevel": "GoHighLevel",
+      "supabase": "Supabase",
+      "slack": "Slack",
+      "googleAnalytics": "Google Analytics"
+    },
+    "toasts": {
+      "nameRequired": "Naam is verplicht",
+      "orgNameRequired": "Organisatienaam is verplicht",
+      "failedSaveProfile": "Profiel opslaan mislukt",
+      "profileSaved": "Profiel opgeslagen",
+      "failedSaveOrg": "Organisatie opslaan mislukt",
+      "orgSaved": "Organisatie opgeslagen",
+      "goalsSaved": "Doelen opgeslagen",
+      "apiDraftNotice": "alleen in deze sessie geconfigureerd — koppel via /api/integrations om te bewaren"
+    }
+  },
+  "liveBand": {
+    "ariaLabel": "Live organisatie-statistieken",
+    "liveYourOrg": "Live — uw organisatie",
+    "fetching": "Live — statistieken ophalen…",
+    "unavailable": "Live statistieken niet beschikbaar",
+    "unavailableHint": "Demo-widgets hieronder getoond. Controleer uw verbinding of API-logs.",
+    "updatedAgo": "Bijgewerkt {ago}",
+    "contacts": "Contacten",
+    "openDeals": "Open deals",
+    "won30d": "Gewonnen (30d)",
+    "closedTx": "Afgesloten transacties",
+    "deltaLast30d": "+{n} laatste 30 dagen",
+    "noNewLast30d": "geen nieuwe laatste 30 dagen",
+    "pipelineValue": "{value} pijplijn",
+    "revenueValue": "{value} omzet",
+    "gmvValue": "{value} GMV"
+  },
+  "integrations": {
+    "title": "Integraties",
+    "subtitle": "Verbind uw favoriete tools met DEUS",
+    "searchPlaceholder": "Zoek integraties…",
+    "status": {
+      "connected": "Verbonden",
+      "error": "Fout",
+      "notConnected": "Niet verbonden"
+    }
+  },
+  "forms": {
+    "contact": {
+      "fullName": "Volledige naam",
+      "company": "Organisatie of bedrijf",
+      "notes": "Aanvullende notities…"
+    },
+    "filterBuilder": {
+      "matchAll": "Match ALLE",
+      "matchAny": "Match ÉÉN",
+      "clearAll": "Alles wissen",
+      "operators": {
+        "eq": "is",
+        "neq": "is niet",
+        "contains": "bevat",
+        "ncontains": "bevat niet",
+        "startsWith": "begint met",
+        "endsWith": "eindigt op",
+        "in": "in",
+        "nin": "niet in",
+        "isEmpty": "is leeg",
+        "isNotEmpty": "is niet leeg",
+        "between": "tussen"
+      },
+      "header": "Filters",
+      "empty": "Nog geen filters. Voeg er hieronder een toe om te verfijnen.",
+      "addFilter": "Filter toevoegen",
+      "valuePlaceholder": "waarde",
+      "rangeFrom": "van",
+      "rangeTo": "tot",
+      "rangeAnd": "en"
+    }
+  },
+  "layout": {
+    "topbarAria": {
+      "openNav": "Navigatiemenu openen",
+      "openPalette": "Commando-palet openen"
+    },
+    "sidebar": {
+      "active": "Actief"
+    },
+    "orgSwitcher": {
+      "switchAria": "Wisselen van organisatie",
+      "currentAria": "Huidig"
+    }
+  },
+  "rooms": {
+    "title": "Kamers",
+    "subtitle": "Voorraad en beschikbaarheid",
+    "kpi": {
+      "totalRooms": "Totaal kamers",
+      "available": "Beschikbaar",
+      "occupied": "Bezet",
+      "maintenance": "Onderhoud"
+    },
+    "filters": {
+      "allStatuses": "Alle statussen"
+    },
+    "statuses": {
+      "available": "Beschikbaar",
+      "occupied": "Bezet",
+      "maintenance": "Onderhoud",
+      "blocked": "Geblokkeerd"
+    },
+    "types": {
+      "standard": "Standaard",
+      "deluxe": "Deluxe",
+      "suite": "Suite",
+      "family": "Familie",
+      "dorm": "Slaapzaal"
+    },
+    "addRoom": "Kamer toevoegen",
+    "editRoom": "Kamer bewerken",
+    "addSubtitle": "Registreer een nieuwe kamer",
+    "editSubtitle": "Kamergegevens bijwerken",
+    "empty": "Geen kamers gevonden.",
+    "loading": "Laden…",
+    "perNight": "/nacht",
+    "meta": {
+      "floor": "Verdieping",
+      "capacity": "Cap.",
+      "reservations": "reserveringen",
+      "tasks": "taken"
+    },
+    "detail": {
+      "price": "Prijs",
+      "capacity": "Capaciteit",
+      "reservations": "Reserveringen",
+      "housekeeping": "Schoonmaak",
+      "guests": " gasten",
+      "floor": "Verdieping"
+    },
+    "actions": {
+      "delete": "Verwijderen",
+      "edit": "Bewerken",
+      "cancel": "Annuleren",
+      "save": "Wijzigingen opslaan",
+      "saving": "Opslaan…"
+    },
+    "form": {
+      "name": "Kamernaam / -nummer",
+      "namePlaceholder": "Suite 201",
+      "type": "Type",
+      "floor": "Verdieping",
+      "capacity": "Capaciteit",
+      "price": "Prijs ($/nacht)",
+      "status": "Status"
+    },
+    "toasts": {
+      "nameRequired": "Naam is verplicht",
+      "invalidPrice": "Ongeldige prijs",
+      "saveFailed": "Opslaan mislukt",
+      "updated": "Kamer bijgewerkt",
+      "created": "Kamer toegevoegd",
+      "deleted": "Kamer verwijderd",
+      "deleteFailed": "Verwijderen mislukt",
+      "networkError": "Netwerkfout"
+    }
+  },
+  "email": {
+    "title": "E-mail",
+    "subtitle": "Beheer accounts en verstuur berichten",
+    "connectAccount": "Account koppelen",
+    "kpi": {
+      "totalAccounts": "Totaal accounts",
+      "connected": "Verbonden",
+      "messagesToday": "Berichten vandaag",
+      "pending": "In behandeling"
+    },
+    "accounts": {
+      "sectionTitle": "Accounts",
+      "refresh": "Vernieuwen",
+      "loading": "Laden…",
+      "emptyTitle": "Geen e-mailaccounts gekoppeld",
+      "emptyAction": "Koppel er een",
+      "syncPrefix": "sync",
+      "timeAgo": {
+        "never": "nooit",
+        "justNow": "zojuist",
+        "minutes": "{n}m geleden",
+        "hours": "{n}u geleden",
+        "days": "{n}d geleden"
+      }
+    },
+    "compose": {
+      "noAccount": "Geen account geselecteerd",
+      "sendFrom": "Verstuur via {provider}",
+      "connectPrompt": "Koppel een account om te beginnen met verzenden",
+      "button": "Opstellen",
+      "title": "Nieuw bericht",
+      "fromLabel": "Van",
+      "to": "Aan",
+      "toPlaceholder": "ontvanger@voorbeeld.com",
+      "addCcBcc": "+ Cc / Bcc toevoegen",
+      "cc": "Cc",
+      "bcc": "Bcc",
+      "subject": "Onderwerp",
+      "subjectPlaceholder": "Onderwerpregel",
+      "message": "Bericht",
+      "messagePlaceholder": "Schrijf je bericht…",
+      "attach": "Bijlage",
+      "attachTooltip": "Bijlagen binnenkort beschikbaar",
+      "send": "Verzenden",
+      "sending": "Verzenden…",
+      "toSubjectRequired": "Aan en Onderwerp zijn verplicht"
+    },
+    "thread": {
+      "comingSoonTitle": "E-mailgesprek-weergave binnenkort beschikbaar",
+      "comingSoonBody": "Inkomende en uitgaande berichten verschijnen hier zodra het mailboxsynchronisatie-endpoint live is."
+    },
+    "addModal": {
+      "title": "E-mailaccount koppelen",
+      "subtitle": "Voeg een mailbox toe om berichten te verzenden en ontvangen",
+      "close": "Sluiten",
+      "provider": "Provider",
+      "emailLabel": "E-mailadres",
+      "emailPlaceholder": "jij@voorbeeld.com",
+      "displayName": "Weergavenaam",
+      "displayNamePlaceholder": "Optioneel — getoond op uitgaande mail",
+      "submit": "Account koppelen",
+      "submitting": "Koppelen…",
+      "emailRequired": "E-mailadres is verplicht",
+      "genericFailed": "Mislukt ({status})",
+      "networkError": "Netwerkfout"
+    },
+    "sendErrors": {
+      "genericFailed": "Mislukt ({status})",
+      "networkError": "Netwerkfout"
+    }
+  },
+  "dealDetail": {
+    "backToDeals": "Terug naar deals",
+    "titleFallback": "Dealdetails",
+    "noPipeline": "Geen pipeline",
+    "sections": {
+      "dealInfo": "Dealinfo",
+      "commission": "Commissie",
+      "probability": "Kans",
+      "notes": "Notities"
+    },
+    "fields": {
+      "expectedClose": "Verwachte sluiting",
+      "dealType": "Dealtype",
+      "pipeline": "Pipeline",
+      "created": "Aangemaakt",
+      "actualClose": "Werkelijke sluiting",
+      "rate": "Tarief",
+      "amount": "Bedrag",
+      "brokerSplit": "Makelaarsverdeling"
+    },
+    "dealTypes": {
+      "standard": "Standaard",
+      "sale": "Verkoop",
+      "rental": "Verhuur",
+      "grant": "Subsidie",
+      "reservation": "Reservering",
+      "other": "Overig"
+    },
+    "actions": {
+      "markWon": "Markeer als gewonnen",
+      "markLost": "Markeer als verloren",
+      "reopen": "Heropenen",
+      "delete": "Verwijderen",
+      "edit": "Bewerken",
+      "cancel": "Annuleren",
+      "saveNotes": "Notities opslaan",
+      "saving": "Opslaan…"
+    },
+    "sideCards": {
+      "contact": "Contact",
+      "owner": "Eigenaar",
+      "project": "Project",
+      "stage": "Fase",
+      "weightedValue": "Gewogen waarde",
+      "pipelineAge": "Pipeline-leeftijd"
+    },
+    "empty": {
+      "noContact": "Geen contact gekoppeld",
+      "unassigned": "Niet toegewezen",
+      "noNotes": "Nog geen notities. Klik op Bewerken om toe te voegen."
+    },
+    "hints": {
+      "clickToEdit": "Klik om te bewerken"
+    },
+    "units": {
+      "days": "dagen"
+    },
+    "toasts": {
+      "markedWon": "Gemarkeerd als gewonnen",
+      "markedLost": "Gemarkeerd als verloren",
+      "reopened": "Deal heropend",
+      "stageUpdated": "Fase bijgewerkt",
+      "saved": "Opgeslagen",
+      "deleted": "Deal verwijderd",
+      "deleteFailed": "Verwijderen mislukt",
+      "updateFailed": "Bijwerken mislukt",
+      "networkError": "Netwerkfout",
+      "titleRequired": "Titel vereist",
+      "invalidValue": "Ongeldige waarde",
+      "rangeZeroToHundred": "Moet tussen 0 en 100 zijn",
+      "notFound": "Deal niet gevonden",
+      "loadFailed": "Kan deal niet laden"
+    },
+    "common": {
+      "loading": "Laden..."
+    }
+  },
+  "transactionDetail": {
+    "backToTransactions": "Terug naar transacties",
+    "titleFallback": "Transactiedetails",
+    "escrowFallback": "Geen escrow-nr.",
+    "noTitleCompany": "Geen notaris",
+    "notFound": "Niet gevonden.",
+    "sections": {
+      "financial": "Financiële gegevens",
+      "closingChecklist": "Afsluitchecklist",
+      "notes": "Notities",
+      "summary": "Samenvatting",
+      "signatures": "Handtekeningen",
+      "linked": "Gekoppeld"
+    },
+    "fields": {
+      "salePrice": "Verkoopprijs",
+      "earnestMoney": "Waarborgsom",
+      "escrowNumber": "Escrow-nummer",
+      "titleCompany": "Notaris",
+      "contractDate": "Contractdatum",
+      "closingDate": "Sluitingsdatum",
+      "earnest": "Waarborg",
+      "signatures": "Handtekeningen",
+      "daysOpen": "Dagen open",
+      "documentName": "Documentnaam",
+      "signerName": "Naam ondertekenaar",
+      "signerEmail": "E-mail ondertekenaar"
+    },
+    "statuses": {
+      "pending": "In behandeling",
+      "inProgress": "Loopt",
+      "closing": "Afronding",
+      "completed": "Afgerond",
+      "cancelled": "Geannuleerd"
+    },
+    "types": {
+      "purchase": "Aankoop",
+      "sale": "Verkoop",
+      "lease": "Verhuur",
+      "rental": "Huur"
+    },
+    "actions": {
+      "requestSignature": "Handtekening aanvragen",
+      "request": "Aanvragen",
+      "delete": "Verwijderen",
+      "cancel": "Annuleren",
+      "save": "Opslaan",
+      "edit": "Bewerken",
+      "viewDeal": "Deal bekijken →",
+      "viewProperty": "Object bekijken →",
+      "sendSignatureRequest": "Handtekeningverzoek versturen",
+      "sending": "Versturen…"
+    },
+    "modal": {
+      "title": "Handtekening aanvragen",
+      "subtitle": "Stuur een document voor elektronische ondertekening",
+      "documentPlaceholder": "Koopovereenkomst",
+      "signerNamePlaceholder": "Jan Jansen",
+      "signerEmailPlaceholder": "jan@voorbeeld.nl"
+    },
+    "checklist": {
+      "defaultItems": {
+        "inspection": "Inspectie ingepland",
+        "appraisal": "Taxatie aangevraagd",
+        "loanApproval": "Hypotheekgoedkeuring ontvangen",
+        "titleSearch": "Eigendomsonderzoek afgerond",
+        "insurance": "Verzekering afgesloten",
+        "walkthrough": "Eindinspectie",
+        "closingDocs": "Sluitingsdocumenten getekend"
+      }
+    },
+    "empty": {
+      "noSignatures": "Nog geen handtekeningverzoeken.",
+      "noNotes": "Geen notities. Klik op Bewerken om toe te voegen."
+    },
+    "hints": {
+      "clickToEdit": "Klik om te bewerken"
+    },
+    "toasts": {
+      "saved": "Opgeslagen",
+      "saveFailed": "Opslaan mislukt",
+      "updateFailed": "Bijwerken mislukt",
+      "networkError": "Netwerkfout",
+      "invalidAmount": "Ongeldig bedrag",
+      "deleted": "Transactie verwijderd",
+      "deleteFailed": "Verwijderen mislukt",
+      "allFieldsRequired": "Alle velden zijn verplicht",
+      "signatureCreated": "Handtekeningverzoek aangemaakt",
+      "signatureFailed": "Handtekeningverzoek mislukt"
+    },
+    "common": {
+      "loading": "Laden..."
+    }
+  },
+  "projectDetail": {
+    "titleFallback": "Project",
+    "notFound": "Project niet gevonden",
+    "backToProjects": "Terug naar projecten",
+    "tabs": {
+      "overview": "Overzicht",
+      "milestones": "Mijlpalen",
+      "impact": "Impact",
+      "contacts": "Contacten",
+      "deals": "Deals"
+    },
+    "statuses": {
+      "planned": "Gepland",
+      "active": "Actief",
+      "completed": "Afgerond",
+      "paused": "Gepauzeerd"
+    },
+    "sections": {
+      "projectDetails": "Projectgegevens",
+      "milestoneProgress": "Mijlpaalvoortgang",
+      "budgetBurn": "Budgetverbruik",
+      "addMilestone": "Mijlpaal toevoegen",
+      "recordImpact": "Impact registreren",
+      "impactRecords": "Impactregistraties",
+      "linkedContacts": "Gekoppelde contacten",
+      "linkedDeals": "Gekoppelde deals"
+    },
+    "stats": {
+      "progress": "Voortgang",
+      "budget": "Budget",
+      "impactEntries": "Impactvermeldingen",
+      "daysActive": "Dagen actief",
+      "records": "registraties",
+      "totalDuration": "totale duur",
+      "soFar": "tot nu toe",
+      "totalPipeline": "Totale pipeline",
+      "weighted": "Gewogen",
+      "won": "Gewonnen",
+      "open": "Open",
+      "milestonesSummary": "{done}/{total} mijlpalen",
+      "burnPercent": "{burn}% uitgegeven",
+      "milestonesCompleted": "{done} van {total} mijlpalen afgerond",
+      "budgetSpent": "€{spent} van €{budget} uitgegeven"
+    },
+    "milestones": {
+      "titlePlaceholder": "Titel van mijlpaal",
+      "addBtn": "Toevoegen",
+      "emptyHint": "Nog geen mijlpalen. Voeg hierboven je eerste toe.",
+      "markPending": "Markeren als openstaand",
+      "markCompleted": "Markeren als afgerond",
+      "deleteAria": "Mijlpaal verwijderen",
+      "overdueLabel": "te laat",
+      "completedLabel": "afgerond {date}"
+    },
+    "impact": {
+      "valuePlaceholder": "Waarde",
+      "notesPlaceholder": "Notities (optioneel)",
+      "recordBtn": "Registreren",
+      "emptyHint": "Nog geen impact geregistreerd. Voeg hierboven je eerste meting toe.",
+      "types": {
+        "co2_kg": "CO2 bespaard",
+        "people_helped": "Mensen geholpen",
+        "trees_planted": "Bomen geplant",
+        "money_donated": "Geld gedoneerd",
+        "water_liters": "Water bespaard",
+        "energy_kwh": "Energie opgewekt",
+        "custom": "Aangepast"
+      }
+    },
+    "contacts": {
+      "emptyHint": "Nog geen contacten gekoppeld."
+    },
+    "deals": {
+      "openBoard": "Deal-board openen →",
+      "emptyHint": "Nog geen deals gekoppeld aan dit project."
+    },
+    "budgetPlaceholder": "Budget (€)",
+    "toasts": {
+      "updated": "Project bijgewerkt",
+      "somethingWrong": "Er ging iets mis",
+      "milestoneAdded": "Mijlpaal toegevoegd",
+      "milestoneRemoved": "Mijlpaal verwijderd",
+      "impactRecorded": "Impact geregistreerd",
+      "positiveValueRequired": "Voer een positieve waarde in",
+      "failedUpdateProject": "Project bijwerken mislukt",
+      "failedAddMilestone": "Mijlpaal toevoegen mislukt",
+      "failedUpdateMilestone": "Mijlpaal bijwerken mislukt",
+      "failedDeleteMilestone": "Mijlpaal verwijderen mislukt",
+      "failedAddMetric": "Meting toevoegen mislukt"
+    }
+  },
+  "propertyDetail": {
+    "titleFallback": "Objectdetails",
+    "backToProperties": "Terug naar objecten",
+    "sections": {
+      "propertyDetails": "Objectgegevens",
+      "showings": "Bezichtigingen",
+      "stats": "Statistieken",
+      "listed": "Aangeboden",
+      "offers": "Biedingen",
+      "description": "Omschrijving"
+    },
+    "fields": {
+      "price": "Prijs",
+      "address": "Adres",
+      "city": "Stad",
+      "state": "Provincie",
+      "zip": "Postcode",
+      "bedrooms": "Slaapkamers",
+      "bathrooms": "Badkamers",
+      "squareFeet": "Oppervlakte",
+      "yearBuilt": "Bouwjaar",
+      "viewings": "Bezichtigingen",
+      "openHouses": "Open dagen",
+      "offers": "Biedingen"
+    },
+    "statuses": {
+      "available": "Beschikbaar",
+      "underContract": "Onder bod",
+      "sold": "Verkocht",
+      "rented": "Verhuurd"
+    },
+    "types": {
+      "residential": "Residentieel",
+      "commercial": "Commercieel",
+      "land": "Grond",
+      "industrial": "Industrieel"
+    },
+    "actions": {
+      "scheduleShowing": "Bezichtiging plannen",
+      "scheduleOpenHouse": "Open dag plannen",
+      "submitOffer": "Bod uitbrengen",
+      "delete": "Verwijderen",
+      "viewAll": "Alles bekijken →",
+      "edit": "Bewerken",
+      "cancel": "Annuleren",
+      "save": "Opslaan"
+    },
+    "empty": {
+      "notFound": "Object niet gevonden.",
+      "noShowings": "Geen bezichtigingen gepland.",
+      "noOffers": "Nog geen biedingen.",
+      "noDescription": "Geen omschrijving."
+    },
+    "hints": {
+      "clickToEdit": "Klik om te bewerken",
+      "clickToChange": "Klik om te wijzigen",
+      "daysOnMarket": "{days} dagen op de markt"
+    },
+    "loading": "Object laden...",
+    "toasts": {
+      "titleRequired": "Titel vereist",
+      "invalidPrice": "Ongeldige prijs",
+      "invalidNumber": "Ongeldig getal",
+      "saved": "Opgeslagen",
+      "saveFailed": "Opslaan mislukt",
+      "networkError": "Netwerkfout",
+      "deleted": "Object verwijderd",
+      "deleteFailed": "Verwijderen mislukt",
+      "notFound": "Object niet gevonden",
+      "loadFailed": "Object kon niet worden geladen"
+    }
+  },
+  "commandPalette": {
+    "placeholder": "Zoek pagina’s, contacten, projecten...",
+    "askAi": "Vraag AI",
+    "askAiAria": "Vraag AI",
+    "askAiTitle": "Vraag AI (Cmd+Shift+K)",
+    "searching": "Zoeken…",
+    "noResults": "Geen resultaten gevonden",
+    "navigate": "navigeren",
+    "select": "selecteren",
+    "resultsOne": "{count} resultaat",
+    "resultsOther": "{count} resultaten",
+    "categories": {
+      "pages": "Pagina’s",
+      "tools": "Hulpmiddelen",
+      "realEstate": "Vastgoed",
+      "hospitality": "Horeca",
+      "philanthropy": "Filantropie",
+      "system": "Systeem",
+      "actions": "Acties",
+      "settings": "Instellingen",
+      "contacts": "Contacten",
+      "projects": "Projecten",
+      "properties": "Panden"
+    },
+    "contactFallback": "Contact",
+    "items": {
+      "dashboard": {
+        "label": "Dashboard",
+        "description": "Overzicht en KPI’s"
+      },
+      "projects": {
+        "label": "Projecten",
+        "description": "Projecten beheren"
+      },
+      "properties": {
+        "label": "Panden",
+        "description": "Panden beheren"
+      },
+      "contacts": {
+        "label": "Contacten",
+        "description": "Personen en organisaties"
+      },
+      "impact": {
+        "label": "Impact",
+        "description": "Impactstatistieken"
+      },
+      "market": {
+        "label": "Markt",
+        "description": "Marktanalyse"
+      },
+      "reports": {
+        "label": "Rapporten",
+        "description": "Rapporten genereren en bekijken"
+      },
+      "kanban": {
+        "label": "Bord",
+        "description": "Pijplijnbord"
+      },
+      "dealsBoard": {
+        "label": "Deals-board",
+        "description": "Pijplijnbord"
+      },
+      "reservations": {
+        "label": "Reserveringen",
+        "description": "Pijplijnbord"
+      },
+      "deals": {
+        "label": "Deals",
+        "description": "Deal-pijplijn"
+      },
+      "calendar": {
+        "label": "Agenda",
+        "description": "Mijlpalen en gebeurtenissen"
+      },
+      "timeline": {
+        "label": "Tijdlijn",
+        "description": "Gantt-weergave van taken"
+      },
+      "documents": {
+        "label": "Documenten",
+        "description": "Bestanden en documenten beheren"
+      },
+      "inbox": {
+        "label": "Postvak",
+        "description": "Gesprekken en berichten"
+      },
+      "email": {
+        "label": "E-mail",
+        "description": "E-mailcampagnes"
+      },
+      "sms": {
+        "label": "SMS",
+        "description": "Sms-berichten"
+      },
+      "templates": {
+        "label": "Sjablonen",
+        "description": "E-mail- en sms-sjablonen"
+      },
+      "pages": {
+        "label": "Pagina’s",
+        "description": "Aangepaste pagina’s"
+      },
+      "ai": {
+        "label": "AI-inzichten",
+        "description": "AI-gedreven analyse"
+      },
+      "propertiesRe": {
+        "label": "Panden",
+        "description": "Vastgoedlistings"
+      },
+      "showings": {
+        "label": "Bezichtigingen",
+        "description": "Bezichtigingen van panden"
+      },
+      "offers": {
+        "label": "Biedingen",
+        "description": "Biedingen op panden"
+      },
+      "openHouses": {
+        "label": "Open huizen",
+        "description": "Open-huisdagen"
+      },
+      "commissions": {
+        "label": "Commissies",
+        "description": "Teamranglijst"
+      },
+      "dripCampaigns": {
+        "label": "Drip-campagnes",
+        "description": "Geautomatiseerde reeksen"
+      },
+      "marketAnalytics": {
+        "label": "Marktanalyse",
+        "description": "Markttrends"
+      },
+      "transactions": {
+        "label": "Transacties",
+        "description": "Vastgoedtransacties"
+      },
+      "actionPlans": {
+        "label": "Actieplannen",
+        "description": "Geautomatiseerde actiereeksen"
+      },
+      "leadScores": {
+        "label": "Lead-scores",
+        "description": "Contactscoring"
+      },
+      "leadRouting": {
+        "label": "Lead-routing",
+        "description": "Leads doorsturen naar makelaars"
+      },
+      "dialer": {
+        "label": "Power Dialer",
+        "description": "Belgeschiedenis en bellen"
+      },
+      "referrals": {
+        "label": "Doorverwijzingen",
+        "description": "Doorverwijscommissies"
+      },
+      "soi": {
+        "label": "Invloedssfeer",
+        "description": "SOI-categorieën"
+      },
+      "cma": {
+        "label": "CMA-rapporten",
+        "description": "Vergelijkende marktanalyse"
+      },
+      "clientPortal": {
+        "label": "Klantportaal",
+        "description": "Toegang tot het klantportaal"
+      },
+      "eSignatures": {
+        "label": "E-handtekeningen",
+        "description": "Document-handtekeningen"
+      },
+      "rooms": {
+        "label": "Kamers",
+        "description": "Kamers en beschikbaarheid beheren"
+      },
+      "grants": {
+        "label": "Subsidies",
+        "description": "Subsidieaanvragen en financiering"
+      },
+      "donors": {
+        "label": "Donateurs",
+        "description": "Dashboard donateurscoring"
+      },
+      "volunteers": {
+        "label": "Vrijwilligers",
+        "description": "Vrijwilligersteam en uren"
+      },
+      "notifications": {
+        "label": "Meldingen",
+        "description": "Alle meldingen"
+      },
+      "automations": {
+        "label": "Automatiseringen",
+        "description": "Workflows automatiseren"
+      },
+      "integrations": {
+        "label": "Integraties",
+        "description": "Gekoppelde apps"
+      },
+      "webhooks": {
+        "label": "Webhooks",
+        "description": "Uitgaande webhooks"
+      },
+      "pipelines": {
+        "label": "Pijplijnen",
+        "description": "Deal-pijplijnen en fases configureren"
+      },
+      "security": {
+        "label": "Beveiliging",
+        "description": "IP-allowlist en inactiviteitstime-out"
+      },
+      "features": {
+        "label": "Feature flags",
+        "description": "Per-organisatie kill-switches zonder redeploy"
+      },
+      "scimGroups": {
+        "label": "SCIM-groepen",
+        "description": "IdP-groepen koppelen aan platformrollen en secties"
+      },
+      "audit": {
+        "label": "Auditlog",
+        "description": "Systeem-audittrail"
+      },
+      "settings": {
+        "label": "Instellingen",
+        "description": "App-voorkeuren"
+      },
+      "newProject": {
+        "label": "Nieuw project",
+        "description": "Maak een nieuw project aan"
+      },
+      "newProperty": {
+        "label": "Nieuw pand",
+        "description": "Maak een nieuw pand aan"
+      },
+      "newRoom": {
+        "label": "Nieuwe kamer",
+        "description": "Maak een nieuwe kamer aan"
+      },
+      "newContact": {
+        "label": "Nieuw contact",
+        "description": "Voeg een nieuw contact toe"
+      },
+      "exportData": {
+        "label": "Gegevens exporteren",
+        "description": "Huidige gegevens als CSV downloaden"
+      },
+      "toDark": {
+        "label": "Naar donkere modus",
+        "description": "Momenteel {theme}"
+      },
+      "toLight": {
+        "label": "Naar lichte modus",
+        "description": "Momenteel {theme}"
+      },
+      "toCsr": {
+        "label": "Wissel naar CSR",
+        "description": "Filantropie- en CSR-modus"
+      },
+      "toRe": {
+        "label": "Wissel naar vastgoed",
+        "description": "Vastgoedmodus"
+      },
+      "toHos": {
+        "label": "Wissel naar hospitality",
+        "description": "Hospitality-modus"
+      }
+    }
+  },
+  "audit": {
+    "title": "Auditlogboek",
+    "subtitle": "Volledige activiteitsgeschiedenis van je werkomgeving",
+    "filters": {
+      "allEntities": "Alle entiteiten",
+      "allActions": "Alle acties",
+      "create": "Aanmaken",
+      "update": "Bijwerken",
+      "delete": "Verwijderen",
+      "allTime": "Alle tijden",
+      "last24h": "Laatste 24 uur",
+      "last7d": "Laatste 7 dagen",
+      "last30d": "Laatste 30 dagen"
+    },
+    "columns": {
+      "timestamp": "Tijdstempel",
+      "action": "Actie",
+      "entity": "Entiteit",
+      "changes": "Wijzigingen",
+      "user": "Gebruiker"
+    },
+    "empty": "Geen auditlogboeken gevonden.",
+    "loading": "Auditlogboeken laden...",
+    "diff": {
+      "noDetails": "Geen veldspecifieke details vastgelegd.",
+      "field": "Veld",
+      "before": "Voor",
+      "after": "Na",
+      "entityId": "entiteit-id",
+      "noDetailsShort": "Geen details"
+    }
+  },
+  "transactions": {
+    "title": "Transacties",
+    "subtitle": "Sluitingen, contracten en escrow",
+    "addLabel": "Transactie",
+    "kpis": {
+      "total": "Totaal aantal transacties",
+      "active": "Actief",
+      "totalVolume": "Totale omzet",
+      "pendingClose": "Sluiting in afwachting"
+    },
+    "filters": {
+      "allStatuses": "Alle statussen",
+      "pending": "In afwachting",
+      "active": "Actief",
+      "closing": "Sluiten",
+      "closed": "Gesloten",
+      "cancelled": "Geannuleerd",
+      "allTypes": "Alle types",
+      "purchase": "Aankoop",
+      "sale": "Verkoop",
+      "lease": "Huur",
+      "refinance": "Herfinanciering"
+    },
+    "columns": {
+      "transaction": "Transactie",
+      "type": "Type",
+      "salePrice": "Verkoopprijs",
+      "status": "Status",
+      "closingDate": "Sluitdatum",
+      "signatures": "Handtekeningen"
+    },
+    "list": {
+      "loading": "Laden...",
+      "empty": "Geen transacties gevonden.",
+      "noEscrow": "Geen escrow-nr."
+    },
+    "modal": {
+      "title": "Transactie toevoegen",
+      "subtitle": "Maak een nieuwe transactie aan",
+      "close": "Sluiten",
+      "type": "Type",
+      "escrowNumber": "Escrow-nummer",
+      "titleCompany": "Titelmaatschappij",
+      "salePrice": "Verkoopprijs ($)",
+      "earnestMoney": "Aanbetaling ($)",
+      "closingDate": "Sluitdatum",
+      "notes": "Notities",
+      "saving": "Opslaan...",
+      "submit": "Transactie toevoegen"
+    },
+    "errors": {
+      "networkError": "Netwerkfout"
+    }
+  },
+  "sms": {
+    "title": "SMS & WhatsApp",
+    "subtitle": "Verstuur en volg SMS- en WhatsApp-berichten",
+    "addLabel": "Bericht versturen",
+    "kpis": {
+      "total": "Totaal aantal berichten",
+      "delivered": "Bezorgd",
+      "failed": "Mislukt",
+      "queued": "In wachtrij"
+    },
+    "filters": {
+      "searchPlaceholder": "Zoeken op nummer...",
+      "allChannels": "Alle kanalen",
+      "allStatuses": "Alle statussen",
+      "queued": "In wachtrij",
+      "sent": "Verzonden",
+      "delivered": "Bezorgd",
+      "failed": "Mislukt",
+      "clear": "Filters wissen"
+    },
+    "direction": {
+      "to": "naar",
+      "from": "van"
+    },
+    "list": {
+      "loading": "Laden...",
+      "empty": "Geen berichten gevonden."
+    },
+    "relative": {
+      "justNow": "zojuist"
+    },
+    "modal": {
+      "title": "Bericht versturen",
+      "subtitle": "Verstuur een nieuw SMS- of WhatsApp-bericht",
+      "close": "Sluiten",
+      "channel": "Kanaal",
+      "toNumber": "Naar nummer",
+      "message": "Bericht",
+      "messagePlaceholder": "Typ je bericht...",
+      "overLimit": "Bericht is langer dan 160 tekens — het wordt opgesplitst in meerdere SMS-berichten.",
+      "sending": "Versturen...",
+      "submit": "Bericht versturen"
+    },
+    "errors": {
+      "networkError": "Netwerkfout"
+    }
+  },
+  "actionPlans": {
+    "title": "Actieplannen",
+    "subtitle": "Geautomatiseerde reeksen gestart door events",
+    "addLabel": "Plan",
+    "kpis": {
+      "total": "Totaal aantal plannen",
+      "active": "Actief",
+      "enrollments": "Totaal aantal inschrijvingen"
+    },
+    "filters": {
+      "all": "Alle statussen",
+      "active": "Actief",
+      "paused": "Gepauzeerd",
+      "archived": "Gearchiveerd"
+    },
+    "list": {
+      "loading": "Laden...",
+      "empty": "Nog geen actieplannen."
+    },
+    "triggers": {
+      "manual": "Handmatig",
+      "new_lead": "Nieuwe lead",
+      "stage_change": "Fasewijziging",
+      "date_trigger": "Datumtrigger"
+    },
+    "modal": {
+      "title": "Actieplan toevoegen",
+      "subtitle": "Maak een nieuw actieplan aan",
+      "close": "Sluiten",
+      "name": "Naam",
+      "namePlaceholder": "bijv. Nieuwe lead-onboarding",
+      "description": "Beschrijving",
+      "descriptionPlaceholder": "Beschrijf dit actieplan...",
+      "triggerEvent": "Triggergebeurtenis",
+      "status": "Status",
+      "saving": "Opslaan...",
+      "submit": "Plan toevoegen"
+    },
+    "statusLabels": {
+      "active": "Actief",
+      "paused": "Gepauzeerd"
+    },
+    "actions": {
+      "delete": "Verwijderen"
+    },
+    "errors": {
+      "nameRequired": "Naam is verplicht",
+      "networkError": "Netwerkfout"
+    }
+  },
+  "documents": {
+    "title": "Documenten",
+    "subtitle": "Bestanden gekoppeld aan projecten, contacten en deals",
+    "addLabel": "Uploaden",
+    "kpis": {
+      "total": "Totaal aantal documenten",
+      "totalSize": "Totale grootte",
+      "linked": "Gekoppeld",
+      "images": "Afbeeldingen"
+    },
+    "search": "Zoek op naam of MIME…",
+    "filters": "Filters",
+    "filtersWithCount": "Filters ({count})",
+    "view": {
+      "grid": "Raster",
+      "table": "Tabel"
+    },
+    "selection": {
+      "countSelected": "{count} geselecteerd",
+      "clear": "Wissen",
+      "deleteCount": "Verwijder {count}"
+    },
+    "list": {
+      "loading": "Laden…",
+      "emptyHeading": "Geen documenten",
+      "uploadFirst": "Upload je eerste document om te beginnen.",
+      "noMatch": "Geen documenten voldoen aan de filters.",
+      "uploadFirstBtn": "Eerste document uploaden"
+    },
+    "card": {
+      "open": "Openen",
+      "save": "Opslaan",
+      "download": "Downloaden",
+      "delete": "Verwijderen"
+    },
+    "columns": {
+      "name": "Naam",
+      "type": "Type",
+      "mime": "MIME",
+      "size": "Grootte",
+      "linked": "Gekoppeld",
+      "uploaded": "Geüpload"
+    },
+    "filterFields": {
+      "name": "Naam",
+      "type": "Type",
+      "mimeType": "MIME-type",
+      "size": "Grootte (bytes)",
+      "linkedTo": "Gekoppeld aan",
+      "file": "Bestand",
+      "image": "Afbeelding",
+      "pdf": "PDF",
+      "spreadsheet": "Spreadsheet",
+      "project": "Project",
+      "contact": "Contact",
+      "deal": "Deal",
+      "property": "Object",
+      "room": "Kamer"
+    },
+    "upload": {
+      "title": "Document uploaden",
+      "subtitle": "Sleep een bestand of voeg toe via URL",
+      "separator": "— of voeg toe via URL —",
+      "name": "Naam",
+      "fileUrl": "Bestands-URL",
+      "type": "Type",
+      "linkTo": "Koppelen aan",
+      "none": "Geen",
+      "mimeType": "MIME-type",
+      "sizeBytes": "Grootte (bytes)",
+      "cancel": "Annuleren",
+      "uploading": "Uploaden…",
+      "submit": "Uploaden",
+      "failed": "Mislukt",
+      "failedUpload": "Uploaden mislukt"
+    },
+    "toasts": {
+      "deleted": "Document verwijderd",
+      "deleteFailed": "Verwijderen mislukt",
+      "networkError": "Netwerkfout",
+      "bulkDeleted": "{count} document(en) verwijderd",
+      "bulkFailed": "{count} konden niet worden verwijderd"
+    }
+  },
+  "templates": {
+    "title": "Sjablonen",
+    "subtitle": "E-mail- en SMS-sjablonen met samenvoegvelden",
+    "addLabel": "Sjabloon",
+    "filters": {
+      "all": "Alles",
+      "email": "E-mail",
+      "sms": "SMS",
+      "letter": "Brief"
+    },
+    "list": {
+      "loading": "Laden...",
+      "empty": "Geen sjablonen gevonden.",
+      "updated": "Bijgewerkt {date}",
+      "preview": "Voorbeeld",
+      "edit": "Bewerken",
+      "delete": "Verwijderen"
+    },
+    "editor": {
+      "titleNew": "Nieuw sjabloon",
+      "titleEdit": "Sjabloon bewerken",
+      "subtitle": "Gebruik {field} voor samenvoegvelden",
+      "name": "Naam",
+      "namePlaceholder": "Welkomstmail",
+      "type": "Type",
+      "subject": "Onderwerp",
+      "body": "Inhoud",
+      "cancel": "Annuleren",
+      "saving": "Opslaan...",
+      "saveChanges": "Wijzigingen opslaan",
+      "create": "Sjabloon aanmaken"
+    },
+    "preview": {
+      "title": "Sjabloonvoorbeeld",
+      "subtitle": "Weergegeven met voorbeeldcontext",
+      "raw": "Ruw",
+      "rendered": "Gerenderd",
+      "sampleContext": "Voorbeeldcontext:",
+      "rendering": "Renderen...",
+      "previewFailed": "Voorbeeld mislukt"
+    },
+    "toasts": {
+      "nameRequired": "Naam is verplicht",
+      "bodyRequired": "Inhoud is verplicht",
+      "saveFailed": "Opslaan mislukt",
+      "updated": "Sjabloon bijgewerkt",
+      "created": "Sjabloon aangemaakt",
+      "deleted": "Sjabloon verwijderd",
+      "deleteFailed": "Verwijderen mislukt"
+    }
+  },
+  "scoringRules": {
+    "title": "Scoreregels",
+    "subtitle": "Ken punten toe aan engagement-events",
+    "addLabel": "Regel",
+    "kpis": {
+      "total": "Totaal aantal regels",
+      "active": "Actieve regels",
+      "totalPoints": "Totaal mogelijke punten"
+    },
+    "list": {
+      "loading": "Laden...",
+      "empty": "Nog geen scoreregels.",
+      "decaysIn": "Vervalt over {days}d",
+      "active": "Actief",
+      "paused": "Gepauzeerd",
+      "delete": "Verwijderen"
+    },
+    "modal": {
+      "title": "Scoreregel toevoegen",
+      "subtitle": "Maak een nieuwe scoreregel",
+      "close": "Sluiten",
+      "name": "Naam",
+      "namePlaceholder": "bijv. E-mail geopend",
+      "event": "Gebeurtenis",
+      "eventPlaceholder": "bijv. email_open",
+      "points": "Punten",
+      "enableDecay": "Puntenverval inschakelen",
+      "decayDays": "Vervaldagen",
+      "enabled": "Ingeschakeld",
+      "saving": "Opslaan...",
+      "submit": "Regel toevoegen"
+    },
+    "errors": {
+      "nameEventRequired": "Naam en gebeurtenis zijn verplicht",
+      "networkError": "Netwerkfout"
+    }
+  },
+  "dripCampaigns": {
+    "title": "Drip-campagnes",
+    "subtitle": "Geautomatiseerde nurture-reeksen in meerdere stappen",
+    "kpis": {
+      "total": "Totaal aantal campagnes",
+      "active": "Actief",
+      "totalSteps": "Totaal aantal stappen",
+      "enrolled": "Ingeschreven"
+    },
+    "filters": {
+      "allTypes": "Alle types",
+      "allStatuses": "Alle statussen",
+      "active": "Actief",
+      "paused": "Gepauzeerd",
+      "archived": "Gearchiveerd"
+    },
+    "types": {
+      "buyer": "Koper-nurture",
+      "seller": "Verkoper-nurture",
+      "nurture": "Algemene nurture",
+      "post_close": "Na sluiting",
+      "sphere": "Invloedssfeer",
+      "open_house": "Open-huisopvolging"
+    },
+    "newCampaign": "Nieuwe campagne",
+    "list": {
+      "loading": "Laden...",
+      "empty": "Geen campagnes gevonden. Klik op Nieuwe campagne om er een aan te maken.",
+      "noSteps": "Geen stappen geconfigureerd",
+      "moreSteps": "+{count} meer",
+      "stepCount": "{count} stap(pen)",
+      "created": "Aangemaakt {date}",
+      "manageEnrollments": "Inschrijvingen beheren",
+      "pause": "Pauzeren",
+      "activate": "Activeren",
+      "edit": "Bewerken",
+      "delete": "Verwijderen"
+    },
+    "form": {
+      "titleNew": "Nieuwe drip-campagne",
+      "titleEdit": "Campagne bewerken",
+      "subtitle": "Reeks geautomatiseerde contactmomenten",
+      "campaignName": "Campagnenaam",
+      "campaignNamePlaceholder": "bijv. Welkomstreeks koper",
+      "type": "Type",
+      "status": "Status",
+      "sequenceSteps": "Reeksstappen ({count})",
+      "addStep": "Stap toevoegen",
+      "step": "Stap {n}",
+      "sendAfter": "Verstuur na",
+      "day": "dag",
+      "days": "dagen",
+      "removeStep": "Stap verwijderen",
+      "subjectPlaceholder": "Onderwerpregel",
+      "emailBodyPlaceholder": "E-mailinhoud…",
+      "messagePlaceholder": "{channel}-bericht…",
+      "chars": "{n} tekens",
+      "emptySteps": "Nog geen stappen. Klik op Stap toevoegen om de reeks op te bouwen.",
+      "cancel": "Annuleren",
+      "saving": "Opslaan…",
+      "saveChanges": "Wijzigingen opslaan",
+      "createCampaign": "Campagne aanmaken"
+    },
+    "toasts": {
+      "nameRequired": "Naam is verplicht",
+      "addStep": "Voeg minstens één stap toe",
+      "stepBody": "Alle stappen hebben een inhoud nodig",
+      "dayInvalid": "Dag moet 0 of hoger zijn",
+      "saveFailed": "Opslaan mislukt",
+      "updated": "Campagne bijgewerkt",
+      "created": "Campagne aangemaakt",
+      "networkError": "Netwerkfout",
+      "statusChanged": "Campagne {status}",
+      "updateFailed": "Bijwerken mislukt",
+      "deleted": "Campagne verwijderd",
+      "deleteFailed": "Verwijderen mislukt"
+    }
+  },
+  "settingsUsers": {
+    "title": "Team en rechten",
+    "subtitle": "Bepaal wie wat ziet in het dashboard",
+    "readOnlyNotice": "Alleen beheerders kunnen teamleden uitnodigen of rechten wijzigen. Je bekijkt deze lijst in alleen-lezen modus.",
+    "team": "Team",
+    "memberCount": "{count} lid/leden",
+    "invite": "Uitnodigen",
+    "loading": "Laden…",
+    "noUsers": "Nog geen gebruikers.",
+    "edit": "Bewerken",
+    "sectionsSummary": {
+      "allSections": "Alle secties",
+      "noSections": "Geen secties"
+    },
+    "groups": {
+      "primary": "Primair",
+      "tools": "Hulpmiddelen",
+      "industry": "Industrie",
+      "system": "Systeem"
+    },
+    "picker": {
+      "fullAccess": "Volledige toegang tot elke sectie",
+      "resetFull": "Herstel naar volledige toegang"
+    },
+    "invModal": {
+      "title": "Teamlid uitnodigen",
+      "email": "E-mail",
+      "nameOptional": "Naam (optioneel)",
+      "role": "Rol",
+      "adminBypass": "Beheerders omzeilen de sectielijst en kunnen andere gebruikers beheren.",
+      "dashboardSections": "Dashboard-secties",
+      "adminAlways": "Beheerders zien altijd elke sectie — de toegangslijst wordt genegeerd.",
+      "cancel": "Annuleren",
+      "sending": "Versturen…",
+      "send": "Uitnodiging versturen"
+    },
+    "editModal": {
+      "titleFn": "Bewerk {name}",
+      "saving": "Opslaan…",
+      "saveChanges": "Wijzigingen opslaan"
+    },
+    "close": "Sluiten",
+    "toasts": {
+      "loadFailed": "Laden van gebruikers mislukt",
+      "emailRequired": "E-mail is verplicht",
+      "inviteFailed": "Uitnodigen van gebruiker mislukt",
+      "invited": "Uitgenodigd: {email}",
+      "created": "{email} aangemaakt (uitnodigingsmail overgeslagen)",
+      "saveFailed": "Opslaan mislukt",
+      "updated": "Bijgewerkt: {email}"
+    }
+  },
+  "calendar": {
+    "title": "Agenda",
+    "subtitle": "Afspraken en deadlines",
+    "newEvent": "Nieuwe afspraak",
+    "selectDate": "Selecteer een datum",
+    "loading": "Laden…",
+    "noEventsOnDate": "Geen afspraken op deze datum",
+    "addEventToDay": "+ Afspraak toevoegen aan deze dag",
+    "upcoming": "Komend",
+    "noUpcoming": "Geen komende afspraken",
+    "allDay": "Hele dag",
+    "prevMonth": "Vorige maand",
+    "nextMonth": "Volgende maand",
+    "eventCount": "{count} afspra(a)k(en)",
+    "days": {
+      "Mon": "Ma",
+      "Tue": "Di",
+      "Wed": "Wo",
+      "Thu": "Do",
+      "Fri": "Vr",
+      "Sat": "Za",
+      "Sun": "Zo"
+    },
+    "months": {
+      "January": "Januari",
+      "February": "Februari",
+      "March": "Maart",
+      "April": "April",
+      "May": "Mei",
+      "June": "Juni",
+      "July": "Juli",
+      "August": "Augustus",
+      "September": "September",
+      "October": "Oktober",
+      "November": "November",
+      "December": "December"
+    },
+    "colors": {
+      "Blue": "Blauw",
+      "Green": "Groen",
+      "Amber": "Amber",
+      "Red": "Rood",
+      "Violet": "Violet"
+    },
+    "form": {
+      "titleNew": "Nieuwe afspraak",
+      "titleEdit": "Afspraak bewerken",
+      "subtitleNew": "Voeg een nieuwe afspraak, deadline of mijlpaal toe",
+      "subtitleEdit": "Werk deze afspraak bij of verwijder hem",
+      "title": "Titel",
+      "titlePlaceholder": "Afspraaktitel",
+      "start": "Begin",
+      "end": "Einde",
+      "allDay": "Hele dag",
+      "allDayHelp": "Afspraak duurt de hele dag",
+      "location": "Locatie",
+      "optional": "Optioneel",
+      "description": "Beschrijving",
+      "color": "Kleur",
+      "delete": "Verwijderen",
+      "cancel": "Annuleren",
+      "saving": "Opslaan…",
+      "save": "Opslaan",
+      "create": "Aanmaken"
+    },
+    "errors": {
+      "titleRequired": "Titel is verplicht",
+      "timesRequired": "Begin- en eindtijd zijn verplicht",
+      "endAfterStart": "Eindtijd moet na de begintijd liggen",
+      "saveFailed": "Opslaan mislukt",
+      "deleteFailed": "Verwijderen mislukt"
+    }
+  },
+  "propertyTaxonomy": {
+    "title": "Objecttaxonomie",
+    "subtitle": "Configureer locaties, types, subtypes en filtervlaggen voor je makelaardij",
+    "loading": "Laden…",
+    "presets": {
+      "title": "Landpresets",
+      "help": "Pas een landpreset toe als startpunt en pas vervolgens hieronder aan. Elke klant kan een eigen taxonomie hanteren."
+    },
+    "country": {
+      "title": "Landlabel",
+      "help": "Wordt getoond in filter-dropdowns en het formulier Object toevoegen (bv. \"Heel Cyprus\", \"Heel Nederland\")."
+    },
+    "districts": {
+      "title": "Districten / regio's",
+      "entries": "{count} items",
+      "placeholder": "bv. Paphos"
+    },
+    "listingTypes": {
+      "title": "Aanbiedingstypen",
+      "valuesNote": "Waarden moeten blijven",
+      "help": "Alleen de labels zijn vertaalbaar (bv. \"Te Koop\" / \"Te Huur\"). Wijzig de kolom value niet — de database gebruikt deze.",
+      "placeholder": "bv. Te Koop"
+    },
+    "propertyTypes": {
+      "title": "Hoofdobjecttypen",
+      "count": "{count} types",
+      "placeholder": "bv. Huizen"
+    },
+    "subtypes": {
+      "title": "Subtypes per objecttype",
+      "help": "Deze verschijnen als cascade-dropdown wanneer de gebruiker een hoofdtype kiest.",
+      "empty": "Voeg eerst minstens één hoofdobjecttype toe hierboven.",
+      "addSubtype": "Voeg {label}-subtype toe"
+    },
+    "flags": {
+      "title": "Filtervlaggen",
+      "keysNote": "Sleutels moeten zijn",
+      "help": "Alleen het label is bewerkbaar. Verwijder een rij om dat selectievakje uit de filterbalk te verbergen.",
+      "restoreBankOwned": "Bankbezit herstellen",
+      "restoreResale": "Doorverkoop herstellen",
+      "bankOwned": "Bankbezit",
+      "resale": "Doorverkoopobjecten"
+    },
+    "list": {
+      "noneYet": "Nog geen — voeg er hieronder een toe.",
+      "remove": "Verwijderen",
+      "add": "Toevoegen",
+      "addNew": "Nieuw toevoegen...",
+      "displayLabel": "Weergavelabel",
+      "internalValue": "interne_waarde"
+    },
+    "save": "Taxonomie opslaan",
+    "saving": "Opslaan…",
+    "toasts": {
+      "loadFailed": "Laden van taxonomie mislukt",
+      "saved": "Taxonomie opgeslagen",
+      "saveFailed": "Opslaan mislukt"
+    }
+  },
+  "leadScores": {
+    "title": "Leadscores",
+    "subtitle": "Gedrags- en demografische scoring met graden",
+    "kpis": {
+      "total": "Totaal gescoorde leads",
+      "avg": "Gem. score",
+      "gradeA": "Aantal Grade A",
+      "gradeB": "Aantal Grade B"
+    },
+    "filters": {
+      "all": "Alle grades",
+      "gradeA": "Cijfer A",
+      "gradeB": "Cijfer B",
+      "gradeC": "Cijfer C",
+      "gradeD": "Cijfer D",
+      "gradeF": "Cijfer F"
+    },
+    "columns": {
+      "contact": "Contact",
+      "score": "Score",
+      "grade": "Cijfer",
+      "progress": "Voortgang",
+      "behavior": "Gedrag",
+      "demo": "Demo-score",
+      "lastActivity": "Laatste activiteit",
+      "actions": "Acties"
+    },
+    "list": {
+      "loading": "Laden...",
+      "empty": "Geen leadscores gevonden.",
+      "view": "Bekijken",
+      "contactFallback": "Contact {id}"
+    }
+  },
+  "aiScoring": {
+    "toasts": {
+      "loadFailed": "AI-scores konden niet worden geladen"
+    },
+    "signals": {
+      "contactedLast3d": "Gecontacteerd in laatste 3 dagen",
+      "contactedThisWeek": "Deze week gecontacteerd",
+      "contactedThisMonth": "Deze maand gecontacteerd",
+      "contactedLast90d": "Gecontacteerd in laatste 90 dagen",
+      "stale": "Verouderd: {n} dagen niet gecontacteerd",
+      "neverContacted": "Nooit gecontacteerd",
+      "activitiesThisWeek": "{n} activiteiten deze week",
+      "activityThisWeek": "{n} activiteit deze week",
+      "activitiesThisMonth": "{n} activiteiten deze maand",
+      "notesOnFile": "{n} notities geregistreerd",
+      "preApproved": "Vooraf goedgekeurd voor hypotheek",
+      "priceRange": "Prijsklasse vastgelegd",
+      "targetAreas": "Gewenste gebieden opgegeven",
+      "fullContactDetails": "Volledige contactgegevens",
+      "noContactDetails": "Geen contactgegevens",
+      "missingEmail": "E-mail ontbreekt",
+      "missingPhone": "Telefoonnummer ontbreekt",
+      "attendedShowings": "{n} bezichtigingen bijgewoond",
+      "attendedShowing": "{n} bezichtiging bijgewoond",
+      "providedFeedback": "Feedback op bezichtiging gegeven",
+      "noShows": "{n} keer niet komen opdagen",
+      "openDeals": "{n} openstaande deal(s)",
+      "wonDeals": "{n} gewonnen deal(s) — trouwe klant"
+    }
+  },
+  "cma": {
+    "title": "Vergelijkende marktanalyse",
+    "subtitle": "Prijs vastgoed op basis van vergelijkbare objecten"
+  },
+  "leadRouting": {
+    "title": "Lead-routering",
+    "subtitle": "Wijs binnenkomende leads automatisch toe aan de juiste makelaar"
+  },
+  "marketAnalytics": {
+    "title": "Marktanalyse",
+    "subtitle": "Volg lokale markttrends en prestaties"
+  },
+  "clientPortal": {
+    "title": "Klantportaal",
+    "subtitle": "Geef klanten veilige toegang tot hun aanbod en documenten"
+  },
+  "soi": {
+    "title": "Netwerkbeheer",
+    "subtitle": "Organiseer je netwerk en houd consequent contact"
+  },
+  "notifications": {
+    "title": "Meldingen",
+    "subtitle": "Blijf op de hoogte van activiteit in je werkruimte",
+    "unread": "ongelezen"
+  },
+  "filterFields": {
+    "options": {
+      "pending": "In behandeling",
+      "ready": "Gereed",
+      "error": "Fout"
+    },
+    "name": "Naam",
+    "company": "Bedrijf",
+    "type": "Type",
+    "email": "E-mail",
+    "phone": "Telefoon",
+    "createdAt": "Aangemaakt",
+    "aiIcpFit": "ICP-match",
+    "aiAttributesStatus": "AI-status",
+    "title": "Titel",
+    "status": "Status",
+    "dealType": "Type",
+    "valueCents": "Waarde (cent)",
+    "probability": "Waarschijnlijkheid",
+    "expectedClose": "Verwachte sluiting",
+    "leadSource": "Leadbron",
+    "pipelineId": "Pijplijn",
+    "stageId": "Fase",
+    "contactId": "Contact",
+    "propertyId": "Object",
+    "ownerId": "Eigenaar",
+    "listingType": "Aanbiedingstype",
+    "district": "District",
+    "town": "Plaats",
+    "city": "Stad",
+    "state": "Provincie / Regio",
+    "priceCents": "Prijs (cent)",
+    "bedrooms": "Slaapkamers",
+    "bathrooms": "Badkamers",
+    "sqft": "Oppervlakte",
+    "yearBuilt": "Bouwjaar",
+    "listingDate": "Aangeboden",
+    "mlsNumber": "MLS-nr.",
+    "bankOwned": "Bankbezit",
+    "isResale": "Doorverkoop"
+  },
+  "aiInsights": {
+    "metric": {
+      "openValue": "Openstaande waarde",
+      "winRate": "Winratio",
+      "stalled": "Stilgevallen",
+      "newContacts": "Nieuwe contacten",
+      "noEmail": "Geen e-mail",
+      "upcoming": "Aankomend"
+    },
+    "action": {
+      "viewDeals": "Deals bekijken",
+      "openPipeline": "Pijplijn openen",
+      "reviewProjects": "Projecten bekijken",
+      "viewContacts": "Contacten bekijken",
+      "filterContacts": "Contacten filteren",
+      "openListings": "Aanbod openen",
+      "viewSchedule": "Agenda bekijken",
+      "reviewShowings": "Bezichtigingen bekijken"
     }
   }
 }

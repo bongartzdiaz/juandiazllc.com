@@ -65,19 +65,20 @@ function OptionListEditor({
   options, onChange, placeholder,
 }: { options: Option[]; onChange: (o: Option[]) => void; placeholder?: string }) {
   const [newLabel, setNewLabel] = useState('')
+  const t = useTranslations('propertyTaxonomy')
   return (
     <div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
         {options.length === 0 && (
           <div style={{ fontSize: 12, color: 'var(--txt3)', fontStyle: 'italic', padding: '8px 0' }}>
-            None yet — add one below.
+            {t('list.noneYet')}
           </div>
         )}
         {options.map((opt, i) => (
           <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 32px', gap: 6 }}>
             <input
               value={opt.label}
-              placeholder="Display label"
+              placeholder={t('list.displayLabel')}
               onChange={e => {
                 const next = options.slice()
                 next[i] = { ...next[i], label: e.target.value }
@@ -87,7 +88,7 @@ function OptionListEditor({
             />
             <input
               value={opt.value}
-              placeholder="internal_value"
+              placeholder={t('list.internalValue')}
               onChange={e => {
                 const next = options.slice()
                 next[i] = { ...next[i], value: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') }
@@ -99,7 +100,7 @@ function OptionListEditor({
               type="button"
               onClick={() => onChange(options.filter((_, j) => j !== i))}
               style={btnIconStyle}
-              title="Remove"
+              title={t('list.remove')}
             ><Trash2 size={13} /></button>
           </div>
         ))}
@@ -108,7 +109,7 @@ function OptionListEditor({
         <input
           value={newLabel}
           onChange={e => setNewLabel(e.target.value)}
-          placeholder={placeholder ?? 'Add new...'}
+          placeholder={placeholder ?? t('list.addNew')}
           style={{ ...inputStyle, flex: 1 }}
           onKeyDown={e => {
             if (e.key === 'Enter' && newLabel.trim()) {
@@ -125,7 +126,7 @@ function OptionListEditor({
             setNewLabel('')
           }}
           style={{ ...btnSecondary, padding: '6px 12px' }}
-        ><Plus size={13} /> Add</button>
+        ><Plus size={13} /> {t('list.add')}</button>
       </div>
     </div>
   )
@@ -139,14 +140,15 @@ export default function PropertyTaxonomyPage() {
   const confirm = useConfirm()
   const tConfirms = useTranslations('confirms')
   const tCommon = useTranslations('common')
+  const t = useTranslations('propertyTaxonomy')
 
   useEffect(() => {
     fetch('/api/properties/taxonomy')
       .then(r => r.json())
       .then(json => { if (json.data) setTax(json.data) })
-      .catch(() => addToast('Failed to load taxonomy', 'error'))
+      .catch(() => addToast(t('toasts.loadFailed'), 'error'))
       .finally(() => setLoading(false))
-  }, [addToast])
+  }, [addToast, t])
 
   const applyPreset = async (presetId: string) => {
     const p = PRESETS.find(x => x.id === presetId)
@@ -181,13 +183,13 @@ export default function PropertyTaxonomyPage() {
       if (res.ok) {
         const json = await res.json()
         if (json.data) setTax(json.data)
-        addToast('Taxonomy saved', 'success')
+        addToast(t('toasts.saved'), 'success')
       } else {
         const err = await res.json().catch(() => ({}))
-        addToast(err.error ?? 'Save failed', 'error')
+        addToast(err.error ?? t('toasts.saveFailed'), 'error')
       }
     } catch {
-      addToast('Save failed', 'error')
+      addToast(t('toasts.saveFailed'), 'error')
     }
     setSaving(false)
   }
@@ -196,8 +198,8 @@ export default function PropertyTaxonomyPage() {
 
   if (loading) {
     return <>
-      <Topbar title="Property Taxonomy" sub="Configure locations, types, subtypes and filter flags for your agency" />
-      <div style={{ padding: 24, color: 'var(--txt3)', fontSize: 13 }}>Loading…</div>
+      <Topbar title={t('title')} sub={t('subtitle')} />
+      <div style={{ padding: 24, color: 'var(--txt3)', fontSize: 13 }}>{t('loading')}</div>
     </>
   }
 
@@ -206,17 +208,17 @@ export default function PropertyTaxonomyPage() {
   return (
     <>
       <Topbar
-        title="Property Taxonomy"
-        sub="Configure locations, types, subtypes and filter flags for your agency"
+        title={t('title')}
+        sub={t('subtitle')}
       />
       <div style={{ padding: '18px 24px 40px', maxWidth: 960 }}>
         {/* Presets */}
         <div style={{ ...cardStyle }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12, gap: 12 }}>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>Country presets</div>
+              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>{t('presets.title')}</div>
               <div style={{ fontSize: 12, color: 'var(--txt3)' }}>
-                Apply a country preset as a starting point, then tweak anything below. Your clients can each run their own taxonomy.
+                {t('presets.help')}
               </div>
             </div>
             <RotateCcw size={14} style={{ color: 'var(--txt3)', flexShrink: 0, marginTop: 4 }} />
@@ -242,10 +244,10 @@ export default function PropertyTaxonomyPage() {
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <MapPin size={15} />
-            <div style={{ fontSize: 14, fontWeight: 700 }}>Country label</div>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>{t('country.title')}</div>
           </div>
           <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 10 }}>
-            Shown in filter dropdowns and the Add Property form (e.g. “All Cyprus”, “All Netherlands”).
+            {t('country.help')}
           </div>
           <input
             value={tax.countryLabel}
@@ -258,13 +260,13 @@ export default function PropertyTaxonomyPage() {
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <MapPin size={15} />
-            <div style={{ fontSize: 14, fontWeight: 700 }}>Districts / Regions</div>
-            <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--txt3)' }}>{tax.districts.length} entries</span>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>{t('districts.title')}</div>
+            <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--txt3)' }}>{t('districts.entries', { count: tax.districts.length })}</span>
           </div>
           <OptionListEditor
             options={tax.districts}
             onChange={o => setTax({ ...tax, districts: o })}
-            placeholder="e.g. Paphos"
+            placeholder={t('districts.placeholder')}
           />
         </div>
 
@@ -272,18 +274,18 @@ export default function PropertyTaxonomyPage() {
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <Tag size={15} />
-            <div style={{ fontSize: 14, fontWeight: 700 }}>Listing types</div>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>{t('listingTypes.title')}</div>
             <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--txt3)' }}>
-              Values must remain <code style={{ background: 'var(--bg2)', padding: '1px 5px', borderRadius: 4 }}>sale</code> / <code style={{ background: 'var(--bg2)', padding: '1px 5px', borderRadius: 4 }}>rent</code>
+              {t('listingTypes.valuesNote')} <code style={{ background: 'var(--bg2)', padding: '1px 5px', borderRadius: 4 }}>sale</code> / <code style={{ background: 'var(--bg2)', padding: '1px 5px', borderRadius: 4 }}>rent</code>
             </span>
           </div>
           <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 10 }}>
-            Only the labels are translatable (e.g. “Te Koop” / “Te Huur”). Don&apos;t change the <code>value</code> column — the database uses it.
+            {t('listingTypes.help')}
           </div>
           <OptionListEditor
             options={tax.listingTypes}
             onChange={o => setTax({ ...tax, listingTypes: o })}
-            placeholder="e.g. For Sale"
+            placeholder={t('listingTypes.placeholder')}
           />
         </div>
 
@@ -291,13 +293,13 @@ export default function PropertyTaxonomyPage() {
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <Home size={15} />
-            <div style={{ fontSize: 14, fontWeight: 700 }}>Top-level property types</div>
-            <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--txt3)' }}>{tax.propertyTypes.length} types</span>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>{t('propertyTypes.title')}</div>
+            <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--txt3)' }}>{t('propertyTypes.count', { count: tax.propertyTypes.length })}</span>
           </div>
           <OptionListEditor
             options={tax.propertyTypes}
             onChange={o => setTax({ ...tax, propertyTypes: o })}
-            placeholder="e.g. Houses"
+            placeholder={t('propertyTypes.placeholder')}
           />
         </div>
 
@@ -305,15 +307,15 @@ export default function PropertyTaxonomyPage() {
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <Tag size={15} />
-            <div style={{ fontSize: 14, fontWeight: 700 }}>Subtypes by property type</div>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>{t('subtypes.title')}</div>
           </div>
           <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 14 }}>
-            These appear as a cascading dropdown when the user picks a top-level type.
+            {t('subtypes.help')}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
             {typesList.length === 0 && (
               <div style={{ fontSize: 12, color: 'var(--txt3)', fontStyle: 'italic' }}>
-                Add at least one top-level property type above first.
+                {t('subtypes.empty')}
               </div>
             )}
             {typesList.map(pt => {
@@ -326,7 +328,7 @@ export default function PropertyTaxonomyPage() {
                   <OptionListEditor
                     options={subs}
                     onChange={o => setTax({ ...tax, subtypes: { ...tax.subtypes, [pt.value]: o } })}
-                    placeholder={`Add ${pt.label} subtype`}
+                    placeholder={t('subtypes.addSubtype', { label: pt.label })}
                   />
                 </div>
               )
@@ -338,13 +340,13 @@ export default function PropertyTaxonomyPage() {
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <FlagIcon size={15} />
-            <div style={{ fontSize: 14, fontWeight: 700 }}>Filter flags</div>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>{t('flags.title')}</div>
             <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--txt3)' }}>
-              Keys must be <code style={{ background: 'var(--bg2)', padding: '1px 5px', borderRadius: 4 }}>isBankOwned</code> / <code style={{ background: 'var(--bg2)', padding: '1px 5px', borderRadius: 4 }}>isResale</code>
+              {t('flags.keysNote')} <code style={{ background: 'var(--bg2)', padding: '1px 5px', borderRadius: 4 }}>isBankOwned</code> / <code style={{ background: 'var(--bg2)', padding: '1px 5px', borderRadius: 4 }}>isResale</code>
             </span>
           </div>
           <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 10 }}>
-            Only the label is editable. Delete a row to hide that checkbox from the filter bar.
+            {t('flags.help')}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {tax.flags.map((f, i) => (
@@ -367,7 +369,7 @@ export default function PropertyTaxonomyPage() {
                   type="button"
                   onClick={() => setTax({ ...tax, flags: tax.flags.filter((_, j) => j !== i) })}
                   style={btnIconStyle}
-                  title="Remove"
+                  title={t('list.remove')}
                 ><Trash2 size={13} /></button>
               </div>
             ))}
@@ -376,16 +378,16 @@ export default function PropertyTaxonomyPage() {
                 {!tax.flags.find(f => f.key === 'isBankOwned') && (
                   <button
                     type="button"
-                    onClick={() => setTax({ ...tax, flags: [...tax.flags, { key: 'isBankOwned', label: 'Bank Owned Properties' }] })}
+                    onClick={() => setTax({ ...tax, flags: [...tax.flags, { key: 'isBankOwned', label: t('flags.bankOwned') }] })}
                     style={{ ...btnSecondary, padding: '6px 12px' }}
-                  ><Plus size={13} /> Restore Bank Owned</button>
+                  ><Plus size={13} /> {t('flags.restoreBankOwned')}</button>
                 )}
                 {!tax.flags.find(f => f.key === 'isResale') && (
                   <button
                     type="button"
-                    onClick={() => setTax({ ...tax, flags: [...tax.flags, { key: 'isResale', label: 'Resale Properties' }] })}
+                    onClick={() => setTax({ ...tax, flags: [...tax.flags, { key: 'isResale', label: t('flags.resale') }] })}
                     style={{ ...btnSecondary, padding: '6px 12px' }}
-                  ><Plus size={13} /> Restore Resale</button>
+                  ><Plus size={13} /> {t('flags.restoreResale')}</button>
                 )}
               </div>
             )}
@@ -406,7 +408,7 @@ export default function PropertyTaxonomyPage() {
             disabled={saving}
             style={{ ...btnPrimary, opacity: saving ? 0.6 : 1 }}
           >
-            <Save size={14} /> {saving ? 'Saving…' : 'Save taxonomy'}
+            <Save size={14} /> {saving ? t('saving') : t('save')}
           </button>
         </div>
       </div>

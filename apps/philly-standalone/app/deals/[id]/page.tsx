@@ -57,6 +57,7 @@ function toInputDate(date: string | null) {
 export default function DealDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const t = useTranslations('deals')
+  const td = useTranslations('dealDetail')
   const tConfirms = useTranslations('confirms')
   const tCommon = useTranslations('common')
   const confirm = useConfirm()
@@ -77,9 +78,9 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
     try {
       const res = await fetch(`/api/deals/${id}`)
       const json = await res.json()
-      if (!res.ok) { setError(json.error ?? 'Deal not found'); return }
+      if (!res.ok) { setError(json.error ?? td('toasts.notFound')); return }
       setDeal(json.data ?? null)
-    } catch { setError('Failed to load deal') }
+    } catch { setError(td('toasts.loadFailed')) }
     finally { setLoading(false) }
   }, [id])
 
@@ -114,14 +115,14 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
       })
       const json = await res.json()
       if (!res.ok) {
-        addToast(json.error ?? 'Update failed', "error")
+        addToast(json.error ?? td('toasts.updateFailed'), "error")
         return
       }
       setDeal(json.data)
       if (successMsg) addToast(successMsg, "success")
       setEditField(null)
     } catch {
-      addToast('Network error', "error")
+      addToast(td('toasts.networkError'), "error")
     } finally {
       setSaving(false)
     }
@@ -138,25 +139,25 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
     if (!ok) return
     const res = await fetch(`/api/deals/${id}`, { method: 'DELETE' })
     if (res.status === 204 || res.ok) {
-      addToast('Deal deleted', "success")
+      addToast(td('toasts.deleted'), "success")
       router.push('/deals')
     } else {
       const j = await res.json().catch(() => ({}))
-      addToast(j.error ?? 'Delete failed', "error")
+      addToast(j.error ?? td('toasts.deleteFailed'), "error")
     }
   }
 
   async function markWon() {
-    await patchDeal({ status: 'won', probability: 100, actualClose: new Date().toISOString() }, 'Marked as won')
+    await patchDeal({ status: 'won', probability: 100, actualClose: new Date().toISOString() }, td('toasts.markedWon'))
   }
   async function markLost() {
-    await patchDeal({ status: 'lost', actualClose: new Date().toISOString() }, 'Marked as lost')
+    await patchDeal({ status: 'lost', actualClose: new Date().toISOString() }, td('toasts.markedLost'))
   }
   async function reopenDeal() {
-    await patchDeal({ status: 'open', actualClose: null }, 'Deal reopened')
+    await patchDeal({ status: 'open', actualClose: null }, td('toasts.reopened'))
   }
   async function changeStage(stageId: string) {
-    await patchDeal({ stageId }, 'Stage updated')
+    await patchDeal({ stageId }, td('toasts.stageUpdated'))
   }
 
   const sc = STATUS_COLORS[deal?.status ?? ''] ?? STATUS_COLORS.open
@@ -173,18 +174,18 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
     const patch: Record<string, unknown> = {}
     switch (editField) {
       case 'title':
-        if (!editValue.trim()) { addToast('Title required', "error"); return }
+        if (!editValue.trim()) { addToast(td('toasts.titleRequired'), "error"); return }
         patch.title = editValue.trim()
         break
       case 'valueCents': {
         const n = Math.round(parseFloat(editValue) * 100)
-        if (!isFinite(n) || n < 0) { addToast('Invalid value', "error"); return }
+        if (!isFinite(n) || n < 0) { addToast(td('toasts.invalidValue'), "error"); return }
         patch.valueCents = n
         break
       }
       case 'probability': {
         const n = parseInt(editValue, 10)
-        if (isNaN(n) || n < 0 || n > 100) { addToast('Must be 0-100', "error"); return }
+        if (isNaN(n) || n < 0 || n > 100) { addToast(td('toasts.rangeZeroToHundred'), "error"); return }
         patch.probability = n
         break
       }
@@ -196,13 +197,13 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
         break
       case 'commissionPct': {
         const n = parseFloat(editValue)
-        if (isNaN(n) || n < 0 || n > 100) { addToast('Must be 0-100', "error"); return }
+        if (isNaN(n) || n < 0 || n > 100) { addToast(td('toasts.rangeZeroToHundred'), "error"); return }
         patch.commissionPct = n
         break
       }
       case 'brokerSplitPct': {
         const n = parseFloat(editValue)
-        if (isNaN(n) || n < 0 || n > 100) { addToast('Must be 0-100', "error"); return }
+        if (isNaN(n) || n < 0 || n > 100) { addToast(td('toasts.rangeZeroToHundred'), "error"); return }
         patch.brokerSplitPct = n
         break
       }
@@ -210,13 +211,13 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
         patch.notes = editValue
         break
     }
-    await patchDeal(patch, 'Saved')
+    await patchDeal(patch, td('toasts.saved'))
   }
 
   return (
     <>
       <Topbar
-        title={deal?.title ?? 'Deal Detail'}
+        title={deal?.title ?? td('titleFallback')}
         sub={deal?.pipeline?.name ?? ''}
       />
       <div style={{ padding: '18px 24px 40px' }}>
@@ -228,11 +229,11 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
           textDecoration: 'none', marginBottom: 16,
         }}>
           <ArrowLeft size={14} />
-          Back to Deals
+          {td('backToDeals')}
         </Link>
 
         {loading ? (
-          <div style={{ padding: 60, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          <div style={{ padding: 60, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{td('common.loading')}</div>
         ) : error ? (
           <div style={{ padding: 60, textAlign: 'center', color: 'var(--r-txt)', fontSize: 13 }}>{error}</div>
         ) : deal ? (
@@ -267,13 +268,13 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                       fontSize: 22, fontWeight: 700, margin: 0, letterSpacing: '-0.02em',
                       color: 'var(--txt)', cursor: 'pointer', display: 'inline-block',
                     }}
-                    title="Click to edit"
+                    title={td('hints.clickToEdit')}
                   >
                     {deal.title}
                   </h1>
                 )}
                 <div style={{ fontSize: 12, color: 'var(--txt3)', marginTop: 4 }}>
-                  {deal.pipeline?.name ?? 'No pipeline'}
+                  {deal.pipeline?.name ?? td('noPipeline')}
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -328,16 +329,16 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
               background: 'var(--bg2)', border: '1px solid var(--border)',
             }}>
               {deal.status !== 'won' && (
-                <ActionBtn onClick={markWon} color="var(--g)" icon={Trophy}>Mark Won</ActionBtn>
+                <ActionBtn onClick={markWon} color="var(--g)" icon={Trophy}>{td('actions.markWon')}</ActionBtn>
               )}
               {deal.status !== 'lost' && (
-                <ActionBtn onClick={markLost} color="var(--r)" icon={XCircle}>Mark Lost</ActionBtn>
+                <ActionBtn onClick={markLost} color="var(--r)" icon={XCircle}>{td('actions.markLost')}</ActionBtn>
               )}
               {deal.status !== 'open' && (
-                <ActionBtn onClick={reopenDeal} color="var(--accent)" icon={RotateCcw}>Reopen</ActionBtn>
+                <ActionBtn onClick={reopenDeal} color="var(--accent)" icon={RotateCcw}>{td('actions.reopen')}</ActionBtn>
               )}
               <div style={{ flex: 1 }} />
-              <ActionBtn onClick={handleDelete} color="var(--r)" icon={Trash2} variant="ghost">Delete</ActionBtn>
+              <ActionBtn onClick={handleDelete} color="var(--r)" icon={Trash2} variant="ghost">{td('actions.delete')}</ActionBtn>
             </div>
 
             {/* 2-column layout */}
@@ -351,7 +352,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                   background: 'var(--panel)', border: '1px solid var(--border)',
                   borderRadius: 14, padding: '20px 24px', boxShadow: 'var(--shadow-sm)',
                 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: 'var(--txt)' }}>Deal Info</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: 'var(--txt)' }}>{td('sections.dealInfo')}</div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 32px' }}>
                     {/* Value — editable */}
@@ -373,7 +374,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                             fontFamily: 'var(--font-red-hat-mono), monospace',
                             color: 'var(--txt)', cursor: 'pointer',
                           }}
-                          title="Click to edit"
+                          title={td('hints.clickToEdit')}
                         >
                           ${(deal.valueCents / 100).toLocaleString()}
                         </span>
@@ -399,7 +400,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                             fontFamily: 'var(--font-red-hat-mono), monospace',
                             color: 'var(--txt)', cursor: 'pointer',
                           }}
-                          title="Click to edit"
+                          title={td('hints.clickToEdit')}
                         >
                           {deal.probability}%
                         </span>
@@ -407,7 +408,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                     </InfoRow>
 
                     {/* Expected Close — editable */}
-                    <InfoRow icon={Calendar} label="Expected Close">
+                    <InfoRow icon={Calendar} label={td('fields.expectedClose')}>
                       {editField === 'expectedClose' ? (
                         <EditField
                           value={editValue}
@@ -420,7 +421,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                         <span
                           onClick={() => startEdit('expectedClose', toInputDate(deal.expectedClose))}
                           style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)', cursor: 'pointer' }}
-                          title="Click to edit"
+                          title={td('hints.clickToEdit')}
                         >
                           {fmt(deal.expectedClose)}
                         </span>
@@ -428,7 +429,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                     </InfoRow>
 
                     {/* Deal Type — editable */}
-                    <InfoRow icon={Briefcase} label="Deal Type">
+                    <InfoRow icon={Briefcase} label={td('fields.dealType')}>
                       {editField === 'dealType' ? (
                         <select
                           autoFocus
@@ -443,12 +444,12 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                             fontFamily: 'inherit', outline: 'none',
                           }}
                         >
-                          <option value="standard">Standard</option>
-                          <option value="sale">Sale</option>
-                          <option value="rental">Rental</option>
-                          <option value="grant">Grant</option>
-                          <option value="reservation">Reservation</option>
-                          <option value="other">Other</option>
+                          <option value="standard">{td('dealTypes.standard')}</option>
+                          <option value="sale">{td('dealTypes.sale')}</option>
+                          <option value="rental">{td('dealTypes.rental')}</option>
+                          <option value="grant">{td('dealTypes.grant')}</option>
+                          <option value="reservation">{td('dealTypes.reservation')}</option>
+                          <option value="other">{td('dealTypes.other')}</option>
                         </select>
                       ) : (
                         <span
@@ -459,7 +460,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                             background: 'var(--bg2)', color: 'var(--txt2)',
                             cursor: 'pointer',
                           }}
-                          title="Click to edit"
+                          title={td('hints.clickToEdit')}
                         >
                           {deal.dealType}
                         </span>
@@ -479,21 +480,21 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                     </InfoRow>
 
                     {/* Pipeline */}
-                    <InfoRow icon={Layers} label="Pipeline">
+                    <InfoRow icon={Layers} label={td('fields.pipeline')}>
                       <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>
                         {deal.pipeline?.name ?? '--'}
                       </span>
                     </InfoRow>
 
                     {/* Created */}
-                    <InfoRow icon={Clock} label="Created">
+                    <InfoRow icon={Clock} label={td('fields.created')}>
                       <span style={{ fontSize: 13, color: 'var(--txt2)' }}>
                         {fmt(deal.createdAt)}
                       </span>
                     </InfoRow>
 
                     {/* Actual Close */}
-                    <InfoRow icon={Calendar} label="Actual Close">
+                    <InfoRow icon={Calendar} label={td('fields.actualClose')}>
                       <span style={{ fontSize: 13, color: 'var(--txt2)' }}>
                         {fmt(deal.actualClose)}
                       </span>
@@ -507,7 +508,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                   borderRadius: 14, padding: '20px 24px', boxShadow: 'var(--shadow-sm)',
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>Probability</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>{td('sections.probability')}</span>
                     <span style={{
                       fontSize: 16, fontWeight: 700,
                       fontFamily: 'var(--font-red-hat-mono), monospace',
@@ -537,37 +538,37 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                   background: 'var(--panel)', border: '1px solid var(--border)',
                   borderRadius: 14, padding: '20px 24px', boxShadow: 'var(--shadow-sm)',
                 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: 'var(--txt)' }}>Commission</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: 'var(--txt)' }}>{td('sections.commission')}</div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
                     <div>
-                      <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>Rate</div>
+                      <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>{td('fields.rate')}</div>
                       {editField === 'commissionPct' ? (
                         <EditField value={editValue} type="number" step="0.1" min="0" max="100" onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} />
                       ) : (
                         <div
                           onClick={() => startEdit('commissionPct', deal.commissionPct)}
                           style={{ fontSize: 15, fontWeight: 700, fontFamily: 'var(--font-red-hat-mono), monospace', color: 'var(--txt)', cursor: 'pointer' }}
-                          title="Click to edit"
+                          title={td('hints.clickToEdit')}
                         >
                           {deal.commissionPct}%
                         </div>
                       )}
                     </div>
                     <div>
-                      <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>Amount</div>
+                      <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>{td('fields.amount')}</div>
                       <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'var(--font-red-hat-mono), monospace', color: 'var(--txt)' }}>
                         ${(deal.commissionCents / 100).toLocaleString()}
                       </div>
                     </div>
                     <div>
-                      <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>Broker Split</div>
+                      <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>{td('fields.brokerSplit')}</div>
                       {editField === 'brokerSplitPct' ? (
                         <EditField value={editValue} type="number" step="0.1" min="0" max="100" onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} />
                       ) : (
                         <div
                           onClick={() => startEdit('brokerSplitPct', deal.brokerSplitPct)}
                           style={{ fontSize: 15, fontWeight: 700, fontFamily: 'var(--font-red-hat-mono), monospace', color: 'var(--txt)', cursor: 'pointer' }}
-                          title="Click to edit"
+                          title={td('hints.clickToEdit')}
                         >
                           {deal.brokerSplitPct}%
                         </div>
@@ -584,7 +585,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>
                       <FileText size={14} style={{ verticalAlign: -2, marginRight: 6 }} />
-                      Notes
+                      {td('sections.notes')}
                     </span>
                     {editField !== 'notes' && (
                       <button
@@ -595,7 +596,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                           display: 'flex', alignItems: 'center', gap: 4,
                         }}
                       >
-                        <Edit2 size={11} /> Edit
+                        <Edit2 size={11} /> {td('actions.edit')}
                       </button>
                     )}
                   </div>
@@ -616,9 +617,9 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                         }}
                       />
                       <div style={{ display: 'flex', gap: 8, marginTop: 10, justifyContent: 'flex-end' }}>
-                        <button onClick={cancelEdit} style={ghostBtnStyle}>Cancel</button>
+                        <button onClick={cancelEdit} style={ghostBtnStyle}>{td('actions.cancel')}</button>
                         <button onClick={saveEdit} disabled={saving} style={primaryBtnStyle}>
-                          {saving ? 'Saving...' : 'Save notes'}
+                          {saving ? td('actions.saving') : td('actions.saveNotes')}
                         </button>
                       </div>
                     </div>
@@ -627,7 +628,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                       fontSize: 13, lineHeight: 1.65, color: 'var(--txt2)',
                       whiteSpace: 'pre-wrap', minHeight: 60,
                     }}>
-                      {deal.notes?.trim() || 'No notes yet. Click Edit to add.'}
+                      {deal.notes?.trim() || td('empty.noNotes')}
                     </div>
                   )}
                 </div>
@@ -637,7 +638,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
                 {/* Contact card */}
-                <SideCard title="Contact">
+                <SideCard title={td('sideCards.contact')}>
                   {deal.contact ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div style={{
@@ -658,12 +659,12 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                       </div>
                     </div>
                   ) : (
-                    <div style={{ fontSize: 12, color: 'var(--txt3)' }}>No contact linked</div>
+                    <div style={{ fontSize: 12, color: 'var(--txt3)' }}>{td('empty.noContact')}</div>
                   )}
                 </SideCard>
 
                 {/* Owner card */}
-                <SideCard title="Owner">
+                <SideCard title={td('sideCards.owner')}>
                   {deal.owner ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div style={{
@@ -680,13 +681,13 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                       </div>
                     </div>
                   ) : (
-                    <div style={{ fontSize: 12, color: 'var(--txt3)' }}>Unassigned</div>
+                    <div style={{ fontSize: 12, color: 'var(--txt3)' }}>{td('empty.unassigned')}</div>
                   )}
                 </SideCard>
 
                 {/* Project card */}
                 {deal.project && (
-                  <SideCard title="Project">
+                  <SideCard title={td('sideCards.project')}>
                     <Link href={`/projects/${deal.project.id}`} style={{
                       display: 'flex', alignItems: 'center', gap: 10,
                       textDecoration: 'none',
@@ -711,7 +712,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                 )}
 
                 {/* Stage info */}
-                <SideCard title="Stage">
+                <SideCard title={td('sideCards.stage')}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{
                       width: 12, height: 12, borderRadius: 4,
@@ -724,7 +725,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                 </SideCard>
 
                 {/* Weighted value */}
-                <SideCard title="Weighted Value">
+                <SideCard title={td('sideCards.weightedValue')}>
                   <div style={{
                     fontSize: 18, fontWeight: 700,
                     fontFamily: 'var(--font-red-hat-mono), monospace',
@@ -738,14 +739,14 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                 </SideCard>
 
                 {/* Days in pipeline */}
-                <SideCard title="Pipeline Age">
+                <SideCard title={td('sideCards.pipelineAge')}>
                   <div style={{
                     fontSize: 18, fontWeight: 700,
                     fontFamily: 'var(--font-red-hat-mono), monospace',
                     color: 'var(--txt)',
                   }}>
                     {Math.max(1, Math.floor((Date.now() - new Date(deal.createdAt).getTime()) / 86400000))}
-                    <span style={{ fontSize: 11, color: 'var(--txt3)', fontWeight: 500, marginLeft: 4 }}>days</span>
+                    <span style={{ fontSize: 11, color: 'var(--txt3)', fontWeight: 500, marginLeft: 4 }}>{td('units.days')}</span>
                   </div>
                 </SideCard>
               </div>

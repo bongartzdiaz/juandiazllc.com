@@ -2,39 +2,51 @@
 
 import { useMemo } from 'react'
 import { Filter } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
+// Step shape stores a stable i18n key (not the human label) so the
+// component can localise at render time. The `key` field maps to
+// dashboard.funnel.<industryGroup>.<key> in the messages catalogue.
 interface FunnelStep {
-  label: string
+  key: string
   count: number
 }
 
-function getFunnelSteps(industry: string): FunnelStep[] {
+function getFunnelSteps(industry: string): { group: 're' | 'hos' | 'csr'; steps: FunnelStep[] } {
   if (industry === 'realestate') {
-    return [
-      { label: 'Lead', count: 1000 },
-      { label: 'Viewing', count: 420 },
-      { label: 'Offer', count: 180 },
-      { label: 'Agreement', count: 85 },
-      { label: 'Closed', count: 62 },
-    ]
+    return {
+      group: 're',
+      steps: [
+        { key: 'lead', count: 1000 },
+        { key: 'viewing', count: 420 },
+        { key: 'offer', count: 180 },
+        { key: 'agreement', count: 85 },
+        { key: 'closed', count: 62 },
+      ],
+    }
   }
   if (industry === 'hospitality') {
-    return [
-      { label: 'Search', count: 2000 },
-      { label: 'Booking', count: 680 },
-      { label: 'Check-in', count: 520 },
-      { label: 'Stay', count: 510 },
-      { label: 'Review', count: 340 },
-    ]
+    return {
+      group: 'hos',
+      steps: [
+        { key: 'search', count: 2000 },
+        { key: 'booking', count: 680 },
+        { key: 'checkin', count: 520 },
+        { key: 'stay', count: 510 },
+        { key: 'review', count: 340 },
+      ],
+    }
   }
-  // philanthropy / CSR
-  return [
-    { label: 'Awareness', count: 500 },
-    { label: 'Interest', count: 280 },
-    { label: 'Proposal', count: 120 },
-    { label: 'Active', count: 45 },
-    { label: 'Completed', count: 38 },
-  ]
+  return {
+    group: 'csr',
+    steps: [
+      { key: 'awareness', count: 500 },
+      { key: 'interest', count: 280 },
+      { key: 'proposal', count: 120 },
+      { key: 'active', count: 45 },
+      { key: 'completed', count: 38 },
+    ],
+  }
 }
 
 function conversionColor(pct: number): string {
@@ -56,7 +68,8 @@ function conversionTxt(pct: number): string {
 }
 
 export function FunnelCard({ industry }: { industry: string }) {
-  const steps = useMemo(() => getFunnelSteps(industry), [industry])
+  const t = useTranslations('dashboard.funnel')
+  const { group, steps } = useMemo(() => getFunnelSteps(industry), [industry])
   const maxCount = steps[0]?.count || 1
   const overallPct = steps.length >= 2
     ? ((steps[steps.length - 1].count / steps[0].count) * 100).toFixed(1)
@@ -75,7 +88,7 @@ export function FunnelCard({ industry }: { industry: string }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Filter size={15} color="var(--txt2)" />
-          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em' }}>Conversion Funnel</span>
+          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em' }}>{t('title')}</span>
         </div>
         <span className="mono" style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent)', background: 'var(--accent-bg)', padding: '2px 8px', borderRadius: 6 }}>
           {overallPct}% overall
@@ -93,11 +106,11 @@ export function FunnelCard({ industry }: { industry: string }) {
           const badgeTxt = i === 0 ? 'var(--accent-txt)' : conversionTxt(convPct)
 
           return (
-            <div key={step.label}>
+            <div key={step.key}>
               {/* Step row */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 3 }}>
                 <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--txt2)', width: 90, flexShrink: 0 }}>
-                  {step.label}
+                  {t(`${group}.${step.key}`)}
                 </span>
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div style={{
@@ -144,7 +157,7 @@ export function FunnelCard({ industry }: { industry: string }) {
         padding: '12px 20px', borderTop: '1px solid var(--border)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
-        <span style={{ fontSize: 11, color: 'var(--txt3)', fontWeight: 500 }}>Overall Conversion</span>
+        <span style={{ fontSize: 11, color: 'var(--txt3)', fontWeight: 500 }}>{t('overall')}</span>
         <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)' }}>
           {steps[0].count.toLocaleString('nl-NL')} &rarr; {steps[steps.length - 1].count.toLocaleString('nl-NL')} ({overallPct}%)
         </span>

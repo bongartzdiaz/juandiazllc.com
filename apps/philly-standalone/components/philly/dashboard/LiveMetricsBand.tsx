@@ -10,6 +10,7 @@
 // render a discreet error state rather than fake numbers.
 
 import { useDashboardSummary, formatCents } from '@/hooks/philly/useDashboardSummary'
+import { useTranslations } from 'next-intl'
 
 function relativeTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime()
@@ -21,11 +22,12 @@ function relativeTime(iso: string): string {
 
 export function LiveMetricsBand() {
   const { data, error, loading } = useDashboardSummary()
+  const t = useTranslations('liveBand')
 
   if (loading && !data) {
     return (
       <div className="live-metrics-band" aria-busy="true">
-        <div className="lmb-label">◉ LIVE — FETCHING ORG METRICS…</div>
+        <div className="lmb-label">◉ {t('fetching')}</div>
       </div>
     )
   }
@@ -33,10 +35,8 @@ export function LiveMetricsBand() {
   if (error || !data) {
     return (
       <div className="live-metrics-band lmb-error">
-        <div className="lmb-label">◉ LIVE METRICS UNAVAILABLE</div>
-        <div className="lmb-error-hint">
-          Showing demo widgets below. Check your connection or API logs.
-        </div>
+        <div className="lmb-label">◉ {t('unavailable')}</div>
+        <div className="lmb-error-hint">{t('unavailableHint')}</div>
       </div>
     )
   }
@@ -45,36 +45,38 @@ export function LiveMetricsBand() {
 
   const items = [
     {
-      label: 'Contacts',
+      label: t('contacts'),
       value: k.contacts.toLocaleString(),
-      delta: k.contactsDelta30d > 0 ? `+${k.contactsDelta30d} last 30d` : 'no new last 30d',
+      delta: k.contactsDelta30d > 0
+        ? t('deltaLast30d', { n: k.contactsDelta30d })
+        : t('noNewLast30d'),
       deltaDir: k.contactsDelta30d > 0 ? 'up' : 'neu',
     },
     {
-      label: 'Open deals',
+      label: t('openDeals'),
       value: k.openDeals.toLocaleString(),
-      delta: formatCents(k.openDealValueCents) + ' pipeline',
+      delta: t('pipelineValue', { value: formatCents(k.openDealValueCents) }),
       deltaDir: 'neu',
     },
     {
-      label: 'Won (30d)',
+      label: t('won30d'),
       value: k.wonDeals30d.toLocaleString(),
-      delta: formatCents(k.wonDealsValueCents30d) + ' revenue',
+      delta: t('revenueValue', { value: formatCents(k.wonDealsValueCents30d) }),
       deltaDir: k.wonDeals30d > 0 ? 'up' : 'neu',
     },
     {
-      label: 'Closed tx',
+      label: t('closedTx'),
       value: k.transactionsCompleted.toLocaleString(),
-      delta: formatCents(k.transactionsSalePriceCents) + ' GMV',
+      delta: t('gmvValue', { value: formatCents(k.transactionsSalePriceCents) }),
       deltaDir: 'neu',
     },
   ]
 
   return (
-    <div className="live-metrics-band" aria-label="Live org metrics">
+    <div className="live-metrics-band" aria-label={t('ariaLabel')}>
       <div className="lmb-header">
-        <span className="lmb-label">◉ LIVE — YOUR ORG</span>
-        <span className="lmb-updated">Updated {relativeTime(data.data.asOf)}</span>
+        <span className="lmb-label">◉ {t('liveYourOrg')}</span>
+        <span className="lmb-updated">{t('updatedAgo', { ago: relativeTime(data.data.asOf) })}</span>
       </div>
       <div className="lmb-grid">
         {items.map((it) => (

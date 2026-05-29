@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { AlertTriangle, AlertCircle, Info, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface Alert {
   severity: 'ok' | 'warn' | 'crit'
@@ -47,6 +48,7 @@ function generateAlerts(industry: string): Alert[] {
 }
 
 export function AlertsCard({ industry }: { industry: string }) {
+  const t = useTranslations('dashboard.alerts')
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null)
   const alerts = useMemo(() => generateAlerts(industry), [industry])
 
@@ -69,7 +71,7 @@ export function AlertsCard({ industry }: { industry: string }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <AlertTriangle size={15} color="var(--txt2)" />
-          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em' }}>Alerts</span>
+          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em' }}>{t('title')}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {counts.crit > 0 && (
@@ -154,7 +156,7 @@ export function AlertsCard({ industry }: { industry: string }) {
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
         cursor: 'pointer',
       }}>
-        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--accent)' }}>View All Alerts</span>
+        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--accent)' }}>{t('viewAll')}</span>
         <ArrowRight size={12} color="var(--accent)" />
       </div>
     </div>

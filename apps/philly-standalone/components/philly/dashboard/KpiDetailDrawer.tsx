@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { X, TrendingUp, TrendingDown, Minus, BarChart3 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface DetailMetric {
   label: string
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export function KpiDetailDrawer({ detail, onClose }: Props) {
+  const t = useTranslations('dashboard.kpiDetail')
   // Close on Escape
   useEffect(() => {
     if (!detail) return
@@ -120,7 +122,7 @@ export function KpiDetailDrawer({ detail, onClose }: Props) {
           {/* Breakdown bars */}
           {detail.breakdown && detail.breakdown.length > 0 && (
             <div style={{ marginBottom: 20 }}>
-              <SectionLabel>Breakdown</SectionLabel>
+              <SectionLabel>{t('breakdown')}</SectionLabel>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {detail.breakdown.map(b => (
                   <div key={b.label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -140,7 +142,7 @@ export function KpiDetailDrawer({ detail, onClose }: Props) {
           {/* Suggestions */}
           {detail.suggestions && detail.suggestions.length > 0 && (
             <div style={{ marginBottom: 20 }}>
-              <SectionLabel>Insights</SectionLabel>
+              <SectionLabel>{t('insights')}</SectionLabel>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {detail.suggestions.map((s, i) => (
                   <div key={i} style={{
@@ -159,7 +161,7 @@ export function KpiDetailDrawer({ detail, onClose }: Props) {
           {/* Recent items */}
           {detail.recentItems && detail.recentItems.length > 0 && (
             <div>
-              <SectionLabel>Recent</SectionLabel>
+              <SectionLabel>{t('recent')}</SectionLabel>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {detail.recentItems.map((item, i) => (
                   <div key={i} style={{

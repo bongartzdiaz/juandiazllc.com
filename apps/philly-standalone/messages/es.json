@@ -38,7 +38,7 @@
     "marketAnalytics": "Análisis de Mercado",
     "notifications": "Notificaciones",
     "offers": "Ofertas",
-    "openHouses": "Open Houses",
+    "openHouses": "Jornadas de puertas abiertas",
     "properties": "Propiedades",
     "referrals": "Referencias",
     "showings": "Visitas",
@@ -54,7 +54,11 @@
   },
   "dashboard": {
     "title": "Panel",
-    "subtitle": "Tu impacto de un vistazo",
+    "subtitle": {
+      "philanthropy": "Tu impacto de un vistazo",
+      "realestate": "Su cartera de un vistazo",
+      "hospitality": "Sus operaciones de un vistazo"
+    },
     "totalProjects": "Proyectos totales",
     "activeProjects": "Proyectos activos",
     "peopleHelped": "Personas ayudadas",
@@ -64,7 +68,125 @@
     "recentActivity": "Actividad reciente",
     "impactOverview": "Resumen de impacto",
     "editDashboard": "Editar panel",
-    "addWidget": "Añadir widget"
+    "addWidget": "Añadir widget",
+    "tabs": {
+      "sales": "Pipeline de ventas",
+      "rental": "Pipeline de alquileres"
+    },
+    "stageFlow": {
+      "sales": "Flujo de 7 etapas",
+      "rental": "Flujo de alquiler de 5 etapas"
+    },
+    "widgets": {
+      "guestJourneyTitle": "Recorrido del huésped",
+      "guestJourneySub": "Resumen del período actual",
+      "impactJourneyTitle": "Recorrido de impacto",
+      "impactJourneySub": "Resumen del ciclo de vida del proyecto",
+      "revenueBreakdown": "Desglose de ingresos",
+      "occupancyTrend": "Tendencia de ocupación",
+      "occupancyTrendSub": "Tasa de ocupación mensual",
+      "occupancyGauge": "Indicador de ocupación",
+      "occupancyGaugeSub": "Tasa de ocupación actual",
+      "guestReviews": "Reseñas de huéspedes",
+      "recentActivity": "Actividad reciente",
+      "quickStats": "ESTADÍSTICAS",
+      "monthlyPerformance": "Rendimiento mensual",
+      "listingsVsClosings": "Listados vs cierres",
+      "listingsVsClosingsSub": "Actividad mensual del mercado",
+      "properties": "Propiedades",
+      "revenueByType": "Ingresos por tipo",
+      "revenueByTypeSub": "Desglose por tipo de propiedad",
+      "revenueForecast": "Previsión de ingresos",
+      "revenueForecastSub": "Real vs. proyectado",
+      "impactOverview": "Resumen de impacto",
+      "impactOverviewSub": "Impacto acumulado a lo largo del tiempo",
+      "projects": "Proyectos",
+      "viewAll": "Ver todo",
+      "sdgCoverage": "Cobertura ODS",
+      "monthlyDonations": "Donaciones mensuales",
+      "sdgDistribution": "Distribución ODS",
+      "sdgDistributionSub": "Asignación de impacto por área de enfoque",
+      "impactForecast": "Previsión de impacto",
+      "actual": "Real",
+      "forecast": "Previsión",
+      "total": "Total",
+      "allocated": "Asignado",
+      "roomsVenues": "Habitaciones y salas",
+      "revenueAndClosings": "Ingresos y cierres",
+      "monthlyPerformanceSub": "Rendimiento mensual"
+    },
+    "alerts": {
+      "title": "Alertas",
+      "viewAll": "Ver todas"
+    },
+    "funnel": {
+      "title": "Embudo de conversión",
+      "overall": "Conversión total",
+      "re": {
+        "lead": "Lead",
+        "viewing": "Visita",
+        "offer": "Oferta",
+        "agreement": "Acuerdo",
+        "closed": "Cerrado"
+      },
+      "hos": {
+        "search": "Búsqueda",
+        "booking": "Reserva",
+        "checkin": "Entrada",
+        "stay": "Estancia",
+        "review": "Reseña"
+      },
+      "csr": {
+        "awareness": "Notoriedad",
+        "interest": "Interés",
+        "proposal": "Propuesta",
+        "active": "Activo",
+        "completed": "Completado"
+      }
+    },
+    "goals": {
+      "title": "Objetivos",
+      "status": {
+        "onTrack": "En curso",
+        "atRisk": "En riesgo",
+        "behind": "Atrasado"
+      },
+      "re": {
+        "listings": "Listados",
+        "dealsClosed": "Operaciones cerradas",
+        "commission": "Comisión",
+        "viewings": "Visitas",
+        "leads": "Leads"
+      },
+      "hos": {
+        "occupancy": "Ocupación",
+        "revpar": "RevPAR",
+        "satisfaction": "Satisfacción",
+        "bookings": "Reservas",
+        "fnbRevenue": "Ingresos F&B"
+      },
+      "csr": {
+        "projects": "Proyectos",
+        "peopleHelped": "Personas ayudadas",
+        "co2": "CO2 reducido",
+        "donations": "Donaciones"
+      }
+    },
+    "leadSource": {
+      "source": "Origen",
+      "count": "Cantidad",
+      "total": "Total"
+    },
+    "kpiDetail": {
+      "breakdown": "Desglose",
+      "insights": "Información",
+      "recent": "Reciente"
+    },
+    "aiAttrs": {
+      "industry": "Sector",
+      "summary": "Resumen",
+      "refreshAria": "Actualizar atributos de IA"
+    }
   },
   "projects": {
     "title": "Proyectos",
@@ -74,7 +196,11 @@
       "planned": "Planificado",
       "active": "Activo",
       "completed": "Completado",
-      "paused": "Pausado"
+      "paused": "Pausado",
+      "pending": "Pendiente",
+      "sold": "Vendido",
+      "maintenance": "Mantenimiento",
+      "reserved": "Reservado"
     },
     "fields": {
       "title": "Título del proyecto",
@@ -94,7 +220,21 @@
     },
     "confirms": {
       "delete": "¿Eliminar \"{title}\"? Esta acción no se puede deshacer."
-    }
+    },
+    "all": "Todos",
+    "titleRE": "Anuncios",
+    "subtitleRE": "Gestiona tus anuncios de propiedades",
+    "titleHOS": "Eventos",
+    "subtitleHOS": "Gestiona tus eventos y reservas",
+    "searchPlaceholder": "Buscar proyectos…",
+    "searchPlaceholderRE": "Buscar anuncios…",
+    "searchPlaceholderHOS": "Buscar eventos…",
+    "gridView": "Vista de cuadrícula",
+    "listView": "Vista de lista",
+    "newProjectRE": "Nuevo anuncio",
+    "newProjectHOS": "Nuevo evento",
+    "createFailed": "No se pudo crear el proyecto",
+    "createdSuccess": "Proyecto creado"
   },
   "contacts": {
     "title": "Contactos",
@@ -104,7 +244,16 @@
       "partner": "Socio",
       "beneficiary": "Beneficiario",
       "stakeholder": "Parte interesada",
-      "donor": "Donante"
+      "donor": "Donante",
+      "buyer": "Comprador",
+      "seller": "Vendedor",
+      "tenant": "Inquilino",
+      "investor": "Inversor",
+      "landlord": "Propietario",
+      "guest": "Huésped",
+      "vendor": "Proveedor",
+      "staff": "Personal",
+      "info": "Información"
     },
     "fields": {
       "name": "Nombre",
@@ -175,7 +324,17 @@
         "unread": "Sin leer",
         "loadError": "No se pudieron cargar las comunicaciones"
       }
-    }
+    },
+    "a11y": {
+      "exportCsv": "Exportar todos los contactos visibles a CSV",
+      "openAdvanced": "Abrir filtro avanzado"
+    },
+    "all": "Todos",
+    "searchPlaceholder": "Buscar contactos…",
+    "subtitleRE": "Compradores, vendedores e inversores",
+    "subtitleHOS": "Huéspedes, proveedores y personal",
+    "createFailed": "No se pudo crear el contacto",
+    "createdSuccess": "Contacto creado"
   },
   "impact": {
     "title": "Impacto",
@@ -183,14 +342,148 @@
     "totalImpact": "Impacto total",
     "byProject": "Por proyecto",
     "sdgAlignment": "Alineación con ODS",
-    "trends": "Tendencias"
+    "trends": "Tendencias",
+    "realEstate": {
+      "title": "Mercado",
+      "subtitle": "Análisis de mercado y rendimiento",
+      "avgPricePerSqm": "Precio medio/m²",
+      "totalVolume": "Volumen total",
+      "daysOnMarket": "Días en el mercado",
+      "listingsActive": "Anuncios activos",
+      "conversionRate": "Tasa de conversión",
+      "commissionEarned": "Comisión obtenida",
+      "propertyBreakdown": "Desglose por tipo de propiedad",
+      "salesVsRentals": "Ventas vs. alquileres",
+      "sales": "Ventas",
+      "rentals": "Alquileres",
+      "deals": "Acuerdos",
+      "volume": "Volumen",
+      "avgDays": "Días medios",
+      "commission": "Comisión",
+      "marketComparison": "Comparativa de mercado",
+      "area": "Zona",
+      "avgPrice": "Precio medio",
+      "dom": "DOM",
+      "trend": "Tendencia",
+      "priceTrend": "Tendencia de precios (12 meses)"
+    },
+    "hospitality": {
+      "title": "Analítica",
+      "subtitle": "Rendimiento e información de huéspedes",
+      "occupancyRate": "Tasa de ocupación",
+      "revpar": "RevPAR",
+      "adr": "ADR",
+      "adrSub": "Tarifa diaria media",
+      "avgReview": "Reseña media",
+      "fbRevenue": "Ingresos F&B",
+      "roomTypePerformance": "Rendimiento por tipo de habitación",
+      "revenueByRoomType": "Ingresos por tipo de habitación",
+      "occupancyTrend": "Tendencia de ocupación e ingresos (12 meses)",
+      "cols": {
+        "roomType": "Tipo de habitación",
+        "occupancyPct": "% Ocupación",
+        "adr": "ADR",
+        "revenue": "Ingresos",
+        "reviews": "Reseñas"
+      },
+      "total": "Total",
+      "occupancy": "Ocupación",
+      "revenue": "Ingresos"
+    },
+    "philanthropy": {
+      "co2Reduced": "CO2 reducido",
+      "peopleHelped": "Personas ayudadas",
+      "treesPlanted": "Árboles plantados",
+      "waterSaved": "Agua ahorrada",
+      "energySaved": "Energía ahorrada",
+      "sdgAlignment": "Alineación ODS",
+      "impactByProject": "Impacto por proyecto",
+      "impactTrend": "Tendencia de impacto (12 meses)",
+      "cols": {
+        "project": "Proyecto",
+        "co2": "CO2 (kg)",
+        "people": "Personas",
+        "trees": "Árboles",
+        "donated": "Donado"
+      },
+      "total": "Total"
+    }
   },
   "kanban": {
     "title": "Kanban",
     "subtitle": "Gestión visual de proyectos",
     "newBoard": "Nuevo tablero",
     "addColumn": "Añadir columna",
-    "addCard": "Añadir tarjeta"
+    "addCard": "Añadir tarjeta",
+    "hospitality": {
+      "title": "Reservas",
+      "subtitle": "Gestiona reservas",
+      "addLabel": "Nueva reserva"
+    },
+    "realestate": {
+      "title": "Operaciones",
+      "subtitle": "Sigue tus transacciones",
+      "addLabel": "Nueva operación",
+      "salesPipeline": "Pipeline de venta",
+      "rentalPipeline": "Pipeline de alquiler",
+      "dealValue": "Valor de la operación",
+      "assignee": "Asignado a",
+      "sale": "Venta",
+      "rental": "Alquiler",
+      "dealProgress": "Progreso de la operación",
+      "salesDeal": "Operación de venta",
+      "rentalDeal": "Operación de alquiler",
+      "documentChecklist": "Checklist de documentos",
+      "noDocuments": "Aún no hay documentos adjuntos.",
+      "docsCount": "{done}/{total} docs."
+    },
+    "preview": {
+      "label": "Modo vista previa:",
+      "body": "las tarjetas que ves debajo son datos de ejemplo. Tu organización aún no tiene tableros kanban — ve a",
+      "dealsLink": "Operaciones",
+      "or": "o",
+      "projectsLink": "Proyectos",
+      "suffix": "para empezar a seguir trabajo real."
+    },
+    "drawer": {
+      "in": "en",
+      "description": "Descripción",
+      "assignee": "Asignado a",
+      "dueDate": "Fecha límite",
+      "status": "Estado",
+      "sdgTags": "Etiquetas ODS",
+      "moveToColumn": "Mover a columna",
+      "unassigned": "Sin asignar",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "close": "Cerrar",
+      "moveFailed": "Error al mover",
+      "editPlaceholder": "Editar — conecta con el flujo de edición"
+    },
+    "addCardModal": {
+      "title": "Añadir tarjeta",
+      "subtitle": "Añade una nueva tarjeta a {column}",
+      "columnFallback": "columna",
+      "titleLabel": "Título *",
+      "titlePlaceholder": "Título de la tarjeta",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Descripción opcional",
+      "priorityLabel": "Prioridad",
+      "assigneeLabel": "Asignado a",
+      "assigneePlaceholder": "ID o nombre del responsable",
+      "cancel": "Cancelar",
+      "submit": "Añadir tarjeta",
+      "submitting": "Añadiendo…",
+      "titleRequired": "El título es obligatorio",
+      "genericFailed": "No se pudo crear la tarjeta ({status})",
+      "networkError": "Error de red"
+    },
+    "priorities": {
+      "low": "Baja",
+      "medium": "Media",
+      "high": "Alta",
+      "urgent": "Urgente"
+    }
   },
   "deals": {
     "toasts": {
@@ -210,7 +503,46 @@
     },
     "confirms": {
       "delete": "¿Eliminar esta operación? Esta acción no se puede deshacer."
-    }
+    },
+    "title": "Operaciones",
+    "subtitle": "Tu canalización de ventas de un vistazo",
+    "addLabel": "Operación",
+    "filters": {
+      "search": "Buscar operaciones…",
+      "clearSearch": "Borrar búsqueda",
+      "openAdvanced": "Abrir filtro avanzado",
+      "clearAdvanced": "Borrar filtro avanzado",
+      "allPipelines": "Todas las canalizaciones",
+      "allStatuses": "Todos los estados"
+    },
+    "pipelines": {
+      "empty": "Sin canalizaciones"
+    },
+    "form": {
+      "notesPlaceholder": "Contexto, próximos pasos…",
+      "cancel": "Cancelar"
+    },
+    "statuses": {
+      "open": "Abierta",
+      "won": "Ganada",
+      "lost": "Perdida"
+    },
+    "view": {
+      "board": "Tablero",
+      "list": "Lista"
+    },
+    "empty": {
+      "title": "Aún no hay canalizaciones",
+      "hint": "Crea primero una canalización mediante la API (POST /api/pipelines)."
+    },
+    "advanced": {
+      "label": "Filtro avanzado",
+      "withCount": "Filtro avanzado ({n, plural, one {# regla} other {# reglas}})",
+      "clear": "Borrar"
+    },
+    "value": "Valor",
+    "stage": "Etapa",
+    "probability": "Probabilidad"
   },
   "properties": {
     "toasts": {
@@ -219,15 +551,244 @@
       "deleteFailed": "Eliminación fallida",
       "noAddress": "Sin dirección registrada",
       "addressCopied": "Dirección copiada",
-      "copyFailed": "Copia fallida"
+      "copyFailed": "Copia fallida",
+      "taxonomyLoadFailed": "No se pudo cargar la taxonomía de propiedades"
     },
     "confirms": {
       "delete": "¿Eliminar \"{title}\"? Esta acción no se puede deshacer."
+    },
+    "title": "Propiedades",
+    "subtitle": "Tu cartera de un vistazo",
+    "addLabel": "Propiedad",
+    "kpis": {
+      "totalProperties": "Total de propiedades",
+      "portfolioValue": "Valor de la cartera",
+      "available": "Disponibles",
+      "totalViewings": "Total de visitas"
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar título, dirección, ciudad…",
+      "allLocations": "Todas las ubicaciones",
+      "allTypes": "Todos los tipos",
+      "allStatuses": "Todos los estados",
+      "customize": "Personalizar filtros",
+      "clear": "Borrar filtros",
+      "openAdvanced": "Abrir filtro avanzado",
+      "clearAdvanced": "Borrar filtro avanzado",
+      "allLocationsNamed": "Todas las {name}",
+      "allSubtypes": "Todos los subtipos"
+    },
+    "statuses": {
+      "available": "Disponible",
+      "under_contract": "Reservada",
+      "sold": "Vendida",
+      "rented": "Alquilada"
+    },
+    "form": {
+      "title": "Añadir propiedad",
+      "listingType": "Tipo de oferta",
+      "propertyTitle": "Título",
+      "district": "Distrito",
+      "selectDistrict": "— Seleccionar —",
+      "address": "Dirección",
+      "subtype": "Subtipo",
+      "bedrooms": "Habitaciones",
+      "bathrooms": "Baños",
+      "sqm": "m²",
+      "bankOwned": "Propiedad bancaria",
+      "resale": "Segunda mano",
+      "saving": "Guardando…",
+      "submit": "Añadir propiedad"
+    },
+    "contextMenu": {
+      "open": "Abrir",
+      "quickView": "Vista rápida",
+      "valuation": "Tasación",
+      "copyAddress": "Copiar dirección",
+      "delete": "Eliminar"
+    },
+    "taxonomy": {
+      "types": {
+        "residential": "Casas",
+        "apartment": "Apartamentos",
+        "land": "Terreno",
+        "commercial": "Comercial"
+      },
+      "listingTypes": {
+        "sale": "En venta",
+        "rent": "En alquiler"
+      },
+      "subtypes": {
+        "detached_house": "Casa unifamiliar",
+        "semi_detached_house": "Casa pareada",
+        "link_detached_house": "Casa adosada en esquina",
+        "bungalow": "Bungaló",
+        "semi_detached_bungalow": "Bungaló pareado",
+        "link_detached_bungalow": "Bungaló adosado",
+        "town_house": "Casa adosada",
+        "end_town_house": "Casa adosada de esquina",
+        "penthouse": "Ático",
+        "entire_floor_apartment": "Piso de planta completa",
+        "ground_floor_apartment": "Bajo",
+        "maisonette": "Dúplex",
+        "plot": "Parcela",
+        "apartment": "Apartamento",
+        "apartment_building": "Edificio de apartamentos",
+        "bar": "Bar",
+        "block_of_flats": "Bloque de pisos",
+        "business_park": "Parque empresarial",
+        "cafe": "Café",
+        "childcare_facility": "Guardería",
+        "commercial_building": "Edificio comercial",
+        "communal_development": "Promoción comunitaria",
+        "convenience_store": "Tienda de conveniencia",
+        "data_center": "Centro de datos",
+        "distribution_warehouse": "Almacén de distribución",
+        "factory": "Fábrica",
+        "farm": "Granja",
+        "garage": "Garaje",
+        "guest_house": "Casa de huéspedes",
+        "hair_dresser_barber_shop": "Peluquería / Barbería",
+        "health_care_facility": "Centro sanitario",
+        "heavy_industrial": "Industria pesada",
+        "high_street_retail_property": "Local comercial en zona céntrica",
+        "hotel": "Hotel",
+        "hotel_apartments": "Apartamentos de hotel",
+        "industrial_building": "Edificio industrial",
+        "industrial_development": "Promoción industrial",
+        "industrial_park": "Polígono industrial",
+        "leisure_facility": "Instalación de ocio",
+        "marine_property": "Propiedad marítima",
+        "mill": "Molino",
+        "mixed_use_property": "Propiedad de uso mixto",
+        "nightclub": "Discoteca",
+        "office": "Oficina",
+        "out_of_town_retail_property": "Local comercial periférico",
+        "petrol_station": "Gasolinera",
+        "place_of_worship": "Lugar de culto",
+        "post_office": "Oficina de correos",
+        "pub": "Pub",
+        "research_and_development_center": "Centro de investigación y desarrollo",
+        "residential_development": "Promoción residencial",
+        "restaurant": "Restaurante",
+        "science_park": "Parque científico",
+        "serviced_office": "Oficina con servicios",
+        "shop": "Tienda",
+        "shopping_center": "Centro comercial",
+        "shopping_mall": "Centro comercial",
+        "showroom": "Sala de exposición",
+        "storage": "Almacenamiento",
+        "trade_counter": "Mostrador mayorista",
+        "warehouse": "Almacén",
+        "workshop": "Taller"
+      }
     }
   },
   "automations": {
     "title": "Automatizaciones",
-    "subtitle": "Reglas basadas en eventos para automatizar flujos de trabajo"
+    "subtitle": "Reglas basadas en eventos para automatizar flujos de trabajo",
+    "addLabel": "Regla",
+    "kpis": {
+      "total": "Reglas totales",
+      "active": "Activas",
+      "totalRuns": "Ejecuciones totales"
+    },
+    "triggers": {
+      "onEntityCreate": "Entidad creada",
+      "onEntityDelete": "Entidad eliminada",
+      "onFieldChange": "Campo modificado",
+      "onStageChange": "Etapa de operación modificada",
+      "onSchedule": "Programado (cron)"
+    },
+    "actions": {
+      "sendEmail": "Enviar email",
+      "sendSMS": "Enviar SMS / WhatsApp",
+      "createNotification": "Crear notificación",
+      "updateField": "Actualizar campo",
+      "moveStage": "Mover etapa de operación",
+      "callWebhook": "Llamar al webhook"
+    },
+    "list": {
+      "loading": "Cargando...",
+      "empty": "Aún no hay reglas de automatización.",
+      "when": "Cuando",
+      "then": "Entonces",
+      "runs": "ejecuciones",
+      "disable": "Desactivar",
+      "enable": "Activar",
+      "active": "Activa",
+      "paused": "Pausada",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "logs": {
+      "loading": "Cargando ejecuciones...",
+      "empty": "Aún no hay ejecuciones."
+    },
+    "editor": {
+      "titleNew": "Nueva regla de automatización",
+      "titleEdit": "Editar regla",
+      "subtitle": "Configura un disparador y una acción",
+      "ruleName": "Nombre de la regla",
+      "ruleNamePlaceholder": "p. ej. Dar la bienvenida a nuevos leads",
+      "whenTrigger": "Cuando (disparador)",
+      "thenAction": "Entonces (acción)",
+      "triggerType": "Tipo de disparador",
+      "actionType": "Tipo de acción",
+      "entity": "Entidad",
+      "anyEntity": "Cualquier entidad",
+      "any": "Cualquiera",
+      "fieldName": "Nombre del campo",
+      "fromOptional": "Desde (opcional)",
+      "toOptional": "A (opcional)",
+      "cron": "Expresión cron",
+      "accountId": "ID de cuenta",
+      "to": "Para",
+      "subject": "Asunto",
+      "bodyMerge": "Cuerpo (admite campos combinados)",
+      "phoneNumber": "Número de teléfono",
+      "channel": "Canal",
+      "body": "Cuerpo",
+      "titleField": "Título",
+      "titlePlaceholder": "Nuevo lead asignado",
+      "linkOptional": "Enlace (opcional)",
+      "field": "Campo",
+      "value": "Valor",
+      "stageId": "ID de etapa",
+      "url": "URL",
+      "payload": "Carga útil (JSON, opcional)",
+      "enabled": "Habilitada",
+      "enabledOn": "La regla se ejecutará en eventos coincidentes",
+      "enabledOff": "La regla está pausada",
+      "mergeHint": "Campos combinados: {fields}",
+      "cancel": "Cancelar",
+      "saving": "Guardando...",
+      "saveChanges": "Guardar cambios",
+      "createRule": "Crear regla"
+    },
+    "summary": {
+      "whenCreated": "Cuando se crea {entity}",
+      "whenDeleted": "Cuando se elimina {entity}",
+      "whenFieldChange": "Cuando {entity}.{field} cambia",
+      "whenStageChange": "Cuando cambia una etapa de operación",
+      "every": "Cada {cron}",
+      "sendEmailTo": "Enviar email a {to}",
+      "sendSmsTo": "Enviar {channel} a {to}",
+      "notify": "Notificar: {title}",
+      "setField": "Establecer {field} = {value}",
+      "moveToStage": "Mover a la etapa {stage}",
+      "postWebhook": "POST {url}"
+    },
+    "toasts": {
+      "nameRequired": "El nombre es obligatorio",
+      "payloadJson": "La carga útil debe ser JSON válido",
+      "saveFailed": "Error al guardar",
+      "updated": "Regla actualizada",
+      "created": "Regla creada",
+      "deleted": "Regla eliminada",
+      "deleteFailed": "Error al eliminar",
+      "toggleFailed": "Error al alternar"
+    }
   },
   "grants": {
     "title": "Subvenciones",
@@ -285,6 +846,23 @@
     },
     "confirms": {
       "delete": "¿Eliminar esta subvención?"
+    },
+    "detail": {
+      "grantAmount": "Importe de la subvención",
+      "funder": "Financiador",
+      "applied": "Solicitada",
+      "awarded": "Concedida",
+      "period": "Período",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "close": "Cerrar"
+    },
+    "form": {
+      "updateSubtitle": "Actualizar detalles de la subvención",
+      "newSubtitle": "Sigue una subvención desde la solicitud hasta la concesión",
+      "cancel": "Cancelar",
+      "saving": "Guardando…",
+      "saveChanges": "Guardar cambios"
     }
   },
   "commissions": {
@@ -300,10 +878,77 @@
       "updateFailed": "Actualización fallida",
       "deleted": "Comisión eliminada",
       "deleteFailed": "Eliminación fallida",
-      "networkError": "Error de red"
+      "networkError": "Error de red",
+      "leaderboardLoadFailed": "Error al cargar la clasificación"
     },
     "confirms": {
       "delete": "¿Eliminar este registro de comisión?"
+    },
+    "kpis": {
+      "ytdGci": "GCI del equipo YTD",
+      "totalNet": "Neto total",
+      "pendingPayouts": "Pagos pendientes",
+      "teamMembers": "Miembros del equipo"
+    },
+    "tabs": {
+      "leaderboard": "Clasificación del equipo",
+      "records": "Registros de comisiones"
+    },
+    "leaderboard": {
+      "hash": "#",
+      "agent": "Agente",
+      "deals": "Operaciones",
+      "won": "Ganadas",
+      "month": "Mes",
+      "volume": "Volumen",
+      "ytdGci": "GCI YTD",
+      "convPct": "Conv. %",
+      "empty": "Aún no hay datos del equipo."
+    },
+    "filters": {
+      "all": "Todos los estados",
+      "pending": "Pendiente",
+      "paid": "Pagada",
+      "voided": "Anulada"
+    },
+    "addCommission": "Añadir comisión",
+    "columns": {
+      "typeNotes": "Tipo / Notas",
+      "gross": "Bruto",
+      "splitPct": "% Reparto",
+      "net": "Neto",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "list": {
+      "loading": "Cargando...",
+      "empty": "Sin registros de comisiones. Haz clic en Añadir comisión."
+    },
+    "actions": {
+      "markPaid": "Marcar como pagada",
+      "void": "Anular",
+      "delete": "Eliminar"
+    },
+    "modal": {
+      "title": "Añadir comisión",
+      "subtitle": "Registrar un pago de comisión",
+      "agent": "Agente",
+      "selectAgent": "Seleccionar agente…",
+      "type": "Tipo",
+      "typeClosing": "Cierre",
+      "typeReferral": "Referencia",
+      "typeRental": "Alquiler",
+      "typeBonus": "Bonificación",
+      "typeOther": "Otro",
+      "grossAmount": "Importe bruto ($)",
+      "splitPct": "% Reparto",
+      "dealId": "ID de operación (opcional)",
+      "dealIdPlaceholder": "Vincular a una operación",
+      "notes": "Notas (opcional)",
+      "netPayout": "Pago neto: ${amount}",
+      "cancel": "Cancelar",
+      "saving": "Guardando…",
+      "submit": "Añadir comisión"
     }
   },
   "eSignatures": {
@@ -323,6 +968,65 @@
     },
     "confirms": {
       "delete": "¿Eliminar esta solicitud de firma?"
+    },
+    "addLabel": "Firma",
+    "kpis": {
+      "total": "Firmas totales",
+      "pending": "Pendientes",
+      "signed": "Firmadas",
+      "completionRate": "Tasa de finalización"
+    },
+    "filters": {
+      "all": "Todos los estados",
+      "pending": "Pendiente",
+      "sent": "Enviada",
+      "viewed": "Vista",
+      "signed": "Firmada",
+      "declined": "Rechazada",
+      "expired": "Caducada"
+    },
+    "columns": {
+      "document": "Documento",
+      "signer": "Firmante",
+      "transaction": "Transacción",
+      "provider": "Proveedor",
+      "status": "Estado",
+      "signed": "Firmada"
+    },
+    "list": {
+      "loading": "Cargando...",
+      "empty": "Aún no hay solicitudes de firma. Haz clic en Solicitar firma para empezar.",
+      "requestSignature": "Solicitar firma"
+    },
+    "detail": {
+      "fallbackTitle": "Firma",
+      "timeline": "Cronología",
+      "created": "Creada",
+      "sent": "Enviada",
+      "viewed": "Vista",
+      "signed": "Firmada",
+      "transaction": "Transacción",
+      "markSent": "Marcar como enviada",
+      "markViewed": "Marcar como vista",
+      "markSigned": "Marcar como firmada",
+      "declined": "Rechazada",
+      "reset": "Restablecer",
+      "delete": "Eliminar"
+    },
+    "request": {
+      "title": "Solicitar firma",
+      "subtitle": "Envía un documento para firma electrónica",
+      "transaction": "Transacción",
+      "selectTransaction": "Selecciona una transacción…",
+      "transactionFallback": "Transacción {id}",
+      "documentName": "Nombre del documento",
+      "signerName": "Nombre del firmante",
+      "signerEmail": "Email del firmante",
+      "provider": "Proveedor",
+      "manual": "Manual",
+      "cancel": "Cancelar",
+      "creating": "Creando…",
+      "submit": "Enviar solicitud"
     }
   },
   "referrals": {
@@ -645,7 +1349,8 @@
     "statuses": {
       "open": "Abierta",
       "closed": "Cerrada",
-      "archived": "Archivada"
+      "archived": "Archivada",
+      "pending": "Pendiente"
     },
     "channels": {
       "email": "Correo",
@@ -728,7 +1433,12 @@
     "signOut": "Cerrar sesión",
     "disconnect": "Desconectar",
     "revoke": "Revocar",
-    "replace": "Reemplazar"
+    "replace": "Reemplazar",
+    "live": "En vivo",
+    "sync": "Sincronizar",
+    "syncing": "Sincronizando…",
+    "created": "Creado",
+    "done": "Listo"
   },
   "confirms": {
     "deleteGeneric": {
@@ -1185,9 +1895,9 @@
     }
   },
   "features": {
-    "title": "Feature flags",
+    "title": "Funciones",
     "subtitle": "Kill-switches por organización en tiempo de ejecución — sin redeploy",
-    "heading": "Feature flags",
+    "heading": "Funciones",
     "description": "Cada interruptor a continuación es un kill-switch por organización. Apaga uno para desactivar esa función en esta organización inmediatamente — sin redeploy, sin cambio de código. Los cambios se aplican en ~60 segundos (TTL del caché en memoria). Cada cambio queda registrado en el log de auditoría.",
     "info": "Cambiar un flag aquí establece un override por organización. El botón \"Restablecer al predeterminado\" elimina el override y cae al predeterminado global (o al predeterminado del código si no hay global definido).",
     "loading": "Cargando…",
@@ -1219,7 +1929,27 @@
       "noImpact": "Actualmente no hay usuarios activos ni integraciones que dependan de esta función.",
       "confirm": "Desactivar función",
       "cancel": "Cancelar",
-      "saving": "Desactivando…"
+      "saving": "Desactivando…",
+      "heading": "Indicadores de funciones",
+      "subtitle": "Interruptores de emergencia por organización en tiempo de ejecución — sin redespliegue",
+      "description": "Cada interruptor de abajo es un interruptor de emergencia por organización. Apaga uno para desactivar esa función en toda esta organización de inmediato — sin redespliegue ni cambios de código. Los cambios surten efecto en ~60 segundos (el TTL de la caché en memoria). Cada cambio queda registrado en el registro de auditoría.",
+      "info": "Cambiar un indicador aquí establece una anulación por organización. El botón «Restablecer a predeterminado» elimina la anulación y vuelve al valor global por defecto (o al valor por defecto del código si no hay uno global).",
+      "empty": "No hay indicadores de funciones catalogados.",
+      "loading": "Cargando…",
+      "enabledLabel": "ACTIVADO",
+      "disabledLabel": "DESACTIVADO",
+      "lockPlatform": "Pausado por la plataforma",
+      "lockSupport": "Establecido por soporte",
+      "supportReason": "Motivo de soporte: {reason}",
+      "upgradeCTA": "Mejora tu plan para activar",
+      "toggleAriaLabel": "Alternar {key}",
+      "toasts": {
+        "featureDisabled": "Función desactivada",
+        "featureEnabled": "Función activada",
+        "networkError": "Error de red",
+        "resetToDefault": "Restablecido a predeterminado",
+        "updateFailed": "Error al actualizar ({status})"
+      }
     },
     "impact": {
       "drip-campaigns": "{count, plural, one {# cliente está inscrito en una campaña drip. Dejará de recibir los correos programados.} other {# clientes están inscritos en campañas drip. Dejarán de recibir los correos programados.}}",
@@ -1375,7 +2105,7 @@
       "lede": "Puedes cambiar ambos más tarde en /settings. La vertical oculta los módulos que no usarás — elige el que esté más cerca de tu día a día.",
       "nameLabel": "Nombre del workspace",
       "namePlaceholder": "Acme Energia SL",
-      "verticalLabel": "Vertical",
+      "verticalLabel": "Sector",
       "ctaCreate": "Crear workspace",
       "ctaBack": "Atrás",
       "ctaCreating": "Creando…",
@@ -1418,7 +2148,7 @@
     "errorLoading": "No se pudieron cargar las organizaciones. Intenta recargar la página.",
     "empty": "Ninguna organización coincide con la búsqueda.",
     "noPlan": "sin suscripción",
-    "overrideCount": "{count, plural, one {# override} other {# overrides}}",
+    "overrideCount": "{count, plural, one {# anulación} other {# anulaciones}}",
     "paginationHint": "Mostrando {shown} de {total} organizaciones. Refina la búsqueda para ver más."
   },
   "adminFeatures": {
@@ -1501,7 +2231,8 @@
     "errors": {
       "nameRequired": "El nombre es obligatorio",
       "phoneRequired": "El teléfono es obligatorio",
-      "invalidEmail": "Formato de correo no válido"
+      "invalidEmail": "Formato de correo no válido",
+      "submitFailed": "No se pudo guardar: revisa los datos e inténtalo de nuevo."
     },
     "submit": "Añadir {entity}",
     "success": "Añadido correctamente",
@@ -1535,7 +2266,8 @@
       "networkError": "Error de red — inténtalo de nuevo",
       "authError": "No permitido — solo los managers pueden importar contactos",
       "close": "Listo"
-    }
+    },
+    "submitting": "Guardando…"
   },
   "reports": {
     "title": "Informes",
@@ -1644,6 +2376,1792 @@
       "IS24_NOT_CONFIGURED": "Faltan las credenciales de socio de ImmoScout24 — contacta con el admin.",
       "IS24_PUBLISH_FAILED": "Publicación en ImmoScout24 fallida: {detail}",
       "IS24_UNPUBLISH_FAILED": "Despublicación en ImmoScout24 fallida: {detail}"
+    }
+  },
+  "journey": {
+    "enquiry": "Consulta",
+    "viewing": "Visita",
+    "reservation": "Reserva",
+    "searches": "Búsqueda",
+    "agreement": "Acuerdo",
+    "transfer": "Transferencia",
+    "commission": "Comisión",
+    "payment": "Pago",
+    "keys": "Llaves"
+  },
+  "kpi": {
+    "activeListings": "Listados activos",
+    "dealsClosed": "Operaciones cerradas",
+    "commission": "Comisión",
+    "commissionYtd": "Comisión YTD",
+    "avgDaysOnMarket": "Días medios en el mercado",
+    "avgDaysToClose": "Días medios al cierre",
+    "totalViewings": "Total de visitas",
+    "activeRentals": "Alquileres activos",
+    "thisMonth": "+{n} este mes",
+    "ytdTotal": "Total YTD",
+    "lastQuarter": "vs trimestre anterior",
+    "belowAverage": "Por debajo de la media",
+    "ongoingLeases": "Contratos vigentes",
+    "revenueClosings": "Ingresos y cierres",
+    "monthlyPerformance": "Rendimiento mensual",
+    "listingsVsClosings": "Listados vs cierres",
+    "monthlyMarketActivity": "Actividad de mercado mensual",
+    "goal": "Objetivo: {n}"
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Administra tu cuenta, organización e integraciones",
+    "nav": {
+      "profile": "Perfil",
+      "organization": "Organización",
+      "preferences": "Preferencias",
+      "apiKeys": "Claves API",
+      "goals": "Objetivos",
+      "integrations": "Integraciones"
+    },
+    "sections": {
+      "profile": {
+        "title": "Perfil",
+        "sub": "Gestiona tu información personal"
+      },
+      "organization": {
+        "title": "Organización",
+        "sub": "Configura los datos de tu organización"
+      },
+      "preferences": {
+        "title": "Preferencias",
+        "sub": "Personaliza tu experiencia"
+      },
+      "apiKeys": {
+        "title": "Claves API",
+        "sub": "Configura integraciones API para servicios externos"
+      },
+      "goals": {
+        "title": "Objetivos",
+        "sub": "Define objetivos de rendimiento para tu equipo"
+      },
+      "integrations": {
+        "title": "Integraciones",
+        "sub": "Conecta servicios externos"
+      }
+    },
+    "fields": {
+      "fullName": "Nombre completo",
+      "email": "Correo electrónico",
+      "role": "Rol",
+      "organizationName": "Nombre de la organización",
+      "industry": "Sector",
+      "language": "Idioma",
+      "theme": "Tema",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de fin",
+      "current": "Actual",
+      "target": "Objetivo"
+    },
+    "actions": {
+      "save": "Guardar",
+      "saveChanges": "Guardar cambios",
+      "saving": "Guardando…",
+      "saveGoals": "Guardar objetivos",
+      "configure": "Configurar",
+      "connect": "Conectar",
+      "show": "Mostrar",
+      "hide": "Ocultar"
+    },
+    "status": {
+      "loading": "Cargando…",
+      "connected": "Conectado",
+      "notConfigured": "Sin configurar",
+      "notConnected": "No conectado",
+      "adminOnly": "Solo los administradores pueden actualizar los datos de la organización."
+    },
+    "theme": {
+      "light": "Claro",
+      "dark": "Oscuro"
+    },
+    "language": {
+      "english": "English",
+      "dutch": "Nederlands"
+    },
+    "industries": {
+      "general": "General",
+      "nonprofit": "Sin ánimo de lucro / ONG",
+      "foundation": "Fundación",
+      "csr": "RSC corporativa",
+      "government": "Gobierno",
+      "education": "Educación",
+      "healthcare": "Sanidad",
+      "realestate": "Inmobiliaria",
+      "hospitality": "Hostelería"
+    },
+    "periods": {
+      "daily": "Diario",
+      "weekly": "Semanal",
+      "monthly": "Mensual",
+      "yearly": "Anual",
+      "custom": "Personalizado"
+    },
+    "goalsList": {
+      "listings": "Inmuebles añadidos",
+      "deals": "Operaciones cerradas",
+      "commission": "Objetivo de comisión",
+      "viewings": "Visitas reservadas",
+      "leads": "Nuevos leads",
+      "projects": "Proyectos completados",
+      "people": "Personas ayudadas",
+      "co2": "CO2 reducido",
+      "donations": "Donaciones recaudadas",
+      "partners": "Socios incorporados",
+      "occupancy": "Tasa de ocupación",
+      "revpar": "Objetivo RevPAR",
+      "satisfaction": "Satisfacción del huésped",
+      "bookings": "Reservas",
+      "fnb": "Ingresos F&B"
+    },
+    "api": {
+      "gohighlevel": {
+        "name": "GoHighLevel CRM",
+        "description": "Conecta tu pipeline de GHL"
+      },
+      "meta": {
+        "name": "Meta Ads",
+        "description": "Campañas publicitarias de Facebook/Instagram"
+      },
+      "googleads": {
+        "name": "Google Ads",
+        "description": "Campañas de búsqueda y display de Google"
+      },
+      "supabase": {
+        "name": "Supabase",
+        "description": "Conexión de base de datos"
+      },
+      "stripe": {
+        "name": "Stripe",
+        "description": "Procesamiento de pagos"
+      },
+      "twilio": {
+        "name": "Twilio",
+        "description": "Mensajería SMS y WhatsApp"
+      },
+      "fieldLabels": {
+        "apiKey": "Clave API",
+        "locationId": "ID de ubicación",
+        "accessToken": "Token de acceso",
+        "accountId": "ID de cuenta",
+        "clientId": "ID de cliente",
+        "clientSecret": "Secreto de cliente",
+        "url": "URL del proyecto",
+        "anonKey": "Clave anónima",
+        "secretKey": "Clave secreta",
+        "accountSid": "Account SID",
+        "authToken": "Token de autenticación"
+      }
+    },
+    "integrationsList": {
+      "gohighlevel": "GoHighLevel",
+      "supabase": "Supabase",
+      "slack": "Slack",
+      "googleAnalytics": "Google Analytics"
+    },
+    "toasts": {
+      "nameRequired": "El nombre es obligatorio",
+      "orgNameRequired": "El nombre de la organización es obligatorio",
+      "failedSaveProfile": "Error al guardar el perfil",
+      "profileSaved": "Perfil guardado",
+      "failedSaveOrg": "Error al guardar la organización",
+      "orgSaved": "Organización guardada",
+      "goalsSaved": "Objetivos guardados",
+      "apiDraftNotice": "configurado solo en esta sesión — conecta mediante /api/integrations para conservarlo"
+    }
+  },
+  "liveBand": {
+    "ariaLabel": "Métricas en vivo de la organización",
+    "liveYourOrg": "En vivo — tu organización",
+    "fetching": "En vivo — obteniendo métricas…",
+    "unavailable": "Métricas en vivo no disponibles",
+    "unavailableHint": "Se muestran widgets de demostración a continuación. Comprueba la conexión o los registros de la API.",
+    "updatedAgo": "Actualizado {ago}",
+    "contacts": "Contactos",
+    "openDeals": "Operaciones abiertas",
+    "won30d": "Ganadas (30d)",
+    "closedTx": "Transacciones cerradas",
+    "deltaLast30d": "+{n} en los últimos 30 días",
+    "noNewLast30d": "ninguna nueva en los últimos 30 días",
+    "pipelineValue": "{value} en pipeline",
+    "revenueValue": "{value} ingresos",
+    "gmvValue": "{value} GMV"
+  },
+  "integrations": {
+    "title": "Integraciones",
+    "subtitle": "Conecta tus herramientas favoritas con DEUS",
+    "searchPlaceholder": "Buscar integraciones…",
+    "status": {
+      "connected": "Conectado",
+      "error": "Error",
+      "notConnected": "Sin conectar"
+    }
+  },
+  "forms": {
+    "contact": {
+      "fullName": "Nombre completo",
+      "company": "Organización o empresa",
+      "notes": "Notas adicionales…"
+    },
+    "filterBuilder": {
+      "matchAll": "Coincidir TODOS",
+      "matchAny": "Coincidir CUALQUIERA",
+      "clearAll": "Borrar todo",
+      "operators": {
+        "eq": "es",
+        "neq": "no es",
+        "contains": "contiene",
+        "ncontains": "no contiene",
+        "startsWith": "empieza por",
+        "endsWith": "termina en",
+        "in": "en",
+        "nin": "no en",
+        "isEmpty": "está vacío",
+        "isNotEmpty": "no está vacío",
+        "between": "entre"
+      },
+      "header": "Filtros",
+      "empty": "Aún no hay filtros. Añade uno abajo para acotar los resultados.",
+      "addFilter": "Añadir filtro",
+      "valuePlaceholder": "valor",
+      "rangeFrom": "desde",
+      "rangeTo": "hasta",
+      "rangeAnd": "y"
+    }
+  },
+  "layout": {
+    "topbarAria": {
+      "openNav": "Abrir menú de navegación",
+      "openPalette": "Abrir paleta de comandos"
+    },
+    "sidebar": {
+      "active": "Activo"
+    },
+    "orgSwitcher": {
+      "switchAria": "Cambiar organización",
+      "currentAria": "Actual"
+    }
+  },
+  "rooms": {
+    "title": "Habitaciones",
+    "subtitle": "Inventario y disponibilidad",
+    "kpi": {
+      "totalRooms": "Total habitaciones",
+      "available": "Disponibles",
+      "occupied": "Ocupadas",
+      "maintenance": "Mantenimiento"
+    },
+    "filters": {
+      "allStatuses": "Todos los estados"
+    },
+    "statuses": {
+      "available": "Disponible",
+      "occupied": "Ocupada",
+      "maintenance": "Mantenimiento",
+      "blocked": "Bloqueada"
+    },
+    "types": {
+      "standard": "Estándar",
+      "deluxe": "Deluxe",
+      "suite": "Suite",
+      "family": "Familiar",
+      "dorm": "Compartida"
+    },
+    "addRoom": "Añadir habitación",
+    "editRoom": "Editar habitación",
+    "addSubtitle": "Registra una nueva habitación",
+    "editSubtitle": "Actualiza los datos de la habitación",
+    "empty": "No se encontraron habitaciones.",
+    "loading": "Cargando…",
+    "perNight": "/noche",
+    "meta": {
+      "floor": "Planta",
+      "capacity": "Cap.",
+      "reservations": "reservas",
+      "tasks": "tareas"
+    },
+    "detail": {
+      "price": "Precio",
+      "capacity": "Capacidad",
+      "reservations": "Reservas",
+      "housekeeping": "Limpieza",
+      "guests": " huéspedes",
+      "floor": "Planta"
+    },
+    "actions": {
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "cancel": "Cancelar",
+      "save": "Guardar cambios",
+      "saving": "Guardando…"
+    },
+    "form": {
+      "name": "Nombre / Número de habitación",
+      "namePlaceholder": "Suite 201",
+      "type": "Tipo",
+      "floor": "Planta",
+      "capacity": "Capacidad",
+      "price": "Precio ($/noche)",
+      "status": "Estado"
+    },
+    "toasts": {
+      "nameRequired": "Nombre obligatorio",
+      "invalidPrice": "Precio no válido",
+      "saveFailed": "Error al guardar",
+      "updated": "Habitación actualizada",
+      "created": "Habitación añadida",
+      "deleted": "Habitación eliminada",
+      "deleteFailed": "Error al eliminar",
+      "networkError": "Error de red"
+    }
+  },
+  "email": {
+    "title": "Correo",
+    "subtitle": "Gestiona cuentas y envía mensajes",
+    "connectAccount": "Conectar cuenta",
+    "kpi": {
+      "totalAccounts": "Total cuentas",
+      "connected": "Conectadas",
+      "messagesToday": "Mensajes hoy",
+      "pending": "Pendientes"
+    },
+    "accounts": {
+      "sectionTitle": "Cuentas",
+      "refresh": "Actualizar",
+      "loading": "Cargando…",
+      "emptyTitle": "Sin cuentas de correo conectadas",
+      "emptyAction": "Conecta una",
+      "syncPrefix": "sinc.",
+      "timeAgo": {
+        "never": "nunca",
+        "justNow": "justo ahora",
+        "minutes": "hace {n}m",
+        "hours": "hace {n}h",
+        "days": "hace {n}d"
+      }
+    },
+    "compose": {
+      "noAccount": "Ninguna cuenta seleccionada",
+      "sendFrom": "Enviar desde {provider}",
+      "connectPrompt": "Conecta una cuenta para empezar a enviar",
+      "button": "Redactar",
+      "title": "Nuevo mensaje",
+      "fromLabel": "De",
+      "to": "Para",
+      "toPlaceholder": "destinatario@ejemplo.com",
+      "addCcBcc": "+ Añadir Cc / Bcc",
+      "cc": "Cc",
+      "bcc": "Bcc",
+      "subject": "Asunto",
+      "subjectPlaceholder": "Línea de asunto",
+      "message": "Mensaje",
+      "messagePlaceholder": "Escribe tu mensaje…",
+      "attach": "Adjuntar",
+      "attachTooltip": "Adjuntos próximamente",
+      "send": "Enviar",
+      "sending": "Enviando…",
+      "toSubjectRequired": "Para y Asunto son obligatorios"
+    },
+    "thread": {
+      "comingSoonTitle": "Vista de conversación próximamente",
+      "comingSoonBody": "Los mensajes entrantes y salientes aparecerán aquí en cuanto se active la sincronización de buzón."
+    },
+    "addModal": {
+      "title": "Conectar cuenta de correo",
+      "subtitle": "Añade un buzón para enviar y recibir mensajes",
+      "close": "Cerrar",
+      "provider": "Proveedor",
+      "emailLabel": "Dirección de correo",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "displayName": "Nombre visible",
+      "displayNamePlaceholder": "Opcional — se muestra en el correo saliente",
+      "submit": "Conectar cuenta",
+      "submitting": "Conectando…",
+      "emailRequired": "El correo es obligatorio",
+      "genericFailed": "Falló ({status})",
+      "networkError": "Error de red"
+    },
+    "sendErrors": {
+      "genericFailed": "Falló ({status})",
+      "networkError": "Error de red"
+    }
+  },
+  "dealDetail": {
+    "backToDeals": "Volver a Negocios",
+    "titleFallback": "Detalle del negocio",
+    "noPipeline": "Sin pipeline",
+    "sections": {
+      "dealInfo": "Información del negocio",
+      "commission": "Comisión",
+      "probability": "Probabilidad",
+      "notes": "Notas"
+    },
+    "fields": {
+      "expectedClose": "Cierre previsto",
+      "dealType": "Tipo de negocio",
+      "pipeline": "Pipeline",
+      "created": "Creado",
+      "actualClose": "Cierre real",
+      "rate": "Tasa",
+      "amount": "Importe",
+      "brokerSplit": "Reparto del agente"
+    },
+    "dealTypes": {
+      "standard": "Estándar",
+      "sale": "Venta",
+      "rental": "Alquiler",
+      "grant": "Subvención",
+      "reservation": "Reserva",
+      "other": "Otro"
+    },
+    "actions": {
+      "markWon": "Marcar como ganado",
+      "markLost": "Marcar como perdido",
+      "reopen": "Reabrir",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "cancel": "Cancelar",
+      "saveNotes": "Guardar notas",
+      "saving": "Guardando…"
+    },
+    "sideCards": {
+      "contact": "Contacto",
+      "owner": "Propietario",
+      "project": "Proyecto",
+      "stage": "Etapa",
+      "weightedValue": "Valor ponderado",
+      "pipelineAge": "Antigüedad en pipeline"
+    },
+    "empty": {
+      "noContact": "Sin contacto vinculado",
+      "unassigned": "Sin asignar",
+      "noNotes": "Aún no hay notas. Haz clic en Editar para añadir."
+    },
+    "hints": {
+      "clickToEdit": "Haz clic para editar"
+    },
+    "units": {
+      "days": "días"
+    },
+    "toasts": {
+      "markedWon": "Marcado como ganado",
+      "markedLost": "Marcado como perdido",
+      "reopened": "Negocio reabierto",
+      "stageUpdated": "Etapa actualizada",
+      "saved": "Guardado",
+      "deleted": "Negocio eliminado",
+      "deleteFailed": "Error al eliminar",
+      "updateFailed": "Error al actualizar",
+      "networkError": "Error de red",
+      "titleRequired": "Título obligatorio",
+      "invalidValue": "Valor no válido",
+      "rangeZeroToHundred": "Debe estar entre 0 y 100",
+      "notFound": "Negocio no encontrado",
+      "loadFailed": "No se pudo cargar el negocio"
+    },
+    "common": {
+      "loading": "Cargando..."
+    }
+  },
+  "transactionDetail": {
+    "backToTransactions": "Volver a Transacciones",
+    "titleFallback": "Detalle de la transacción",
+    "escrowFallback": "Sin n.º de depósito",
+    "noTitleCompany": "Sin notaría",
+    "notFound": "No encontrada.",
+    "sections": {
+      "financial": "Datos financieros",
+      "closingChecklist": "Lista de cierre",
+      "notes": "Notas",
+      "summary": "Resumen",
+      "signatures": "Firmas",
+      "linked": "Vinculado"
+    },
+    "fields": {
+      "salePrice": "Precio de venta",
+      "earnestMoney": "Señal",
+      "escrowNumber": "Número de depósito",
+      "titleCompany": "Notaría",
+      "contractDate": "Fecha del contrato",
+      "closingDate": "Fecha de cierre",
+      "earnest": "Señal",
+      "signatures": "Firmas",
+      "daysOpen": "Días abierta",
+      "documentName": "Nombre del documento",
+      "signerName": "Nombre del firmante",
+      "signerEmail": "Correo del firmante"
+    },
+    "statuses": {
+      "pending": "Pendiente",
+      "inProgress": "En curso",
+      "closing": "Cerrando",
+      "completed": "Completada",
+      "cancelled": "Cancelada"
+    },
+    "types": {
+      "purchase": "Compra",
+      "sale": "Venta",
+      "lease": "Arrendamiento",
+      "rental": "Alquiler"
+    },
+    "actions": {
+      "requestSignature": "Solicitar firma",
+      "request": "Solicitar",
+      "delete": "Eliminar",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "edit": "Editar",
+      "viewDeal": "Ver negocio →",
+      "viewProperty": "Ver inmueble →",
+      "sendSignatureRequest": "Enviar solicitud de firma",
+      "sending": "Enviando…"
+    },
+    "modal": {
+      "title": "Solicitar firma",
+      "subtitle": "Envía un documento para firma electrónica",
+      "documentPlaceholder": "Contrato de compraventa",
+      "signerNamePlaceholder": "Juan Pérez",
+      "signerEmailPlaceholder": "juan@ejemplo.com"
+    },
+    "checklist": {
+      "defaultItems": {
+        "inspection": "Inspección programada",
+        "appraisal": "Tasación solicitada",
+        "loanApproval": "Aprobación del préstamo recibida",
+        "titleSearch": "Búsqueda registral completada",
+        "insurance": "Seguro contratado",
+        "walkthrough": "Visita final",
+        "closingDocs": "Documentos de cierre firmados"
+      }
+    },
+    "empty": {
+      "noSignatures": "Aún no hay solicitudes de firma.",
+      "noNotes": "Sin notas. Haz clic en Editar para añadir."
+    },
+    "hints": {
+      "clickToEdit": "Haz clic para editar"
+    },
+    "toasts": {
+      "saved": "Guardado",
+      "saveFailed": "Error al guardar",
+      "updateFailed": "Error al actualizar",
+      "networkError": "Error de red",
+      "invalidAmount": "Importe no válido",
+      "deleted": "Transacción eliminada",
+      "deleteFailed": "Error al eliminar",
+      "allFieldsRequired": "Todos los campos son obligatorios",
+      "signatureCreated": "Solicitud de firma creada",
+      "signatureFailed": "No se pudo solicitar la firma"
+    },
+    "common": {
+      "loading": "Cargando..."
+    }
+  },
+  "projectDetail": {
+    "titleFallback": "Proyecto",
+    "notFound": "Proyecto no encontrado",
+    "backToProjects": "Volver a Proyectos",
+    "tabs": {
+      "overview": "Resumen",
+      "milestones": "Hitos",
+      "impact": "Impacto",
+      "contacts": "Contactos",
+      "deals": "Negocios"
+    },
+    "statuses": {
+      "planned": "Planificado",
+      "active": "Activo",
+      "completed": "Completado",
+      "paused": "En pausa"
+    },
+    "sections": {
+      "projectDetails": "Detalles del proyecto",
+      "milestoneProgress": "Progreso de hitos",
+      "budgetBurn": "Consumo del presupuesto",
+      "addMilestone": "Añadir hito",
+      "recordImpact": "Registrar impacto",
+      "impactRecords": "Registros de impacto",
+      "linkedContacts": "Contactos vinculados",
+      "linkedDeals": "Negocios vinculados"
+    },
+    "stats": {
+      "progress": "Progreso",
+      "budget": "Presupuesto",
+      "impactEntries": "Entradas de impacto",
+      "daysActive": "Días activos",
+      "records": "registros",
+      "totalDuration": "duración total",
+      "soFar": "hasta ahora",
+      "totalPipeline": "Pipeline total",
+      "weighted": "Ponderado",
+      "won": "Ganados",
+      "open": "Abiertos",
+      "milestonesSummary": "{done}/{total} hitos",
+      "burnPercent": "{burn}% gastado",
+      "milestonesCompleted": "{done} de {total} hitos completados",
+      "budgetSpent": "€{spent} de €{budget} gastados"
+    },
+    "milestones": {
+      "titlePlaceholder": "Título del hito",
+      "addBtn": "Añadir",
+      "emptyHint": "Aún no hay hitos. Añade el primero arriba.",
+      "markPending": "Marcar como pendiente",
+      "markCompleted": "Marcar como completado",
+      "deleteAria": "Eliminar hito",
+      "overdueLabel": "vencido",
+      "completedLabel": "completado el {date}"
+    },
+    "impact": {
+      "valuePlaceholder": "Valor",
+      "notesPlaceholder": "Notas (opcional)",
+      "recordBtn": "Registrar",
+      "emptyHint": "Aún no hay impacto registrado. Registra tu primera métrica arriba.",
+      "types": {
+        "co2_kg": "CO2 reducido",
+        "people_helped": "Personas ayudadas",
+        "trees_planted": "Árboles plantados",
+        "money_donated": "Dinero donado",
+        "water_liters": "Agua ahorrada",
+        "energy_kwh": "Energía generada",
+        "custom": "Personalizado"
+      }
+    },
+    "contacts": {
+      "emptyHint": "Aún no hay contactos vinculados."
+    },
+    "deals": {
+      "openBoard": "Abrir tablero de negocios →",
+      "emptyHint": "Aún no hay negocios vinculados a este proyecto."
+    },
+    "budgetPlaceholder": "Presupuesto (€)",
+    "toasts": {
+      "updated": "Proyecto actualizado",
+      "somethingWrong": "Algo salió mal",
+      "milestoneAdded": "Hito añadido",
+      "milestoneRemoved": "Hito eliminado",
+      "impactRecorded": "Impacto registrado",
+      "positiveValueRequired": "Introduce un valor positivo",
+      "failedUpdateProject": "Error al actualizar el proyecto",
+      "failedAddMilestone": "Error al añadir el hito",
+      "failedUpdateMilestone": "Error al actualizar el hito",
+      "failedDeleteMilestone": "Error al eliminar el hito",
+      "failedAddMetric": "Error al añadir la métrica"
+    }
+  },
+  "propertyDetail": {
+    "titleFallback": "Detalle del inmueble",
+    "backToProperties": "Volver a Inmuebles",
+    "sections": {
+      "propertyDetails": "Datos del inmueble",
+      "showings": "Visitas",
+      "stats": "Estadísticas",
+      "listed": "Publicado",
+      "offers": "Ofertas",
+      "description": "Descripción"
+    },
+    "fields": {
+      "price": "Precio",
+      "address": "Dirección",
+      "city": "Ciudad",
+      "state": "Provincia",
+      "zip": "Código postal",
+      "bedrooms": "Dormitorios",
+      "bathrooms": "Baños",
+      "squareFeet": "Superficie",
+      "yearBuilt": "Año de construcción",
+      "viewings": "Visitas",
+      "openHouses": "Jornadas de puertas abiertas",
+      "offers": "Ofertas"
+    },
+    "statuses": {
+      "available": "Disponible",
+      "underContract": "Bajo contrato",
+      "sold": "Vendido",
+      "rented": "Alquilado"
+    },
+    "types": {
+      "residential": "Residencial",
+      "commercial": "Comercial",
+      "land": "Suelo",
+      "industrial": "Industrial"
+    },
+    "actions": {
+      "scheduleShowing": "Programar visita",
+      "scheduleOpenHouse": "Programar puertas abiertas",
+      "submitOffer": "Enviar oferta",
+      "delete": "Eliminar",
+      "viewAll": "Ver todo →",
+      "edit": "Editar",
+      "cancel": "Cancelar",
+      "save": "Guardar"
+    },
+    "empty": {
+      "notFound": "Inmueble no encontrado.",
+      "noShowings": "No hay visitas programadas.",
+      "noOffers": "Aún no hay ofertas.",
+      "noDescription": "Sin descripción."
+    },
+    "hints": {
+      "clickToEdit": "Haz clic para editar",
+      "clickToChange": "Haz clic para cambiar",
+      "daysOnMarket": "{days} días en el mercado"
+    },
+    "loading": "Cargando inmueble...",
+    "toasts": {
+      "titleRequired": "Título obligatorio",
+      "invalidPrice": "Precio no válido",
+      "invalidNumber": "Número no válido",
+      "saved": "Guardado",
+      "saveFailed": "Error al guardar",
+      "networkError": "Error de red",
+      "deleted": "Inmueble eliminado",
+      "deleteFailed": "Error al eliminar",
+      "notFound": "Inmueble no encontrado",
+      "loadFailed": "No se pudo cargar el inmueble"
+    }
+  },
+  "commandPalette": {
+    "placeholder": "Busca páginas, contactos, proyectos...",
+    "askAi": "Pregunta a la IA",
+    "askAiAria": "Pregunta a la IA",
+    "askAiTitle": "Pregunta a la IA (Cmd+Shift+K)",
+    "searching": "Buscando…",
+    "noResults": "Sin resultados",
+    "navigate": "navegar",
+    "select": "seleccionar",
+    "resultsOne": "{count} resultado",
+    "resultsOther": "{count} resultados",
+    "categories": {
+      "pages": "Páginas",
+      "tools": "Herramientas",
+      "realEstate": "Inmobiliario",
+      "hospitality": "Hostelería",
+      "philanthropy": "Filantropía",
+      "system": "Sistema",
+      "actions": "Acciones",
+      "settings": "Ajustes",
+      "contacts": "Contactos",
+      "projects": "Proyectos",
+      "properties": "Inmuebles"
+    },
+    "contactFallback": "Contacto",
+    "items": {
+      "dashboard": {
+        "label": "Panel",
+        "description": "Resumen y KPIs"
+      },
+      "projects": {
+        "label": "Proyectos",
+        "description": "Gestiona proyectos"
+      },
+      "properties": {
+        "label": "Inmuebles",
+        "description": "Gestiona inmuebles"
+      },
+      "contacts": {
+        "label": "Contactos",
+        "description": "Personas y organizaciones"
+      },
+      "impact": {
+        "label": "Impacto",
+        "description": "Métricas de impacto"
+      },
+      "market": {
+        "label": "Mercado",
+        "description": "Analítica de mercado"
+      },
+      "reports": {
+        "label": "Informes",
+        "description": "Genera y consulta informes"
+      },
+      "kanban": {
+        "label": "Tablero",
+        "description": "Tablero de pipeline"
+      },
+      "dealsBoard": {
+        "label": "Tablero de deals",
+        "description": "Tablero de pipeline"
+      },
+      "reservations": {
+        "label": "Reservas",
+        "description": "Tablero de pipeline"
+      },
+      "deals": {
+        "label": "Operaciones",
+        "description": "Pipeline de deals"
+      },
+      "calendar": {
+        "label": "Calendario",
+        "description": "Hitos y eventos"
+      },
+      "timeline": {
+        "label": "Cronograma",
+        "description": "Vista Gantt de tareas"
+      },
+      "documents": {
+        "label": "Documentos",
+        "description": "Gestiona archivos y documentos"
+      },
+      "inbox": {
+        "label": "Bandeja de entrada",
+        "description": "Conversaciones y mensajes"
+      },
+      "email": {
+        "label": "Email",
+        "description": "Campañas de email"
+      },
+      "sms": {
+        "label": "SMS",
+        "description": "Mensajería SMS"
+      },
+      "templates": {
+        "label": "Plantillas",
+        "description": "Plantillas de email y SMS"
+      },
+      "pages": {
+        "label": "Páginas",
+        "description": "Páginas personalizadas"
+      },
+      "ai": {
+        "label": "Información IA",
+        "description": "Análisis con IA"
+      },
+      "propertiesRe": {
+        "label": "Inmuebles",
+        "description": "Listados inmobiliarios"
+      },
+      "showings": {
+        "label": "Visitas",
+        "description": "Visitas a inmuebles"
+      },
+      "offers": {
+        "label": "Ofertas",
+        "description": "Ofertas de inmuebles"
+      },
+      "openHouses": {
+        "label": "Jornadas de puertas abiertas",
+        "description": "Eventos open house"
+      },
+      "commissions": {
+        "label": "Comisiones",
+        "description": "Ranking del equipo"
+      },
+      "dripCampaigns": {
+        "label": "Campañas drip",
+        "description": "Secuencias automáticas"
+      },
+      "marketAnalytics": {
+        "label": "Analítica de mercado",
+        "description": "Tendencias del mercado"
+      },
+      "transactions": {
+        "label": "Transacciones",
+        "description": "Transacciones inmobiliarias"
+      },
+      "actionPlans": {
+        "label": "Planes de acción",
+        "description": "Secuencias de acciones automatizadas"
+      },
+      "leadScores": {
+        "label": "Puntuación de leads",
+        "description": "Scoring de contactos"
+      },
+      "leadRouting": {
+        "label": "Enrutamiento de leads",
+        "description": "Asigna leads a agentes"
+      },
+      "dialer": {
+        "label": "Marcador automático",
+        "description": "Registro de llamadas y marcado"
+      },
+      "referrals": {
+        "label": "Referidos",
+        "description": "Comisiones por referidos"
+      },
+      "soi": {
+        "label": "Esfera de influencia",
+        "description": "Categorías SOI"
+      },
+      "cma": {
+        "label": "Informes CMA",
+        "description": "Análisis comparativo de mercado"
+      },
+      "clientPortal": {
+        "label": "Portal de cliente",
+        "description": "Acceso al portal de cliente"
+      },
+      "eSignatures": {
+        "label": "Firmas electrónicas",
+        "description": "Firmas de documentos"
+      },
+      "rooms": {
+        "label": "Habitaciones",
+        "description": "Gestiona habitaciones y disponibilidad"
+      },
+      "grants": {
+        "label": "Subvenciones",
+        "description": "Solicitudes y financiación"
+      },
+      "donors": {
+        "label": "Donantes",
+        "description": "Panel de scoring de donantes"
+      },
+      "volunteers": {
+        "label": "Voluntarios",
+        "description": "Equipo y horas de voluntariado"
+      },
+      "notifications": {
+        "label": "Notificaciones",
+        "description": "Todas las notificaciones"
+      },
+      "automations": {
+        "label": "Automatizaciones",
+        "description": "Automatiza flujos"
+      },
+      "integrations": {
+        "label": "Integraciones",
+        "description": "Apps conectadas"
+      },
+      "webhooks": {
+        "label": "Webhooks",
+        "description": "Webhooks salientes"
+      },
+      "pipelines": {
+        "label": "Pipelines",
+        "description": "Configura pipelines y fases"
+      },
+      "security": {
+        "label": "Seguridad",
+        "description": "Lista de IP y tiempo de inactividad"
+      },
+      "features": {
+        "label": "Funciones",
+        "description": "Kill-switches por organización sin redeploy"
+      },
+      "scimGroups": {
+        "label": "Grupos SCIM",
+        "description": "Mapea grupos del IdP a roles y secciones"
+      },
+      "audit": {
+        "label": "Registro de auditoría",
+        "description": "Pista de auditoría del sistema"
+      },
+      "settings": {
+        "label": "Ajustes",
+        "description": "Preferencias de la app"
+      },
+      "newProject": {
+        "label": "Nuevo proyecto",
+        "description": "Crea un nuevo proyecto"
+      },
+      "newProperty": {
+        "label": "Nuevo inmueble",
+        "description": "Crea un nuevo inmueble"
+      },
+      "newRoom": {
+        "label": "Nueva habitación",
+        "description": "Crea una nueva habitación"
+      },
+      "newContact": {
+        "label": "Nuevo contacto",
+        "description": "Añade un nuevo contacto"
+      },
+      "exportData": {
+        "label": "Exportar datos",
+        "description": "Descarga los datos actuales como CSV"
+      },
+      "toDark": {
+        "label": "Cambiar a modo oscuro",
+        "description": "Actualmente {theme}"
+      },
+      "toLight": {
+        "label": "Cambiar a modo claro",
+        "description": "Actualmente {theme}"
+      },
+      "toCsr": {
+        "label": "Cambiar a CSR",
+        "description": "Modo filantropía y CSR"
+      },
+      "toRe": {
+        "label": "Cambiar a inmobiliario",
+        "description": "Modo inmobiliario"
+      },
+      "toHos": {
+        "label": "Cambiar a hospitality",
+        "description": "Modo hospitality"
+      }
+    }
+  },
+  "audit": {
+    "title": "Registro de auditoría",
+    "subtitle": "Historial completo de actividad en tu espacio de trabajo",
+    "filters": {
+      "allEntities": "Todas las entidades",
+      "allActions": "Todas las acciones",
+      "create": "Crear",
+      "update": "Actualizar",
+      "delete": "Eliminar",
+      "allTime": "Todo el tiempo",
+      "last24h": "Últimas 24 horas",
+      "last7d": "Últimos 7 días",
+      "last30d": "Últimos 30 días"
+    },
+    "columns": {
+      "timestamp": "Marca de tiempo",
+      "action": "Acción",
+      "entity": "Entidad",
+      "changes": "Cambios",
+      "user": "Usuario"
+    },
+    "empty": "No se encontraron registros de auditoría.",
+    "loading": "Cargando registros de auditoría...",
+    "diff": {
+      "noDetails": "No se registraron detalles a nivel de campo.",
+      "field": "Campo",
+      "before": "Antes",
+      "after": "Después",
+      "entityId": "id de entidad",
+      "noDetailsShort": "Sin detalles"
+    }
+  },
+  "transactions": {
+    "title": "Transacciones",
+    "subtitle": "Cierres, contratos y plica",
+    "addLabel": "Transacción",
+    "kpis": {
+      "total": "Transacciones totales",
+      "active": "Activas",
+      "totalVolume": "Volumen total",
+      "pendingClose": "Cierre pendiente"
+    },
+    "filters": {
+      "allStatuses": "Todos los estados",
+      "pending": "Pendiente",
+      "active": "Activa",
+      "closing": "Cerrando",
+      "closed": "Cerrada",
+      "cancelled": "Cancelada",
+      "allTypes": "Todos los tipos",
+      "purchase": "Compra",
+      "sale": "Venta",
+      "lease": "Arrendamiento",
+      "refinance": "Refinanciación"
+    },
+    "columns": {
+      "transaction": "Transacción",
+      "type": "Tipo",
+      "salePrice": "Precio de venta",
+      "status": "Estado",
+      "closingDate": "Fecha de cierre",
+      "signatures": "Firmas"
+    },
+    "list": {
+      "loading": "Cargando...",
+      "empty": "No se encontraron transacciones.",
+      "noEscrow": "Sin n.º de plica"
+    },
+    "modal": {
+      "title": "Añadir transacción",
+      "subtitle": "Crear una nueva transacción",
+      "close": "Cerrar",
+      "type": "Tipo",
+      "escrowNumber": "Número de plica",
+      "titleCompany": "Compañía de títulos",
+      "salePrice": "Precio de venta ($)",
+      "earnestMoney": "Señal ($)",
+      "closingDate": "Fecha de cierre",
+      "notes": "Notas",
+      "saving": "Guardando...",
+      "submit": "Añadir transacción"
+    },
+    "errors": {
+      "networkError": "Error de red"
+    }
+  },
+  "sms": {
+    "title": "SMS y WhatsApp",
+    "subtitle": "Envía y rastrea mensajes SMS y WhatsApp",
+    "addLabel": "Enviar mensaje",
+    "kpis": {
+      "total": "Mensajes totales",
+      "delivered": "Entregados",
+      "failed": "Fallidos",
+      "queued": "En cola"
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar por número...",
+      "allChannels": "Todos los canales",
+      "allStatuses": "Todos los estados",
+      "queued": "En cola",
+      "sent": "Enviados",
+      "delivered": "Entregados",
+      "failed": "Fallidos",
+      "clear": "Limpiar filtros"
+    },
+    "direction": {
+      "to": "a",
+      "from": "de"
+    },
+    "list": {
+      "loading": "Cargando...",
+      "empty": "No se encontraron mensajes."
+    },
+    "relative": {
+      "justNow": "ahora mismo"
+    },
+    "modal": {
+      "title": "Enviar mensaje",
+      "subtitle": "Enviar un nuevo mensaje SMS o WhatsApp",
+      "close": "Cerrar",
+      "channel": "Canal",
+      "toNumber": "Al número",
+      "message": "Mensaje",
+      "messagePlaceholder": "Escribe tu mensaje...",
+      "overLimit": "El mensaje supera los 160 caracteres — se dividirá en varios SMS.",
+      "sending": "Enviando...",
+      "submit": "Enviar mensaje"
+    },
+    "errors": {
+      "networkError": "Error de red"
+    }
+  },
+  "actionPlans": {
+    "title": "Planes de acción",
+    "subtitle": "Secuencias automatizadas activadas por eventos",
+    "addLabel": "Plan",
+    "kpis": {
+      "total": "Planes totales",
+      "active": "Activos",
+      "enrollments": "Inscripciones totales"
+    },
+    "filters": {
+      "all": "Todos los estados",
+      "active": "Activo",
+      "paused": "Pausado",
+      "archived": "Archivado"
+    },
+    "list": {
+      "loading": "Cargando...",
+      "empty": "Aún no hay planes de acción."
+    },
+    "triggers": {
+      "manual": "Manual",
+      "new_lead": "Nuevo lead",
+      "stage_change": "Cambio de etapa",
+      "date_trigger": "Activador por fecha"
+    },
+    "modal": {
+      "title": "Añadir plan de acción",
+      "subtitle": "Crear un nuevo plan de acción",
+      "close": "Cerrar",
+      "name": "Nombre",
+      "namePlaceholder": "p. ej. Onboarding de nuevo lead",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Describe este plan de acción...",
+      "triggerEvent": "Evento desencadenante",
+      "status": "Estado",
+      "saving": "Guardando...",
+      "submit": "Añadir plan"
+    },
+    "statusLabels": {
+      "active": "Activo",
+      "paused": "Pausado"
+    },
+    "actions": {
+      "delete": "Eliminar"
+    },
+    "errors": {
+      "nameRequired": "El nombre es obligatorio",
+      "networkError": "Error de red"
+    }
+  },
+  "documents": {
+    "title": "Documentos",
+    "subtitle": "Archivos vinculados a proyectos, contactos y operaciones",
+    "addLabel": "Subir",
+    "kpis": {
+      "total": "Documentos totales",
+      "totalSize": "Tamaño total",
+      "linked": "Vinculados",
+      "images": "Imágenes"
+    },
+    "search": "Buscar por nombre o MIME…",
+    "filters": "Filtros",
+    "filtersWithCount": "Filtros ({count})",
+    "view": {
+      "grid": "Cuadrícula",
+      "table": "Tabla"
+    },
+    "selection": {
+      "countSelected": "{count} seleccionados",
+      "clear": "Limpiar",
+      "deleteCount": "Eliminar {count}"
+    },
+    "list": {
+      "loading": "Cargando…",
+      "emptyHeading": "Sin documentos",
+      "uploadFirst": "Sube tu primer documento para empezar.",
+      "noMatch": "Ningún documento coincide con los filtros.",
+      "uploadFirstBtn": "Subir primer documento"
+    },
+    "card": {
+      "open": "Abrir",
+      "save": "Guardar",
+      "download": "Descargar",
+      "delete": "Eliminar"
+    },
+    "columns": {
+      "name": "Nombre",
+      "type": "Tipo",
+      "mime": "MIME",
+      "size": "Tamaño",
+      "linked": "Vinculado",
+      "uploaded": "Subido"
+    },
+    "filterFields": {
+      "name": "Nombre",
+      "type": "Tipo",
+      "mimeType": "Tipo MIME",
+      "size": "Tamaño (bytes)",
+      "linkedTo": "Vinculado a",
+      "file": "Archivo",
+      "image": "Imagen",
+      "pdf": "PDF",
+      "spreadsheet": "Hoja de cálculo",
+      "project": "Proyecto",
+      "contact": "Contacto",
+      "deal": "Operación",
+      "property": "Propiedad",
+      "room": "Habitación"
+    },
+    "upload": {
+      "title": "Subir documento",
+      "subtitle": "Arrastra un archivo o añade por URL",
+      "separator": "— o añadir por URL —",
+      "name": "Nombre",
+      "fileUrl": "URL del archivo",
+      "type": "Tipo",
+      "linkTo": "Vincular a",
+      "none": "Ninguno",
+      "mimeType": "Tipo MIME",
+      "sizeBytes": "Tamaño (bytes)",
+      "cancel": "Cancelar",
+      "uploading": "Subiendo…",
+      "submit": "Subir",
+      "failed": "Fallido",
+      "failedUpload": "Error al subir"
+    },
+    "toasts": {
+      "deleted": "Documento eliminado",
+      "deleteFailed": "Error al eliminar",
+      "networkError": "Error de red",
+      "bulkDeleted": "{count} documento(s) eliminados",
+      "bulkFailed": "{count} no se pudieron eliminar"
+    }
+  },
+  "templates": {
+    "title": "Plantillas",
+    "subtitle": "Plantillas de email y SMS con campos combinados",
+    "addLabel": "Plantilla",
+    "filters": {
+      "all": "Todos",
+      "email": "Email",
+      "sms": "SMS",
+      "letter": "Carta"
+    },
+    "list": {
+      "loading": "Cargando...",
+      "empty": "No se encontraron plantillas.",
+      "updated": "Actualizado {date}",
+      "preview": "Vista previa",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "editor": {
+      "titleNew": "Nueva plantilla",
+      "titleEdit": "Editar plantilla",
+      "subtitle": "Usa {field} para campos combinados",
+      "name": "Nombre",
+      "namePlaceholder": "Email de bienvenida",
+      "type": "Tipo",
+      "subject": "Asunto",
+      "body": "Cuerpo",
+      "cancel": "Cancelar",
+      "saving": "Guardando...",
+      "saveChanges": "Guardar cambios",
+      "create": "Crear plantilla"
+    },
+    "preview": {
+      "title": "Vista previa de plantilla",
+      "subtitle": "Renderizado con contexto de ejemplo",
+      "raw": "Sin procesar",
+      "rendered": "Renderizado",
+      "sampleContext": "Contexto de ejemplo:",
+      "rendering": "Renderizando...",
+      "previewFailed": "Vista previa fallida"
+    },
+    "toasts": {
+      "nameRequired": "El nombre es obligatorio",
+      "bodyRequired": "El cuerpo es obligatorio",
+      "saveFailed": "Error al guardar",
+      "updated": "Plantilla actualizada",
+      "created": "Plantilla creada",
+      "deleted": "Plantilla eliminada",
+      "deleteFailed": "Error al eliminar"
+    }
+  },
+  "scoringRules": {
+    "title": "Reglas de puntuación",
+    "subtitle": "Otorga puntos por eventos de interacción",
+    "addLabel": "Regla",
+    "kpis": {
+      "total": "Reglas totales",
+      "active": "Reglas activas",
+      "totalPoints": "Puntos máximos posibles"
+    },
+    "list": {
+      "loading": "Cargando...",
+      "empty": "Aún no hay reglas de puntuación.",
+      "decaysIn": "Decae en {days}d",
+      "active": "Activa",
+      "paused": "Pausada",
+      "delete": "Eliminar"
+    },
+    "modal": {
+      "title": "Añadir regla de puntuación",
+      "subtitle": "Crear una nueva regla de puntuación",
+      "close": "Cerrar",
+      "name": "Nombre",
+      "namePlaceholder": "p. ej. Email abierto",
+      "event": "Evento",
+      "eventPlaceholder": "p. ej. email_open",
+      "points": "Puntos",
+      "enableDecay": "Activar decaimiento de puntos",
+      "decayDays": "Días de decaimiento",
+      "enabled": "Habilitada",
+      "saving": "Guardando...",
+      "submit": "Añadir regla"
+    },
+    "errors": {
+      "nameEventRequired": "Nombre y evento son obligatorios",
+      "networkError": "Error de red"
+    }
+  },
+  "dripCampaigns": {
+    "title": "Campañas de goteo",
+    "subtitle": "Secuencias de nutrición automatizadas de varios pasos",
+    "kpis": {
+      "total": "Campañas totales",
+      "active": "Activas",
+      "totalSteps": "Pasos totales",
+      "enrolled": "Inscritos"
+    },
+    "filters": {
+      "allTypes": "Todos los tipos",
+      "allStatuses": "Todos los estados",
+      "active": "Activo",
+      "paused": "Pausado",
+      "archived": "Archivado"
+    },
+    "types": {
+      "buyer": "Nutrición de comprador",
+      "seller": "Nutrición de vendedor",
+      "nurture": "Nutrición general",
+      "post_close": "Post-cierre",
+      "sphere": "Esfera de influencia",
+      "open_house": "Seguimiento de jornada de puertas abiertas"
+    },
+    "newCampaign": "Nueva campaña",
+    "list": {
+      "loading": "Cargando...",
+      "empty": "No se encontraron campañas. Haz clic en Nueva campaña para crear una.",
+      "noSteps": "Sin pasos configurados",
+      "moreSteps": "+{count} más",
+      "stepCount": "{count} paso(s)",
+      "created": "Creada {date}",
+      "manageEnrollments": "Gestionar inscripciones",
+      "pause": "Pausar",
+      "activate": "Activar",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "form": {
+      "titleNew": "Nueva campaña de goteo",
+      "titleEdit": "Editar campaña",
+      "subtitle": "Secuencia de toques automatizados",
+      "campaignName": "Nombre de campaña",
+      "campaignNamePlaceholder": "p. ej. Secuencia de bienvenida al comprador",
+      "type": "Tipo",
+      "status": "Estado",
+      "sequenceSteps": "Pasos de secuencia ({count})",
+      "addStep": "Añadir paso",
+      "step": "Paso {n}",
+      "sendAfter": "Enviar tras",
+      "day": "día",
+      "days": "días",
+      "removeStep": "Eliminar paso",
+      "subjectPlaceholder": "Línea de asunto",
+      "emailBodyPlaceholder": "Cuerpo del email…",
+      "messagePlaceholder": "Mensaje {channel}…",
+      "chars": "{n} caracteres",
+      "emptySteps": "Aún no hay pasos. Haz clic en Añadir paso para empezar a construir la secuencia.",
+      "cancel": "Cancelar",
+      "saving": "Guardando…",
+      "saveChanges": "Guardar cambios",
+      "createCampaign": "Crear campaña"
+    },
+    "toasts": {
+      "nameRequired": "El nombre es obligatorio",
+      "addStep": "Añade al menos un paso",
+      "stepBody": "Todos los pasos necesitan un cuerpo",
+      "dayInvalid": "El día debe ser 0 o más",
+      "saveFailed": "Error al guardar",
+      "updated": "Campaña actualizada",
+      "created": "Campaña creada",
+      "networkError": "Error de red",
+      "statusChanged": "Campaña {status}",
+      "updateFailed": "Error al actualizar",
+      "deleted": "Campaña eliminada",
+      "deleteFailed": "Error al eliminar"
+    }
+  },
+  "settingsUsers": {
+    "title": "Equipo y permisos",
+    "subtitle": "Controla quién ve qué dentro del panel",
+    "readOnlyNotice": "Solo los administradores pueden invitar compañeros o cambiar permisos. Estás viendo esta lista en modo de solo lectura.",
+    "team": "Equipo",
+    "memberCount": "{count} miembro(s)",
+    "invite": "Invitar",
+    "loading": "Cargando…",
+    "noUsers": "Aún no hay usuarios.",
+    "edit": "Editar",
+    "sectionsSummary": {
+      "allSections": "Todas las secciones",
+      "noSections": "Sin secciones"
+    },
+    "groups": {
+      "primary": "Primario",
+      "tools": "Herramientas",
+      "industry": "Sector",
+      "system": "Sistema"
+    },
+    "picker": {
+      "fullAccess": "Acceso completo a todas las secciones",
+      "resetFull": "Restablecer al acceso completo"
+    },
+    "invModal": {
+      "title": "Invitar al equipo",
+      "email": "Email",
+      "nameOptional": "Nombre (opcional)",
+      "role": "Rol",
+      "adminBypass": "Los administradores omiten la lista de secciones y pueden gestionar a otros usuarios.",
+      "dashboardSections": "Secciones del panel",
+      "adminAlways": "Los administradores siempre ven todas las secciones — se ignora la lista permitida.",
+      "cancel": "Cancelar",
+      "sending": "Enviando…",
+      "send": "Enviar invitación"
+    },
+    "editModal": {
+      "titleFn": "Editar a {name}",
+      "saving": "Guardando…",
+      "saveChanges": "Guardar cambios"
+    },
+    "close": "Cerrar",
+    "toasts": {
+      "loadFailed": "Error al cargar los usuarios",
+      "emailRequired": "El email es obligatorio",
+      "inviteFailed": "Error al invitar al usuario",
+      "invited": "Invitado {email}",
+      "created": "Creado {email} (correo de invitación omitido)",
+      "saveFailed": "Error al guardar",
+      "updated": "Actualizado {email}"
+    }
+  },
+  "calendar": {
+    "title": "Calendario",
+    "subtitle": "Citas y plazos",
+    "newEvent": "Nuevo evento",
+    "selectDate": "Selecciona una fecha",
+    "loading": "Cargando…",
+    "noEventsOnDate": "No hay eventos en esta fecha",
+    "addEventToDay": "+ Añadir evento a este día",
+    "upcoming": "Próximos",
+    "noUpcoming": "No hay eventos próximos",
+    "allDay": "Todo el día",
+    "prevMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "eventCount": "{count} evento(s)",
+    "days": {
+      "Mon": "Lun",
+      "Tue": "Mar",
+      "Wed": "Mié",
+      "Thu": "Jue",
+      "Fri": "Vie",
+      "Sat": "Sáb",
+      "Sun": "Dom"
+    },
+    "months": {
+      "January": "Enero",
+      "February": "Febrero",
+      "March": "Marzo",
+      "April": "Abril",
+      "May": "Mayo",
+      "June": "Junio",
+      "July": "Julio",
+      "August": "Agosto",
+      "September": "Septiembre",
+      "October": "Octubre",
+      "November": "Noviembre",
+      "December": "Diciembre"
+    },
+    "colors": {
+      "Blue": "Azul",
+      "Green": "Verde",
+      "Amber": "Ámbar",
+      "Red": "Rojo",
+      "Violet": "Violeta"
+    },
+    "form": {
+      "titleNew": "Nuevo evento",
+      "titleEdit": "Editar evento",
+      "subtitleNew": "Añade una nueva cita, plazo o hito",
+      "subtitleEdit": "Actualiza o elimina este evento del calendario",
+      "title": "Título",
+      "titlePlaceholder": "Título del evento",
+      "start": "Inicio",
+      "end": "Fin",
+      "allDay": "Todo el día",
+      "allDayHelp": "El evento dura todo el día",
+      "location": "Ubicación",
+      "optional": "Opcional",
+      "description": "Descripción",
+      "color": "Color",
+      "delete": "Eliminar",
+      "cancel": "Cancelar",
+      "saving": "Guardando…",
+      "save": "Guardar",
+      "create": "Crear"
+    },
+    "errors": {
+      "titleRequired": "El título es obligatorio",
+      "timesRequired": "Las horas de inicio y fin son obligatorias",
+      "endAfterStart": "La hora de fin debe ser posterior a la de inicio",
+      "saveFailed": "Error al guardar",
+      "deleteFailed": "Error al eliminar"
+    }
+  },
+  "propertyTaxonomy": {
+    "title": "Taxonomía de propiedades",
+    "subtitle": "Configura ubicaciones, tipos, subtipos y banderas de filtro para tu agencia",
+    "loading": "Cargando…",
+    "presets": {
+      "title": "Predefinidos por país",
+      "help": "Aplica un preset de país como punto de partida y ajusta lo de abajo. Cada cliente puede tener su propia taxonomía."
+    },
+    "country": {
+      "title": "Etiqueta de país",
+      "help": "Se muestra en los desplegables de filtros y en el formulario Añadir propiedad (p. ej. \"Todo Chipre\", \"Todo Países Bajos\")."
+    },
+    "districts": {
+      "title": "Distritos / Regiones",
+      "entries": "{count} entradas",
+      "placeholder": "p. ej. Paphos"
+    },
+    "listingTypes": {
+      "title": "Tipos de anuncio",
+      "valuesNote": "Los valores deben permanecer",
+      "help": "Solo las etiquetas son traducibles (p. ej. \"En venta\" / \"En alquiler\"). No cambies la columna value — la base de datos la utiliza.",
+      "placeholder": "p. ej. En venta"
+    },
+    "propertyTypes": {
+      "title": "Tipos de propiedad principales",
+      "count": "{count} tipos",
+      "placeholder": "p. ej. Casas"
+    },
+    "subtypes": {
+      "title": "Subtipos por tipo de propiedad",
+      "help": "Aparecen como menú desplegable en cascada cuando el usuario elige un tipo principal.",
+      "empty": "Añade primero al menos un tipo principal de propiedad.",
+      "addSubtype": "Añadir subtipo de {label}"
+    },
+    "flags": {
+      "title": "Banderas de filtro",
+      "keysNote": "Las claves deben ser",
+      "help": "Solo la etiqueta es editable. Elimina una fila para ocultar esa casilla de la barra de filtros.",
+      "restoreBankOwned": "Restaurar Propiedad bancaria",
+      "restoreResale": "Restaurar Reventa",
+      "bankOwned": "Propiedades bancarias",
+      "resale": "Propiedades de reventa"
+    },
+    "list": {
+      "noneYet": "Aún ninguno — añade uno abajo.",
+      "remove": "Eliminar",
+      "add": "Añadir",
+      "addNew": "Añadir nuevo...",
+      "displayLabel": "Etiqueta visible",
+      "internalValue": "valor_interno"
+    },
+    "save": "Guardar taxonomía",
+    "saving": "Guardando…",
+    "toasts": {
+      "loadFailed": "Error al cargar la taxonomía",
+      "saved": "Taxonomía guardada",
+      "saveFailed": "Error al guardar"
+    }
+  },
+  "leadScores": {
+    "title": "Puntuaciones de leads",
+    "subtitle": "Puntuación de comportamiento + demográfica con calificaciones",
+    "kpis": {
+      "total": "Leads puntuados",
+      "avg": "Puntuación media",
+      "gradeA": "Total grado A",
+      "gradeB": "Total grado B"
+    },
+    "filters": {
+      "all": "Todos los grados",
+      "gradeA": "Grado A",
+      "gradeB": "Grado B",
+      "gradeC": "Grado C",
+      "gradeD": "Grado D",
+      "gradeF": "Grado F"
+    },
+    "columns": {
+      "contact": "Contacto",
+      "score": "Puntuación",
+      "grade": "Grado",
+      "progress": "Progreso",
+      "behavior": "Comportamiento",
+      "demo": "Puntuación demográfica",
+      "lastActivity": "Última actividad",
+      "actions": "Acciones"
+    },
+    "list": {
+      "loading": "Cargando...",
+      "empty": "No se encontraron puntuaciones de leads.",
+      "view": "Ver",
+      "contactFallback": "Contacto {id}"
+    }
+  },
+  "aiScoring": {
+    "toasts": {
+      "loadFailed": "No se pudieron cargar las puntuaciones de IA"
+    },
+    "signals": {
+      "contactedLast3d": "Contactado en los últimos 3 días",
+      "contactedThisWeek": "Contactado esta semana",
+      "contactedThisMonth": "Contactado este mes",
+      "contactedLast90d": "Contactado en los últimos 90 días",
+      "stale": "Inactivo: sin contacto desde hace {n} días",
+      "neverContacted": "Nunca contactado",
+      "activitiesThisWeek": "{n} actividades esta semana",
+      "activityThisWeek": "{n} actividad esta semana",
+      "activitiesThisMonth": "{n} actividades este mes",
+      "notesOnFile": "{n} notas registradas",
+      "preApproved": "Hipoteca preaprobada",
+      "priceRange": "Rango de precio definido",
+      "targetAreas": "Zonas objetivo especificadas",
+      "fullContactDetails": "Datos de contacto completos",
+      "noContactDetails": "Sin datos de contacto",
+      "missingEmail": "Falta el correo",
+      "missingPhone": "Falta el teléfono",
+      "attendedShowings": "Asistió a {n} visitas",
+      "attendedShowing": "Asistió a {n} visita",
+      "providedFeedback": "Dejó comentarios de la visita",
+      "noShows": "{n} ausencias",
+      "openDeals": "{n} operación(es) abierta(s)",
+      "wonDeals": "{n} operación(es) ganada(s) — cliente fiel"
+    }
+  },
+  "cma": {
+    "title": "Análisis comparativo de mercado",
+    "subtitle": "Valora propiedades con comparables respaldados por datos"
+  },
+  "leadRouting": {
+    "title": "Enrutamiento de leads",
+    "subtitle": "Asigna automáticamente los leads entrantes al agente adecuado"
+  },
+  "marketAnalytics": {
+    "title": "Analítica de mercado",
+    "subtitle": "Sigue las tendencias y el rendimiento del mercado local"
+  },
+  "clientPortal": {
+    "title": "Portal del cliente",
+    "subtitle": "Da a los clientes acceso seguro a sus anuncios y documentos"
+  },
+  "soi": {
+    "title": "Esfera de influencia",
+    "subtitle": "Organiza tu red y mantén el contacto de forma constante"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "subtitle": "Mantente al tanto de la actividad de tu espacio de trabajo",
+    "unread": "sin leer"
+  },
+  "filterFields": {
+    "options": {
+      "pending": "Pendiente",
+      "ready": "Listo",
+      "error": "Error"
+    },
+    "name": "Nombre",
+    "company": "Empresa",
+    "type": "Tipo",
+    "email": "Correo",
+    "phone": "Teléfono",
+    "createdAt": "Creado",
+    "aiIcpFit": "Ajuste ICP",
+    "aiAttributesStatus": "Estado IA",
+    "title": "Título",
+    "status": "Estado",
+    "dealType": "Tipo",
+    "valueCents": "Valor (céntimos)",
+    "probability": "Probabilidad",
+    "expectedClose": "Cierre previsto",
+    "leadSource": "Origen del lead",
+    "pipelineId": "Embudo",
+    "stageId": "Etapa",
+    "contactId": "Contacto",
+    "propertyId": "Propiedad",
+    "ownerId": "Propietario",
+    "listingType": "Tipo de anuncio",
+    "district": "Distrito",
+    "town": "Población",
+    "city": "Ciudad",
+    "state": "Provincia / Región",
+    "priceCents": "Precio (céntimos)",
+    "bedrooms": "Dormitorios",
+    "bathrooms": "Baños",
+    "sqft": "Superficie",
+    "yearBuilt": "Año de construcción",
+    "listingDate": "Publicado",
+    "mlsNumber": "N.º MLS",
+    "bankOwned": "Propiedad bancaria",
+    "isResale": "Reventa"
+  },
+  "aiInsights": {
+    "metric": {
+      "openValue": "Valor abierto",
+      "winRate": "Tasa de éxito",
+      "stalled": "Estancados",
+      "newContacts": "Contactos nuevos",
+      "noEmail": "Sin correo",
+      "upcoming": "Próximas"
+    },
+    "action": {
+      "viewDeals": "Ver operaciones",
+      "openPipeline": "Abrir embudo",
+      "reviewProjects": "Revisar proyectos",
+      "viewContacts": "Ver contactos",
+      "filterContacts": "Filtrar contactos",
+      "openListings": "Abrir anuncios",
+      "viewSchedule": "Ver agenda",
+      "reviewShowings": "Revisar visitas"
     }
   }
 }

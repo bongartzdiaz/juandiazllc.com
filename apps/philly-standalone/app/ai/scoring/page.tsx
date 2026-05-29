@@ -10,12 +10,20 @@ import { fetchJson } from '@/lib/philly/fetch-json'
 
 type LeadTier = 'hot' | 'warm' | 'nurture' | 'cold' | 'dormant'
 
+interface LeadSignal {
+  label: string
+  labelKey?: string
+  labelParams?: Record<string, number>
+  points: number
+  positive: boolean
+}
+
 interface LeadScore {
   contactId: string
   contactName: string
   score: number
   tier: LeadTier
-  signals: { label: string; points: number; positive: boolean }[]
+  signals: LeadSignal[]
   reasons: string[]
 }
 
@@ -60,6 +68,17 @@ export default function AIScoringPage() {
 
   const scores = report?.scores ?? []
   const filtered = filter === 'all' ? scores : scores.filter(s => s.tier === filter)
+
+  // Localize a signal by its stable key (under the `aiScoring` namespace),
+  // falling back to the English label baked into the signal by the engine.
+  const signalLabel = (s: LeadSignal) =>
+    s.labelKey && t.has(s.labelKey) ? t(s.labelKey, s.labelParams) : s.label
+  // Top-3 reasons, localized. Falls back to the engine's English `reasons`
+  // when no signals are present.
+  const localizedReasons = (lead: LeadScore) =>
+    lead.signals.length > 0
+      ? lead.signals.slice(0, 3).map(signalLabel).join(' · ')
+      : lead.reasons.join(' · ')
   const dist = report?.distribution ?? { hot: 0, warm: 0, nurture: 0, cold: 0, dormant: 0 }
 
   return (
@@ -198,7 +217,7 @@ export default function AIScoringPage() {
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--txt3)',
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {lead.reasons.join(' · ') || '—'}
+                    {localizedReasons(lead) || '—'}
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
