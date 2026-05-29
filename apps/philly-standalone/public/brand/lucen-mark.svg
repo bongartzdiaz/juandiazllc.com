@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- LUCEN AI brandmark — broken-circle "L" monogram.
+       Sister mark to deus-mark.svg. Used in the footer link
+       "Powered by LUCEN AI" + the /about page.
+
+       Color via currentColor. -->
+
+  <g stroke="currentColor" stroke-width="14" fill="none" stroke-linecap="butt">
+    <!-- Outer ring: 4 arcs with 20° gaps at cardinals — identical
+         spec to the DEUS ring so the family relationship reads. -->
+    <path d="M 117.6 12.2 A 92 92 0 0 1 187.8 82.4" />
+    <path d="M 187.8 117.6 A 92 92 0 0 1 117.6 187.8" />
+    <path d="M 82.4 187.8 A 92 92 0 0 1 12.2 117.6" />
+    <path d="M 12.2 82.4 A 92 92 0 0 1 82.4 12.2" />
+  </g>
+
+  <!-- Inner "L" letterform — geometric, with the bottom serif
+       extending into the ring break -->
+  <g stroke="currentColor" fill="none">
+    <line x1="72" y1="56" x2="72" y2="148" stroke-width="13" />
+    <line x1="72" y1="148" x2="138" y2="148" stroke-width="13" />
+  </g>
+</svg>

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" fill="none">
+  <!-- DEUS CRM wordmark = brandmark + text lockup.
+       Used in the topbar / report header / login page.
+       Color via currentColor. -->
+
+  <!-- The mark (same as deus-mark.svg, scaled down + left-anchored) -->
+  <g transform="translate(20, 30) scale(0.7)" stroke="currentColor" stroke-width="14" fill="none" stroke-linecap="butt">
+    <path d="M 117.6 12.2 A 92 92 0 0 1 187.8 82.4" />
+    <path d="M 187.8 117.6 A 92 92 0 0 1 117.6 187.8" />
+    <path d="M 82.4 187.8 A 92 92 0 0 1 12.2 117.6" />
+    <path d="M 12.2 82.4 A 92 92 0 0 1 82.4 12.2" />
+  </g>
+  <g transform="translate(20, 30) scale(0.7)" stroke="currentColor" fill="none">
+    <circle cx="88" cy="118" r="38" stroke-width="13" />
+    <line x1="126" y1="58" x2="126" y2="156" stroke-width="13" stroke-linecap="butt" />
+  </g>
+
+  <!-- Wordmark — uppercase DEUS in Red Hat Mono Bold,
+       slight tracking, kerned to align optically with the mark -->
+  <text
+    x="180" y="125"
+    font-family="'Red Hat Mono', monospace"
+    font-weight="700"
+    font-size="72"
+    letter-spacing="0.04em"
+    fill="currentColor"
+  >DEUS</text>
+
+  <!-- Subtle "CRM" subtitle below -->
+  <text
+    x="183" y="160"
+    font-family="'Red Hat Mono', monospace"
+    font-weight="500"
+    font-size="20"
+    letter-spacing="0.32em"
+    fill="currentColor"
+    opacity="0.7"
+  >CRM</text>
+</svg>

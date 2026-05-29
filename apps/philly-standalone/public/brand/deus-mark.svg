@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" stroke-linecap="butt">
+  <!-- DEUS CRM brandmark — third pass.
+       Stencil-style "d" inside a broken circle.
+       Geometry locked from the canonical brand image:
+       - Outer ring: 4 thick arcs, 4 small gaps at 12/3/6/9.
+       - Inner "d": small circle (bowl) in upper-center-left, vertical
+         stem on the right side extending the full inner height.
+       - Both ring and d use the same stroke thickness so the mark
+         reads as a single coherent stencil. -->
+
+  <g stroke="currentColor" fill="none" stroke-width="16">
+    <!-- ───── Outer ring: 4 arcs ───── -->
+    <path d="M 119.5 11.7 A 92 92 0 0 1 188.3 80.5" />
+    <path d="M 188.3 119.5 A 92 92 0 0 1 119.5 188.3" />
+    <path d="M 80.5 188.3 A 92 92 0 0 1 11.7 119.5" />
+    <path d="M 11.7 80.5 A 92 92 0 0 1 80.5 11.7" />
+
+    <!-- ───── Inner "d" letterform ───── -->
+    <!-- Bowl: small circle, upper-center-LEFT. Radius 26, centre (82, 88).
+         Slightly above the geometric centre so the stem has room to
+         extend below it. -->
+    <circle cx="82" cy="88" r="26" />
+    <!-- Stem: vertical line on the right of the bowl.
+         Starts at top of inner space (y=44), ends at bottom (y=156).
+         x=120 places it just to the right of the bowl, touching the
+         bowl's right edge optically. -->
+    <line x1="120" y1="44" x2="120" y2="156" />
+  </g>
+</svg>
