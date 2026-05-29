@@ -8,6 +8,10 @@ import type { Locale } from "@/lib/i18n/dict";
 
 export const HOME_FAQ: FaqItem[] = [
   {
+    q: "What is a fractional revenue operator?",
+    a: "A fractional revenue operator is a part-time, hands-on partner who designs and ships a company's revenue systems — CRM, automation, growth infrastructure — without a full-time hire. Juan Diaz works this way with operators in energy, real estate and hospitality: advisory plus build, not slides.",
+  },
+  {
     q: "What does Juan Diaz, LLC actually do?",
     a: "Juan Diaz, LLC builds revenue engines for operators — the CRM, automations and growth infrastructure that turn a team of humans plus software into a compounding system. We operate as a holding company with internal ventures (Philly CRM, Voltafy, Help Mij Besparen) and a small number of operator engagements per year.",
   },

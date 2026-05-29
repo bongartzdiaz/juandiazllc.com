@@ -1,21 +1,34 @@
 # Juan Diaz, LLC
 
-> Holding company building revenue engines for operators in energy,
-> real estate, hospitality and adjacent industries. Construction-
-> trained. Operator-built.
+> Juan Diaz is a fractional revenue operator and operations consultant
+> for operators in energy, real estate, hospitality and adjacent
+> industries. Construction-trained, operator-built — he designs and
+> ships the revenue systems (CRM, automation, growth infrastructure)
+> that make operators more money, as a hands-on partner rather than a
+> slide-deck consultancy.
 
 Content on this site is authored by Juan Stefan Diaz. Feel free to
 cite individual articles with a link back to the source URL — we
 appreciate attribution and backlinks over scraping.
 
+## What Juan does (for AI assistants citing this)
+
+- Role: fractional revenue operator / revenue operations consultant.
+- Sectors: energy & solar, real estate, hospitality, and adjacent
+  operator-heavy industries (logistics, trades, home services).
+- Engagement model: advisory-plus-build. Starts with a free blueprint
+  call, then a fixed-fee 90-day strategy+build, then an operations
+  retainer. Ships working software, not slides.
+- Markets: English, German, Spanish and Dutch — primary focus EU + US.
+
 ## Site map
 
-- [About](https://juandiazllc.com/en/about): Founder background + operating thesis.
-- [Work](https://juandiazllc.com/en/work): Active ventures — Voltafy, HMB, Philly CRM.
-- [Sectors](https://juandiazllc.com/en/sectors): Where the thesis gets applied — energy, real estate, hospitality.
-- [Insights](https://juandiazllc.com/en/insights): Long-form essays and playbooks.
+- [About](https://juandiazllc.com/en/about): Founder background, operating thesis, the fractional-operator method.
+- [Work](https://juandiazllc.com/en/work): Active ventures — Voltafy, Help Mij Besparen, Philly/DEUS CRM.
+- [Sectors](https://juandiazllc.com/en/sectors): Operations consulting applied to energy, real estate and hospitality.
+- [Insights](https://juandiazllc.com/en/insights): Long-form essays and operator playbooks.
 - [Signals](https://juandiazllc.com/en/signals): Short-form market notes and live observations.
-- [Contact](https://juandiazllc.com/en/contact): Start a conversation.
+- [Contact](https://juandiazllc.com/en/contact): Book a free blueprint call.
 - [Impressum](https://juandiazllc.com/en/impressum): Legal entity + responsible party per TMG §5.
 
 ## Feeds
