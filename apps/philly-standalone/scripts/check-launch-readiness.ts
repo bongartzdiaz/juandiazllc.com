@@ -254,6 +254,15 @@ const ENV_EXAMPLE_IGNORE = new Set([
   // Node / Next.js runtime
   'NODE_ENV',
   'NEXT_RUNTIME',
+  // Next.js dev/start server port — set on the command line (next dev --port)
+  // or by the host platform, never read by app code. Documenting it in
+  // .env.example would imply it's app config, which it isn't.
+  'PORT',
+  // Seed / local-preview only. Read by prisma/seed.ts and the localhost-gated
+  // NEXT_PUBLIC_BYPASS_AUTH path (auth-helpers.ts) — never by the web app in
+  // production. Declaring it in .env.example would mislead prod operators into
+  // thinking it changes runtime auth. Set inline when seeding.
+  'SEED_ADMIN_EMAIL',
   // Vercel platform
   'NEXT_PUBLIC_VERCEL_ENV',
   // Dev-only escape hatch — deliberately undocumented in .env.example
@@ -515,6 +524,56 @@ check('6.dataflow.gaps', 'Data flows', 'Known untested data-flow paths documente
     detail: '3 known data-flow gaps: SCIM provisioning, drip dispatcher race, first-login User provisioning. Each tracked as a follow-up in PRE-LAUNCH-AUDIT.md §3.',
     reference: 'PRE-LAUNCH-AUDIT.md §2',
   };
+});
+
+/* ── §7 i18n integrity ───────────────────────────────────────── */
+
+check('7.i18n.refs', 'i18n', 'Every t() reference resolves to an en.json key', () => {
+  // Runs the reference-integrity checker: extracts every literal t('key')
+  // call, resolves it through its useTranslations() scope, diffs vs en.json.
+  // Catches "referenced-but-never-created" keys that render raw + throw
+  // MISSING_MESSAGE at runtime (e.g. NL users seeing "contacts.searchPlaceholder").
+  const r = safeExec('node scripts/i18n-check-refs.mjs', ROOT);
+  if (r.ok) {
+    return { status: 'PASS', detail: 'All literal t() references exist in en.json.' };
+  }
+  // exit 1 = missing keys; surface the offending list (first lines of stdout).
+  const missing = r.stdout.split('\n').filter(l => /MISSING|^\s{2}[a-z]/.test(l)).slice(0, 8).join(' ');
+  return {
+    status: 'FAIL',
+    detail: `Referenced keys missing from en.json: ${missing || r.stdout.slice(0, 200)}`,
+    reference: 'scripts/i18n-check-refs.mjs',
+  };
+});
+
+check('7.i18n.parity', 'i18n', 'All locales at 100% key parity with en.json', () => {
+  // en.json is the source of truth; nl/de/es/fr must have exactly the same
+  // key set (no missing → no English fallback at runtime; no extra → no dead keys).
+  const MSG = join(ROOT, 'messages');
+  const flatten = (o: Record<string, unknown>, p = '', acc: string[] = []): string[] => {
+    for (const [k, v] of Object.entries(o)) {
+      const np = p ? `${p}.${k}` : k;
+      if (v && typeof v === 'object' && !Array.isArray(v)) flatten(v as Record<string, unknown>, np, acc);
+      else acc.push(np);
+    }
+    return acc;
+  };
+  const enPath = join(MSG, 'en.json');
+  if (!existsSync(enPath)) return { status: 'FAIL', detail: 'messages/en.json not found.' };
+  const en = new Set(flatten(JSON.parse(readFileSync(enPath, 'utf8'))));
+  const offenders: string[] = [];
+  for (const loc of ['nl', 'de', 'es', 'fr']) {
+    const p = join(MSG, `${loc}.json`);
+    if (!existsSync(p)) { offenders.push(`${loc}: file missing`); continue; }
+    const set = new Set(flatten(JSON.parse(readFileSync(p, 'utf8'))));
+    const missing = [...en].filter(k => !set.has(k)).length;
+    const extra = [...set].filter(k => !en.has(k)).length;
+    if (missing || extra) offenders.push(`${loc}: ${missing} missing, ${extra} extra`);
+  }
+  if (offenders.length === 0) {
+    return { status: 'PASS', detail: `${en.size} keys × 5 locales, 100% parity.` };
+  }
+  return { status: 'FAIL', detail: `Parity broken — ${offenders.join('; ')}`, reference: 'npm run i18n:fill' };
 });
 
 /* ── Summary ─────────────────────────────────────────────────── */

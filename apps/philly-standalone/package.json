@@ -22,6 +22,7 @@
     "check:dead:strict": "knip",
     "db:slow": "tsx scripts/db-slow-queries.ts",
     "i18n:fill": "tsx scripts/i18n-fill-missing.ts",
+    "i18n:check-refs": "node scripts/i18n-check-refs.mjs",
     "pii:backfill": "tsx scripts/encrypt-contact-notes.ts",
     "pii:backfill-notes": "tsx scripts/encrypt-contact-note-content.ts",
     "pii:backfill-hashes": "tsx scripts/backfill-contact-blind-index.ts",
@@ -43,6 +44,8 @@
     "db:push": "prisma db push",
     "db:deploy": "prisma migrate deploy",
     "seed": "tsx prisma/seed.ts",
+    "seed:demo": "tsx prisma/seed.ts && tsx prisma/seed-demo-data.ts && tsx prisma/seed-demo-inbox.ts",
+    "seed:demo:inbox": "tsx prisma/seed-demo-inbox.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
