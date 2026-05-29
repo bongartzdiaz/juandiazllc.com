@@ -75,7 +75,7 @@ export interface GenerateReportInput {
 /** Load per-type data from Prisma. Each branch returns the shape the
  *  matching template expects. */
 async function loadData(input: GenerateReportInput): Promise<unknown> {
-  const { prisma, organizationId, type } = input
+  const { prisma, organizationId, type, strings } = input
 
   switch (type) {
     case 'quarterly': {
@@ -113,16 +113,20 @@ async function loadData(input: GenerateReportInput): Promise<unknown> {
         where: { organizationId },
         select: { sdgGoals: true },
       })
-      // 17 UN SDGs — labels stay in the generator since they're stable.
-      const SDG_LABELS: Record<number, string> = {
+      // 17 UN SDGs — localized goal names are threaded in via `strings`
+      // (keys sdg1..sdg17, populated by getReportStrings). English
+      // fallbacks kept here so the generator stays self-contained if a
+      // caller passes a sparse strings map.
+      const SDG_FALLBACK: Record<number, string> = {
         1: 'No poverty', 2: 'Zero hunger', 3: 'Good health & well-being',
         4: 'Quality education', 5: 'Gender equality', 6: 'Clean water & sanitation',
         7: 'Affordable & clean energy', 8: 'Decent work & economic growth',
         9: 'Industry, innovation & infrastructure', 10: 'Reduced inequalities',
-        11: 'Sustainable cities & communities', 12: 'Responsible consumption',
+        11: 'Sustainable cities & communities', 12: 'Responsible consumption & production',
         13: 'Climate action', 14: 'Life below water', 15: 'Life on land',
         16: 'Peace, justice & strong institutions', 17: 'Partnerships for the goals',
       }
+      const sdgLabel = (n: number): string => strings[`sdg${n}`] ?? SDG_FALLBACK[n] ?? `SDG ${n}`
       const counts = new Map<number, number>()
       for (const p of projects) {
         let arr: number[] = []
@@ -139,7 +143,7 @@ async function loadData(input: GenerateReportInput): Promise<unknown> {
       }
       const sdgCoverage = Array.from({ length: 17 }, (_, i) => {
         const sdg = i + 1
-        return { sdg, label: SDG_LABELS[sdg] ?? `SDG ${sdg}`, projectCount: counts.get(sdg) ?? 0 }
+        return { sdg, label: sdgLabel(sdg), projectCount: counts.get(sdg) ?? 0 }
       })
       const data: SdgData = { sdgCoverage, totalProjects: projects.length }
       return data
@@ -167,9 +171,9 @@ async function loadData(input: GenerateReportInput): Promise<unknown> {
       const totalSpent = projects.reduce((s, p) => s + p.spentCents, 0)
 
       const kpis = [
-        { label: 'Active projects', value: String(activeCount), trend: 'flat' as const },
-        { label: 'Completed projects', value: String(completedCount), trend: 'up' as const },
-        { label: 'Deals won', value: String(deals.length), trend: 'up' as const },
+        { label: strings.kpiActiveProjects ?? 'Active projects', value: String(activeCount), trend: 'flat' as const },
+        { label: strings.kpiCompletedProjects ?? 'Completed projects', value: String(completedCount), trend: 'up' as const },
+        { label: strings.kpiDealsWon ?? 'Deals won', value: String(deals.length), trend: 'up' as const },
       ]
       const topProjects = projects
         .filter(p => p.status === 'active' || p.status === 'completed')

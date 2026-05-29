@@ -6,11 +6,30 @@
    that used to live in this file was replaced 2026-05-27. */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import { generateReport as buildReportHtml, REPORT_TYPES, type ReportType } from '@/lib/philly/reports/generator'
+import { getReportStrings, getReportShellStrings } from '@/lib/philly/reports/strings'
+
+/** Supported UI locales (mirrors i18n/request.ts). The `pai-locale`
+ *  cookie holds a bare 2-letter code; unknown values fall back to 'en'. */
+const SUPPORTED_LOCALES = ['en', 'nl', 'de', 'es', 'fr'] as const
+type UiLocale = (typeof SUPPORTED_LOCALES)[number]
+
+/** Map the 2-letter UI locale to a BCP-47 tag for Intl currency/date
+ *  formatting in the generator. */
+const INTL_LOCALE: Record<UiLocale, string> = {
+  en: 'en-IE', nl: 'nl-NL', de: 'de-DE', es: 'es-ES', fr: 'fr-FR',
+}
+
+async function resolveLocale(): Promise<UiLocale> {
+  const cookieStore = await cookies()
+  const raw = cookieStore.get('pai-locale')?.value
+  return (SUPPORTED_LOCALES as readonly string[]).includes(raw ?? '') ? (raw as UiLocale) : 'en'
+}
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -63,8 +82,13 @@ export async function POST(req: NextRequest) {
     },
   })
 
+  // Resolve the operator's UI language from the pai-locale cookie BEFORE
+  // the fire-and-forget runs — cookies() must be read inside the request
+  // scope, not from the detached async task.
+  const locale = await resolveLocale()
+
   // Generate report content asynchronously
-  void generateAndPersist(report.id, scope.organizationId, body.type as ReportType, body.title.trim())
+  void generateAndPersist(report.id, scope.organizationId, body.type as ReportType, body.title.trim(), locale)
 
   return NextResponse.json({ data: report }, { status: 201 })
 }
@@ -74,60 +98,27 @@ export async function POST(req: NextRequest) {
  *  Report row immediately in `generating` status; the UI polls until
  *  status flips to `ready` or `failed`.
  *
- *  i18n: strings are passed in from a server-side next-intl resolver
- *  per report type. For now we use English defaults baked into the
- *  templates; a future PR wires the Acceptlanguage / org default locale
- *  via next-intl's server-side getTranslations(). */
+ *  i18n: report copy + SDG goal names come from
+ *  lib/philly/reports/strings.ts, keyed off the operator's pai-locale
+ *  cookie (resolved in the request scope and threaded in here). The
+ *  generator stays locale-agnostic — strings are passed in, never
+ *  imported into the templates. */
 async function generateAndPersist(
   reportId: string,
   organizationId: string,
   type: ReportType,
   title: string,
+  locale: UiLocale,
 ) {
   const prisma = getAuthPrisma()
   try {
-    // English strings inline — non-blocking on the i18n wire-up. Each
-    // template falls back to these keys if a string is missing.
-    const strings: Record<string, string> = {
-      // common
-      totalProjects: 'Total projects', totalBudget: 'Total budget',
-      totalSpent: 'Total spent', remaining: 'Remaining', utilization: 'Utilization',
-      active: 'active', completed: 'completed',
-      projectBreakdown: 'Project breakdown', noProjects: 'No projects in this period.',
-      impactTotals: 'Impact totals',
-      colProject: 'Project', colStatus: 'Status', colBudget: 'Budget',
-      colSpent: 'Spent', colUtil: 'Util.', colRemaining: 'Remaining',
-      colMetric: 'Metric', colTotal: 'Total',
-      // financial extras
-      healthBreakdown: 'Portfolio health', onTrack: 'On track',
-      underutilised: 'Under-utilised', overBudget: 'Over budget',
-      // sdg
-      sdgsCovered: 'SDGs covered', outOfSeventeen: 'of the 17 UN goals',
-      coverageByGoal: 'Coverage by goal', noSdgData: 'No SDG data on file. Tag projects with SDGs to populate this report.',
-      colGoal: 'Goal', colLabel: 'Label', colProjects: 'Projects', colShare: 'Share',
-      // stakeholder
-      highlights: 'Highlights this period', noHighlights: 'No curated highlights — set them in Settings → Reports.',
-      topProjects: 'Top projects', colImpact: 'Impact summary',
-      // performance
-      dealsClosed: 'Deals closed', totalValue: 'Total value', avgDeal: 'Avg deal size',
-      monthlyTrend: 'Monthly trend', noClosedDeals: 'No closed deals in this period.',
-      colMonth: 'Month', colDeals: 'Deals', colValue: 'Value', colTrend: 'Trend',
-      pipelineByStage: 'Pipeline by stage', colStage: 'Stage', colCount: 'Count',
-      // regional
-      countries: 'Countries', cities: 'Cities', byCountry: 'By country',
-      byCity: 'By city', colCountry: 'Country', colCity: 'City', colContacts: 'Contacts',
-      noRegionalData: 'No regional data on file. Tag projects with country/city to populate.',
-      cityRowsCappedAt: '+ {n} more cities',
-    }
-    const shellStrings = { footer: 'Generated by DEUS · Confidential' }
-
     const html = await buildReportHtml({
       type,
       prisma,
       organizationId,
-      locale: 'en-IE',
-      strings,
-      shellStrings,
+      locale: INTL_LOCALE[locale],
+      strings: getReportStrings(locale),
+      shellStrings: getReportShellStrings(locale),
       title,
     })
 
