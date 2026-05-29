@@ -10,9 +10,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "About Juan Diaz — operator, builder, founder",
+    title: "About Juan Diaz — Fractional Revenue Operator & Builder",
     description:
-      "Construction-trained, operator-built. Juan Diaz runs Juan Diaz, LLC — a holding company building revenue engines for operators in energy, real estate and hospitality.",
+      "Juan Diaz is a fractional revenue operator and operations consultant — construction-trained, operator-built — running Juan Diaz, LLC and building revenue systems for operators in energy, real estate and hospitality.",
     alternates: buildAlternates(l, "/about"),
     openGraph: {
       type: "profile",
@@ -34,7 +34,7 @@ const personSchema = {
   alternateName: "Juan Diaz",
   url: `${SITE}/about`,
   image: AUTHOR_IMAGE_URL,
-  jobTitle: "Founder, Juan Diaz, LLC",
+  jobTitle: "Fractional Revenue Operator & Founder, Juan Diaz, LLC",
   worksFor: {
     "@type": "Organization",
     name: "Juan Diaz, LLC",

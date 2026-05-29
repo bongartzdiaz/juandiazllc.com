@@ -19,18 +19,24 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 import { faqSchema } from "@/lib/seo/schema";
 import { HOME_FAQ } from "@/lib/seo/faqs";
 
+// Titles lead with the commercial search term ("fractional revenue
+// operator" / localized) then the brand — the home page is the primary
+// ranking target for the personal-operator positioning. Kept <60 chars
+// so Google doesn't truncate. Descriptions carry the long-tail + the
+// three target sectors (energy / real estate / hospitality) + the
+// credibility hook, in the priority markets (EN/DE/ES).
 const TITLES: Record<string, string> = {
-  en: "Juan Diaz, LLC — revenue engines for operators",
-  nl: "Juan Diaz, LLC — omzetmotoren voor operators",
-  de: "Juan Diaz, LLC — Umsatzmotoren für Operators",
-  es: "Juan Diaz, LLC — motores de ingresos para operadores",
+  en: "Juan Diaz — Fractional Revenue Operator & Consultant",
+  nl: "Juan Diaz — Revenue Operator & Operations-consultant",
+  de: "Juan Diaz — Fractional Revenue Operator & Berater",
+  es: "Juan Diaz — Operador de Revenue Fraccional y Consultor",
 };
 
 const DESCRIPTIONS: Record<string, string> = {
-  en: "Revenue engines for operators in energy, real estate, hospitality and adjacent industries. Construction-trained. Operator-built.",
-  nl: "Omzetmotoren voor operators in energie, vastgoed, horeca en aanverwante sectoren. Getraind in bouwmanagement. Gebouwd voor operators.",
-  de: "Umsatzmotoren für Operators in Energie, Immobilien, Gastgewerbe und angrenzenden Branchen. Bauleitungs-trainiert. Operator-gebaut.",
-  es: "Motores de ingresos para operadores en energía, bienes raíces, hostelería e industrias adyacentes. Formado en gestión de construcción. Construido para operadores.",
+  en: "Juan Diaz is a fractional revenue operator and operations consultant for energy, real estate and hospitality operators. Construction-trained, operator-built.",
+  nl: "Juan Diaz — fractional revenue operator en operations-consultant voor operators in energie, vastgoed en horeca. Bouwkundig getraind, operator-built.",
+  de: "Juan Diaz ist Fractional Revenue Operator und Operations-Berater für Betreiber in Energie, Immobilien und Gastgewerbe. Bauerprobt, operator-built.",
+  es: "Juan Diaz, operador de revenue fraccional y consultor de operaciones para energía, inmobiliario y hostelería. Formado en construcción, hecho por operadores.",
 };
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
