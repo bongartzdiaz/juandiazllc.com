@@ -71,7 +71,7 @@ export function Sectors() {
             <div>
               <div className="ix">{s.ix}</div>
               <div className="ico">{s.icon}</div>
-              <h4>{s.titleA} <em>{s.titleB}</em></h4>
+              <h3>{s.titleA} <em>{s.titleB}</em></h3>
               <p>{s.body}</p>
             </div>
             <div className="tags">

@@ -1,8 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useT } from "@/lib/i18n/useT";
-import { Globe } from "./Globe";
+
+// Globe is decorative (the hero stage is aria-hidden) and pulls in
+// d3-geo + topojson-client + a 108KB world-atlas fetch. Dynamic-import
+// with ssr:false keeps it off the critical path: hero text + LCP paint
+// immediately, the interactive earth hydrates after. A faint skeleton
+// holds the layout so there's no jump when it mounts.
+const Globe = dynamic(() => import("./Globe").then((m) => m.Globe), {
+  ssr: false,
+  loading: () => <div className="globe-skeleton" aria-hidden="true" />,
+});
 
 // Hero — interactive earth with real countries (SVG orthographic
 // projection via d3-geo). Background is a living Milky Way: rotating

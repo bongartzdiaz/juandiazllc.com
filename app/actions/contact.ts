@@ -16,7 +16,10 @@ export type ContactState = { status: "idle" | "ok" | "err"; message?: string };
 //   so the bot doesn't retry, and skip all side effects.
 
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
-const NOTIFY_TO = process.env.CONTACT_NOTIFY_TO ?? "juan@juandiazllc.com";
+// Lead notifications land in Juan's Proton inbox by default. Override
+// per-environment with CONTACT_NOTIFY_TO. The lead is ALSO persisted to
+// Supabase regardless, so nothing is lost even if the email hop fails.
+const NOTIFY_TO = process.env.CONTACT_NOTIFY_TO ?? "diazJSBD@proton.me";
 const NOTIFY_FROM = process.env.CONTACT_NOTIFY_FROM ?? "noreply@juandiazllc.com";
 
 async function notifyEmail(payload: {

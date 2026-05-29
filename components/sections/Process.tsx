@@ -31,7 +31,7 @@ export function Process() {
             <div key={s.n} className="proc-step">
               <div>
                 <div className="n"><em>{s.n}</em> / {s.name}</div>
-                <h5>{s.titleA} <em>{s.titleB}</em></h5>
+                <h3>{s.titleA} <em>{s.titleB}</em></h3>
                 <p>{s.body}</p>
               </div>
               <div className="dot" />

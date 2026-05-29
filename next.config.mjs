@@ -13,7 +13,9 @@ const nextConfig = {
   poweredByHeader: false,
   devIndicators: false,
   experimental: {
-    optimizePackageImports: ['three', 'lucide-react', 'recharts'],
+    // three removed — the WebGL globe was replaced by a CSS+SVG (d3-geo)
+    // globe; three is no longer imported anywhere.
+    optimizePackageImports: ['lucide-react', 'recharts'],
   },
 };
 
