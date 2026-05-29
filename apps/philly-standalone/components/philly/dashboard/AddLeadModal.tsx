@@ -45,6 +45,11 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
   const [company, setCompany] = useState('')
   const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
+  // Submit-level error (API/network failure) — distinct from per-field
+  // validation `errors`. Drives the red banner above the submit button so a
+  // failed POST no longer shows a false "Success!".
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
   // File-import state (CSV + XLSX share the same preview/headers data path —
   // the variable names keep the historical `csv` prefix for diff stability).
@@ -76,7 +81,8 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
 
   const resetForm = useCallback(() => {
     setName(''); setEmail(''); setPhone(''); setSource(''); setCompany(''); setNotes('')
-    setErrors({}); setCsvFile(null); setCsvPreview([]); setCsvAllRows([]); setCsvHeaders([])
+    setErrors({}); setSubmitError(null); setSubmitting(false)
+    setCsvFile(null); setCsvPreview([]); setCsvAllRows([]); setCsvHeaders([])
     setXlsxError(null); setMapping({}); setImporting(false); setImportResult(null); setImportError(null)
     setSuccess(false); setTab('manual')
   }, [])
@@ -95,12 +101,22 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
     return Object.keys(e).length === 0
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateManual()) return
+    setSubmitError(null)
+    setSubmitting(true)
     const data = { name: name.trim(), email: email.trim(), phone: phone.trim(), source, company: company.trim(), notes: notes.trim() }
-    onAdd?.(data)
-    setSuccess(true)
-    setTimeout(() => { handleClose() }, 1500)
+    try {
+      // Await the parent handler — it POSTs to /api/contacts and THROWS on
+      // a non-2xx/network failure. Only show success if it actually resolves.
+      await onAdd?.(data)
+      setSuccess(true)
+      setTimeout(() => { handleClose() }, 1500)
+    } catch {
+      setSubmitError(t('errors.submitFailed'))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const parseCsv = (text: string) => {
@@ -290,16 +306,28 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
                 />
               </FormField>
 
+              {submitError && (
+                <div style={{
+                  fontSize: 11.5, color: 'var(--r)', fontWeight: 600,
+                  marginTop: 4, marginBottom: 8,
+                  padding: '8px 10px', background: 'var(--r-bg)',
+                  border: '1px solid var(--r-border, var(--r))', borderRadius: 8,
+                }}>
+                  {submitError}
+                </div>
+              )}
               <button
                 onClick={handleSubmit}
+                disabled={submitting}
                 style={{
                   width: '100%', padding: '10px 0', fontSize: 13, fontWeight: 600,
                   background: 'var(--accent)', color: 'var(--accent-txt)', border: 'none',
-                  borderRadius: 8, cursor: 'pointer', marginTop: 4,
+                  borderRadius: 8, cursor: submitting ? 'not-allowed' : 'pointer', marginTop: 4,
+                  opacity: submitting ? 0.6 : 1,
                   transition: 'opacity 150ms',
                 }}
               >
-                {t('submit', { entity: entityLabel })}
+                {submitting ? t('submitting') : t('submit', { entity: entityLabel })}
               </button>
             </>
           ) : (

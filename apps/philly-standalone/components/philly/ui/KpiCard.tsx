@@ -201,14 +201,30 @@ export function KpiCard({
         <div style={{ fontSize: 10.5, color: 'var(--txt3)', marginTop: 3 }}>{goal}</div>
       )}
 
-      {/* Goal progress bar */}
+      {/* Sparkline — in-flow trend strip (no longer absolute-positioned so it
+          stops overlapping the goal-progress bar). Renders only when there's
+          actual trend data, with clear margin from the delta above. */}
+      {sparkData && sparkData.length >= 2 && (
+        <div style={{ marginTop: 10, height: 22, opacity: 0.55 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={sparkData.map((v, i) => ({ v, i }))}>
+              <Line type="monotone" dataKey="v" stroke={accentColor || 'var(--accent)'} strokeWidth={1.5} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* Goal progress — clearly separated below the trend strip so the card
+          reads as: value → delta → trend → goal. No more visual collision. */}
       {hasGoalProgress && (
-        <div style={{ marginTop: 6 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-            <span style={{ fontSize: 9.5, color: 'var(--txt3)' }}>Goal: {goalTarget}</span>
-            <span className="mono" style={{ fontSize: 9.5, fontWeight: 600, color: goalPct >= 100 ? 'var(--g-txt)' : 'var(--txt3)' }}>{goalPct}%</span>
+        <div style={{ marginTop: 10, paddingTop: 8, borderTop: '1px dashed var(--border)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+            <span style={{ fontSize: 10, color: 'var(--txt3)' }}>
+              Goal: <span className="mono" style={{ color: 'var(--txt2)', fontWeight: 600 }}>{goalTarget}</span>
+            </span>
+            <span className="mono" style={{ fontSize: 10, fontWeight: 600, color: goalPct >= 100 ? 'var(--g-txt)' : goalPct >= 70 ? 'var(--accent)' : 'var(--txt3)' }}>{goalPct}%</span>
           </div>
-          <div style={{ height: 3, borderRadius: 2, background: 'var(--bg2)', overflow: 'hidden' }}>
+          <div style={{ height: 4, borderRadius: 2, background: 'var(--bg2)', overflow: 'hidden' }}>
             <div style={{
               height: '100%', borderRadius: 2,
               width: `${goalPct}%`,
@@ -216,17 +232,6 @@ export function KpiCard({
               transition: 'width 0.8s ease',
             }} />
           </div>
-        </div>
-      )}
-
-      {/* Sparkline mini-chart — needs >=2 points to render a line */}
-      {sparkData && sparkData.length >= 2 && (
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 30, opacity: 0.6, borderRadius: '0 0 12px 12px', overflow: 'hidden' }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={sparkData.map((v, i) => ({ v, i }))}>
-              <Line type="monotone" dataKey="v" stroke={accentColor || 'var(--accent)'} strokeWidth={1.5} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
         </div>
       )}
     </div>

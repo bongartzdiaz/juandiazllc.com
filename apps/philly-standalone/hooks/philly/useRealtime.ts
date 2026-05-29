@@ -148,6 +148,18 @@ export interface PresenceUser {
 
 export function usePresence() {
   const [users, setUsers] = useState<PresenceUser[]>([])
+  // The current user's own id — used to exclude self from the presence list.
+  // You shouldn't see your own avatar in "who else is online" (it duplicates
+  // the user chip already shown in the sidebar). In a solo session this makes
+  // the indicator render nothing.
+  const [selfId, setSelfId] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch('/api/me')
+      .then(r => r.json())
+      .then(j => setSelfId(j?.data?.id ?? j?.id ?? null))
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     fetch('/api/realtime/presence')
@@ -176,5 +188,6 @@ export function usePresence() {
     }
   }, [])
 
-  return users
+  // Never include the current user — presence is "who ELSE is here".
+  return selfId ? users.filter(u => u.userId !== selfId) : users
 }

@@ -2,6 +2,11 @@
 
 /* ══ LIGHT THEME — Philly Dashboard ══ */
 [data-theme="light"] {
+  /* Tells the browser to render native form-control popups (the <select>
+     <option> list, date pickers, scrollbars) in LIGHT — otherwise the
+     option list defaults to a light popup even in dark mode, giving
+     unreadable light-grey-on-white text. */
+  color-scheme: light;
   --bg:       #F7F8FA;
   --bg2:      #EDEEF2;
   --panel:    #FFFFFF;
@@ -31,6 +36,9 @@
 
 /* ══ DARK THEME — Philly Dashboard ══ */
 [data-theme="dark"] {
+  /* Render native <select> option popups (+ scrollbars, pickers) in DARK
+     so the dropdown list is readable instead of light-grey-on-white. */
+  color-scheme: dark;
   --bg:       #0B0E13;
   --bg2:      #141820;
   --panel:    #111620;
@@ -59,13 +67,35 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-jakarta);
+  /* DEUS brand: Red Hat Mono is the SOLE brand font across all
+     5 locales (en/nl/de/es/fr). Plus Jakarta is kept as a fallback
+     for the `font-sans` Tailwind class but no production component
+     should reach for it. Same font for body, headings, numbers — a
+     single consistent voice across every screen + locale. */
+  --font-sans: var(--font-red-hat-mono);
   --font-mono: var(--font-red-hat-mono);
 }
 
 /* ══ BASE ══ */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+
+/* Native <select> dropdown readability — belt-and-suspenders alongside
+   `color-scheme` above. Some browsers (notably Chromium on Windows) render
+   the custom-styled <select> trigger correctly but fall back to a default
+   popup for the <option> list. Pin the option bg/color to the theme tokens
+   so the list is always legible in BOTH themes. The selected/hovered option
+   keeps the accent so the active choice stands out. */
+select option,
+select optgroup {
+  background-color: var(--panel);
+  color: var(--txt);
+}
+select option:checked {
+  background-color: var(--accent-bg);
+  color: var(--accent-txt);
+  font-weight: 600;
+}
 
 body {
   background: var(--bg);
@@ -310,24 +340,27 @@ input::placeholder, textarea::placeholder {
 .live-metrics-band {
   margin: 0 28px 24px;
   padding: 18px 22px;
-  border: 1px solid var(--line, #153525);
+  /* Theme-aware: --border + --panel adapt to light/dark via the
+     :root[data-theme] declarations. Old hardcoded `rgba(5,20,14,0.55)`
+     was always dark, so light theme operators saw a black band. */
+  border: 1px solid var(--border);
   border-radius: 14px;
   background:
-    linear-gradient(180deg, rgba(46,196,137,0.06) 0%, rgba(46,196,137,0) 60%),
-    rgba(5,20,14,0.55);
+    linear-gradient(180deg, var(--accent-bg) 0%, transparent 70%),
+    var(--panel);
 }
 .lmb-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 14px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-red-hat-mono), 'Red Hat Mono', monospace;
   font-size: 10.5px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 .lmb-label { color: var(--accent); }
-.lmb-updated { color: var(--muted, #7FA393); }
+.lmb-updated { color: var(--txt3); }
 .lmb-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -339,33 +372,36 @@ input::placeholder, textarea::placeholder {
   gap: 4px;
 }
 .lmb-v {
-  font-family: 'Inter', sans-serif;
-  font-weight: 300;
+  /* Red Hat Mono everywhere — single brand font. Previously Inter
+     which split the brand voice. */
+  font-family: var(--font-red-hat-mono), 'Red Hat Mono', monospace;
+  font-weight: 500;
   font-size: clamp(28px, 3vw, 38px);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   color: var(--accent);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 .lmb-k {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-red-hat-mono), 'Red Hat Mono', monospace;
   font-size: 10.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--muted, #9ABAA9);
+  color: var(--txt3);
   margin-top: 8px;
 }
 .lmb-d {
   font-size: 11.5px;
-  color: var(--muted-soft, #7FA393);
+  color: var(--txt3);
   margin-top: 4px;
+  font-family: var(--font-red-hat-mono), 'Red Hat Mono', monospace;
 }
 .lmb-d-up { color: var(--accent); }
-.lmb-error { border-color: rgba(222, 112, 112, 0.3); }
-.lmb-error .lmb-label { color: #DE7070; }
+.lmb-error { border-color: var(--r-border); }
+.lmb-error .lmb-label { color: var(--r); }
 .lmb-error-hint {
   font-size: 12px;
-  color: var(--muted, #9ABAA9);
+  color: var(--txt3);
   margin-top: 6px;
 }
 @media (max-width: 640px) {
