@@ -1,0 +1,57 @@
+name: CI
+
+# Pre-merge quality gate (A-09). Runs on every pull request and on
+# pushes to main. Blocks regressions — type errors or failing tests —
+# from reaching production, since merge-to-main auto-deploys via Vercel.
+#
+# To make these checks actually BLOCK a merge, enable branch protection
+# on `main` in GitHub repo settings → Branches → require status checks
+# → select "typecheck" and "test". (Operator step; a workflow alone
+# does not enforce a merge gate.)
+#
+# Note: `npm run lint` is intentionally NOT gated — `next lint` was
+# removed in Next.js 16 and the script currently no-ops/errors. Migrate
+# it to the ESLint CLI, then add a lint job here. (Follow-up.)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Cancel superseded runs on the same ref to save minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Generate Prisma client
+        run: npx prisma generate
+      - name: Typecheck
+        run: npm run typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Generate Prisma client
+        run: npx prisma generate
+      - name: Test (vitest)
+        run: npm test -- --run
