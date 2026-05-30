@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { useTheme } from '@/hooks/philly/useTheme'
 import { useLocale } from '@/hooks/philly/useLocale'
+import { LOCALES, LOCALE_NAMES } from '@/lib/i18n/dict'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useToast } from '@/hooks/philly/useToast'
 import {
@@ -454,8 +455,8 @@ export default function SettingsPage() {
                 {/* Language toggle */}
                 <div>
                   <label style={labelStyle}>Language</label>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    {(['en', 'nl'] as const).map(l => (
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {LOCALES.map(l => (
                       <button key={l} onClick={() => setLang(l)} style={{
                         display: 'flex', alignItems: 'center', gap: 5,
                         padding: '7px 16px', borderRadius: 8,
@@ -466,7 +467,7 @@ export default function SettingsPage() {
                         fontFamily: 'inherit',
                       }}>
                         <Globe size={12} />
-                        {l === 'en' ? 'English' : 'Nederlands'}
+                        {LOCALE_NAMES[l]}
                       </button>
                     ))}
                   </div>

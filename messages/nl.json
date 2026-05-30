@@ -404,6 +404,7 @@
     "subtitle": "Volg document handtekeningen"
   },
   "common": {
+    "language": "Taal",
     "save": "Opslaan",
     "cancel": "Annuleren",
     "delete": "Verwijderen",

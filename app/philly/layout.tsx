@@ -27,14 +27,22 @@ export const metadata: Metadata = {
 
 // Boot script — runs before hydration to set data-theme on <html> from
 // localStorage (or OS preference), so the dashboard never flashes light
-// before useTheme catches up. Scoped to /philly/* only.
+// before useTheme catches up. Scoped to /philly/* only. Also syncs <html lang>
+// to the CRM locale (pai-locale cookie) so screen readers announce NL/DE/ES
+// content correctly (A11Y-07 / LOC-04 — the root layout's lang reads the
+// marketing jdl_locale cookie, which doesn't track the CRM language).
 const themeBootScript = `(function(){try{
   var t=localStorage.getItem('pai-theme');
   if(t!=='dark'&&t!=='light'){
     t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
   }
   document.documentElement.setAttribute('data-theme',t);
-}catch(e){document.documentElement.setAttribute('data-theme','light');}})();`
+}catch(e){document.documentElement.setAttribute('data-theme','light');}
+try{
+  var m=document.cookie.match(/(?:^|; )pai-locale=([^;]*)/);
+  var l=m&&m[1];
+  if(l==='en'||l==='nl'||l==='de'||l==='es'){document.documentElement.lang=l;}
+}catch(e){}})();`
 
 export default async function PhillyLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale()

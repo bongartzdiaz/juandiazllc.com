@@ -95,7 +95,9 @@ export function DataTable<T extends { id: string | number }>({
       <div style={{ position: 'absolute', top: 7, right: 8, zIndex: 2 }}>
         <button
           onClick={() => setShowColPicker(s => !s)}
-          title="Columns"
+          aria-label="Choose columns"
+          aria-haspopup="menu"
+          aria-expanded={showColPicker}
           style={{
             width: 26, height: 26, borderRadius: 6, border: 'none',
             background: 'var(--bg2)', color: 'var(--txt3)',
@@ -106,7 +108,7 @@ export function DataTable<T extends { id: string | number }>({
           <Settings2 size={12} />
         </button>
         {showColPicker && (
-          <div style={{
+          <div role="menu" aria-label="Toggle columns" style={{
             position: 'absolute', top: 30, right: 0,
             background: 'var(--panel)', border: '1px solid var(--border)',
             borderRadius: 8, boxShadow: 'var(--shadow-md)',
@@ -118,6 +120,8 @@ export function DataTable<T extends { id: string | number }>({
             {columns.map(col => (
               <button
                 key={col.key}
+                role="menuitemcheckbox"
+                aria-checked={visibility[col.key] !== false}
                 onClick={() => setVisibility(v => ({ ...v, [col.key]: v[col.key] === false }))}
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: 7,
@@ -147,36 +151,58 @@ export function DataTable<T extends { id: string | number }>({
           <thead style={stickyHeader ? { position: 'sticky', top: 0, zIndex: 1 } : undefined}>
             <tr style={{ background: 'var(--bg2)' }}>
               {selectable && (
-                <th style={{ ...thStyle, width: 40, padding: cellPad }}>
+                <th scope="col" style={{ ...thStyle, width: 40, padding: cellPad }}>
                   <Checkbox
                     checked={allSelected}
                     indeterminate={someSelected}
                     onChange={toggleAll}
+                    label="Select all rows"
                   />
                 </th>
               )}
-              {visibleColumns.map(col => (
-                <th
-                  key={col.key}
-                  onClick={() => toggleSort(col.key)}
-                  style={{
-                    ...thStyle,
-                    padding: cellPad,
-                    width: col.width,
-                    textAlign: col.align ?? 'left',
-                    cursor: col.sortable ? 'pointer' : 'default',
-                  }}
-                >
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                    {col.label}
-                    {col.sortable && (
-                      sort?.key === col.key
-                        ? sort.dir === 'asc' ? <ChevronUp size={11} /> : <ChevronDown size={11} />
-                        : <ChevronsUpDown size={11} style={{ opacity: 0.4 }} />
+              {visibleColumns.map(col => {
+                const sortState = col.sortable
+                  ? (sort?.key === col.key ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none')
+                  : undefined
+                const sortIcon = col.sortable && (
+                  sort?.key === col.key
+                    ? sort.dir === 'asc' ? <ChevronUp size={11} /> : <ChevronDown size={11} />
+                    : <ChevronsUpDown size={11} style={{ opacity: 0.4 }} />
+                )
+                return (
+                  <th
+                    key={col.key}
+                    scope="col"
+                    aria-sort={sortState}
+                    style={{
+                      ...thStyle,
+                      padding: cellPad,
+                      width: col.width,
+                      textAlign: col.align ?? 'left',
+                    }}
+                  >
+                    {col.sortable ? (
+                      <button
+                        type="button"
+                        onClick={() => toggleSort(col.key)}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 4,
+                          background: 'none', border: 'none', padding: 0,
+                          font: 'inherit', color: 'inherit', letterSpacing: 'inherit',
+                          textTransform: 'inherit', cursor: 'pointer',
+                        }}
+                      >
+                        {col.label}
+                        {sortIcon}
+                      </button>
+                    ) : (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        {col.label}
+                      </span>
                     )}
-                  </span>
-                </th>
-              ))}
+                  </th>
+                )
+              })}
             </tr>
           </thead>
           <tbody>
@@ -209,7 +235,7 @@ export function DataTable<T extends { id: string | number }>({
                 >
                   {selectable && (
                     <td style={{ padding: cellPad, width: 40 }} onClick={e => e.stopPropagation()}>
-                      <Checkbox checked={isSelected} onChange={() => toggleRow(id)} />
+                      <Checkbox checked={isSelected} onChange={() => toggleRow(id)} label="Select row" />
                     </td>
                   )}
                   {visibleColumns.map(col => {
@@ -251,13 +277,17 @@ const thStyle: React.CSSProperties = {
   userSelect: 'none',
 }
 
-function Checkbox({ checked, indeterminate, onChange }: {
+function Checkbox({ checked, indeterminate, onChange, label }: {
   checked: boolean
   indeterminate?: boolean
   onChange: () => void
+  label?: string
 }) {
   return (
     <button
+      role="checkbox"
+      aria-checked={indeterminate ? 'mixed' : checked}
+      aria-label={label}
       onClick={e => { e.stopPropagation(); onChange() }}
       style={{
         width: 16, height: 16, borderRadius: 4,

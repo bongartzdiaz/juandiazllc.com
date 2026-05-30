@@ -404,6 +404,7 @@
     "subtitle": "Track document signatures"
   },
   "common": {
+    "language": "Language",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",

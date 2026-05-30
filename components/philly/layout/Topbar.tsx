@@ -10,6 +10,7 @@ import { PresenceIndicator } from '@/components/philly/ui/PresenceIndicator'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useSync } from '@/hooks/philly/useSync'
 import { useTranslations } from 'next-intl'
+import { LOCALES, LOCALE_NAMES, type Locale } from '@/lib/i18n/dict'
 
 export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuToggle, editMode, onToggleEdit }: {
   title: string
@@ -22,7 +23,7 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
   onToggleEdit?: () => void
 }) {
   const { theme, toggle } = useTheme()
-  const { locale, toggle: toggleLocale } = useLocale()
+  const { locale, switchLocale } = useLocale()
   const { industry } = useIndustry()
   const mobileMenu = useMobileMenu()
   const { syncAll, syncing } = useSync()
@@ -136,22 +137,31 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
           {t('live')}
         </span>
 
-        {/* Language toggle */}
-        <button
-          onClick={toggleLocale}
-          aria-label={`Switch language, currently ${locale.toUpperCase()}`}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 5,
-            background: 'var(--bg2)', color: 'var(--txt2)',
-            border: '1px solid var(--border)',
-            borderRadius: 8, padding: '5px 10px',
-            fontSize: 11, fontWeight: 600, cursor: 'pointer',
-            fontFamily: 'inherit',
-          }}
-        >
-          <Globe size={12} />
-          {locale.toUpperCase()}
-        </button>
+        {/* Language picker — all four supported locales (LOC-01). Native
+            <select> so it is fully keyboard- and screen-reader-accessible. */}
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <Globe
+            size={12}
+            style={{ position: 'absolute', left: 8, pointerEvents: 'none', color: 'var(--txt2)' }}
+          />
+          <select
+            value={locale}
+            onChange={(e) => switchLocale(e.target.value as Locale)}
+            aria-label={t('language')}
+            style={{
+              appearance: 'none',
+              background: 'var(--bg2)', color: 'var(--txt2)',
+              border: '1px solid var(--border)',
+              borderRadius: 8, padding: '5px 10px 5px 24px',
+              fontSize: 11, fontWeight: 600, cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            {LOCALES.map((l) => (
+              <option key={l} value={l}>{LOCALE_NAMES[l]}</option>
+            ))}
+          </select>
+        </div>
 
         {/* Theme toggle */}
         <button

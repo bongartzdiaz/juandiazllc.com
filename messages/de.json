@@ -404,6 +404,7 @@
     "subtitle": "Dokument-Signaturen verfolgen"
   },
   "common": {
+    "language": "Sprache",
     "save": "Speichern",
     "cancel": "Abbrechen",
     "delete": "Löschen",

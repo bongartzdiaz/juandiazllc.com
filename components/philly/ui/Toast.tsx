@@ -16,17 +16,25 @@ export function ToastContainer() {
   if (toasts.length === 0) return null
 
   return (
-    <div style={{
-      position: 'fixed', top: 16, right: 16, zIndex: 9999,
-      display: 'flex', flexDirection: 'column', gap: 8,
-      maxWidth: 380,
-    }}>
+    // aria-live region (A11Y-06): success/info announce politely, errors and
+    // warnings assertively via each toast's role below. Without this, screen
+    // readers got no feedback on save success/failure or validation errors.
+    <div
+      aria-live="polite"
+      style={{
+        position: 'fixed', top: 16, right: 16, zIndex: 9999,
+        display: 'flex', flexDirection: 'column', gap: 8,
+        maxWidth: 380,
+      }}
+    >
       {toasts.map(toast => {
         const cfg = typeConfig[toast.type]
         const Icon = cfg.icon
+        const assertive = toast.type === 'error' || toast.type === 'warning'
         return (
           <div
             key={toast.id}
+            role={assertive ? 'alert' : 'status'}
             style={{
               display: 'flex', alignItems: 'center', gap: 10,
               padding: '12px 14px', borderRadius: 10,
@@ -40,6 +48,7 @@ export function ToastContainer() {
             <span style={{ fontSize: 13, flex: 1, color: 'var(--txt)' }}>{toast.message}</span>
             <button
               onClick={() => removeToast(toast.id)}
+              aria-label="Dismiss notification"
               style={{
                 background: 'none', border: 'none', cursor: 'pointer',
                 padding: 2, display: 'flex', color: 'var(--txt3)',

@@ -404,6 +404,7 @@
     "subtitle": "Sigue firmas de documentos"
   },
   "common": {
+    "language": "Idioma",
     "save": "Guardar",
     "cancel": "Cancelar",
     "delete": "Eliminar",
