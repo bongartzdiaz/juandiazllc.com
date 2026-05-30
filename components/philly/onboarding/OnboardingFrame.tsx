@@ -115,7 +115,7 @@ export function OnboardingFrame({ step, title, sub, children, footer }: Props) {
 export const obButtonPrimary: React.CSSProperties = {
   display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
   padding: '10px 18px', borderRadius: 8, fontSize: 14, fontWeight: 600,
-  background: 'var(--accent)', color: '#fff', border: 'none',
+  background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
   cursor: 'pointer', fontFamily: 'inherit',
   minHeight: 44, // touch target compliance
 }

@@ -191,7 +191,7 @@ export default function OpenHousesPage() {
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '8px 14px', borderRadius: 10,
-              background: 'var(--accent)', color: '#fff',
+              background: 'var(--accent)', color: 'var(--accent-fg)',
               border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
               fontFamily: 'inherit', boxShadow: 'var(--shadow-sm)',
             }}
@@ -303,7 +303,7 @@ export default function OpenHousesPage() {
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 6,
                     padding: '9px 14px', borderRadius: 8,
-                    background: 'var(--accent)', color: '#fff',
+                    background: 'var(--accent)', color: 'var(--accent-fg)',
                     border: 'none', fontSize: 12, fontWeight: 600,
                     cursor: 'pointer', fontFamily: 'inherit',
                   }}
@@ -405,7 +405,7 @@ export default function OpenHousesPage() {
               disabled={submitting}
               style={{
                 padding: '9px 18px', borderRadius: 8,
-                background: 'var(--accent)', color: '#fff',
+                background: 'var(--accent)', color: 'var(--accent-fg)',
                 border: 'none', fontSize: 12, fontWeight: 600,
                 cursor: submitting ? 'wait' : 'pointer',
                 fontFamily: 'inherit',

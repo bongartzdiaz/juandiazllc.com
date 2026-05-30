@@ -610,7 +610,7 @@ export default function KanbanPage() {
                   style={{
                     padding: '8px 16px', borderRadius: 8,
                     border: 'none', background: 'var(--accent)',
-                    fontSize: 12, fontWeight: 600, color: '#fff',
+                    fontSize: 12, fontWeight: 600, color: 'var(--accent-fg)',
                     cursor: addCardLoading || !addTitle.trim() ? 'not-allowed' : 'pointer',
                     opacity: addCardLoading || !addTitle.trim() ? 0.5 : 1,
                   }}

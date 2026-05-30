@@ -423,7 +423,7 @@ const providerRowStyle: React.CSSProperties = {
 const primaryBtn: React.CSSProperties = {
   display: 'inline-flex', alignItems: 'center', gap: 4,
   padding: '6px 12px', borderRadius: 7,
-  background: 'var(--accent)', color: '#fff', border: 'none',
+  background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
   fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
 }
 

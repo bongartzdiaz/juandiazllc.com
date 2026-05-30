@@ -859,7 +859,7 @@ function EditField({
 
 const primaryBtnStyle: React.CSSProperties = {
   padding: '8px 16px', borderRadius: 10, border: 'none',
-  background: 'var(--accent)', color: '#fff',
+  background: 'var(--accent)', color: 'var(--accent-fg)',
   fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
 }
 const ghostBtnStyle: React.CSSProperties = {

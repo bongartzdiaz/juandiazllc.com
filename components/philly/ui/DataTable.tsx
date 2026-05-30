@@ -131,7 +131,7 @@ export function DataTable<T extends { id: string | number }>({
                   background: visibility[col.key] !== false ? 'var(--accent)' : 'var(--bg2)',
                   border: '1px solid var(--border)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#fff',
+                  color: 'var(--accent-fg)',
                 }}>
                   {visibility[col.key] !== false && <Check size={9} strokeWidth={3} />}
                 </span>
@@ -265,11 +265,11 @@ function Checkbox({ checked, indeterminate, onChange }: {
         border: `1px solid ${checked || indeterminate ? 'var(--accent)' : 'var(--border)'}`,
         cursor: 'pointer', padding: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: '#fff',
+        color: 'var(--accent-fg)',
       }}
     >
       {indeterminate ? (
-        <span style={{ width: 7, height: 2, background: '#fff', borderRadius: 1 }} />
+        <span style={{ width: 7, height: 2, background: 'var(--accent-fg)', borderRadius: 1 }} />
       ) : checked ? (
         <Check size={11} strokeWidth={3} />
       ) : null}

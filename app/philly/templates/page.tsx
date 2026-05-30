@@ -332,7 +332,7 @@ export default function TemplatesPage() {
           }}>Cancel</button>
           <button onClick={save} disabled={saving} style={{
             padding: '8px 18px', borderRadius: 8, border: 'none',
-            background: 'var(--accent)', color: '#fff',
+            background: 'var(--accent)', color: 'var(--accent-fg)',
             fontSize: 12, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
             fontFamily: 'inherit', opacity: saving ? 0.6 : 1,
           }}>{saving ? 'Saving...' : (editing ? 'Save Changes' : 'Create Template')}</button>

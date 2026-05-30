@@ -247,7 +247,7 @@ export default function OffersPage() {
           <button onClick={openCreate} style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '8px 14px', borderRadius: 10,
-            background: 'var(--accent)', color: '#fff',
+            background: 'var(--accent)', color: 'var(--accent-fg)',
             border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
             fontFamily: 'inherit', boxShadow: 'var(--shadow-sm)',
           }}>
@@ -389,7 +389,7 @@ export default function OffersPage() {
               <button onClick={() => openEdit(selected)} style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 padding: '8px 14px', borderRadius: 8,
-                background: 'var(--accent)', color: '#fff', border: 'none',
+                background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
                 fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
               }}>
                 <Edit2 size={12} /> Edit
@@ -518,7 +518,7 @@ export default function OffersPage() {
             <button onClick={submitForm} disabled={saving} style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '9px 18px', borderRadius: 8,
-              background: 'var(--accent)', color: '#fff', border: 'none',
+              background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
               fontSize: 12, fontWeight: 600, cursor: saving ? 'wait' : 'pointer',
               fontFamily: 'inherit', opacity: saving ? 0.7 : 1,
             }}>

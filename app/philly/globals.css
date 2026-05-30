@@ -10,13 +10,17 @@
   --border2:  #CDD2DC;
   --txt:      #111318;
   --txt2:     #4A5568;
-  --txt3:     #94A3B8;
+  /* --txt3 darkened for WCAG AA (A11Y-02): #5C6675 is ~5.8:1 on white panel
+     and ~4.9:1 on --bg2, vs the old #94A3B8 (2.2-2.6:1, failing). */
+  --txt3:     #5C6675;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
   --shadow:    0 4px 12px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
   --shadow-md: 0 8px 24px rgba(0,0,0,0.09), 0 2px 8px rgba(0,0,0,0.05);
   --shadow-glow: 0 0 0 1px rgba(13,115,119,0.10), 0 4px 16px rgba(13,115,119,0.06);
 
   --accent: #0D7377;
+  /* On-accent text colour (A11Y-01). Light accent #0D7377 + white = 5.62:1. */
+  --accent-fg: #FFFFFF;
   --accent-bg: #ECFCFC;
   --accent-border: #A8E8EA;
   --accent-txt: #0A5C5F;
@@ -39,13 +43,18 @@
   --border2:  rgba(255,255,255,0.14);
   --txt:      #EDF2F7;
   --txt2:     #A0AEC0;
-  --txt3:     #718096;
+  /* --txt3 lightened for WCAG AA (A11Y-02): #8593A6 is ~5.7:1 on --panel and
+     --bg2, vs the old #718096 (4.4-4.5:1, borderline/failing on --bg2). */
+  --txt3:     #8593A6;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
   --shadow:    0 4px 16px rgba(0,0,0,0.45);
   --shadow-md: 0 8px 28px rgba(0,0,0,0.55);
   --shadow-glow: 0 0 0 1px rgba(45,212,191,0.10), 0 4px 20px rgba(45,212,191,0.05);
 
   --accent: #2DD4BF;
+  /* On-accent text colour (A11Y-01). Bright accent #2DD4BF needs near-black
+     text: white is 1.86:1 (fail), #0B0E13 is ~11:1. */
+  --accent-fg: #0B0E13;
   --accent-bg: rgba(45,212,191,0.10);
   --accent-border: rgba(45,212,191,0.25);
   --accent-txt: #5EEAD4;
@@ -290,7 +299,7 @@ input::placeholder, textarea::placeholder {
 }
 .widget-edit-label {
   position: absolute; top: -10px; left: 12px; z-index: 2;
-  background: var(--accent); color: #fff;
+  background: var(--accent); color: var(--accent-fg);
   font-size: 9px; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.08em;
   padding: 2px 8px; border-radius: 4px;

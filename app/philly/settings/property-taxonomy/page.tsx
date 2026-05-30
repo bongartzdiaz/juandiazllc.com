@@ -39,7 +39,7 @@ const btnIconStyle: React.CSSProperties = {
 
 const btnPrimary: React.CSSProperties = {
   padding: '8px 14px', borderRadius: 8, border: 'none',
-  background: 'var(--accent)', color: '#fff',
+  background: 'var(--accent)', color: 'var(--accent-fg)',
   fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
   display: 'inline-flex', alignItems: 'center', gap: 6,
 }

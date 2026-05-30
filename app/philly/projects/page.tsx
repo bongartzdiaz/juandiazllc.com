@@ -553,7 +553,7 @@ export default function ProjectsPage() {
                     href={`/projects/${p.id}`}
                     style={{
                       flex: 1, padding: '9px 14px', borderRadius: 8,
-                      background: 'var(--accent)', color: '#fff',
+                      background: 'var(--accent)', color: 'var(--accent-fg)',
                       border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
                       fontFamily: 'inherit', textDecoration: 'none',
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,

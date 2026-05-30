@@ -100,7 +100,7 @@ export default function PagesListPage() {
               onClick={() => setShowNew(true)}
               style={{
                 padding: '8px 16px', borderRadius: 8, border: 'none',
-                background: 'var(--accent)', color: '#fff', fontWeight: 600,
+                background: 'var(--accent)', color: 'var(--accent-fg)', fontWeight: 600,
                 fontSize: 13, cursor: 'pointer',
               }}
             >
@@ -159,7 +159,7 @@ export default function PagesListPage() {
                     href={`/pages/${p.slug}/edit`}
                     style={{
                       flex: 1, padding: '6px 10px', borderRadius: 7,
-                      background: 'var(--accent)', color: '#fff',
+                      background: 'var(--accent)', color: 'var(--accent-fg)',
                       fontSize: 11.5, fontWeight: 600, textAlign: 'center',
                       textDecoration: 'none',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
@@ -228,7 +228,7 @@ export default function PagesListPage() {
             disabled={busy || !newTitle.trim()}
             style={{
               padding: '7px 14px', borderRadius: 7, border: 'none',
-              background: 'var(--accent)', color: '#fff',
+              background: 'var(--accent)', color: 'var(--accent-fg)',
               fontSize: 12.5, fontWeight: 600, cursor: busy ? 'wait' : 'pointer',
               opacity: !newTitle.trim() ? 0.5 : 1,
             }}

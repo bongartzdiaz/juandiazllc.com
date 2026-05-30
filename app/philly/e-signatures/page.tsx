@@ -177,7 +177,7 @@ export default function ESignaturesPage() {
           <button onClick={() => setShowAdd(true)} style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '8px 14px', borderRadius: 10,
-            background: 'var(--accent)', color: '#fff',
+            background: 'var(--accent)', color: 'var(--accent-fg)',
             border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
             fontFamily: 'inherit', boxShadow: 'var(--shadow-sm)',
           }}>
@@ -300,7 +300,7 @@ export default function ESignaturesPage() {
             {!['signed', 'declined', 'expired'].includes(selected.status) && (
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {selected.status === 'pending' && (
-                  <StatusBtn onClick={() => changeStatus(selected.id, 'sent')} bg="var(--accent)" color="#fff">
+                  <StatusBtn onClick={() => changeStatus(selected.id, 'sent')} bg="var(--accent)" color="var(--accent-fg)">
                     <Send size={12} /> Mark Sent
                   </StatusBtn>
                 )}
@@ -382,7 +382,7 @@ export default function ESignaturesPage() {
             }}>Cancel</button>
             <button onClick={handleAddSignature} disabled={saving} style={{
               padding: '9px 18px', borderRadius: 8,
-              background: 'var(--accent)', color: '#fff', border: 'none',
+              background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
               fontSize: 12, fontWeight: 600, cursor: saving ? 'wait' : 'pointer',
               fontFamily: 'inherit', opacity: saving ? 0.7 : 1,
             }}>{saving ? 'Creating…' : 'Send Request'}</button>

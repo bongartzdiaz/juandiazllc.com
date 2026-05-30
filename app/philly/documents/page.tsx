@@ -318,7 +318,7 @@ export default function DocumentsPage() {
                 onClick={() => setShowUpload(true)}
                 style={{
                   padding: '8px 16px', borderRadius: 8, border: 'none',
-                  background: 'var(--accent)', color: '#fff', fontWeight: 600,
+                  background: 'var(--accent)', color: 'var(--accent-fg)', fontWeight: 600,
                   fontSize: 13, cursor: 'pointer',
                   display: 'inline-flex', alignItems: 'center', gap: 6,
                 }}
@@ -480,6 +480,6 @@ const cancelBtn: React.CSSProperties = {
 }
 const primaryBtn: React.CSSProperties = {
   padding: '7px 14px', borderRadius: 7, border: 'none',
-  background: 'var(--accent)', color: '#fff',
+  background: 'var(--accent)', color: 'var(--accent-fg)',
   fontSize: 12.5, fontWeight: 600,
 }

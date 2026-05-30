@@ -26,7 +26,7 @@ const sectionSubStyle: React.CSSProperties = {
 const accentBtnStyle: React.CSSProperties = {
   display: 'inline-flex', alignItems: 'center', gap: 6,
   padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600,
-  background: 'var(--accent)', color: '#fff', border: 'none',
+  background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
   cursor: 'pointer', fontFamily: 'inherit',
 }
 

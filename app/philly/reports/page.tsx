@@ -242,7 +242,7 @@ export default function ReportsPage() {
                       fontSize: 12, fontWeight: 600,
                       cursor: isGenerating || generating !== null ? 'not-allowed' : 'pointer',
                       background: isGenerating ? 'var(--accent-border)' : 'var(--accent)',
-                      color: '#fff',
+                      color: 'var(--accent-fg)',
                       border: 'none', boxShadow: 'var(--shadow-sm)',
                       fontFamily: 'inherit', width: '100%',
                       opacity: generating !== null && !isGenerating ? 0.5 : 1,

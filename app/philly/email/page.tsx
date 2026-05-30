@@ -227,7 +227,7 @@ export default function EmailPage() {
                   onClick={() => setShowAdd(true)}
                   style={{
                     padding: '6px 14px', borderRadius: 8, border: 'none',
-                    background: 'var(--accent)', color: '#fff',
+                    background: 'var(--accent)', color: 'var(--accent-fg)',
                     fontSize: 12, fontWeight: 600, cursor: 'pointer',
                     fontFamily: 'inherit',
                   }}

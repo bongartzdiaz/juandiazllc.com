@@ -194,7 +194,7 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
               display: 'inline-flex', alignItems: 'center', gap: 5,
               padding: '6px 14px', borderRadius: 8,
               fontSize: 12, fontWeight: 600, cursor: 'pointer',
-              background: 'var(--accent)', color: '#fff',
+              background: 'var(--accent)', color: 'var(--accent-fg)',
               border: 'none', boxShadow: 'var(--shadow-sm)',
               fontFamily: 'inherit',
             }}

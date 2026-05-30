@@ -283,7 +283,7 @@ export default function ReferralsPage() {
             <button onClick={handleAddReferral} disabled={saving} style={{
               width: '100%', marginTop: 18, padding: '10px 0',
               borderRadius: 10, border: 'none',
-              background: 'var(--accent)', color: '#fff',
+              background: 'var(--accent)', color: 'var(--accent-fg)',
               fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit', opacity: saving ? 0.6 : 1,
             }}>

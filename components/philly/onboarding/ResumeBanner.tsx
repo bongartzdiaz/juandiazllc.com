@@ -82,7 +82,7 @@ export function ResumeBanner() {
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 4,
           padding: '6px 12px', borderRadius: 6, fontSize: 12,
-          fontWeight: 600, background: 'var(--accent)', color: '#fff',
+          fontWeight: 600, background: 'var(--accent)', color: 'var(--accent-fg)',
           textDecoration: 'none', whiteSpace: 'nowrap',
         }}
       >

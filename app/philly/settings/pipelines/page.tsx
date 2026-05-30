@@ -261,7 +261,7 @@ export default function PipelineAdminPage() {
               <button onClick={openCreatePipeline} style={{
                 display: 'inline-flex', alignItems: 'center', gap: 4,
                 padding: '5px 10px', borderRadius: 7,
-                background: 'var(--accent)', color: '#fff', border: 'none',
+                background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
                 fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
               }}>
                 <Plus size={11} /> New
@@ -522,7 +522,7 @@ export default function PipelineAdminPage() {
             }}>Cancel</button>
             <button onClick={submitPipeline} disabled={saving} style={{
               padding: '9px 18px', borderRadius: 8,
-              background: 'var(--accent)', color: '#fff', border: 'none',
+              background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
               fontSize: 12, fontWeight: 600, cursor: saving ? 'wait' : 'pointer',
               fontFamily: 'inherit', opacity: saving ? 0.7 : 1,
             }}>{saving ? 'Saving…' : editingPipelineId ? 'Save' : 'Create'}</button>

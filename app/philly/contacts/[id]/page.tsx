@@ -398,7 +398,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
               <button onClick={handleSave} style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5,
                 padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
-                background: 'var(--accent)', color: '#fff', border: 'none',
+                background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
                 cursor: 'pointer', fontFamily: 'inherit',
               }}>
                 <Save size={13} /> {tCommon('save')}
@@ -668,7 +668,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                           width: 20, height: 20, borderRadius: 10,
                           background: 'var(--accent)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 9, fontWeight: 700, color: '#fff', flexShrink: 0,
+                          fontSize: 9, fontWeight: 700, color: 'var(--accent-fg)', flexShrink: 0,
                         }}>{getInitials(n.user.name)}</div>
                         <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--txt2)' }}>{n.user.name}</span>
                         <span style={{ fontSize: 11, color: 'var(--txt3)' }}>
