@@ -23,6 +23,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { listDueForRenewal, renew } from '@/lib/philly/calendar/push-sync'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { timingSafeEqualStr } from '@/lib/philly/crypto'
 import { logAudit } from '@/lib/philly/audit'
 import type { AuthScope } from '@/lib/philly/auth-helpers'
 import { logger } from '@/lib/philly/logger'
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
   let triggeredBy: 'cron' | 'admin' = 'cron'
   let adminScope: AuthScope | null = null
 
-  if (cronSecret && headerSecret && headerSecret === cronSecret) {
+  if (cronSecret && headerSecret && timingSafeEqualStr(headerSecret, cronSecret)) {
     // Cron path — processes ALL organizations.
   } else {
     const scope = await requireRole(['admin'])

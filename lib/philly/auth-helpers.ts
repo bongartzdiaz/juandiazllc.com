@@ -4,8 +4,10 @@
    Single-sign-on: the brand site authenticates users via Supabase
    (juandiazllc.com/login). This helper reads that Supabase session
    server-side and maps the Supabase user to a Philly User row in
-   MariaDB (auto-provisioned on first sight so brand users can enter
-   the CRM without a separate signup).
+   MariaDB. Provisioning is DENY-BY-DEFAULT (A-01): only the first-ever
+   user bootstraps an admin; every other unknown email is rejected with
+   403 and must be invited. Set ALLOW_AUTOPROVISION=1 to opt back into
+   auto-join (single-operator, locked-down-signup deployments only).
 
    Every Philly API route calls requireScope() / requireRole() and
    gets back { userId, organizationId, role, email } — exactly the
@@ -45,6 +47,18 @@ class UserDeletedError extends Error {
   }
 }
 
+/**
+ * Sentinel thrown when an unknown email (no Philly User row) tries to
+ * enter the CRM and auto-provisioning is denied (A-01). Caught by
+ * requireScope and turned into a 403. Access must come via an invite.
+ */
+class NoWorkspaceAccessError extends Error {
+  constructor() {
+    super('No workspace access for this account')
+    this.name = 'NoWorkspaceAccessError'
+  }
+}
+
 interface ResolvedUser {
   id: string
   email: string
@@ -75,6 +89,22 @@ async function resolvePhillyUser(email: string): Promise<ResolvedUser> {
     }
   }
 
+  // Deny-by-default auto-provisioning (A-01). An unknown email that
+  // obtains a Supabase session must NOT silently join an existing org —
+  // that was a tenant-breakout the moment >1 customer org exists (or if
+  // Supabase signup is open). Rules:
+  //   - The very first user bootstraps the initial admin (fresh deploy).
+  //   - Any later unknown email is rejected (403); access comes through
+  //     an invite, which creates the User row directly via
+  //     /api/invites/accept (so resolvePhillyUser finds it as `existing`).
+  //   - Set ALLOW_AUTOPROVISION=1 to restore the old auto-join. ONLY for
+  //     single-operator deployments with Supabase signup locked down —
+  //     never with open signup.
+  const userCount = await prisma.user.count()
+  if (userCount > 0 && process.env.ALLOW_AUTOPROVISION !== '1') {
+    throw new NoWorkspaceAccessError()
+  }
+
   // Auto-provision: look up or create the default org.
   let org = await prisma.organization.findFirst({
     orderBy: { createdAt: 'asc' },
@@ -88,7 +118,6 @@ async function resolvePhillyUser(email: string): Promise<ResolvedUser> {
   }
 
   // First user onboarded is admin, subsequent users viewer.
-  const userCount = await prisma.user.count()
   const role = userCount === 0 ? 'admin' : 'viewer'
 
   const created = await prisma.user.create({
@@ -160,6 +189,11 @@ export async function requireScope(): Promise<AuthScope | NextResponse> {
       // Sign the Supabase session out client-side via the standard 401
       // wouldn't be accurate; 410 is the AVG-correct answer.
       return jsonError('Account deleted', 410)
+    }
+    if (err instanceof NoWorkspaceAccessError) {
+      // 403 — authenticated, but not a member of any workspace. Must be
+      // invited; we never silently auto-join an org (A-01).
+      return jsonError('No workspace access — ask an admin to invite you', 403)
     }
     console.error('[requireScope] failed to resolve philly user', err)
     return jsonError('Auth provisioning failed', 500)

@@ -20,15 +20,33 @@ const TAG_LEN = 16
 function deriveKey(): Buffer {
   const raw = process.env.INTEGRATION_SECRET ?? process.env.NEXTAUTH_SECRET ?? ''
   if (!raw) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('INTEGRATION_SECRET (or NEXTAUTH_SECRET) must be set in production')
+    // Fail closed everywhere except an explicit local/test context (A-16).
+    // The previous guard only threw on NODE_ENV==='production', so a
+    // staging/preview box, a container with NODE_ENV unset, or any Vercel
+    // deploy would silently encrypt OAuth/calendar/2FA secrets with this
+    // public placeholder key. Allow the placeholder ONLY for `test` and
+    // `development`, and never on Vercel.
+    const env = process.env.NODE_ENV
+    const isLocalOrTest = (env === 'test' || env === 'development') && !process.env.VERCEL
+    if (!isLocalOrTest) {
+      throw new Error('INTEGRATION_SECRET (or NEXTAUTH_SECRET) must be set outside local/test environments')
     }
-    // Dev-only deterministic placeholder so tests/local runs don't crash.
+    // Dev/test-only deterministic placeholder so tests/local runs don't crash.
     // WARNING: tokens encrypted with this key are not secret.
     return crypto.createHash('sha256').update('dev-integration-secret-do-not-use-in-prod').digest()
   }
   // Allow raw hex, base64, or any string — hash to 32 bytes.
   return crypto.createHash('sha256').update(raw).digest()
+}
+
+/** Constant-time string comparison (A-29). Returns false on length
+    mismatch without leaking timing. Use for comparing secrets/tokens
+    (cron secrets, signatures) instead of `===`. */
+export function timingSafeEqualStr(a: string, b: string): boolean {
+  const ab = Buffer.from(a)
+  const bb = Buffer.from(b)
+  if (ab.length !== bb.length) return false
+  return crypto.timingSafeEqual(ab, bb)
 }
 
 // Lazy-init so tests can set env vars before first use.

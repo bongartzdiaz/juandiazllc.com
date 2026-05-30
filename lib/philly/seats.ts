@@ -59,7 +59,10 @@ export async function getSeatStatusTx(
   const now = new Date()
 
   const [users, invites, org, sub] = await Promise.all([
-    tx.user.count({ where: { organizationId } }),
+    // Exclude soft-deleted users: a user in their 30-day deletion window
+    // still has a row but must not consume a seat, else an at-cap org
+    // can't invite a replacement until hard-purge runs (A-07).
+    tx.user.count({ where: { organizationId, deletedAt: null } }),
     tx.invite.count({
       where: {
         organizationId,

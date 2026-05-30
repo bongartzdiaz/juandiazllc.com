@@ -139,11 +139,17 @@ export async function DELETE(req: NextRequest) {
 
   const now = new Date()
 
-  // Race-safe last-admin guard: count + delete in one Serializable
-  // transaction. Without this, two admins can simultaneously read
-  // "adminCount = 2", both pass the > 1 check, both proceed to soft-
-  // delete, ending the org with 0 admins. With Serializable, Postgres
-  // detects the conflict and rolls one back.
+  // Last-admin guard: count + delete in one Serializable transaction.
+  // Without it, two admins can simultaneously read "adminCount = 2",
+  // both pass the > 1 check, and both soft-delete, ending the org with
+  // 0 admins.
+  // NOTE (A-05): the live engine is MySQL/MariaDB, NOT Postgres. MySQL
+  // SERIALIZABLE uses locking reads (not Postgres SSI predicate-conflict
+  // detection), so the count→delete phantom race is not guaranteed to be
+  // aborted the way Postgres would. The catch below maps MySQL deadlocks
+  // to 409 as partial mitigation. For a hard guarantee, take a
+  // `SELECT ... FOR UPDATE` lock on the org row to serialize this section
+  // (follow-up). Do NOT trust this comment's prior "Postgres" claim.
   try {
     await prisma.$transaction(async (tx) => {
       if (target.role === 'admin') {

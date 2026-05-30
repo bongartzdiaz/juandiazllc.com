@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
 
   // Last-mile seat check: a flurry of accepts in parallel could each pass
   // the issue-time check. Re-check at accept-time too.
-  const userCount = await prisma.user.count({ where: { organizationId: org.id } })
+  const userCount = await prisma.user.count({ where: { organizationId: org.id, deletedAt: null } })
   // Subscription seat limit (if present, otherwise org.seatLimit)
   const sub = await prisma.subscription.findUnique({
     where: { organizationId: org.id },

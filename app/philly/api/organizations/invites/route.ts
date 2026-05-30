@@ -78,11 +78,14 @@ export async function POST(req: NextRequest) {
   const token = generateInviteToken()
   const expiresAt = defaultInviteExpiry()
 
-  // Race-safe seat claim: count + duplicate checks + create happen in one
-  // Serializable transaction. Without this, two concurrent invites can
-  // both read "1 seat free", both pass the check, and the org ends up
-  // over-subscribed. With Serializable + concurrent insert on the Invite
-  // table, Postgres detects the conflict and rolls one back.
+  // Seat claim: count + duplicate checks + create in one Serializable
+  // transaction. Without it, two concurrent invites can both read
+  // "1 seat free", both pass, and the org over-subscribes.
+  // NOTE (A-05): the live engine is MySQL/MariaDB, NOT Postgres. MySQL
+  // SERIALIZABLE does not detect the count→insert phantom race the way
+  // Postgres SSI does; the catch below maps deadlocks to 409 as partial
+  // mitigation. A hard guarantee needs a `SELECT ... FOR UPDATE` lock on
+  // the org row (follow-up). Disregard the prior "Postgres" claim.
   let invite: { id: string; email: string; role: string; expiresAt: Date; createdAt: Date }
   try {
     invite = await prisma.$transaction(async (tx) => {
@@ -131,9 +134,9 @@ export async function POST(req: NextRequest) {
     if (err instanceof UserAlreadyInOrgError) {
       return jsonError('This person already has an account in this organization.', 409)
     }
-    // Postgres serialization conflict: two concurrent invites raced; the
-    // loser sees this. Surface as a retryable conflict so the caller can
-    // re-submit (UI can do this transparently).
+    // Serialization/deadlock conflict (MySQL deadlock or serialization
+    // failure): two concurrent invites raced; the loser sees this.
+    // Surface as a retryable 409 so the caller can re-submit.
     if (err instanceof Error && /serializable|deadlock|conflict/i.test(err.message)) {
       return jsonError('Concurrent change conflict. Please retry.', 409)
     }
