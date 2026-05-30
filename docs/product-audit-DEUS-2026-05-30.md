@@ -139,10 +139,10 @@ most are bounded, mechanical fixes on an otherwise sound foundation.
 
 | ID | Sev | Finding |
 |---|---|---|
-| LOC-01 | High | In-app switcher only toggles en↔nl; DE/ES unreachable despite full translations (`hooks/philly/useLocale.ts:4,37`) |
+| LOC-01 | High | In-app switcher only toggles en↔nl; DE/ES unreachable despite full translations (`hooks/philly/useLocale.ts:4,37`) — **FIXED 2026-05-30** (4-locale picker in Topbar + settings) |
 | LOC-02 | High | 28/73 pages hard-coded English (dashboard, billing, reports, most settings) |
 | LOC-03 | High | Number/date/currency locale-blind; `formatCurrency` defaults `en-US`; 154 hard-coded `Intl`/`toLocale` locale args |
-| LOC-04 | Med | Root `<html lang>` reads `jdl_locale` not CRM `pai-locale` (SC 3.1.1) |
+| LOC-04 | Med | Root `<html lang>` reads `jdl_locale` not CRM `pai-locale` (SC 3.1.1) — **FIXED 2026-05-30** (boot-script lang from pai-locale) |
 | LOC-05 | Med | aria-labels/screen-reader text hard-coded English even where visible text is translated |
 | LOC-06 | Med | Invite emails hard-coded English, no locale param (backend not locale-aware) |
 | LOC-07 | Med | Help-center 20 articles English-only (only drawer chrome translated) |
@@ -178,9 +178,9 @@ most are bounded, mechanical fixes on an otherwise sound foundation.
 | A11Y-03 | High | No heading elements on most pages; page title is a styled `div` |
 | A11Y-04 | High | Form labels not associated (`htmlFor`/`id` missing) app-wide |
 | A11Y-05 | High | Errors not linked to fields; required is visual-only |
-| A11Y-06 | High | Toasts not announced (no `aria-live`/role) — incl. validation errors |
-| A11Y-07 | High | `<html lang>` doesn't track CRM locale |
-| A11Y-08 | High | DataTable sort headers + custom checkboxes lack semantics/keyboard |
+| A11Y-06 | High | Toasts not announced (no `aria-live`/role) — incl. validation errors — **FIXED 2026-05-30** |
+| A11Y-07 | High | `<html lang>` doesn't track CRM locale — **FIXED 2026-05-30** |
+| A11Y-08 | High | DataTable sort headers + custom checkboxes lack semantics/keyboard — **FIXED 2026-05-30** |
 | A11Y-09 | Med | Tab UIs lack tablist/tab/tabpanel roles |
 | A11Y-10 | High | Clickable card/row `div`s not keyboard-operable (kanban, palette, table) |
 | A11Y-11 | Med | Kanban add-card modal has no focus trap/return |
@@ -260,11 +260,14 @@ most are bounded, mechanical fixes on an otherwise sound foundation.
    create/update + stage reorder~~ ✅ (reusable guard in `lib/philly/v1-fk-guard.ts`)
 
 **P1 — High (this sprint)**
-4. LOC-01: 4-locale keyboard-accessible language picker; widen `useLocale`.
+4. ~~LOC-01: 4-locale keyboard-accessible language picker; widen `useLocale`~~ ✅ 2026-05-30
+   (Topbar + settings pickers, `common.language` × 4).
 5. LOC-02: externalize the 28 English-only pages (start dashboard + billing).
 6. LOC-03: thread active locale through all formatters.
-7. A11Y-03/04/05/06/08/10: headings, label association, `aria-live` toasts,
-   table + clickable-row keyboard semantics.
+7. A11Y partial: ~~A11Y-06 (aria-live toasts), A11Y-07 (`<html lang>`),
+   A11Y-08 (table semantics)~~ ✅ 2026-05-30. Still open: A11Y-03 (headings),
+   A11Y-04 (label association), A11Y-05 (error wiring), A11Y-10 (clickable-row
+   keyboard) — these are per-page sweeps.
 8. FE-01 + FE-02: real error states via `ApiErrorBanner`; gate `DEMO_*` behind
    an explicit demo flag, never as a live-tenant fallback.
 9. BE-05: Zod schemas for the ~74 raw-JSON mutation routes (money/enums first).
