@@ -120,6 +120,7 @@ export async function generateDonorScores(organizationId: string): Promise<Donor
     }
   }
 
+  // org-scope-lint-ok: ids derived from the org-scoped activity.findMany({ where: { organizationId } }) above
   const contacts = await prisma.contact.findMany({
     where: { id: { in: ids } },
     select: { id: true, name: true },

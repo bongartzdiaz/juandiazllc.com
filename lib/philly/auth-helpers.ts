@@ -100,6 +100,7 @@ async function resolvePhillyUser(email: string): Promise<ResolvedUser> {
   //   - Set ALLOW_AUTOPROVISION=1 to restore the old auto-join. ONLY for
   //     single-operator deployments with Supabase signup locked down —
   //     never with open signup.
+  // org-scope-lint-ok: bootstrap check — counts ALL users to detect a fresh deploy; org-agnostic by design
   const userCount = await prisma.user.count()
   if (userCount > 0 && process.env.ALLOW_AUTOPROVISION !== '1') {
     throw new NoWorkspaceAccessError()

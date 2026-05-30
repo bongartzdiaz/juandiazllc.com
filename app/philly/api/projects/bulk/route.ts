@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
   const ownedIds = owned.map((p: any) => p.id)
 
   if (body.action === 'delete') {
+    // org-scope-lint-ok: ownedIds are pre-filtered to scope.organizationId by the owned-query above
     const result = await prisma.project.deleteMany({ where: { id: { in: ownedIds } } })
     for (const id of ownedIds) {
       await logAudit({ scope, action: 'delete', entity: 'project', entityId: id })
@@ -45,11 +46,13 @@ export async function POST(req: NextRequest) {
     for (const key of allowed) {
       if (body.data[key] !== undefined) updateData[key] = body.data[key]
     }
+    // org-scope-lint-ok: ownedIds are pre-filtered to scope.organizationId by the owned-query above
     const result = await prisma.project.updateMany({ where: { id: { in: ownedIds } }, data: updateData })
     return NextResponse.json({ data: { updated: result.count } })
   }
 
   if (body.action === 'export') {
+    // org-scope-lint-ok: ownedIds are pre-filtered to scope.organizationId by the owned-query above
     const projects = await prisma.project.findMany({
       where: { id: { in: ownedIds } },
       include: { milestones: true, _count: { select: { impactMetrics: true, contactProjects: true } } },

@@ -204,16 +204,19 @@ export async function generateLeadScores(organizationId: string, limit = 500): P
 
   /* Batch-fetch engagement signals */
   const [activities7d, activities30d, activities90d, notes, showings, deals] = await Promise.all([
+    // org-scope-lint-ok: contactIds derived from the org-scoped contact.findMany above
     prisma.activity.groupBy({
       by: ['contactId'],
       where: { contactId: { in: contactIds }, createdAt: { gte: sevenDaysAgo } },
       _count: true,
     }).catch(() => [] as Array<{ contactId: string | null; _count: number }>),
+    // org-scope-lint-ok: contactIds derived from the org-scoped contact.findMany above
     prisma.activity.groupBy({
       by: ['contactId'],
       where: { contactId: { in: contactIds }, createdAt: { gte: thirtyDaysAgo } },
       _count: true,
     }).catch(() => [] as Array<{ contactId: string | null; _count: number }>),
+    // org-scope-lint-ok: contactIds derived from the org-scoped contact.findMany above
     prisma.activity.groupBy({
       by: ['contactId'],
       where: { contactId: { in: contactIds }, createdAt: { gte: ninetyDaysAgo } },

@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
 
   const where = { userId: scope.userId }
   const [reports, total] = await Promise.all([
+    // org-scope-lint-ok: Report rows are per-user; scoped to the caller's own userId (tighter than org)
     prisma.report.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take: limit }),
     prisma.report.count({ where }),
   ])

@@ -98,6 +98,7 @@ export interface PublicConnection {
 
 export async function listConnectionsForUser(userId: string): Promise<PublicConnection[]> {
   const prisma = getAuthPrisma()
+  // org-scope-lint-ok: CalendarConnection is per-user; scoped to the passed userId (tighter than org)
   const rows = await prisma.calendarConnection.findMany({
     where: { userId },
     orderBy: { createdAt: 'asc' },

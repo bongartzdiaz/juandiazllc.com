@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
   const ownedIds = owned.map((c: any) => c.id)
 
   if (body.action === 'delete') {
+    // org-scope-lint-ok: ownedIds are pre-filtered to scope.organizationId by the owned-query above
     const result = await prisma.contact.deleteMany({
       where: { id: { in: ownedIds } },
     })
@@ -53,6 +54,7 @@ export async function POST(req: NextRequest) {
       if (body.data[key] !== undefined) updateData[key] = body.data[key]
     }
 
+    // org-scope-lint-ok: ownedIds are pre-filtered to scope.organizationId by the owned-query above
     const result = await prisma.contact.updateMany({
       where: { id: { in: ownedIds } },
       data: updateData,
@@ -61,6 +63,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (body.action === 'export') {
+    // org-scope-lint-ok: ownedIds are pre-filtered to scope.organizationId by the owned-query above
     const contacts = await prisma.contact.findMany({
       where: { id: { in: ownedIds } },
       include: { contactProjects: { include: { project: { select: { title: true } } } } },

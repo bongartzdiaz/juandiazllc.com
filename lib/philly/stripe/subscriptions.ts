@@ -137,6 +137,7 @@ export function subscriptionPeriodEnd(sub: Stripe.Subscription): Date | null {
  */
 export async function markCanceled(stripeSubId: string): Promise<void> {
   const prisma = getAuthPrisma()
+  // org-scope-lint-ok: scoped by globally-unique stripeSubId (one Stripe sub = one org); Stripe webhook context, no user scope
   await prisma.subscription.updateMany({
     where: { stripeSubId },
     data: { status: 'canceled', cancelAt: null },
@@ -150,6 +151,7 @@ export async function markCanceled(stripeSubId: string): Promise<void> {
  */
 export async function markPastDue(stripeSubId: string): Promise<void> {
   const prisma = getAuthPrisma()
+  // org-scope-lint-ok: scoped by globally-unique stripeSubId (one Stripe sub = one org); Stripe webhook context, no user scope
   await prisma.subscription.updateMany({
     where: { stripeSubId },
     data: { status: 'past_due' },
@@ -164,6 +166,7 @@ export async function markPastDue(stripeSubId: string): Promise<void> {
  */
 export async function markActive(stripeSubId: string): Promise<void> {
   const prisma = getAuthPrisma()
+  // org-scope-lint-ok: scoped by globally-unique stripeSubId (one Stripe sub = one org); Stripe webhook context, no user scope
   await prisma.subscription.updateMany({
     where: { stripeSubId },
     data: { status: 'active' },
