@@ -12,6 +12,12 @@ name: CI
 # Note: `npm run lint` is intentionally NOT gated — `next lint` was
 # removed in Next.js 16 and the script currently no-ops/errors. Migrate
 # it to the ESLint CLI, then add a lint job here. (Follow-up.)
+#
+# Node 24: package-lock.json is generated with npm 11 (Node 24). `npm ci`
+# on Node 22 (npm 10) rejects the lockfile ("Missing magicast/@swc/helpers
+# from lock file") because the two npm majors compute the tree differently.
+# Pin to 24 so `npm ci` uses the npm that produced the lock. (Vercel uses
+# the lenient `npm install` so its build is unaffected.)
 
 on:
   pull_request:
@@ -33,7 +39,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
       - run: npm ci
       - name: Generate Prisma client
@@ -48,7 +54,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
       - run: npm ci
       - name: Generate Prisma client
