@@ -21,7 +21,10 @@
        }
      }
 
-   Everything is tenant-scoped via getAuthPrisma() → RLS-style org filter.
+   Tenant isolation is enforced per-query (MariaDB, NO row-level security):
+   Contact/Transaction/AuditLog filter on organizationId directly; Deal has no
+   organizationId column and is scoped through its pipeline relation
+   (pipeline.organizationId). Every read below MUST carry one of those filters.
 */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -60,12 +63,12 @@ export async function GET(_req: NextRequest) {
       where: { organizationId: orgId, createdAt: { gte: thirtyDaysAgo } },
     }),
     prisma.deal.aggregate({
-      where: { status: 'open' },
+      where: { status: 'open', pipeline: { organizationId: orgId } },
       _count: { _all: true },
       _sum: { valueCents: true },
     }),
     prisma.deal.aggregate({
-      where: { status: 'won', actualClose: { gte: thirtyDaysAgo } },
+      where: { status: 'won', actualClose: { gte: thirtyDaysAgo }, pipeline: { organizationId: orgId } },
       _count: { _all: true },
       _sum: { valueCents: true },
     }),
@@ -79,6 +82,7 @@ export async function GET(_req: NextRequest) {
       where: {
         status: 'won',
         actualClose: { gte: sixMonthsAgo },
+        pipeline: { organizationId: orgId },
       },
       select: { valueCents: true, actualClose: true },
     }),

@@ -49,12 +49,21 @@ const BULK_OPS = new Set([
 ])
 const SUPPRESS_MARKER = 'org-scope-lint-ok'
 
+// Models with no organizationId column that are nonetheless tenant-scoped
+// through a relation. The correct filter spells out `organizationId` inside
+// the relation (e.g. `where: { pipeline: { organizationId } }`), so the same
+// organizationId presence check covers them — they just need to be in the
+// tracked-accessor set. Adding these closes the blind spot that hid BE-01
+// (dashboard deal aggregates summed across all tenants).
+const RELATION_SCOPED = ['deal', 'pipelineStage']
+
 /** Parse prisma/schema.prisma → Set of tenant-scoped Prisma client accessors.
- *  A model is tenant-scoped when it declares an `organizationId` field.
- *  The client accessor is the model name with a lowercased first char. */
+ *  A model is tenant-scoped when it declares an `organizationId` field (direct)
+ *  or appears in RELATION_SCOPED (scoped through a relation). The client
+ *  accessor is the model name with a lowercased first char. */
 function tenantAccessors() {
   const schema = readFileSync(join(ROOT, 'prisma', 'schema.prisma'), 'utf8')
-  const accessors = new Set()
+  const accessors = new Set(RELATION_SCOPED)
   const modelRe = /^model\s+(\w+)\s*\{([^}]*)\}/gms
   let m
   while ((m = modelRe.exec(schema)) !== null) {

@@ -231,6 +231,7 @@ export async function generateLeadScores(organizationId: string, limit = 500): P
       where: { contactId: { in: contactIds } },
       select: { contactId: true, status: true, feedback: true },
     }).catch(() => [] as Array<{ contactId: string | null; status: string; feedback: string }>),
+    // org-scope-lint-ok: contactIds derived from the org-scoped contact.findMany above
     prisma.deal.findMany({
       where: { contactId: { in: contactIds } },
       select: { contactId: true, status: true },
