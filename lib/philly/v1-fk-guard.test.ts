@@ -1,5 +1,11 @@
 import { describe, it, expect, vi } from 'vitest'
-import { findCrossOrgForeignKey, V1_FK_FIELDS } from './v1-fk-guard'
+import {
+  findCrossOrgForeignKey,
+  findForeignKeyNotInOrg,
+  stageBelongsToPipeline,
+  someUserNotInOrg,
+  V1_FK_FIELDS,
+} from './v1-fk-guard'
 
 /** Fake Prisma: each model's findFirst returns a row only when the where
  *  clause's org matches `ownedOrg` (direct column or nested pipeline). */
@@ -61,9 +67,91 @@ describe('findCrossOrgForeignKey', () => {
     expect(prisma.property.findFirst).not.toHaveBeenCalled()
   })
 
-  it('knows the expected FK fields', () => {
+  it('knows the expected FK fields (incl. projectId added for internal routes)', () => {
     expect(V1_FK_FIELDS).toEqual(
-      expect.arrayContaining(['contactId', 'propertyId', 'roomId', 'agentId', 'dealId', 'stageId']),
+      expect.arrayContaining([
+        'contactId', 'propertyId', 'roomId', 'agentId', 'dealId', 'stageId', 'projectId',
+      ]),
     )
+  })
+})
+
+describe('findForeignKeyNotInOrg (generic, BE-09)', () => {
+  it('returns null when all explicit checks pass', async () => {
+    const prisma = fakePrisma('org-A')
+    const bad = await findForeignKeyNotInOrg(prisma, 'org-A', [
+      { field: 'buyerContactId', model: 'contact', value: 'c1' },
+      { field: 'dealId', model: 'deal', value: 'd1' },
+    ])
+    expect(bad).toBeNull()
+  })
+
+  it('flags the first cross-org field using its request-specific name', async () => {
+    const prisma = fakePrisma('org-A')
+    const bad = await findForeignKeyNotInOrg(prisma, 'org-B', [
+      { field: 'sellerAgentId', model: 'user', value: 'u1' },
+    ])
+    expect(bad).toBe('sellerAgentId')
+  })
+
+  it('skips empty/null values', async () => {
+    const prisma = fakePrisma('org-A')
+    const bad = await findForeignKeyNotInOrg(prisma, 'org-B', [
+      { field: 'dealId', model: 'deal', value: null },
+      { field: 'propertyId', model: 'property', value: '' },
+    ])
+    expect(bad).toBeNull()
+  })
+})
+
+describe('stageBelongsToPipeline (BE-02)', () => {
+  function pipelineStageFake(pipelineId: string) {
+    return {
+      pipelineStage: {
+        findFirst: vi.fn(async (args: { where: Record<string, unknown> }) =>
+          args.where.pipelineId === pipelineId ? { id: args.where.id } : null,
+        ),
+      },
+    }
+  }
+  it('true when the stage is in the pipeline', async () => {
+    expect(await stageBelongsToPipeline(pipelineStageFake('p1'), 's1', 'p1')).toBe(true)
+  })
+  it('false when the stage is in another pipeline', async () => {
+    expect(await stageBelongsToPipeline(pipelineStageFake('p1'), 's1', 'p2')).toBe(false)
+  })
+  it('false for an empty/null stage id', async () => {
+    expect(await stageBelongsToPipeline(pipelineStageFake('p1'), '', 'p1')).toBe(false)
+    expect(await stageBelongsToPipeline(pipelineStageFake('p1'), null, 'p1')).toBe(false)
+  })
+})
+
+describe('someUserNotInOrg (BE-09 calendar attendees)', () => {
+  function userCountFake(orgUsers: string[]) {
+    return {
+      user: {
+        count: vi.fn(async (args: { where: { id: { in: string[] }; organizationId: string } }) =>
+          args.where.id.in.filter((id) => orgUsers.includes(id)).length,
+        ),
+      },
+    }
+  }
+  it('false when every attendee is in the org', async () => {
+    expect(await someUserNotInOrg(userCountFake(['u1', 'u2']), 'org-A', ['u1', 'u2'])).toBe(false)
+  })
+  it('true when an attendee is from another org', async () => {
+    expect(await someUserNotInOrg(userCountFake(['u1']), 'org-A', ['u1', 'u2'])).toBe(true)
+  })
+  it('false for an empty attendee list (no query)', async () => {
+    const fake = userCountFake([])
+    expect(await someUserNotInOrg(fake, 'org-A', [])).toBe(false)
+    expect(fake.user.count).not.toHaveBeenCalled()
+  })
+  it('dedupes ids before counting', async () => {
+    const fake = userCountFake(['u1'])
+    expect(await someUserNotInOrg(fake, 'org-A', ['u1', 'u1'])).toBe(false)
+    expect(fake.user.count).toHaveBeenCalledWith({
+      where: { id: { in: ['u1'] }, organizationId: 'org-A' },
+    })
   })
 })

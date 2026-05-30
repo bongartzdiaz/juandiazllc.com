@@ -51,9 +51,16 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
   const prisma = getAuthPrisma()
   const pipeline = await prisma.pipeline.findFirst({
     where: { id: pipelineId, organizationId: scope.organizationId },
-    select: { id: true },
+    select: { id: true, stages: { select: { id: true } } },
   })
   if (!pipeline) return jsonError('Pipeline not found', 404)
+
+  // BE-03: only stages that belong to THIS pipeline may be reordered. Without
+  // this, a manager could pass stage ids from another pipeline/tenant and
+  // rewrite their positions (cross-tenant write via the reorder endpoint).
+  const ownStageIds = new Set(pipeline.stages.map((s: { id: string }) => s.id))
+  const foreign = body.stages.find(s => !ownStageIds.has(s.id))
+  if (foreign) return jsonError('stages must all belong to this pipeline', 400)
 
   await prisma.$transaction(
     body.stages.map(s =>
