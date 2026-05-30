@@ -194,8 +194,8 @@ most are bounded, mechanical fixes on an otherwise sound foundation.
 
 | ID | Sev | Finding |
 |---|---|---|
-| FE-01 | High | Fetch errors swallowed as empty (94 sites); only 2/73 pages show an error state |
-| FE-02 | High | Flagship pages render fabricated `DEMO_*` on empty/failed fetch; dashboard is all mock |
+| FE-01 | High | Fetch errors swallowed as empty (94 sites); only 2/73 pages show an error state — **PARTIAL 2026-05-30**: contacts + projects now show ApiErrorBanner + loading/empty states; remaining ~35 list pages pending |
+| FE-02 | High | Flagship pages render fabricated `DEMO_*` on empty/failed fetch; dashboard is all mock — **FIXED 2026-05-30** on contacts + projects (demo fallback removed); kanban already discloses ("Preview mode" banner); dashboard all-mock still pending (needs `/api/dashboard/summary` wiring) |
 | FE-03 | Med | 37 pages hand-roll useEffect+fetch instead of SWR `useApi` (~12% migrated) |
 | FE-04 | Med | Pervasive inline styles, no shared style layer |
 | FE-05 | Med | 14 inline modal re-implementations bypass the accessible `Modal` |
