@@ -43,11 +43,14 @@ gated by four systemic issues, in priority order:
    real empty/erroring tenant, and validation/audit-diff coverage is uneven on
    the backend.
 
-Severity tally (≈55 findings): **Critical 3** (BE-01 fixed → 2 open: both
-A11Y contrast), **High 15**, **Medium 22**, **Low 13**, **Info 2**.
+Severity tally (≈55 findings): **Critical 3 — all FIXED 2026-05-30** (BE-01
+dashboard org-scope; A11Y-01/02 contrast), **High 15** (3 fixed: BE-02/03/09),
+**Medium 22** (1 fixed: BE-09 family), **Low 13**, **Info 2**.
 
-Verdict: **not enterprise-ready** until the Critical + High items in the
-roadmap (§N) are closed. None of the remaining items is a multi-week rewrite;
+Verdict: with the P0 batch closed, no Critical issues remain. Still **not
+enterprise-ready** until the remaining High items in the roadmap (§N) are
+closed (LOC-01/02 DE/ES + English-only pages, A11Y-03..10 semantics, FE-01/02
+error/demo states, BE-05 validation coverage). None of the remaining items is a multi-week rewrite;
 most are bounded, mechanical fixes on an otherwise sound foundation.
 
 ---
@@ -207,14 +210,14 @@ most are bounded, mechanical fixes on an otherwise sound foundation.
 | ID | Sev | Finding | Status |
 |---|---|---|---|
 | BE-01 | **Critical** | Dashboard deal aggregates omitted org filter → cross-tenant numbers | **FIXED 2026-05-30** |
-| BE-02 | High | Deal stage transition never validates stage∈pipeline/org | open |
-| BE-03 | High | Pipeline-stage reorder updates arbitrary stage IDs w/o ownership check | open |
+| BE-02 | High | Deal stage transition never validates stage∈pipeline/org | **FIXED 2026-05-30** |
+| BE-03 | High | Pipeline-stage reorder updates arbitrary stage IDs w/o ownership check | **FIXED 2026-05-30** |
 | BE-04 | Med | Won/Lost capture no reason, no required `actualClose` → silent revenue drop | open |
 | BE-05 | High | ~74 mutation routes use raw JSON + ad-hoc checks vs ~29 Zod | open |
 | BE-06 | Med | v1 API skips Zod + writes no audit row | open |
 | BE-07 | Med | Inconsistent response envelopes across the API | open |
 | BE-08 | Med | PATCH routes log audit rows with empty change diffs | open |
-| BE-09 | Med | Internal create routes lack the cross-org FK guard the v1 API has | open |
+| BE-09 | Med | Internal create routes lack the cross-org FK guard the v1 API has | **FIXED 2026-05-30** |
 | BE-10 | Med | Report HTML built by string-concat (stored-XSS) + unawaited generation | open |
 | BE-11 | Med | Inbound webhook: no idempotency, no signature verification | open |
 | BE-12 | Low | Bulk update/delete: unvalidated enums, empty `updateMany`, N+1 audit, no tx | open |
@@ -250,12 +253,11 @@ most are bounded, mechanical fixes on an otherwise sound foundation.
 
 ## N. Prioritized roadmap
 
-**P0 — Critical (this week)**
-1. ~~BE-01 dashboard deal org-scope~~ ✅ done 2026-05-30.
-2. A11Y-01 + A11Y-02: define per-theme `--accent-fg` and darken `--txt3` to ≥4.5:1.
-3. BE-02 + BE-03 + BE-09: apply `findCrossOrgForeignKey`/stage-ownership checks
-   to internal create/update + stage reorder (close the remaining tenant-write
-   gaps the lint can't see at the FK level).
+**P0 — Critical (this week) — ALL DONE 2026-05-30**
+1. ~~BE-01 dashboard deal org-scope~~ ✅
+2. ~~A11Y-01 + A11Y-02: per-theme `--accent-fg` + darken `--txt3` to ≥4.5:1~~ ✅
+3. ~~BE-02 + BE-03 + BE-09: stage-ownership + cross-org FK checks on internal
+   create/update + stage reorder~~ ✅ (reusable guard in `lib/philly/v1-fk-guard.ts`)
 
 **P1 — High (this sprint)**
 4. LOC-01: 4-locale keyboard-accessible language picker; widen `useLocale`.
