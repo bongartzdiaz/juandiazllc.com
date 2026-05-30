@@ -8,6 +8,7 @@ import {
 import { validateBody } from "@/lib/philly/validation";
 import { updateOutreachMessageSchema } from "@/lib/philly/validation/schemas";
 import { enforceRateLimit, PRESET_MUTATION } from "@/lib/philly/rate-limit";
+import { denyIfNotOutreachOperator } from "@/lib/philly/outreach-guard";
 import { logger } from "@/lib/philly/logger";
 
 interface MessageLeadEnrichment {
@@ -33,6 +34,8 @@ export const runtime = "nodejs";
 export async function GET(req: NextRequest) {
   const scope = await requireScope();
   if (scope instanceof NextResponse) return scope;
+  const denied = await denyIfNotOutreachOperator(scope);
+  if (denied) return denied;
 
   const db = liClient();
   const url = new URL(req.url);
@@ -105,6 +108,8 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const scope = await requireRole(["admin", "manager"]);
   if (scope instanceof NextResponse) return scope;
+  const denied = await denyIfNotOutreachOperator(scope);
+  if (denied) return denied;
 
   const limited = enforceRateLimit(`outreach:messages:${scope.userId}`, PRESET_MUTATION);
   if (limited) return limited;

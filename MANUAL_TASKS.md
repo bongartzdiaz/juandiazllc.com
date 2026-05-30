@@ -3,6 +3,25 @@
 Every item here is a one-time human action that unblocks code that's
 already shipped. Strike through (`~~...~~`) when done.
 
+## Outreach operator allowlist — REQUIRED before onboarding customer #2 (A-13, 2026-05-30)
+
+The `li.*` LinkedIn-outreach surface (`/philly/outreach/*` + `/api/outreach/*`)
+is single-tenant — it holds the operator's own outreach pipeline and has no
+`organization_id` column, so it cannot be org-scoped. A new guard
+(`lib/philly/outreach-guard.ts`) protects it:
+
+- **Today (single org):** nothing to do. With one organization in the DB the
+  guard allows access — there is no other tenant to leak to.
+- **Before a SECOND organization exists:** set the Vercel env var
+  `OUTREACH_OPERATOR_ORG_IDS` to the operator org id(s) (comma-separated).
+  Only those orgs may then reach the outreach surface; every other org gets a
+  404. If you skip this, the guard fails safe — once a 2nd org exists with no
+  allowlist configured it denies the outreach surface to everyone (and logs a
+  warning) rather than leak the operator's data.
+
+- [ ] (at customer #2) Set `OUTREACH_OPERATOR_ORG_IDS=<operator-org-id>` in
+      Vercel (production + preview).
+
 ## Repo strategy — DEUS-SHARED is now primary for CRM (2026-05-07)
 
 Decision: future CRM (DEUS) work moves to `bongartzdiaz/DEUS-SHARED`.
