@@ -38,6 +38,9 @@ const MIN_PURGE_AFTER_DAYS = 7 // sanity floor — never purge < 7d
 export interface HardPurgeResult {
   /** Number of users fully anonymized in this run. */
   purged: number
+  /** Number of calendar connections erased across all purged users (A-08).
+   *  Each cascades to its CalendarChannel + SyncedCalendarEvent rows. */
+  calendarConnectionsErased: number
   /** Cutoff timestamp — all soft-deletes older than this were processed. */
   cutoff: string
   /** Days threshold actually applied. */
@@ -81,11 +84,12 @@ export async function purgeStaleSoftDeletedUsers(opts: {
   })
 
   if (candidates.length === 0) {
-    return { purged: 0, cutoff: cutoff.toISOString(), days }
+    return { purged: 0, calendarConnectionsErased: 0, cutoff: cutoff.toISOString(), days }
   }
 
   const now = new Date()
   let purged = 0
+  let calendarConnectionsErased = 0
   for (const user of candidates) {
     try {
       await prisma.user.update({
@@ -120,6 +124,20 @@ export async function purgeStaleSoftDeletedUsers(opts: {
       await prisma.account.deleteMany({
         where: { userId: user.id },
       })
+      // Erase calendar data (A-08, GDPR Art. 17). The user row is
+      // tombstoned (not physically deleted), so the onDelete:Cascade from
+      // User -> CalendarConnection never fires and the user's encrypted
+      // OAuth tokens + synced meeting metadata would otherwise survive
+      // erasure indefinitely. Delete the connection explicitly: that
+      // cascades to its CalendarChannel (auth secrets) and
+      // SyncedCalendarEvent (title/location/matchedEmails) rows.
+      // (Provider-side push-unsubscribe + OAuth token revoke is a
+      // best-effort follow-up — the channel is deleted here and expires
+      // upstream within its TTL; we no longer hold the token.)
+      const delConns = await prisma.calendarConnection.deleteMany({
+        where: { userId: user.id },
+      })
+      calendarConnectionsErased += delConns.count
       purged++
     } catch (err) {
       // Log and continue — single bad row shouldn't tank the batch
@@ -133,10 +151,11 @@ export async function purgeStaleSoftDeletedUsers(opts: {
 
   logger.info('hard-purge: completed', {
     purged,
+    calendarConnectionsErased,
     cutoff: cutoff.toISOString(),
     days,
     organizationId: opts.organizationId ?? 'all',
   })
 
-  return { purged, cutoff: cutoff.toISOString(), days }
+  return { purged, calendarConnectionsErased, cutoff: cutoff.toISOString(), days }
 }
