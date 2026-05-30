@@ -11,6 +11,7 @@ import type { ProjectFormData } from '@/components/philly/forms/ProjectForm'
 import { Search, Grid3X3, List } from 'lucide-react'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useApi } from '@/hooks/philly/useApi'
+import { ApiErrorBanner } from '@/components/philly/ui/ApiErrorBanner'
 import { useToast } from '@/hooks/philly/useToast'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useUrlState } from '@/hooks/philly/useUrlState'
@@ -76,14 +77,6 @@ function mapApiProject(p: ApiProject): UiProject {
   }
 }
 
-const DEMO_PROJECTS = [
-  { id: '1', title: 'Urban Reforestation Amsterdam', status: 'active', category: 'Environment', budget: 120000, spent: 86400, startDate: '2025-09-01', sdgs: [11, 13, 15], milestones: 8, completedMilestones: 6, contacts: 5 },
-  { id: '2', title: 'Clean Water Access Kenya', status: 'active', category: 'Water & Sanitation', budget: 250000, spent: 112500, startDate: '2025-11-15', sdgs: [6, 3], milestones: 12, completedMilestones: 5, contacts: 8 },
-  { id: '3', title: 'Tech Education for Youth', status: 'active', category: 'Education', budget: 80000, spent: 70400, startDate: '2025-06-01', sdgs: [4, 8, 10], milestones: 10, completedMilestones: 9, contacts: 12 },
-  { id: '4', title: 'Renewable Energy Transition', status: 'planned', category: 'Energy', budget: 500000, spent: 75000, startDate: '2026-04-01', sdgs: [7, 13], milestones: 15, completedMilestones: 2, contacts: 3 },
-  { id: '5', title: 'Food Bank Partnership', status: 'completed', category: 'Hunger', budget: 45000, spent: 43200, startDate: '2025-03-01', sdgs: [1, 2], milestones: 6, completedMilestones: 6, contacts: 4 },
-  { id: '6', title: 'Ocean Plastic Cleanup', status: 'active', category: 'Environment', budget: 180000, spent: 54000, startDate: '2026-01-15', sdgs: [14, 13], milestones: 10, completedMilestones: 3, contacts: 6 },
-]
 
 const RE_PROJECTS = [
   { id: '1', title: 'Penthouse Suite — Zuidas', status: 'active', category: 'Residential', budget: 1250000, spent: 0, startDate: '2026-01-15', sdgs: [] as number[], milestones: 4, completedMilestones: 2, contacts: 3 },
@@ -126,6 +119,7 @@ const statusColors: Record<string, { bg: string; txt: string; border: string }> 
 export default function ProjectsPage() {
   const { industry } = useIndustry()
   const t = useTranslations('projects')
+  const tCommon = useTranslations('common')
   const { addToast } = useToast()
   const [filters, setFilters] = useUrlState({ q: '', status: 'all', view: 'grid' })
   const search = filters.q
@@ -180,13 +174,14 @@ export default function ProjectsPage() {
     }
   }
 
+  // FE-02: live vertical shows REAL projects only (no demo fallback). RE/HOS
+  // are explicit showcase verticals and keep their curated demo sets.
   const projects: UiProject[] = isHOS
     ? HOS_PROJECTS
     : isRE
     ? RE_PROJECTS
-    : liveProjects.length > 0
-    ? liveProjects
-    : DEMO_PROJECTS
+    : liveProjects
+  const showLiveStates = !isRE && !isHOS
   const statusOptions = isHOS
     ? ['all', 'active', 'maintenance', 'reserved']
     : isRE
@@ -240,9 +235,9 @@ export default function ProjectsPage() {
           ) : (
             <>
               <KpiCard label="Total Projects" value={projects.length} icon="folder" accentColor="var(--accent)" delay={80} />
-              <KpiCard label="Active" value={activeCount} delta={`${Math.round((activeCount / projects.length) * 100)}% of total`} deltaDir="up" icon="zap" accentColor="var(--g)" delay={130} />
+              <KpiCard label="Active" value={activeCount} delta={`${projects.length ? Math.round((activeCount / projects.length) * 100) : 0}% of total`} deltaDir="up" icon="zap" accentColor="var(--g)" delay={130} />
               <KpiCard label="Total Budget" value={`€${(totalBudget / 1000).toFixed(0)}K`} icon="dollar-sign" accentColor="var(--accent)" delay={180} />
-              <KpiCard label="Budget Used" value={`${Math.round((totalSpent / totalBudget) * 100)}%`} delta={`€${(totalSpent / 1000).toFixed(0)}K spent`} deltaDir="neu" icon="chart" accentColor="var(--y)" delay={230} />
+              <KpiCard label="Budget Used" value={`${totalBudget ? Math.round((totalSpent / totalBudget) * 100) : 0}%`} delta={`€${(totalSpent / 1000).toFixed(0)}K spent`} deltaDir="neu" icon="chart" accentColor="var(--y)" delay={230} />
             </>
           )}
         </div>
@@ -301,6 +296,14 @@ export default function ProjectsPage() {
             }}><List size={14} /></button>
           </div>
         </div>
+
+        {/* FE-01/FE-10: real error + distinct loading/empty states (live only) */}
+        {showLiveStates && apiQuery.error && <ApiErrorBanner errors={[apiQuery.error]} />}
+        {showLiveStates && apiQuery.loading && filtered.length === 0 ? (
+          <div style={{ padding: 48, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{tCommon('loading')}</div>
+        ) : filtered.length === 0 ? (
+          <div style={{ padding: 48, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{tCommon('noResults')}</div>
+        ) : null}
 
         {/* Projects Grid/List */}
         {view === 'grid' ? (

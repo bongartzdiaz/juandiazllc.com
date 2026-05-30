@@ -11,6 +11,7 @@ import type { ContactFormData } from '@/components/philly/forms/ContactForm'
 import { Search, Mail, Phone, FolderKanban, Upload } from 'lucide-react'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useApi } from '@/hooks/philly/useApi'
+import { ApiErrorBanner } from '@/components/philly/ui/ApiErrorBanner'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useUrlState } from '@/hooks/philly/useUrlState'
@@ -57,19 +58,6 @@ function mapApiContact(c: ApiContact): Contact {
     projects: c._count?.contactProjects ?? 0,
   }
 }
-
-const DEMO_CONTACTS: Contact[] = [
-  { id: '1', firstName: 'Sarah', lastName: 'Chen', company: 'GreenFuture Foundation', type: 'partner', email: 's.chen@greenfuture.org', phone: '+31 6 1234 5678', projects: 3 },
-  { id: '2', firstName: 'Marcus', lastName: 'Williams', company: 'EcoVentures Capital', type: 'donor', email: 'm.williams@ecoventures.com', phone: '+31 6 2345 6789', projects: 2 },
-  { id: '3', firstName: 'Aisha', lastName: 'Patel', company: 'City of Amsterdam', type: 'stakeholder', email: 'a.patel@amsterdam.nl', phone: '+31 20 555 0101', projects: 4 },
-  { id: '4', firstName: 'James', lastName: 'O\'Brien', company: 'CleanOcean Initiative', type: 'partner', email: 'j.obrien@cleanocean.org', phone: '+44 7700 900123', projects: 1 },
-  { id: '5', firstName: 'Fatima', lastName: 'Al-Rashid', company: 'Water for Life Trust', type: 'beneficiary', email: 'f.alrashid@waterforlife.org', phone: '+254 700 123456', projects: 2 },
-  { id: '6', firstName: 'Erik', lastName: 'Johansson', company: 'Nordic Impact Fund', type: 'donor', email: 'e.johansson@nordicimpact.se', phone: '+46 70 123 4567', projects: 5 },
-  { id: '7', firstName: 'Priya', lastName: 'Sharma', company: 'TechBridge Education', type: 'partner', email: 'p.sharma@techbridge.edu', phone: '+91 98765 43210', projects: 3 },
-  { id: '8', firstName: 'David', lastName: 'Muller', company: 'EU Climate Commission', type: 'stakeholder', email: 'd.muller@ec.europa.eu', phone: '+32 2 299 1111', projects: 2 },
-  { id: '9', firstName: 'Lina', lastName: 'Torres', company: 'SolarAid International', type: 'beneficiary', email: 'l.torres@solaraid.org', phone: '+34 612 345 678', projects: 1 },
-  { id: '10', firstName: 'Robert', lastName: 'Kim', company: 'Pacific Green Alliance', type: 'donor', email: 'r.kim@pacificgreen.org', phone: '+1 415 555 0199', projects: 4 },
-]
 
 const RE_CONTACTS: Contact[] = [
   { id: '1', firstName: 'Willem', lastName: 'de Vries', company: 'De Vries Family Office', type: 'buyer', email: 'w.devries@devries-fo.nl', phone: '+31 6 1122 3344', projects: 2 },
@@ -132,6 +120,7 @@ const avatarColors: Record<string, string> = {
 export default function ContactsPage() {
   const { industry } = useIndustry()
   const t = useTranslations('contacts')
+  const tCommon = useTranslations('common')
   const [filters, setFilters] = useUrlState({ q: '', type: 'all' })
   const search = filters.q
   const typeFilter = filters.type
@@ -156,13 +145,15 @@ export default function ContactsPage() {
     return rows.map(mapApiContact)
   }, [apiQuery.data, isRE, isHOS])
 
+  // FE-02: the default (live) vertical shows REAL data only — never demo
+  // fallback. RE/HOS are explicit showcase verticals and keep their curated
+  // demo sets. An empty/erroring live tenant gets a real empty/error state below.
   const contacts: Contact[] = isHOS
     ? HOS_CONTACTS
     : isRE
     ? RE_CONTACTS
-    : liveContacts.length > 0
-    ? liveContacts
-    : DEMO_CONTACTS
+    : liveContacts
+  const showLiveStates = !isRE && !isHOS
   const filterOptions = isHOS
     ? ['all', 'guest', 'vendor', 'partner', 'staff']
     : isRE
@@ -285,6 +276,15 @@ export default function ContactsPage() {
             Import
           </Link>
         </div>
+
+        {/* FE-01: surface a real fetch error instead of silently showing an
+            empty list. FE-10: distinct loading / empty / data states. */}
+        {showLiveStates && apiQuery.error && <ApiErrorBanner errors={[apiQuery.error]} />}
+        {showLiveStates && apiQuery.loading && filtered.length === 0 ? (
+          <div style={{ padding: 48, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{tCommon('loading')}</div>
+        ) : filtered.length === 0 ? (
+          <div style={{ padding: 48, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{tCommon('noResults')}</div>
+        ) : null}
 
         {/* Contact cards grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
