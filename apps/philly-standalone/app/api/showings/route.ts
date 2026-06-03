@@ -2,15 +2,27 @@
    POST /api/showings — schedule a showing */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireSection, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  propertyId: z.string().trim().min(1, 'propertyId is required').max(120),
+  date: z.string().min(1, 'date is required'),
+  agentId: z.string().max(120).optional(),
+  contactId: z.string().max(120).optional(),
+  duration: z.number().optional(),
+  status: z.string().max(60).optional(),
+  notes: z.string().max(10000).optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireSection('showings')
@@ -56,11 +68,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`showings.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-
-  if (!body.propertyId) return jsonError('propertyId is required', 400)
-  if (!body.date) return jsonError('date is required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const prop = await prisma.property.findFirst({

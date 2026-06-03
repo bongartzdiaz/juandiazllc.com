@@ -2,14 +2,26 @@
    POST /api/documents — upload document metadata */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireSection, jsonError } from '@/lib/philly/auth-helpers'
+import { requireSection } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  name: z.string().trim().min(1, 'name is required').max(255),
+  url: z.string().trim().min(1, 'url is required').max(2_000),
+  type: z.string().trim().max(40).optional(),
+  mimeType: z.string().trim().max(120).optional(),
+  sizeBytes: z.coerce.number().int().min(0).optional(),
+  entityType: z.string().trim().max(40).optional(),
+  entityId: z.string().trim().max(80).optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireSection('documents')
@@ -42,24 +54,18 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`documents.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: {
-    name?: string; type?: string; mimeType?: string; sizeBytes?: number
-    url?: string; entityType?: string; entityId?: string
-  }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-
-  if (!body.name?.trim()) return jsonError('name is required', 400)
-  if (!body.url?.trim()) return jsonError('url is required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const doc = await prisma.document.create({
     data: {
       organizationId: scope.organizationId,
-      name: body.name.trim(),
+      name: body.name,
       type: body.type ?? 'file',
       mimeType: body.mimeType ?? '',
       sizeBytes: body.sizeBytes ?? 0,
-      url: body.url.trim(),
+      url: body.url,
       entityType: body.entityType ?? null,
       entityId: body.entityId ?? null,
       uploadedBy: scope.userId,

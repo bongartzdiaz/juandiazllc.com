@@ -6,13 +6,21 @@
    that used to live in this file was replaced 2026-05-27. */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { cookies } from 'next/headers'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
+import { requireScope } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import { generateReport as buildReportHtml, REPORT_TYPES, type ReportType } from '@/lib/philly/reports/generator'
 import { getReportStrings, getReportShellStrings } from '@/lib/philly/reports/strings'
+import { parseBody } from '@/lib/philly/api/validate'
+
+const createSchema = z.object({
+  title: z.string().trim().min(1, 'title is required').max(255),
+  type: z.enum(REPORT_TYPES as readonly [string, ...string[]]),
+  configJson: z.string().max(20000).optional(),
+})
 
 /** Supported UI locales (mirrors i18n/request.ts). The `pai-locale`
  *  cookie holds a bare 2-letter code; unknown values fall back to 'en'. */
@@ -57,16 +65,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`reports.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: { title?: string; type?: string; configJson?: string }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-
-  if (!body.title?.trim()) return jsonError('title is required', 400)
-  if (!body.type) return jsonError('type is required', 400)
-  // Validate against the closed set of report types — protects against
-  // typos in stale UI clients + means the generator dispatch is total.
-  if (!REPORT_TYPES.includes(body.type as ReportType)) {
-    return jsonError(`Unknown report type: ${body.type}`, 400)
-  }
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
 
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
     data: {
       userId: scope.userId,
       organizationId: scope.organizationId,
-      title: body.title.trim(),
+      title: body.title,
       type: body.type,
       configJson: body.configJson ?? '{}',
       status: 'generating',
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
   const locale = await resolveLocale()
 
   // Generate report content asynchronously
-  void generateAndPersist(report.id, scope.organizationId, body.type as ReportType, body.title.trim(), locale)
+  void generateAndPersist(report.id, scope.organizationId, body.type as ReportType, body.title, locale)
 
   return NextResponse.json({ data: report }, { status: 201 })
 }

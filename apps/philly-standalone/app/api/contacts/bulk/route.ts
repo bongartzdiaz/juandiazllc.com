@@ -2,14 +2,25 @@
    Body: { action: 'delete' | 'update' | 'export', ids: string[], data?: {} } */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import { decryptPii } from '@/lib/philly/pii'
+import { parseBody } from '@/lib/philly/api/validate'
+import { idSchema } from '@/lib/philly/api/schemas'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const bulkSchema = z.object({
+  action: z.enum(['delete', 'update', 'export']),
+  ids: z.array(idSchema).min(1, 'ids must be a non-empty array').max(200, 'Maximum 200 items per bulk operation'),
+  // Only `type` and `company` are applied (allow-list enforced below); keep
+  // the schema permissive on shape but bounded so we never accept a huge blob.
+  data: z.record(z.string(), z.unknown()).optional(),
+})
 
 export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin', 'manager'])
@@ -18,12 +29,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`contacts:bulk:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: { action?: string; ids?: string[]; data?: Record<string, unknown> }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-
-  if (!body.action) return jsonError('action is required', 400)
-  if (!Array.isArray(body.ids) || body.ids.length === 0) return jsonError('ids must be a non-empty array', 400)
-  if (body.ids.length > 200) return jsonError('Maximum 200 items per bulk operation', 400)
+  const body = await parseBody(req, bulkSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
 

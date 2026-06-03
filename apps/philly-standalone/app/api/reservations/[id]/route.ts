@@ -1,16 +1,30 @@
 /* GET/PATCH/DELETE /api/reservations/[id] */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 type RouteCtx = { params: Promise<{ id: string }> }
+
+const updateSchema = z.object({
+  guestName: z.string().trim().max(120).optional(),
+  guestEmail: z.string().trim().max(255).optional(),
+  guestPhone: z.string().trim().max(60).optional(),
+  status: z.string().trim().max(60).optional(),
+  totalCents: z.coerce.number().optional(),
+  notes: z.string().trim().max(10_000).optional(),
+  roomId: z.string().trim().max(80).optional(),
+  checkIn: z.string().optional(),
+  checkOut: z.string().optional(),
+})
 
 export async function GET(_req: NextRequest, ctx: RouteCtx) {
   const scope = await requireScope()
@@ -34,8 +48,8 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
   const { id } = await ctx.params
 
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, updateSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.reservation.findFirst({

@@ -8,9 +8,17 @@ import { logAudit, diffChanges } from '@/lib/philly/audit'
 import { publishEntityUpdated } from '@/lib/philly/realtime/publish'
 import { serverError } from '@/lib/philly/safe-error'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const patchSchema = z.object({
+  name: z.string().max(255).optional(),
+  industry: z.string().optional(),
+  logoUrl: z.string().max(2000).optional(),
+}).passthrough()
 
 const ORG_SELECT = {
   id: true,
@@ -46,8 +54,8 @@ export async function PATCH(req: NextRequest) {
   const limited = enforceRateLimit(`organization.update:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const data: Record<string, unknown> = {}
   if (typeof body.name === 'string' && body.name.trim()) data.name = body.name.trim()

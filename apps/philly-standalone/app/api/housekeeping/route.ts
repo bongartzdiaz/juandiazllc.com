@@ -7,15 +7,26 @@
    organizationId column. */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  roomId: z.string().trim().min(1, 'roomId is required').max(80),
+  type: z.string().trim().max(60).optional(),
+  status: z.string().trim().max(60).optional(),
+  priority: z.string().trim().max(60).optional(),
+  assignedTo: z.string().trim().max(120).nullable().optional(),
+  notes: z.string().trim().max(10_000).optional(),
+})
 
 const ALLOWED_TYPES = new Set(['cleaning', 'inspection', 'maintenance', 'turnover'])
 const ALLOWED_STATUSES = new Set(['pending', 'in_progress', 'completed'])
@@ -61,13 +72,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`housekeeping:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: {
-    roomId?: string; type?: string; status?: string;
-    priority?: string; assignedTo?: string | null; notes?: string;
-  }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-
-  if (!body.roomId) return jsonError('roomId is required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const room = await prisma.room.findFirst({

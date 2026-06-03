@@ -2,13 +2,24 @@
    POST /api/pipelines — create pipeline (admin only) */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
+import { requireScope, requireRole } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  name: z.string().trim().min(1, 'name is required').max(120),
+  industry: z.string().trim().max(60).optional(),
+  stages: z
+    .array(z.object({ name: z.string().trim().min(1).max(60), color: z.string().max(20).optional() }))
+    .max(40)
+    .optional(),
+})
 
 export async function GET() {
   const scope = await requireScope()
@@ -34,15 +45,14 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`pipelines.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: { name?: string; industry?: string; stages?: { name: string; color?: string }[] }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.name?.trim()) return jsonError('name is required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const pipeline = await prisma.pipeline.create({
     data: {
       organizationId: scope.organizationId,
-      name: body.name.trim(),
+      name: body.name,
       industry: body.industry ?? 'general',
       stages: {
         create: (body.stages ?? [{ name: 'New' }, { name: 'In Progress' }, { name: 'Closed' }]).map((s, i) => ({

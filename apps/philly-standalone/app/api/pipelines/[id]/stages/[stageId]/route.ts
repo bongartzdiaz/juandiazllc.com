@@ -1,13 +1,21 @@
 /* PATCH/DELETE /api/pipelines/[id]/stages/[stageId] */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const patchSchema = z.object({
+  name: z.string().trim().min(1, 'name cannot be empty').max(60).optional(),
+  color: z.string().max(20).optional(),
+  position: z.coerce.number().int().optional(),
+})
 
 type Ctx = { params: Promise<{ id: string; stageId: string }> }
 
@@ -19,8 +27,8 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (limited) return limited
 
   const { id: pipelineId, stageId } = await ctx.params
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.pipelineStage.findFirst({
@@ -30,11 +38,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (!existing) return jsonError('Stage not found', 404)
 
   const data: Record<string, unknown> = {}
-  if (body.name !== undefined) {
-    const n = String(body.name).trim()
-    if (!n) return jsonError('name cannot be empty', 400)
-    data.name = n
-  }
+  if (body.name !== undefined) data.name = body.name
   if (body.color !== undefined) data.color = body.color
   if (body.position !== undefined) data.position = body.position
 

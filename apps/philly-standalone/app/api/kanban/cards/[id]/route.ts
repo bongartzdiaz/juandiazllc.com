@@ -7,11 +7,24 @@ import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit, diffChanges } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 type RouteCtx = { params: Promise<{ id: string }> }
+
+const patchSchema = z.object({
+  columnId: z.string().optional(),
+  title: z.string().trim().max(255).optional(),
+  description: z.string().max(20000).optional(),
+  priority: z.string().max(40).optional(),
+  dueDate: z.union([z.string(), z.null()]).optional(),
+  assigneeId: z.union([z.string(), z.null()]).optional(),
+  projectId: z.union([z.string(), z.null()]).optional(),
+  position: z.coerce.number().optional(),
+})
 
 export async function PATCH(req: NextRequest, ctx: RouteCtx) {
   const scope = await requireRole(['admin', 'manager'])
@@ -22,23 +35,8 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
   const { id } = await ctx.params
 
-  let body: unknown
-  try {
-    body = await req.json()
-  } catch {
-    return jsonError('Invalid JSON body', 400)
-  }
-
-  const input = body as Partial<{
-    columnId: string
-    title: string
-    description: string
-    priority: string
-    dueDate: string | null
-    assigneeId: string | null
-    projectId: string | null
-    position: number
-  }>
+  const input = await parseBody(req, patchSchema)
+  if (input instanceof NextResponse) return input
 
   const prisma = getAuthPrisma()
 
@@ -65,7 +63,7 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
   const data: Record<string, unknown> = {}
   if (input.columnId !== undefined) data.columnId = input.columnId
-  if (input.title !== undefined) data.title = input.title.trim()
+  if (input.title !== undefined) data.title = input.title
   if (input.description !== undefined) data.description = input.description
   if (input.priority !== undefined) data.priority = input.priority
   if (input.assigneeId !== undefined) data.assigneeId = input.assigneeId

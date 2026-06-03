@@ -1,14 +1,24 @@
 /* GET/PATCH/DELETE /api/documents/[id] */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireSection, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const patchSchema = z.object({
+  name: z.string().trim().min(1).max(255).optional(),
+  type: z.string().trim().max(40).optional(),
+  mimeType: z.string().trim().max(120).optional(),
+  entityType: z.string().trim().max(40).optional(),
+  entityId: z.string().trim().max(80).optional(),
+})
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -32,8 +42,8 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (limited) return limited
 
   const { id } = await ctx.params
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.document.findFirst({

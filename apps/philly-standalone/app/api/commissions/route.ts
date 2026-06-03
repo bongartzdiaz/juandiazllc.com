@@ -2,15 +2,27 @@
    POST /api/commissions — create commission record */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireSection, jsonError } from '@/lib/philly/auth-helpers'
+import { requireSection } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  agentId: z.string().trim().min(1, 'agentId is required').max(120),
+  grossCents: z.number().positive('grossCents must be positive'),
+  dealId: z.string().max(120).optional(),
+  type: z.string().max(60).optional(),
+  splitPct: z.number().optional(),
+  status: z.string().max(60).optional(),
+  notes: z.string().max(10000).optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireSection('commissions')
@@ -45,11 +57,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`commissions.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-
-  if (!body.agentId) return jsonError('agentId is required', 400)
-  if (!body.grossCents || body.grossCents <= 0) return jsonError('grossCents must be positive', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const splitPct = body.splitPct ?? 100
   const netCents = Math.round(body.grossCents * (splitPct / 100))

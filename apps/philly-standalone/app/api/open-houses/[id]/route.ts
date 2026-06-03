@@ -3,16 +3,27 @@
    DELETE /api/open-houses/[id] — cancel/remove */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 type Ctx = { params: Promise<{ id: string }> }
+
+const patchSchema = z.object({
+  date: z.string().optional(),
+  startTime: z.string().max(40).optional(),
+  endTime: z.string().max(40).optional(),
+  notes: z.string().max(10000).optional(),
+  status: z.string().max(60).optional(),
+  hostAgentId: z.string().max(120).optional(),
+})
 
 const ohInclude = {
   property: { select: { id: true, title: true, address: true, city: true, priceCents: true } },
@@ -41,8 +52,8 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (limited) return limited
 
   const { id } = await ctx.params
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.openHouse.findFirst({

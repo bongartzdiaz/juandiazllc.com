@@ -3,14 +3,22 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
+import { requireRole } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { generateApiKey } from '@/lib/philly/api-keys'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  name: z.string().trim().min(1, 'name is required').max(120),
+  permissions: z.string().optional(),
+  expiresInDays: z.coerce.number().optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireRole(['admin'])
@@ -39,9 +47,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`api-keys.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: { name?: string; permissions?: string; expiresInDays?: number }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.name?.trim()) return jsonError('name is required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const permissions = (body.permissions === 'write' || body.permissions === 'admin') ? body.permissions : 'read'
 
@@ -54,7 +61,7 @@ export async function POST(req: NextRequest) {
   const apiKey = await prisma.apiKey.create({
     data: {
       organizationId: scope.organizationId,
-      name: body.name.trim(),
+      name: body.name,
       keyHash: hash,
       prefix,
       permissions,

@@ -2,15 +2,21 @@
    POST /api/contacts/[id]/notes — add a note */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { encryptPii, decryptPii } from '@/lib/philly/pii'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createNoteSchema = z.object({
+  content: z.string().trim().min(1, 'content is required').max(10_000),
+})
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -53,9 +59,8 @@ export async function POST(req: NextRequest, ctx: Ctx) {
 
   const { id } = await ctx.params
 
-  let body: { content?: string }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.content?.trim()) return jsonError('content is required', 400)
+  const body = await parseBody(req, createNoteSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const contact = await prisma.contact.findFirst({
@@ -64,7 +69,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   })
   if (!contact) return jsonError('Contact not found', 404)
 
-  const plaintext = body.content.trim()
+  const plaintext = body.content
   const note = await prisma.contactNote.create({
     data: { contactId: id, userId: scope.userId, content: encryptPii(plaintext) ?? '' },
     include: { user: { select: { id: true, name: true, avatarUrl: true } } },

@@ -1,16 +1,43 @@
 /* GET/PATCH/DELETE /api/properties/[id] */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireSection, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 type RouteCtx = { params: Promise<{ id: string }> }
+
+const patchSchema = z.object({
+  title: z.string().max(255).optional(),
+  type: z.string().max(60).optional(),
+  status: z.string().max(60).optional(),
+  address: z.string().max(255).optional(),
+  city: z.string().max(120).optional(),
+  state: z.string().max(120).optional(),
+  zipCode: z.string().max(40).optional(),
+  country: z.string().max(120).optional(),
+  lat: z.number().optional(),
+  lng: z.number().optional(),
+  priceCents: z.number().optional(),
+  bedrooms: z.number().optional(),
+  bathrooms: z.number().optional(),
+  sqft: z.number().optional(),
+  yearBuilt: z.number().optional(),
+  description: z.string().max(10000).optional(),
+  features: z.any().optional(),
+  images: z.any().optional(),
+  mlsNumber: z.string().max(120).optional(),
+  hoaCents: z.number().optional(),
+  listingDate: z.string().nullable().optional(),
+  expirationDate: z.string().nullable().optional(),
+})
 
 export async function GET(_req: NextRequest, ctx: RouteCtx) {
   const scope = await requireSection('properties')
@@ -36,8 +63,8 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
   const { id } = await ctx.params
 
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.property.findFirst({

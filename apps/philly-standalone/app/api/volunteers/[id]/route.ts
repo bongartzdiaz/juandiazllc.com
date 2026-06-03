@@ -6,9 +6,20 @@ import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const patchSchema = z.object({
+  name: z.string().trim().min(1).max(255).optional(),
+  email: z.string().max(255).optional(),
+  phone: z.string().max(60).optional(),
+  skills: z.unknown().optional(),
+  status: z.string().trim().max(60).optional(),
+  totalHours: z.coerce.number().optional(),
+})
 
 type RouteCtx = { params: Promise<{ id: string }> }
 
@@ -34,8 +45,8 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
   const { id } = await ctx.params
 
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.volunteer.findFirst({

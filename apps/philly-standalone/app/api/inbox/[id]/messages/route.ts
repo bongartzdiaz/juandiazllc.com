@@ -2,15 +2,26 @@
    POST /api/inbox/:id/messages — send new message */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated, publishEntityUpdated } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_SEND } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  body: z.string().trim().min(1, 'body is required').max(50_000),
+  direction: z.string().max(20).optional(),
+  fromAddress: z.string().max(255).optional(),
+  toAddress: z.string().max(255).optional(),
+  subject: z.string().max(255).optional(),
+  bodyHtml: z.string().max(500_000).optional(),
+})
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const scope = await requireScope()
@@ -43,9 +54,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (limited) return limited
 
   const { id } = await params
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.body?.trim()) return jsonError('body is required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const conv = await prisma.conversation.findFirst({
@@ -61,7 +71,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       fromAddress: body.fromAddress ?? '',
       toAddress: body.toAddress ?? '',
       subject: body.subject ?? conv.subject,
-      body: body.body.trim(),
+      body: body.body,
       bodyHtml: body.bodyHtml ?? '',
       status: body.direction === 'inbound' ? 'received' : 'sent',
     },

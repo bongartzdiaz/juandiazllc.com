@@ -2,17 +2,34 @@
    POST /api/sms — send a message via Twilio adapter */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireSection, jsonError } from '@/lib/philly/auth-helpers'
+import { requireSection } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { sendSms } from '@/lib/philly/sms/send'
 import { serverError } from '@/lib/philly/safe-error'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_SEND } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const sendSchema = z
+  .object({
+    toNumber: z.string().trim().min(1, 'toNumber is required').max(40),
+    fromNumber: z.string().max(40).optional(),
+    body: z.string().max(50_000).optional(),
+    channel: z.string().max(20).optional(),
+    contactId: z.string().max(255).optional(),
+    templateId: z.string().max(255).optional(),
+    templateContext: z.record(z.string(), z.unknown()).optional(),
+  })
+  .refine((b) => (typeof b.templateId === 'string' && b.templateId) || (typeof b.body === 'string' && b.body.trim()), {
+    message: 'body or templateId is required',
+    path: ['body'],
+  })
 
 export async function GET(req: NextRequest) {
   const scope = await requireSection('sms')
@@ -48,16 +65,12 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`sms:send:${scope.organizationId}`, PRESET_SEND)
   if (limited) return limited
 
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (typeof body.toNumber !== 'string' || !body.toNumber.trim()) return jsonError('toNumber is required', 400)
-  if (!body.templateId && (typeof body.body !== 'string' || !body.body.trim())) {
-    return jsonError('body or templateId is required', 400)
-  }
+  const body = await parseBody(req, sendSchema)
+  if (body instanceof NextResponse) return body
 
   try {
     const result = await sendSms(scope.organizationId, {
-      toNumber: body.toNumber.trim(),
+      toNumber: body.toNumber,
       fromNumber: typeof body.fromNumber === 'string' ? body.fromNumber : undefined,
       body: typeof body.body === 'string' ? body.body : undefined,
       channel: body.channel === 'whatsapp' ? 'whatsapp' : 'sms',

@@ -2,15 +2,25 @@
    POST /api/e-signatures — create signature request */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  transactionId: z.string().trim().min(1, 'transactionId is required').max(80),
+  documentName: z.string().trim().min(1, 'documentName is required').max(255),
+  signerEmail: z.string().trim().min(1, 'signerEmail is required').max(255),
+  signerName: z.string().trim().max(120).optional(),
+  provider: z.string().trim().max(40).optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireScope()
@@ -50,11 +60,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`e-signatures.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.transactionId?.trim()) return jsonError('transactionId is required', 400)
-  if (!body.documentName?.trim()) return jsonError('documentName is required', 400)
-  if (!body.signerEmail?.trim()) return jsonError('signerEmail is required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   // Verify transaction belongs to org
   const prisma = getAuthPrisma()
@@ -66,9 +73,9 @@ export async function POST(req: NextRequest) {
   const sig = await prisma.eSignature.create({
     data: {
       transactionId: body.transactionId,
-      documentName: body.documentName.trim(),
+      documentName: body.documentName,
       signerName: body.signerName ?? '',
-      signerEmail: body.signerEmail.trim(),
+      signerEmail: body.signerEmail,
       status: 'pending',
       provider: body.provider ?? 'manual',
     },

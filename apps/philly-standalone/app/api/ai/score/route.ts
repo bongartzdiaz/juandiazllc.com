@@ -1,7 +1,9 @@
 ﻿/* GET /api/ai/score — predictive lead scores for org */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
+import { parseQuery } from '@/lib/philly/api/validate'
 import { generateLeadScores } from '@/lib/philly/ai/scoring'
 import { enforceRateLimit } from '@/lib/philly/rate-limit'
 import { SLO, withSpan } from '@/lib/philly/observability'
@@ -10,6 +12,10 @@ import { getAuthPrisma } from '@/lib/philly/auth'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const querySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(1000).default(500),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireScope()
@@ -25,8 +31,9 @@ export async function GET(req: NextRequest) {
     return jsonError('AI deal-scoring is disabled for this organization', 403)
   }
 
-  const url = new URL(req.url)
-  const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '500', 10) || 500, 1000)
+  const q = parseQuery(req.nextUrl.searchParams, querySchema)
+  if (q instanceof NextResponse) return q
+  const { limit } = q
 
   return withSpan(
     {

@@ -21,12 +21,14 @@
    Bundle CX — initial implementation. */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { requireScope } from '@/lib/philly/auth-helpers'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import { logAudit } from '@/lib/philly/audit'
 import { logger } from '@/lib/philly/logger'
 import { stripe, isStripeConfigured } from '@/lib/philly/billing/stripe'
+import { parseBody } from '@/lib/philly/api/validate'
 import {
   isValidPlanSlug,
   stripePriceIdForPlan,
@@ -35,6 +37,10 @@ import {
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const bodySchema = z.object({
+  plan: z.unknown().optional(),
+}).passthrough()
 
 // Bundle DE — resolve the site URL from the incoming request when
 // NEXT_PUBLIC_SITE_URL is unset, instead of falling back to a
@@ -61,8 +67,8 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, bodySchema)
+  if (body instanceof NextResponse) return body
   const plan = body.plan
   if (!isValidPlanSlug(plan)) return jsonError('Invalid plan', 400)
 

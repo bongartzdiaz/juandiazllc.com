@@ -10,9 +10,18 @@ import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit, diffChanges } from '@/lib/philly/audit'
 import { serverError } from '@/lib/philly/safe-error'
 import { parseDashboardSections } from '@/lib/philly/sections'
+import { parseBody } from '@/lib/philly/api/validate'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const patchSchema = z.object({
+  name: z.string().optional(),
+  email: z.string().optional(),
+  locale: z.string().optional(),
+  avatarUrl: z.string().optional(),
+}).passthrough()
 
 const ME_SELECT = {
   id: true,
@@ -61,8 +70,8 @@ export async function PATCH(req: NextRequest) {
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
 
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const data: Record<string, unknown> = {}
   if (typeof body.name === 'string' && body.name.trim()) data.name = body.name.trim()

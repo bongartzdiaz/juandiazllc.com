@@ -2,15 +2,22 @@
    Read-only. Does not execute anything. */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { requireScope } from '@/lib/philly/auth-helpers'
 import { planCommand } from '@/lib/philly/ai/command-planner'
 import { enforceRateLimit } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 type IndustryHint = 'realestate' | 'hospitality' | 'philanthropy'
 const VALID_INDUSTRIES: readonly IndustryHint[] = ['realestate', 'hospitality', 'philanthropy']
+
+const bodySchema = z.object({
+  input: z.string().trim().min(1, 'input is required').max(500, 'input too long'),
+  industry: z.string().optional(),
+})
 
 export async function POST(req: NextRequest) {
   const scope = await requireScope()
@@ -20,14 +27,10 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`ai:plan:${scope.userId}`, { capacity: 20, refillPerSec: 0.33 })
   if (limited) return limited
 
-  let body: { input?: string; industry?: string }
-  try { body = await req.json() }
-  catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }) }
+  const body = await parseBody(req, bodySchema)
+  if (body instanceof NextResponse) return body
 
-  const input = (body.input ?? '').trim()
-  if (!input) return NextResponse.json({ error: 'input is required' }, { status: 400 })
-  if (input.length > 500) return NextResponse.json({ error: 'input too long' }, { status: 400 })
-
+  const input = body.input
   const industry = VALID_INDUSTRIES.includes(body.industry as IndustryHint)
     ? (body.industry as IndustryHint)
     : null

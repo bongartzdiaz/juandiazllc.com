@@ -14,8 +14,10 @@
    PR-3/4. */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireSuperAdmin, jsonError } from '@/lib/philly/auth-helpers'
+import { parseQuery } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -23,12 +25,18 @@ export const runtime = 'nodejs'
 const DEFAULT_LIMIT = 50
 const MAX_LIMIT = 200
 
+const querySchema = z.object({
+  q: z.string().max(200).optional(),
+})
+
 export async function GET(req: NextRequest) {
   const scope = await requireSuperAdmin()
   if (scope instanceof NextResponse) return scope
 
   const url = new URL(req.url)
-  const q = (url.searchParams.get('q') ?? '').trim()
+  const parsedQuery = parseQuery(req.nextUrl.searchParams, querySchema)
+  if (parsedQuery instanceof NextResponse) return parsedQuery
+  const q = (parsedQuery.q ?? '').trim()
   const limit = Math.min(
     Math.max(parseInt(url.searchParams.get('limit') ?? `${DEFAULT_LIMIT}`, 10) || DEFAULT_LIMIT, 1),
     MAX_LIMIT,

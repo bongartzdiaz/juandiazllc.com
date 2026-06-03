@@ -2,13 +2,24 @@
    POST /api/views — create a saved view */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
+import { requireScope } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  entity: z.string().trim().min(1, 'entity is required').max(60),
+  name: z.string().trim().min(1, 'name is required').max(120),
+  filtersJson: z.string().max(20_000).optional(),
+  columnsJson: z.string().max(20_000).optional(),
+  sortJson: z.string().max(5_000).optional(),
+  isShared: z.boolean().optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireScope()
@@ -39,14 +50,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`views:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: {
-    entity?: string; name?: string; filtersJson?: string
-    columnsJson?: string; sortJson?: string; isShared?: boolean
-  }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-
-  if (!body.entity) return jsonError('entity is required', 400)
-  if (!body.name?.trim()) return jsonError('name is required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const view = await prisma.savedView.create({
@@ -54,7 +59,7 @@ export async function POST(req: NextRequest) {
       organizationId: scope.organizationId,
       userId: scope.userId,
       entity: body.entity,
-      name: body.name.trim(),
+      name: body.name,
       filtersJson: body.filtersJson ?? '[]',
       columnsJson: body.columnsJson ?? '[]',
       sortJson: body.sortJson ?? '{}',

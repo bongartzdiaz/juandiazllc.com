@@ -2,16 +2,25 @@
    POST /api/client-portal — create portal access for a contact */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
+import { requireScope, requireRole } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { decryptPii } from '@/lib/philly/pii'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  contactId: z.string().trim().min(1, 'contactId is required').max(120),
+  permissions: z.any().optional(),
+  enabled: z.boolean().optional(),
+  expiresAt: z.string().optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireScope()
@@ -53,9 +62,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`client-portal.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.contactId?.trim()) return jsonError('contactId is required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const access = await prisma.clientPortalAccess.create({

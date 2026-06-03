@@ -2,14 +2,36 @@
    POST /api/scoring-rules — create rule */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
+import { idSchema } from '@/lib/philly/api/schemas'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  name: z.string().trim().min(1, 'name is required').max(120),
+  event: z.string().trim().min(1, 'event is required').max(120),
+  points: z.coerce.number().optional(),
+  decay: z.boolean().optional(),
+  decayDays: z.coerce.number().optional(),
+  enabled: z.boolean().optional(),
+})
+
+const patchSchema = z.object({
+  id: idSchema,
+  name: z.string().trim().min(1).max(120).optional(),
+  event: z.string().trim().min(1).max(120).optional(),
+  points: z.coerce.number().optional(),
+  decay: z.boolean().optional(),
+  decayDays: z.coerce.number().optional(),
+  enabled: z.boolean().optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireScope()
@@ -34,17 +56,15 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`scoring-rules.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.name?.trim()) return jsonError('name is required', 400)
-  if (!body.event?.trim()) return jsonError('event is required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const rule = await prisma.scoringRule.create({
     data: {
       organizationId: scope.organizationId,
-      name: body.name.trim(),
-      event: body.event.trim(),
+      name: body.name,
+      event: body.event,
       points: body.points ?? 5,
       decay: body.decay ?? false,
       decayDays: body.decayDays ?? 90,
@@ -63,9 +83,8 @@ export async function PATCH(req: NextRequest) {
   const limited = enforceRateLimit(`scoring-rules.update:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.id) return jsonError('id is required', 400)
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.scoringRule.findFirst({
@@ -75,8 +94,8 @@ export async function PATCH(req: NextRequest) {
   if (!existing) return jsonError('Rule not found', 404)
 
   const data: Record<string, unknown> = {}
-  if (body.name !== undefined) data.name = String(body.name).trim()
-  if (body.event !== undefined) data.event = String(body.event).trim()
+  if (body.name !== undefined) data.name = body.name
+  if (body.event !== undefined) data.event = body.event
   if (body.points !== undefined) data.points = body.points
   if (body.decay !== undefined) data.decay = body.decay
   if (body.decayDays !== undefined) data.decayDays = body.decayDays

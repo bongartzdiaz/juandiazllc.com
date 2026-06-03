@@ -2,14 +2,29 @@
    POST /api/soi — create SOI category */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  name: z.string().trim().min(1, 'name is required').max(120),
+  touchFrequency: z.number().optional(),
+  color: z.string().max(20).optional(),
+})
+
+const patchSchema = z.object({
+  id: z.string().trim().min(1, 'id is required').max(120),
+  name: z.string().trim().max(120).optional(),
+  touchFrequency: z.number().optional(),
+  color: z.string().max(20).optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireScope()
@@ -34,15 +49,14 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`soi.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.name?.trim()) return jsonError('name is required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const cat = await prisma.soiCategory.create({
     data: {
       organizationId: scope.organizationId,
-      name: body.name.trim(),
+      name: body.name,
       touchFrequency: body.touchFrequency ?? 30,
       color: body.color ?? '#3b82f6',
     },
@@ -59,9 +73,8 @@ export async function PATCH(req: NextRequest) {
   const limited = enforceRateLimit(`soi.update:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.id) return jsonError('id is required', 400)
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.soiCategory.findFirst({
@@ -71,7 +84,7 @@ export async function PATCH(req: NextRequest) {
   if (!existing) return jsonError('Category not found', 404)
 
   const data: Record<string, unknown> = {}
-  if (body.name !== undefined) data.name = String(body.name).trim()
+  if (body.name !== undefined) data.name = body.name
   if (body.touchFrequency !== undefined) data.touchFrequency = body.touchFrequency
   if (body.color !== undefined) data.color = body.color
 

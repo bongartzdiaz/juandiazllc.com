@@ -1,16 +1,24 @@
 /* PATCH/DELETE /api/client-portal/[id] */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 type Ctx = { params: Promise<{ id: string }> }
+
+const patchSchema = z.object({
+  enabled: z.boolean().optional(),
+  permissions: z.any().optional(),
+  expiresAt: z.string().nullable().optional(),
+})
 
 export async function PATCH(req: NextRequest, ctx: Ctx) {
   const scope = await requireRole(['admin', 'manager'])
@@ -20,8 +28,8 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (limited) return limited
 
   const { id } = await ctx.params
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.clientPortalAccess.findFirst({

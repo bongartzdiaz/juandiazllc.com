@@ -8,9 +8,20 @@ import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  title: z.string().trim().min(1, 'title is required').max(255),
+  slug: z.string().trim().max(255).optional(),
+  blocks: z
+    .array(z.object({ type: z.string().optional(), content: z.unknown().optional() }).passthrough())
+    .max(500)
+    .optional(),
+})
 
 function slugify(input: string): string {
   return input
@@ -52,16 +63,10 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`pages.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: {
-    title?: string
-    slug?: string
-    blocks?: Array<{ type: string; content: unknown }>
-  }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
-  if (!body.title?.trim()) return jsonError('title is required', 400)
-
-  const baseSlug = slugify(body.slug?.trim() || body.title)
+  const baseSlug = slugify(body.slug || body.title)
   const prisma = getAuthPrisma()
 
   // ensure unique slug within org
@@ -79,7 +84,7 @@ export async function POST(req: NextRequest) {
   const page = await prisma.customPage.create({
     data: {
       organizationId: scope.organizationId,
-      title: body.title.trim(),
+      title: body.title,
       slug,
       createdBy: scope.userId,
       blocks: {

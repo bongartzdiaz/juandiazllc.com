@@ -2,13 +2,28 @@
    PUT  /api/pipelines/[id]/stages — reorder all stages (body: [{id, position}]) */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
+import { idSchema } from '@/lib/philly/api/schemas'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createStageSchema = z.object({
+  name: z.string().trim().min(1, 'name is required').max(60),
+  color: z.string().max(20).optional(),
+  position: z.coerce.number().int().optional(),
+})
+
+const reorderStagesSchema = z.object({
+  stages: z
+    .array(z.object({ id: idSchema, position: z.coerce.number().int() }))
+    .max(40),
+})
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -20,9 +35,8 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   if (limited) return limited
 
   const { id: pipelineId } = await ctx.params
-  let body: { name?: string; color?: string; position?: number }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.name?.trim()) return jsonError('name is required', 400)
+  const body = await parseBody(req, createStageSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const pipeline = await prisma.pipeline.findFirst({
@@ -35,7 +49,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   const stage = await prisma.pipelineStage.create({
     data: {
       pipelineId,
-      name: body.name.trim(),
+      name: body.name,
       position,
       color: body.color ?? '#94A3B8',
     },
@@ -53,9 +67,8 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
   if (limited) return limited
 
   const { id: pipelineId } = await ctx.params
-  let body: { stages?: { id: string; position: number }[] }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!Array.isArray(body.stages)) return jsonError('stages array required', 400)
+  const body = await parseBody(req, reorderStagesSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const pipeline = await prisma.pipeline.findFirst({

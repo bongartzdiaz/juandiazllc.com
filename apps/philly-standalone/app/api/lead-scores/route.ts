@@ -2,15 +2,25 @@
    POST /api/lead-scores — recalculate a contact's score */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
+import { requireScope, requireRole } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { decryptPii } from '@/lib/philly/pii'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
+import { idSchema } from '@/lib/philly/api/schemas'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  contactId: idSchema,
+  behaviorScore: z.coerce.number().optional(),
+  demographicScore: z.coerce.number().optional(),
+  reason: z.string().trim().max(255).optional(),
+})
 
 function gradeFromScore(score: number): string {
   if (score >= 80) return 'A'
@@ -64,9 +74,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`lead-scores.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.contactId?.trim()) return jsonError('contactId is required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const behaviorScore = body.behaviorScore ?? 0
   const demographicScore = body.demographicScore ?? 0

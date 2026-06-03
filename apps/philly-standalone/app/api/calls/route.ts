@@ -2,14 +2,32 @@
    POST /api/calls — log a call */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
+import { requireScope, requireRole } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  agentId: z.string().max(255).optional(),
+  contactId: z.string().max(255).optional(),
+  direction: z.string().max(20).optional(),
+  phoneNumber: z.string().max(40).optional(),
+  status: z.string().max(40).optional(),
+  duration: z.coerce.number().int().optional(),
+  outcome: z.string().max(120).optional(),
+  notes: z.string().max(10_000).optional(),
+  recordingUrl: z.string().max(2000).optional(),
+  disposition: z.string().max(120).optional(),
+  callbackAt: z.string().max(64).optional(),
+  startedAt: z.string().max(64).optional(),
+  endedAt: z.string().max(64).optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireScope()
@@ -44,8 +62,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`calls.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const call = await prisma.callLog.create({

@@ -2,14 +2,35 @@
    POST /api/referrals — create referral */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  referrerId: z.string().trim().min(1, 'referrerId is required').max(255),
+  referredId: z.string().trim().min(1, 'referredId is required').max(255),
+  dealId: z.string().max(255).optional(),
+  status: z.string().max(40).optional(),
+  commissionPct: z.coerce.number().optional(),
+  commissionCents: z.coerce.number().int().optional(),
+  notes: z.string().max(10_000).optional(),
+})
+
+const patchSchema = z.object({
+  id: z.string().trim().min(1, 'id is required').max(255),
+  status: z.string().max(40).optional(),
+  commissionPct: z.coerce.number().optional(),
+  commissionCents: z.coerce.number().int().optional(),
+  notes: z.string().max(10_000).optional(),
+  dealId: z.string().max(255).optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireScope()
@@ -57,10 +78,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`referrals.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.referrerId?.trim()) return jsonError('referrerId is required', 400)
-  if (!body.referredId?.trim()) return jsonError('referredId is required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const ref = await prisma.referral.create({
@@ -87,9 +106,8 @@ export async function PATCH(req: NextRequest) {
   const limited = enforceRateLimit(`referrals.update:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.id) return jsonError('id is required', 400)
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.referral.findFirst({

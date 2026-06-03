@@ -2,15 +2,29 @@
    POST /api/email/accounts — connect new email account */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
+import { requireScope, requireRole } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { encryptSecret } from '@/lib/philly/crypto'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  email: z.string().trim().min(1, 'email is required').max(255),
+  password: z.string().max(1000).optional(),
+  provider: z.string().max(60).optional(),
+  displayName: z.string().max(255).optional(),
+  smtpHost: z.string().max(255).optional(),
+  smtpPort: z.coerce.number().int().optional(),
+  imapHost: z.string().max(255).optional(),
+  imapPort: z.coerce.number().int().optional(),
+  username: z.string().max(255).optional(),
+})
 
 // Strip the encryptedPass field on every response — even though the
 // stored value is encrypted at rest, leaking the ciphertext narrows
@@ -52,9 +66,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`email-accounts:create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.email?.trim()) return jsonError('email is required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   // Encrypt the SMTP/IMAP password before insert. The DB column is
   // named `encryptedPass`; that name has been a contract for a while
@@ -68,7 +81,7 @@ export async function POST(req: NextRequest) {
       organizationId: scope.organizationId,
       userId: scope.userId,
       provider: body.provider ?? 'smtp',
-      email: body.email.trim(),
+      email: body.email,
       displayName: body.displayName ?? '',
       smtpHost: body.smtpHost ?? '',
       smtpPort: body.smtpPort ?? 587,

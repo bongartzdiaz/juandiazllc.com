@@ -2,13 +2,27 @@
    POST /api/agent-goals — set agent goals */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
+import { idSchema } from '@/lib/philly/api/schemas'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const upsertSchema = z.object({
+  agentId: idSchema,
+  year: z.coerce.number(),
+  month: z.coerce.number(),
+  dealTarget: z.coerce.number().optional(),
+  volumeTarget: z.coerce.number().optional(),
+  gciTarget: z.coerce.number().optional(),
+  callsTarget: z.coerce.number().optional(),
+  showingsTarget: z.coerce.number().optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireScope()
@@ -45,10 +59,9 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`agent-goals.upsert:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, upsertSchema)
+  if (body instanceof NextResponse) return body
 
-  if (!body.agentId) return jsonError('agentId is required', 400)
   if (!body.year || !body.month) return jsonError('year and month are required', 400)
 
   const prisma = getAuthPrisma()

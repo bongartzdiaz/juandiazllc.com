@@ -1,14 +1,23 @@
 /* GET/PATCH/DELETE /api/drip-campaigns/[id] */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const patchSchema = z.object({
+  name: z.string().trim().min(1, 'name cannot be empty').max(120).optional(),
+  type: z.string().max(40).optional(),
+  status: z.string().max(40).optional(),
+  steps: z.array(z.unknown()).max(200).optional(),
+})
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -32,8 +41,8 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (limited) return limited
 
   const { id } = await ctx.params
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.dripCampaign.findFirst({
@@ -43,11 +52,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (!existing) return jsonError('Campaign not found', 404)
 
   const data: Record<string, unknown> = {}
-  if (body.name !== undefined) {
-    const name = String(body.name).trim()
-    if (!name) return jsonError('name cannot be empty', 400)
-    data.name = name
-  }
+  if (body.name !== undefined) data.name = body.name
   if (body.type !== undefined) data.type = body.type
   if (body.status !== undefined) data.status = body.status
   if (body.steps !== undefined) data.stepsJson = JSON.stringify(body.steps)

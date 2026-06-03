@@ -1,12 +1,18 @@
 ﻿/* POST /api/ai/query — natural language query */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { requireScope } from '@/lib/philly/auth-helpers'
 import { runNLQuery } from '@/lib/philly/ai/nl-query'
 import { enforceRateLimit } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const bodySchema = z.object({
+  question: z.string().trim().min(1, 'question is required').max(500, 'question too long'),
+})
 
 export async function POST(req: NextRequest) {
   const scope = await requireScope()
@@ -16,12 +22,10 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`ai:query:${scope.userId}`, { capacity: 30, refillPerSec: 0.5 })
   if (limited) return limited
 
-  let body: { question?: string }
-  try { body = await req.json() } catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }) }
+  const body = await parseBody(req, bodySchema)
+  if (body instanceof NextResponse) return body
 
-  const question = (body.question ?? '').trim()
-  if (!question) return NextResponse.json({ error: 'question is required' }, { status: 400 })
-  if (question.length > 500) return NextResponse.json({ error: 'question too long' }, { status: 400 })
+  const question = body.question
 
   try {
     const result = await runNLQuery(scope.organizationId, question)

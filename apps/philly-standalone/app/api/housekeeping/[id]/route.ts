@@ -4,15 +4,25 @@
    Tenancy enforced via the Room relation. */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 type RouteCtx = { params: Promise<{ id: string }> }
+
+const updateSchema = z.object({
+  status: z.string().trim().max(60).optional(),
+  type: z.string().trim().max(60).optional(),
+  priority: z.string().trim().max(60).optional(),
+  assignedTo: z.string().trim().max(120).nullable().optional(),
+  notes: z.string().trim().max(10_000).optional(),
+})
 
 const ALLOWED_TYPES = new Set(['cleaning', 'inspection', 'maintenance', 'turnover'])
 const ALLOWED_STATUSES = new Set(['pending', 'in_progress', 'completed'])
@@ -27,11 +37,8 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
   const { id } = await ctx.params
 
-  let body: {
-    status?: string; type?: string; priority?: string;
-    assignedTo?: string | null; notes?: string;
-  }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, updateSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.housekeepingTask.findFirst({

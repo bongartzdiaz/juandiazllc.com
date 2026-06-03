@@ -8,9 +8,11 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireSection, jsonError } from '@/lib/philly/auth-helpers'
+import { requireSection } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
+import { reorderBody } from '@/lib/philly/api/schemas'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -24,17 +26,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`deals:reorder:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: { ids?: string[] }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-
-  if (!Array.isArray(body.ids) || body.ids.length === 0) {
-    return jsonError('ids must be a non-empty array', 400)
-  }
-  if (body.ids.length > MAX_REORDER) {
-    return jsonError(`Maximum ${MAX_REORDER} deals per reorder call`, 400)
-  }
-  const unique = new Set(body.ids)
-  if (unique.size !== body.ids.length) return jsonError('ids must be unique', 400)
+  const body = await parseBody(req, reorderBody(MAX_REORDER))
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
 

@@ -11,12 +11,30 @@
 // Returns 204 on success so clients don't need to parse a body.
 
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 
 // Edge runtime — the Slack webhook + console.error are both edge-
 // safe (global fetch, console). Rate-limit bucket is per-region,
 // which is fine for anti-flood since a runaway client typically
 // sticks to one region anyway.
 export const runtime = "edge";
+
+// Anonymous public telemetry — bounded but deliberately lenient so a
+// legit error report is never rejected. Every field is optional and
+// coerced (a numeric `message` still passes, matching the prior
+// `String(...)` behaviour); generous `.max()` caps unbounded payloads.
+// `.catch` on the whole object means even a non-object body degrades to
+// `{}` rather than 400, mirroring the old hand-rolled extraction.
+const reportSchema = z
+  .object({
+    message: z.coerce.string().max(10_000).optional(),
+    stack: z.coerce.string().max(40_000).optional(),
+    url: z.coerce.string().max(5_000).optional(),
+    userAgent: z.coerce.string().max(5_000).optional(),
+    source: z.coerce.string().max(500).optional(),
+    digest: z.coerce.string().max(1_000).optional(),
+  })
+  .catch({});
 
 // Simple in-memory token bucket — good enough for a single Vercel
 // lambda instance. If we scale horizontally we'd move to Upstash
@@ -80,19 +98,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 });
   }
 
-  let body: Record<string, unknown> = {};
+  let raw: unknown;
   try {
-    body = await req.json();
+    raw = await req.json();
   } catch {
     return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
 
-  const message = String(body.message ?? "client error").slice(0, 1000);
-  const stack = body.stack ? String(body.stack).slice(0, 4000) : undefined;
-  const url = body.url ? String(body.url).slice(0, 500) : undefined;
-  const userAgent = body.userAgent ? String(body.userAgent).slice(0, 500) : undefined;
-  const source = body.source ? String(body.source).slice(0, 50) : "brand";
-  const digest = body.digest ? String(body.digest).slice(0, 100) : undefined;
+  // `.catch({})` guarantees success — schema only bounds/coerces, never
+  // rejects, so a legit (if oddly-shaped) report still gets logged.
+  const body = reportSchema.parse(raw);
+
+  const message = (body.message ?? "client error").slice(0, 1000);
+  const stack = body.stack ? body.stack.slice(0, 4000) : undefined;
+  const url = body.url ? body.url.slice(0, 500) : undefined;
+  const userAgent = body.userAgent ? body.userAgent.slice(0, 500) : undefined;
+  const source = body.source ? body.source.slice(0, 50) : "brand";
+  const digest = body.digest ? body.digest.slice(0, 100) : undefined;
 
   // Always land in Vercel logs — cheapest tier of visibility.
   console.error("[brand-error]", { message, url, source, digest });

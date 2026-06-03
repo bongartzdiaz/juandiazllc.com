@@ -2,14 +2,29 @@
    DELETE /api/e-signatures/[id] — delete signature request */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const patchSchema = z.object({
+  signerName: z.string().max(120).optional(),
+  signerEmail: z.string().max(255).optional(),
+  documentName: z.string().max(255).optional(),
+  provider: z.string().max(40).optional(),
+  externalId: z.string().max(120).optional(),
+  status: z.string().max(40).optional(),
+  // Optional client-supplied timestamps; only used to suppress the auto-stamp.
+  sentAt: z.string().optional(),
+  viewedAt: z.string().optional(),
+  signedAt: z.string().optional(),
+})
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -34,8 +49,8 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (limited) return limited
 
   const { id } = await ctx.params
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.eSignature.findFirst({

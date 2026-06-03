@@ -2,20 +2,27 @@
    POST /api/notifications — create a notification (internal use) */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope } from '@/lib/philly/auth-helpers'
+import { parseQuery } from '@/lib/philly/api/validate'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const querySchema = z.object({
+  unread: z.string().optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
 
   const { page, limit, skip } = parsePagination(req)
-  const url = new URL(req.url)
-  const unreadOnly = url.searchParams.get('unread') === 'true'
+  const q = parseQuery(req.nextUrl.searchParams, querySchema)
+  if (q instanceof NextResponse) return q
+  const unreadOnly = q.unread === 'true'
 
   const prisma = getAuthPrisma()
   const where = {

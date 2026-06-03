@@ -2,12 +2,23 @@
    DELETE /api/views/[id] — owner-only delete */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const patchSchema = z.object({
+  name: z.string().trim().min(1, 'name cannot be empty').max(120).optional(),
+  filtersJson: z.string().max(20_000).optional(),
+  columnsJson: z.string().max(20_000).optional(),
+  sortJson: z.string().max(5_000).optional(),
+  isShared: z.boolean().optional(),
+  isDefault: z.boolean().optional(),
+})
 
 type RouteCtx = { params: Promise<{ id: string }> }
 
@@ -20,15 +31,8 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
   const { id } = await ctx.params
 
-  let body: {
-    name?: string
-    filtersJson?: string
-    columnsJson?: string
-    sortJson?: string
-    isShared?: boolean
-    isDefault?: boolean
-  }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   // Owner-or-admin tenancy check. Shared views can only be edited by
@@ -47,10 +51,7 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
   if (!existing) return jsonError('Saved view not found', 404)
 
   const data: Record<string, unknown> = {}
-  if (body.name !== undefined) {
-    if (!body.name.trim()) return jsonError('name cannot be empty', 400)
-    data.name = body.name.trim()
-  }
+  if (body.name !== undefined) data.name = body.name
   if (body.filtersJson !== undefined) data.filtersJson = body.filtersJson
   if (body.columnsJson !== undefined) data.columnsJson = body.columnsJson
   if (body.sortJson !== undefined) data.sortJson = body.sortJson

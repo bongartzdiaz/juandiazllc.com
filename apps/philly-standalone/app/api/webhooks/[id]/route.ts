@@ -2,16 +2,25 @@
    Admin-only. Secret is masked in responses unless regenerated. */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { encryptSecret } from '@/lib/philly/crypto'
 import { maskWebhookSecret } from '@/lib/philly/webhooks/secrets'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const patchSchema = z.object({
+  url: z.string().trim().optional(),
+  events: z.array(z.string()).optional(),
+  enabled: z.boolean().optional(),
+  rotateSecret: z.boolean().optional(),
+})
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const scope = await requireRole(['admin'])
@@ -39,8 +48,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const { id } = await params
 
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.webhook.findFirst({
@@ -49,7 +58,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!existing) return jsonError('Webhook not found', 404)
 
   const data: Record<string, unknown> = {}
-  if (typeof body.url === 'string') data.url = body.url.trim()
+  if (typeof body.url === 'string') data.url = body.url
   if (Array.isArray(body.events)) data.events = JSON.stringify(body.events)
   if (typeof body.enabled === 'boolean') data.enabled = body.enabled
 

@@ -7,15 +7,21 @@
    actually delivers the steps. */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
 import { parseSteps, initialDueAt } from '@/lib/philly/drip/steps'
 import { logger } from '@/lib/philly/logger'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const enrollSchema = z.object({
+  contactId: z.string().trim().min(1, 'contactId is required').max(255),
+})
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -56,11 +62,8 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   if (limited) return limited
 
   const { id } = await ctx.params
-  let body: { contactId?: string }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-  if (!body.contactId || typeof body.contactId !== 'string') {
-    return jsonError('contactId is required', 400)
-  }
+  const body = await parseBody(req, enrollSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const campaign = await prisma.dripCampaign.findFirst({

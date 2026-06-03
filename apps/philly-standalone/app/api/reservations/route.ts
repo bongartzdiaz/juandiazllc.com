@@ -2,14 +2,28 @@
    POST /api/reservations — create reservation */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  roomId: z.string().trim().min(1, 'roomId is required').max(80),
+  guestName: z.string().trim().min(1, 'guestName is required').max(120),
+  guestEmail: z.string().trim().max(255).optional(),
+  guestPhone: z.string().trim().max(60).optional(),
+  checkIn: z.string().min(1, 'checkIn and checkOut are required'),
+  checkOut: z.string().min(1, 'checkIn and checkOut are required'),
+  status: z.string().trim().max(60).optional(),
+  totalCents: z.coerce.number().optional(),
+  notes: z.string().trim().max(10_000).optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireScope()
@@ -45,12 +59,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`reservations.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-
-  if (!body.roomId) return jsonError('roomId is required', 400)
-  if (!body.guestName?.trim()) return jsonError('guestName is required', 400)
-  if (!body.checkIn || !body.checkOut) return jsonError('checkIn and checkOut are required', 400)
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const room = await prisma.room.findFirst({
@@ -62,7 +72,7 @@ export async function POST(req: NextRequest) {
   const reservation = await prisma.reservation.create({
     data: {
       roomId: body.roomId,
-      guestName: body.guestName.trim(),
+      guestName: body.guestName,
       guestEmail: body.guestEmail ?? '',
       guestPhone: body.guestPhone ?? '',
       checkIn: new Date(body.checkIn),

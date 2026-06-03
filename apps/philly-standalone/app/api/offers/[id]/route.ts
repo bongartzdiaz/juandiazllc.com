@@ -1,16 +1,34 @@
 /* GET/PATCH/DELETE /api/offers/[id] */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireSection, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 type RouteCtx = { params: Promise<{ id: string }> }
+
+const patchSchema = z.object({
+  amountCents: z.number().optional(),
+  status: z.string().max(60).optional(),
+  counterJson: z.any().optional(),
+  contingencies: z.any().optional(),
+  earnestCents: z.number().optional(),
+  closingCostsCents: z.number().optional(),
+  inspectionDays: z.number().optional(),
+  financingType: z.string().max(60).optional(),
+  notes: z.string().max(10000).optional(),
+  contactId: z.string().max(120).optional(),
+  dealId: z.string().max(120).optional(),
+  expiresAt: z.string().nullable().optional(),
+  respondedAt: z.string().nullable().optional(),
+})
 
 export async function GET(_req: NextRequest, ctx: RouteCtx) {
   const scope = await requireSection('offers')
@@ -33,8 +51,8 @@ export async function PATCH(req: NextRequest, ctx: RouteCtx) {
 
   const { id } = await ctx.params
 
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.offer.findFirst({

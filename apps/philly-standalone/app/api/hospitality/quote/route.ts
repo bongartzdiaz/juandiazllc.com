@@ -2,13 +2,21 @@
    Body: { roomId, checkIn, checkOut } */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope, jsonError } from '@/lib/philly/auth-helpers'
 import { computeStayPrice } from '@/lib/philly/hospitality/pricing'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const quoteSchema = z.object({
+  roomId: z.string().trim().min(1, 'roomId is required').max(80),
+  checkIn: z.string().min(1, 'checkIn and checkOut required'),
+  checkOut: z.string().min(1, 'checkIn and checkOut required'),
+})
 
 export async function POST(req: NextRequest) {
   const scope = await requireScope()
@@ -17,11 +25,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`hospitality.quote:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: { roomId?: string; checkIn?: string; checkOut?: string }
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
-
-  if (!body.roomId) return jsonError('roomId is required', 400)
-  if (!body.checkIn || !body.checkOut) return jsonError('checkIn and checkOut required', 400)
+  const body = await parseBody(req, quoteSchema)
+  if (body instanceof NextResponse) return body
 
   const checkIn = new Date(body.checkIn)
   const checkOut = new Date(body.checkOut)

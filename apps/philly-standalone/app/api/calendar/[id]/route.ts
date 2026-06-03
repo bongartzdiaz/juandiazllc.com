@@ -8,9 +8,21 @@ import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const patchSchema = z.object({
+  title: z.string().trim().max(255).optional(),
+  description: z.string().max(20000).optional(),
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
+  allDay: z.boolean().optional(),
+  location: z.string().max(255).optional(),
+  color: z.string().max(20).optional(),
+})
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -36,8 +48,8 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (limited) return limited
 
   const { id } = await ctx.params
-  let body: Record<string, unknown>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, patchSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const existing = await prisma.calendarEvent.findFirst({
@@ -47,10 +59,10 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (!existing) return jsonError('Event not found', 404)
 
   const data: Record<string, unknown> = {}
-  if (body.title !== undefined) data.title = (body.title as string).trim()
+  if (body.title !== undefined) data.title = body.title
   if (body.description !== undefined) data.description = body.description
-  if (body.startTime !== undefined) data.startTime = new Date(body.startTime as string)
-  if (body.endTime !== undefined) data.endTime = new Date(body.endTime as string)
+  if (body.startTime !== undefined) data.startTime = new Date(body.startTime)
+  if (body.endTime !== undefined) data.endTime = new Date(body.endTime)
   if (body.allDay !== undefined) data.allDay = body.allDay
   if (body.location !== undefined) data.location = body.location
   if (body.color !== undefined) data.color = body.color

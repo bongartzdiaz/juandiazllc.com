@@ -2,15 +2,36 @@
    POST /api/transactions — create transaction */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
+import { requireScope, requireRole } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { parseBody } from '@/lib/philly/api/validate'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+const createSchema = z.object({
+  dealId: z.string().max(120).optional(),
+  propertyId: z.string().max(120).optional(),
+  type: z.string().max(60).optional(),
+  status: z.string().max(60).optional(),
+  closingDate: z.string().optional(),
+  contractDate: z.string().optional(),
+  escrowNumber: z.string().max(120).optional(),
+  titleCompany: z.string().max(255).optional(),
+  buyerAgentId: z.string().max(120).optional(),
+  sellerAgentId: z.string().max(120).optional(),
+  buyerContactId: z.string().max(120).optional(),
+  sellerContactId: z.string().max(120).optional(),
+  salePrice: z.number().optional(),
+  earnestMoney: z.number().optional(),
+  notes: z.string().max(10000).optional(),
+  checklist: z.any().optional(),
+})
 
 export async function GET(req: NextRequest) {
   const scope = await requireScope()
@@ -46,8 +67,8 @@ export async function POST(req: NextRequest) {
   const limited = enforceRateLimit(`transactions.create:${scope.userId}`, PRESET_MUTATION)
   if (limited) return limited
 
-  let body: Record<string, any>
-  try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
+  const body = await parseBody(req, createSchema)
+  if (body instanceof NextResponse) return body
 
   const prisma = getAuthPrisma()
   const txn = await prisma.transaction.create({
