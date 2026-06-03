@@ -28,6 +28,7 @@ import {
   HOS_JOURNEY, HOS_SUMMARY,
 } from '@/components/philly/dashboard/JourneyBar'
 import type { JourneyPeriod } from '@/components/philly/dashboard/JourneyBar'
+import { keyboardClickable } from '@/lib/philly/a11y'
 import {
   FolderKanban, Leaf, Globe2, ArrowRight, Clock,
   Building2, Euro, TrendingUp, Home, Calendar,
@@ -486,7 +487,7 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
               {rooms.data.map(p => {
                 const sc = hosStatusColors[p.status] || hosStatusColors.available
                 return (
-                  <div key={p.id} className="card-hover" onClick={() => router.push('/rooms')} style={{
+                  <div key={p.id} className="card-hover" {...keyboardClickable(() => router.push('/rooms'))} style={{
                     padding: '12px 14px', borderRadius: 10,
                     border: '1px solid var(--border)', background: 'var(--panel2)',
                     display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
@@ -946,7 +947,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
               {properties.data.map(p => {
                 const sc = statusColors[p.status] || statusColors.active
                 return (
-                  <div key={p.id} className="card-hover" onClick={() => router.push('/properties')} style={{
+                  <div key={p.id} className="card-hover" {...keyboardClickable(() => router.push('/properties'))} style={{
                     padding: '12px 14px', borderRadius: 10,
                     border: '1px solid var(--border)', background: 'var(--panel2)',
                     display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
@@ -1309,7 +1310,7 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
             {projects.data.map(p => {
               const sc = statusColors[p.status] || statusColors.planned
               return (
-                <div key={p.id} className="card-hover" onClick={() => router.push('/projects')} style={{
+                <div key={p.id} className="card-hover" {...keyboardClickable(() => router.push('/projects'))} style={{
                   padding: '12px 14px', borderRadius: 10, marginBottom: 8,
                   border: '1px solid var(--border)', background: 'var(--panel2)',
                   display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
