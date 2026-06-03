@@ -12,6 +12,10 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   devIndicators: false,
+  // Pin the workspace root: multiple lockfiles (worktree + parent) made Next
+  // guess the root, which can mis-trace files for the build output. This
+  // repo's own dir is the correct root.
+  turbopack: { root: import.meta.dirname },
   experimental: {
     // three is still used by components/LoginScene.tsx via a dynamic
     // import("three") for the WebGL login background — code-split to the

@@ -22,7 +22,6 @@ export function Footer() {
         <Link href="/contact">{t("nav.contact")}</Link>
         <Link href="/privacy">{t("footer.privacy")}</Link>
         <Link href="/impressum">{t("footer.impressum")}</Link>
-        <Link href="/login">{t("nav.login")}</Link>
       </nav>
       <div style={{ display: "flex", flexDirection: "column", gap: 8, textAlign: "right" }}>
         <div>

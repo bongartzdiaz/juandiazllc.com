@@ -17,11 +17,23 @@
  * it open during an incident sees updates without a hard reload.
  */
 
+import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import StatusRefresher from '@/components/status/StatusRefresher'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
+
+// Utility page — give it a clear title but keep it OUT of the index (it's a
+// live health view, not a ranking target; a SERP entry could show stale or
+// "degraded" status). Not in the sitemap either (app/sitemap.ts).
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'System status — Juan Diaz, LLC',
+    description: 'Live uptime and dependency health for juandiazllc.com services.',
+    robots: { index: false, follow: true },
+  }
+}
 
 interface HealthCheck {
   name: string
