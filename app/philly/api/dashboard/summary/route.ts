@@ -30,18 +30,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireScope } from '@/lib/philly/auth-helpers'
+import { realEstateBlock, hospitalityBlock } from '@/lib/philly/dashboard-aggregates'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
 
   const prisma = getAuthPrisma()
   const orgId = scope.organizationId
+  // Only the requested vertical's block is computed — a philanthropy org never
+  // pays for RE/HOS aggregates (and vice versa).
+  const vertical = req.nextUrl.searchParams.get('vertical')
 
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
@@ -120,6 +124,11 @@ export async function GET(_req: NextRequest) {
     }
   }
 
+  // Vertical-specific block (sequential after the base reads — one extra
+  // round-trip on a ≥60s-refreshed dashboard is acceptable).
+  const re = vertical === 'realestate' ? await realEstateBlock(prisma, orgId) : undefined
+  const hos = vertical === 'hospitality' ? await hospitalityBlock(prisma, orgId, now) : undefined
+
   return NextResponse.json({
     data: {
       kpis: {
@@ -132,6 +141,8 @@ export async function GET(_req: NextRequest) {
         transactionsCompleted: completedTx._count._all,
         transactionsSalePriceCents: completedTx._sum.salePrice ?? 0,
       },
+      ...(re ? { re } : {}),
+      ...(hos ? { hos } : {}),
       monthlyRevenue: buckets,
       recentActivity: (recentAudit as Array<{
         id: string

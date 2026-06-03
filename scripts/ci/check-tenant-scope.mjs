@@ -55,7 +55,7 @@ const SUPPRESS_MARKER = 'org-scope-lint-ok'
 // organizationId presence check covers them — they just need to be in the
 // tracked-accessor set. Adding these closes the blind spot that hid BE-01
 // (dashboard deal aggregates summed across all tenants).
-const RELATION_SCOPED = ['deal', 'pipelineStage']
+const RELATION_SCOPED = ['deal', 'pipelineStage', 'reservation']
 
 /** Parse prisma/schema.prisma → Set of tenant-scoped Prisma client accessors.
  *  A model is tenant-scoped when it declares an `organizationId` field (direct)
