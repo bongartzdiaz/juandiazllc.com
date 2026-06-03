@@ -39,6 +39,8 @@ const DESCRIPTIONS: Record<string, string> = {
   es: "Juan Diaz, operador de revenue fraccional y consultor de operaciones para energía, inmobiliario y hostelería. Formado en construcción, hecho por operadores.",
 };
 
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const l = assertLocale(locale);
@@ -60,11 +62,29 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const l = assertLocale(locale);
+  // #5 — make the core consultancy offering explicit for service search intent
+  // + LLMs (the page otherwise only carried FAQ schema). Sector-framed Service
+  // schema already lives on /sectors/[slug]; this is the service-framed parent.
+  const serviceLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    name: "Juan Diaz, LLC — Fractional Revenue Operations",
+    url: `${SITE}/${l}`,
+    description: DESCRIPTIONS[l],
+    serviceType: "Fractional revenue operations, operator software, build-vs-buy advisory",
+    areaServed: ["United States", "European Union", "Netherlands", "Germany", "Spain"],
+    availableLanguage: ["English", "Dutch", "German", "Spanish"],
+    provider: { "@type": "Organization", name: "Juan Diaz, LLC", url: SITE },
+  };
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(HOME_FAQ)) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
       />
       <Hero />
       <Marquee />

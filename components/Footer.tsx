@@ -17,6 +17,7 @@ export function Footer() {
         <Link href="/now">{t("footer.now")}</Link>
         <Link href="/uses">{t("footer.uses")}</Link>
         <Link href="/work">{t("nav.work")}</Link>
+        <Link href="/services">{t("nav.services")}</Link>
         <Link href="/sectors">{t("nav.sectors")}</Link>
         <Link href="/insights">{t("nav.insights")}</Link>
         <Link href="/signals">{t("nav.signals")}</Link>
