@@ -89,14 +89,18 @@ export function Topbar({ title, sub, onSync, onAdd, addLabel = 'New', onMenuTogg
           minWidth: 0,
           maxWidth: 'calc(100vw - 720px)',  // leave room for the right-side cluster
         }}>
-          <div style={{
+          {/* A11Y-03: the page title is the document's single <h1>. Inline
+              styles keep the existing visual size; margin:0 neutralises the
+              browser's default h1 spacing. */}
+          <h1 style={{
             fontSize: 16,
             fontWeight: 600,
             letterSpacing: '-0.02em',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-          }}>{title}</div>
+            margin: 0,
+          }}>{title}</h1>
           <div className="mono" style={{
             fontSize: 11.5,
             color: 'var(--txt3)',
