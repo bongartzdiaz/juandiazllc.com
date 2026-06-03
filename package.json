@@ -15,7 +15,10 @@
     "postinstall": "prisma generate",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:deploy": "prisma migrate deploy"
+    "db:deploy": "prisma migrate deploy",
+    "regen:pricing": "node scripts/regenerate-pricing.mjs",
+    "regen:pricing:check": "node scripts/regenerate-pricing.mjs --check",
+    "lint:tenant-scope": "node scripts/ci/check-tenant-scope.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.71",
@@ -44,6 +47,7 @@
     "react-dom": "19.2.3",
     "react-is": "^19.2.5",
     "recharts": "^3.8.1",
+    "stripe": "^17.7.0",
     "swr": "^2.4.1",
     "three": "^0.161.0",
     "topojson-client": "^3.1.0",

@@ -396,7 +396,7 @@ export default function WebhooksPage() {
                                   style={{
                                     display: 'inline-flex', alignItems: 'center', gap: 4,
                                     padding: '3px 8px', borderRadius: 5,
-                                    background: 'var(--accent)', color: '#fff', border: 'none',
+                                    background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
                                     fontSize: 10, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
                                   }}
                                 >

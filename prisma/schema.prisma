@@ -12,9 +12,35 @@ model Organization {
   slug      String   @unique
   logoUrl   String?
   industry  String   @default("general")
+  // Default seat allowance for free / trial orgs. A Subscription overrides
+  // this when present (Subscription.seatCount is authoritative). Keeping a
+  // column on Organization gives us a sane fallback before billing is wired.
+  seatLimit Int      @default(3)
+  // Soft-delete support (GDPR right to erasure). When set, the org is
+  // hidden from auth/login flows; hard-purge runs 30 days later.
+  deletedAt DateTime?
+  // First-time-setup wizard state. Cursor advances welcome → org → team →
+  // contacts → calendar → done. `skipped` is a terminal-ish state for an
+  // admin who clicked "Skip" on a step that wasn't required (the banner on
+  // the dashboard nudges them back).
+  onboardingStep        String   @default("welcome")
+  onboardingCompletedAt DateTime?
+  onboardingSkippedAt   DateTime?
+  // Captured during onboarding step 2; canonical at the org level. Replaces
+  // the localStorage-only `pai-industry` for newly-onboarded orgs.
+  timeZone        String @default("Europe/Amsterdam")
+  defaultCurrency String @default("EUR") // ISO 4217
+  // Privacy-by-design toggle — when true, synced calendar event titles
+  // and locations are stored as a SHA-256 hash + "(redacted)" label
+  // instead of verbatim. Defensive default for medical / legal /
+  // financial verticals where Art. 9 special categories are likely
+  // to appear in user calendars.
+  redactSyncedTitles Boolean @default(false)
   createdAt DateTime @default(now())
 
   users          User[]
+  subscription   Subscription?
+  invites        Invite[]
   projects       Project[]
   contacts       Contact[]
   kanbanBoards   KanbanBoard[]
@@ -22,7 +48,8 @@ model Organization {
   auditLogs      AuditLog[]
   savedViews     SavedView[]
   pipelines      Pipeline[]
-  calendarEvents CalendarEvent[]
+  calendarEvents      CalendarEvent[]
+  calendarConnections CalendarConnection[]
   notifications  Notification[]
   automations    AutomationRule[]
   webhooks       Webhook[]
@@ -78,6 +105,12 @@ model User {
   twoFactorSecret     String?   // encrypted via src/lib/crypto.ts
   twoFactorEnabled    Boolean   @default(false)
   twoFactorVerifiedAt DateTime?
+  // GDPR Art. 17 — soft-delete window. While set, the user cannot
+  // authenticate; sessions are invalidated server-side via
+  // tokensInvalidAfter. Hard-purge runs 30 days after deletedAt.
+  deletedAt           DateTime?
+  // Who initiated the delete: self (= same id) or an org admin.
+  deletedByUserId     String?
 
   organization    Organization     @relation(fields: [organizationId], references: [id])
   twoFactorRecoveryCodes TwoFactorRecoveryCode[]
@@ -95,6 +128,59 @@ model User {
   eventAttendees  EventAttendee[]
   reports         Report[]
   deals           Deal[]          @relation("dealOwner")
+  calendarConnections CalendarConnection[]
+
+  @@index([organizationId])
+}
+
+// One Subscription per Organization. Mirrors Stripe state — the source of
+// truth for billing is Stripe, this row is the cached projection we read
+// on every seat-check. Created either by Stripe webhook (`subscription.created`)
+// or, for trials, by an admin invite at signup time.
+model Subscription {
+  id                String   @id @default(cuid())
+  organizationId    String   @unique
+  plan              String   // "trial" | "starter" | "professional" | "enterprise"
+  status            String   // "active" | "trialing" | "past_due" | "canceled"
+  seatCount         Int      // billable seats — must be >= active user count
+  stripeCustomerId  String?
+  stripeSubId       String?  @unique
+  currentPeriodEnd  DateTime?
+  cancelAt          DateTime? // 30-day notice period
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+// Pending team-invite. Single-use token; expires at expiresAt. Marked
+// acceptedAt when the invitee completes signup — at that point a User row
+// is created in the same Organization with the role from this Invite.
+// We keep accepted/revoked rows for the audit trail; cleanup is by
+// retention policy, not by this table.
+model Invite {
+  id               String    @id @default(cuid())
+  organizationId   String
+  email            String
+  role             String    // "admin" | "manager" | "viewer"
+  // Cryptographically random token (32 bytes, base64url). Unique across
+  // the table — collision-resistant by construction.
+  token            String    @unique
+  invitedByUserId  String    // FK-less reference to User.id (no cascade to keep audit row alive)
+  expiresAt        DateTime
+  acceptedAt       DateTime?
+  acceptedByUserId String?
+  revokedAt        DateTime?
+  revokedByUserId  String?
+  createdAt        DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, expiresAt])
+  @@index([organizationId, email, acceptedAt, revokedAt])
+  @@index([email])
 }
 
 model TwoFactorRecoveryCode {
@@ -128,6 +214,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -137,6 +224,8 @@ model Session {
   expires      DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -168,6 +257,8 @@ model Project {
   contactProjects ContactProject[]
   kanbanCards     KanbanCard[]
   deals           Deal[]
+
+  @@index([organizationId])
 }
 
 model ProjectMilestone {
@@ -269,6 +360,8 @@ model KanbanBoard {
 
   organization Organization   @relation(fields: [organizationId], references: [id])
   columns      KanbanColumn[]
+
+  @@index([organizationId])
 }
 
 model KanbanColumn {
@@ -280,6 +373,8 @@ model KanbanColumn {
 
   board KanbanBoard  @relation(fields: [boardId], references: [id], onDelete: Cascade)
   cards KanbanCard[]
+
+  @@index([boardId])
 }
 
 model KanbanCard {
@@ -325,6 +420,7 @@ model CustomPage {
   blocks       PageBlock[]
 
   @@unique([organizationId, slug])
+  @@index([createdBy])
 }
 
 model PageBlock {
@@ -498,6 +594,135 @@ model Deal {
 
 // ── Phase 2D: Calendar Events ──
 
+// Per-user OAuth connection to a third-party calendar provider. Tokens
+// are encrypted at rest via lib/philly/crypto.ts (AES-256-GCM with key
+// derived from INTEGRATION_SECRET / NEXTAUTH_SECRET). Each user can
+// connect at most one calendar per provider — enforced via the
+// `(userId, provider)` unique index.
+//
+// Lifecycle:
+//   1. User clicks Connect in /onboarding/calendar or /settings.
+//   2. /api/calendar/oauth/start signs a state token containing
+//      { userId, orgId, provider, redirectTo, nonce, expiresAt } and
+//      redirects to the provider's authorize endpoint.
+//   3. Provider redirects back to /api/calendar/oauth/callback with
+//      ?code=... &state=... — we verify state, exchange code for
+//      tokens, encrypt + persist a CalendarConnection.
+//   4. Token refresh happens lazily on read (see lib/philly/calendar/
+//      connection.ts → ensureFreshAccessToken). expiresAt < now+30s ⇒
+//      we exchange the refreshToken before returning the access token.
+//
+// Soft-disconnect: status='revoked' instead of row delete, so we keep
+// an audit trail for compliance reviews. Hard-delete only on user
+// account erasure (DSAR Art. 17), via the existing User cascade.
+model CalendarConnection {
+  id             String    @id @default(cuid())
+  userId         String
+  organizationId String
+  provider       String    // "google" | "microsoft"
+  // Provider-side identity — Google `email`, Microsoft `userPrincipalName`.
+  // Used to display "Connected as foo@example.com" in the UI without
+  // having to call the provider again.
+  providerAccountId String
+  providerEmail     String?
+  // Encrypted via encryptSecret() — never logged, never returned over
+  // the wire. Decryption is server-only via decryptSecret().
+  accessTokenEnc String   @db.Text
+  refreshTokenEnc String? @db.Text
+  // When the access token expires. We refresh proactively at 30s
+  // before this timestamp on read. Null means the provider didn't
+  // include `expires_in` (rare; we'll refresh on first 401).
+  expiresAt      DateTime?
+  // Space-separated scope string from the token response. Stored so
+  // we know whether to ask for re-consent when we add features that
+  // need wider scopes.
+  scopes         String    @db.Text
+  status         String    @default("active") // active, revoked, error
+  // Last error from a token refresh or API call — null on success.
+  // Used to surface "Reconnect" prompts in the UI without polluting
+  // the audit log with transient failures.
+  lastError      String?   @db.Text
+  // Throttled — updated on every successful API call, used to age
+  // out unused connections on a janitor job.
+  lastUsedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Organization deletion is intentionally NOT cascaded. Calendar
+  // connections belong to a User; an org delete that orphans
+  // connections is almost always a mistake. We let the FK constraint
+  // refuse the delete (Prisma default = Restrict) so the operator has
+  // to explicitly clear or move the connections first. User-side
+  // cascade above handles the GDPR Art. 17 erasure path.
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  channels       CalendarChannel[]
+  syncedEvents   SyncedCalendarEvent[]
+
+  @@unique([userId, provider])
+  @@index([organizationId, provider])
+  @@index([status])
+}
+
+// Per-CalendarConnection push-sync registration with the provider.
+// Google calls these "channels", Microsoft calls them "subscriptions" —
+// we use a single neutral term. Lives separately from CalendarConnection
+// so OAuth state and push-sync state have independent lifecycles
+// (a channel can fail without invalidating the OAuth tokens, and vice
+// versa). See docs/calendar-push-sync.md for the architectural rationale.
+//
+// Idempotency: providers can deliver the same notification twice. We
+// dedupe at two layers — `lastMessageNum` (Google's monotonic counter)
+// and the upstream upsert that the actual event sync uses. Even if a
+// notification fires the sync twice, the DB state is the same.
+//
+// Renewal: Google channels live 7 days, Microsoft subscriptions ~70
+// hours. A cron job (TODO) finds rows where expiresAt < NOW + buffer
+// and renews them — Google by creating a new channel + stopping the
+// old one, Microsoft by PATCH /subscriptions/{id}.
+model CalendarChannel {
+  id             String    @id @default(cuid())
+  connectionId   String
+  provider       String    // mirrors connection.provider — denormalized for index
+  // Google: channel id we generated and sent in `watch`. MS: subscriptionId
+  // returned by /subscriptions. Unique per provider — used by webhook to
+  // look up which connection owns this notification.
+  externalId     String
+  // Google only — opaque resource id returned by `watch`. Required to call
+  // /channels/stop. Null on MS (DELETE /subscriptions/{id} uses externalId).
+  resourceId     String?
+  // MS only — the subscribed resource path (e.g. "me/events"). Stored so
+  // an auditor can see what was watched without joining tables.
+  resource       String?
+  // Encrypted via lib/philly/crypto.ts — Google's `token` (echoed back as
+  // X-Goog-Channel-Token) and MS's `clientState` (echoed in every
+  // notification body). Generated as 32-byte base64url random at create
+  // time. Verified on every webhook delivery before we trust the payload.
+  authSecretEnc  String    @db.Text
+  // Provider-specific delta marker. Google: events.list syncToken.
+  // Microsoft: calendarView/delta deltaLink. Null on first run; populated
+  // after the first successful sync. Provider can invalidate (Google 410);
+  // we drop and re-bootstrap on the next notification.
+  syncToken      String?   @db.Text
+  expiresAt      DateTime
+  lastRenewedAt  DateTime?
+  // Google's monotonic message counter. We refuse to process a notification
+  // whose number is <= this value — that's a duplicate redelivery. MS
+  // doesn't have an equivalent (different idempotency strategy via
+  // notification id ring-buffer if needed).
+  lastMessageNum Int?
+  status         String    @default("active") // active | expired | error
+  lastError      String?   @db.Text
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  connection CalendarConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, externalId])
+  @@index([expiresAt, status])
+  @@index([connectionId])
+}
+
 model CalendarEvent {
   id             String    @id @default(cuid())
   organizationId String
@@ -531,6 +756,70 @@ model EventAttendee {
   @@unique([eventId, userId])
   @@index([eventId])
   @@index([userId])
+}
+
+// External calendar events synced from Google / Microsoft via push-sync.
+//
+// Distinct from `CalendarEvent` (the in-app, user-created model) so:
+//   1. delta-sync upserts never collide with user-created data
+//   2. retention + erasure can target synced events independently
+//   3. Art. 9 controls (filtering, redaction) live in one place
+//
+// PRIVACY-BY-DESIGN — only events whose attendee list intersects with
+// CRM Contacts are persisted. Events with NO CRM-contact attendee are
+// counted but not stored — keeps personal medical/political/etc.
+// appointments out of the system entirely.
+//
+// Fields deliberately OMITTED:
+//   - description: too high-risk for Art. 9 (clinical notes, therapy
+//     details, legal-strategy memos). The provider link covers users
+//     who need it.
+//   - full attendee list: only emails matching a CRM Contact are
+//     stored; non-matching attendees are dropped entirely.
+//   - color, recurrence rules, conferencing data: not in MVP scope.
+model SyncedCalendarEvent {
+  id             String   @id @default(cuid())
+  // Owning connection — one synced event row per user-connection-event.
+  // Two attendees both syncing the same meeting get DIFFERENT rows
+  // because each owns their own calendar's representation.
+  connectionId   String
+  organizationId String
+  userId         String
+  provider       String   // "google" | "microsoft"
+  // Provider-side event id. Composite key with connectionId for upsert
+  // because two providers (or two users) can re-use the same id space.
+  externalId     String
+  // Optional title. Stored verbatim by default; if the org has
+  // `redactSyncedTitles` set we store a SHA-256 hash + a generic
+  // "(redacted)" label instead (defensive default for medical / legal
+  // verticals). Description is NEVER stored.
+  title          String   @default("")
+  // Optional location (often professional — office addresses). Same
+  // redaction rule as title.
+  location       String   @default("")
+  // Provider deep-link back to the event. Lets users jump to the full
+  // record (with description, recurrence, etc.) in their own provider
+  // UI without us holding that data.
+  htmlLink       String   @default("") @db.Text
+  startTime      DateTime
+  endTime        DateTime
+  allDay         Boolean  @default(false)
+  // Comma-separated list of CRM-Contact-matched attendee emails. Only
+  // emails resolving to a Contact in the same organization are stored;
+  // non-matching attendees are not persisted. UI uses this to filter
+  // "events with this contact" on the deal page.
+  matchedEmails  String   @default("") @db.Text
+  // Soft-delete: provider tells us the event was cancelled. We keep
+  // the row briefly (for "recently cancelled" UI) before pruning.
+  cancelledAt    DateTime?
+  syncedAt       DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  connection   CalendarConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@unique([connectionId, externalId])
+  @@index([organizationId, startTime])
+  @@index([userId, startTime])
 }
 
 // ── Phase 2E: Reports ──

@@ -22,6 +22,15 @@ import {
   updateOutreachMessageSchema,
   leadSearchQuery,
   leadSortFieldEnum,
+  createInviteSchema,
+  acceptInviteSchema,
+  inviteRoleEnum,
+  deleteAccountSchema,
+  deleteUserSchema,
+  dsarScopeEnum,
+  onboardingStepEnum,
+  advanceOnboardingStepSchema,
+  updateOrgDetailsSchema,
 } from './schemas'
 
 // Schema coverage smoke tests. Every API route in /philly/api validates
@@ -477,5 +486,213 @@ describe('updateOutreachMessageSchema', () => {
     expect(() =>
       updateOutreachMessageSchema.parse({ id: 'not-a-uuid', action: 'approve' }),
     ).toThrow()
+  })
+})
+
+// ── Invites + seats ──
+
+describe('createInviteSchema', () => {
+  it('accepts a valid email + role', () => {
+    const out = createInviteSchema.parse({ email: 'jane@example.com', role: 'manager' })
+    expect(out.email).toBe('jane@example.com')
+    expect(out.role).toBe('manager')
+  })
+
+  it('defaults role to viewer', () => {
+    const out = createInviteSchema.parse({ email: 'jane@example.com' })
+    expect(out.role).toBe('viewer')
+  })
+
+  it('lowercases + trims the email so duplicates canonicalize', () => {
+    const out = createInviteSchema.parse({ email: '  Jane@Example.COM  ' })
+    expect(out.email).toBe('jane@example.com')
+  })
+
+  it('rejects malformed emails', () => {
+    expect(() => createInviteSchema.parse({ email: 'not-an-email' })).toThrow()
+    expect(() => createInviteSchema.parse({ email: '@example.com' })).toThrow()
+  })
+
+  it('rejects unknown roles — prevents privilege escalation', () => {
+    expect(() => createInviteSchema.parse({ email: 'a@b.com', role: 'superadmin' })).toThrow()
+    expect(() => createInviteSchema.parse({ email: 'a@b.com', role: 'owner' })).toThrow()
+  })
+
+  it('caps email length to prevent payload abuse', () => {
+    const oversized = 'a'.repeat(250) + '@b.com'
+    expect(() => createInviteSchema.parse({ email: oversized })).toThrow()
+  })
+})
+
+describe('acceptInviteSchema', () => {
+  const valid = {
+    token: 'a'.repeat(43),
+    name: 'Jane Doe',
+    password: 'long-strong-password-123',
+  }
+
+  it('accepts a fully-valid payload', () => {
+    const out = acceptInviteSchema.parse(valid)
+    expect(out.name).toBe('Jane Doe')
+  })
+
+  it('rejects passwords shorter than 12 chars — bank-grade minimum', () => {
+    expect(() => acceptInviteSchema.parse({ ...valid, password: 'short' })).toThrow()
+    expect(() => acceptInviteSchema.parse({ ...valid, password: 'eleven-chrs' })).toThrow()
+  })
+
+  it('rejects tokens shorter than 20 chars — prevents accidental brute-force', () => {
+    expect(() => acceptInviteSchema.parse({ ...valid, token: 'short' })).toThrow()
+  })
+
+  it('caps token length so storage never blows up', () => {
+    expect(() => acceptInviteSchema.parse({ ...valid, token: 'a'.repeat(101) })).toThrow()
+  })
+
+  it('caps name length to prevent payload abuse', () => {
+    expect(() => acceptInviteSchema.parse({ ...valid, name: 'a'.repeat(121) })).toThrow()
+  })
+
+  it('rejects an empty name', () => {
+    expect(() => acceptInviteSchema.parse({ ...valid, name: '   ' })).toThrow()
+  })
+
+  it('caps password length so we never bcrypt a 1MB payload', () => {
+    expect(() => acceptInviteSchema.parse({ ...valid, password: 'a'.repeat(201) })).toThrow()
+  })
+})
+
+describe('inviteRoleEnum', () => {
+  it('only accepts the three documented roles', () => {
+    expect(inviteRoleEnum.parse('admin')).toBe('admin')
+    expect(inviteRoleEnum.parse('manager')).toBe('manager')
+    expect(inviteRoleEnum.parse('viewer')).toBe('viewer')
+  })
+
+  it('rejects anything else — privilege-escalation guard', () => {
+    expect(() => inviteRoleEnum.parse('owner')).toThrow()
+    expect(() => inviteRoleEnum.parse('root')).toThrow()
+    expect(() => inviteRoleEnum.parse('')).toThrow()
+  })
+})
+
+// ── GDPR — erasure ──
+
+describe('deleteAccountSchema', () => {
+  it('accepts the literal "DELETE" confirmation', () => {
+    expect(deleteAccountSchema.parse({ confirmation: 'DELETE' }).confirmation).toBe('DELETE')
+  })
+
+  it('rejects lowercase "delete" — typed-confirmation must be exact', () => {
+    expect(() => deleteAccountSchema.parse({ confirmation: 'delete' })).toThrow()
+  })
+
+  it('rejects close misses to prevent accidental deletes', () => {
+    expect(() => deleteAccountSchema.parse({ confirmation: 'DELET' })).toThrow()
+    expect(() => deleteAccountSchema.parse({ confirmation: 'DELETE ' })).toThrow()
+    expect(() => deleteAccountSchema.parse({ confirmation: '' })).toThrow()
+  })
+
+  it('rejects missing confirmation', () => {
+    expect(() => deleteAccountSchema.parse({})).toThrow()
+  })
+})
+
+describe('deleteUserSchema', () => {
+  it('accepts no body', () => {
+    expect(deleteUserSchema.parse({}).reason).toBeUndefined()
+  })
+
+  it('accepts a reason', () => {
+    expect(deleteUserSchema.parse({ reason: 'Left the company' }).reason).toBe('Left the company')
+  })
+
+  it('caps reason length to prevent payload abuse', () => {
+    expect(() => deleteUserSchema.parse({ reason: 'a'.repeat(501) })).toThrow()
+  })
+})
+
+describe('dsarScopeEnum', () => {
+  it('accepts user and org', () => {
+    expect(dsarScopeEnum.parse('user')).toBe('user')
+    expect(dsarScopeEnum.parse('org')).toBe('org')
+  })
+
+  it('rejects anything else — prevents arbitrary scope expansion', () => {
+    expect(() => dsarScopeEnum.parse('all')).toThrow()
+    expect(() => dsarScopeEnum.parse('admin')).toThrow()
+    expect(() => dsarScopeEnum.parse('global')).toThrow()
+  })
+})
+
+// ── Onboarding wizard ──
+
+describe('onboardingStepEnum', () => {
+  it('accepts the 6 documented steps', () => {
+    for (const s of ['welcome', 'org', 'team', 'contacts', 'calendar', 'done']) {
+      expect(onboardingStepEnum.parse(s)).toBe(s)
+    }
+  })
+
+  it('rejects steps outside the wizard', () => {
+    expect(() => onboardingStepEnum.parse('billing')).toThrow()
+    expect(() => onboardingStepEnum.parse('start')).toThrow()
+  })
+})
+
+describe('advanceOnboardingStepSchema', () => {
+  it('accepts each valid step', () => {
+    expect(advanceOnboardingStepSchema.parse({ step: 'team' }).step).toBe('team')
+  })
+
+  it('rejects missing step', () => {
+    expect(() => advanceOnboardingStepSchema.parse({})).toThrow()
+  })
+
+  it('rejects invalid step', () => {
+    expect(() => advanceOnboardingStepSchema.parse({ step: 'totally_made_up' })).toThrow()
+  })
+})
+
+describe('updateOrgDetailsSchema', () => {
+  const valid = {
+    name: 'Acme Real Estate',
+    industry: 'realestate' as const,
+    timeZone: 'Europe/Amsterdam',
+    defaultCurrency: 'EUR' as const,
+  }
+
+  it('accepts a valid payload', () => {
+    expect(updateOrgDetailsSchema.parse(valid).name).toBe('Acme Real Estate')
+  })
+
+  it('trims whitespace from name', () => {
+    expect(updateOrgDetailsSchema.parse({ ...valid, name: '  Acme  ' }).name).toBe('Acme')
+  })
+
+  it('rejects whitespace-only name (trim then min-1)', () => {
+    expect(() => updateOrgDetailsSchema.parse({ ...valid, name: '   ' })).toThrow()
+  })
+
+  it('caps name length to prevent payload abuse', () => {
+    expect(() => updateOrgDetailsSchema.parse({ ...valid, name: 'a'.repeat(121) })).toThrow()
+  })
+
+  it('rejects unknown industry', () => {
+    expect(() => updateOrgDetailsSchema.parse({ ...valid, industry: 'philanthropy' })).toThrow()
+  })
+
+  it('makes industry optional (welcome step pre-fills it)', () => {
+    const { industry, ...rest } = valid
+    void industry
+    expect(updateOrgDetailsSchema.parse(rest).name).toBe('Acme Real Estate')
+  })
+
+  it('rejects unsupported currency', () => {
+    expect(() => updateOrgDetailsSchema.parse({ ...valid, defaultCurrency: 'JPY' })).toThrow()
+  })
+
+  it('rejects empty time zone', () => {
+    expect(() => updateOrgDetailsSchema.parse({ ...valid, timeZone: '' })).toThrow()
   })
 })

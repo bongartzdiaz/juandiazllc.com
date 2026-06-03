@@ -301,7 +301,7 @@ async function main() {
       organizationId: org.id,
       userId: admin.id,
       type: 'info',
-      title: 'Welcome to Philly Dashboard',
+      title: 'Welcome to DEUS',
       message: 'Your CRM is ready. Explore /contacts, /deals, /projects — or jump to /settings/pipelines to configure stages.',
       read: false,
     },

@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { assertSafeWebhookUrl, UnsafeWebhookUrlError } from '@/lib/philly/webhooks/ssrf-guard'
 import { logAudit } from '@/lib/philly/audit'
 import crypto from 'crypto'
 
@@ -38,10 +40,21 @@ export async function POST(req: NextRequest) {
   const scope = await requireRole(['admin'])
   if (scope instanceof NextResponse) return scope
 
+  const limited = enforceRateLimit(`webhooks:create:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   let body: { url?: string; events?: string[]; enabled?: boolean }
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
 
   if (!body.url?.trim()) return jsonError('url is required', 400)
+
+  // SSRF guard (A-04): https-only, no internal/private/metadata targets.
+  try {
+    await assertSafeWebhookUrl(body.url.trim())
+  } catch (e) {
+    if (e instanceof UnsafeWebhookUrlError) return jsonError(e.message, 400)
+    throw e
+  }
 
   const secret = crypto.randomBytes(32).toString('hex')
 

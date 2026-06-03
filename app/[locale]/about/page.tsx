@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
+import { AUTHOR_IMAGE_PATH, AUTHOR_IMAGE_URL, PERSON_SAME_AS } from "@/lib/seo/branding";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -9,9 +10,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "About Juan Diaz — operator, builder, founder",
+    title: "About Juan Diaz — Fractional Revenue Operator & Builder",
     description:
-      "Construction-trained, operator-built. Juan Diaz runs Juan Diaz, LLC — a holding company building revenue engines for operators in energy, real estate and hospitality.",
+      "Juan Diaz is a fractional revenue operator and operations consultant — construction-trained, operator-built — running Juan Diaz, LLC and building revenue systems for operators in energy, real estate and hospitality.",
     alternates: buildAlternates(l, "/about"),
     openGraph: {
       type: "profile",
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         "Construction-trained, operator-built. Revenue engines for operators in energy, real estate and hospitality.",
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
-      images: [{ url: "/me/portrait.jpg", width: 1200, height: 1200, alt: "Juan Diaz" }],
+      images: [{ url: AUTHOR_IMAGE_PATH, width: 1200, height: 1200, alt: "Juan Diaz" }],
     },
   };
 }
@@ -32,8 +33,8 @@ const personSchema = {
   name: "Juan Stefan Bongartz Diaz",
   alternateName: "Juan Diaz",
   url: `${SITE}/about`,
-  image: `${SITE}/me/portrait.jpg`,
-  jobTitle: "Founder, Juan Diaz, LLC",
+  image: AUTHOR_IMAGE_URL,
+  jobTitle: "Fractional Revenue Operator & Founder, Juan Diaz, LLC",
   worksFor: {
     "@type": "Organization",
     name: "Juan Diaz, LLC",
@@ -50,7 +51,7 @@ const personSchema = {
     "Sales automation",
     "Data engineering for operators",
   ],
-  sameAs: ["https://github.com/bongartzdiaz"],
+  sameAs: PERSON_SAME_AS,
 };
 
 const FOCUS_KEYS = [

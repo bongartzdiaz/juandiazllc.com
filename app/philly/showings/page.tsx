@@ -236,7 +236,7 @@ export default function ShowingsPage() {
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '8px 14px', borderRadius: 10,
-              background: 'var(--accent)', color: '#fff',
+              background: 'var(--accent)', color: 'var(--accent-fg)',
               border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
               fontFamily: 'inherit', boxShadow: 'var(--shadow-sm)',
             }}
@@ -396,7 +396,7 @@ export default function ShowingsPage() {
                   onClick={saveFeedback}
                   style={{
                     marginTop: 8, padding: '7px 14px', borderRadius: 8,
-                    background: 'var(--accent)', color: '#fff', border: 'none',
+                    background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
                     fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
                     display: 'inline-flex', alignItems: 'center', gap: 5,
                   }}
@@ -483,7 +483,7 @@ export default function ShowingsPage() {
             }}>Cancel</button>
             <button onClick={submitForm} disabled={saving} style={{
               padding: '9px 18px', borderRadius: 8,
-              background: 'var(--accent)', color: '#fff', border: 'none',
+              background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
               fontSize: 12, fontWeight: 600, cursor: saving ? 'wait' : 'pointer',
               fontFamily: 'inherit', opacity: saving ? 0.7 : 1,
             }}>{saving ? 'Saving…' : editingId ? 'Save' : 'Schedule'}</button>

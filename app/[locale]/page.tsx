@@ -19,19 +19,27 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 import { faqSchema } from "@/lib/seo/schema";
 import { HOME_FAQ } from "@/lib/seo/faqs";
 
+// Titles lead with the commercial search term ("fractional revenue
+// operator" / localized) then the brand — the home page is the primary
+// ranking target for the personal-operator positioning. Kept <60 chars
+// so Google doesn't truncate. Descriptions carry the long-tail + the
+// three target sectors (energy / real estate / hospitality) + the
+// credibility hook, in the priority markets (EN/DE/ES).
 const TITLES: Record<string, string> = {
-  en: "Juan Diaz, LLC — revenue engines for operators",
-  nl: "Juan Diaz, LLC — omzetmotoren voor operators",
-  de: "Juan Diaz, LLC — Umsatzmotoren für Operators",
-  es: "Juan Diaz, LLC — motores de ingresos para operadores",
+  en: "Juan Diaz — Fractional Revenue Operator & Consultant",
+  nl: "Juan Diaz — Revenue Operator & Operations-consultant",
+  de: "Juan Diaz — Fractional Revenue Operator & Berater",
+  es: "Juan Diaz — Operador de Revenue Fraccional y Consultor",
 };
 
 const DESCRIPTIONS: Record<string, string> = {
-  en: "Revenue engines for operators in energy, real estate, hospitality and adjacent industries. Construction-trained. Operator-built.",
-  nl: "Omzetmotoren voor operators in energie, vastgoed, horeca en aanverwante sectoren. Getraind in bouwmanagement. Gebouwd voor operators.",
-  de: "Umsatzmotoren für Operators in Energie, Immobilien, Gastgewerbe und angrenzenden Branchen. Bauleitungs-trainiert. Operator-gebaut.",
-  es: "Motores de ingresos para operadores en energía, bienes raíces, hostelería e industrias adyacentes. Formado en gestión de construcción. Construido para operadores.",
+  en: "Juan Diaz is a fractional revenue operator and operations consultant for energy, real estate and hospitality operators. Construction-trained, operator-built.",
+  nl: "Juan Diaz — fractional revenue operator en operations-consultant voor operators in energie, vastgoed en horeca. Bouwkundig getraind, operator-built.",
+  de: "Juan Diaz ist Fractional Revenue Operator und Operations-Berater für Betreiber in Energie, Immobilien und Gastgewerbe. Bauerprobt, operator-built.",
+  es: "Juan Diaz, operador de revenue fraccional y consultor de operaciones para energía, inmobiliario y hostelería. Formado en construcción, hecho por operadores.",
 };
+
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -54,11 +62,29 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const l = assertLocale(locale);
+  // #5 — make the core consultancy offering explicit for service search intent
+  // + LLMs (the page otherwise only carried FAQ schema). Sector-framed Service
+  // schema already lives on /sectors/[slug]; this is the service-framed parent.
+  const serviceLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    name: "Juan Diaz, LLC — Fractional Revenue Operations",
+    url: `${SITE}/${l}`,
+    description: DESCRIPTIONS[l],
+    serviceType: "Fractional revenue operations, operator software, build-vs-buy advisory",
+    areaServed: ["United States", "European Union", "Netherlands", "Germany", "Spain"],
+    availableLanguage: ["English", "Dutch", "German", "Spanish"],
+    provider: { "@type": "Organization", name: "Juan Diaz, LLC", url: SITE },
+  };
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(HOME_FAQ)) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
       />
       <Hero />
       <Marquee />

@@ -783,7 +783,7 @@ export default function DealsPage() {
                 onClick={handleAddDeal} disabled={saving}
                 style={{
                   flex: 1, padding: '10px 0', borderRadius: 10, fontSize: 13, fontWeight: 600,
-                  background: 'var(--accent)', color: '#fff', border: 'none',
+                  background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
                   cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit',
                   opacity: saving ? 0.65 : 1,
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,

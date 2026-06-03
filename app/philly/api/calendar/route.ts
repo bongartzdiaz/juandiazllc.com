@@ -3,12 +3,13 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
-import { requireScope, requireRole } from '@/lib/philly/auth-helpers'
+import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { validateBody } from '@/lib/philly/validation'
 import { createCalendarEventSchema } from '@/lib/philly/validation/schemas'
+import { someUserNotInOrg } from '@/lib/philly/v1-fk-guard'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -57,6 +58,13 @@ export async function POST(req: NextRequest) {
   const body = parsed.data
 
   const prisma = getAuthPrisma()
+
+  // BE-09: every attendee must be a user in the caller's org (no cross-tenant
+  // invite of another org's users).
+  if (await someUserNotInOrg(prisma, scope.organizationId, body.attendeeIds)) {
+    return jsonError('attendeeIds must all be users in your organization', 400)
+  }
+
   const event = await prisma.calendarEvent.create({
     data: {
       organizationId: scope.organizationId,

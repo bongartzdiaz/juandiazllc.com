@@ -9,6 +9,7 @@ import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
 import { validateBody } from '@/lib/philly/validation'
 import { createDealSchema } from '@/lib/philly/validation/schemas'
+import { stageBelongsToPipeline, findForeignKeyNotInOrg } from '@/lib/philly/v1-fk-guard'
 import { SLO, withSpan } from '@/lib/philly/observability'
 
 export const dynamic = 'force-dynamic'
@@ -96,6 +97,18 @@ export async function POST(req: NextRequest) {
         select: { id: true },
       })
       if (!pipeline) return jsonError('Pipeline not found', 404)
+
+      // BE-02: the stage must belong to THIS pipeline (not just the org), else
+      // the deal lands in a foreign pipeline's stage and corrupts reporting.
+      if (!(await stageBelongsToPipeline(prisma, body.stageId, body.pipelineId))) {
+        return jsonError('stageId does not belong to the pipeline', 400)
+      }
+
+      // BE-09: a client-supplied contact must belong to the caller's org.
+      const badFk = await findForeignKeyNotInOrg(prisma, scope.organizationId, [
+        { field: 'contactId', model: 'contact', value: body.contactId },
+      ])
+      if (badFk) return jsonError(`${badFk} does not belong to your organization`, 400)
 
       const deal = await prisma.deal.create({
         data: {

@@ -4,16 +4,34 @@
 // so the listing page, RSS feed, sitemap and Article schema can all
 // source from one truth.
 
+import type { Locale } from "@/lib/i18n/dict";
+
+/** Localized overrides for a post's user-facing content. */
+export type InsightL10n = { title: string; summary: string; body: InsightBlock[] };
+
 export type Insight = {
   slug: string;
   title: string;
   summary: string;
   tag: string;
   publishedAt: string;
+  /** Last meaningful content update (ISO). Feeds BlogPosting.dateModified for
+   *  freshness signals; falls back to publishedAt when absent. */
+  updatedAt?: string;
   readingMinutes: number;
   body: InsightBlock[];
   seo?: { metaTitle?: string; metaDescription?: string };
+  /** Locales this post is published under. Undefined = all four (the default,
+   *  used by language-agnostic operator content with EN as the int'l fallback).
+   *  Market-specific posts (e.g. Dutch saldering/WhatsApp) set this to ['nl']
+   *  so they don't surface as thin content under /en,/de,/es. */
+  markets?: Locale[];
+  /** Real localized content per locale. When present for the active locale the
+   *  detail/listing renders it instead of the base (EN/NL) strings. */
+  i18n?: Partial<Record<Locale, InsightL10n>>;
 };
+
+const ALL_LOCALES: Locale[] = ["en", "nl", "de", "es"];
 
 export type InsightBlock =
   | { type: "h2"; text: string }
@@ -42,10 +60,49 @@ export const POSTS: Insight[] = [
       { type: "p", text: "Write down the three highest-value hours your top performer spends in a typical week. If your candidate automation does not touch those three hours directly, the ROI is theatre. Shelve it. The gains from automating a bottleneck person for five hours a week dwarf automating ten non-bottlenecks for fifty." },
       { type: "quote", text: "Automation ROI is measured by what gets un-queued, not by what gets done faster." },
       { type: "p", text: "The operators who grow stop confusing activity with throughput. You want fewer automations, pointed at sharper targets, each paying for itself in weeks not quarters." }
-    ]
+    ],
+    i18n: {
+      de: {
+        title: "Der Mythos vom Automatisierungs-ROI — und was sich wirklich auszahlt",
+        summary:
+          "Die meisten Automatisierungsprojekte sparen Stunden, die ohnehin niemand investiert hätte. Drei Regeln, um die auszuwählen, die wirklich die GuV bewegen — und ein Test, bevor Sie das nächste Tool kaufen.",
+        body: [
+          { type: "p", text: "Jeder Operator, den ich treffe, hat ein Foliendeck von irgendeinem Berater, das behauptet, sein Team werde 400 Stunden pro Jahr sparen. Meistens ist diese Zahl rechnerische Fiktion — Stunden, die nie abgerechnet worden wären, Meetings, die nie gebucht worden wären, Arbeit, die nie erledigt worden wäre. Echter Automatisierungs-ROI ist enger und härter." },
+          { type: "h2", text: "Die drei Fragen, die echten ROI von Theater trennen" },
+          { type: "ul", items: [
+            "Wird die automatisierte Arbeit derzeit von einer Person erledigt, die Ihr Engpass ist? Wenn nein, schaffen Sie keine Kapazität frei, Sie machen die ohnehin Untätigen schneller.",
+            "Entfernt die Automatisierung eine Entscheidung, oder beschleunigt sie nur die Dateneingabe? Entfernte Entscheidungen summieren sich; schnellere Dateneingabe sättigt bei vielleicht 20 Prozent der theoretischen Einsparung.",
+            "Wenn es eine Woche lang ausfällt, bemerkt es jemand? Wenn nein, haben Sie ein Museum automatisiert."
+          ]},
+          { type: "h2", text: "Der Test, bevor Sie kaufen" },
+          { type: "p", text: "Notieren Sie die drei wertvollsten Stunden, die Ihr Leistungsträger in einer typischen Woche verbringt. Wenn Ihre Kandidaten-Automatisierung diese drei Stunden nicht direkt berührt, ist der ROI Theater. Legen Sie sie zur Seite. Der Gewinn aus der Automatisierung einer Engpass-Person für fünf Stunden pro Woche übertrifft die Automatisierung von zehn Nicht-Engpässen für fünfzig." },
+          { type: "quote", text: "Automatisierungs-ROI misst sich daran, was aus der Warteschlange verschwindet — nicht daran, was schneller erledigt wird." },
+          { type: "p", text: "Die Operatoren, die wachsen, hören auf, Aktivität mit Durchsatz zu verwechseln. Sie wollen weniger Automatisierungen, auf schärfere Ziele gerichtet, jede zahlt sich in Wochen aus, nicht in Quartalen." }
+        ],
+      },
+      es: {
+        title: "El mito del ROI de la automatización, y lo que de verdad se amortiza",
+        summary:
+          "La mayoría de los proyectos de automatización ahorran horas que nadie iba a invertir de todos modos. Tres reglas para elegir las que sí mueven la cuenta de resultados — y una prueba antes de comprar otra herramienta.",
+        body: [
+          { type: "p", text: "Todo operador que conozco tiene una presentación de algún consultor que afirma que su equipo ahorrará 400 horas al año. Casi siempre esa cifra es ficción aritmética: horas que nunca se habrían facturado, reuniones que nunca se habrían convocado, trabajo que nunca se habría hecho. El ROI real de la automatización es más estrecho y más duro." },
+          { type: "h2", text: "Las tres preguntas que separan el ROI real del teatro" },
+          { type: "ul", items: [
+            "¿El trabajo que se automatiza lo hace ahora una persona que es tu cuello de botella? Si no, no estás liberando capacidad, estás acelerando a quien ya está ocioso.",
+            "¿La automatización elimina una decisión o solo agiliza la introducción de datos? Las decisiones eliminadas se acumulan; la entrada de datos más rápida se satura quizá en el 20 por ciento del ahorro teórico.",
+            "Si se rompe durante una semana, ¿alguien lo nota? Si la respuesta es no, has automatizado un museo."
+          ]},
+          { type: "h2", text: "La prueba antes de comprar" },
+          { type: "p", text: "Anota las tres horas de mayor valor que tu mejor profesional dedica en una semana típica. Si tu candidata a automatización no toca esas tres horas directamente, el ROI es teatro. Apártala. La ganancia de automatizar a una persona cuello de botella cinco horas a la semana eclipsa la de automatizar diez no-cuellos de botella durante cincuenta." },
+          { type: "quote", text: "El ROI de la automatización se mide por lo que sale de la cola, no por lo que se hace más rápido." },
+          { type: "p", text: "Los operadores que crecen dejan de confundir actividad con rendimiento. Quieres menos automatizaciones, apuntadas a objetivos más afilados, cada una amortizándose en semanas, no en trimestres." }
+        ],
+      },
+    },
   },
   {
     slug: "whatsapp-first-funnel-nl",
+    markets: ["nl"],
     title: "Why your Dutch lead funnel should start on WhatsApp",
     summary:
       "Nederlandse consumenten beantwoorden WhatsApp in 90 seconden en email in een week. Hoe je je funnel inricht zodat het eerste contact altijd WhatsApp is — zonder de lead kwijt te raken in de doorverwijzing.",
@@ -89,10 +146,57 @@ export const POSTS: Insight[] = [
       { type: "h2", text: "The practical move" },
       { type: "p", text: "Before touching a vendor contract, write down the ten actions your team performs most on a typical Tuesday. Prototype those ten actions as one-tap flows. Anything that takes more than three taps gets rethought. The CRM is not the system — the ten flows are. Everything else is reporting." },
       { type: "p", text: "That is the same lens I use when I build Philly — the CRM I ship to operators. Revenue is earned by field teams, so the software has to treat them like the primary user." }
-    ]
+    ],
+    i18n: {
+      de: {
+        title: "Warum die meisten Operator-CRMs binnen 90 Tagen scheitern",
+        summary:
+          "Ein CRM, das das Team meidet, ist schlimmer als eine Tabelle. Das Muster, das die Akzeptanz in Energie-, Immobilien- und Hospitality-Betrieben tötet — und fünf Entscheidungen, die es vor dem Rollout beheben.",
+        body: [
+          { type: "p", text: "Jeder Operator, mit dem ich spreche, hat dieselbe Geschichte: Sie kauften ein CRM, migrierten die Kontakte, hielten zwei Schulungen ab, und binnen eines Quartals lief die Deal-Pipeline wieder über WhatsApp und Gedächtnis. Die Diagnose ist fast immer dieselbe — und sie ist nie die Schuld der Software." },
+          { type: "h2", text: "Das Symptom ist die Akzeptanz. Die Ursache ist das Design." },
+          { type: "p", text: "Wenn ein CRM aufgegeben wird, liegt die eigentliche Ursache meist darin, dass es um das herum konfiguriert wurde, was das Büro sehen wollte, nicht um das, was das Außendienstteam tun musste. Die Dashboards sind schön. Die Dateneingabe ist teuer. Also hören die Leute, die Umsatz erzeugen, auf, Daten einzugeben, die Dashboards werden leer, und die Geschäftsführung nennt es ein Tech-Problem." },
+          { type: "h2", text: "Fünf Entscheidungen, die bestimmen, ob es hält" },
+          { type: "ul", items: [
+            "Wer verantwortet den täglichen Pipeline-Review, und sind es zehn Minuten oder eine Stunde?",
+            "Ist eine Statusänderung ein Knopf oder ein Formular? Die Antwort muss 'Knopf' lauten.",
+            "Zahlt sich jedes Feld in einer nachgelagerten Automatisierung aus, oder ist es nur ein Museum?",
+            "Was passiert bei Phasenübergängen — nichts, oder ein sichtbarer Anstoß an den nächsten Verantwortlichen?",
+            "Ist die mobile Eingabe gleichwertig zum Desktop, oder ist Mobil ein schreibgeschützter Nachgedanke?"
+          ]},
+          { type: "quote", text: "Wenn ein Vertriebsmitarbeiter einen Deal nicht auf dem Weg vom Parkplatz zur Haustür aktualisieren kann, verliert das CRM bereits." },
+          { type: "h2", text: "Der praktische Schritt" },
+          { type: "p", text: "Bevor Sie einen Anbietervertrag anfassen, notieren Sie die zehn Aktionen, die Ihr Team an einem typischen Dienstag am häufigsten ausführt. Prototypisieren Sie diese zehn Aktionen als Ein-Tipp-Abläufe. Alles, was mehr als drei Tipps braucht, wird neu gedacht. Das CRM ist nicht das System — die zehn Abläufe sind es. Alles andere ist Reporting." },
+          { type: "p", text: "Das ist dieselbe Brille, mit der ich Philly baue — das CRM, das ich an Operatoren ausliefere. Umsatz wird von Außendienstteams erzielt, also muss die Software sie als primäre Nutzer behandeln." }
+        ],
+      },
+      es: {
+        title: "Por qué la mayoría de los CRM de operadores fracasan en 90 días",
+        summary:
+          "Un CRM que el equipo evita es peor que una hoja de cálculo. El patrón que mata la adopción en negocios de energía, inmobiliaria y hostelería — y cinco decisiones que lo arreglan antes del despliegue.",
+        body: [
+          { type: "p", text: "Todo operador con quien hablo tiene la misma historia: compraron un CRM, migraron los contactos, hicieron dos sesiones de formación, y en un trimestre el pipeline de oportunidades volvió a WhatsApp y a la memoria. El diagnóstico es casi siempre el mismo — y nunca es culpa del software." },
+          { type: "h2", text: "El síntoma es la adopción. La causa es el diseño." },
+          { type: "p", text: "Cuando se abandona un CRM, la causa raíz suele ser que se configuró en torno a lo que la oficina quería ver, no a lo que el equipo de campo necesitaba hacer. Los paneles son preciosos. La introducción de datos es cara. Así que quienes generan ingresos dejan de meter datos, los paneles se quedan en blanco, y la dirección lo llama un problema técnico." },
+          { type: "h2", text: "Cinco decisiones que determinan si cuaja" },
+          { type: "ul", items: [
+            "¿Quién es responsable de la revisión diaria del pipeline, y son diez minutos o una hora?",
+            "¿Cambiar de estado es un botón o un formulario? La respuesta tiene que ser 'botón'.",
+            "¿Cada campo se amortiza en una automatización posterior, o es solo un museo?",
+            "¿Qué ocurre en las transiciones de etapa — nada, o un aviso visible al siguiente responsable?",
+            "¿La introducción en móvil es igual que en escritorio, o el móvil es una ocurrencia tardía de solo lectura?"
+          ]},
+          { type: "quote", text: "Si un comercial no puede actualizar una oportunidad mientras camina del aparcamiento a la puerta, el CRM ya está perdiendo." },
+          { type: "h2", text: "El movimiento práctico" },
+          { type: "p", text: "Antes de tocar un contrato con un proveedor, anota las diez acciones que tu equipo realiza más en un martes típico. Prototipa esas diez acciones como flujos de un toque. Todo lo que necesite más de tres toques se replantea. El CRM no es el sistema — los diez flujos lo son. Todo lo demás es reporting." },
+          { type: "p", text: "Esa es la misma lente con la que construyo Philly — el CRM que entrego a operadores. Los ingresos los ganan los equipos de campo, así que el software debe tratarlos como el usuario principal." }
+        ],
+      },
+    },
   },
   {
     slug: "salderingsregeling-2027-wat-operators-nu-moeten-doen",
+    markets: ["nl"],
     title: "Salderingsregeling 2027 — wat operators nu moeten doen",
     summary:
       "De afschaffing raakt installateurs harder dan huiseigenaren. Drie aanpassingen in je funnel die het verschil maken tussen een rustig 2027 en een acquisitie-crisis.",
@@ -135,7 +239,51 @@ export const POSTS: Insight[] = [
         "Invest the saved budget in the integration layer and the three core workflows. That is where the moat lives."
       ]},
       { type: "p", text: "The operators who get this right stop feeling like their tech stack owns them. The ones who do not, eventually hire a Chief of Staff whose job is largely to move CSVs between tools. That is an expensive outcome to accept." }
-    ]
+    ],
+    i18n: {
+      de: {
+        title: "Die Build-vs-Buy-Falle, in die Operatoren immer wieder tappen",
+        summary:
+          "Selbst bauen wirkt teuer, bis man die Workarounds zählt. Einkaufen wirkt sicher, bis zur dritten Integration. Ein Entscheidungsrahmen, der zur Realität von Operatoren passt.",
+        body: [
+          { type: "p", text: "Irgendwo zwischen einem Betrieb mit 50 und einem mit 500 Mitarbeitern führt jedes Führungsteam dasselbe Gespräch: Wir haben vier Anbieter, drei davon sprechen nicht miteinander, und unsere Leute verbringen täglich eine Stunde damit, Daten zwischen ihnen hin- und herzuschieben. Kaufen wir weiter ein, oder bauen wir selbst?" },
+          { type: "h2", text: "Die eigentliche Frage ist nicht Build vs. Buy" },
+          { type: "p", text: "Die eigentliche Frage lautet: Welche zwei, drei Fähigkeiten sind wirklich entscheidend dafür, wie wir gewinnen — und welche fünfzehn sind Standardware, die einfach funktionieren muss? Operatoren, die das richtig machen, kaufen die Standardware (E-Mail, Kalender, Buchhaltung, Lohnabrechnung) und bauen — oder lassen bauen — eine dünne Integrationsschicht plus die zwei, drei Kern-Workflows, die sie unterscheidbar machen." },
+          { type: "h2", text: "Die Falle, die ich am häufigsten sehe" },
+          { type: "p", text: "Für jede Funktion das Best-of-Breed-Tool kaufen und hoffen, dass ein Zapier-Friedhof alles zusammenklebt. Das funktioniert, bis man eine echte Frage über drei davon hinweg beantworten muss — und plötzlich besteht die Antwort aus drei Stunden CSV-Exporten. Das ist die Steuer dafür, fünfzehnmal auf Nummer sicher gegangen zu sein." },
+          { type: "quote", text: "Wenn es mit Ihrem aktuellen Stack länger als einen Tag dauert, eine Frage auf Vorstandsebene zu beantworten, ist Ihr Stack kein Stack mehr — er ist ein Museum." },
+          { type: "h2", text: "Ein Rahmen, der wirklich funktioniert" },
+          { type: "ul", items: [
+            "Notieren Sie die drei Fragen, die die Führung in unter einer Minute beantworten können sollte. Das ist der Kern.",
+            "Bestimmen Sie für jede, welches System die Quelle der Wahrheit ist — wenn die Antwort eine Tabelle ist, haben Sie Ihr Bauziel gefunden.",
+            "Alles andere ist Standardware. Kaufen Sie das günstigste Tool, das die Aufgabe erledigt, ohne Ihre Datenverträge zu brechen.",
+            "Investieren Sie das gesparte Budget in die Integrationsschicht und die drei Kern-Workflows. Dort liegt der Burggraben."
+          ]},
+          { type: "p", text: "Operatoren, die das richtig machen, haben nicht länger das Gefühl, ihr Tech-Stack besitze sie. Die anderen stellen irgendwann einen Chief of Staff ein, dessen Aufgabe größtenteils darin besteht, CSVs zwischen Tools zu verschieben. Das ist ein teures Ergebnis, das man hinnehmen muss." }
+        ],
+      },
+      es: {
+        title: "La trampa de construir o comprar en la que los operadores caen una y otra vez",
+        summary:
+          "Construir parece caro hasta que cuentas los apaños. Comprar parece seguro hasta la tercera integración. Un marco de decisión que encaja con la realidad del operador.",
+        body: [
+          { type: "p", text: "En algún punto entre un operador de 50 personas y uno de 500, todo equipo directivo tiene la misma conversación: tenemos cuatro proveedores, tres no se hablan entre sí, y nuestra gente pasa una hora al día moviendo datos entre ellos. ¿Seguimos comprando o construimos?" },
+          { type: "h2", text: "La verdadera pregunta no es construir o comprar" },
+          { type: "p", text: "La verdadera pregunta es: ¿cuáles dos o tres capacidades son realmente esenciales para cómo ganamos, y cuáles quince son commodities que solo necesitan funcionar? Los operadores que aciertan compran las commodities (correo, calendario, contabilidad, nóminas) y construyen —o pagan por construir— una capa de integración ligera más los dos o tres flujos de trabajo centrales que los hacen diferentes." },
+          { type: "h2", text: "La trampa que veo con más frecuencia" },
+          { type: "p", text: "Comprar la mejor herramienta de su categoría para cada función y esperar que un cementerio de Zapier las pegue. Funciona hasta que necesitas responder una pregunta real que cruza tres de ellas, y de repente la respuesta son tres horas de exportaciones CSV. Ese es el impuesto que pagas por elegir lo seguro quince veces." },
+          { type: "quote", text: "Si con tu stack actual cuesta más de un día responder una pregunta a nivel de consejo, tu stack ya no es tu stack: es un museo." },
+          { type: "h2", text: "Un marco que sí funciona" },
+          { type: "ul", items: [
+            "Anota las tres preguntas que la dirección debería poder responder en menos de un minuto. Eso es lo central.",
+            "Para cada una, identifica qué sistema es la fuente de la verdad; si la respuesta es una hoja de cálculo, has encontrado tu objetivo de construcción.",
+            "Todo lo demás es commodity. Compra la herramienta más barata que haga el trabajo sin romper tus contratos de datos.",
+            "Invierte el presupuesto ahorrado en la capa de integración y los tres flujos centrales. Ahí vive la ventaja competitiva."
+          ]},
+          { type: "p", text: "Los operadores que aciertan dejan de sentir que su stack tecnológico los posee. Los que no, acaban contratando a un Chief of Staff cuyo trabajo es, en gran parte, mover CSVs entre herramientas. Es un resultado caro de aceptar." }
+        ],
+      },
+    },
   }
   ,{
     slug: "the-field-team-is-the-product",
@@ -158,10 +306,51 @@ export const POSTS: Insight[] = [
       ]},
       { type: "quote", text: "A CRM is not the system of record. It is the system of action. If it is not easier than what came before, nothing gets recorded." },
       { type: "p", text: "This is the lens behind Philly. The dashboards came after we got the field flow right. If you reverse the order, you get a museum." }
-    ]
+    ],
+    i18n: {
+      de: {
+        title: "Das Außendienstteam ist das Produkt — nicht das Dashboard",
+        summary:
+          "Führungskräfte kaufen Software fürs Reporting. Außendienstteams nutzen sie, um Deals abzuschließen. Stehen beide in Spannung, gewinnt das Außendienstteam standardmäßig — indem es sie einfach nicht mehr nutzt. Entwerfen Sie zuerst für sie.",
+        body: [
+          { type: "p", text: "Gehen Sie in einen beliebigen 50-Personen-Betrieb und stellen Sie zwei Leuten dieselbe Frage: Was macht das CRM? Der CFO spricht über Pipeline-Transparenz und Umsatzprognose. Der Außendienstmitarbeiter spricht über die acht Tipps, die nötig sind, um einen Anruf zu protokollieren. Diese beiden Antworten beschreiben völlig verschiedene Produkte." },
+          { type: "h2", text: "Warum das Büro den Roadmap-Kampf meist gewinnt" },
+          { type: "p", text: "Das Büro bezahlt das Tool, sitzt in den Demos und schreibt die Anforderungen. Das Außendienstteam ist beschäftigt — mit Umsatz erzeugen. Also wird die Software für die gebaut, die danach gefragt haben, nicht für die, die sie nutzen müssen. Sechs Monate später versteht niemand, warum die Akzeptanz bei 30 Prozent liegt." },
+          { type: "h2", text: "Ein einfacher Test vor jeder CRM-Entscheidung" },
+          { type: "ul", items: [
+            "Setzen Sie sich einen ganzen Tag neben einen Außendienstmitarbeiter. Zählen Sie die Tipps pro Deal-Aktualisierung.",
+            "Sind es mehr als drei, kämpft die Software bereits gegen Sie.",
+            "Fragen Sie, was sie bräuchten, um fünf Deals auf dem Weg vom Auto zur Haustür zu aktualisieren. Bauen Sie das.",
+            "Zeigen Sie dann dem CFO das Dashboard — aber nur mit Daten, die das Außendienstteam tatsächlich in drei Tipps erzeugen kann."
+          ]},
+          { type: "quote", text: "Ein CRM ist nicht das System der Aufzeichnung. Es ist das System des Handelns. Ist es nicht einfacher als das Vorherige, wird nichts aufgezeichnet." },
+          { type: "p", text: "Das ist die Brille hinter Philly. Die Dashboards kamen, nachdem wir den Außendienst-Ablauf richtig hatten. Kehren Sie die Reihenfolge um, bekommen Sie ein Museum." }
+        ],
+      },
+      es: {
+        title: "El equipo de campo es el producto — no el panel",
+        summary:
+          "Los directivos compran software para reporting. Los equipos de campo lo usan para cerrar tratos. Cuando ambos están en tensión, el equipo de campo gana por defecto — simplemente deja de usarlo. Diséñalo primero para ellos.",
+        body: [
+          { type: "p", text: "Entra en cualquier operador de 50 personas y haz a dos personas la misma pregunta: ¿qué hace el CRM? El director financiero hablará de visibilidad del pipeline y previsión de ingresos. El comercial de campo hablará de los ocho toques que cuesta registrar una llamada. Esas dos respuestas describen productos completamente distintos." },
+          { type: "h2", text: "Por qué la oficina suele ganar la pelea por la hoja de ruta" },
+          { type: "p", text: "La oficina paga la herramienta, asiste a las demos y escribe los requisitos. El equipo de campo está ocupado — generando ingresos. Así que el software se construye para quienes lo pidieron, no para quienes tienen que usarlo. Seis meses después nadie entiende por qué la adopción está en el 30 por ciento." },
+          { type: "h2", text: "Una prueba sencilla antes de cualquier decisión de CRM" },
+          { type: "ul", items: [
+            "Siéntate junto a un comercial de campo un día entero. Cuenta los toques por actualización de oportunidad.",
+            "Si son más de tres, el software ya está luchando contra ti.",
+            "Pregunta qué necesitaría para actualizar cinco oportunidades caminando del coche a la puerta. Construye eso.",
+            "Luego enseña al director financiero el panel — pero solo con datos que el equipo de campo pueda producir de verdad en tres toques."
+          ]},
+          { type: "quote", text: "Un CRM no es el sistema de registro. Es el sistema de acción. Si no es más fácil que lo anterior, no se registra nada." },
+          { type: "p", text: "Esta es la lente detrás de Philly. Los paneles llegaron después de acertar con el flujo de campo. Si inviertes el orden, obtienes un museo." }
+        ],
+      },
+    },
   },
   {
     slug: "thuisbatterij-verkoop-na-2027",
+    markets: ["nl"],
     title: "Thuisbatterijen verkopen na 2027 — wat werkelijk werkt",
     summary:
       "De salderingsregeling verdwijnt. De batterij-installateurs die 2027 overleven zijn niet de goedkoopste — ze zijn de duidelijkste. Drie patronen uit succesvolle NL installateurs.",
@@ -203,17 +392,77 @@ export const POSTS: Insight[] = [
       { type: "p", text: "For each tile on your dashboard, ask two questions. One: if this number goes green, what board-level decision do I make differently? Two: what would have to be true for this number to look good while the business is actually in trouble? If you cannot answer both in under a minute per tile, that tile is decoration, not instrumentation." },
       { type: "quote", text: "The best dashboards have fewer tiles than people expect. Every tile that is not answering a decision is competing for the attention of the ones that are." },
       { type: "p", text: "When we build reporting inside Philly, we start from the decision, not the data. It forces uncomfortable conversations — 'we actually don't know what we would do if this number moved' — but those are the conversations that make the dashboard worth building." }
-    ]
+    ],
+    i18n: {
+      de: {
+        title: "Warum die meisten Operator-Dashboards ihre CEOs leise belügen",
+        summary:
+          "Die Zahlen auf dem Dashboard sind nie falsch — aber der Rahmen ist es. Drei Muster, die saubere Daten in irreführende Narrative verwandeln, und wie Sie Ihr eigenes Dashboard in unter einer Stunde prüfen.",
+        body: [
+          { type: "p", text: "Jeder CEO kennt den Moment: Das Dashboard ist grün, das Meeting läuft gut, und zwei Wochen später schlägt eine Kundenabwanderung oder ein Liquiditätsengpass ein, den niemand kommen sah. Das Dashboard war nicht falsch. Es schaute nur nicht auf das Richtige." },
+          { type: "h2", text: "Drei Muster, die leise in die Irre führen" },
+          { type: "ul", items: [
+            "Durchschnitte ohne Verteilungen — 'durchschnittliche Deal-Größe 42.000 €' verbirgt, dass die Hälfte Ihres Umsatzes von zwei Kunden kommt.",
+            "Nachlaufende Indikatoren als vorlaufende verkleidet — MRR ist ein nachlaufender Indikator. Was der CEO braucht, ist Pipeline-Geschwindigkeit, und die liegt zwei Systeme entfernt.",
+            "Vanity-Kennzahlen, die sich von selbst bewegen — die 'Aktivierungsrate' steigt, weil Sie die Messlatte dafür angehoben haben, was als Anmeldung zählt, nicht weil das Produkt besser wurde."
+          ]},
+          { type: "h2", text: "Ein einstündiges Audit, das Sie heute durchführen können" },
+          { type: "p", text: "Stellen Sie für jede Kachel Ihres Dashboards zwei Fragen. Erstens: Wenn diese Zahl grün wird, welche Entscheidung auf Vorstandsebene treffe ich anders? Zweitens: Was müsste wahr sein, damit diese Zahl gut aussieht, während das Geschäft tatsächlich in Schwierigkeiten steckt? Können Sie nicht beides in unter einer Minute pro Kachel beantworten, ist diese Kachel Dekoration, keine Instrumentierung." },
+          { type: "quote", text: "Die besten Dashboards haben weniger Kacheln, als man erwartet. Jede Kachel, die keine Entscheidung beantwortet, konkurriert um die Aufmerksamkeit derer, die es tun." },
+          { type: "p", text: "Wenn wir das Reporting in Philly bauen, beginnen wir bei der Entscheidung, nicht bei den Daten. Das erzwingt unbequeme Gespräche — 'wir wissen eigentlich nicht, was wir täten, wenn sich diese Zahl bewegt' — aber genau diese Gespräche machen das Dashboard bauenswert." }
+        ],
+      },
+      es: {
+        title: "Por qué la mayoría de los paneles de operadores mienten en voz baja a sus CEO",
+        summary:
+          "Los números del panel nunca están mal — pero el encuadre sí. Tres patrones que convierten datos limpios en narrativas engañosas, y cómo auditar tu propio panel en menos de una hora.",
+        body: [
+          { type: "p", text: "Todo CEO ha vivido el momento: el panel se ve verde, la reunión va bien, y dos semanas después llega una fuga de clientes o un apuro de caja que nadie vio venir. El panel no estaba mal. Simplemente no miraba lo correcto." },
+          { type: "h2", text: "Tres patrones que engañan en voz baja" },
+          { type: "ul", items: [
+            "Promedios sin distribuciones — 'tamaño medio de operación 42.000 €' oculta que la mitad de tus ingresos viene de dos cuentas.",
+            "Indicadores rezagados disfrazados de adelantados — el MRR es un indicador rezagado. Lo que el CEO necesita es la velocidad del pipeline, y eso vive a dos sistemas de distancia.",
+            "Ratios de vanidad que se mueven solos — la 'tasa de activación' sube porque subiste el listón de lo que cuenta como alta, no porque el producto mejorara."
+          ]},
+          { type: "h2", text: "Una auditoría de una hora que puedes hacer hoy" },
+          { type: "p", text: "Para cada casilla de tu panel, haz dos preguntas. Una: si este número se pone verde, ¿qué decisión a nivel de consejo tomo distinta? Dos: ¿qué tendría que ser cierto para que este número se vea bien mientras el negocio está realmente en problemas? Si no puedes responder ambas en menos de un minuto por casilla, esa casilla es decoración, no instrumentación." },
+          { type: "quote", text: "Los mejores paneles tienen menos casillas de las que la gente espera. Cada casilla que no responde a una decisión compite por la atención de las que sí." },
+          { type: "p", text: "Cuando construimos el reporting dentro de Philly, partimos de la decisión, no de los datos. Obliga a conversaciones incómodas — 'en realidad no sabemos qué haríamos si este número se moviera' — pero son esas conversaciones las que hacen que el panel merezca construirse." }
+        ],
+      },
+    },
   }
 
 ];
 
-export function getAllInsights(): Insight[] {
-  return [...POSTS].sort((a, b) => (a.publishedAt > b.publishedAt ? -1 : 1));
+/** Locales a post is published under (default: all four). */
+export function insightMarkets(p: Insight): Locale[] {
+  return p.markets ?? ALL_LOCALES;
 }
 
-export function getInsight(slug: string): Insight | undefined {
-  return POSTS.find((p) => p.slug === slug);
+export function isInMarket(p: Insight, locale: Locale): boolean {
+  return insightMarkets(p).includes(locale);
+}
+
+/** Apply localized content for `locale` if present; otherwise return the base
+ *  post unchanged. `markets` is preserved so callers can still gate. */
+export function localizedInsight(p: Insight, locale: Locale): Insight {
+  const t = p.i18n?.[locale];
+  return t ? { ...p, title: t.title, summary: t.summary, body: t.body } : p;
+}
+
+/** All posts (newest first). With a locale: only posts published in that
+ *  market, with localized content applied. */
+export function getAllInsights(locale?: Locale): Insight[] {
+  const sorted = [...POSTS].sort((a, b) => (a.publishedAt > b.publishedAt ? -1 : 1));
+  if (!locale) return sorted;
+  return sorted.filter((p) => isInMarket(p, locale)).map((p) => localizedInsight(p, locale));
+}
+
+export function getInsight(slug: string, locale?: Locale): Insight | undefined {
+  const p = POSTS.find((x) => x.slug === slug);
+  if (!p) return undefined;
+  return locale ? localizedInsight(p, locale) : p;
 }
 
 export function formatDate(iso: string): string {

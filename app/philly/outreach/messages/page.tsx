@@ -271,7 +271,7 @@ export default function MessagesPage() {
                       onClick={() => handleAction(msg.id, 'edit', editBody)}
                       style={{
                         padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
-                        border: 'none', background: 'var(--accent)', color: '#fff', cursor: 'pointer',
+                        border: 'none', background: 'var(--accent)', color: 'var(--accent-fg)', cursor: 'pointer',
                         display: 'flex', alignItems: 'center', gap: 4,
                       }}
                     >

@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useT } from "@/lib/i18n/useT";
 
 const OPT_OUT_KEY = "analytics-opt-out";
 
 export function AnalyticsOptOut() {
+  const t = useT();
   const [optedOut, setOptedOut] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -27,7 +29,7 @@ export function AnalyticsOptOut() {
           color: "var(--muted-soft)",
         }}
       >
-        Loading opt-out status…
+        {t("priv.optout.loading")}
       </div>
     );
   }
@@ -62,10 +64,10 @@ export function AnalyticsOptOut() {
     >
       <div style={{ flex: "1 1 260px" }}>
         <div style={{ fontWeight: 500, marginBottom: 4 }}>
-          {optedOut ? "Analytics disabled on this browser." : "Analytics enabled."}
+          {optedOut ? t("priv.optout.disabled") : t("priv.optout.enabled")}
         </div>
         <div style={{ color: "var(--muted)", fontSize: 14, lineHeight: 1.55 }}>
-          Plausible collects aggregate, cookieless page views — no personal data, no cross-site tracking. You can still opt out if you prefer.
+          {t("priv.optout.body")}
         </div>
       </div>
       <button
@@ -75,7 +77,7 @@ export function AnalyticsOptOut() {
         style={{ whiteSpace: "nowrap" }}
         aria-pressed={optedOut}
       >
-        {optedOut ? "Re-enable analytics" : "Opt out of analytics"}
+        {optedOut ? t("priv.optout.btn.enable") : t("priv.optout.btn.disable")}
       </button>
     </div>
   );

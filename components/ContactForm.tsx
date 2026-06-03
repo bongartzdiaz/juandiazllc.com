@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import { submitLead, type ContactState } from "@/app/actions/contact";
 import { useT } from "@/lib/i18n/useT";
 
@@ -42,6 +42,16 @@ export function ContactForm() {
   const canAdvanceFrom1 = sector !== "";
   const canAdvanceFrom2 = stage !== "";
   const progress = state.status === "ok" ? 100 : Math.round(((step - 1) / totalSteps) * 100 + 33);
+
+  // #10 — fire the Plausible conversion goal once a lead is submitted. This is
+  // the business metric the SEO funnel optimizes for (qualified operator leads),
+  // not pageviews. The sector is attached as a prop for segmentation.
+  useEffect(() => {
+    if (state.status !== "ok") return;
+    (window as unknown as {
+      plausible?: (event: string, opts?: { props?: Record<string, string> }) => void;
+    }).plausible?.("Contact Submitted", { props: { sector: sector || "unknown" } });
+  }, [state.status, sector]);
 
   return (
     <div className="auth-card progressive-form" style={{ maxWidth: 720, padding: "40px 36px" }}>

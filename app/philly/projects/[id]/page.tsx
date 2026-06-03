@@ -524,7 +524,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               <button onClick={handleSave} style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5,
                 padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
-                background: 'var(--accent)', color: '#fff', border: 'none',
+                background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
                 cursor: 'pointer', fontFamily: 'inherit',
               }}>
                 <Save size={13} /> {tCommon('save')}
@@ -1018,7 +1018,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                         width: 36, height: 36, borderRadius: 18,
                         background: 'var(--accent)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 13, fontWeight: 700, color: '#fff', flexShrink: 0,
+                        fontSize: 13, fontWeight: 700, color: 'var(--accent-fg)', flexShrink: 0,
                       }}>{initials}</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)', lineHeight: 1.3 }}>

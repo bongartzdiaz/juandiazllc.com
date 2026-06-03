@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllInsights, formatDate } from "@/lib/insights";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
-import { LOCALES } from "@/lib/i18n/dict";
+import { LOCALES, type Locale } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
 // Tag archive pages — /insights/tag/systems, /insights/tag/energy etc.
@@ -22,18 +22,26 @@ function toSlug(tag: string) {
     .replace(/(^-|-$)/g, "");
 }
 
-function uniqueTags() {
+function uniqueTags(locale?: Locale) {
   const map = new Map<string, string>(); // slug -> canonical tag
-  for (const p of getAllInsights()) {
+  for (const p of getAllInsights(locale)) {
     const slug = toSlug(p.tag);
     if (!map.has(slug)) map.set(slug, p.tag);
   }
   return map;
 }
 
+/** Locales in which a given tag-slug actually has published posts. */
+function tagLocales(tag: string): Locale[] {
+  return LOCALES.filter((l) => uniqueTags(l).has(tag));
+}
+
 export function generateStaticParams() {
-  const tags = Array.from(uniqueTags().keys());
-  return LOCALES.flatMap((locale) => tags.map((tag) => ({ locale, tag })));
+  // Only generate a tag page for a locale if that market has posts with the tag
+  // (so a Dutch-only tag doesn't spawn empty /en,/de,/es archives).
+  return LOCALES.flatMap((locale) =>
+    Array.from(uniqueTags(locale).keys()).map((tag) => ({ locale, tag })),
+  );
 }
 
 export async function generateMetadata(
@@ -41,12 +49,12 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale, tag } = await params;
   const l = assertLocale(locale);
-  const canonical = uniqueTags().get(tag);
+  const canonical = uniqueTags(l).get(tag);
   if (!canonical) return { title: "Tag not found" };
   return {
     title: `${canonical} insights — revenue engines for operators`,
     description: `Everything I've written on ${canonical.toLowerCase()} — field notes, case patterns, decisions that moved real P&Ls.`,
-    alternates: buildAlternates(l, `/insights/tag/${tag}`),
+    alternates: buildAlternates(l, `/insights/tag/${tag}`, tagLocales(tag)),
     openGraph: {
       type: "website",
       url: `/${l}/insights/tag/${tag}`,
@@ -60,11 +68,12 @@ export async function generateMetadata(
 export default async function TagArchivePage(
   { params }: { params: Promise<{ locale: string; tag: string }> }
 ) {
-  const { tag } = await params;
-  const canonical = uniqueTags().get(tag);
+  const { locale, tag } = await params;
+  const l = assertLocale(locale);
+  const canonical = uniqueTags(l).get(tag);
   if (!canonical) notFound();
 
-  const posts = getAllInsights().filter((p) => p.tag === canonical);
+  const posts = getAllInsights(l).filter((p) => p.tag === canonical);
 
   const crumbs = breadcrumbSchema([
     { name: "Home", path: "/" },

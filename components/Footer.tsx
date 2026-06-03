@@ -17,12 +17,13 @@ export function Footer() {
         <Link href="/now">{t("footer.now")}</Link>
         <Link href="/uses">{t("footer.uses")}</Link>
         <Link href="/work">{t("nav.work")}</Link>
+        <Link href="/services">{t("nav.services")}</Link>
+        <Link href="/sectors">{t("nav.sectors")}</Link>
         <Link href="/insights">{t("nav.insights")}</Link>
         <Link href="/signals">{t("nav.signals")}</Link>
         <Link href="/contact">{t("nav.contact")}</Link>
         <Link href="/privacy">{t("footer.privacy")}</Link>
         <Link href="/impressum">{t("footer.impressum")}</Link>
-        <Link href="/login">{t("nav.login")}</Link>
       </nav>
       <div style={{ display: "flex", flexDirection: "column", gap: 8, textAlign: "right" }}>
         <div>

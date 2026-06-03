@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAllInsights, getInsight, formatDate, tocFromBody, headingSlug } from "@/lib/insights";
+import { getAllInsights, getInsight, insightMarkets, isInMarket, formatDate, tocFromBody, headingSlug } from "@/lib/insights";
 import { getVentureForTag } from "@/lib/ventures";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { ReadingProgress } from "@/components/ReadingProgress";
@@ -10,20 +10,26 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 import { blogPostingSchema } from "@/lib/seo/article";
 
 export async function generateStaticParams() {
-  return LOCALES.flatMap((locale) => getAllInsights().map((p) => ({ locale, slug: p.slug })));
+  // Only pre-render (locale, slug) pairs where the post is published in that
+  // market — so Dutch-only posts exist under /nl and never /en,/de,/es.
+  return LOCALES.flatMap((locale) =>
+    getAllInsights(locale).map((p) => ({ locale, slug: p.slug })),
+  );
 }
+
+export const dynamicParams = false;
 
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string; slug: string }> }
 ): Promise<Metadata> {
   const { locale, slug } = await params;
   const l = assertLocale(locale);
-  const post = getInsight(slug);
-  if (!post) return { title: "Not found" };
+  const post = getInsight(slug, l);
+  if (!post || !isInMarket(post, l)) return { title: "Not found" };
   return {
     title: post.seo?.metaTitle ?? post.title,
     description: post.seo?.metaDescription ?? post.summary,
-    alternates: buildAlternates(l, `/insights/${post.slug}`),
+    alternates: buildAlternates(l, `/insights/${post.slug}`, insightMarkets(post)),
     openGraph: {
       type: "article",
       url: `/${l}/insights/${post.slug}`,
@@ -56,8 +62,8 @@ export default async function InsightPage(
   const { locale, slug } = await params;
   const l = assertLocale(locale);
   const t = (k: string) => translate(l, k);
-  const post = getInsight(slug);
-  if (!post) notFound();
+  const post = getInsight(slug, l);
+  if (!post || !isInMarket(post, l)) notFound();
 
   const articleSchema = blogPostingSchema({
     locale: l,
@@ -65,6 +71,7 @@ export default async function InsightPage(
     headline: post.title,
     description: post.summary,
     datePublished: post.publishedAt,
+    dateModified: post.updatedAt ?? post.publishedAt,
     tag: post.tag,
   });
 

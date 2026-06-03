@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useT } from "@/lib/i18n/useT";
 
 // Appears after 600px of scroll. Smooth-scrolls to top on click.
 // Respects prefers-reduced-motion.
 
 export function BackToTop() {
+  const t = useT();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -25,7 +27,7 @@ export function BackToTop() {
   return (
     <button
       type="button"
-      aria-label="Back to top"
+      aria-label={t("a11y.backtotop")}
       onClick={toTop}
       className="back-to-top"
       data-visible={visible}

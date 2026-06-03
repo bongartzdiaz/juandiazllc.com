@@ -315,7 +315,7 @@ export default function IntegrationsPage() {
         }}>
           <div style={{
             width: 44, height: 44, borderRadius: 11,
-            background: 'var(--accent)', color: '#fff',
+            background: 'var(--accent)', color: 'var(--accent-fg)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <Plug size={20} />
@@ -529,7 +529,7 @@ export default function IntegrationsPage() {
                         style={{
                           display: 'inline-flex', alignItems: 'center', gap: 4,
                           padding: '6px 12px', borderRadius: 7,
-                          background: 'var(--accent)', color: '#fff',
+                          background: 'var(--accent)', color: 'var(--accent-fg)',
                           border: 'none',
                           fontSize: 11, fontWeight: 600,
                           cursor: isBusy ? 'not-allowed' : 'pointer',
@@ -591,7 +591,7 @@ export default function IntegrationsPage() {
                 disabled={!apiKeyInput.trim() || busy === keyModalFor.id}
                 style={{
                   padding: '8px 16px', borderRadius: 7,
-                  background: 'var(--accent)', color: '#fff', border: 'none',
+                  background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none',
                   fontSize: 12, fontWeight: 600,
                   cursor: apiKeyInput.trim() ? 'pointer' : 'not-allowed',
                   opacity: apiKeyInput.trim() ? 1 : 0.5,

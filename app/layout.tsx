@@ -1,6 +1,25 @@
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+
+// Self-hosted via next/font — zero render-blocking 3rd-party request,
+// woff2 served from our own origin, automatic font-display: swap +
+// size-adjust fallback metrics (kills CLS). Exposed as CSS variables
+// so globals.css references them as var(--font-inter) / var(--font-mono).
+// Replaces the old <link rel="stylesheet"> to fonts.googleapis.com.
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+  style: ["normal", "italic"],
+});
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-mono",
+  weight: ["300", "400", "500"],
+});
 import { Overlays } from "@/components/Overlays";
 import { Preloader } from "@/components/Preloader";
 import { GlobalEffects } from "@/components/GlobalEffects";
@@ -19,22 +38,26 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Juan Diaz, LLC — Revenue Engines for Operators",
+    default: "Juan Diaz — Fractional Revenue Operator & Consultant",
     template: "%s · Juan Diaz, LLC",
   },
   description:
-    "Juan Diaz, LLC builds the systems that make operators more money. Revenue engines, CRM, automations and growth infrastructure for energy, real estate, hospitality and adjacent industries.",
+    "Juan Diaz is a fractional revenue operator and operations consultant for energy, real estate and hospitality operators — building the revenue systems that make operators more money. Construction-trained, operator-built.",
   keywords: [
     "juan diaz",
     "juandiazllc",
-    "revenue engine",
-    "operator crm",
-    "energy crm",
-    "real estate crm",
-    "growth infrastructure",
-    "automation",
-    "construction operator",
-    "b2b systems",
+    "fractional revenue operator",
+    "revenue operations consultant",
+    "operations consultant",
+    "revops consultant",
+    "fractional operator",
+    "revenue operations partner",
+    "operations consultant energy",
+    "operations consultant real estate",
+    "operations consultant hospitality",
+    "operator-led growth",
+    "revenue systems consultant",
+    "construction-trained operator",
   ],
   authors: [{ name: "Juan Stefan Bongartz Diaz", url: SITE_URL }],
   creator: "Juan Diaz, LLC",
@@ -59,7 +82,7 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE_URL,
     siteName: "Juan Diaz, LLC",
-    title: "Juan Diaz, LLC — Revenue Engines for Operators",
+    title: "Juan Diaz — Fractional Revenue Operator & Consultant",
     description:
       "I build the systems that make operators more money. Construction-trained. Operator-built.",
     locale: "en_US",
@@ -77,7 +100,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@juandiazllc",
     creator: "@juanstefandz",
-    title: "Juan Diaz, LLC — Revenue Engines for Operators",
+    title: "Juan Diaz — Fractional Revenue Operator & Consultant",
     description:
       "I build the systems that make operators more money. Construction-trained. Operator-built.",
     images: ["/opengraph-image"],
@@ -157,22 +180,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const cookieLocale = c.get("jdl_locale")?.value;
   const lang = cookieLocale && (LOCALES as readonly string[]).includes(cookieLocale) ? cookieLocale : DEFAULT_LOCALE;
   return (
-    <html lang={lang}>
+    <html lang={lang} className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
         {/* Feed autodiscovery — RSS for readers, JSON Feed for modern clients */}
         <link rel="alternate" type="application/rss+xml" title="Juan Diaz, LLC — Insights" href="/rss.xml" />
         <link rel="alternate" type="application/feed+json" title="Juan Diaz, LLC — Insights" href="/feed.json" />
         {/* Credits file per humanstxt.org — a weak signal but a
             cheap one, and it gives curious readers a way in. */}
         <link rel="author" href="/humans.txt" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        {/* Single-family load reduces network + keeps typography consistent.
-            Instrument Serif dropped — Inter italic now serves editorial emphasis. */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300..700;1,300..500&family=JetBrains+Mono:wght@300;400;500&display=swap"
-          rel="stylesheet"
-        />
+        {/* Fonts are self-hosted via next/font/google (see top of file) —
+            no fonts.googleapis.com round-trip, no render-blocking. */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}

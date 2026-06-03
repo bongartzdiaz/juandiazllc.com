@@ -7,6 +7,7 @@ import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
+import { findForeignKeyNotInOrg } from '@/lib/philly/v1-fk-guard'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -46,6 +47,18 @@ export async function POST(req: NextRequest) {
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
 
   const prisma = getAuthPrisma()
+
+  // BE-09: every client-supplied relation must belong to the caller's org.
+  const badFk = await findForeignKeyNotInOrg(prisma, scope.organizationId, [
+    { field: 'dealId', model: 'deal', value: body.dealId },
+    { field: 'propertyId', model: 'property', value: body.propertyId },
+    { field: 'buyerAgentId', model: 'user', value: body.buyerAgentId },
+    { field: 'sellerAgentId', model: 'user', value: body.sellerAgentId },
+    { field: 'buyerContactId', model: 'contact', value: body.buyerContactId },
+    { field: 'sellerContactId', model: 'contact', value: body.sellerContactId },
+  ])
+  if (badFk) return jsonError(`${badFk} does not belong to your organization`, 400)
+
   const txn = await prisma.transaction.create({
     data: {
       organizationId: scope.organizationId,

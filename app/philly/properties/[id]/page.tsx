@@ -515,7 +515,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                     <div style={{ display: 'flex', gap: 8, marginTop: 10, justifyContent: 'flex-end' }}>
                       <button onClick={cancelEdit} style={outlineBtn('var(--txt2)', 'var(--border)')}>Cancel</button>
                       <button onClick={saveEdit} style={{
-                        padding: '7px 14px', borderRadius: 8, background: 'var(--accent)', color: '#fff',
+                        padding: '7px 14px', borderRadius: 8, background: 'var(--accent)', color: 'var(--accent-fg)',
                         border: 'none', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
                       }}>Save</button>
                     </div>

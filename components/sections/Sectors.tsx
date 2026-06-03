@@ -32,12 +32,29 @@ const ICONS = {
 
 export function Sectors() {
   const t = useT();
+  // ix + tags previously hardcoded English; now keyed under sectors.<id>.* so
+  // NL/DE/ES visitors get translated category labels and tag chips. Tags stay
+  // partially English in NL/DE/ES where the term is industry shorthand
+  // (Solar, Retrofit, ESG) and translated where there's a clean equivalent
+  // (Installers/Installateurs, Channels/Kanalen). See dict.ts.
   const cards = [
-    { slug: "energy", ix: "— 01 / Energy", titleA: t("sectors.e.title.a"), titleB: t("sectors.e.title.b"), body: t("sectors.e.body"), icon: ICONS.energy, tags: ["Solar", "Installers", "Metering", "Post-2027"] },
-    { slug: "real-estate", ix: "— 02 / Real Estate", titleA: t("sectors.re.title.a"), titleB: t("sectors.re.title.b"), body: t("sectors.re.body"), icon: ICONS.re, tags: ["Retrofit", "Portfolio", "Tenant ops", "ESG"] },
-    { slug: "hospitality", ix: "— 03 / Hospitality", titleA: t("sectors.h.title.a"), titleB: t("sectors.h.title.b"), body: t("sectors.h.body"), icon: ICONS.hosp, tags: ["Revenue ops", "Channels", "Staff", "Guest data"] },
-    { slug: "adjacent", ix: "— 04 / Adjacent", titleA: t("sectors.adj.title.a"), titleB: t("sectors.adj.title.b"), body: t("sectors.adj.body"), icon: ICONS.adj, tags: ["Field ops", "Fleet", "Retail", "Services"] },
-  ];
+    { slug: "energy",      idKey: "e",   icon: ICONS.energy },
+    { slug: "real-estate", idKey: "re",  icon: ICONS.re },
+    { slug: "hospitality", idKey: "h",   icon: ICONS.hosp },
+    { slug: "adjacent",    idKey: "adj", icon: ICONS.adj },
+  ].map((s) => ({
+    ...s,
+    ix: t(`sectors.${s.idKey}.ix`),
+    titleA: t(`sectors.${s.idKey}.title.a`),
+    titleB: t(`sectors.${s.idKey}.title.b`),
+    body: t(`sectors.${s.idKey}.body`),
+    tags: [
+      t(`sectors.${s.idKey}.tag.1`),
+      t(`sectors.${s.idKey}.tag.2`),
+      t(`sectors.${s.idKey}.tag.3`),
+      t(`sectors.${s.idKey}.tag.4`),
+    ],
+  }));
 
   return (
     <section id="sectors">
@@ -54,7 +71,7 @@ export function Sectors() {
             <div>
               <div className="ix">{s.ix}</div>
               <div className="ico">{s.icon}</div>
-              <h4>{s.titleA} <em>{s.titleB}</em></h4>
+              <h3>{s.titleA} <em>{s.titleB}</em></h3>
               <p>{s.body}</p>
             </div>
             <div className="tags">

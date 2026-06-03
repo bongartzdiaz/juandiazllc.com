@@ -101,7 +101,7 @@ export function LiveUpdateBanner({ message, onDismiss, onReload }: {
     <div style={{
       position: 'fixed', bottom: 20, right: 20, zIndex: 100,
       padding: '10px 14px', borderRadius: 10,
-      background: 'var(--accent)', color: '#fff',
+      background: 'var(--accent)', color: 'var(--accent-fg)',
       boxShadow: 'var(--shadow-lg)',
       display: 'flex', alignItems: 'center', gap: 10,
       fontSize: 12.5, fontWeight: 600,

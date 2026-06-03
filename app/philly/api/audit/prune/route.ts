@@ -16,6 +16,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
+import { timingSafeEqualStr } from '@/lib/philly/crypto'
 import { logAudit } from '@/lib/philly/audit'
 import { logger } from '@/lib/philly/logger'
 
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
   let triggeredBy: 'cron' | 'admin' = 'cron'
   let adminUserId: string | undefined
 
-  if (cronSecret && headerSecret && headerSecret === cronSecret) {
+  if (cronSecret && headerSecret && timingSafeEqualStr(headerSecret, cronSecret)) {
     // Cron run — prunes across ALL organizations
   } else {
     const scope = await requireRole(['admin'])

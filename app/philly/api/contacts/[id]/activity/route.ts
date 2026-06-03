@@ -26,6 +26,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
   const { page, limit, skip } = parsePagination(req)
   const where = { contactId: id }
   const [activities, total] = await Promise.all([
+    // org-scope-lint-ok: parent contact verified in scope.organizationId above; activities scoped by that contactId
     prisma.activity.findMany({
       where,
       orderBy: { createdAt: 'desc' },
@@ -33,6 +34,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
       take: limit,
       include: { user: { select: { id: true, name: true } } },
     }),
+    // org-scope-lint-ok: see above — scoped by the org-verified contactId
     prisma.activity.count({ where }),
   ])
 

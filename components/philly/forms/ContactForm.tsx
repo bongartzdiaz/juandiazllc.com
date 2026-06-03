@@ -158,7 +158,7 @@ export function ContactForm({ onSubmit, onCancel, initial }: ContactFormProps) {
             borderRadius: 8,
             border: 'none',
             background: 'var(--accent)',
-            color: '#fff',
+            color: 'var(--accent-fg)',
             cursor: 'pointer',
             fontWeight: 600,
             fontSize: 13,

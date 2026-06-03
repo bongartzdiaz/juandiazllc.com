@@ -45,7 +45,7 @@ export default function PageView() {
           <Link href="/philly/pages" style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '8px 14px', borderRadius: 7,
-            background: 'var(--accent)', color: '#fff',
+            background: 'var(--accent)', color: 'var(--accent-fg)',
             fontSize: 13, fontWeight: 600, textDecoration: 'none',
           }}>
             <ArrowLeft size={13} /> Back to pages
@@ -81,7 +81,7 @@ export default function PageView() {
           <Link href={`/pages/${page.slug}/edit`} style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '7px 12px', borderRadius: 7,
-            background: 'var(--accent)', color: '#fff',
+            background: 'var(--accent)', color: 'var(--accent-fg)',
             fontSize: 12.5, fontWeight: 600, textDecoration: 'none',
           }}>
             <Pencil size={12} /> Edit page

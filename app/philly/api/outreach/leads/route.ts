@@ -8,6 +8,7 @@ import {
   type LiCampaignEnrichment,
 } from "@/lib/supabase/li-client";
 import { leadSearchQuery, leadSortFieldEnum } from "@/lib/philly/validation/schemas";
+import { denyIfNotOutreachOperator } from "@/lib/philly/outreach-guard";
 import { logger } from "@/lib/philly/logger";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +29,8 @@ export const runtime = "nodejs";
 export async function GET(req: NextRequest) {
   const scope = await requireScope();
   if (scope instanceof NextResponse) return scope;
+  const denied = await denyIfNotOutreachOperator(scope);
+  if (denied) return denied;
 
   const db = liClient();
   const url = new URL(req.url);

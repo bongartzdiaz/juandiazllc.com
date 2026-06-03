@@ -8,6 +8,7 @@ import {
 import { validateBody } from "@/lib/philly/validation";
 import { updateOutreachLeadSchema } from "@/lib/philly/validation/schemas";
 import { enforceRateLimit, PRESET_MUTATION } from "@/lib/philly/rate-limit";
+import { denyIfNotOutreachOperator } from "@/lib/philly/outreach-guard";
 import { logger } from "@/lib/philly/logger";
 
 type TimelineEntry =
@@ -55,6 +56,8 @@ export async function GET(
 ) {
   const scope = await requireScope();
   if (scope instanceof NextResponse) return scope;
+  const denied = await denyIfNotOutreachOperator(scope);
+  if (denied) return denied;
 
   const { id } = await params;
   const db = liClient();
@@ -169,6 +172,8 @@ export async function PATCH(
 ) {
   const scope = await requireRole(["admin", "manager"]);
   if (scope instanceof NextResponse) return scope;
+  const denied = await denyIfNotOutreachOperator(scope);
+  if (denied) return denied;
 
   const limited = enforceRateLimit(`outreach:leads:${scope.userId}`, PRESET_MUTATION);
   if (limited) return limited;

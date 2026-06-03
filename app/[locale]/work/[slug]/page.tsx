@@ -3,8 +3,11 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { VENTURES, getVenture } from "@/lib/ventures";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
+import { AUTHOR_PERSON } from "@/lib/seo/article";
 import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
 export function generateStaticParams() {
   return LOCALES.flatMap((locale) => VENTURES.map((v) => ({ locale, slug: v.slug })));
@@ -45,9 +48,26 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
     { name: v.name, path: `/work/${v.slug}` },
   ]);
 
+  // CreativeWork schema for the case itself (the page previously only emitted a
+  // breadcrumb trail). Ties the proof layer to the canonical authored Person +
+  // the org, and labels its sector for topical relevance.
+  const workSchema = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: v.name,
+    headline: `${v.name} — ${v.tagline}`,
+    description: v.summary,
+    url: `${SITE}/${l}/work/${v.slug}`,
+    about: v.sector,
+    inLanguage: l,
+    creator: { "@type": "Organization", name: "Juan Diaz, LLC", url: SITE },
+    author: AUTHOR_PERSON,
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(workSchema) }} />
       <header
         className="page-hero"
         style={{

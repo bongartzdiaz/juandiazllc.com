@@ -19,15 +19,19 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const l = assertLocale(locale);
   const s = getSector(slug);
   if (!s) return { title: "Sector not found" };
+  // Prefer the keyword-targeted SEO strings; fall back to the brand
+  // tagline/summary when a sector hasn't defined them.
+  const seoTitle = s.seoTitle ?? `${s.name} — ${s.tagline}`;
+  const seoDescription = s.seoDescription ?? s.summary;
   return {
-    title: `${s.name} — ${s.tagline}`,
-    description: s.summary,
+    title: seoTitle,
+    description: seoDescription,
     alternates: buildAlternates(l, `/sectors/${s.slug}`),
     openGraph: {
       type: "article",
       url: `/${l}/sectors/${s.slug}`,
-      title: `${s.name} — ${s.tagline}`,
-      description: s.summary,
+      title: seoTitle,
+      description: seoDescription,
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
     },

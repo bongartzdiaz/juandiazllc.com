@@ -276,7 +276,7 @@ export default function CalendarPage() {
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '8px 14px', fontSize: 13, fontWeight: 600,
-              background: 'var(--accent)', color: '#fff',
+              background: 'var(--accent)', color: 'var(--accent-fg)',
               border: 'none', borderRadius: 8, cursor: 'pointer',
             }}
           >
@@ -639,7 +639,7 @@ export default function CalendarPage() {
                 disabled={submitting}
                 style={{
                   padding: '8px 14px', fontSize: 13, fontWeight: 600,
-                  background: 'var(--accent)', color: '#fff',
+                  background: 'var(--accent)', color: 'var(--accent-fg)',
                   border: 'none', borderRadius: 7,
                   cursor: submitting ? 'not-allowed' : 'pointer',
                   opacity: submitting ? 0.7 : 1,

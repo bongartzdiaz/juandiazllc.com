@@ -9,6 +9,7 @@
 
 import crypto from 'crypto'
 import { getAuthPrisma } from '@/lib/philly/auth'
+import { assertSafeWebhookUrl, UnsafeWebhookUrlError } from './ssrf-guard'
 
 interface DispatchOptions {
   /** Direct URL to POST to (skips lookup). Used by automation callWebhook action. */
@@ -61,6 +62,17 @@ export async function dispatchWebhookEvent(
 
     // Direct-call mode (from automation action)
     if (opts.url) {
+      // SSRF re-check at dispatch (A-04): defeats DNS rebinding and any
+      // URL stored before the create-time guard existed.
+      try {
+        await assertSafeWebhookUrl(opts.url)
+      } catch (err) {
+        if (err instanceof UnsafeWebhookUrlError) {
+          console.error(`[webhook:direct] blocked unsafe url ${opts.url}: ${err.message}`)
+          return
+        }
+        throw err
+      }
       const body = JSON.stringify({ event, payload: opts.payload ?? payload, timestamp: new Date().toISOString() })
       const result = await deliverWithRetry(opts.url, body, null)
       // Log under a synthetic webhook if possible (skipped — just console)
@@ -84,6 +96,21 @@ export async function dispatchWebhookEvent(
       let events: string[] = []
       try { events = JSON.parse(wh.events || '[]') } catch {}
       if (!events.includes('*') && !events.includes(event)) return
+
+      // SSRF re-check at dispatch (A-04): a URL may have been stored
+      // before the guard existed, or its DNS may now resolve internally
+      // (rebinding). Record a blocked delivery instead of firing.
+      try {
+        await assertSafeWebhookUrl(wh.url)
+      } catch (err) {
+        if (err instanceof UnsafeWebhookUrlError) {
+          await prisma.webhookDelivery.create({
+            data: { webhookId: wh.id, event, payload: body.slice(0, 65000), statusCode: null, response: `blocked: ${err.message}` },
+          }).catch(() => {})
+          return
+        }
+        throw err
+      }
 
       const delivery = await deliverWithRetry(wh.url, body, wh.secret)
       await prisma.webhookDelivery.create({

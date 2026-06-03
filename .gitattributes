@@ -1,0 +1,21 @@
+# Default behaviour: let Git auto-detect text vs binary, normalize to LF
+# in the repo, and check out platform-native (CRLF on Windows, LF elsewhere).
+* text=auto
+
+# Files that MUST keep LF endings regardless of platform.
+# Shell scripts with CRLF break bash on Linux. SQL files don't break, but
+# editor diffs are cleaner with consistent endings.
+*.sh        text eol=lf
+*.bash      text eol=lf
+*.sql       text eol=lf
+*.example   text eol=lf
+
+# Binary files — never normalize, never line-ending-convert.
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.pdf       binary
+*.woff      binary
+*.woff2     binary

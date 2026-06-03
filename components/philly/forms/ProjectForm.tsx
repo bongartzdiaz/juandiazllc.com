@@ -233,7 +233,7 @@ export function ProjectForm({ onSubmit, onCancel, initial }: ProjectFormProps) {
           type="submit"
           style={{
             padding: '8px 18px', borderRadius: 8,
-            border: 'none', background: 'var(--accent)', color: '#fff',
+            border: 'none', background: 'var(--accent)', color: 'var(--accent-fg)',
             cursor: 'pointer', fontWeight: 600, fontSize: 13,
           }}
         >

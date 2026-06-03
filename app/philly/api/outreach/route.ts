@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireScope, jsonError } from "@/lib/philly/auth-helpers";
+import { denyIfNotOutreachOperator } from "@/lib/philly/outreach-guard";
 import { liClient } from "@/lib/supabase/li-client";
 import { logger } from "@/lib/philly/logger";
 
@@ -21,6 +22,8 @@ type ViewName = keyof typeof VIEWS;
 export async function GET(req: NextRequest) {
   const scope = await requireScope();
   if (scope instanceof NextResponse) return scope;
+  const denied = await denyIfNotOutreachOperator(scope);
+  if (denied) return denied;
 
   const db = liClient();
   const url = new URL(req.url);

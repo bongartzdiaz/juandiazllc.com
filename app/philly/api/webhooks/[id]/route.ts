@@ -4,6 +4,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthPrisma } from '@/lib/philly/auth'
 import { requireRole, jsonError } from '@/lib/philly/auth-helpers'
+import { enforceRateLimit, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { assertSafeWebhookUrl, UnsafeWebhookUrlError } from '@/lib/philly/webhooks/ssrf-guard'
 import { logAudit } from '@/lib/philly/audit'
 import crypto from 'crypto'
 
@@ -32,6 +34,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (scope instanceof NextResponse) return scope
   const { id } = await params
 
+  const limited = enforceRateLimit(`webhooks:update:${scope.userId}`, PRESET_MUTATION)
+  if (limited) return limited
+
   let body: Record<string, unknown>
   try { body = await req.json() } catch { return jsonError('Invalid JSON', 400) }
 
@@ -42,7 +47,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!existing) return jsonError('Webhook not found', 404)
 
   const data: Record<string, unknown> = {}
-  if (typeof body.url === 'string') data.url = body.url.trim()
+  if (typeof body.url === 'string') {
+    // SSRF guard (A-04): validate the new URL before storing it.
+    try {
+      await assertSafeWebhookUrl(body.url.trim())
+    } catch (e) {
+      if (e instanceof UnsafeWebhookUrlError) return jsonError(e.message, 400)
+      throw e
+    }
+    data.url = body.url.trim()
+  }
   if (Array.isArray(body.events)) data.events = JSON.stringify(body.events)
   if (typeof body.enabled === 'boolean') data.enabled = body.enabled
   if (body.rotateSecret === true) data.secret = crypto.randomBytes(32).toString('hex')

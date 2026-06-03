@@ -320,3 +320,108 @@ export const updateOutreachMessageSchema = z.discriminatedUnion('action', [
   }),
 ])
 
+// ── Invites + seats ──
+
+export const inviteRoleEnum = z.enum(['admin', 'manager', 'viewer'])
+
+export const createInviteSchema = z.object({
+  // trim+lowercase BEFORE email validation, so "  Jane@Example.COM  " canonicalizes
+  // and dedupe lookups don't miss whitespace-padded variants.
+  email: z
+    .string()
+    .max(254)
+    .transform(s => s.trim().toLowerCase())
+    .pipe(z.string().email()),
+  role: inviteRoleEnum.default('viewer'),
+})
+
+export const acceptInviteSchema = z.object({
+  token: z.string().min(20).max(100),
+  // trim BEFORE min-length check, so "   " is rejected as empty
+  name: z
+    .string()
+    .max(120)
+    .transform(s => s.trim())
+    .pipe(z.string().min(1, 'Name cannot be blank')),
+  password: z.string().min(12).max(200),
+})
+
+// ── GDPR — erasure (Art. 17) ──
+
+/**
+ * Self-delete confirmation. Customer must literally type "DELETE" so an
+ * accidental click can't take their account down. The string is intentionally
+ * not localized — the same word ships in all UIs.
+ */
+export const deleteAccountSchema = z.object({
+  confirmation: z.literal('DELETE'),
+})
+
+/** Admin removes a teammate. Reason is optional but encouraged. */
+export const deleteUserSchema = z.object({
+  reason: z.string().max(500).optional(),
+})
+
+// ── GDPR — DSAR scope (Art. 15) ──
+
+export const dsarScopeEnum = z.enum(['user', 'org'])
+
+// ── Onboarding wizard ──
+
+export const onboardingStepEnum = z.enum([
+  'welcome', 'org', 'team', 'contacts', 'calendar', 'done',
+])
+
+export const advanceOnboardingStepSchema = z.object({
+  step: onboardingStepEnum,
+})
+
+/** Step 2 — org details. Industry can be set here OR in step 1. */
+export const updateOrgDetailsSchema = z.object({
+  name: z.string().min(1).max(120).transform(s => s.trim()).pipe(z.string().min(1)),
+  industry: z.enum(['realestate', 'hospitality']).optional(),
+  timeZone: z.string().min(1).max(60),
+  defaultCurrency: z.enum(['EUR', 'USD', 'GBP', 'CHF', 'NOK', 'SEK', 'DKK']),
+})
+
+// ── Contact import (CSV → JSON) ──
+
+/**
+ * Contact-type values the customer's CSV may put in the `type` column.
+ * Mirrors the Contact.type defaults across both verticals (RE + hospitality).
+ */
+export const contactTypeEnum = z.enum([
+  'partner', 'beneficiary', 'stakeholder', 'donor',
+  'buyer', 'seller', 'tenant', 'landlord',
+  'guest', 'vendor', 'staff', 'investor',
+])
+
+export const leadStatusEnum_v1 = z.enum([
+  'new', 'contacted', 'qualified', 'nurture', 'hot',
+  'under_contract', 'closed', 'lost',
+])
+
+/**
+ * One inbound row. Server validates every field independently — even
+ * trusted clients can post rows that don't match the local-parse contract.
+ */
+export const importContactRowSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(200).transform(s => s.trim()),
+  email: z.preprocess(
+    (v) => (typeof v === 'string' ? v.trim().toLowerCase() : v),
+    z.union([z.literal(''), z.string().email().max(254)]).optional().default(''),
+  ),
+  phone: z.string().max(50).optional().default(''),
+  company: z.string().max(200).optional().default(''),
+  type: contactTypeEnum.optional().default('stakeholder'),
+  notes: z.string().max(2000).optional().default(''),
+  leadSource: z.string().max(100).optional().default(''),
+  leadStatus: leadStatusEnum_v1.optional(),
+})
+
+export const importContactsSchema = z.object({
+  rows: z.array(importContactRowSchema).min(1, 'At least one row is required').max(10000, 'Max 10,000 rows per import'),
+  /** Filename for the audit row — purely informational. */
+  source: z.string().max(200).optional().default('csv'),
+})
+

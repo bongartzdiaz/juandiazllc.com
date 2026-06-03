@@ -3,6 +3,11 @@ export type Sector = {
   name: string;
   tagline: string;
   summary: string;
+  // SEO-only overrides. The visible page uses name/tagline/summary
+  // (brand voice); generateMetadata prefers these keyword-targeted
+  // strings when present, falling back to name+tagline / summary.
+  seoTitle?: string;
+  seoDescription?: string;
   leaks: { title: string; body: string }[];
   playbook: { phase: string; applied: string }[];
   proof: { title: string; body: string; href?: string }[];
@@ -16,6 +21,9 @@ export const SECTORS: Sector[] = [
     slug: "energy",
     name: "Energy & solar",
     tagline: "The grid is about to change. Most operators are not ready.",
+    seoTitle: "Energy & Solar Operations Consultant | Juan Diaz",
+    seoDescription:
+      "Fractional revenue operator and operations consultant for energy and solar operators — honest tooling, CRM and revenue systems built for the post-2027 grid.",
     summary:
       "Dutch households, installers, and grid operators are heading into the 2027 net-metering phase-out with software that was built for a different economic reality. Real revenue will be won by whoever ships honest tooling first.",
     leaks: [
@@ -43,6 +51,9 @@ export const SECTORS: Sector[] = [
     slug: "real-estate",
     name: "Real estate",
     tagline: "Numbers the asset manager can actually trust.",
+    seoTitle: "Real Estate Operations Consultant | Juan Diaz",
+    seoDescription:
+      "Operations consultant and fractional revenue operator for real estate — unified portfolio data, ESG reporting and asset numbers the manager can actually trust.",
     summary:
       "Real estate runs on numbers that everyone quietly knows are wrong. Utilities data is patchy, tenant ops live in email threads, ESG reporting is produced under deadline pressure once a year. The operators know — the software doesn't.",
     leaks: [
@@ -69,6 +80,9 @@ export const SECTORS: Sector[] = [
     slug: "hospitality",
     name: "Hospitality & revenue",
     tagline: "From gut-feel pricing to an honest instrument.",
+    seoTitle: "Hospitality Revenue & Operations Consultant | Juan Diaz",
+    seoDescription:
+      "Revenue operations consultant for hospitality operators — channel intelligence, a pricing instrument and frontline tools that replace gut-feel decisions.",
     summary:
       "Hospitality is one of the few industries where the revenue manager still makes call-by-call judgment decisions without a real instrument to check them against. The biggest margin lives in the 10 minutes before check-in, and most of it is slipping through on gut feel.",
     leaks: [
@@ -95,6 +109,9 @@ export const SECTORS: Sector[] = [
     slug: "adjacent",
     name: "Adjacent sectors",
     tagline: "Anywhere operators have a P&L and bad software.",
+    seoTitle: "Operations Consultant for Operators | Juan Diaz",
+    seoDescription:
+      "Fractional revenue operator and operations consultant for logistics, retail and field-service operators running real P&Ls on software that lies to them.",
     summary:
       "Logistics, retail, field services, frontier industries — the five-phase method doesn't care what industry your building sits in. If there are operators running real operations against a real P&L on software that lies to them, the playbook applies.",
     leaks: [

@@ -1,0 +1,592 @@
+{
+  "nav": {
+    "core": "Kern",
+    "tools": "Werkzeuge",
+    "system": "System",
+    "dashboard": "Übersicht",
+    "projects": "Projekte",
+    "contacts": "Kontakte",
+    "impact": "Wirkung",
+    "market": "Markt",
+    "reports": "Berichte",
+    "dealsBoard": "Deals-Board",
+    "deals": "Deals",
+    "calendar": "Kalender",
+    "timeline": "Zeitachse",
+    "documents": "Dokumente",
+    "properties": "Objekte",
+    "showings": "Besichtigungen",
+    "offers": "Angebote",
+    "openHouses": "Tag der offenen Tür",
+    "commissions": "Provisionen",
+    "dripCampaigns": "Drip-Kampagnen",
+    "marketAnalytics": "Marktanalyse",
+    "rooms": "Zimmer",
+    "grants": "Förderungen",
+    "volunteers": "Freiwillige",
+    "donors": "Spender",
+    "webhooks": "Webhooks",
+    "notifications": "Benachrichtigungen",
+    "automations": "Automatisierungen",
+    "auditLog": "Audit-Log",
+    "settings": "Einstellungen",
+    "kanban": "Kanban",
+    "pages": "Seiten",
+    "aiInsights": "KI-Insights",
+    "outreach": "Outreach",
+    "aiScoring": "Lead-Scoring",
+    "aiAsk": "KI fragen",
+    "reservations": "Reservierungen",
+    "quotes": "Angebote",
+    "board": "Board",
+    "inbox": "Posteingang",
+    "templates": "Vorlagen",
+    "actionPlans": "Aktionspläne",
+    "transactions": "Transaktionen",
+    "leadScores": "Lead-Bewertungen",
+    "scoringRules": "Bewertungsregeln",
+    "leadRouting": "Lead-Routing",
+    "dialer": "Power-Dialer",
+    "referrals": "Empfehlungen",
+    "soi": "Bekanntenkreis",
+    "cma": "CMA-Berichte",
+    "clientPortal": "Kundenportal",
+    "eSignatures": "E-Signaturen",
+    "email": "E-Mail",
+    "sms": "SMS",
+    "integrations": "Integrationen"
+  },
+  "dashboard": {
+    "title": "Übersicht",
+    "subtitle": "Ihr Portfolio auf einen Blick",
+    "totalProjects": "Projekte gesamt",
+    "activeProjects": "Aktive Projekte",
+    "peopleHelped": "Erreichte Personen",
+    "co2Reduced": "CO2 reduziert",
+    "moneyDonated": "Gesamt gespendet",
+    "sdgCoverage": "SDG-Abdeckung",
+    "recentActivity": "Letzte Aktivität",
+    "impactOverview": "Wirkungsübersicht",
+    "editDashboard": "Übersicht bearbeiten",
+    "addWidget": "Widget hinzufügen"
+  },
+  "projects": {
+    "title": "Projekte",
+    "titleRE": "Objekte",
+    "titleHOS": "Locations & Zimmer",
+    "subtitle": "Verwalte deine CSR-Initiativen",
+    "subtitleRE": "Verwalte dein Portfolio",
+    "subtitleHOS": "Verwalte deine Locations",
+    "newProject": "Neues Projekt",
+    "newProjectRE": "Neues Objekt",
+    "newProjectHOS": "Neues Zimmer",
+    "searchPlaceholder": "Projekte suchen…",
+    "searchPlaceholderRE": "Objekte suchen…",
+    "searchPlaceholderHOS": "Zimmer & Locations suchen…",
+    "gridView": "Rasteransicht",
+    "listView": "Listenansicht",
+    "all": "Alle",
+    "createdSuccess": "Projekt erfolgreich erstellt",
+    "createFailed": "Projekt konnte nicht erstellt werden",
+    "status": {
+      "planned": "Geplant",
+      "active": "Aktiv",
+      "completed": "Abgeschlossen",
+      "paused": "Pausiert"
+    },
+    "fields": {
+      "title": "Projekttitel",
+      "description": "Beschreibung",
+      "category": "Kategorie",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "budget": "Budget",
+      "sdgGoals": "SDG-Ziele",
+      "status": "Status"
+    }
+  },
+  "contacts": {
+    "title": "Kontakte",
+    "subtitle": "Partner, Spender & Stakeholder",
+    "subtitleRE": "Käufer, Verkäufer & Investoren",
+    "subtitleHOS": "Gäste, Lieferanten & Partner",
+    "newContact": "Neuer Kontakt",
+    "searchPlaceholder": "Kontakte suchen…",
+    "all": "Alle",
+    "createdSuccess": "Kontakt erfolgreich erstellt",
+    "createFailed": "Kontakt konnte nicht erstellt werden",
+    "types": {
+      "partner": "Partner",
+      "beneficiary": "Begünstigter",
+      "stakeholder": "Stakeholder",
+      "donor": "Spender",
+      "buyer": "Käufer",
+      "seller": "Verkäufer",
+      "tenant": "Mieter",
+      "landlord": "Vermieter",
+      "investor": "Investor",
+      "guest": "Gast",
+      "vendor": "Lieferant",
+      "staff": "Mitarbeiter"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "company": "Firma",
+      "type": "Typ",
+      "notes": "Notizen"
+    }
+  },
+  "deals": {
+    "title": "Deals",
+    "subtitle": "Verfolge und verwalte deine Deal-Pipeline",
+    "totalValue": "Gesamtwert",
+    "openDeals": "Offene Deals",
+    "won": "Gewonnen",
+    "avgProbability": "Ø Wahrscheinlichkeit",
+    "allPipelines": "Alle Pipelines",
+    "allStatuses": "Alle Status",
+    "deal": "Deal",
+    "stage": "Phase",
+    "value": "Wert",
+    "probability": "Wahrsch.",
+    "contact": "Kontakt",
+    "status": "Status",
+    "noneFound": "Keine Deals gefunden. Erstelle zuerst eine Pipeline.",
+    "open": "Offen",
+    "lost": "Verloren"
+  },
+  "properties": {
+    "title": "Objekte",
+    "subtitle": "Verwalte deine Immobilien-Listings",
+    "totalProperties": "Gesamtobjekte",
+    "portfolioValue": "Portfoliowert",
+    "available": "Verfügbar",
+    "totalViewings": "Gesamt-Besichtigungen",
+    "searchPlaceholder": "Objekte suchen…"
+  },
+  "showings": {
+    "title": "Besichtigungen",
+    "subtitle": "Plane und verfolge Objektbesichtigungen",
+    "totalShowings": "Gesamt-Besichtigungen",
+    "scheduled": "Geplant",
+    "completed": "Abgeschlossen",
+    "avgRating": "Ø Bewertung",
+    "property": "Objekt",
+    "dateTime": "Datum/Uhrzeit",
+    "agent": "Makler",
+    "contact": "Kontakt",
+    "rating": "Bewertung",
+    "status": "Status",
+    "noneYet": "Noch keine Besichtigungen geplant.",
+    "cancelled": "Abgesagt",
+    "noShow": "Nicht erschienen"
+  },
+  "offers": {
+    "title": "Angebote",
+    "subtitle": "Verfolge und verwalte Angebote für Objekte",
+    "totalOfferValue": "Gesamt-Angebotswert",
+    "pending": "Ausstehend",
+    "accepted": "Angenommen",
+    "acceptRate": "Annahmequote",
+    "buyer": "Käufer",
+    "amount": "Betrag",
+    "date": "Datum",
+    "status": "Status",
+    "noneYet": "Noch keine Angebote.",
+    "rejected": "Abgelehnt",
+    "countered": "Gegenangebot",
+    "withdrawn": "Zurückgezogen",
+    "expired": "Abgelaufen"
+  },
+  "openHouses": {
+    "title": "Tag der offenen Tür",
+    "subtitle": "Plane und verwalte Open-House-Termine",
+    "totalEvents": "Gesamt-Events",
+    "upcoming": "Anstehend",
+    "totalVisitors": "Gesamt-Besucher",
+    "avgVisitors": "Ø Besucher",
+    "property": "Objekt",
+    "date": "Datum",
+    "time": "Uhrzeit",
+    "host": "Gastgeber",
+    "visitors": "Besucher",
+    "noneYet": "Keine Open Houses geplant."
+  },
+  "commissions": {
+    "title": "Provisionen",
+    "subtitle": "Provisions-Tracking und Team-Leaderboard",
+    "ytdTeamGci": "YTD Team-GCI",
+    "totalNet": "Netto gesamt",
+    "pendingPayouts": "Ausstehende Auszahlungen",
+    "teamMembers": "Teammitglieder",
+    "teamLeaderboard": "Team-Leaderboard",
+    "commissionRecords": "Provisions-Einträge",
+    "rank": "#",
+    "agent": "Makler",
+    "deals": "Deals",
+    "won": "Gewonnen",
+    "month": "Monat",
+    "volume": "Volumen",
+    "ytdGci": "YTD GCI",
+    "convRate": "Conv %",
+    "noTeamData": "Noch keine Team-Daten.",
+    "type": "Typ / Notizen",
+    "gross": "Brutto",
+    "splitPct": "Split %",
+    "net": "Netto",
+    "status": "Status",
+    "noRecords": "Keine Provisions-Einträge.",
+    "paid": "Bezahlt",
+    "voided": "Storniert"
+  },
+  "dripCampaigns": {
+    "title": "Drip-Kampagnen",
+    "subtitle": "Automatisierte E-Mail- und SMS-Sequenzen",
+    "totalCampaigns": "Gesamt-Kampagnen",
+    "active": "Aktiv",
+    "totalSteps": "Schritte gesamt",
+    "types": "Typen",
+    "allTypes": "Alle Typen",
+    "allStatuses": "Alle Status",
+    "paused": "Pausiert",
+    "draft": "Entwurf",
+    "completed": "Abgeschlossen",
+    "noSteps": "Keine Schritte konfiguriert",
+    "noneFound": "Keine Kampagnen gefunden.",
+    "buyerNurture": "Käufer-Nurture",
+    "sellerNurture": "Verkäufer-Nurture",
+    "newListing": "Neues Listing",
+    "openHouseFollowUp": "Open-House-Follow-up",
+    "homeAnniversary": "Einzugs-Jubiläum",
+    "referralRequest": "Empfehlungs-Anfrage",
+    "justSold": "Gerade verkauft",
+    "marketUpdate": "Markt-Update"
+  },
+  "marketAnalytics": {
+    "title": "Markt-Analyse",
+    "subtitle": "Immobilienmarkt-Daten und Trends",
+    "medianPrice": "Medianpreis",
+    "avgDaysOnMarket": "Ø Tage am Markt",
+    "ytdClosedSales": "YTD abgeschlossene Verkäufe",
+    "avgInventory": "Ø Bestand",
+    "filterByZip": "Nach PLZ filtern…",
+    "zip": "PLZ",
+    "month": "Monat",
+    "dom": "DOM",
+    "active": "Aktiv",
+    "closed": "Abgeschlossen",
+    "new": "Neu",
+    "sqft": "€/m²",
+    "inventory": "Bestand",
+    "noData": "Keine Marktdaten vorhanden. Über API hinzufügen.",
+    "hotMarket": "Heißer Markt (<3 Mon. Bestand)",
+    "balanced": "Ausgeglichen (3–6 Mon.)",
+    "coolMarket": "Kühler Markt (>6 Mon.)"
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "unread": "ungelesen",
+    "markAllRead": "Alle als gelesen markieren",
+    "noneYet": "Noch keine Benachrichtigungen."
+  },
+  "automations": {
+    "title": "Automationen",
+    "subtitle": "Workflows und Benachrichtigungen automatisieren",
+    "totalRules": "Regeln gesamt",
+    "active": "Aktiv",
+    "totalRuns": "Ausführungen gesamt"
+  },
+  "audit": {
+    "title": "Audit-Log",
+    "subtitle": "Alle Systemänderungen verfolgen"
+  },
+  "documents": {
+    "title": "Dokumente",
+    "subtitle": "Dateien und Dokumente verwalten"
+  },
+  "impact": {
+    "title": "Impact",
+    "subtitle": "Miss, was zählt",
+    "totalImpact": "Gesamt-Impact",
+    "byProject": "Pro Projekt",
+    "sdgAlignment": "SDG-Alignment",
+    "trends": "Trends"
+  },
+  "kanban": {
+    "title": "Kanban",
+    "subtitle": "Visuelles Projektmanagement",
+    "newBoard": "Neues Board",
+    "addColumn": "Spalte hinzufügen",
+    "addCard": "Karte hinzufügen"
+  },
+  "rooms": {
+    "title": "Zimmer",
+    "subtitle": "Hotelzimmer und Verfügbarkeit verwalten"
+  },
+  "grants": {
+    "title": "Förderungen",
+    "subtitle": "Förderanträge und Finanzierung verfolgen"
+  },
+  "volunteers": {
+    "title": "Freiwillige",
+    "subtitle": "Freiwilligenteam und Stunden verwalten"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Verwalte dein Konto und deine Einstellungen",
+    "language": "Sprache",
+    "theme": "Theme",
+    "profile": "Profil",
+    "organization": "Organisation",
+    "preferences": "Präferenzen",
+    "apiKeys": "API-Schlüssel",
+    "goals": "Ziele",
+    "integrations": "Integrationen",
+    "units": "Einheiten & Währung",
+    "unitSystem": "Maßsystem",
+    "metric": "Metrisch (m², km, °C)",
+    "imperial": "Imperial (sqft, mi, °F)",
+    "currency": "Währung",
+    "currencyDefault": "Standardwährung für alle Geldbeträge"
+  },
+  "inbox": {
+    "title": "Posteingang",
+    "subtitle": "Konversationen und Nachrichten"
+  },
+  "templates": {
+    "title": "Vorlagen",
+    "subtitle": "Vorlagenbibliothek für E-Mail und SMS"
+  },
+  "actionPlans": {
+    "title": "Aktionspläne",
+    "subtitle": "Automatisierte Aktionssequenzen"
+  },
+  "transactions": {
+    "title": "Transaktionen",
+    "subtitle": "Immobilientransaktionen verfolgen"
+  },
+  "leadScores": {
+    "title": "Lead-Scores",
+    "subtitle": "Dashboard für Kontakt-Scoring"
+  },
+  "scoringRules": {
+    "title": "Scoring-Regeln",
+    "subtitle": "Lead-Scoring-Regeln konfigurieren"
+  },
+  "leadRouting": {
+    "title": "Lead-Routing",
+    "subtitle": "Leads an Makler zuweisen"
+  },
+  "dialer": {
+    "title": "Power Dialer",
+    "subtitle": "Anrufprotokolle und Anruflisten"
+  },
+  "referrals": {
+    "title": "Empfehlungen",
+    "subtitle": "Empfehlungsprovisionen verfolgen"
+  },
+  "soi": {
+    "title": "Einflussbereich",
+    "subtitle": "Verwalte deine SOI-Kategorien"
+  },
+  "cma": {
+    "title": "CMA-Berichte",
+    "subtitle": "Vergleichende Marktanalyse"
+  },
+  "clientPortal": {
+    "title": "Kundenportal",
+    "subtitle": "Zugang zum Kundenportal verwalten"
+  },
+  "eSignatures": {
+    "title": "E-Signaturen",
+    "subtitle": "Dokument-Signaturen verfolgen"
+  },
+  "common": {
+    "language": "Sprache",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "add": "Hinzufügen",
+    "search": "Suchen…",
+    "filter": "Filter",
+    "noResults": "Keine Ergebnisse",
+    "loading": "Wird geladen…",
+    "viewAll": "Alle anzeigen",
+    "back": "Zurück",
+    "allStatuses": "Alle Status",
+    "created": "Erstellt",
+    "signOut": "Abmelden",
+    "live": "LIVE",
+    "sync": "Synchronisieren",
+    "syncing": "Wird synchronisiert…",
+    "done": "Fertig",
+    "step": "Schritt",
+    "steps": "Schritte",
+    "unassigned": "Nicht zugewiesen",
+    "mode": "Modus"
+  },
+  "quickStart": {
+    "title": "Schnellstart",
+    "subtitle": "Drei Schritte, mit denen DEUS in etwa zehn Minuten von leer zu nützlich wird.",
+    "dismiss": "Schnellstart ausblenden",
+    "doneLabel": "Erledigt",
+    "calendar": {
+      "title": "Kalender verbinden",
+      "description": "Termine mit Ihren Kontakten erscheinen innerhalb von Sekunden auf der Kontaktseite.",
+      "cta": "Verbinden"
+    },
+    "contacts": {
+      "title": "Kontakte importieren",
+      "description": "Laden Sie eine CSV-Datei hoch (bis zu 10 000 Zeilen) und DEUS ordnet die Spalten automatisch zu.",
+      "cta": "Importieren"
+    },
+    "team": {
+      "title": "Team einladen",
+      "description": "Senden Sie rollenbasierte Einladungen per E-Mail. Der Empfänger legt sein eigenes Passwort fest.",
+      "cta": "Einladen"
+    }
+  },
+  "help": {
+    "label": "Hilfe",
+    "openFull": "Vollständiges Hilfe-Center öffnen",
+    "search": "Hilfeartikel durchsuchen",
+    "searchShort": "Suchen…",
+    "back": "Zurück",
+    "languageNotice": "Hilfeartikel sind derzeit auf Englisch. Schreiben Sie an support@lucen.ai für Hilfe auf Deutsch — wir antworten in Ihrer Sprache.",
+    "stuckTitle": "Trotzdem festgefahren?",
+    "stuckBody": "Schreiben Sie an support@lucen.ai. Echter Mensch, EU-Geschäftszeiten, Antwort innerhalb eines Werktages.",
+    "stuckHint": "Geben Sie an: was Sie versucht haben, was Sie erwartet haben, was passiert ist. Screenshots helfen.",
+    "openHelp": "Hilfe öffnen",
+    "closeHelp": "Hilfe schließen"
+  },
+  "wizard": {
+    "frame": {
+      "stepIndicator": "Schritt {current} von {total}",
+      "closeAria": "Setup schließen und zurück zum Dashboard",
+      "footerByline": "DEUS by LucenAI",
+      "footerPrivacy": "Datenschutz"
+    },
+    "common": {
+      "continue": "Weiter",
+      "networkError": "Netzwerkfehler. Versuche es erneut.",
+      "saveError": "Speichern fehlgeschlagen. Versuche es erneut.",
+      "removeRowAria": "Zeile entfernen"
+    },
+    "welcome": {
+      "heroTitle": "Willkommen bei DEUS, {firstName}",
+      "heroTitleNoName": "Willkommen bei DEUS",
+      "heroSub": "Fünf kurze Schritte, um dein Team und deine Kontakte einzurichten. Was du später erledigen willst, kannst du überspringen.",
+      "reCardTitle": "Immobilien",
+      "reCardBody": "Maklerbüros, Hausverwaltung, Vertriebsteams. Deals, Objekte und Besichtigungen.",
+      "hospCardTitle": "Gastgewerbe",
+      "hospCardBody": "Hotels, Restaurants, Veranstaltungsorte. Reservierungen, Zimmer und Angebote."
+    },
+    "org": {
+      "heading": "Über deine Organisation",
+      "sub": "Wir brauchen ein paar Basisangaben, um Daten, Deals und Berichte richtig einzurichten.",
+      "companyNameLabel": "Firmenname",
+      "companyNamePlaceholder": "z. B. Bongartz Diaz Real Estate",
+      "timeZoneLabel": "Zeitzone",
+      "timeZoneHelper": "Wir erkennen sie automatisch über deinen Browser. Pass sie bei Bedarf an.",
+      "currencyLabel": "Standardwährung",
+      "currencyHelper": "Wird für Dealwerte und Berichte verwendet. Pro Deal überschreibbar.",
+      "primaryCta": "Speichern und weiter",
+      "validationEmptyName": "Gib deinen Firmennamen ein.",
+      "validationInvalidTz": "Wähle eine Zeitzone."
+    },
+    "team": {
+      "heading": "Lade dein Team ein",
+      "sub": "Dein Plan startet mit 3 Seats. Füge hier bis zu 5 Einladungen hinzu, oder überspringe und mach es später.",
+      "emailLabel": "E-Mail",
+      "emailPlaceholder": "kollege@beispiel.de",
+      "roleLabel": "Rolle",
+      "roleViewer": "Viewer",
+      "roleManager": "Manager",
+      "roleAdmin": "Admin",
+      "tooltipAdmin": "Voller Zugriff, inklusive Abrechnung und Teamverwaltung.",
+      "tooltipManager": "Voller Zugriff außer Abrechnung.",
+      "tooltipViewer": "Lesezugriff auf Kontakte, Deals und Berichte.",
+      "primaryCtaContinue": "Weiter",
+      "primaryCtaSendOne": "{count} Einladung senden",
+      "primaryCtaSendMany": "{count} Einladungen senden",
+      "secondarySkip": "Überspringen — ich lade später ein",
+      "addAnother": "Weitere hinzufügen",
+      "inlineSuccess": "Gesendet an {email}",
+      "inlineErrorDup": "Bereits in deinem Team",
+      "inlineErrorGeneric": "Versand fehlgeschlagen",
+      "inlineErrorNetwork": "Netzwerkfehler",
+      "seatCounter": "{used} von {limit} Seats verwendet",
+      "counterHelper": "Zählt dich, deine Teammitglieder und ausstehende Einladungen."
+    },
+    "contacts": {
+      "heading": "Füge deine Kontakte hinzu",
+      "sub": "Bring deine bestehenden Kontakte rein, damit Deals ab Tag eins mit echten Personen verbunden sind.",
+      "cardATitle": "CSV hochladen",
+      "cardABody": "Wir mappen Name, E-Mail, Telefon und Firma automatisch. Vor dem Speichern gibt's eine Vorschau.",
+      "cardBTitle": "Manuell hinzufügen",
+      "cardBBody": "Öffne ein leeres Kontaktformular und füge sie nach und nach hinzu.",
+      "skip": "Überspringen — ich füge Kontakte später hinzu",
+      "tip": "Bis zu 10.000 Zeilen pro Datei."
+    },
+    "calendar": {
+      "heading": "Verbinde deinen Kalender",
+      "sub": "Termine synchronisieren in beide Richtungen, und die Zeit pro Deal wird automatisch erfasst.",
+      "googleBtn": "Google Kalender verbinden",
+      "googleDetail": "Gmail, Workspace, Google-Konten",
+      "outlookBtn": "Outlook verbinden",
+      "outlookDetail": "Microsoft 365, Outlook.com, Exchange",
+      "googleProviderName": "Google Kalender",
+      "outlookProviderName": "Outlook / Microsoft 365",
+      "providerConnected": "{provider} verbunden.",
+      "disconnect": "Trennen",
+      "disconnectConfirm": "Diesen Kalender trennen? Du kannst später aus den Einstellungen erneut verbinden.",
+      "lockAria": "OAuth-gesichert",
+      "skip": "Überspringen — ich verbinde später",
+      "continueCta": "Weiter",
+      "popupBlocked": "Dein Browser hat das Popup blockiert. Erlaube Popups für app.lucen.ai und versuche es erneut.",
+      "retry": "Erneut versuchen",
+      "errAccessDenied": "Du hast die Kalenderberechtigung abgelehnt. Es wurden keine Daten geändert.",
+      "errStateExpired": "Der Verbindungs-Link ist abgelaufen. Klicke erneut auf Verbinden.",
+      "errProviderNotConfigured": "Der Kalender-Anbieter ist noch nicht konfiguriert — dein Operator muss OAuth-Credentials hinzufügen.",
+      "errTokenRejected": "Der Anbieter hat die Verbindung abgelehnt. Versuche es bitte erneut.",
+      "errSessionLost": "Deine Sitzung ist mitten im Vorgang abgelaufen. Melde dich erneut an, um fortzufahren.",
+      "errMissingParams": "Der Callback war fehlerhaft. Klicke auf Verbinden, um es erneut zu versuchen.",
+      "errGeneric": "Verbindung fehlgeschlagen ({code}).",
+      "trustToggle": "Was wir lesen — und was nicht",
+      "trustBullet1": "Lesezugriff: Termine aus deinem Hauptkalender in einem 14-Tage-Fenster.",
+      "trustBullet2": "Wir lesen niemals fremde geteilte Kalender oder deine Frei/Beschäftigt-Einstellungen.",
+      "trustBullet3": "Tokens sind verschlüsselt gespeichert. Du kannst jederzeit in den Einstellungen trennen."
+    },
+    "done": {
+      "heroTitle": "Fertig eingerichtet!",
+      "heroSub": "Drei schnelle Dinge, die du jetzt vom Dashboard aus tun kannst.",
+      "card1Title": "Eine KI-Erkenntnis ausführen",
+      "card1Body": "Wähle einen beliebigen Deal und frag DEUS nach den nächsten Schritten. Läuft lokal auf unserem Server.",
+      "card2Title": "Lies die 5-seitige Tour",
+      "card2Body": "Eine kurze Tour durch jeden Bildschirm, den du diese Woche nutzen wirst.",
+      "card3Title": "Audit-Log durchgehen",
+      "card3Body": "Jede Änderung in DEUS wird aufgezeichnet. Sieh, wer wann was getan hat.",
+      "primaryCta": "Zum Dashboard",
+      "toast": "Setup abgeschlossen — willkommen bei DEUS"
+    },
+    "resume": {
+      "bannerTitle": "Beende deine DEUS-Einrichtung",
+      "bannerBody": "Du bist {n} Schritte weit. Mache weiter, um dein Team einzuladen und Kontakte zu importieren.",
+      "primary": "Setup fortsetzen",
+      "dismiss": "Heute ausblenden"
+    },
+    "emptyState": {
+      "heading": "Dein Admin übernimmt das Setup",
+      "body": "Nur der Organisations-Admin durchläuft den Setup-Wizard. Sobald er fertig ist, hast du vollen Zugriff auf Kontakte, Deals und den Rest von DEUS.",
+      "primaryCta": "Zurück zum Dashboard"
+    },
+    "toast": {
+      "saveSuccess": "Gespeichert",
+      "skipConfirm": "Übersprungen — du kannst es später beenden",
+      "stepCompleted": "Schritt gespeichert"
+    }
+  }
+}

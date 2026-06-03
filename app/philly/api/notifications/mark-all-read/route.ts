@@ -12,6 +12,7 @@ export async function POST() {
   if (scope instanceof NextResponse) return scope
 
   const prisma = getAuthPrisma()
+  // org-scope-lint-ok: Notification rows are per-user; scoped to the caller's own userId (tighter than org)
   const result = await prisma.notification.updateMany({
     where: { userId: scope.userId, read: false },
     data: { read: true },

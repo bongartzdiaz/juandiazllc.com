@@ -117,6 +117,56 @@ export function webPageSchema(opts: {
   };
 }
 
+// Product + AggregateOffer for /pricing. Each public tier becomes
+// an Offer; Enterprise is dropped from the structured data since it's
+// contact-us only (no price = no Offer eligible for rich-results).
+export type PricingTierOffer = {
+  name: string;
+  description: string;
+  priceEuro: number; // monthly per-seat price, e.g. 40
+  url: string; // CTA href, will be absolute-ified
+};
+
+export function productOfferSchema(opts: {
+  locale: Locale;
+  productName: string;
+  productDescription: string;
+  tiers: PricingTierOffer[];
+}): Record<string, unknown> {
+  const url = `${SITE}/${opts.locale}/pricing`;
+  const prices = opts.tiers.map((t) => t.priceEuro);
+  const lowPrice = Math.min(...prices);
+  const highPrice = Math.max(...prices);
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: opts.productName,
+    description: opts.productDescription,
+    url,
+    brand: {
+      "@type": "Brand",
+      name: "DEUS",
+    },
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "EUR",
+      lowPrice: lowPrice.toString(),
+      highPrice: highPrice.toString(),
+      offerCount: opts.tiers.length,
+      offers: opts.tiers.map((tier) => ({
+        "@type": "Offer",
+        name: tier.name,
+        description: tier.description,
+        price: tier.priceEuro.toString(),
+        priceCurrency: "EUR",
+        url: tier.url.startsWith("http") ? tier.url : `${SITE}${tier.url}`,
+        availability: "https://schema.org/InStock",
+        category: "SaaS subscription",
+      })),
+    },
+  };
+}
+
 export function contactPointSchema(): Record<string, unknown> {
   return {
     "@context": "https://schema.org",

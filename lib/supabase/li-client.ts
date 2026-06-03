@@ -7,6 +7,34 @@ let _liClient: any = null;
  * Supabase service-role client targeting the `li` (LinkedIn outreach) schema.
  * Singleton — safe to call from any API route.
  *
+ * MULTI-TENANCY DECISION (2026-05-06):
+ *
+ *   The `li.*` schema is intentionally **single-tenant** — it carries
+ *   data from Juan's own LinkedIn outreach pipeline (in the separate
+ *   `linkedin outreach` project), exposed inside DEUS as a dashboard
+ *   feature for the operator (Juan) only. Customer-facing organizations
+ *   do NOT write to or read from this schema.
+ *
+ *   Access is gated at three layers:
+ *     1. The `/api/outreach/*` mutating routes require `requireRole(['admin','manager'])`
+ *        — only org admins/managers can see the outreach surface.
+ *     2. The dashboard (philly) is itself private to a small operator
+ *        set; multi-customer orgs cannot reach `/philly/outreach` because
+ *        the sidebar entry is gated to industries that include 'general',
+ *        and the surface is operator-only.
+ *     3. The service-role key is a server-only env var; the bundle never
+ *        ships it to a browser.
+ *
+ *   When DEUS opens this surface to customer orgs (a sales feature in
+ *   their plan), we will:
+ *     a) add an `organization_id` column to every `li.*` table
+ *     b) backfill the existing rows to Juan's org id
+ *     c) force-filter every `liClient()` query with
+ *        `.eq('organization_id', scope.organizationId)`
+ *     d) write Postgres RLS policies as defense-in-depth
+ *   Track this with a memo in `_drafts/li-multitenancy-plan.md` when the
+ *   feature appears on the roadmap.
+ *
  * The Supabase generated `Database` type only covers the public schema in
  * this repo. Hand-rolled types below mirror what the routes actually
  * select; keep them in sync if a column is added or renamed.

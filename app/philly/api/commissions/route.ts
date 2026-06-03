@@ -7,6 +7,7 @@ import { requireScope, requireRole, jsonError } from '@/lib/philly/auth-helpers'
 import { parsePagination, paginatedResponse } from '@/lib/philly/pagination'
 import { logAudit } from '@/lib/philly/audit'
 import { publishEntityCreated } from '@/lib/philly/realtime/publish'
+import { findForeignKeyNotInOrg } from '@/lib/philly/v1-fk-guard'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -51,6 +52,14 @@ export async function POST(req: NextRequest) {
   const netCents = Math.round(body.grossCents * (splitPct / 100))
 
   const prisma = getAuthPrisma()
+
+  // BE-09: agent + deal FKs must belong to the caller's org.
+  const badFk = await findForeignKeyNotInOrg(prisma, scope.organizationId, [
+    { field: 'agentId', model: 'user', value: body.agentId },
+    { field: 'dealId', model: 'deal', value: body.dealId },
+  ])
+  if (badFk) return jsonError(`${badFk} does not belong to your organization`, 400)
+
   const record = await prisma.commissionRecord.create({
     data: {
       organizationId: scope.organizationId,

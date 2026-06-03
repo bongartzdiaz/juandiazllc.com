@@ -317,7 +317,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
               <button onClick={() => setShowAddSig(true)} style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 padding: '7px 12px', borderRadius: 10,
-                background: 'var(--accent)', color: '#fff',
+                background: 'var(--accent)', color: 'var(--accent-fg)',
                 border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 fontFamily: 'inherit',
               }}>
@@ -629,7 +629,7 @@ const inputStyle: React.CSSProperties = {
 }
 
 const primaryBtn: React.CSSProperties = {
-  padding: '7px 14px', borderRadius: 8, background: 'var(--accent)', color: '#fff',
+  padding: '7px 14px', borderRadius: 8, background: 'var(--accent)', color: 'var(--accent-fg)',
   border: 'none', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
 }
 

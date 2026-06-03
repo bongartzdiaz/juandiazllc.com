@@ -17,6 +17,7 @@ import { validateApiKey, canWrite, canAdmin, ApiKeyScope } from '@/lib/philly/ap
 import { publishEntityCreated, publishEntityUpdated, publishEntityDeleted } from '@/lib/philly/realtime/publish'
 import { serverError } from '@/lib/philly/safe-error'
 import { enforceRateLimit, PRESET_READ, PRESET_MUTATION } from '@/lib/philly/rate-limit'
+import { findCrossOrgForeignKey } from '@/lib/philly/v1-fk-guard'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -165,6 +166,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
   if ('organizationId' in filter) data.organizationId = (filter as { organizationId: string }).organizationId
 
   const prisma = getAuthPrisma() as PrismaLike
+
+  // Tenant FK guard (A-02): every supplied foreign key must resolve to a
+  // row inside the caller's org, else an offer/reservation/showing/etc.
+  // could be attached to another tenant's property/room/deal.
+  const badFk = await findCrossOrgForeignKey(prisma, scope.organizationId, data)
+  if (badFk) return NextResponse.json({ error: `Invalid ${badFk}: not found in your organization` }, { status: 400 })
+
   try {
     const row = await prisma[cfg.model].create({ data })
     publishEntityCreated(scope.organizationId, cfg.auditEntity, row.id)
@@ -194,6 +202,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ pa
   const where = { id, ...(cfg.scopeFilter?.(scope) ?? {}) }
   const existing = await prisma[cfg.model].findFirst({ where })
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+  // Tenant FK guard (A-02): a PATCH must not repoint a foreign key at
+  // another tenant's record.
+  const badFk = await findCrossOrgForeignKey(prisma, scope.organizationId, data)
+  if (badFk) return NextResponse.json({ error: `Invalid ${badFk}: not found in your organization` }, { status: 400 })
 
   const row = await prisma[cfg.model].update({ where: { id }, data })
   publishEntityUpdated(scope.organizationId, cfg.auditEntity, id, undefined, row, existing)

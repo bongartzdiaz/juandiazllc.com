@@ -42,6 +42,9 @@ export type AuditEntity =
   | 'apiKey'
   | 'clientPortalAccess'
   | 'email'
+  | 'invite'
+  | 'subscription'
+  | 'user'
   | 'sms'
   | 'call'
   | 'cmaReport'
@@ -63,7 +66,6 @@ export type AuditEntity =
   | 'openHouseVisit'
   | 'pipeline'
   | 'pipelineStage'
-  | 'user'
   | 'organization'
   | 'auditLog'
 

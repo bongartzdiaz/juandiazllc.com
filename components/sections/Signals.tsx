@@ -20,7 +20,7 @@ export function Signals() {
         {posts.map((p) => (
           <Link key={p.slug} href={`/signals/${p.slug}`} className="sig" data-reveal>
             <div className="date">— {p.dateLabel}</div>
-            <h4>{p.title}</h4>
+            <h3>{p.title}</h3>
             <div className="tag">{t("signals.read")}</div>
           </Link>
         ))}
