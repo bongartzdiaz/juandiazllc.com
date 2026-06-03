@@ -21,7 +21,10 @@
        }
      }
 
-   Everything is tenant-scoped via getAuthPrisma() → RLS-style org filter.
+   Tenant scoping is EXPLICIT per query — getAuthPrisma() is a plain
+   PrismaClient with no RLS extension, so every where-clause must carry the
+   org filter itself (directly via organizationId, or via the pipeline
+   relation for deals which have no org column).
 */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -60,12 +63,16 @@ export async function GET(_req: NextRequest) {
       where: { organizationId: orgId, createdAt: { gte: thirtyDaysAgo } },
     }),
     prisma.deal.aggregate({
-      where: { status: 'open' },
+      // Deals carry no organizationId column — they are tenant-scoped through
+      // their pipeline. Without this nested filter the aggregate counts open
+      // deals across EVERY org (cross-tenant leak). getAuthPrisma() is a plain
+      // PrismaClient with no RLS extension, so the filter MUST be explicit.
+      where: { status: 'open', pipeline: { organizationId: orgId } },
       _count: { _all: true },
       _sum: { valueCents: true },
     }),
     prisma.deal.aggregate({
-      where: { status: 'won', actualClose: { gte: thirtyDaysAgo } },
+      where: { status: 'won', actualClose: { gte: thirtyDaysAgo }, pipeline: { organizationId: orgId } },
       _count: { _all: true },
       _sum: { valueCents: true },
     }),
@@ -75,10 +82,12 @@ export async function GET(_req: NextRequest) {
       _sum: { salePrice: true },
     }),
     // Monthly revenue chart: won deals over last 6 months, bucketed in JS.
+    // Same tenant-scoping caveat — filter through the pipeline relation.
     prisma.deal.findMany({
       where: {
         status: 'won',
         actualClose: { gte: sixMonthsAgo },
+        pipeline: { organizationId: orgId },
       },
       select: { valueCents: true, actualClose: true },
     }),
