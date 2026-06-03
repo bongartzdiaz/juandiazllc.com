@@ -23,7 +23,7 @@ type FeedItem = {
 };
 
 function buildItems(): FeedItem[] {
-  const insights: FeedItem[] = getAllInsights().map((p) => ({
+  const insights: FeedItem[] = getAllInsights("en").map((p) => ({
     id: `${SITE}/en/insights/${p.slug}`,
     url: `${SITE}/en/insights/${p.slug}`,
     title: p.title,

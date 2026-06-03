@@ -4,6 +4,11 @@
 // so the listing page, RSS feed, sitemap and Article schema can all
 // source from one truth.
 
+import type { Locale } from "@/lib/i18n/dict";
+
+/** Localized overrides for a post's user-facing content. */
+export type InsightL10n = { title: string; summary: string; body: InsightBlock[] };
+
 export type Insight = {
   slug: string;
   title: string;
@@ -13,7 +18,17 @@ export type Insight = {
   readingMinutes: number;
   body: InsightBlock[];
   seo?: { metaTitle?: string; metaDescription?: string };
+  /** Locales this post is published under. Undefined = all four (the default,
+   *  used by language-agnostic operator content with EN as the int'l fallback).
+   *  Market-specific posts (e.g. Dutch saldering/WhatsApp) set this to ['nl']
+   *  so they don't surface as thin content under /en,/de,/es. */
+  markets?: Locale[];
+  /** Real localized content per locale. When present for the active locale the
+   *  detail/listing renders it instead of the base (EN/NL) strings. */
+  i18n?: Partial<Record<Locale, InsightL10n>>;
 };
+
+const ALL_LOCALES: Locale[] = ["en", "nl", "de", "es"];
 
 export type InsightBlock =
   | { type: "h2"; text: string }
@@ -46,6 +61,7 @@ export const POSTS: Insight[] = [
   },
   {
     slug: "whatsapp-first-funnel-nl",
+    markets: ["nl"],
     title: "Why your Dutch lead funnel should start on WhatsApp",
     summary:
       "Nederlandse consumenten beantwoorden WhatsApp in 90 seconden en email in een week. Hoe je je funnel inricht zodat het eerste contact altijd WhatsApp is — zonder de lead kwijt te raken in de doorverwijzing.",
@@ -93,6 +109,7 @@ export const POSTS: Insight[] = [
   },
   {
     slug: "salderingsregeling-2027-wat-operators-nu-moeten-doen",
+    markets: ["nl"],
     title: "Salderingsregeling 2027 — wat operators nu moeten doen",
     summary:
       "De afschaffing raakt installateurs harder dan huiseigenaren. Drie aanpassingen in je funnel die het verschil maken tussen een rustig 2027 en een acquisitie-crisis.",
@@ -162,6 +179,7 @@ export const POSTS: Insight[] = [
   },
   {
     slug: "thuisbatterij-verkoop-na-2027",
+    markets: ["nl"],
     title: "Thuisbatterijen verkopen na 2027 — wat werkelijk werkt",
     summary:
       "De salderingsregeling verdwijnt. De batterij-installateurs die 2027 overleven zijn niet de goedkoopste — ze zijn de duidelijkste. Drie patronen uit succesvolle NL installateurs.",
@@ -208,12 +226,34 @@ export const POSTS: Insight[] = [
 
 ];
 
-export function getAllInsights(): Insight[] {
-  return [...POSTS].sort((a, b) => (a.publishedAt > b.publishedAt ? -1 : 1));
+/** Locales a post is published under (default: all four). */
+export function insightMarkets(p: Insight): Locale[] {
+  return p.markets ?? ALL_LOCALES;
 }
 
-export function getInsight(slug: string): Insight | undefined {
-  return POSTS.find((p) => p.slug === slug);
+export function isInMarket(p: Insight, locale: Locale): boolean {
+  return insightMarkets(p).includes(locale);
+}
+
+/** Apply localized content for `locale` if present; otherwise return the base
+ *  post unchanged. `markets` is preserved so callers can still gate. */
+export function localizedInsight(p: Insight, locale: Locale): Insight {
+  const t = p.i18n?.[locale];
+  return t ? { ...p, title: t.title, summary: t.summary, body: t.body } : p;
+}
+
+/** All posts (newest first). With a locale: only posts published in that
+ *  market, with localized content applied. */
+export function getAllInsights(locale?: Locale): Insight[] {
+  const sorted = [...POSTS].sort((a, b) => (a.publishedAt > b.publishedAt ? -1 : 1));
+  if (!locale) return sorted;
+  return sorted.filter((p) => isInMarket(p, locale)).map((p) => localizedInsight(p, locale));
+}
+
+export function getInsight(slug: string, locale?: Locale): Insight | undefined {
+  const p = POSTS.find((x) => x.slug === slug);
+  if (!p) return undefined;
+  return locale ? localizedInsight(p, locale) : p;
 }
 
 export function formatDate(iso: string): string {

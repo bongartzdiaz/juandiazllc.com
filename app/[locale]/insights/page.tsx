@@ -34,7 +34,7 @@ export default async function InsightsIndex({ params }: { params: Promise<{ loca
   const { locale } = await params;
   const l = assertLocale(locale);
   const t = (k: string) => translate(l, k);
-  const posts = getAllInsights();
+  const posts = getAllInsights(l);
 
   const crumbs = breadcrumbSchema([
     { name: "Home", path: `/${l}` },

@@ -19,12 +19,20 @@ function normalize(path: string): string {
   return path.startsWith("/") ? path : `/${path}`;
 }
 
-/** `alternates` object for a given locale + unprefixed path (e.g. "/about"). */
-export function buildAlternates(locale: Locale, path: string): NonNullable<Metadata["alternates"]> {
+/** `alternates` object for a given locale + unprefixed path (e.g. "/about").
+ *  `locales` defaults to all four; pass a subset for market-restricted pages
+ *  (e.g. a Dutch-only insight → ["nl"]) so hreflang only points at variants
+ *  that actually exist. x-default favours en, else the first available locale. */
+export function buildAlternates(
+  locale: Locale,
+  path: string,
+  locales: readonly Locale[] = LOCALES,
+): NonNullable<Metadata["alternates"]> {
   const p = normalize(path);
   const languages: Record<string, string> = {};
-  for (const l of LOCALES) languages[l] = `/${l}${p}`;
-  languages["x-default"] = `/en${p}`;
+  for (const l of locales) languages[l] = `/${l}${p}`;
+  const xDefault = locales.includes("en") ? "en" : locales[0];
+  languages["x-default"] = `/${xDefault}${p}`;
   return {
     canonical: `/${locale}${p}`,
     languages,

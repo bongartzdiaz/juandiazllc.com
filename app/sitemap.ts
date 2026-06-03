@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
-import { getAllInsights } from "@/lib/insights";
+import { getAllInsights, insightMarkets } from "@/lib/insights";
 import { VENTURES } from "@/lib/ventures";
 import { SIGNALS } from "@/lib/signals";
 import { SECTORS } from "@/lib/sectors";
-import { LOCALES } from "@/lib/i18n/dict";
+import { LOCALES, type Locale } from "@/lib/i18n/dict";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -16,6 +16,9 @@ type Entry = {
   priority: number;
   change: MetadataRoute.Sitemap[number]["changeFrequency"];
   lastMod?: Date;
+  /** Locales this entry exists in. Undefined = all four. Used so Dutch-only
+   *  insights only emit a /nl URL (+ nl hreflang), not /en,/de,/es. */
+  locales?: Locale[];
 };
 
 // Emits one URL per (locale, path) combination with hreflang alternates
@@ -64,6 +67,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
     change: "monthly",
     lastMod: new Date(p.publishedAt),
+    locales: insightMarkets(p),
   }));
 
   const tagSet = new Set(getAllInsights().map((p) => toSlug(p.tag)));
@@ -71,6 +75,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     path: `/insights/tag/${t}`,
     priority: 0.6,
     change: "weekly",
+    locales: LOCALES.filter((loc) => getAllInsights(loc).some((p) => toSlug(p.tag) === t)),
   }));
 
   const all = [
@@ -83,10 +88,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   return all.flatMap((entry) => {
+    const locs = entry.locales ?? LOCALES;
     const languages: Record<string, string> = {};
-    for (const l of LOCALES) languages[l] = `${SITE}/${l}${entry.path}`;
-    languages["x-default"] = `${SITE}/en${entry.path}`;
-    return LOCALES.map((locale) => ({
+    for (const l of locs) languages[l] = `${SITE}/${l}${entry.path}`;
+    languages["x-default"] = `${SITE}/${locs.includes("en") ? "en" : locs[0]}${entry.path}`;
+    return locs.map((locale) => ({
       url: `${SITE}/${locale}${entry.path}`,
       lastModified: entry.lastMod ?? now,
       changeFrequency: entry.change,
