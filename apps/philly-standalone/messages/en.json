@@ -1443,7 +1443,11 @@
     "sync": "Sync",
     "syncing": "Syncing…",
     "created": "Created",
-    "done": "Done"
+    "done": "Done",
+    "loadFailed": "Couldn't load data",
+    "retry": "Retry",
+    "emptyTitle": "Nothing here yet",
+    "emptyHint": "Add your first item to get started."
   },
   "confirms": {
     "deleteGeneric": {

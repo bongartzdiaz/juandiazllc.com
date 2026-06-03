@@ -1443,7 +1443,11 @@
     "sync": "Synchronisieren",
     "syncing": "Synchronisierung läuft…",
     "created": "Erstellt",
-    "done": "Fertig"
+    "done": "Fertig",
+    "loadFailed": "Daten konnten nicht geladen werden",
+    "retry": "Erneut versuchen",
+    "emptyTitle": "Noch nichts vorhanden",
+    "emptyHint": "Fügen Sie Ihr erstes Element hinzu."
   },
   "confirms": {
     "deleteGeneric": {

@@ -1443,7 +1443,11 @@
     "sync": "Sincronizar",
     "syncing": "Sincronizando…",
     "created": "Creado",
-    "done": "Listo"
+    "done": "Listo",
+    "loadFailed": "No se pudieron cargar los datos",
+    "retry": "Reintentar",
+    "emptyTitle": "Aún no hay nada",
+    "emptyHint": "Añade tu primer elemento para empezar."
   },
   "confirms": {
     "deleteGeneric": {

@@ -1443,7 +1443,11 @@
     "sync": "Synchroniseren",
     "syncing": "Bezig met synchroniseren…",
     "created": "Aangemaakt",
-    "done": "Klaar"
+    "done": "Klaar",
+    "loadFailed": "Kon gegevens niet laden",
+    "retry": "Opnieuw",
+    "emptyTitle": "Nog niets hier",
+    "emptyHint": "Voeg je eerste item toe om te beginnen."
   },
   "confirms": {
     "deleteGeneric": {
