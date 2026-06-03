@@ -576,6 +576,26 @@ check('7.i18n.parity', 'i18n', 'All locales at 100% key parity with en.json', ()
   return { status: 'FAIL', detail: `Parity broken — ${offenders.join('; ')}`, reference: 'npm run i18n:fill' };
 });
 
+check('8.be.zod-coverage', 'Validation', 'Every API route validates untrusted input (BE-05)', () => {
+  // Runs the BE-05 route inventory gate: every app/api route that reads a
+  // request body or query string must EITHER validate it (parseBody/parseQuery
+  // /validateBody/safeParse/bespoke parser) OR be on the documented ALLOW list
+  // in the script (cron empty-body, out-of-band OAuth, SSE stream, etc).
+  // Exit 1 = an unexplained raw route exists → a write/query path takes
+  // untrusted input with no schema, the core BE-05 risk.
+  const r = safeExec('node scripts/be05-route-inventory.mjs', ROOT);
+  if (r.ok) {
+    const line = r.stdout.split('\n').find(l => l.includes('already validated')) ?? '';
+    return { status: 'PASS', detail: `All input-taking routes validate or are allowlisted. ${line.trim()}` };
+  }
+  const offenders = r.stdout.split('\n').filter(l => /^\s+- /.test(l)).slice(0, 8).join(' ');
+  return {
+    status: 'FAIL',
+    detail: `Unvalidated raw route(s): ${offenders || r.stdout.slice(-200)}`,
+    reference: 'scripts/be05-route-inventory.mjs',
+  };
+});
+
 /* ── Summary ─────────────────────────────────────────────────── */
 
 const tally: Record<Status, number> = { PASS: 0, FAIL: 0, WARN: 0, MANUAL: 0, SKIP: 0 };

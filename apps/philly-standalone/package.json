@@ -23,6 +23,7 @@
     "db:slow": "tsx scripts/db-slow-queries.ts",
     "i18n:fill": "tsx scripts/i18n-fill-missing.ts",
     "i18n:check-refs": "node scripts/i18n-check-refs.mjs",
+    "be:check": "node scripts/be05-route-inventory.mjs",
     "pii:backfill": "tsx scripts/encrypt-contact-notes.ts",
     "pii:backfill-notes": "tsx scripts/encrypt-contact-note-content.ts",
     "pii:backfill-hashes": "tsx scripts/backfill-contact-blind-index.ts",
