@@ -4,7 +4,7 @@
 // founder's bio or social profiles — instead of editing each page.
 
 import type { Locale } from "@/lib/i18n/dict";
-import { AUTHOR_IMAGE_URL, ORG_LOGO_URL } from "@/lib/seo/branding";
+import { AUTHOR_IMAGE_URL, ORG_LOGO_URL, PERSON_SAME_AS } from "@/lib/seo/branding";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -37,11 +37,7 @@ export const AUTHOR_PERSON = {
     name: "Juan Diaz, LLC",
     url: SITE,
   },
-  sameAs: [
-    "https://github.com/bongartzdiaz",
-    "https://linkedin.com/in/juanstefan",
-    "https://instagram.com/diazelcazador",
-  ],
+  sameAs: PERSON_SAME_AS,
 };
 
 export const PUBLISHER_ORG = {

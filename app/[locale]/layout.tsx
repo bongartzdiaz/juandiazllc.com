@@ -8,7 +8,7 @@ import { CommandPalette } from "@/components/CommandPalette";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { LOCALES, type Locale } from "@/lib/i18n/dict";
 import { ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
-import { AUTHOR_IMAGE_URL, ORG_LOGO_URL } from "@/lib/seo/branding";
+import { AUTHOR_IMAGE_URL, ORG_LOGO_URL, PERSON_SAME_AS } from "@/lib/seo/branding";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -79,18 +79,12 @@ export default async function MainLayout({
                 jobTitle: "Founder",
                 image: AUTHOR_IMAGE_URL,
                 url: `${SITE_URL}/${l}/about`,
-                sameAs: [
-                  "https://linkedin.com/in/juanstefan",
-                  "https://instagram.com/diazelcazador",
-                ],
+                sameAs: PERSON_SAME_AS,
               },
               foundingDate: "2026",
               description:
                 "Holding company shipping revenue engines for operators in energy, real estate, hospitality and adjacent industries.",
-              sameAs: [
-                "https://linkedin.com/in/juanstefan",
-                "https://instagram.com/diazelcazador",
-              ],
+              sameAs: PERSON_SAME_AS,
               address: { "@type": "PostalAddress", addressCountry: "US", addressRegion: "Delaware" },
               contactPoint: {
                 "@type": "ContactPoint",

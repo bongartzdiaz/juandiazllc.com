@@ -22,6 +22,7 @@ const en: Dict = {
   // Nav
   "nav.story": "Story",
   "nav.work": "Work",
+  "nav.sectors": "Sectors",
   "nav.insights": "Insights",
   "nav.signals": "Signals",
   "nav.contact": "Contact",
@@ -802,6 +803,7 @@ const en: Dict = {
 const nl: Dict = {
   "nav.story": "Verhaal",
   "nav.work": "Werk",
+  "nav.sectors": "Sectoren",
   "nav.insights": "Inzichten",
   "nav.signals": "Signalen",
   "nav.pricing": "Prijzen",
@@ -1551,6 +1553,7 @@ const nl: Dict = {
 const de: Dict = {
   "nav.story": "Story",
   "nav.work": "Arbeit",
+  "nav.sectors": "Sektoren",
   "nav.insights": "Einblicke",
   "nav.signals": "Signale",
   "nav.contact": "Kontakt",
@@ -2301,6 +2304,7 @@ const es: Dict = {
   "nav.story": "Historia",
   "nav.insights": "Perspectivas",
   "nav.work": "Trabajo",
+  "nav.sectors": "Sectores",
   "nav.signals": "Señales",
   "nav.contact": "Contacto",
   "nav.about": "Sobre",

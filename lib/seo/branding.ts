@@ -47,3 +47,17 @@ export const AUTHOR_IMAGE_FALLBACK_URL = `${SITE}/icon-512.svg`;
  * icon is the canonical brand mark and exists today.
  */
 export const ORG_LOGO_URL = `${SITE}/icon.svg`;
+
+/**
+ * Canonical `sameAs` profile set for the founder Person + the Organization —
+ * single source of truth. Google treats sameAs as entity-disambiguation
+ * signals (knowledge panel + author authority/E-E-A-T) and wants them
+ * CONSISTENT across every JSON-LD block. Previously these drifted: layout had
+ * linkedin+instagram, article.ts had github+linkedin+instagram, about had
+ * github only. Reference this array everywhere instead of literals.
+ */
+export const PERSON_SAME_AS = [
+  "https://linkedin.com/in/juanstefan",
+  "https://github.com/bongartzdiaz",
+  "https://instagram.com/diazelcazador",
+];

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
-import { AUTHOR_IMAGE_PATH, AUTHOR_IMAGE_URL } from "@/lib/seo/branding";
+import { AUTHOR_IMAGE_PATH, AUTHOR_IMAGE_URL, PERSON_SAME_AS } from "@/lib/seo/branding";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -51,7 +51,7 @@ const personSchema = {
     "Sales automation",
     "Data engineering for operators",
   ],
-  sameAs: ["https://github.com/bongartzdiaz"],
+  sameAs: PERSON_SAME_AS,
 };
 
 const FOCUS_KEYS = [
