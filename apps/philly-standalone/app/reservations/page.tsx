@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/philly/useToast'
 import { Filter, Plus, BedDouble, User as UserIcon, Calendar as CalIcon, DollarSign } from 'lucide-react'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 interface Reservation {
   id: string
@@ -194,10 +195,12 @@ export default function ReservationsPage() {
           <div style={{ display: 'grid', gridTemplateColumns: resGridTemplate, gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
             {visibleResColumns.map((c) => <span key={c.id}>{c.label}</span>)}
           </div>
-          {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          {reservationsQuery.error ? (
+            <div style={{ padding: 16 }}><ListError onRetry={reservationsQuery.refetch} message={reservationsQuery.error} /></div>
+          ) : loading ? (
+            <div style={{ padding: 16 }}><ListLoading /></div>
           ) : reservations.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('noResults')}</div>
+            <div style={{ padding: 16 }}><ListEmpty /></div>
           ) : reservations.map((r, idx) => {
             const sc = STATUS_COLORS[r.status] ?? { bg: 'var(--bg2)', txt: 'var(--txt2)' }
             const nights = nightsBetween(r.checkIn, r.checkOut)

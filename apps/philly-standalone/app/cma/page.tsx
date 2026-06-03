@@ -9,6 +9,7 @@ import { Filter, MapPin, Bed, Bath, Maximize, BarChart3, Trash2, Edit2, Send, Ey
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 interface CMA {
   id: string
@@ -190,10 +191,12 @@ export default function CmaPage() {
         </div>
 
         {/* Card Grid */}
-        {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+        {cmasQuery.error ? (
+          <ListError onRetry={fetchData} message={cmasQuery.error} />
+        ) : loading ? (
+          <ListLoading />
         ) : cmas.length === 0 ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No CMA reports found.</div>
+          <ListEmpty />
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
             {cmas.map(cma => {

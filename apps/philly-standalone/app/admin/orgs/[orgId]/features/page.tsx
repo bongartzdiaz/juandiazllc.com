@@ -20,6 +20,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
 import { SourceBadge } from '@/components/philly/features/SourceBadge'
+import { ListLoading, ListError } from '@/components/philly/ui/ListStates'
 import { OverrideConfirmDialog } from '@/components/philly/features/OverrideConfirmDialog'
 import type { ResolveReason, SuperAdminOverride } from '@/lib/philly/features/resolve'
 import { ArrowLeft, Settings2 } from 'lucide-react'
@@ -104,29 +105,16 @@ export default function AdminOrgFeaturesPage({ params }: PageProps) {
         </Link>
 
         {error && (
-          <div
-            role="alert"
-            style={{
-              background: 'var(--r-bg)',
-              border: '1px solid var(--r-border)',
-              color: 'var(--r-txt)',
-              borderRadius: 8,
-              padding: '12px 14px',
-              fontSize: 13,
-              marginBottom: 20,
-            }}
-          >
-            {t('errorLoading')}
+          <div style={{ marginBottom: 20 }}>
+            <ListError onRetry={refetch} message={error} />
           </div>
         )}
 
-        {loading && (
-          <div style={{ color: 'var(--txt2)', padding: '40px 0', textAlign: 'center' }}>
-            {t('loading')}
-          </div>
+        {!error && loading && (
+          <ListLoading />
         )}
 
-        {data && (
+        {!error && data && (
           <>
             {data.data.organization.plan && (
               <div

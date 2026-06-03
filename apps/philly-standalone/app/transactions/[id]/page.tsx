@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/philly/useToast'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
+import { ListLoading, ListError } from '@/components/philly/ui/ListStates'
 
 interface ESignature {
   id: string
@@ -256,9 +257,9 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
         </Link>
 
         {loading ? (
-          <div style={{ padding: 60, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{tt('common.loading')}</div>
+          <ListLoading />
         ) : error || !tx ? (
-          <div style={{ padding: 60, textAlign: 'center', color: 'var(--r-txt)', fontSize: 13 }}>{error || tt('notFound')}</div>
+          <ListError onRetry={fetchTx} message={error || tt('notFound')} />
         ) : (
           <>
             {/* Header */}

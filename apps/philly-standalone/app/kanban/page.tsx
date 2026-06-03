@@ -9,6 +9,7 @@ import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
+import { ListError } from '@/components/philly/ui/ListStates'
 
 const SDG_COLORS: Record<number, string> = {
   1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21',
@@ -287,6 +288,13 @@ export default function KanbanPage() {
       />
 
       <div style={{ padding: '18px 24px 40px' }}>
+        {/* Board load error — additive banner; demo fallback still renders below */}
+        {boardsQuery.error && (
+          <div style={{ marginBottom: 14 }}>
+            <ListError onRetry={fetchBoards} message={boardsQuery.error} />
+          </div>
+        )}
+
         {/* Demo content notice */}
         {!hasRealBoards && realBoards !== null && (
           <div style={{

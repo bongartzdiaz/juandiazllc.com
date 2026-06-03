@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 const SHOWING_COLUMNS: ColumnDef[] = [
   { id: 'property', label: 'Property', required: true },
@@ -276,10 +277,12 @@ export default function ShowingsPage() {
           <div style={{ display: 'grid', gridTemplateColumns: showingsGridTemplate, gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
             {visibleShowingColumns.map((c) => <span key={c.id}>{c.label}</span>)}
           </div>
-          {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          {showingsQuery.error ? (
+            <div style={{ padding: 16 }}><ListError onRetry={fetchData} message={showingsQuery.error} /></div>
+          ) : loading ? (
+            <div style={{ padding: 16 }}><ListLoading /></div>
           ) : showings.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No showings scheduled yet. Click Schedule Showing to start.</div>
+            <div style={{ padding: 16 }}><ListEmpty /></div>
           ) : showings.map((showing, idx) => {
             const d = new Date(showing.date)
             return (

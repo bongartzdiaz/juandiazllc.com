@@ -16,6 +16,7 @@ import {
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { ListLoading, ListError } from '@/components/philly/ui/ListStates'
 
 interface Doc {
   id: string
@@ -316,8 +317,10 @@ export default function DocumentsPage() {
           </div>
         )}
 
-        {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)' }}>{t('list.loading')}</div>
+        {docsQuery.error ? (
+          <ListError onRetry={fetchDocs} message={docsQuery.error} />
+        ) : loading ? (
+          <ListLoading />
         ) : filtered.length === 0 ? (
           <div style={{
             padding: 60, textAlign: 'center', background: 'var(--panel)',

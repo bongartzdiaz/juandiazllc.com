@@ -9,6 +9,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useApi } from '@/hooks/philly/useApi'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 import { FileText, Layers, Calendar, Trash2, Pencil, ExternalLink } from 'lucide-react'
 
 interface PageRow {
@@ -90,29 +91,26 @@ export default function PagesListPage() {
           <KpiCard icon="calendar" label="Updated This Week" value={String(recentlyUpdated)} />
         </div>
 
-        {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)' }}>Loading…</div>
+        {pagesQuery.error ? (
+          <ListError onRetry={fetchData} message={pagesQuery.error} />
+        ) : loading ? (
+          <ListLoading />
         ) : pages.length === 0 ? (
-          <div style={{
-            padding: 60, textAlign: 'center', background: 'var(--panel)',
-            border: '1px dashed var(--border)', borderRadius: 12,
-          }}>
-            <FileText size={32} color="var(--txt3)" style={{ margin: '0 auto 10px' }} />
-            <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>No custom pages yet</div>
-            <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 14 }}>
-              Build your own dashboards, reports, and knowledge base.
-            </div>
-            <button
-              onClick={() => setShowNew(true)}
-              style={{
-                padding: '8px 16px', borderRadius: 8, border: 'none',
-                background: 'var(--accent)', color: '#fff', fontWeight: 600,
-                fontSize: 13, cursor: 'pointer',
-              }}
-            >
-              Create your first page
-            </button>
-          </div>
+          <ListEmpty
+            icon={<FileText size={28} />}
+            action={
+              <button
+                onClick={() => setShowNew(true)}
+                style={{
+                  padding: '8px 16px', borderRadius: 8, border: 'none',
+                  background: 'var(--accent)', color: '#fff', fontWeight: 600,
+                  fontSize: 13, cursor: 'pointer',
+                }}
+              >
+                Create your first page
+              </button>
+            }
+          />
         ) : (
           <div style={{
             display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12,

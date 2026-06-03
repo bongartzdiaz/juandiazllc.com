@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 const VOL_COLUMNS: ColumnDef[] = [
   { id: 'name', label: 'Name', required: true },
@@ -176,10 +177,12 @@ export default function VolunteersPage() {
           <div style={{ display: 'grid', gridTemplateColumns: volsGridTemplate, gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
             {visibleVolColumns.map((c) => <span key={c.id}>{c.label}</span>)}
           </div>
-          {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          {volunteersQuery.error ? (
+            <div style={{ padding: 16 }}><ListError onRetry={fetchData} message={volunteersQuery.error} /></div>
+          ) : loading ? (
+            <div style={{ padding: 16 }}><ListLoading /></div>
           ) : volunteers.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No volunteers found.</div>
+            <div style={{ padding: 16 }}><ListEmpty /></div>
           ) : volunteers.map((vol, idx) => {
             const sc = STATUS_COLORS[vol.status] ?? { bg: 'var(--bg2)', txt: 'var(--txt2)' }
             return (

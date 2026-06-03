@@ -13,6 +13,7 @@ import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 interface Permissions {
   viewListings?: boolean
@@ -207,18 +208,12 @@ export default function ClientPortalPage() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {loading ? (
-            <div style={{
-              padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13,
-              background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)',
-            }}>Loading...</div>
+          {clientsQuery.error ? (
+            <ListError onRetry={fetchData} message={clientsQuery.error} />
+          ) : loading ? (
+            <ListLoading />
           ) : clients.length === 0 ? (
-            <div style={{
-              padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13,
-              background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)',
-            }}>
-              No client portal access granted yet. Click Grant Access to invite a client.
-            </div>
+            <ListEmpty />
           ) : clients.map(client => {
             const perms = parsePermissions(client.permissions)
             const activeCount = Object.values(perms).filter(Boolean).length

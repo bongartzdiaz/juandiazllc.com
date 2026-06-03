@@ -9,6 +9,7 @@ import { X, Trash2, Edit2 } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 interface SoiCategory {
   id: string
@@ -137,16 +138,12 @@ export default function SoiPage() {
         </div>
 
         {/* Category Cards Grid */}
-        {loading ? (
-          <div style={{
-            padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13,
-            background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)',
-          }}>Loading...</div>
+        {categoriesQuery.error ? (
+          <ListError onRetry={fetchData} message={categoriesQuery.error} />
+        ) : loading ? (
+          <ListLoading />
         ) : categories.length === 0 ? (
-          <div style={{
-            padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13,
-            background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)',
-          }}>No SOI categories yet. Add one to get started.</div>
+          <ListEmpty />
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             {categories.map(cat => (

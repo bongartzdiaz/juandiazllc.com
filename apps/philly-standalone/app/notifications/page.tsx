@@ -6,6 +6,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { useRealtime } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 import { Bell, CheckCheck, Info, AlertTriangle, CheckCircle2, XCircle, Clock } from 'lucide-react'
 
 interface Notification {
@@ -37,7 +38,7 @@ export default function NotificationsPage() {
   const [actionError, setActionError] = useState<string | null>(null)
   const t = useTranslations('notifications')
 
-  const { data, loading, mutate, refetch } = useApi<NotificationsResponse>(
+  const { data, loading, error, mutate, refetch } = useApi<NotificationsResponse>(
     `/notifications?page=${page}&limit=20`,
   )
   const notifications = data?.data ?? []
@@ -102,13 +103,12 @@ export default function NotificationsPage() {
         )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          {error ? (
+            <ListError onRetry={refetch} message={error} />
+          ) : loading ? (
+            <ListLoading />
           ) : notifications.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13, background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)' }}>
-              <Bell size={32} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-              No notifications yet.
-            </div>
+            <ListEmpty icon={<Bell size={28} />} />
           ) : notifications.map(n => {
             const Icon = TYPE_ICONS[n.type] ?? Info
             const colors = TYPE_COLORS[n.type] ?? TYPE_COLORS.info

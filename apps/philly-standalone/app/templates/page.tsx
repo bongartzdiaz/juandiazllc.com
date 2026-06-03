@@ -9,6 +9,7 @@ import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
 import { FileText, Mail, MessageSquare, Phone, Edit3, Trash2, Eye, Filter } from 'lucide-react'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 interface Template {
   id: string
@@ -220,13 +221,12 @@ export default function TemplatesPage() {
         </div>
 
         {/* List */}
-        {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
+        {templatesQuery.error ? (
+          <ListError onRetry={fetchData} message={templatesQuery.error} />
+        ) : loading ? (
+          <ListLoading />
         ) : templates.length === 0 ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13, background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)' }}>
-            <FileText size={32} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-            {t('list.empty')}
-          </div>
+          <ListEmpty icon={<FileText size={28} />} />
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 12 }}>
             {templates.map(tpl => {

@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { Shield, Filter, Clock, FileText, ChevronDown, Calendar } from 'lucide-react'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 import type { AuditLog } from '@/lib/philly/types'
 
 // Full entity catalogue mirrors AuditEntity in lib/philly/audit.ts.
@@ -187,14 +188,12 @@ export default function AuditLogPage() {
           </div>
 
           {/* Rows */}
-          {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-              {t('loading')}
-            </div>
+          {auditQuery.error ? (
+            <div style={{ padding: 16 }}><ListError onRetry={auditQuery.refetch} message={auditQuery.error} /></div>
+          ) : loading ? (
+            <div style={{ padding: 16 }}><ListLoading /></div>
           ) : logs.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-              {t('empty')}
-            </div>
+            <div style={{ padding: 16 }}><ListEmpty /></div>
           ) : (
             logs.map((log, idx) => {
               const expanded = expandedId === log.id

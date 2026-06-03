@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
+import { ListError } from '@/components/philly/ui/ListStates'
 import { Shield, Globe2, Clock, Save, AlertTriangle, Info } from 'lucide-react'
 
 /* Bundle S — operator UI for the per-org enterprise access controls
@@ -100,6 +101,12 @@ export default function SecuritySettingsPage() {
     <>
       <Topbar title="Security" sub="Enterprise access controls for this organisation" />
       <div style={{ padding: '18px 24px 40px', maxWidth: 760 }}>
+
+        {policyQuery.error && (
+          <div style={{ marginBottom: 18 }}>
+            <ListError onRetry={policyQuery.refetch} message={policyQuery.error} />
+          </div>
+        )}
 
         <div style={{
           display: 'flex', alignItems: 'flex-start', gap: 10,

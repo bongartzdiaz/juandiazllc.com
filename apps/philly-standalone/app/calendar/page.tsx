@@ -8,6 +8,7 @@ import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
 import { ChevronLeft, ChevronRight, Clock, MapPin, Users, Plus, Trash2 } from 'lucide-react'
+import { ListError } from '@/components/philly/ui/ListStates'
 
 interface ApiAttendee {
   id: string
@@ -288,12 +289,8 @@ export default function CalendarPage() {
         </div>
 
         {fetchError && (
-          <div style={{
-            padding: '10px 14px', marginBottom: 12, borderRadius: 8,
-            background: 'var(--r-bg)', border: '1px solid var(--r-border)',
-            color: 'var(--r)', fontSize: 13,
-          }}>
-            {fetchError}
+          <div style={{ marginBottom: 12 }}>
+            <ListError onRetry={fetchEvents} message={fetchError} />
           </div>
         )}
 

@@ -7,6 +7,7 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useApi } from '@/hooks/philly/useApi'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { Mail, Send, Plus, X, RefreshCw, Paperclip, Clock } from 'lucide-react'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 interface EmailAccount {
   id: string
@@ -215,22 +216,26 @@ export default function EmailPage() {
               ><RefreshCw size={12} /></button>
             </div>
 
-            {loading ? (
-              <div style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('accounts.loading')}</div>
+            {accountsQuery.error ? (
+              <ListError onRetry={fetchAccounts} message={accountsQuery.error} />
+            ) : loading ? (
+              <ListLoading />
             ) : accounts.length === 0 ? (
-              <div style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-                <Mail size={28} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-                <div style={{ marginBottom: 12 }}>{t('accounts.emptyTitle')}</div>
-                <button
-                  onClick={() => setShowAdd(true)}
-                  style={{
-                    padding: '6px 14px', borderRadius: 8, border: 'none',
-                    background: 'var(--accent)', color: '#fff',
-                    fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                    fontFamily: 'inherit',
-                  }}
-                >{t('accounts.emptyAction')}</button>
-              </div>
+              <ListEmpty
+                icon={<Mail size={28} />}
+                title={t('accounts.emptyTitle')}
+                action={
+                  <button
+                    onClick={() => setShowAdd(true)}
+                    style={{
+                      padding: '6px 14px', borderRadius: 8, border: 'none',
+                      background: 'var(--accent)', color: '#fff',
+                      fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                      fontFamily: 'inherit',
+                    }}
+                  >{t('accounts.emptyAction')}</button>
+                }
+              />
             ) : accounts.map((acc, idx) => {
               const info = PROVIDER_INFO[acc.provider] ?? { label: acc.provider, color: '#6b7280' }
               const sc = STATUS_COLORS[acc.status] ?? { bg: 'var(--bg2)', txt: 'var(--txt2)' }

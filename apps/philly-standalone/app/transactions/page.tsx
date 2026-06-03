@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { useGlobalShortcuts } from '@/hooks/philly/useGlobalShortcuts'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 const TXN_COLUMNS: ColumnDef[] = [
   { id: 'transaction', label: 'Transaction', required: true },
@@ -211,10 +212,12 @@ export default function TransactionsPage() {
           <div style={{ display: 'grid', gridTemplateColumns: txnGridTemplate, gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
             {visibleTxnColumns.map((c) => <span key={c.id}>{c.label}</span>)}
           </div>
-          {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
+          {transactionsQuery.error ? (
+            <div style={{ padding: 16 }}><ListError onRetry={fetchData} message={transactionsQuery.error} /></div>
+          ) : loading ? (
+            <div style={{ padding: 16 }}><ListLoading /></div>
           ) : transactions.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.empty')}</div>
+            <div style={{ padding: 16 }}><ListEmpty /></div>
           ) : transactions.map((txn, idx) => (
             <div key={txn.id}
               ref={(el) => {

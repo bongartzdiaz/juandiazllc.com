@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 const ESIG_COLUMNS: ColumnDef[] = [
   { id: 'document', label: 'Document', required: true },
@@ -228,12 +229,12 @@ export default function ESignaturesPage() {
           }}>
             {visibleEsigColumns.map((c) => <span key={c.id}>{c.label}</span>)}
           </div>
-          {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
+          {sigsQuery.error ? (
+            <div style={{ padding: 16 }}><ListError onRetry={fetchData} message={sigsQuery.error} /></div>
+          ) : loading ? (
+            <div style={{ padding: 16 }}><ListLoading /></div>
           ) : sigs.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-              {t('list.empty')}
-            </div>
+            <div style={{ padding: 16 }}><ListEmpty /></div>
           ) : sigs.map((sig, idx) => {
             const sc = STATUS_COLORS[sig.status] ?? { bg: 'var(--bg2)', txt: 'var(--txt3)', border: 'var(--border)' }
             const pc = PROVIDER_COLORS[sig.provider] ?? { bg: 'var(--bg2)', txt: 'var(--txt2)' }

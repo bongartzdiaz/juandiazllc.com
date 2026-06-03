@@ -10,6 +10,7 @@ import { useApi } from '@/hooks/philly/useApi'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { Phone, PhoneCall, List, Filter, X, Loader2 } from 'lucide-react'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 /* ── Types ──────────────────────────────────────────────── */
 
@@ -392,10 +393,12 @@ export default function DialerPage() {
                 {visibleCallColumns.map((c) => <span key={c.id}>{c.label}</span>)}
               </div>
 
-              {callsLoading ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('states.loading')}</div>
+              {callsQuery.error ? (
+                <ListError onRetry={fetchCalls} message={callsQuery.error} />
+              ) : callsLoading ? (
+                <ListLoading />
               ) : calls.length === 0 ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('states.noCalls')}</div>
+                <ListEmpty />
               ) : calls.map((call, idx) => (
                 <div key={call.id} style={{
                   display: 'grid', gridTemplateColumns: callGridTemplate,
@@ -470,10 +473,12 @@ export default function DialerPage() {
             </div>
 
             {/* List cards */}
-            {listsLoading ? (
-              <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('states.loading')}</div>
+            {listsQuery.error ? (
+              <ListError onRetry={fetchLists} message={listsQuery.error} />
+            ) : listsLoading ? (
+              <ListLoading />
             ) : lists.length === 0 ? (
-              <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('states.noLists')}</div>
+              <ListEmpty />
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 12, marginBottom: 16 }}>
                 {lists.map(list => {

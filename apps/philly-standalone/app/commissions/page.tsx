@@ -13,6 +13,7 @@ import { useApi } from '@/hooks/philly/useApi'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { fetchJson } from '@/lib/philly/fetch-json'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 const COMMISSION_COLUMNS: ColumnDef[] = [
   { id: 'type', label: 'Type / Notes', required: true },
@@ -279,10 +280,12 @@ export default function CommissionsPage() {
               <div style={{ display: 'grid', gridTemplateColumns: commissionGridTemplate, gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
                 {visibleCommissionColumns.map((c) => <span key={c.id}>{c.label}</span>)}
               </div>
-              {loading ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
+              {recordsQuery.error ? (
+                <div style={{ padding: 16 }}><ListError onRetry={fetchRecords} message={recordsQuery.error} /></div>
+              ) : loading ? (
+                <div style={{ padding: 16 }}><ListLoading /></div>
               ) : records.length === 0 ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.empty')}</div>
+                <div style={{ padding: 16 }}><ListEmpty /></div>
               ) : records.map((rec, idx) => (
                 <div key={rec.id} style={{ display: 'grid', gridTemplateColumns: commissionGridTemplate, gap: 12, padding: '10px 16px', borderBottom: idx < records.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent' }}>
                   {visibleCommissionColumns.map((c) => {

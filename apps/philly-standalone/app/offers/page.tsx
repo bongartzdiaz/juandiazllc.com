@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { fetchJson } from '@/lib/philly/fetch-json'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 interface Offer {
   id: string
@@ -266,12 +267,12 @@ export default function OffersPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px 120px 120px 100px', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
             <span>Property</span><span>Buyer</span><span>Amount</span><span>Date</span><span>Status</span>
           </div>
-          {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          {offersQuery.error ? (
+            <div style={{ padding: 16 }}><ListError onRetry={fetchData} message={offersQuery.error} /></div>
+          ) : loading ? (
+            <div style={{ padding: 16 }}><ListLoading /></div>
           ) : offers.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-              No offers yet. Click Submit Offer to create one.
-            </div>
+            <div style={{ padding: 16 }}><ListEmpty /></div>
           ) : offers.map((offer, idx) => (
             <div
               key={offer.id}

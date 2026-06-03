@@ -7,6 +7,7 @@ import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
 import { ToggleLeft, ToggleRight, Info, Lock, ArrowUpRight, AlertTriangle } from 'lucide-react'
 import { SourceBadge } from '@/components/philly/features/SourceBadge'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import type { ResolveReason, SuperAdminOverride } from '@/lib/philly/features/resolve'
 
@@ -158,29 +159,13 @@ export default function FeatureFlagsPage() {
           <span>{t('info')}</span>
         </div>
 
-        {flagsQuery.loading && (
-          <div style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-            {t('loading')}
-          </div>
-        )}
-
-        {flagsQuery.error && (
-          <div
-            style={{
-              padding: '14px 16px', borderRadius: 10,
-              background: 'var(--r-bg)', border: '1px solid var(--r-border)',
-              color: 'var(--r-txt)', fontSize: 13,
-            }}
-          >
-            {flagsQuery.error}
-          </div>
-        )}
-
-        {!flagsQuery.loading && !flagsQuery.error && flags.length === 0 && (
-          <div style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-            {t('empty')}
-          </div>
-        )}
+        {flagsQuery.error ? (
+          <ListError onRetry={flagsQuery.refetch} message={flagsQuery.error} />
+        ) : flagsQuery.loading ? (
+          <ListLoading />
+        ) : flags.length === 0 ? (
+          <ListEmpty />
+        ) : null}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {flags.map(f => {

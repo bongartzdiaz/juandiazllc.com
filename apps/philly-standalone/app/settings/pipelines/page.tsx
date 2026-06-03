@@ -12,6 +12,7 @@ import {
 import { useToast } from '@/hooks/philly/useToast'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useApi } from '@/hooks/philly/useApi'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 import { useTranslations } from 'next-intl'
 
 interface Stage {
@@ -282,15 +283,12 @@ export default function PipelineAdminPage() {
               </button>
             </div>
 
-            {loading ? (
-              <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-                Loading…
-              </div>
+            {pipelinesQuery.error ? (
+              <div style={{ padding: 12 }}><ListError onRetry={fetchPipelines} message={pipelinesQuery.error} /></div>
+            ) : loading ? (
+              <div style={{ padding: 12 }}><ListLoading /></div>
             ) : pipelines.length === 0 ? (
-              <div style={{ padding: 30, textAlign: 'center', color: 'var(--txt3)', fontSize: 12 }}>
-                <Columns3 size={26} style={{ margin: '0 auto 10px', opacity: 0.3 }} />
-                No pipelines yet. Click New to create your first.
-              </div>
+              <div style={{ padding: 12 }}><ListEmpty icon={<Columns3 size={26} />} /></div>
             ) : pipelines.map(p => {
               const isSelected = p.id === selectedId
               return (

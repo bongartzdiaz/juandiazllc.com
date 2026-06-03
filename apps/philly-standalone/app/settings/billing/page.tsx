@@ -25,6 +25,7 @@ import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
+import { ListLoading, ListError } from '@/components/philly/ui/ListStates'
 import { Check, ArrowRight, Info, Sparkles, Crown, Building } from 'lucide-react'
 
 interface SubscriptionRow {
@@ -103,6 +104,18 @@ export default function BillingPage() {
     <>
       <Topbar title={t('title')} sub={t('subtitle')} />
       <div style={{ padding: '24px 32px', maxWidth: 1000 }}>
+        {meQuery.error && (
+          <div style={{ marginBottom: 24 }}>
+            <ListError onRetry={meQuery.refetch} message={meQuery.error} />
+          </div>
+        )}
+
+        {!meQuery.error && meQuery.loading && !meQuery.data && (
+          <div style={{ marginBottom: 24 }}>
+            <ListLoading />
+          </div>
+        )}
+
         {/* Current subscription status banner */}
         {currentPlan && (
           <div

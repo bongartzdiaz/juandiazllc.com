@@ -16,6 +16,7 @@ import { useApi } from '@/hooks/philly/useApi'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { fetchJson } from '@/lib/philly/fetch-json'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 const OH_COLUMNS: ColumnDef[] = [
   { id: 'property', label: 'Property', required: true },
@@ -229,12 +230,12 @@ export default function OpenHousesPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px 140px 100px 80px', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
             <span>Property</span><span>Date</span><span>Time</span><span>Status</span><span>Visitors</span>
           </div>
-          {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          {openHousesQuery.error ? (
+            <div style={{ padding: 16 }}><ListError onRetry={fetchData} message={openHousesQuery.error} /></div>
+          ) : loading ? (
+            <div style={{ padding: 16 }}><ListLoading /></div>
           ) : filtered.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-              {timeFilter === 'all' ? 'No open houses yet. Schedule one above.' : 'No open houses match the filter.'}
-            </div>
+            <div style={{ padding: 16 }}><ListEmpty /></div>
           ) : filtered.map((oh, idx) => {
             const ohDate = new Date(oh.date)
             const isPast = ohDate < now

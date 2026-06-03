@@ -26,6 +26,7 @@ import { AdvancedFilterBuilder } from '@/components/philly/filter/AdvancedFilter
 import { DEAL_FILTER_SCHEMA } from '@/lib/philly/filter/schemas'
 import type { FilterSpec } from '@/lib/philly/filter/types'
 import { useGlobalShortcuts } from '@/hooks/philly/useGlobalShortcuts'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 const DEAL_COLUMN_DEFS: ColumnDef[] = [
   { id: 'deal', label: 'Deal', required: true },
@@ -979,12 +980,12 @@ export default function DealsPage() {
                 ))}
                 <span aria-hidden></span>
               </div>
-              {loading ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading…</div>
+              {dealsQuery.error ? (
+                <div style={{ padding: 16 }}><ListError onRetry={fetchDeals} message={dealsQuery.error} /></div>
+              ) : loading ? (
+                <div style={{ padding: 16 }}><ListLoading /></div>
               ) : visibleDeals.length === 0 ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-                  {debouncedSearch ? 'No deals match your search.' : 'No deals found.'}
-                </div>
+                <div style={{ padding: 16 }}><ListEmpty /></div>
               ) : visibleDeals.map((deal, idx) => {
                 const isFocused = focusedDealId === deal.id
                 const isDragOver = listDragOverId === deal.id

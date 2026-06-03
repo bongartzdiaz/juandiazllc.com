@@ -6,6 +6,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
 import { Users, Save, Info, RotateCcw } from 'lucide-react'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 import { SECTIONS } from '@/lib/philly/sections'
 
 /* Bundle BX — operator UI for SCIM group → role/sections mapping.
@@ -151,25 +152,15 @@ export default function ScimGroupsPage() {
           <span>{t('info')}</span>
         </div>
 
-        {groupsQuery.loading && (
-          <div style={{ padding: 32, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-            {t('loading')}
-          </div>
-        )}
-
         {groupsQuery.error && (
-          <div
-            style={{
-              padding: '14px 16px', borderRadius: 10,
-              background: 'var(--r-bg)', border: '1px solid var(--r-border)',
-              color: 'var(--r-txt)', fontSize: 13,
-            }}
-          >
-            {groupsQuery.error}
-          </div>
+          <ListError onRetry={groupsQuery.refetch} message={groupsQuery.error} />
         )}
 
-        {!groupsQuery.loading && groups.length === 0 && (
+        {!groupsQuery.error && groupsQuery.loading && (
+          <ListLoading />
+        )}
+
+        {!groupsQuery.error && !groupsQuery.loading && groups.length === 0 && (
           <div
             style={{
               padding: 32, textAlign: 'center',

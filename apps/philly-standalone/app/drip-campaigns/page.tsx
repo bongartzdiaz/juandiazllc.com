@@ -14,6 +14,7 @@ import {
   MessageSquare, Phone, Users,
 } from 'lucide-react'
 import { EnrollmentModal } from '@/components/philly/drip/EnrollmentModal'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 interface DripStep {
   day: number
@@ -223,12 +224,12 @@ export default function DripCampaignsPage() {
         </div>
 
         {/* Campaign Cards */}
-        {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
+        {campaignsQuery.error ? (
+          <ListError onRetry={fetchCampaigns} message={campaignsQuery.error} />
+        ) : loading ? (
+          <ListLoading />
         ) : filtered.length === 0 ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13, background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)' }}>
-            {t('list.empty')}
-          </div>
+          <ListEmpty />
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
             {filtered.map(campaign => {

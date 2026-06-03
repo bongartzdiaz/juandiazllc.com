@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useApi } from '@/hooks/philly/useApi'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 import { Search } from 'lucide-react'
 
 interface MarketSnapshot {
@@ -79,10 +80,12 @@ export default function MarketAnalyticsPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '80px 80px 110px 80px 80px 80px 80px 80px 90px', gap: 8, padding: '10px 16px', borderBottom: '1px solid var(--border)', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--txt3)' }}>
             <span>ZIP</span><span>Month</span><span>Median Price</span><span>DOM</span><span>Active</span><span>Closed</span><span>New</span><span>$/SqFt</span><span>Inventory</span>
           </div>
-          {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          {snapshotsQuery.error ? (
+            <div style={{ padding: 16 }}><ListError onRetry={snapshotsQuery.refetch} message={snapshotsQuery.error} /></div>
+          ) : loading ? (
+            <div style={{ padding: 16 }}><ListLoading /></div>
           ) : snapshots.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>No market data available. Add data via API.</div>
+            <div style={{ padding: 16 }}><ListEmpty /></div>
           ) : snapshots.map((sn, idx) => (
             <div key={sn.id} style={{ display: 'grid', gridTemplateColumns: '80px 80px 110px 80px 80px 80px 80px 80px 90px', gap: 8, padding: '10px 16px', borderBottom: idx < snapshots.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent' }}>
               <span style={{ fontWeight: 600, fontFamily: "var(--font-red-hat-mono), monospace" }}>{sn.zipCode}</span>

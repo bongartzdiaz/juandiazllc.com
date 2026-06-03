@@ -11,6 +11,7 @@ import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 interface Room {
   id: string
@@ -161,10 +162,12 @@ export default function RoomsPage() {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-          {loading ? (
-            <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('loading')}</div>
+          {roomsQuery.error ? (
+            <div style={{ gridColumn: '1 / -1' }}><ListError onRetry={fetchData} message={roomsQuery.error} /></div>
+          ) : loading ? (
+            <div style={{ gridColumn: '1 / -1' }}><ListLoading /></div>
           ) : rooms.length === 0 ? (
-            <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13, background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)' }}>{t('empty')}</div>
+            <div style={{ gridColumn: '1 / -1' }}><ListEmpty /></div>
           ) : rooms.map(room => {
             const sc = STATUS_COLORS[room.status] ?? { bg: 'var(--bg2)', txt: 'var(--txt2)' }
             return (

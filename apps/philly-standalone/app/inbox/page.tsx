@@ -10,6 +10,7 @@ import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
 import { fetchJson } from '@/lib/philly/fetch-json'
 import { Filter, Mail, MessageSquare, Phone, MessageCircle, Clock, Inbox, Send, ArrowLeft, Loader2 } from 'lucide-react'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 interface Message {
   id: string
@@ -250,13 +251,12 @@ export default function InboxPage() {
               <span>{t('columns.conversation')}</span><span>{t('columns.channel')}</span><span>{t('columns.time')}</span>
             </div>
             <div style={{ maxHeight: 'calc(100vh - 360px)', overflowY: 'auto' }}>
-              {loading ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('states.loading')}</div>
+              {conversationsQuery.error ? (
+                <ListError onRetry={fetchConversations} message={conversationsQuery.error} />
+              ) : loading ? (
+                <ListLoading />
               ) : conversations.length === 0 ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>
-                  <Inbox size={32} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-                  {t('states.noConversations')}
-                </div>
+                <ListEmpty icon={<Inbox size={28} />} />
               ) : conversations.map((conv, idx) => {
                 const channelInfo = CHANNEL_ICONS[conv.channel] ?? CHANNEL_ICONS.email
                 const ChannelIcon = channelInfo.icon

@@ -8,6 +8,7 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { Play, Pause, X, Clock, Zap, Trash2 } from 'lucide-react'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 interface ScoringRule {
   id: string
@@ -139,13 +140,12 @@ export default function ScoringRulesPage() {
 
         {/* Card List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {loading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
+          {rulesQuery.error ? (
+            <ListError onRetry={fetchData} message={rulesQuery.error} />
+          ) : loading ? (
+            <ListLoading />
           ) : rules.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13, background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)' }}>
-              <Zap size={32} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-              {t('list.empty')}
-            </div>
+            <ListEmpty icon={<Zap size={28} />} />
           ) : rules.map(rule => (
             <div key={rule.id} style={{
               display: 'flex', alignItems: 'center', gap: 14,

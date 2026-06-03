@@ -9,6 +9,7 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
 import { ListChecks, Play, Pause, Filter, Users, X, Trash2 } from 'lucide-react'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 interface ActionPlan {
   id: string
@@ -180,13 +181,12 @@ export default function ActionPlansPage() {
         </div>
 
         {/* Plan Cards */}
-        {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>{t('list.loading')}</div>
+        {plansQuery.error ? (
+          <ListError onRetry={fetchPlans} message={plansQuery.error} />
+        ) : loading ? (
+          <ListLoading />
         ) : plans.length === 0 ? (
-          <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13, background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)' }}>
-            <ListChecks size={32} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-            {t('list.empty')}
-          </div>
+          <ListEmpty icon={<ListChecks size={28} />} />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {plans.map(plan => {

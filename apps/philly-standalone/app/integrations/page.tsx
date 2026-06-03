@@ -6,6 +6,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 import { useTranslations } from 'next-intl'
 import {
   Plug, Search, Filter, Check, X, ExternalLink, AlertCircle,
@@ -389,17 +390,12 @@ export default function IntegrationsPage() {
 
         {/* Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-          {loading ? (
-            <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          {(catalogQuery.error || integrationsQuery.error) ? (
+            <div style={{ gridColumn: '1 / -1' }}><ListError onRetry={fetchAll} message={catalogQuery.error || integrationsQuery.error} /></div>
+          ) : loading ? (
+            <div style={{ gridColumn: '1 / -1' }}><ListLoading /></div>
           ) : filtered.length === 0 ? (
-            <div style={{
-              gridColumn: '1 / -1', padding: 40, textAlign: 'center',
-              color: 'var(--txt3)', fontSize: 13,
-              background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)',
-            }}>
-              <Plug size={32} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-              <div>No integrations match your filters.</div>
-            </div>
+            <div style={{ gridColumn: '1 / -1' }}><ListEmpty icon={<Plug size={28} />} /></div>
           ) : filtered.map(item => {
             const record = byProvider.get(item.id)
             const isConnected = record?.status === 'connected'

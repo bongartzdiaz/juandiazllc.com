@@ -20,6 +20,7 @@ import { AdvancedFilterBuilder } from '@/components/philly/filter/AdvancedFilter
 import { PROPERTY_FILTER_SCHEMA } from '@/lib/philly/filter/schemas'
 import type { FilterSpec } from '@/lib/philly/filter/types'
 import { fetchJson } from '@/lib/philly/fetch-json'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 type Option = { value: string; label: string }
 type Flag = { key: string; label: string }
@@ -563,10 +564,12 @@ export default function PropertiesPage() {
 
         {/* Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-          {loading ? (
-            <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13 }}>Loading...</div>
+          {propertiesQuery.error ? (
+            <div style={{ gridColumn: '1 / -1' }}><ListError onRetry={fetchData} message={propertiesQuery.error} /></div>
+          ) : loading ? (
+            <div style={{ gridColumn: '1 / -1' }}><ListLoading /></div>
           ) : properties.length === 0 ? (
-            <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', color: 'var(--txt3)', fontSize: 13, background: 'var(--panel)', borderRadius: 12, border: '1px solid var(--border)' }}>No properties found.</div>
+            <div style={{ gridColumn: '1 / -1' }}><ListEmpty /></div>
           ) : properties.map(prop => {
             const sc = STATUS_COLORS[prop.status] ?? { bg: 'var(--bg2)', txt: 'var(--txt2)' }
             return (

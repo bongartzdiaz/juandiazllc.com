@@ -18,6 +18,7 @@ import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { useApi } from '@/hooks/philly/useApi'
+import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 import { Search, ArrowRight, ShieldCheck } from 'lucide-react'
 
 interface OrgRow {
@@ -43,7 +44,7 @@ export default function AdminOrgsPage() {
   // Debounce-free for simplicity — useApi caches by key, and the list
   // is small (super-admin browses, doesn't stress-test).
   const queryString = q.trim() ? `?q=${encodeURIComponent(q.trim())}` : ''
-  const { data, loading, error } = useApi<OrgsResponse>(`/admin/orgs${queryString}`)
+  const { data, loading, error, refetch } = useApi<OrgsResponse>(`/admin/orgs${queryString}`)
 
   return (
     <>
@@ -87,44 +88,22 @@ export default function AdminOrgsPage() {
         </div>
 
         {error && (
-          <div
-            role="alert"
-            style={{
-              background: 'var(--r-bg)',
-              border: '1px solid var(--r-border)',
-              color: 'var(--r-txt)',
-              borderRadius: 8,
-              padding: '12px 14px',
-              fontSize: 13,
-              marginBottom: 20,
-            }}
-          >
-            {t('errorLoading')}
+          <div style={{ marginBottom: 20 }}>
+            <ListError onRetry={refetch} message={error} />
           </div>
         )}
 
-        {loading && (
-          <div style={{ color: 'var(--txt2)', padding: '40px 0', textAlign: 'center' }}>
-            {t('loading')}
+        {!error && loading && (
+          <div style={{ marginBottom: 20 }}>
+            <ListLoading />
           </div>
         )}
 
-        {data && data.data.length === 0 && !loading && (
-          <div
-            style={{
-              color: 'var(--txt2)',
-              padding: '40px 0',
-              textAlign: 'center',
-              background: 'var(--panel)',
-              border: '1px solid var(--border)',
-              borderRadius: 12,
-            }}
-          >
-            {t('empty')}
-          </div>
+        {!error && data && data.data.length === 0 && !loading && (
+          <ListEmpty />
         )}
 
-        {data && data.data.length > 0 && (
+        {!error && data && data.data.length > 0 && (
           <div
             style={{
               background: 'var(--panel)',
