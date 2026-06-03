@@ -36,12 +36,13 @@ export const runtime = 'nodejs'
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   const scope = await requireScope()
   if (scope instanceof NextResponse) return scope
 
   const prisma = getAuthPrisma()
   const orgId = scope.organizationId
+  const industry = req.nextUrl.searchParams.get('industry') ?? 'csr'
 
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
@@ -125,8 +126,38 @@ export async function GET(_req: NextRequest) {
     }
   }
 
+  // Industry-specific live counts for the KPI cards. Each is a cheap COUNT
+  // scoped to the org (Property/Room/Project carry organizationId directly).
+  // Widgets without a clean live source fall back to sample data + a badge
+  // on the client, so we only compute what we can answer truthfully here.
+  let industryCounts: Record<string, number> = {}
+  if (industry === 'realestate') {
+    const [propsTotal, propsActive, propsRental, soldThisMonth] = await Promise.all([
+      prisma.property.count({ where: { organizationId: orgId } }),
+      prisma.property.count({ where: { organizationId: orgId, status: 'active' } }),
+      prisma.property.count({ where: { organizationId: orgId, listingType: 'rental', status: 'active' } }),
+      prisma.property.count({ where: { organizationId: orgId, status: 'sold', updatedAt: { gte: thirtyDaysAgo } } }),
+    ])
+    industryCounts = { propertiesTotal: propsTotal, activeListings: propsActive, activeRentals: propsRental, soldThisMonth }
+  } else if (industry === 'hospitality') {
+    const [roomsTotal, roomsOccupied, reservationsActive] = await Promise.all([
+      prisma.room.count({ where: { organizationId: orgId } }),
+      prisma.room.count({ where: { organizationId: orgId, status: 'occupied' } }),
+      prisma.reservation.count({ where: { room: { organizationId: orgId }, status: { in: ['confirmed', 'checked_in'] } } }),
+    ])
+    industryCounts = { roomsTotal, roomsOccupied, reservationsActive }
+  } else {
+    const [projectsTotal, projectsActive] = await Promise.all([
+      prisma.project.count({ where: { organizationId: orgId } }),
+      prisma.project.count({ where: { organizationId: orgId, status: 'active' } }),
+    ])
+    industryCounts = { projectsTotal, projectsActive }
+  }
+
   return NextResponse.json({
     data: {
+      industry,
+      industryCounts,
       kpis: {
         contacts: contactsTotal,
         contactsDelta30d: contactsNew30d,

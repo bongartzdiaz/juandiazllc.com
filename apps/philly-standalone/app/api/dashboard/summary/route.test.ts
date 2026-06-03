@@ -33,6 +33,12 @@ vi.mock('@/lib/philly/auth', () => ({
     },
     transaction: { aggregate: async () => ({ _count: { _all: 0 }, _sum: { salePrice: 0 } }) },
     auditLog: { findMany: async () => [] },
+    // Industry-count sources (added with the industry-aware summary). The
+    // default request has no ?industry, so the CSR branch (project.count) runs.
+    property: { count: async () => 0 },
+    room: { count: async () => 0 },
+    reservation: { count: async () => 0 },
+    project: { count: async () => 0 },
   }),
 }))
 
