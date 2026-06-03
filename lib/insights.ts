@@ -152,7 +152,51 @@ export const POSTS: Insight[] = [
         "Invest the saved budget in the integration layer and the three core workflows. That is where the moat lives."
       ]},
       { type: "p", text: "The operators who get this right stop feeling like their tech stack owns them. The ones who do not, eventually hire a Chief of Staff whose job is largely to move CSVs between tools. That is an expensive outcome to accept." }
-    ]
+    ],
+    i18n: {
+      de: {
+        title: "Die Build-vs-Buy-Falle, in die Operatoren immer wieder tappen",
+        summary:
+          "Selbst bauen wirkt teuer, bis man die Workarounds zählt. Einkaufen wirkt sicher, bis zur dritten Integration. Ein Entscheidungsrahmen, der zur Realität von Operatoren passt.",
+        body: [
+          { type: "p", text: "Irgendwo zwischen einem Betrieb mit 50 und einem mit 500 Mitarbeitern führt jedes Führungsteam dasselbe Gespräch: Wir haben vier Anbieter, drei davon sprechen nicht miteinander, und unsere Leute verbringen täglich eine Stunde damit, Daten zwischen ihnen hin- und herzuschieben. Kaufen wir weiter ein, oder bauen wir selbst?" },
+          { type: "h2", text: "Die eigentliche Frage ist nicht Build vs. Buy" },
+          { type: "p", text: "Die eigentliche Frage lautet: Welche zwei, drei Fähigkeiten sind wirklich entscheidend dafür, wie wir gewinnen — und welche fünfzehn sind Standardware, die einfach funktionieren muss? Operatoren, die das richtig machen, kaufen die Standardware (E-Mail, Kalender, Buchhaltung, Lohnabrechnung) und bauen — oder lassen bauen — eine dünne Integrationsschicht plus die zwei, drei Kern-Workflows, die sie unterscheidbar machen." },
+          { type: "h2", text: "Die Falle, die ich am häufigsten sehe" },
+          { type: "p", text: "Für jede Funktion das Best-of-Breed-Tool kaufen und hoffen, dass ein Zapier-Friedhof alles zusammenklebt. Das funktioniert, bis man eine echte Frage über drei davon hinweg beantworten muss — und plötzlich besteht die Antwort aus drei Stunden CSV-Exporten. Das ist die Steuer dafür, fünfzehnmal auf Nummer sicher gegangen zu sein." },
+          { type: "quote", text: "Wenn es mit Ihrem aktuellen Stack länger als einen Tag dauert, eine Frage auf Vorstandsebene zu beantworten, ist Ihr Stack kein Stack mehr — er ist ein Museum." },
+          { type: "h2", text: "Ein Rahmen, der wirklich funktioniert" },
+          { type: "ul", items: [
+            "Notieren Sie die drei Fragen, die die Führung in unter einer Minute beantworten können sollte. Das ist der Kern.",
+            "Bestimmen Sie für jede, welches System die Quelle der Wahrheit ist — wenn die Antwort eine Tabelle ist, haben Sie Ihr Bauziel gefunden.",
+            "Alles andere ist Standardware. Kaufen Sie das günstigste Tool, das die Aufgabe erledigt, ohne Ihre Datenverträge zu brechen.",
+            "Investieren Sie das gesparte Budget in die Integrationsschicht und die drei Kern-Workflows. Dort liegt der Burggraben."
+          ]},
+          { type: "p", text: "Operatoren, die das richtig machen, haben nicht länger das Gefühl, ihr Tech-Stack besitze sie. Die anderen stellen irgendwann einen Chief of Staff ein, dessen Aufgabe größtenteils darin besteht, CSVs zwischen Tools zu verschieben. Das ist ein teures Ergebnis, das man hinnehmen muss." }
+        ],
+      },
+      es: {
+        title: "La trampa de construir o comprar en la que los operadores caen una y otra vez",
+        summary:
+          "Construir parece caro hasta que cuentas los apaños. Comprar parece seguro hasta la tercera integración. Un marco de decisión que encaja con la realidad del operador.",
+        body: [
+          { type: "p", text: "En algún punto entre un operador de 50 personas y uno de 500, todo equipo directivo tiene la misma conversación: tenemos cuatro proveedores, tres no se hablan entre sí, y nuestra gente pasa una hora al día moviendo datos entre ellos. ¿Seguimos comprando o construimos?" },
+          { type: "h2", text: "La verdadera pregunta no es construir o comprar" },
+          { type: "p", text: "La verdadera pregunta es: ¿cuáles dos o tres capacidades son realmente esenciales para cómo ganamos, y cuáles quince son commodities que solo necesitan funcionar? Los operadores que aciertan compran las commodities (correo, calendario, contabilidad, nóminas) y construyen —o pagan por construir— una capa de integración ligera más los dos o tres flujos de trabajo centrales que los hacen diferentes." },
+          { type: "h2", text: "La trampa que veo con más frecuencia" },
+          { type: "p", text: "Comprar la mejor herramienta de su categoría para cada función y esperar que un cementerio de Zapier las pegue. Funciona hasta que necesitas responder una pregunta real que cruza tres de ellas, y de repente la respuesta son tres horas de exportaciones CSV. Ese es el impuesto que pagas por elegir lo seguro quince veces." },
+          { type: "quote", text: "Si con tu stack actual cuesta más de un día responder una pregunta a nivel de consejo, tu stack ya no es tu stack: es un museo." },
+          { type: "h2", text: "Un marco que sí funciona" },
+          { type: "ul", items: [
+            "Anota las tres preguntas que la dirección debería poder responder en menos de un minuto. Eso es lo central.",
+            "Para cada una, identifica qué sistema es la fuente de la verdad; si la respuesta es una hoja de cálculo, has encontrado tu objetivo de construcción.",
+            "Todo lo demás es commodity. Compra la herramienta más barata que haga el trabajo sin romper tus contratos de datos.",
+            "Invierte el presupuesto ahorrado en la capa de integración y los tres flujos centrales. Ahí vive la ventaja competitiva."
+          ]},
+          { type: "p", text: "Los operadores que aciertan dejan de sentir que su stack tecnológico los posee. Los que no, acaban contratando a un Chief of Staff cuyo trabajo es, en gran parte, mover CSVs entre herramientas. Es un resultado caro de aceptar." }
+        ],
+      },
+    },
   }
   ,{
     slug: "the-field-team-is-the-product",
