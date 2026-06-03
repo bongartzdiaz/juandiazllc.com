@@ -113,7 +113,12 @@
       "allocated": "Allocated",
       "roomsVenues": "Rooms & Venues",
       "revenueAndClosings": "Revenue & Closings",
-      "monthlyPerformanceSub": "Monthly performance"
+      "monthlyPerformanceSub": "Monthly performance",
+      "sampleData": "Sample data",
+      "sampleDataTooltip": "Showing example data — add your own to see live numbers.",
+      "loadError": "Couldn't load data",
+      "retry": "Retry",
+      "noDataYet": "No data yet"
     },
     "alerts": {
       "title": "Alerts",

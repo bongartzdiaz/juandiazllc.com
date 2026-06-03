@@ -113,7 +113,12 @@
       "allocated": "Zugewiesen",
       "roomsVenues": "Zimmer & Veranstaltungsräume",
       "revenueAndClosings": "Umsatz & Abschlüsse",
-      "monthlyPerformanceSub": "Monatliche Leistung"
+      "monthlyPerformanceSub": "Monatliche Leistung",
+      "sampleData": "Beispieldaten",
+      "sampleDataTooltip": "Beispieldaten — fügen Sie eigene Daten hinzu, um Live-Zahlen zu sehen.",
+      "loadError": "Daten konnten nicht geladen werden",
+      "retry": "Erneut",
+      "noDataYet": "Noch keine Daten"
     },
     "alerts": {
       "title": "Hinweise",

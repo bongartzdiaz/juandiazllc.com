@@ -19,6 +19,8 @@ import { ForecastCard } from '@/components/philly/dashboard/ForecastCard'
 import { InsightsCard } from '@/components/philly/ai/InsightsCard'
 import { LeadSourceCard } from '@/components/philly/dashboard/LeadSourceCard'
 import { AddLeadModal } from '@/components/philly/dashboard/AddLeadModal'
+import { SampleBadge } from '@/components/philly/ui/SampleBadge'
+import { useDashboardData, liveOrSample } from '@/hooks/philly/useDashboardData'
 import {
   JourneyBar,
   CSR_JOURNEY, CSR_SUMMARY,
@@ -192,6 +194,70 @@ const statusColors: Record<string, { bg: string; txt: string; border: string }> 
   sold: { bg: 'var(--g-bg)', txt: 'var(--g-txt)', border: 'var(--g-border)' },
 }
 
+// ── Live → widget-row mappers (shared by the dashboards) ──
+function relTime(iso: string): string {
+  const then = new Date(iso).getTime()
+  if (Number.isNaN(then)) return ''
+  const diffSec = Math.max(0, Math.floor((Date.now() - then) / 1000))
+  if (diffSec < 60) return 'just now'
+  const m = Math.floor(diffSec / 60); if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60); if (h < 24) return `${h}h ago`
+  const d = Math.floor(h / 24); return `${d}d ago`
+}
+function cap(s: string): string { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s }
+
+function mapActivity(a: { action: string; entity: string; at: string }): { text: string; time: string } {
+  return { text: `${cap(a.action)} ${a.entity}`, time: relTime(a.at) }
+}
+
+function mapLiveProperty(p: Record<string, unknown>): {
+  id: string; title: string; status: string; type: string; price: number
+  sqm: number; beds: number; daysOnMarket: number; viewings: number
+} {
+  const cents = (p.priceCents ?? p.listPriceCents ?? 0) as number
+  const created = p.createdAt ? new Date(p.createdAt as string).getTime() : Date.now()
+  const dom = Math.max(0, Math.floor((Date.now() - created) / 86_400_000))
+  const listingType = (p.listingType as string) ?? (p.type as string) ?? 'sale'
+  return {
+    id: String(p.id ?? ''),
+    title: String(p.title ?? 'Untitled'),
+    status: String(p.status ?? 'active'),
+    type: cap(listingType),
+    price: Math.round(cents / 100),
+    sqm: Number(p.sqft ?? p.livingAreaSqm ?? 0) || 0,
+    beds: Number(p.bedrooms ?? 0) || 0,
+    daysOnMarket: dom,
+    viewings: Number(p.viewings ?? 0) || 0,
+  }
+}
+
+function mapLiveRoom(r: Record<string, unknown>): {
+  id: string; title: string; status: string; type: string; rate: number; guests: string; nights: number
+} {
+  return {
+    id: String(r.id ?? ''),
+    title: String(r.name ?? 'Room'),
+    status: String(r.status ?? 'available'),
+    type: String(r.type ?? 'Standard'),
+    rate: Math.round((Number(r.priceCentsNight ?? 0) || 0) / 100),
+    guests: '',
+    nights: 0,
+  }
+}
+
+function mapLiveProject(p: Record<string, unknown>): {
+  id: string; title: string; status: string; category: string; progress: number; sdgs: number[]
+} {
+  return {
+    id: String(p.id ?? ''),
+    title: String(p.title ?? p.name ?? 'Project'),
+    status: String(p.status ?? 'active'),
+    category: String(p.category ?? '—'),
+    progress: Number(p.progress ?? 0) || 0,
+    sdgs: Array.isArray(p.sdgGoals) ? (p.sdgGoals as number[]) : [],
+  }
+}
+
 export default function DashboardPage() {
   const router = useRouter()
   const { industry, config } = useIndustry()
@@ -266,6 +332,17 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
   const router = useRouter()
   const tDash = useTranslations('dashboard')
 
+  // ── Live data (org-scoped) with sample fallback per widget ──
+  const live = useDashboardData('hospitality')
+  const liveRooms = (live.list ?? []).map(mapLiveRoom)
+  const rooms = liveOrSample(liveRooms, HOS_ROOMS, a => a.length > 0)
+  const liveActivity = (live.summary?.recentActivity ?? []).map(mapActivity)
+  const activity = liveOrSample(liveActivity, HOS_ACTIVITY, a => a.length > 0)
+  const roomsTotal = live.summary?.industryCounts?.roomsTotal ?? 0
+  const roomsOccupied = live.summary?.industryCounts?.roomsOccupied ?? 0
+  const liveOccupancy = roomsTotal > 0 ? Math.round((roomsOccupied / roomsTotal) * 100) : 0
+  const kpiIsSample = !live.loading && roomsTotal === 0
+
   return (
     <>
       <Topbar title={tDash('title')} sub={tDash('subtitle.hospitality')} addLabel="Booking" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
@@ -281,8 +358,11 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
         />
 
         {/* KPIs */}
+        {kpiIsSample && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}><SampleBadge /></div>
+        )}
         <div className="kpi-grid-5" style={{ marginBottom: 18 }}>
-          <KpiCard label="Occupancy Rate" value={kpi.getKpiValue('occupancy', '78%')} delta="+4% vs last month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={80} editable onValueChange={v => kpi.setKpiValue('occupancy', v)} goalCurrent={78} goalTarget={kpi.getGoal('occupancy_rate')?.target ?? 85} sparkData={[72, 74, 78, 75, 80, 77, 78]} />
+          <KpiCard label="Occupancy Rate" value={kpi.getKpiValue('occupancy', liveOccupancy > 0 ? `${liveOccupancy}%` : '78%')} delta="+4% vs last month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={80} editable onValueChange={v => kpi.setKpiValue('occupancy', v)} goalCurrent={liveOccupancy > 0 ? liveOccupancy : 78} goalTarget={kpi.getGoal('occupancy_rate')?.target ?? 85} sparkData={[72, 74, 78, 75, 80, 77, 78]} />
           <KpiCard label="RevPAR" value={kpi.getKpiValue('revpar', '€142')} delta="+€12 vs avg" deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('revpar', v)} goalCurrent={95} goalTarget={kpi.getGoal('revpar_target')?.target ?? 120} sparkData={[128, 135, 142, 138, 145, 140, 142]} />
           <KpiCard label="ADR" value={kpi.getKpiValue('adr', '€185')} delta="Avg Daily Rate" deltaDir="neu" icon="chart" accentColor="var(--b)" delay={180} editable onValueChange={v => kpi.setKpiValue('adr', v)} sparkData={[175, 180, 182, 185, 183, 186, 185]} />
           <KpiCard label="Guest Satisfaction" value={kpi.getKpiValue('satisfaction', '4.6/5')} delta="Based on 189 reviews" deltaDir="up" icon="heart" accentColor="var(--y)" delay={230} editable onValueChange={v => kpi.setKpiValue('satisfaction', v)} goalCurrent={4.2} goalTarget={kpi.getGoal('guest_satisfaction')?.target ?? 4.5} sparkData={[4.2, 4.3, 4.5, 4.4, 4.6, 4.5, 4.6]} />
@@ -303,8 +383,11 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
               }}>
                 <Euro size={14} color="var(--accent)" />
               </div>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.revenueBreakdown')}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.revenueBreakdown')}</div>
+                  <SampleBadge />
+                </div>
                 <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>Room + F&B revenue monthly</div>
               </div>
             </div>
@@ -389,6 +472,7 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
                   <BedDouble size={14} color="var(--accent)" />
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.roomsVenues')}</div>
+                {!live.loading && rooms.isSample && <SampleBadge />}
               </div>
               <button onClick={() => router.push('/rooms')} style={{
                 fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none',
@@ -399,7 +483,7 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
               </button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {HOS_ROOMS.map(p => {
+              {rooms.data.map(p => {
                 const sc = hosStatusColors[p.status] || hosStatusColors.available
                 return (
                   <div key={p.id} className="card-hover" onClick={() => router.push('/rooms')} style={{
@@ -455,10 +539,11 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
               </div>
               <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.recentActivity')}</div>
             </div>
-            {HOS_ACTIVITY.map((a, i) => (
+            {!live.loading && activity.isSample && <div style={{ marginBottom: 6 }}><SampleBadge /></div>}
+            {activity.data.map((a, i) => (
               <div key={i} style={{
                 padding: '10px 0',
-                borderBottom: i < HOS_ACTIVITY.length - 1 ? '1px solid var(--border)' : 'none',
+                borderBottom: i < activity.data.length - 1 ? '1px solid var(--border)' : 'none',
               }}>
                 <div style={{ fontSize: 12.5, lineHeight: 1.4 }}>{a.text}</div>
                 <div className="mono" style={{ fontSize: 10.5, color: 'var(--txt3)', marginTop: 2 }}>{a.time}</div>
@@ -609,10 +694,29 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
   const tDash = useTranslations('dashboard')
   const tJourney = useTranslations('journey')
   const [pipelineMode, setPipelineMode] = useState<'sales' | 'rental'>('sales')
-  const totalRevenue = RE_MONTHLY.reduce((s, m) => s + m.revenue, 0)
-  const totalClosed = RE_MONTHLY.reduce((s, m) => s + m.closed, 0)
-  const activeListings = RE_PROPERTIES.filter(p => p.status === 'active').length
+
+  // ── Live data (org-scoped) with sample fallback per widget ──
+  const live = useDashboardData('realestate')
+  const liveRevenue = (live.summary?.monthlyRevenue ?? []).map(m => ({
+    month: m.month, revenue: Math.round(m.revenueCents / 100), closed: m.wonDeals, listings: 0,
+  }))
+  const revenue = liveOrSample(liveRevenue, RE_MONTHLY, a => a.some(m => m.revenue > 0))
+  const liveProps = (live.list ?? []).map(mapLiveProperty)
+  const properties = liveOrSample(liveProps, RE_PROPERTIES, a => a.length > 0)
+  const liveActivity = (live.summary?.recentActivity ?? []).map(mapActivity)
+  const activity = liveOrSample(liveActivity, RE_ACTIVITY, a => a.length > 0)
+
+  const sampleRevenue = RE_MONTHLY.reduce((s, m) => s + m.revenue, 0)
+  const liveCommission = (live.summary?.monthlyRevenue ?? []).reduce((s, m) => s + m.revenueCents, 0) / 100
+  const totalRevenue = liveCommission > 0 ? liveCommission : sampleRevenue
+  const liveClosed = (live.summary?.monthlyRevenue ?? []).reduce((s, m) => s + m.wonDeals, 0)
+  const totalClosed = liveClosed > 0 ? liveClosed : RE_MONTHLY.reduce((s, m) => s + m.closed, 0)
+  const liveActiveListings = live.summary?.industryCounts?.activeListings ?? 0
+  const activeListings = liveActiveListings > 0 ? liveActiveListings : RE_PROPERTIES.filter(p => p.status === 'active').length
+  const liveRentals = live.summary?.industryCounts?.activeRentals ?? 0
   const avgDaysOnMarket = Math.round(RE_PROPERTIES.filter(p => p.daysOnMarket > 0).reduce((s, p) => s + p.daysOnMarket, 0) / RE_PROPERTIES.filter(p => p.daysOnMarket > 0).length)
+  // KPI row is "sample" only when loaded AND the org has no listings/revenue.
+  const kpiIsSample = !live.loading && liveActiveListings === 0 && liveCommission === 0
 
   // Translate the journey step labels via the `journey.<stage>` namespace
   // — the stages array's hardcoded English labels are overwritten at render
@@ -652,6 +756,9 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
         </div>
 
         {/* KPIs */}
+        {kpiIsSample && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}><SampleBadge /></div>
+        )}
         <div className="kpi-grid-6" style={{ marginBottom: 18 }}>
           <KpiCard label="Active Listings" value={kpi.getKpiValue('listings', activeListings)} delta="+3 this month" deltaDir="up" icon="folder" accentColor="var(--b)" delay={80} editable onValueChange={v => kpi.setKpiValue('listings', v)} goalCurrent={activeListings} goalTarget={kpi.getGoal('listings_added')?.target ?? 10} sparkData={[5, 4, 6, 5, 7, 4, 3]} onOpenDetail={() => openKpiDetail({
             title: 'Active Listings',
@@ -716,7 +823,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
             ],
             suggestions: ['Follow up with no-shows within 24h', 'Open houses drive 3.2x more viewings than private'],
           })} />
-          <KpiCard label="Active Rentals" value={kpi.getKpiValue('rentals', '14')} delta="Ongoing leases" deltaDir="neu" icon="home" accentColor="var(--p)" delay={330} editable onValueChange={v => kpi.setKpiValue('rentals', v)} sparkData={[10, 11, 12, 11, 13, 14, 14]} onOpenDetail={() => openKpiDetail({
+          <KpiCard label="Active Rentals" value={kpi.getKpiValue('rentals', liveRentals > 0 ? liveRentals : '14')} delta="Ongoing leases" deltaDir="neu" icon="home" accentColor="var(--p)" delay={330} editable onValueChange={v => kpi.setKpiValue('rentals', v)} sparkData={[10, 11, 12, 11, 13, 14, 14]} onOpenDetail={() => openKpiDetail({
             title: 'Active Rentals',
             subtitle: '14 ongoing lease agreements',
             metrics: [
@@ -743,14 +850,17 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
               }}>
                 <Euro size={14} color="var(--accent)" />
               </div>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.revenueAndClosings')}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.revenueAndClosings')}</div>
+                  {!live.loading && revenue.isSample && <SampleBadge />}
+                </div>
                 <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{tDash('widgets.monthlyPerformanceSub')}</div>
               </div>
             </div>
             <div style={{ height: 250 }}>
               <ResponsiveContainer key={`re-rev-${themeKey}`} width="100%" height="100%">
-                <BarChart data={RE_MONTHLY}>
+                <BarChart data={revenue.data}>
                   <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: 'var(--txt3)' }} axisLine={false} tickLine={false} width={50} />
                   <Tooltip
@@ -822,6 +932,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
                   <Building2 size={14} color="var(--accent)" />
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.properties')}</div>
+                {!live.loading && properties.isSample && <SampleBadge />}
               </div>
               <button onClick={() => router.push('/properties')} style={{
                 fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none',
@@ -832,7 +943,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
               </button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {RE_PROPERTIES.map(p => {
+              {properties.data.map(p => {
                 const sc = statusColors[p.status] || statusColors.active
                 return (
                   <div key={p.id} className="card-hover" onClick={() => router.push('/properties')} style={{
@@ -891,10 +1002,11 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
               </div>
               <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.recentActivity')}</div>
             </div>
-            {RE_ACTIVITY.map((a, i) => (
+            {!live.loading && activity.isSample && <div style={{ marginBottom: 6 }}><SampleBadge /></div>}
+            {activity.data.map((a, i) => (
               <div key={i} style={{
                 padding: '10px 0',
-                borderBottom: i < RE_ACTIVITY.length - 1 ? '1px solid var(--border)' : 'none',
+                borderBottom: i < activity.data.length - 1 ? '1px solid var(--border)' : 'none',
               }}>
                 <div style={{ fontSize: 12.5, lineHeight: 1.4 }}>{a.text}</div>
                 <div className="mono" style={{ fontSize: 10.5, color: 'var(--txt3)', marginTop: 2 }}>{a.time}</div>
@@ -1081,6 +1193,16 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
 function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
   const router = useRouter()
   const tDash = useTranslations('dashboard')
+
+  // ── Live data (org-scoped) with sample fallback per widget ──
+  const live = useDashboardData('csr')
+  const liveProjects = (live.list ?? []).map(mapLiveProject)
+  const projects = liveOrSample(liveProjects, CSR_PROJECTS, a => a.length > 0)
+  const liveActivity = (live.summary?.recentActivity ?? []).map(mapActivity)
+  const activity = liveOrSample(liveActivity, CSR_ACTIVITY, a => a.length > 0)
+  const projectsActive = live.summary?.industryCounts?.projectsActive ?? 0
+  const kpiIsSample = !live.loading && projectsActive === 0
+
   return (
     <>
       <Topbar title={tDash('title')} sub={tDash('subtitle.philanthropy')} addLabel="Contact" onAdd={onAddLead} editMode={layout.editMode} onToggleEdit={layout.toggleEdit} />
@@ -1096,8 +1218,11 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
         />
 
         {/* KPI Strip */}
+        {kpiIsSample && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}><SampleBadge /></div>
+        )}
         <div className="kpi-grid-5" style={{ marginBottom: 18 }}>
-          <KpiCard label="Active Projects" value={kpi.getKpiValue('projects', '4')} delta="+1 this month" deltaDir="up" icon="folder" accentColor="var(--accent)" delay={80} editable onValueChange={v => kpi.setKpiValue('projects', v)} goalCurrent={4} goalTarget={kpi.getGoal('projects_completed')?.target ?? 6} sparkData={[2, 3, 3, 3, 4, 3, 4]} />
+          <KpiCard label="Active Projects" value={kpi.getKpiValue('projects', projectsActive > 0 ? projectsActive : '4')} delta="+1 this month" deltaDir="up" icon="folder" accentColor="var(--accent)" delay={80} editable onValueChange={v => kpi.setKpiValue('projects', v)} goalCurrent={projectsActive > 0 ? projectsActive : 4} goalTarget={kpi.getGoal('projects_completed')?.target ?? 6} sparkData={[2, 3, 3, 3, 4, 3, 4]} />
           <KpiCard label="People Helped" value={kpi.getKpiValue('people', '1,100')} delta="+19.6% vs last month" deltaDir="up" icon="heart" accentColor="var(--p)" delay={130} editable onValueChange={v => kpi.setKpiValue('people', v)} goalCurrent={1100} goalTarget={kpi.getGoal('people_helped')?.target ?? 2000} sparkData={[650, 720, 810, 880, 950, 1020, 1100]} />
           <KpiCard label="CO2 Reduced" value={kpi.getKpiValue('co2', '4.5t')} delta="+18.4% vs last month" deltaDir="up" icon="leaf" accentColor="var(--g)" delay={180} editable onValueChange={v => kpi.setKpiValue('co2', v)} goalCurrent={4500} goalTarget={kpi.getGoal('co2_reduced')?.target ?? 10000} sparkData={[2.1, 2.5, 2.9, 3.2, 3.6, 4.0, 4.5]} />
           <KpiCard label="Trees Planted" value={kpi.getKpiValue('trees', '2,340')} delta="Target: 5,000" deltaDir="neu" icon="tree" accentColor="var(--g)" delay={230} editable onValueChange={v => kpi.setKpiValue('trees', v)} sparkData={[800, 1050, 1300, 1550, 1800, 2050, 2340]} />
@@ -1114,8 +1239,11 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
               <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Globe2 size={14} color="var(--accent)" />
               </div>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.impactOverview')}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.impactOverview')}</div>
+                  <SampleBadge />
+                </div>
                 <div style={{ fontSize: 10.5, color: 'var(--txt3)' }}>{tDash('widgets.impactOverviewSub')}</div>
               </div>
             </div>
@@ -1152,8 +1280,9 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
               </div>
               <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.recentActivity')}</div>
             </div>
-            {CSR_ACTIVITY.map((a, i) => (
-              <div key={i} style={{ padding: '10px 0', borderBottom: i < CSR_ACTIVITY.length - 1 ? '1px solid var(--border)' : 'none' }}>
+            {!live.loading && activity.isSample && <div style={{ marginBottom: 6 }}><SampleBadge /></div>}
+            {activity.data.map((a, i) => (
+              <div key={i} style={{ padding: '10px 0', borderBottom: i < activity.data.length - 1 ? '1px solid var(--border)' : 'none' }}>
                 <div style={{ fontSize: 12.5, lineHeight: 1.4 }}>{a.text}</div>
                 <div className="mono" style={{ fontSize: 10.5, color: 'var(--txt3)', marginTop: 2 }}>{a.time}</div>
               </div>
@@ -1173,10 +1302,11 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
                   <FolderKanban size={14} color="var(--accent)" />
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>{tDash('widgets.projects')}</div>
+                {!live.loading && projects.isSample && <SampleBadge />}
               </div>
               <button onClick={() => router.push('/projects')} style={{ fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'inherit' }}>{tDash('widgets.viewAll')} <ArrowRight size={12} /></button>
             </div>
-            {CSR_PROJECTS.map(p => {
+            {projects.data.map(p => {
               const sc = statusColors[p.status] || statusColors.planned
               return (
                 <div key={p.id} className="card-hover" onClick={() => router.push('/projects')} style={{

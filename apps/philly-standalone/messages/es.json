@@ -113,7 +113,12 @@
       "allocated": "Asignado",
       "roomsVenues": "Habitaciones y salas",
       "revenueAndClosings": "Ingresos y cierres",
-      "monthlyPerformanceSub": "Rendimiento mensual"
+      "monthlyPerformanceSub": "Rendimiento mensual",
+      "sampleData": "Datos de ejemplo",
+      "sampleDataTooltip": "Datos de ejemplo — añade los tuyos para ver cifras reales.",
+      "loadError": "No se pudieron cargar los datos",
+      "retry": "Reintentar",
+      "noDataYet": "Aún no hay datos"
     },
     "alerts": {
       "title": "Alertas",

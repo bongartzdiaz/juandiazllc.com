@@ -113,7 +113,12 @@
       "allocated": "Toegewezen",
       "roomsVenues": "Kamers & Zalen",
       "revenueAndClosings": "Omzet & afsluitingen",
-      "monthlyPerformanceSub": "Maandelijkse prestaties"
+      "monthlyPerformanceSub": "Maandelijkse prestaties",
+      "sampleData": "Voorbeeldgegevens",
+      "sampleDataTooltip": "Voorbeeldgegevens — voeg je eigen data toe voor live cijfers.",
+      "loadError": "Kon gegevens niet laden",
+      "retry": "Opnieuw",
+      "noDataYet": "Nog geen gegevens"
     },
     "alerts": {
       "title": "Meldingen",

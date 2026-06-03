@@ -113,7 +113,12 @@
       "allocated": "Alloué",
       "roomsVenues": "Chambres et salles",
       "revenueAndClosings": "Revenus et ventes",
-      "monthlyPerformanceSub": "Performance mensuelle"
+      "monthlyPerformanceSub": "Performance mensuelle",
+      "sampleData": "Données d'exemple",
+      "sampleDataTooltip": "Données d'exemple — ajoutez les vôtres pour voir des chiffres réels.",
+      "loadError": "Impossible de charger les données",
+      "retry": "Réessayer",
+      "noDataYet": "Pas encore de données"
     },
     "alerts": {
       "title": "Alertes",
