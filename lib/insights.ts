@@ -15,6 +15,9 @@ export type Insight = {
   summary: string;
   tag: string;
   publishedAt: string;
+  /** Last meaningful content update (ISO). Feeds BlogPosting.dateModified for
+   *  freshness signals; falls back to publishedAt when absent. */
+  updatedAt?: string;
   readingMinutes: number;
   body: InsightBlock[];
   seo?: { metaTitle?: string; metaDescription?: string };

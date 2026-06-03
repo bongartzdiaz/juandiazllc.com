@@ -71,6 +71,7 @@ export default async function InsightPage(
     headline: post.title,
     description: post.summary,
     datePublished: post.publishedAt,
+    dateModified: post.updatedAt ?? post.publishedAt,
     tag: post.tag,
   });
 

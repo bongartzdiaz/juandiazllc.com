@@ -39,7 +39,9 @@ export function Analytics() {
       id="plausible"
       strategy="afterInteractive"
       data-domain={domain}
-      src={`${host}/js/script.js`}
+      // tagged-events variant: enables custom goal events (window.plausible(...)
+      // for the contact-submit conversion, and class-based tagging for CTAs).
+      src={`${host}/js/script.tagged-events.js`}
     />
   );
 }
