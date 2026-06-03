@@ -4172,5 +4172,92 @@
       "viewSchedule": "Ver agenda",
       "reviewShowings": "Revisar visitas"
     }
+  },
+  "onboardingPage": {
+    "title": "Bienvenido",
+    "loading": "Cargando…",
+    "signedInAs": "Sesión iniciada como <strong>{email}</strong>. Para empezar a usar el CRM necesitas una organización. Puedes crear la tuya propia (te convertirás en su administrador) o esperar a que un administrador existente te invite.",
+    "form": {
+      "heading": "Crear una nueva organización"
+    },
+    "fields": {
+      "orgName": "Nombre de la organización",
+      "orgNamePlaceholder": "Acme S.L.",
+      "displayName": "Tu nombre para mostrar (opcional)",
+      "displayNamePlaceholder": "Juan Pérez"
+    },
+    "cta": {
+      "create": "Crear organización",
+      "creating": "Creando…"
+    },
+    "invitedHint": "¿Ya te han invitado a una organización? Solo cierra sesión y vuelve a iniciarla una vez que tu administrador haya creado tu cuenta: entrarás automáticamente en su organización.",
+    "errors": {
+      "statusCheck": "No se pudo comprobar el estado de incorporación",
+      "createFailed": "No se pudo crear la organización",
+      "network": "Error de red"
+    }
+  },
+  "setup2fa": {
+    "title": "Configurar la autenticación de dos factores",
+    "intro": "Los administradores deben registrar una aplicación de autenticación TOTP (Google Authenticator, 1Password, Authy — cualquiera que admita otpauth://). Configuración única; unos 60 segundos.",
+    "init": {
+      "starting": "Iniciando la configuración…"
+    },
+    "step1": {
+      "title": "Paso 1 — Escanea este código QR con tu aplicación de autenticación",
+      "qrAlt": "Código QR de autenticación de dos factores",
+      "manualToggle": "¿No puedes escanear? Introduce esta clave secreta manualmente"
+    },
+    "step2": {
+      "title": "Paso 2 — Introduce el código de 6 dígitos que muestra tu aplicación"
+    },
+    "verify": {
+      "button": "Verificar",
+      "busy": "Verificando…"
+    },
+    "step3": {
+      "title": "Paso 3 — Guarda tus códigos de recuperación",
+      "description": "Cada código funciona una sola vez. Úsalos para iniciar sesión si pierdes el acceso a tu aplicación de autenticación. <strong>Guárdalos ahora</strong> — no volveremos a mostrarlos. Trátalos como contraseñas.",
+      "copyAll": "Copiar todo",
+      "download": "Descargar .txt",
+      "done": "Listo — ir al panel"
+    },
+    "errors": {
+      "startFailed": "No se pudo iniciar la configuración de 2FA",
+      "network": "Error de red",
+      "verifyFailed": "Error de verificación ({status})"
+    }
+  },
+  "securitySettings": {
+    "pageTitle": "Seguridad",
+    "pageSubtitle": "Controles de acceso empresariales para esta organización",
+    "intro": "Estas políticas se evalúan en cada solicitud autenticada mediante <scope>requireScope()</scope>. Ambas están desactivadas de forma predeterminada (NULL = sin restricción). Los cambios quedan registrados en el registro de auditoría. Consulta el runbook de operaciones en <runbook>docs/operations/SESSION-POLICY.md</runbook>.",
+    "ipAllowlist": {
+      "title": "Lista de IP permitidas",
+      "description": "Rangos CIDR separados por comas. IPv4 o IPv6. Se aceptan IP individuales (tratadas como /32 o /128). Vacío = abierto a cualquier IP de origen. El loopback y RFC1918 NO se consideran de confianza automáticamente.",
+      "label": "Redes permitidas",
+      "invalidEntries": "Estas entradas no se interpretan como rangos CIDR válidos:",
+      "lockoutWarning": "Advertencia de bloqueo: una lista vacía permite el acceso a todos. Una lista que no incluya tu propia IP TE bloqueará — la recuperación requiere una actualización de la base de datos por parte del operador de la plataforma."
+    },
+    "idleTimeout": {
+      "title": "Tiempo de espera por inactividad de sesión",
+      "description": "Las sesiones con más de estos minutos desde la última solicitud autenticada del usuario se devuelven al inicio de sesión. Rango permitido: 5 – 1440 minutos (24 horas). Vacío = sin tiempo de espera por inactividad.",
+      "label": "Minutos"
+    },
+    "actions": {
+      "save": "Guardar cambios",
+      "saving": "Guardando…",
+      "discard": "Descartar"
+    },
+    "footer": {
+      "adminNote": "Solo administradores · los cambios se registran en la auditoría"
+    },
+    "toast": {
+      "idleRange": "El tiempo de espera por inactividad debe ser un número entero entre 5 y 1440 minutos",
+      "invalidCidr": "Entradas CIDR no válidas — consulta más abajo",
+      "saveFailed": "Error al guardar ({status})",
+      "saved": "Configuración de seguridad guardada",
+      "networkError": "Error de red"
+    }
   }
 }

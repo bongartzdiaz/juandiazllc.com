@@ -11,6 +11,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 interface Status {
   needsOnboarding: boolean
@@ -19,6 +20,7 @@ interface Status {
 }
 
 export default function OnboardingPage() {
+  const t = useTranslations('onboardingPage')
   const router = useRouter()
   const [status, setStatus] = useState<Status | null>(null)
   const [name, setName] = useState('')
@@ -38,12 +40,12 @@ export default function OnboardingPage() {
         }
       })
       .catch(() => {
-        if (!cancelled) setError('Failed to check onboarding status')
+        if (!cancelled) setError(t('errors.statusCheck'))
       })
     return () => {
       cancelled = true
     }
-  }, [router])
+  }, [router, t])
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -60,12 +62,12 @@ export default function OnboardingPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error ?? 'Failed to create organization')
+        setError(data.error ?? t('errors.createFailed'))
         return
       }
       router.replace('/')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Network error')
+      setError(err instanceof Error ? err.message : t('errors.network'))
     } finally {
       setBusy(false)
     }
@@ -74,7 +76,7 @@ export default function OnboardingPage() {
   if (!status) {
     return (
       <main className="mx-auto max-w-md p-8">
-        <p className="text-sm text-zinc-500">Loading…</p>
+        <p className="text-sm text-zinc-500">{t('loading')}</p>
       </main>
     )
   }
@@ -82,19 +84,20 @@ export default function OnboardingPage() {
   return (
     <main className="mx-auto max-w-md p-8 space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold">Welcome</h1>
+        <h1 className="text-2xl font-semibold">{t('title')}</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Signed in as <strong>{status.email}</strong>. To start using the
-          CRM you need an organization. You can create your own (you become
-          its admin), or wait for an existing admin to invite you.
+          {t.rich('signedInAs', {
+            email: status.email ?? '',
+            strong: (chunks) => <strong>{chunks}</strong>,
+          })}
         </p>
       </header>
 
       <form onSubmit={submit} className="space-y-4 rounded-md border border-zinc-200 p-4">
-        <h2 className="font-medium">Create a new organization</h2>
+        <h2 className="font-medium">{t('form.heading')}</h2>
 
         <label className="block text-sm">
-          <span className="block font-medium">Organization name</span>
+          <span className="block font-medium">{t('fields.orgName')}</span>
           <input
             type="text"
             required
@@ -103,19 +106,19 @@ export default function OnboardingPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="mt-1 w-full rounded border border-zinc-300 px-2 py-1"
-            placeholder="Acme Inc."
+            placeholder={t('fields.orgNamePlaceholder')}
           />
         </label>
 
         <label className="block text-sm">
-          <span className="block font-medium">Your display name (optional)</span>
+          <span className="block font-medium">{t('fields.displayName')}</span>
           <input
             type="text"
             maxLength={120}
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             className="mt-1 w-full rounded border border-zinc-300 px-2 py-1"
-            placeholder="Jane Doe"
+            placeholder={t('fields.displayNamePlaceholder')}
           />
         </label>
 
@@ -124,16 +127,14 @@ export default function OnboardingPage() {
           disabled={busy || name.length < 2}
           className="rounded bg-zinc-900 px-4 py-2 text-sm text-white disabled:opacity-50"
         >
-          {busy ? 'Creating…' : 'Create organization'}
+          {busy ? t('cta.creating') : t('cta.create')}
         </button>
 
         {error && <p className="text-sm text-red-700">{error}</p>}
       </form>
 
       <p className="text-xs text-zinc-500">
-        Already invited to an organization? Just sign out and sign back in
-        once your admin has created your account — you will land in their
-        organization automatically.
+        {t('invitedHint')}
       </p>
     </main>
   )

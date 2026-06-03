@@ -4172,5 +4172,92 @@
       "viewSchedule": "Voir le planning",
       "reviewShowings": "Examiner les visites"
     }
+  },
+  "onboardingPage": {
+    "title": "Bienvenue",
+    "loading": "Chargement…",
+    "signedInAs": "Connecté en tant que <strong>{email}</strong>. Pour commencer à utiliser le CRM, vous avez besoin d'une organisation. Vous pouvez créer la vôtre (vous en devenez l'administrateur) ou attendre qu'un administrateur existant vous invite.",
+    "form": {
+      "heading": "Créer une nouvelle organisation"
+    },
+    "fields": {
+      "orgName": "Nom de l'organisation",
+      "orgNamePlaceholder": "Acme SARL",
+      "displayName": "Votre nom d'affichage (facultatif)",
+      "displayNamePlaceholder": "Jean Dupont"
+    },
+    "cta": {
+      "create": "Créer l'organisation",
+      "creating": "Création…"
+    },
+    "invitedHint": "Déjà invité à une organisation ? Déconnectez-vous puis reconnectez-vous une fois que votre administrateur a créé votre compte — vous arriverez automatiquement dans son organisation.",
+    "errors": {
+      "statusCheck": "Échec de la vérification du statut d'intégration",
+      "createFailed": "Échec de la création de l'organisation",
+      "network": "Erreur réseau"
+    }
+  },
+  "setup2fa": {
+    "title": "Configurer l’authentification à deux facteurs",
+    "intro": "Les administrateurs doivent enregistrer une application d’authentification TOTP (Google Authenticator, 1Password, Authy — toute application compatible otpauth://). Configuration unique ; environ 60 secondes.",
+    "init": {
+      "starting": "Démarrage de la configuration…"
+    },
+    "step1": {
+      "title": "Étape 1 — Scannez ce code QR avec votre application d’authentification",
+      "qrAlt": "Code QR d’authentification à deux facteurs",
+      "manualToggle": "Impossible de scanner ? Saisissez cette clé secrète manuellement"
+    },
+    "step2": {
+      "title": "Étape 2 — Saisissez le code à 6 chiffres affiché par votre application"
+    },
+    "verify": {
+      "button": "Vérifier",
+      "busy": "Vérification…"
+    },
+    "step3": {
+      "title": "Étape 3 — Enregistrez vos codes de récupération",
+      "description": "Chaque code ne fonctionne qu’une seule fois. Utilisez-les pour vous connecter si vous perdez l’accès à votre application d’authentification. <strong>Enregistrez-les maintenant</strong> — nous ne les afficherons plus. Traitez-les comme des mots de passe.",
+      "copyAll": "Tout copier",
+      "download": "Télécharger .txt",
+      "done": "Terminé — aller au tableau de bord"
+    },
+    "errors": {
+      "startFailed": "Échec du démarrage de la configuration 2FA",
+      "network": "Erreur réseau",
+      "verifyFailed": "Échec de la vérification ({status})"
+    }
+  },
+  "securitySettings": {
+    "pageTitle": "Sécurité",
+    "pageSubtitle": "Contrôles d'accès entreprise pour cette organisation",
+    "intro": "Ces politiques sont évaluées à chaque requête authentifiée par <scope>requireScope()</scope>. Les deux sont désactivées par défaut (NULL = aucune restriction). Les modifications sont consignées dans le journal d'audit. Consultez le runbook d'exploitation à <runbook>docs/operations/SESSION-POLICY.md</runbook>.",
+    "ipAllowlist": {
+      "title": "Liste d'autorisation IP",
+      "description": "Plages CIDR séparées par des virgules. IPv4 ou IPv6. Les IP uniques sont acceptées (traitées comme /32 ou /128). Vide = ouvert à toute IP source. Le loopback et RFC1918 ne sont PAS approuvés automatiquement.",
+      "label": "Réseaux autorisés",
+      "invalidEntries": "Ces entrées ne s'analysent pas comme des plages CIDR valides :",
+      "lockoutWarning": "Avertissement de verrouillage : une liste vide laisse tout le monde entrer. Une liste qui n'inclut pas votre propre IP VOUS verrouille — la récupération nécessite une mise à jour de la base de données par l'opérateur de la plateforme."
+    },
+    "idleTimeout": {
+      "title": "Délai d'inactivité de session",
+      "description": "Les sessions plus anciennes que ce nombre de minutes depuis la dernière requête authentifiée de l'utilisateur sont renvoyées vers la connexion. Plage autorisée : 5 – 1440 minutes (24 heures). Vide = aucun délai d'inactivité.",
+      "label": "Minutes"
+    },
+    "actions": {
+      "save": "Enregistrer les modifications",
+      "saving": "Enregistrement…",
+      "discard": "Annuler"
+    },
+    "footer": {
+      "adminNote": "Administrateur uniquement · les modifications sont consignées dans l'audit"
+    },
+    "toast": {
+      "idleRange": "Le délai d'inactivité doit être un entier compris entre 5 et 1440 minutes",
+      "invalidCidr": "Entrées CIDR non valides — voir ci-dessous",
+      "saveFailed": "Échec de l'enregistrement ({status})",
+      "saved": "Paramètres de sécurité enregistrés",
+      "networkError": "Erreur réseau"
+    }
   }
 }

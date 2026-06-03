@@ -4172,5 +4172,92 @@
       "viewSchedule": "Terminplan ansehen",
       "reviewShowings": "Besichtigungen prüfen"
     }
+  },
+  "onboardingPage": {
+    "title": "Willkommen",
+    "loading": "Wird geladen…",
+    "signedInAs": "Angemeldet als <strong>{email}</strong>. Um das CRM zu nutzen, benötigen Sie eine Organisation. Sie können Ihre eigene erstellen (und werden deren Administrator) oder warten, bis ein bestehender Administrator Sie einlädt.",
+    "form": {
+      "heading": "Neue Organisation erstellen"
+    },
+    "fields": {
+      "orgName": "Organisationsname",
+      "orgNamePlaceholder": "Acme GmbH",
+      "displayName": "Ihr Anzeigename (optional)",
+      "displayNamePlaceholder": "Max Mustermann"
+    },
+    "cta": {
+      "create": "Organisation erstellen",
+      "creating": "Wird erstellt…"
+    },
+    "invitedHint": "Bereits zu einer Organisation eingeladen? Melden Sie sich einfach ab und wieder an, sobald Ihr Administrator Ihr Konto erstellt hat — Sie landen dann automatisch in dessen Organisation.",
+    "errors": {
+      "statusCheck": "Onboarding-Status konnte nicht geprüft werden",
+      "createFailed": "Organisation konnte nicht erstellt werden",
+      "network": "Netzwerkfehler"
+    }
+  },
+  "setup2fa": {
+    "title": "Zwei-Faktor-Authentifizierung einrichten",
+    "intro": "Administratoren müssen eine TOTP-Authenticator-App einrichten (Google Authenticator, 1Password, Authy — alles, was otpauth:// unterstützt). Einmalige Einrichtung; etwa 60 Sekunden.",
+    "init": {
+      "starting": "Einrichtung wird gestartet…"
+    },
+    "step1": {
+      "title": "Schritt 1 — Scannen Sie diesen QR-Code mit Ihrer Authenticator-App",
+      "qrAlt": "QR-Code für die Zwei-Faktor-Authentifizierung",
+      "manualToggle": "Scannen nicht möglich? Geben Sie diesen geheimen Schlüssel manuell ein"
+    },
+    "step2": {
+      "title": "Schritt 2 — Geben Sie den 6-stelligen Code aus Ihrer App ein"
+    },
+    "verify": {
+      "button": "Bestätigen",
+      "busy": "Wird überprüft…"
+    },
+    "step3": {
+      "title": "Schritt 3 — Speichern Sie Ihre Wiederherstellungscodes",
+      "description": "Jeder Code funktioniert nur einmal. Verwenden Sie sie zur Anmeldung, falls Sie den Zugriff auf Ihre Authenticator-App verlieren. <strong>Speichern Sie sie jetzt</strong> — wir zeigen sie nicht erneut an. Behandeln Sie sie wie Passwörter.",
+      "copyAll": "Alle kopieren",
+      "download": ".txt herunterladen",
+      "done": "Fertig — zum Dashboard"
+    },
+    "errors": {
+      "startFailed": "2FA-Einrichtung konnte nicht gestartet werden",
+      "network": "Netzwerkfehler",
+      "verifyFailed": "Überprüfung fehlgeschlagen ({status})"
+    }
+  },
+  "securitySettings": {
+    "pageTitle": "Sicherheit",
+    "pageSubtitle": "Enterprise-Zugriffskontrollen für diese Organisation",
+    "intro": "Diese Richtlinien werden bei jeder authentifizierten Anfrage durch <scope>requireScope()</scope> ausgewertet. Beide sind standardmäßig deaktiviert (NULL = keine Einschränkung). Änderungen werden im Audit-Log erfasst. Siehe das Operations-Runbook unter <runbook>docs/operations/SESSION-POLICY.md</runbook>.",
+    "ipAllowlist": {
+      "title": "IP-Zulassungsliste",
+      "description": "Kommagetrennte CIDR-Bereiche. IPv4 oder IPv6. Einzelne IPs werden akzeptiert (als /32 bzw. /128 behandelt). Leer = für jede Quell-IP offen. Loopback und RFC1918 werden NICHT automatisch als vertrauenswürdig eingestuft.",
+      "label": "Zugelassene Netzwerke",
+      "invalidEntries": "Diese Einträge lassen sich nicht als gültige CIDR-Bereiche verarbeiten:",
+      "lockoutWarning": "Aussperrungswarnung: Eine leere Liste lässt jeden zu. Eine Liste ohne Ihre eigene IP sperrt SIE aus — die Wiederherstellung erfordert eine Datenbankaktualisierung durch den Plattformbetreiber."
+    },
+    "idleTimeout": {
+      "title": "Sitzungs-Inaktivitätszeitlimit",
+      "description": "Sitzungen, die seit der letzten authentifizierten Anfrage des Benutzers älter als diese Anzahl von Minuten sind, werden zur Anmeldung zurückgeschickt. Zulässiger Bereich: 5 – 1440 Minuten (24 Stunden). Leer = kein Inaktivitätszeitlimit.",
+      "label": "Minuten"
+    },
+    "actions": {
+      "save": "Änderungen speichern",
+      "saving": "Speichern…",
+      "discard": "Verwerfen"
+    },
+    "footer": {
+      "adminNote": "Nur Administrator · Änderungen werden im Audit-Log erfasst"
+    },
+    "toast": {
+      "idleRange": "Das Inaktivitätszeitlimit muss eine Ganzzahl zwischen 5 und 1440 Minuten sein",
+      "invalidCidr": "Ungültige CIDR-Einträge — siehe unten",
+      "saveFailed": "Speichern fehlgeschlagen ({status})",
+      "saved": "Sicherheitseinstellungen gespeichert",
+      "networkError": "Netzwerkfehler"
+    }
   }
 }

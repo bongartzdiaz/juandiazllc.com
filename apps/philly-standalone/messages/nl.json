@@ -4172,5 +4172,92 @@
       "viewSchedule": "Agenda bekijken",
       "reviewShowings": "Bezichtigingen bekijken"
     }
+  },
+  "onboardingPage": {
+    "title": "Welkom",
+    "loading": "Laden…",
+    "signedInAs": "Ingelogd als <strong>{email}</strong>. Om de CRM te gebruiken heb je een organisatie nodig. Je kunt je eigen organisatie aanmaken (je wordt dan beheerder), of wachten tot een bestaande beheerder je uitnodigt.",
+    "form": {
+      "heading": "Nieuwe organisatie aanmaken"
+    },
+    "fields": {
+      "orgName": "Organisatienaam",
+      "orgNamePlaceholder": "Acme B.V.",
+      "displayName": "Je weergavenaam (optioneel)",
+      "displayNamePlaceholder": "Jan Jansen"
+    },
+    "cta": {
+      "create": "Organisatie aanmaken",
+      "creating": "Bezig met aanmaken…"
+    },
+    "invitedHint": "Al uitgenodigd voor een organisatie? Log uit en weer in zodra je beheerder je account heeft aangemaakt — je komt dan automatisch in hun organisatie terecht.",
+    "errors": {
+      "statusCheck": "Kon onboardingstatus niet controleren",
+      "createFailed": "Kon organisatie niet aanmaken",
+      "network": "Netwerkfout"
+    }
+  },
+  "setup2fa": {
+    "title": "Tweestapsverificatie instellen",
+    "intro": "Beheerders moeten een TOTP-authenticator-app instellen (Google Authenticator, 1Password, Authy — alles wat otpauth:// ondersteunt). Eenmalige instelling; ongeveer 60 seconden.",
+    "init": {
+      "starting": "Instellen wordt gestart…"
+    },
+    "step1": {
+      "title": "Stap 1 — Scan deze QR-code met je authenticator-app",
+      "qrAlt": "QR-code voor tweestapsverificatie",
+      "manualToggle": "Kun je niet scannen? Voer deze geheime sleutel handmatig in"
+    },
+    "step2": {
+      "title": "Stap 2 — Voer de 6-cijferige code uit je app in"
+    },
+    "verify": {
+      "button": "Verifiëren",
+      "busy": "Bezig met verifiëren…"
+    },
+    "step3": {
+      "title": "Stap 3 — Bewaar je herstelcodes",
+      "description": "Elke code werkt eenmalig. Gebruik ze om in te loggen als je geen toegang meer hebt tot je authenticator. <strong>Bewaar ze nu</strong> — we tonen ze niet opnieuw. Behandel ze als wachtwoorden.",
+      "copyAll": "Alles kopiëren",
+      "download": ".txt downloaden",
+      "done": "Klaar — naar dashboard"
+    },
+    "errors": {
+      "startFailed": "Kan 2FA-instelling niet starten",
+      "network": "Netwerkfout",
+      "verifyFailed": "Verificatie mislukt ({status})"
+    }
+  },
+  "securitySettings": {
+    "pageTitle": "Beveiliging",
+    "pageSubtitle": "Enterprise-toegangscontroles voor deze organisatie",
+    "intro": "Deze beleidsregels worden bij elk geauthenticeerd verzoek geëvalueerd door <scope>requireScope()</scope>. Beide staan standaard uit (NULL = geen beperking). Wijzigingen komen in het auditlog. Zie de operations-runbook op <runbook>docs/operations/SESSION-POLICY.md</runbook>.",
+    "ipAllowlist": {
+      "title": "IP-allowlist",
+      "description": "Door komma's gescheiden CIDR-ranges. IPv4 of IPv6. Losse IP's worden geaccepteerd (behandeld als /32 of /128). Leeg = open voor elk bron-IP. Loopback en RFC1918 worden NIET automatisch vertrouwd.",
+      "label": "Toegestane netwerken",
+      "invalidEntries": "Deze invoer kan niet als geldige CIDR-range worden verwerkt:",
+      "lockoutWarning": "Waarschuwing voor buitensluiting: een lege lijst laat iedereen toe. Een lijst zonder je eigen IP sluit JOU buiten — herstel vereist een database-update door de platformbeheerder."
+    },
+    "idleTimeout": {
+      "title": "Sessie-inactiviteitslimiet",
+      "description": "Sessies die ouder zijn dan dit aantal minuten sinds het laatste geauthenticeerde verzoek van de gebruiker worden teruggestuurd naar het aanmelden. Toegestaan bereik: 5 – 1440 minuten (24 uur). Leeg = geen inactiviteitslimiet.",
+      "label": "Minuten"
+    },
+    "actions": {
+      "save": "Wijzigingen opslaan",
+      "saving": "Opslaan…",
+      "discard": "Verwerpen"
+    },
+    "footer": {
+      "adminNote": "Alleen beheerder · wijzigingen worden geaudit"
+    },
+    "toast": {
+      "idleRange": "Inactiviteitslimiet moet een geheel getal tussen 5 en 1440 minuten zijn",
+      "invalidCidr": "Ongeldige CIDR-invoer — zie hieronder",
+      "saveFailed": "Opslaan mislukt ({status})",
+      "saved": "Beveiligingsinstellingen opgeslagen",
+      "networkError": "Netwerkfout"
+    }
   }
 }

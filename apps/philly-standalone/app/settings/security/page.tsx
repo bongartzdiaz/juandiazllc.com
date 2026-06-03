@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
@@ -29,6 +30,7 @@ const labelStyle: React.CSSProperties = {
 }
 
 export default function SecuritySettingsPage() {
+  const t = useTranslations('securitySettings')
   const { addToast } = useToast()
   const policyQuery = useApi<{ data: SecurityPolicy }>('/admin/security')
   const policy = policyQuery.data?.data
@@ -61,7 +63,7 @@ export default function SecuritySettingsPage() {
         } else {
           const n = Number(trimmed)
           if (!Number.isInteger(n) || n < 5 || n > 1440) {
-            addToast('Idle timeout must be an integer between 5 and 1440 minutes', 'error')
+            addToast(t('toast.idleRange'), 'error')
             setSaving(false)
             return
           }
@@ -78,18 +80,18 @@ export default function SecuritySettingsPage() {
       if (!res.ok) {
         if (Array.isArray(json.invalid)) {
           setInvalid(json.invalid)
-          addToast(`Invalid CIDR entries — see below`, 'error')
+          addToast(t('toast.invalidCidr'), 'error')
         } else {
-          addToast(json.error ?? `Save failed (${res.status})`, 'error')
+          addToast(json.error ?? t('toast.saveFailed', { status: res.status }), 'error')
         }
         return
       }
-      addToast('Security settings saved', 'success')
+      addToast(t('toast.saved'), 'success')
       setDraftAllowlist(null)
       setDraftIdle(null)
       policyQuery.refetch()
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Network error', 'error')
+      addToast(err instanceof Error ? err.message : t('toast.networkError'), 'error')
     } finally {
       setSaving(false)
     }
@@ -99,7 +101,7 @@ export default function SecuritySettingsPage() {
 
   return (
     <>
-      <Topbar title="Security" sub="Enterprise access controls for this organisation" />
+      <Topbar title={t('pageTitle')} sub={t('pageSubtitle')} />
       <div style={{ padding: '18px 24px 40px', maxWidth: 760 }}>
 
         {policyQuery.error && (
@@ -117,10 +119,10 @@ export default function SecuritySettingsPage() {
         }}>
           <Info size={14} style={{ flexShrink: 0, color: 'var(--accent)', marginTop: 2 }} />
           <div>
-            These policies are evaluated on every authenticated request by{' '}
-            <code style={{ fontSize: 11 }}>requireScope()</code>. Both default to off
-            (NULL = no restriction). Updates land in the audit log. See the operations
-            runbook at <code style={{ fontSize: 11 }}>docs/operations/SESSION-POLICY.md</code>.
+            {t.rich('intro', {
+              scope: () => <code style={{ fontSize: 11 }}>requireScope()</code>,
+              runbook: () => <code style={{ fontSize: 11 }}>docs/operations/SESSION-POLICY.md</code>,
+            })}
           </div>
         </div>
 
@@ -132,15 +134,14 @@ export default function SecuritySettingsPage() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
             <Globe2 size={15} color="var(--accent)" />
-            <div style={{ fontSize: 14, fontWeight: 600 }}>IP allowlist</div>
+            <div style={{ fontSize: 14, fontWeight: 600 }}>{t('ipAllowlist.title')}</div>
           </div>
           <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 14, lineHeight: 1.5 }}>
-            Comma-separated CIDR ranges. IPv4 or IPv6. Single IPs are accepted (treated as /32 or /128).
-            Empty = open to any source IP. Loopback and RFC1918 are NOT auto-trusted.
+            {t('ipAllowlist.description')}
           </div>
 
           <label style={labelStyle} htmlFor="ipAllowlist">
-            Allowed networks
+            {t('ipAllowlist.label')}
           </label>
           <textarea
             id="ipAllowlist"
@@ -166,7 +167,7 @@ export default function SecuritySettingsPage() {
             }}>
               <AlertTriangle size={13} style={{ flexShrink: 0, marginTop: 2 }} />
               <div>
-                These entries don't parse as valid CIDR ranges:&nbsp;
+                {t('ipAllowlist.invalidEntries')}&nbsp;
                 <code>{invalid.join(', ')}</code>
               </div>
             </div>
@@ -177,7 +178,7 @@ export default function SecuritySettingsPage() {
           }}>
             <AlertTriangle size={12} style={{ flexShrink: 0, marginTop: 1 }} />
             <span>
-              Lock-out warning: an empty list lets everyone in. A list that doesn't include your own IP locks YOU out — recovery requires a database update by the platform operator.
+              {t('ipAllowlist.lockoutWarning')}
             </span>
           </div>
         </div>
@@ -190,16 +191,14 @@ export default function SecuritySettingsPage() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
             <Clock size={15} color="var(--accent)" />
-            <div style={{ fontSize: 14, fontWeight: 600 }}>Session idle timeout</div>
+            <div style={{ fontSize: 14, fontWeight: 600 }}>{t('idleTimeout.title')}</div>
           </div>
           <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 14, lineHeight: 1.5 }}>
-            Sessions older than this many minutes since the user's last
-            authenticated request are kicked back to sign-in.
-            Allowed range: 5 – 1440 minutes (24 hours). Empty = no idle timeout.
+            {t('idleTimeout.description')}
           </div>
 
           <label style={labelStyle} htmlFor="idle">
-            Minutes
+            {t('idleTimeout.label')}
           </label>
           <input
             id="idle"
@@ -230,7 +229,7 @@ export default function SecuritySettingsPage() {
             }}
           >
             <Save size={13} />
-            {saving ? 'Saving…' : 'Save changes'}
+            {saving ? t('actions.saving') : t('actions.save')}
           </button>
           {dirty && !saving && (
             <button
@@ -244,13 +243,13 @@ export default function SecuritySettingsPage() {
                 fontFamily: 'inherit',
               }}
             >
-              Discard
+              {t('actions.discard')}
             </button>
           )}
           <div style={{ flex: 1 }} />
           <Shield size={13} color="var(--txt3)" />
           <span style={{ fontSize: 11, color: 'var(--txt3)' }}>
-            Admin only · changes are audit-logged
+            {t('footer.adminNote')}
           </span>
         </div>
       </div>

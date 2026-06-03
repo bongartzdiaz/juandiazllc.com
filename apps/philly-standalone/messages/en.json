@@ -4172,5 +4172,92 @@
       "viewSchedule": "View schedule",
       "reviewShowings": "Review showings"
     }
+  },
+  "onboardingPage": {
+    "title": "Welcome",
+    "loading": "Loading…",
+    "signedInAs": "Signed in as <strong>{email}</strong>. To start using the CRM you need an organization. You can create your own (you become its admin), or wait for an existing admin to invite you.",
+    "form": {
+      "heading": "Create a new organization"
+    },
+    "fields": {
+      "orgName": "Organization name",
+      "orgNamePlaceholder": "Acme Inc.",
+      "displayName": "Your display name (optional)",
+      "displayNamePlaceholder": "Jane Doe"
+    },
+    "cta": {
+      "create": "Create organization",
+      "creating": "Creating…"
+    },
+    "invitedHint": "Already invited to an organization? Just sign out and sign back in once your admin has created your account — you will land in their organization automatically.",
+    "errors": {
+      "statusCheck": "Failed to check onboarding status",
+      "createFailed": "Failed to create organization",
+      "network": "Network error"
+    }
+  },
+  "setup2fa": {
+    "title": "Set up two-factor authentication",
+    "intro": "Admins are required to enrol a TOTP authenticator app (Google Authenticator, 1Password, Authy — anything that supports otpauth://). One-time setup; about 60 seconds.",
+    "init": {
+      "starting": "Starting setup…"
+    },
+    "step1": {
+      "title": "Step 1 — Scan this QR code with your authenticator app",
+      "qrAlt": "Two-factor authentication QR code",
+      "manualToggle": "Can’t scan? Enter this secret manually"
+    },
+    "step2": {
+      "title": "Step 2 — Enter the 6-digit code your app shows"
+    },
+    "verify": {
+      "button": "Verify",
+      "busy": "Verifying…"
+    },
+    "step3": {
+      "title": "Step 3 — Save your recovery codes",
+      "description": "Each code works once. Use them to sign in if you lose access to your authenticator. <strong>Save them now</strong> — we won’t show them again. Treat them like passwords.",
+      "copyAll": "Copy all",
+      "download": "Download .txt",
+      "done": "Done — go to dashboard"
+    },
+    "errors": {
+      "startFailed": "Failed to start 2FA setup",
+      "network": "Network error",
+      "verifyFailed": "Verification failed ({status})"
+    }
+  },
+  "securitySettings": {
+    "pageTitle": "Security",
+    "pageSubtitle": "Enterprise access controls for this organisation",
+    "intro": "These policies are evaluated on every authenticated request by <scope>requireScope()</scope>. Both default to off (NULL = no restriction). Updates land in the audit log. See the operations runbook at <runbook>docs/operations/SESSION-POLICY.md</runbook>.",
+    "ipAllowlist": {
+      "title": "IP allowlist",
+      "description": "Comma-separated CIDR ranges. IPv4 or IPv6. Single IPs are accepted (treated as /32 or /128). Empty = open to any source IP. Loopback and RFC1918 are NOT auto-trusted.",
+      "label": "Allowed networks",
+      "invalidEntries": "These entries don't parse as valid CIDR ranges:",
+      "lockoutWarning": "Lock-out warning: an empty list lets everyone in. A list that doesn't include your own IP locks YOU out — recovery requires a database update by the platform operator."
+    },
+    "idleTimeout": {
+      "title": "Session idle timeout",
+      "description": "Sessions older than this many minutes since the user's last authenticated request are kicked back to sign-in. Allowed range: 5 – 1440 minutes (24 hours). Empty = no idle timeout.",
+      "label": "Minutes"
+    },
+    "actions": {
+      "save": "Save changes",
+      "saving": "Saving…",
+      "discard": "Discard"
+    },
+    "footer": {
+      "adminNote": "Admin only · changes are audit-logged"
+    },
+    "toast": {
+      "idleRange": "Idle timeout must be an integer between 5 and 1440 minutes",
+      "invalidCidr": "Invalid CIDR entries — see below",
+      "saveFailed": "Save failed ({status})",
+      "saved": "Security settings saved",
+      "networkError": "Network error"
+    }
   }
 }

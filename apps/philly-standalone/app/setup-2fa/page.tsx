@@ -17,6 +17,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 type Step = 'init' | 'verify' | 'codes' | 'done'
 
@@ -27,6 +28,7 @@ interface SetupResponse {
 }
 
 export default function Setup2FAPage() {
+  const t = useTranslations('setup2fa')
   const router = useRouter()
   const [step, setStep] = useState<Step>('init')
   const [setupData, setSetupData] = useState<SetupResponse | null>(null)
@@ -42,17 +44,17 @@ export default function Setup2FAPage() {
       const res = await fetch('/api/2fa/setup', { method: 'POST' })
       const json = await res.json()
       if (!res.ok) {
-        setError(json.error ?? 'Failed to start 2FA setup')
+        setError(json.error ?? t('errors.startFailed'))
         return
       }
       setSetupData(json)
       setStep('verify')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Network error')
+      setError(err instanceof Error ? err.message : t('errors.network'))
     } finally {
       setBusy(false)
     }
-  }, [])
+  }, [t])
 
   // Auto-start the flow on mount; admins arriving here have a
   // single click experience: scan QR, type code, save codes, done.
@@ -73,13 +75,13 @@ export default function Setup2FAPage() {
       })
       const json = await res.json()
       if (!res.ok) {
-        setError(json.error ?? `Verification failed (${res.status})`)
+        setError(json.error ?? t('errors.verifyFailed', { status: res.status }))
         return
       }
       setRecoveryCodes(json.recoveryCodes ?? [])
       setStep('codes')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Network error')
+      setError(err instanceof Error ? err.message : t('errors.network'))
     } finally {
       setBusy(false)
     }
@@ -93,16 +95,14 @@ export default function Setup2FAPage() {
   return (
     <main style={{ maxWidth: 520, margin: '40px auto', padding: '0 20px' }}>
       <header style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Set up two-factor auth</h1>
+        <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>{t('title')}</h1>
         <p style={{ color: 'var(--txt3)', fontSize: 13, lineHeight: 1.5 }}>
-          Admins are required to enrol a TOTP authenticator app
-          (Google Authenticator, 1Password, Authy — anything that
-          supports otpauth://). One-time setup; ~60 seconds.
+          {t('intro')}
         </p>
       </header>
 
       {step === 'init' && (
-        <p style={{ fontSize: 13, color: 'var(--txt3)' }}>Starting setup…</p>
+        <p style={{ fontSize: 13, color: 'var(--txt3)' }}>{t('init.starting')}</p>
       )}
 
       {step === 'verify' && setupData && (
@@ -115,17 +115,17 @@ export default function Setup2FAPage() {
           }}
         >
           <h2 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>
-            Step 1 — Scan this QR with your authenticator app
+            {t('step1.title')}
           </h2>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
             {/* QR is a data: URL produced server-side, so this is
                  safe to embed without external network. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={setupData.qrDataUrl} alt="2FA QR code" width={240} height={240} />
+            <img src={setupData.qrDataUrl} alt={t('step1.qrAlt')} width={240} height={240} />
           </div>
           <details style={{ marginBottom: 18 }}>
             <summary style={{ cursor: 'pointer', fontSize: 12, color: 'var(--txt3)' }}>
-              Can&rsquo;t scan? Type this secret manually
+              {t('step1.manualToggle')}
             </summary>
             <code
               style={{
@@ -144,7 +144,7 @@ export default function Setup2FAPage() {
           </details>
 
           <h2 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>
-            Step 2 — Enter the 6-digit code your app shows
+            {t('step2.title')}
           </h2>
           <form onSubmit={submitVerify} style={{ display: 'flex', gap: 8 }}>
             <input
@@ -182,7 +182,7 @@ export default function Setup2FAPage() {
                 opacity: busy || !/^\d{6}$/.test(code) ? 0.5 : 1,
               }}
             >
-              {busy ? 'Verifying…' : 'Verify'}
+              {busy ? t('verify.busy') : t('verify.button')}
             </button>
           </form>
 
@@ -215,12 +215,12 @@ export default function Setup2FAPage() {
           }}
         >
           <h2 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>
-            Step 3 — Save your recovery codes
+            {t('step3.title')}
           </h2>
           <p style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 14 }}>
-            Each code works once. Use them to sign in if you lose
-            access to your authenticator. <strong>Save them now</strong> —
-            we won&rsquo;t show them again. Treat them like passwords.
+            {t.rich('step3.description', {
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </p>
           <div
             style={{
@@ -253,7 +253,7 @@ export default function Setup2FAPage() {
                 cursor: 'pointer',
               }}
             >
-              Copy all
+              {t('step3.copyAll')}
             </button>
             <button
               onClick={() => {
@@ -276,7 +276,7 @@ export default function Setup2FAPage() {
                 cursor: 'pointer',
               }}
             >
-              Download .txt
+              {t('step3.download')}
             </button>
             <button
               onClick={finish}
@@ -292,7 +292,7 @@ export default function Setup2FAPage() {
                 cursor: 'pointer',
               }}
             >
-              Done — go to dashboard
+              {t('step3.done')}
             </button>
           </div>
         </section>
