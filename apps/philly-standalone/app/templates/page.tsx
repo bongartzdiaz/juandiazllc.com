@@ -304,10 +304,10 @@ export default function TemplatesPage() {
         size="md"
       >
         <FormField label={t('editor.name')} required>
-          <input value={fName} onChange={e => setFName(e.target.value)} placeholder={t('editor.namePlaceholder')} style={inputStyle} />
+          <input aria-label={t('editor.name')} value={fName} onChange={e => setFName(e.target.value)} placeholder={t('editor.namePlaceholder')} style={inputStyle} />
         </FormField>
         <FormField label={t('editor.type')} required>
-          <select value={fType} onChange={e => setFType(e.target.value as 'email' | 'sms' | 'whatsapp' | 'letter')} style={{ ...inputStyle, cursor: 'pointer' }}>
+          <select aria-label={t('editor.type')} value={fType} onChange={e => setFType(e.target.value as 'email' | 'sms' | 'whatsapp' | 'letter')} style={{ ...inputStyle, cursor: 'pointer' }}>
             <option value="email">{t('filters.email')}</option>
             <option value="sms">{t('filters.sms')}</option>
             <option value="whatsapp">WhatsApp</option>
@@ -316,11 +316,12 @@ export default function TemplatesPage() {
         </FormField>
         {fType === 'email' && (
           <FormField label={t('editor.subject')}>
-            <input value={fSubject} onChange={e => setFSubject(e.target.value)} placeholder="Welcome, {{first_name}}" style={inputStyle} />
+            <input aria-label={t('editor.subject')} value={fSubject} onChange={e => setFSubject(e.target.value)} placeholder="Welcome, {{first_name}}" style={inputStyle} />
           </FormField>
         )}
         <FormField label={t('editor.body')} required>
           <textarea
+            aria-label={t('editor.body')}
             value={fBody}
             onChange={e => setFBody(e.target.value)}
             rows={10}

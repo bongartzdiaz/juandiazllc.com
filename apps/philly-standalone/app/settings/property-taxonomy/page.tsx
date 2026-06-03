@@ -85,6 +85,7 @@ function OptionListEditor({
                 onChange(next)
               }}
               style={inputStyle}
+              aria-label={t('list.displayLabel')}
             />
             <input
               value={opt.value}
@@ -95,6 +96,7 @@ function OptionListEditor({
                 onChange(next)
               }}
               style={{ ...inputStyle, fontFamily: 'var(--font-red-hat-mono), monospace', fontSize: 11 }}
+              aria-label={t('list.internalValue')}
             />
             <button
               type="button"
@@ -111,6 +113,7 @@ function OptionListEditor({
           onChange={e => setNewLabel(e.target.value)}
           placeholder={placeholder ?? t('list.addNew')}
           style={{ ...inputStyle, flex: 1 }}
+          aria-label={placeholder ?? t('list.addNew')}
           onKeyDown={e => {
             if (e.key === 'Enter' && newLabel.trim()) {
               onChange([...options, { value: slugify(newLabel), label: newLabel.trim() }])
@@ -253,6 +256,7 @@ export default function PropertyTaxonomyPage() {
             value={tax.countryLabel}
             onChange={e => setTax({ ...tax, countryLabel: e.target.value })}
             style={{ ...inputStyle, width: 280 }}
+            aria-label={t('country.title')}
           />
         </div>
 
@@ -359,11 +363,13 @@ export default function PropertyTaxonomyPage() {
                     setTax({ ...tax, flags: next })
                   }}
                   style={inputStyle}
+                  aria-label={t('list.displayLabel')}
                 />
                 <input
                   value={f.key}
                   readOnly
                   style={{ ...inputStyle, fontFamily: 'var(--font-red-hat-mono), monospace', fontSize: 11, opacity: 0.7 }}
+                  aria-label={t('list.internalValue')}
                 />
                 <button
                   type="button"

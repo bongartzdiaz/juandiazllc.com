@@ -262,6 +262,7 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
                   style={{ ...inputStyle, borderColor: errors.name ? 'var(--r)' : 'var(--border)' }}
                   value={name} onChange={e => setName(e.target.value)}
                   placeholder={t('placeholders.name')}
+                  aria-label={t('fields.name')}
                 />
                 {errors.name && <span style={{ fontSize: 11, color: 'var(--r)', marginTop: 3, display: 'block' }}>{errors.name}</span>}
               </FormField>
@@ -271,6 +272,7 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
                   style={{ ...inputStyle, borderColor: errors.email ? 'var(--r)' : 'var(--border)' }}
                   type="email" value={email} onChange={e => setEmail(e.target.value)}
                   placeholder={t('placeholders.email')}
+                  aria-label={t('fields.email')}
                 />
                 {errors.email && <span style={{ fontSize: 11, color: 'var(--r)', marginTop: 3, display: 'block' }}>{errors.email}</span>}
               </FormField>
@@ -280,6 +282,7 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
                   style={{ ...inputStyle, borderColor: errors.phone ? 'var(--r)' : 'var(--border)' }}
                   type="tel" value={phone} onChange={e => setPhone(e.target.value)}
                   placeholder={t('placeholders.phone')}
+                  aria-label={t('fields.phone')}
                 />
                 {errors.phone && <span style={{ fontSize: 11, color: 'var(--r)', marginTop: 3, display: 'block' }}>{errors.phone}</span>}
               </FormField>
@@ -288,6 +291,7 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
                 <select
                   style={{ ...inputStyle, cursor: 'pointer' }}
                   value={source} onChange={e => setSource(e.target.value)}
+                  aria-label={t('fields.source')}
                 >
                   <option value="">{t('placeholders.source')}</option>
                   {sources.map(s => <option key={s} value={s}>{s}</option>)}
@@ -295,7 +299,7 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
               </FormField>
 
               <FormField label={t('fields.company')}>
-                <input style={inputStyle} value={company} onChange={e => setCompany(e.target.value)} placeholder={t('placeholders.company')} />
+                <input style={inputStyle} value={company} onChange={e => setCompany(e.target.value)} placeholder={t('placeholders.company')} aria-label={t('fields.company')} />
               </FormField>
 
               <FormField label={t('fields.notes')}>
@@ -303,6 +307,7 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
                   style={{ ...inputStyle, minHeight: 72, resize: 'vertical' }}
                   value={notes} onChange={e => setNotes(e.target.value)}
                   placeholder={t('placeholders.notes')}
+                  aria-label={t('fields.notes')}
                 />
               </FormField>
 
@@ -454,6 +459,7 @@ export function AddLeadModal({ open, onClose, industry, onAdd }: Props) {
                             value={mapping[field] ?? ''}
                             onChange={e => setMapping(m => ({ ...m, [field]: e.target.value || undefined }))}
                             style={{ ...inputStyle, fontSize: 12, padding: '6px 10px', cursor: 'pointer' }}
+                            aria-label={t(`mapping.${field}`)}
                           >
                             <option value="">{t('mapping.noColumn')}</option>
                             {csvHeaders.map(h => <option key={h} value={h}>{h}</option>)}

@@ -241,6 +241,7 @@ export default function OffersPage() {
           <FilterSelect
             value={statusFilter}
             onChange={v => { setStatusFilter(v); setPage(1) }}
+            ariaLabel="All Statuses"
             options={[
               { value: '', label: 'All Statuses' },
               { value: 'pending', label: 'Pending' },
@@ -421,6 +422,7 @@ export default function OffersPage() {
               value={form.propertyId}
               onChange={e => setForm({ ...form, propertyId: e.target.value })}
               disabled={!!editingId}
+              aria-label="Property"
               style={inputStyle}
             >
               <option value="">Select a property…</option>
@@ -436,6 +438,7 @@ export default function OffersPage() {
             <select
               value={form.contactId}
               onChange={e => setForm({ ...form, contactId: e.target.value })}
+              aria-label="Buyer (contact)"
               style={inputStyle}
             >
               <option value="">No contact linked</option>
@@ -452,6 +455,7 @@ export default function OffersPage() {
                 value={form.amount}
                 onChange={e => setForm({ ...form, amount: e.target.value })}
                 placeholder="500000"
+                aria-label="Offer Amount ($)"
                 style={inputStyle}
               />
             </FormField>
@@ -463,6 +467,7 @@ export default function OffersPage() {
                 value={form.earnest}
                 onChange={e => setForm({ ...form, earnest: e.target.value })}
                 placeholder="5000"
+                aria-label="Earnest Money ($)"
                 style={inputStyle}
               />
             </FormField>
@@ -475,6 +480,7 @@ export default function OffersPage() {
                 value={form.closingCosts}
                 onChange={e => setForm({ ...form, closingCosts: e.target.value })}
                 placeholder="0"
+                aria-label="Closing Costs ($)"
                 style={inputStyle}
               />
             </FormField>
@@ -483,6 +489,7 @@ export default function OffersPage() {
                 type="number" min="0" max="60"
                 value={form.inspectionDays}
                 onChange={e => setForm({ ...form, inspectionDays: e.target.value })}
+                aria-label="Inspection (days)"
                 style={inputStyle}
               />
             </FormField>
@@ -490,6 +497,7 @@ export default function OffersPage() {
               <select
                 value={form.financingType}
                 onChange={e => setForm({ ...form, financingType: e.target.value })}
+                aria-label="Financing"
                 style={inputStyle}
               >
                 {FINANCING_TYPES.map(ft => <option key={ft.value} value={ft.value}>{ft.label}</option>)}
@@ -502,6 +510,7 @@ export default function OffersPage() {
               type="date"
               value={form.expiresAt}
               onChange={e => setForm({ ...form, expiresAt: e.target.value })}
+              aria-label="Offer Expires"
               style={inputStyle}
             />
           </FormField>
@@ -512,6 +521,7 @@ export default function OffersPage() {
               value={form.notes}
               onChange={e => setForm({ ...form, notes: e.target.value })}
               placeholder="Contingencies, seller concessions, closing preferences…"
+              aria-label="Notes"
               style={{ ...inputStyle, resize: 'vertical' }}
             />
           </FormField>
@@ -590,11 +600,11 @@ function StatTile({ label, value, highlight }: { label: string; value: string; h
   )
 }
 
-function FilterSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+function FilterSelect({ value, onChange, options, ariaLabel }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; ariaLabel?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
       <Filter size={13} style={{ color: 'var(--txt3)' }} />
-      <select value={value} onChange={e => onChange(e.target.value)} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+      <select value={value} onChange={e => onChange(e.target.value)} aria-label={ariaLabel} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>

@@ -215,16 +215,16 @@ export default function SoiPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Name</label>
-                <input value={addName} onChange={e => setAddName(e.target.value)} placeholder="e.g. Close Friends" style={inputStyle} />
+                <input aria-label="Name" value={addName} onChange={e => setAddName(e.target.value)} placeholder="e.g. Close Friends" style={inputStyle} />
               </div>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Days between touches</label>
-                <input type="number" min={1} value={addFrequency} onChange={e => setAddFrequency(e.target.value)} placeholder="30" style={inputStyle} />
+                <input aria-label="Days between touches" type="number" min={1} value={addFrequency} onChange={e => setAddFrequency(e.target.value)} placeholder="30" style={inputStyle} />
               </div>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Color</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <input type="color" value={addColor} onChange={e => setAddColor(e.target.value)} style={{
+                  <input aria-label="Color" type="color" value={addColor} onChange={e => setAddColor(e.target.value)} style={{
                     width: 40, height: 34, borderRadius: 8, border: '1px solid var(--border)',
                     background: 'var(--bg2)', cursor: 'pointer', padding: 2,
                   }} />

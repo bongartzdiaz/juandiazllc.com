@@ -259,7 +259,7 @@ export default function CommissionsPage() {
           <>
             {/* Commission Records */}
             <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
-              <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
+              <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }} ariaLabel={t('filters.all')}
                 options={[{ value: '', label: t('filters.all') }, { value: 'pending', label: t('filters.pending') }, { value: 'paid', label: t('filters.paid') }, { value: 'voided', label: t('filters.voided') }]} />
               <div style={{ flex: 1 }} />
               <ColumnPicker
@@ -347,13 +347,13 @@ export default function CommissionsPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <FormField label={t('modal.agent')}>
-              <select value={form.agentId} onChange={e => setForm({ ...form, agentId: e.target.value })} style={inputStyle}>
+              <select value={form.agentId} onChange={e => setForm({ ...form, agentId: e.target.value })} aria-label={t('modal.agent')} style={inputStyle}>
                 <option value="">{t('modal.selectAgent')}</option>
                 {leaderboard.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
             </FormField>
             <FormField label={t('modal.type')}>
-              <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={inputStyle}>
+              <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} aria-label={t('modal.type')} style={inputStyle}>
                 <option value="closing">{t('modal.typeClosing')}</option>
                 <option value="referral">{t('modal.typeReferral')}</option>
                 <option value="rental">{t('modal.typeRental')}</option>
@@ -364,17 +364,18 @@ export default function CommissionsPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
             <FormField label={t('modal.grossAmount')}>
-              <input type="number" min="0" step="100" value={form.gross} onChange={e => setForm({ ...form, gross: e.target.value })} placeholder="15000" style={inputStyle} />
+              <input type="number" min="0" step="100" value={form.gross} onChange={e => setForm({ ...form, gross: e.target.value })} placeholder="15000" aria-label={t('modal.grossAmount')} style={inputStyle} />
             </FormField>
             <FormField label={t('modal.splitPct')}>
-              <input type="number" min="0" max="100" value={form.splitPct} onChange={e => setForm({ ...form, splitPct: e.target.value })} style={inputStyle} />
+              <input type="number" min="0" max="100" value={form.splitPct} onChange={e => setForm({ ...form, splitPct: e.target.value })} aria-label={t('modal.splitPct')} style={inputStyle} />
             </FormField>
           </div>
           <FormField label={t('modal.dealId')}>
-            <input value={form.dealId} onChange={e => setForm({ ...form, dealId: e.target.value })} placeholder={t('modal.dealIdPlaceholder')} style={inputStyle} />
+            <input value={form.dealId} onChange={e => setForm({ ...form, dealId: e.target.value })} placeholder={t('modal.dealIdPlaceholder')} aria-label={t('modal.dealId')} style={inputStyle} />
           </FormField>
           <FormField label={t('modal.notes')}>
             <textarea rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
+              aria-label={t('modal.notes')}
               style={{ ...inputStyle, resize: 'vertical' }} />
           </FormField>
 
@@ -422,11 +423,11 @@ function miniBtn(color: string): React.CSSProperties {
   }
 }
 
-function FilterSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+function FilterSelect({ value, onChange, options, ariaLabel }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; ariaLabel?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
       <Filter size={13} style={{ color: 'var(--txt3)' }} />
-      <select value={value} onChange={e => onChange(e.target.value)} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+      <select value={value} onChange={e => onChange(e.target.value)} aria-label={ariaLabel} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>

@@ -608,6 +608,7 @@ export default function DealsPage() {
               value={search}
               onChange={e => setFilters({ q: e.target.value })}
               placeholder={t('filters.search')}
+              aria-label={t('filters.search')}
               style={{
                 flex: 1, background: 'none', border: 'none',
                 fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit',
@@ -626,6 +627,7 @@ export default function DealsPage() {
             icon={Filter}
             value={selectedPipeline}
             onChange={v => { setFilters({ pipelineId: v }); setPage(1) }}
+            ariaLabel={t('filters.allPipelines')}
             options={[
               { value: '', label: t('filters.allPipelines') },
               ...pipelines.map(p => ({ value: p.id, label: p.name })),
@@ -635,6 +637,7 @@ export default function DealsPage() {
             icon={Filter}
             value={statusFilter}
             onChange={v => { setFilters({ status: v }); setPage(1) }}
+            ariaLabel={t('filters.allStatuses')}
             options={[
               { value: '', label: t('filters.allStatuses') },
               { value: 'open', label: t('statuses.open') },
@@ -1132,13 +1135,14 @@ export default function DealsPage() {
                 <input
                   value={addTitle} onChange={e => setAddTitle(e.target.value)}
                   placeholder="e.g. Acme Corp renewal"
+                  aria-label="Title"
                   style={fieldInputStyle}
                 />
               </Field>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <Field label="Pipeline *">
-                  <select value={addPipelineId} onChange={e => setAddPipelineId(e.target.value)} style={fieldInputStyle}>
+                  <select value={addPipelineId} onChange={e => setAddPipelineId(e.target.value)} aria-label="Pipeline" style={fieldInputStyle}>
                     {pipelines.length === 0 && <option value="">{t('pipelines.empty')}</option>}
                     {pipelines.map(p => (
                       <option key={p.id} value={p.id}>{p.name}</option>
@@ -1146,7 +1150,7 @@ export default function DealsPage() {
                   </select>
                 </Field>
                 <Field label="Stage *">
-                  <select value={addStageId} onChange={e => setAddStageId(e.target.value)} style={fieldInputStyle}>
+                  <select value={addStageId} onChange={e => setAddStageId(e.target.value)} aria-label="Stage" style={fieldInputStyle}>
                     {(pipelines.find(p => p.id === addPipelineId)?.stages ?? []).map(s => (
                       <option key={s.id} value={s.id}>{s.name}</option>
                     ))}
@@ -1160,6 +1164,7 @@ export default function DealsPage() {
                     type="number" min={0} step={100}
                     value={addValue} onChange={e => setAddValue(e.target.value)}
                     placeholder="0"
+                    aria-label="Value ($)"
                     style={fieldInputStyle}
                   />
                 </Field>
@@ -1167,6 +1172,7 @@ export default function DealsPage() {
                   <input
                     type="number" min={0} max={100}
                     value={addProbability} onChange={e => setAddProbability(e.target.value)}
+                    aria-label="Probability (%)"
                     style={fieldInputStyle}
                   />
                 </Field>
@@ -1174,7 +1180,7 @@ export default function DealsPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <Field label="Status">
-                  <select value={addStatus} onChange={e => setAddStatus(e.target.value)} style={fieldInputStyle}>
+                  <select value={addStatus} onChange={e => setAddStatus(e.target.value)} aria-label="Status" style={fieldInputStyle}>
                     <option value="open">Open</option>
                     <option value="won">Won</option>
                     <option value="lost">Lost</option>
@@ -1184,13 +1190,14 @@ export default function DealsPage() {
                   <input
                     type="date"
                     value={addExpectedClose} onChange={e => setAddExpectedClose(e.target.value)}
+                    aria-label="Expected Close"
                     style={fieldInputStyle}
                   />
                 </Field>
               </div>
 
               <Field label="Contact">
-                <select value={addContactId} onChange={e => setAddContactId(e.target.value)} style={fieldInputStyle}>
+                <select value={addContactId} onChange={e => setAddContactId(e.target.value)} aria-label="Contact" style={fieldInputStyle}>
                   <option value="">— None —</option>
                   {contacts.map(c => (
                     <option key={c.id} value={c.id}>{c.name}{c.email ? ` · ${c.email}` : ''}</option>
@@ -1202,6 +1209,7 @@ export default function DealsPage() {
                 <textarea
                   value={addNotes} onChange={e => setAddNotes(e.target.value)}
                   rows={3} placeholder={t('form.notesPlaceholder')}
+                  aria-label="Notes"
                   style={{ ...fieldInputStyle, resize: 'vertical', lineHeight: 1.5 }}
                 />
               </Field>
@@ -1299,12 +1307,13 @@ export default function DealsPage() {
    ------------------------------------------------------------------ */
 
 function FilterSelect({
-  icon: Icon, value, onChange, options,
+  icon: Icon, value, onChange, options, ariaLabel,
 }: {
   icon: typeof Filter
   value: string
   onChange: (v: string) => void
   options: { value: string; label: string }[]
+  ariaLabel?: string
 }) {
   return (
     <div style={{
@@ -1314,6 +1323,7 @@ function FilterSelect({
     }}>
       <Icon size={13} style={{ color: 'var(--txt3)' }} />
       <select value={value} onChange={e => onChange(e.target.value)}
+        aria-label={ariaLabel}
         style={{
           background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)',
           fontFamily: 'inherit', cursor: 'pointer', outline: 'none',

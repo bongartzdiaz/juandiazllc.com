@@ -431,13 +431,14 @@ export default function PropertiesPage() {
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(1) }}
               placeholder={t('filters.searchPlaceholder')}
+              aria-label={t('filters.searchPlaceholder')}
               style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', outline: 'none', width: '100%' }}
             />
           </div>
 
           <div style={selectBarStyle}>
             <MapPin size={13} style={{ color: 'var(--txt3)' }} />
-            <select value={district} onChange={e => { setDistrict(e.target.value); setPage(1) }} style={selectStyle}>
+            <select value={district} onChange={e => { setDistrict(e.target.value); setPage(1) }} aria-label={t('filters.allLocations')} style={selectStyle}>
               <option value="">{taxonomy?.countryLabel ? t('filters.allLocationsNamed', { name: taxonomy.countryLabel }) : t('filters.allLocations')}</option>
               {districts.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
             </select>
@@ -445,7 +446,7 @@ export default function PropertiesPage() {
 
           <div style={selectBarStyle}>
             <Tag size={13} style={{ color: 'var(--txt3)' }} />
-            <select value={type} onChange={e => { setType(e.target.value); setPage(1) }} style={selectStyle}>
+            <select value={type} onChange={e => { setType(e.target.value); setPage(1) }} aria-label={t('filters.allTypes')} style={selectStyle}>
               <option value="">{t('filters.allTypes')}</option>
               {propertyTypes.map(pt => <option key={pt.value} value={pt.value}>{taxLabel('types', pt.value, pt.label)}</option>)}
             </select>
@@ -453,7 +454,7 @@ export default function PropertiesPage() {
 
           {type && (
             <div style={selectBarStyle}>
-              <select value={subtype} onChange={e => { setSubtype(e.target.value); setPage(1) }} style={selectStyle}>
+              <select value={subtype} onChange={e => { setSubtype(e.target.value); setPage(1) }} aria-label="Subtype" style={selectStyle}>
                 {subtypeOptions.map(s => <option key={s.value || 'all'} value={s.value}>{taxLabel('subtypes', s.value, s.label)}</option>)}
               </select>
             </div>
@@ -461,7 +462,7 @@ export default function PropertiesPage() {
 
           <div style={selectBarStyle}>
             <Filter size={13} style={{ color: 'var(--txt3)' }} />
-            <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} style={selectStyle}>
+            <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} aria-label={t('filters.allStatuses')} style={selectStyle}>
               <option value="">{t('filters.allStatuses')}</option>
               <option value="available">{t('statuses.available')}</option>
               <option value="under_contract">{t('statuses.under_contract')}</option>
@@ -734,42 +735,42 @@ export default function PropertiesPage() {
 
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.propertyTitle')}</label>
-                <input value={addTitle} onChange={e => setAddTitle(e.target.value)} style={inputStyle} />
+                <input value={addTitle} onChange={e => setAddTitle(e.target.value)} aria-label={t('form.propertyTitle')} style={inputStyle} />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div>
                   <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.district')}</label>
-                  <select value={addDistrict} onChange={e => setAddDistrict(e.target.value)} style={inputStyle}>
+                  <select value={addDistrict} onChange={e => setAddDistrict(e.target.value)} aria-label={t('form.district')} style={inputStyle}>
                     <option value="">{t('form.selectDistrict')}</option>
                     {districts.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Town / Area</label>
-                  <input value={addTown} onChange={e => setAddTown(e.target.value)} placeholder="e.g. Kato Paphos" style={inputStyle} />
+                  <input value={addTown} onChange={e => setAddTown(e.target.value)} placeholder="e.g. Kato Paphos" aria-label="Town / Area" style={inputStyle} />
                 </div>
               </div>
 
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.address')}</label>
-                <input value={addAddress} onChange={e => setAddAddress(e.target.value)} style={inputStyle} />
+                <input value={addAddress} onChange={e => setAddAddress(e.target.value)} aria-label={t('form.address')} style={inputStyle} />
               </div>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>City</label>
-                <input value={addCity} onChange={e => setAddCity(e.target.value)} style={inputStyle} />
+                <input value={addCity} onChange={e => setAddCity(e.target.value)} aria-label="City" style={inputStyle} />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div>
                   <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Type</label>
-                  <select value={addType} onChange={e => setAddType(e.target.value)} style={inputStyle}>
+                  <select value={addType} onChange={e => setAddType(e.target.value)} aria-label="Type" style={inputStyle}>
                     {propertyTypes.map(pt => <option key={pt.value} value={pt.value}>{taxLabel('types', pt.value, pt.label)}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.subtype')}</label>
-                  <select value={addSubtype} onChange={e => setAddSubtype(e.target.value)} style={inputStyle}>
+                  <select value={addSubtype} onChange={e => setAddSubtype(e.target.value)} aria-label={t('form.subtype')} style={inputStyle}>
                     {addSubtypeOptions.map(s => <option key={s.value || 'all'} value={s.value}>{taxLabel('subtypes', s.value, s.label)}</option>)}
                   </select>
                 </div>
@@ -779,21 +780,21 @@ export default function PropertiesPage() {
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>
                   Price € {addListingType === 'rent' ? '(per month)' : ''}
                 </label>
-                <input type="number" value={addPrice} onChange={e => setAddPrice(e.target.value)} style={inputStyle} />
+                <input type="number" value={addPrice} onChange={e => setAddPrice(e.target.value)} aria-label="Price" style={inputStyle} />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
                 <div>
                   <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.bedrooms')}</label>
-                  <input type="number" value={addBedrooms} onChange={e => setAddBedrooms(e.target.value)} style={inputStyle} />
+                  <input type="number" value={addBedrooms} onChange={e => setAddBedrooms(e.target.value)} aria-label={t('form.bedrooms')} style={inputStyle} />
                 </div>
                 <div>
                   <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.bathrooms')}</label>
-                  <input type="number" value={addBathrooms} onChange={e => setAddBathrooms(e.target.value)} style={inputStyle} />
+                  <input type="number" value={addBathrooms} onChange={e => setAddBathrooms(e.target.value)} aria-label={t('form.bathrooms')} style={inputStyle} />
                 </div>
                 <div>
                   <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('form.sqm')}</label>
-                  <input type="number" value={addSqft} onChange={e => setAddSqft(e.target.value)} style={inputStyle} />
+                  <input type="number" value={addSqft} onChange={e => setAddSqft(e.target.value)} aria-label={t('form.sqm')} style={inputStyle} />
                 </div>
               </div>
 

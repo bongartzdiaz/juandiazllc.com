@@ -448,6 +448,7 @@ export default function WebhooksPage() {
             value={url}
             onChange={e => setUrl(e.target.value)}
             placeholder="https://example.com/webhook"
+            aria-label="URL"
             style={{
               width: '100%', padding: '9px 12px', borderRadius: 7,
               border: '1px solid var(--border)', background: 'var(--bg2)',

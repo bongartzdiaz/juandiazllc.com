@@ -195,6 +195,7 @@ export default function ApiKeysPage() {
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="Name (e.g. 'Zapier integration')"
+              aria-label="Key name"
               style={{
                 width: '100%', padding: '9px 12px', borderRadius: 7,
                 border: '1px solid var(--border)', background: 'var(--bg)',
@@ -230,6 +231,7 @@ export default function ApiKeysPage() {
                 value={expiresInDays}
                 onChange={e => setExpiresInDays(e.target.value)}
                 placeholder="Leave empty for no expiration"
+                aria-label="Expires in (days, optional)"
                 style={{
                   width: '100%', padding: '8px 12px', borderRadius: 7,
                   border: '1px solid var(--border)', background: 'var(--bg)',

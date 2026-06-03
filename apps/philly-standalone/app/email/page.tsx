@@ -384,6 +384,7 @@ export default function EmailPage() {
               <div>
                 <label style={labelStyle}>{t('addModal.provider')}</label>
                 <select
+                  aria-label={t('addModal.provider')}
                   value={addProvider}
                   onChange={e => setAddProvider(e.target.value as 'smtp' | 'gmail' | 'outlook')}
                   style={inputStyle}
@@ -396,6 +397,7 @@ export default function EmailPage() {
               <div>
                 <label style={labelStyle}>{t('addModal.emailLabel')}</label>
                 <input
+                  aria-label={t('addModal.emailLabel')}
                   type="email"
                   value={addEmail}
                   onChange={e => setAddEmail(e.target.value)}
@@ -406,6 +408,7 @@ export default function EmailPage() {
               <div>
                 <label style={labelStyle}>{t('addModal.displayName')}</label>
                 <input
+                  aria-label={t('addModal.displayName')}
                   value={addDisplayName}
                   onChange={e => setAddDisplayName(e.target.value)}
                   placeholder={t('addModal.displayNamePlaceholder')}
@@ -473,6 +476,7 @@ export default function EmailPage() {
               <div>
                 <label style={labelStyle}>{t('compose.to')}</label>
                 <input
+                  aria-label={t('compose.to')}
                   value={cmpTo}
                   onChange={e => setCmpTo(e.target.value)}
                   placeholder={t('compose.toPlaceholder')}
@@ -493,11 +497,11 @@ export default function EmailPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <div>
                     <label style={labelStyle}>{t('compose.cc')}</label>
-                    <input value={cmpCc} onChange={e => setCmpCc(e.target.value)} style={inputStyle} />
+                    <input aria-label={t('compose.cc')} value={cmpCc} onChange={e => setCmpCc(e.target.value)} style={inputStyle} />
                   </div>
                   <div>
                     <label style={labelStyle}>{t('compose.bcc')}</label>
-                    <input value={cmpBcc} onChange={e => setCmpBcc(e.target.value)} style={inputStyle} />
+                    <input aria-label={t('compose.bcc')} value={cmpBcc} onChange={e => setCmpBcc(e.target.value)} style={inputStyle} />
                   </div>
                 </div>
               )}
@@ -505,6 +509,7 @@ export default function EmailPage() {
               <div>
                 <label style={labelStyle}>{t('compose.subject')}</label>
                 <input
+                  aria-label={t('compose.subject')}
                   value={cmpSubject}
                   onChange={e => setCmpSubject(e.target.value)}
                   placeholder={t('compose.subjectPlaceholder')}
@@ -515,6 +520,7 @@ export default function EmailPage() {
               <div>
                 <label style={labelStyle}>{t('compose.message')}</label>
                 <textarea
+                  aria-label={t('compose.message')}
                   value={cmpBody}
                   onChange={e => setCmpBody(e.target.value)}
                   placeholder={t('compose.messagePlaceholder')}

@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useFormat } from '@/hooks/philly/useFormat'
 import { ListLoading, ListError } from '@/components/philly/ui/ListStates'
+import { keyboardClickable } from '@/lib/philly/a11y'
 
 interface Doc {
   id: string
@@ -355,7 +356,7 @@ export default function DocumentsPage() {
               return (
                 <div
                   key={d.id}
-                  onClick={() => setSelected(s => s.includes(d.id) ? s.filter(x => x !== d.id) : [...s, d.id])}
+                  {...keyboardClickable(() => setSelected(s => s.includes(d.id) ? s.filter(x => x !== d.id) : [...s, d.id]))}
                   style={{
                     background: 'var(--panel)',
                     border: `${isSelected ? 2 : 1}px solid ${isSelected ? 'var(--accent)' : 'var(--border)'}`,
@@ -435,14 +436,14 @@ export default function DocumentsPage() {
           {t('upload.separator')}
         </div>
         <FormField label={t('upload.name')} required>
-          <input value={upName} onChange={e => setUpName(e.target.value)} style={inputStyle} autoFocus />
+          <input aria-label={t('upload.name')} value={upName} onChange={e => setUpName(e.target.value)} style={inputStyle} autoFocus />
         </FormField>
         <FormField label={t('upload.fileUrl')} required>
-          <input value={upUrl} onChange={e => setUpUrl(e.target.value)} className="mono" style={{ ...inputStyle, fontSize: 11.5 }} placeholder="https://…" />
+          <input aria-label={t('upload.fileUrl')} value={upUrl} onChange={e => setUpUrl(e.target.value)} className="mono" style={{ ...inputStyle, fontSize: 11.5 }} placeholder="https://…" />
         </FormField>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <FormField label={t('upload.type')}>
-            <select value={upType} onChange={e => setUpType(e.target.value)} style={inputStyle}>
+            <select aria-label={t('upload.type')} value={upType} onChange={e => setUpType(e.target.value)} style={inputStyle}>
               <option value="file">{t('filterFields.file')}</option>
               <option value="image">{t('filterFields.image')}</option>
               <option value="pdf">{t('filterFields.pdf')}</option>
@@ -450,7 +451,7 @@ export default function DocumentsPage() {
             </select>
           </FormField>
           <FormField label={t('upload.linkTo')}>
-            <select value={upEntity} onChange={e => setUpEntity(e.target.value)} style={inputStyle}>
+            <select aria-label={t('upload.linkTo')} value={upEntity} onChange={e => setUpEntity(e.target.value)} style={inputStyle}>
               <option value="">{t('upload.none')}</option>
               <option value="project">{t('filterFields.project')}</option>
               <option value="contact">{t('filterFields.contact')}</option>
@@ -462,10 +463,10 @@ export default function DocumentsPage() {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <FormField label={t('upload.mimeType')}>
-            <input value={upMime} onChange={e => setUpMime(e.target.value)} className="mono" style={{ ...inputStyle, fontSize: 11.5 }} placeholder="application/pdf" />
+            <input aria-label={t('upload.mimeType')} value={upMime} onChange={e => setUpMime(e.target.value)} className="mono" style={{ ...inputStyle, fontSize: 11.5 }} placeholder="application/pdf" />
           </FormField>
           <FormField label={t('upload.sizeBytes')}>
-            <input type="number" value={upSize} onChange={e => setUpSize(Number(e.target.value))} style={inputStyle} />
+            <input aria-label={t('upload.sizeBytes')} type="number" value={upSize} onChange={e => setUpSize(Number(e.target.value))} style={inputStyle} />
           </FormField>
         </div>
         {upErr && <div style={{ color: 'var(--r-txt)', fontSize: 12, marginBottom: 8 }}>{upErr}</div>}

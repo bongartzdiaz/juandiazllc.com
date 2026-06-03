@@ -372,6 +372,7 @@ export default function DialerPage() {
             {/* Outcome filter */}
             <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
               <FilterSelect
+                ariaLabel={t('filters.allOutcomes')}
                 value={outcomeFilter}
                 onChange={v => { setOutcomeFilter(v); setCallPage(1) }}
                 options={[
@@ -616,7 +617,7 @@ export default function DialerPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.name')}</label>
-                <input value={addName} onChange={e => setAddName(e.target.value)} placeholder={t('placeholders.listName')} style={{
+                <input aria-label={t('fields.name')} value={addName} onChange={e => setAddName(e.target.value)} placeholder={t('placeholders.listName')} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
@@ -624,7 +625,7 @@ export default function DialerPage() {
               </div>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.assignedTo')}</label>
-                <input value={addAssigned} onChange={e => setAddAssigned(e.target.value)} placeholder={t('placeholders.agentName')} style={{
+                <input aria-label={t('fields.assignedTo')} value={addAssigned} onChange={e => setAddAssigned(e.target.value)} placeholder={t('placeholders.agentName')} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
@@ -730,6 +731,7 @@ export default function DialerPage() {
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.phoneNumber')}</label>
                 <input
+                  aria-label={t('fields.phoneNumber')}
                   value={callPhone}
                   onChange={e => setCallPhone(e.target.value)}
                   placeholder="+1 555 555 0123"
@@ -745,7 +747,7 @@ export default function DialerPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div>
                   <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.outcome')}</label>
-                  <select value={callOutcome} onChange={e => setCallOutcome(e.target.value)} style={{
+                  <select aria-label={t('fields.outcome')} value={callOutcome} onChange={e => setCallOutcome(e.target.value)} style={{
                     width: '100%', padding: '8px 12px', borderRadius: 8,
                     border: '1px solid var(--border)', background: 'var(--bg2)',
                     fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
@@ -756,6 +758,7 @@ export default function DialerPage() {
                 <div>
                   <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.durationSec')}</label>
                   <input
+                    aria-label={t('fields.durationSec')}
                     value={callDuration}
                     onChange={e => setCallDuration(e.target.value.replace(/[^0-9]/g, ''))}
                     inputMode="numeric"
@@ -771,6 +774,7 @@ export default function DialerPage() {
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.notes')}</label>
                 <textarea
+                  aria-label={t('fields.notes')}
                   value={callNotes}
                   onChange={e => setCallNotes(e.target.value)}
                   rows={3}
@@ -828,11 +832,11 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
   )
 }
 
-function FilterSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+function FilterSelect({ value, onChange, options, ariaLabel }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; ariaLabel?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
       <Filter size={13} style={{ color: 'var(--txt3)' }} />
-      <select value={value} onChange={e => onChange(e.target.value)} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+      <select aria-label={ariaLabel} value={value} onChange={e => onChange(e.target.value)} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>

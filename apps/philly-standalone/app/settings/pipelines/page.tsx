@@ -389,11 +389,13 @@ export default function PipelineAdminPage() {
                                 value={stageColor}
                                 onChange={e => setStageColor(e.target.value)}
                                 style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid var(--border)', cursor: 'pointer', padding: 2, background: 'var(--panel)' }}
+                                aria-label="Stage color"
                               />
                               <input
                                 autoFocus
                                 value={stageName}
                                 onChange={e => setStageName(e.target.value)}
+                                aria-label="Stage name"
                                 onKeyDown={e => { if (e.key === 'Enter') saveStage(); if (e.key === 'Escape') setEditingStageId(null) }}
                                 style={{
                                   flex: 1, padding: '6px 10px', borderRadius: 7,
@@ -452,6 +454,7 @@ export default function PipelineAdminPage() {
                         value={newStageColor}
                         onChange={e => setNewStageColor(e.target.value)}
                         style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid var(--border)', cursor: 'pointer', padding: 2, background: 'var(--panel)' }}
+                        aria-label="Stage color"
                       />
                       <input
                         autoFocus
@@ -459,6 +462,7 @@ export default function PipelineAdminPage() {
                         onChange={e => setNewStageName(e.target.value)}
                         onKeyDown={e => { if (e.key === 'Enter') addStage(); if (e.key === 'Escape') { setAddingStage(false); setNewStageName('') } }}
                         placeholder="Stage name (e.g. Negotiation)"
+                        aria-label="Stage name"
                         style={{
                           flex: 1, padding: '6px 10px', borderRadius: 7,
                           border: '1px solid var(--accent)', background: 'var(--panel)',
@@ -518,10 +522,10 @@ export default function PipelineAdminPage() {
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <FormField label="Pipeline Name">
-            <input value={pipelineName} onChange={e => setPipelineName(e.target.value)} placeholder="e.g. Sales, Buyer Nurture, Donor Cultivation" style={inputStyle} autoFocus />
+            <input value={pipelineName} onChange={e => setPipelineName(e.target.value)} placeholder="e.g. Sales, Buyer Nurture, Donor Cultivation" style={inputStyle} autoFocus aria-label="Pipeline Name" />
           </FormField>
           <FormField label="Industry">
-            <select value={pipelineIndustry} onChange={e => setPipelineIndustry(e.target.value)} style={inputStyle}>
+            <select value={pipelineIndustry} onChange={e => setPipelineIndustry(e.target.value)} style={inputStyle} aria-label="Industry">
               {Object.entries(INDUSTRY_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
             </select>
           </FormField>

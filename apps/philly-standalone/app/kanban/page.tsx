@@ -531,6 +531,7 @@ export default function KanbanPage() {
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('addCardModal.titleLabel')}</label>
                 <input
+                  aria-label={t('addCardModal.titleLabel')}
                   value={addTitle}
                   onChange={e => setAddTitle(e.target.value)}
                   required
@@ -546,6 +547,7 @@ export default function KanbanPage() {
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('addCardModal.descriptionLabel')}</label>
                 <textarea
+                  aria-label={t('addCardModal.descriptionLabel')}
                   value={addDesc}
                   onChange={e => setAddDesc(e.target.value)}
                   rows={3}
@@ -561,6 +563,7 @@ export default function KanbanPage() {
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('addCardModal.priorityLabel')}</label>
                 <select
+                  aria-label={t('addCardModal.priorityLabel')}
                   value={addPriority}
                   onChange={e => setAddPriority(e.target.value as 'low' | 'medium' | 'high')}
                   style={{
@@ -577,6 +580,7 @@ export default function KanbanPage() {
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('addCardModal.assigneeLabel')}</label>
                 <input
+                  aria-label={t('addCardModal.assigneeLabel')}
                   value={addAssignee}
                   onChange={e => setAddAssignee(e.target.value)}
                   placeholder={t('addCardModal.assigneePlaceholder')}
@@ -780,6 +784,7 @@ function CardDetailDrawer({
           <div style={{ marginBottom: 18 }}>
             <DrawerLabel>{t('drawer.moveToColumn')}</DrawerLabel>
             <select
+              aria-label={t('drawer.moveToColumn')}
               defaultValue={currentColumn?.id ?? ''}
               onChange={async (e) => {
                 const newColumnId = e.target.value

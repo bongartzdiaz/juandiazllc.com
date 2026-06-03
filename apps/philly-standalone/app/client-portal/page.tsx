@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { keyboardClickable } from '@/lib/philly/a11y'
 
 interface Permissions {
   viewListings?: boolean
@@ -223,7 +224,7 @@ export default function ClientPortalPage() {
             return (
               <div
                 key={client.id}
-                onClick={() => openDetail(client)}
+                {...keyboardClickable(() => openDetail(client))}
                 className="card-hover"
                 style={{
                   display: 'flex', alignItems: 'center', gap: 14,
@@ -422,7 +423,7 @@ export default function ClientPortalPage() {
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <FormField label="Contact">
-            <select value={addContactId} onChange={e => setAddContactId(e.target.value)} style={inputStyle}>
+            <select aria-label="Contact" value={addContactId} onChange={e => setAddContactId(e.target.value)} style={inputStyle}>
               <option value="">Select a contact…</option>
               {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
@@ -455,7 +456,7 @@ export default function ClientPortalPage() {
           </div>
 
           <FormField label="Expires (optional)">
-            <input type="date" value={addExpiresAt} onChange={e => setAddExpiresAt(e.target.value)} style={inputStyle} />
+            <input aria-label="Expires (optional)" type="date" value={addExpiresAt} onChange={e => setAddExpiresAt(e.target.value)} style={inputStyle} />
           </FormField>
 
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', borderTop: '1px solid var(--border)', paddingTop: 14 }}>

@@ -209,9 +209,9 @@ export default function DripCampaignsPage() {
 
         {/* Filters + Add */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
-          <FilterSelect value={typeFilter} onChange={setTypeFilter}
+          <FilterSelect ariaLabel={t('filters.allTypes')} value={typeFilter} onChange={setTypeFilter}
             options={[{ value: '', label: t('filters.allTypes') }, ...Object.keys(TYPE_LABELS).map((v) => ({ value: v, label: (() => { try { return t(`types.${v}` as any) } catch { return TYPE_LABELS[v] } })() }))]} />
-          <FilterSelect value={statusFilter} onChange={setStatusFilter}
+          <FilterSelect ariaLabel={t('filters.allStatuses')} value={statusFilter} onChange={setStatusFilter}
             options={[{ value: '', label: t('filters.allStatuses') }, { value: 'active', label: t('filters.active') }, { value: 'paused', label: t('filters.paused') }, { value: 'archived', label: t('filters.archived') }]} />
           <div style={{ flex: 1 }} />
           <button onClick={openCreate} style={{
@@ -333,15 +333,15 @@ export default function DripCampaignsPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 10 }}>
             <FormField label={t('form.campaignName')}>
-              <input value={formName} onChange={e => setFormName(e.target.value)} placeholder={t('form.campaignNamePlaceholder')} style={inputStyle} />
+              <input aria-label={t('form.campaignName')} value={formName} onChange={e => setFormName(e.target.value)} placeholder={t('form.campaignNamePlaceholder')} style={inputStyle} />
             </FormField>
             <FormField label={t('form.type')}>
-              <select value={formType} onChange={e => setFormType(e.target.value)} style={inputStyle}>
+              <select aria-label={t('form.type')} value={formType} onChange={e => setFormType(e.target.value)} style={inputStyle}>
                 {Object.keys(TYPE_LABELS).map((v) => <option key={v} value={v}>{(() => { try { return t(`types.${v}` as any) } catch { return TYPE_LABELS[v] } })()}</option>)}
               </select>
             </FormField>
             <FormField label={t('form.status')}>
-              <select value={formStatus} onChange={e => setFormStatus(e.target.value)} style={inputStyle}>
+              <select aria-label={t('form.status')} value={formStatus} onChange={e => setFormStatus(e.target.value)} style={inputStyle}>
                 <option value="active">{t('filters.active')}</option>
                 <option value="paused">{t('filters.paused')}</option>
                 <option value="archived">{t('filters.archived')}</option>
@@ -381,6 +381,7 @@ export default function DripCampaignsPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                         <span style={{ fontSize: 10, color: 'var(--txt3)' }}>{t('form.sendAfter')}</span>
                         <input
+                          aria-label={t('form.sendAfter')}
                           type="number"
                           min="0"
                           value={step.day}
@@ -429,6 +430,7 @@ export default function DripCampaignsPage() {
                     </div>
                     {step.channel === 'email' && (
                       <input
+                        aria-label={t('form.subjectPlaceholder')}
                         placeholder={t('form.subjectPlaceholder')}
                         value={step.subject ?? ''}
                         onChange={e => updateStep(i, { subject: e.target.value })}
@@ -436,6 +438,7 @@ export default function DripCampaignsPage() {
                       />
                     )}
                     <textarea
+                      aria-label={step.channel === 'email' ? t('form.emailBodyPlaceholder') : t('form.messagePlaceholder', { channel: step.channel.toUpperCase() })}
                       placeholder={step.channel === 'email' ? t('form.emailBodyPlaceholder') : t('form.messagePlaceholder', { channel: step.channel.toUpperCase() })}
                       value={step.body}
                       onChange={e => updateStep(i, { body: e.target.value })}
@@ -505,11 +508,11 @@ const miniBtn: React.CSSProperties = {
   display: 'flex', alignItems: 'center', justifyContent: 'center',
 }
 
-function FilterSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+function FilterSelect({ value, onChange, options, ariaLabel }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; ariaLabel?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
       <Filter size={13} style={{ color: 'var(--txt3)' }} />
-      <select value={value} onChange={e => onChange(e.target.value)} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+      <select aria-label={ariaLabel} value={value} onChange={e => onChange(e.target.value)} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>

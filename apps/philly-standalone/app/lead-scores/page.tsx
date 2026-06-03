@@ -117,7 +117,7 @@ export default function LeadScoresPage() {
         <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
             <Filter size={13} style={{ color: 'var(--txt3)' }} />
-            <select value={gradeFilter} onChange={e => { setGradeFilter(e.target.value); setPage(1) }} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+            <select aria-label={t('filters.all')} value={gradeFilter} onChange={e => { setGradeFilter(e.target.value); setPage(1) }} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
               <option value="">{t('filters.all')}</option>
               <option value="A">{t('filters.gradeA')}</option>
               <option value="B">{t('filters.gradeB')}</option>

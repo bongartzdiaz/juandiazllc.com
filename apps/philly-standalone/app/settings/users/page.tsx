@@ -368,6 +368,7 @@ function InviteModal({
             onChange={(e) => setEmail(e.target.value)}
             placeholder="new.user@company.com"
             style={input}
+            aria-label={t('invModal.email')}
           />
         </div>
         <div>
@@ -377,11 +378,12 @@ function InviteModal({
             onChange={(e) => setName(e.target.value)}
             placeholder="Jane Doe"
             style={input}
+            aria-label={t('invModal.nameOptional')}
           />
         </div>
         <div>
           <label style={label}>{t('invModal.role')}</label>
-          <select value={role} onChange={(e) => setRole(e.target.value as Role)} style={{ ...input, cursor: 'pointer' }}>
+          <select value={role} onChange={(e) => setRole(e.target.value as Role)} style={{ ...input, cursor: 'pointer' }} aria-label={t('invModal.role')}>
             {ROLES.map((r) => (
               <option key={r} value={r} style={{ textTransform: 'capitalize' }}>{r}</option>
             ))}
@@ -454,7 +456,7 @@ function EditModal({
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <div>
           <label style={label}>{t('invModal.role')}</label>
-          <select value={role} onChange={(e) => setRole(e.target.value as Role)} style={{ ...input, cursor: 'pointer' }}>
+          <select value={role} onChange={(e) => setRole(e.target.value as Role)} style={{ ...input, cursor: 'pointer' }} aria-label={t('invModal.role')}>
             {ROLES.map((r) => (
               <option key={r} value={r} style={{ textTransform: 'capitalize' }}>{r}</option>
             ))}

@@ -13,6 +13,7 @@ import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useFormat } from '@/hooks/philly/useFormat'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { keyboardClickable } from '@/lib/philly/a11y'
 
 interface Room {
   id: string
@@ -145,7 +146,7 @@ export default function RoomsPage() {
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
             <Filter size={13} style={{ color: 'var(--txt3)' }} />
-            <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+            <select aria-label={t('form.status')} value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
               <option value="">{t('filters.allStatuses')}</option>
               <option value="available">{t('statuses.available')}</option>
               <option value="occupied">{t('statuses.occupied')}</option>
@@ -175,7 +176,7 @@ export default function RoomsPage() {
           ) : rooms.map(room => {
             const sc = STATUS_COLORS[room.status] ?? { bg: 'var(--bg2)', txt: 'var(--txt2)' }
             return (
-              <div key={room.id} className="card-hover" onClick={() => setSelectedRoom(room)} style={{ padding: '14px 16px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--panel)', boxShadow: 'var(--shadow-sm)', cursor: 'pointer' }}>
+              <div key={room.id} className="card-hover" {...keyboardClickable(() => setSelectedRoom(room))} style={{ padding: '14px 16px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--panel)', boxShadow: 'var(--shadow-sm)', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--txt)' }}>{room.name}</div>
                   <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 9, fontWeight: 600, textTransform: 'uppercase', background: sc.bg, color: sc.txt }}>{t(`statuses.${room.status}` as 'statuses.available')}</span>
@@ -272,10 +273,10 @@ export default function RoomsPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
             <FormField label={t('form.name')}>
-              <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder={t('form.namePlaceholder')} style={inputStyle} />
+              <input aria-label={t('form.name')} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder={t('form.namePlaceholder')} style={inputStyle} />
             </FormField>
             <FormField label={t('form.type')}>
-              <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={inputStyle}>
+              <select aria-label={t('form.type')} value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={inputStyle}>
                 <option value="standard">{t('types.standard')}</option>
                 <option value="deluxe">{t('types.deluxe')}</option>
                 <option value="suite">{t('types.suite')}</option>
@@ -286,16 +287,16 @@ export default function RoomsPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 10 }}>
             <FormField label={t('form.floor')}>
-              <input type="number" min="0" value={form.floor} onChange={e => setForm({ ...form, floor: e.target.value })} style={inputStyle} />
+              <input aria-label={t('form.floor')} type="number" min="0" value={form.floor} onChange={e => setForm({ ...form, floor: e.target.value })} style={inputStyle} />
             </FormField>
             <FormField label={t('form.capacity')}>
-              <input type="number" min="1" value={form.capacity} onChange={e => setForm({ ...form, capacity: e.target.value })} style={inputStyle} />
+              <input aria-label={t('form.capacity')} type="number" min="1" value={form.capacity} onChange={e => setForm({ ...form, capacity: e.target.value })} style={inputStyle} />
             </FormField>
             <FormField label={t('form.price')}>
-              <input type="number" min="0" step="5" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} style={inputStyle} />
+              <input aria-label={t('form.price')} type="number" min="0" step="5" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} style={inputStyle} />
             </FormField>
             <FormField label={t('form.status')}>
-              <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} style={inputStyle}>
+              <select aria-label={t('form.status')} value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} style={inputStyle}>
                 <option value="available">{t('statuses.available')}</option>
                 <option value="occupied">{t('statuses.occupied')}</option>
                 <option value="maintenance">{t('statuses.maintenance')}</option>

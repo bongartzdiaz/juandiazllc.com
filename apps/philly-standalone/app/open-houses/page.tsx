@@ -206,6 +206,7 @@ export default function OpenHousesPage() {
             <select
               value={timeFilter}
               onChange={e => { setTimeFilter(e.target.value as TimeFilter); setPage(1) }}
+              aria-label="All Events"
               style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}
             >
               <option value="all">All Events</option>
@@ -368,6 +369,7 @@ export default function OpenHousesPage() {
             <select
               value={form.propertyId}
               onChange={e => setForm({ ...form, propertyId: e.target.value })}
+              aria-label="Property"
               style={inputStyle}
               disabled={!!editingId}
             >
@@ -384,6 +386,7 @@ export default function OpenHousesPage() {
                 type="date"
                 value={form.date}
                 onChange={e => setForm({ ...form, date: e.target.value })}
+                aria-label="Date"
                 style={inputStyle}
               />
             </FormField>
@@ -392,6 +395,7 @@ export default function OpenHousesPage() {
                 type="time"
                 value={form.startTime}
                 onChange={e => setForm({ ...form, startTime: e.target.value })}
+                aria-label="Start"
                 style={inputStyle}
               />
             </FormField>
@@ -400,6 +404,7 @@ export default function OpenHousesPage() {
                 type="time"
                 value={form.endTime}
                 onChange={e => setForm({ ...form, endTime: e.target.value })}
+                aria-label="End"
                 style={inputStyle}
               />
             </FormField>
@@ -411,6 +416,7 @@ export default function OpenHousesPage() {
               value={form.notes}
               onChange={e => setForm({ ...form, notes: e.target.value })}
               placeholder="Refreshments, parking info, special instructions…"
+              aria-label="Notes"
               style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
             />
           </FormField>

@@ -250,7 +250,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
             }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 {editField === 'title' ? (
-                  <InlineEdit value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} big />
+                  <InlineEdit value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} big ariaLabel="Title" />
                 ) : (
                   <h1
                     onClick={() => startEdit('title', property.title)}
@@ -269,6 +269,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 {editField === 'status' ? (
                   <select autoFocus value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveEdit}
+                    aria-label="Status"
                     style={{ ...inputStyle, width: 150 }}>
                     <option value="available">{tpr('statuses.available')}</option>
                     <option value="under_contract">{tpr('statuses.underContract')}</option>
@@ -290,6 +291,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 )}
                 {editField === 'type' ? (
                   <select autoFocus value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveEdit}
+                    aria-label="Type"
                     style={{ ...inputStyle, width: 140 }}>
                     <option value="residential">{tpr('types.residential')}</option>
                     <option value="commercial">{tpr('types.commercial')}</option>
@@ -350,7 +352,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                       {tpr('fields.price')}
                     </div>
                     {editField === 'priceCents' ? (
-                      <InlineEdit value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} type="number" />
+                      <InlineEdit value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} type="number" ariaLabel={tpr('fields.price')} />
                     ) : (
                       <div
                         onClick={() => startEdit('priceCents', (property.priceCents / 100).toString())}
@@ -522,6 +524,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                   <>
                     <textarea
                       autoFocus rows={5} value={editValue} onChange={e => setEditValue(e.target.value)}
+                      aria-label={tpr('sections.description')}
                       style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.6 }}
                     />
                     <div style={{ display: 'flex', gap: 8, marginTop: 10, justifyContent: 'flex-end' }}>
@@ -583,8 +586,8 @@ function outlineBtn(color: string, border: string): React.CSSProperties {
   }
 }
 
-function InlineEdit({ value, onChange, onSave, onCancel, type, big }: {
-  value: string; onChange: (v: string) => void; onSave: () => void; onCancel: () => void; type?: string; big?: boolean;
+function InlineEdit({ value, onChange, onSave, onCancel, type, big, ariaLabel }: {
+  value: string; onChange: (v: string) => void; onSave: () => void; onCancel: () => void; type?: string; big?: boolean; ariaLabel?: string;
 }) {
   return (
     <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -592,6 +595,7 @@ function InlineEdit({ value, onChange, onSave, onCancel, type, big }: {
         autoFocus
         type={type ?? 'text'}
         value={value}
+        aria-label={ariaLabel}
         onChange={e => onChange(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter') onSave(); if (e.key === 'Escape') onCancel() }}
         style={{
@@ -631,7 +635,7 @@ function EditableField({
         {label}
       </div>
       {editField === field ? (
-        <InlineEdit value={editValue} onChange={setEditValue} onSave={onSave} onCancel={onCancel} type={type} />
+        <InlineEdit value={editValue} onChange={setEditValue} onSave={onSave} onCancel={onCancel} type={type} ariaLabel={label} />
       ) : (
         <div
           onClick={() => startEdit(field, value)}

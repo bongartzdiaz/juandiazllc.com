@@ -234,6 +234,7 @@ export default function ScimGroupsPage() {
                         border: '1px solid var(--border)', background: 'var(--bg2)',
                         fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
                       }}
+                      aria-label={t('role')}
                     >
                       <option value="">{t('roleNone')}</option>
                       {ROLES.map((r) => (

@@ -197,7 +197,7 @@ export default function GrantsPage() {
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
             <Filter size={13} style={{ color: 'var(--txt3)' }} />
-            <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+            <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} aria-label={t('filters.all')} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
               <option value="">{t('filters.all')}</option>
               {Object.keys(STATUS_COLORS).map(s => <option key={s} value={s}>{t(`filters.${s}` as 'filters.applied')}</option>)}
             </select>
@@ -356,44 +356,46 @@ export default function GrantsPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
             <FormField label={t('fields.title')}>
-              <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder={t('placeholders.title')} style={inputStyle} />
+              <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder={t('placeholders.title')} aria-label={t('fields.title')} style={inputStyle} />
             </FormField>
             <FormField label={t('fields.amount')}>
-              <input type="number" min="0" step="1000" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} placeholder={t('placeholders.amount')} style={inputStyle} />
+              <input type="number" min="0" step="1000" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} placeholder={t('placeholders.amount')} aria-label={t('fields.amount')} style={inputStyle} />
             </FormField>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
             <FormField label={t('fields.funder')}>
-              <input value={form.funder} onChange={e => setForm({ ...form, funder: e.target.value })} placeholder={t('placeholders.funder')} style={inputStyle} />
+              <input value={form.funder} onChange={e => setForm({ ...form, funder: e.target.value })} placeholder={t('placeholders.funder')} aria-label={t('fields.funder')} style={inputStyle} />
             </FormField>
             <FormField label={t('fields.status')}>
-              <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} style={inputStyle}>
+              <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} aria-label={t('fields.status')} style={inputStyle}>
                 {Object.keys(STATUS_COLORS).map(s => <option key={s} value={s}>{(() => { try { return t(`filters.${s}` as any) } catch { return s.replace('_', ' ') } })()}</option>)}
               </select>
             </FormField>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <FormField label={t('fields.appliedDate')}>
-              <input type="date" value={form.appliedDate} onChange={e => setForm({ ...form, appliedDate: e.target.value })} style={inputStyle} />
+              <input type="date" value={form.appliedDate} onChange={e => setForm({ ...form, appliedDate: e.target.value })} aria-label={t('fields.appliedDate')} style={inputStyle} />
             </FormField>
             <FormField label={t('fields.awardedDate')}>
-              <input type="date" value={form.awardedDate} onChange={e => setForm({ ...form, awardedDate: e.target.value })} style={inputStyle} />
+              <input type="date" value={form.awardedDate} onChange={e => setForm({ ...form, awardedDate: e.target.value })} aria-label={t('fields.awardedDate')} style={inputStyle} />
             </FormField>
             <FormField label={t('fields.startDate')}>
-              <input type="date" value={form.startDate} onChange={e => setForm({ ...form, startDate: e.target.value })} style={inputStyle} />
+              <input type="date" value={form.startDate} onChange={e => setForm({ ...form, startDate: e.target.value })} aria-label={t('fields.startDate')} style={inputStyle} />
             </FormField>
             <FormField label={t('fields.endDate')}>
-              <input type="date" value={form.endDate} onChange={e => setForm({ ...form, endDate: e.target.value })} style={inputStyle} />
+              <input type="date" value={form.endDate} onChange={e => setForm({ ...form, endDate: e.target.value })} aria-label={t('fields.endDate')} style={inputStyle} />
             </FormField>
           </div>
           <FormField label={t('fields.description')}>
             <textarea rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
               placeholder={t('placeholders.description')}
+              aria-label={t('fields.description')}
               style={{ ...inputStyle, resize: 'vertical' }} />
           </FormField>
           <FormField label={t('fields.requirements')}>
             <textarea rows={2} value={form.requirements} onChange={e => setForm({ ...form, requirements: e.target.value })}
               placeholder={t('placeholders.requirements')}
+              aria-label={t('fields.requirements')}
               style={{ ...inputStyle, resize: 'vertical' }} />
           </FormField>
 

@@ -406,19 +406,19 @@ export default function AutomationsPage() {
         size="lg"
       >
         <FormField label={t('editor.ruleName')} required>
-          <input value={fName} onChange={e => setFName(e.target.value)} placeholder={t('editor.ruleNamePlaceholder')} style={inputStyle} />
+          <input value={fName} onChange={e => setFName(e.target.value)} placeholder={t('editor.ruleNamePlaceholder')} style={inputStyle} aria-label={t('editor.ruleName')} />
         </FormField>
 
         {/* WHEN */}
         <SectionLabel text={t('editor.whenTrigger')} />
         <FormField label={t('editor.triggerType')}>
-          <select value={fTrigger} onChange={e => { setFTrigger(e.target.value); setFTrigCfg({}) }} style={{ ...inputStyle, cursor: 'pointer' }}>
+          <select value={fTrigger} onChange={e => { setFTrigger(e.target.value); setFTrigCfg({}) }} style={{ ...inputStyle, cursor: 'pointer' }} aria-label={t('editor.triggerType')}>
             {TRIGGERS.map(tr => <option key={tr.v} value={tr.v}>{(() => { try { return t(`triggers.${tr.v}` as any) } catch { return tr.label } })()}</option>)}
           </select>
         </FormField>
         {(fTrigger === 'onEntityCreate' || fTrigger === 'onEntityDelete') && (
           <FormField label={t('editor.entity')}>
-            <select value={fTrigCfg.entity ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, entity: e.target.value || undefined })} style={{ ...inputStyle, cursor: 'pointer' }}>
+            <select value={fTrigCfg.entity ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, entity: e.target.value || undefined })} style={{ ...inputStyle, cursor: 'pointer' }} aria-label={t('editor.entity')}>
               <option value="">{t('editor.anyEntity')}</option>
               {ENTITIES.map(en => <option key={en} value={en}>{en}</option>)}
             </select>
@@ -427,32 +427,32 @@ export default function AutomationsPage() {
         {fTrigger === 'onFieldChange' && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <FormField label={t('editor.entity')}>
-              <select value={fTrigCfg.entity ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, entity: e.target.value || undefined })} style={{ ...inputStyle, cursor: 'pointer' }}>
+              <select value={fTrigCfg.entity ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, entity: e.target.value || undefined })} style={{ ...inputStyle, cursor: 'pointer' }} aria-label={t('editor.entity')}>
                 <option value="">{t('editor.any')}</option>
                 {ENTITIES.map(en => <option key={en} value={en}>{en}</option>)}
               </select>
             </FormField>
             <FormField label={t('editor.fieldName')}>
-              <input value={fTrigCfg.field ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, field: e.target.value || undefined })} placeholder="status" style={monoStyle} />
+              <input value={fTrigCfg.field ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, field: e.target.value || undefined })} placeholder="status" style={monoStyle} aria-label={t('editor.fieldName')} />
             </FormField>
             <FormField label={t('editor.fromOptional')}>
-              <input value={fTrigCfg.from ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, from: e.target.value || undefined })} placeholder="new" style={monoStyle} />
+              <input value={fTrigCfg.from ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, from: e.target.value || undefined })} placeholder="new" style={monoStyle} aria-label={t('editor.fromOptional')} />
             </FormField>
             <FormField label={t('editor.toOptional')}>
-              <input value={fTrigCfg.to ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, to: e.target.value || undefined })} placeholder="won" style={monoStyle} />
+              <input value={fTrigCfg.to ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, to: e.target.value || undefined })} placeholder="won" style={monoStyle} aria-label={t('editor.toOptional')} />
             </FormField>
           </div>
         )}
         {fTrigger === 'onSchedule' && (
           <FormField label={t('editor.cron')}>
-            <input value={fTrigCfg.cron ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, cron: e.target.value || undefined })} placeholder="0 9 * * 1" style={monoStyle} />
+            <input value={fTrigCfg.cron ?? ''} onChange={e => setFTrigCfg({ ...fTrigCfg, cron: e.target.value || undefined })} placeholder="0 9 * * 1" style={monoStyle} aria-label={t('editor.cron')} />
           </FormField>
         )}
 
         {/* THEN */}
         <SectionLabel text={t('editor.thenAction')} />
         <FormField label={t('editor.actionType')}>
-          <select value={fAction} onChange={e => { setFAction(e.target.value); setFActCfg({}) }} style={{ ...inputStyle, cursor: 'pointer' }}>
+          <select value={fAction} onChange={e => { setFAction(e.target.value); setFActCfg({}) }} style={{ ...inputStyle, cursor: 'pointer' }} aria-label={t('editor.actionType')}>
             {ACTIONS.map(a => <option key={a.v} value={a.v}>{(() => { try { return t(`actions.${a.v}` as any) } catch { return a.label } })()}</option>)}
           </select>
         </FormField>
@@ -461,17 +461,17 @@ export default function AutomationsPage() {
           <>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <FormField label={t('editor.accountId')} required>
-                <input value={fActCfg.accountId ?? ''} onChange={e => setFActCfg({ ...fActCfg, accountId: e.target.value })} placeholder="email account id" style={monoStyle} />
+                <input value={fActCfg.accountId ?? ''} onChange={e => setFActCfg({ ...fActCfg, accountId: e.target.value })} placeholder="email account id" style={monoStyle} aria-label={t('editor.accountId')} />
               </FormField>
               <FormField label={t('editor.to')} required>
-                <input value={fActCfg.to ?? ''} onChange={e => setFActCfg({ ...fActCfg, to: e.target.value })} placeholder="{{email}}" style={monoStyle} />
+                <input value={fActCfg.to ?? ''} onChange={e => setFActCfg({ ...fActCfg, to: e.target.value })} placeholder="{{email}}" style={monoStyle} aria-label={t('editor.to')} />
               </FormField>
             </div>
             <FormField label={t('editor.subject')}>
-              <input value={fActCfg.subject ?? ''} onChange={e => setFActCfg({ ...fActCfg, subject: e.target.value })} placeholder="Hi {{first_name}}" style={monoStyle} />
+              <input value={fActCfg.subject ?? ''} onChange={e => setFActCfg({ ...fActCfg, subject: e.target.value })} placeholder="Hi {{first_name}}" style={monoStyle} aria-label={t('editor.subject')} />
             </FormField>
             <FormField label={t('editor.bodyMerge')}>
-              <textarea value={fActCfg.body ?? ''} onChange={e => setFActCfg({ ...fActCfg, body: e.target.value })} rows={6} placeholder="Hi {{first_name}}, ..." style={{ ...monoStyle, resize: 'vertical' }} />
+              <textarea value={fActCfg.body ?? ''} onChange={e => setFActCfg({ ...fActCfg, body: e.target.value })} rows={6} placeholder="Hi {{first_name}}, ..." style={{ ...monoStyle, resize: 'vertical' }} aria-label={t('editor.bodyMerge')} />
             </FormField>
             <MergeHint />
           </>
@@ -481,17 +481,17 @@ export default function AutomationsPage() {
           <>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 180px', gap: 12 }}>
               <FormField label={t('editor.phoneNumber')} required>
-                <input value={fActCfg.toNumber ?? ''} onChange={e => setFActCfg({ ...fActCfg, toNumber: e.target.value })} placeholder="{{phone}}" style={monoStyle} />
+                <input value={fActCfg.toNumber ?? ''} onChange={e => setFActCfg({ ...fActCfg, toNumber: e.target.value })} placeholder="{{phone}}" style={monoStyle} aria-label={t('editor.phoneNumber')} />
               </FormField>
               <FormField label={t('editor.channel')}>
-                <select value={fActCfg.channel ?? 'sms'} onChange={e => setFActCfg({ ...fActCfg, channel: e.target.value as 'sms' | 'whatsapp' })} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <select value={fActCfg.channel ?? 'sms'} onChange={e => setFActCfg({ ...fActCfg, channel: e.target.value as 'sms' | 'whatsapp' })} style={{ ...inputStyle, cursor: 'pointer' }} aria-label={t('editor.channel')}>
                   <option value="sms">SMS</option>
                   <option value="whatsapp">WhatsApp</option>
                 </select>
               </FormField>
             </div>
             <FormField label={t('editor.body')}>
-              <textarea value={fActCfg.body ?? ''} onChange={e => setFActCfg({ ...fActCfg, body: e.target.value })} rows={4} placeholder="Hi {{first_name}}, ..." style={{ ...monoStyle, resize: 'vertical' }} />
+              <textarea value={fActCfg.body ?? ''} onChange={e => setFActCfg({ ...fActCfg, body: e.target.value })} rows={4} placeholder="Hi {{first_name}}, ..." style={{ ...monoStyle, resize: 'vertical' }} aria-label={t('editor.body')} />
             </FormField>
             <MergeHint />
           </>
@@ -500,13 +500,13 @@ export default function AutomationsPage() {
         {fAction === 'createNotification' && (
           <>
             <FormField label={t('editor.titleField')} required>
-              <input value={fActCfg.title ?? ''} onChange={e => setFActCfg({ ...fActCfg, title: e.target.value })} placeholder={t('editor.titlePlaceholder')} style={inputStyle} />
+              <input value={fActCfg.title ?? ''} onChange={e => setFActCfg({ ...fActCfg, title: e.target.value })} placeholder={t('editor.titlePlaceholder')} style={inputStyle} aria-label={t('editor.titleField')} />
             </FormField>
             <FormField label={t('editor.body')}>
-              <textarea value={fActCfg.body ?? ''} onChange={e => setFActCfg({ ...fActCfg, body: e.target.value })} rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
+              <textarea value={fActCfg.body ?? ''} onChange={e => setFActCfg({ ...fActCfg, body: e.target.value })} rows={3} style={{ ...inputStyle, resize: 'vertical' }} aria-label={t('editor.body')} />
             </FormField>
             <FormField label={t('editor.linkOptional')}>
-              <input value={fActCfg.link ?? ''} onChange={e => setFActCfg({ ...fActCfg, link: e.target.value })} placeholder="/contacts/{{__entityId}}" style={monoStyle} />
+              <input value={fActCfg.link ?? ''} onChange={e => setFActCfg({ ...fActCfg, link: e.target.value })} placeholder="/contacts/{{__entityId}}" style={monoStyle} aria-label={t('editor.linkOptional')} />
             </FormField>
           </>
         )}
@@ -514,24 +514,24 @@ export default function AutomationsPage() {
         {fAction === 'updateField' && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <FormField label={t('editor.field')} required>
-              <input value={fActCfg.field ?? ''} onChange={e => setFActCfg({ ...fActCfg, field: e.target.value })} placeholder="status" style={monoStyle} />
+              <input value={fActCfg.field ?? ''} onChange={e => setFActCfg({ ...fActCfg, field: e.target.value })} placeholder="status" style={monoStyle} aria-label={t('editor.field')} />
             </FormField>
             <FormField label={t('editor.value')} required>
-              <input value={String(fActCfg.value ?? '')} onChange={e => setFActCfg({ ...fActCfg, value: e.target.value })} placeholder="qualified" style={monoStyle} />
+              <input value={String(fActCfg.value ?? '')} onChange={e => setFActCfg({ ...fActCfg, value: e.target.value })} placeholder="qualified" style={monoStyle} aria-label={t('editor.value')} />
             </FormField>
           </div>
         )}
 
         {fAction === 'moveStage' && (
           <FormField label={t('editor.stageId')} required>
-            <input value={fActCfg.stageId ?? ''} onChange={e => setFActCfg({ ...fActCfg, stageId: e.target.value })} placeholder="stage_xyz" style={monoStyle} />
+            <input value={fActCfg.stageId ?? ''} onChange={e => setFActCfg({ ...fActCfg, stageId: e.target.value })} placeholder="stage_xyz" style={monoStyle} aria-label={t('editor.stageId')} />
           </FormField>
         )}
 
         {fAction === 'callWebhook' && (
           <>
             <FormField label={t('editor.url')} required>
-              <input value={fActCfg.url ?? ''} onChange={e => setFActCfg({ ...fActCfg, url: e.target.value })} placeholder="https://hooks.example.com/abc" style={monoStyle} />
+              <input value={fActCfg.url ?? ''} onChange={e => setFActCfg({ ...fActCfg, url: e.target.value })} placeholder="https://hooks.example.com/abc" style={monoStyle} aria-label={t('editor.url')} />
             </FormField>
             <FormField label={t('editor.payload')}>
               <textarea
@@ -540,6 +540,7 @@ export default function AutomationsPage() {
                 rows={6}
                 placeholder='{"event": "contact.created"}'
                 style={{ ...monoStyle, resize: 'vertical' }}
+                aria-label={t('editor.payload')}
               />
             </FormField>
           </>

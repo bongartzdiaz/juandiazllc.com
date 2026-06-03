@@ -432,6 +432,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                 <input
                   value={editTitle} onChange={e => setEditTitle(e.target.value)}
                   placeholder={t('fields.title')}
+                  aria-label={t('fields.title')}
                   style={{
                     padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)',
                     background: 'var(--bg2)', fontSize: 16, fontWeight: 700,
@@ -440,6 +441,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                 <textarea
                   value={editDescription} onChange={e => setEditDescription(e.target.value)}
                   placeholder={t('fields.description')}
+                  aria-label={t('fields.description')}
                   rows={2}
                   style={{
                     padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)',
@@ -451,6 +453,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                   <input
                     value={editCategory} onChange={e => setEditCategory(e.target.value)}
                     placeholder={t('fields.category')}
+                    aria-label={t('fields.category')}
                     style={{
                       padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border)',
                       background: 'var(--bg2)', fontSize: 12,
@@ -459,6 +462,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                   <select
                     value={editStatus}
                     onChange={e => setEditStatus(e.target.value as Project['status'])}
+                    aria-label={t('fields.status')}
                     style={{
                       padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border)',
                       background: 'var(--bg2)', fontSize: 12, fontFamily: 'inherit',
@@ -473,6 +477,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                     type="number" min={0} step={100}
                     value={editBudget} onChange={e => setEditBudget(e.target.value)}
                     placeholder={tp('budgetPlaceholder')}
+                    aria-label={t('fields.budget')}
                     style={{
                       padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border)',
                       background: 'var(--bg2)', fontSize: 12,
@@ -483,6 +488,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                   <input
                     type="date"
                     value={editStart} onChange={e => setEditStart(e.target.value)}
+                    aria-label={t('fields.startDate')}
                     style={{
                       padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border)',
                       background: 'var(--bg2)', fontSize: 12, fontFamily: 'inherit',
@@ -491,6 +497,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                   <input
                     type="date"
                     value={editEnd} onChange={e => setEditEnd(e.target.value)}
+                    aria-label={t('fields.endDate')}
                     style={{
                       padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border)',
                       background: 'var(--bg2)', fontSize: 12, fontFamily: 'inherit',
@@ -755,6 +762,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                   value={newMsTitle}
                   onChange={e => setNewMsTitle(e.target.value)}
                   placeholder={tp('milestones.titlePlaceholder')}
+                  aria-label={tp('milestones.titlePlaceholder')}
                   style={{
                     padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)',
                     background: 'var(--bg2)', fontSize: 13, fontFamily: 'inherit',
@@ -764,6 +772,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                   type="date"
                   value={newMsDate}
                   onChange={e => setNewMsDate(e.target.value)}
+                  aria-label="Milestone date"
                   style={{
                     padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)',
                     background: 'var(--bg2)', fontSize: 13, fontFamily: 'inherit',
@@ -877,6 +886,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                 <select
                   value={newMetricType}
                   onChange={e => setNewMetricType(e.target.value)}
+                  aria-label="Impact type"
                   style={{
                     padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)',
                     background: 'var(--bg2)', fontSize: 13, fontFamily: 'inherit',
@@ -891,6 +901,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                   value={newMetricValue}
                   onChange={e => setNewMetricValue(e.target.value)}
                   placeholder={tp('impact.valuePlaceholder')}
+                  aria-label={tp('impact.valuePlaceholder')}
                   style={{
                     padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)',
                     background: 'var(--bg2)', fontSize: 13, fontFamily: 'inherit',
@@ -900,6 +911,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                   value={newMetricNotes}
                   onChange={e => setNewMetricNotes(e.target.value)}
                   placeholder={tp('impact.notesPlaceholder')}
+                  aria-label={tp('impact.notesPlaceholder')}
                   style={{
                     padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)',
                     background: 'var(--bg2)', fontSize: 13, fontFamily: 'inherit',

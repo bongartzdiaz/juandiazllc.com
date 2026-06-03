@@ -231,15 +231,15 @@ export default function ScoringRulesPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.name')}</label>
-                <input value={addName} onChange={e => setAddName(e.target.value)} placeholder={t('modal.namePlaceholder')} style={inputStyle} />
+                <input value={addName} onChange={e => setAddName(e.target.value)} placeholder={t('modal.namePlaceholder')} style={inputStyle} aria-label={t('modal.name')} />
               </div>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.event')}</label>
-                <input value={addEvent} onChange={e => setAddEvent(e.target.value)} placeholder={t('modal.eventPlaceholder')} style={inputStyle} />
+                <input value={addEvent} onChange={e => setAddEvent(e.target.value)} placeholder={t('modal.eventPlaceholder')} style={inputStyle} aria-label={t('modal.event')} />
               </div>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.points')}</label>
-                <input type="number" value={addPoints} onChange={e => setAddPoints(e.target.value)} placeholder="10" style={inputStyle} />
+                <input type="number" value={addPoints} onChange={e => setAddPoints(e.target.value)} placeholder="10" style={inputStyle} aria-label={t('modal.points')} />
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <input type="checkbox" id="decay-check" checked={addDecay} onChange={e => setAddDecay(e.target.checked)} style={{ width: 16, height: 16, accentColor: 'var(--accent)', cursor: 'pointer' }} />
@@ -248,7 +248,7 @@ export default function ScoringRulesPage() {
               {addDecay && (
                 <div>
                   <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('modal.decayDays')}</label>
-                  <input type="number" value={addDecayDays} onChange={e => setAddDecayDays(e.target.value)} placeholder="30" style={inputStyle} />
+                  <input type="number" value={addDecayDays} onChange={e => setAddDecayDays(e.target.value)} placeholder="30" style={inputStyle} aria-label={t('modal.decayDays')} />
                 </div>
               )}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

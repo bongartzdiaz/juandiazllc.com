@@ -14,6 +14,7 @@ import { Filter, Plus, BedDouble, User as UserIcon, Calendar as CalIcon, DollarS
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { keyboardClickable } from '@/lib/philly/a11y'
 
 interface Reservation {
   id: string
@@ -183,7 +184,7 @@ export default function ReservationsPage() {
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
             <Filter size={13} style={{ color: 'var(--txt3)' }} />
-            <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+            <select aria-label="Status" value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
               <option value="">{t('filters.all')}</option>
               {Object.keys(STATUS_COLORS).map(s => (
                 <option key={s} value={s}>{t(`filters.${s}` as 'filters.confirmed')}</option>
@@ -210,7 +211,7 @@ export default function ReservationsPage() {
             const sc = STATUS_COLORS[r.status] ?? { bg: 'var(--bg2)', txt: 'var(--txt2)' }
             const nights = nightsBetween(r.checkIn, r.checkOut)
             return (
-              <div key={r.id} onClick={() => setSelected(r)} className="card-hover" style={{
+              <div key={r.id} {...keyboardClickable(() => setSelected(r))} className="card-hover" style={{
                 display: 'grid', gridTemplateColumns: resGridTemplate, gap: 12,
                 padding: '10px 16px',
                 borderBottom: idx < reservations.length - 1 ? '1px solid var(--border)' : 'none',
@@ -281,35 +282,35 @@ export default function ReservationsPage() {
       <Modal open={showAdd} onClose={() => { setShowAdd(false); resetForm() }} title={t('newReservation')} subtitle={t('subtitle')} size="md">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <FormField label={t('fields.room')}>
-            <select value={form.roomId} onChange={e => setForm({ ...form, roomId: e.target.value })} style={inputStyle}>
+            <select aria-label={t('fields.room')} value={form.roomId} onChange={e => setForm({ ...form, roomId: e.target.value })} style={inputStyle}>
               <option value="">{t('filters.allRooms')}</option>
               {rooms.map(r => <option key={r.id} value={r.id}>{r.name} ({r.type})</option>)}
             </select>
           </FormField>
           <FormField label={t('fields.guest')}>
-            <input value={form.guestName} onChange={e => setForm({ ...form, guestName: e.target.value })} placeholder="Jane Doe" style={inputStyle} />
+            <input aria-label={t('fields.guest')} value={form.guestName} onChange={e => setForm({ ...form, guestName: e.target.value })} placeholder="Jane Doe" style={inputStyle} />
           </FormField>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <FormField label={t('fields.email')}>
-              <input type="email" value={form.guestEmail} onChange={e => setForm({ ...form, guestEmail: e.target.value })} placeholder="guest@example.com" style={inputStyle} />
+              <input aria-label={t('fields.email')} type="email" value={form.guestEmail} onChange={e => setForm({ ...form, guestEmail: e.target.value })} placeholder="guest@example.com" style={inputStyle} />
             </FormField>
             <FormField label={t('fields.phone')}>
-              <input value={form.guestPhone} onChange={e => setForm({ ...form, guestPhone: e.target.value })} placeholder="+1 555 555 0100" style={inputStyle} />
+              <input aria-label={t('fields.phone')} value={form.guestPhone} onChange={e => setForm({ ...form, guestPhone: e.target.value })} placeholder="+1 555 555 0100" style={inputStyle} />
             </FormField>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <FormField label={t('fields.checkIn')}>
-              <input type="date" value={form.checkIn} onChange={e => setForm({ ...form, checkIn: e.target.value })} style={inputStyle} />
+              <input aria-label={t('fields.checkIn')} type="date" value={form.checkIn} onChange={e => setForm({ ...form, checkIn: e.target.value })} style={inputStyle} />
             </FormField>
             <FormField label={t('fields.checkOut')}>
-              <input type="date" value={form.checkOut} onChange={e => setForm({ ...form, checkOut: e.target.value })} style={inputStyle} />
+              <input aria-label={t('fields.checkOut')} type="date" value={form.checkOut} onChange={e => setForm({ ...form, checkOut: e.target.value })} style={inputStyle} />
             </FormField>
           </div>
           <FormField label={t('fields.total')}>
-            <input type="number" min="0" step="10" value={form.total} onChange={e => setForm({ ...form, total: e.target.value })} placeholder="450" style={inputStyle} />
+            <input aria-label={t('fields.total')} type="number" min="0" step="10" value={form.total} onChange={e => setForm({ ...form, total: e.target.value })} placeholder="450" style={inputStyle} />
           </FormField>
           <FormField label={t('fields.notes')}>
-            <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
+            <textarea aria-label={t('fields.notes')} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
           </FormField>
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', borderTop: '1px solid var(--border)', paddingTop: 14 }}>
             <button onClick={() => { setShowAdd(false); resetForm() }} disabled={saving} style={{

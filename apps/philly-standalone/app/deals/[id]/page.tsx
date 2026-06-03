@@ -250,6 +250,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                       value={editValue}
                       onChange={e => setEditValue(e.target.value)}
                       onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit() }}
+                      aria-label="Title"
                       style={{
                         flex: 1, fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em',
                         padding: '4px 10px', borderRadius: 8,
@@ -292,6 +293,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                     value={deal.stage.id}
                     onChange={e => changeStage(e.target.value)}
                     disabled={saving}
+                    aria-label="Stage"
                     style={{
                       padding: '4px 12px', borderRadius: 8,
                       fontSize: 11, fontWeight: 700, cursor: 'pointer',
@@ -361,6 +363,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                           value={editValue}
                           type="number"
                           step="0.01"
+                          ariaLabel={t('value')}
                           onChange={setEditValue}
                           onSave={saveEdit}
                           onCancel={cancelEdit}
@@ -387,6 +390,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                           value={editValue}
                           type="number"
                           min="0" max="100"
+                          ariaLabel={t('probability')}
                           onChange={setEditValue}
                           onSave={saveEdit}
                           onCancel={cancelEdit}
@@ -412,6 +416,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                         <EditField
                           value={editValue}
                           type="date"
+                          ariaLabel={td('fields.expectedClose')}
                           onChange={setEditValue}
                           onSave={saveEdit}
                           onCancel={cancelEdit}
@@ -436,6 +441,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                           onChange={e => setEditValue(e.target.value)}
                           onBlur={saveEdit}
                           onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit() }}
+                          aria-label={td('fields.dealType')}
                           style={{
                             fontSize: 11, fontWeight: 600, padding: '2px 8px',
                             borderRadius: 6, border: '1px solid var(--accent)',
@@ -542,7 +548,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                     <div>
                       <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>{td('fields.rate')}</div>
                       {editField === 'commissionPct' ? (
-                        <EditField value={editValue} type="number" step="0.1" min="0" max="100" onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} />
+                        <EditField value={editValue} type="number" step="0.1" min="0" max="100" ariaLabel={td('fields.rate')} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} />
                       ) : (
                         <div
                           onClick={() => startEdit('commissionPct', deal.commissionPct)}
@@ -562,7 +568,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                     <div>
                       <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>{td('fields.brokerSplit')}</div>
                       {editField === 'brokerSplitPct' ? (
-                        <EditField value={editValue} type="number" step="0.1" min="0" max="100" onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} />
+                        <EditField value={editValue} type="number" step="0.1" min="0" max="100" ariaLabel={td('fields.brokerSplit')} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} />
                       ) : (
                         <div
                           onClick={() => startEdit('brokerSplitPct', deal.brokerSplitPct)}
@@ -607,6 +613,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                         onChange={e => setEditValue(e.target.value)}
                         onKeyDown={e => { if (e.key === 'Escape') cancelEdit() }}
                         rows={6}
+                        aria-label={td('sections.notes')}
                         style={{
                           width: '100%', resize: 'vertical',
                           padding: '10px 12px', borderRadius: 10,
@@ -839,7 +846,7 @@ function ActionBtn({
 }
 
 function EditField({
-  value, onChange, onSave, onCancel, type, step, min, max,
+  value, onChange, onSave, onCancel, type, step, min, max, ariaLabel,
 }: {
   value: string
   onChange: (v: string) => void
@@ -849,6 +856,7 @@ function EditField({
   step?: string
   min?: string
   max?: string
+  ariaLabel?: string
 }) {
   return (
     <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -858,6 +866,7 @@ function EditField({
         step={step}
         min={min}
         max={max}
+        aria-label={ariaLabel}
         value={value}
         onChange={e => onChange(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter') onSave(); if (e.key === 'Escape') onCancel() }}

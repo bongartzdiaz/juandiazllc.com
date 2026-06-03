@@ -8,6 +8,7 @@ import { useRealtime } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 import { Bell, CheckCheck, Info, AlertTriangle, CheckCircle2, XCircle, Clock } from 'lucide-react'
+import { keyboardClickable } from '@/lib/philly/a11y'
 
 interface Notification {
   id: string
@@ -113,7 +114,7 @@ export default function NotificationsPage() {
             const Icon = TYPE_ICONS[n.type] ?? Info
             const colors = TYPE_COLORS[n.type] ?? TYPE_COLORS.info
             return (
-              <div key={n.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 16px', borderRadius: 10, border: '1px solid var(--border)', background: n.read ? 'var(--panel)' : 'color-mix(in srgb, var(--accent) 5%, var(--panel))', cursor: n.read ? 'default' : 'pointer' }} onClick={() => !n.read && markRead(n.id)}>
+              <div key={n.id} {...keyboardClickable(() => !n.read && markRead(n.id))} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 16px', borderRadius: 10, border: '1px solid var(--border)', background: n.read ? 'var(--panel)' : 'color-mix(in srgb, var(--accent) 5%, var(--panel))', cursor: n.read ? 'default' : 'pointer' }}>
                 <div style={{ width: 28, height: 28, borderRadius: 8, background: colors.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Icon size={14} style={{ color: colors.txt }} />
                 </div>

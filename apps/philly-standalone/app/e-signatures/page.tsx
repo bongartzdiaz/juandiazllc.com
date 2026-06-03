@@ -192,7 +192,7 @@ export default function ESignaturesPage() {
         </div>
 
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
-          <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
+          <FilterSelect ariaLabel={t('filters.all')} value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
             options={[
               { value: '', label: t('filters.all') },
               { value: 'pending', label: t('filters.pending') },
@@ -369,7 +369,7 @@ export default function ESignaturesPage() {
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <FormField label={t('request.transaction')}>
-            <select value={addTxId} onChange={e => setAddTxId(e.target.value)} style={inputStyle}>
+            <select aria-label={t('request.transaction')} value={addTxId} onChange={e => setAddTxId(e.target.value)} style={inputStyle}>
               <option value="">{t('request.selectTransaction')}</option>
               {transactions.map(tx => (
                 <option key={tx.id} value={tx.id}>
@@ -379,16 +379,16 @@ export default function ESignaturesPage() {
             </select>
           </FormField>
           <FormField label={t('request.documentName')}>
-            <input value={addDocName} onChange={e => setAddDocName(e.target.value)} placeholder="Purchase Agreement" style={inputStyle} />
+            <input aria-label={t('request.documentName')} value={addDocName} onChange={e => setAddDocName(e.target.value)} placeholder="Purchase Agreement" style={inputStyle} />
           </FormField>
           <FormField label={t('request.signerName')}>
-            <input value={addSignerName} onChange={e => setAddSignerName(e.target.value)} placeholder="Jane Doe" style={inputStyle} />
+            <input aria-label={t('request.signerName')} value={addSignerName} onChange={e => setAddSignerName(e.target.value)} placeholder="Jane Doe" style={inputStyle} />
           </FormField>
           <FormField label={t('request.signerEmail')}>
-            <input type="email" value={addSignerEmail} onChange={e => setAddSignerEmail(e.target.value)} placeholder="jane@example.com" style={inputStyle} />
+            <input aria-label={t('request.signerEmail')} type="email" value={addSignerEmail} onChange={e => setAddSignerEmail(e.target.value)} placeholder="jane@example.com" style={inputStyle} />
           </FormField>
           <FormField label={t('request.provider')}>
-            <select value={addProvider} onChange={e => setAddProvider(e.target.value)} style={inputStyle}>
+            <select aria-label={t('request.provider')} value={addProvider} onChange={e => setAddProvider(e.target.value)} style={inputStyle}>
               <option value="manual">{t('request.manual')}</option>
               <option value="docusign">DocuSign</option>
               <option value="hellosign">HelloSign / Dropbox Sign</option>
@@ -460,11 +460,11 @@ function StatusBtn({ onClick, bg, color, border, children }: { onClick: () => vo
   )
 }
 
-function FilterSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+function FilterSelect({ value, onChange, options, ariaLabel }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; ariaLabel?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
       <Filter size={13} style={{ color: 'var(--txt3)' }} />
-      <select value={value} onChange={e => onChange(e.target.value)} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+      <select aria-label={ariaLabel} value={value} onChange={e => onChange(e.target.value)} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>

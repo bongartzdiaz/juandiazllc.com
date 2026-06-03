@@ -210,6 +210,7 @@ export default function SmsPage() {
           <div style={{ ...selectBarStyle, flex: 1, minWidth: 220, maxWidth: 320 }}>
             <Search size={13} style={{ color: 'var(--txt3)' }} />
             <input
+              aria-label={t('filters.searchPlaceholder')}
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={t('filters.searchPlaceholder')}
@@ -228,6 +229,7 @@ export default function SmsPage() {
           <div style={selectBarStyle}>
             <Filter size={13} style={{ color: 'var(--txt3)' }} />
             <select
+              aria-label={t('filters.allChannels')}
               value={channelFilter}
               onChange={e => {
                 setChannelFilter(e.target.value)
@@ -244,6 +246,7 @@ export default function SmsPage() {
           <div style={selectBarStyle}>
             <Filter size={13} style={{ color: 'var(--txt3)' }} />
             <select
+              aria-label={t('filters.allStatuses')}
               value={statusFilter}
               onChange={e => {
                 setStatusFilter(e.target.value)
@@ -560,6 +563,7 @@ export default function SmsPage() {
                   {t('modal.toNumber')}
                 </label>
                 <input
+                  aria-label={t('modal.toNumber')}
                   type="tel"
                   value={sendToNumber}
                   onChange={e => setSendToNumber(e.target.value)}
@@ -602,6 +606,7 @@ export default function SmsPage() {
                   )}
                 </div>
                 <textarea
+                  aria-label={t('modal.message')}
                   value={sendBody}
                   onChange={e => setSendBody(e.target.value)}
                   placeholder={t('modal.messagePlaceholder')}

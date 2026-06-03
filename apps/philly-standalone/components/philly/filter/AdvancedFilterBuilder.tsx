@@ -144,6 +144,7 @@ export function AdvancedFilterBuilder({ open, onClose, schema, initial, onApply 
                     })
                   }}
                   style={selectStyle}
+                  aria-label={field ? field.label : t('addRule')}
                 >
                   {schema.fields.map((f) => (
                     <option key={f.id} value={f.id}>{f.label}</option>
@@ -153,6 +154,7 @@ export function AdvancedFilterBuilder({ open, onClose, schema, initial, onApply 
                   value={rule.operator}
                   onChange={(e) => updateRule(idx, { operator: e.target.value as Operator, value: undefined })}
                   style={selectStyle}
+                  aria-label="Operator"
                 >
                   {operators.map((op) => (
                     <option key={op} value={op}>
@@ -334,6 +336,7 @@ function ValueInput({
         value={typeof rule.value === 'string' ? rule.value : ''}
         onChange={(e) => onChange(e.target.value)}
         style={selectStyle}
+        aria-label={field.label}
       >
         <option value="">{t('selectPlaceholder')}</option>
         {field.options.map((o) => (
@@ -354,6 +357,7 @@ function ValueInput({
           onChange={(e) => onChange([e.target.value, hi as string])}
           style={inputStyle}
           placeholder={t('rangeFrom')}
+          aria-label={t('rangeFrom')}
         />
         <input
           type={inputType}
@@ -361,6 +365,7 @@ function ValueInput({
           onChange={(e) => onChange([lo as string, e.target.value])}
           style={inputStyle}
           placeholder={t('rangeTo')}
+          aria-label={t('rangeTo')}
         />
       </div>
     )
@@ -378,6 +383,7 @@ function ValueInput({
       onChange={(e) => onChange(field.type === 'number' ? Number(e.target.value) : e.target.value)}
       style={inputStyle}
       placeholder={t('valuePlaceholder')}
+      aria-label={field.label}
     />
   )
 }

@@ -245,7 +245,7 @@ export default function ShowingsPage() {
         </div>
 
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
-          <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
+          <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }} ariaLabel="All Statuses"
             options={[
               { value: '', label: 'All Statuses' },
               { value: 'scheduled', label: 'Scheduled' },
@@ -431,6 +431,7 @@ export default function ShowingsPage() {
                   value={feedback}
                   onChange={e => setFeedback(e.target.value)}
                   placeholder="Buyer feedback, next steps, concerns…"
+                  aria-label="Buyer feedback"
                   rows={3}
                   style={{
                     width: '100%', padding: '8px 10px', borderRadius: 8,
@@ -485,6 +486,7 @@ export default function ShowingsPage() {
               value={form.propertyId}
               onChange={e => setForm({ ...form, propertyId: e.target.value })}
               disabled={!!editingId}
+              aria-label="Property"
               style={inputStyle}
             >
               <option value="">Select a property…</option>
@@ -497,6 +499,7 @@ export default function ShowingsPage() {
               value={form.contactId}
               onChange={e => setForm({ ...form, contactId: e.target.value })}
               disabled={!!editingId}
+              aria-label="Contact"
               style={inputStyle}
             >
               <option value="">No contact linked</option>
@@ -506,18 +509,18 @@ export default function ShowingsPage() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
             <FormField label="Date">
-              <input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} style={inputStyle} />
+              <input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} aria-label="Date" style={inputStyle} />
             </FormField>
             <FormField label="Time">
-              <input type="time" value={form.time} onChange={e => setForm({ ...form, time: e.target.value })} style={inputStyle} />
+              <input type="time" value={form.time} onChange={e => setForm({ ...form, time: e.target.value })} aria-label="Time" style={inputStyle} />
             </FormField>
             <FormField label="Duration (min)">
-              <input type="number" min="5" step="5" value={form.duration} onChange={e => setForm({ ...form, duration: e.target.value })} style={inputStyle} />
+              <input type="number" min="5" step="5" value={form.duration} onChange={e => setForm({ ...form, duration: e.target.value })} aria-label="Duration (min)" style={inputStyle} />
             </FormField>
           </div>
 
           <FormField label="Notes (optional)">
-            <textarea rows={3} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} style={{ ...inputStyle, resize: 'vertical' }} />
+            <textarea rows={3} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} aria-label="Notes" style={{ ...inputStyle, resize: 'vertical' }} />
           </FormField>
 
           <div style={{ display: 'flex', gap: 8, borderTop: '1px solid var(--border)', paddingTop: 14, justifyContent: 'flex-end' }}>
@@ -573,11 +576,11 @@ function StatusBtn({ onClick, color, border, children }: { onClick: () => void; 
   )
 }
 
-function FilterSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+function FilterSelect({ value, onChange, options, ariaLabel }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; ariaLabel?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
       <Filter size={13} style={{ color: 'var(--txt3)' }} />
-      <select value={value} onChange={e => onChange(e.target.value)} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+      <select value={value} onChange={e => onChange(e.target.value)} aria-label={ariaLabel} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>

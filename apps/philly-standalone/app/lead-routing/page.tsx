@@ -242,11 +242,11 @@ export default function LeadRoutingPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Name</label>
-                <input value={addName} onChange={e => setAddName(e.target.value)} placeholder="e.g. East Side Leads" style={inputStyle} />
+                <input aria-label="Name" value={addName} onChange={e => setAddName(e.target.value)} placeholder="e.g. East Side Leads" style={inputStyle} />
               </div>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Strategy</label>
-                <select value={addStrategy} onChange={e => setAddStrategy(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <select aria-label="Strategy" value={addStrategy} onChange={e => setAddStrategy(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
                   {STRATEGY_OPTIONS.map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </div>

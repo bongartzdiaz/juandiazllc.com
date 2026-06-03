@@ -497,6 +497,7 @@ export default function CalendarPage() {
         <form onSubmit={submit}>
           <FormField label="Title" required>
             <input
+              aria-label="Title"
               type="text"
               value={form.title}
               onChange={e => setForm({ ...form, title: e.target.value })}
@@ -513,6 +514,7 @@ export default function CalendarPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <FormField label="Start" required>
               <input
+                aria-label="Start"
                 type="datetime-local"
                 value={form.startTime}
                 onChange={e => setForm({ ...form, startTime: e.target.value })}
@@ -525,6 +527,7 @@ export default function CalendarPage() {
             </FormField>
             <FormField label="End" required>
               <input
+                aria-label="End"
                 type="datetime-local"
                 value={form.endTime}
                 onChange={e => setForm({ ...form, endTime: e.target.value })}
@@ -550,6 +553,7 @@ export default function CalendarPage() {
 
           <FormField label="Location">
             <input
+              aria-label="Location"
               type="text"
               value={form.location}
               onChange={e => setForm({ ...form, location: e.target.value })}
@@ -564,6 +568,7 @@ export default function CalendarPage() {
 
           <FormField label="Description">
             <textarea
+              aria-label="Description"
               value={form.description}
               onChange={e => setForm({ ...form, description: e.target.value })}
               placeholder={t('form.optional')}

@@ -69,10 +69,10 @@ export default function MarketAnalyticsPage() {
         <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12, maxWidth: 200 }}>
             <Search size={13} style={{ color: 'var(--txt3)' }} />
-            <input value={zipCode} onChange={e => setZipCode(e.target.value)} placeholder="Filter by ZIP..." style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', outline: 'none', width: '100%' }} />
+            <input value={zipCode} onChange={e => setZipCode(e.target.value)} placeholder="Filter by ZIP..." aria-label="Filter by ZIP" style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', outline: 'none', width: '100%' }} />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
-            <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+            <select value={year} onChange={e => setYear(Number(e.target.value))} aria-label="Year" style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
               {[2026, 2025, 2024, 2023].map(y => <option key={y} value={y}>{y}</option>)}
             </select>
           </div>

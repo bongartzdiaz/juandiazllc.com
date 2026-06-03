@@ -182,7 +182,7 @@ export default function ReferralsPage() {
 
         {/* Filters */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
-          <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
+          <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }} ariaLabel="All Statuses"
             options={[
               { value: '', label: 'All Statuses' },
               { value: 'pending', label: 'Pending' },
@@ -282,7 +282,7 @@ export default function ReferralsPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Referrer (who referred)</label>
-                <select value={addReferrerId} onChange={e => setAddReferrerId(e.target.value)} style={{
+                <select value={addReferrerId} onChange={e => setAddReferrerId(e.target.value)} aria-label="Referrer (who referred)" style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
@@ -293,7 +293,7 @@ export default function ReferralsPage() {
               </div>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Referred (new lead)</label>
-                <select value={addReferredId} onChange={e => setAddReferredId(e.target.value)} style={{
+                <select value={addReferredId} onChange={e => setAddReferredId(e.target.value)} aria-label="Referred (new lead)" style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
@@ -304,7 +304,7 @@ export default function ReferralsPage() {
               </div>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Commission %</label>
-                <input type="number" min={0} max={100} value={addCommissionPct} onChange={e => setAddCommissionPct(e.target.value)} placeholder="e.g. 25" style={{
+                <input type="number" min={0} max={100} value={addCommissionPct} onChange={e => setAddCommissionPct(e.target.value)} placeholder="e.g. 25" aria-label="Commission %" style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
@@ -312,7 +312,7 @@ export default function ReferralsPage() {
               </div>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>Notes</label>
-                <textarea value={addNotes} onChange={e => setAddNotes(e.target.value)} placeholder="Optional notes" rows={3} style={{
+                <textarea value={addNotes} onChange={e => setAddNotes(e.target.value)} placeholder="Optional notes" rows={3} aria-label="Notes" style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
@@ -355,11 +355,11 @@ function miniBtn(color: string): React.CSSProperties {
   }
 }
 
-function FilterSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+function FilterSelect({ value, onChange, options, ariaLabel }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; ariaLabel?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
       <Filter size={13} style={{ color: 'var(--txt3)' }} />
-      <select value={value} onChange={e => onChange(e.target.value)} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+      <select value={value} onChange={e => onChange(e.target.value)} aria-label={ariaLabel} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>

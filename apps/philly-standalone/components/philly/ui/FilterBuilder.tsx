@@ -158,6 +158,7 @@ export function FilterBuilder({ fields, value, onChange, compact }: FilterBuilde
             <select
               value={value.combinator}
               onChange={e => onChange({ ...value, combinator: e.target.value as 'and' | 'or' })}
+              aria-label={t('header')}
               style={{
                 padding: '3px 7px', borderRadius: 5,
                 border: '1px solid var(--border)', background: 'var(--bg2)',
@@ -245,6 +246,7 @@ function RuleRow({ rule, fields, tf, onChange, onRemove }: {
           onChange({ field: e.target.value, operator: OPERATORS_BY_TYPE[next.type][0], value: '' })
         }}
         style={selectStyle}
+        aria-label={fieldLabel(field)}
       >
         {fields.map(f => <option key={f.key} value={f.key}>{fieldLabel(f)}</option>)}
       </select>
@@ -252,6 +254,7 @@ function RuleRow({ rule, fields, tf, onChange, onRemove }: {
         value={rule.operator}
         onChange={e => onChange({ operator: e.target.value as FilterOperator, value: '' })}
         style={selectStyle}
+        aria-label="Operator"
       >
         {operators.map(op => <option key={op} value={op}>{t.has(`operators.${op}`) ? t(`operators.${op}`) : OPERATOR_LABELS[op]}</option>)}
       </select>
@@ -261,6 +264,7 @@ function RuleRow({ rule, fields, tf, onChange, onRemove }: {
           value={String(rule.value ?? '')}
           onChange={e => onChange({ value: e.target.value })}
           style={selectStyle}
+          aria-label={fieldLabel(field)}
         >
           <option value="">—</option>
           {field.options?.map(o => <option key={o.value} value={o.value}>{optLabel(o)}</option>)}
@@ -271,6 +275,7 @@ function RuleRow({ rule, fields, tf, onChange, onRemove }: {
           value={String(rule.value ?? 'true')}
           onChange={e => onChange({ value: e.target.value === 'true' })}
           style={selectStyle}
+          aria-label={fieldLabel(field)}
         >
           <option value="true">true</option>
           <option value="false">false</option>
@@ -283,6 +288,7 @@ function RuleRow({ rule, fields, tf, onChange, onRemove }: {
           onChange={e => onChange({ value: field.type === 'number' ? Number(e.target.value) : e.target.value })}
           placeholder={t('valuePlaceholder')}
           style={inputStyle}
+          aria-label={fieldLabel(field)}
         />
       )}
       {needsValue && !isBetween && field.type === 'date' && (
@@ -291,6 +297,7 @@ function RuleRow({ rule, fields, tf, onChange, onRemove }: {
           value={String(rule.value ?? '')}
           onChange={e => onChange({ value: e.target.value })}
           style={inputStyle}
+          aria-label={fieldLabel(field)}
         />
       )}
       {isBetween && (
@@ -303,6 +310,7 @@ function RuleRow({ rule, fields, tf, onChange, onRemove }: {
               onChange({ value: [e.target.value, String(current[1] ?? '')] as [string, string] })
             }}
             placeholder={t('rangeFrom')}
+            aria-label={t('rangeFrom')}
             style={{ ...inputStyle, width: 110 }}
           />
           <span style={{ fontSize: 11, color: 'var(--txt3)' }}>{t('rangeAnd')}</span>
@@ -314,6 +322,7 @@ function RuleRow({ rule, fields, tf, onChange, onRemove }: {
               onChange({ value: [String(current[0] ?? ''), e.target.value] as [string, string] })
             }}
             placeholder={t('rangeTo')}
+            aria-label={t('rangeTo')}
             style={{ ...inputStyle, width: 110 }}
           />
         </>
@@ -367,6 +376,7 @@ export function QuickSearch({
         value={inner}
         onChange={e => setInner(e.target.value)}
         placeholder={placeholder}
+        aria-label={placeholder}
         style={{
           border: 'none', background: 'transparent', outline: 'none',
           padding: '7px 8px', width: '100%', color: 'var(--txt)',

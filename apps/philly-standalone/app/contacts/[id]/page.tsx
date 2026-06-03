@@ -334,6 +334,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                   <input
                     value={editName} onChange={e => setEditName(e.target.value)}
                     placeholder={t('fields.name')}
+                    aria-label={t('fields.name')}
                     style={{
                       padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border)',
                       background: 'var(--bg2)', fontSize: 14, fontWeight: 600,
@@ -342,6 +343,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                   <input
                     value={editCompany} onChange={e => setEditCompany(e.target.value)}
                     placeholder={t('fields.company')}
+                    aria-label={t('fields.company')}
                     style={{
                       padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border)',
                       background: 'var(--bg2)', fontSize: 13,
@@ -352,6 +354,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                   <input
                     value={editEmail} onChange={e => setEditEmail(e.target.value)}
                     placeholder={t('fields.email')}
+                    aria-label={t('fields.email')}
                     style={{
                       padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border)',
                       background: 'var(--bg2)', fontSize: 13,
@@ -360,6 +363,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                   <input
                     value={editPhone} onChange={e => setEditPhone(e.target.value)}
                     placeholder={t('fields.phone')}
+                    aria-label={t('fields.phone')}
                     style={{
                       padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border)',
                       background: 'var(--bg2)', fontSize: 13,
@@ -629,6 +633,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                 value={noteText}
                 onChange={e => setNoteText(e.target.value)}
                 placeholder="Write a note..."
+                aria-label="Write a note"
                 rows={3}
                 style={{
                   width: '100%', padding: '10px 12px', borderRadius: 8,

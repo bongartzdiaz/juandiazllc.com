@@ -282,23 +282,23 @@ export default function ActionPlansPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
                 <label style={labelStyle}>{t('modal.name')}</label>
-                <input value={addName} onChange={e => setAddName(e.target.value)} placeholder={t('modal.namePlaceholder')} style={inputStyle} />
+                <input value={addName} onChange={e => setAddName(e.target.value)} placeholder={t('modal.namePlaceholder')} style={inputStyle} aria-label={t('modal.name')} />
               </div>
               <div>
                 <label style={labelStyle}>{t('modal.description')}</label>
                 <textarea value={addDescription} onChange={e => setAddDescription(e.target.value)} placeholder={t('modal.descriptionPlaceholder')} rows={3} style={{
                   ...inputStyle, resize: 'vertical',
-                }} />
+                }} aria-label={t('modal.description')} />
               </div>
               <div>
                 <label style={labelStyle}>{t('modal.triggerEvent')}</label>
-                <select value={addTrigger} onChange={e => setAddTrigger(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <select value={addTrigger} onChange={e => setAddTrigger(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }} aria-label={t('modal.triggerEvent')}>
                   {TRIGGER_OPTIONS.map(([k]) => <option key={k} value={k}>{(() => { try { return t(`triggers.${k}` as any) } catch { return TRIGGER_LABELS[k] } })()}</option>)}
                 </select>
               </div>
               <div>
                 <label style={labelStyle}>{t('modal.status')}</label>
-                <select value={addStatus} onChange={e => setAddStatus(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <select value={addStatus} onChange={e => setAddStatus(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }} aria-label={t('modal.status')}>
                   <option value="active">{t('filters.active')}</option>
                   <option value="paused">{t('filters.paused')}</option>
                   <option value="archived">{t('filters.archived')}</option>
@@ -330,7 +330,7 @@ function FilterSelect({ value, onChange, options }: { value: string; onChange: (
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
       <Filter size={13} style={{ color: 'var(--txt3)' }} />
-      <select value={value} onChange={e => onChange(e.target.value)} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+      <select value={value} onChange={e => onChange(e.target.value)} aria-label="Filter by status" style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>

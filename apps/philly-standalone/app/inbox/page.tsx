@@ -237,9 +237,9 @@ export default function InboxPage() {
 
         {/* Filters */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
-          <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
+          <FilterSelect ariaLabel={t('filters.allStatuses')} value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
             options={[{ value: '', label: t('filters.allStatuses') }, { value: 'open', label: t('statuses.open') }, { value: 'closed', label: t('statuses.closed') }, { value: 'archived', label: t('statuses.archived') }]} />
-          <FilterSelect value={channelFilter} onChange={v => { setChannelFilter(v); setPage(1) }}
+          <FilterSelect ariaLabel={t('filters.allChannels')} value={channelFilter} onChange={v => { setChannelFilter(v); setPage(1) }}
             options={[{ value: '', label: t('filters.allChannels') }, { value: 'email', label: t('channels.email') }, { value: 'sms', label: t('channels.sms') }, { value: 'whatsapp', label: t('channels.whatsapp') }, { value: 'phone', label: t('channels.phone') }]} />
         </div>
 
@@ -426,6 +426,7 @@ export default function InboxPage() {
                   )}
                   <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
                     <textarea
+                      aria-label={t('reply.placeholder', { channel: channelLabel(selected.channel, t) })}
                       value={reply}
                       onChange={e => setReply(e.target.value)}
                       onKeyDown={e => {
@@ -496,7 +497,7 @@ export default function InboxPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.contact')}</label>
-                <select value={addContactId} onChange={e => setAddContactId(e.target.value)} style={{
+                <select aria-label={t('fields.contact')} value={addContactId} onChange={e => setAddContactId(e.target.value)} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
@@ -507,7 +508,7 @@ export default function InboxPage() {
               </div>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.channel')}</label>
-                <select value={addChannel} onChange={e => setAddChannel(e.target.value)} style={{
+                <select aria-label={t('fields.channel')} value={addChannel} onChange={e => setAddChannel(e.target.value)} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
@@ -520,7 +521,7 @@ export default function InboxPage() {
               </div>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.subject')}</label>
-                <input value={addSubject} onChange={e => setAddSubject(e.target.value)} placeholder={t('placeholders.subject')} style={{
+                <input aria-label={t('fields.subject')} value={addSubject} onChange={e => setAddSubject(e.target.value)} placeholder={t('placeholders.subject')} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
                   fontSize: 13, color: 'var(--txt)', fontFamily: 'inherit',
@@ -528,7 +529,7 @@ export default function InboxPage() {
               </div>
               <div>
                 <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--txt2)', marginBottom: 4, display: 'block' }}>{t('fields.firstMessage')}</label>
-                <textarea value={addFirstMessage} onChange={e => setAddFirstMessage(e.target.value)} rows={3}
+                <textarea aria-label={t('fields.firstMessage')} value={addFirstMessage} onChange={e => setAddFirstMessage(e.target.value)} rows={3}
                   placeholder={t('placeholders.firstMessage')} style={{
                   width: '100%', padding: '8px 12px', borderRadius: 8,
                   border: '1px solid var(--border)', background: 'var(--bg2)',
@@ -572,11 +573,11 @@ function statusLabel(status: string, t: InboxT): string {
   return status
 }
 
-function FilterSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+function FilterSelect({ value, onChange, options, ariaLabel }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; ariaLabel?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
       <Filter size={13} style={{ color: 'var(--txt3)' }} />
-      <select value={value} onChange={e => onChange(e.target.value)} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+      <select aria-label={ariaLabel} value={value} onChange={e => onChange(e.target.value)} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>

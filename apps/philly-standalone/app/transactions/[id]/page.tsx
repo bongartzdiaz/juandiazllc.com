@@ -15,6 +15,7 @@ import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { ListLoading, ListError } from '@/components/philly/ui/ListStates'
 import { useFormat } from '@/hooks/philly/useFormat'
+import { keyboardClickable } from '@/lib/philly/a11y'
 
 interface ESignature {
   id: string
@@ -281,6 +282,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 {editField === 'status' ? (
                   <select autoFocus value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveEdit}
+                    aria-label="Status"
                     style={{ ...inputStyle, width: 150 }}>
                     <option value="pending">{tt('statuses.pending')}</option>
                     <option value="in_progress">{tt('statuses.inProgress')}</option>
@@ -300,6 +302,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                 )}
                 {editField === 'type' ? (
                   <select autoFocus value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={saveEdit}
+                    aria-label="Type"
                     style={{ ...inputStyle, width: 130 }}>
                     <option value="purchase">{tt('types.purchase')}</option>
                     <option value="sale">{tt('types.sale')}</option>
@@ -357,9 +360,9 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                     <div>
                       <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>{tt('fields.salePrice')}</div>
                       {editField === 'salePrice' ? (
-                        <InlineEdit value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} type="number" big />
+                        <InlineEdit value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} type="number" big ariaLabel={tt('fields.salePrice')} />
                       ) : (
-                        <div onClick={() => startEdit('salePrice', (tx.salePrice / 100).toString())}
+                        <div {...keyboardClickable(() => startEdit('salePrice', (tx.salePrice / 100).toString()))}
                           className="mono"
                           style={{ fontSize: 22, fontWeight: 700, color: 'var(--accent)', cursor: 'pointer' }}
                           title={tt('hints.clickToEdit')}
@@ -371,9 +374,9 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                     <div>
                       <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>{tt('fields.earnestMoney')}</div>
                       {editField === 'earnestMoney' ? (
-                        <InlineEdit value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} type="number" big />
+                        <InlineEdit value={editValue} onChange={setEditValue} onSave={saveEdit} onCancel={cancelEdit} type="number" big ariaLabel={tt('fields.earnestMoney')} />
                       ) : (
-                        <div onClick={() => startEdit('earnestMoney', (tx.earnestMoney / 100).toString())}
+                        <div {...keyboardClickable(() => startEdit('earnestMoney', (tx.earnestMoney / 100).toString()))}
                           className="mono"
                           style={{ fontSize: 22, fontWeight: 700, color: 'var(--txt)', cursor: 'pointer' }}
                           title={tt('hints.clickToEdit')}
@@ -472,6 +475,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                   {editField === 'notes' ? (
                     <>
                       <textarea autoFocus rows={5} value={editValue} onChange={e => setEditValue(e.target.value)}
+                        aria-label={tt('sections.notes')}
                         style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.6 }}
                       />
                       <div style={{ display: 'flex', gap: 8, marginTop: 10, justifyContent: 'flex-end' }}>
@@ -603,13 +607,13 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <FieldLabel label={tt('fields.documentName')}>
-                <input value={sigDocName} onChange={e => setSigDocName(e.target.value)} placeholder={tt('modal.documentPlaceholder')} style={inputStyle} />
+                <input value={sigDocName} onChange={e => setSigDocName(e.target.value)} placeholder={tt('modal.documentPlaceholder')} aria-label={tt('modal.documentPlaceholder')} style={inputStyle} />
               </FieldLabel>
               <FieldLabel label={tt('fields.signerName')}>
-                <input value={sigName} onChange={e => setSigName(e.target.value)} placeholder={tt('modal.signerNamePlaceholder')} style={inputStyle} />
+                <input value={sigName} onChange={e => setSigName(e.target.value)} placeholder={tt('modal.signerNamePlaceholder')} aria-label={tt('modal.signerNamePlaceholder')} style={inputStyle} />
               </FieldLabel>
               <FieldLabel label={tt('fields.signerEmail')}>
-                <input type="email" value={sigEmail} onChange={e => setSigEmail(e.target.value)} placeholder={tt('modal.signerEmailPlaceholder')} style={inputStyle} />
+                <input type="email" value={sigEmail} onChange={e => setSigEmail(e.target.value)} placeholder={tt('modal.signerEmailPlaceholder')} aria-label={tt('modal.signerEmailPlaceholder')} style={inputStyle} />
               </FieldLabel>
             </div>
             <button onClick={submitSignature} disabled={sigSaving} style={{
@@ -663,8 +667,8 @@ function FieldLabel({ label, children }: { label: string; children: React.ReactN
   )
 }
 
-function InlineEdit({ value, onChange, onSave, onCancel, type, big }: {
-  value: string; onChange: (v: string) => void; onSave: () => void; onCancel: () => void; type?: string; big?: boolean;
+function InlineEdit({ value, onChange, onSave, onCancel, type, big, ariaLabel }: {
+  value: string; onChange: (v: string) => void; onSave: () => void; onCancel: () => void; type?: string; big?: boolean; ariaLabel?: string;
 }) {
   return (
     <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -672,6 +676,7 @@ function InlineEdit({ value, onChange, onSave, onCancel, type, big }: {
         autoFocus
         type={type ?? 'text'}
         value={value}
+        aria-label={ariaLabel}
         onChange={e => onChange(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter') onSave(); if (e.key === 'Escape') onCancel() }}
         style={{
@@ -715,10 +720,10 @@ function EditableField({
         {label}
       </div>
       {editField === field ? (
-        <InlineEdit value={editValue} onChange={setEditValue} onSave={onSave} onCancel={onCancel} type={type} />
+        <InlineEdit value={editValue} onChange={setEditValue} onSave={onSave} onCancel={onCancel} type={type} ariaLabel={label} />
       ) : (
         <div
-          onClick={() => startEdit(field, value)}
+          {...keyboardClickable(() => startEdit(field, value))}
           style={{ fontSize: 13, color: 'var(--txt)', fontWeight: 500, cursor: 'pointer', minHeight: 18 }}
           title={clickToEditTitle ?? 'Click to edit'}
         >

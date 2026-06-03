@@ -376,11 +376,11 @@ export default function SettingsPage() {
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
                       <div>
                         <label style={labelStyle}>{t('fields.fullName')}</label>
-                        <input value={profileName} onChange={e => setProfileName(e.target.value)} style={inputStyle} />
+                        <input value={profileName} onChange={e => setProfileName(e.target.value)} style={inputStyle} aria-label={t('fields.fullName')} />
                       </div>
                       <div>
                         <label style={labelStyle}>{t('fields.email')}</label>
-                        <input value={profileEmail} onChange={e => setProfileEmail(e.target.value)} type="email" style={inputStyle} />
+                        <input value={profileEmail} onChange={e => setProfileEmail(e.target.value)} type="email" style={inputStyle} aria-label={t('fields.email')} />
                       </div>
                       <div>
                         <label style={labelStyle}>{t('fields.role')}</label>
@@ -418,11 +418,11 @@ export default function SettingsPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 400 }}>
                     <div>
                       <label style={labelStyle}>{t('fields.organizationName')}</label>
-                      <input value={orgName} onChange={e => setOrgName(e.target.value)} style={inputStyle} />
+                      <input value={orgName} onChange={e => setOrgName(e.target.value)} style={inputStyle} aria-label={t('fields.organizationName')} />
                     </div>
                     <div>
                       <label style={labelStyle}>{t('fields.industry')}</label>
-                      <select value={orgIndustry} onChange={e => setOrgIndustry(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                      <select value={orgIndustry} onChange={e => setOrgIndustry(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }} aria-label={t('fields.industry')}>
                         <option value="general">{t('industries.general')}</option>
                         <option value="nonprofit">{t('industries.nonprofit')}</option>
                         <option value="foundation">{t('industries.foundation')}</option>
@@ -566,6 +566,7 @@ export default function SettingsPage() {
                                   value={apiValues[api.id]?.[field.key] ?? ''}
                                   onChange={e => updateApiField(api.id, field.key, e.target.value)}
                                   style={{ ...inputStyle, paddingRight: 36 }}
+                                  aria-label={t(`api.fieldLabels.${field.labelKey}`)}
                                 />
                                 <button
                                   onClick={() => toggleFieldVisibility(uid)}
@@ -630,6 +631,7 @@ export default function SettingsPage() {
                       value={customRange.start}
                       onChange={e => setCustomRange(prev => ({ ...prev, start: e.target.value }))}
                       style={inputStyle}
+                      aria-label={t('fields.startDate')}
                     />
                   </div>
                   <div style={{ flex: 1 }}>
@@ -639,6 +641,7 @@ export default function SettingsPage() {
                       value={customRange.end}
                       onChange={e => setCustomRange(prev => ({ ...prev, end: e.target.value }))}
                       style={inputStyle}
+                      aria-label={t('fields.endDate')}
                     />
                   </div>
                 </div>
@@ -687,6 +690,7 @@ export default function SettingsPage() {
                             value={currentValue}
                             onChange={e => kpi.setKpiValue(g.key, Number(e.target.value))}
                             style={inputStyle}
+                            aria-label={`${t(`goalsList.${g.key}`)} — ${t('fields.current')}`}
                           />
                         </div>
                         <div style={{ flex: 1 }}>
@@ -696,6 +700,7 @@ export default function SettingsPage() {
                             value={target}
                             onChange={e => setTarget(g.key, Number(e.target.value))}
                             style={inputStyle}
+                            aria-label={`${t(`goalsList.${g.key}`)} — ${t('fields.target')}`}
                           />
                         </div>
                       </div>

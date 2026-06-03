@@ -150,7 +150,7 @@ export default function VolunteersPage() {
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
             <Filter size={13} style={{ color: 'var(--txt3)' }} />
-            <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+            <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }} aria-label={t('filters.all')} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
               <option value="">{t('filters.all')}</option>
               <option value="active">{t('filters.active')}</option>
               <option value="inactive">{t('filters.inactive')}</option>
@@ -295,18 +295,18 @@ export default function VolunteersPage() {
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <FormField label={t('fields.name')}>
-            <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} style={inputStyle} />
+            <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} aria-label={t('fields.name')} style={inputStyle} />
           </FormField>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <FormField label={t('fields.email')}>
-              <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="volunteer@example.com" style={inputStyle} />
+              <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="volunteer@example.com" aria-label={t('fields.email')} style={inputStyle} />
             </FormField>
             <FormField label={t('fields.phone')}>
-              <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+1 555 555 0100" style={inputStyle} />
+              <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+1 555 555 0100" aria-label={t('fields.phone')} style={inputStyle} />
             </FormField>
           </div>
           <FormField label={t('fields.status')}>
-            <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} style={inputStyle}>
+            <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} aria-label={t('fields.status')} style={inputStyle}>
               <option value="onboarding">{t('filters.onboarding')}</option>
               <option value="active">{t('filters.active')}</option>
               <option value="inactive">{t('filters.inactive')}</option>

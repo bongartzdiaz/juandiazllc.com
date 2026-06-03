@@ -106,6 +106,7 @@ export default function AuditLogPage() {
             <select
               value={entityFilter}
               onChange={e => { setEntityFilter(e.target.value); setPage(1) }}
+              aria-label={t('filters.allEntities')}
               style={{
                 background: 'none', border: 'none', fontSize: 12,
                 color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer',
@@ -129,6 +130,7 @@ export default function AuditLogPage() {
             <select
               value={actionFilter}
               onChange={e => { setActionFilter(e.target.value); setPage(1) }}
+              aria-label={t('filters.allActions')}
               style={{
                 background: 'none', border: 'none', fontSize: 12,
                 color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer',
@@ -152,6 +154,7 @@ export default function AuditLogPage() {
             <select
               value={rangeFilter}
               onChange={e => { setRangeFilter(e.target.value); setPage(1) }}
+              aria-label={t('filters.allTime')}
               style={{
                 background: 'none', border: 'none', fontSize: 12,
                 color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer',

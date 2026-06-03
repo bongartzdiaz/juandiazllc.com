@@ -218,14 +218,14 @@ export default function HousekeepingPage() {
       <Modal open={showAdd} onClose={() => { setShowAdd(false); resetForm() }} title={t('newTask')} subtitle={t('subtitle')} size="sm">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <FormField label={t('fields.room')}>
-            <select value={form.roomId} onChange={e => setForm({ ...form, roomId: e.target.value })} style={inputStyle}>
+            <select aria-label={t('fields.room')} value={form.roomId} onChange={e => setForm({ ...form, roomId: e.target.value })} style={inputStyle}>
               <option value="">{t('filters.allRooms')}</option>
               {rooms.map(r => <option key={r.id} value={r.id}>{r.name} ({r.type})</option>)}
             </select>
           </FormField>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <FormField label={t('fields.type')}>
-              <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={inputStyle}>
+              <select aria-label={t('fields.type')} value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={inputStyle}>
                 <option value="cleaning">{t('types.cleaning')}</option>
                 <option value="inspection">{t('types.inspection')}</option>
                 <option value="maintenance">{t('types.maintenance')}</option>
@@ -233,7 +233,7 @@ export default function HousekeepingPage() {
               </select>
             </FormField>
             <FormField label={t('fields.priority')}>
-              <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })} style={inputStyle}>
+              <select aria-label={t('fields.priority')} value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })} style={inputStyle}>
                 <option value="low">{t('priorities.low')}</option>
                 <option value="medium">{t('priorities.medium')}</option>
                 <option value="high">{t('priorities.high')}</option>
@@ -242,7 +242,7 @@ export default function HousekeepingPage() {
             </FormField>
           </div>
           <FormField label={t('fields.notes')}>
-            <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
+            <textarea aria-label={t('fields.notes')} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
           </FormField>
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', borderTop: '1px solid var(--border)', paddingTop: 14 }}>
             <button onClick={() => { setShowAdd(false); resetForm() }} disabled={saving} style={{

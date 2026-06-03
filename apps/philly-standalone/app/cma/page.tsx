@@ -184,7 +184,7 @@ export default function CmaPage() {
 
         {/* Filters */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
-          <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }}
+          <FilterSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }} ariaLabel="All Statuses"
             options={[
               { value: '', label: 'All Statuses' },
               { value: 'draft', label: 'Draft' },
@@ -308,29 +308,29 @@ export default function CmaPage() {
             <div style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 18 }}>{editingId ? 'Update CMA report details' : 'Create a new Comparative Market Analysis'}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <ModalField label="Subject Address">
-                <input value={addAddress} onChange={e => setAddAddress(e.target.value)} style={inputStyle} placeholder="123 Main St" />
+                <input value={addAddress} onChange={e => setAddAddress(e.target.value)} aria-label="Subject Address" style={inputStyle} placeholder="123 Main St" />
               </ModalField>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <ModalField label="City">
-                  <input value={addCity} onChange={e => setAddCity(e.target.value)} style={inputStyle} placeholder="Philadelphia" />
+                  <input value={addCity} onChange={e => setAddCity(e.target.value)} aria-label="City" style={inputStyle} placeholder="Philadelphia" />
                 </ModalField>
                 <ModalField label="ZIP">
-                  <input value={addZip} onChange={e => setAddZip(e.target.value)} style={inputStyle} placeholder="19103" />
+                  <input value={addZip} onChange={e => setAddZip(e.target.value)} aria-label="ZIP" style={inputStyle} placeholder="19103" />
                 </ModalField>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
                 <ModalField label="Beds">
-                  <input type="number" min={0} value={addBeds} onChange={e => setAddBeds(e.target.value)} style={inputStyle} />
+                  <input type="number" min={0} value={addBeds} onChange={e => setAddBeds(e.target.value)} aria-label="Beds" style={inputStyle} />
                 </ModalField>
                 <ModalField label="Baths">
-                  <input type="number" min={0} step={0.5} value={addBaths} onChange={e => setAddBaths(e.target.value)} style={inputStyle} />
+                  <input type="number" min={0} step={0.5} value={addBaths} onChange={e => setAddBaths(e.target.value)} aria-label="Baths" style={inputStyle} />
                 </ModalField>
                 <ModalField label="Sqft">
-                  <input type="number" min={0} value={addSqft} onChange={e => setAddSqft(e.target.value)} style={inputStyle} />
+                  <input type="number" min={0} value={addSqft} onChange={e => setAddSqft(e.target.value)} aria-label="Sqft" style={inputStyle} />
                 </ModalField>
               </div>
               <ModalField label="Estimated Value ($)">
-                <input type="number" min={0} value={addValue} onChange={e => setAddValue(e.target.value)} style={inputStyle} placeholder="350000" />
+                <input type="number" min={0} value={addValue} onChange={e => setAddValue(e.target.value)} aria-label="Estimated Value ($)" style={inputStyle} placeholder="350000" />
               </ModalField>
             </div>
             {addError && (
@@ -380,11 +380,11 @@ function ModalField({ label, children }: { label: string; children: React.ReactN
   )
 }
 
-function FilterSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+function FilterSelect({ value, onChange, options, ariaLabel }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; ariaLabel?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--panel)', fontSize: 12 }}>
       <Filter size={13} style={{ color: 'var(--txt3)' }} />
-      <select value={value} onChange={e => onChange(e.target.value)} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
+      <select value={value} onChange={e => onChange(e.target.value)} aria-label={ariaLabel} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--txt)', fontFamily: 'inherit', cursor: 'pointer', outline: 'none' }}>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>
