@@ -6,6 +6,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useApi } from '@/hooks/philly/useApi'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { Search } from 'lucide-react'
 
 interface MarketSnapshot {
@@ -28,6 +29,8 @@ export default function MarketAnalyticsPage() {
   const [zipCode, setZipCode] = useState('')
   const [year, setYear] = useState(new Date().getFullYear())
   const t = useTranslations('marketAnalytics')
+  // LOC-03 — locale-bound money, replacing $-hardcoded toLocaleString().
+  const fmt = useFormat()
 
   const params = new URLSearchParams({ year: String(year) })
   if (zipCode) params.set('zipCode', zipCode)
@@ -54,7 +57,7 @@ export default function MarketAnalyticsPage() {
       <Topbar title={t('title')} sub={t('subtitle')} />
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="dollar-sign" label="Median Price" value={`$${(medianPrice / 100).toLocaleString()}`}
+          <KpiCard icon="dollar-sign" label="Median Price" value={fmt.currency(medianPrice, { cents: true })}
             delta={priceChange !== 0 ? `${Math.abs(priceChange)}% MoM` : undefined}
             deltaDir={priceChange > 0 ? 'up' : priceChange < 0 ? 'down' : 'neu'} />
           <KpiCard icon="calendar" label="Avg Days on Market" value={String(avgDOM)} />
@@ -90,12 +93,12 @@ export default function MarketAnalyticsPage() {
             <div key={sn.id} style={{ display: 'grid', gridTemplateColumns: '80px 80px 110px 80px 80px 80px 80px 80px 90px', gap: 8, padding: '10px 16px', borderBottom: idx < snapshots.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12, alignItems: 'center', background: idx % 2 === 1 ? 'color-mix(in srgb, var(--bg2) 30%, transparent)' : 'transparent' }}>
               <span style={{ fontWeight: 600, fontFamily: "var(--font-red-hat-mono), monospace" }}>{sn.zipCode}</span>
               <span style={{ fontSize: 11 }}>{MONTH_NAMES[sn.month - 1]} {sn.year}</span>
-              <span style={{ fontWeight: 600, fontFamily: "var(--font-red-hat-mono), monospace" }}>${(sn.medianPriceCents / 100).toLocaleString()}</span>
+              <span style={{ fontWeight: 600, fontFamily: "var(--font-red-hat-mono), monospace" }}>{fmt.currency(sn.medianPriceCents, { cents: true })}</span>
               <span style={{ fontFamily: "var(--font-red-hat-mono), monospace" }}>{sn.avgDaysOnMarket}</span>
               <span style={{ fontFamily: "var(--font-red-hat-mono), monospace" }}>{sn.activeListings}</span>
               <span style={{ fontFamily: "var(--font-red-hat-mono), monospace", fontWeight: 600, color: 'var(--g-txt)' }}>{sn.closedSales}</span>
               <span style={{ fontFamily: "var(--font-red-hat-mono), monospace" }}>{sn.newListings}</span>
-              <span style={{ fontFamily: "var(--font-red-hat-mono), monospace" }}>${sn.avgPricePerSqft}</span>
+              <span style={{ fontFamily: "var(--font-red-hat-mono), monospace" }}>{fmt.currency(sn.avgPricePerSqft)}</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <span style={{ fontFamily: "var(--font-red-hat-mono), monospace" }}>{sn.inventoryMonths.toFixed(1)}</span>
                 {sn.inventoryMonths < 3 ? (

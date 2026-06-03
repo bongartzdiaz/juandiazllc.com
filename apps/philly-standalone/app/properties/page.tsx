@@ -21,6 +21,7 @@ import { PROPERTY_FILTER_SCHEMA } from '@/lib/philly/filter/schemas'
 import type { FilterSpec } from '@/lib/philly/filter/types'
 import { fetchJson } from '@/lib/philly/fetch-json'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 type Option = { value: string; label: string }
 type Flag = { key: string; label: string }
@@ -126,6 +127,8 @@ export default function PropertiesPage() {
 
   const router = useRouter()
   const { addToast } = useToast()
+  // LOC-03 — locale-bound money/number, replacing native toLocaleString().
+  const fmt = useFormat()
 
   // Bundle BU — advanced filter builder (properties lift). Declared
   // above applySavedView so the saved-view round-trip can write to
@@ -393,7 +396,7 @@ export default function PropertiesPage() {
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
           <KpiCard icon="folder" label={t('kpis.totalProperties')} value={String(total)} />
-          <KpiCard icon="dollar-sign" label={t('kpis.portfolioValue')} value={`€${(totalValue / 100).toLocaleString()}`} />
+          <KpiCard icon="dollar-sign" label={t('kpis.portfolioValue')} value={fmt.currency(totalValue, { cents: true })} />
           <KpiCard icon="target" label={t('kpis.available')} value={String(available)} />
           <KpiCard icon="chart" label={t('kpis.totalViewings')} value={String(properties.reduce((s, p) => s + p._count.viewings, 0))} />
         </div>
@@ -678,12 +681,12 @@ export default function PropertiesPage() {
                     </div>
                   )}
                   <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--txt)', fontFamily: 'var(--font-red-hat-mono), monospace', marginBottom: 8 }}>
-                    €{(prop.priceCents / 100).toLocaleString()}{prop.listingType === 'rent' ? <span style={{ fontSize: 11, color: 'var(--txt3)' }}> /mo</span> : null}
+                    {fmt.currency(prop.priceCents, { cents: true })}{prop.listingType === 'rent' ? <span style={{ fontSize: 11, color: 'var(--txt3)' }}> /mo</span> : null}
                   </div>
                   <div style={{ display: 'flex', gap: 12, fontSize: 11, color: 'var(--txt2)' }}>
                     {prop.bedrooms != null && <span>{prop.bedrooms} bed</span>}
                     {prop.bathrooms != null && <span>{prop.bathrooms} bath</span>}
-                    {prop.sqft != null && <span>{prop.sqft.toLocaleString()} m²</span>}
+                    {prop.sqft != null && <span>{fmt.number(prop.sqft)} m²</span>}
                     <span style={{ marginLeft: 'auto' }}>{prop._count.viewings} viewings</span>
                   </div>
                 </div>

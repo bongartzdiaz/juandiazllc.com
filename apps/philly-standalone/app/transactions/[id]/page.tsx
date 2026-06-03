@@ -14,6 +14,7 @@ import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { ListLoading, ListError } from '@/components/philly/ui/ListStates'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 interface ESignature {
   id: string
@@ -103,6 +104,8 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
   const confirm = useConfirm()
   const router = useRouter()
   const { addToast } = useToast()
+  // LOC-03 — locale-bound money/date, replacing $-hardcoded toLocaleString().
+  const fmt = useFormat()
 
   const [editField, setEditField] = useState<string | null>(null)
   const [editValue, setEditValue] = useState('')
@@ -361,7 +364,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                           style={{ fontSize: 22, fontWeight: 700, color: 'var(--accent)', cursor: 'pointer' }}
                           title={tt('hints.clickToEdit')}
                         >
-                          ${(tx.salePrice / 100).toLocaleString()}
+                          {fmt.currency(tx.salePrice, { cents: true })}
                         </div>
                       )}
                     </div>
@@ -375,7 +378,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                           style={{ fontSize: 22, fontWeight: 700, color: 'var(--txt)', cursor: 'pointer' }}
                           title={tt('hints.clickToEdit')}
                         >
-                          ${(tx.earnestMoney / 100).toLocaleString()}
+                          {fmt.currency(tx.earnestMoney, { cents: true })}
                         </div>
                       )}
                     </div>
@@ -389,13 +392,13 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
 
                     <EditableField label={tt('fields.contractDate')} field="contractDate"
                       value={tx.contractDate ? new Date(tx.contractDate).toISOString().slice(0, 10) : ''}
-                      display={tx.contractDate ? new Date(tx.contractDate).toLocaleDateString() : '—'}
+                      display={tx.contractDate ? fmt.date(tx.contractDate) : '—'}
                       type="date"
                       editField={editField} editValue={editValue} setEditValue={setEditValue}
                       startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} clickToEditTitle={tt('hints.clickToEdit')} />
                     <EditableField label={tt('fields.closingDate')} field="closingDate"
                       value={tx.closingDate ? new Date(tx.closingDate).toISOString().slice(0, 10) : ''}
-                      display={tx.closingDate ? new Date(tx.closingDate).toLocaleDateString() : '—'}
+                      display={tx.closingDate ? fmt.date(tx.closingDate) : '—'}
                       type="date"
                       editField={editField} editValue={editValue} setEditValue={setEditValue}
                       startEdit={startEdit} onSave={saveEdit} onCancel={cancelEdit} />
@@ -490,8 +493,8 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                 {/* Summary tiles */}
                 <SideCard title={tt('sections.summary')}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <StatRow icon={<DollarSign size={13} />} label={tt('fields.salePrice')} value={`$${(tx.salePrice / 100).toLocaleString()}`} />
-                    <StatRow icon={<DollarSign size={13} />} label={tt('fields.earnest')} value={`$${(tx.earnestMoney / 100).toLocaleString()}`} />
+                    <StatRow icon={<DollarSign size={13} />} label={tt('fields.salePrice')} value={fmt.currency(tx.salePrice, { cents: true })} />
+                    <StatRow icon={<DollarSign size={13} />} label={tt('fields.earnest')} value={fmt.currency(tx.earnestMoney, { cents: true })} />
                     <StatRow icon={<PenTool size={13} />} label={tt('fields.signatures')} value={String(tx._count?.signatures ?? 0)} />
                     <StatRow icon={<Calendar size={13} />} label={tt('fields.daysOpen')} value={String(Math.max(1, Math.floor((Date.now() - new Date(tx.createdAt).getTime()) / 86400000)))} />
                   </div>

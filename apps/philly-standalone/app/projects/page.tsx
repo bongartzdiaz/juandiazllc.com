@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useUrlState } from '@/hooks/philly/useUrlState'
 import { useDebouncedValue } from '@/hooks/philly/useDebouncedValue'
@@ -129,6 +130,11 @@ export default function ProjectsPage() {
   const { industry } = useIndustry()
   const t = useTranslations('projects')
   const { addToast } = useToast()
+  // LOC-03 — locale-bound money/date. budget/spent are already major
+  // euros (mapApiProject divides cents by 100), so pass them directly.
+  const fmt = useFormat()
+  const fmtMoney = (major: number) => fmt.currency(major)
+  const fmtDate = (iso: string) => (iso ? fmt.date(iso) : '—')
   const [filters, setFilters] = useUrlState({ q: '', status: 'all', view: 'grid' })
   const search = filters.q
   const statusFilter = filters.status
@@ -214,10 +220,8 @@ export default function ProjectsPage() {
 
   const budgetLabel = isHOS ? 'Nightly Rate' : isRE ? 'Price' : 'Budget'
 
-  const formatCurrency = (v: number) => {
-    if (v >= 1000000) return `€${(v / 1000000).toFixed(1)}M`
-    return `€${(v / 1000).toFixed(0)}K`
-  }
+  // Compact currency on major-euro values, now locale-aware.
+  const formatCurrency = (v: number) => fmt.compactCurrency(v)
 
   return (
     <>
@@ -235,7 +239,7 @@ export default function ProjectsPage() {
             <>
               <KpiCard label="Total Venues" value={projects.length} icon="folder" accentColor="var(--accent)" delay={80} />
               <KpiCard label="Available" value={projects.filter(p => p.status === 'active').length} delta={`${Math.round((activeCount / projects.length) * 100)}% of total`} deltaDir="up" icon="zap" accentColor="var(--g)" delay={130} />
-              <KpiCard label="Avg Nightly Rate" value={`€${Math.round(projects.filter(p => p.budget > 0).reduce((s, p) => s + p.budget, 0) / projects.filter(p => p.budget > 0).length)}`} icon="dollar-sign" accentColor="var(--accent)" delay={180} />
+              <KpiCard label="Avg Nightly Rate" value={fmtMoney(Math.round(projects.filter(p => p.budget > 0).reduce((s, p) => s + p.budget, 0) / projects.filter(p => p.budget > 0).length))} icon="dollar-sign" accentColor="var(--accent)" delay={180} />
               <KpiCard label="Occupancy" value="78%" delta="Current month" deltaDir="up" icon="chart" accentColor="var(--y)" delay={230} />
             </>
           ) : isRE ? (
@@ -249,8 +253,8 @@ export default function ProjectsPage() {
             <>
               <KpiCard label="Total Projects" value={projects.length} icon="folder" accentColor="var(--accent)" delay={80} />
               <KpiCard label="Active" value={activeCount} delta={`${Math.round((activeCount / projects.length) * 100)}% of total`} deltaDir="up" icon="zap" accentColor="var(--g)" delay={130} />
-              <KpiCard label="Total Budget" value={`€${(totalBudget / 1000).toFixed(0)}K`} icon="dollar-sign" accentColor="var(--accent)" delay={180} />
-              <KpiCard label="Budget Used" value={`${Math.round((totalSpent / totalBudget) * 100)}%`} delta={`€${(totalSpent / 1000).toFixed(0)}K spent`} deltaDir="neu" icon="chart" accentColor="var(--y)" delay={230} />
+              <KpiCard label="Total Budget" value={formatCurrency(totalBudget)} icon="dollar-sign" accentColor="var(--accent)" delay={180} />
+              <KpiCard label="Budget Used" value={`${Math.round((totalSpent / totalBudget) * 100)}%`} delta={`${formatCurrency(totalSpent)} spent`} deltaDir="neu" icon="chart" accentColor="var(--y)" delay={230} />
             </>
           )}
         </div>
@@ -383,10 +387,10 @@ export default function ProjectsPage() {
                     <span style={{ color: 'var(--txt3)' }}>{budgetLabel}</span>
                     <span className="mono" style={{ fontWeight: 600 }}>
                       {isHOS
-                        ? (p.budget > 0 ? `€${p.budget}/night` : '—')
+                        ? (p.budget > 0 ? `${fmtMoney(p.budget)}/night` : '—')
                         : isRE
                         ? formatCurrency(p.budget)
-                        : `€${(p.spent / 1000).toFixed(0)}K / €${(p.budget / 1000).toFixed(0)}K`
+                        : `${formatCurrency(p.spent)} / ${formatCurrency(p.budget)}`
                       }
                     </span>
                   </div>
@@ -432,7 +436,7 @@ export default function ProjectsPage() {
                       </td>
                       <td style={{ padding: '12px 14px', fontSize: 12, color: 'var(--txt2)' }}>{p.category}</td>
                       <td className="mono" style={{ padding: '12px 14px', fontSize: 12 }}>
-                        {isHOS ? (p.budget > 0 ? `€${p.budget}/night` : '—') : isRE ? formatCurrency(p.budget) : `€${(p.budget / 1000).toFixed(0)}K`}
+                        {isHOS ? (p.budget > 0 ? `${fmtMoney(p.budget)}/night` : '—') : formatCurrency(p.budget)}
                       </td>
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -512,13 +516,13 @@ export default function ProjectsPage() {
                     {isHOS ? 'Nightly Rate' : isRE ? 'Price' : 'Budget'}
                   </div>
                   <div className="mono" style={{ fontSize: 18, fontWeight: 700, color: 'var(--txt)', marginTop: 4 }}>
-                    {isHOS ? (p.budget > 0 ? `€${p.budget}/night` : '—') : isRE ? formatCurrency(p.budget) : `€${(p.budget / 1000).toFixed(0)}K`}
+                    {isHOS ? (p.budget > 0 ? `${fmtMoney(p.budget)}/night` : '—') : formatCurrency(p.budget)}
                   </div>
                 </div>
                 <div style={{ padding: 12, background: 'var(--bg2)', borderRadius: 10 }}>
                   <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Spent</div>
                   <div className="mono" style={{ fontSize: 18, fontWeight: 700, color: 'var(--txt)', marginTop: 4 }}>
-                    €{(p.spent / 1000).toFixed(0)}K
+                    {formatCurrency(p.spent)}
                   </div>
                 </div>
               </div>
@@ -542,7 +546,7 @@ export default function ProjectsPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, fontSize: 12 }}>
                 <div>
                   <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 4 }}>Start Date</div>
-                  <div style={{ color: 'var(--txt)' }}>{p.startDate ? new Date(p.startDate).toLocaleDateString() : '—'}</div>
+                  <div style={{ color: 'var(--txt)' }}>{fmtDate(p.startDate)}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 4 }}>Contacts</div>

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { Modal } from '@/components/philly/ui/Modal'
 import { useApi } from '@/hooks/philly/useApi'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 /* Bundle V — popover quick-view for a property. Mounted from
    app/properties/page.tsx. Same pattern as ContactQuickView. */
@@ -59,6 +60,7 @@ interface Props {
 export function PropertyQuickView({ propertyId, onClose }: Props) {
   const t = useTranslations('quickview')
   const tc = useTranslations('common')
+  const fmt = useFormat()
   const open = propertyId != null
   const query = useApi<{ data: PropertyDetail }>(open ? `/properties/${propertyId}` : '', { enabled: open })
   const p = query.data?.data ?? null
@@ -109,7 +111,7 @@ export function PropertyQuickView({ propertyId, onClose }: Props) {
             <span style={{ flex: 1 }} />
             <span style={{ fontSize: 11, color: 'var(--txt3)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
               <Calendar size={11} />
-              {t('listedOn', { date: new Date(p.createdAt).toLocaleDateString() })}
+              {t('listedOn', { date: fmt.date(p.createdAt) })}
             </span>
           </div>
 
@@ -121,14 +123,14 @@ export function PropertyQuickView({ propertyId, onClose }: Props) {
           }}>
             <div style={{ fontSize: 10.5, color: 'var(--txt3)', marginBottom: 2 }}>{t('property.price')}</div>
             <div className="mono" style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.1 }}>
-              €{(p.priceCents / 100).toLocaleString()}
+              {fmt.currency(p.priceCents, { cents: true })}
               {p.listingType === 'rent' && (
                 <span style={{ fontSize: 12, color: 'var(--txt3)', fontWeight: 400 }}> {t('property.perMonth')}</span>
               )}
             </div>
             {p.hoaCents != null && p.hoaCents > 0 && (
               <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 4 }}>
-                {t('property.hoa', { amount: (p.hoaCents / 100).toLocaleString() })}
+                {t('property.hoa', { amount: fmt.number(p.hoaCents / 100) })}
               </div>
             )}
           </div>
@@ -155,7 +157,7 @@ export function PropertyQuickView({ propertyId, onClose }: Props) {
           }}>
             <Stat icon={BedDouble} label={t('property.bed')} value={p.bedrooms != null ? String(p.bedrooms) : '—'} />
             <Stat icon={Bath} label={t('property.bath')} value={p.bathrooms != null ? String(p.bathrooms) : '—'} />
-            <Stat icon={Ruler} label={t('property.area')} value={p.sqft != null ? p.sqft.toLocaleString() : '—'} />
+            <Stat icon={Ruler} label={t('property.area')} value={p.sqft != null ? fmt.number(p.sqft) : '—'} />
             <Stat icon={Home} label={t('property.built')} value={p.yearBuilt != null ? String(p.yearBuilt) : '—'} />
           </div>
 

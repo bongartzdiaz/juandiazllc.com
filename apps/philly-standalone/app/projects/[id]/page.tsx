@@ -6,6 +6,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { useTranslations } from 'next-intl'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import {
   ArrowLeft, Tag, Calendar, Save, X, Pencil, Target,
@@ -107,12 +108,6 @@ const IMPACT_TYPES = [
    Helpers
    ------------------------------------------------------------------ */
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-  })
-}
-
 function parseSdgs(raw: number[] | string): number[] {
   if (Array.isArray(raw)) return raw
   try { const p = JSON.parse(raw); return Array.isArray(p) ? p : [] }
@@ -127,14 +122,21 @@ function getImpactLabel(type: string, tp: (k: string) => string): string {
   return type.replace(/_/g, ' ')
 }
 
-function formatImpactValue(type: string, value: number, unit: string): string {
+// LOC-03 — takes the locale-bound formatter. money_donated values are
+// major euros; everything else is a plain (already-major) number.
+function formatImpactValue(
+  type: string,
+  value: number,
+  unit: string,
+  fmt: { currency: (n: number) => string; number: (n: number) => string },
+): string {
   if (type === 'money_donated') {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value)
+    return fmt.currency(value)
   }
   if (type === 'water_liters' && value >= 1000) return `${(value / 1000).toFixed(1)} kL`
   if (type === 'energy_kwh' && value >= 1000) return `${(value / 1000).toFixed(1)} MWh`
-  const fmt = new Intl.NumberFormat('en-US').format(value)
-  return unit ? `${fmt} ${unit}` : fmt
+  const num = fmt.number(value)
+  return unit ? `${num} ${unit}` : num
 }
 
 function daysBetween(start: string, end: string | null): number {
@@ -179,6 +181,12 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const tp = useTranslations('projectDetail')
   const tCommon = useTranslations('common')
   const { addToast } = useToast()
+  // LOC-03 — locale-bound money/date. `formatDate` keeps its name so the
+  // existing call-sites are unchanged. fmtMoney handles cents (deal values);
+  // budget/spent are already major euros (see stats memo).
+  const fmt = useFormat()
+  const formatDate = (iso: string) => fmt.date(iso)
+  const fmtMoney = (cents: number) => fmt.currency(cents, { cents: true })
 
   const [activeTab, setActiveTab] = useState<Tab>('overview')
   const [editing, setEditing] = useState(false)
@@ -601,7 +609,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
               {[
                 { label: tp('stats.progress'), value: `${stats.progress}%`, sub: tp('stats.milestonesSummary', { done: stats.doneMs, total: stats.totalMs }), icon: CheckCircle2, color: stats.progress >= 80 ? 'var(--g)' : stats.progress >= 50 ? 'var(--accent)' : 'var(--y)' },
-                { label: tp('stats.budget'), value: `€${(stats.budget / 1000).toFixed(0)}K`, sub: tp('stats.burnPercent', { burn: stats.burn }), icon: DollarSign, color: 'var(--accent)' },
+                { label: tp('stats.budget'), value: fmt.compactCurrency(stats.budget), sub: tp('stats.burnPercent', { burn: stats.burn }), icon: DollarSign, color: 'var(--accent)' },
                 { label: tp('stats.impactEntries'), value: project.impactMetrics.length, sub: tp('stats.records'), icon: TrendingUp, color: 'var(--g)' },
                 { label: tp('stats.daysActive'), value: stats.days, sub: project.endDate ? tp('stats.totalDuration') : tp('stats.soFar'), icon: Clock, color: 'var(--p)' },
               ].map(s => (
@@ -671,7 +679,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                   }} />
                 </div>
                 <div style={{ fontSize: 11.5, color: 'var(--txt3)', marginTop: 8 }}>
-                  {tp('stats.budgetSpent', { spent: stats.spent.toLocaleString(), budget: stats.budget.toLocaleString() })}
+                  {tp('stats.budgetSpent', { spent: fmt.number(stats.spent), budget: fmt.number(stats.budget) })}
                 </div>
               </div>
             </div>
@@ -689,7 +697,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                   { icon: AlertCircle, label: t('fields.status'), value: project.status, cap: true },
                   { icon: Calendar, label: t('fields.startDate'), value: formatDate(project.startDate) },
                   { icon: Calendar, label: t('fields.endDate'),   value: project.endDate ? formatDate(project.endDate) : '—' },
-                  { icon: DollarSign, label: t('fields.budget'), value: `€${stats.budget.toLocaleString()}` },
+                  { icon: DollarSign, label: t('fields.budget'), value: fmt.currency(stats.budget) },
                   { icon: Clock,    label: tCommon('created'),   value: formatDate(project.createdAt) },
                 ].map(row => (
                   <div key={row.label} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
@@ -934,7 +942,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                         {getImpactLabel(type, tp)}
                       </div>
                       <div className="mono" style={{ fontSize: 20, fontWeight: 700 }}>
-                        {formatImpactValue(type, agg.value, agg.unit)}
+                        {formatImpactValue(type, agg.value, agg.unit, fmt)}
                       </div>
                     </div>
                   ))}
@@ -985,7 +993,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                         </div>
                       </div>
                       <div className="mono" style={{ fontSize: 15, fontWeight: 700, color: 'var(--txt)', flexShrink: 0 }}>
-                        {formatImpactValue(m.metricType, m.value, m.unit)}
+                        {formatImpactValue(m.metricType, m.value, m.unit, fmt)}
                       </div>
                     </div>
                   ))}
@@ -1054,8 +1062,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             {/* Deal KPI strip */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
               {[
-                { label: tp('stats.totalPipeline'), value: `$${Math.round(deals.filter(d => d.status === 'open').reduce((s, d) => s + d.valueCents, 0) / 100).toLocaleString()}`, color: 'var(--accent)' },
-                { label: tp('stats.weighted'), value: `$${Math.round(deals.filter(d => d.status === 'open').reduce((s, d) => s + (d.valueCents * d.probability) / 100, 0) / 100).toLocaleString()}`, color: 'var(--p)' },
+                { label: tp('stats.totalPipeline'), value: fmtMoney(deals.filter(d => d.status === 'open').reduce((s, d) => s + d.valueCents, 0)), color: 'var(--accent)' },
+                { label: tp('stats.weighted'), value: fmtMoney(deals.filter(d => d.status === 'open').reduce((s, d) => s + (d.valueCents * d.probability) / 100, 0)), color: 'var(--p)' },
                 { label: tp('stats.won'), value: String(deals.filter(d => d.status === 'won').length), color: 'var(--g)' },
                 { label: tp('stats.open'), value: String(deals.filter(d => d.status === 'open').length), color: 'var(--b-txt)' },
               ].map(k => (
@@ -1135,7 +1143,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                           </div>
                         </div>
                         <div className="mono" style={{ fontSize: 14, fontWeight: 700, color: 'var(--txt)' }}>
-                          ${(d.valueCents / 100).toLocaleString()}
+                          {fmtMoney(d.valueCents)}
                         </div>
                         <div className="mono" style={{
                           fontSize: 11, fontWeight: 700, minWidth: 38, textAlign: 'right',

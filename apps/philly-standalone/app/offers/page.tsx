@@ -13,6 +13,7 @@ import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { fetchJson } from '@/lib/philly/fetch-json'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 interface Offer {
   id: string
@@ -68,10 +69,6 @@ const emptyForm = {
   notes: '',
 }
 
-function fmtMoney(cents: number) {
-  return `$${(cents / 100).toLocaleString()}`
-}
-
 export default function OffersPage() {
   const [properties, setProperties] = useState<PropertyLite[]>([])
   const [contacts, setContacts] = useState<ContactLite[]>([])
@@ -100,6 +97,9 @@ export default function OffersPage() {
   const tCommon = useTranslations('common')
   const confirm = useConfirm()
   const { addToast } = useToast()
+  // LOC-03 — locale-bound money/date, replacing the old $-hardcoded helper.
+  const fmt = useFormat()
+  const fmtMoney = (cents: number) => fmt.currency(cents, { cents: true })
 
   useEffect(() => {
     // Bundle CK — fetchJson surfaces non-2xx as a typed error so a
@@ -292,7 +292,7 @@ export default function OffersPage() {
               </div>
               <span style={{ fontSize: 11, color: 'var(--txt2)' }}>{offer.contact?.name ?? '-'}</span>
               <span style={{ fontWeight: 600, fontFamily: 'var(--font-red-hat-mono), monospace' }}>{fmtMoney(offer.amountCents)}</span>
-              <span style={{ fontSize: 11, fontFamily: 'var(--font-red-hat-mono), monospace' }}>{new Date(offer.submittedAt).toLocaleDateString()}</span>
+              <span style={{ fontSize: 11, fontFamily: 'var(--font-red-hat-mono), monospace' }}>{fmt.date(offer.submittedAt)}</span>
               <span style={{
                 padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
                 textTransform: 'uppercase',

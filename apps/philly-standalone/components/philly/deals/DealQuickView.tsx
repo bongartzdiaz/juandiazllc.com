@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { Modal } from '@/components/philly/ui/Modal'
 import { useApi } from '@/hooks/philly/useApi'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 /* Bundle V — popover quick-view for a deal. Same pattern as
    ContactQuickView (Bundle T): fetches the same endpoint the detail
@@ -37,17 +38,6 @@ const STATUS_COLORS: Record<string, { bg: string; txt: string; border: string }>
   lost: { bg: 'var(--r-bg)', txt: 'var(--r-txt)', border: 'var(--r-border)' },
 }
 
-function fmtMoney(cents: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency', currency: 'USD', maximumFractionDigits: 0,
-  }).format(cents / 100)
-}
-
-function fmtDate(iso: string | null): string {
-  if (!iso) return '—'
-  return new Date(iso).toLocaleDateString()
-}
-
 interface Props {
   dealId: string | null
   onClose: () => void
@@ -56,6 +46,9 @@ interface Props {
 export function DealQuickView({ dealId, onClose }: Props) {
   const t = useTranslations('quickview')
   const tc = useTranslations('common')
+  const fmt = useFormat()
+  const fmtMoney = (cents: number) => fmt.currency(cents, { cents: true })
+  const fmtDate = (iso: string | null) => (iso ? fmt.date(iso) : '—')
   const open = dealId != null
   const query = useApi<{ data: DealDetail }>(open ? `/deals/${dealId}` : '', { enabled: open })
   const d = query.data?.data ?? null

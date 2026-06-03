@@ -2,6 +2,7 @@
 
 import { Fragment, useState } from 'react'
 import { useApi } from '@/hooks/philly/useApi'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
@@ -61,6 +62,7 @@ const ACTION_COLORS: Record<string, { bg: string; txt: string }> = {
 
 export default function AuditLogPage() {
   const t = useTranslations('audit')
+  const fmt = useFormat()
   const [page, setPage] = useState(1)
   const [entityFilter, setEntityFilter] = useState('')
   const [actionFilter, setActionFilter] = useState('')
@@ -232,7 +234,7 @@ export default function AuditLogPage() {
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--txt3)', fontSize: 11 }}>
                       <Clock size={11} />
-                      {formatTimestamp(log.createdAt)}
+                      {fmt.dateTime(log.createdAt)}
                     </div>
 
                     <div>
@@ -300,12 +302,6 @@ export default function AuditLogPage() {
       </div>
     </>
   )
-}
-
-function formatTimestamp(iso: string): string {
-  const d = new Date(iso)
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) +
-    ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
 }
 
 function formatChanges(changesStr: string): string {

@@ -11,6 +11,7 @@ import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 
 interface Room {
@@ -43,6 +44,9 @@ export default function RoomsPage() {
   const tCommon = useTranslations('common')
   const confirm = useConfirm()
   const { addToast } = useToast()
+  // LOC-03 — locale-bound currency, replacing the old $-hardcoded display.
+  const fmt = useFormat()
+  const fmtMoney = (cents: number) => fmt.currency(cents, { cents: true })
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState('')
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
@@ -180,7 +184,7 @@ export default function RoomsPage() {
                   {t(`types.${room.type}` as 'types.standard')} | {t('meta.floor')} {room.floor} | {t('meta.capacity')} {room.capacity}
                 </div>
                 <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--txt)', fontFamily: "var(--font-red-hat-mono), monospace" }}>
-                  ${(room.priceCentsNight / 100).toFixed(0)}<span style={{ fontSize: 10, fontWeight: 400, color: 'var(--txt3)' }}>{t('perNight')}</span>
+                  {fmtMoney(room.priceCentsNight)}<span style={{ fontSize: 10, fontWeight: 400, color: 'var(--txt3)' }}>{t('perNight')}</span>
                 </div>
                 <div style={{ fontSize: 10, color: 'var(--txt3)', marginTop: 6 }}>
                   {room._count.reservations} {t('meta.reservations')} | {room._count.housekeeping} {t('meta.tasks')}
@@ -213,7 +217,7 @@ export default function RoomsPage() {
                 <div style={{ padding: 12, background: 'var(--bg2)', borderRadius: 10 }}>
                   <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{t('detail.price')}</div>
                   <div className="mono" style={{ fontSize: 18, fontWeight: 700, color: 'var(--txt)', marginTop: 4 }}>
-                    ${(r.priceCentsNight / 100).toFixed(0)}<span style={{ fontSize: 11, color: 'var(--txt3)' }}>{t('perNight')}</span>
+                    {fmtMoney(r.priceCentsNight)}<span style={{ fontSize: 11, color: 'var(--txt3)' }}>{t('perNight')}</span>
                   </div>
                 </div>
                 <div style={{ padding: 12, background: 'var(--bg2)', borderRadius: 10 }}>

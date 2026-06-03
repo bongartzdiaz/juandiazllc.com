@@ -9,6 +9,7 @@ import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useApi } from '@/hooks/philly/useApi'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { Filter, Plus, BedDouble, User as UserIcon, Calendar as CalIcon, DollarSign } from 'lucide-react'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
@@ -67,6 +68,10 @@ function nightsBetween(a: string, b: string): number {
 export default function ReservationsPage() {
   const t = useTranslations('reservations')
   const { addToast } = useToast()
+  // LOC-03 — locale-bound money/date, replacing the old $-hardcoded helpers.
+  const fmt = useFormat()
+  const fmtMoney = (cents: number) => fmt.currency(cents, { cents: true })
+  const fmtDate = (iso: string) => fmt.date(iso)
 
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState('')
@@ -172,7 +177,7 @@ export default function ReservationsPage() {
           <KpiCard icon="calendar" label={t('kpis.total')} value={String(total)} />
           <KpiCard icon="users" label={t('kpis.upcoming')} value={String(upcoming)} />
           <KpiCard icon="bed-double" label={t('kpis.checkedIn')} value={String(checkedIn)} />
-          <KpiCard icon="dollar-sign" label={t('kpis.revenue')} value={`$${(monthRevenueCents / 100).toLocaleString()}`} />
+          <KpiCard icon="dollar-sign" label={t('kpis.revenue')} value={fmtMoney(monthRevenueCents)} />
         </div>
 
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
@@ -226,11 +231,11 @@ export default function ReservationsPage() {
                   )
                   if (c.id === 'dates') return (
                     <span key="dates" style={{ fontSize: 11, color: 'var(--txt2)', fontFamily: 'var(--font-red-hat-mono), monospace' }}>
-                      {new Date(r.checkIn).toLocaleDateString()} → {new Date(r.checkOut).toLocaleDateString()}
+                      {fmtDate(r.checkIn)} → {fmtDate(r.checkOut)}
                     </span>
                   )
                   if (c.id === 'nights') return <span key="nights" className="mono">{nights}</span>
-                  if (c.id === 'total') return <span key="total" className="mono" style={{ fontWeight: 600 }}>${(r.totalCents / 100).toLocaleString()}</span>
+                  if (c.id === 'total') return <span key="total" className="mono" style={{ fontWeight: 600 }}>{fmtMoney(r.totalCents)}</span>
                   if (c.id === 'status') return <span key="status" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 9, fontWeight: 600, textTransform: 'uppercase', background: sc.bg, color: sc.txt, justifySelf: 'start' }}>{r.status.replace('_', ' ')}</span>
                   return <span key={c.id} />
                 })}
@@ -246,9 +251,9 @@ export default function ReservationsPage() {
         {selected && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <DetailTile icon={CalIcon} label={t('fields.checkIn')} value={new Date(selected.checkIn).toLocaleDateString()} />
-              <DetailTile icon={CalIcon} label={t('fields.checkOut')} value={new Date(selected.checkOut).toLocaleDateString()} />
-              <DetailTile icon={DollarSign} label={t('fields.total')} value={`$${(selected.totalCents / 100).toLocaleString()}`} />
+              <DetailTile icon={CalIcon} label={t('fields.checkIn')} value={fmtDate(selected.checkIn)} />
+              <DetailTile icon={CalIcon} label={t('fields.checkOut')} value={fmtDate(selected.checkOut)} />
+              <DetailTile icon={DollarSign} label={t('fields.total')} value={fmtMoney(selected.totalCents)} />
               <DetailTile icon={UserIcon} label={t('fields.email')} value={selected.guestEmail || '—'} />
             </div>
             {selected.notes && (

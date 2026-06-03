@@ -14,6 +14,7 @@ import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { fetchJson } from '@/lib/philly/fetch-json'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 const COMMISSION_COLUMNS: ColumnDef[] = [
   { id: 'type', label: 'Type / Notes', required: true },
@@ -78,6 +79,8 @@ export default function CommissionsPage() {
   const [statusFilter, setStatusFilter] = useState('')
   const t = useTranslations('commissions')
   const { addToast } = useToast()
+  // LOC-03 — locale-bound money/number/date, replacing $-hardcoded toLocaleString().
+  const fmt = useFormat()
 
   const params = new URLSearchParams({ page: String(page), limit: '25' })
   if (statusFilter) params.set('status', statusFilter)
@@ -186,8 +189,8 @@ export default function CommissionsPage() {
       <Topbar title={t('title')} sub={t('subtitle')} />
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
-          <KpiCard icon="dollar-sign" label={t('kpis.ytdGci')} value={`$${(lbTotalCommission / 100).toLocaleString()}`} />
-          <KpiCard icon="trending-up" label={t('kpis.totalNet')} value={`$${(totalNet / 100).toLocaleString()}`} />
+          <KpiCard icon="dollar-sign" label={t('kpis.ytdGci')} value={fmt.currency(lbTotalCommission, { cents: true })} />
+          <KpiCard icon="trending-up" label={t('kpis.totalNet')} value={fmt.currency(totalNet, { cents: true })} />
           <KpiCard icon="target" label={t('kpis.pendingPayouts')} value={String(pendingCount)} />
           <KpiCard icon="users" label={t('kpis.teamMembers')} value={String(leaderboard.length)} />
         </div>
@@ -241,8 +244,8 @@ export default function CommissionsPage() {
                 <span style={{ fontFamily: "var(--font-red-hat-mono), monospace", fontWeight: 500 }}>{entry.totalDeals}</span>
                 <span style={{ fontFamily: "var(--font-red-hat-mono), monospace", fontWeight: 600, color: 'var(--g-txt)' }}>{entry.wonDeals}</span>
                 <span style={{ fontFamily: "var(--font-red-hat-mono), monospace", fontWeight: 500 }}>{entry.monthDeals}</span>
-                <span style={{ fontFamily: "var(--font-red-hat-mono), monospace", fontWeight: 600 }}>${(entry.totalVolumeCents / 100).toLocaleString()}</span>
-                <span style={{ fontFamily: "var(--font-red-hat-mono), monospace", fontWeight: 700, color: 'var(--accent)' }}>${(entry.ytdCommissionCents / 100).toLocaleString()}</span>
+                <span style={{ fontFamily: "var(--font-red-hat-mono), monospace", fontWeight: 600 }}>{fmt.currency(entry.totalVolumeCents, { cents: true })}</span>
+                <span style={{ fontFamily: "var(--font-red-hat-mono), monospace", fontWeight: 700, color: 'var(--accent)' }}>{fmt.currency(entry.ytdCommissionCents, { cents: true })}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <div style={{ flex: 1, height: 4, borderRadius: 2, background: 'var(--bg2)', overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${entry.conversionRate}%`, borderRadius: 2, background: entry.conversionRate >= 50 ? 'var(--g)' : entry.conversionRate >= 25 ? 'var(--y)' : 'var(--r)', transition: 'width 0.5s ease' }} />
@@ -292,17 +295,17 @@ export default function CommissionsPage() {
                     if (c.id === 'type') return (
                       <div key="type">
                         <div style={{ fontWeight: 600, color: 'var(--txt)', textTransform: 'capitalize' }}>{rec.type}</div>
-                        <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{rec.notes || new Date(rec.createdAt).toLocaleDateString()}</div>
+                        <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{rec.notes || fmt.date(rec.createdAt)}</div>
                       </div>
                     )
                     if (c.id === 'gross') return (
-                      <span key="gross" style={{ fontWeight: 600, fontFamily: "var(--font-red-hat-mono), monospace" }}>${(rec.grossCents / 100).toLocaleString()}</span>
+                      <span key="gross" style={{ fontWeight: 600, fontFamily: "var(--font-red-hat-mono), monospace" }}>{fmt.currency(rec.grossCents, { cents: true })}</span>
                     )
                     if (c.id === 'split') return (
                       <span key="split" style={{ fontFamily: "var(--font-red-hat-mono), monospace" }}>{rec.splitPct}%</span>
                     )
                     if (c.id === 'net') return (
-                      <span key="net" style={{ fontWeight: 700, fontFamily: "var(--font-red-hat-mono), monospace", color: 'var(--g-txt)' }}>${(rec.netCents / 100).toLocaleString()}</span>
+                      <span key="net" style={{ fontWeight: 700, fontFamily: "var(--font-red-hat-mono), monospace", color: 'var(--g-txt)' }}>{fmt.currency(rec.netCents, { cents: true })}</span>
                     )
                     if (c.id === 'status') return (
                       <span key="status" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: STATUS_COLORS[rec.status]?.bg ?? 'var(--bg2)', color: STATUS_COLORS[rec.status]?.txt ?? 'var(--txt2)', justifySelf: 'start' }}>{rec.status}</span>
@@ -380,7 +383,7 @@ export default function CommissionsPage() {
               padding: 10, borderRadius: 8, background: 'var(--bg2)',
               fontSize: 12, color: 'var(--txt2)', textAlign: 'center',
             }}>
-              {t('modal.netPayout', { amount: Math.round((parseFloat(form.gross) || 0) * (parseFloat(form.splitPct) || 100) / 100).toLocaleString() })}
+              {t('modal.netPayout', { amount: fmt.number(Math.round((parseFloat(form.gross) || 0) * (parseFloat(form.splitPct) || 100) / 100)) })}
             </div>
           )}
 

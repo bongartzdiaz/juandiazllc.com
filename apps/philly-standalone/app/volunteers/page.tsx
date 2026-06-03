@@ -10,6 +10,7 @@ import { Filter, Mail, Phone, Clock, Calendar as CalIcon, Plus, Trash2, Edit2 } 
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
@@ -52,6 +53,10 @@ const emptyForm = { name: '', email: '', phone: '', status: 'onboarding' }
 export default function VolunteersPage() {
   const t = useTranslations('volunteers')
   const { addToast } = useToast()
+  // LOC-03 — locale-bound number/date formatting (hours are a count).
+  const fmt = useFormat()
+  const fmtNumber = (n: number) => fmt.number(n)
+  const fmtDate = (iso: string) => fmt.date(iso)
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState('')
   const [selected, setSelected] = useState<Volunteer | null>(null)
@@ -138,7 +143,7 @@ export default function VolunteersPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
           <KpiCard icon="users" label={t('kpis.total')} value={String(total)} />
           <KpiCard icon="target" label={t('kpis.active')} value={String(active)} />
-          <KpiCard icon="calendar" label={t('kpis.totalHours')} value={totalHours.toLocaleString()} />
+          <KpiCard icon="calendar" label={t('kpis.totalHours')} value={fmtNumber(totalHours)} />
           <KpiCard icon="trending-down" label={t('filters.inactive')} value={String(volunteers.filter(v => v.status === 'inactive').length)} />
         </div>
 
@@ -222,7 +227,7 @@ export default function VolunteersPage() {
         open={!!selected}
         onClose={() => setSelected(null)}
         title={selected?.name ?? ''}
-        subtitle={selected ? `Joined ${new Date(selected.createdAt).toLocaleDateString()}` : ''}
+        subtitle={selected ? `Joined ${fmtDate(selected.createdAt)}` : ''}
         size="md"
       >
         {selected && (() => {
@@ -237,7 +242,7 @@ export default function VolunteersPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <DetailTile icon={Mail} label={t('fields.email')} value={v.email || '-'} />
                 <DetailTile icon={Phone} label={t('fields.phone')} value={v.phone || '-'} />
-                <DetailTile icon={Clock} label={t('kpis.totalHours')} value={v.totalHours.toLocaleString()} />
+                <DetailTile icon={Clock} label={t('kpis.totalHours')} value={fmtNumber(v.totalHours)} />
                 <DetailTile icon={CalIcon} label={t('fields.activityLogs')} value={String(v._count.volunteerLogs)} />
               </div>
 

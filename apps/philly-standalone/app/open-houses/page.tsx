@@ -17,6 +17,7 @@ import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { fetchJson } from '@/lib/philly/fetch-json'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 const OH_COLUMNS: ColumnDef[] = [
   { id: 'property', label: 'Property', required: true },
@@ -82,6 +83,8 @@ export default function OpenHousesPage() {
 
   const t = useTranslations('openHouses')
   const { addToast } = useToast()
+  // LOC-03 — locale-bound date, replacing native toLocaleDateString().
+  const fmt = useFormat()
 
   // Bundle BS — column visibility prefs.
   const ohColumns = useColumnPrefs('pai-openHouses-columns-v1', OH_DEFAULTS)
@@ -256,7 +259,7 @@ export default function OpenHousesPage() {
                   <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{oh.property?.title ?? 'Unknown'}</div>
                   <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{oh.property?.address ?? ''}</div>
                 </div>
-                <span style={{ fontFamily: "var(--font-red-hat-mono), monospace", fontSize: 11 }}>{ohDate.toLocaleDateString()}</span>
+                <span style={{ fontFamily: "var(--font-red-hat-mono), monospace", fontSize: 11 }}>{fmt.date(ohDate)}</span>
                 <span style={{ fontSize: 11, fontFamily: "var(--font-red-hat-mono), monospace" }}>{oh.startTime} - {oh.endTime}</span>
                 <span style={{
                   fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
@@ -296,7 +299,7 @@ export default function OpenHousesPage() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <DetailTile icon={CalIcon} label="Date" value={d.toLocaleDateString()} />
+                <DetailTile icon={CalIcon} label="Date" value={fmt.date(d)} />
                 <DetailTile icon={Clock} label="Time" value={`${selected.startTime} - ${selected.endTime}`} />
                 <DetailTile icon={UsersIcon} label="Visitors" value={String(visits)} />
                 <DetailTile icon={MapPin} label="Address" value={selected.property?.address ?? '-'} />

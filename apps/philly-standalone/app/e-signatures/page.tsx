@@ -10,6 +10,7 @@ import { Filter, Plus, Send, Eye, CheckCircle2, Trash2, RefreshCw, X } from 'luc
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
@@ -86,6 +87,7 @@ export default function ESignaturesPage() {
   const [saving, setSaving] = useState(false)
 
   const [selected, setSelected] = useState<ESignature | null>(null)
+  const fmt = useFormat()
 
   // Bundle AJ — column visibility prefs.
   const esigColumns = useColumnPrefs('pai-esignatures-columns-v1', ESIG_DEFAULTS)
@@ -262,7 +264,7 @@ export default function ESignaturesPage() {
                   if (c.id === 'transaction') return <span key="transaction" style={{ fontSize: 11, color: 'var(--txt2)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sig.transaction?.escrowNumber || '—'}</span>
                   if (c.id === 'provider') return <span key="provider" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: pc.bg, color: pc.txt, justifySelf: 'start' }}>{sig.provider}</span>
                   if (c.id === 'status') return <span key="status" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: sc.bg, color: sc.txt, border: `1px solid ${sc.border}`, justifySelf: 'start' }}>{sig.status}</span>
-                  if (c.id === 'signed') return <span key="signed" style={{ fontSize: 11, fontFamily: 'var(--font-red-hat-mono), monospace', color: 'var(--txt2)' }}>{sig.signedAt ? new Date(sig.signedAt).toLocaleDateString() : '-'}</span>
+                  if (c.id === 'signed') return <span key="signed" style={{ fontSize: 11, fontFamily: 'var(--font-red-hat-mono), monospace', color: 'var(--txt2)' }}>{sig.signedAt ? fmt.date(sig.signedAt) : '-'}</span>
                   return <span key={c.id} />
                 })}
               </div>
@@ -421,6 +423,7 @@ const inputStyle: React.CSSProperties = {
 }
 
 function TimelineRow({ icon: Icon, label, date }: { icon: React.ComponentType<{ size?: number }>; label: string; date: string | null }) {
+  const fmt = useFormat()
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 8,
@@ -438,7 +441,7 @@ function TimelineRow({ icon: Icon, label, date }: { icon: React.ComponentType<{ 
       </div>
       <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--txt)', minWidth: 70 }}>{label}</span>
       <span className="mono" style={{ fontSize: 11, color: 'var(--txt3)' }}>
-        {date ? new Date(date).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+        {date ? fmt.dateTime(date) : '—'}
       </span>
     </div>
   )

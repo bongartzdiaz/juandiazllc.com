@@ -8,6 +8,7 @@ import { Modal } from '@/components/philly/ui/Modal'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { ListError } from '@/components/philly/ui/ListStates'
 
@@ -215,15 +216,15 @@ const RENTAL_STAGE_MAP: Record<string, number> = {
   'r-enquiry': 0, 'r-viewing': 1, 'r-agreement': 2, 'r-payment': 3, 'r-active': 4,
 }
 
-function formatDealValue(value: number, type: 'sale' | 'rental'): string {
+type MoneyFmt = ReturnType<typeof useFormat>
+
+// LOC-03 — locale-bound. `value` is already in major euros (e.g. 700000 = €700K,
+// 1850 = €1850/mo), so no { cents } here. Rentals show a per-month suffix.
+function formatDealValue(value: number, type: 'sale' | 'rental', fmt: MoneyFmt): string {
   if (type === 'rental') {
-    return `€${value.toLocaleString('en-NL')}/mo`
+    return `${fmt.currency(value)}/mo`
   }
-  if (value >= 1000000) {
-    const m = value / 1000000
-    return `€${m % 1 === 0 ? m.toFixed(0) : m.toFixed(1)}M`
-  }
-  return `€${Math.round(value / 1000)}K`
+  return fmt.compactCurrency(value)
 }
 
 interface RealBoard {
@@ -245,6 +246,7 @@ interface RealBoard {
 
 export default function KanbanPage() {
   const t = useTranslations('kanban')
+  const fmt = useFormat()
   const { industry } = useIndustry()
   const isRE = industry === 'realestate'
   const isHOS = industry === 'hospitality'
@@ -428,7 +430,7 @@ export default function KanbanPage() {
                             <span style={{
                               fontSize: 12, fontWeight: 700, color: 'var(--accent)',
                             }}>
-                              {formatDealValue(card.dealValue, card.dealType)}
+                              {formatDealValue(card.dealValue, card.dealType, fmt)}
                             </span>
                             {card.documents && card.documents.length > 0 && (
                               <span style={{
@@ -452,7 +454,7 @@ export default function KanbanPage() {
                           }}>{card.assignee}</div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10.5, color: 'var(--txt3)' }}>
                             <Calendar size={10} />
-                            <span className="mono">{card.dueDate}</span>
+                            <span className="mono">{fmt.date(card.dueDate)}</span>
                           </div>
                         </div>
                       </div>
@@ -661,6 +663,7 @@ function CardDetailDrawer({
   const t = useTranslations('kanban')
   const tConfirms = useTranslations('confirms')
   const tCommon = useTranslations('common')
+  const fmt = useFormat()
   const confirm = useConfirm()
   useEffect(() => {
     if (!card) return
@@ -750,7 +753,7 @@ function CardDetailDrawer({
           {/* Meta grid */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 18 }}>
             <MetaRow icon={User} label={t('drawer.assignee')} value={card.assignee || t('drawer.unassigned')} />
-            <MetaRow icon={Calendar} label={t('drawer.dueDate')} value={card.dueDate} mono />
+            <MetaRow icon={Calendar} label={t('drawer.dueDate')} value={fmt.date(card.dueDate)} mono />
             <MetaRow icon={Columns3} label={t('drawer.status')} value={currentColumn?.title ?? '—'} />
           </div>
 
@@ -895,6 +898,7 @@ function MetaRow({
 
 function DealModal({ card: selectedCard, reMode, isRE }: { card: KanbanCard; reMode: 'sales' | 'rental'; isRE: boolean; onClose: () => void }) {
   const t = useTranslations('kanban')
+  const fmt = useFormat()
   const allColumns = reMode === 'sales' ? RE_SALES_COLUMNS : RE_RENTAL_COLUMNS
   const stages = selectedCard.dealType === 'sale' ? SALES_STAGES : RENTAL_STAGES
   const stageMap = selectedCard.dealType === 'sale' ? SALES_STAGE_MAP : RENTAL_STAGE_MAP
@@ -914,7 +918,7 @@ function DealModal({ card: selectedCard, reMode, isRE }: { card: KanbanCard; reM
                   <div>
                     <div style={{ fontSize: 10, color: 'var(--txt3)', marginBottom: 2 }}>{t('realestate.dealValue')}</div>
                     <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--accent)' }}>
-                      {formatDealValue(selectedCard.dealValue, selectedCard.dealType)}
+                      {formatDealValue(selectedCard.dealValue, selectedCard.dealType, fmt)}
                     </div>
                   </div>
                   <span style={{

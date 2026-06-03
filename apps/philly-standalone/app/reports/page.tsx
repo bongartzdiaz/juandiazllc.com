@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { BarChart3, Target, DollarSign, Users, Download, FileText, TrendingUp, Globe, Loader2, TableProperties } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { exportToCSV } from '@/lib/philly/export'
 
 // Template *visuals* — strings come from i18n via the templateId.
@@ -77,6 +78,7 @@ function downloadReportHTML(report: ApiReport) {
 
 export default function ReportsPage() {
   const t = useTranslations('reports')
+  const fmt = useFormat()
   const [reports, setReports] = useState<ApiReport[]>([])
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState<string | null>(null)
@@ -268,7 +270,7 @@ export default function ReportsPage() {
                       <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600 }}>{r.title}</td>
                       <td style={{ padding: '12px 14px', fontSize: 12, color: 'var(--txt2)' }}>{typeLabels[r.type] ?? r.type}</td>
                       <td className="mono" style={{ padding: '12px 14px', fontSize: 12, color: 'var(--txt2)' }}>
-                        {new Date(r.createdAt).toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                        {fmt.dateTime(r.createdAt)}
                       </td>
                       <td style={{ padding: '12px 14px' }}>
                         <span style={{

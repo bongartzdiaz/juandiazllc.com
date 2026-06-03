@@ -12,6 +12,7 @@ import {
 import { useToast } from '@/hooks/philly/useToast'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useConfirm } from '@/hooks/philly/useConfirm'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 interface Deal {
   id: string
@@ -44,11 +45,6 @@ const STATUS_COLORS: Record<string, { bg: string; txt: string; border: string }>
   lost: { bg: 'var(--r-bg)', txt: 'var(--r-txt)', border: 'var(--r-border)' },
 }
 
-function fmt(date: string | null) {
-  if (!date) return '--'
-  return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-}
-
 function toInputDate(date: string | null) {
   if (!date) return ''
   return new Date(date).toISOString().slice(0, 10)
@@ -63,6 +59,9 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
   const confirm = useConfirm()
   const router = useRouter()
   const { addToast } = useToast()
+  // LOC-03 — locale-bound money/date, replacing the old $-hardcoded / en-US helpers.
+  const fmt = useFormat()
+  const fmtDate = (date: string | null) => (date ? fmt.date(date) : '--')
 
   const [deal, setDeal] = useState<Deal | null>(null)
   const [pipelines, setPipelines] = useState<Pipeline[]>([])
@@ -376,7 +375,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                           }}
                           title={td('hints.clickToEdit')}
                         >
-                          ${(deal.valueCents / 100).toLocaleString()}
+                          {fmt.currency(deal.valueCents, { cents: true })}
                         </span>
                       )}
                     </InfoRow>
@@ -423,7 +422,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                           style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)', cursor: 'pointer' }}
                           title={td('hints.clickToEdit')}
                         >
-                          {fmt(deal.expectedClose)}
+                          {fmtDate(deal.expectedClose)}
                         </span>
                       )}
                     </InfoRow>
@@ -489,14 +488,14 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                     {/* Created */}
                     <InfoRow icon={Clock} label={td('fields.created')}>
                       <span style={{ fontSize: 13, color: 'var(--txt2)' }}>
-                        {fmt(deal.createdAt)}
+                        {fmtDate(deal.createdAt)}
                       </span>
                     </InfoRow>
 
                     {/* Actual Close */}
                     <InfoRow icon={Calendar} label={td('fields.actualClose')}>
                       <span style={{ fontSize: 13, color: 'var(--txt2)' }}>
-                        {fmt(deal.actualClose)}
+                        {fmtDate(deal.actualClose)}
                       </span>
                     </InfoRow>
                   </div>
@@ -557,7 +556,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                     <div>
                       <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt3)', textTransform: 'uppercase', marginBottom: 4 }}>{td('fields.amount')}</div>
                       <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'var(--font-red-hat-mono), monospace', color: 'var(--txt)' }}>
-                        ${(deal.commissionCents / 100).toLocaleString()}
+                        {fmt.currency(deal.commissionCents, { cents: true })}
                       </div>
                     </div>
                     <div>
@@ -731,7 +730,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
                     fontFamily: 'var(--font-red-hat-mono), monospace',
                     color: 'var(--accent)',
                   }}>
-                    ${((deal.valueCents * deal.probability) / 10000).toLocaleString()}
+                    {fmt.currency((deal.valueCents * deal.probability) / 10000)}
                   </div>
                   <div style={{ fontSize: 10, color: 'var(--txt3)', marginTop: 4 }}>
                     {t('value')} x {t('probability')}

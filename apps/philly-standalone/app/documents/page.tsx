@@ -16,6 +16,7 @@ import {
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { ListLoading, ListError } from '@/components/philly/ui/ListStates'
 
 interface Doc {
@@ -75,6 +76,7 @@ export default function DocumentsPage() {
   const tCommon = useTranslations('common')
   const { addToast } = useToast()
   const confirm = useConfirm()
+  const fmt = useFormat()
   const [filter, setFilter] = useState<FilterGroup>(emptyFilter())
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<string[]>([])
@@ -210,7 +212,7 @@ export default function DocumentsPage() {
     },
     {
       key: 'createdAt', label: t('columns.uploaded'), sortable: true, mono: true, width: 120,
-      accessor: (d) => new Date(d.createdAt).toLocaleDateString(),
+      accessor: (d) => fmt.date(d.createdAt),
     },
     {
       key: 'actions', label: '', width: 80, align: 'right',
@@ -373,7 +375,7 @@ export default function DocumentsPage() {
                     {d.name}
                   </div>
                   <div className="mono" style={{ fontSize: 10.5, color: 'var(--txt3)' }}>
-                    {formatBytes(d.sizeBytes)} · {new Date(d.createdAt).toLocaleDateString()}
+                    {formatBytes(d.sizeBytes)} · {fmt.date(d.createdAt)}
                   </div>
                   {d.entityType && (
                     <span style={{

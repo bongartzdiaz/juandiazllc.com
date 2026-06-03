@@ -9,6 +9,7 @@ import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useApi } from '@/hooks/philly/useApi'
+import { useFormat } from '@/hooks/philly/useFormat'
 import {
   Filter, Mail, Play, Pause, Plus, Trash2, Edit2, GripVertical, X,
   MessageSquare, Phone, Users,
@@ -69,6 +70,7 @@ export default function DripCampaignsPage() {
   const t = useTranslations('dripCampaigns')
   const tConfirms = useTranslations('confirms')
   const tCommon = useTranslations('common')
+  const fmt = useFormat()
   const { addToast } = useToast()
   const confirm = useConfirm()
 
@@ -289,7 +291,7 @@ export default function DripCampaignsPage() {
                     gap: 6,
                   }}>
                     <span style={{ fontSize: 10, color: 'var(--txt3)' }}>
-                      {t('list.created', { date: new Date(campaign.createdAt).toLocaleDateString() })}
+                      {t('list.created', { date: fmt.date(campaign.createdAt) })}
                     </span>
                     <div style={{ display: 'flex', gap: 4 }}>
                       <button

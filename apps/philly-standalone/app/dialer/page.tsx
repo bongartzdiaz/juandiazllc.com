@@ -7,6 +7,7 @@ import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { Phone, PhoneCall, List, Filter, X, Loader2 } from 'lucide-react'
@@ -115,6 +116,7 @@ function setCursor(listId: string, idx: number) {
 
 export default function DialerPage() {
   const t = useTranslations('dialer')
+  const fmt = useFormat()
 
   const OUTCOMES = OUTCOME_VALUES.map(v => ({ value: v, label: t(`outcomes.${v}`) }))
 
@@ -438,8 +440,7 @@ export default function DialerPage() {
                     )
                     if (c.id === 'startedAt') return (
                       <span key="startedAt" style={{ fontSize: 11, color: 'var(--txt2)', fontFamily: 'var(--font-red-hat-mono), monospace' }}>
-                        {new Date(call.startedAt).toLocaleDateString()}{' '}
-                        {new Date(call.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {fmt.dateTime(call.startedAt)}
                       </span>
                     )
                     if (c.id === 'notes') return (

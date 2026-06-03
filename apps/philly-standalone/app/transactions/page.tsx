@@ -13,6 +13,7 @@ import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { useGlobalShortcuts } from '@/hooks/philly/useGlobalShortcuts'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 const TXN_COLUMNS: ColumnDef[] = [
   { id: 'transaction', label: 'Transaction', required: true },
@@ -78,6 +79,8 @@ export default function TransactionsPage() {
   const [addError, setAddError] = useState<string | null>(null)
   const t = useTranslations('transactions')
   const router = useRouter()
+  // LOC-03 — locale-bound money/date, replacing $-hardcoded toLocaleString().
+  const fmt = useFormat()
 
   // Bundle AI — j/k navigation through transactions list.
   const [focusedTxnId, setFocusedTxnId] = useState<string | null>(null)
@@ -186,7 +189,7 @@ export default function TransactionsPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
           <KpiCard icon="file-text" label={t('kpis.total')} value={String(total)} />
           <KpiCard icon="target" label={t('kpis.active')} value={String(activeCount)} />
-          <KpiCard icon="dollar-sign" label={t('kpis.totalVolume')} value={`$${(totalVolume / 100).toLocaleString()}`} />
+          <KpiCard icon="dollar-sign" label={t('kpis.totalVolume')} value={fmt.currency(totalVolume, { cents: true })} />
           <KpiCard icon="calendar" label={t('kpis.pendingClose')} value={String(pendingClose)} />
         </div>
 
@@ -250,13 +253,13 @@ export default function TransactionsPage() {
                   <span key="type" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: 'var(--bg2)', color: 'var(--txt2)', display: 'inline-block', maxWidth: 'fit-content' }}>{txn.type}</span>
                 )
                 if (c.id === 'salePrice') return (
-                  <span key="salePrice" style={{ fontWeight: 600, fontFamily: 'var(--font-red-hat-mono), monospace' }}>${(txn.salePrice / 100).toLocaleString()}</span>
+                  <span key="salePrice" style={{ fontWeight: 600, fontFamily: 'var(--font-red-hat-mono), monospace' }}>{fmt.currency(txn.salePrice, { cents: true })}</span>
                 )
                 if (c.id === 'status') return (
                   <span key="status" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: STATUS_COLORS[txn.status]?.bg ?? 'var(--bg2)', color: STATUS_COLORS[txn.status]?.txt ?? 'var(--txt2)', display: 'inline-block', maxWidth: 'fit-content' }}>{txn.status}</span>
                 )
                 if (c.id === 'closingDate') return (
-                  <span key="closingDate" style={{ fontSize: 11, fontFamily: 'var(--font-red-hat-mono), monospace' }}>{txn.closingDate ? new Date(txn.closingDate).toLocaleDateString() : '-'}</span>
+                  <span key="closingDate" style={{ fontSize: 11, fontFamily: 'var(--font-red-hat-mono), monospace' }}>{txn.closingDate ? fmt.date(txn.closingDate) : '-'}</span>
                 )
                 if (c.id === 'signatures') return (
                   <div key="signatures" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>

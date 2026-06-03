@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 interface CMA {
   id: string
@@ -64,6 +65,8 @@ export default function CmaPage() {
   const tCommon = useTranslations('common')
   const confirm = useConfirm()
   const { addToast } = useToast()
+  // LOC-03 — locale-bound money/number, replacing $-hardcoded toLocaleString().
+  const fmt = useFormat()
 
   const closeAddModal = () => {
     setShowAdd(false)
@@ -176,7 +179,7 @@ export default function CmaPage() {
           <KpiCard icon="folder" label="Total CMAs" value={String(total)} />
           <KpiCard icon="target" label="Draft" value={String(drafts)} />
           <KpiCard icon="trending-up" label="Sent" value={String(sent)} />
-          <KpiCard icon="dollar-sign" label="Avg Estimated Value" value={`$${avgValue.toLocaleString()}`} />
+          <KpiCard icon="dollar-sign" label="Avg Estimated Value" value={fmt.currency(avgValue)} />
         </div>
 
         {/* Filters */}
@@ -237,7 +240,7 @@ export default function CmaPage() {
                       <Bath size={12} style={{ color: 'var(--txt3)' }} /> {cma.subjectBaths} ba
                     </span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <Maximize size={12} style={{ color: 'var(--txt3)' }} /> {cma.subjectSqft.toLocaleString()} sqft
+                      <Maximize size={12} style={{ color: 'var(--txt3)' }} /> {fmt.number(cma.subjectSqft)} sqft
                     </span>
                   </div>
 
@@ -247,7 +250,7 @@ export default function CmaPage() {
                     color: 'var(--txt)',
                     fontFamily: "var(--font-red-hat-mono), 'Red Hat Mono', monospace",
                   }}>
-                    ${(cma.estimatedValue / 100).toLocaleString()}
+                    {fmt.currency(cma.estimatedValue, { cents: true })}
                   </div>
 
                   {/* Footer: comparables + date */}

@@ -6,6 +6,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useToast } from '@/hooks/philly/useToast'
+import { useFormat } from '@/hooks/philly/useFormat'
 import {
   Filter, Search, LayoutGrid, List as ListIcon, X, Plus, GripVertical,
   Calendar, User as UserIcon, Eye, ExternalLink, Copy, Trash2, CheckCircle, XCircle,
@@ -93,18 +94,6 @@ const STATUS_COLORS: Record<string, { bg: string; txt: string; border: string }>
    Helpers
    ------------------------------------------------------------------ */
 
-function fmtMoney(cents: number): string {
-  const n = cents / 100
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`
-  return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
-}
-
-function fmtDate(iso: string | null): string {
-  if (!iso) return '—'
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-}
-
 /* ------------------------------------------------------------------
    Page
    ------------------------------------------------------------------ */
@@ -112,6 +101,10 @@ function fmtDate(iso: string | null): string {
 export default function DealsPage() {
   const t = useTranslations('deals')
   const { addToast } = useToast()
+  // LOC-03 — locale-bound money/date, replacing the old $-hardcoded helpers.
+  const fmt = useFormat()
+  const fmtMoney = (cents: number) => fmt.compactCurrency(cents, { cents: true })
+  const fmtDate = (iso: string | null) => (iso ? fmt.date(iso) : '—')
   const router = useRouter()
 
   const [filters, setFilters] = useUrlState({

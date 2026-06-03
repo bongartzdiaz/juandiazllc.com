@@ -13,6 +13,7 @@ import { useApi } from '@/hooks/philly/useApi'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 const SHOWING_COLUMNS: ColumnDef[] = [
   { id: 'property', label: 'Property', required: true },
@@ -92,6 +93,8 @@ export default function ShowingsPage() {
 
   const t = useTranslations('showings')
   const { addToast } = useToast()
+  // LOC-03 — locale-bound date/time, replacing native toLocale*String().
+  const fmt = useFormat()
 
   // Bundle BS — column visibility prefs.
   const showingColumns = useColumnPrefs('pai-showings-columns-v1', SHOWING_DEFAULTS)
@@ -308,7 +311,7 @@ export default function ShowingsPage() {
                   if (c.id === 'date') return (
                     <div key="date">
                       <div style={{ fontWeight: 500, fontSize: 11, fontFamily: "var(--font-red-hat-mono), monospace" }}>
-                        {d.toLocaleDateString()}
+                        {fmt.date(d)}
                       </div>
                       <div style={{ fontSize: 10, color: 'var(--txt3)' }}>
                         {d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -368,7 +371,7 @@ export default function ShowingsPage() {
                 <span style={{
                   padding: '3px 10px', borderRadius: 6, fontSize: 10, fontWeight: 600,
                   background: 'var(--bg2)', color: 'var(--txt2)',
-                }}>{d.toLocaleString()}</span>
+                }}>{fmt.dateTime(d)}</span>
                 <span style={{
                   padding: '3px 10px', borderRadius: 6, fontSize: 10, fontWeight: 600,
                   background: 'var(--bg2)', color: 'var(--txt2)',

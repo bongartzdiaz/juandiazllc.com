@@ -8,6 +8,7 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Users, Filter, Plus, X, ArrowRight, Trash2, CheckCircle2 } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { fetchJson } from '@/lib/philly/fetch-json'
@@ -73,6 +74,9 @@ export default function ReferralsPage() {
   const [contacts, setContacts] = useState<ContactLite[]>([])
   const t = useTranslations('referrals')
   const { addToast } = useToast()
+  // LOC-03 — locale-bound currency, replacing the old $-hardcoded display.
+  const fmt = useFormat()
+  const fmtMoney = (cents: number) => fmt.currency(cents, { cents: true })
 
   // Bundle AJ — column visibility prefs.
   const refColumns = useColumnPrefs('pai-referrals-columns-v1', REF_DEFAULTS)
@@ -172,8 +176,8 @@ export default function ReferralsPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
           <KpiCard icon="users" label="Total Referrals" value={String(totalReferrals)} />
           <KpiCard icon="trending-up" label="Active" value={String(activeCount)} />
-          <KpiCard icon="dollar-sign" label="Total Commission" value={`$${(totalCommission / 100).toLocaleString()}`} />
-          <KpiCard icon="dollar-sign" label="Paid Out" value={`$${(paidOut / 100).toLocaleString()}`} />
+          <KpiCard icon="dollar-sign" label="Total Commission" value={fmtMoney(totalCommission)} />
+          <KpiCard icon="dollar-sign" label="Paid Out" value={fmtMoney(paidOut)} />
         </div>
 
         {/* Filters */}
@@ -228,7 +232,7 @@ export default function ReferralsPage() {
                   </div>
                 )
                 if (c.id === 'pct') return <span key="pct" className="mono" style={{ fontWeight: 600 }}>{ref.commissionPct}%</span>
-                if (c.id === 'commission') return <span key="commission" className="mono" style={{ fontWeight: 600, color: 'var(--g-txt)' }}>${(ref.commissionCents / 100).toLocaleString()}</span>
+                if (c.id === 'commission') return <span key="commission" className="mono" style={{ fontWeight: 600, color: 'var(--g-txt)' }}>{fmtMoney(ref.commissionCents)}</span>
                 if (c.id === 'status') return <span key="status" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600, textTransform: 'uppercase', background: STATUS_COLORS[ref.status]?.bg ?? 'var(--bg2)', color: STATUS_COLORS[ref.status]?.txt ?? 'var(--txt2)', justifySelf: 'start' }}>{ref.status}</span>
                 if (c.id === 'actions') return (
                   <div key="actions" style={{ display: 'flex', gap: 4 }}>

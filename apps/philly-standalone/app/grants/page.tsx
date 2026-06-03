@@ -10,6 +10,7 @@ import { Filter, Euro, Calendar as CalIcon, Building2, CheckCircle2, Plus, Trash
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
@@ -62,13 +63,14 @@ const STATUS_COLORS: Record<string, { bg: string; txt: string }> = {
   rejected: { bg: 'var(--r-bg)', txt: 'var(--r-txt)' },
 }
 
-function fmtDate(s: string | null) {
-  return s ? new Date(s).toLocaleDateString() : '-'
-}
-
 export default function GrantsPage() {
   const t = useTranslations('grants')
   const { addToast } = useToast()
+  // LOC-03 — locale-bound money/date. `fmtDate` keeps its name + '-' null
+  // fallback so existing call-sites are unchanged. Amounts are cents.
+  const fmt = useFormat()
+  const fmtMoney = (cents: number) => fmt.currency(cents, { cents: true })
+  const fmtDate = (s: string | null) => (s ? fmt.date(s) : '-')
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState('')
   const [selected, setSelected] = useState<Grant | null>(null)
@@ -187,7 +189,7 @@ export default function GrantsPage() {
       <div style={{ padding: '18px 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
           <KpiCard icon="award" label={t('kpis.total')} value={String(total)} />
-          <KpiCard icon="dollar-sign" label={t('kpis.funded')} value={`$${(totalFunding / 100).toLocaleString()}`} />
+          <KpiCard icon="dollar-sign" label={t('kpis.funded')} value={fmtMoney(totalFunding)} />
           <KpiCard icon="target" label={t('kpis.active')} value={String(activeGrants.length)} />
           <KpiCard icon="calendar" label={t('kpis.pending')} value={String(pending.length)} />
         </div>
@@ -249,9 +251,9 @@ export default function GrantsPage() {
                 {visibleGrantColumns.map((c) => {
                   if (c.id === 'grant') return <div key="grant" style={{ fontWeight: 600, color: 'var(--txt)' }}>{grant.title}</div>
                   if (c.id === 'funder') return <span key="funder" style={{ color: 'var(--txt2)' }}>{grant.funder || '-'}</span>
-                  if (c.id === 'amount') return <span key="amount" style={{ fontWeight: 600, fontFamily: 'var(--font-red-hat-mono), monospace' }}>${(grant.amountCents / 100).toLocaleString()}</span>
+                  if (c.id === 'amount') return <span key="amount" style={{ fontWeight: 600, fontFamily: 'var(--font-red-hat-mono), monospace' }}>{fmtMoney(grant.amountCents)}</span>
                   if (c.id === 'status') return <span key="status" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 9, fontWeight: 600, textTransform: 'uppercase', background: sc.bg, color: sc.txt, display: 'inline-block', maxWidth: 'fit-content' }}>{grant.status.replace('_', ' ')}</span>
-                  if (c.id === 'dates') return <span key="dates" style={{ fontSize: 10, color: 'var(--txt3)' }}>{grant.startDate ? new Date(grant.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '-'}</span>
+                  if (c.id === 'dates') return <span key="dates" style={{ fontSize: 10, color: 'var(--txt3)' }}>{fmtDate(grant.startDate)}</span>
                   return <span key={c.id} />
                 })}
               </div>
@@ -288,7 +290,7 @@ export default function GrantsPage() {
                 <div>
                   <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--txt3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{t('detail.grantAmount')}</div>
                   <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: 'var(--txt)', marginTop: 2 }}>
-                    ${(g.amountCents / 100).toLocaleString()}
+                    {fmtMoney(g.amountCents)}
                   </div>
                 </div>
               </div>

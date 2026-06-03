@@ -6,6 +6,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { useTranslations } from 'next-intl'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
+import { useFormat } from '@/hooks/philly/useFormat'
 import {
   ArrowLeft, Mail, Phone, Building2, Tag, Globe2, Calendar,
   Save, X, Pencil, FileText, Activity, FolderKanban, User,
@@ -110,20 +111,9 @@ function getInitials(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-  })
-}
-
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  })
-}
-
-function timeAgo(iso: string): string {
+// LOC-03 — `timeAgo` takes the locale-bound date formatter so its
+// >30-day fallback renders in the active locale, not hardcoded en-US.
+function timeAgo(iso: string, fmtDate: (iso: string) => string): string {
   const diff = Date.now() - new Date(iso).getTime()
   const mins = Math.floor(diff / 60000)
   if (mins < 1) return 'just now'
@@ -132,7 +122,7 @@ function timeAgo(iso: string): string {
   if (hrs < 24) return `${hrs}h ago`
   const days = Math.floor(hrs / 24)
   if (days < 30) return `${days}d ago`
-  return formatDate(iso)
+  return fmtDate(iso)
 }
 
 const activityIcons: Record<string, typeof Activity> = {
@@ -167,6 +157,11 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
   const t = useTranslations('contacts')
   const tCommon = useTranslations('common')
   const { addToast } = useToast()
+  // LOC-03 — locale-bound money/date, replacing the old en-US helpers.
+  const fmt = useFormat()
+  const fmtMoney = (cents: number) => fmt.currency(cents, { cents: true })
+  const fmtDate = (iso: string) => fmt.date(iso)
+  const fmtDateTime = (iso: string) => fmt.dateTime(iso)
 
   const [activeTab, setActiveTab] = useState<Tab>('overview')
   const [editing, setEditing] = useState(false)
@@ -533,7 +528,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                   { icon: Building2, label: t('fields.company'), value: contact.company || '-' },
                   { icon: Tag, label: t('fields.type'), value: contact.type, capitalize: true },
                   { icon: Globe2, label: 'Source', value: contact.source || '-' },
-                  { icon: Calendar, label: tCommon('created'), value: formatDate(contact.createdAt) },
+                  { icon: Calendar, label: tCommon('created'), value: fmtDate(contact.createdAt) },
                 ].map(row => (
                   <div key={row.label} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                     <row.icon size={14} color="var(--txt3)" style={{ marginTop: 2, flexShrink: 0 }} />
@@ -602,7 +597,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                           <span style={{ fontSize: 11, color: 'var(--txt3)' }}>{a.user.name}</span>
                           <span style={{ fontSize: 11, color: 'var(--txt3)' }}>
                             <Clock size={10} style={{ marginRight: 3, verticalAlign: 'middle' }} />
-                            {timeAgo(a.createdAt)}
+                            {timeAgo(a.createdAt, fmtDate)}
                           </span>
                         </div>
                       </div>
@@ -699,7 +694,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                         <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--txt2)' }}>{n.user.name}</span>
                         <span style={{ fontSize: 11, color: 'var(--txt3)' }}>
                           <Clock size={10} style={{ marginRight: 3, verticalAlign: 'middle' }} />
-                          {formatDateTime(n.createdAt)}
+                          {fmtDateTime(n.createdAt)}
                         </span>
                       </div>
                     </div>
@@ -798,13 +793,13 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
             }}>
               <DealKpi
                 label="Total Pipeline"
-                value={`$${Math.round(deals.filter(d => d.status === 'open').reduce((s, d) => s + d.valueCents, 0) / 100).toLocaleString()}`}
+                value={fmtMoney(deals.filter(d => d.status === 'open').reduce((s, d) => s + d.valueCents, 0))}
                 icon={Briefcase}
                 color="var(--accent)"
               />
               <DealKpi
                 label="Weighted"
-                value={`$${Math.round(deals.filter(d => d.status === 'open').reduce((s, d) => s + (d.valueCents * d.probability) / 100, 0) / 100).toLocaleString()}`}
+                value={fmtMoney(deals.filter(d => d.status === 'open').reduce((s, d) => s + (d.valueCents * d.probability) / 100, 0))}
                 icon={TrendingUp}
                 color="var(--p)"
               />
@@ -886,7 +881,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                           </div>
                           <div style={{ fontSize: 11, color: 'var(--txt3)' }}>
                             {d.pipeline?.name ?? '—'} · {d.stage.name}
-                            {d.expectedClose && ` · closes ${new Date(d.expectedClose).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                            {d.expectedClose && ` · closes ${fmtDate(d.expectedClose)}`}
                           </div>
                         </div>
                         <div style={{
@@ -894,7 +889,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                           fontFamily: 'var(--font-red-hat-mono), monospace',
                           color: 'var(--txt)',
                         }}>
-                          ${(d.valueCents / 100).toLocaleString()}
+                          {fmtMoney(d.valueCents)}
                         </div>
                         <div style={{
                           fontSize: 11, fontWeight: 700, minWidth: 38, textAlign: 'right',
