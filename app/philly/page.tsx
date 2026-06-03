@@ -11,6 +11,9 @@ import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useKpiStore } from '@/hooks/philly/useKpiStore'
 import { useTheme } from '@/hooks/philly/useTheme'
 import { useDashboardLayout } from '@/hooks/philly/useDashboardLayout'
+import { useApi } from '@/hooks/philly/useApi'
+import { ApiErrorBanner } from '@/components/philly/ui/ApiErrorBanner'
+import { formatActivityFeed, type ActivityItem } from '@/lib/philly/dashboard-activity'
 import { CSR_WIDGETS, RE_WIDGETS, HOS_WIDGETS } from '@/lib/philly/dashboard-layout'
 import { KpiDetailDrawer } from '@/components/philly/dashboard/KpiDetailDrawer'
 import { AlertsCard } from '@/components/philly/dashboard/AlertsCard'
@@ -55,14 +58,6 @@ const CSR_PROJECTS = [
   { id: '5', title: 'Food Bank Partnership', status: 'completed', category: 'Hunger', progress: 100, sdgs: [1, 2] },
 ]
 
-const CSR_ACTIVITY = [
-  { text: 'Milestone completed: "500 trees planted"', time: '2h ago' },
-  { text: 'New partner added: GreenTech Solutions', time: '5h ago' },
-  { text: 'Impact report generated for Q1 2026', time: '1d ago' },
-  { text: 'Budget updated for Clean Water Access', time: '1d ago' },
-  { text: 'New project created: Renewable Energy', time: '2d ago' },
-]
-
 // ── Real Estate Demo Data ──
 const RE_MONTHLY = [
   { month: 'Oct', revenue: 42000, listings: 8, closed: 3 },
@@ -79,15 +74,6 @@ const RE_PROPERTIES = [
   { id: '3', title: 'Studio Apartment — De Pijp', status: 'pending', type: 'Rental', price: 1850, sqm: 38, beds: 1, daysOnMarket: 5, viewings: 22 },
   { id: '4', title: 'Commercial Office — Centrum', status: 'active', type: 'Lease', price: 4500, sqm: 220, beds: 0, daysOnMarket: 45, viewings: 6 },
   { id: '5', title: 'Townhouse — Jordaan', status: 'sold', type: 'Sale', price: 920000, sqm: 125, beds: 3, daysOnMarket: 0, viewings: 31 },
-]
-
-const RE_ACTIVITY = [
-  { text: 'New offer received: Penthouse Suite — €1.2M', time: '1h ago' },
-  { text: 'Viewing scheduled: Family Home — Tomorrow 14:00', time: '3h ago' },
-  { text: 'Rental agreement signed: Zuidas Office — €8,500/mo', time: '6h ago' },
-  { text: 'Contract signed: Townhouse — Jordaan', time: '1d ago' },
-  { text: 'Tenant payment received: De Pijp Studio — €1,850', time: '1d ago' },
-  { text: 'New listing: Commercial Office — Centrum', time: '2d ago' },
 ]
 
 // Pipeline data now in JourneyBar component configs
@@ -108,14 +94,6 @@ const HOS_ROOMS = [
   { id: '3', title: 'Deluxe King 305', status: 'occupied', type: 'Deluxe', rate: 225, guests: 'T. Nakamura', nights: 2 },
   { id: '4', title: 'Restaurant — La Terrazza', status: 'available', type: 'F&B Venue', rate: 0, guests: '', nights: 0 },
   { id: '5', title: 'Conference Hall A', status: 'reserved', type: 'Event Space', rate: 800, guests: 'TechCorp Summit', nights: 1 },
-]
-
-const HOS_ACTIVITY = [
-  { text: 'New booking: Suite 401 — 3 nights', time: '45m ago' },
-  { text: 'Guest checkout: Room 205 — rated 5 stars', time: '2h ago' },
-  { text: 'Review received: 5 stars — "Excellent service"', time: '3h ago' },
-  { text: 'Maintenance completed: Room 108 — AC repair', time: '5h ago' },
-  { text: 'F&B order: La Terrazza — private dinner for 12', time: '1d ago' },
 ]
 
 // Pipeline data now in JourneyBar component configs
@@ -211,11 +189,27 @@ export default function DashboardPage() {
 
   const onAddLead = useCallback(() => setAddLeadOpen(true), [])
 
-  const shared = { config, kpi: kpiStore, themeKey: theme, layout, openKpiDetail, journeyPeriod, setJourneyPeriod, industry, onAddLead }
+  // Live, org-scoped dashboard data. The vertical param keeps the endpoint
+  // from computing RE/HOS aggregates for a general/philanthropy org.
+  const vertical = industry === 'realestate' ? 'realestate' : industry === 'hospitality' ? 'hospitality' : 'general'
+  const summaryQuery = useApi<{ data: DashboardSummary }>(`/dashboard/summary?vertical=${vertical}`)
+  const summary = summaryQuery.data?.data ?? null
+  const activity = formatActivityFeed(summary?.recentActivity)
+
+  const shared = {
+    config, kpi: kpiStore, themeKey: theme, layout, openKpiDetail,
+    journeyPeriod, setJourneyPeriod, industry, onAddLead,
+    summary, activity, summaryLoading: summaryQuery.loading,
+  }
 
   return (
     <>
       <LiveMetricsBand />
+      {summaryQuery.error && (
+        <div style={{ padding: '0 24px', marginTop: 12 }}>
+          <ApiErrorBanner errors={[summaryQuery.error]} />
+        </div>
+      )}
       {industry === 'hospitality' ? <HospitalityDashboard {...shared} /> :
        industry === 'realestate' ? <RealEstateDashboard {...shared} /> :
        <CSRDashboard {...shared} />}
@@ -240,6 +234,19 @@ export default function DashboardPage() {
 }
 
 type LayoutReturn = ReturnType<typeof useDashboardLayout>
+interface DashboardSummary {
+  kpis: {
+    contacts: number; contactsDelta30d: number
+    openDeals: number; openDealValueCents: number
+    wonDeals30d: number; wonDealsValueCents30d: number
+    transactionsCompleted: number; transactionsSalePriceCents: number
+  }
+  re?: { properties: number; activeListings: number; soldOrRented: number; portfolioValueCents: number }
+  hos?: { rooms: number; occupied: number; available: number; occupancyPct: number; upcomingReservations: number; reservationRevenueCents: number }
+  monthlyRevenue: { month: string; revenueCents: number; wonDeals: number }[]
+  recentActivity: { action: string; entity: string; at: string }[]
+  asOf: string
+}
 type DashboardProps = {
   config: { dashboardTitle: string; dashboardSub: string }
   kpi: KpiStore
@@ -250,13 +257,16 @@ type DashboardProps = {
   setJourneyPeriod: (p: JourneyPeriod) => void
   industry: string
   onAddLead: () => void
+  summary: DashboardSummary | null
+  activity: ActivityItem[]
+  summaryLoading: boolean
 }
 
 type KpiStore = ReturnType<typeof useKpiStore>
 // ══════════════════════════════════════════
 // HOSPITALITY DASHBOARD
 // ══════════════════════════════════════════
-function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
+function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourneyPeriod, industry, onAddLead, summary, activity, summaryLoading }: DashboardProps) {
   const router = useRouter()
 
   return (
@@ -277,11 +287,11 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
 
         {/* KPIs */}
         <div className="kpi-grid-5" style={{ marginBottom: 18 }}>
-          <KpiCard label="Occupancy Rate" value={kpi.getKpiValue('occupancy', '78%')} delta="+4% vs last month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={80} editable onValueChange={v => kpi.setKpiValue('occupancy', v)} goalCurrent={78} goalTarget={kpi.getGoal('occupancy_rate')?.target ?? 85} sparkData={[72, 74, 78, 75, 80, 77, 78]} />
+          <KpiCard label="Occupancy Rate" value={kpi.getKpiValue('occupancy', summary?.hos ? `${summary.hos.occupancyPct}%` : '78%')} delta="+4% vs last month" deltaDir="up" icon="users" accentColor="var(--accent)" delay={80} editable onValueChange={v => kpi.setKpiValue('occupancy', v)} goalCurrent={78} goalTarget={kpi.getGoal('occupancy_rate')?.target ?? 85} sparkData={[72, 74, 78, 75, 80, 77, 78]} />
           <KpiCard label="RevPAR" value={kpi.getKpiValue('revpar', '€142')} delta="+€12 vs avg" deltaDir="up" icon="dollar-sign" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('revpar', v)} goalCurrent={95} goalTarget={kpi.getGoal('revpar_target')?.target ?? 120} sparkData={[128, 135, 142, 138, 145, 140, 142]} />
           <KpiCard label="ADR" value={kpi.getKpiValue('adr', '€185')} delta="Avg Daily Rate" deltaDir="neu" icon="chart" accentColor="var(--b)" delay={180} editable onValueChange={v => kpi.setKpiValue('adr', v)} sparkData={[175, 180, 182, 185, 183, 186, 185]} />
           <KpiCard label="Guest Satisfaction" value={kpi.getKpiValue('satisfaction', '4.6/5')} delta="Based on 189 reviews" deltaDir="up" icon="heart" accentColor="var(--y)" delay={230} editable onValueChange={v => kpi.setKpiValue('satisfaction', v)} goalCurrent={4.2} goalTarget={kpi.getGoal('guest_satisfaction')?.target ?? 4.5} sparkData={[4.2, 4.3, 4.5, 4.4, 4.6, 4.5, 4.6]} />
-          <KpiCard label="Total Bookings" value={kpi.getKpiValue('bookings', '234')} delta="+18 this week" deltaDir="up" icon="calendar" hot delay={280} editable onValueChange={v => kpi.setKpiValue('bookings', v)} goalCurrent={148} goalTarget={kpi.getGoal('bookings')?.target ?? 200} sparkData={[195, 210, 218, 225, 230, 228, 234]} />
+          <KpiCard label="Total Bookings" value={kpi.getKpiValue('bookings', summary?.hos ? String(summary.hos.upcomingReservations) : '234')} delta="+18 this week" deltaDir="up" icon="calendar" hot delay={280} editable onValueChange={v => kpi.setKpiValue('bookings', v)} goalCurrent={148} goalTarget={kpi.getGoal('bookings')?.target ?? 200} sparkData={[195, 210, 218, 225, 230, 228, 234]} />
         </div>
 
         {/* Revenue Chart (full width now that pipeline is in JourneyBar) */}
@@ -450,10 +460,12 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
               </div>
               <div style={{ fontSize: 14, fontWeight: 600 }}>Recent Activity</div>
             </div>
-            {HOS_ACTIVITY.map((a, i) => (
+            {activity.length === 0 ? (
+              <div style={{ padding: '10px 0', fontSize: 12, color: 'var(--txt3)' }}>{summaryLoading ? 'Loading…' : 'No recent activity'}</div>
+            ) : activity.map((a, i) => (
               <div key={i} style={{
                 padding: '10px 0',
-                borderBottom: i < HOS_ACTIVITY.length - 1 ? '1px solid var(--border)' : 'none',
+                borderBottom: i < activity.length - 1 ? '1px solid var(--border)' : 'none',
               }}>
                 <div style={{ fontSize: 12.5, lineHeight: 1.4 }}>{a.text}</div>
                 <div className="mono" style={{ fontSize: 10.5, color: 'var(--txt3)', marginTop: 2 }}>{a.time}</div>
@@ -599,7 +611,7 @@ function HospitalityDashboard({ config, kpi, themeKey, layout, journeyPeriod, se
 // ══════════════════════════════════════════
 // REAL ESTATE DASHBOARD
 // ══════════════════════════════════════════
-function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
+function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, journeyPeriod, setJourneyPeriod, industry, onAddLead, summary, activity, summaryLoading }: DashboardProps) {
   const router = useRouter()
   const [pipelineMode, setPipelineMode] = useState<'sales' | 'rental'>('sales')
   const totalRevenue = RE_MONTHLY.reduce((s, m) => s + m.revenue, 0)
@@ -641,7 +653,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
 
         {/* KPIs */}
         <div className="kpi-grid-6" style={{ marginBottom: 18 }}>
-          <KpiCard label="Active Listings" value={kpi.getKpiValue('listings', activeListings)} delta="+3 this month" deltaDir="up" icon="folder" accentColor="var(--b)" delay={80} editable onValueChange={v => kpi.setKpiValue('listings', v)} goalCurrent={activeListings} goalTarget={kpi.getGoal('listings_added')?.target ?? 10} sparkData={[5, 4, 6, 5, 7, 4, 3]} onOpenDetail={() => openKpiDetail({
+          <KpiCard label="Active Listings" value={kpi.getKpiValue('listings', summary?.re ? summary.re.activeListings : activeListings)} delta="+3 this month" deltaDir="up" icon="folder" accentColor="var(--b)" delay={80} editable onValueChange={v => kpi.setKpiValue('listings', v)} goalCurrent={activeListings} goalTarget={kpi.getGoal('listings_added')?.target ?? 10} sparkData={[5, 4, 6, 5, 7, 4, 3]} onOpenDetail={() => openKpiDetail({
             title: 'Active Listings',
             subtitle: `${activeListings} currently on the market`,
             metrics: [
@@ -659,7 +671,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
               'Schedule open houses for new listings within first 14 days',
             ],
           })} />
-          <KpiCard label="Deals Closed" value={kpi.getKpiValue('closed', totalClosed)} delta="YTD total" deltaDir="up" icon="target" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('closed', v)} goalCurrent={totalClosed} goalTarget={kpi.getGoal('deals_closed')?.target ?? 50} sparkData={[3, 5, 4, 6, 5, 7, 6]} onOpenDetail={() => openKpiDetail({
+          <KpiCard label="Deals Closed" value={kpi.getKpiValue('closed', summary?.re ? summary.re.soldOrRented : totalClosed)} delta="YTD total" deltaDir="up" icon="target" accentColor="var(--g)" delay={130} editable onValueChange={v => kpi.setKpiValue('closed', v)} goalCurrent={totalClosed} goalTarget={kpi.getGoal('deals_closed')?.target ?? 50} sparkData={[3, 5, 4, 6, 5, 7, 6]} onOpenDetail={() => openKpiDetail({
             title: 'Deals Closed',
             subtitle: `${totalClosed} total closed YTD`,
             metrics: [
@@ -879,10 +891,12 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
               </div>
               <div style={{ fontSize: 14, fontWeight: 600 }}>Recent Activity</div>
             </div>
-            {RE_ACTIVITY.map((a, i) => (
+            {activity.length === 0 ? (
+              <div style={{ padding: '10px 0', fontSize: 12, color: 'var(--txt3)' }}>{summaryLoading ? 'Loading…' : 'No recent activity'}</div>
+            ) : activity.map((a, i) => (
               <div key={i} style={{
                 padding: '10px 0',
-                borderBottom: i < RE_ACTIVITY.length - 1 ? '1px solid var(--border)' : 'none',
+                borderBottom: i < activity.length - 1 ? '1px solid var(--border)' : 'none',
               }}>
                 <div style={{ fontSize: 12.5, lineHeight: 1.4 }}>{a.text}</div>
                 <div className="mono" style={{ fontSize: 10.5, color: 'var(--txt3)', marginTop: 2 }}>{a.time}</div>
@@ -1066,7 +1080,7 @@ function RealEstateDashboard({ config, kpi, themeKey, layout, openKpiDetail, jou
 // ══════════════════════════════════════════
 // CSR / PHILANTHROPY DASHBOARD (original)
 // ══════════════════════════════════════════
-function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourneyPeriod, industry, onAddLead }: DashboardProps) {
+function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourneyPeriod, industry, onAddLead, activity, summaryLoading }: DashboardProps) {
   const router = useRouter()
   return (
     <>
@@ -1141,8 +1155,10 @@ function CSRDashboard({ config, kpi, themeKey, layout, journeyPeriod, setJourney
               </div>
               <div style={{ fontSize: 14, fontWeight: 600 }}>Recent Activity</div>
             </div>
-            {CSR_ACTIVITY.map((a, i) => (
-              <div key={i} style={{ padding: '10px 0', borderBottom: i < CSR_ACTIVITY.length - 1 ? '1px solid var(--border)' : 'none' }}>
+            {activity.length === 0 ? (
+              <div style={{ padding: '10px 0', fontSize: 12, color: 'var(--txt3)' }}>{summaryLoading ? 'Loading…' : 'No recent activity'}</div>
+            ) : activity.map((a, i) => (
+              <div key={i} style={{ padding: '10px 0', borderBottom: i < activity.length - 1 ? '1px solid var(--border)' : 'none' }}>
                 <div style={{ fontSize: 12.5, lineHeight: 1.4 }}>{a.text}</div>
                 <div className="mono" style={{ fontSize: 10.5, color: 'var(--txt3)', marginTop: 2 }}>{a.time}</div>
               </div>
