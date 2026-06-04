@@ -10,6 +10,7 @@ import { Filter, Plus, Send, Eye, CheckCircle2, Trash2, RefreshCw, X } from 'luc
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useFormat } from '@/hooks/philly/useFormat'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
@@ -92,6 +93,8 @@ export default function ESignaturesPage() {
   // Bundle AJ — column visibility prefs.
   const esigColumns = useColumnPrefs('pai-esignatures-columns-v1', ESIG_DEFAULTS)
   const t = useTranslations('eSignatures')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const localizedColumns = useMemo<ColumnDef[]>(() => [
     { id: 'document', label: t('columns.document'), required: true },
     { id: 'signer', label: t('columns.signer') },
@@ -169,7 +172,8 @@ export default function ESignaturesPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm(t('confirms.delete'))) return
+    const ok = await confirm({ title: t('confirms.delete'), confirmLabel: tCommon('delete'), cancelLabel: tCommon('cancel'), danger: true })
+    if (!ok) return
     try {
       const res = await fetch(`/api/e-signatures/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

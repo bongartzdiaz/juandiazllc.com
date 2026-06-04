@@ -8,6 +8,7 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Users, Filter, Plus, X, ArrowRight, Trash2, CheckCircle2 } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useFormat } from '@/hooks/philly/useFormat'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
@@ -73,6 +74,8 @@ export default function ReferralsPage() {
   const [addError, setAddError] = useState<string | null>(null)
   const [contacts, setContacts] = useState<ContactLite[]>([])
   const t = useTranslations('referrals')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const { addToast } = useToast()
   // LOC-03 — locale-bound currency, replacing the old $-hardcoded display.
   const fmt = useFormat()
@@ -118,7 +121,8 @@ export default function ReferralsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm(t('confirms.delete'))) return
+    const ok = await confirm({ title: t('confirms.delete'), confirmLabel: tCommon('delete'), cancelLabel: tCommon('cancel'), danger: true })
+    if (!ok) return
     try {
       const res = await fetch(`/api/referrals?id=${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

@@ -10,6 +10,7 @@ import { Filter, Star, Plus, Trash2, CheckCircle2, Edit2 } from 'lucide-react'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
@@ -92,6 +93,8 @@ export default function ShowingsPage() {
   const [rating, setRating] = useState<number | null>(null)
 
   const t = useTranslations('showings')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const { addToast } = useToast()
   // LOC-03 — locale-bound date/time, replacing native toLocale*String().
   const fmt = useFormat()
@@ -214,7 +217,8 @@ export default function ShowingsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm(t('confirms.delete'))) return
+    const ok = await confirm({ title: t('confirms.delete'), confirmLabel: tCommon('delete'), cancelLabel: tCommon('cancel'), danger: true })
+    if (!ok) return
     try {
       const res = await fetch(`/api/showings/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

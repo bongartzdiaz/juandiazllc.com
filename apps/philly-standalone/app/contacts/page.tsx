@@ -22,6 +22,7 @@ import type { SavedView } from '@/hooks/philly/useSavedViews'
 import { useApi } from '@/hooks/philly/useApi'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useUrlState } from '@/hooks/philly/useUrlState'
 import { useDebouncedValue } from '@/hooks/philly/useDebouncedValue'
 import { toCsv, downloadCsv } from '@/lib/philly/csv'
@@ -142,6 +143,8 @@ const avatarColors: Record<string, string> = {
 export default function ContactsPage() {
   const { industry } = useIndustry()
   const t = useTranslations('contacts')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const tFilter = useTranslations('filter')
   const [filters, setFilters] = useUrlState({ q: '', type: 'all' })
   const search = filters.q
@@ -330,7 +333,8 @@ export default function ContactsPage() {
   const handleBulkDelete = useCallback(async () => {
     if (!isLive || selected.size === 0) return
     const ids = Array.from(selected)
-    if (!confirm(t('confirms.bulkDelete', { count: ids.length }))) return
+    const ok = await confirm({ title: t('confirms.bulkDelete', { count: ids.length }), confirmLabel: tCommon('delete'), cancelLabel: tCommon('cancel'), danger: true })
+    if (!ok) return
     setBulkBusy(true)
     try {
       const res = await fetch('/api/contacts/bulk', {

@@ -10,6 +10,7 @@ import { Filter, Euro, Calendar as CalIcon, Building2, CheckCircle2, Plus, Trash
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useFormat } from '@/hooks/philly/useFormat'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
@@ -65,6 +66,8 @@ const STATUS_COLORS: Record<string, { bg: string; txt: string }> = {
 
 export default function GrantsPage() {
   const t = useTranslations('grants')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const { addToast } = useToast()
   // LOC-03 — locale-bound money/date. `fmtDate` keeps its name + '-' null
   // fallback so existing call-sites are unchanged. Amounts are cents.
@@ -165,7 +168,8 @@ export default function GrantsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm(t('confirms.delete'))) return
+    const ok = await confirm({ title: t('confirms.delete'), confirmLabel: tCommon('delete'), cancelLabel: tCommon('cancel'), danger: true })
+    if (!ok) return
     try {
       const res = await fetch(`/api/grants/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

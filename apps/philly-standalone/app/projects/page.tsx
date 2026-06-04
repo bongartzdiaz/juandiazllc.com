@@ -12,6 +12,7 @@ import { Search, Grid3X3, List, ExternalLink, Eye, Trash2, Copy } from 'lucide-r
 import { useRouter } from 'next/navigation'
 import { useIndustry } from '@/hooks/philly/useIndustry'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useToast } from '@/hooks/philly/useToast'
 import { useFormat } from '@/hooks/philly/useFormat'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
@@ -129,6 +130,8 @@ const statusColors: Record<string, { bg: string; txt: string; border: string }> 
 export default function ProjectsPage() {
   const { industry } = useIndustry()
   const t = useTranslations('projects')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const { addToast } = useToast()
   // LOC-03 — locale-bound money/date. budget/spent are already major
   // euros (mapApiProject divides cents by 100), so pass them directly.
@@ -623,7 +626,8 @@ export default function ProjectsPage() {
           { kind: 'action', label: 'Delete', icon: Trash2, destructive: true,
             disabled: !isLive,
             onClick: async () => {
-              if (!confirm(t('confirms.delete', { title: proj.title }))) return
+              const ok = await confirm({ title: t('confirms.delete', { title: proj.title }), confirmLabel: tCommon('delete'), cancelLabel: tCommon('cancel'), danger: true })
+              if (!ok) return
               try {
                 const res = await fetch(`/api/projects/${proj.id}`, { method: 'DELETE' })
                 if (!res.ok && res.status !== 204) throw new Error(`Failed (${res.status})`)

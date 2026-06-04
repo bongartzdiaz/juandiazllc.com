@@ -13,6 +13,7 @@ import {
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { fetchJson } from '@/lib/philly/fetch-json'
@@ -82,6 +83,8 @@ export default function OpenHousesPage() {
   const [submitting, setSubmitting] = useState(false)
 
   const t = useTranslations('openHouses')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const { addToast } = useToast()
   // LOC-03 — locale-bound date, replacing native toLocaleDateString().
   const fmt = useFormat()
@@ -173,7 +176,8 @@ export default function OpenHousesPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm(t('confirms.cancel'))) return
+    const ok = await confirm({ title: t('confirms.cancel'), confirmLabel: tCommon('delete'), cancelLabel: tCommon('cancel'), danger: true })
+    if (!ok) return
     try {
       const res = await fetch(`/api/open-houses/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

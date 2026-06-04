@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Bookmark, BookmarkPlus, Check, Trash2, Users, X } from 'lucide-react'
 import { useSavedViews, type SavedView } from '@/hooks/philly/useSavedViews'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 
 /* Bundle AA — saved-views chip bar, rendered above the list/grid
    on contacts / deals / properties. Lets a user persist the
@@ -179,6 +180,8 @@ function ViewChip({
   onDelete: () => void
 }) {
   const t = useTranslations('views')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const [hover, setHover] = useState(false)
   return (
     <span
@@ -210,7 +213,7 @@ function ViewChip({
       <button
         type="button"
         aria-label={t('deletePrompt', { name: view.name })}
-        onClick={(e) => { e.stopPropagation(); if (confirm(t('deletePrompt', { name: view.name }))) onDelete() }}
+        onClick={async (e) => { e.stopPropagation(); const ok = await confirm({ title: t('deletePrompt', { name: view.name }), confirmLabel: tCommon('delete'), cancelLabel: tCommon('cancel'), danger: true }); if (ok) onDelete() }}
         style={{
           width: 18, height: 18, padding: 0, borderRadius: 4,
           background: 'transparent', border: 'none', cursor: 'pointer',

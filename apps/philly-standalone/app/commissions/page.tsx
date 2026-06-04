@@ -9,6 +9,7 @@ import { Filter, Trophy, Plus, Trash2, CheckCircle2, XCircle } from 'lucide-reac
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useApi } from '@/hooks/philly/useApi'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
@@ -78,6 +79,8 @@ export default function CommissionsPage() {
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState('')
   const t = useTranslations('commissions')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const { addToast } = useToast()
   // LOC-03 — locale-bound money/number/date, replacing $-hardcoded toLocaleString().
   const fmt = useFormat()
@@ -157,7 +160,8 @@ export default function CommissionsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm(t('confirms.delete'))) return
+    const ok = await confirm({ title: t('confirms.delete'), confirmLabel: tCommon('delete'), cancelLabel: tCommon('cancel'), danger: true })
+    if (!ok) return
     try {
       const res = await fetch(`/api/commissions/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

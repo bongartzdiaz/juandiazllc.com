@@ -6,6 +6,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useToast } from '@/hooks/philly/useToast'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useFormat } from '@/hooks/philly/useFormat'
 import {
   Filter, Search, LayoutGrid, List as ListIcon, X, Plus, GripVertical,
@@ -100,6 +101,8 @@ const STATUS_COLORS: Record<string, { bg: string; txt: string; border: string }>
 
 export default function DealsPage() {
   const t = useTranslations('deals')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const { addToast } = useToast()
   // LOC-03 — locale-bound money/date, replacing the old $-hardcoded helpers.
   const fmt = useFormat()
@@ -442,7 +445,8 @@ export default function DealsPage() {
   /* ---- Delete (used by context menu) ---- */
   const deleteDeal = useCallback(async (dealId: string) => {
     if (!dealsData) return
-    if (!confirm(t('confirms.delete'))) return
+    const ok = await confirm({ title: t('confirms.delete'), confirmLabel: tCommon('delete'), cancelLabel: tCommon('cancel'), danger: true })
+    if (!ok) return
     const snapshot = dealsData
     const next: DealsResponse = {
       ...dealsData,

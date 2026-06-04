@@ -10,6 +10,7 @@ import { Filter, Mail, Phone, Clock, Calendar as CalIcon, Plus, Trash2, Edit2 } 
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useFormat } from '@/hooks/philly/useFormat'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
@@ -52,6 +53,8 @@ const emptyForm = { name: '', email: '', phone: '', status: 'onboarding' }
 
 export default function VolunteersPage() {
   const t = useTranslations('volunteers')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const { addToast } = useToast()
   // LOC-03 — locale-bound number/date formatting (hours are a count).
   const fmt = useFormat()
@@ -119,7 +122,8 @@ export default function VolunteersPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm(t('confirms.remove'))) return
+    const ok = await confirm({ title: t('confirms.remove'), confirmLabel: tCommon('delete'), cancelLabel: tCommon('cancel'), danger: true })
+    if (!ok) return
     try {
       const res = await fetch(`/api/volunteers/${id}`, { method: 'DELETE' })
       if (res.status === 204 || res.ok) {

@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { Modal } from '@/components/philly/ui/Modal'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { useToast } from '@/hooks/philly/useToast'
 import { useDebouncedValue } from '@/hooks/philly/useDebouncedValue'
 import { Search, X, UserMinus, AlertCircle, Clock, CheckCircle2, Pause } from 'lucide-react'
@@ -70,6 +71,8 @@ function fmtRelative(iso: string | null): string {
 
 export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose, onChanged }: Props) {
   const t = useTranslations('dripEnrollment')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
   const open = campaignId != null
   const { addToast } = useToast()
 
@@ -139,7 +142,8 @@ export function EnrollmentModal({ campaignId, campaignName, totalSteps, onClose,
 
   async function unenroll(contactId: string) {
     if (!campaignId || isBusy(contactId)) return
-    if (!confirm(t('cancelConfirm'))) return
+    const ok = await confirm({ title: t('cancelConfirm'), confirmLabel: tCommon('delete'), cancelLabel: tCommon('cancel'), danger: true })
+    if (!ok) return
     setBusyFor(contactId, true)
     try {
       const res = await fetch(`/api/drip-campaigns/${campaignId}/enroll?contactId=${encodeURIComponent(contactId)}`, {

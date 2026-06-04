@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
+import { useConfirm } from '@/hooks/philly/useConfirm'
 import { PropertyQuickView } from '@/components/philly/properties/PropertyQuickView'
 import { SavedViewsBar } from '@/components/philly/views/SavedViewsBar'
 import type { SavedView } from '@/hooks/philly/useSavedViews'
@@ -156,6 +157,8 @@ export default function PropertiesPage() {
   }, [])
 
   const t = useTranslations('properties')
+  const tCommon = useTranslations('common')
+  const confirm = useConfirm()
 
   const closeAddModal = () => {
     setShowAdd(false)
@@ -865,7 +868,8 @@ export default function PropertiesPage() {
           { kind: 'separator' },
           { kind: 'action', label: t('contextMenu.delete'), icon: Trash2, destructive: true,
             onClick: async () => {
-              if (!confirm(t('confirms.delete', { title: p.title }))) return
+              const ok = await confirm({ title: t('confirms.delete', { title: p.title }), confirmLabel: tCommon('delete'), cancelLabel: tCommon('cancel'), danger: true })
+              if (!ok) return
               try {
                 const res = await fetch(`/api/properties/${p.id}`, { method: 'DELETE' })
                 if (!res.ok && res.status !== 204) throw new Error(`Failed (${res.status})`)
