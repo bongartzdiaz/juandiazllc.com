@@ -11,6 +11,7 @@ import { Filter } from 'lucide-react'
 import { useColumnPrefs } from '@/hooks/philly/useColumnPrefs'
 import { ColumnPicker, type ColumnDef } from '@/components/philly/ui/ColumnPicker'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 const LS_COLUMNS: ColumnDef[] = [
   { id: 'contact', label: 'Contact', required: true },
@@ -64,6 +65,7 @@ export default function LeadScoresPage() {
   const [page, setPage] = useState(1)
   const [gradeFilter, setGradeFilter] = useState('')
   const t = useTranslations('leadScores')
+  const fmt = useFormat()
   const router = useRouter()
 
   const params = new URLSearchParams({ page: String(page), limit: '25' })
@@ -154,7 +156,7 @@ export default function LeadScoresPage() {
                 if (c.id === 'contact') return (
                   <div key="contact">
                     <div style={{ fontWeight: 600, color: 'var(--txt)' }}>{record.contact?.name ?? t('list.contactFallback', { id: record.contactId.slice(0, 8) })}</div>
-                    <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{record.contact?.email ?? new Date(record.createdAt).toLocaleDateString()}</div>
+                    <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{record.contact?.email ?? fmt.date(record.createdAt)}</div>
                   </div>
                 )
                 if (c.id === 'score') return <span key="score" style={{ fontWeight: 700, fontSize: 16, fontFamily: 'var(--font-red-hat-mono), monospace', color: 'var(--txt)' }}>{record.score}</span>
@@ -169,7 +171,7 @@ export default function LeadScoresPage() {
                 )
                 if (c.id === 'behavior') return <span key="behavior" style={{ fontFamily: 'var(--font-red-hat-mono), monospace', fontWeight: 500 }}>{record.behaviorScore}</span>
                 if (c.id === 'demo') return <span key="demo" style={{ fontFamily: 'var(--font-red-hat-mono), monospace', fontWeight: 500 }}>{record.demographicScore}</span>
-                if (c.id === 'lastActivity') return <span key="lastActivity" style={{ fontSize: 11, color: 'var(--txt2)' }}>{record.lastActivity ? new Date(record.lastActivity).toLocaleDateString() : '-'}</span>
+                if (c.id === 'lastActivity') return <span key="lastActivity" style={{ fontSize: 11, color: 'var(--txt2)' }}>{record.lastActivity ? fmt.date(record.lastActivity) : '-'}</span>
                 if (c.id === 'actions') return (
                   <div key="actions" style={{ display: 'flex', gap: 4 }}>
                     <button

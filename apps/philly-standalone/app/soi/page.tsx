@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/philly/useToast'
 import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 interface SoiCategory {
   id: string
@@ -27,6 +28,7 @@ const inputStyle: React.CSSProperties = {
 }
 
 export default function SoiPage() {
+  const fmt = useFormat()
   const [page, setPage] = useState(1)
   const [showAdd, setShowAdd] = useState(false)
 
@@ -168,7 +170,7 @@ export default function SoiPage() {
                   paddingTop: 6, borderTop: '1px solid var(--border)', marginTop: 'auto',
                 }}>
                   <span style={{ fontSize: 10, color: 'var(--txt3)' }}>
-                    Created {new Date(cat.createdAt).toLocaleDateString()}
+                    Created {fmt.date(cat.createdAt)}
                   </span>
                   <div style={{ display: 'flex', gap: 4 }}>
                     <button onClick={() => openEdit(cat)} title="Edit" style={miniBtn('var(--txt2)')}>

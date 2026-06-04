@@ -9,6 +9,7 @@ import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
 import { ChevronLeft, ChevronRight, Clock, MapPin, Users, Plus, Trash2 } from 'lucide-react'
 import { ListError } from '@/components/philly/ui/ListStates'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 interface ApiAttendee {
   id: string
@@ -96,6 +97,7 @@ export default function CalendarPage() {
   const tConfirms = useTranslations('confirms')
   const tCommon = useTranslations('common')
   const t = useTranslations('calendar')
+  const fmt = useFormat()
   const confirm = useConfirm()
 
   const year = currentDate.getFullYear()
@@ -389,8 +391,8 @@ export default function CalendarPage() {
           }}>
             <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>
               {selectedDate
-                ? new Date(selectedDate + 'T00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
-                : 'Select a date'}
+                ? fmt.dateFull(selectedDate + 'T00:00')
+                : t('selectDate')}
             </div>
 
             {loading && (

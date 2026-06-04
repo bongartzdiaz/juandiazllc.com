@@ -22,6 +22,7 @@ import { useToast } from '@/hooks/philly/useToast'
 import { useMySections } from '@/hooks/philly/useMySections'
 import { SECTIONS, SECTION_GROUPS, type SectionGroup } from '@/lib/philly/sections'
 import { UserPlus, X, Check, ShieldAlert } from 'lucide-react'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 type Role = 'admin' | 'manager' | 'viewer'
 
@@ -172,10 +173,11 @@ function UserRow({
   user, canEdit, onEdit,
 }: { user: TeamUser; canEdit: boolean; onEdit: () => void }) {
   const t = useTranslations('settingsUsers')
+  const fmt = useFormat()
   const sectionsSummary = useSectionsSummary()
   const initials = (user.name || user.email || 'U').slice(0, 2).toUpperCase()
   const lastLogin = user.lastLoginAt
-    ? new Date(user.lastLoginAt).toLocaleDateString()
+    ? fmt.date(user.lastLoginAt)
     : '—'
   return (
     <div style={{

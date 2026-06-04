@@ -4264,5 +4264,76 @@
     "title": "Section not available",
     "message": "Your account doesn't have access to <code>{slug}</code>. Ask an admin to enable it in Settings → Users.",
     "backToDashboard": "Back to dashboard"
+  },
+  "donors": {
+    "title": "Donor Scoring",
+    "subtitle": "RFM analysis of donor history",
+    "banner": {
+      "scored": "{n, plural, =1 {# donor scored} other {# donors scored}}",
+      "analyzing": "Analyzing donations…",
+      "generated": "Generated {date}",
+      "working": "Working…"
+    },
+    "refresh": {
+      "idle": "Refresh",
+      "busy": "Refreshing…"
+    },
+    "segments": {
+      "champions": "Champions",
+      "loyal": "Loyal",
+      "potential": "Potential",
+      "at_risk": "At Risk",
+      "lost": "Lost"
+    },
+    "loading": "Loading…",
+    "empty": {
+      "all": "No donors yet. Log donations via Activity to see scores.",
+      "filtered": "No donors in {segment}. Log donations via Activity to see scores."
+    },
+    "columns": {
+      "score": "Score",
+      "donor": "Donor",
+      "rfm": "R/F/M",
+      "donations": "Donations",
+      "total": "Total",
+      "segment": "Segment"
+    },
+    "row": {
+      "last": "Last"
+    }
+  },
+  "aiAsk": {
+    "topbar": {
+      "title": "Ask AI",
+      "sub": "Natural language queries across your data"
+    },
+    "hero": {
+      "title": "Ask anything about your business",
+      "subtitle": "Pattern-based engine — supports contacts, projects, deals, properties, showings, volunteers, grants."
+    },
+    "input": {
+      "placeholder": "e.g., How many deals this month?"
+    },
+    "submit": {
+      "idle": "Ask",
+      "loading": "Asking…"
+    },
+    "examples": {
+      "contactsThisMonth": "How many contacts this month?",
+      "topDeals": "Show me top 5 deals by value",
+      "activeProjects": "List active projects",
+      "propertiesAvailable": "Show properties available",
+      "topGrants": "Top 10 grants",
+      "recentShowings": "Recent showings",
+      "activeVolunteers": "Volunteers with status active"
+    },
+    "result": {
+      "questionLabel": "Q",
+      "answerLabel": "A",
+      "plan": "plan: {intent} → {entity} (limit {limit})"
+    },
+    "recent": "Recent",
+    "noData": "No data",
+    "requestFailed": "Request failed"
   }
 }

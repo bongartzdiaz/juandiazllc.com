@@ -10,6 +10,7 @@ import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { Modal, FormField } from '@/components/philly/ui/Modal'
 import { useApi } from '@/hooks/philly/useApi'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { FileText, Layers, Calendar, Trash2, Pencil, ExternalLink } from 'lucide-react'
 
 interface PageRow {
@@ -22,6 +23,7 @@ interface PageRow {
 }
 
 export default function PagesListPage() {
+  const fmt = useFormat()
   const [showNew, setShowNew] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [newSlug, setNewSlug] = useState('')
@@ -143,7 +145,7 @@ export default function PagesListPage() {
 
                 <div className="mono" style={{ fontSize: 10, color: 'var(--txt3)', display: 'flex', alignItems: 'center', gap: 5 }}>
                   <Calendar size={10} />
-                  Updated {new Date(p.updatedAt).toLocaleDateString()}
+                  Updated {fmt.date(p.updatedAt)}
                 </div>
 
                 <div style={{ display: 'flex', gap: 6, marginTop: 'auto', paddingTop: 6 }}>

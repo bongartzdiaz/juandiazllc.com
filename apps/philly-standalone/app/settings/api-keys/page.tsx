@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Key, Plus, Trash2, Copy, Check, RefreshCw, AlertCircle } from 'lucide-react'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 interface ApiKey {
   id: string
@@ -19,6 +20,7 @@ interface ApiKey {
 }
 
 export default function ApiKeysPage() {
+  const fmt = useFormat()
   const [keys, setKeys] = useState<ApiKey[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
@@ -358,10 +360,10 @@ export default function ApiKeysPage() {
                   {k.permissions}
                 </span>
                 <div style={{ fontSize: 11, color: 'var(--txt3)' }}>
-                  {k.lastUsedAt ? `Used ${new Date(k.lastUsedAt).toLocaleDateString()}` : 'Never used'}
+                  {k.lastUsedAt ? `Used ${fmt.date(k.lastUsedAt)}` : 'Never used'}
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--txt3)' }}>
-                  {expires ? `Expires ${expires.toLocaleDateString()}` : new Date(k.createdAt).toLocaleDateString()}
+                  {expires ? `Expires ${fmt.date(expires)}` : fmt.date(k.createdAt)}
                 </div>
                 <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
                   <button

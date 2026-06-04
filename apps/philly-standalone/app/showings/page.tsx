@@ -314,7 +314,7 @@ export default function ShowingsPage() {
                         {fmt.date(d)}
                       </div>
                       <div style={{ fontSize: 10, color: 'var(--txt3)' }}>
-                        {d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {fmt.time(d)}
                       </div>
                     </div>
                   )

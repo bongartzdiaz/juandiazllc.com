@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { Sparkles, AlertTriangle, CheckCircle2, Info, RefreshCw, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import type { Insight, InsightsReport, InsightSeverity } from '@/lib/philly/ai/insights'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 const SEV_ICON: Record<InsightSeverity, React.ComponentType<{ size?: number }>> = {
   critical: AlertTriangle,
@@ -27,6 +28,7 @@ interface Props {
 }
 
 export function InsightsCard({ limit = 4, showSummary = true, showRefresh = true, compact = false }: Props) {
+  const fmt = useFormat()
   const [report, setReport] = useState<InsightsReport | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -73,7 +75,7 @@ export function InsightsCard({ limit = 4, showSummary = true, showRefresh = true
             <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--txt)' }}>AI Insights</div>
             {report && (
               <div style={{ fontSize: 11, color: 'var(--txt3)', fontFamily: 'var(--font-mono, monospace)' }}>
-                {new Date(report.generatedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                {fmt.time(report.generatedAt)}
               </div>
             )}
           </div>

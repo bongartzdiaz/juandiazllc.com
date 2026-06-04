@@ -15,6 +15,7 @@ import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 import { keyboardClickable } from '@/lib/philly/a11y'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 interface Permissions {
   viewListings?: boolean
@@ -52,6 +53,7 @@ function parsePermissions(raw: string): Permissions {
 }
 
 export default function ClientPortalPage() {
+  const fmt = useFormat()
   const [contacts, setContacts] = useState<ContactLite[]>([])
   const [page, setPage] = useState(1)
 
@@ -268,7 +270,7 @@ export default function ClientPortalPage() {
                     {client.contact?.email && <span>{client.contact.email}</span>}
                     <span>{activeCount} permission{activeCount !== 1 ? 's' : ''} granted</span>
                     <span className="mono">
-                      {expiresDate ? `Expires ${expiresDate.toLocaleDateString()}` : 'No expiry'}
+                      {expiresDate ? `Expires ${fmt.date(expiresDate)}` : 'No expiry'}
                     </span>
                   </div>
                 </div>
@@ -381,9 +383,9 @@ export default function ClientPortalPage() {
             </div>
 
             <div style={{ fontSize: 11, color: 'var(--txt3)' }}>
-              Created {new Date(selected.createdAt).toLocaleDateString()}
-              {selected.lastLoginAt && ` · Last login ${new Date(selected.lastLoginAt).toLocaleDateString()}`}
-              {selected.expiresAt && ` · Expires ${new Date(selected.expiresAt).toLocaleDateString()}`}
+              Created {fmt.date(selected.createdAt)}
+              {selected.lastLoginAt && ` · Last login ${fmt.date(selected.lastLoginAt)}`}
+              {selected.expiresAt && ` · Expires ${fmt.date(selected.expiresAt)}`}
             </div>
 
             <div style={{ display: 'flex', gap: 8, borderTop: '1px solid var(--border)', paddingTop: 14 }}>

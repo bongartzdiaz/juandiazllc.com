@@ -4264,5 +4264,76 @@
     "title": "Bereich nicht verfügbar",
     "message": "Ihr Konto hat keinen Zugriff auf <code>{slug}</code>. Bitten Sie einen Administrator, ihn unter Einstellungen → Benutzer zu aktivieren.",
     "backToDashboard": "Zurück zum Dashboard"
+  },
+  "donors": {
+    "title": "Spender-Scoring",
+    "subtitle": "RFM-Analyse der Spendenhistorie",
+    "banner": {
+      "scored": "{n, plural, =1 {# Spender bewertet} other {# Spender bewertet}}",
+      "analyzing": "Spenden werden analysiert…",
+      "generated": "Erstellt am {date}",
+      "working": "Wird verarbeitet…"
+    },
+    "refresh": {
+      "idle": "Aktualisieren",
+      "busy": "Wird aktualisiert…"
+    },
+    "segments": {
+      "champions": "Champions",
+      "loyal": "Treu",
+      "potential": "Potenzial",
+      "at_risk": "Gefährdet",
+      "lost": "Verloren"
+    },
+    "loading": "Wird geladen…",
+    "empty": {
+      "all": "Noch keine Spender. Erfassen Sie Spenden über Aktivität, um Scores zu sehen.",
+      "filtered": "Keine Spender in {segment}. Erfassen Sie Spenden über Aktivität, um Scores zu sehen."
+    },
+    "columns": {
+      "score": "Score",
+      "donor": "Spender",
+      "rfm": "R/F/M",
+      "donations": "Spenden",
+      "total": "Gesamt",
+      "segment": "Segment"
+    },
+    "row": {
+      "last": "Zuletzt"
+    }
+  },
+  "aiAsk": {
+    "topbar": {
+      "title": "AI fragen",
+      "sub": "Abfragen in natürlicher Sprache über Ihre Daten"
+    },
+    "hero": {
+      "title": "Fragen Sie alles über Ihr Unternehmen",
+      "subtitle": "Musterbasierte Engine — unterstützt Kontakte, Projekte, Deals, Immobilien, Besichtigungen, Freiwillige und Förderungen."
+    },
+    "input": {
+      "placeholder": "z. B. Wie viele Deals diesen Monat?"
+    },
+    "submit": {
+      "idle": "Fragen",
+      "loading": "Wird gefragt…"
+    },
+    "examples": {
+      "contactsThisMonth": "Wie viele Kontakte diesen Monat?",
+      "topDeals": "Zeige die Top 5 Deals nach Wert",
+      "activeProjects": "Aktive Projekte auflisten",
+      "propertiesAvailable": "Verfügbare Immobilien anzeigen",
+      "topGrants": "Top 10 Förderungen",
+      "recentShowings": "Aktuelle Besichtigungen",
+      "activeVolunteers": "Freiwillige mit Status aktiv"
+    },
+    "result": {
+      "questionLabel": "F",
+      "answerLabel": "A",
+      "plan": "Plan: {intent} → {entity} (Limit {limit})"
+    },
+    "recent": "Zuletzt",
+    "noData": "Keine Daten",
+    "requestFailed": "Anfrage fehlgeschlagen"
   }
 }

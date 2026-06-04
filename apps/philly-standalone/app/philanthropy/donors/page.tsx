@@ -2,8 +2,10 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { Heart, RefreshCw } from 'lucide-react'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 type RfmSegment = 'champions' | 'loyal' | 'potential' | 'at_risk' | 'lost'
 
@@ -28,12 +30,12 @@ interface Report {
 }
 
 const SEG_ORDER: RfmSegment[] = ['champions', 'loyal', 'potential', 'at_risk', 'lost']
-const SEG_TOKENS: Record<RfmSegment, { bg: string; txt: string; border: string; label: string }> = {
-  champions:  { bg: 'var(--g-bg)',  txt: 'var(--g-txt)',  border: 'var(--g-border)',  label: 'Champions' },
-  loyal:      { bg: 'var(--b-bg)',  txt: 'var(--b-txt)',  border: 'var(--b-border)',  label: 'Loyal' },
-  potential:  { bg: 'var(--y-bg)',  txt: 'var(--y-txt)',  border: 'var(--y-border)',  label: 'Potential' },
-  at_risk:    { bg: 'var(--o-bg)',  txt: 'var(--o-txt)',  border: 'var(--o-border)',  label: 'At Risk' },
-  lost:       { bg: 'var(--r-bg)',  txt: 'var(--r-txt)',  border: 'var(--r-border)',  label: 'Lost' },
+const SEG_TOKENS: Record<RfmSegment, { bg: string; txt: string; border: string }> = {
+  champions:  { bg: 'var(--g-bg)',  txt: 'var(--g-txt)',  border: 'var(--g-border)' },
+  loyal:      { bg: 'var(--b-bg)',  txt: 'var(--b-txt)',  border: 'var(--b-border)' },
+  potential:  { bg: 'var(--y-bg)',  txt: 'var(--y-txt)',  border: 'var(--y-border)' },
+  at_risk:    { bg: 'var(--o-bg)',  txt: 'var(--o-txt)',  border: 'var(--o-border)' },
+  lost:       { bg: 'var(--r-bg)',  txt: 'var(--r-txt)',  border: 'var(--r-border)' },
 }
 
 function fmtMoney(cents: number) {
@@ -41,6 +43,8 @@ function fmtMoney(cents: number) {
 }
 
 export default function DonorsPage() {
+  const t = useTranslations('donors')
+  const fmt = useFormat()
   const [report, setReport] = useState<Report | null>(null)
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<RfmSegment | 'all'>('all')
@@ -62,7 +66,7 @@ export default function DonorsPage() {
 
   return (
     <>
-      <Topbar title="Donor Scoring" sub="RFM analysis of donor history" />
+      <Topbar title={t('title')} sub={t('subtitle')} />
       <div style={{ padding: '20px 28px 40px' }}>
         <div style={{
           background: 'linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%)',
@@ -78,10 +82,10 @@ export default function DonorsPage() {
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em' }}>
-              {report ? `${report.count} donors scored` : 'Analyzing donations…'}
+              {report ? t('banner.scored', { n: report.count }) : t('banner.analyzing')}
             </div>
             <div style={{ fontSize: 12, opacity: 0.9 }}>
-              {report ? `Generated ${new Date(report.generatedAt).toLocaleString()}` : 'Working…'}
+              {report ? t('banner.generated', { date: new Date(report.generatedAt).toLocaleString() }) : t('banner.working')}
             </div>
           </div>
           <button
@@ -95,7 +99,7 @@ export default function DonorsPage() {
             }}
           >
             <RefreshCw size={13} style={loading ? { animation: 'spin 1s linear infinite' } : {}} />
-            {loading ? 'Refreshing…' : 'Refresh'}
+            {loading ? t('refresh.busy') : t('refresh.idle')}
           </button>
         </div>
 
@@ -122,7 +126,7 @@ export default function DonorsPage() {
                   fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
                   color: tok.txt, letterSpacing: '0.04em',
                 }}>
-                  {tok.label}
+                  {t(`segments.${seg}`)}
                 </div>
                 <div style={{
                   fontSize: 20, fontWeight: 700, color: 'var(--txt)',
@@ -141,12 +145,13 @@ export default function DonorsPage() {
         }}>
           {loading && !report ? (
             <div style={{ padding: 40, textAlign: 'center', fontSize: 13, color: 'var(--txt3)' }}>
-              Loading…
+              {t('loading')}
             </div>
           ) : filtered.length === 0 ? (
             <div style={{ padding: 40, textAlign: 'center', fontSize: 13, color: 'var(--txt3)' }}>
-              No donors {filter !== 'all' ? `in ${SEG_TOKENS[filter].label}` : ''}. Log donations
-              via Activity to see scores.
+              {filter !== 'all'
+                ? t('empty.filtered', { segment: t(`segments.${filter}`) })
+                : t('empty.all')}
             </div>
           ) : (
             <div style={{
@@ -156,12 +161,12 @@ export default function DonorsPage() {
               color: 'var(--txt3)', letterSpacing: '0.04em',
               borderBottom: '1px solid var(--border)',
             }}>
-              <div>Score</div>
-              <div>Donor</div>
-              <div>R/F/M</div>
-              <div>Donations</div>
-              <div>Total</div>
-              <div>Segment</div>
+              <div>{t('columns.score')}</div>
+              <div>{t('columns.donor')}</div>
+              <div>{t('columns.rfm')}</div>
+              <div>{t('columns.donations')}</div>
+              <div>{t('columns.total')}</div>
+              <div>{t('columns.segment')}</div>
             </div>
           )}
           {filtered.map((d, i) => {
@@ -194,7 +199,7 @@ export default function DonorsPage() {
                     {d.contactName}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 2 }}>
-                    Last: {d.lastDonation ? new Date(d.lastDonation).toLocaleDateString() : '—'}
+                    {t('row.last')}: {d.lastDonation ? fmt.date(d.lastDonation) : '—'}
                   </div>
                 </div>
                 <div style={{
@@ -218,7 +223,7 @@ export default function DonorsPage() {
                   textTransform: 'uppercase', letterSpacing: '0.04em',
                   textAlign: 'center',
                 }}>
-                  {tok.label}
+                  {t(`segments.${d.segment}`)}
                 </span>
               </Link>
             )

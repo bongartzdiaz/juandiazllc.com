@@ -10,6 +10,7 @@ import {
 import { Modal } from '@/components/philly/ui/Modal'
 import { useApi } from '@/hooks/philly/useApi'
 import { useToast } from '@/hooks/philly/useToast'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { ContactForm } from '@/components/philly/forms/ContactForm'
 import type { ContactFormData } from '@/components/philly/forms/ContactForm'
 
@@ -69,6 +70,7 @@ interface Props {
 export function ContactQuickView({ contactId, onClose }: Props) {
   const t = useTranslations('quickview')
   const tCommon = useTranslations('common')
+  const fmt = useFormat()
   const open = contactId != null
   const query = useApi<{ data: ContactDetail }>(open ? `/contacts/${contactId}` : '', {
     enabled: open,
@@ -146,7 +148,7 @@ export function ContactQuickView({ contactId, onClose }: Props) {
             <span style={{ flex: 1 }} />
             <span style={{ fontSize: 11, color: 'var(--txt3)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
               <Calendar size={11} />
-              {t('addedOn', { date: new Date(c.createdAt).toLocaleDateString() })}
+              {t('addedOn', { date: fmt.date(c.createdAt) })}
             </span>
           </div>
 

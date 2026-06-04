@@ -6,6 +6,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { Pagination } from '@/components/philly/ui/Pagination'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
+import { useFormat } from '@/hooks/philly/useFormat'
 import {
   MessageSquare,
   MessageCircle,
@@ -80,6 +81,7 @@ const selectStyle: React.CSSProperties = {
 
 export default function SmsPage() {
   const t = useTranslations('sms')
+  const fmt = useFormat()
   const [messages, setMessages] = useState<SmsMessage[]>([])
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
@@ -148,7 +150,7 @@ export default function SmsPage() {
     if (hrs < 24) return `${hrs}h ago`
     const days = Math.floor(hrs / 24)
     if (days < 7) return `${days}d ago`
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    return fmt.date(d)
   }
 
   const [sendError, setSendError] = useState<string | null>(null)

@@ -87,6 +87,15 @@ export function useFormat() {
     const dateTime = (d: string | number | Date) =>
       new Intl.DateTimeFormat(bcp, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(d))
 
-    return { locale, bcp, currency, compactCurrency, number, compact, percent, date, dateTime }
+    /** Time only, e.g. "14:30" / "2:30 PM". Locale-aware. */
+    const time = (d: string | number | Date) =>
+      new Intl.DateTimeFormat(bcp, { timeStyle: 'short' }).format(new Date(d))
+
+    /** Full, weekday-led date, e.g. "Wednesday, 4 June" / "woensdag 4 juni".
+     *  For headers where the weekday matters (calendar). Locale-aware, no year. */
+    const dateFull = (d: string | number | Date) =>
+      new Intl.DateTimeFormat(bcp, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(d))
+
+    return { locale, bcp, currency, compactCurrency, number, compact, percent, date, dateTime, time, dateFull }
   }, [locale])
 }

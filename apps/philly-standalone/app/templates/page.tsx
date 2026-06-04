@@ -10,6 +10,7 @@ import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useApi } from '@/hooks/philly/useApi'
 import { FileText, Mail, MessageSquare, Phone, Edit3, Trash2, Eye, Filter } from 'lucide-react'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 interface Template {
   id: string
@@ -59,6 +60,7 @@ function parseVars(v: string): string[] {
 }
 
 export default function TemplatesPage() {
+  const fmt = useFormat()
   const [typeFilter, setTypeFilter] = useState('')
 
   const params = new URLSearchParams()
@@ -280,7 +282,7 @@ export default function TemplatesPage() {
                     marginTop: 'auto', paddingTop: 8, borderTop: '1px solid var(--border)',
                   }}>
                     <span style={{ fontSize: 10, color: 'var(--txt3)' }}>
-                      {t('list.updated', { date: new Date(tpl.updatedAt ?? tpl.createdAt).toLocaleDateString() })}
+                      {t('list.updated', { date: fmt.date(tpl.updatedAt ?? tpl.createdAt) })}
                     </span>
                     <div style={{ display: 'flex', gap: 4 }}>
                       <IconBtn onClick={() => preview(tpl)} title={t('list.preview')}><Eye size={13} /></IconBtn>

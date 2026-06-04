@@ -4264,5 +4264,76 @@
     "title": "Sección no disponible",
     "message": "Tu cuenta no tiene acceso a <code>{slug}</code>. Pide a un administrador que lo habilite en Configuración → Usuarios.",
     "backToDashboard": "Volver al panel"
+  },
+  "donors": {
+    "title": "Puntuación de donantes",
+    "subtitle": "Análisis RFM del historial de donaciones",
+    "banner": {
+      "scored": "{n, plural, =1 {# donante puntuado} other {# donantes puntuados}}",
+      "analyzing": "Analizando donaciones…",
+      "generated": "Generado el {date}",
+      "working": "Procesando…"
+    },
+    "refresh": {
+      "idle": "Actualizar",
+      "busy": "Actualizando…"
+    },
+    "segments": {
+      "champions": "Campeones",
+      "loyal": "Leales",
+      "potential": "Potencial",
+      "at_risk": "En riesgo",
+      "lost": "Perdidos"
+    },
+    "loading": "Cargando…",
+    "empty": {
+      "all": "Aún no hay donantes. Registre donaciones desde Actividad para ver las puntuaciones.",
+      "filtered": "No hay donantes en {segment}. Registre donaciones desde Actividad para ver las puntuaciones."
+    },
+    "columns": {
+      "score": "Puntuación",
+      "donor": "Donante",
+      "rfm": "R/F/M",
+      "donations": "Donaciones",
+      "total": "Total",
+      "segment": "Segmento"
+    },
+    "row": {
+      "last": "Última"
+    }
+  },
+  "aiAsk": {
+    "topbar": {
+      "title": "Preguntar a la IA",
+      "sub": "Consultas en lenguaje natural sobre tus datos"
+    },
+    "hero": {
+      "title": "Pregunta lo que sea sobre tu negocio",
+      "subtitle": "Motor basado en patrones — admite contactos, proyectos, oportunidades, propiedades, visitas, voluntarios y subvenciones."
+    },
+    "input": {
+      "placeholder": "p. ej., ¿Cuántas oportunidades este mes?"
+    },
+    "submit": {
+      "idle": "Preguntar",
+      "loading": "Preguntando…"
+    },
+    "examples": {
+      "contactsThisMonth": "¿Cuántos contactos este mes?",
+      "topDeals": "Muéstrame las 5 mejores oportunidades por valor",
+      "activeProjects": "Listar proyectos activos",
+      "propertiesAvailable": "Mostrar propiedades disponibles",
+      "topGrants": "Top 10 subvenciones",
+      "recentShowings": "Visitas recientes",
+      "activeVolunteers": "Voluntarios con estado activo"
+    },
+    "result": {
+      "questionLabel": "P",
+      "answerLabel": "R",
+      "plan": "plan: {intent} → {entity} (límite {limit})"
+    },
+    "recent": "Recientes",
+    "noData": "Sin datos",
+    "requestFailed": "La solicitud falló"
   }
 }

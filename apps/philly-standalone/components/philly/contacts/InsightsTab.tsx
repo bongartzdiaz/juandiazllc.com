@@ -13,6 +13,7 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useToast } from '@/hooks/philly/useToast'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { Sparkles, TrendingUp, Briefcase, RefreshCw } from 'lucide-react'
 
 export interface ContactInsights {
@@ -39,6 +40,7 @@ function scoreColor(score: number | null): string {
 
 export function InsightsTab({ contactId, insights, onRefreshed }: Props) {
   const t = useTranslations('contacts.masterProfile.insights')
+  const fmt = useFormat()
   const { addToast } = useToast()
   const [refreshing, setRefreshing] = useState(false)
 
@@ -149,7 +151,7 @@ export function InsightsTab({ contactId, insights, onRefreshed }: Props) {
               </div>
               {insights.aiAttributesUpdatedAt && (
                 <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 10 }}>
-                  {t('updatedAt', { date: new Date(insights.aiAttributesUpdatedAt).toLocaleDateString() })}
+                  {t('updatedAt', { date: fmt.date(insights.aiAttributesUpdatedAt) })}
                 </div>
               )}
             </div>

@@ -4264,5 +4264,76 @@
     "title": "Sectie niet beschikbaar",
     "message": "Je account heeft geen toegang tot <code>{slug}</code>. Vraag een beheerder om dit in te schakelen via Instellingen → Gebruikers.",
     "backToDashboard": "Terug naar dashboard"
+  },
+  "donors": {
+    "title": "Donorscores",
+    "subtitle": "RFM-analyse van donatiegeschiedenis",
+    "banner": {
+      "scored": "{n, plural, =1 {# donor gescoord} other {# donoren gescoord}}",
+      "analyzing": "Donaties analyseren…",
+      "generated": "Gegenereerd op {date}",
+      "working": "Bezig…"
+    },
+    "refresh": {
+      "idle": "Vernieuwen",
+      "busy": "Vernieuwen…"
+    },
+    "segments": {
+      "champions": "Kampioenen",
+      "loyal": "Loyaal",
+      "potential": "Potentieel",
+      "at_risk": "Risico",
+      "lost": "Verloren"
+    },
+    "loading": "Laden…",
+    "empty": {
+      "all": "Nog geen donoren. Registreer donaties via Activiteit om scores te zien.",
+      "filtered": "Geen donoren in {segment}. Registreer donaties via Activiteit om scores te zien."
+    },
+    "columns": {
+      "score": "Score",
+      "donor": "Donor",
+      "rfm": "R/F/M",
+      "donations": "Donaties",
+      "total": "Totaal",
+      "segment": "Segment"
+    },
+    "row": {
+      "last": "Laatste"
+    }
+  },
+  "aiAsk": {
+    "topbar": {
+      "title": "AI vragen",
+      "sub": "Zoekopdrachten in natuurlijke taal door je data"
+    },
+    "hero": {
+      "title": "Vraag alles over je organisatie",
+      "subtitle": "Patroongebaseerde engine — ondersteunt contacten, projecten, deals, panden, bezichtigingen, vrijwilligers en subsidies."
+    },
+    "input": {
+      "placeholder": "bijv. Hoeveel deals deze maand?"
+    },
+    "submit": {
+      "idle": "Vragen",
+      "loading": "Bezig…"
+    },
+    "examples": {
+      "contactsThisMonth": "Hoeveel contacten deze maand?",
+      "topDeals": "Toon de top 5 deals op waarde",
+      "activeProjects": "Toon actieve projecten",
+      "propertiesAvailable": "Toon beschikbare panden",
+      "topGrants": "Top 10 subsidies",
+      "recentShowings": "Recente bezichtigingen",
+      "activeVolunteers": "Vrijwilligers met status actief"
+    },
+    "result": {
+      "questionLabel": "V",
+      "answerLabel": "A",
+      "plan": "plan: {intent} → {entity} (limiet {limit})"
+    },
+    "recent": "Recent",
+    "noData": "Geen data",
+    "requestFailed": "Verzoek mislukt"
   }
 }

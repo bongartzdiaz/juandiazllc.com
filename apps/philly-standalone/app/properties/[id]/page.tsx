@@ -422,11 +422,11 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                             <div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--txt)' }}>
                                 <Calendar size={11} style={{ color: 'var(--txt3)' }} />
-                                {d.toLocaleDateString()}
+                                {fmt.date(d)}
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: 'var(--txt3)', marginTop: 2 }}>
                                 <Clock size={10} />
-                                {d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                {fmt.time(d)}
                               </div>
                             </div>
                             <span className="mono" style={{ fontSize: 11, color: 'var(--txt2)' }}>{s.duration}min</span>
@@ -460,9 +460,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 {/* Listed */}
                 <SideCard title={tpr('sections.listed')}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>
-                    {new Date(property.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric', month: 'short', day: 'numeric',
-                    })}
+                    {fmt.date(property.createdAt)}
                   </div>
                   <div style={{ fontSize: 10, color: 'var(--txt3)', marginTop: 4 }}>
                     {tpr('hints.daysOnMarket', { days: Math.floor((Date.now() - new Date(property.createdAt).getTime()) / 86400000) })}

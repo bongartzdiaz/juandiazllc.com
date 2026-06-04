@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, FormEvent } from 'react'
+import { useTranslations } from 'next-intl'
 import { Topbar } from '@/components/philly/layout/Topbar'
 import { MessageSquareText, Send, Sparkles } from 'lucide-react'
 
@@ -12,17 +13,19 @@ interface NLResult {
   count?: number
 }
 
-const EXAMPLES = [
-  'How many contacts this month?',
-  'Show me top 5 deals by value',
-  'List active projects',
-  'Show properties available',
-  'Top 10 grants',
-  'Recent showings',
-  'Volunteers with status active',
-]
+// Example IDs are stable across locales; labels resolve via t('examples.<id>').
+const EXAMPLE_IDS = [
+  'contactsThisMonth',
+  'topDeals',
+  'activeProjects',
+  'propertiesAvailable',
+  'topGrants',
+  'recentShowings',
+  'activeVolunteers',
+] as const
 
 export default function AIAskPage() {
+  const t = useTranslations('aiAsk')
   const [question, setQuestion] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<NLResult | null>(null)
@@ -38,11 +41,11 @@ export default function AIAskPage() {
         body: JSON.stringify({ question: q }),
       })
       const json = await res.json()
-      const r: NLResult = json.data ?? { question: q, plan: { intent: 'list', entity: '', filters: {}, limit: 0 }, answer: json.error ?? 'No data', data: [] }
+      const r: NLResult = json.data ?? { question: q, plan: { intent: 'list', entity: '', filters: {}, limit: 0 }, answer: json.error ?? t('noData'), data: [] }
       setResult(r)
       setHistory(h => [r, ...h].slice(0, 20))
     } catch {
-      setResult({ question: q, plan: { intent: 'list', entity: '', filters: {}, limit: 0 }, answer: 'Request failed', data: [] })
+      setResult({ question: q, plan: { intent: 'list', entity: '', filters: {}, limit: 0 }, answer: t('requestFailed'), data: [] })
     } finally {
       setLoading(false)
     }
@@ -55,7 +58,7 @@ export default function AIAskPage() {
 
   return (
     <>
-      <Topbar title="Ask AI" sub="Natural language queries across your data" />
+      <Topbar title={t('topbar.title')} sub={t('topbar.sub')} />
       <div style={{ padding: '20px 28px 40px', maxWidth: 980, margin: '0 auto' }}>
         {/* Hero */}
         <div style={{
@@ -72,10 +75,10 @@ export default function AIAskPage() {
           </div>
           <div>
             <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em' }}>
-              Ask anything about your business
+              {t('hero.title')}
             </div>
             <div style={{ fontSize: 11.5, opacity: 0.9, marginTop: 2 }}>
-              Pattern-based engine — supports contacts, projects, deals, properties, showings, volunteers, grants.
+              {t('hero.subtitle')}
             </div>
           </div>
         </div>
@@ -92,7 +95,7 @@ export default function AIAskPage() {
             <input
               value={question}
               onChange={e => setQuestion(e.target.value)}
-              placeholder="e.g., How many deals this month?"
+              placeholder={t('input.placeholder')}
               disabled={loading}
               style={{
                 flex: 1, border: 'none', background: 'none',
@@ -115,27 +118,30 @@ export default function AIAskPage() {
             }}
           >
             <Send size={13} />
-            {loading ? 'Asking…' : 'Ask'}
+            {loading ? t('submit.loading') : t('submit.idle')}
           </button>
         </form>
 
         {/* Examples */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 22 }}>
-          {EXAMPLES.map(ex => (
-            <button
-              key={ex}
-              onClick={() => { setQuestion(ex); submit(ex) }}
-              disabled={loading}
-              style={{
-                padding: '5px 10px', borderRadius: 6,
-                border: '1px solid var(--border)', background: 'var(--panel)',
-                fontSize: 11, color: 'var(--txt2)', cursor: 'pointer',
-                fontFamily: 'inherit',
-              }}
-            >
-              {ex}
-            </button>
-          ))}
+          {EXAMPLE_IDS.map(id => {
+            const ex = t(`examples.${id}`)
+            return (
+              <button
+                key={id}
+                onClick={() => { setQuestion(ex); submit(ex) }}
+                disabled={loading}
+                style={{
+                  padding: '5px 10px', borderRadius: 6,
+                  border: '1px solid var(--border)', background: 'var(--panel)',
+                  fontSize: 11, color: 'var(--txt2)', cursor: 'pointer',
+                  fontFamily: 'inherit',
+                }}
+              >
+                {ex}
+              </button>
+            )
+          })}
         </div>
 
         {/* Current result */}
@@ -149,20 +155,20 @@ export default function AIAskPage() {
               background: 'var(--bg2)',
             }}>
               <div style={{ fontSize: 11, color: 'var(--txt3)', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 4 }}>
-                Q
+                {t('result.questionLabel')}
               </div>
               <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--txt)', marginBottom: 12 }}>
                 {result.question}
               </div>
               <div style={{ fontSize: 11, color: 'var(--txt3)', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 4 }}>
-                A
+                {t('result.answerLabel')}
               </div>
               <div style={{ fontSize: 13.5, color: 'var(--txt)' }}>
                 {result.answer}
               </div>
               <div style={{ fontSize: 10.5, color: 'var(--txt3)', marginTop: 8,
                 fontFamily: "var(--font-red-hat-mono), monospace" }}>
-                plan: {result.plan.intent} → {result.plan.entity} (limit {result.plan.limit})
+                {t('result.plan', { intent: result.plan.intent, entity: result.plan.entity, limit: result.plan.limit })}
               </div>
             </div>
             {result.data.length > 0 && (
@@ -183,7 +189,7 @@ export default function AIAskPage() {
         {history.length > 1 && (
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--txt3)', letterSpacing: '0.06em', marginBottom: 10 }}>
-              Recent
+              {t('recent')}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {history.slice(1).map((h, i) => (

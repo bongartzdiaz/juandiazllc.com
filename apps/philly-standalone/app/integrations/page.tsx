@@ -8,6 +8,7 @@ import { useApi } from '@/hooks/philly/useApi'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 import { ListLoading, ListEmpty, ListError } from '@/components/philly/ui/ListStates'
 import { useTranslations } from 'next-intl'
+import { useFormat } from '@/hooks/philly/useFormat'
 import {
   Plug, Search, Filter, Check, X, ExternalLink, AlertCircle,
   Calendar, MessageSquare, CreditCard, FileText, Megaphone, Zap,
@@ -75,21 +76,6 @@ const BRAND_COLOR: Record<string, string> = {
   quickbooks: '#2ca01c',
 }
 
-function formatRelative(dateStr: string | null): string {
-  if (!dateStr) return 'Never'
-  const d = new Date(dateStr)
-  const diffMs = Date.now() - d.getTime()
-  const sec = Math.floor(diffMs / 1000)
-  if (sec < 60) return 'just now'
-  const min = Math.floor(sec / 60)
-  if (min < 60) return `${min}m ago`
-  const hr = Math.floor(min / 60)
-  if (hr < 24) return `${hr}h ago`
-  const day = Math.floor(hr / 24)
-  if (day < 30) return `${day}d ago`
-  return d.toLocaleDateString()
-}
-
 export default function IntegrationsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -97,6 +83,22 @@ export default function IntegrationsPage() {
   const tConfirms = useTranslations('confirms')
   const tCommon = useTranslations('common')
   const t = useTranslations('integrations')
+  const fmt = useFormat()
+
+  const formatRelative = (dateStr: string | null): string => {
+    if (!dateStr) return 'Never'
+    const d = new Date(dateStr)
+    const diffMs = Date.now() - d.getTime()
+    const sec = Math.floor(diffMs / 1000)
+    if (sec < 60) return 'just now'
+    const min = Math.floor(sec / 60)
+    if (min < 60) return `${min}m ago`
+    const hr = Math.floor(min / 60)
+    if (hr < 24) return `${hr}h ago`
+    const day = Math.floor(hr / 24)
+    if (day < 30) return `${day}d ago`
+    return fmt.date(d)
+  }
 
   interface CatalogResponse { data: CatalogItem[] }
   interface IntegrationsResponse { data: Integration[] }
