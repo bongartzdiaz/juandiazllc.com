@@ -12,6 +12,7 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { useMySections } from '@/hooks/philly/useMySections'
 import { hasSection, sectionForPath } from '@/lib/philly/sections'
 import { ShieldOff } from 'lucide-react'
@@ -39,6 +40,7 @@ export function SectionGuard({ children }: { children: React.ReactNode }) {
 }
 
 function ForbiddenScreen({ slug }: { slug: string }) {
+  const t = useTranslations('sectionGuard')
   return (
     <div
       style={{
@@ -76,12 +78,15 @@ function ForbiddenScreen({ slug }: { slug: string }) {
           <ShieldOff size={26} strokeWidth={2} />
         </div>
         <h1 style={{ fontSize: 20, fontWeight: 600, marginBottom: 10 }}>
-          Section not available
+          {t('title')}
         </h1>
         <p style={{ fontSize: 14, color: 'var(--txt2)', lineHeight: 1.55, marginBottom: 24 }}>
-          Your account doesn&apos;t have access to <code
-            style={{ padding: '1px 6px', background: 'var(--bg2)', borderRadius: 4, fontSize: 12 }}
-          >{slug}</code>. Ask an admin to enable it in Settings &rarr; Users.
+          {t.rich('message', {
+            slug,
+            code: (chunks) => (
+              <code style={{ padding: '1px 6px', background: 'var(--bg2)', borderRadius: 4, fontSize: 12 }}>{chunks}</code>
+            ),
+          })}
         </p>
         <Link
           href="/"
@@ -96,7 +101,7 @@ function ForbiddenScreen({ slug }: { slug: string }) {
             textDecoration: 'none',
           }}
         >
-          Back to dashboard
+          {t('backToDashboard')}
         </Link>
       </div>
     </div>

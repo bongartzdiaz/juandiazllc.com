@@ -4259,5 +4259,10 @@
       "saved": "Configuración de seguridad guardada",
       "networkError": "Error de red"
     }
+  },
+  "sectionGuard": {
+    "title": "Sección no disponible",
+    "message": "Tu cuenta no tiene acceso a <code>{slug}</code>. Pide a un administrador que lo habilite en Configuración → Usuarios.",
+    "backToDashboard": "Volver al panel"
   }
 }

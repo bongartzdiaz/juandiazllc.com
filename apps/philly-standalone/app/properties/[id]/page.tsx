@@ -10,6 +10,7 @@ import {
   DollarSign, Check, X, Edit2, Trash2, Briefcase, Home,
 } from 'lucide-react'
 import { useToast } from '@/hooks/philly/useToast'
+import { useFormat } from '@/hooks/philly/useFormat'
 import { useEntitySubscription } from '@/hooks/philly/useRealtime'
 import { useConfirm } from '@/hooks/philly/useConfirm'
 
@@ -83,6 +84,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   const { id } = use(params)
   const t = useTranslations('properties')
   const tpr = useTranslations('propertyDetail')
+  const fmt = useFormat() // LOC-03 — locale-aware € (was hardcoded $ + toLocaleString)
   const tConfirms = useTranslations('confirms')
   const tCommon = useTranslations('common')
   const confirm = useConfirm()
@@ -360,7 +362,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                         style={{ fontSize: 26, fontWeight: 700, color: 'var(--txt)', cursor: 'pointer' }}
                         title={tpr('hints.clickToEdit')}
                       >
-                        ${(property.priceCents / 100).toLocaleString()}
+                        {fmt.currency(property.priceCents, { cents: true })}
                       </div>
                     )}
                   </div>
@@ -486,7 +488,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                           }}>
                             <div style={{ minWidth: 0 }}>
                               <div className="mono" style={{ fontWeight: 700, color: 'var(--txt)' }}>
-                                ${(o.amountCents / 100).toLocaleString()}
+                                {fmt.currency(o.amountCents, { cents: true })}
                               </div>
                               <div style={{ fontSize: 10, color: 'var(--txt3)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                 {o.contact?.name ?? '—'}

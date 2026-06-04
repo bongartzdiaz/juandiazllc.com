@@ -4259,5 +4259,10 @@
       "saved": "Paramètres de sécurité enregistrés",
       "networkError": "Erreur réseau"
     }
+  },
+  "sectionGuard": {
+    "title": "Section non disponible",
+    "message": "Votre compte n'a pas accès à <code>{slug}</code>. Demandez à un administrateur de l'activer dans Paramètres → Utilisateurs.",
+    "backToDashboard": "Retour au tableau de bord"
   }
 }

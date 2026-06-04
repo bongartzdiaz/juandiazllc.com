@@ -4259,5 +4259,10 @@
       "saved": "Security settings saved",
       "networkError": "Network error"
     }
+  },
+  "sectionGuard": {
+    "title": "Section not available",
+    "message": "Your account doesn't have access to <code>{slug}</code>. Ask an admin to enable it in Settings → Users.",
+    "backToDashboard": "Back to dashboard"
   }
 }

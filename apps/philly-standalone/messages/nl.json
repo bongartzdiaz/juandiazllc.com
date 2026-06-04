@@ -4259,5 +4259,10 @@
       "saved": "Beveiligingsinstellingen opgeslagen",
       "networkError": "Netwerkfout"
     }
+  },
+  "sectionGuard": {
+    "title": "Sectie niet beschikbaar",
+    "message": "Je account heeft geen toegang tot <code>{slug}</code>. Vraag een beheerder om dit in te schakelen via Instellingen → Gebruikers.",
+    "backToDashboard": "Terug naar dashboard"
   }
 }

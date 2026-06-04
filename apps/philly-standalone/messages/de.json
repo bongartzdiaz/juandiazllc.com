@@ -4259,5 +4259,10 @@
       "saved": "Sicherheitseinstellungen gespeichert",
       "networkError": "Netzwerkfehler"
     }
+  },
+  "sectionGuard": {
+    "title": "Bereich nicht verfügbar",
+    "message": "Ihr Konto hat keinen Zugriff auf <code>{slug}</code>. Bitten Sie einen Administrator, ihn unter Einstellungen → Benutzer zu aktivieren.",
+    "backToDashboard": "Zurück zum Dashboard"
   }
 }

@@ -6,6 +6,7 @@ import { Topbar } from '@/components/philly/layout/Topbar'
 import { KpiCard } from '@/components/philly/ui/KpiCard'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useIndustry } from '@/hooks/philly/useIndustry'
+import { useFormat } from '@/hooks/philly/useFormat'
 
 /* ── Philanthropy data ── */
 
@@ -136,6 +137,7 @@ const HOS_TREND_DATA = [
 export default function ImpactPage() {
   const t = useTranslations('impact')
   const { industry } = useIndustry()
+  const fmt = useFormat() // LOC-03 — locale-aware € (was hardcoded $)
   const isRE = industry === 'realestate'
   const isHOS = industry === 'hospitality'
 
@@ -528,7 +530,7 @@ export default function ImpactPage() {
                   <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>{totals.co2Kg.toLocaleString()}</td>
                   <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>{totals.peopleHelped.toLocaleString()}</td>
                   <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>{totals.trees.toLocaleString()}</td>
-                  <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>${(totals.donated / 1000).toFixed(1)}K</td>
+                  <td className="mono" style={{ padding: '10px 14px', fontSize: 12, textAlign: 'right', fontWeight: 700 }}>{fmt.compactCurrency(totals.donated)}</td>
                 </tr>
               </tbody>
             </table>
