@@ -3,6 +3,9 @@ export type Venture = {
   name: string;
   tagline: string;
   sector: string;
+  // Canonical sector-page slug (lib/sectors.ts) this build belongs to.
+  // Drives the /work/[slug] → /sectors/[slug] cross-link.
+  sectorSlug: string;
   status: "live" | "shipping" | "reserved";
   domain: string;
   external: string;
@@ -21,6 +24,7 @@ export const VENTURES: Venture[] = [
     name: "Voltafy",
     tagline: "The platform layer.",
     sector: "Energy",
+    sectorSlug: "energy",
     status: "live",
     domain: "voltafy.nl",
     external: "https://voltafy.nl",
@@ -50,6 +54,7 @@ export const VENTURES: Venture[] = [
     name: "Performance Tracker",
     tagline: "See what your system is really doing.",
     sector: "Energy / Dashboard",
+    sectorSlug: "energy",
     status: "live",
     domain: "performancetracker.nl",
     external: "https://performancetracker.nl",
@@ -79,6 +84,7 @@ export const VENTURES: Venture[] = [
     name: "Help Mij Besparen",
     tagline: "Lower your energy bill, in plain Dutch.",
     sector: "Energy / Consumer",
+    sectorSlug: "energy",
     status: "live",
     domain: "helpmijbesparen.nl",
     external: "https://helpmijbesparen.nl",
@@ -108,6 +114,7 @@ export const VENTURES: Venture[] = [
     name: "Salderingsregeling 2027",
     tagline: "The phase-out, explained.",
     sector: "Energy / Policy",
+    sectorSlug: "energy",
     status: "live",
     domain: "salderingsregeling2027.nl",
     external: "https://salderingsregeling2027.nl",
@@ -137,6 +144,7 @@ export const VENTURES: Venture[] = [
     name: "Philly",
     tagline: "The US ops dashboard.",
     sector: "Logistics / Field",
+    sectorSlug: "adjacent",
     status: "shipping",
     domain: "philly.juandiazllc.com",
     external: "/app",

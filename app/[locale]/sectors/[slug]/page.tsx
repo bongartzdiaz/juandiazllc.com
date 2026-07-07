@@ -271,7 +271,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
           <div style={{ fontFamily: "'Inter'", fontWeight: 300, fontSize: "clamp(26px, 3vw, 42px)", letterSpacing: "-.02em", lineHeight: 1.15, marginBottom: 28, maxWidth: "26ch" }}>
             Let&apos;s draw the <em>blueprint</em>.
           </div>
-          <Link className="btn primary btn-mag" href="/contact">
+          <Link className={`btn primary btn-mag plausible-event-name=Sector+CTA plausible-event-sector=${s.slug}`} href="/contact">
             Book a blueprint call <span className="arr">→</span>
           </Link>
         </div>

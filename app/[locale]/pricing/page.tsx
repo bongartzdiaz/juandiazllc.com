@@ -313,7 +313,9 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
 
                 <Link
                   href={tier.ctaHref}
-                  className={isPopular ? "btn primary btn-mag" : "btn"}
+                  // plausible-event-* classes: click-goal tagging for the
+                  // script.tagged-events.js variant (see components/Analytics.tsx).
+                  className={`${isPopular ? "btn primary btn-mag" : "btn"} plausible-event-name=Pricing+CTA plausible-event-tier=${tier.key}`}
                   style={{ alignSelf: "flex-start" }}
                 >
                   {ctaLabel} <span className="arr">→</span>
@@ -501,10 +503,10 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
             {t("pricing.outro.body")}
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <Link className="btn primary btn-mag" href="/contact?interest=trial">
+            <Link className="btn primary btn-mag plausible-event-name=Pricing+CTA plausible-event-tier=trial" href="/contact?interest=trial">
               {t("pricing.outro.cta")} <span className="arr">→</span>
             </Link>
-            <Link className="btn" href="mailto:hello@lucen.ai">
+            <Link className="btn plausible-event-name=Pricing+CTA plausible-event-tier=email" href="mailto:hello@lucen.ai">
               {t("pricing.outro.alt")}
             </Link>
           </div>
