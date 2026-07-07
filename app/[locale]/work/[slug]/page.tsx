@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { VENTURES, getVenture } from "@/lib/ventures";
+import { getSector } from "@/lib/sectors";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { AUTHOR_PERSON } from "@/lib/seo/article";
 import { LOCALES, translate } from "@/lib/i18n/dict";
@@ -41,6 +42,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
   if (!v) notFound();
 
   const others = VENTURES.filter((x) => x.slug !== v.slug).slice(0, 3);
+  const sector = getSector(v.sectorSlug);
 
   const crumbs = breadcrumbSchema([
     { name: "Home", path: "/" },
@@ -225,9 +227,16 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
             style={{ fontFamily: "'Inter'", fontWeight: 300, fontSize: "clamp(24px, 3vw, 36px)", letterSpacing: "-.02em", lineHeight: 1.2, marginBottom: 24, maxWidth: "30ch" }}
             dangerouslySetInnerHTML={{ __html: t("work.d.want.title") }}
           />
-          <Link className="btn primary btn-mag" href="/contact">
-            {t("work.d.want.cta")} <span className="arr">→</span>
-          </Link>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <Link className="btn primary btn-mag" href="/contact">
+              {t("work.d.want.cta")} <span className="arr">→</span>
+            </Link>
+            {sector && (
+              <Link className="btn ghost" href={`/sectors/${sector.slug}`}>
+                {t("work.d.want.sector").replace("{sector}", sector.name)} <span className="arr">→</span>
+              </Link>
+            )}
+          </div>
         </div>
       </article>
 

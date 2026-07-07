@@ -85,7 +85,12 @@ export default async function MainLayout({
               description:
                 "Holding company shipping revenue engines for operators in energy, real estate, hospitality and adjacent industries.",
               sameAs: PERSON_SAME_AS,
-              address: { "@type": "PostalAddress", addressCountry: "US", addressRegion: "Delaware" },
+              // Delaware = the legal entity; Amsterdam = the operating base.
+              // The NL block carries the local-intent signal for NL/DE/ES search.
+              address: [
+                { "@type": "PostalAddress", addressCountry: "US", addressRegion: "Delaware" },
+                { "@type": "PostalAddress", addressCountry: "NL", addressLocality: "Amsterdam" },
+              ],
               contactPoint: {
                 "@type": "ContactPoint",
                 email: "juan@juandiazllc.com",
