@@ -1,14 +1,20 @@
 name: Lighthouse CI
 
-# Runs Lighthouse against the production deployment on main. We used to
-# also run against the PR preview, but Vercel Preview Protection puts
-# previews behind an auth wall — the Lighthouse runner hits the login
-# page and times out. Running only against production avoids the false
-# failures while still gating on regressions before the next release.
+# Runs Lighthouse against the public production domain on main.
 #
-# Uses treosh/lighthouse-ci-action which handles LHCI server-less
-# (uploads to temporary-public-storage so we get a URL to inspect).
-# No LHCI server required.
+# History: we first audited PR previews (auth-walled by Vercel Preview
+# Protection → login page → timeout), then production *deployment URLs*
+# (juandiazllc-xxx.vercel.app) — but those sit behind Vercel Deployment
+# Protection too, so the wait step timed out on every push since May.
+# The only surface that is reliably public is the production domain
+# itself, so that is what we audit.
+#
+# We still wait for the Vercel production deployment of THIS commit to
+# succeed before auditing — via the GitHub Deployments API (no HTTP
+# probe against protected URLs) — so we never score the previous build.
+#
+# Uses treosh/lighthouse-ci-action server-less (uploads to
+# temporary-public-storage so we get a URL to inspect).
 
 on:
   push:
@@ -16,33 +22,62 @@ on:
   # Manual trigger for ad-hoc runs.
   workflow_dispatch:
 
+env:
+  PROD_URL: https://juandiazllc.com
+
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
-    # Wait for Vercel to finish deploying production before we audit.
-    # We give Vercel up to 10 minutes to land the build.
     timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Wait for Vercel deployment
-        id: vercel
-        uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          max_timeout: 600
-          environment: Production
+      - name: Wait for Vercel production deploy of this commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # On workflow_dispatch there may be no deployment for the SHA
+          # (re-running against an already-live build) — poll, but fall
+          # through to the audit if the deployment is already gone from
+          # the first page of results after a few tries.
+          sha="${{ github.sha }}"
+          echo "Waiting for Vercel Production deployment of $sha …"
+          for i in $(seq 1 60); do
+            dep=$(gh api "repos/${{ github.repository }}/deployments?sha=$sha" \
+              --jq '[.[] | select(.environment | test("production"; "i"))][0].id' || true)
+            if [ -n "$dep" ] && [ "$dep" != "null" ]; then
+              state=$(gh api "repos/${{ github.repository }}/deployments/$dep/statuses" \
+                --jq '.[0].state' || true)
+              echo "  attempt $i: deployment $dep state=$state"
+              case "$state" in
+                success) echo "Deployment succeeded."; exit 0 ;;
+                failure|error) echo "Deployment failed — skipping audit."; exit 1 ;;
+              esac
+            else
+              echo "  attempt $i: no production deployment found yet"
+              # workflow_dispatch on an old commit: nothing will appear.
+              if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$i" -ge 6 ]; then
+                echo "Manual run without a fresh deployment — auditing current production."
+                exit 0
+              fi
+            fi
+            sleep 10
+          done
+          echo "Timed out waiting for the production deployment."
+          exit 1
 
       - name: Run Lighthouse
         uses: treosh/lighthouse-ci-action@v12
         with:
+          # Locale-prefixed URLs: the unprefixed paths 307-redirect via the
+          # locale middleware, which would bill the redirect to the perf score.
           urls: |
-            ${{ steps.vercel.outputs.url }}
-            ${{ steps.vercel.outputs.url }}/insights
-            ${{ steps.vercel.outputs.url }}/work
-            ${{ steps.vercel.outputs.url }}/about
-            ${{ steps.vercel.outputs.url }}/contact
+            ${{ env.PROD_URL }}/en
+            ${{ env.PROD_URL }}/en/insights
+            ${{ env.PROD_URL }}/en/work
+            ${{ env.PROD_URL }}/en/about
+            ${{ env.PROD_URL }}/en/contact
           configPath: ./.lighthouserc.json
           uploadArtifacts: true
           temporaryPublicStorage: true
