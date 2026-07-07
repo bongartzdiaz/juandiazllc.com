@@ -29,6 +29,24 @@ export function Footer() {
         <div>
           <span id="footTime">—</span> · {t("footer.tz")}
         </div>
+        <div style={{ fontSize: 12 }}>
+          <a
+            href="tel:+31653142656"
+            style={{ fontVariantNumeric: "tabular-nums" }}
+            aria-label="Call +31 6 5314 2656"
+          >
+            +31 6 5314 2656
+          </a>
+          {" · "}
+          <a
+            href="https://wa.me/message/GUH2NLTZM6LTK1"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WhatsApp +31 6 5314 2656"
+          >
+            WhatsApp
+          </a>
+        </div>
         <div style={{ color: "var(--muted-soft)", fontSize: 11 }}>
           juandiazllc.com · {t("footer.version")}
         </div>
