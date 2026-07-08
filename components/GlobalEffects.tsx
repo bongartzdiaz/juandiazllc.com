@@ -2,7 +2,9 @@
 
 import { useEffect } from "react";
 
-const SCR_CHARS = "!<>-_\\/[]{}—=+*^?#█▓▒░01";
+// No block glyphs (█▓▒░) — much wider than the average letter, so a
+// scrambled line's width jumped per frame and shifted inline siblings.
+const SCR_CHARS = "!<>-_\\/[]{}—=+*^?#01";
 
 export function GlobalEffects() {
   useEffect(() => {
@@ -168,15 +170,33 @@ export function GlobalEffects() {
                 });
               })(el);
               let lastEnd = 0;
+              const lockedSpans: HTMLSpanElement[] = [];
               nodes.forEach((node, i) => {
                 const t = node.textContent ?? "";
                 if (!t) return;
+                // Width-lock: random chars have different advance widths
+                // than the real text, so an unlocked span jitters per
+                // frame and shifts its inline siblings (the <em> in the
+                // hero h1 was the biggest CLS source after the box
+                // clamp). Single-line nodes get a fixed pixel width for
+                // the duration; multi-line nodes can't be boxed without
+                // breaking wrap, so they rely on the outer clamp.
+                const range = document.createRange();
+                range.selectNodeContents(node);
+                const rects = range.getClientRects();
+                const lockW = rects.length === 1 ? rects[0].width : null;
                 // Atomic swap: the span carries same-length placeholder
                 // text from the same frame the node is cleared, so the
                 // heading never collapses.
                 const span = document.createElement("span");
                 span.className = "scramble";
                 span.textContent = randomChars(t);
+                if (lockW !== null) {
+                  span.style.display = "inline-block";
+                  span.style.width = `${lockW}px`;
+                  span.style.whiteSpace = "nowrap";
+                  lockedSpans.push(span);
+                }
                 node.textContent = "";
                 node.parentNode?.insertBefore(span, node);
                 const delay = i * 60;
@@ -190,6 +210,14 @@ export function GlobalEffects() {
                   el.style.minHeight = "";
                   el.style.maxHeight = "";
                   el.style.overflow = "";
+                  // Release width locks so later reflows (window resize)
+                  // wrap naturally — final text equals locked width, so
+                  // this changes nothing visually.
+                  for (const s of lockedSpans) {
+                    s.style.display = "";
+                    s.style.width = "";
+                    s.style.whiteSpace = "";
+                  }
                 }, lastEnd + 250),
               );
             } catch {}
