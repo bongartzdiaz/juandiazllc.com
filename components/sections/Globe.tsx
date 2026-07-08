@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { geoOrthographic, geoPath, geoGraticule, geoCentroid } from "d3-geo";
 import { feature } from "topojson-client";
-import type { Feature, FeatureCollection, Geometry, GeoJsonProperties } from "geojson";
+import type { Feature, Geometry } from "geojson";
 import type { Topology, GeometryCollection } from "topojson-specification";
 import { useT } from "@/lib/i18n/useT";
 
@@ -11,12 +11,23 @@ import { useT } from "@/lib/i18n/useT";
 // animate the projection's rotate() + scale() to fly to the country,
 // then slide in an info panel. Pure SVG, no WebGL; orthographic
 // projection gives a real sphere that rotates in true 3D.
+//
+// Rendering architecture: the country layer + all rotation/zoom updates
+// are IMPERATIVE (direct DOM writes into a <g ref>), not React state.
+// The previous React version re-rendered 177 <path> elements per
+// rotation frame — on slow hardware (Lighthouse CI runners, low-end
+// laptops) a single frame crossed the 50ms long-task threshold and the
+// home page's TBT ballooned. Direct `d`-attribute writes cost a few ms
+// per frame and never involve the reconciler. React owns only the
+// static chrome (sphere, defs), interaction state (hover hint,
+// selected panel) and container size.
 
 type CountryProps = { name: string };
 type CountryFeature = Feature<Geometry, CountryProps>;
 
-const ROTATION_SPEED = 0.05; // deg per frame — gentle drift
+const ROTATION_SPEED = 0.05; // deg per 16.7ms — gentle drift
 const BASE_SCALE_RATIO = 0.48; // fraction of min(w,h)/2
+const BUILD_CHUNK = 12; // countries appended per animation frame
 
 // Countries that get a richer info card. Everything else uses a
 // generic "exploring here" placeholder. Extend as we add real work.
@@ -39,21 +50,68 @@ const FEATURED: Record<string, { eyebrow: string; body: string }> = {
   },
 };
 
+const SVG_NS = "http://www.w3.org/2000/svg";
+
 export function Globe() {
   const t = useT();
   const svgRef = useRef<SVGSVGElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const countriesGRef = useRef<SVGGElement>(null);
+  const graticuleElRef = useRef<SVGPathElement>(null);
+  const circleRefs = useRef<(SVGCircleElement | null)[]>([null, null, null]);
+
   const [size, setSize] = useState({ w: 640, h: 640 });
-  const [countries, setCountries] = useState<CountryFeature[]>([]);
-  const [rotation, setRotation] = useState<[number, number, number]>([20, -20, 0]);
-  const [zoom, setZoom] = useState(1);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selected, setSelected] = useState<CountryFeature | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+
+  // Imperative world state — mutated by the rAF loops, never React state.
+  const rotationRef = useRef<[number, number, number]>([20, -20, 0]);
+  const zoomRef = useRef(1);
+  const featuresRef = useRef<CountryFeature[]>([]);
+  const pathElsRef = useRef<SVGPathElement[]>([]);
+  const sizeRef = useRef(size);
+  const selectedRef = useRef<CountryFeature | null>(null);
   const animRef = useRef<number | null>(null);
   const flyRef = useRef<number | null>(null);
+  const buildRef = useRef<number | null>(null);
   const draggingRef = useRef(false);
   const reduceMotion = useRef(false);
+
+  const graticule = useMemo(() => geoGraticule().step([15, 15])(), []);
+
+  /** Recompute the projection and write every geo path + sphere radius
+   *  straight into the DOM. ~5–25ms for the full 110m world — always
+   *  under the 50ms long-task threshold, even on weak hardware. */
+  const redraw = useCallback(() => {
+    const { w, h } = sizeRef.current;
+    const projection = geoOrthographic()
+      .scale(Math.min(w, h) * BASE_SCALE_RATIO * zoomRef.current)
+      .translate([w / 2, h / 2])
+      .rotate(rotationRef.current)
+      .clipAngle(90);
+    const p = geoPath(projection);
+
+    if (graticuleElRef.current) {
+      graticuleElRef.current.setAttribute("d", p(graticule) || "");
+    }
+    const feats = featuresRef.current;
+    const els = pathElsRef.current;
+    for (let i = 0; i < els.length; i++) {
+      const d = p(feats[i]);
+      if (d) {
+        els[i].setAttribute("d", d);
+        els[i].style.display = "";
+      } else {
+        // Far side of the sphere — clipped away entirely.
+        els[i].style.display = "none";
+      }
+    }
+    const r = Math.min(w, h) * BASE_SCALE_RATIO * zoomRef.current;
+    for (const c of circleRefs.current) {
+      if (c) c.setAttribute("r", String(r));
+    }
+  }, [graticule]);
 
   // Measure + track container size
   useEffect(() => {
@@ -63,11 +121,13 @@ export function Globe() {
       const r = entries[0].contentRect;
       const s = Math.min(r.width, r.height);
       setSize({ w: s, h: s });
+      sizeRef.current = { w: s, h: s };
+      redraw();
     });
     obs.observe(el);
     reduceMotion.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     return () => obs.disconnect();
-  }, []);
+  }, [redraw]);
 
   // Gate heavy work on viewport entry — defer the ~108 KB TopoJSON
   // fetch until the globe scrolls into view. Keeps LCP fast on pages
@@ -92,63 +152,66 @@ export function Globe() {
     return () => io.disconnect();
   }, []);
 
-  // Load TopoJSON once — only after the globe enters viewport.
-  // The decode + first render used to happen as one synchronous burst
-  // (~480ms long task → the bulk of the home page's TBT). Now the
-  // topology→feature conversion and the state fill run in idle-time
-  // slices of 40 countries, so no single task crosses the 50ms
-  // long-task threshold and the globe fills in over a few frames.
+  // Load TopoJSON once and build the country layer imperatively —
+  // BUILD_CHUNK path elements appended per animation frame. Each frame
+  // does a handful of feature() conversions + createElement calls, so
+  // the build never produces a long task and the globe fills in over
+  // ~15 frames (~a quarter second).
   useEffect(() => {
     if (!isVisible) return;
     let alive = true;
-    const timers: number[] = [];
-    const idle = (cb: () => void, timeout = 1200) => {
-      if (typeof window.requestIdleCallback === "function") {
-        window.requestIdleCallback(() => { if (alive) cb(); }, { timeout });
-      } else {
-        timers.push(window.setTimeout(() => { if (alive) cb(); }, 200));
-      }
-    };
     fetch("/world-110m.json")
       .then((r) => r.json())
       .then((topo: Topology) => {
-        if (!alive) return;
+        if (!alive || !countriesGRef.current) return;
         const col = topo.objects.countries as GeometryCollection<CountryProps>;
         const geoms = col.geometries;
-        const BATCH = 40;
         let i = 0;
-        const append = () => {
-          const batch = geoms
-            .slice(i, i + BATCH)
-            .map((g) => feature(topo, g) as unknown as CountryFeature);
-          setCountries((prev) => [...prev, ...batch]);
-          i += BATCH;
-          if (i < geoms.length) idle(append, 800);
+        const buildChunk = () => {
+          if (!alive || !countriesGRef.current) return;
+          const end = Math.min(i + BUILD_CHUNK, geoms.length);
+          for (; i < end; i++) {
+            const f = feature(topo, geoms[i]) as unknown as CountryFeature;
+            const idx = featuresRef.current.length;
+            featuresRef.current.push(f);
+            const el = document.createElementNS(SVG_NS, "path");
+            el.setAttribute("class", "country");
+            el.dataset.idx = String(idx);
+            const title = document.createElementNS(SVG_NS, "title");
+            title.textContent = f.properties?.name || `c${idx}`;
+            el.appendChild(title);
+            countriesGRef.current.appendChild(el);
+            pathElsRef.current.push(el);
+          }
+          redraw();
+          if (i < geoms.length) buildRef.current = requestAnimationFrame(buildChunk);
         };
-        idle(append);
+        buildRef.current = requestAnimationFrame(buildChunk);
       })
       .catch(() => {
         /* network blocked — globe still renders graticule only */
       });
     return () => {
       alive = false;
-      timers.forEach((t) => window.clearTimeout(t));
+      if (buildRef.current) cancelAnimationFrame(buildRef.current);
     };
-  }, [isVisible]);
+  }, [isVisible, redraw]);
 
-  // Auto-rotate loop (paused when a country is selected or user drags).
-  // State updates are throttled to ~30fps — every update re-projects all
-  // country paths through React, so halving the cadence halves the
-  // steady-state main-thread cost. The step is time-based, so the drift
-  // speed is identical to the old per-frame version.
+  // Auto-rotate loop — throttled to ~30fps, mutates the rotation ref
+  // and redraws imperatively. No React involvement per frame.
   useEffect(() => {
     if (selected || reduceMotion.current) return;
     let last = performance.now();
     function tick(now: number) {
-      if (!draggingRef.current && now - last >= 33) {
+      if (!draggingRef.current && !selectedRef.current && now - last >= 33) {
         const dt = now - last;
         last = now;
-        setRotation(([l, p, g]) => [l + ROTATION_SPEED * (dt / 16.7), p, g]);
+        rotationRef.current = [
+          rotationRef.current[0] + ROTATION_SPEED * (dt / 16.7),
+          rotationRef.current[1],
+          rotationRef.current[2],
+        ];
+        redraw();
       }
       animRef.current = requestAnimationFrame(tick);
     }
@@ -156,9 +219,9 @@ export function Globe() {
     return () => {
       if (animRef.current) cancelAnimationFrame(animRef.current);
     };
-  }, [selected]);
+  }, [selected, redraw]);
 
-  // Fly-to animation — lerp rotation + zoom
+  // Fly-to animation — lerp rotation + zoom via refs
   const flyTo = useCallback((f: CountryFeature) => {
     const [lng, lat] = geoCentroid(f);
     const targetRot: [number, number, number] = [-lng, -lat, 0];
@@ -166,8 +229,10 @@ export function Globe() {
     if (flyRef.current) cancelAnimationFrame(flyRef.current);
     const start = performance.now();
     const duration = reduceMotion.current ? 0 : 1100;
-    const fromRot: [number, number, number] = [...rotation];
-    const fromZoom = zoom;
+    const fromRot: [number, number, number] = [...rotationRef.current];
+    const fromZoom = zoomRef.current;
+    // Mark selected immediately in the ref so auto-rotate pauses.
+    selectedRef.current = f;
 
     // shortest angular path on longitude
     let deltaLng = targetRot[0] - fromRot[0];
@@ -177,35 +242,90 @@ export function Globe() {
     function step(now: number) {
       const t = duration === 0 ? 1 : Math.min(1, (now - start) / duration);
       const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; // easeInOutQuad
-      setRotation([
+      rotationRef.current = [
         fromRot[0] + deltaLng * e,
         fromRot[1] + (targetRot[1] - fromRot[1]) * e,
         0,
-      ]);
-      setZoom(fromZoom + (targetZoom - fromZoom) * e);
+      ];
+      zoomRef.current = fromZoom + (targetZoom - fromZoom) * e;
+      redraw();
       if (t < 1) flyRef.current = requestAnimationFrame(step);
       else setSelected(f);
     }
     flyRef.current = requestAnimationFrame(step);
-  }, [rotation, zoom]);
+  }, [redraw]);
 
   const flyHome = useCallback(() => {
     if (flyRef.current) cancelAnimationFrame(flyRef.current);
     const start = performance.now();
     const duration = reduceMotion.current ? 0 : 900;
-    const fromRot: [number, number, number] = [...rotation];
-    const fromZoom = zoom;
+    const fromZoom = zoomRef.current;
     const targetZoom = 1;
+    selectedRef.current = null;
     setSelected(null);
     function step(now: number) {
       const t = duration === 0 ? 1 : Math.min(1, (now - start) / duration);
       const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-      setZoom(fromZoom + (targetZoom - fromZoom) * e);
-      setRotation(fromRot); // keep current longitude, let auto-rotate resume
+      zoomRef.current = fromZoom + (targetZoom - fromZoom) * e;
+      redraw();
       if (t < 1) flyRef.current = requestAnimationFrame(step);
     }
     flyRef.current = requestAnimationFrame(step);
-  }, [rotation, zoom]);
+  }, [redraw]);
+
+  // Hover + click via event delegation on the countries group — the
+  // imperative <path> elements carry data-idx back to their feature.
+  const featureFromEvent = useCallback((e: Event): { f: CountryFeature; el: SVGPathElement } | null => {
+    const target = (e.target as Element | null)?.closest?.("path.country") as SVGPathElement | null;
+    if (!target || target.dataset.idx === undefined) return null;
+    const f = featuresRef.current[Number(target.dataset.idx)];
+    return f ? { f, el: target } : null;
+  }, []);
+
+  useEffect(() => {
+    const g = countriesGRef.current;
+    if (!g) return;
+    let hoverEl: SVGPathElement | null = null;
+    const over = (e: Event) => {
+      const hit = featureFromEvent(e);
+      if (!hit || hit.el === hoverEl) return;
+      hoverEl?.classList.remove("hover");
+      hoverEl = hit.el;
+      hoverEl.classList.add("hover");
+      setHoveredId(hit.f.properties?.name || null);
+    };
+    const out = (e: Event) => {
+      const related = (e as MouseEvent).relatedTarget as Element | null;
+      if (related && related.closest("path.country")) return; // moving between countries
+      hoverEl?.classList.remove("hover");
+      hoverEl = null;
+      setHoveredId(null);
+    };
+    const click = (e: Event) => {
+      if (draggingRef.current) return;
+      const hit = featureFromEvent(e);
+      if (!hit) return;
+      e.stopPropagation();
+      g.querySelector("path.selected")?.classList.remove("selected");
+      hit.el.classList.add("selected");
+      flyTo(hit.f);
+    };
+    g.addEventListener("mouseover", over);
+    g.addEventListener("mouseout", out);
+    g.addEventListener("click", click);
+    return () => {
+      g.removeEventListener("mouseover", over);
+      g.removeEventListener("mouseout", out);
+      g.removeEventListener("click", click);
+    };
+  }, [featureFromEvent, flyTo]);
+
+  // Clear the selected highlight when the panel closes.
+  useEffect(() => {
+    if (!selected) {
+      countriesGRef.current?.querySelector("path.selected")?.classList.remove("selected");
+    }
+  }, [selected]);
 
   // Drag-to-rotate on pointer
   useEffect(() => {
@@ -213,7 +333,7 @@ export function Globe() {
     if (!svg) return;
     let lastX = 0, lastY = 0;
     function down(e: PointerEvent) {
-      if (selected) return;
+      if (selectedRef.current) return;
       draggingRef.current = true;
       lastX = e.clientX;
       lastY = e.clientY;
@@ -225,7 +345,9 @@ export function Globe() {
       const dy = e.clientY - lastY;
       lastX = e.clientX;
       lastY = e.clientY;
-      setRotation(([l, p, g]) => [l + dx * 0.3, Math.max(-80, Math.min(80, p - dy * 0.3)), g]);
+      const [l, p, g] = rotationRef.current;
+      rotationRef.current = [l + dx * 0.3, Math.max(-80, Math.min(80, p - dy * 0.3)), g];
+      redraw();
     }
     function up(e: PointerEvent) {
       draggingRef.current = false;
@@ -241,20 +363,18 @@ export function Globe() {
       svg.removeEventListener("pointerup", up);
       svg.removeEventListener("pointerleave", up);
     };
-  }, [selected]);
+  }, [redraw]);
 
-  const projection = useMemo(() => {
-    return geoOrthographic()
-      .scale(Math.min(size.w, size.h) * BASE_SCALE_RATIO * zoom)
-      .translate([size.w / 2, size.h / 2])
-      .rotate(rotation)
-      .clipAngle(90);
-  }, [size.w, size.h, zoom, rotation]);
-
-  const path = useMemo(() => geoPath(projection), [projection]);
-  const graticule = useMemo(() => geoGraticule().step([15, 15])(), []);
+  // Keep the sphere geometry in sync when React re-renders for a size
+  // change (viewBox + circle centers are React-owned; radii + paths are
+  // ref-owned and refreshed by redraw()).
+  useEffect(() => {
+    sizeRef.current = size;
+    redraw();
+  }, [size, redraw]);
 
   const featured = selected?.properties?.name ? FEATURED[selected.properties.name] : undefined;
+  const r0 = Math.min(size.w, size.h) * BASE_SCALE_RATIO;
 
   return (
     <div className="globe-wrap" ref={wrapperRef}>
@@ -288,55 +408,34 @@ export function Globe() {
 
         {/* ocean sphere */}
         <circle
+          ref={(el) => { circleRefs.current[0] = el; }}
           cx={size.w / 2}
           cy={size.h / 2}
-          r={Math.min(size.w, size.h) * BASE_SCALE_RATIO * zoom}
+          r={r0}
           fill="url(#oceanGrad)"
         />
 
         {/* graticule — lat/long wireframe */}
-        <path d={path(graticule) || undefined} className="globe-graticule" />
+        <path ref={graticuleElRef} className="globe-graticule" />
 
-        {/* countries */}
-        <g className="globe-countries">
-          {countries.map((f, i) => {
-            const d = path(f);
-            if (!d) return null;
-            const name = f.properties?.name || `c${i}`;
-            const isHover = hoveredId === name;
-            const isSelected = selected?.properties?.name === name;
-            return (
-              <path
-                key={name}
-                d={d}
-                className={`country${isHover ? " hover" : ""}${isSelected ? " selected" : ""}`}
-                onMouseEnter={() => setHoveredId(name)}
-                onMouseLeave={() => setHoveredId(null)}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (draggingRef.current) return;
-                  flyTo(f);
-                }}
-              >
-                <title>{name}</title>
-              </path>
-            );
-          })}
-        </g>
+        {/* countries — populated imperatively, see buildChunk() */}
+        <g ref={countriesGRef} className="globe-countries" />
 
         {/* limb glow — atmospheric rim on top */}
         <circle
+          ref={(el) => { circleRefs.current[1] = el; }}
           cx={size.w / 2}
           cy={size.h / 2}
-          r={Math.min(size.w, size.h) * BASE_SCALE_RATIO * zoom}
+          r={r0}
           fill="url(#limbGrad)"
           pointerEvents="none"
         />
         {/* specular highlight */}
         <circle
+          ref={(el) => { circleRefs.current[2] = el; }}
           cx={size.w / 2}
           cy={size.h / 2}
-          r={Math.min(size.w, size.h) * BASE_SCALE_RATIO * zoom}
+          r={r0}
           fill="url(#specularGrad)"
           style={{ mixBlendMode: "screen" }}
           pointerEvents="none"
