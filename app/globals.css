@@ -29,7 +29,12 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  text-rendering: optimizeLegibility;
+  /* NB: no `text-rendering: optimizeLegibility` here. It forces the
+     slow text-shaping path on the page's very first layout — measured
+     as the single ~470ms unattributable long task behind the home
+     page's TBT (A/B: dropping it cut the first-layout task ~6×).
+     Chromium's default already applies kerning + standard ligatures
+     for OpenType fonts, so there is no visual difference. */
 }
 body {
   min-height: 100vh;
