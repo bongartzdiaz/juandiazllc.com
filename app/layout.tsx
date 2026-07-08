@@ -107,10 +107,10 @@ export const metadata: Metadata = {
     images: ["/opengraph-image"],
   },
   icons: {
-    icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
-    ],
+    // NB: /favicon.svg is deliberately absent — app/favicon.svg is not a
+    // Next filename convention (only favicon.ico auto-serves), so listing
+    // it here 404'd on every page. /icon.svg is the convention route.
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
     shortcut: "/icon.svg",
   },
