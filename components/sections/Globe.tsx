@@ -92,32 +92,63 @@ export function Globe() {
     return () => io.disconnect();
   }, []);
 
-  // Load TopoJSON once — only after the globe enters viewport
+  // Load TopoJSON once — only after the globe enters viewport.
+  // The decode + first render used to happen as one synchronous burst
+  // (~480ms long task → the bulk of the home page's TBT). Now the
+  // topology→feature conversion and the state fill run in idle-time
+  // slices of 40 countries, so no single task crosses the 50ms
+  // long-task threshold and the globe fills in over a few frames.
   useEffect(() => {
     if (!isVisible) return;
     let alive = true;
+    const timers: number[] = [];
+    const idle = (cb: () => void, timeout = 1200) => {
+      if (typeof window.requestIdleCallback === "function") {
+        window.requestIdleCallback(() => { if (alive) cb(); }, { timeout });
+      } else {
+        timers.push(window.setTimeout(() => { if (alive) cb(); }, 200));
+      }
+    };
     fetch("/world-110m.json")
       .then((r) => r.json())
       .then((topo: Topology) => {
         if (!alive) return;
         const col = topo.objects.countries as GeometryCollection<CountryProps>;
-        const fc = feature(topo, col) as unknown as FeatureCollection<Geometry, CountryProps>;
-        setCountries(fc.features as CountryFeature[]);
+        const geoms = col.geometries;
+        const BATCH = 40;
+        let i = 0;
+        const append = () => {
+          const batch = geoms
+            .slice(i, i + BATCH)
+            .map((g) => feature(topo, g) as unknown as CountryFeature);
+          setCountries((prev) => [...prev, ...batch]);
+          i += BATCH;
+          if (i < geoms.length) idle(append, 800);
+        };
+        idle(append);
       })
       .catch(() => {
         /* network blocked — globe still renders graticule only */
       });
     return () => {
       alive = false;
+      timers.forEach((t) => window.clearTimeout(t));
     };
   }, [isVisible]);
 
-  // Auto-rotate loop (paused when a country is selected or user drags)
+  // Auto-rotate loop (paused when a country is selected or user drags).
+  // State updates are throttled to ~30fps — every update re-projects all
+  // country paths through React, so halving the cadence halves the
+  // steady-state main-thread cost. The step is time-based, so the drift
+  // speed is identical to the old per-frame version.
   useEffect(() => {
     if (selected || reduceMotion.current) return;
-    function tick() {
-      if (!draggingRef.current) {
-        setRotation(([l, p, g]) => [l + ROTATION_SPEED, p, g]);
+    let last = performance.now();
+    function tick(now: number) {
+      if (!draggingRef.current && now - last >= 33) {
+        const dt = now - last;
+        last = now;
+        setRotation(([l, p, g]) => [l + ROTATION_SPEED * (dt / 16.7), p, g]);
       }
       animRef.current = requestAnimationFrame(tick);
     }

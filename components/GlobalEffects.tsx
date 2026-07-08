@@ -131,7 +131,19 @@ export function GlobalEffects() {
     );
     document.querySelectorAll("[data-reveal]").forEach((el) => io.observe(el));
 
-    /* Scramble text on reveal */
+    /* Scramble text on reveal.
+       Layout-stability contract (the old version scored CLS 4.2 on
+       /insights): never leave a text node empty across a frame, and
+       freeze the heading's box while the animation runs. Emptying the
+       node collapsed the heading → every section below jumped up, then
+       back down as the scramble refilled it — 15 layout shifts per page. */
+    const randomChars = (final: string) => {
+      let out = "";
+      for (let i = 0; i < final.length; i++) {
+        out += final[i] === " " ? " " : SCR_CHARS[Math.floor(Math.random() * SCR_CHARS.length)];
+      }
+      return out;
+    };
     function scramble(el: Element, final: string, duration = 900) {
       const N = final.length;
       const start = performance.now();
@@ -151,14 +163,26 @@ export function GlobalEffects() {
       requestAnimationFrame(frame);
     }
     let sio: IntersectionObserver | null = null;
-    try {
+    const scrambleUnfreeze = new Map<HTMLElement, number>();
+    // Static text for reduced-motion users — and no CLS risk either.
+    const prefersReduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!prefersReduce) try {
       const targets = document.querySelectorAll(".sec-head h2, .story-lead, .kinetic .sub span:first-child, .page-hero h1");
       sio = new IntersectionObserver(
         (entries) => {
           entries.forEach((e) => {
             if (!e.isIntersecting) return;
             try {
-              const el = e.target;
+              const el = e.target as HTMLElement;
+              // Clamp the box: same-length scramble chars include wide
+              // glyphs (█▓▒), so mid-animation the text can wrap to an
+              // extra line and grow the element — shifting every section
+              // below it. Fixing both bounds + clipping keeps the outer
+              // geometry constant for the whole animation.
+              const boxH = el.getBoundingClientRect().height;
+              el.style.minHeight = `${boxH}px`;
+              el.style.maxHeight = `${boxH}px`;
+              el.style.overflow = "hidden";
               const nodes: Node[] = [];
               (function walk(node: Node) {
                 node.childNodes.forEach((c) => {
@@ -166,21 +190,31 @@ export function GlobalEffects() {
                   else if (c.nodeType === 1) walk(c);
                 });
               })(el);
+              let lastEnd = 0;
               nodes.forEach((node, i) => {
                 const t = node.textContent ?? "";
                 if (!t) return;
+                // Atomic swap: the span carries same-length placeholder
+                // text from the same frame the node is cleared, so the
+                // heading never collapses.
+                const span = document.createElement("span");
+                span.className = "scramble";
+                span.textContent = randomChars(t);
                 node.textContent = "";
-                window.setTimeout(() => {
-                  try {
-                    const span = document.createElement("span");
-                    span.className = "scramble";
-                    if (node.parentNode) {
-                      node.parentNode.insertBefore(span, node);
-                      scramble(span, t, 700 + i * 80);
-                    }
-                  } catch {}
-                }, i * 60);
+                node.parentNode?.insertBefore(span, node);
+                const delay = i * 60;
+                const duration = 700 + i * 80;
+                window.setTimeout(() => scramble(span, t, duration), delay);
+                lastEnd = Math.max(lastEnd, delay + duration);
               });
+              scrambleUnfreeze.set(
+                el,
+                window.setTimeout(() => {
+                  el.style.minHeight = "";
+                  el.style.maxHeight = "";
+                  el.style.overflow = "";
+                }, lastEnd + 250),
+              );
             } catch {}
             sio?.unobserve(e.target);
           });
@@ -192,6 +226,7 @@ export function GlobalEffects() {
 
     return () => {
       window.clearTimeout(failsafe);
+      scrambleUnfreeze.forEach((id) => window.clearTimeout(id));
       window.removeEventListener("load", finish);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("scroll", onScrollCta);
