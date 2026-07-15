@@ -131,7 +131,10 @@ export default async function EnergyRoiPage({
           <p style={{ color: "var(--muted)", fontSize: 16, lineHeight: 1.65, marginBottom: 28, maxWidth: "60ch" }}>
             {t("roi.outro.body")}
           </p>
-          <Link className="btn primary btn-mag" href="/contact">
+          <Link
+            className="btn primary btn-mag plausible-event-name=Tool+CTA plausible-event-tool=energy-roi"
+            href="/contact?interest=energy-roi"
+          >
             {t("roi.outro.cta")} <span className="arr">→</span>
           </Link>
         </div>
