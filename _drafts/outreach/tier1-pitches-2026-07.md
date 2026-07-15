@@ -99,29 +99,48 @@ editor-naam via over-ons-pagina — [VUL IN: naam]
 
 ## 3. Tweakers.net — Nederlands
 
+> **Angle-wissel (2026-07-15):** de oorspronkelijke omvormer-
+> normalisatie-angle is geschrapt na een code-audit — er bestaan géén
+> omvormer-merk-API-integraties in de Voltafy/PT-repos (de site-copy
+> daarover is aspirationeel). Deze versie draait op het systeem dat
+> wél draait: de 2Solar-sync-pipeline van PerformanceTracker.
+> Technische feiten hieronder komen uit
+> `Mr Diaz - PerformanceTracker/10-Projecten/.../project_2solar_integratie_plan.md`
+> en de sync-SOP's — verifieerbaar, niet verzonnen.
+
 **Aan:** redactie@tweakers.net
-**Onderwerp:** `Ik koppelde [VUL IN: N] omvormer-merken aan één opbrengstmodel — architectuur + valkuilen`
+**Onderwerp:** `Lead-sync bouwen op een CRM-API zonder gedocumenteerde rate limits — architectuur + missers`
 
 > Hoi redactie,
 >
-> Ik bouw software voor de Nederlandse zonne-sector, waaronder een
-> monitoring-platform dat opbrengstdata van [VUL IN: N] omvormer-merken
-> normaliseert naar één eerlijk yield-model — eerlijk in de zin van:
-> niet gebouwd door de partij die je de panelen verkocht.
+> Ik bouw software voor Nederlandse zonne-installateurs, waaronder een
+> klantreis-pipeline die leads en projectstatussen synchroniseert met
+> 2Solar — het CRM dat een groot deel van de Nederlandse solar-sector
+> draait, met een API waarvan de rate limits nergens gedocumenteerd
+> staan. De pipeline draait sinds [VUL IN: maand] in productie en
+> verwerkte tot nu toe [VUL IN: N] projecten.
 >
-> Ik wil voor Tweakers een technisch stuk schrijven: **"Eén
-> opbrengstmodel voor [N] omvormer-merken: de architectuur, en wat ik
-> anders zou doen"**. Geen "wij gebruikten AI"-verhaal; ik schreef de
-> code zelf en laat de architectuur zien.
+> Ik wil voor Tweakers een technisch stuk schrijven: **"Betrouwbaar
+> syncen met een API die je niet vertrouwt: dead-letter queues en
+> gap-detectors op Supabase"**. Geen "wij gebruikten AI"-verhaal; ik
+> schreef de code zelf en laat de architectuur zien.
 >
 > Het stuk bevat:
-> - hoe de API's per merk verschillen ([VUL IN: 2-3 concrete voorbeelden: polling vs push, resolutie, rate limits])
-> - het normalisatiemodel: [VUL IN: hoe seizoens-/oriëntatiecorrectie werkt]
-> - het datamodel ([VUL IN: stack-keuzes + waarom, bijv. time-series opslag])
-> - wat niet werkte: [VUL IN: eerlijke miss, bijv. een merk-API die stilletjes data afrondde]
+> - de reliability-laag: uurlijkse sync-cron + gap-detector, retry-cron
+>   elke 15 minuten, dagelijkse integriteitscheck en een dead-letter-
+>   tabel voor events die na retries blijven falen
+> - omgaan met ongedocumenteerde limits: conservatief plafond,
+>   monitoren, en een permissie-401 op het person-endpoint die het
+>   ontwerp veranderde
+> - identity-matching in de praktijk: telefoonnummer-normalisatie naar
+>   +31, waarom telefoon wint van e-mail, en de edge-cases daarvan
+> - de stack-keuze: Supabase (Postgres + edge functions + pg_cron) in
+>   plaats van een aparte queue-service — en waar dat begint te knellen
+> - wat niet werkte: [VUL IN: eerlijke miss — bijv. de DLQ-rate of een
+>   sync-gap-incident uit de logboeken]
 >
-> Vendor-neutraal: merken worden functioneel beschreven, geen
-> productpromotie, databron onderaan vermeld met één link.
+> 2Solar wordt feitelijk en neutraal beschreven, geen productpromotie;
+> databron onderaan vermeld met één link.
 >
 > Richtlengte: 1.000-1.400 woorden. Concept binnen een week.
 >
@@ -129,6 +148,11 @@ editor-naam via over-ons-pagina — [VUL IN: naam]
 > Juan Diaz
 > https://juandiazllc.com/nl/about
 > https://juandiazllc.com/nl/insights
+
+**Resterende [VUL IN]'s — waar te vinden (2 min, HMB-Supabase dashboard):**
+- productie-sinds: eerste run van `sync-twosolar-hourly` (cron-historie of oudste rij)
+- N projecten: `select count(*) from solar_requests` (of de synced-projects-tabel)
+- eerlijke miss: DLQ-aantal (`client_events_dlq`) of een incident uit de sync-logboeken in de PT-vault
 
 ---
 
@@ -198,7 +222,7 @@ ES:
 |---|---|---|---|---|
 | Solar Magazine NL | — | — | — | cijfers nodig |
 | PV Magazine DE | — | — | — | cijfers nodig |
-| Tweakers.net | — | — | — | cijfers nodig |
+| Tweakers.net | — | — | — | angle herschreven op 2Solar-pipeline; 3 cijfers uit HMB-Supabase nodig |
 | El Confidencial | — | — | — | zwakste — evt. bewaren |
 
 **Data-bronnen om de `[VUL IN]`-cijfers te halen:**
