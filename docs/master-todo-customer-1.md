@@ -211,6 +211,27 @@ roadmap:
 
 ---
 
+## 🔴 Marketing-site meetketen (toegevoegd 2026-07-08 — health-sweep)
+
+Productie meet momenteel NIETS: geen Plausible, geen GA, geen
+lead-mailnotificaties. Alle CTA-tagging + goals-code staat al live
+(PR #62/#64) maar is dood zonder deze env-vars. ~20 min werk totaal.
+
+| # | Actie | Waar | Eigenaar |
+|---|---|---|---|
+| 1 | `NEXT_PUBLIC_PLAUSIBLE_DOMAIN=juandiazllc.com` zetten | Vercel → juandiazllc-com → Settings → Env Vars (Production) + redeploy | Juan |
+| 2 | `NEXT_PUBLIC_GA4_ID=G-…` zetten (GA4-property aanmaken als die nog niet bestaat) | Vercel env vars, zelfde plek | Juan |
+| 3 | `RESEND_API_KEY` zetten — anders komt er GEEN mail bij een nieuwe lead binnen (lead staat wél in Supabase `leads`) | Vercel env vars + Resend domain-verify afronden | Juan |
+| 4 | Plausible-goals aanmaken: **Contact Submitted**, **Pricing CTA** (prop `tier`), **Sector CTA** (prop `sector`) | Plausible dashboard → Site settings → Goals | Juan |
+| 5 | Philly-DB beslissing: `/philly/api/health` geeft 503 op prod (MariaDB onbereikbaar). Verwacht post-Hetzner? Dan health-check aanpassen; anders `DATABASE_URL` op Vercel fixen | Vercel env vars óf `app/philly/api/health` | Juan |
+
+Besloten 2026-07-08: home Lighthouse-perf 0.80 geaccepteerd (optie A).
+Rest-TBT = eerste compositor-commit van de hero-sky op software-raster
+CI-runners; lab-artefact, geen real-user-probleem. Field-data via
+Plausible/GA (na regel 1-2 hierboven) is de echte meetlat.
+
+---
+
 ## 🔴 Beslismomenten — hard te missen
 
 Vier beslissingen die **vóór** een specifieke datum moeten vallen:
