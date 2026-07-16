@@ -38,6 +38,15 @@ export function ContactForm() {
   const [step, setStep] = useState(1);
   const [sector, setSector] = useState("");
   const [stage, setStage] = useState("");
+  // CTA attribution: pricing tiers, the energy-roi tool and other surfaces
+  // link here as /contact?interest=<slug>. Captured once on mount (client-
+  // only, lazy initializer — no SSR value needed for an attribution field)
+  // and sanitized to a slug so nothing unexpected lands in Supabase.
+  const [interest] = useState(() => {
+    if (typeof window === "undefined") return "";
+    const raw = new URLSearchParams(window.location.search).get("interest") ?? "";
+    return raw.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40);
+  });
   const totalSteps = 3;
   const canAdvanceFrom1 = sector !== "";
   const canAdvanceFrom2 = stage !== "";
@@ -186,7 +195,11 @@ export function ContactForm() {
             />
 
             <input type="hidden" name="sector" value={sector} />
-            <input type="hidden" name="source" value={`contact_page:stage=${stage}`} />
+            <input
+              type="hidden"
+              name="source"
+              value={`contact_page${interest ? `:interest=${interest}` : ""}:stage=${stage}`}
+            />
             {/* Honeypot */}
             <div className="hp-field" aria-hidden="true">
               <label htmlFor="website">Website (leave blank)</label>

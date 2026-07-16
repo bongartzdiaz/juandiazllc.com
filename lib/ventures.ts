@@ -65,9 +65,9 @@ export const VENTURES: Venture[] = [
     phases: [
       { title: "Survey", body: "Surveyed a few dozen owners who had bought solar in the previous five years and asked them one question: do you trust the number you see? The answer was almost always no." },
       { title: "Blueprint", body: "Designed around two primary users: the homeowner who wants one number, and the installer who wants twenty. Same data, two views, no compromise." },
-      { title: "Build", body: "Integrations with the major Dutch inverter brands, a normalized yield model, and a clean alerting system that respects the owner's attention." },
-      { title: "Commission", body: "Verified against actual measured output across seasons — a dashboard that lies about summer is useless in November." },
-      { title: "Operate", body: "Shipping new integrations as they become available. The honest number wins compound trust over time." },
+      { title: "Build", body: "A customer-journey pipeline synced hourly with the CRM that runs much of the Dutch solar trade — with gap detectors, retry queues and a dead-letter table so no lead or status change silently disappears." },
+      { title: "Commission", body: "Stress-tested against the API's undocumented limits and permission quirks — a sync layer that fails loudly beats one that fails politely." },
+      { title: "Operate", body: "Daily integrity checks and a growing playbook of edge cases. The honest number wins compound trust over time." },
     ],
     stack: ["Next.js", "Postgres", "TimescaleDB", "TypeScript", "Recharts"],
     metrics: [
