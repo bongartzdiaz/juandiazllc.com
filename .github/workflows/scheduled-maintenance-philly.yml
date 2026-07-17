@@ -37,10 +37,11 @@ jobs:
       - name: Claude maintenance run
         uses: anthropics/claude-code-action@v1
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: |
             --allowedTools Bash,Edit,Read,Write,Glob,Grep
             --max-turns 60
+            --model claude-haiku-4-5-20251001
           prompt: |
             You are the weekly scheduled-maintenance agent for the philly-standalone
             app inside bongartzdiaz/juandiazllc.com, running autonomously in GitHub
