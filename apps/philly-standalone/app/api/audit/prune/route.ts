@@ -48,6 +48,13 @@ export async function POST(req: NextRequest) {
   } else {
     const scope = await requireRole(['admin'])
     if (scope instanceof NextResponse) return scope
+
+    // Throttle the admin-triggered path — this endpoint issues a destructive
+    // deleteMany on AuditLog. The cron path is guarded by the shared secret
+    // above; the admin "Prune now" button is what needs a per-user rate limit.
+    const limited = enforceRateLimit(`audit:prune:${scope.userId}`, PRESET_MUTATION)
+    if (limited) return limited
+
     orgFilter = scope.organizationId
     triggeredBy = 'admin'
     adminUserId = scope.userId
