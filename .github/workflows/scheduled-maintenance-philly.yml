@@ -1,0 +1,86 @@
+name: Scheduled Maintenance — philly-standalone (Claude)
+
+# Lives on `main` so GitHub's cron fires (scheduled workflows only run from the
+# default branch), but operates on the `claude/rebrand-philly-to-deus` branch
+# where apps/philly-standalone actually lives. Server-side, no local machine.
+# GitHub cron is UTC. 07:00 UTC Monday ≈ 08:00–09:00 Amsterdam.
+on:
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: read
+
+concurrency:
+  group: scheduled-maintenance-philly
+  cancel-in-progress: false
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout the rebrand branch (where philly-standalone lives)
+        uses: actions/checkout@v4
+        with:
+          ref: claude/rebrand-philly-to-deus
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Claude maintenance run
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: |
+            --allowedTools Bash,Edit,Read,Write,Glob,Grep
+            --max-turns 60
+          prompt: |
+            You are the weekly scheduled-maintenance agent for the philly-standalone
+            app inside bongartzdiaz/juandiazllc.com, running autonomously in GitHub
+            Actions. CRITICAL: this is a LIVE, MULTI-TENANT SaaS CRM (real-estate +
+            hospitality + philanthropy). Tenant-isolation bugs = cross-customer data
+            leaks. Err heavily toward REPORTING over changing.
+
+            You have been checked out on branch `claude/rebrand-philly-to-deus`.
+            Work ONLY inside `apps/philly-standalone/` (Next.js 16, npm, Prisma/MariaDB,
+            Supabase auth).
+
+            HARD CONSTRAINTS (never violate):
+            - Create a NEW branch `maint/philly-weekly-${{ github.run_id }}` off the
+              current `claude/rebrand-philly-to-deus`. NEVER commit/push `main` or the
+              rebrand branch directly. NEVER merge. NEVER deploy.
+            - Open ONLY a DRAFT pull request with BASE `claude/rebrand-philly-to-deus`
+              (NOT main): `gh pr create --draft --base claude/rebrand-philly-to-deus`.
+            - NEVER modify RLS/tenant-isolation/auth logic, migrations, or DB schema in
+              an automated fix — REPORT those in the PR body, never auto-fix.
+            - NEVER read, print, edit, or commit secrets/.env/.key/.pem or credentials.
+            - NEVER run destructive git. report-don't-auto-apply for anything needing
+              judgment. Real bugs get reported, not papered over.
+
+            TASKS (each safe change as its own commit; run everything from apps/philly-standalone):
+            1. `npm ci`. Run typecheck, lint, tests. Apply ONLY safe mechanical lint/type
+               fixes (unused imports, import type, formatting) — never touch auth/RLS/
+               tenant/business logic. If a test reveals a real bug, REPORT it.
+            2. `npm audit`. Apply ONLY safe patch/minor bumps via `npm audit fix` (no
+               --force, no majors, no runtime deps like next/react/prisma/stripe). List
+               anything runtime-facing or major as recommendations only.
+            3. SECURITY + TENANT ISOLATION scan (highest-value — REPORT, do not fix):
+               queries missing a tenant/organizationId filter, USING(true)-style gaps,
+               service-role keys reachable from client code, SQL string-concat, unsafe
+               eval/dangerouslySetInnerHTML, dropped rate-limits on mutating endpoints,
+               auth bypasses. Report every finding with file:line + severity.
+            4. Triage open issues via `gh issue list --repo bongartzdiaz/juandiazllc.com`
+               — suggest label + fix approach in the PR body. Change/comment nothing.
+
+            OUTPUT: Open ONE draft PR (base `claude/rebrand-philly-to-deus`) titled
+            "[weekly-maint] philly-standalone — safe fixes + security report" whose body
+            has: per-task summary, safe fixes committed, the reported (not-applied)
+            security/tenant-isolation findings, and issue-triage notes. If nothing to
+            commit and nothing to report, do not open a PR.
