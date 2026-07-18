@@ -3,6 +3,32 @@
 Every item here is a one-time human action that unblocks code that's
 already shipped. Strike through (`~~...~~`) when done.
 
+## UptimeRobot monitoring — site health checks (2026-07-18)
+
+The daily SEO pulse cron can't reach juandiazllc.com directly (Cloudflare
+blocks the headless execution environment's IPs). UptimeRobot runs from
+its own trusted IPs and is whitelisted by Cloudflare's bot rules by default.
+
+Setup takes ~5 minutes:
+
+- [ ] Create a free UptimeRobot account at https://uptimerobot.com (50 monitors,
+      5-min intervals, no card required).
+- [ ] Go to **Dashboard → My Settings → API Settings** → generate a
+      **read-write API key** (starts with `ur`).
+- [ ] Run the setup script from the repo root:
+      ```bash
+      UPTIMEROBOT_API_KEY=ur... bash scripts/setup-uptimerobot.sh
+      ```
+      This creates 5 monitors:
+      - `/en` homepage
+      - `/sitemap.xml`
+      - `/robots.txt`
+      - `/de/insights/the-build-vs-buy-trap` (DE content / i18n routing)
+      - `/en/tools/energy-roi` (high-value conversion page)
+- [ ] Confirm all 5 appear green in the dashboard within ~1 minute.
+- [ ] (Optional) Add a Slack alert contact in Dashboard → Alert Contacts so
+      downtime pings #ops or similar, rather than only emailing.
+
 ## Outreach operator allowlist — REQUIRED before onboarding customer #2 (A-13, 2026-05-30)
 
 The `li.*` LinkedIn-outreach surface (`/philly/outreach/*` + `/api/outreach/*`)
