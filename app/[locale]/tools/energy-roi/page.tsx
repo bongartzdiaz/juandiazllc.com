@@ -4,6 +4,7 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 import { translate } from "@/lib/i18n/dict";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { EnergyRoi, type RoiLabels } from "@/components/calculators/EnergyRoi";
+import { EnergyInsightLinks } from "@/components/EnergyInsightLinks";
 
 // Server wrapper for the Energy ROI calculator. Reads the translated
 // `roi.*` keys via translate() and hands them to the client component
@@ -93,6 +94,7 @@ export default async function EnergyRoiPage({
 
       <section style={{ padding: "40px 40px 80px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <EnergyRoi labels={labels} />
+        <EnergyInsightLinks locale={l} />
       </section>
 
       <section style={{ padding: "40px 40px 140px", maxWidth: "var(--max)", margin: "0 auto" }}>

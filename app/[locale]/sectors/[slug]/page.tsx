@@ -7,6 +7,7 @@ import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { FaqSection } from "@/components/FaqSection";
 import { Countdown2027 } from "@/components/Countdown2027";
+import { EnergyInsightLinks } from "@/components/EnergyInsightLinks";
 import { faqSchema, serviceSchema } from "@/lib/seo/schema";
 import { getSectorFaq } from "@/lib/seo/faqs";
 
@@ -159,6 +160,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
             </span>
           </Link>
         )}
+        {s.slug === "energy" && <EnergyInsightLinks locale={l} />}
         <h2>Where <em>revenue leaks</em> in this sector.</h2>
         <p style={{ color: "var(--muted)" }}>The five common failure modes I see when I survey a new operator in this space.</p>
 
