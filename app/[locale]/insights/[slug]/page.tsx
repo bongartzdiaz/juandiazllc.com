@@ -153,6 +153,14 @@ export default async function InsightPage(
                     {block.cite ? <cite>— {block.cite}</cite> : null}
                   </blockquote>
                 );
+              if (block.type === "cta")
+                return (
+                  <p key={i} className="ia-inline-cta">
+                    <Link href={block.href} className="btn primary">
+                      {block.text} <span className="arr">→</span>
+                    </Link>
+                  </p>
+                );
               return null;
             });
           })()}

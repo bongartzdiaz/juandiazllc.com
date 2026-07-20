@@ -30,7 +30,7 @@ function buildItems(): FeedItem[] {
     summary: p.summary,
     content_text: p.body
       .map((b) => {
-        if (b.type === "p" || b.type === "h2" || b.type === "quote") return b.text;
+        if (b.type === "p" || b.type === "h2" || b.type === "quote" || b.type === "cta") return b.text;
         if (b.type === "ul") return b.items.map((i) => `• ${i}`).join("\n");
         return "";
       })
