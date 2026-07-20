@@ -993,3 +993,57 @@ cluster (DE Heimspeicher / ES autoconsumo) or the orphan sector pages
 4 files touched (insights data, new component, 2 page mounts) + CLAUDE.md.
 Typecheck clean. 418/418 tests pass (crypto flake didn't fire this run).
 Build green — 242 static pages, new `/nl` page generates, no route errors.
+
+### 2026-07-20 (cont'd) — SEO: DE Heimspeicher cluster (new market)
+
+Opened a second market cluster after finishing the NL saldering set:
+three `markets: ["de"]` energy insights anchored in **German** regulatory
+reality, plus the plumbing to cross-link and surface them correctly.
+
+**Key content decision — NOT a translation of the NL cluster.** Germany
+has no salderingsregeling. The DE articles are written to the real
+German market: sinking Einspeisevergütung (halbjährliche Degression),
+§14a EnWG (reduzierte Netzentgelte für steuerbare Verbrauchseinrichtungen),
+§41a EnWG dynamic-tariff mandate (2025), Smart-Meter-Rollout, negative
+Börsenpreise. Translating the Dutch saldering posts would have been
+factually wrong for a German reader.
+
+- **Three new insights** in `lib/insights.ts`, all `markets: ["de"]`,
+  tag `Energy`, German bodies (Sie-form, matching existing DE i18n):
+  - `heimspeicher-wirtschaftlichkeit-2026` — honest Amortisationsrechnung
+    (payback; parallels the NL terugverdientijd piece but framed on the
+    Einspeisevergütung↔Strompreis spread, not saldering).
+  - `dynamische-stromtarife-wann-lohnt-es-sich` — when a dynamic tariff
+    actually pays (§14a/§41a, Smart Meter, battery arbitrage).
+  - `sinkende-einspeiseverguetung-was-installateure-sagen-muessen` —
+    installer customer-communication angle.
+- **No `cta` to `/tools/energy-roi`.** That calculator is explicitly
+  Dutch-saldering-modelling — even its German copy says "die
+  niederländische Salderingsregeling … 1. Januar 2027". Linking German
+  Heimspeicher articles to it would confuse the reader, so the DE
+  cluster relies on related-posts + the sector/tool cross-link block
+  instead. (A German-market ROI calculator would be its own build.)
+- **Generalised `components/EnergyInsightLinks.tsx`** from NL-only to a
+  per-locale copy map (`nl` + `de`; en/es → null). Now renders the
+  current locale's Energy cluster: NL saldering posts on `/nl`, DE
+  Heimspeicher posts on `/de`, on both the energy sector page and the
+  ROI calculator page (mounts already pass `locale={l}`, no page edits).
+- **Fixed a latent related-posts bug** in
+  `app/[locale]/insights/[slug]/page.tsx`: "read next" used
+  `getAllInsights()` (all markets), so on non-NL locales it could link
+  to NL-only posts that 404. Switched to `getAllInsights(l)` — in-market
+  only, and it also applies localized titles. Pure improvement; needed
+  so the DE cluster cross-links to its own siblings, not NL 404s.
+
+Auto-wiring: sitemap (per-locale), `/de/insights` listing, and a new
+`/de/insights/tag/energy` page all pick the cluster up. Verified all 3
+DE slugs land in the generated sitemap under `/de/insights/`.
+
+3 files touched (insights data, generalised component, related-posts
+fix) + CLAUDE.md. Typecheck clean. 418/418 tests pass. Build green —
+246 static pages (+3 articles +1 new DE energy-tag page), all 3 `/de`
+pages generate, no route errors.
+
+Next SEO move: ES autoconsumo cluster (same pattern, Spanish market:
+autoconsumo, batería virtual, compensación de excedentes) or the orphan
+real-estate/hospitality sector pages.

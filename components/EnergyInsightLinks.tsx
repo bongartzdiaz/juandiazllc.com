@@ -2,21 +2,36 @@ import Link from "next/link";
 import { getAllInsights } from "@/lib/insights";
 import type { Locale } from "@/lib/i18n/dict";
 
-// Cross-links into the NL post-salderingsregeling energy insight cluster.
-// Those articles are markets:["nl"] only, so this self-gates to /nl — it
-// renders nothing on /en,/de,/es (where the links would 404). Mounted on
-// the two highest-intent energy surfaces (the energy sector page + the ROI
-// calculator) so internal-link equity flows into the cluster and readers
-// get an obvious next step after "run the math". Copy is hardcoded Dutch
-// because the block only ever appears on the NL locale.
+// Cross-links into a locale's energy insight cluster. The energy clusters
+// are market-scoped (NL: post-salderingsregeling; DE: Einspeisevergütung /
+// Heimspeicher), so this renders the CURRENT locale's Energy-tagged posts
+// and self-gates to locales that actually have a cluster — en/es get null,
+// no broken links. Mounted on the two highest-intent energy surfaces (the
+// energy sector page + the ROI calculator) so internal-link equity flows
+// into the cluster. Copy is per-locale; inline-styled to match the
+// surrounding pages (no globals.css dependency).
+const COPY: Partial<Record<Locale, { label: string; lede: string; more: string }>> = {
+  nl: {
+    label: "◉ Verder lezen",
+    lede: "Alles over het einde van de salderingsregeling en wat het voor jouw rendement betekent.",
+    more: "min",
+  },
+  de: {
+    label: "◉ Weiterlesen",
+    lede: "Alles zur sinkenden Einspeisevergütung und zur Wirtschaftlichkeit von Heimspeichern und dynamischen Tarifen.",
+    more: "Min.",
+  },
+};
+
 export function EnergyInsightLinks({ locale }: { locale: Locale }) {
-  if (locale !== "nl") return null;
-  const posts = getAllInsights("nl").filter((p) => p.tag === "Energy");
+  const copy = COPY[locale];
+  if (!copy) return null;
+  const posts = getAllInsights(locale).filter((p) => p.tag === "Energy");
   if (posts.length === 0) return null;
 
   return (
     <aside
-      aria-label="Verder lezen over de salderingsregeling"
+      aria-label={copy.label.replace(/^◉\s*/, "")}
       style={{
         marginTop: 48,
         padding: 28,
@@ -35,10 +50,10 @@ export function EnergyInsightLinks({ locale }: { locale: Locale }) {
           marginBottom: 8,
         }}
       >
-        ◉ Verder lezen
+        {copy.label}
       </div>
       <div style={{ color: "var(--muted)", fontSize: 15, lineHeight: 1.55, marginBottom: 18, maxWidth: "56ch" }}>
-        Alles over het einde van de salderingsregeling en wat het voor jouw rendement betekent.
+        {copy.lede}
       </div>
       <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
         {posts.map((p) => (
@@ -66,7 +81,7 @@ export function EnergyInsightLinks({ locale }: { locale: Locale }) {
                   whiteSpace: "nowrap",
                 }}
               >
-                {p.readingMinutes} min →
+                {p.readingMinutes} {copy.more} →
               </span>
             </Link>
           </li>
