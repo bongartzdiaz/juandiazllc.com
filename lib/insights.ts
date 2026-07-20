@@ -647,6 +647,144 @@ export const POSTS: Insight[] = [
     ]
   },
   {
+    slug: "the-esg-number-your-asset-manager-cant-defend",
+    title: "The ESG number your asset manager can't defend",
+    summary:
+      "Every real estate operator produces an ESG number once a year. Almost none can defend it line by line when an investor's due-diligence team starts pulling threads. Why the number falls apart under scrutiny — and how to make it reproducible from the meter.",
+    tag: "Real estate",
+    publishedAt: "2026-07-20",
+    readingMinutes: 6,
+    body: [
+      { type: "p", text: "Every real estate operator produces an ESG number once a year. Almost none can defend it line by line when an investor's due-diligence team starts pulling threads. The report looks precise — three decimal places, a nice chart — and it is quietly indefensible." },
+      { type: "h2", text: "Why the number falls apart under scrutiny" },
+      { type: "p", text: "The annual ESG report is assembled in a two-week scramble from data that lives in a dozen property managers' systems, each with its own definition of energy use, occupancy, and common area. Aggregate figures built on inconsistent denominators look authoritative and mean almost nothing. The person who signs it usually knows this — and hopes nobody asks." },
+      { type: "h2", text: "Three questions a due-diligence team will ask" },
+      { type: "ul", items: [
+        "Which meter does this kWh figure come from, and does it reconcile with the utility invoice?",
+        "When two assets report the same intensity, are they dividing by the same denominator — lettable area, gross area, or something a property manager invented?",
+        "If I re-run this one building from source, do I land on your number?"
+      ]},
+      { type: "p", text: "If the answer to any of these is a spreadsheet and a phone call to a property manager, the number is a narrative, not a measurement — and a good analyst will find the seam in an afternoon." },
+      { type: "h2", text: "Make ESG a live surface, not an annual fire drill" },
+      { type: "p", text: "The fix is not a better report. It is defining the numbers once — the exact meter, the exact denominator, the exact period — and computing them continuously from source, so the annual report is a screenshot of something that was already true all year. When the dashboard disagrees with the invoice, the dashboard is wrong, and you find out in March, not in the data room." },
+      { type: "quote", text: "An ESG number you assemble once a year is a story. One you can reproduce from the meter on any given Tuesday is an asset." },
+      { type: "p", text: "The operators who win the next capital raise are the ones whose numbers survive the due-diligence room. That is a data-architecture decision, made long before the report is due." }
+    ],
+    i18n: {
+      de: {
+        title: "Die ESG-Zahl, die Ihr Asset Manager nicht verteidigen kann",
+        summary:
+          "Jeder Immobilienbetreiber produziert einmal im Jahr eine ESG-Zahl. Kaum einer kann sie Zeile für Zeile verteidigen, sobald das Due-Diligence-Team eines Investors nachhakt. Warum die Zahl unter Prüfung zerfällt — und wie Sie sie aus dem Zähler reproduzierbar machen.",
+        body: [
+          { type: "p", text: "Jeder Immobilienbetreiber produziert einmal im Jahr eine ESG-Zahl. Kaum einer kann sie Zeile für Zeile verteidigen, sobald das Due-Diligence-Team eines Investors anfängt, an den Fäden zu ziehen. Der Bericht sieht präzise aus — drei Nachkommastellen, ein schönes Diagramm — und ist im Stillen nicht haltbar." },
+          { type: "h2", text: "Warum die Zahl unter Prüfung zerfällt" },
+          { type: "p", text: "Der jährliche ESG-Bericht entsteht in einem zweiwöchigen Kraftakt aus Daten, die in einem Dutzend Systemen verschiedener Property Manager liegen — jedes mit eigener Definition von Energieverbrauch, Belegung und Gemeinschaftsfläche. Aggregate auf uneinheitlichen Nennern wirken maßgeblich und bedeuten fast nichts. Wer unterschreibt, weiß das meist — und hofft, dass niemand nachfragt." },
+          { type: "h2", text: "Drei Fragen, die ein Due-Diligence-Team stellen wird" },
+          { type: "ul", items: [
+            "Aus welchem Zähler stammt diese kWh-Zahl, und stimmt sie mit der Versorgerrechnung überein?",
+            "Wenn zwei Objekte dieselbe Intensität melden — teilen sie durch denselben Nenner: vermietbare Fläche, Bruttofläche oder etwas, das ein Property Manager erfunden hat?",
+            "Wenn ich dieses eine Gebäude aus der Quelle neu rechne, komme ich auf Ihre Zahl?"
+          ]},
+          { type: "p", text: "Ist die Antwort auf eine dieser Fragen eine Tabelle und ein Anruf beim Property Manager, ist die Zahl ein Narrativ, keine Messung — und ein guter Analyst findet die Naht an einem Nachmittag." },
+          { type: "h2", text: "Machen Sie ESG zu einer lebenden Fläche, nicht zum jährlichen Feueralarm" },
+          { type: "p", text: "Die Lösung ist kein besserer Bericht. Sie besteht darin, die Zahlen einmal zu definieren — den exakten Zähler, den exakten Nenner, den exakten Zeitraum — und sie fortlaufend aus der Quelle zu berechnen, sodass der Jahresbericht ein Screenshot von etwas ist, das ohnehin das ganze Jahr galt. Wenn das Dashboard der Rechnung widerspricht, ist das Dashboard falsch — und Sie erfahren es im März, nicht im Datenraum." },
+          { type: "quote", text: "Eine ESG-Zahl, die Sie einmal im Jahr zusammensetzen, ist eine Geschichte. Eine, die Sie an einem beliebigen Dienstag aus dem Zähler reproduzieren, ist ein Vermögenswert." },
+          { type: "p", text: "Die Betreiber, die die nächste Kapitalrunde gewinnen, sind die, deren Zahlen den Due-Diligence-Raum überstehen. Das ist eine Entscheidung über die Datenarchitektur — lange bevor der Bericht fällig ist." }
+        ],
+      },
+      es: {
+        title: "El número ESG que tu gestor de activos no puede defender",
+        summary:
+          "Todo operador inmobiliario produce un número ESG una vez al año. Casi ninguno puede defenderlo línea por línea cuando el equipo de due diligence de un inversor empieza a tirar del hilo. Por qué el número se desmorona bajo escrutinio — y cómo hacerlo reproducible desde el contador.",
+        body: [
+          { type: "p", text: "Todo operador inmobiliario produce un número ESG una vez al año. Casi ninguno puede defenderlo línea por línea cuando el equipo de due diligence de un inversor empieza a tirar del hilo. El informe parece preciso —tres decimales, un gráfico bonito— y es, en silencio, indefendible." },
+          { type: "h2", text: "Por qué el número se desmorona bajo escrutinio" },
+          { type: "p", text: "El informe ESG anual se monta en dos semanas a la carrera con datos que viven en los sistemas de una docena de gestores de fincas, cada uno con su propia definición de consumo energético, ocupación y zona común. Los agregados construidos sobre denominadores inconsistentes parecen autorizados y no significan casi nada. Quien lo firma normalmente lo sabe — y espera que nadie pregunte." },
+          { type: "h2", text: "Tres preguntas que hará un equipo de due diligence" },
+          { type: "ul", items: [
+            "¿De qué contador sale esta cifra de kWh, y cuadra con la factura de la compañía?",
+            "Cuando dos activos reportan la misma intensidad, ¿dividen por el mismo denominador —superficie alquilable, superficie bruta o algo que se inventó un gestor?",
+            "Si recalculo este edificio desde el origen, ¿llego a tu número?"
+          ]},
+          { type: "p", text: "Si la respuesta a alguna de estas es una hoja de cálculo y una llamada al gestor de fincas, el número es un relato, no una medición — y un buen analista encuentra la costura en una tarde." },
+          { type: "h2", text: "Haz del ESG una superficie viva, no un simulacro anual" },
+          { type: "p", text: "La solución no es un informe mejor. Es definir los números una vez —el contador exacto, el denominador exacto, el periodo exacto— y calcularlos de forma continua desde el origen, de modo que el informe anual sea una captura de algo que ya era cierto todo el año. Cuando el panel contradice la factura, el panel está mal, y te enteras en marzo, no en la sala de datos." },
+          { type: "quote", text: "Un número ESG que montas una vez al año es un cuento. Uno que puedes reproducir desde el contador un martes cualquiera es un activo." },
+          { type: "p", text: "Los operadores que ganan la siguiente ronda de capital son aquellos cuyos números sobreviven a la sala de due diligence. Eso es una decisión de arquitectura de datos, tomada mucho antes de que venza el informe." }
+        ],
+      },
+    },
+  },
+  {
+    slug: "the-ten-minutes-before-check-in",
+    title: "The ten minutes before check-in where your margin leaks",
+    summary:
+      "Ask a hotel revenue manager where the margin is and they point at the rate card. Ask where it leaks and the honest answer is the ten minutes before check-in — the upsell not offered, the room assigned by habit, the rate held too long. Most of it is decided on gut feel.",
+    tag: "Hospitality",
+    publishedAt: "2026-07-20",
+    readingMinutes: 5,
+    body: [
+      { type: "p", text: "Ask a hotel revenue manager where the margin is, and they point at the rate card. Ask where it leaks, and the honest answer is the ten minutes before check-in — the upsell not offered, the room assigned by habit, the rate held two days too long. Most of that is decided on gut feel, by someone with no instrument to check the call against." },
+      { type: "h2", text: "The most valuable ten minutes in the building have no instrument" },
+      { type: "p", text: "Hospitality is one of the last industries where a senior operator makes call-by-call revenue decisions without a tool to check them against. The revenue manager knows this week's numbers. They rarely know why — and by the time they do, next week is already pricing." },
+      { type: "h2", text: "Where the leak actually is" },
+      { type: "ul", items: [
+        "Upsells offered inconsistently, because nothing prompts the front desk at the one moment the guest is standing there ready to say yes.",
+        "Rooms assigned by convenience, not by yield — the premium room handed to a standard-rate guest because it was next in the list.",
+        "Rates that move on the revenue manager's gut, two days after the market already moved."
+      ]},
+      { type: "p", text: "None of these are pricing-tool problems. They are decision-support problems at the frontline, where the actual revenue event happens and where almost no software is pointed." },
+      { type: "h2", text: "Build the instrument, not another dashboard" },
+      { type: "p", text: "The revenue manager doesn't need a prettier report of last week. They need a live instrument that makes the right call obvious in the ten minutes it matters — and frontline tools the staff actually open. Run it in parallel to the existing process for two cycles and prove the number before you flip the default." },
+      { type: "quote", text: "In hospitality the margin doesn't leak in the spreadsheet. It leaks at the front desk, ten minutes before check-in, one gut-feel decision at a time." },
+      { type: "p", text: "The operators who pull ahead stop treating revenue as something you review after the week, and start treating it as something you instrument during it." }
+    ],
+    i18n: {
+      de: {
+        title: "Die zehn Minuten vor dem Check-in, in denen Ihre Marge verloren geht",
+        summary:
+          "Fragen Sie einen Revenue Manager, wo die Marge steckt, zeigt er auf die Preisliste. Fragen Sie, wo sie verloren geht, ist die ehrliche Antwort: in den zehn Minuten vor dem Check-in — das nicht angebotene Upgrade, das aus Gewohnheit vergebene Zimmer, der zu lange gehaltene Preis. Meist aus dem Bauch entschieden.",
+        body: [
+          { type: "p", text: "Fragen Sie einen Hotel-Revenue-Manager, wo die Marge steckt, zeigt er auf die Preisliste. Fragen Sie, wo sie verloren geht, ist die ehrliche Antwort: in den zehn Minuten vor dem Check-in — das nicht angebotene Upgrade, das aus Gewohnheit vergebene Zimmer, der zwei Tage zu lange gehaltene Preis. Das meiste davon wird aus dem Bauch entschieden, von jemandem ohne Instrument, um die Entscheidung zu prüfen." },
+          { type: "h2", text: "Die wertvollsten zehn Minuten im Haus haben kein Instrument" },
+          { type: "p", text: "Hospitality ist eine der letzten Branchen, in der ein erfahrener Operator Umsatzentscheidungen von Fall zu Fall trifft, ohne ein Werkzeug zur Gegenprüfung. Der Revenue Manager kennt die Zahlen dieser Woche. Warum sie so sind, weiß er selten — und wenn er es weiß, kalkuliert die nächste Woche schon." },
+          { type: "h2", text: "Wo die Marge wirklich verloren geht" },
+          { type: "ul", items: [
+            "Upgrades werden uneinheitlich angeboten, weil nichts die Rezeption in genau dem Moment anstößt, in dem der Gast bereit ist, ja zu sagen.",
+            "Zimmer werden nach Bequemlichkeit vergeben, nicht nach Ertrag — das Premiumzimmer geht an einen Standardtarif-Gast, weil es als Nächstes in der Liste stand.",
+            "Preise bewegen sich nach dem Bauchgefühl des Revenue Managers, zwei Tage nachdem sich der Markt schon bewegt hat."
+          ]},
+          { type: "p", text: "Nichts davon ist ein Problem des Preistools. Es sind Probleme der Entscheidungsunterstützung an der Front, wo das eigentliche Umsatzereignis stattfindet — und wohin kaum eine Software zeigt." },
+          { type: "h2", text: "Bauen Sie das Instrument, nicht noch ein Dashboard" },
+          { type: "p", text: "Der Revenue Manager braucht keinen hübscheren Bericht der letzten Woche. Er braucht ein lebendiges Instrument, das die richtige Entscheidung in den zehn Minuten offensichtlich macht, in denen sie zählt — und Frontline-Werkzeuge, die das Personal tatsächlich öffnet. Lassen Sie es zwei Zyklen parallel zum bestehenden Prozess laufen und beweisen Sie die Zahl, bevor Sie umschalten." },
+          { type: "quote", text: "In der Hotellerie geht die Marge nicht in der Tabelle verloren. Sie geht an der Rezeption verloren, zehn Minuten vor dem Check-in, eine Bauchentscheidung nach der anderen." },
+          { type: "p", text: "Die Betreiber, die vorbeiziehen, behandeln Umsatz nicht mehr als etwas, das man nach der Woche prüft, sondern als etwas, das man während der Woche instrumentiert." }
+        ],
+      },
+      es: {
+        title: "Los diez minutos antes del check-in donde se te escapa el margen",
+        summary:
+          "Pregunta a un revenue manager dónde está el margen y señala la tarifa. Pregunta dónde se escapa y la respuesta honesta son los diez minutos antes del check-in — el upselling no ofrecido, la habitación asignada por costumbre, la tarifa mantenida demasiado tiempo. Casi todo se decide a ojo.",
+        body: [
+          { type: "p", text: "Pregunta a un revenue manager de hotel dónde está el margen y señala la tarifa. Pregunta dónde se escapa y la respuesta honesta son los diez minutos antes del check-in — el upselling no ofrecido, la habitación asignada por costumbre, la tarifa mantenida dos días de más. Casi todo eso se decide a ojo, por alguien sin un instrumento para contrastar la decisión." },
+          { type: "h2", text: "Los diez minutos más valiosos del edificio no tienen instrumento" },
+          { type: "p", text: "La hostelería es uno de los últimos sectores donde un operador con experiencia toma decisiones de ingresos caso por caso sin una herramienta con la que contrastarlas. El revenue manager conoce los números de esta semana. Rara vez sabe por qué — y para cuando lo sabe, la semana siguiente ya está tarificando." },
+          { type: "h2", text: "Dónde se escapa el margen de verdad" },
+          { type: "ul", items: [
+            "Los upsellings se ofrecen de forma inconsistente, porque nada avisa a la recepción en el único momento en que el huésped está delante, listo para decir que sí.",
+            "Las habitaciones se asignan por comodidad, no por rentabilidad — la habitación premium va a un huésped de tarifa estándar porque era la siguiente de la lista.",
+            "Las tarifas se mueven según la intuición del revenue manager, dos días después de que el mercado ya se moviera."
+          ]},
+          { type: "p", text: "Nada de esto es un problema de la herramienta de precios. Son problemas de apoyo a la decisión en primera línea, donde ocurre el verdadero evento de ingresos — y a donde casi ningún software apunta." },
+          { type: "h2", text: "Construye el instrumento, no otro panel" },
+          { type: "p", text: "El revenue manager no necesita un informe más bonito de la semana pasada. Necesita un instrumento vivo que haga obvia la decisión correcta en los diez minutos que importan — y herramientas de primera línea que el personal abra de verdad. Hazlo funcionar en paralelo al proceso actual durante dos ciclos y demuestra el número antes de cambiar el valor por defecto." },
+          { type: "quote", text: "En hostelería el margen no se escapa en la hoja de cálculo. Se escapa en recepción, diez minutos antes del check-in, una decisión a ojo cada vez." },
+          { type: "p", text: "Los operadores que se adelantan dejan de tratar los ingresos como algo que se revisa después de la semana y empiezan a tratarlos como algo que se instrumenta durante ella." }
+        ],
+      },
+    },
+  },
+  {
     slug: "why-most-operator-dashboards-lie",
     title: "Why most operator dashboards quietly lie to their CEOs",
     summary:

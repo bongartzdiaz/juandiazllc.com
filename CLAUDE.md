@@ -1092,3 +1092,44 @@ Energy content now spans all three EU markets: NL (saldering, 5 posts),
 DE (Einspeisevergütung/Heimspeicher, 3), ES (autoconsumo, 3). Next:
 orphan real-estate/hospitality sector pages, or per-market ROI
 calculators (the current one is Dutch-saldering-only).
+
+### 2026-07-20 (cont'd) — SEO: feed the orphan real-estate + hospitality sectors
+
+The `real-estate` and `hospitality` sector pages existed but had zero
+supporting insight articles — topical dead-ends with no cluster. Unlike
+the energy clusters, these topics aren't tied to one country's
+regulation, so they're **all-market operator articles** (EN base + de/es
+i18n, NL falls back to EN base — matching the existing all-market
+operator-article convention).
+
+- **Two new insights** in `lib/insights.ts`, no `markets` field (all
+  four locales), full en/de/es i18n:
+  - `the-esg-number-your-asset-manager-cant-defend` — tag **"Real
+    estate"**. Real-estate ESG reporting is assembled once a year from
+    inconsistent per-property-manager data and can't survive investor
+    due diligence; make it reproducible from the meter. (Draws on the
+    sector page's own "ESG as a scramble" / "portfolio blindness" leaks.)
+  - `the-ten-minutes-before-check-in` — tag **"Hospitality"**. The
+    highest-margin moment (pre-check-in upsell / room assignment / rate)
+    is decided on gut feel with no instrument; build the instrument, not
+    another dashboard.
+- **New component `components/SectorInsightLinks.tsx`** — general
+  "Further reading" block for a sector page. Maps sectorSlug → insight
+  tag (`real-estate`→"Real estate", `hospitality`→"Hospitality"),
+  renders `getAllInsights(locale).filter(tag)` with a 4-locale heading,
+  self-gates to null when a sector has no matching in-market posts (e.g.
+  `adjacent`). Mounted on the sector page for every sector; only the two
+  fed sectors render anything today. Energy keeps its own
+  `EnergyInsightLinks` (market-scoped, topic-specific copy) — this
+  component handles the all-market operator sectors.
+- Tag pages (`/insights/tag/real-estate`, `/insights/tag/hospitality`)
+  auto-generate per locale from the new tags; venture cross-link is
+  undefined for these tags (no card, graceful).
+
+Verified: all 2 articles + 2 tag pages generate in **all four locales**
+and land in the sitemap. Typecheck clean. 418/418 tests. Build green —
+266 static pages (+16: 2 articles ×4 + 2 tag pages ×4).
+
+3 files touched (insights data, new component, sector-page mount) +
+CLAUDE.md. Follow-ups: a 2nd article per sector would deepen each
+cluster; per-market ROI calculators remain the bigger energy-funnel play.
