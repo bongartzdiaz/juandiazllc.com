@@ -37,6 +37,18 @@ function withTimeout<T>(p: Promise<T>, ms: number, what: string): Promise<T> {
 }
 
 async function checkDatabase(): Promise<Check> {
+  // Same contract as the Stripe check: absent config is "not running
+  // here", not "down". The CRM database lives with the DEUS-SHARED
+  // deployment — a marketing-only deploy without DATABASE_URL should
+  // report degraded (200), not page the uptime monitor with a 503.
+  if (!process.env.DATABASE_URL) {
+    return {
+      name: 'database',
+      ok: true,
+      critical: false,
+      detail: 'not configured — CRM data lives on the DEUS deployment',
+    }
+  }
   const start = Date.now()
   try {
     const prisma = getAuthPrisma()

@@ -89,15 +89,12 @@ that compounds *after* you have a defensible cluster in one language.
   locale-native, high-cadence (weekly). Insights are fewer, longer,
   translated.
 
-### Signals page upgrades (pending)
+### Signals page upgrades — DONE (verified 2026-07-20)
 
-1. Add `Article` JSON-LD to `/signals/[slug]` (insights has it,
-   signals doesn't).
-2. Add `/signals/tag/[tag]` pages mirroring the insights tag
-   archives — gives each topic cluster its own SEO surface.
-3. Add `/rss.xml` + `/feed.json` for both insights AND signals.
-   AI crawlers (ChatGPT, Perplexity) weight RSS discovery heavily.
-4. Mark each post `inLanguage: "en" | "nl" | "de" | "es"` in data.
+All four shipped: BlogPosting JSON-LD with `inLanguage` on
+`/signals/[slug]` (via `blogPostingSchema`, lib/seo/schema.ts),
+`/signals/tag/[tag]` archives, and `/rss.xml` + `/feed.json`
+site-wide with autodiscovery links in the layout head.
 
 ### Author schema (shipped 2026-04-19)
 
