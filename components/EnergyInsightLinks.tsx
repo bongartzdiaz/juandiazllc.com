@@ -4,7 +4,8 @@ import type { Locale } from "@/lib/i18n/dict";
 
 // Cross-links into a locale's energy insight cluster. The energy clusters
 // are market-scoped (NL: post-salderingsregeling; DE: Einspeisevergütung /
-// Heimspeicher), so this renders the CURRENT locale's Energy-tagged posts
+// Heimspeicher; ES: compensación de excedentes / autoconsumo), so this
+// renders the CURRENT locale's Energy-tagged posts
 // and self-gates to locales that actually have a cluster — en/es get null,
 // no broken links. Mounted on the two highest-intent energy surfaces (the
 // energy sector page + the ROI calculator) so internal-link equity flows
@@ -20,6 +21,11 @@ const COPY: Partial<Record<Locale, { label: string; lede: string; more: string }
     label: "◉ Weiterlesen",
     lede: "Alles zur sinkenden Einspeisevergütung und zur Wirtschaftlichkeit von Heimspeichern und dynamischen Tarifen.",
     more: "Min.",
+  },
+  es: {
+    label: "◉ Seguir leyendo",
+    lede: "Todo sobre la compensación de excedentes, la batería virtual y la rentabilidad real del autoconsumo.",
+    more: "min",
   },
 };
 
