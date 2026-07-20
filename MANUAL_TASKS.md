@@ -29,6 +29,36 @@ Setup takes ~5 minutes:
 - [ ] (Optional) Add a Slack alert contact in Dashboard → Alert Contacts so
       downtime pings #ops or similar, rather than only emailing.
 
+## Ahrefs API — free DR key migration (DEADLINE 2026-08-01) + plan limits (2026-07-20)
+
+Surfaced by the daily SEO pulse. Two separate items:
+
+**1. Free Domain-Rating endpoint — hard deadline 2026-08-01.**
+The pulse's Part C uses Ahrefs' free public Domain Rating endpoint. Ahrefs
+is removing *unauthenticated* access to it on **2026-08-01**; after that it
+returns an error without a key.
+
+- [ ] Generate a free Ahrefs API key (~5 min):
+      https://docs.ahrefs.com/en/api/reference/public/get-domain-rating-free
+- [ ] Set it where the Ahrefs MCP / pulse reads it (e.g. `AHREFS_API_KEY`).
+- [ ] Re-run the pulse and confirm the DR number returns without the
+      "unauthenticated access will be removed" warning.
+
+**2. Ahrefs plan gates the useful SEO data.**
+The attached Ahrefs MCP connector returns `Insufficient plan` for every
+GSC (`gsc-*`), keyword (`keywords-explorer-*`), rank-tracker, and
+site-explorer endpoint. Only the free public DR endpoint works today, so
+Part C of the daily pulse (top queries, clicks/impressions, indexing
+errors on new pages) **cannot run**. Decide one:
+
+- [ ] Upgrade the Ahrefs plan to a tier that includes GSC + keyword APIs, **or**
+- [ ] Wire Google Search Console directly (GSC API / service account) for the
+      pulse instead of going through Ahrefs. GSC is free and is the actual
+      source the pulse wants; Ahrefs was only a proxy for it.
+
+Until one of these lands, the pulse should keep reporting "GSC not wired /
+plan insufficient" for Part C rather than implying it ran.
+
 ## Outreach operator allowlist — REQUIRED before onboarding customer #2 (A-13, 2026-05-30)
 
 The `li.*` LinkedIn-outreach surface (`/philly/outreach/*` + `/api/outreach/*`)

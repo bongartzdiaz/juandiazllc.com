@@ -1168,3 +1168,42 @@ both land in the sitemap across all four locales.
 
 Sector clusters now: real-estate (2), hospitality (2), each surfaced via
 SectorInsightLinks + tag pages.
+
+### 2026-07-20 — end-of-day handoff / queued for next session
+
+Big content day: 7 PRs merged (#82–#88), 15 fresh insights across NL/DE/ES
++ EN, restarting a ~3-month-stale blog. State on `main` @ `e9a61f2`,
+working tree clean, all preview builds green.
+
+**Content footprint now:**
+- Energy: NL saldering (5), DE Heimspeicher (3), ES autoconsumo (3) — each
+  market-authentic (not translated), cross-linked, surfaced on its
+  sector + calculator pages via `EnergyInsightLinks` (per-locale copy map).
+- Operator sectors: real-estate (2), hospitality (2) — all-market
+  (EN+de+es i18n), surfaced via `SectorInsightLinks` (tag-driven) + tag
+  pages.
+- Infra shipped: `cta` InsightBlock type, related-posts market-fix
+  (`getAllInsights(l)`), two cross-link components.
+
+**Queued for next session (in priority order):**
+1. **Per-market ROI calculators — NEEDS A PRODUCT STEER, don't build blind.**
+   The current `EnergyRoi` is a Dutch-*saldering model* (reference scenario
+   values every kWh at retail = "what you lose when net-metering ends"),
+   which is why NL articles funnel into it and DE/ES can't. DE/ES never had
+   net metering → they need a *different scenario model* (self-consumption
+   vs feed-in: DE Einspeisevergütung, ES capped compensación). Open
+   question for the operator: **one calculator that adapts per locale, or
+   separate tools** (`/tools/heimspeicher-rechner`, `/tools/autoconsumo`)?
+   Highest-leverage remaining energy-funnel move once decided.
+2. **Ahrefs — see MANUAL_TASKS.md** (added this session): free DR key
+   migration by **2026-08-01** (hard deadline), and the plan gates GSC +
+   keyword data so the pulse's Part C can't run. Decide: upgrade plan or
+   wire GSC directly.
+3. Optional content: a 3rd article to deepen any sector; or a 4th EU market
+   only if there's a real regulatory hook (there isn't an obvious one).
+
+**Daily-pulse notes for tomorrow's run:** Supabase MCP works (leads query
+is reliable). Site-health curl/WebFetch from the headless env is blocked
+by Cloudflare — the UptimeRobot task in MANUAL_TASKS.md is the fix; until
+it's set up, report the health checks as "can't verify from headless env,"
+not as failures. Ahrefs Part C = "plan insufficient / GSC not wired."
