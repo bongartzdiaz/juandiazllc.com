@@ -469,6 +469,95 @@ export const POSTS: Insight[] = [
     ]
   },
   {
+    slug: "heimspeicher-wirtschaftlichkeit-2026",
+    markets: ["de"],
+    title: "Heimspeicher-Wirtschaftlichkeit 2026 — die ehrliche Amortisationsrechnung",
+    summary:
+      "\"Zehn Jahre\" steht in jedem Angebot, gilt aber für kaum jemanden. Was die Amortisation eines Heimspeichers wirklich bestimmt — jetzt, wo die Einspeisevergütung immer weiter sinkt — und wie Sie sie für Ihren eigenen Fall rechnen, statt sie zu glauben.",
+    tag: "Energy",
+    publishedAt: "2026-07-20",
+    readingMinutes: 6,
+    body: [
+      { type: "p", text: "Fragen Sie drei Anbieter nach der Amortisationszeit desselben Heimspeichers, und Sie bekommen drei Zahlen zwischen sieben und fünfzehn Jahren. Keiner von ihnen lügt — sie rechnen nur mit unterschiedlichen Annahmen, und die Annahme, die Sie nicht sehen, entscheidet das Ergebnis. Weil die Einspeisevergütung halbjährlich weiter sinkt, wird dieser Unterschied größer, nicht kleiner." },
+      { type: "h2", text: "Warum es die eine Amortisationszeit nicht gibt" },
+      { type: "p", text: "Ein Heimspeicher verdient sich über einen einzigen Hebel: die Differenz zwischen dem, was Sie für den Netzbezug zahlen (rund 30 bis 35 Cent), und dem, was Sie für die Einspeisung bekommen (bei Neuanlagen nur noch rund 8 Cent). Jede Kilowattstunde, die der Speicher vom günstigen Einspeisen ins teure Selbstnutzen verschiebt, ist diese Differenz wert. Wie groß dieser Hebel bei Ihnen ausfällt, hängt vollständig davon ab, wann und wie Sie verbrauchen — nicht vom Datenblatt des Speichers." },
+      { type: "ul", items: [
+        "Ihre Eigenverbrauchsquote ohne Speicher — wer schon tagsüber viel verbraucht, hebt weniger; wer vor allem abends verbraucht, holt mehr aus dem Speicher.",
+        "Der Abstand zwischen Strompreis und Einspeisevergütung — er wächst mit jeder Degressionsstufe, und genau das macht Eigenverbrauch attraktiver als Einspeisen.",
+        "Ein dynamischer Tarif — mit ihm kann der Speicher zusätzlich günstige Netzstunden laden und teure Stunden überbrücken, was die Rechnung spürbar verkürzt.",
+        "Künftige Verbraucher — eine Wärmepumpe oder ein E-Auto verändern Ihr Lastprofil so stark, dass eine heutige Amortisationszeit in drei Jahren nicht mehr stimmt."
+      ]},
+      { type: "p", text: "Keine dieser vier Größen steht im Angebot. Deshalb ist jede Broschürenzahl ein Mittelwert über Haushalte, die Ihnen weder ähneln noch existieren. Die einzige ehrliche Amortisationszeit ist die, die Sie mit Ihren eigenen Zahlen rechnen." },
+      { type: "h2", text: "Die Rechnung, die stimmt" },
+      { type: "p", text: "Beginnen Sie nicht beim Speicherpreis, sondern bei Ihrem Jahresverbrauch und Ihrem Verbrauchszeitpunkt. Rechnen Sie aus, wie viel Ihres Solarstroms Sie heute schon selbst nutzen und wie viel ein Speicher dazu beiträgt — bewertet mit der Einspeisevergütung, wie sie in den kommenden Jahren aussieht, nicht mit dem Tarif von heute." },
+      { type: "ul", items: [
+        "Nehmen Sie Ihren tatsächlichen Jahresverbrauch und Ihre Erzeugung, keine Schätzung pro Quadratmeter Dach.",
+        "Rechnen Sie mit der weiter sinkenden Einspeisevergütung, nicht mit dem heutigen Satz — die Degression ist gesetzlich vorgezeichnet.",
+        "Tun Sie es zweimal: einmal mit den heutigen Strompreisen, einmal mit einem pessimistischen Szenario. Kommt der Speicher in beiden Fällen heraus, ist es eine gute Entscheidung."
+      ]},
+      { type: "quote", text: "Eine Amortisationszeit aus der Broschüre ist eine Wette mit fremden Annahmen. Eine, die Sie selbst rechnen, ist eine Entscheidung." },
+      { type: "p", text: "Der Kunde, der in fünf Jahren noch zufrieden ist, ist nicht der mit dem niedrigsten Preis, sondern der, dem vorab eine Rechnung vorlag, die auf sein eigenes Haus passte. Für Fachbetriebe ist das keine Zusatzarbeit — es ist der Unterschied zwischen einem Preisvergleicher und einem Kunden, der unterschreibt." }
+    ]
+  },
+  {
+    slug: "dynamische-stromtarife-wann-lohnt-es-sich",
+    markets: ["de"],
+    title: "Dynamische Stromtarife — wann sich der Wechsel wirklich lohnt",
+    summary:
+      "Seit 2025 muss jeder Versorger einen dynamischen Tarif anbieten. Warum er für den einen hunderte Euro bringt und den anderen Geld kostet — und was Sie mit §14a, Smart Meter und Speicher prüfen müssen, bevor Sie wechseln.",
+    tag: "Energy",
+    publishedAt: "2026-07-20",
+    readingMinutes: 6,
+    body: [
+      { type: "p", text: "Seit 2025 ist jeder Stromanbieter gesetzlich verpflichtet, einen dynamischen Tarif anzubieten. Damit ist der Tarif verfügbar — aber verfügbar heißt nicht vorteilhaft. Ein dynamischer Tarif rechnet stündlich zum Börsenpreis ab, und ob das für Sie ein Gewinn oder ein Verlust ist, entscheidet allein Ihr Verbrauchszeitpunkt." },
+      { type: "h2", text: "Für wen sich der dynamische Tarif rechnet — und für wen nicht" },
+      { type: "p", text: "Photovoltaik speist am meisten rund um die Mittagszeit ein — genau dann, wenn halb Deutschland ebenfalls einspeist und der Börsenpreis gegen null oder ins Negative fällt. Ihr Bezug liegt morgens und abends, wenn der Preis hoch ist. Ohne Speicher oder Steuerung kaufen Sie also teuer und speisen billig ein. Das ist die Asymmetrie, die die meisten Wechselversprechen übergehen." },
+      { type: "ul", items: [
+        "Hohe Tageslast (Homeoffice, Wärmepumpe, E-Auto, das tagsüber lädt): dynamisch gewinnt oft, weil Sie die teuren Abendstunden umgehen.",
+        "Klassisches Verbrauchsprofil (tagsüber leeres Haus, Spitze am Abend): dynamisch ohne Speicher kostet gegenüber einem festen Tarif eher Geld.",
+        "Mit Heimspeicher oder steuerbaren Verbrauchern: das Profil kippt — Sie laden in günstigen Stunden und überbrücken die teuren, und dynamisch wird fast immer die bessere Wahl."
+      ]},
+      { type: "p", text: "Dazu kommt der regulatorische Hebel: Wer eine steuerbare Verbrauchseinrichtung wie Wärmepumpe oder Wallbox nach §14a EnWG anmeldet, bekommt reduzierte Netzentgelte — und mit einem intelligenten Messsystem lässt sich der dynamische Tarif überhaupt erst sauber ausreizen. Ohne Smart Meter bleibt der Tarif eine Blackbox." },
+      { type: "h2", text: "Drei Dinge, die Sie vor dem Wechsel festhalten" },
+      { type: "ul", items: [
+        "Ihr Lastprofil pro Stunde, nicht pro Jahr. Zwei Haushalte mit 4.000 kWh können völlig unterschiedliche Tarife brauchen, je nachdem, wann diese 4.000 kWh anfallen.",
+        "Ob ein intelligentes Messsystem verbaut oder beauftragt ist — ohne das funktioniert die stündliche Abrechnung nicht.",
+        "Was sich mit Wärmepumpe oder E-Auto in den nächsten Jahren ändert. Beide verschieben Ihr Profil so stark, dass die Wechselentscheidung von heute das überstehen muss."
+      ]},
+      { type: "quote", text: "Ein dynamischer Tarif ist kein Produkt, das man kauft. Er ist ein Ergebnis, das man ausrechnet — und wer das ehrlich zeigt, gewinnt den Kunden, der zögert." },
+      { type: "p", text: "Die Versorger und Fachbetriebe, die hier Vertrauen aufbauen, sind nicht die, die \"dynamisch\" als cleveren Zusatz in jedes Angebot kleben. Es sind die, die pro Haushalt zeigen, wann es sich eben nicht lohnt. Das kostet ein paar einfache Abschlüsse — und bringt den Kunden, den der Wettbewerber mit einem Standardversprechen verliert." }
+    ]
+  },
+  {
+    slug: "sinkende-einspeiseverguetung-was-installateure-sagen-muessen",
+    markets: ["de"],
+    title: "Sinkende Einspeisevergütung: was Installateure ihren Kunden jetzt sagen müssen",
+    summary:
+      "Die halbjährliche Degression ist kein technisches Detail, das man im Angebot versteckt — sie ist ein Gespräch, das Sie vor dem Wettbewerber führen. Welche Kunden Sie jetzt anrufen, und die drei Sätze, die Zweifel ausräumen statt sie zu nähren.",
+    tag: "Energy",
+    publishedAt: "2026-07-20",
+    readingMinutes: 5,
+    body: [
+      { type: "p", text: "Die meisten Fachbetriebe behandeln die sinkende Einspeisevergütung als Fußnote: eine Zeile unten im Angebot, eine Frage, die man beantwortet, wenn der Kunde davon anfängt. Das ist eine verschenkte Chance. Der Kunde, der von Ihnen hört, was sich ändert — bevor er es aus den Nachrichten oder vom Wettbewerber hört — vertraut Ihnen den nächsten Schritt an. Der Kunde, der es woanders aufschnappt, kommt mit Misstrauen zurück." },
+      { type: "h2", text: "Die Kunden, die Sie jetzt anrufen, entscheiden Ihr nächstes Jahr" },
+      { type: "p", text: "Drei Gruppen brauchen dieses Gespräch in diesem Monat, und jede fragt etwas anderes. Wer sie verwechselt, verliert bei allen dreien." },
+      { type: "ul", items: [
+        "Bestandskunden nur mit Modulen — sie halten ihre Rendite für gesichert und erschrecken später. Rufen Sie an, solange die Vergütung noch nicht weiter gefallen ist. Ein Speicher-Nachrüstgeschäft an einen zufriedenen Kunden ist der günstigste Abschluss des Jahres.",
+        "Laufende Angebote — hier muss die Amortisationsrechnung jetzt mit der Vergütung von morgen stimmen, nicht mit dem Satz von heute. Ein Angebot auf veralteten Annahmen wird zur Reklamation, sobald der Kunde es merkt.",
+        "Zögerer, die \"noch abwarten\" — für sie ist die Degression genau das Argument. Nicht als Druck, sondern als ehrliche Rechnung: was das Warten sie kostet."
+      ]},
+      { type: "p", text: "In allen drei Gesprächen ist das Stärkste, was Sie tun können, nicht reden, sondern rechnen — dem Kunden seine eigenen Zahlen zeigen statt einer allgemeinen Geschichte." },
+      { type: "h2", text: "Das ehrliche Gespräch in drei Sätzen" },
+      { type: "ul", items: [
+        "Was sich ändert: \"Die Einspeisevergütung sinkt weiter Stufe für Stufe — was Sie fürs Einspeisen bekommen, wird jedes Halbjahr weniger.\"",
+        "Was das für Sie heißt: \"Für Ihren Verbrauch bedeutet das konkret dies\" — mit einer Zahl aus seiner eigenen Situation, nicht aus einer Broschüre.",
+        "Welche Optionen es gibt: \"Sie können nichts tun, Ihren Eigenverbrauch erhöhen oder einen Speicher prüfen — lassen Sie uns alle drei durchrechnen, bevor Sie wählen.\""
+      ]},
+      { type: "quote", text: "Wer die Degression nutzt, um zu verkaufen, gewinnt einen Abschluss. Wer sie nutzt, um ehrlich zu informieren, gewinnt den Kunden und seine Nachbarn." },
+      { type: "p", text: "Die Einspeisevergütung sinkt für alle gleichzeitig. Der Unterschied zwischen den Fachbetrieben, die darunter leiden, und denen, die daran wachsen, liegt nicht im Preis oder im Produkt — er liegt darin, wer das Gespräch zuerst führt und ob es ehrlich ist. Fangen Sie diese Woche an, bei den Kunden, die Sie schon haben." }
+    ]
+  },
+  {
     slug: "why-most-operator-dashboards-lie",
     title: "Why most operator dashboards quietly lie to their CEOs",
     summary:

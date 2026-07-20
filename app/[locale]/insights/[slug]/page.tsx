@@ -76,7 +76,11 @@ export default async function InsightPage(
   });
 
   const toc = tocFromBody(post.body);
-  const related = getAllInsights().filter((p) => p.slug !== post.slug).slice(0, 2);
+  // In-market only: getAllInsights(l) filters to posts published in this
+  // locale's market and applies localized titles — so "read next" never
+  // links to a post that 404s under the current locale (e.g. an NL-only
+  // saldering post surfaced on /de).
+  const related = getAllInsights(l).filter((p) => p.slug !== post.slug).slice(0, 2);
   const venture = getVentureForTag(post.tag);
   const crumbs = breadcrumbSchema([
     { name: "Home", path: `/${l}` },
