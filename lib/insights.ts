@@ -407,6 +407,38 @@ export const POSTS: Insight[] = [
     ]
   },
   {
+    slug: "thuisbatterij-terugverdientijd-2027",
+    markets: ["nl"],
+    title: "Thuisbatterij terugverdientijd 2027 — de eerlijke rekensom",
+    summary:
+      "'Zeven jaar' staat in elke folder, maar dat getal geldt voor bijna niemand. Wat de terugverdientijd van een thuisbatterij écht bepaalt na het wegvallen van de saldering — en hoe je 'm voor jouw situatie uitrekent in plaats van 'm te geloven.",
+    tag: "Energy",
+    publishedAt: "2026-07-20",
+    readingMinutes: 6,
+    body: [
+      { type: "p", text: "Vraag drie aanbieders naar de terugverdientijd van dezelfde thuisbatterij en je krijgt drie getallen tussen de vijf en de twaalf jaar. Ze liegen geen van allen — ze rekenen alleen met verschillende aannames, en de aanname die je niet ziet, bepaalt het antwoord. Na het wegvallen van de salderingsregeling wordt dat verschil groter, niet kleiner." },
+      { type: "h2", text: "Waarom er geen één terugverdientijd bestaat" },
+      { type: "p", text: "Een thuisbatterij verdient zichzelf terug op twee manieren: méér zonnestroom zelf gebruiken in plaats van 'm bijna gratis terugleveren, en stroom opslaan als die goedkoop is om 'm te gebruiken als die duur is. Beide effecten hangen volledig af van hoe en wanneer jij verbruikt. Dezelfde batterij die bij het ene huishouden in zes jaar rond is, doet er bij het volgende dertien over." },
+      { type: "ul", items: [
+        "Je zelfverbruik zonder batterij — verbruik je nu al veel overdag, dan valt er minder winst te halen; verbruik je vooral 's avonds, dan doet de batterij meer.",
+        "De prijs die je krijgt voor teruglevering — die daalt na 2027 hard, en juist dáárdoor wordt opslaan aantrekkelijker dan terugleveren.",
+        "Het verschil tussen dag- en piektarief (of de spreiding op een dynamisch contract) — hoe groter de spread, hoe sneller de batterij rond is.",
+        "Toekomstige apparaten — een warmtepomp of EV verandert je verbruik zo sterk dat een terugverdientijd van vandaag over drie jaar niet meer klopt."
+      ]},
+      { type: "p", text: "Geen enkele van deze vier staat in de folder. Daarom is elk brochure-getal een gemiddelde van huishoudens die op jou lijken noch bestaan. De enige eerlijke terugverdientijd is die je met je eigen cijfers uitrekent." },
+      { type: "cta", text: "Bereken je eigen terugverdientijd met de salderings-ROI-calculator", href: "/tools/energy-roi" },
+      { type: "h2", text: "De rekensom die wél klopt" },
+      { type: "p", text: "Begin niet bij de prijs van de batterij, maar bij je eigen jaarverbruik en je verbruiksmoment. Reken uit hoeveel van je zonnestroom je nú al zelf gebruikt, en hoeveel een batterij daaraan toevoegt tegen realistische prijzen ná 2027 — niet tegen het salderingsvoordeel van vandaag dat er straks niet meer is." },
+      { type: "ul", items: [
+        "Neem je werkelijke jaarverbruik en je opwek, niet een schatting per vierkante meter dak.",
+        "Reken met de terugleververgoeding zoals die ná 2027 wordt, niet met het huidige saldeertarief.",
+        "Doe het twee keer: één keer met de energieprijzen van nu, één keer met een pessimistisch scenario. Als de batterij in beide gevallen rond komt, is het een goede beslissing."
+      ]},
+      { type: "quote", text: "Een terugverdientijd die je uit een folder overneemt, is een gok met andermans aannames. Eén die je zelf uitrekent, is een beslissing." },
+      { type: "p", text: "De klant die na 2027 tevreden blijft, is niet degene die de laagste prijs kreeg, maar degene die vooraf een som zag kloppen die op zijn eigen huis sloeg. Voor installateurs is dat geen extra werk — het is het verschil tussen een prijs-shopper en een koper die tekent." }
+    ]
+  },
+  {
     slug: "why-most-operator-dashboards-lie",
     title: "Why most operator dashboards quietly lie to their CEOs",
     summary:

@@ -933,3 +933,25 @@ installateur-angle) to complete the cluster.
 4 files touched (insights data + type, detail renderer, feed mapper,
 css). Typecheck clean. 417 pass + the same documented crypto flake.
 Production build green — new `/nl` page generates, no route errors.
+
+### 2026-07-20 (cont'd) — SEO Tier-1 #2: thuisbatterij terugverdientijd
+
+Second piece of the NL energy cluster, riding on the `cta` infra merged
+in #82 (so this PR is content-only — one file).
+
+- **New insight** `thuisbatterij-terugverdientijd-2027` in
+  `lib/insights.ts`. `markets: ["nl"]`, tag `Energy`, Dutch body, one
+  `cta` block → `/tools/energy-roi`. Consumer/installer search-intent
+  counterpart to the operator-angle `thuisbatterij-verkoop-na-2027`:
+  that post is about *how installers sell* batteries; this one is the
+  honest *terugverdientijd rekensom* (what actually determines payback,
+  why brochure numbers mislead, how to compute it for your own profile).
+  Distinct angle + target term ("thuisbatterij terugverdientijd"), no
+  overlap with the three existing saldering/battery posts.
+- 1 file changed. Typecheck clean. 417 pass + the same documented
+  crypto flake (green in isolation). Build green — 241 static pages,
+  new `/nl` page generates.
+
+Cluster now: dynamisch-energiecontract + thuisbatterij-terugverdientijd
+shipped; Tier-1 #3 (installateur-angle "salderen stopt") + the
+`/sectors/energy`/calculator cross-links remain as follow-ups.
