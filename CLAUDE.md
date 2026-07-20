@@ -1133,3 +1133,38 @@ and land in the sitemap. Typecheck clean. 418/418 tests. Build green —
 3 files touched (insights data, new component, sector-page mount) +
 CLAUDE.md. Follow-ups: a 2nd article per sector would deepen each
 cluster; per-market ROI calculators remain the bigger energy-funnel play.
+
+### 2026-07-20 (cont'd) — real-estate + hospitality round 2 (clusters, not orphans)
+
+Second article for each sector, turning the two single-article sectors
+into real 2-article clusters. Content-only — rides on the
+`SectorInsightLinks` infra + tags from the previous PR (no component or
+page changes; both blocks auto-append the new posts by tag).
+
+- **`the-retrofit-roi-model-that-doesnt-survive-the-building`** — tag
+  "Real estate". Retrofit (insulation/heat-pump/solar) payback models
+  built on regional averages break against the specific asset; model
+  from the meter. Distinct from the ESG-due-diligence piece.
+- **`what-your-channel-mix-hides-about-your-best-guests`** — tag
+  "Hospitality". OTA-vs-direct true contribution (net of commission,
+  cancellation, ancillary, repeat) lives across five dashboards that
+  never reconcile; price the channel by contribution, not rate. Distinct
+  from the check-in-margin piece.
+- Both all-market (EN base + de/es i18n), same convention as round 1.
+
+**Calculator decision (deferred, needs a steer):** considered building
+per-market ROI calculators (the DE/ES energy clusters have no tool to
+funnel into) but the existing `EnergyRoi` is a Dutch-saldering *model*
+(its reference scenario values every kWh at retail = "what you lose when
+saldering ends"). DE/ES never had net metering, so an honest calculator
+there needs a *different scenario model* (self-consumption vs feed-in),
+plus route-structure + default-value decisions. That's an
+architecturally significant modeling call — left for an explicit steer
+rather than guessed at. Flagged as the next big energy-funnel play.
+
+1 file touched (insights data) + CLAUDE.md. Typecheck clean. 418/418
+tests. Build green — 274 static pages (+8: 2 articles ×4 locales),
+both land in the sitemap across all four locales.
+
+Sector clusters now: real-estate (2), hospitality (2), each surfaced via
+SectorInsightLinks + tag pages.

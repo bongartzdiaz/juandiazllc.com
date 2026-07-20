@@ -785,6 +785,150 @@ export const POSTS: Insight[] = [
     },
   },
   {
+    slug: "the-retrofit-roi-model-that-doesnt-survive-the-building",
+    title: "The retrofit ROI model that doesn't survive the building",
+    summary:
+      "Every retrofit decision — insulation, heat pump, solar — comes with an ROI model, and almost all of them run on regional averages. That's where retrofit money quietly dies. Why the model breaks against the actual asset, and how to build one from the meter.",
+    tag: "Real estate",
+    publishedAt: "2026-07-20",
+    readingMinutes: 6,
+    body: [
+      { type: "p", text: "Every retrofit decision — insulation, heat pump, solar — comes with an ROI model. Almost all of them are built on regional averages, and regional averages are where retrofit money quietly dies. The number looks bankable and describes a building that isn't yours." },
+      { type: "h2", text: "The model is regional. The building is specific." },
+      { type: "p", text: "A heat-pump payback calculated on \"average\" heating demand assumes an envelope, an occupancy pattern, and a climate your specific asset may not share. Be off by 20 percent on the demand assumption and a nine-year payback becomes fourteen — or the reverse, and you skip a retrofit that would have paid back in six." },
+      { type: "h2", text: "Where the models break" },
+      { type: "ul", items: [
+        "Heating and cooling demand pulled from building-type averages, not the asset's own meter history.",
+        "Occupancy assumed at design spec, not what tenants actually do.",
+        "Energy prices held flat — when they are the single most volatile input in the whole model.",
+        "Grants assumed at the headline rate, not what the building actually qualifies for."
+      ]},
+      { type: "p", text: "Each assumption is defensible in isolation and catastrophic in combination. A retrofit business case is the product of four assumptions, so a 20 percent error on each doesn't add — it compounds." },
+      { type: "h2", text: "Model from the meter, not the brochure" },
+      { type: "p", text: "The retrofits that pay back are the ones modeled on the building's own consumption history, its real occupancy, and a price scenario you actually believe. It is slower than the brochure calculator. It is also the difference between a capex decision and a guess wearing a spreadsheet." },
+      { type: "quote", text: "A retrofit ROI built on regional averages is precise about a building that doesn't exist. Model the one you own." },
+      { type: "p", text: "The asset managers who retrofit well don't have better contractors. They have better inputs — and they know which of their buildings to leave alone." }
+    ],
+    i18n: {
+      de: {
+        title: "Das Sanierungs-ROI-Modell, das am echten Gebäude scheitert",
+        summary:
+          "Jede Sanierungsentscheidung — Dämmung, Wärmepumpe, Solar — kommt mit einem ROI-Modell, und fast alle laufen auf regionalen Durchschnitten. Genau da verschwindet das Sanierungsgeld leise. Warum das Modell am echten Objekt scheitert, und wie Sie es aus dem Zähler bauen.",
+        body: [
+          { type: "p", text: "Jede Sanierungsentscheidung — Dämmung, Wärmepumpe, Solar — kommt mit einem ROI-Modell. Fast alle sind auf regionalen Durchschnitten gebaut, und regionale Durchschnitte sind der Ort, an dem Sanierungsgeld leise verschwindet. Die Zahl wirkt belastbar und beschreibt ein Gebäude, das nicht Ihres ist." },
+          { type: "h2", text: "Das Modell ist regional. Das Gebäude ist konkret." },
+          { type: "p", text: "Eine Wärmepumpen-Amortisation auf \"durchschnittlichem\" Heizbedarf setzt eine Gebäudehülle, ein Nutzungsmuster und ein Klima voraus, die Ihr konkretes Objekt vielleicht nicht teilt. Liegen Sie beim Bedarf um 20 Prozent daneben, wird aus neun Jahren Amortisation vierzehn — oder umgekehrt, und Sie lassen eine Sanierung aus, die sich in sechs gerechnet hätte." },
+          { type: "h2", text: "Wo die Modelle brechen" },
+          { type: "ul", items: [
+            "Heiz- und Kühlbedarf aus Gebäudetyp-Durchschnitten statt aus der Zählerhistorie des Objekts.",
+            "Belegung nach Planungssoll angenommen, nicht nach dem, was die Mieter tatsächlich tun.",
+            "Energiepreise konstant gehalten — obwohl sie die volatilste Größe im ganzen Modell sind.",
+            "Förderung zum Schlagzeilensatz angenommen, nicht zu dem, was das Gebäude wirklich erhält."
+          ]},
+          { type: "p", text: "Jede Annahme ist für sich vertretbar und in Kombination katastrophal. Ein Sanierungs-Business-Case ist das Produkt von vier Annahmen, also addiert sich ein 20-Prozent-Fehler bei jeder nicht — er potenziert sich." },
+          { type: "h2", text: "Rechnen Sie aus dem Zähler, nicht aus der Broschüre" },
+          { type: "p", text: "Die Sanierungen, die sich rechnen, sind die, die auf der eigenen Verbrauchshistorie des Gebäudes, seiner echten Belegung und einem Preisszenario modelliert sind, das Sie tatsächlich glauben. Das ist langsamer als der Broschürenrechner. Es ist auch der Unterschied zwischen einer Investitionsentscheidung und einer als Tabelle verkleideten Vermutung." },
+          { type: "quote", text: "Ein Sanierungs-ROI auf regionalen Durchschnitten ist präzise über ein Gebäude, das es nicht gibt. Modellieren Sie das, das Ihnen gehört." },
+          { type: "p", text: "Die Asset Manager, die gut sanieren, haben keine besseren Handwerker. Sie haben bessere Eingangsdaten — und sie wissen, welche ihrer Gebäude sie in Ruhe lassen." }
+        ],
+      },
+      es: {
+        title: "El modelo de ROI de reforma que no sobrevive al edificio",
+        summary:
+          "Cada decisión de reforma —aislamiento, aerotermia, solar— viene con un modelo de ROI, y casi todos funcionan con medias regionales. Ahí es donde el dinero de la reforma desaparece en silencio. Por qué el modelo se rompe contra el activo real, y cómo construirlo desde el contador.",
+        body: [
+          { type: "p", text: "Cada decisión de reforma —aislamiento, aerotermia, solar— viene con un modelo de ROI. Casi todos se construyen sobre medias regionales, y las medias regionales son donde el dinero de la reforma desaparece en silencio. El número parece fiable y describe un edificio que no es el tuyo." },
+          { type: "h2", text: "El modelo es regional. El edificio es concreto." },
+          { type: "p", text: "Una amortización de aerotermia calculada sobre una demanda de calefacción \"media\" presupone una envolvente, un patrón de ocupación y un clima que tu activo concreto quizá no comparta. Fállate un 20 por ciento en la demanda y una amortización de nueve años se convierte en catorce — o al revés, y descartas una reforma que se habría pagado en seis." },
+          { type: "h2", text: "Dónde se rompen los modelos" },
+          { type: "ul", items: [
+            "Demanda de calefacción y refrigeración sacada de medias por tipo de edificio, no del histórico del propio contador.",
+            "Ocupación asumida según proyecto, no según lo que los inquilinos hacen de verdad.",
+            "Precios de la energía mantenidos planos — cuando son la variable más volátil de todo el modelo.",
+            "Subvención asumida al tipo de titular, no a lo que el edificio realmente cumple."
+          ]},
+          { type: "p", text: "Cada supuesto es defendible por separado y catastrófico en combinación. Un caso de negocio de reforma es el producto de cuatro supuestos, así que un error del 20 por ciento en cada uno no se suma — se multiplica." },
+          { type: "h2", text: "Modela desde el contador, no desde el folleto" },
+          { type: "p", text: "Las reformas que se pagan son las que se modelan sobre el histórico de consumo del propio edificio, su ocupación real y un escenario de precios que de verdad te creas. Es más lento que la calculadora del folleto. También es la diferencia entre una decisión de inversión y una suposición disfrazada de hoja de cálculo." },
+          { type: "quote", text: "Un ROI de reforma construido sobre medias regionales es preciso sobre un edificio que no existe. Modela el que tienes." },
+          { type: "p", text: "Los gestores de activos que reforman bien no tienen mejores instaladores. Tienen mejores datos de entrada — y saben qué edificios dejar en paz." }
+        ],
+      },
+    },
+  },
+  {
+    slug: "what-your-channel-mix-hides-about-your-best-guests",
+    title: "What your channel mix hides about your best guests",
+    summary:
+      "Every hotel knows its channel mix. Almost none know what a guest from each channel is actually worth after the channel takes its cut. That gap — spread across five dashboards that never reconcile — is where the margin story falls apart.",
+    tag: "Hospitality",
+    publishedAt: "2026-07-20",
+    readingMinutes: 5,
+    body: [
+      { type: "p", text: "Every hotel knows its channel mix — this much OTA, this much direct, this much corporate. Almost none know what a guest from each channel is actually worth after the channel takes its cut. That gap is where the margin story quietly falls apart." },
+      { type: "h2", text: "The headline number and the real number" },
+      { type: "p", text: "An OTA booking at the same nightly rate as a direct booking is not the same revenue. Strip out the commission, the higher cancellation rate, the lower ancillary spend, and the shorter stay, and two identical-looking bookings can differ by a quarter in contribution. The channel mix report shows none of that." },
+      { type: "h2", text: "What the five dashboards never reconcile" },
+      { type: "ul", items: [
+        "Commission and payment fees — which live in finance, not in the channel report.",
+        "Cancellation and no-show rates by channel — which live in operations.",
+        "Ancillary spend (F&B, spa, upsells) by channel — which lives nowhere in particular.",
+        "Repeat rate by channel — the number that decides lifetime value, and that almost nobody tracks."
+      ]},
+      { type: "p", text: "Each dashboard is internally consistent and collectively useless, because a guest's true value is the product of numbers that never sit in the same table." },
+      { type: "h2", text: "Price the channel by contribution, not by rate" },
+      { type: "p", text: "The move is to compute contribution per booking per channel — net of commission, weighted by cancellation, plus ancillary and repeat value — and let that, not gross rate, drive how hard you fight for direct. Sometimes the OTA guest is worth more than you assumed. More often, the direct guest is worth far more than the rate card suggests." },
+      { type: "quote", text: "Your channel mix report ranks bookings by rate. Your P&L ranks them by contribution. Until those two agree, you're optimizing the wrong number." },
+      { type: "p", text: "The revenue teams that pull ahead stop defending the channel mix and start defending the contribution per guest — a different, and much more profitable, fight." }
+    ],
+    i18n: {
+      de: {
+        title: "Was Ihr Channel-Mix über Ihre besten Gäste verschweigt",
+        summary:
+          "Jedes Hotel kennt seinen Channel-Mix. Kaum eines weiß, was ein Gast aus jedem Kanal tatsächlich wert ist, nachdem der Kanal seinen Schnitt genommen hat. Diese Lücke — verteilt auf fünf Dashboards, die nie zusammenpassen — ist der Ort, an dem die Margengeschichte zerfällt.",
+        body: [
+          { type: "p", text: "Jedes Hotel kennt seinen Channel-Mix — so viel OTA, so viel Direkt, so viel Corporate. Kaum eines weiß, was ein Gast aus jedem Kanal tatsächlich wert ist, nachdem der Kanal seinen Schnitt genommen hat. Diese Lücke ist der Ort, an dem die Margengeschichte leise zerfällt." },
+          { type: "h2", text: "Die Schlagzeilenzahl und die echte Zahl" },
+          { type: "p", text: "Eine OTA-Buchung zum gleichen Übernachtungspreis wie eine Direktbuchung ist nicht derselbe Umsatz. Rechnen Sie Provision, höhere Stornoquote, geringere Zusatzausgaben und kürzere Aufenthaltsdauer heraus, und zwei identisch aussehende Buchungen können sich im Deckungsbeitrag um ein Viertel unterscheiden. Der Channel-Mix-Bericht zeigt davon nichts." },
+          { type: "h2", text: "Was die fünf Dashboards nie in Einklang bringen" },
+          { type: "ul", items: [
+            "Provision und Zahlungsgebühren — die in der Finanzabteilung liegen, nicht im Channel-Bericht.",
+            "Storno- und No-Show-Quoten je Kanal — die im Betrieb liegen.",
+            "Zusatzausgaben (F&B, Spa, Upgrades) je Kanal — die nirgendwo richtig liegen.",
+            "Wiederkehrrate je Kanal — die Zahl, die den Lebenszeitwert entscheidet und die kaum jemand erfasst."
+          ]},
+          { type: "p", text: "Jedes Dashboard ist in sich stimmig und zusammen nutzlos, weil der wahre Wert eines Gastes das Produkt von Zahlen ist, die nie in derselben Tabelle stehen." },
+          { type: "h2", text: "Bewerten Sie den Kanal nach Deckungsbeitrag, nicht nach Preis" },
+          { type: "p", text: "Der richtige Schritt ist, den Deckungsbeitrag je Buchung je Kanal zu berechnen — netto nach Provision, gewichtet nach Storno, plus Zusatz- und Wiederkehrwert — und das, nicht den Bruttopreis, entscheiden zu lassen, wie hart Sie um Direktbuchungen kämpfen. Manchmal ist der OTA-Gast mehr wert als angenommen. Häufiger ist der Direktgast weit mehr wert, als die Preisliste vermuten lässt." },
+          { type: "quote", text: "Ihr Channel-Mix-Bericht sortiert Buchungen nach Preis. Ihre GuV sortiert sie nach Deckungsbeitrag. Solange die beiden nicht übereinstimmen, optimieren Sie die falsche Zahl." },
+          { type: "p", text: "Die Revenue-Teams, die vorbeiziehen, verteidigen nicht mehr den Channel-Mix, sondern den Deckungsbeitrag je Gast — ein anderer und weit profitablerer Kampf." }
+        ],
+      },
+      es: {
+        title: "Lo que tu mix de canales oculta sobre tus mejores huéspedes",
+        summary:
+          "Todo hotel conoce su mix de canales. Casi ninguno sabe cuánto vale de verdad un huésped de cada canal después de que el canal se lleve su parte. Ese hueco —repartido en cinco paneles que nunca cuadran— es donde se desmorona la historia del margen.",
+        body: [
+          { type: "p", text: "Todo hotel conoce su mix de canales — tanto de OTA, tanto directo, tanto corporativo. Casi ninguno sabe cuánto vale de verdad un huésped de cada canal después de que el canal se lleve su parte. Ese hueco es donde la historia del margen se desmorona en silencio." },
+          { type: "h2", text: "El número de titular y el número real" },
+          { type: "p", text: "Una reserva de OTA a la misma tarifa por noche que una directa no es el mismo ingreso. Quita la comisión, la mayor tasa de cancelación, el menor gasto accesorio y la estancia más corta, y dos reservas idénticas en apariencia pueden diferir en un cuarto de su contribución. El informe de mix de canales no muestra nada de eso." },
+          { type: "h2", text: "Lo que los cinco paneles nunca cuadran" },
+          { type: "ul", items: [
+            "Comisión y comisiones de pago — que viven en finanzas, no en el informe de canales.",
+            "Tasas de cancelación y no-show por canal — que viven en operaciones.",
+            "Gasto accesorio (restauración, spa, upsellings) por canal — que no vive en ningún sitio concreto.",
+            "Tasa de repetición por canal — el número que decide el valor de vida y que casi nadie mide."
+          ]},
+          { type: "p", text: "Cada panel es coherente por dentro e inútil en conjunto, porque el valor real de un huésped es el producto de números que nunca están en la misma tabla." },
+          { type: "h2", text: "Valora el canal por contribución, no por tarifa" },
+          { type: "p", text: "El movimiento es calcular la contribución por reserva y por canal —neta de comisión, ponderada por cancelación, más valor accesorio y de repetición— y dejar que eso, no la tarifa bruta, decida cuánto peleas por lo directo. A veces el huésped de OTA vale más de lo que suponías. Más a menudo, el directo vale mucho más de lo que sugiere la tarifa." },
+          { type: "quote", text: "Tu informe de mix de canales ordena las reservas por tarifa. Tu cuenta de resultados las ordena por contribución. Hasta que ambos coincidan, estás optimizando el número equivocado." },
+          { type: "p", text: "Los equipos de ingresos que se adelantan dejan de defender el mix de canales y empiezan a defender la contribución por huésped — una pelea distinta y mucho más rentable." }
+        ],
+      },
+    },
+  },
+  {
     slug: "why-most-operator-dashboards-lie",
     title: "Why most operator dashboards quietly lie to their CEOs",
     summary:
