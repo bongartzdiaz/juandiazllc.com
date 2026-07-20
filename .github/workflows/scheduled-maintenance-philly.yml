@@ -13,6 +13,10 @@ permissions:
   contents: write
   pull-requests: write
   issues: read
+  # claude-code-action exchanges an Actions OIDC token during setup —
+  # without this every run dies in the auth step ("Failed to get OIDC
+  # token"), which is why all scheduled runs since 2026-07-18 failed.
+  id-token: write
 
 concurrency:
   group: scheduled-maintenance-philly
