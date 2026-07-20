@@ -955,3 +955,41 @@ in #82 (so this PR is content-only — one file).
 Cluster now: dynamisch-energiecontract + thuisbatterij-terugverdientijd
 shipped; Tier-1 #3 (installateur-angle "salderen stopt") + the
 `/sectors/energy`/calculator cross-links remain as follow-ups.
+
+### 2026-07-20 (cont'd) — SEO Tier-1 #3 + cluster cross-links
+
+Completes the NL post-salderingsregeling energy cluster: the last
+article plus the internal cross-linking that ties the four pieces to
+the two highest-intent surfaces.
+
+- **New insight** `salderen-stopt-wat-installateurs-nu-moeten-vertellen`
+  in `lib/insights.ts`. `markets: ["nl"]`, tag `Energy`, Dutch body,
+  one `cta` → `/tools/energy-roi`. Installer *customer-communication*
+  angle — which existing/prospect customers to reach before 2027 and a
+  three-sentence honest script — distinct from the other four
+  saldering/battery posts (funnel / sales / contract-math / payback).
+- **New shared component** `components/EnergyInsightLinks.tsx`. Server
+  component, **self-gates to `locale === "nl"`** (returns null otherwise)
+  because the cluster is `markets:["nl"]` — mounting it on the
+  all-locale sector/tool pages would otherwise emit links that 404 on
+  /en,/de,/es. Renders `getAllInsights("nl").filter(tag === "Energy")`
+  as a linked "Verder lezen" list. Inline-styled to match the
+  surrounding pages (no globals.css churn). Copy hardcoded Dutch since
+  it only ever renders on /nl.
+- **Cross-links wired**: mounted on `app/[locale]/sectors/[slug]/page.tsx`
+  (energy slug only, after the ROI-calculator link) and
+  `app/[locale]/tools/energy-roi/page.tsx` (after the calculator, before
+  the outro CTA). Internal-link equity now flows from the two
+  high-intent energy surfaces into the whole cluster, and both
+  directions are covered (articles → calculator via `cta`; calculator +
+  sector → articles via the new block).
+
+Cluster complete (5 NL energy posts: whatsapp-funnel is Growth, the
+other four are the saldering set) + bidirectional internal links.
+Follow-ups exhausted for this cluster; next SEO move would be a new
+cluster (DE Heimspeicher / ES autoconsumo) or the orphan sector pages
+(real-estate, hospitality) per the earlier audit.
+
+4 files touched (insights data, new component, 2 page mounts) + CLAUDE.md.
+Typecheck clean. 418/418 tests pass (crypto flake didn't fire this run).
+Build green — 242 static pages, new `/nl` page generates, no route errors.

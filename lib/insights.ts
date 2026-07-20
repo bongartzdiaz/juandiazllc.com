@@ -439,6 +439,36 @@ export const POSTS: Insight[] = [
     ]
   },
   {
+    slug: "salderen-stopt-wat-installateurs-nu-moeten-vertellen",
+    markets: ["nl"],
+    title: "Salderen stopt: wat installateurs hun klanten nú moeten vertellen",
+    summary:
+      "Het einde van de salderingsregeling is geen technisch detail dat je in de offerte verstopt — het is een gesprek dat je vóór je concurrent voert. Welke klanten je nu belt, en de drie zinnen die twijfel wegnemen in plaats van 'm te voeden.",
+    tag: "Energy",
+    publishedAt: "2026-07-20",
+    readingMinutes: 5,
+    body: [
+      { type: "p", text: "De meeste installateurs behandelen het einde van de saldering als een voetnoot: een regel onderaan de offerte, een vraag die je beantwoordt als de klant erover begint. Dat is een gemiste kans. De klant die van jóú hoort wat er verandert — voordat hij het van het journaal of van je concurrent hoort — vertrouwt jou met de vervolgstap. De klant die het ergens anders oppikt, komt met wantrouwen terug." },
+      { type: "h2", text: "De klanten die je nú belt, bepalen je 2027" },
+      { type: "p", text: "Er zijn drie groepen die dit gesprek deze maand nodig hebben, en ze vragen elk iets anders. Wie ze door elkaar haalt, verliest bij alle drie." },
+      { type: "ul", items: [
+        "Bestaande klanten met alleen panelen — zij denken dat hun rendement gegarandeerd is en schrikken straks. Bel ze vóór 2027, niet erna. Een batterij-upsell aan een tevreden klant is de goedkoopste deal die je dit jaar sluit.",
+        "Lopende offertes — hier moet de terugverdiensom nú kloppen met de regels van ná 2027, niet met het saldeervoordeel van vandaag. Een offerte op verouderde aannames wordt een klacht zodra de klant het doorheeft.",
+        "Twijfelaars die 'nog even wachten' — voor hen is de deadline juist het argument. Niet als druk, maar als eerlijke rekensom: wat het wachten hen kost."
+      ]},
+      { type: "p", text: "In alle drie de gesprekken is het sterkste dat je kunt doen niet praten, maar rekenen — de klant zijn eigen cijfers laten zien in plaats van een algemeen verhaal." },
+      { type: "cta", text: "Laat de klant zijn eigen som zien met de salderings-ROI-calculator", href: "/tools/energy-roi" },
+      { type: "h2", text: "Het eerlijke gesprek in drie zinnen" },
+      { type: "ul", items: [
+        "Wat er verandert: 'Vanaf 2027 wordt teruggeleverde stroom niet meer één-op-één weggestreept — het moment waarop je verbruikt gaat meetellen.'",
+        "Wat dat voor jou betekent: 'Voor jouw verbruik betekent dat concreet dít' — met een getal uit zijn eigen situatie, niet uit een folder.",
+        "Wat de opties zijn: 'Je kunt niets doen, je zelfverbruik verhogen, of een batterij overwegen — laten we alle drie doorrekenen voordat je kiest.'"
+      ]},
+      { type: "quote", text: "De installateur die de deadline gebruikt om te verkopen, wint één deal. De installateur die 'm gebruikt om eerlijk te informeren, wint de klant én zijn buren." },
+      { type: "p", text: "Salderen stopt voor iedereen tegelijk. Het verschil tussen de installateurs die er last van hebben en de installateurs die eraan groeien, zit niet in de prijs of het product — het zit in wie het gesprek als eerste voert, en of dat gesprek eerlijk is. Begin deze week, bij de klanten die je al hebt." }
+    ]
+  },
+  {
     slug: "why-most-operator-dashboards-lie",
     title: "Why most operator dashboards quietly lie to their CEOs",
     summary:
