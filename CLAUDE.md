@@ -1047,3 +1047,48 @@ pages generate, no route errors.
 Next SEO move: ES autoconsumo cluster (same pattern, Spanish market:
 autoconsumo, batería virtual, compensación de excedentes) or the orphan
 real-estate/hospitality sector pages.
+
+### 2026-07-20 (cont'd) — SEO: ES autoconsumo cluster (third market)
+
+Third market cluster, completing NL + DE + ES energy coverage. Three
+`markets: ["es"]` energy insights anchored in **Spanish** regulatory
+reality — again NOT a translation of the NL/DE clusters.
+
+**Market specifics baked in:** Spain has neither salderingsregeling nor
+Einspeisevergütung. It has **compensación de excedentes** (RD 244/2019):
+surplus is valued and subtracted from the month's término de energía but
+**capped at that term — it is NOT balance neto (net metering)**, never
+offsets the power term/taxes, and doesn't roll over. Plus **batería
+virtual** (a commercial € -credit product, not net metering), **PVPC /
+tarifa por horas**, and the retail↔compensation spread (~0.20-0.25 vs
+~0.05-0.10 €/kWh, topado). Copy is informal "tú" to match existing ES
+i18n voice.
+
+- **Three new insights** in `lib/insights.ts`:
+  - `autoconsumo-con-bateria-rentabilidad-2026` — honest payback (parallels
+    the DE Heimspeicher / NL terugverdientijd piece, framed on the capped
+    compensación, not saldering/Einspeisevergütung).
+  - `compensacion-de-excedentes-no-es-balance-neto` — the distinctly-Spanish
+    misconception correction + sizing implications + where batería virtual
+    fits. High-intent, corrects a real and costly error.
+  - `autoconsumo-lo-que-los-instaladores-deben-explicar` — installer
+    customer-communication angle.
+- **No `cta` to `/tools/energy-roi`** — same reasoning as the DE cluster;
+  the calculator models Dutch saldering, wrong for a Spanish reader.
+- **Added `es` to the `EnergyInsightLinks` COPY map** (nl + de + es now;
+  en → null). The ES cluster now surfaces on `/es/sectors/energy` and
+  `/es/tools/energy-roi` via the existing `locale={l}` mounts — no page
+  edits. Related-posts already market-aware (`getAllInsights(l)`, shipped
+  in the DE PR), so the ES articles cross-link to their own siblings.
+
+Auto-wiring verified: all 3 ES slugs land in the generated sitemap under
+`/es/insights/`; new `/es/insights/tag/energy` page generates.
+
+2 files touched (insights data, component copy-map entry) + CLAUDE.md.
+Typecheck clean. 418/418 tests pass. Build green — 250 static pages
+(+3 articles +1 new ES energy-tag page), no route errors.
+
+Energy content now spans all three EU markets: NL (saldering, 5 posts),
+DE (Einspeisevergütung/Heimspeicher, 3), ES (autoconsumo, 3). Next:
+orphan real-estate/hospitality sector pages, or per-market ROI
+calculators (the current one is Dutch-saldering-only).

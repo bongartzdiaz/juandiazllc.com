@@ -558,6 +558,95 @@ export const POSTS: Insight[] = [
     ]
   },
   {
+    slug: "autoconsumo-con-bateria-rentabilidad-2026",
+    markets: ["es"],
+    title: "Autoconsumo con batería en 2026: la rentabilidad real, no la del folleto",
+    summary:
+      "\"Diez años\" pone cada presupuesto, pero eso no vale para casi nadie. Qué determina de verdad la rentabilidad de una batería en España — con la compensación de excedentes topada y barata — y cómo calcularla para tu caso en vez de creértela.",
+    tag: "Energy",
+    publishedAt: "2026-07-20",
+    readingMinutes: 6,
+    body: [
+      { type: "p", text: "Pide a tres instaladores la rentabilidad de la misma batería y te darán tres números entre siete y catorce años. Ninguno miente: solo calculan con supuestos distintos, y el supuesto que no ves es el que decide el resultado. En España, donde la compensación de excedentes está topada y se paga poco, ese margen de error es enorme." },
+      { type: "h2", text: "Por qué no existe una única rentabilidad" },
+      { type: "p", text: "Una batería gana por un único hueco: la diferencia entre lo que pagas por la energía de la red (unos 0,20-0,25 €/kWh) y lo que te compensan por el excedente que viertes (a menudo 0,05-0,10 €/kWh, y encima con un tope mensual). Cada kilovatio hora que la batería pasa de \"excedente mal pagado\" a \"autoconsumo\" vale esa diferencia. Cuánto de ese hueco aprovechas depende por completo de cuándo y cómo consumes, no de la ficha técnica de la batería." },
+      { type: "ul", items: [
+        "Tu cuota de autoconsumo sin batería — si ya consumes mucho de día, hay menos que ganar; si consumes sobre todo de noche, la batería hace más.",
+        "El tope de la compensación — no puede superar el valor de tu consumo del mes, así que el excedente de más no se paga; la batería convierte ese excedente perdido en ahorro.",
+        "La tarifa por horas o el PVPC — con precio horario la batería puede además cargar en horas valle y cubrir las de punta, lo que acorta la cuenta.",
+        "Consumos futuros — un aerotermo o un coche eléctrico cambian tanto tu perfil que una rentabilidad de hoy deja de valer en tres años."
+      ]},
+      { type: "p", text: "Ninguna de estas cuatro variables está en el folleto. Por eso cualquier número de catálogo es una media de hogares que ni se parecen a ti ni existen. La única rentabilidad honesta es la que calculas con tus propios datos." },
+      { type: "h2", text: "La cuenta que sí cuadra" },
+      { type: "p", text: "No empieces por el precio de la batería, sino por tu consumo anual y tu momento de consumo. Calcula cuánta de tu energía solar autoconsumes ya y cuánto añade una batería, valorado con la compensación real —topada y baja—, no con un balance neto que en España no existe." },
+      { type: "ul", items: [
+        "Usa tu consumo anual real y tu producción, no una estimación por metro cuadrado de tejado.",
+        "Calcula con la compensación real de tu comercializadora y su tope mensual, no con una cifra de balance neto.",
+        "Hazlo dos veces: una con los precios de hoy y otra con un escenario pesimista. Si la batería sale a cuenta en ambos, es una buena decisión."
+      ]},
+      { type: "quote", text: "Una rentabilidad sacada del folleto es una apuesta con supuestos ajenos. Una que calculas tú es una decisión." },
+      { type: "p", text: "El cliente que sigue contento a los cinco años no es el del precio más bajo, sino aquel que vio de antemano una cuenta que encajaba con su propia casa. Para el instalador no es trabajo extra: es la diferencia entre un comparador de precios y un cliente que firma." }
+    ]
+  },
+  {
+    slug: "compensacion-de-excedentes-no-es-balance-neto",
+    markets: ["es"],
+    title: "Compensación de excedentes: por qué no es balance neto (y qué cambia al dimensionar)",
+    summary:
+      "Mucha gente cree que el excedente solar funciona como un contador que gira hacia atrás. En España no es así: la compensación está topada y no se acumula. Qué significa eso de verdad al dimensionar tu instalación — y dónde encaja la batería virtual.",
+    tag: "Energy",
+    publishedAt: "2026-07-20",
+    readingMinutes: 6,
+    body: [
+      { type: "p", text: "El error más caro del autoconsumo en España es creer que el excedente que viertes a la red se descuenta como en un contador que va hacia atrás. No es balance neto. Es compensación de excedentes, y las reglas son otras — con un tope que decide cuánta placa te conviene poner." },
+      { type: "h2", text: "Compensación no es balance neto" },
+      { type: "p", text: "Bajo el RD 244/2019, en la modalidad con excedentes acogida a compensación, la energía que viertes se valora y se resta del término de energía de tu factura del mes. Pero esa compensación nunca puede superar ese término: no descuenta el término de potencia, ni los impuestos, ni se guarda para el mes siguiente. El excedente que supera tu consumo del mes, sencillamente, se regala." },
+      { type: "ul", items: [
+        "No sobredimensiones para \"vender\" excedente — a partir de cierto punto produces energía que no se te paga.",
+        "El óptimo maximiza el autoconsumo, no la producción: cada kWh que consumes vale 0,20-0,25 €, cada kWh vertido apenas 0,05-0,10 € y con tope.",
+        "Una batería —o una batería virtual— es lo que convierte ese excedente perdido en valor real."
+      ]},
+      { type: "p", text: "La batería virtual que ofrecen algunas comercializadoras no es balance neto tampoco: es un producto comercial que guarda tu excedente como saldo en euros para usarlo en meses siguientes o en otros conceptos de la factura. Puede tener sentido, pero tiene letra pequeña — condiciones, permanencias y precios de compensación que conviene leer antes de firmar." },
+      { type: "h2", text: "Qué mirar antes de dimensionar" },
+      { type: "ul", items: [
+        "Tu curva de consumo por horas, no solo el total anual: define cuánto excedente vas a generar realmente.",
+        "El precio y el tope de compensación de tu comercializadora — es lo que decide el valor de cada kWh vertido.",
+        "Si te interesa más autoconsumo directo, batería física o batería virtual: son tres formas distintas de tratar el mismo excedente, con números distintos."
+      ]},
+      { type: "quote", text: "En España no vendes tu excedente a la red: lo compensas hasta un tope. Quien dimensiona sin saberlo, paga placas que trabajan gratis." },
+      { type: "p", text: "Dimensionar bien no es poner el tejado más grande posible, sino el que mejor encaja con tu consumo y tu forma de tratar el excedente. El instalador que lo explica antes de vender gana el cliente que, al entender la factura, deja de comparar solo el precio." }
+    ]
+  },
+  {
+    slug: "autoconsumo-lo-que-los-instaladores-deben-explicar",
+    markets: ["es"],
+    title: "Autoconsumo: lo que los instaladores deben explicar antes de vender",
+    summary:
+      "La compensación de excedentes no es un detalle para la letra pequeña — es una conversación que ganas antes que tu competencia. A qué clientes llamar ahora, y las tres frases que despejan la duda en vez de alimentarla.",
+    tag: "Energy",
+    publishedAt: "2026-07-20",
+    readingMinutes: 5,
+    body: [
+      { type: "p", text: "La mayoría de instaladores tratan la compensación de excedentes como una nota al pie: una línea en el presupuesto, una pregunta que respondes si el cliente la saca. Es una oportunidad desperdiciada. El cliente que se entera por ti de cómo funciona de verdad —antes de oírlo del vecino o de la competencia— te confía el siguiente paso. El que lo pilla por otro lado vuelve con desconfianza." },
+      { type: "h2", text: "Los clientes a los que llamas ahora deciden tu año" },
+      { type: "p", text: "Hay tres grupos que necesitan esta conversación este mes, y cada uno pregunta algo distinto. Quien los confunde, pierde en los tres." },
+      { type: "ul", items: [
+        "Clientes solo con placas — creen que su excedente vale mucho más de lo que la compensación paga. Llámalos antes de que les llegue una factura que no esperan; una batería a un cliente contento es la venta más barata del año.",
+        "Presupuestos en curso — aquí la cuenta de rentabilidad tiene que cuadrar con la compensación real y topada, no con un balance neto que no existe. Un presupuesto con números inflados acaba en reclamación.",
+        "Los que \"esperan un poco\" — para ellos el argumento es la propia cuenta: qué les cuesta esperar, calculado sobre su consumo, no como presión."
+      ]},
+      { type: "p", text: "En las tres conversaciones lo más fuerte que puedes hacer no es hablar, sino calcular: enseñarle al cliente sus propios números en vez de un discurso general." },
+      { type: "h2", text: "La conversación honesta en tres frases" },
+      { type: "ul", items: [
+        "Qué cambia: \"En España el excedente no gira el contador hacia atrás; se compensa hasta un tope, y lo que sobra no se paga.\"",
+        "Qué significa para ti: \"Para tu consumo, eso concretamente es esto\" — con un número de su propia situación, no de un folleto.",
+        "Qué opciones hay: \"Puedes no hacer nada, subir tu autoconsumo o valorar una batería —física o virtual—; calculémoslas antes de decidir.\""
+      ]},
+      { type: "quote", text: "Quien usa la compensación para vender, gana una venta. Quien la usa para informar con honestidad, gana al cliente y a sus vecinos." },
+      { type: "p", text: "Las reglas del autoconsumo son iguales para todos a la vez. La diferencia entre los instaladores que sufren y los que crecen no está en el precio ni en el producto — está en quién tiene la conversación primero y en si es honesta. Empieza esta semana, por los clientes que ya tienes." }
+    ]
+  },
+  {
     slug: "why-most-operator-dashboards-lie",
     title: "Why most operator dashboards quietly lie to their CEOs",
     summary:
