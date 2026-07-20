@@ -37,7 +37,11 @@ export type InsightBlock =
   | { type: "h2"; text: string }
   | { type: "p"; text: string }
   | { type: "ul"; items: string[] }
-  | { type: "quote"; text: string; cite?: string };
+  | { type: "quote"; text: string; cite?: string }
+  /** Inline call-to-action rendered as a button link. Used for internal links
+   *  to tools/pages that the plain-text `p` renderer can't carry (e.g. the
+   *  energy-ROI calculator). `href` is locale-less; middleware resolves it. */
+  | { type: "cta"; text: string; href: string };
 
 export const POSTS: Insight[] = [
   {
@@ -370,6 +374,36 @@ export const POSTS: Insight[] = [
       { type: "p", text: "De leads die converteren hebben allemaal één ding gemeen: ze hebben een persoonlijk verbruiksrapport gezien voordat ze met een adviseur spraken. Geen rapport = prijs-shopper. Wel een rapport = serieuze koper die een partner zoekt, niet de goedkoopste offerte." },
       { type: "quote", text: "De prijsoorlog in thuisbatterijen komt eraan. De installateurs die winnen zijn degenen die al een jaar voor die oorlog een sterker narratief hebben opgebouwd." },
       { type: "p", text: "Dat narratief is geen marketing. Het is een funnel die elke lead een rekenmodel geeft voordat er iemand aan de telefoon hangt. Bouw die laag nu — in 2027 is het te laat." }
+    ]
+  },
+  {
+    slug: "dynamisch-energiecontract-na-de-salderingsregeling",
+    markets: ["nl"],
+    title: "Dynamisch energiecontract na de salderingsregeling — reken het écht door",
+    summary:
+      "Zonder saldering wordt het uur waarop je stroom teruglevert ineens belangrijk. Waarom een dynamisch contract voor de één honderden euro's oplevert en voor de ander geld kost — en hoe je het per klant doorrekent voordat je iets belooft.",
+    tag: "Energy",
+    publishedAt: "2026-07-20",
+    readingMinutes: 6,
+    body: [
+      { type: "p", text: "Met de salderingsregeling maakte het niet uit wanneer je stroom terugleverde: elke teruggeleverde kilowattuur werd één-op-één weggestreept tegen een afgenomen kilowattuur, tegen je vaste tarief. Vanaf 2027 verdwijnt die streep. Het uur waarop je levert en het uur waarop je verbruikt worden ineens twee verschillende getallen — en precies daar zit het hele verhaal van het dynamische energiecontract." },
+      { type: "h2", text: "Waarom 'dynamisch' voor de één wint en voor de ander verliest" },
+      { type: "p", text: "Een dynamisch contract rekent per uur af tegen de marktprijs. Zonnepanelen leveren het meest rond het middaguur — precies het moment waarop half Nederland ook levert en de prijs richting nul of negatief zakt. Je afname zit 's ochtends en 's avonds, als de prijs juist hoog is. Zonder batterij of sturing verkoop je dus goedkoop en koop je duur. Dat is de asymmetrie die de meeste verkoopgesprekken overslaan." },
+      { type: "ul", items: [
+        "Hoog zelfverbruik overdag (thuiswerker, warmtepomp, EV die overdag laadt): dynamisch wint vaak, omdat je de dure avonduren omzeilt.",
+        "Klassiek verbruiksprofiel (overdag leeg huis, piek 's avonds): dynamisch zonder batterij kost geld ten opzichte van een vast contract.",
+        "Met thuisbatterij of slimme sturing: het profiel kantelt — je schuift levering naar de dure uren en dynamisch wordt bijna altijd de betere keuze."
+      ]},
+      { type: "p", text: "Het punt is niet dat dynamisch goed of slecht is. Het punt is dat het antwoord per huishouden verschilt, en dat je het niet uit een brochure kunt halen. Je moet het doorrekenen met het echte verbruiksprofiel van de klant en realistische uurprijzen — niet met het jaargemiddelde dat elke aanbieder in zijn folder zet." },
+      { type: "cta", text: "Reken een scenario door met de salderings-ROI-calculator", href: "/tools/energy-roi" },
+      { type: "h2", text: "Drie dingen die je vastlegt vóór je een dynamisch contract aanraadt" },
+      { type: "ul", items: [
+        "Het verbruiksprofiel per uur, niet per jaar. Een klant met 3.500 kWh kan twee totaal verschillende contracten nodig hebben, afhankelijk van wánneer die 3.500 kWh valt.",
+        "De aanname over toekomstige uurprijzen. Reken minstens één pessimistisch scenario door — negatieve middagprijzen worden structureler, niet minder.",
+        "Wat er verandert bij een warmtepomp of EV binnen drie jaar. De helft van je klanten verschuift straks van profiel, en het advies van vandaag moet die verschuiving overleven."
+      ]},
+      { type: "quote", text: "Een dynamisch contract is geen product dat je verkoopt. Het is een uitkomst die je uitrekent — en de installateur die dat eerlijk laat zien, wint de klant die twijfelt." },
+      { type: "p", text: "De aanbieders die na 2027 vertrouwen opbouwen, zijn niet degenen die 'dynamisch' als slimme upsell in elke offerte plakken. Het zijn degenen die per klant laten zien wanneer het níét de moeite waard is. Dat kost je een paar makkelijke deals — en levert je de klant op die je concurrent met een standaardverhaal kwijtraakt." }
     ]
   },
   {

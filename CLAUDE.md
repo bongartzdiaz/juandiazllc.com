@@ -891,3 +891,45 @@ audit report; not blocking.
 clean. Tests: 301 pass + 1 pre-existing flake in crypto.test.ts
 (documented in readiness-sprint session log; passes in isolation,
 fails when interleaved — not introduced by this work).
+
+### 2026-07-20 — SEO: new NL energy insight (dynamisch energiecontract)
+
+Restarted the insights cadence (last post was 2026-04-15 — ~3 months
+stale) by shipping the highest-ROI piece from an SEO content audit:
+deepen the NL post-salderingsregeling energy cluster, which is the
+site's only realistic ranking wedge on a DR-0 domain (urgent 2027
+deadline, high commercial intent, thin Dutch competition).
+
+- **New insight** `dynamisch-energiecontract-na-de-salderingsregeling`
+  in `lib/insights.ts`. `markets: ["nl"]`, tag `Energy`, Dutch body —
+  matches the convention of its two siblings (`salderingsregeling-2027`,
+  `thuisbatterij-verkoop-na-2027`), which are NL-only with no i18n.
+  Deliberately did NOT add en/de/es i18n: salderingsregeling is a
+  Dutch-regulatory topic, and CLAUDE.md's own rule is that
+  market-specific posts stay `["nl"]` "so they don't surface as thin
+  content under /en,/de,/es". (My earlier pitch loosely said "+ i18n";
+  corrected to match the repo convention.)
+- **New `InsightBlock` variant** `{ type: "cta"; text; href }`. The
+  existing `p` renderer emits plain text (`<p>{text}</p>`) — no inline
+  links — so an internal link to the ROI calculator wasn't expressible.
+  The `cta` block renders as a `.btn.primary` link in
+  `app/[locale]/insights/[slug]/page.tsx`. The article uses it once to
+  link `/tools/energy-roi` mid-body (the internal-link SEO value + a
+  natural funnel step from "reken het door" to the calculator).
+- **feed.json** (`app/feed.json/route.ts`) — added `cta` to the
+  body-flattening branch (returns `b.text`). Harmless for this post
+  (NL-only, never in the EN feed) but keeps the mapper correct if an
+  all-market post ever uses `cta`. `tocFromBody` ignores non-h2 blocks;
+  `rss.xml` uses `summary` only — both unaffected.
+- **globals.css** — one rule `.ia-body .ia-inline-cta { margin: … }`
+  for CTA spacing; reuses existing `.btn.primary` styling.
+
+Auto-wiring already in place: the detail page's related-posts + the
+`Energy`-tag → Voltafy venture cross-link surface automatically. Follow-
+ups (not in this PR): cross-link the new article from `/sectors/energy`
+and the calculator page; Tier-1 #2/#3 (thuisbatterij terugverdientijd,
+installateur-angle) to complete the cluster.
+
+4 files touched (insights data + type, detail renderer, feed mapper,
+css). Typecheck clean. 417 pass + the same documented crypto flake.
+Production build green — new `/nl` page generates, no route errors.
