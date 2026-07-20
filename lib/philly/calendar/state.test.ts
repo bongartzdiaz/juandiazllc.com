@@ -58,12 +58,14 @@ describe('signState / verifyState', () => {
   it('rejects a tampered signature', () => {
     const token = signState(baseInput)
     const [payload, sig] = token.split('.')
-    // Force a different last character — base64url uses [A-Za-z0-9_-]
-    // and the original sig has uniform distribution, so picking 'X' or
-    // 'Y' based on the existing last char guarantees a real change
-    // (vs. flaky 1-in-64 collision when the last char was already 'X').
-    const replacement = sig.endsWith('X') ? 'Y' : 'X'
-    const tampered = `${payload}.${sig.slice(0, -1)}${replacement}`
+    // Flip the FIRST character of the signature. The last character
+    // only carries 2 real bits (43 × 6 = 258 bits for a 256-bit HMAC),
+    // so last-char tampering can decode to identical bytes — the
+    // string-compare in verifyState now rejects that too, but tampering
+    // a fully-significant character keeps this test implementation-
+    // agnostic and deterministic.
+    const replacement = sig.startsWith('X') ? 'Y' : 'X'
+    const tampered = `${payload}.${replacement}${sig.slice(1)}`
     const result = verifyState(tampered)
     expect(result.ok).toBe(false)
     expect(result.error).toBe('bad-signature')
