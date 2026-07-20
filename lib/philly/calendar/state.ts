@@ -94,10 +94,15 @@ export function verifyState(token: string | null | undefined, now: number = Date
 
   // Constant-time signature compare to defeat timing attacks.
   const expected = b64url(hmac(getKey(), payloadB64))
-  // Buffer.compare on equal-length buffers; if lengths differ, abort
-  // before timingSafeEqual (which throws on mismatch).
-  const a = Buffer.from(sig, 'base64url')
-  const b = Buffer.from(expected, 'base64url')
+  // Compare the base64url STRINGS, not their decoded bytes. Decoding
+  // first silently drops the 4 unused padding bits in the final
+  // character (43 chars × 6 bits = 258 bits for a 256-bit HMAC), so
+  // e.g. sig "…Q" and tampered "…X" decode to identical bytes — a
+  // signature-malleability quirk that also made the tampered-signature
+  // test flake. Our own encoding is canonical; anything else fails.
+  // Length guard first: timingSafeEqual throws on unequal lengths.
+  const a = Buffer.from(sig, 'utf8')
+  const b = Buffer.from(expected, 'utf8')
   if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
     return { ok: false, error: 'bad-signature' }
   }

@@ -28,3 +28,6 @@ philly/.env*.local
 philly/*.tsbuildinfo
 philly/next-env.d.ts
 philly/.vercel
+.env*
+# but keep the documented template in git
+!.env.example

@@ -222,6 +222,7 @@ lead-mailnotificaties. Alle CTA-tagging + goals-code staat al live
 | 1 | `NEXT_PUBLIC_PLAUSIBLE_DOMAIN=juandiazllc.com` zetten | Vercel → juandiazllc-com → Settings → Env Vars (Production) + redeploy | Juan |
 | 2 | `NEXT_PUBLIC_GA4_ID=G-…` zetten (GA4-property aanmaken als die nog niet bestaat) | Vercel env vars, zelfde plek | Juan |
 | 3 | `RESEND_API_KEY` zetten — anders komt er GEEN mail bij een nieuwe lead binnen (lead staat wél in Supabase `leads`) | Vercel env vars + Resend domain-verify afronden | Juan |
+| 3b | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` zetten voor push-melding per lead: bot maken via @BotFather (/newbot), bot een bericht sturen, chat-id uit `getUpdates` halen | Vercel env vars, zelfde plek | Juan |
 | 4 | Plausible-goals aanmaken: **Contact Submitted**, **Pricing CTA** (prop `tier`), **Sector CTA** (prop `sector`) | Plausible dashboard → Site settings → Goals | Juan |
 | 5 | Philly-DB beslissing: `/philly/api/health` geeft 503 op prod (MariaDB onbereikbaar). Verwacht post-Hetzner? Dan health-check aanpassen; anders `DATABASE_URL` op Vercel fixen | Vercel env vars óf `app/philly/api/health` | Juan |
 

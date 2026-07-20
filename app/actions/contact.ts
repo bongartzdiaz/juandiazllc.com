@@ -22,6 +22,44 @@ const RESEND_ENDPOINT = "https://api.resend.com/emails";
 const NOTIFY_TO = process.env.CONTACT_NOTIFY_TO ?? "diazJSBD@proton.me";
 const NOTIFY_FROM = process.env.CONTACT_NOTIFY_FROM ?? "noreply@juandiazllc.com";
 
+// Telegram is the instant channel next to the Resend mail: push on the
+// phone the second a lead lands. Configure TELEGRAM_BOT_TOKEN (from
+// @BotFather) + TELEGRAM_CHAT_ID (your own chat with the bot) — both
+// unset means silent no-op, same contract as the Resend hop.
+async function notifyTelegram(payload: {
+  name: string;
+  email: string;
+  company: string;
+  sector: string;
+  message: string;
+  source: string;
+}) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return; // silently no-op if not configured
+
+  // Plain text, no parse_mode — lead fields are user input and Telegram
+  // Markdown/HTML parsing on untrusted text is an injection foot-gun.
+  const text =
+    `🟢 Nieuwe lead — juandiazllc.com\n\n` +
+    `Naam:    ${payload.name || "(niet ingevuld)"}\n` +
+    `Email:   ${payload.email}\n` +
+    `Bedrijf: ${payload.company || "(niet ingevuld)"}\n` +
+    `Sector:  ${payload.sector || "(niet ingevuld)"}\n` +
+    `Bron:    ${payload.source}\n\n` +
+    `${payload.message}`.slice(0, 3900); // Telegram cap is 4096 chars
+
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text }),
+    });
+  } catch {
+    // Swallow — the row is safe in Supabase, the push is a nicety.
+  }
+}
+
 async function notifyEmail(payload: {
   name: string;
   email: string;
@@ -98,8 +136,12 @@ export async function submitLead(
       return { status: "err", message: "Something went wrong. Try again." };
     }
 
-    // Fire-and-forget email notification. Don't await failure to the user.
-    await notifyEmail({ name, email, company, sector, message, source });
+    // Fire-and-forget notifications — email + Telegram in parallel.
+    // Both no-op when unconfigured and never fail the user.
+    await Promise.all([
+      notifyEmail({ name, email, company, sector, message, source }),
+      notifyTelegram({ name, email, company, sector, message, source }),
+    ]);
 
     return {
       status: "ok",
