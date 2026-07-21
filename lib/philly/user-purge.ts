@@ -30,6 +30,7 @@
 */
 
 import { getAuthPrisma } from '@/lib/philly/auth'
+import { purgeMarketingData } from '@/lib/philly/dsar-marketing'
 import { logger } from '@/lib/philly/logger'
 
 const HARD_PURGE_AFTER_DAYS = 30
@@ -41,6 +42,15 @@ export interface HardPurgeResult {
   /** Number of calendar connections erased across all purged users (A-08).
    *  Each cascades to its CalendarChannel + SyncedCalendarEvent rows. */
   calendarConnectionsErased: number
+  /** Contact-form rows erased from the marketing store (Supabase), matched
+   *  on the purged users' email addresses. */
+  marketingLeadsErased: number
+  /** Newsletter rows erased from the marketing store. */
+  marketingSubscribersErased: number
+  /** False when the marketing store could not be reached. Erasure is then
+   *  INCOMPLETE for this run — personal data survives in Supabase and the
+   *  run must be retried. Never report success to a data subject on this. */
+  marketingStorePurged: boolean
   /** Cutoff timestamp — all soft-deletes older than this were processed. */
   cutoff: string
   /** Days threshold actually applied. */
@@ -84,8 +94,22 @@ export async function purgeStaleSoftDeletedUsers(opts: {
   })
 
   if (candidates.length === 0) {
-    return { purged: 0, calendarConnectionsErased: 0, cutoff: cutoff.toISOString(), days }
+    return {
+      purged: 0,
+      calendarConnectionsErased: 0,
+      marketingLeadsErased: 0,
+      marketingSubscribersErased: 0,
+      marketingStorePurged: true,
+      cutoff: cutoff.toISOString(),
+      days,
+    }
   }
+
+  /* Capture the real addresses before anonymization overwrites them —
+     the marketing store keys on email and nothing else, so once the
+     User row carries a synthetic `deleted-…` address the link to those
+     rows is gone for good. */
+  const emailsToPurge = candidates.map((c) => c.email)
 
   const now = new Date()
   let purged = 0
@@ -149,13 +173,35 @@ export async function purgeStaleSoftDeletedUsers(opts: {
     }
   }
 
+  /* Second store. Runs after the CRM loop so a Supabase outage cannot
+     stall the anonymization we can complete — but the result is
+     reported honestly rather than folded into a success count. */
+  const marketing = await purgeMarketingData(emailsToPurge)
+  if (!marketing.available) {
+    logger.error('hard-purge: marketing store NOT purged — erasure incomplete', {
+      error: marketing.error,
+      affectedUsers: emailsToPurge.length,
+    })
+  }
+
   logger.info('hard-purge: completed', {
     purged,
     calendarConnectionsErased,
+    marketingLeadsErased: marketing.leadsDeleted,
+    marketingSubscribersErased: marketing.subscribersDeleted,
+    marketingStorePurged: marketing.available,
     cutoff: cutoff.toISOString(),
     days,
     organizationId: opts.organizationId ?? 'all',
   })
 
-  return { purged, calendarConnectionsErased, cutoff: cutoff.toISOString(), days }
+  return {
+    purged,
+    calendarConnectionsErased,
+    marketingLeadsErased: marketing.leadsDeleted,
+    marketingSubscribersErased: marketing.subscribersDeleted,
+    marketingStorePurged: marketing.available,
+    cutoff: cutoff.toISOString(),
+    days,
+  }
 }

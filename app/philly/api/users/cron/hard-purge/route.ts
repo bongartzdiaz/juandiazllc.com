@@ -81,6 +81,22 @@ export async function POST(req: NextRequest) {
     })
   }
 
+  // Erasure spans two stores (CRM in MariaDB, marketing in Supabase). If
+  // the second could not be reached, personal data survives — so this
+  // must NOT read as a completed run. 500 makes the scheduler retry and
+  // any alerting fire; the CRM half is idempotent (already-anonymized
+  // rows are filtered out by the `deleted-` email prefix), so a retry is
+  // safe. The body still reports exactly what did succeed.
+  if (!result.marketingStorePurged) {
+    return NextResponse.json(
+      {
+        error: 'erasure incomplete — marketing store not purged',
+        data: { ...result, triggeredBy },
+      },
+      { status: 500 },
+    )
+  }
+
   return NextResponse.json({
     data: { ...result, triggeredBy },
   })
