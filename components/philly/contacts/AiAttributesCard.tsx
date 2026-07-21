@@ -16,6 +16,20 @@ export interface ContactAiAttributes {
   aiAttributesStatus?: string | null
   aiAttributesUpdatedAt?: string | null
   aiAttributesError?: string | null
+  /** "crm" | "crm+web:<host>" — provenance of the last run. */
+  aiAttributesSources?: string | null
+}
+
+/* Turn the stored provenance string into operator-readable text.
+   Shown next to the timestamp so it is always visible which sources
+   produced the inference — GDPR Art. 15 + AI Act Art. 50 transparency
+   (see docs/legal/DPIA-AI-ATTRIBUTES.md §4). */
+export function describeSources(sources?: string | null): string | null {
+  if (!sources) return null
+  if (sources === 'crm') return 'From CRM data only'
+  const web = sources.match(/^crm\+web:(.+)$/)
+  if (web) return `From CRM data + ${web[1]}`
+  return null
 }
 
 type Props = {
@@ -159,6 +173,9 @@ export function AiAttributesCard({ contactId, attrs, onUpdated }: Props) {
             {attrs.aiAttributesUpdatedAt && (
               <div style={{ fontSize: 11, color: 'var(--txt3)' }}>
                 Updated {new Date(attrs.aiAttributesUpdatedAt).toLocaleString()}
+                {describeSources(attrs.aiAttributesSources) && (
+                  <> · {describeSources(attrs.aiAttributesSources)}</>
+                )}
               </div>
             )}
           </div>

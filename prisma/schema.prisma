@@ -311,6 +311,10 @@ model Contact {
   aiAttributesStatus     String?   // "pending" | "ready" | "error" (null = never run)
   aiAttributesUpdatedAt  DateTime?
   aiAttributesError      String?   @db.Text // last error message if status=error
+  // Provenance of the last run: "crm" or "crm+web:<host>". Required for
+  // GDPR Art. 15 — a data subject may ask which sources fed the
+  // inference. See docs/legal/DPIA-AI-ATTRIBUTES.md §1.2a.
+  aiAttributesSources    String?
 
   organization    Organization     @relation(fields: [organizationId], references: [id])
   contactProjects ContactProject[]

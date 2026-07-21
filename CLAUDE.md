@@ -213,19 +213,29 @@ through NL/DE/ES on `/work`, `/insights`, `/sectors`, `/signals`,
 
 ### Pending for the next session
 
+> ⚠️ **This list is historical (April 2026) and items 1, 2 and 4 were
+> already shipped long before they were struck through here.** It has
+> misled two separate sessions into "building" finished features.
+> **Verify against the code before acting on anything in this block.**
+
 **Top of queue (already authorized by the user with "Lets go and do it all"):**
-1. Wire up `/tools/energy-roi` page — server wrapper for the already-shipped
-   `EnergyRoi` component. Probably link from `/sectors/energy` and add to
-   the sitemap. All dict keys exist (`roi.*`).
-2. **Vercel AI SDK v5 — Attio-style AI Attributes on contacts.** Add a
-   server action that takes a contact row, calls the AI SDK with a
-   prompt template, and writes back structured attributes (industry,
-   ICP fit score, summary). Background job + UI surface in
-   `/philly/contacts/[id]`.
+1. ~~Wire up `/tools/energy-roi` page~~ — **DONE**, shipped in PR #9
+   (`9038b9e`) with sitemap entry + two CTAs from `/sectors/energy`.
+   Confirmed 2026-05-07.
+2. ~~**Vercel AI SDK v5 — Attio-style AI Attributes on contacts.**~~ —
+   **DONE**, also shipped in PR #9. `lib/philly/ai/contact-attributes.ts`,
+   `POST /philly/api/contacts/[id]/ai-attributes`,
+   `components/philly/contacts/AiAttributesCard.tsx`, schema fields
+   `aiIndustry` / `aiIcpFit` / `aiSummary` / `aiAttributesStatus`.
+   Built as an API route, not a server action. Confirmed 2026-07-21.
 3. **SWR rollout across dashboard pages.** Currently most /philly pages
    do `async` server fetches on every nav. Wrap list queries in SWR so
    navigation feels instant + background revalidates. ~56 pages touched.
-4. **`@vercel/otel` + Sentry SLOs** on login, create-deal, AI-action.
+   *(Not verified — check before starting.)*
+4. ~~**`@vercel/otel` + Sentry SLOs** on login, create-deal, AI-action.~~
+   — **DONE**; all three paths wrapped in `withSpan`. The `@vercel/otel`
+   half was deliberately dropped (peer-dep conflict with Sentry 9); see
+   the SLO section at the top of this file.
 
 **Deferred (Bundle 4+, flagged but not scheduled):**
 - CopilotKit inline-generative-UI
@@ -1207,3 +1217,67 @@ is reliable). Site-health curl/WebFetch from the headless env is blocked
 by Cloudflare — the UptimeRobot task in MANUAL_TASKS.md is the fix; until
 it's set up, report the health checks as "can't verify from headless env,"
 not as failures. Ahrefs Part C = "plan insufficient / GSC not wired."
+
+### 2026-07-21 — AI contact attributes: web enrichment + compliance correction
+
+Started as "build the AI Attributes feature" from the stale pending
+list above. **It was already shipped in PR #9.** Verified before
+writing code; the pending list is now annotated so this stops
+happening. Real work became the one genuine gap (optional website
+enrichment) plus two compliance defects found on the way.
+
+**Feature — optional company-homepage enrichment (off by default)**
+- `lib/philly/ai/company-domain.ts` (NEW) — pure derivation of a
+  company URL from an email address. Refuses consumer mailboxes
+  (~45 domains incl. NL/BE/DE/ES ISPs), disposable/relay domains,
+  and bare public suffixes; strips subdomains and paths so only a
+  bare `https://<registrable-domain>` can ever be produced. This is
+  the gate that decides whether third-party data is fetched at all,
+  so it carries the heaviest test coverage.
+- `lib/philly/ai/scrape-contact-site.ts` (NEW) — Firecrawl v1 client.
+  Single homepage, `onlyMainContent`, 8k-char cap, 8s abort (inside
+  the 15s AI_ACTION SLO). Never throws; every failure returns a typed
+  `reason` and the caller falls back to CRM-only.
+- `contact-attributes.ts` — `GenerateInput` gains `websiteContent` /
+  `websiteUrl`; `runAndPersistContactAttributes` gains
+  `enrichFromWeb?: boolean`. Scrape is best-effort and non-fatal.
+- **Prompt-injection hardening.** Scraped pages are third-party
+  controlled, so this is a real vector, not a theoretical one.
+  Defence in depth: untrusted-content fences + a system-prompt clause
+  telling the model to ignore embedded directives (and to treat one
+  as evidence the source is untrustworthy); forged fence markers
+  stripped from the body before wrapping; Zod schema caps what any
+  successful injection could emit; 8k truncation. `systemPrompt` and
+  `userPrompt` exported specifically so these assertions are direct.
+- Schema: `Contact.aiAttributesSources` (`"crm"` | `"crm+web:<host>"`).
+  Migration pending operator-side (`ai_attributes_sources`).
+- UI: `AiAttributesCard` shows "From CRM data only" / "From CRM data
+  + acmesolar.nl" next to the timestamp.
+
+**Compliance — two defects found, neither introduced by this work**
+1. **The DPIA lived only in the `deus-shared-port` worktree**, never
+   in the source-of-truth repo. Copied to `docs/legal/` and revised:
+   new §1.2a (external source + enforced-constraint table mapping
+   each promise to the code that keeps it), reworked §2.2 LIA and
+   §2.3 minimisation to distinguish the default config from the
+   enriched one, new risks 9-11 (prompt injection, sub-processor
+   exposure, sole-trader conflation), §5 now records that **§1.2a is
+   not signed off** and web enrichment must not be enabled until a
+   DPO reviews it, plus a new §6 open-items list.
+2. **`_drafts/legal/subprocessors-en.md` was factually wrong.** It
+   stated DEUS uses no third-party AI APIs and transfers no data
+   outside the EEA, while the code has called Anthropic's hosted API
+   since PR #9 — and the DPIA's own risk 5 assumes an Anthropic DPA.
+   That document is destined for `/legal/subprocessors`, so publishing
+   it would have been a false statement to customers. Added a
+   DO-NOT-PUBLISH banner explaining the discrepancy, corrected rows
+   with `[VERIFY]` markers for entity/region/DPA (not invented), and
+   a conditional-sub-processor table for Firecrawl.
+
+**Deliberately NOT done**: enabling `FIRECRAWL_API_KEY` anywhere.
+The feature is dark until legal sign-off — see MANUAL_TASKS.md.
+
+483/483 tests green (65 new), typecheck clean. Note `npm test`
+without exclusions also picks up `diaz-editor-gtm/` and other
+untracked scratch dirs' node_modules and reports 3 spurious file
+failures; the real suite is clean.

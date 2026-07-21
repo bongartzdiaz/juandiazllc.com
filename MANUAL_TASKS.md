@@ -3,6 +3,59 @@
 Every item here is a one-time human action that unblocks code that's
 already shipped. Strike through (`~~...~~`) when done.
 
+## AI contact attributes — web enrichment (2026-07-21)
+
+### 1. Database migration (required — the code expects the column)
+
+```bash
+npx prisma migrate dev --name ai_attributes_sources
+```
+
+Adds `Contact.aiAttributesSources` — records whether an enrichment run
+used CRM data only or also read a company homepage. Needed for GDPR
+Art. 15 ("which sources did you use about me").
+
+### 2. Web enrichment — LEGAL GATE, do not enable yet
+
+`FIRECRAWL_API_KEY` is **deliberately left unset**. The code ships
+safe-by-default: with no key, enrichment behaves exactly as before
+(CRM data only) and never makes an external request.
+
+**Before setting it in any environment with real contact data:**
+
+- [ ] Read `docs/legal/DPIA-AI-ATTRIBUTES.md` §1.2a and risks 9-11
+- [ ] Get DPO/legal sign-off on §1.2a — §5 records that this is **not
+      yet obtained**, and residual risk 11 (sole-trader/personal-domain
+      conflation) is accepted rather than eliminated
+- [ ] Sign a DPA with Firecrawl and confirm their region + transfer
+      mechanism
+- [ ] Update `_drafts/legal/subprocessors-en.md` (Firecrawl row has
+      `[VERIFY]` placeholders) and notify customers 30 days ahead, as
+      that document promises
+
+Only then:
+
+```bash
+npx vercel env add FIRECRAWL_API_KEY production
+```
+
+### 3. Sub-processor list is factually wrong — fix independently
+
+`_drafts/legal/subprocessors-en.md` claimed DEUS uses no third-party AI
+APIs and transfers no data outside the EEA. The shipped code calls
+Anthropic's hosted API. The draft now carries a DO-NOT-PUBLISH banner
+and corrected rows with `[VERIFY]` markers.
+
+- [ ] Confirm the Anthropic legal entity, region, and transfer
+      mechanism; fill the placeholders
+- [ ] Confirm an Anthropic DPA + SCCs actually exist (the DPIA's
+      risk-5 mitigation assumes they do)
+- [ ] Decide: correct the public claim, or finish the Hetzner
+      self-hosting cutover so the original claim becomes true
+
+**This blocks publishing `/legal/subprocessors`.** It is independent of
+the web-enrichment feature — it was already inaccurate.
+
 ## UptimeRobot monitoring — site health checks (2026-07-18)
 
 The daily SEO pulse cron can't reach juandiazllc.com directly (Cloudflare
