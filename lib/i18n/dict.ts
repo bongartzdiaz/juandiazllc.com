@@ -229,7 +229,7 @@ const en: Dict = {
   "ventures.label": "◉ 03 — Ventures",
   "ventures.title.a": "The playbook,",
   "ventures.title.b": "in motion.",
-  "ventures.sub": "Live products under the holding — each one the five-phase playbook applied to a real sector. Proof, not pitch. Visit any of them.",
+  "ventures.sub": "Live products under the holding, each one the five phases applied to a different sector. They are running today — click through and judge for yourself.",
 
   // Signals section head
   "signals.label": "◉ 04 — Signals",
@@ -1014,7 +1014,7 @@ const nl: Dict = {
   "ventures.label": "◉ 03 — Ventures",
   "ventures.title.a": "De aanpak,",
   "ventures.title.b": "in actie.",
-  "ventures.sub": "Live producten onder de holding — elk een toepassing van diezelfde vijf fases op een andere sector. Bewijs, geen verkoopverhaal. Klik er gerust doorheen.",
+  "ventures.sub": "Live producten onder de holding, elk dezelfde vijf fases toegepast op een andere sector. Ze draaien vandaag — klik erdoorheen en oordeel zelf.",
 
   "signals.label": "◉ 04 — Signalen",
   "signals.title.a": "Veldnotities,",
@@ -1786,7 +1786,7 @@ const de: Dict = {
   "ventures.label": "◉ 03 — Ventures",
   "ventures.title.a": "Die Methode,",
   "ventures.title.b": "in Bewegung.",
-  "ventures.sub": "Live-Produkte unter der Holding — jedes davon dieselben fünf Phasen, angewendet auf eine andere Branche. Beweis statt Versprechen. Besuchen Sie sie ruhig.",
+  "ventures.sub": "Live-Produkte unter der Holding, jedes dieselben fünf Phasen auf eine andere Branche angewendet. Sie laufen heute — klicken Sie sich durch und urteilen Sie selbst.",
 
   "signals.label": "◉ 04 — Signale",
   "signals.title.a": "Feldnotizen,",
@@ -2558,7 +2558,7 @@ const es: Dict = {
   "ventures.label": "◉ 03 — Proyectos",
   "ventures.title.a": "El método,",
   "ventures.title.b": "en marcha.",
-  "ventures.sub": "Productos vivos bajo la holding — cada uno las mismas cinco fases aplicadas a otro sector. Prueba, no promesa. Entra a verlos.",
+  "ventures.sub": "Productos vivos bajo la holding, cada uno las mismas cinco fases aplicadas a otro sector. Están funcionando hoy — entra y júzgalo tú mismo.",
 
   "signals.label": "◉ 04 — Señales",
   "signals.title.a": "Notas de campo,",
