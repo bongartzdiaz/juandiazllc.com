@@ -36,15 +36,17 @@ carelessness to exactly the buyer who is comparing carefully.
 | Founding Beta price | €99, one-time | ✅ verified — `unit_amount: 9900` in `diaz-beta-checkout` |
 | Founding Beta cap | 100 spots | ✅ verified — `public_beta_status.cap = 100` |
 | Founding spots taken | 2 | ✅ verified — `public_beta_status.sold`, changes; never hardcode |
-| Regular price after beta | **NEEDS A DECISION** | ⚠️ `€997` on site, `€1,000` in pv-string-sizer README |
+| Regular price after beta | €997, one-time | ✅ decided 2026-07-21 — chosen over €1,000 because it already appeared on the site, pricing page and checkout |
 | Subscription | None. One-time purchase. | ✅ verified — Stripe `mode: 'payment'`, not `subscription` |
 | Updates | Lifetime | ✅ product promise, no expiry in licence issuance |
 | Trial | 14 days, no card | ✅ verified — `diaz-trial-init` |
 | Educational tier | €500 | ✅ live Payment Link on the homepage |
 
-**Action:** pick €997 or €1,000 and make both surfaces agree. €997 reads as
-pricing psychology; €1,000 reads as confident. Either is fine — both at once
-is not.
+~~**Action:** pick €997 or €1,000 and make both surfaces agree.~~ **Done
+2026-07-21.** €997 it is; the pv-string-sizer README was corrected to match.
+The remaining risk is the same one repeating: four surfaces carry prices, and
+nothing enforces that they agree. When this number next changes, grep for the
+old value across all four before calling it done.
 
 ## Diaz Editor — product
 
@@ -61,22 +63,35 @@ is not.
 
 ## Competitor pricing — every one needs a dated source
 
-⚠️ **All figures below are unverified.** They are the numbers currently in use,
-not confirmed prices. Before the next copy change, check each against the
-vendor's own pricing page and record the date. An out-of-date competitor price
-in an ad is a legal problem, not a typo.
+Checked 2026-07-21 against each vendor's own checkout, US pricing in USD.
+**Three of the four were wrong**, and one product no longer exists under the
+name we used.
 
-| Product | Figure in use | Where | Source | Checked |
+| Product | Was in copy | Actual | Source | Checked |
 | --- | --- | --- | --- | --- |
-| AutoCAD LT | `$455/yr` | diazatlas.com | — | ⚠️ never |
-| AutoCAD LT | `$575/year` | social captions | — | ⚠️ conflicts with the above |
-| SketchUp Pro | `$349/yr` | both | — | ⚠️ never |
-| Fusion 360 | `$545/yr` | diazatlas.com | — | ⚠️ never |
-| Revit | `$2,805/year` | social captions | — | ⚠️ never |
-| AutoCAD (full) | `~€2,203/yr` | GTM claims memo | Autodesk list price, "from" | dated, pre-publish |
+| AutoCAD LT | `$455/yr` (site), `$575/year` (captions) | **$540/year** | autodesk.com/products/autocad-lt/buy | 2026-07-21 |
+| Revit | `$2,805/year` (captions) | **$3,005/year** | autodesk.com/products/revit/buy | 2026-07-21 |
+| Autodesk Fusion | `$545/yr` as "Fusion 360" (site) | **$680/year** list, $510 first-year promo | autodesk.com/products/fusion-360/buy | 2026-07-21 |
+| SketchUp Pro | `$349/yr` | ⚠️ unverified — the Trimble pricing page does not render for automated fetch | — | never |
 
-**Action:** one person, one afternoon, six vendor pages. Then this table is an
-asset instead of a liability.
+Three notes that matter more than the numbers:
+
+1. **"Fusion 360" is now "Autodesk Fusion".** Naming a competitor's product
+   wrong is a small thing that a comparison-shopper notices immediately.
+2. **Fusion's price depends on tier and promo.** $680 is list for Fusion for
+   Design; there is a 25%-off first year at $510, and cheaper tiers exist. A
+   single number for Fusion is always going to be an approximation — say which
+   tier, or drop it.
+3. **These are USD, US-geolocated.** Diaz Editor is priced in EUR for EU
+   buyers. Comparing €99 against a dollar figure invites the reader to do a
+   conversion you did not intend. Consider quoting EU pricing for the
+   comparison, or stating the currency assumption.
+
+~~**Action:** one person, one afternoon, six vendor pages.~~ **Done for three
+of four on 2026-07-21.** SketchUp Pro still needs a human with a browser.
+Re-check all of them before any campaign that leans on the comparison — vendor
+pricing moves, and a stale figure in an ad is a legal problem rather than a
+typo.
 
 ## juandiazllc.com
 
