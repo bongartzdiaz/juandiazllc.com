@@ -250,10 +250,10 @@ const en: Dict = {
   "hud.cmd.hint": "Command palette (⌘K)",
 
   // Marquee + Kinetic
-  "marquee.full": "Revenue engines <span class=\"sep\">✦</span> <em>Energy</em> · Real estate · Hospitality <span class=\"sep\">✦</span> Construction-trained <span class=\"sep\">✦</span> Five phases <span class=\"sep\">✦</span> <em>Blueprint</em> before build <span class=\"sep\">✦</span> Shipped, not pitched <span class=\"sep\">✦</span>",
+  "marquee.full": "Voltafy <span class=\"sep\">✦</span> Performance Tracker <span class=\"sep\">✦</span> Help Mij Besparen <span class=\"sep\">✦</span> <em>Energy</em> · Real estate · Hospitality <span class=\"sep\">✦</span> <em>Blueprint</em> before build <span class=\"sep\">✦</span> Amsterdam ↔ Philly <span class=\"sep\">✦</span>",
   "kinetic.transmission": "◉ Transmission 001",
   "kinetic.subtitle": "— Building for 2027 / Amsterdam → Everywhere",
-  "kinetic.body": "Honest <em>energy</em> tools <span class=\"o\"></span> Built by operators <span class=\"o\"></span> Shipped, not pitched <span class=\"o\"></span>",
+  "kinetic.body": "Honest <em>energy</em> tools <span class=\"o\"></span> Solar, batteries, and the maths behind them <span class=\"o\"></span> Built where the work happens <span class=\"o\"></span>",
 
   // Contact section
   "contact.section.label": "◉ 05 — Direct line",
@@ -1032,10 +1032,10 @@ const nl: Dict = {
   "hud.sound.off": "◐ Geluid uit",
   "hud.cmd.hint": "Commandopalet (⌘K)",
 
-  "marquee.full": "Omzetmotoren <span class=\"sep\">✦</span> <em>Energie</em> · Vastgoed · Hospitality <span class=\"sep\">✦</span> Bouwkundig opgeleid <span class=\"sep\">✦</span> Vijf fases <span class=\"sep\">✦</span> <em>Blueprint</em> vóór de bouw <span class=\"sep\">✦</span> Opgeleverd, niet verkocht <span class=\"sep\">✦</span>",
+  "marquee.full": "Voltafy <span class=\"sep\">✦</span> Performance Tracker <span class=\"sep\">✦</span> Help Mij Besparen <span class=\"sep\">✦</span> <em>Energie</em> · Vastgoed · Hospitality <span class=\"sep\">✦</span> Eerst het <em>ontwerp</em>, dan bouwen <span class=\"sep\">✦</span> Amsterdam ↔ Philly <span class=\"sep\">✦</span>",
   "kinetic.transmission": "◉ Uitzending 001",
   "kinetic.subtitle": "— Bouwen voor 2027 / Amsterdam → overal",
-  "kinetic.body": "Eerlijke <em>energie</em>-tools <span class=\"o\"></span> Gebouwd door operators <span class=\"o\"></span> Opgeleverd, niet verkocht <span class=\"o\"></span>",
+  "kinetic.body": "Eerlijke <em>energie</em>-tools <span class=\"o\"></span> Zon, batterijen en de rekensom erachter <span class=\"o\"></span> Gebouwd waar het werk gebeurt <span class=\"o\"></span>",
 
   "contact.section.label": "◉ 05 — Directe lijn",
 
@@ -1804,10 +1804,10 @@ const de: Dict = {
   "hud.sound.off": "◐ Ton aus",
   "hud.cmd.hint": "Befehlspalette (⌘K)",
 
-  "marquee.full": "Umsatzmotoren <span class=\"sep\">✦</span> <em>Energie</em> · Immobilien · Hospitality <span class=\"sep\">✦</span> Bauingenieurlich geschult <span class=\"sep\">✦</span> Fünf Phasen <span class=\"sep\">✦</span> <em>Bauplan</em> vor dem Bau <span class=\"sep\">✦</span> Geliefert, nicht verkauft <span class=\"sep\">✦</span>",
+  "marquee.full": "Voltafy <span class=\"sep\">✦</span> Performance Tracker <span class=\"sep\">✦</span> Help Mij Besparen <span class=\"sep\">✦</span> <em>Energie</em> · Immobilien · Hospitality <span class=\"sep\">✦</span> Erst der <em>Entwurf</em>, dann der Bau <span class=\"sep\">✦</span> Amsterdam ↔ Philly <span class=\"sep\">✦</span>",
   "kinetic.transmission": "◉ Übertragung 001",
   "kinetic.subtitle": "— Bauen für 2027 / Amsterdam → überall",
-  "kinetic.body": "Ehrliche <em>Energie</em>-Tools <span class=\"o\"></span> Von Betreibern gebaut <span class=\"o\"></span> Geliefert, nicht verkauft <span class=\"o\"></span>",
+  "kinetic.body": "Ehrliche <em>Energie</em>-Tools <span class=\"o\"></span> Solar, Speicher und die Rechnung dahinter <span class=\"o\"></span> Gebaut, wo die Arbeit stattfindet <span class=\"o\"></span>",
 
   "contact.section.label": "◉ 05 — Direktleitung",
 
@@ -2576,10 +2576,10 @@ const es: Dict = {
   "hud.sound.off": "◐ Sonido desactivado",
   "hud.cmd.hint": "Paleta de comandos (⌘K)",
 
-  "marquee.full": "Motores de ingresos <span class=\"sep\">✦</span> <em>Energía</em> · Inmobiliario · Hostelería <span class=\"sep\">✦</span> Formado en construcción <span class=\"sep\">✦</span> Cinco fases <span class=\"sep\">✦</span> <em>Plano</em> antes de construir <span class=\"sep\">✦</span> Entregado, no vendido <span class=\"sep\">✦</span>",
+  "marquee.full": "Voltafy <span class=\"sep\">✦</span> Performance Tracker <span class=\"sep\">✦</span> Help Mij Besparen <span class=\"sep\">✦</span> <em>Energía</em> · Inmobiliario · Hostelería <span class=\"sep\">✦</span> Primero el <em>diseño</em>, después la obra <span class=\"sep\">✦</span> Amsterdam ↔ Philly <span class=\"sep\">✦</span>",
   "kinetic.transmission": "◉ Transmisión 001",
   "kinetic.subtitle": "— Construyendo para 2027 / Ámsterdam → a todas partes",
-  "kinetic.body": "Herramientas <em>energéticas</em> honestas <span class=\"o\"></span> Construidas por operadores <span class=\"o\"></span> Entregado, no vendido <span class=\"o\"></span>",
+  "kinetic.body": "Herramientas <em>energéticas</em> honestas <span class=\"o\"></span> Solar, baterías y los números detrás <span class=\"o\"></span> Construidas donde ocurre el trabajo <span class=\"o\"></span>",
 
   "contact.section.label": "◉ 05 — Línea directa",
 
