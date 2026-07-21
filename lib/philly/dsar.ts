@@ -12,13 +12,18 @@
    --------------------------------------------------------------- */
 
 import type { PrismaClient } from '@prisma/client'
+import { fetchMarketingData } from '@/lib/philly/dsar-marketing'
 
+// 1.3.0 — adds marketing_leads + marketing_subscribers slices. Those
+// live in Supabase Postgres, not the CRM's MariaDB, and were previously
+// absent from every export: a subject asking "what do you hold on me"
+// got an answer covering only half the estate.
 // 1.2.0 — adds synced_calendar_events slice (push-sync persistence).
 // 1.1.0 — adds calendar_connections + calendar_channels slices.
 // Sensitive fields (encrypted tokens, authSecret, providerAccountId,
 // syncToken/deltaLink) are explicitly omitted — same pattern as
 // passwordHash + invite token in 1.0.0.
-export const DSAR_EXPORT_VERSION = '1.2.0'
+export const DSAR_EXPORT_VERSION = '1.3.0'
 
 export type DsarScope = 'user' | 'org'
 
@@ -36,6 +41,11 @@ export interface DsarManifest {
   calendar_connection_count: number
   calendar_channel_count: number
   synced_calendar_event_count: number
+  marketing_lead_count: number
+  marketing_subscriber_count: number
+  /** False when the marketing store could not be read — the export is
+   *  then knowingly incomplete and says so in `notice`. */
+  marketing_store_included: boolean
   notice: string
 }
 
@@ -51,6 +61,10 @@ export interface DsarArchive {
   calendar_connections: unknown[]
   calendar_channels: unknown[]
   synced_calendar_events: unknown[]
+  /** Public contact-form submissions, matched on email address. */
+  marketing_leads: unknown[]
+  /** Newsletter signups, matched on email address. */
+  marketing_subscribers: unknown[]
   // Org-scope extras (omitted for user-scope exports)
   team?: unknown[]
   projects?: unknown[]
@@ -273,6 +287,17 @@ export async function buildDsarArchive({
     })
   }
 
+  /* ── Marketing store (Supabase, separate from the CRM's MariaDB) ──
+     Matched on email, the only identifier a public form submission
+     carries. Org-scope covers every teammate's address. */
+  const marketing = await fetchMarketingData(
+    scope === 'org'
+      ? (team as Array<{ email?: string }> | undefined)?.map((t) => t.email) ?? [
+          (user as { email?: string } | null)?.email,
+        ]
+      : [(user as { email?: string } | null)?.email],
+  )
+
   const manifest: DsarManifest = {
     export_version: DSAR_EXPORT_VERSION,
     generated_at: new Date().toISOString(),
@@ -287,12 +312,22 @@ export async function buildDsarArchive({
     calendar_connection_count: calendarConnections.length,
     calendar_channel_count: calendarChannels.length,
     synced_calendar_event_count: syncedCalendarEvents.length,
+    marketing_lead_count: marketing.leads.length,
+    marketing_subscriber_count: marketing.subscribers.length,
+    marketing_store_included: marketing.available,
     notice:
       'This export is generated under AVG/GDPR Art. 15 (right of access) ' +
       'and Art. 20 (data portability). Sensitive credentials (password ' +
       'hashes, 2FA secrets, invite tokens) are omitted. Audit log is ' +
       'capped at 5000 most recent entries; for the full log contact ' +
-      'privacy@lucen.ai.',
+      'privacy@lucen.ai. Marketing submissions are matched on exact ' +
+      'email address, so anything submitted with a different address is ' +
+      'not included.' +
+      (marketing.available
+        ? ''
+        : ' WARNING: the marketing store could not be reached, so ' +
+          'contact-form and newsletter records are MISSING from this ' +
+          'export. Request a re-export or contact privacy@lucen.ai.'),
   }
 
   return {
@@ -307,6 +342,8 @@ export async function buildDsarArchive({
     calendar_connections: calendarConnections,
     calendar_channels: calendarChannels,
     synced_calendar_events: syncedCalendarEvents,
+    marketing_leads: marketing.leads,
+    marketing_subscribers: marketing.subscribers,
     ...(scope === 'org' ? { team, projects, pipelines, invites } : {}),
   }
 }
