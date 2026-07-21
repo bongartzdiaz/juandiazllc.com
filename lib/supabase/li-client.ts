@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { getSecretKey, getSupabaseUrl } from "./keys";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _liClient: any = null;
@@ -41,9 +42,8 @@ let _liClient: any = null;
  */
 export function liClient() {
   if (_liClient) return _liClient;
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error("Missing SUPABASE_URL or SERVICE_ROLE_KEY for li schema");
+  const url = getSupabaseUrl();
+  const key = getSecretKey();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _liClient = createClient(url, key, { db: { schema: "li" } } as any);
   return _liClient;
