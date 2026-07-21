@@ -1,5 +1,31 @@
 "use server";
 
+/* ⚠️ NOT WIRED TO ANY FORM — see the note below before using this.
+ *
+ * This is a double opt-in flow: insert into `newsletter_subs` with a
+ * confirm_token, email a confirmation link, and only on confirmation does
+ * /api/newsletter/confirm mark the row confirmed.
+ *
+ * It cannot work today, for two independent reasons:
+ *
+ *   1. `newsletter_subs` does not exist. Not in this project's database, not
+ *      in any schema. Every call failed with "relation does not exist", which
+ *      is why the /insights signup captured nothing for its entire lifetime.
+ *   2. Confirmation needs RESEND_API_KEY, which is not configured. Creating
+ *      the table alone would be worse than the current state: signups would
+ *      appear to succeed and then sit unconfirmed forever, invisibly.
+ *
+ * On 2026-07-21 components/NewsletterForm.tsx was pointed at
+ * app/actions/subscribe.ts instead, which writes to `subscribers` and works.
+ * That is single opt-in — a step down in consent hygiene, taken because a
+ * visible working form beats an invisible broken one.
+ *
+ * To bring this back: create `newsletter_subs` (id, email, source, locale,
+ * confirm_token, confirmed_at, created_at) with an insert policy for `anon`,
+ * configure RESEND_API_KEY, then repoint NewsletterForm here and verify a
+ * confirmation mail actually arrives before trusting it.
+ */
+
 import { randomUUID } from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
