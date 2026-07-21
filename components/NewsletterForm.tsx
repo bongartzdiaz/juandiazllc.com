@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { subscribeToNewsletter, type NewsletterState } from "@/app/actions/newsletter";
+import { subscribe, type SubscribeState } from "@/app/actions/subscribe";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 
 // Compact newsletter signup. Writes to Supabase `newsletter_subs`
@@ -14,7 +14,7 @@ import { useLocale } from "@/lib/i18n/LocaleProvider";
 // Intentionally minimal markup so it drops into any section without
 // a layout fight. Parent controls surrounding spacing.
 
-const initial: NewsletterState = { status: "idle" };
+const initial: SubscribeState = { status: "idle" };
 
 type Props = {
   source?: string;
@@ -29,7 +29,7 @@ export function NewsletterForm({
   headline,
   sub,
 }: Props) {
-  const [state, formAction, pending] = useActionState(subscribeToNewsletter, initial);
+  const [state, formAction, pending] = useActionState(subscribe, initial);
   const { locale, t } = useLocale();
   const resolvedHeadline = headline ?? t("nl.headline");
   const resolvedSub = sub ?? t("nl.sub");
