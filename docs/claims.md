@@ -36,15 +36,17 @@ carelessness to exactly the buyer who is comparing carefully.
 | Founding Beta price | €99, one-time | ✅ verified — `unit_amount: 9900` in `diaz-beta-checkout` |
 | Founding Beta cap | 100 spots | ✅ verified — `public_beta_status.cap = 100` |
 | Founding spots taken | 2 | ✅ verified — `public_beta_status.sold`, changes; never hardcode |
-| Regular price after beta | **NEEDS A DECISION** | ⚠️ `€997` on site, `€1,000` in pv-string-sizer README |
+| Regular price after beta | €997, one-time | ✅ decided 2026-07-21 — chosen over €1,000 because it already appeared on the site, pricing page and checkout |
 | Subscription | None. One-time purchase. | ✅ verified — Stripe `mode: 'payment'`, not `subscription` |
 | Updates | Lifetime | ✅ product promise, no expiry in licence issuance |
 | Trial | 14 days, no card | ✅ verified — `diaz-trial-init` |
 | Educational tier | €500 | ✅ live Payment Link on the homepage |
 
-**Action:** pick €997 or €1,000 and make both surfaces agree. €997 reads as
-pricing psychology; €1,000 reads as confident. Either is fine — both at once
-is not.
+~~**Action:** pick €997 or €1,000 and make both surfaces agree.~~ **Done
+2026-07-21.** €997 it is; the pv-string-sizer README was corrected to match.
+The remaining risk is the same one repeating: four surfaces carry prices, and
+nothing enforces that they agree. When this number next changes, grep for the
+old value across all four before calling it done.
 
 ## Diaz Editor — product
 
