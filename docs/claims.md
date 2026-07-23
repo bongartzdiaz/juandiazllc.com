@@ -72,7 +72,8 @@ name we used.
 | AutoCAD LT | `$455/yr` (site), `$575/year` (captions) | **$540/year** | autodesk.com/products/autocad-lt/buy | 2026-07-21 |
 | Revit | `$2,805/year` (captions) | **$3,005/year** | autodesk.com/products/revit/buy | 2026-07-21 |
 | Autodesk Fusion | `$545/yr` as "Fusion 360" (site) | **$680/year** list, $510 first-year promo | autodesk.com/products/fusion-360/buy | 2026-07-21 |
-| SketchUp Pro | `$349/yr` | ⚠️ unverified — the Trimble pricing page does not render for automated fetch | — | never |
+| SketchUp Pro | `$349/yr`, `€349`, "349 Euro" | **$399/year** ($33.25/mo billed annually) | sketchup.trimble.com/en/plans-and-pricing | 2026-07-23 |
+| SketchUp Studio | `$699/yr` | **$819/year** ($68.25/mo billed annually) | sketchup.trimble.com/en/plans-and-pricing | 2026-07-23 |
 
 Three notes that matter more than the numbers:
 
@@ -82,13 +83,17 @@ Three notes that matter more than the numbers:
    Design; there is a 25%-off first year at $510, and cheaper tiers exist. A
    single number for Fusion is always going to be an approximation — say which
    tier, or drop it.
-3. **These are USD, US-geolocated.** Diaz Editor is priced in EUR for EU
-   buyers. Comparing €99 against a dollar figure invites the reader to do a
-   conversion you did not intend. Consider quoting EU pricing for the
-   comparison, or stating the currency assumption.
+3. **These are USD — and that is the vendor's own currency.** Trimble and
+   Autodesk list in USD on their own pricing pages; even SketchUp's German
+   locale shows "$33,25 USD". Every €-denominated competitor figure our copy
+   ever carried was an invention, not a vendor price. Quote USD, always.
 
-~~**Action:** one person, one afternoon, six vendor pages.~~ **Done for three
-of four on 2026-07-21.** SketchUp Pro still needs a human with a browser.
+~~**Action:** one person, one afternoon, six vendor pages.~~ **Done, all four
+verified** (three on 2026-07-21, SketchUp on 2026-07-23 — the Trimble page
+rendered for automated fetch on retry). The 2026-07-23 sweep (diaz-editor
+PR #431) corrected 323 files including the `.md` blog sources, EUR variants
+and derived 5-year totals the first sweep missed, plus the programmatic-SEO
+generator templates so regeneration cannot reintroduce old numbers.
 Re-check all of them before any campaign that leans on the comparison — vendor
 pricing moves, and a stale figure in an ad is a legal problem rather than a
 typo.
