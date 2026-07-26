@@ -53,7 +53,9 @@ old value across all four before calling it done.
 | Claim | Status |
 | --- | --- |
 | 3D building editor + 2D CAD module | ✅ |
-| DXF import and export | ✅ |
+| DXF **export** | ✅ verified — `packages/editor/src/lib/dxf-export.ts`, ships in v0.4.46 |
+| DXF **import** | ⚠️ merged 2026-07-26, but **in no downloadable build yet**. Do not claim until a release ships with it. Walls only, from user-selected layers |
+| **IFC** (any version, import or export) | ❌ **NEVER CLAIM THIS.** Zero lines of IFC code exist. See below |
 | **Native DWG** | ❌ **NEVER CLAIM THIS.** DXF only. See `project_diaz_editor_gtm_claims` |
 | Works offline, no cloud | ✅ desktop app, local files |
 | PDF export with title block + bill of materials | ✅ |
@@ -107,6 +109,37 @@ typo.
 | Construction-management background | ✅ |
 | Ventures named as live: Voltafy, Performance Tracker, Help Mij Besparen, Salderingsregeling 2027 | ✅ real projects — but see below |
 | Client results, revenue figures, testimonials | ❌ none exist; do not imply any |
+
+## The IFC claim — how a feature that never existed reached 1,643 places
+
+Counted on `main` 2026-07-26: **1,643 IFC mentions across 413 files**, against
+**zero lines of IFC code** in `packages/` or `apps/`. Most of it was one
+templated line repeated by the programmatic-SEO generators:
+
+> *"DXF + IFC import — works with any architect, contractor or installer"*
+
+A second template also claimed **DWG** — the one format the rules here have
+always forbidden:
+
+> *"DXF + IFC import/export — works with architects (IFC), contractors (DWG),
+> and CNC workshops (DXF)"*
+
+Corrected 2026-07-26 (diaz-editor PR, phase 3): 1,303 templated mentions swept
+mechanically, the remaining ~102 rewritten by hand because they were embedded
+in advice paragraphs — including a whole H2 section explaining how to run an
+IFC workflow that does not exist.
+
+**Two lessons worth keeping:**
+
+1. **A generator multiplies a claim.** One wrong sentence in
+   `_gen-programmatic-seo*.py` became a thousand. Any claim entering a template
+   deserves the scrutiny of a claim entering a contract — fix the generator, or
+   the sweep undoes itself on the next regeneration.
+2. **"Built" is not "shipped".** DXF import was merged and tested on
+   2026-07-26, but the newest downloadable build (v0.4.46, 4 July) does not
+   contain it. Claiming it the day it merges is the same error as IFC, only
+   subtler: the buyer downloads and cannot find the feature. **A claim goes
+   live when the release does, not when the PR does.**
 
 **Careful with venture copy.** Describing a venture is fine. Implying it earned
 a specific outcome is not, unless the number is here with a source. The
