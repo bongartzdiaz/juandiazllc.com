@@ -1,0 +1,88 @@
+name: Retention (daily)
+
+# AVG art. 5(1)(e) + art. 17. Deze drie endpoints bestonden al maar werden door
+# NIETS aangeroepen — er is geen vercel.json in deze repo, geen pg_cron, geen
+# scheduler. Gevolg tot nu toe: de belofte "binnen 30 dagen definitief
+# verwijderd" (app/philly/api/me/route.ts) werd door geen enkel draaiend proces
+# nagekomen, en omdat de hard-purge de ENIGE aanroeper is van de
+# Supabase-lead-verwijdering, werden die leads ook nooit gewist.
+#
+# Waarom GitHub Actions en niet Vercel Cron:
+#   1. De routes zijn POST-only; Vercel Cron stuurt GET  → 405.
+#   2. De routes lezen de header `X-Cron-Secret`; Vercel Cron stuurt
+#      `Authorization: Bearer`  → 401.
+#   3. Uurlijkse crons vereisen een Vercel Pro-plan.
+# Vercel Cron zou dus drie wijzigingen aan beveiligingsgevoelige auth-code
+# vereisen. Een curl met de juiste header vereist er nul. Deze repo is publiek,
+# dus Actions-minuten zijn gratis.
+#
+# Vereist twee repo-secrets:
+#   CRON_SECRET  — exact dezelfde waarde als de Vercel-env-var CRON_SECRET
+#   SITE_URL     — optioneel; standaard https://juandiazllc.com
+
+on:
+  schedule:
+    # 03:00 UTC — buiten piek, na middernacht in elke EU-tijdzone.
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: retention-daily
+  cancel-in-progress: false
+
+jobs:
+  retention:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check secret is present
+        run: |
+          if [ -z "${{ secrets.CRON_SECRET }}" ]; then
+            echo "::error title=Missing secret::CRON_SECRET repo-secret niet gezet. Zonder dit draait er geen enkele retentiejob en blijft de 30-dagen-verwijderbelofte onvervuld."
+            exit 1
+          fi
+
+      - name: Run retention endpoints
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ secrets.SITE_URL || 'https://juandiazllc.com' }}
+        run: |
+          set -uo pipefail
+          failed=0
+
+          run_job() {
+            local name="$1" path="$2"
+            echo "→ ${name}"
+            # -sS: stil maar toon fouten. Body en status apart, zodat de status
+            # niet in de body verdwijnt.
+            local body status
+            body=$(curl -sS -X POST "${SITE_URL}${path}" \
+              -H "X-Cron-Secret: ${CRON_SECRET}" \
+              -H 'Content-Type: application/json' \
+              -w '\n%{http_code}' \
+              --max-time 120) || { echo "::error::${name}: curl faalde"; failed=1; return; }
+
+            status=$(printf '%s' "$body" | tail -n1)
+            body=$(printf '%s' "$body" | sed '$d')
+
+            if [ "$status" = "200" ]; then
+              echo "   ok (${status}) ${body}"
+            else
+              # Let op: de body kan een generieke 500 zijn; die loggen we, maar
+              # er staat per ontwerp geen PII in deze responses.
+              echo "::error title=${name} faalde::HTTP ${status} — ${body}"
+              failed=1
+            fi
+          }
+
+          # Volgorde is bewust: erasure eerst. Als de audit-prune zou falen,
+          # mag dat de AVG-verwijdering niet blokkeren.
+          run_job "GDPR hard-purge (30d)"        "/philly/api/users/cron/hard-purge"
+          run_job "Audit-log prune (365d)"       "/philly/api/audit/prune"
+          run_job "Calendar-channel prune (90d)" "/philly/api/calendar/cron/prune-channels"
+
+          if [ "$failed" -ne 0 ]; then
+            echo "::error title=Retentie onvolledig::Minstens één retentiejob faalde. Dit is een AVG-verplichting, geen optionele opruiming — onderzoek voordat de volgende run draait."
+            exit 1
+          fi
+          echo "Alle retentiejobs geslaagd."
