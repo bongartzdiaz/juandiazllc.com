@@ -315,10 +315,10 @@ export const HELP_ARTICLES: HelpArticle[] = [
     slug: 'where-data-lives',
     category: 'privacy',
     title: 'Where your data lives',
-    summary: 'Hetzner Falkenstein (Germany). EU-only sub-processors. No US data transfer.',
+    summary: 'Supabase, Vercel, Stripe Ireland, Resend. AI enrichment runs at Anthropic in the US.',
     body:
-      "Production runs on Hetzner Falkenstein, Germany — EU jurisdiction, no Schrems II concerns. Sub-processors are EU-resident or DPF-certified (Stripe Ireland, Resend EU region, etc.). Backups are stored in Backblaze B2 EU (Amsterdam). Database backups are encrypted at rest with AES-256.\n\nThe full sub-processor list is at /legal/subprocessors (or in the DPA when one is signed).",
-    tags: ['hosting', 'gdpr', 'eu', 'hetzner', 'data-residency', 'backups'],
+      "Your data sits with our hosting and service providers: Supabase (database and authentication), Vercel (application hosting), Stripe Payments Europe Ltd in Ireland (payments) and Resend (email).\n\nOne processing step leaves the EEA: AI-assisted contact enrichment sends the contact's name, email, phone, company and notes to Anthropic in the United States. That is the only transfer of personal data to a third country in the product today.\n\nThe hosting region of each provider is being confirmed and will be published in the sub-processor list. Ask us and we will send you the current version.",
+    tags: ['hosting', 'gdpr', 'data-residency', 'sub-processors', 'transfers'],
   },
 
   // ── Troubleshooting ────────────────────────────────────────────

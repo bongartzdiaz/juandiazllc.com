@@ -769,7 +769,7 @@ const en: Dict = {
   "pricing.faq.q5": "What happens if I go over a limit?",
   "pricing.faq.a5": "You get a notification at 80% of any limit. We won't block your workflow without warning. If you stay over the limit consistently, we'll suggest the right tier — usually upgrading. No surprise overage fees.",
   "pricing.faq.q6": "Where is my data stored?",
-  "pricing.faq.a6": "Hetzner Falkenstein, Germany. Backups in Amsterdam (Backblaze B2 EU). Your data never leaves the European Economic Area. Enterprise customers can choose a specific EU country for primary hosting.",
+  "pricing.faq.a6": "With our hosting and service providers: Supabase (database and authentication), Vercel (application hosting), Stripe Payments Europe Ltd in Ireland (payments) and Resend (email). AI-assisted contact enrichment is processed by Anthropic in the United States. The full sub-processor list, including the region of each, is being finalised — ask us and we will send you the current version.",
 
   // Pricing — feature labels (regenerated via npm run regen:pricing;
   // labels themselves stay hand-translated per locale)
@@ -818,7 +818,7 @@ const en: Dict = {
   "pricing.feat.limits.deals": "Deals",
   "pricing.feat.limits.storage": "Storage",
   "pricing.feat.limits.apiRequestsPerMonth": "API requests per month",
-  "pricing.feat.infrastructure.sharedMultiTenant": "Shared multi-tenant (Hetzner Falkenstein)",
+  "pricing.feat.infrastructure.sharedMultiTenant": "Shared multi-tenant",
   "pricing.feat.infrastructure.dedicatedServer": "Dedicated server",
 };
 
@@ -1542,7 +1542,7 @@ const nl: Dict = {
   "pricing.faq.q5": "Wat gebeurt er als ik een limiet overschrijd?",
   "pricing.faq.a5": "Je krijgt een melding bij 80% van elke limiet. We blokkeren je werk niet zonder waarschuwing. Bij consistent boven de limiet stellen we de juiste tier voor — meestal upgraden. Geen verrassings-overage-kosten.",
   "pricing.faq.q6": "Waar zit mijn data?",
-  "pricing.faq.a6": "Hetzner Falkenstein, Duitsland. Back-ups in Amsterdam (Backblaze B2 EU). Je data verlaat de Europese Economische Ruimte nooit. Enterprise-klanten kunnen een specifiek EU-land kiezen voor primaire hosting.",
+  "pricing.faq.a6": "Bij onze hosting- en dienstverleners: Supabase (database en authenticatie), Vercel (applicatie-hosting), Stripe Payments Europe Ltd in Ierland (betalingen) en Resend (e-mail). AI-ondersteunde contactverrijking wordt verwerkt door Anthropic in de Verenigde Staten. De volledige sub-verwerkerslijst, met per partij de regio, wordt afgerond — vraag ernaar en we sturen de actuele versie.",
 
   // Pricing — feature-labels NL
   "pricing.feat.core.contacts": "Contacten",
@@ -1590,7 +1590,7 @@ const nl: Dict = {
   "pricing.feat.limits.deals": "Deals",
   "pricing.feat.limits.storage": "Opslag",
   "pricing.feat.limits.apiRequestsPerMonth": "API-aanvragen per maand",
-  "pricing.feat.infrastructure.sharedMultiTenant": "Gedeelde multi-tenant (Hetzner Falkenstein)",
+  "pricing.feat.infrastructure.sharedMultiTenant": "Gedeelde multi-tenant",
   "pricing.feat.infrastructure.dedicatedServer": "Dedicated server",
 };
 
@@ -2314,7 +2314,7 @@ const de: Dict = {
   "pricing.faq.q5": "Was passiert, wenn ich ein Limit überschreite?",
   "pricing.faq.a5": "Sie erhalten eine Benachrichtigung bei 80% jedes Limits. Wir blockieren Ihre Arbeit nicht ohne Vorwarnung. Bei konstantem Überschreiten schlagen wir die richtige Stufe vor — meist upgraden. Keine Überraschungsgebühren.",
   "pricing.faq.q6": "Wo werden meine Daten gespeichert?",
-  "pricing.faq.a6": "Hetzner Falkenstein, Deutschland. Backups in Amsterdam (Backblaze B2 EU). Ihre Daten verlassen niemals den Europäischen Wirtschaftsraum. Enterprise-Kunden können ein bestimmtes EU-Land für das primäre Hosting wählen.",
+  "pricing.faq.a6": "Bei unseren Hosting- und Dienstleistern: Supabase (Datenbank und Authentifizierung), Vercel (Anwendungs-Hosting), Stripe Payments Europe Ltd in Irland (Zahlungen) und Resend (E-Mail). KI-gestützte Kontaktanreicherung wird von Anthropic in den USA verarbeitet. Die vollständige Liste der Unterauftragsverarbeiter samt Region wird derzeit finalisiert — fragen Sie uns, wir senden Ihnen die aktuelle Fassung.",
 
   // Pricing — feature-labels DE
   "pricing.feat.core.contacts": "Kontakte",
@@ -2362,7 +2362,7 @@ const de: Dict = {
   "pricing.feat.limits.deals": "Deals",
   "pricing.feat.limits.storage": "Speicher",
   "pricing.feat.limits.apiRequestsPerMonth": "API-Anfragen pro Monat",
-  "pricing.feat.infrastructure.sharedMultiTenant": "Geteilte Multi-Tenant-Infrastruktur (Hetzner Falkenstein)",
+  "pricing.feat.infrastructure.sharedMultiTenant": "Geteilte Multi-Tenant-Infrastruktur",
   "pricing.feat.infrastructure.dedicatedServer": "Dedizierter Server",
 };
 
@@ -3086,7 +3086,7 @@ const es: Dict = {
   "pricing.faq.q5": "¿Qué pasa si supero un límite?",
   "pricing.faq.a5": "Recibes una notificación al 80% de cualquier límite. No bloqueamos tu trabajo sin avisar. Si sigues por encima del límite consistentemente, te sugerimos el nivel correcto — normalmente subir. Sin cargos sorpresa por exceso.",
   "pricing.faq.q6": "¿Dónde se almacenan mis datos?",
-  "pricing.faq.a6": "Hetzner Falkenstein, Alemania. Backups en Ámsterdam (Backblaze B2 EU). Tus datos nunca salen del Espacio Económico Europeo. Los clientes Enterprise pueden elegir un país EU específico para el hosting primario.",
+  "pricing.faq.a6": "Con nuestros proveedores de hosting y servicios: Supabase (base de datos y autenticación), Vercel (hosting de la aplicación), Stripe Payments Europe Ltd en Irlanda (pagos) y Resend (correo). El enriquecimiento de contactos con IA lo procesa Anthropic en Estados Unidos. La lista completa de subencargados, con la región de cada uno, se está finalizando — pregunta y te enviamos la versión actual.",
 
   // Pricing — feature-labels ES
   "pricing.feat.core.contacts": "Contactos",
@@ -3134,7 +3134,7 @@ const es: Dict = {
   "pricing.feat.limits.deals": "Negocios",
   "pricing.feat.limits.storage": "Almacenamiento",
   "pricing.feat.limits.apiRequestsPerMonth": "Solicitudes API por mes",
-  "pricing.feat.infrastructure.sharedMultiTenant": "Multi-tenant compartido (Hetzner Falkenstein)",
+  "pricing.feat.infrastructure.sharedMultiTenant": "Multi-tenant compartido",
   "pricing.feat.infrastructure.dedicatedServer": "Servidor dedicado",
 };
 
