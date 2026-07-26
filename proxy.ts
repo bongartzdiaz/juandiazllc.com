@@ -120,9 +120,9 @@ function buildCsp(nonce: string, strict: boolean): string {
   const directives: Record<string, string[]> = {
     'default-src': ["'self'"],
     'script-src': scriptSrc,
-    'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+    'style-src': ["'self'", "'unsafe-inline'"],
     'img-src': ["'self'", 'data:', 'blob:', 'https:'],
-    'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com'],
+    'font-src': ["'self'", 'data:'],
     'connect-src': [
       "'self'",
       ...(isDev ? ['ws:', 'wss:', 'http://localhost:*'] : []),
