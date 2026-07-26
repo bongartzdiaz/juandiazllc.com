@@ -7,8 +7,9 @@
  * Why a status page at all:
  *   - Customers want to know "is it me or is it them" without emailing
  *     support. A 1-click /status answers that.
- *   - During Hetzner cutover (Friday 2026-05-15) we'll point this at
- *     the new infra and customers can verify it's reachable.
+ *   - Er was een Hetzner-cutover gepland (2026-05-15). Die is NIET
+ *     doorgegaan; de infra draait nog op Supabase + Vercel. De
+ *     hosting-claims op deze pagina zijn op 2026-07-26 gecorrigeerd.
  *   - Audit-clean: matches what every B2B SaaS does. No-cost trust
  *     signal.
  *
@@ -181,8 +182,8 @@ export default async function StatusPage() {
 
       <footer style={{ marginTop: 48, fontSize: 13, opacity: 0.6 }}>
         <p style={{ margin: '0 0 6px' }}>
-          Hosted on Hetzner Falkenstein (Germany). Backups on Backblaze B2 (Amsterdam). All data in
-          the EU.
+          Hosted with Supabase and Vercel. For where each piece of data sits, and which
+          sub-processors are involved, ask us for the current sub-processor list.
         </p>
         <p style={{ margin: 0 }}>
           Reporting an incident? Email{' '}

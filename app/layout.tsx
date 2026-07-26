@@ -25,7 +25,6 @@ import { Preloader } from "@/components/Preloader";
 import { GlobalEffects } from "@/components/GlobalEffects";
 import { BackToTop } from "@/components/BackToTop";
 import { Analytics } from "@/components/Analytics";
-import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { WebVitalsReporter } from "@/components/WebVitalsReporter";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 import { LOCALES, DEFAULT_LOCALE } from "@/lib/i18n/dict";
@@ -209,7 +208,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <GlobalEffects />
           <BackToTop />
           <Analytics />
-          <GoogleAnalytics />
           <WebVitalsReporter />
         </LocaleProvider>
       </body>

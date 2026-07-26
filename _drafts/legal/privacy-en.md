@@ -61,7 +61,7 @@ We notify you 30 days before adding or replacing a Sub-processor.
 
 ## 5. Where your data is stored
 
-All Personal Data is stored on servers physically located inside the European Economic Area. The DEUS application servers are in Falkenstein, Germany. Backups are encrypted and stored in Amsterdam. **We do not transfer Personal Data outside the EEA.**
+**[CORRECTED 2026-07-26 — the previous text described a Hetzner migration that never took place.]** Personal Data sits with Supabase (database, authentication) and Vercel (application hosting); payments run through Stripe Payments Europe Ltd in Ireland and email through Resend. The hosting region of each provider still has to be confirmed and will be stated in the sub-processor list. **One transfer leaves the EEA:** AI-assisted contact enrichment sends contact data to Anthropic in the United States.
 
 ## 6. AI processing
 

@@ -383,7 +383,7 @@ const en: Dict = {
   "priv.h.cookies": "Cookies we set",
   "priv.p.cookies": "A session cookie when you sign in (so the dashboard remembers you) and a locale preference cookie (so the site stays in your language). That is the full list — the marketing site sets no tracking or advertising cookies, which is why you do not see a consent banner.",
   "priv.h.analytics": "Analytics",
-  "priv.p.analytics": "We use Plausible Analytics — cookieless, EU-hosted, aggregate page counts only. No personal identifier, no cross-site tracking, no resale to third parties. Because there is no personal data, EU regulators do not require a consent prompt. If you still want out, toggle the switch below.",
+  "priv.p.analytics": "We use Plausible Analytics — cookieless, EU-hosted, aggregate page counts only. No personal identifier, no cross-site tracking, no resale to third parties. Dutch law exempts analytics with no or minor privacy impact from the consent requirement (art. 11.7a(3) Telecommunicatiewet), provided it is not used for profiling — which it is not. If you still want out, toggle the switch below.",
   "priv.h.contact": "The contact form",
   "priv.p.contact": "When you submit the contact form, your name, email, company and message are stored in our Supabase database so I can write back. Nothing is forwarded to marketing platforms. If you later want that record deleted, mail me (the address is at the bottom of every page) and it is gone within a working day.",
   "priv.h.dashboard": "The dashboard (Philly CRM)",
@@ -769,7 +769,7 @@ const en: Dict = {
   "pricing.faq.q5": "What happens if I go over a limit?",
   "pricing.faq.a5": "You get a notification at 80% of any limit. We won't block your workflow without warning. If you stay over the limit consistently, we'll suggest the right tier — usually upgrading. No surprise overage fees.",
   "pricing.faq.q6": "Where is my data stored?",
-  "pricing.faq.a6": "Hetzner Falkenstein, Germany. Backups in Amsterdam (Backblaze B2 EU). Your data never leaves the European Economic Area. Enterprise customers can choose a specific EU country for primary hosting.",
+  "pricing.faq.a6": "With our hosting and service providers: Supabase (database and authentication), Vercel (application hosting), Stripe Payments Europe Ltd in Ireland (payments) and Resend (email). AI-assisted contact enrichment is processed by Anthropic in the United States. The full sub-processor list, including the region of each, is being finalised — ask us and we will send you the current version.",
 
   // Pricing — feature labels (regenerated via npm run regen:pricing;
   // labels themselves stay hand-translated per locale)
@@ -818,7 +818,7 @@ const en: Dict = {
   "pricing.feat.limits.deals": "Deals",
   "pricing.feat.limits.storage": "Storage",
   "pricing.feat.limits.apiRequestsPerMonth": "API requests per month",
-  "pricing.feat.infrastructure.sharedMultiTenant": "Shared multi-tenant (Hetzner Falkenstein)",
+  "pricing.feat.infrastructure.sharedMultiTenant": "Shared multi-tenant",
   "pricing.feat.infrastructure.dedicatedServer": "Dedicated server",
 };
 
@@ -1542,7 +1542,7 @@ const nl: Dict = {
   "pricing.faq.q5": "Wat gebeurt er als ik een limiet overschrijd?",
   "pricing.faq.a5": "Je krijgt een melding bij 80% van elke limiet. We blokkeren je werk niet zonder waarschuwing. Bij consistent boven de limiet stellen we de juiste tier voor — meestal upgraden. Geen verrassings-overage-kosten.",
   "pricing.faq.q6": "Waar zit mijn data?",
-  "pricing.faq.a6": "Hetzner Falkenstein, Duitsland. Back-ups in Amsterdam (Backblaze B2 EU). Je data verlaat de Europese Economische Ruimte nooit. Enterprise-klanten kunnen een specifiek EU-land kiezen voor primaire hosting.",
+  "pricing.faq.a6": "Bij onze hosting- en dienstverleners: Supabase (database en authenticatie), Vercel (applicatie-hosting), Stripe Payments Europe Ltd in Ierland (betalingen) en Resend (e-mail). AI-ondersteunde contactverrijking wordt verwerkt door Anthropic in de Verenigde Staten. De volledige sub-verwerkerslijst, met per partij de regio, wordt afgerond — vraag ernaar en we sturen de actuele versie.",
 
   // Pricing — feature-labels NL
   "pricing.feat.core.contacts": "Contacten",
@@ -1590,7 +1590,7 @@ const nl: Dict = {
   "pricing.feat.limits.deals": "Deals",
   "pricing.feat.limits.storage": "Opslag",
   "pricing.feat.limits.apiRequestsPerMonth": "API-aanvragen per maand",
-  "pricing.feat.infrastructure.sharedMultiTenant": "Gedeelde multi-tenant (Hetzner Falkenstein)",
+  "pricing.feat.infrastructure.sharedMultiTenant": "Gedeelde multi-tenant",
   "pricing.feat.infrastructure.dedicatedServer": "Dedicated server",
 };
 
@@ -1935,7 +1935,7 @@ const de: Dict = {
   "priv.h.cookies": "Cookies, die wir setzen",
   "priv.p.cookies": "Ein Session-Cookie beim Einloggen (damit das Dashboard Sie wiedererkennt) und ein Sprachpräferenz-Cookie (damit die Seite in Ihrer Sprache bleibt). Das ist die vollständige Liste — die Marketing-Seite setzt keine Tracking- oder Werbe-Cookies, deshalb sehen Sie kein Consent-Banner.",
   "priv.h.analytics": "Analytics",
-  "priv.p.analytics": "Wir nutzen Plausible Analytics — cookielos, EU-gehostet, nur aggregierte Seitenaufrufe. Keine persönliche Kennung, kein Cross-Site-Tracking, kein Weiterverkauf an Dritte. Da keine personenbezogenen Daten verarbeitet werden, verlangen EU-Aufsichtsbehörden keine Consent-Abfrage. Wenn Sie dennoch opt-out wünschen, nutzen Sie den Schalter unten.",
+  "priv.p.analytics": "Wir nutzen Plausible Analytics — cookielos, EU-gehostet, nur aggregierte Seitenaufrufe. Keine persönliche Kennung, kein Cross-Site-Tracking, kein Weiterverkauf an Dritte. Das niederländische Recht nimmt Analytics mit keinen oder geringen Auswirkungen auf die Privatsphäre von der Einwilligungspflicht aus (Art. 11.7a Abs. 3 Telecommunicatiewet), sofern es nicht der Profilbildung dient — was hier nicht der Fall ist. Wenn Sie dennoch opt-out wünschen, nutzen Sie den Schalter unten.",
   "priv.h.contact": "Das Kontaktformular",
   "priv.p.contact": "Wenn Sie das Kontaktformular absenden, werden Ihr Name, Ihre E-Mail, Ihr Unternehmen und Ihre Nachricht in unserer Supabase-Datenbank gespeichert, damit ich antworten kann. Nichts wird an Marketingplattformen weitergeleitet. Möchten Sie den Datensatz später gelöscht haben, schreiben Sie mir (die Adresse steht im Footer jeder Seite), und er ist innerhalb eines Werktags verschwunden.",
   "priv.h.dashboard": "Das Dashboard (Philly CRM)",
@@ -2314,7 +2314,7 @@ const de: Dict = {
   "pricing.faq.q5": "Was passiert, wenn ich ein Limit überschreite?",
   "pricing.faq.a5": "Sie erhalten eine Benachrichtigung bei 80% jedes Limits. Wir blockieren Ihre Arbeit nicht ohne Vorwarnung. Bei konstantem Überschreiten schlagen wir die richtige Stufe vor — meist upgraden. Keine Überraschungsgebühren.",
   "pricing.faq.q6": "Wo werden meine Daten gespeichert?",
-  "pricing.faq.a6": "Hetzner Falkenstein, Deutschland. Backups in Amsterdam (Backblaze B2 EU). Ihre Daten verlassen niemals den Europäischen Wirtschaftsraum. Enterprise-Kunden können ein bestimmtes EU-Land für das primäre Hosting wählen.",
+  "pricing.faq.a6": "Bei unseren Hosting- und Dienstleistern: Supabase (Datenbank und Authentifizierung), Vercel (Anwendungs-Hosting), Stripe Payments Europe Ltd in Irland (Zahlungen) und Resend (E-Mail). KI-gestützte Kontaktanreicherung wird von Anthropic in den USA verarbeitet. Die vollständige Liste der Unterauftragsverarbeiter samt Region wird derzeit finalisiert — fragen Sie uns, wir senden Ihnen die aktuelle Fassung.",
 
   // Pricing — feature-labels DE
   "pricing.feat.core.contacts": "Kontakte",
@@ -2362,7 +2362,7 @@ const de: Dict = {
   "pricing.feat.limits.deals": "Deals",
   "pricing.feat.limits.storage": "Speicher",
   "pricing.feat.limits.apiRequestsPerMonth": "API-Anfragen pro Monat",
-  "pricing.feat.infrastructure.sharedMultiTenant": "Geteilte Multi-Tenant-Infrastruktur (Hetzner Falkenstein)",
+  "pricing.feat.infrastructure.sharedMultiTenant": "Geteilte Multi-Tenant-Infrastruktur",
   "pricing.feat.infrastructure.dedicatedServer": "Dedizierter Server",
 };
 
@@ -2707,7 +2707,7 @@ const es: Dict = {
   "priv.h.cookies": "Cookies que ponemos",
   "priv.p.cookies": "Una cookie de sesión cuando inicia sesión (para que el dashboard le recuerde) y una cookie de preferencia de idioma (para que el sitio se mantenga en su idioma). Esa es la lista completa — el sitio de marketing no pone cookies de tracking ni publicitarias, por eso no ve un banner de consentimiento.",
   "priv.h.analytics": "Analítica",
-  "priv.p.analytics": "Usamos Plausible Analytics — sin cookies, alojado en la UE, solo vistas de página agregadas. Sin identificador personal, sin tracking cross-site, sin reventa a terceros. Al no haber datos personales, los reguladores de la UE no exigen aviso de consentimiento. Si aun así prefiere salir, use el interruptor de abajo.",
+  "priv.p.analytics": "Usamos Plausible Analytics — sin cookies, alojado en la UE, solo vistas de página agregadas. Sin identificador personal, sin tracking cross-site, sin reventa a terceros. La ley neerlandesa exime del requisito de consentimiento a la analítica con impacto nulo o mínimo en la privacidad (art. 11.7a.3 Telecommunicatiewet), siempre que no se use para elaboración de perfiles — y no se usa. Si aun así prefiere salir, use el interruptor de abajo.",
   "priv.h.contact": "El formulario de contacto",
   "priv.p.contact": "Cuando envía el formulario de contacto, su nombre, email, empresa y mensaje se guardan en nuestra base de datos Supabase para que yo pueda responder. Nada se reenvía a plataformas de marketing. Si más tarde quiere que se elimine ese registro, escríbame (la dirección está al pie de cada página) y desaparece en un día laborable.",
   "priv.h.dashboard": "El dashboard (Philly CRM)",
@@ -3086,7 +3086,7 @@ const es: Dict = {
   "pricing.faq.q5": "¿Qué pasa si supero un límite?",
   "pricing.faq.a5": "Recibes una notificación al 80% de cualquier límite. No bloqueamos tu trabajo sin avisar. Si sigues por encima del límite consistentemente, te sugerimos el nivel correcto — normalmente subir. Sin cargos sorpresa por exceso.",
   "pricing.faq.q6": "¿Dónde se almacenan mis datos?",
-  "pricing.faq.a6": "Hetzner Falkenstein, Alemania. Backups en Ámsterdam (Backblaze B2 EU). Tus datos nunca salen del Espacio Económico Europeo. Los clientes Enterprise pueden elegir un país EU específico para el hosting primario.",
+  "pricing.faq.a6": "Con nuestros proveedores de hosting y servicios: Supabase (base de datos y autenticación), Vercel (hosting de la aplicación), Stripe Payments Europe Ltd en Irlanda (pagos) y Resend (correo). El enriquecimiento de contactos con IA lo procesa Anthropic en Estados Unidos. La lista completa de subencargados, con la región de cada uno, se está finalizando — pregunta y te enviamos la versión actual.",
 
   // Pricing — feature-labels ES
   "pricing.feat.core.contacts": "Contactos",
@@ -3134,7 +3134,7 @@ const es: Dict = {
   "pricing.feat.limits.deals": "Negocios",
   "pricing.feat.limits.storage": "Almacenamiento",
   "pricing.feat.limits.apiRequestsPerMonth": "Solicitudes API por mes",
-  "pricing.feat.infrastructure.sharedMultiTenant": "Multi-tenant compartido (Hetzner Falkenstein)",
+  "pricing.feat.infrastructure.sharedMultiTenant": "Multi-tenant compartido",
   "pricing.feat.infrastructure.dedicatedServer": "Servidor dedicado",
 };
 

@@ -1,3 +1,9 @@
+> ## ⛔ SUPERSEDED 2026-07-26
+> Dit concept is vervangen door `docs/legal/subprocessors.md`.
+> Het beschreef Hetzner-hosting die nooit heeft bestaan en stelde dat er
+> geen doorgifte buiten de EER plaatsvindt — beide onjuist.
+> **Niet gebruiken. Niet publiceren.**
+
 ---
 last_updated: 2026-07-21
 locale: en
