@@ -8,6 +8,7 @@ import { ReadingProgress } from "@/components/ReadingProgress";
 import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { blogPostingSchema } from "@/lib/seo/article";
+import { BOOKING_15MIN } from "@/lib/booking";
 
 export async function generateStaticParams() {
   // Only pre-render (locale, slug) pairs where the post is published in that
@@ -171,12 +172,26 @@ export default async function InsightPage(
         </div>
 
         <footer className="ia-foot">
+          {/* De tekst hierboven belooft al "een kort gesprek is de volgende
+              stap", maar de knop wees naar een formulier met zeven velden. Dat
+              is de plek waar AI-verkeer landt en waar de intentie het hoogst
+              is, dus daar hoort de boeking te staan — niet het formulier.
+              Eén primaire actie, met de formulierroute eronder voor wie liever
+              schrijft. Geen tweede knop ernaast: dat dwingt een keuze af. */}
           <div className="ia-cta">
             <h3 dangerouslySetInnerHTML={{ __html: t("insights.d.want.title") }} />
             <p>{t("insights.d.want.body")}</p>
-            <Link href="/contact" className="btn primary">
-              {t("insights.d.want.cta")} <span className="arr">→</span>
-            </Link>
+            <a
+              className="btn primary plausible-event-name=Boeking+15min"
+              href={BOOKING_15MIN}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t("contact.book.cta")} <span className="arr">→</span>
+            </a>
+            <p style={{ marginTop: 12, fontSize: 14 }}>
+              <Link href="/contact">{t("insights.d.want.cta")}</Link>
+            </p>
           </div>
 
           {venture && (
