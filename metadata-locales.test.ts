@@ -110,7 +110,16 @@ describe("titellengte", () => {
         // layout-template en telt mee in wat de zoeker ziet, dus het wordt hier
         // uit dezelfde constante gelezen — anders meet de gate een ander
         // achtervoegsel dan er verstuurd wordt.
-        const volledig = t.includes("Juan Diaz") ? t : `${t}${TITLE_SUFFIX}`;
+        //
+        // Tot 2026-08-02 stond hier `t.includes("Juan Diaz") ? t : ...`. Dat is
+        // een gok naar intentie in plaats van een meting van gedrag: in Next.js
+        // bepaalt de VORM of de template wordt toegepast, niet de inhoud.
+        // `title: "..."` en `title.default` krijgen het achtervoegsel, alleen
+        // `title.absolute` ontsnapt eraan. Elke titel met de merknaam erin viel
+        // daardoor buiten deze controle — juist de langste titels dus.
+        const absoluut =
+          !!md.title && typeof md.title === "object" && "absolute" in md.title;
+        const volledig = absoluut ? t : `${t}${TITLE_SUFFIX}`;
         expect(volledig.length, `${route} [${l}]: "${volledig}"`).toBeLessThanOrEqual(60);
       }
     });

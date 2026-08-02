@@ -10,9 +10,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "About Juan Diaz — Fractional Revenue Operator & Builder",
-    description:
-      "Juan Diaz is a fractional revenue operator and operations consultant — construction-trained, operator-built — running Juan Diaz, LLC and building revenue systems for operators in energy, real estate and hospitality.",
+    title: translate(l, "meta.about.title"),
+    description: translate(l, "meta.about.description"),
     alternates: buildAlternates(l, "/about"),
     openGraph: {
       type: "profile",

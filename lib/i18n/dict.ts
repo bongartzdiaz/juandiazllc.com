@@ -861,6 +861,20 @@ const en: Dict = {
   "meta.signals.title": "Signals — field notes and build logs",
   "meta.signals.description":
     "Operating notes on designing operator tools, shipping dashboards that survive real environments, and running a small studio at speed.",
+  "meta.story.title": "Story — construction-trained, operator-built",
+  "meta.story.description":
+    "How Juan Diaz, LLC started: construction management, the crossover to revenue operations, and why I build honest software for operators.",
+  // "About" alleen zou samen met het achtervoegsel "About · Juan Diaz" opleveren.
+  // Vandaar "About me": de merknaam staat al achteraan.
+  "meta.about.title": "About me — fractional revenue operator",
+  "meta.about.description":
+    "Construction-management-trained, Amsterdam-based. I build revenue engines for operators in energy, real estate, hospitality and adjacent sectors.",
+  "meta.now.title": "Now — what I'm focused on this quarter",
+  "meta.now.description":
+    "A monthly-ish snapshot of what I'm actually building, shipping and thinking about. Short, dated, honest. If it isn't here, it isn't the focus.",
+  "meta.uses.title": "Uses — the stack behind the build",
+  "meta.uses.description":
+    "The tools, frameworks, services and hardware I actually use to build revenue engines. No affiliate links. Updated as the stack changes.",
 };
 
 const nl: Dict = {
@@ -1656,6 +1670,18 @@ const nl: Dict = {
   "meta.signals.title": "Signalen — veldnotities en buildlogs",
   "meta.signals.description":
     "Werknotities over het ontwerpen van operator-tools, dashboards die het in het veld uithouden, en een kleine studio op snelheid runnen.",
+  "meta.story.title": "Verhaal — bouwkundig opgeleid, zelf operator",
+  "meta.story.description":
+    "Hoe Juan Diaz, LLC begon: bouwmanagement, de overstap naar revenue operations, en waarom ik eerlijke software voor operators bouw.",
+  "meta.about.title": "Over mij — fractional revenue operator",
+  "meta.about.description":
+    "Bouwkundig opgeleid, gevestigd in Amsterdam. Ik bouw omzetmotoren voor operators in energie, vastgoed, hospitality en aanverwante sectoren.",
+  "meta.now.title": "Nu — waar ik dit kwartaal aan werk",
+  "meta.now.description":
+    "Ongeveer maandelijks een momentopname van wat ik echt bouw en uitrol. Kort, gedateerd, eerlijk. Staat het er niet, dan is het niet de focus.",
+  "meta.uses.title": "Tools — de stack achter de bouw",
+  "meta.uses.description":
+    "De tools, frameworks, diensten en hardware die ik echt gebruik om omzetmotoren te bouwen. Geen affiliate links. Bijgewerkt als de stack verandert.",
 };
 
 const de: Dict = {
@@ -2451,6 +2477,18 @@ const de: Dict = {
   "meta.signals.title": "Signale — Feldnotizen und Build-Logs",
   "meta.signals.description":
     "Arbeitsnotizen zum Entwurf von Operator-Werkzeugen, zu Dashboards, die im Feld bestehen, und zum Betrieb eines kleinen Studios im Tempo.",
+  "meta.story.title": "Story — vom Bau zur Umsatzarbeit",
+  "meta.story.description":
+    "Wie Juan Diaz, LLC entstand: Baumanagement, der Wechsel zu Revenue Operations und warum ich ehrliche Software für Betreiber baue.",
+  "meta.about.title": "Über mich — Fractional Revenue Operator",
+  "meta.about.description":
+    "Ausgebildet im Baumanagement, ansässig in Amsterdam. Ich baue Umsatzmaschinen für Betreiber in Energie, Immobilien, Hospitality und angrenzenden Branchen.",
+  "meta.now.title": "Jetzt — woran ich dieses Quartal arbeite",
+  "meta.now.description":
+    "Etwa monatlich eine Momentaufnahme dessen, was ich wirklich baue und ausliefere. Kurz, datiert, ehrlich. Was hier fehlt, ist nicht der Fokus.",
+  "meta.uses.title": "Tools — der Stack hinter dem Aufbau",
+  "meta.uses.description":
+    "Die Werkzeuge, Frameworks, Dienste und Hardware, mit denen ich wirklich Umsatzmaschinen baue. Keine Affiliate-Links. Aktualisiert bei Änderungen.",
 };
 
 const es: Dict = {
@@ -3246,6 +3284,18 @@ const es: Dict = {
   "meta.signals.title": "Señales — notas de campo y registros",
   "meta.signals.description":
     "Notas de trabajo sobre diseñar herramientas para operadores, paneles que aguantan el terreno y llevar un estudio pequeño a buen ritmo.",
+  "meta.story.title": "Historia — de la construcción a los ingresos",
+  "meta.story.description":
+    "Cómo empezó Juan Diaz, LLC: gestión de obra, el salto a revenue operations y por qué construyo software honesto para operadores.",
+  "meta.about.title": "Sobre mí — revenue operator fraccional",
+  "meta.about.description":
+    "Formado en gestión de obra, con base en Ámsterdam. Construyo motores de ingresos para operadores en energía, inmobiliario, hostelería y sectores afines.",
+  "meta.now.title": "Ahora — en qué estoy centrado este trimestre",
+  "meta.now.description":
+    "Una instantánea casi mensual de lo que construyo y publico de verdad. Corta, fechada, honesta. Si no está aquí, no es el foco.",
+  "meta.uses.title": "Herramientas — el stack detrás de la obra",
+  "meta.uses.description":
+    "Las herramientas, frameworks, servicios y hardware que uso de verdad para construir motores de ingresos. Sin enlaces de afiliado. Se actualiza.",
 };
 
 export const DICT: Record<Locale, Dict> = { en, nl, de, es };
