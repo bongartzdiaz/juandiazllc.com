@@ -130,6 +130,32 @@ describe('proxy: CSRF same-origin check', () => {
     expect(res.status).not.toBe(403)
   })
 
+  // Regressie 2026-08-02. De cal.com-webhook stuurt Origin: https://cal.com mee.
+  // Zonder uitzondering kreeg élke boeking 403 en draaide de
+  // handtekeningcontrole nooit — gemeten op productie, niet bedacht. Dat is een
+  // stille fout: cal.com meldt niets en er komt simpelweg nooit een lead.
+  it('blokkeert /api/cal NIET bij een Origin van cal.com', async () => {
+    const res = await middleware(
+      makeReq('https://juandiazllc.com/api/cal', {
+        method: 'POST',
+        headers: { host: 'juandiazllc.com', origin: 'https://cal.com' },
+      }),
+    )
+    expect(res.status).not.toBe(403)
+  })
+
+  // De keerzijde: de uitzondering moet smal zijn. Als deze test ooit omvalt is
+  // het CSRF-gat verbreed en staat elk /api/*-pad open voor cal.com.
+  it('blokkeert een andere route nog steeds bij diezelfde Origin', async () => {
+    const res = await middleware(
+      makeReq('https://juandiazllc.com/api/newsletter', {
+        method: 'POST',
+        headers: { host: 'juandiazllc.com', origin: 'https://cal.com' },
+      }),
+    )
+    expect(res.status).toBe(403)
+  })
+
   it('falls back to Referer when Origin header is absent', async () => {
     const res = await middleware(
       makeReq('https://juandiazllc.com/api/newsletter', {

@@ -69,6 +69,14 @@ const CSRF_EXEMPT_PREFIXES = [
   '/api/csp-report',     // browsers POST CSP violation reports (no Origin)
   '/api/vitals',         // Web Vitals beacons, keepalive fetch (no Origin on unload)
   '/api/health',         // uptime probe
+  // cal.com-webhook. Stuurt Origin: https://cal.com mee, dus zonder deze
+  // uitzondering krijgt élke boeking 403 en draait de handtekeningcontrole
+  // nooit. Gemeten op productie 2026-08-02, vóór deze regel:
+  //   zonder Origin  -> 503 (route werkt, secret nog niet gezet)
+  //   met Origin     -> 403 {"error":"Cross-origin request blocked"}
+  // Voldoet aan het criterium hierboven: de route authenticeert zichzelf met
+  // een HMAC-SHA256-handtekening over de rauwe body en weigert alles zonder.
+  '/api/cal',
 ]
 
 function isCsrfExempt(pathname: string): boolean {
