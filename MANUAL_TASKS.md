@@ -82,6 +82,56 @@ Setup takes ~5 minutes:
 - [ ] (Optional) Add a Slack alert contact in Dashboard → Alert Contacts so
       downtime pings #ops or similar, rather than only emailing.
 
+## Cal.com — verplichte vragen + webhook (2026-08-02)
+
+De ontvanger staat klaar op `POST /api/cal`. Hij doet **niets** zolang deze twee
+stappen niet zijn gezet: zonder `CAL_WEBHOOK_SECRET` antwoordt hij 503, en zonder
+webhook in cal.com komt er niets binnen.
+
+**1. Verplichte booking-vragen** — cal.com → Event Types → *15 min* → Advanced →
+Booking questions.
+
+Nu vraagt het formulier alleen naam, e-mail en een **optionele** notitie. Je gaat
+een gesprek in zonder te weten wie er zit of wat hij wil.
+
+| Vraag | Type | Verplicht | Identifier (moet exact) |
+|---|---|---|---|
+| Bedrijf | text | ja | `company` |
+| Website | text | nee | `website` |
+| Sector | select: energie / vastgoed / hospitality / anders | ja | `sector` |
+| Welk probleem wil je in 15 minuten oplossen? | textarea | **ja** | `probleem` |
+
+De route leest die identifiers. Wijk je ervan af, dan komt het antwoord wel
+binnen maar landt het niet in de juiste kolom — de lead wordt dan aangemaakt met
+lege velden, zonder foutmelding.
+
+> Verplichte vragen **blokkeren de boeking**. Er ontstaat dus geen afspraak die
+> je daarna moet afzeggen. Annuleren blijft nuttig voor no-shows, niet voor
+> ontbrekende gegevens.
+
+**2. Webhook** — cal.com → Settings → Developer → Webhooks → *New*.
+
+- [ ] Subscriber URL: `https://juandiazllc.com/api/cal`
+- [ ] Event triggers: **Booking Created** en **Booking Cancelled**
+- [ ] Secret: genereer een lange willekeurige waarde en vul die in
+- [ ] Zet diezelfde waarde in Vercel als `CAL_WEBHOOK_SECRET` (Production +
+      Preview) en redeploy
+- [ ] Doe één testboeking en controleer: rij in `leads` met `source='cal_15min'`,
+      Telegram-push aangekomen, en `metadata->>cal_uid` gevuld
+
+**3. Aanbevolen hardening (nog niet gedaan).** De idempotentie zit nu alleen in
+de applicatie: de route kijkt of er al een lead met dezelfde `cal_uid` bestaat.
+Bij twee gelijktijdige leveringen kan dat een race verliezen. Een index maakt het
+een garantie:
+
+```sql
+create unique index concurrently if not exists leads_cal_uid_uniek
+  on public.leads ((metadata->>'cal_uid'))
+  where metadata ? 'cal_uid';
+```
+
+Dit is een schemawijziging op productie — bewust niet zelf uitgevoerd.
+
 ## Plausible — doel "Boeking 15min" aanmaken (2026-08-02)
 
 De boekknop op `/contact` is getagd met `plausible-event-name=Boeking+15min`.

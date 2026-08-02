@@ -1,6 +1,10 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+// Verhuisd naar lib/notify.ts op 2026-08-02, zodat de cal.com-webhook dezelfde
+// meldingen kan gebruiken. Niet geëxporteerd vanuit dit bestand: alles wat een
+// "use server"-module exporteert wordt een publiek aanroepbare server-action.
+import { notifyEmail, notifyTelegram } from "@/lib/notify";
 
 export type ContactState = { status: "idle" | "ok" | "err"; message?: string };
 
@@ -14,92 +18,6 @@ export type ContactState = { status: "idle" | "ok" | "err"; message?: string };
 //   honeypot is a hidden input that real users never touch; bots
 //   fill every field they can find. If it's non-empty, we fake-ok
 //   so the bot doesn't retry, and skip all side effects.
-
-const RESEND_ENDPOINT = "https://api.resend.com/emails";
-// Lead notifications land in Juan's Proton inbox by default. Override
-// per-environment with CONTACT_NOTIFY_TO. The lead is ALSO persisted to
-// Supabase regardless, so nothing is lost even if the email hop fails.
-const NOTIFY_TO = process.env.CONTACT_NOTIFY_TO ?? "diazJSBD@proton.me";
-const NOTIFY_FROM = process.env.CONTACT_NOTIFY_FROM ?? "noreply@juandiazllc.com";
-
-// Telegram is the instant channel next to the Resend mail: push on the
-// phone the second a lead lands. Configure TELEGRAM_BOT_TOKEN (from
-// @BotFather) + TELEGRAM_CHAT_ID (your own chat with the bot) — both
-// unset means silent no-op, same contract as the Resend hop.
-async function notifyTelegram(payload: {
-  name: string;
-  email: string;
-  company: string;
-  sector: string;
-  message: string;
-  source: string;
-}) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) return; // silently no-op if not configured
-
-  // Plain text, no parse_mode — lead fields are user input and Telegram
-  // Markdown/HTML parsing on untrusted text is an injection foot-gun.
-  const text =
-    `🟢 Nieuwe lead — juandiazllc.com\n\n` +
-    `Naam:    ${payload.name || "(niet ingevuld)"}\n` +
-    `Email:   ${payload.email}\n` +
-    `Bedrijf: ${payload.company || "(niet ingevuld)"}\n` +
-    `Sector:  ${payload.sector || "(niet ingevuld)"}\n` +
-    `Bron:    ${payload.source}\n\n` +
-    `${payload.message}`.slice(0, 3900); // Telegram cap is 4096 chars
-
-  try {
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text }),
-    });
-  } catch {
-    // Swallow — the row is safe in Supabase, the push is a nicety.
-  }
-}
-
-async function notifyEmail(payload: {
-  name: string;
-  email: string;
-  company: string;
-  sector: string;
-  message: string;
-  source: string;
-}) {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) return; // silently no-op if not configured
-
-  const subject = `New contact — ${payload.name || payload.email}${payload.company ? " @ " + payload.company : ""}`;
-  const text =
-    `New blueprint-call request from juandiazllc.com\n\n` +
-    `Name:    ${payload.name || "(not provided)"}\n` +
-    `Email:   ${payload.email}\n` +
-    `Company: ${payload.company || "(not provided)"}\n` +
-    `Sector:  ${payload.sector || "(not provided)"}\n` +
-    `Source:  ${payload.source}\n\n` +
-    `Message:\n${payload.message}\n`;
-
-  try {
-    await fetch(RESEND_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${key}`,
-      },
-      body: JSON.stringify({
-        from: NOTIFY_FROM,
-        to: [NOTIFY_TO],
-        reply_to: payload.email,
-        subject,
-        text,
-      }),
-    });
-  } catch {
-    // Swallow — the row is safe in Supabase, email is just a nicety.
-  }
-}
 
 export async function submitLead(
   _prev: ContactState,
