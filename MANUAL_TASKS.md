@@ -82,14 +82,58 @@ Setup takes ~5 minutes:
 - [ ] (Optional) Add a Slack alert contact in Dashboard → Alert Contacts so
       downtime pings #ops or similar, rather than only emailing.
 
-## Ahrefs API — free DR key migration (DEADLINE 2026-08-01) + plan limits (2026-07-20)
+## Plausible — doel "Boeking 15min" aanmaken (2026-08-02)
 
-Surfaced by the daily SEO pulse. Two separate items:
+De boekknop op `/contact` is getagd met `plausible-event-name=Boeking+15min`.
+De `tagged-events`-variant van het script staat al aan
+(`components/Analytics.tsx`), dus de klik wordt verstuurd zodra de knop live is.
 
-**1. Free Domain-Rating endpoint — hard deadline 2026-08-01.**
-The pulse's Part C uses Ahrefs' free public Domain Rating endpoint. Ahrefs
-is removing *unauthenticated* access to it on **2026-08-01**; after that it
-returns an error without a key.
+**Maar Plausible telt een custom event pas als het doel bestaat.** Zonder deze
+stap komen de kliks binnen en worden ze weggegooid — je ziet niets, en dat is
+niet te onderscheiden van "niemand klikt".
+
+- [ ] Plausible → Site Settings → **Goals** → *Add goal* → **Custom event**
+- [ ] Naam exact: `Boeking 15min` (de `+` in de class is een spatie)
+- [ ] Na de eerste echte klik controleren of hij in het dashboard verschijnt
+
+## Ahrefs API — deadline VERSTREKEN, sleutel is dood (gemeten 2026-08-02)
+
+> **Stand 2026-08-02.** De deadline hieronder is verlopen en er is niets meer
+> gemigreerd. Gemeten vandaag: **élk** Ahrefs-endpoint geeft nu
+> `Insufficient plan` — ook `subscription-info-limits-and-usage`, dat volgens de
+> documentatie gratis is en geen API-units kost. Er komt dus geen enkel getal
+> meer uit Ahrefs: geen DR, geen keywords, geen verkeer.
+>
+> Dat betekent dat de site op dit moment **blind publiceert**. Er is geen manier
+> om te zien of een artikel iets doet, welke zoekopdrachten binnenkomen, of een
+> nieuwe pagina wordt geïndexeerd.
+>
+> **Beslis één van beide en doe het ook:**
+>
+> - [ ] Ahrefs vervangen — een betaald plan dat de GSC- en keyword-API's bevat
+> - [ ] Ahrefs laten vallen en **Google Search Console rechtstreeks koppelen**.
+>       Gratis, en het is de bron waar de pulse eigenlijk om vraagt; Ahrefs was
+>       er alleen een doorgeefluik voor. Aanbevolen.
+>
+> Zolang geen van beide is gebeurd, hoort de pulse "geen SEO-data beschikbaar"
+> te melden — niet een leeg resultaat dat op nul lijkt.
+
+**Google Search Console koppelen (aanbevolen route, ~20 min)**
+
+- [ ] Property aanmaken voor `juandiazllc.com` op
+      https://search.google.com/search-console — kies **Domain**, niet
+      URL-prefix, anders mis je de subdomeinen.
+- [ ] Verifiëren via DNS-TXT bij de registrar.
+- [ ] Sitemap indienen: `https://juandiazllc.com/sitemap.xml` (die bestaat al en
+      bevat hreflang per locale).
+- [ ] Voor geautomatiseerd uitlezen: service-account aanmaken in Google Cloud,
+      Search Console API aanzetten, het service-account-e-mailadres als
+      gebruiker toevoegen in Search Console.
+
+**Historische context — free Domain-Rating endpoint, deadline 2026-08-01.**
+De pulse gebruikte Ahrefs' gratis publieke Domain-Rating-endpoint. Ahrefs
+verwijderde *niet-geauthenticeerde* toegang daarop per **2026-08-01**; daarna
+geeft het een fout zonder sleutel.
 
 - [ ] Generate a free Ahrefs API key (~5 min):
       https://docs.ahrefs.com/en/api/reference/public/get-domain-rating-free

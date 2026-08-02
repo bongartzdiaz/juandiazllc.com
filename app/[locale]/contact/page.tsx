@@ -6,6 +6,7 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 import { translate } from "@/lib/i18n/dict";
 import { faqSchema, contactPointSchema } from "@/lib/seo/schema";
 import { CONTACT_FAQ } from "@/lib/seo/faqs";
+import { BOOKING_15MIN } from "@/lib/booking";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -41,6 +42,47 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
       </header>
       <section style={{ padding: "60px 40px 20px", maxWidth: 760, margin: "0 auto" }}>
         <Capacity locale={l} />
+      </section>
+
+      {/* Boeken staat bewust bóven de directline-kaart en niet erin: die kaart
+          spreekt van "drie manieren", en een vierde knop erin zou die tekst
+          laten liegen. Dit is ook de primaire actie — een tijdslot kiezen kost
+          één klik, het formulier eronder vraagt zeven velden. */}
+      <section
+        aria-labelledby="book-heading"
+        style={{ padding: "20px 40px 0", maxWidth: 760, margin: "0 auto" }}
+      >
+        <div
+          style={{
+            border: "1px solid var(--mint, #5EFFB1)",
+            borderRadius: 14,
+            padding: "24px 28px",
+            background: "var(--bg-card, rgba(94,255,177,0.04))",
+          }}
+        >
+          <h2
+            id="book-heading"
+            style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}
+          >
+            {t("contact.book.title")}
+          </h2>
+          <p style={{ color: "var(--muted, #8a9a93)", fontSize: 14, marginBottom: 18 }}>
+            {t("contact.book.lede")}
+          </p>
+          {/* plausible-event-name legt de klik vast als doel "Boeking 15min".
+              Werkt zonder extra JavaScript omdat components/Analytics.tsx al de
+              tagged-events-variant laadt. Cookieloos, geen persoonsgegevens —
+              alleen een teller. Zonder dit weet je niet of deze knop iets doet,
+              en dat was precies het probleem met de vorige drie SEO-sprints. */}
+          <a
+            className="btn primary plausible-event-name=Boeking+15min"
+            href={BOOKING_15MIN}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t("contact.book.cta")}
+          </a>
+        </div>
       </section>
 
       <section
