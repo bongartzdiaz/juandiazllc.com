@@ -6,8 +6,9 @@ name: CI
 #
 # To make these checks actually BLOCK a merge, enable branch protection
 # on `main` in GitHub repo settings → Branches → require status checks
-# → select "typecheck" and "test". (Operator step; a workflow alone
-# does not enforce a merge gate.)
+# → select "typecheck", "test", "tenant-scope" and "i18n". (Operator step;
+# a workflow alone does not enforce a merge gate — zonder die instelling
+# is dit een rapportage, geen poort.)
 #
 # Note: `npm run lint` is intentionally NOT gated — `next lint` was
 # removed in Next.js 16 and the script currently no-ops/errors. Migrate
@@ -61,6 +62,25 @@ jobs:
         run: npx prisma generate
       - name: Test (vitest)
         run: npm test -- --run
+
+  # i18n-pariteit. translate() valt stil terug op Engels wanneer een sleutel
+  # ontbreekt, dus een vergeten vertaling levert geen foutmelding en geen lege
+  # plek op — maar keurige Engelse tekst op een Nederlandse pagina. Dat ziet er
+  # werkend uit en haalt daarom elke handmatige controle en elke code review.
+  #
+  # Bewust GEEN `npm ci`: het script gebruikt alleen node:fs/path/url en leest
+  # één bestand. Installeren zou de job van seconden naar minuten trekken zonder
+  # iets toe te voegen.
+  i18n:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: i18n-sleutelpariteit (en/nl/de/es)
+        run: node scripts/check-i18n-parity.mjs
 
   # A-03 — tenant-scope lint. The CRM has NO row-level security; tenant
   # isolation is enforced entirely in application code. This gate fails the
