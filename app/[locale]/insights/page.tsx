@@ -15,13 +15,12 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "Insights — operator systems, energy funnels, revenue engines",
-    description:
-      "Field notes on building the systems that move real P&Ls. Operator CRMs, energy funnels, build-vs-buy — written for the people who own the number.",
+    title: translate(l, "meta.insights.title"),
+    description: translate(l, "meta.insights.description"),
     alternates: buildAlternates(l, "/insights"),
     openGraph: {
-      title: "Insights — Juan Diaz, LLC",
-      description: "Field notes on building the systems that move real P&Ls.",
+      title: translate(l, "meta.insights.title"),
+      description: translate(l, "meta.insights.description"),
       type: "website",
       url: `/${l}/insights`,
       locale: ogLocale(l),

@@ -852,6 +852,15 @@ const en: Dict = {
   "meta.work.title": "Work — revenue engines running in the field",
   "meta.work.description":
     "Live products under Juan Diaz, LLC. Each one is the five-phase method applied to a real sector, with real operators using it every day.",
+  // Het eerste woord van deze twee titels volgt bewust nav.insights / nav.signals,
+  // die per taal vertaald zijn. Een zoeker die op "Inzichten" klikt hoort niet op
+  // een pagina te landen die "Insights" heet.
+  "meta.insights.title": "Insights — field notes from the build",
+  "meta.insights.description":
+    "Short pieces on the systems I actually ship: operator CRMs, energy funnels, and the build-vs-buy calls behind them. No gated PDFs, no newsletter wall.",
+  "meta.signals.title": "Signals — field notes and build logs",
+  "meta.signals.description":
+    "Operating notes on designing operator tools, shipping dashboards that survive real environments, and running a small studio at speed.",
 };
 
 const nl: Dict = {
@@ -1641,6 +1650,12 @@ const nl: Dict = {
   "meta.work.title": "Werk — omzetmotoren die in het veld draaien",
   "meta.work.description":
     "Live producten van Juan Diaz, LLC. Elk daarvan is de vijf-fase-methode toegepast op een echte sector, met operators die er dagelijks mee werken.",
+  "meta.insights.title": "Inzichten — veldnotities uit de build",
+  "meta.insights.description":
+    "Korte stukken over de systemen die ik echt uitrol: operator-CRM's, energie-funnels, en de build-vs-buy-keuzes erachter. Geen gated PDF's, geen muur.",
+  "meta.signals.title": "Signalen — veldnotities en buildlogs",
+  "meta.signals.description":
+    "Werknotities over het ontwerpen van operator-tools, dashboards die het in het veld uithouden, en een kleine studio op snelheid runnen.",
 };
 
 const de: Dict = {
@@ -2430,6 +2445,12 @@ const de: Dict = {
   "meta.work.title": "Arbeiten — Umsatzmaschinen im Feldeinsatz",
   "meta.work.description":
     "Live-Produkte von Juan Diaz, LLC. Jedes davon ist die Fünf-Phasen-Methode in einer echten Branche, täglich im Einsatz bei echten Betreibern.",
+  "meta.insights.title": "Einblicke — Feldnotizen aus dem Aufbau",
+  "meta.insights.description":
+    "Kurze Texte zu den Systemen, die ich wirklich ausliefere: Operator-CRMs, Energie-Funnels und die Build-vs-Buy-Entscheidungen dahinter. Ohne Anmeldung.",
+  "meta.signals.title": "Signale — Feldnotizen und Build-Logs",
+  "meta.signals.description":
+    "Arbeitsnotizen zum Entwurf von Operator-Werkzeugen, zu Dashboards, die im Feld bestehen, und zum Betrieb eines kleinen Studios im Tempo.",
 };
 
 const es: Dict = {
@@ -3219,6 +3240,12 @@ const es: Dict = {
   "meta.work.title": "Proyectos — motores de ingresos en marcha",
   "meta.work.description":
     "Productos en marcha de Juan Diaz, LLC. Cada uno es el método de cinco fases aplicado a un sector real, con operadores que lo usan a diario.",
+  "meta.insights.title": "Perspectivas — notas de campo desde la obra",
+  "meta.insights.description":
+    "Textos breves sobre los sistemas que de verdad pongo en marcha: CRM para operadores, embudos de energía y las decisiones build-vs-buy detrás.",
+  "meta.signals.title": "Señales — notas de campo y registros",
+  "meta.signals.description":
+    "Notas de trabajo sobre diseñar herramientas para operadores, paneles que aguantan el terreno y llevar un estudio pequeño a buen ritmo.",
 };
 
 export const DICT: Record<Locale, Dict> = { en, nl, de, es };

@@ -10,9 +10,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "Signals — field notes and build logs",
-    description:
-      "Short essays on designing operator tools, shipping dashboards that survive real environments, and running small studios at speed.",
+    title: translate(l, "meta.signals.title"),
+    description: translate(l, "meta.signals.description"),
     alternates: buildAlternates(l, "/signals"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
