@@ -69,8 +69,13 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
           <p style={{ color: "var(--muted, #8a9a93)", fontSize: 14, marginBottom: 18 }}>
             {t("contact.book.lede")}
           </p>
+          {/* plausible-event-name legt de klik vast als doel "Boeking 15min".
+              Werkt zonder extra JavaScript omdat components/Analytics.tsx al de
+              tagged-events-variant laadt. Cookieloos, geen persoonsgegevens —
+              alleen een teller. Zonder dit weet je niet of deze knop iets doet,
+              en dat was precies het probleem met de vorige drie SEO-sprints. */}
           <a
-            className="btn primary"
+            className="btn primary plausible-event-name=Boeking+15min"
             href={BOOKING_15MIN}
             target="_blank"
             rel="noopener noreferrer"
