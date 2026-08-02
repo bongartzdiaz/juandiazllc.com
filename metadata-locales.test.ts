@@ -59,10 +59,19 @@ async function metadataVoor(bestand: string, locale: string): Promise<Md | null>
   return mod.generateMetadata({ params: Promise.resolve({ locale }) });
 }
 
-const tekst = (v: unknown): string =>
-  typeof v === "string" ? v : v && typeof v === "object" && "default" in v
-    ? String((v as { default: unknown }).default)
-    : String(v ?? "");
+// Next.js accepteert de titel als string of als object met `absolute` /
+// `default` / `template`. Zonder deze uitpakking wordt zo'n object
+// "[object Object]" — dat is 15 tekens en glipt langs de lengtecontrole heen,
+// en het is voor elke taal hetzelfde dus ook langs de vertaalcontrole.
+const tekst = (v: unknown): string => {
+  if (typeof v === "string") return v;
+  if (v && typeof v === "object") {
+    for (const sleutel of ["absolute", "default"] as const) {
+      if (sleutel in v) return String((v as Record<string, unknown>)[sleutel]);
+    }
+  }
+  return String(v ?? "");
+};
 
 const routes = statischeRoutes();
 const anderTalen = LOCALES.filter((l) => l !== "en");

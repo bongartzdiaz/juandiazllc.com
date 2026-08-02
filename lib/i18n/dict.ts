@@ -875,6 +875,21 @@ const en: Dict = {
   "meta.uses.title": "Uses — the stack behind the build",
   "meta.uses.description":
     "The tools, frameworks, services and hardware I actually use to build revenue engines. No affiliate links. Updated as the stack changes.",
+  "meta.privacy.title": "Privacy — what this site knows about you",
+  "meta.privacy.description":
+    "What this site stores, what it does not, and how to reach me about your data. Plain language: as little as possible.",
+  "meta.impressum.title": "Impressum — legal notice",
+  "meta.impressum.description":
+    "Legal notice for Juan Diaz, LLC: company details, contact, and responsibility for content per German TMG §5 and EU DSA article 12.",
+  // De homepage is de merkpagina; het achtervoegsel zou de naam verdubbelen
+  // ("Juan Diaz — … · Juan Diaz"). Vandaar title.absolute in de pagina zelf.
+  "meta.home.title": "Juan Diaz — Fractional Revenue Operator & Consultant",
+  "meta.home.description":
+    "Juan Diaz is a fractional revenue operator and operations consultant for energy, real estate and hospitality operators. Construction-trained, operator-built.",
+  "meta.pricing.title": "Pricing — DEUS CRM, EU-hosted, GDPR-clean",
+  // De rekenmachine modelleert de Nederlandse salderingsregeling. "Saldering"
+  // zegt een Engelse lezer niets, dus daar staat "net metering".
+  "meta.energyRoi.title": "Energy ROI calculator — net metering 2027",
 };
 
 const nl: Dict = {
@@ -1682,6 +1697,17 @@ const nl: Dict = {
   "meta.uses.title": "Tools — de stack achter de bouw",
   "meta.uses.description":
     "De tools, frameworks, diensten en hardware die ik echt gebruik om omzetmotoren te bouwen. Geen affiliate links. Bijgewerkt als de stack verandert.",
+  "meta.privacy.title": "Privacy — wat deze site over je weet",
+  "meta.privacy.description":
+    "Wat deze site opslaat, wat niet, en hoe je me bereikt over je gegevens. In gewone taal: zo weinig mogelijk.",
+  "meta.impressum.title": "Colofon — juridische informatie",
+  "meta.impressum.description":
+    "Juridische informatie van Juan Diaz, LLC: bedrijfsgegevens, contact en verantwoordelijkheid voor de inhoud volgens § 5 TMG en artikel 12 DSA.",
+  "meta.home.title": "Juan Diaz — Revenue Operator & Operations-consultant",
+  "meta.home.description":
+    "Juan Diaz — fractional revenue operator en operations-consultant voor operators in energie, vastgoed en horeca. Bouwkundig getraind, operator-built.",
+  "meta.pricing.title": "Prijzen — DEUS CRM, EU-gehost, GDPR-klaar",
+  "meta.energyRoi.title": "Energie-ROI — de saldeer-som voor 2027",
 };
 
 const de: Dict = {
@@ -2489,6 +2515,17 @@ const de: Dict = {
   "meta.uses.title": "Tools — der Stack hinter dem Aufbau",
   "meta.uses.description":
     "Die Werkzeuge, Frameworks, Dienste und Hardware, mit denen ich wirklich Umsatzmaschinen baue. Keine Affiliate-Links. Aktualisiert bei Änderungen.",
+  "meta.privacy.title": "Datenschutz — was diese Seite über Sie weiß",
+  "meta.privacy.description":
+    "Was diese Website speichert, was nicht, und wie Sie mich zu Ihren Daten erreichen. Im Klartext: so wenig wie möglich.",
+  "meta.impressum.title": "Impressum — Angaben gemäß § 5 TMG",
+  "meta.impressum.description":
+    "Rechtliche Angaben zu Juan Diaz, LLC: Unternehmensdaten, Kontakt und Verantwortung für den Inhalt nach § 5 TMG und Artikel 12 EU-DSA.",
+  "meta.home.title": "Juan Diaz — Fractional Revenue Operator & Berater",
+  "meta.home.description":
+    "Juan Diaz ist Fractional Revenue Operator und Operations-Berater für Betreiber in Energie, Immobilien und Gastgewerbe. Bauerprobt, operator-built.",
+  "meta.pricing.title": "Preise — DEUS CRM, EU-gehostet, DSGVO-konform",
+  "meta.energyRoi.title": "Energie-ROI-Rechner — Einspeisung ab 2027",
 };
 
 const es: Dict = {
@@ -3296,6 +3333,17 @@ const es: Dict = {
   "meta.uses.title": "Herramientas — el stack detrás de la obra",
   "meta.uses.description":
     "Las herramientas, frameworks, servicios y hardware que uso de verdad para construir motores de ingresos. Sin enlaces de afiliado. Se actualiza.",
+  "meta.privacy.title": "Privacidad — qué sabe este sitio sobre ti",
+  "meta.privacy.description":
+    "Qué guarda este sitio, qué no, y cómo contactarme sobre tus datos. En lenguaje claro: lo menos posible.",
+  "meta.impressum.title": "Aviso legal — información de la empresa",
+  "meta.impressum.description":
+    "Aviso legal de Juan Diaz, LLC: datos de la empresa, contacto y responsabilidad del contenido según el § 5 TMG alemán y el artículo 12 del DSA.",
+  "meta.home.title": "Juan Diaz — Operador de Revenue Fraccional y Consultor",
+  "meta.home.description":
+    "Juan Diaz, operador de revenue fraccional y consultor de operaciones para energía, inmobiliario y hostelería. Formado en construcción, hecho por operadores.",
+  "meta.pricing.title": "Precios — DEUS CRM, alojado en EU, conforme RGPD",
+  "meta.energyRoi.title": "Calculadora de ROI energético — saldo 2027",
 };
 
 export const DICT: Record<Locale, Dict> = { en, nl, de, es };

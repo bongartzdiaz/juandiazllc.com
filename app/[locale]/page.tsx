@@ -16,6 +16,7 @@ import { FaqSection } from "@/components/FaqSection";
 import { LiveSignals } from "@/components/LiveSignals";
 import { Countdown2027 } from "@/components/Countdown2027";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+import { translate } from "@/lib/i18n/dict";
 import { faqSchema } from "@/lib/seo/schema";
 import { HOME_FAQ } from "@/lib/seo/faqs";
 
@@ -25,19 +26,6 @@ import { HOME_FAQ } from "@/lib/seo/faqs";
 // so Google doesn't truncate. Descriptions carry the long-tail + the
 // three target sectors (energy / real estate / hospitality) + the
 // credibility hook, in the priority markets (EN/DE/ES).
-const TITLES: Record<string, string> = {
-  en: "Juan Diaz — Fractional Revenue Operator & Consultant",
-  nl: "Juan Diaz — Revenue Operator & Operations-consultant",
-  de: "Juan Diaz — Fractional Revenue Operator & Berater",
-  es: "Juan Diaz — Operador de Revenue Fraccional y Consultor",
-};
-
-const DESCRIPTIONS: Record<string, string> = {
-  en: "Juan Diaz is a fractional revenue operator and operations consultant for energy, real estate and hospitality operators. Construction-trained, operator-built.",
-  nl: "Juan Diaz — fractional revenue operator en operations-consultant voor operators in energie, vastgoed en horeca. Bouwkundig getraind, operator-built.",
-  de: "Juan Diaz ist Fractional Revenue Operator und Operations-Berater für Betreiber in Energie, Immobilien und Gastgewerbe. Bauerprobt, operator-built.",
-  es: "Juan Diaz, operador de revenue fraccional y consultor de operaciones para energía, inmobiliario y hostelería. Formado en construcción, hecho por operadores.",
-};
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -45,13 +33,16 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: TITLES[l],
-    description: DESCRIPTIONS[l],
+    // absolute: de homepage is de merkpagina. Zonder dit plakt de
+    // layout-template er nog een " · Juan Diaz" achter en staat de naam
+    // er twee keer in — 64 tekens, gemeten 2026-08-02.
+    title: { absolute: translate(l, "meta.home.title") },
+    description: translate(l, "meta.home.description"),
     alternates: buildAlternates(l, "/"),
     openGraph: {
       type: "website",
-      title: TITLES[l],
-      description: DESCRIPTIONS[l],
+      title: translate(l, "meta.home.title"),
+      description: translate(l, "meta.home.description"),
       url: `/${l}`,
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
@@ -70,7 +61,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     "@type": "ProfessionalService",
     name: "Juan Diaz, LLC — Fractional Revenue Operations",
     url: `${SITE}/${l}`,
-    description: DESCRIPTIONS[l],
+    description: translate(l, "meta.home.description"),
     serviceType: "Fractional revenue operations, operator software, build-vs-buy advisory",
     areaServed: ["United States", "European Union", "Netherlands", "Germany", "Spain"],
     availableLanguage: ["English", "Dutch", "German", "Spanish"],
