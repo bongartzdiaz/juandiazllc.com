@@ -823,6 +823,73 @@ const en: Dict = {
   "pricing.feat.limits.apiRequestsPerMonth": "API requests per month",
   "pricing.feat.infrastructure.sharedMultiTenant": "Shared multi-tenant",
   "pricing.feat.infrastructure.dedicatedServer": "Dedicated server",
+
+  // Metadata — <title> en <meta description> per pagina.
+  //
+  // Staat hier en niet in de pagina zelf, zodat de i18n-pariteitsgate
+  // (npm run i18n:check) merkt wanneer een taal achterblijft. Tot 2026-08-02
+  // stonden deze teksten hardgecodeerd in generateMetadata: ~127 niet-Engelse
+  // URL's serveerden een Engelse titel achter een vertaalde pagina.
+  //
+  // Twee regels, bewaakt door metadata-locales.test.ts:
+  //   titel  — max 48 tekens; het achtervoegsel uit lib/seo/branding.ts
+  //            (TITLE_SUFFIX) kost de resterende 12 van de 60 die Google toont
+  //   omschr — mikken op ~150; Google kapt rond de 160
+  //
+  // Dit is bewust NIET dezelfde tekst als de `.lede` van de pagina. Een lede
+  // wordt gelezen ná de klik; een description moet die klik nog verdienen en
+  // wordt afgekapt. Drie ledes (sectors, insights, signals) zijn 185-274 tekens
+  // en kunnen dat niet allebei zijn.
+  "meta.services.title": "Services — revenue operations for operators",
+  "meta.services.description":
+    "Four ways operators work with me: a full revenue-engine build, fractional revenue operations, build-vs-buy advice, or a second opinion before you sign.",
+  "meta.sectors.title": "Sectors — energy, real estate, hospitality",
+  "meta.sectors.description":
+    "The same five phases against different P&Ls. Per sector: where revenue leaks, how the method runs against it, and what I can actually point to.",
+  "meta.contact.title": "Contact — book a 15-minute call",
+  "meta.contact.description":
+    "Book a 15-minute call or leave your details. Free, blunt, no pitch deck. I answer within 24 hours.",
+  "meta.work.title": "Work — revenue engines running in the field",
+  "meta.work.description":
+    "Live products under Juan Diaz, LLC. Each one is the five-phase method applied to a real sector, with real operators using it every day.",
+  // Het eerste woord van deze twee titels volgt bewust nav.insights / nav.signals,
+  // die per taal vertaald zijn. Een zoeker die op "Inzichten" klikt hoort niet op
+  // een pagina te landen die "Insights" heet.
+  "meta.insights.title": "Insights — field notes from the build",
+  "meta.insights.description":
+    "Short pieces on the systems I actually ship: operator CRMs, energy funnels, and the build-vs-buy calls behind them. No gated PDFs, no newsletter wall.",
+  "meta.signals.title": "Signals — field notes and build logs",
+  "meta.signals.description":
+    "Operating notes on designing operator tools, shipping dashboards that survive real environments, and running a small studio at speed.",
+  "meta.story.title": "Story — construction-trained, operator-built",
+  "meta.story.description":
+    "How Juan Diaz, LLC started: construction management, the crossover to revenue operations, and why I build honest software for operators.",
+  // "About" alleen zou samen met het achtervoegsel "About · Juan Diaz" opleveren.
+  // Vandaar "About me": de merknaam staat al achteraan.
+  "meta.about.title": "About me — fractional revenue operator",
+  "meta.about.description":
+    "Construction-management-trained, Amsterdam-based. I build revenue engines for operators in energy, real estate, hospitality and adjacent sectors.",
+  "meta.now.title": "Now — what I'm focused on this quarter",
+  "meta.now.description":
+    "A monthly-ish snapshot of what I'm actually building, shipping and thinking about. Short, dated, honest. If it isn't here, it isn't the focus.",
+  "meta.uses.title": "Uses — the stack behind the build",
+  "meta.uses.description":
+    "The tools, frameworks, services and hardware I actually use to build revenue engines. No affiliate links. Updated as the stack changes.",
+  "meta.privacy.title": "Privacy — what this site knows about you",
+  "meta.privacy.description":
+    "What this site stores, what it does not, and how to reach me about your data. Plain language: as little as possible.",
+  "meta.impressum.title": "Impressum — legal notice",
+  "meta.impressum.description":
+    "Legal notice for Juan Diaz, LLC: company details, contact, and responsibility for content per German TMG §5 and EU DSA article 12.",
+  // De homepage is de merkpagina; het achtervoegsel zou de naam verdubbelen
+  // ("Juan Diaz — … · Juan Diaz"). Vandaar title.absolute in de pagina zelf.
+  "meta.home.title": "Juan Diaz — Fractional Revenue Operator & Consultant",
+  "meta.home.description":
+    "Juan Diaz is a fractional revenue operator and operations consultant for energy, real estate and hospitality operators. Construction-trained, operator-built.",
+  "meta.pricing.title": "Pricing — DEUS CRM, EU-hosted, GDPR-clean",
+  // De rekenmachine modelleert de Nederlandse salderingsregeling. "Saldering"
+  // zegt een Engelse lezer niets, dus daar staat "net metering".
+  "meta.energyRoi.title": "Energy ROI calculator — net metering 2027",
 };
 
 const nl: Dict = {
@@ -1598,6 +1665,49 @@ const nl: Dict = {
   "pricing.feat.limits.apiRequestsPerMonth": "API-aanvragen per maand",
   "pricing.feat.infrastructure.sharedMultiTenant": "Gedeelde multi-tenant",
   "pricing.feat.infrastructure.dedicatedServer": "Dedicated server",
+
+  // Metadata — zie de toelichting bij het Engelse blok.
+  "meta.services.title": "Diensten — revenue operations voor operators",
+  "meta.services.description":
+    "Vier manieren waarop operators met me werken: een volledige omzetmotor, fractional revenue operations, build-vs-buy-advies of een second opinion.",
+  "meta.sectors.title": "Sectoren — energie, vastgoed, hospitality",
+  "meta.sectors.description":
+    "Dezelfde vijf fases tegen andere cijfers. Per sector: waar de omzet weglekt, hoe de methode daartegen staat, en wat ik echt kan aanwijzen.",
+  "meta.contact.title": "Contact — plan een gesprek van 15 minuten",
+  "meta.contact.description":
+    "Plan een gesprek van 15 minuten of laat je gegevens achter. Gratis, direct, geen verkooppraatje. Ik reageer binnen 24 uur.",
+  "meta.work.title": "Werk — omzetmotoren die in het veld draaien",
+  "meta.work.description":
+    "Live producten van Juan Diaz, LLC. Elk daarvan is de vijf-fase-methode toegepast op een echte sector, met operators die er dagelijks mee werken.",
+  "meta.insights.title": "Inzichten — veldnotities uit de build",
+  "meta.insights.description":
+    "Korte stukken over de systemen die ik echt uitrol: operator-CRM's, energie-funnels, en de build-vs-buy-keuzes erachter. Geen gated PDF's, geen muur.",
+  "meta.signals.title": "Signalen — veldnotities en buildlogs",
+  "meta.signals.description":
+    "Werknotities over het ontwerpen van operator-tools, dashboards die het in het veld uithouden, en een kleine studio op snelheid runnen.",
+  "meta.story.title": "Verhaal — bouwkundig opgeleid, zelf operator",
+  "meta.story.description":
+    "Hoe Juan Diaz, LLC begon: bouwmanagement, de overstap naar revenue operations, en waarom ik eerlijke software voor operators bouw.",
+  "meta.about.title": "Over mij — fractional revenue operator",
+  "meta.about.description":
+    "Bouwkundig opgeleid, gevestigd in Amsterdam. Ik bouw omzetmotoren voor operators in energie, vastgoed, hospitality en aanverwante sectoren.",
+  "meta.now.title": "Nu — waar ik dit kwartaal aan werk",
+  "meta.now.description":
+    "Ongeveer maandelijks een momentopname van wat ik echt bouw en uitrol. Kort, gedateerd, eerlijk. Staat het er niet, dan is het niet de focus.",
+  "meta.uses.title": "Tools — de stack achter de bouw",
+  "meta.uses.description":
+    "De tools, frameworks, diensten en hardware die ik echt gebruik om omzetmotoren te bouwen. Geen affiliate links. Bijgewerkt als de stack verandert.",
+  "meta.privacy.title": "Privacy — wat deze site over je weet",
+  "meta.privacy.description":
+    "Wat deze site opslaat, wat niet, en hoe je me bereikt over je gegevens. In gewone taal: zo weinig mogelijk.",
+  "meta.impressum.title": "Colofon — juridische informatie",
+  "meta.impressum.description":
+    "Juridische informatie van Juan Diaz, LLC: bedrijfsgegevens, contact en verantwoordelijkheid voor de inhoud volgens § 5 TMG en artikel 12 DSA.",
+  "meta.home.title": "Juan Diaz — Revenue Operator & Operations-consultant",
+  "meta.home.description":
+    "Juan Diaz — fractional revenue operator en operations-consultant voor operators in energie, vastgoed en horeca. Bouwkundig getraind, operator-built.",
+  "meta.pricing.title": "Prijzen — DEUS CRM, EU-gehost, GDPR-klaar",
+  "meta.energyRoi.title": "Energie-ROI — de saldeer-som voor 2027",
 };
 
 const de: Dict = {
@@ -2373,6 +2483,49 @@ const de: Dict = {
   "pricing.feat.limits.apiRequestsPerMonth": "API-Anfragen pro Monat",
   "pricing.feat.infrastructure.sharedMultiTenant": "Geteilte Multi-Tenant-Infrastruktur",
   "pricing.feat.infrastructure.dedicatedServer": "Dedizierter Server",
+
+  // Metadata — siehe Erläuterung im englischen Block.
+  "meta.services.title": "Leistungen — Revenue Operations für Betreiber",
+  "meta.services.description":
+    "Vier Wege, wie Betreiber mit mir arbeiten: kompletter Aufbau einer Umsatzmaschine, Fractional Revenue Operations, Build-vs-Buy-Beratung, Zweitmeinung.",
+  "meta.sectors.title": "Branchen — Energie, Immobilien, Hospitality",
+  "meta.sectors.description":
+    "Dieselben fünf Phasen, andere Zahlen. Pro Branche: wo Umsatz verloren geht, wie die Methode dagegen läuft und worauf ich konkret verweisen kann.",
+  "meta.contact.title": "Kontakt — 15-Minuten-Gespräch buchen",
+  "meta.contact.description":
+    "Buchen Sie ein 15-Minuten-Gespräch oder hinterlassen Sie Ihre Daten. Kostenlos, direkt, ohne Verkaufsgespräch. Antwort binnen 24 Stunden.",
+  "meta.work.title": "Arbeiten — Umsatzmaschinen im Feldeinsatz",
+  "meta.work.description":
+    "Live-Produkte von Juan Diaz, LLC. Jedes davon ist die Fünf-Phasen-Methode in einer echten Branche, täglich im Einsatz bei echten Betreibern.",
+  "meta.insights.title": "Einblicke — Feldnotizen aus dem Aufbau",
+  "meta.insights.description":
+    "Kurze Texte zu den Systemen, die ich wirklich ausliefere: Operator-CRMs, Energie-Funnels und die Build-vs-Buy-Entscheidungen dahinter. Ohne Anmeldung.",
+  "meta.signals.title": "Signale — Feldnotizen und Build-Logs",
+  "meta.signals.description":
+    "Arbeitsnotizen zum Entwurf von Operator-Werkzeugen, zu Dashboards, die im Feld bestehen, und zum Betrieb eines kleinen Studios im Tempo.",
+  "meta.story.title": "Story — vom Bau zur Umsatzarbeit",
+  "meta.story.description":
+    "Wie Juan Diaz, LLC entstand: Baumanagement, der Wechsel zu Revenue Operations und warum ich ehrliche Software für Betreiber baue.",
+  "meta.about.title": "Über mich — Fractional Revenue Operator",
+  "meta.about.description":
+    "Ausgebildet im Baumanagement, ansässig in Amsterdam. Ich baue Umsatzmaschinen für Betreiber in Energie, Immobilien, Hospitality und angrenzenden Branchen.",
+  "meta.now.title": "Jetzt — woran ich dieses Quartal arbeite",
+  "meta.now.description":
+    "Etwa monatlich eine Momentaufnahme dessen, was ich wirklich baue und ausliefere. Kurz, datiert, ehrlich. Was hier fehlt, ist nicht der Fokus.",
+  "meta.uses.title": "Tools — der Stack hinter dem Aufbau",
+  "meta.uses.description":
+    "Die Werkzeuge, Frameworks, Dienste und Hardware, mit denen ich wirklich Umsatzmaschinen baue. Keine Affiliate-Links. Aktualisiert bei Änderungen.",
+  "meta.privacy.title": "Datenschutz — was diese Seite über Sie weiß",
+  "meta.privacy.description":
+    "Was diese Website speichert, was nicht, und wie Sie mich zu Ihren Daten erreichen. Im Klartext: so wenig wie möglich.",
+  "meta.impressum.title": "Impressum — Angaben gemäß § 5 TMG",
+  "meta.impressum.description":
+    "Rechtliche Angaben zu Juan Diaz, LLC: Unternehmensdaten, Kontakt und Verantwortung für den Inhalt nach § 5 TMG und Artikel 12 EU-DSA.",
+  "meta.home.title": "Juan Diaz — Fractional Revenue Operator & Berater",
+  "meta.home.description":
+    "Juan Diaz ist Fractional Revenue Operator und Operations-Berater für Betreiber in Energie, Immobilien und Gastgewerbe. Bauerprobt, operator-built.",
+  "meta.pricing.title": "Preise — DEUS CRM, EU-gehostet, DSGVO-konform",
+  "meta.energyRoi.title": "Energie-ROI-Rechner — Einspeisung ab 2027",
 };
 
 const es: Dict = {
@@ -3148,6 +3301,49 @@ const es: Dict = {
   "pricing.feat.limits.apiRequestsPerMonth": "Solicitudes API por mes",
   "pricing.feat.infrastructure.sharedMultiTenant": "Multi-tenant compartido",
   "pricing.feat.infrastructure.dedicatedServer": "Servidor dedicado",
+
+  // Metadata — ver la explicación en el bloque en inglés.
+  "meta.services.title": "Servicios — revenue operations para operadores",
+  "meta.services.description":
+    "Cuatro formas de trabajar conmigo: construir el motor de ingresos completo, revenue operations fraccional, asesoría build-vs-buy o una segunda opinión.",
+  "meta.sectors.title": "Sectores — energía, inmobiliario, hostelería",
+  "meta.sectors.description":
+    "Las mismas cinco fases contra otras cuentas. Por sector: dónde se escapa el ingreso, cómo actúa el método y qué puedo enseñarte de verdad.",
+  "meta.contact.title": "Contacto — reserva una llamada de 15 min",
+  "meta.contact.description":
+    "Reserva una llamada de 15 minutos o déjame tus datos. Gratis, directo, sin presentación de ventas. Respondo en 24 horas.",
+  "meta.work.title": "Proyectos — motores de ingresos en marcha",
+  "meta.work.description":
+    "Productos en marcha de Juan Diaz, LLC. Cada uno es el método de cinco fases aplicado a un sector real, con operadores que lo usan a diario.",
+  "meta.insights.title": "Perspectivas — notas de campo desde la obra",
+  "meta.insights.description":
+    "Textos breves sobre los sistemas que de verdad pongo en marcha: CRM para operadores, embudos de energía y las decisiones build-vs-buy detrás.",
+  "meta.signals.title": "Señales — notas de campo y registros",
+  "meta.signals.description":
+    "Notas de trabajo sobre diseñar herramientas para operadores, paneles que aguantan el terreno y llevar un estudio pequeño a buen ritmo.",
+  "meta.story.title": "Historia — de la construcción a los ingresos",
+  "meta.story.description":
+    "Cómo empezó Juan Diaz, LLC: gestión de obra, el salto a revenue operations y por qué construyo software honesto para operadores.",
+  "meta.about.title": "Sobre mí — revenue operator fraccional",
+  "meta.about.description":
+    "Formado en gestión de obra, con base en Ámsterdam. Construyo motores de ingresos para operadores en energía, inmobiliario, hostelería y sectores afines.",
+  "meta.now.title": "Ahora — en qué estoy centrado este trimestre",
+  "meta.now.description":
+    "Una instantánea casi mensual de lo que construyo y publico de verdad. Corta, fechada, honesta. Si no está aquí, no es el foco.",
+  "meta.uses.title": "Herramientas — el stack detrás de la obra",
+  "meta.uses.description":
+    "Las herramientas, frameworks, servicios y hardware que uso de verdad para construir motores de ingresos. Sin enlaces de afiliado. Se actualiza.",
+  "meta.privacy.title": "Privacidad — qué sabe este sitio sobre ti",
+  "meta.privacy.description":
+    "Qué guarda este sitio, qué no, y cómo contactarme sobre tus datos. En lenguaje claro: lo menos posible.",
+  "meta.impressum.title": "Aviso legal — información de la empresa",
+  "meta.impressum.description":
+    "Aviso legal de Juan Diaz, LLC: datos de la empresa, contacto y responsabilidad del contenido según el § 5 TMG alemán y el artículo 12 del DSA.",
+  "meta.home.title": "Juan Diaz — Operador de Revenue Fraccional y Consultor",
+  "meta.home.description":
+    "Juan Diaz, operador de revenue fraccional y consultor de operaciones para energía, inmobiliario y hostelería. Formado en construcción, hecho por operadores.",
+  "meta.pricing.title": "Precios — DEUS CRM, alojado en EU, conforme RGPD",
+  "meta.energyRoi.title": "Calculadora de ROI energético — saldo 2027",
 };
 
 export const DICT: Record<Locale, Dict> = { en, nl, de, es };

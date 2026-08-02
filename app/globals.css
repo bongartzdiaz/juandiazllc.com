@@ -1,4 +1,8 @@
 :root {
+  /* Hoogte van nav.top (fixed, z-index 50). Gemeten op 2026-08-02: 92px op
+     desktop. Alles wat op top:0 plakt schuift hier onderdoor, dus dat moet
+     hiermee rekening houden — zie .ch-num. */
+  --nav-h: 92px;
   /* Deeper, richer forest — darker, more saturated, less cyan. */
   --bg:        #020D0A;
   --bg-2:      #04150F;
@@ -28,7 +32,22 @@ html, body {
   font-family: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  /* `clip`, niet `hidden` — en dat verschil is niet cosmetisch.
+     Zodra één as `hidden` is, maakt de browser van dit element een
+     scroll-container. `position: sticky` plakt dan aan die container in
+     plaats van aan het venster, en dus plakt hij nergens meer.
+
+     Gemeten op 2026-08-02, prod-build, /nl, scrollY 7914 (midden in
+     .chapters):
+        met hidden   .chapters-pin op top -1600px  -> weggescrold
+        met clip     .chapters-pin op top     0px  -> blijft staan
+     Gevolg van hidden: de sectie reserveert 3200px scrollruimte voor een
+     paneel dat er niet meer is, dus je kijkt 1600px lang naar niets. Dat
+     gold voor alle vier de talen en ook voor aside.timeline.
+
+     `clip` knipt horizontale overloop net zo goed weg, maar maakt géén
+     scroll-container. Zet dit dus niet terug op `hidden`. */
+  overflow-x: clip;
   /* NB: no `text-rendering: optimizeLegibility` here. It forces the
      slow text-shaping path on the page's very first layout — measured
      as the single ~470ms unattributable long task behind the home
@@ -832,7 +851,13 @@ footer .f-mark { color: var(--text); }
 .ch-scene .rotR { animation: spinR 80s linear infinite; transform-origin: center; }
 .ch-scene .rotFast { animation: spin 20s linear infinite; transform-origin: center; }
 .ch-scene .wave { stroke: var(--accent); stroke-width: 1; fill: none; opacity: .5; }
-.ch-num { position: absolute; top: 32px; left: 32px; font-family: var(--font-mono), 'JetBrains Mono'; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted-soft); z-index: 2; }
+/* top moet de vaste nav vrijhouden: .chapters-pin plakt op top:0 en nav.top
+   ligt daar 92px overheen. Met de oude top:32px botste "Hoofdstuk 03" op het
+   logo en de klok. Dat viel niet op zolang de pin niet plakte (zie de
+   overflow-x-noot bovenaan) — de fix daarvan maakte dit zichtbaar.
+   Onder 860px wordt de pin `relative` en overlapt er niets, dus de
+   desktopwaarde volstaat. */
+.ch-num { position: absolute; top: calc(var(--nav-h) + 16px); left: 32px; font-family: var(--font-mono), 'JetBrains Mono'; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted-soft); z-index: 2; }
 .ch-num b { color: var(--accent); font-weight: 500; }
 .ch-bars { position: absolute; bottom: 32px; left: 32px; right: 32px; display: flex; gap: 6px; z-index: 2; }
 .ch-bars i { flex: 1; height: 2px; background: var(--line); position: relative; overflow: hidden; }

@@ -18,13 +18,6 @@ import { faqSchema, productOfferSchema, type FaqItem } from "@/lib/seo/schema";
 // localized; individual feature names stay English in v1 (industry-norm
 // for B2B SaaS pricing; full localization in v2 would add ~120 keys).
 
-const TITLES: Record<string, string> = {
-  en: "Pricing — DEUS CRM, EU-hosted, GDPR-clean",
-  nl: "Prijzen — DEUS CRM, EU-gehost, GDPR-klaar",
-  de: "Preise — DEUS CRM, EU-gehostet, DSGVO-konform",
-  es: "Precios — DEUS CRM, alojado en EU, conforme RGPD",
-};
-
 type TierKey = "starter" | "pro" | "business" | "enterprise";
 
 type Tier = {
@@ -182,13 +175,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   const description = translate(l, "pricing.lede");
+  const title = translate(l, "meta.pricing.title");
   return {
-    title: TITLES[l],
+    title,
     description,
     alternates: buildAlternates(l, "/pricing"),
     openGraph: {
       type: "website",
-      title: TITLES[l],
+      title,
       description,
       url: `/${l}/pricing`,
       locale: ogLocale(l),

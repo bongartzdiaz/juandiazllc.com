@@ -10,9 +10,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "Sectors — where the playbook applies",
-    description:
-      "Energy, real estate, hospitality, adjacent. The five-phase method applied to the P&Ls that need it most.",
+    title: translate(l, "meta.sectors.title"),
+    description: translate(l, "meta.sectors.description"),
     alternates: buildAlternates(l, "/sectors"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };

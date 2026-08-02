@@ -12,9 +12,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "Contact — book a blueprint call",
-    description:
-      "Direct line to Juan. Blueprint calls are free, blunt, and under 30 minutes. Leave your details and I'll come back within 24 hours.",
+    title: translate(l, "meta.contact.title"),
+    description: translate(l, "meta.contact.description"),
     alternates: buildAlternates(l, "/contact"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };

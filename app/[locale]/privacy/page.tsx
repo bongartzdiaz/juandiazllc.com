@@ -10,9 +10,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "Privacy",
-    description:
-      "What this site stores, what it does not, and how to reach me about your data.",
+    title: translate(l, "meta.privacy.title"),
+    description: translate(l, "meta.privacy.description"),
     alternates: buildAlternates(l, "/privacy"),
     robots: { index: true, follow: true },
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },

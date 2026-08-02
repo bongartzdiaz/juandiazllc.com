@@ -10,13 +10,6 @@ import { EnergyInsightLinks } from "@/components/EnergyInsightLinks";
 // `roi.*` keys via translate() and hands them to the client component
 // as a plain-object prop — keeps the calculator itself locale-agnostic.
 
-const TITLES: Record<string, string> = {
-  en: "Energy ROI calculator — honest salderings-math for 2027",
-  nl: "Energie-ROI-rekenmachine — eerlijke saldeer-som voor 2027",
-  de: "Energie-ROI-Rechner — ehrliche Einspeise-Rechnung für 2027",
-  es: "Calculadora de ROI energético — aritmética honesta del saldo 2027",
-};
-
 export async function generateMetadata({
   params,
 }: {
@@ -25,13 +18,14 @@ export async function generateMetadata({
   const { locale } = await params;
   const l = assertLocale(locale);
   const description = translate(l, "roi.lede");
+  const title = translate(l, "meta.energyRoi.title");
   return {
-    title: TITLES[l],
+    title,
     description,
     alternates: buildAlternates(l, "/tools/energy-roi"),
     openGraph: {
       type: "website",
-      title: TITLES[l],
+      title,
       description,
       url: `/${l}/tools/energy-roi`,
       locale: ogLocale(l),
@@ -80,7 +74,7 @@ export default async function EnergyRoiPage({
   const crumbs = breadcrumbSchema([
     { name: "Home", path: `/${l}` },
     { name: "Tools", path: `/${l}/tools/energy-roi` },
-    { name: TITLES[l], path: `/${l}/tools/energy-roi` },
+    { name: translate(l, "meta.energyRoi.title"), path: `/${l}/tools/energy-roi` },
   ]);
 
   return (

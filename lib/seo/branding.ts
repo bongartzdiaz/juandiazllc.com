@@ -49,6 +49,24 @@ export const AUTHOR_IMAGE_FALLBACK_URL = `${SITE}/icon-512.svg`;
 export const ORG_LOGO_URL = `${SITE}/icon.svg`;
 
 /**
+ * Het achtervoegsel dat `title.template` in app/layout.tsx aan elke paginatitel
+ * plakt. Staat hier omdat de metadata-gate (metadata-locales.test.ts) hetzelfde
+ * getal nodig heeft: Google kapt rond de 60 tekens, dus wat dit kost gaat af van
+ * wat de pagina zelf mag zeggen.
+ *
+ * Was " · Juan Diaz, LLC" (17 tekens) tot 2026-08-02. Ingekort naar 12 omdat
+ * er anders 43 tekens overbleven voor de titel — te weinig voor Duits en Spaans.
+ * Gemeten: zelfs /pricing, de pagina die het patroon goed doet, viel in DE (45)
+ * en ES (47) buiten de grens. Nu is de ruimte 48.
+ *
+ * Verander dit niet zonder de gate opnieuw te draaien.
+ */
+export const TITLE_SUFFIX = " · Juan Diaz";
+
+/** Wat er overblijft voor de paginatitel zelf bij een SERP-limiet van 60. */
+export const TITLE_BUDGET = 60 - TITLE_SUFFIX.length;
+
+/**
  * Canonical `sameAs` profile set for the founder Person + the Organization —
  * single source of truth. Google treats sameAs as entity-disambiguation
  * signals (knowledge panel + author authority/E-E-A-T) and wants them

@@ -13,9 +13,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "Now — what I'm focused on this quarter",
-    description:
-      "A monthly-ish snapshot of what Juan Diaz, LLC is actually building, shipping, and thinking about. Last updated inline.",
+    title: translate(l, "meta.now.title"),
+    description: translate(l, "meta.now.description"),
     alternates: buildAlternates(l, "/now"),
     openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
