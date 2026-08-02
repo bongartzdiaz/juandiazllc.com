@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { LOCALES } from "@/lib/i18n/dict";
+import { TITLE_SUFFIX } from "@/lib/seo/branding";
 
 /* ---------------------------------------------------------------
    Metadata per taal — de gate
@@ -105,9 +106,11 @@ describe("titellengte", () => {
         if (!md) continue;
         const t = tekst(md.title);
         if (!t || t === "undefined") continue;
-        // Google kapt rond de 60 tekens. Het achtervoegsel "· Juan Diaz, LLC"
-        // komt uit de layout-template en telt mee in wat de zoeker ziet.
-        const volledig = t.includes("Juan Diaz") ? t : `${t} · Juan Diaz, LLC`;
+        // Google kapt rond de 60 tekens. Het achtervoegsel komt uit de
+        // layout-template en telt mee in wat de zoeker ziet, dus het wordt hier
+        // uit dezelfde constante gelezen — anders meet de gate een ander
+        // achtervoegsel dan er verstuurd wordt.
+        const volledig = t.includes("Juan Diaz") ? t : `${t}${TITLE_SUFFIX}`;
         expect(volledig.length, `${route} [${l}]: "${volledig}"`).toBeLessThanOrEqual(60);
       }
     });

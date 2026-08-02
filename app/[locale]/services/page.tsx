@@ -20,14 +20,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   return {
-    title: "Services — fractional revenue operations for operators",
-    description:
-      "Four ways operators work with Juan Diaz: revenue-engine builds, fractional revenue operations, build-vs-buy advisory, and operator instruments — for energy, real estate and hospitality.",
+    title: translate(l, "meta.services.title"),
+    description: translate(l, "meta.services.description"),
     alternates: buildAlternates(l, "/services"),
     openGraph: {
       type: "website",
       url: `/${l}/services`,
-      title: "Services — fractional revenue operations for operators",
+      title: translate(l, "meta.services.title"),
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
     },

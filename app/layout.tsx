@@ -28,6 +28,7 @@ import { Analytics } from "@/components/Analytics";
 import { WebVitalsReporter } from "@/components/WebVitalsReporter";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 import { LOCALES, DEFAULT_LOCALE } from "@/lib/i18n/dict";
+import { TITLE_SUFFIX } from "@/lib/seo/branding";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: "Juan Diaz — Fractional Revenue Operator & Consultant",
-    template: "%s · Juan Diaz, LLC",
+    template: `%s${TITLE_SUFFIX}`,
   },
   description:
     "Juan Diaz is a fractional revenue operator and operations consultant for energy, real estate and hospitality operators — building the revenue systems that make operators more money. Construction-trained, operator-built.",

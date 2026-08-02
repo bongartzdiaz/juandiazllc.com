@@ -823,6 +823,35 @@ const en: Dict = {
   "pricing.feat.limits.apiRequestsPerMonth": "API requests per month",
   "pricing.feat.infrastructure.sharedMultiTenant": "Shared multi-tenant",
   "pricing.feat.infrastructure.dedicatedServer": "Dedicated server",
+
+  // Metadata — <title> en <meta description> per pagina.
+  //
+  // Staat hier en niet in de pagina zelf, zodat de i18n-pariteitsgate
+  // (npm run i18n:check) merkt wanneer een taal achterblijft. Tot 2026-08-02
+  // stonden deze teksten hardgecodeerd in generateMetadata: ~127 niet-Engelse
+  // URL's serveerden een Engelse titel achter een vertaalde pagina.
+  //
+  // Twee regels, bewaakt door metadata-locales.test.ts:
+  //   titel  — max 48 tekens; het achtervoegsel uit lib/seo/branding.ts
+  //            (TITLE_SUFFIX) kost de resterende 12 van de 60 die Google toont
+  //   omschr — mikken op ~150; Google kapt rond de 160
+  //
+  // Dit is bewust NIET dezelfde tekst als de `.lede` van de pagina. Een lede
+  // wordt gelezen ná de klik; een description moet die klik nog verdienen en
+  // wordt afgekapt. Drie ledes (sectors, insights, signals) zijn 185-274 tekens
+  // en kunnen dat niet allebei zijn.
+  "meta.services.title": "Services — revenue operations for operators",
+  "meta.services.description":
+    "Four ways operators work with me: a full revenue-engine build, fractional revenue operations, build-vs-buy advice, or a second opinion before you sign.",
+  "meta.sectors.title": "Sectors — energy, real estate, hospitality",
+  "meta.sectors.description":
+    "The same five phases against different P&Ls. Per sector: where revenue leaks, how the method runs against it, and what I can actually point to.",
+  "meta.contact.title": "Contact — book a 15-minute call",
+  "meta.contact.description":
+    "Book a 15-minute call or leave your details. Free, blunt, no pitch deck. I answer within 24 hours.",
+  "meta.work.title": "Work — revenue engines running in the field",
+  "meta.work.description":
+    "Live products under Juan Diaz, LLC. Each one is the five-phase method applied to a real sector, with real operators using it every day.",
 };
 
 const nl: Dict = {
@@ -1598,6 +1627,20 @@ const nl: Dict = {
   "pricing.feat.limits.apiRequestsPerMonth": "API-aanvragen per maand",
   "pricing.feat.infrastructure.sharedMultiTenant": "Gedeelde multi-tenant",
   "pricing.feat.infrastructure.dedicatedServer": "Dedicated server",
+
+  // Metadata — zie de toelichting bij het Engelse blok.
+  "meta.services.title": "Diensten — revenue operations voor operators",
+  "meta.services.description":
+    "Vier manieren waarop operators met me werken: een volledige omzetmotor, fractional revenue operations, build-vs-buy-advies of een second opinion.",
+  "meta.sectors.title": "Sectoren — energie, vastgoed, hospitality",
+  "meta.sectors.description":
+    "Dezelfde vijf fases tegen andere cijfers. Per sector: waar de omzet weglekt, hoe de methode daartegen staat, en wat ik echt kan aanwijzen.",
+  "meta.contact.title": "Contact — plan een gesprek van 15 minuten",
+  "meta.contact.description":
+    "Plan een gesprek van 15 minuten of laat je gegevens achter. Gratis, direct, geen verkooppraatje. Ik reageer binnen 24 uur.",
+  "meta.work.title": "Werk — omzetmotoren die in het veld draaien",
+  "meta.work.description":
+    "Live producten van Juan Diaz, LLC. Elk daarvan is de vijf-fase-methode toegepast op een echte sector, met operators die er dagelijks mee werken.",
 };
 
 const de: Dict = {
@@ -2373,6 +2416,20 @@ const de: Dict = {
   "pricing.feat.limits.apiRequestsPerMonth": "API-Anfragen pro Monat",
   "pricing.feat.infrastructure.sharedMultiTenant": "Geteilte Multi-Tenant-Infrastruktur",
   "pricing.feat.infrastructure.dedicatedServer": "Dedizierter Server",
+
+  // Metadata — siehe Erläuterung im englischen Block.
+  "meta.services.title": "Leistungen — Revenue Operations für Betreiber",
+  "meta.services.description":
+    "Vier Wege, wie Betreiber mit mir arbeiten: kompletter Aufbau einer Umsatzmaschine, Fractional Revenue Operations, Build-vs-Buy-Beratung, Zweitmeinung.",
+  "meta.sectors.title": "Branchen — Energie, Immobilien, Hospitality",
+  "meta.sectors.description":
+    "Dieselben fünf Phasen, andere Zahlen. Pro Branche: wo Umsatz verloren geht, wie die Methode dagegen läuft und worauf ich konkret verweisen kann.",
+  "meta.contact.title": "Kontakt — 15-Minuten-Gespräch buchen",
+  "meta.contact.description":
+    "Buchen Sie ein 15-Minuten-Gespräch oder hinterlassen Sie Ihre Daten. Kostenlos, direkt, ohne Verkaufsgespräch. Antwort binnen 24 Stunden.",
+  "meta.work.title": "Arbeiten — Umsatzmaschinen im Feldeinsatz",
+  "meta.work.description":
+    "Live-Produkte von Juan Diaz, LLC. Jedes davon ist die Fünf-Phasen-Methode in einer echten Branche, täglich im Einsatz bei echten Betreibern.",
 };
 
 const es: Dict = {
@@ -3148,6 +3205,20 @@ const es: Dict = {
   "pricing.feat.limits.apiRequestsPerMonth": "Solicitudes API por mes",
   "pricing.feat.infrastructure.sharedMultiTenant": "Multi-tenant compartido",
   "pricing.feat.infrastructure.dedicatedServer": "Servidor dedicado",
+
+  // Metadata — ver la explicación en el bloque en inglés.
+  "meta.services.title": "Servicios — revenue operations para operadores",
+  "meta.services.description":
+    "Cuatro formas de trabajar conmigo: construir el motor de ingresos completo, revenue operations fraccional, asesoría build-vs-buy o una segunda opinión.",
+  "meta.sectors.title": "Sectores — energía, inmobiliario, hostelería",
+  "meta.sectors.description":
+    "Las mismas cinco fases contra otras cuentas. Por sector: dónde se escapa el ingreso, cómo actúa el método y qué puedo enseñarte de verdad.",
+  "meta.contact.title": "Contacto — reserva una llamada de 15 min",
+  "meta.contact.description":
+    "Reserva una llamada de 15 minutos o déjame tus datos. Gratis, directo, sin presentación de ventas. Respondo en 24 horas.",
+  "meta.work.title": "Proyectos — motores de ingresos en marcha",
+  "meta.work.description":
+    "Productos en marcha de Juan Diaz, LLC. Cada uno es el método de cinco fases aplicado a un sector real, con operadores que lo usan a diario.",
 };
 
 export const DICT: Record<Locale, Dict> = { en, nl, de, es };
