@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { getSectors } from "@/lib/sectors";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
@@ -49,7 +49,7 @@ export default async function SectorsIndex({ params }: { params: Promise<{ local
       <section style={{ padding: "80px 40px 160px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
           {sectors.map((s) => (
-            <Link key={s.slug} href={`/sectors/${s.slug}`} className="sec-card" data-reveal style={{ minHeight: 340 }}>
+            <LocaleLink key={s.slug} href={`/sectors/${s.slug}`} className="sec-card" data-reveal style={{ minHeight: 340 }}>
               <div>
                 <div className="ix">— {s.name}</div>
                 <h4 style={{ marginTop: 14, fontSize: 26, lineHeight: 1.12 }}>{s.tagline}</h4>
@@ -60,7 +60,7 @@ export default async function SectorsIndex({ params }: { params: Promise<{ local
                   <span key={t} className="tag">{t}</span>
                 ))}
               </div>
-            </Link>
+            </LocaleLink>
           ))}
         </div>
       </section>

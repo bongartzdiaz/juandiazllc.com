@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { getAllInsights } from "@/lib/insights";
 import type { Locale } from "@/lib/i18n/dict";
 
@@ -64,7 +64,7 @@ export function EnergyInsightLinks({ locale }: { locale: Locale }) {
       <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
         {posts.map((p) => (
           <li key={p.slug} style={{ borderTop: "1px solid var(--line)" }}>
-            <Link
+            <LocaleLink
               href={`/insights/${p.slug}`}
               style={{
                 display: "flex",
@@ -89,7 +89,7 @@ export function EnergyInsightLinks({ locale }: { locale: Locale }) {
               >
                 {p.readingMinutes} {copy.more} →
               </span>
-            </Link>
+            </LocaleLink>
           </li>
         ))}
       </ul>

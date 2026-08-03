@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { getVentures } from "@/lib/ventures";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
@@ -116,7 +116,7 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
                   {v.domain}
                 </div>
                 <div style={{ display: "flex", gap: 10 }}>
-                  <Link
+                  <LocaleLink
                     href={`/work/${v.slug}`}
                     style={{
                       fontFamily: "'JetBrains Mono'",
@@ -131,7 +131,7 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
                     }}
                   >
                     {t("work.page.cta.details")}
-                  </Link>
+                  </LocaleLink>
                   {v.external.startsWith("http") && (
                     <a
                       href={v.external}

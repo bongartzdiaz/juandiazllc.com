@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { useEffect, useState } from "react";
 import { useT } from "@/lib/i18n/useT";
 
@@ -37,7 +37,7 @@ export function Countdown2027({ variant = "full", href = "/work/salderingsregeli
 
   if (variant === "chip") {
     return (
-      <Link href={href} className="countdown-chip" aria-label={t("fomo.countdown.label")}>
+      <LocaleLink href={href} className="countdown-chip" aria-label={t("fomo.countdown.label")}>
         <span className="countdown-chip-dot" aria-hidden />
         <span className="countdown-chip-label">{t("fomo.countdown.label")}</span>
         <span className="countdown-chip-value">
@@ -49,7 +49,7 @@ export function Countdown2027({ variant = "full", href = "/work/salderingsregeli
           <span>:</span>
           <span>{String(r.seconds).padStart(2, "0")}</span>
         </span>
-      </Link>
+      </LocaleLink>
     );
   }
 
@@ -83,9 +83,9 @@ export function Countdown2027({ variant = "full", href = "/work/salderingsregeli
           <span className="countdown-unit">{t("fomo.countdown.seconds")}</span>
         </div>
       </div>
-      <Link href={href} className="countdown-full-cta">
+      <LocaleLink href={href} className="countdown-full-cta">
         {t("fomo.countdown.cta")}
-      </Link>
+      </LocaleLink>
     </aside>
   );
 }

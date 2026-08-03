@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import { AUTHOR_IMAGE_PATH, AUTHOR_IMAGE_URL, PERSON_SAME_AS } from "@/lib/seo/branding";
@@ -113,18 +113,18 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         <p>{t("about.p.why1")}</p>
         <p>
           {t("about.p.why2.1")}{" "}
-          <Link href="/story">{t("about.p.why2.link1")}</Link>
+          <LocaleLink href="/story">{t("about.p.why2.link1")}</LocaleLink>
           {t("about.p.why2.2")}{" "}
-          <Link href="/work">{t("about.p.why2.link2")}</Link>
+          <LocaleLink href="/work">{t("about.p.why2.link2")}</LocaleLink>
           {t("about.p.why2.3")}{" "}
-          <Link href="/insights">{t("about.p.why2.link3")}</Link>{" "}
+          <LocaleLink href="/insights">{t("about.p.why2.link3")}</LocaleLink>{" "}
           {t("about.p.why2.4")}
         </p>
 
         <div className="about-cta" style={{ marginTop: 48 }}>
-          <Link href="/contact" className="btn primary">
+          <LocaleLink href="/contact" className="btn primary">
             {t("about.cta")} <span className="arr">→</span>
-          </Link>
+          </LocaleLink>
         </div>
       </article>
     </>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
@@ -127,12 +127,12 @@ export default async function EnergyRoiPage({
           <p style={{ color: "var(--muted)", fontSize: 16, lineHeight: 1.65, marginBottom: 28, maxWidth: "60ch" }}>
             {t("roi.outro.body")}
           </p>
-          <Link
+          <LocaleLink
             className="btn primary btn-mag plausible-event-name=Tool+CTA plausible-event-tool=energy-roi"
             href="/contact?interest=energy-roi"
           >
             {t("roi.outro.cta")} <span className="arr">→</span>
-          </Link>
+          </LocaleLink>
         </div>
       </section>
     </>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { notFound } from "next/navigation";
 import { getAllInsights, formatDate } from "@/lib/insights";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
@@ -94,7 +94,7 @@ export default async function TagArchivePage(
           {translate(l, posts.length === 1 ? "insights.tag.lede.one" : "insights.tag.lede.many")
             .replace("{n}", String(posts.length))
             .replace("{tag}", label)}{" "}
-          <Link href={`/${l}/insights`}>{translate(l, "insights.tag.back")}</Link>.
+          <LocaleLink href={`/${l}/insights`}>{translate(l, "insights.tag.back")}</LocaleLink>.
         </p>
       </header>
 
@@ -113,7 +113,7 @@ export default async function TagArchivePage(
           }}
         >
           {posts.map((p) => (
-            <Link
+            <LocaleLink
               key={p.slug}
               href={`/insights/${p.slug}`}
               className="insight-card"
@@ -130,7 +130,7 @@ export default async function TagArchivePage(
               <span className="ic-read">
                 Read <span className="arr">→</span>
               </span>
-            </Link>
+            </LocaleLink>
           ))}
         </div>
       </section>

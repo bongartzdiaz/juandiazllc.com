@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 
@@ -80,13 +80,13 @@ export default async function NowPage({ params }: { params: Promise<{ locale: st
 
         <p style={{ marginTop: 48 }}>
           {t("now.outro.1")}{" "}
-          <Link href="/contact">{t("now.outro.link.contact")}</Link>
+          <LocaleLink href="/contact">{t("now.outro.link.contact")}</LocaleLink>
           {t("now.outro.2")}{" "}
-          <Link href="/insights">{t("now.outro.link.insights")}</Link>{" "}
+          <LocaleLink href="/insights">{t("now.outro.link.insights")}</LocaleLink>{" "}
           {t("now.outro.3")}{" "}
-          <Link href="/story">{t("now.outro.link.story")}</Link>{" "}
+          <LocaleLink href="/story">{t("now.outro.link.story")}</LocaleLink>{" "}
           {t("now.outro.4")}{" "}
-          <Link href="/uses">{t("now.outro.link.uses")}</Link>.
+          <LocaleLink href="/uses">{t("now.outro.link.uses")}</LocaleLink>.
         </p>
       </article>
     </>

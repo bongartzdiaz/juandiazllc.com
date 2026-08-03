@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { VENTURES, getVenture, getVentures } from "@/lib/ventures";
 import { getSector } from "@/lib/sectors";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
@@ -106,9 +106,9 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
             >
               {t("work.d.visit")} {v.domain} <span className="arr">↗</span>
             </a>
-            <Link className="btn ghost" href="/contact">
+            <LocaleLink className="btn ghost" href="/contact">
               {t("work.d.talk")} <span className="arr">→</span>
-            </Link>
+            </LocaleLink>
           </div>
         </div>
       </header>
@@ -230,13 +230,13 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
             dangerouslySetInnerHTML={{ __html: t("work.d.want.title") }}
           />
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <Link className="btn primary btn-mag" href="/contact">
+            <LocaleLink className="btn primary btn-mag" href="/contact">
               {t("work.d.want.cta")} <span className="arr">→</span>
-            </Link>
+            </LocaleLink>
             {sector && (
-              <Link className="btn ghost" href={`/sectors/${sector.slug}`}>
+              <LocaleLink className="btn ghost" href={`/sectors/${sector.slug}`}>
                 {t("work.d.want.sector").replace("{sector}", sector.name)} <span className="arr">→</span>
-              </Link>
+              </LocaleLink>
             )}
           </div>
         </div>
@@ -258,7 +258,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
           }}
         >
           {others.map((o) => (
-            <Link
+            <LocaleLink
               key={o.slug}
               href={`/work/${o.slug}`}
               className="sec-card"
@@ -273,7 +273,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
               <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--muted-soft)", textTransform: "uppercase", marginTop: 20 }}>
                 {t("work.d.seebuild")}
               </div>
-            </Link>
+            </LocaleLink>
           ))}
         </div>
       </section>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { SECTORS, getSector, getSectors } from "@/lib/sectors";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { LOCALES, translate } from "@/lib/i18n/dict";
@@ -120,9 +120,9 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
                 />
                 <p className="anchor-callout-text">{body}</p>
               </div>
-              <Link href={anchorHref} className="anchor-callout-cta">
+              <LocaleLink href={anchorHref} className="anchor-callout-cta">
                 {cta}
-              </Link>
+              </LocaleLink>
             </aside>
           );
         })()}
@@ -132,7 +132,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
           </div>
         )}
         {s.slug === "energy" && (
-          <Link
+          <LocaleLink
             href="/tools/energy-roi"
             style={{
               display: "flex",
@@ -159,7 +159,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
             <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--accent)", textTransform: "uppercase", whiteSpace: "nowrap" }}>
               Run the math →
             </span>
-          </Link>
+          </LocaleLink>
         )}
         {s.slug === "energy" && <EnergyInsightLinks locale={l} />}
         <SectorInsightLinks locale={l} sectorSlug={s.slug} />
@@ -249,9 +249,9 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
               </div>
             );
             return p.href ? (
-              <Link key={i} href={p.href} style={{ textDecoration: "none" }}>
+              <LocaleLink key={i} href={p.href} style={{ textDecoration: "none" }}>
                 {Inner}
-              </Link>
+              </LocaleLink>
             ) : (
               <div key={i}>{Inner}</div>
             );
@@ -275,9 +275,9 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
           <div style={{ fontFamily: "'Inter'", fontWeight: 300, fontSize: "clamp(26px, 3vw, 42px)", letterSpacing: "-.02em", lineHeight: 1.15, marginBottom: 28, maxWidth: "26ch" }}>
             Let&apos;s draw the <em>blueprint</em>.
           </div>
-          <Link className={`btn primary btn-mag plausible-event-name=Sector+CTA plausible-event-sector=${s.slug}`} href="/contact">
+          <LocaleLink className={`btn primary btn-mag plausible-event-name=Sector+CTA plausible-event-sector=${s.slug}`} href="/contact">
             Book a blueprint call <span className="arr">→</span>
-          </Link>
+          </LocaleLink>
         </div>
       </article>
 
@@ -291,7 +291,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
           {others.map((o) => (
-            <Link key={o.slug} href={`/sectors/${o.slug}`} className="sec-card" data-reveal style={{ minHeight: 200 }}>
+            <LocaleLink key={o.slug} href={`/sectors/${o.slug}`} className="sec-card" data-reveal style={{ minHeight: 200 }}>
               <div>
                 <div className="ix">— {o.name}</div>
                 <h4 style={{ marginTop: 14, fontSize: 22 }}>{o.tagline}</h4>
@@ -299,7 +299,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
               <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--muted-soft)", textTransform: "uppercase", marginTop: 20 }}>
                 See the sector →
               </div>
-            </Link>
+            </LocaleLink>
           ))}
         </div>
       </section>

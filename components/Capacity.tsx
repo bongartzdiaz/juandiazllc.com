@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { translate, type Locale } from "@/lib/i18n/dict";
 
 // Honest capacity signal. One blueprint engagement per quarter is the
@@ -28,9 +28,9 @@ export function Capacity({ locale, variant = "full", quarter = "Q3 2026" }: Prop
         <span className="capacity-strip-text">
           <strong>{quarter}</strong> — {SLOTS_REMAINING}/{TOTAL_SLOTS} {t("fomo.capacity.slotsLabel")}
         </span>
-        <Link href="/contact" className="capacity-strip-cta">
+        <LocaleLink href="/contact" className="capacity-strip-cta">
           {t("fomo.capacity.cta")} →
-        </Link>
+        </LocaleLink>
       </div>
     );
   }
@@ -59,9 +59,9 @@ export function Capacity({ locale, variant = "full", quarter = "Q3 2026" }: Prop
         {t("fomo.capacity.slotsLabel")}
       </p>
       <p className="capacity-note">{t("fomo.capacity.note")}</p>
-      <Link href="/contact" className="capacity-cta">
+      <LocaleLink href="/contact" className="capacity-cta">
         {t("fomo.capacity.cta")} →
-      </Link>
+      </LocaleLink>
     </aside>
   );
 }

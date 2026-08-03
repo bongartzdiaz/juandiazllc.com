@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { SignOutButton } from "@/components/SignOutButton";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
@@ -77,8 +77,8 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
           </p>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <Link className="btn ghost" href="/">{t("dash.btn.site")}</Link>
-          <Link className="btn ghost" href="/app">{t("dash.btn.hub")}</Link>
+          <LocaleLink className="btn ghost" href="/">{t("dash.btn.site")}</LocaleLink>
+          <LocaleLink className="btn ghost" href="/app">{t("dash.btn.hub")}</LocaleLink>
           <SignOutButton />
         </div>
       </header>
