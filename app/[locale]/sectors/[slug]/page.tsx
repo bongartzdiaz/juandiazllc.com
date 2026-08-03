@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { SECTORS, getSector } from "@/lib/sectors";
+import { SECTORS, getSector, getSectors } from "@/lib/sectors";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
@@ -19,7 +19,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params;
   const l = assertLocale(locale);
-  const s = getSector(slug);
+  const s = getSector(slug, l);
   if (!s) return { title: "Sector not found" };
   // Prefer the keyword-targeted SEO strings; fall back to the brand
   // tagline/summary when a sector hasn't defined them.
@@ -43,10 +43,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function SectorPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
   const l = assertLocale(locale);
-  const s = getSector(slug);
+  const s = getSector(slug, l);
   if (!s) notFound();
 
-  const others = SECTORS.filter((x) => x.slug !== s.slug);
+  const others = getSectors(l).filter((x) => x.slug !== s.slug);
   const sectorFaq = getSectorFaq(l, s.slug);
 
   const crumbs = breadcrumbSchema([
@@ -71,7 +71,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
       <header className="page-hero" style={{ position: "relative", overflow: "hidden" }}>
         <div aria-hidden style={{ position: "absolute", inset: 0, background: s.gradient, pointerEvents: "none" }} />
         <div style={{ position: "relative" }}>
-          <div className="eyebrow">◉ Sector</div>
+          <div className="eyebrow">{translate(l, "sectors.detail.eyebrow")}</div>
           <h1>{s.name.split(" & ").map((part, i) => (
             i === 0 ? <span key={i}>{part}</span> : <span key={i}> & <em>{part}</em></span>
           ))}</h1>

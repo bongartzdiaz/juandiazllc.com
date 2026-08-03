@@ -42,7 +42,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
   if (!v) notFound();
 
   const others = VENTURES.filter((x) => x.slug !== v.slug).slice(0, 3);
-  const sector = getSector(v.sectorSlug);
+  const sector = getSector(v.sectorSlug, l);
 
   const crumbs = breadcrumbSchema([
     { name: "Home", path: "/" },
