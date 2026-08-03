@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllInsights, formatDate } from "@/lib/insights";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
-import { LOCALES, type Locale } from "@/lib/i18n/dict";
+import { LOCALES, translate, type Locale } from "@/lib/i18n/dict";
+import { tagLabel, tagSlug } from "@/lib/i18n/tags";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 
 // Tag archive pages — /insights/tag/systems, /insights/tag/energy etc.
@@ -15,17 +16,10 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 // become hyphens, so "Real Estate" -> "real-estate". The page title
 // uses the canonical case from the first post that declares the tag.
 
-function toSlug(tag: string) {
-  return tag
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
 function uniqueTags(locale?: Locale) {
   const map = new Map<string, string>(); // slug -> canonical tag
   for (const p of getAllInsights(locale)) {
-    const slug = toSlug(p.tag);
+    const slug = tagSlug(p.tag);
     if (!map.has(slug)) map.set(slug, p.tag);
   }
   return map;
@@ -51,14 +45,15 @@ export async function generateMetadata(
   const l = assertLocale(locale);
   const canonical = uniqueTags(l).get(tag);
   if (!canonical) return { title: "Tag not found" };
+  const label = tagLabel(l, tag, canonical);
   return {
-    title: `${canonical} insights — revenue engines for operators`,
-    description: `Everything I've written on ${canonical.toLowerCase()} — field notes, case patterns, decisions that moved real P&Ls.`,
+    title: translate(l, "insights.tag.meta.title").replace("{tag}", label),
+    description: translate(l, "insights.tag.meta.description").replace("{tag}", label),
     alternates: buildAlternates(l, `/insights/tag/${tag}`, tagLocales(tag)),
     openGraph: {
       type: "website",
       url: `/${l}/insights/tag/${tag}`,
-      title: `${canonical} insights — Juan Diaz, LLC`,
+      title: translate(l, "insights.tag.meta.title").replace("{tag}", label),
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
     },
@@ -74,11 +69,12 @@ export default async function TagArchivePage(
   if (!canonical) notFound();
 
   const posts = getAllInsights(l).filter((p) => p.tag === canonical);
+  const label = tagLabel(l, tag, canonical);
 
   const crumbs = breadcrumbSchema([
-    { name: "Home", path: "/" },
-    { name: "Insights", path: "/insights" },
-    { name: canonical, path: `/insights/tag/${tag}` },
+    { name: "Home", path: `/${l}` },
+    { name: "Insights", path: `/${l}/insights` },
+    { name: label, path: `/${l}/insights/tag/${tag}` },
   ]);
 
   return (
@@ -88,14 +84,17 @@ export default async function TagArchivePage(
         dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }}
       />
       <header className="page-hero">
-        <div className="eyebrow">◉ {canonical}</div>
-        <h1>
-          Writing on <em>{canonical.toLowerCase()}</em>.
-        </h1>
+        <div className="eyebrow">◉ {label}</div>
+        <h1
+          dangerouslySetInnerHTML={{
+            __html: translate(l, "insights.tag.h1").replace("{tag}", label),
+          }}
+        />
         <p>
-          {posts.length} piece{posts.length === 1 ? "" : "s"} across the {canonical}{" "}
-          cluster. Field notes, not thought leadership —{" "}
-          <Link href="/insights">back to all insights</Link>.
+          {translate(l, posts.length === 1 ? "insights.tag.lede.one" : "insights.tag.lede.many")
+            .replace("{n}", String(posts.length))
+            .replace("{tag}", label)}{" "}
+          <Link href={`/${l}/insights`}>{translate(l, "insights.tag.back")}</Link>.
         </p>
       </header>
 

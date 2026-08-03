@@ -71,9 +71,9 @@ export function ContactForm() {
         {t("form.step")} {Math.min(step, totalSteps)} {t("form.of")} {totalSteps}
       </div>
 
-      <h1>
+      <h2>
         {t("contact.title.a")} <em>{t("contact.title.b")}</em>
-      </h1>
+      </h2>
       <p>{t("contact.lede")}</p>
 
       <form className="auth-form" action={formAction}>

@@ -1083,7 +1083,7 @@ footer .f-mark { color: var(--text); }
   animation: pulse 1.6s infinite;
 }
 
-.auth-card h1 {
+.auth-card h1, .auth-card h2 {
   font-family: var(--font-inter), 'Inter';
   font-weight: 300;
   font-size: 38px;
@@ -1094,7 +1094,7 @@ footer .f-mark { color: var(--text); }
   overflow-wrap: anywhere;
   hyphens: auto;
 }
-.auth-card h1 em { color: var(--accent); font-style: italic; }
+.auth-card h1 em, .auth-card h2 em { color: var(--accent); font-style: italic; }
 .auth-card p {
   color: var(--muted);
   font-size: 15px;
@@ -1221,7 +1221,7 @@ footer .f-mark { color: var(--text); }
 
 @media (max-width: 500px) {
   .auth-card { padding: 44px 28px 32px; border-radius: 18px; }
-  .auth-card h1 { font-size: 32px; }
+  .auth-card h1, .auth-card h2 { font-size: 32px; }
   .auth-mark { width: 72px; height: 72px; top: -36px; }
 }
 

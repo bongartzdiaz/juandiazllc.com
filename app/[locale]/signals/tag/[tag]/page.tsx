@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SIGNALS, getSignals } from "@/lib/signals";
+import { tagLabel, tagSlug } from "@/lib/i18n/tags";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
@@ -12,17 +13,10 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 // hyphens (so "Real Estate" → "real-estate"). Canonical case comes from
 // the first signal that declares the tag.
 
-function toSlug(tag: string) {
-  return tag
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
 function uniqueTags() {
   const map = new Map<string, string>(); // slug -> canonical tag
   for (const s of SIGNALS) {
-    const slug = toSlug(s.tag);
+    const slug = tagSlug(s.tag);
     if (!map.has(slug)) map.set(slug, s.tag);
   }
   return map;
@@ -40,15 +34,16 @@ export async function generateMetadata(
   const l = assertLocale(locale);
   const canonical = uniqueTags().get(tag);
   if (!canonical) return { title: "Tag not found" };
-  const title = `${translate(l, "signals.tag.title")} ${canonical}`;
+  const label = tagLabel(l, tag, canonical);
+  const title = `${translate(l, "signals.tag.title")} ${label}`;
   return {
     title,
-    description: `${translate(l, "signals.tag.title")} ${canonical.toLowerCase()} — field notes and build logs from Juan Diaz, LLC.`,
+    description: translate(l, "signals.tag.desc").replace("{tag}", label),
     alternates: buildAlternates(l, `/signals/tag/${tag}`),
     openGraph: {
       type: "website",
       url: `/${l}/signals/tag/${tag}`,
-      title: `${canonical} signals — Juan Diaz, LLC`,
+      title,
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
     },
@@ -85,9 +80,9 @@ export default async function SignalsTagArchivePage(
         >
           {translate(l, "signals.tag.back")}
         </Link>
-        <div className="eyebrow">◉ {canonical}</div>
+        <div className="eyebrow">◉ {tagLabel(l, tag, canonical)}</div>
         <h1>
-          {translate(l, "signals.tag.title")} <em>{canonical}</em>
+          {translate(l, "signals.tag.title")} <em>{tagLabel(l, tag, canonical)}</em>
         </h1>
         <p>
           {posts.length} piece{posts.length === 1 ? "" : "s"} tagged{" "}
