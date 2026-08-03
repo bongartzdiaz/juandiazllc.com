@@ -146,6 +146,57 @@ niet te onderscheiden van "niemand klikt".
 - [ ] Naam exact: `Boeking 15min` (de `+` in de class is een spatie)
 - [ ] Na de eerste echte klik controleren of hij in het dashboard verschijnt
 
+## DataForSEO — vervangt Ahrefs (client staat klaar, 2026-08-03)
+
+Ahrefs gaat eruit. `lib/seo/dataforseo.ts` is de vervanger; hij is geschreven
+tegen de API-vorm zoals die op 2026-08-03 in de documentatie stond en heeft
+18 tests. Wat nog ontbreekt zijn de inloggegevens.
+
+**Wat DataForSEO NIET doet:** jouw clicks en vertoningen. Die staan alleen in
+Search Console en zijn privé voor de eigenaar van de property — geen enkele
+derde partij komt erbij. DataForSEO ziet de buitenkant (posities, volumes,
+backlinks, concurrenten) en schat die. Je hebt ze allebei nodig.
+
+**Route 1 — client in de repo (voor de dagelijkse pulse en CI)**
+
+- [ ] Haal de API-inloggegevens op bij https://app.dataforseo.com/api-access.
+      Dat is **niet** je accountwachtwoord maar een apart, gegenereerd
+      wachtwoord.
+- [ ] Zet ze als `DATAFORSEO_LOGIN` en `DATAFORSEO_PASSWORD` — lokaal in
+      `.env.local`, en in Vercel als de pulse daar moet draaien.
+- [ ] Eerst kijken wat het zou opvragen, gratis:
+      `npm run seo:report:dry`
+- [ ] Daarna echt (dit kost geld; het script drukt de kosten per onderdeel en
+      het totaal af): `npm run seo:report` — of `npx tsx scripts/seo-report.ts
+      --markt=de` voor een andere markt.
+
+**Route 2 — MCP-server (voor ad-hoc onderzoek tijdens een sessie)**
+
+Toevoegen aan de Claude-configuratie. De officiële server draait via npx:
+
+```json
+{
+  "mcpServers": {
+    "dataforseo": {
+      "command": "npx",
+      "args": ["-y", "dataforseo-mcp-server"],
+      "env": {
+        "DATAFORSEO_USERNAME": "<login>",
+        "DATAFORSEO_PASSWORD": "<api-wachtwoord>"
+      }
+    }
+  }
+}
+```
+
+> Deze snippet is **niet geverifieerd** — ik kon hem zonder inloggegevens niet
+> draaien, en het pakketnaam-veld is het soort ding dat verandert. Controleer
+> hem tegen de actuele README van DataForSEO voor je hem plakt.
+
+**Let op de kosten.** Elk verzoek wordt afgerekend. De client geeft `cost` per
+antwoord terug en het rapport telt op; laat dat staan. De limiet is 12
+verzoeken per minuut, dus de client houdt vijf seconden tussen aanroepen aan.
+
 ## Ahrefs API — deels dood, deadline is 10 aug (opnieuw gemeten 2026-08-03)
 
 > **Correctie op de regel hieronder.** De vorige versie van dit blok zei dat de
