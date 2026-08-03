@@ -146,13 +146,24 @@ niet te onderscheiden van "niemand klikt".
 - [ ] Naam exact: `Boeking 15min` (de `+` in de class is een spatie)
 - [ ] Na de eerste echte klik controleren of hij in het dashboard verschijnt
 
-## Ahrefs API — deadline VERSTREKEN, sleutel is dood (gemeten 2026-08-02)
+## Ahrefs API — deels dood, deadline is 10 aug (opnieuw gemeten 2026-08-03)
 
-> **Stand 2026-08-02.** De deadline hieronder is verlopen en er is niets meer
-> gemigreerd. Gemeten vandaag: **élk** Ahrefs-endpoint geeft nu
-> `Insufficient plan` — ook `subscription-info-limits-and-usage`, dat volgens de
-> documentatie gratis is en geen API-units kost. Er komt dus geen enkel getal
-> meer uit Ahrefs: geen DR, geen keywords, geen verkeer.
+> **Correctie op de regel hieronder.** De vorige versie van dit blok zei dat de
+> deadline verstreken was en dat **élk** endpoint `Insufficient plan` gaf.
+> Allebei niet waar, opnieuw gemeten op 2026-08-03:
+>
+> | endpoint | uitkomst vandaag |
+> |---|---|
+> | `public-domain-rating-free` | **werkt** — DR = 0.0 |
+> | `subscription-info-limits-and-usage` | `Insufficient plan` |
+> | alle `gsc-*` | `Insufficient plan` |
+>
+> De waarschuwing die het DR-endpoint zelf meestuurt noemt **2026-08-10**, niet
+> 2026-08-01. Er is dus nog een week om de gratis sleutel te regelen, geen
+> gemiste deadline.
+>
+> Wat wél klopt: er komt geen zoekdata uit Ahrefs. Geen keywords, geen
+> verkeer, geen GSC.
 >
 > Dat betekent dat de site op dit moment **blind publiceert**. Er is geen manier
 > om te zien of een artikel iets doet, welke zoekopdrachten binnenkomen, of een
@@ -170,12 +181,37 @@ niet te onderscheiden van "niemand klikt".
 
 **Google Search Console koppelen (aanbevolen route, ~20 min)**
 
+> **Vooraf gecontroleerd op 2026-08-03**, zodat deze twintig minuten niet
+> stuklopen op iets wat vooraf te meten was:
+>
+> - `https://juandiazllc.com/sitemap.xml` geeft 200 en staat op het juiste
+>   domein (lokaal staat er `localhost:3000` in — dat is de dev-waarde van
+>   `NEXT_PUBLIC_SITE_URL` en raakt productie niet).
+> - 176 `<url>`-blokken, alle met `hreflang` én `lastmod`.
+> - hreflang is wederkerig: geen enkele annotatie wijst naar een URL die
+>   zelf niet terugverwijst. Google negeert eenzijdige annotaties, dus dit
+>   is de fout die het vaakst stilletjes misgaat.
+> - Steekproef van 15 URL's: allemaal 200, canonical gelijk aan de
+>   sitemap-URL.
+>
+> Kortom: de sitemap is klaar om ingediend te worden. Het script staat in de
+> sessie-scratchpad (`sitemap-check.mjs`) als je het wilt herhalen.
+
 - [ ] Property aanmaken voor `juandiazllc.com` op
       https://search.google.com/search-console — kies **Domain**, niet
       URL-prefix, anders mis je de subdomeinen.
 - [ ] Verifiëren via DNS-TXT bij de registrar.
-- [ ] Sitemap indienen: `https://juandiazllc.com/sitemap.xml` (die bestaat al en
-      bevat hreflang per locale).
+      *Kies je toch URL-prefix, dan geeft Google een meta-tag in plaats van een
+      DNS-record. Zet de waarde daarvan als `GOOGLE_SITE_VERIFICATION` in
+      Vercel — `app/layout.tsx` rendert de tag dan op elke pagina, in alle vier
+      de talen. Zonder die variabele wordt er niets gerenderd, dus er hoeft
+      geen code te wijzigen.*
+      *Beide richtingen gemeten op 2026-08-03. Let op: de metadata wordt bij het
+      verzoek berekend, niet bij de build — een dráaiende server pikt een nieuwe
+      variabele dus niet op. Op Vercel is dat vanzelf goed (nieuwe deploy =
+      nieuw proces); lokaal moet je `next start` herstarten, anders test je een
+      oude toestand. Daar liep ik zelf eerst in.*
+- [ ] Sitemap indienen: `https://juandiazllc.com/sitemap.xml`.
 - [ ] Voor geautomatiseerd uitlezen: service-account aanmaken in Google Cloud,
       Search Console API aanzetten, het service-account-e-mailadres als
       gebruiker toevoegen in Search Console.
