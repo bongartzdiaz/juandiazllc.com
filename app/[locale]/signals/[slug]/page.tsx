@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { SIGNALS, getSignal } from "@/lib/signals";
+import { SIGNALS, getSignal, getSignals } from "@/lib/signals";
 import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
@@ -18,16 +18,17 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params;
   const l = assertLocale(locale);
-  const s = getSignal(slug);
+  const s = getSignal(slug, l);
   if (!s) return { title: "Signal not found" };
+  const titel = s.seoTitle ?? s.title;
   return {
-    title: s.title,
+    title: titel,
     description: s.excerpt,
     alternates: buildAlternates(l, `/signals/${s.slug}`),
     openGraph: {
       type: "article",
       url: `/${l}/signals/${s.slug}`,
-      title: s.title,
+      title: titel,
       description: s.excerpt,
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
@@ -51,12 +52,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function SignalPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
   const l = assertLocale(locale);
-  const s = getSignal(slug);
+  const s = getSignal(slug, l);
   if (!s) notFound();
 
-  const idx = SIGNALS.findIndex((x) => x.slug === s.slug);
-  const prev = idx > 0 ? SIGNALS[idx - 1] : null;
-  const next = idx < SIGNALS.length - 1 ? SIGNALS[idx + 1] : null;
+  const alle = getSignals(l);
+  const idx = alle.findIndex((x) => x.slug === s.slug);
+  const prev = idx > 0 ? alle[idx - 1] : null;
+  const next = idx < alle.length - 1 ? alle[idx + 1] : null;
 
   // Flatten the block body into a plain-text articleBody for schema.
   // Lists are bulleted so keyword signal survives; quotes/headings

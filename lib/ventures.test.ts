@@ -136,7 +136,9 @@ describe("elke venture is in alle vier de talen af", () => {
       it("vertaalde lijsten hebben dezelfde lengte als de basis", () => {
         for (const l of VERTAALD) {
           const x = getVenture(v.slug, l)!;
-          expect(x.phases, `${v.slug}/${l} phases`).toHaveLength(v.phases.length);
+          // phases gaat door mergeByIndex, dus de lengte van het resultaat is
+          // altijd gelijk; de echte invariant zit in de rauwe vertaaldata.
+          expect(v.i18n![l]!.phases, `${v.slug}/${l} phases`).toHaveLength(v.phases.length);
           expect(x.metrics, `${v.slug}/${l} metrics`).toHaveLength(v.metrics.length);
           expect(x.relatedSectors, `${v.slug}/${l} relatedSectors`).toHaveLength(v.relatedSectors.length);
         }

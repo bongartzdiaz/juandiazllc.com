@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SIGNALS } from "@/lib/signals";
+import { SIGNALS, getSignals } from "@/lib/signals";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
@@ -63,7 +63,7 @@ export default async function SignalsTagArchivePage(
   const canonical = uniqueTags().get(tag);
   if (!canonical) notFound();
 
-  const posts = SIGNALS.filter((s) => s.tag === canonical);
+  const posts = getSignals(l).filter((s) => s.tag === canonical);
 
   const crumbs = breadcrumbSchema([
     { name: "Home", path: `/${l}` },

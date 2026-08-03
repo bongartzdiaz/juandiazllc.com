@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useT } from "@/lib/i18n/useT";
-import { SIGNALS } from "@/lib/signals";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { getSignals } from "@/lib/signals";
 
 export function Signals() {
-  const t = useT();
-  const posts = SIGNALS.slice(0, 3);
+  const { t, locale } = useLocale();
+  const posts = getSignals(locale).slice(0, 3);
   return (
     <section id="signals">
       <div className="sec-head" data-reveal>
