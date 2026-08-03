@@ -536,6 +536,7 @@ const en: Dict = {
   "work.d.seebuild": "See the build →",
 
   "sectors.page.eyebrow": "◉ Sectors",
+  "sectors.detail.eyebrow": "◉ Sector",
   "sectors.page.title": "Where the <em>playbook</em> applies.",
   "sectors.page.lede": "Energy, real estate, hospitality and adjacent operator industries — the same five phases against different P&Ls. Every sector page is a real survey: where revenue leaks, how the method runs against it, and what I can point to (or the slot still open for a first partner).",
 
@@ -1386,6 +1387,7 @@ const nl: Dict = {
   "work.d.seebuild": "Bekijk de build →",
 
   "sectors.page.eyebrow": "◉ Sectoren",
+  "sectors.detail.eyebrow": "◉ Sector",
   "sectors.page.title": "Waar het <em>draaiboek</em> werkt.",
   "sectors.page.lede": "Energie, vastgoed, hospitality en aanverwante operator-sectoren — dezelfde vijf fases tegen andere cijfers. Elke sectorpagina is een echte verkenning: waar de omzet weglekt, hoe de methode daartegen staat, en wat ik kan aanwijzen (of het openstaande plekje voor een eerste partner).",
 
@@ -2207,6 +2209,7 @@ const de: Dict = {
   "work.d.seebuild": "Build ansehen →",
 
   "sectors.page.eyebrow": "◉ Sektoren",
+  "sectors.detail.eyebrow": "◉ Sektor",
   "sectors.page.title": "Wo das <em>Drehbuch</em> greift.",
   "sectors.page.lede": "Energie, Immobilien, Hospitality und angrenzende Betreiberbranchen — dieselben fünf Phasen, andere Zahlen. Jede Branchenseite ist eine echte Bestandsaufnahme: wo Umsatz verloren geht, wie die Methode dagegen läuft, und worauf ich verweisen kann (oder der noch freie Platz für einen ersten Partner).",
 
@@ -3028,6 +3031,7 @@ const es: Dict = {
   "work.d.seebuild": "Ver el build →",
 
   "sectors.page.eyebrow": "◉ Sectores",
+  "sectors.detail.eyebrow": "◉ Sector",
   "sectors.page.title": "Donde el <em>manual</em> aplica.",
   "sectors.page.lede": "Energía, inmobiliario, hostelería y sectores operativos afines — las mismas cinco fases contra otras cuentas. Cada página de sector es un diagnóstico real: dónde se escapa el ingreso, cómo actúa el método, y qué puedo enseñar (o el hueco libre para un primer socio).",
 
