@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { getSignals } from "@/lib/signals";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
@@ -48,7 +48,7 @@ export default async function SignalsIndex({ params }: { params: Promise<{ local
       <section style={{ padding: "80px 40px 160px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div style={{ display: "grid", gap: 12 }}>
           {getSignals(l).map((s) => (
-            <Link
+            <LocaleLink
               key={s.slug}
               href={`/signals/${s.slug}`}
               style={{
@@ -97,7 +97,7 @@ export default async function SignalsIndex({ params }: { params: Promise<{ local
               >
                 {t("signals.page.read")}
               </div>
-            </Link>
+            </LocaleLink>
           ))}
         </div>
       </section>

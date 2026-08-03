@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { notFound } from "next/navigation";
 import { getAllInsights, getInsight, insightMarkets, isInMarket, formatDate, tocFromBody, headingSlug } from "@/lib/insights";
 import { getVentureForTag } from "@/lib/ventures";
@@ -102,11 +102,11 @@ export default async function InsightPage(
       />
       <article className="insight-article">
         <header className="ia-head">
-          <Link href="/insights" className="ia-back">
+          <LocaleLink href="/insights" className="ia-back">
             <span className="arr" style={{ marginRight: 6 }}>←</span> {t("insights.d.allposts")}
-          </Link>
+          </LocaleLink>
           <div className="ia-meta">
-            <Link href={`/insights/tag/${post.tag.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`} className="ia-tag">{post.tag}</Link>
+            <LocaleLink href={`/insights/tag/${post.tag.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`} className="ia-tag">{post.tag}</LocaleLink>
             <span>·</span>
             <span>{formatDate(post.publishedAt)}</span>
             <span>·</span>
@@ -161,9 +161,9 @@ export default async function InsightPage(
               if (block.type === "cta")
                 return (
                   <p key={i} className="ia-inline-cta">
-                    <Link href={block.href} className="btn primary">
+                    <LocaleLink href={block.href} className="btn primary">
                       {block.text} <span className="arr">→</span>
-                    </Link>
+                    </LocaleLink>
                   </p>
                 );
               return null;
@@ -190,19 +190,19 @@ export default async function InsightPage(
               {t("contact.book.cta")} <span className="arr">→</span>
             </a>
             <p style={{ marginTop: 12, fontSize: 14 }}>
-              <Link href="/contact">{t("insights.d.want.cta")}</Link>
+              <LocaleLink href="/contact">{t("insights.d.want.cta")}</LocaleLink>
             </p>
           </div>
 
           {venture && (
             <div className="ia-venture">
               <div className="label">{t("insights.d.seenwild")}</div>
-              <Link href={`/work/${venture.slug}`} className="ia-venture-card">
+              <LocaleLink href={`/work/${venture.slug}`} className="ia-venture-card">
                 <div className="iav-sector">{venture.sector}</div>
                 <h3 className="iav-name">{venture.name}</h3>
                 <p className="iav-tagline">{venture.tagline}</p>
                 <span className="iav-cue">{t("insights.d.seeventure")} <span className="arr">→</span></span>
-              </Link>
+              </LocaleLink>
             </div>
           )}
 
@@ -211,7 +211,7 @@ export default async function InsightPage(
               <div className="label">{t("insights.d.readnext")}</div>
               <div className="ia-related-grid">
                 {related.map((r) => (
-                  <Link key={r.slug} href={`/insights/${r.slug}`} className="insight-card">
+                  <LocaleLink key={r.slug} href={`/insights/${r.slug}`} className="insight-card">
                     <div className="ic-top">
                       <span className="ic-tag">— {r.tag}</span>
                       <span className="ic-meta">{r.readingMinutes} {t("insights.d.min")}</span>
@@ -219,7 +219,7 @@ export default async function InsightPage(
                     <h2 className="ic-title" style={{ fontSize: 22 }}>
                       {r.title}
                     </h2>
-                  </Link>
+                  </LocaleLink>
                 ))}
               </div>
             </div>

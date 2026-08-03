@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { useT } from "@/lib/i18n/useT";
 
 const ICONS = {
@@ -67,7 +67,7 @@ export function Sectors() {
       </div>
       <div className="sectors-grid">
         {cards.map((s, i) => (
-          <Link key={i} href={`/sectors/${s.slug}`} className="sec-card" data-reveal>
+          <LocaleLink key={i} href={`/sectors/${s.slug}`} className="sec-card" data-reveal>
             <div>
               <div className="ix">{s.ix}</div>
               <div className="ico">{s.icon}</div>
@@ -79,7 +79,7 @@ export function Sectors() {
                 <span key={tag} className="tag">{tag}</span>
               ))}
             </div>
-          </Link>
+          </LocaleLink>
         ))}
       </div>
     </section>

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 
 export function NotFoundBody() {
@@ -48,15 +48,15 @@ export function NotFoundBody() {
             flexWrap: "wrap",
           }}
         >
-          <Link href={`/${locale}`} className="btn primary">
+          <LocaleLink href={`/${locale}`} className="btn primary">
             {t("nf.btn.home")} <span className="arr">→</span>
-          </Link>
-          <Link href={`/${locale}/insights`} className="btn ghost">
+          </LocaleLink>
+          <LocaleLink href={`/${locale}/insights`} className="btn ghost">
             {t("nf.btn.insights")} <span className="arr">→</span>
-          </Link>
-          <Link href={`/${locale}/contact`} className="btn ghost">
+          </LocaleLink>
+          <LocaleLink href={`/${locale}/contact`} className="btn ghost">
             {t("nf.btn.contact")} <span className="arr">→</span>
-          </Link>
+          </LocaleLink>
         </div>
       </div>
     </section>

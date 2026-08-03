@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { notFound } from "next/navigation";
 import { SIGNALS, getSignals } from "@/lib/signals";
 import { tagLabel, tagSlug } from "@/lib/i18n/tags";
@@ -73,13 +73,13 @@ export default async function SignalsTagArchivePage(
         dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }}
       />
       <header className="page-hero">
-        <Link
+        <LocaleLink
           href="/signals"
           className="eyebrow"
           style={{ display: "inline-block", marginBottom: 20 }}
         >
           {translate(l, "signals.tag.back")}
-        </Link>
+        </LocaleLink>
         <div className="eyebrow">◉ {tagLabel(l, tag, canonical)}</div>
         <h1>
           {translate(l, "signals.tag.title")} <em>{tagLabel(l, tag, canonical)}</em>
@@ -87,7 +87,7 @@ export default async function SignalsTagArchivePage(
         <p>
           {posts.length} piece{posts.length === 1 ? "" : "s"} tagged{" "}
           <em>{canonical.toLowerCase()}</em> —{" "}
-          <Link href="/signals">back to all signals</Link>.
+          <LocaleLink href="/signals">back to all signals</LocaleLink>.
         </p>
       </header>
 
@@ -105,7 +105,7 @@ export default async function SignalsTagArchivePage(
         ) : (
           <div style={{ display: "grid", gap: 12 }}>
             {posts.map((s) => (
-              <Link
+              <LocaleLink
                 key={s.slug}
                 href={`/signals/${s.slug}`}
                 style={{
@@ -172,7 +172,7 @@ export default async function SignalsTagArchivePage(
                 >
                   Read →
                 </div>
-              </Link>
+              </LocaleLink>
             ))}
           </div>
         )}

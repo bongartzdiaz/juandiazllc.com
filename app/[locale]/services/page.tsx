@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
@@ -78,7 +78,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
       <section style={{ padding: "80px 40px 80px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
           {DELIVERABLES.map((d) => (
-            <Link key={d.id} href={d.href} className="sec-card" data-reveal style={{ minHeight: 240 }}>
+            <LocaleLink key={d.id} href={d.href} className="sec-card" data-reveal style={{ minHeight: 240 }}>
               <div>
                 <div className="ix">— {t(`services.${d.id}.title`)}</div>
                 <p style={{ marginTop: 16 }}>{t(`services.${d.id}.body`)}</p>
@@ -86,7 +86,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
               <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--muted-soft)", textTransform: "uppercase", marginTop: 20 }}>
                 {t("services.more")} <span className="arr">→</span>
               </div>
-            </Link>
+            </LocaleLink>
           ))}
         </div>
       </section>
@@ -95,9 +95,9 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
           <div style={{ fontFamily: "'Inter'", fontWeight: 300, fontSize: "clamp(22px, 3vw, 32px)", letterSpacing: "-.02em", marginBottom: 24 }}>
             {t("services.cta.title")}
           </div>
-          <Link className="btn primary btn-mag" href="/contact">
+          <LocaleLink className="btn primary btn-mag" href="/contact">
             {t("services.cta.btn")} <span className="arr">→</span>
-          </Link>
+          </LocaleLink>
         </div>
       </section>
       {/* De pagina beschreef vier diensten maar beantwoordde geen koopvraag.

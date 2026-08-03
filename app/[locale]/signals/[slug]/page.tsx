@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { SIGNALS, getSignal, getSignals } from "@/lib/signals";
 import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
@@ -100,9 +100,9 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
         dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }}
       />
       <header className="page-hero" style={{ paddingBottom: 32 }}>
-        <Link href="/signals" className="eyebrow" style={{ display: "inline-block", marginBottom: 24 }}>
+        <LocaleLink href="/signals" className="eyebrow" style={{ display: "inline-block", marginBottom: 24 }}>
           ← {translate(l, "signals.d.all")}
-        </Link>
+        </LocaleLink>
         <div
           style={{
             display: "flex",
@@ -155,16 +155,16 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
           <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 12, letterSpacing: ".1em", color: "var(--muted-soft)", textTransform: "uppercase" }}>
             — Juan Stefan Bongartz Diaz
           </div>
-          <Link className="btn primary btn-mag" href="/contact">
+          <LocaleLink className="btn primary btn-mag" href="/contact">
             {translate(l, "signals.d.cta")} <span className="arr">→</span>
-          </Link>
+          </LocaleLink>
         </div>
       </article>
 
       <section style={{ padding: "40px 40px 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {prev ? (
-            <Link
+            <LocaleLink
               href={`/signals/${prev.slug}`}
               style={{
                 padding: 24,
@@ -180,10 +180,10 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
               <div style={{ fontSize: 18, fontWeight: 500, letterSpacing: "-.015em", lineHeight: 1.3 }}>
                 {prev.title}
               </div>
-            </Link>
+            </LocaleLink>
           ) : <div />}
           {next ? (
-            <Link
+            <LocaleLink
               href={`/signals/${next.slug}`}
               style={{
                 padding: 24,
@@ -200,7 +200,7 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
               <div style={{ fontSize: 18, fontWeight: 500, letterSpacing: "-.015em", lineHeight: 1.3 }}>
                 {next.title}
               </div>
-            </Link>
+            </LocaleLink>
           ) : <div />}
         </div>
       </section>

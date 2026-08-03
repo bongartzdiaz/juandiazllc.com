@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { SignOutButton } from "@/components/SignOutButton";
 import { VENTURES, getVentures } from "@/lib/ventures";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { buildGreeting } from "@/lib/greeting";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
@@ -387,15 +387,15 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
           </div>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <Link className="btn primary" href="/philly">
+          <LocaleLink className="btn primary" href="/philly">
             {t("app.btn.master")}
-          </Link>
-          <Link className="btn ghost" href="/philly/deals">
+          </LocaleLink>
+          <LocaleLink className="btn ghost" href="/philly/deals">
             {t("app.btn.dispatch")}
-          </Link>
-          <Link className="btn ghost" href="/">
+          </LocaleLink>
+          <LocaleLink className="btn ghost" href="/">
             {t("app.btn.back")}
-          </Link>
+          </LocaleLink>
           <SignOutButton />
         </div>
       </section>

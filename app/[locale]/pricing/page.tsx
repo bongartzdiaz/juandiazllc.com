@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
@@ -305,7 +305,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
                   </div>
                 </div>
 
-                <Link
+                <LocaleLink
                   href={tier.ctaHref}
                   // plausible-event-* classes: click-goal tagging for the
                   // script.tagged-events.js variant (see components/Analytics.tsx).
@@ -313,7 +313,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
                   style={{ alignSelf: "flex-start" }}
                 >
                   {ctaLabel} <span className="arr">→</span>
-                </Link>
+                </LocaleLink>
               </div>
             );
           })}
@@ -429,9 +429,9 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
           <p style={{ color: "var(--muted)", fontSize: 16, lineHeight: 1.65, marginBottom: 24, maxWidth: "60ch" }}>
             {t("pricing.migration.body")}
           </p>
-          <Link className="btn" href="mailto:hello@lucen.ai?subject=DEUS%20migration%20service">
+          <LocaleLink className="btn" href="mailto:hello@lucen.ai?subject=DEUS%20migration%20service">
             {t("pricing.migration.cta")} <span className="arr">→</span>
-          </Link>
+          </LocaleLink>
         </div>
       </section>
 
@@ -497,12 +497,12 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
             {t("pricing.outro.body")}
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <Link className="btn primary btn-mag plausible-event-name=Pricing+CTA plausible-event-tier=trial" href="/contact?interest=trial">
+            <LocaleLink className="btn primary btn-mag plausible-event-name=Pricing+CTA plausible-event-tier=trial" href="/contact?interest=trial">
               {t("pricing.outro.cta")} <span className="arr">→</span>
-            </Link>
-            <Link className="btn plausible-event-name=Pricing+CTA plausible-event-tier=email" href="mailto:hello@lucen.ai">
+            </LocaleLink>
+            <LocaleLink className="btn plausible-event-name=Pricing+CTA plausible-event-tier=email" href="mailto:hello@lucen.ai">
               {t("pricing.outro.alt")}
-            </Link>
+            </LocaleLink>
           </div>
         </div>
       </section>

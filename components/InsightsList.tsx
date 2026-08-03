@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { formatDate, type Insight } from "@/lib/insights";
 import { useT } from "@/lib/i18n/useT";
 
@@ -87,7 +87,7 @@ export function InsightsList({ posts }: Props) {
         }}
       >
         {filtered.map((p) => (
-          <Link
+          <LocaleLink
             key={p.slug}
             href={`/insights/${p.slug}`}
             className="insight-card"
@@ -104,7 +104,7 @@ export function InsightsList({ posts }: Props) {
             <span className="ic-read">
               {t("insights.card.read")} <span className="arr">→</span>
             </span>
-          </Link>
+          </LocaleLink>
         ))}
       </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import dynamic from "next/dynamic";
 import { useT } from "@/lib/i18n/useT";
 
@@ -53,12 +53,12 @@ export function Hero() {
               <b>Juan Diaz, LLC</b> {t("hero.desc")}
             </p>
             <div className="hero-ctas">
-              <Link className="btn primary btn-mag" href="/contact">
+              <LocaleLink className="btn primary btn-mag" href="/contact">
                 {t("hero.cta.primary")} <span className="arr">→</span>
-              </Link>
-              <Link className="btn ghost" href="/work">
+              </LocaleLink>
+              <LocaleLink className="btn ghost" href="/work">
                 {t("hero.cta.secondary")} <span className="arr">→</span>
-              </Link>
+              </LocaleLink>
             </div>
           </div>
           <div className="scroll-hint">

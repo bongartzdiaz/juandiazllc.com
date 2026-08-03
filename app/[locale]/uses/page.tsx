@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 
@@ -101,9 +101,9 @@ export default async function UsesPage({ params }: { params: Promise<{ locale: s
                 <li key={it.name}>
                   {it.url ? (
                     it.url.startsWith("/") ? (
-                      <Link href={it.url}>
+                      <LocaleLink href={it.url}>
                         <strong>{it.name}</strong>
-                      </Link>
+                      </LocaleLink>
                     ) : (
                       <a href={it.url} target="_blank" rel="noopener noreferrer">
                         <strong>{it.name}</strong>
@@ -120,7 +120,7 @@ export default async function UsesPage({ params }: { params: Promise<{ locale: s
         ))}
 
         <p style={{ marginTop: 48 }}>
-          {t("uses.outro.1")} <Link href="/contact">{t("uses.outro.link")}</Link> {t("uses.outro.2")}
+          {t("uses.outro.1")} <LocaleLink href="/contact">{t("uses.outro.link")}</LocaleLink> {t("uses.outro.2")}
         </p>
       </article>
     </>

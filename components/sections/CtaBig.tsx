@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { subscribe, type SubscribeState } from "@/app/actions/subscribe";
 import { useT } from "@/lib/i18n/useT";
 
@@ -19,12 +19,12 @@ export function CtaBig() {
       </h2>
       <p className="lede" data-reveal>{t("cta.lede")}</p>
       <div className="btns" data-reveal>
-        <Link className="btn primary btn-mag" href="/contact">
+        <LocaleLink className="btn primary btn-mag" href="/contact">
           {t("cta.primary")} <span className="arr">→</span>
-        </Link>
-        <Link className="btn ghost" href="/work">
+        </LocaleLink>
+        <LocaleLink className="btn ghost" href="/work">
           {t("cta.secondary")} <span className="arr">→</span>
-        </Link>
+        </LocaleLink>
       </div>
       <form className="news" data-reveal action={formAction}>
         <input

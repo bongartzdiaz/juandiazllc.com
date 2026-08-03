@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { getSignals } from "@/lib/signals";
 
@@ -18,11 +18,11 @@ export function Signals() {
       </div>
       <div className="signals">
         {posts.map((p) => (
-          <Link key={p.slug} href={`/signals/${p.slug}`} className="sig" data-reveal>
+          <LocaleLink key={p.slug} href={`/signals/${p.slug}`} className="sig" data-reveal>
             <div className="date">— {p.dateLabel}</div>
             <h3>{p.title}</h3>
             <div className="tag">{t("signals.read")}</div>
-          </Link>
+          </LocaleLink>
         ))}
       </div>
     </section>
