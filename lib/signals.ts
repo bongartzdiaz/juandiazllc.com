@@ -125,7 +125,7 @@ export const SIGNALS: Signal[] = [
     title: "Every business is a construction project. Here's the five-phase build plan.",
     seoTitle: "The five-phase build plan for a business",
     excerpt:
-      "Construction managers know something most SaaS founders don't: you can't ship a building on vibes. The method transfers cleanly to revenue engines — and here's exactly how.",
+      "Construction managers know something most SaaS founders don't: you can't ship a building on vibes. The method transfers cleanly to revenue engines.",
     body: [
       { type: "p", text: "When I trained as a construction manager, the lesson that stuck hardest wasn't about concrete or schedules or bills of quantities. It was the five-phase rhythm: Survey, Blueprint, Build, Commission, Operate." },
       { type: "p", text: "You can't ship a building on vibes. Every building that got shipped ran that rhythm or something structurally identical. Skip a phase and the building gets finished late, over budget, or — worst of all — finished on time and quietly wrong." },
@@ -173,7 +173,7 @@ export const SIGNALS: Signal[] = [
       de: {
         title: "Jedes Unternehmen ist ein Bauprojekt. Hier ist der Fünf-Phasen-Plan.",
         seoTitle: "Der Fünf-Phasen-Bauplan fürs Geschäft",
-        excerpt: "Bauleiter wissen etwas, das den meisten Software-Gründern fehlt: Ein Gebäude liefert man nicht nach Gefühl aus. Die Methode überträgt sich sauber auf Umsatzmotoren.",
+        excerpt: "Bauleiter wissen etwas, das Software-Gründern fehlt: Ein Gebäude liefert man nicht nach Gefühl aus. Die Methode überträgt sich auf Umsatzmotoren.",
         dateLabel: "2026.03 · Baulog",
         readTime: "7 Min. Lesezeit",
         body: [

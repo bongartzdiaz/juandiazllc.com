@@ -907,6 +907,7 @@ const en: Dict = {
   // De rekenmachine modelleert de Nederlandse salderingsregeling. "Saldering"
   // zegt een Engelse lezer niets, dus daar staat "net metering".
   "meta.energyRoi.title": "Energy ROI calculator — net metering 2027",
+  "meta.energyRoi.description": "Work out what the end of Dutch net metering in 2027 costs you, with and without a home battery. Free, no signup, numbers for your own case.",
   "faq.home.title": "Operator questions, answered",
   "faq.contact.title": "Before you book a call",
   "faq.services.title": "What operators ask before they start",
@@ -1745,6 +1746,7 @@ const nl: Dict = {
     "Juan Diaz — fractional revenue operator en operations-consultant voor operators in energie, vastgoed en horeca. Bouwkundig getraind, operator-built.",
   "meta.pricing.title": "Prijzen — DEUS CRM, EU-gehost, GDPR-klaar",
   "meta.energyRoi.title": "Energie-ROI — de saldeer-som voor 2027",
+  "meta.energyRoi.description": "Reken door wat het einde van de salderingsregeling in 2027 je kost, met en zonder thuisbatterij. Gratis, zonder aanmelding, cijfers per situatie.",
   "faq.home.title": "Vragen van operators, beantwoord",
   "faq.contact.title": "Voordat je een gesprek plant",
   "faq.services.title": "Wat operators vragen vóór ze beginnen",
@@ -2583,6 +2585,7 @@ const de: Dict = {
     "Juan Diaz ist Fractional Revenue Operator und Operations-Berater für Betreiber in Energie, Immobilien und Gastgewerbe. Bauerprobt, operator-built.",
   "meta.pricing.title": "Preise — DEUS CRM, EU-gehostet, DSGVO-konform",
   "meta.energyRoi.title": "Energie-ROI-Rechner — Einspeisung ab 2027",
+  "meta.energyRoi.description": "Rechnen Sie durch, was das Ende der niederländischen Saldierungsregelung 2027 kostet, mit und ohne Heimspeicher. Kostenlos, ohne Anmeldung.",
   "faq.home.title": "Fragen von Betreibern, beantwortet",
   "faq.contact.title": "Bevor Sie ein Gespräch buchen",
   "faq.services.title": "Was Betreiber fragen, bevor sie starten",
@@ -3421,6 +3424,7 @@ const es: Dict = {
     "Juan Diaz, operador de revenue fraccional y consultor de operaciones para energía, inmobiliario y hostelería. Formado en construcción, hecho por operadores.",
   "meta.pricing.title": "Precios — DEUS CRM, alojado en EU, conforme RGPD",
   "meta.energyRoi.title": "Calculadora de ROI energético — saldo 2027",
+  "meta.energyRoi.description": "Calcula lo que te cuesta el fin del balance neto neerlandés en 2027, con y sin batería. Gratis, sin registro, cifras para tu propio caso.",
   "faq.home.title": "Preguntas de operadores, respondidas",
   "faq.contact.title": "Antes de reservar una llamada",
   "faq.services.title": "Lo que preguntan los operadores antes de empezar",
