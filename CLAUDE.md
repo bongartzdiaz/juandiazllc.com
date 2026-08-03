@@ -1329,3 +1329,70 @@ statische codescan meldde 11 mogelijke `<em>`-lekken waarvan er 10 vals waren,
 de preloader leek schuldig maar is `opacity: 0`, en een "horizontale
 scrollbalk" op 768px bleek de statusbalk. **Alleen wat de geserveerde HTML en
 de gerenderde layout laten zien telt.**
+
+### 2026-08-03 (vervolg) — de contentlaag viertalig, en zes gates die het zo houden
+
+Tien PR's (#115 t/m #124). De aanleiding was PR #108 van eerder die dag, die
+de metadata per taal repareerde. Bij het nameten bleek dat een symptoom van
+iets groters.
+
+**De vondst.** De navigatie was vertaald, de inhoud niet. De vier
+sectorpagina's, vijf ventures, drie signals-essays en negen artikelen
+serveerden onder `/nl`, `/de` en `/es` dezelfde Engelse tekst als onder
+`/en` — terwijl die 85 URL's in de sitemap staan en via hreflang naar elkaar
+wijzen. De negen operator-artikelen hadden al Duits en Spaans; Nederlands
+ontbrak, dus de thuismarkt was de enige taal die terugviel op Engels.
+
+**Het patroon dat nu overal geldt.** `Sector`, `Venture` en `Signal` hebben
+een `i18n`-veld met per taal een `…L10n`, gespiegeld naar wat `Insight` al
+deed. Die typen dragen bewust alleen kopij: `slug`, `gradient`, `proof[].href`,
+`phases[].title`, het bloktype van een signal en `Signal.tag` staan er niet
+in, want dat is structuur of een routeersleutel. `lib/i18n/merge.ts` bevat
+`defined()` en `mergeByIndex()`; die laatste houdt de basislengte aan.
+
+**Zes gates, elk bewezen door hem opzettelijk te breken:**
+
+| gate | bewaakt |
+|---|---|
+| `sectors.test.ts` · `ventures.test.ts` · `signals.test.ts` | vier talen af, titels verschillen, binnen `TITLE_BUDGET`, lijstlengtes gelijk |
+| `insights.i18n.test.ts` | blokstructuur van vertalingen (Insight vervangt de body in zijn geheel, dus geen merge bewaakt hem) |
+| `insights.seo.test.ts` | zoektitel en -beschrijving per markt binnen wat Google toont |
+| `lib/i18n/link-conventie.test.ts` | marketingcode importeert `next/link` niet rechtstreeks |
+| `lib/i18n/tags.test.ts` | elke tag in gebruik heeft een label in vier woordenboeken |
+| `scripts/seo-audit.ts` | dubbele/te lange titels en beschrijvingen, h1's, taalloze links — draait tegen een server |
+
+**Auditstand:** dubbele-titel 26→0, dubbele-description 26→0, meerdere-h1
+4→0, link-zonder-taal 176→0, titel-te-lang 42→0, description-te-lang 54→0.
+De lengtecontroles zijn in #122 aan de audit toegevoegd; daarvóór was dat
+probleem onzichtbaar.
+
+**Drie regels die deze sessie hard heeft gemaakt.**
+
+1. *Assert niet door het vangnet.* Drie keer bleek een test van mijzelf niet
+   te kúnnen falen. `mergeByIndex` vult korte vertalingen aan vanuit de
+   basis, dus een lengtecontrole op de uitvoer slaagt altijd — assert op
+   `post.i18n[taal]`. `translate()` valt terug op Engels, dus een
+   sleutelcontrole via die functie ziet een ontbrekend Duits label niet —
+   assert op `DICT[l]`.
+2. *Hermeet de hele lijst, niet je doelcijfer.* Bij het inkorten van
+   beschrijvingen zette ik Nederlandse tekst in het Engelse vak:
+   `description-te-lang` naar 0, `dubbele-description` van 0 naar 1.
+3. *Plaatsaanduidingen en verbuigende talen botsen.* `Einblicke zu {tag}`
+   levert met `tag=Systeme` de verkeerde naamval op, terwijl hetzelfde label
+   in de h1 correct staat. Eén label, twee naamvallen — de oplossing is een
+   sjabloon waarin de tag géén naamval draagt: `{tag} — Einblicke für
+   Betreiber`.
+
+**Meetopstelling.** Alles gemeten op `next start` (poort 3200) ná herstart,
+want een draaiende server blijft de vorige build serveren. Let op: de lokale
+build heeft `NEXT_PUBLIC_SITE_URL=http://localhost:3000`, dus een crawl op
+3200 meldt 176× `canonical-wijkt-af`. Dat is een meetartefact, geen defect —
+productie geeft `https://juandiazllc.com/nl`.
+
+**Blijft staan.** Geen hamburgermenu onder 860px (bestaand, ontwerpkeuze).
+Operator-acties: DNS TXT voor Search Console, Plausible-goal `Boeking 15min`,
+branch protection op main met de vier CI-jobs.
+
+> De dekkingsnotitie bovenaan dit bestand ("~1% file coverage", april 2026)
+> gaat over `lib/philly/*` en klopt daar nog grotendeels. De marketingkant
+> staat inmiddels op 989 tests; verwar die twee niet.
