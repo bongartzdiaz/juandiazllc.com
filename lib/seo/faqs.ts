@@ -493,6 +493,118 @@ export const CONTACT_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
   ],
 };
 
+/* ─────────────────────────────────────────────────────────────────────────
+   Services-FAQ.
+
+   /services beschrijft vier diensten maar beantwoordde geen enkele koopvraag:
+   waar begin je, wat kost het, moet mijn huidige CRM eruit. Dat is de pagina
+   met de hoogste intentie zonder FAQ (gemeten 2026-08-03: zeven publieke
+   pagina's hadden er geen).
+
+   Elk antwoord hieronder staat op een claim die de site al publiek maakt:
+   het gratis blueprint-gesprek van 30 minuten, de diagnosesprint van 30 dagen
+   tegen vaste prijs (contact-FAQ), en het traject van 90 dagen met vaste prijs
+   gevolgd door een maandelijkse retainer (llms.txt). Er staat bewust GEEN
+   bedrag in: het enige prijsgetal dat ik in de codebase vond ("expect five
+   figures") stond in BRAND_FAQ, en dat werd nergens gerenderd — een nooit
+   gepubliceerde claim ga ik niet alsnog live zetten.
+   ───────────────────────────────────────────────────────────────────────── */
+
+export const SERVICES_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
+  en: [
+    {
+      q: "Which of the four services do I need?",
+      a: "Start from the symptom, not the service. Numbers you don't trust points to a revenue-engine build. A system nobody runs points to fractional operations. A vendor contract on your desk points to build-vs-buy advisory. A field team guessing points to instruments. If two fit, say so on the call.",
+    },
+    {
+      q: "How does an engagement start?",
+      a: "With a free 30-minute blueprint call that ends in a one-page diagnosis. If there is real work, the usual next step is a 30-day diagnostic sprint at a flat fee, so both sides de-risk before anything gets built. The full scope is quoted after that, not before.",
+    },
+    {
+      q: "How is this priced?",
+      a: "Per outcome, not per hour. The diagnostic sprint is a flat fee. A build is a fixed fee for the first 90 days of strategy and construction, followed by a monthly retainer for operations. You get the number after the diagnosis, when it can be honest.",
+    },
+    {
+      q: "Do we have to replace our current CRM?",
+      a: "Usually not. Commodity workflows — email, accounting, payroll — should keep the cheapest reliable tool that doesn't hold your data hostage. What gets built is the integration layer plus the two or three flows that actually differentiate you. Replacing everything is rarely the cheapest path.",
+    },
+    {
+      q: "Can I hire you for the advice only?",
+      a: "Yes. Build-vs-buy advisory is a standalone engagement: you get a written answer on what to buy, what to build, and where the integration cost really lands. No obligation to have us build it afterwards — plenty of clients take the answer and execute in-house.",
+    },
+  ],
+  nl: [
+    {
+      q: "Welke van de vier heb ik nodig?",
+      a: "Begin bij het symptoom, niet bij de dienst. Cijfers die je niet vertrouwt wijzen op een revenue-engine build. Een systeem dat niemand bijhoudt wijst op fractional operations. Een leverancierscontract op je bureau wijst op build-vs-buy-advies. Een buitendienst die gokt wijst op instrumenten.",
+    },
+    {
+      q: "Hoe begint een traject?",
+      a: "Met een gratis blueprint-gesprek van 30 minuten dat eindigt in een diagnose van één pagina. Is er echt werk, dan volgt meestal een diagnosesprint van 30 dagen tegen vaste prijs, zodat beide kanten het risico beperken vóór er iets gebouwd wordt. De volledige scope offreren we daarna.",
+    },
+    {
+      q: "Hoe wordt dit geprijsd?",
+      a: "Per uitkomst, niet per uur. De diagnosesprint heeft een vaste prijs. Een build is een vaste prijs voor de eerste 90 dagen strategie en bouw, gevolgd door een maandelijkse retainer voor beheer. Het bedrag krijg je ná de diagnose, wanneer het eerlijk kan zijn.",
+    },
+    {
+      q: "Moet ons huidige CRM eruit?",
+      a: "Meestal niet. Standaardwerk — mail, boekhouding, loon — houdt de goedkoopste betrouwbare tool die je data niet gijzelt. Wat we bouwen is de koppellaag plus de twee of drie stromen die je écht onderscheiden. Alles vervangen is zelden de goedkoopste route.",
+    },
+    {
+      q: "Kan ik jullie alleen voor het advies inhuren?",
+      a: "Ja. Build-vs-buy-advies is een losse opdracht: je krijgt een schriftelijk antwoord op wat je koopt, wat je bouwt, en waar de integratiekosten echt landen. Zonder verplichting om het daarna door ons te laten bouwen — genoeg klanten voeren het zelf uit.",
+    },
+  ],
+  de: [
+    {
+      q: "Welche der vier Leistungen brauche ich?",
+      a: "Gehen Sie vom Symptom aus, nicht von der Leistung. Zahlen, denen Sie nicht trauen, deuten auf einen Revenue-Engine-Build. Ein System, das niemand pflegt, auf Fractional Operations. Ein Anbietervertrag auf dem Tisch auf Build-vs-Buy-Beratung. Ein ratender Außendienst auf Instrumente.",
+    },
+    {
+      q: "Wie beginnt ein Projekt?",
+      a: "Mit einem kostenlosen 30-minütigen Blueprint-Gespräch, das mit einer einseitigen Diagnose endet. Gibt es echte Arbeit, folgt meist ein 30-tägiger Diagnose-Sprint zum Festpreis, damit beide Seiten das Risiko begrenzen, bevor gebaut wird. Der volle Umfang wird danach kalkuliert.",
+    },
+    {
+      q: "Wie wird das kalkuliert?",
+      a: "Nach Ergebnis, nicht nach Stunde. Der Diagnose-Sprint hat einen Festpreis. Ein Build ist ein Festpreis für die ersten 90 Tage Strategie und Umsetzung, danach ein monatliches Retainer für den Betrieb. Die Zahl bekommen Sie nach der Diagnose — dann, wenn sie ehrlich sein kann.",
+    },
+    {
+      q: "Müssen wir unser jetziges CRM ersetzen?",
+      a: "Meistens nicht. Standardprozesse — Mail, Buchhaltung, Lohn — behalten das günstigste zuverlässige Werkzeug, das Ihre Daten nicht einsperrt. Gebaut wird die Integrationsschicht plus die zwei oder drei Abläufe, die Sie wirklich unterscheiden. Alles zu ersetzen ist selten der günstigste Weg.",
+    },
+    {
+      q: "Kann ich Sie nur für die Beratung buchen?",
+      a: "Ja. Die Build-vs-Buy-Beratung ist ein eigenständiges Mandat: Sie erhalten eine schriftliche Antwort darauf, was zu kaufen, was zu bauen ist und wo die Integrationskosten wirklich anfallen. Ohne Verpflichtung, danach bei uns zu bauen — viele setzen es intern um.",
+    },
+  ],
+  es: [
+    {
+      q: "¿Cuál de los cuatro servicios necesito?",
+      a: "Parte del síntoma, no del servicio. Números en los que no confías apuntan a construir el motor de ingresos. Un sistema que nadie mantiene apunta a operaciones fraccionales. Un contrato de proveedor sobre la mesa apunta a asesoría build-vs-buy. Un equipo de campo que adivina apunta a instrumentos.",
+    },
+    {
+      q: "¿Cómo empieza un proyecto?",
+      a: "Con una llamada blueprint gratuita de 30 minutos que termina en un diagnóstico de una página. Si hay trabajo real, lo habitual es un sprint de diagnóstico de 30 días a precio cerrado, para que ambas partes reduzcan riesgo antes de construir. El alcance completo se presupuesta después.",
+    },
+    {
+      q: "¿Cómo se fija el precio?",
+      a: "Por resultado, no por hora. El sprint de diagnóstico tiene precio cerrado. Una construcción es precio fijo para los primeros 90 días de estrategia y desarrollo, seguido de una cuota mensual de operación. La cifra llega tras el diagnóstico, cuando puede ser honesta.",
+    },
+    {
+      q: "¿Hay que sustituir nuestro CRM actual?",
+      a: "Normalmente no. Lo genérico — correo, contabilidad, nóminas — se queda con la herramienta fiable más barata que no secuestre tus datos. Lo que se construye es la capa de integración y los dos o tres flujos que de verdad te diferencian. Sustituirlo todo rara vez sale más barato.",
+    },
+    {
+      q: "¿Puedo contrataros solo para el consejo?",
+      a: "Sí. La asesoría build-vs-buy es un encargo independiente: recibes una respuesta escrita sobre qué comprar, qué construir y dónde caen de verdad los costes de integración. Sin obligación de que lo construyamos después — muchos clientes lo ejecutan internamente.",
+    },
+  ],
+};
+
+export function getServicesFaq(locale: Locale): FaqItem[] {
+  return SERVICES_FAQ_BY_LOCALE[locale] ?? SERVICES_FAQ_BY_LOCALE.en;
+}
+
 export function getHomeFaq(locale: Locale): FaqItem[] {
   return HOME_FAQ_BY_LOCALE[locale] ?? HOME_FAQ_BY_LOCALE.en;
 }

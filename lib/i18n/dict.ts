@@ -892,6 +892,7 @@ const en: Dict = {
   "meta.energyRoi.title": "Energy ROI calculator — net metering 2027",
   "faq.home.title": "Operator questions, answered",
   "faq.contact.title": "Before you book a call",
+  "faq.services.title": "What operators ask before they start",
 };
 
 const nl: Dict = {
@@ -1712,6 +1713,7 @@ const nl: Dict = {
   "meta.energyRoi.title": "Energie-ROI — de saldeer-som voor 2027",
   "faq.home.title": "Vragen van operators, beantwoord",
   "faq.contact.title": "Voordat je een gesprek plant",
+  "faq.services.title": "Wat operators vragen vóór ze beginnen",
 };
 
 const de: Dict = {
@@ -2532,6 +2534,7 @@ const de: Dict = {
   "meta.energyRoi.title": "Energie-ROI-Rechner — Einspeisung ab 2027",
   "faq.home.title": "Fragen von Betreibern, beantwortet",
   "faq.contact.title": "Bevor Sie ein Gespräch buchen",
+  "faq.services.title": "Was Betreiber fragen, bevor sie starten",
 };
 
 const es: Dict = {
@@ -3352,6 +3355,7 @@ const es: Dict = {
   "meta.energyRoi.title": "Calculadora de ROI energético — saldo 2027",
   "faq.home.title": "Preguntas de operadores, respondidas",
   "faq.contact.title": "Antes de reservar una llamada",
+  "faq.services.title": "Lo que preguntan los operadores antes de empezar",
 };
 
 export const DICT: Record<Locale, Dict> = { en, nl, de, es };

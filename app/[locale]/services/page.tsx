@@ -3,6 +3,9 @@ import Link from "next/link";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
+import { faqSchema } from "@/lib/seo/schema";
+import { getServicesFaq } from "@/lib/seo/faqs";
+import { FaqSection } from "@/components/FaqSection";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -97,6 +100,14 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
           </Link>
         </div>
       </section>
+      {/* De pagina beschreef vier diensten maar beantwoordde geen koopvraag.
+          Staat ná de CTA: wie al overtuigd is klikt door, wie nog twijfelt
+          leest verder. Het schema geeft dezelfde antwoorden aan AI-overzichten. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(getServicesFaq(l))) }}
+      />
+      <FaqSection title={t("faq.services.title")} items={getServicesFaq(l)} />
     </>
   );
 }

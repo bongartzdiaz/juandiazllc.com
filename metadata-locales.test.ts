@@ -3,7 +3,7 @@ import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { LOCALES, type Locale } from "@/lib/i18n/dict";
 import { TITLE_SUFFIX } from "@/lib/seo/branding";
-import { getHomeFaq, getContactFaq } from "@/lib/seo/faqs";
+import { getHomeFaq, getContactFaq, getServicesFaq } from "@/lib/seo/faqs";
 
 /* ---------------------------------------------------------------
    Metadata per taal — de gate
@@ -123,6 +123,7 @@ describe("FAQ is per taal geschreven", () => {
   const sets: [string, (l: Locale) => { q: string; a: string }[]][] = [
     ["home", getHomeFaq],
     ["contact", getContactFaq],
+    ["services", getServicesFaq],
   ];
 
   for (const [naam, haal] of sets) {
