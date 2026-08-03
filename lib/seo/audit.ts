@@ -139,6 +139,75 @@ export function controleerDubbeleDescriptions(paginas: Pagina[]): Bevinding[] {
   return uit;
 }
 
+/* ── lengtes ──────────────────────────────────────────────────────────────
+   Google kapt de titel in de zoekresultaten af op breedte, niet op tekens:
+   ongeveer 600 pixels. Een tekental is daar een benadering van, want een titel
+   vol hoofdletters en W's past er eerder over dan een met i's en l's. De
+   grenzen hieronder zijn dus een signaal om naar te kijken, geen harde regel —
+   vandaar waarschuwing en notitie, en geen fout.
+
+   Ontbreken van een titel is wél een fout: dan verzint Google er zelf een. */
+
+export const TITEL_MAX = 60;
+export const TITEL_MIN = 15;
+export const DESC_MAX = 160;
+export const DESC_MIN = 70;
+
+export function controleerTitelLengte(pagina: Pagina): Bevinding[] {
+  const t = haalTitel(pagina.html);
+  if (!t) {
+    return [{ ernst: "fout", soort: "geen-titel", url: pagina.url, detail: "pagina heeft geen <title>" }];
+  }
+  // haalTitel ontslaat entiteiten al, dus &amp; telt hier als één teken en
+  // niet als vijf. Zonder dat zou elke titel met een & vals alarm geven.
+  if (t.length > TITEL_MAX) {
+    return [{
+      ernst: "waarschuwing",
+      soort: "titel-te-lang",
+      url: pagina.url,
+      detail: `${t.length} tekens, ${t.length - TITEL_MAX} boven de ${TITEL_MAX} die Google doorgaans toont: "${t}"`,
+    }];
+  }
+  if (t.length < TITEL_MIN) {
+    return [{
+      ernst: "notitie",
+      soort: "titel-te-kort",
+      url: pagina.url,
+      detail: `${t.length} tekens: "${t}" — te weinig om een zoekopdracht mee te winnen`,
+    }];
+  }
+  return [];
+}
+
+export function controleerDescriptionLengte(pagina: Pagina): Bevinding[] {
+  const d = haalDescription(pagina.html);
+  if (!d) {
+    return [{
+      ernst: "waarschuwing",
+      soort: "geen-description",
+      url: pagina.url,
+      detail: "geen <meta name=description>, dus Google knipt zelf een fragment uit de pagina",
+    }];
+  }
+  if (d.length > DESC_MAX) {
+    return [{
+      ernst: "waarschuwing",
+      soort: "description-te-lang",
+      url: pagina.url,
+      detail: `${d.length} tekens, ${d.length - DESC_MAX} boven de ${DESC_MAX}; de staart valt weg: "${d.slice(DESC_MAX - 20, DESC_MAX + 25)}…"`,
+    }];
+  }
+  if (d.length < DESC_MIN) {
+    return [{
+      ernst: "notitie",
+      soort: "description-te-kort",
+      url: pagina.url,
+      detail: `${d.length} tekens: "${d}" — laat ruimte liggen`,
+    }];
+  }
+  return [];
+}
+
 /** Precies één h1 per pagina. Nul is een gemiste kans, meer dan één is rommel. */
 export function controleerH1(pagina: Pagina): Bevinding[] {
   const h1s = haalH1s(pagina.html);
@@ -331,6 +400,8 @@ export function auditPagina(pagina: Pagina): Bevinding[] {
     ];
   }
   return [
+    ...controleerTitelLengte(pagina),
+    ...controleerDescriptionLengte(pagina),
     ...controleerH1(pagina),
     ...controleerCanonical(pagina),
     ...controleerRedirect(pagina),

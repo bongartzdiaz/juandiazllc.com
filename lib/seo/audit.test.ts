@@ -19,6 +19,10 @@ import {
   auditPagina,
   telPerErnst,
   type Pagina,
+  controleerTitelLengte,
+  controleerDescriptionLengte,
+  TITEL_MAX,
+  DESC_MAX,
 } from "./audit";
 
 const pagina = (url: string, html: string, extra: Partial<Pagina> = {}): Pagina => ({
@@ -292,7 +296,11 @@ describe("auditPagina", () => {
   });
 
   it("een schone pagina levert niets op", () => {
+    // Titel en beschrijving horen bij een schone pagina; sinds de
+    // lengtecontroles bestaan is een pagina zonder die twee niet schoon.
     const html =
+      '<title>Een titel van keurige lengte hier</title>' +
+      '<meta name="description" content="' + "d".repeat(120) + '">' +
       '<h1>Kop</h1><link rel="canonical" href="https://x.test/a"/>' +
       '<img src="a.png" alt="beschrijving">' +
       '<script type="application/ld+json">{"@type":"WebPage"}</script>';
@@ -304,6 +312,8 @@ describe("auditPagina", () => {
     const soorten = b.map((x) => x.soort);
     expect(soorten).toContain("geen-h1");
     expect(soorten).toContain("geen-canonical");
+    expect(soorten).toContain("geen-titel");
+    expect(soorten).toContain("geen-description");
     expect(soorten).toContain("img-zonder-alt");
   });
 });
@@ -316,5 +326,76 @@ describe("telPerErnst", () => {
       { ernst: "waarschuwing", soort: "c", url: "u", detail: "" },
     ]);
     expect(t).toEqual({ fout: 2, waarschuwing: 1, notitie: 0 });
+  });
+});
+
+/* ── lengtecontroles ─────────────────────────────────────────────────────── */
+
+// hergebruikt de pagina()-helper hierboven
+const metTitel = (t: string) =>
+  pagina("https://x.nl/en", `<html><head><title>${t}</title></head><body></body></html>`);
+const metDesc = (d: string) =>
+  pagina("https://x.nl/en", `<html><head><title>Een prima titel hier</title><meta name="description" content="${d}"></head></html>`);
+const zonderKop = () => pagina("https://x.nl/en", "<html><head></head></html>");
+
+describe("controleerTitelLengte", () => {
+  it("zwijgt bij een titel binnen de grenzen", () => {
+    expect(controleerTitelLengte(metTitel("Operations consultant vastgoed · Juan Diaz"))).toEqual([]);
+  });
+
+  it("meldt een ontbrekende titel als fout", () => {
+    const b = controleerTitelLengte(zonderKop());
+    expect(b).toHaveLength(1);
+    expect(b[0].soort).toBe("geen-titel");
+    expect(b[0].ernst).toBe("fout");
+  });
+
+  it("waarschuwt bij een te lange titel en noemt het aantal", () => {
+    const t = "Why most operator dashboards quietly lie to their CEOs · Juan Diaz";
+    const b = controleerTitelLengte(metTitel(t));
+    expect(b[0].soort).toBe("titel-te-lang");
+    expect(b[0].ernst).toBe("waarschuwing");
+    expect(b[0].detail).toContain(`${t.length} tekens`);
+  });
+
+  // Dit is de valkuil: de ruwe HTML bevat &amp;, wat vijf tekens is maar er
+  // één toont. Zonder ontsla() zou elke titel met een & vals alarm geven.
+  it("telt een HTML-entiteit als het teken dat de lezer ziet", () => {
+    const zichtbaar = "Energie & zon voor operators, en meer tekst erbij hier";
+    expect(zichtbaar.length).toBeLessThanOrEqual(TITEL_MAX);
+    expect(controleerTitelLengte(metTitel(zichtbaar.replace("&", "&amp;")))).toEqual([]);
+  });
+
+  it("noteert een te korte titel, maar niet als fout", () => {
+    const b = controleerTitelLengte(metTitel("Werk"));
+    expect(b[0].soort).toBe("titel-te-kort");
+    expect(b[0].ernst).toBe("notitie");
+  });
+
+  it("de grens zelf telt nog als goed", () => {
+    expect(controleerTitelLengte(metTitel("x".repeat(TITEL_MAX)))).toEqual([]);
+    expect(controleerTitelLengte(metTitel("x".repeat(TITEL_MAX + 1)))[0].soort).toBe("titel-te-lang");
+  });
+});
+
+describe("controleerDescriptionLengte", () => {
+  it("zwijgt bij een beschrijving binnen de grenzen", () => {
+    expect(controleerDescriptionLengte(metDesc("d".repeat(120)))).toEqual([]);
+  });
+
+  it("waarschuwt als de beschrijving ontbreekt", () => {
+    const b = controleerDescriptionLengte(metTitel("Een prima titel hier"));
+    expect(b[0].soort).toBe("geen-description");
+    expect(b[0].ernst).toBe("waarschuwing");
+  });
+
+  it("waarschuwt bij te lang en toont waar de staart wegvalt", () => {
+    const b = controleerDescriptionLengte(metDesc("d".repeat(DESC_MAX + 30)));
+    expect(b[0].soort).toBe("description-te-lang");
+    expect(b[0].detail).toContain("30 boven");
+  });
+
+  it("noteert te kort", () => {
+    expect(controleerDescriptionLengte(metDesc("kort"))[0].soort).toBe("description-te-kort");
   });
 });
