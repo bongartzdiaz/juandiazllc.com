@@ -66,6 +66,24 @@ export const POSTS: Insight[] = [
       { type: "p", text: "The operators who grow stop confusing activity with throughput. You want fewer automations, pointed at sharper targets, each paying for itself in weeks not quarters." }
     ],
     i18n: {
+      nl: {
+        title: "De automatiserings-ROI-mythe, en wat wél terugverdient",
+        summary:
+          "De meeste automatiseringsprojecten besparen uren die niemand toch al ging maken. Drie regels om de projecten te kiezen die de P&L echt verzetten — en één test vóór je weer een tool koopt.",
+        body: [
+          { type: "p", text: "Elke operator die ik spreek heeft een slidedeck van een adviseur liggen waarin staat dat het team 400 uur per jaar bespaart. Meestal is dat getal rekenkundige fictie: uren die nooit gefactureerd zouden zijn, afspraken die nooit gepland zouden worden, werk dat nooit gedaan zou worden. Echte automatiserings-ROI is smaller en harder." },
+          { type: "h2", text: "De drie vragen die echte ROI van theater scheiden" },
+          { type: "ul", items: [
+            "Wordt het werk dat je automatiseert nu gedaan door iemand die je knelpunt is? Zo nee, dan maak je geen capaciteit vrij maar iemand die al ruimte had sneller.",
+            "Haalt de automatisering een beslissing weg, of versnelt hij alleen invoerwerk? Weggehaalde beslissingen stapelen zich op; snellere invoer loopt vast rond twintig procent van de theoretische besparing.",
+            "Merkt iemand het als het een week stukstaat? Is het antwoord nee, dan heb je een museum geautomatiseerd.",
+          ] },
+          { type: "h2", text: "De test vóór je koopt" },
+          { type: "p", text: "Schrijf de drie meest waardevolle uren op die je beste medewerker in een gewone week maakt. Raakt de automatisering die je overweegt die drie uur niet rechtstreeks, dan is de ROI theater. Leg hem weg. De winst van vijf uur per week automatiseren bij een knelpunt is groter dan vijftig uur bij mensen die geen knelpunt zijn." },
+          { type: "quote", text: "Automatiserings-ROI meet je aan wat er uit de wachtrij verdwijnt, niet aan wat er sneller gaat." },
+          { type: "p", text: "De operators die groeien houden op activiteit met doorstroom te verwarren. Je wilt minder automatiseringen, gericht op scherpere doelen, elk terugverdiend in weken en niet in kwartalen." },
+        ],
+      },
       de: {
         title: "Der Mythos vom Automatisierungs-ROI — und was sich wirklich auszahlt",
         summary:
@@ -152,6 +170,28 @@ export const POSTS: Insight[] = [
       { type: "p", text: "That is the same lens I use when I build Philly — the CRM I ship to operators. Revenue is earned by field teams, so the software has to treat them like the primary user." }
     ],
     i18n: {
+      nl: {
+        title: "Waarom operator-CRM's het binnen 90 dagen begeven",
+        summary:
+          "Een CRM dat het team mijdt is slechter dan een spreadsheet. Het patroon dat de invoering nekt bij energie-, vastgoed- en horecabedrijven — en vijf keuzes die het vóór de uitrol oplossen.",
+        body: [
+          { type: "p", text: "Elke operator die ik spreek heeft hetzelfde verhaal: ze kochten een CRM, zetten de contacten over, gaven twee trainingen, en binnen een kwartaal liep de pijplijn weer via WhatsApp en het geheugen. De diagnose is bijna altijd dezelfde — en het ligt nooit aan de software." },
+          { type: "h2", text: "Het symptoom is gebruik. De oorzaak is ontwerp." },
+          { type: "p", text: "Als een CRM wordt verlaten, komt dat meestal doordat hij is ingericht op wat het kantoor wil zien en niet op wat het veldteam moet doen. De dashboards zijn mooi. Het invoeren is duur. Dus de mensen die de omzet maken stoppen met invoeren, de dashboards lopen leeg, en de directie noemt het een technisch probleem." },
+          { type: "h2", text: "Vijf keuzes die bepalen of het beklijft" },
+          { type: "ul", items: [
+            "Wie is eigenaar van het dagelijkse pijplijnoverleg, en duurt dat tien minuten of een uur?",
+            "Is een statuswijziging een knop of een formulier? Het antwoord moet 'knop' zijn.",
+            "Verdient elk veld zichzelf terug in een automatisering verderop, of is het een museumstuk?",
+            "Wat gebeurt er bij een faseovergang: niets, of een zichtbaar duwtje naar de volgende eigenaar?",
+            "Is invoeren op mobiel gelijkwaardig aan desktop, of is mobiel een leesbare bijzaak?",
+          ] },
+          { type: "quote", text: "Kan een verkoper een deal niet bijwerken tijdens het lopen van de parkeerplaats naar de voordeur, dan verliest het CRM al." },
+          { type: "h2", text: "Wat je concreet doet" },
+          { type: "p", text: "Voordat je een leverancierscontract aanraakt, schrijf je de tien handelingen op die je team op een gewone dinsdag het vaakst doet. Bouw die tien als flows van één tik. Alles wat meer dan drie tikken kost gaat terug naar de tekentafel. Het CRM is niet het systeem — die tien flows zijn het systeem. De rest is rapportage." },
+          { type: "p", text: "Datzelfde vizier gebruik ik bij het bouwen van Philly, het CRM dat ik aan operators lever. De omzet wordt gemaakt door veldteams, dus de software hoort ze als hoofdgebruiker te behandelen." },
+        ],
+      },
       de: {
         title: "Warum die meisten Operator-CRMs binnen 90 Tagen scheitern",
         summary:
@@ -245,6 +285,27 @@ export const POSTS: Insight[] = [
       { type: "p", text: "The operators who get this right stop feeling like their tech stack owns them. The ones who do not, eventually hire a Chief of Staff whose job is largely to move CSVs between tools. That is an expensive outcome to accept." }
     ],
     i18n: {
+      nl: {
+        title: "De bouwen-of-kopen-val waar operators in lopen",
+        summary:
+          "Bouwen lijkt duur tot je de omwegen meetelt. Kopen lijkt veilig tot je bij de derde koppeling komt. Een afwegingskader dat past bij de praktijk van een operator.",
+        body: [
+          { type: "p", text: "Ergens tussen vijftig en vijfhonderd medewerkers voert elk directieteam hetzelfde gesprek: we hebben vier leveranciers, drie daarvan praten niet met elkaar, en onze mensen zijn een uur per dag bezig data heen en weer te schuiven. Kopen we door, of gaan we bouwen?" },
+          { type: "h2", text: "De echte vraag is niet bouwen of kopen" },
+          { type: "p", text: "De echte vraag is: welke twee of drie capaciteiten bepalen hoe wij winnen, en welke vijftien zijn gebruiksartikelen die gewoon moeten werken? Operators die dit goed doen kopen de gebruiksartikelen — mail, agenda, boekhouding, salarisadministratie — en bouwen, of laten bouwen, een dunne koppellaag plus de twee of drie kernprocessen die hen onderscheiden." },
+          { type: "h2", text: "De val die ik het vaakst zie" },
+          { type: "p", text: "Voor elke functie de beste tool kopen en hopen dat een kerkhof van Zapier-koppelingen het aan elkaar plakt. Dat werkt tot je een echte vraag wilt beantwoorden die door drie van die tools loopt, en het antwoord opeens drie uur CSV-exports is. Dat is de prijs van vijftien keer veilig kiezen." },
+          { type: "quote", text: "Kost het meer dan een dag om met je huidige stack een directievraag te beantwoorden, dan is die stack niet meer van jou — dan is het een museum." },
+          { type: "h2", text: "Een kader dat wel werkt" },
+          { type: "ul", items: [
+            "Noteer de drie vragen die de directie binnen een minuut moet kunnen beantwoorden. Dat is de kern.",
+            "Zoek per vraag welk systeem de bron van waarheid is. Is het antwoord een spreadsheet, dan heb je gevonden wat je moet bouwen.",
+            "De rest is gebruiksartikel. Koop de goedkoopste tool die het werk doet zonder je data-afspraken te breken.",
+            "Steek het bespaarde budget in de koppellaag en die drie kernprocessen. Daar zit het verdedigbare deel.",
+          ] },
+          { type: "p", text: "De operators die dit goed doen hebben niet langer het gevoel dat hun stack de baas over hen is. Wie het niet doet, huurt op een dag iemand in wiens werk grotendeels bestaat uit CSV's tussen tools verplaatsen. Dat is een dure uitkomst om te accepteren." },
+        ],
+      },
       de: {
         title: "Die Build-vs-Buy-Falle, in die Operatoren immer wieder tappen",
         summary:
@@ -312,6 +373,25 @@ export const POSTS: Insight[] = [
       { type: "p", text: "This is the lens behind Philly. The dashboards came after we got the field flow right. If you reverse the order, you get a museum." }
     ],
     i18n: {
+      nl: {
+        title: "Het veldteam is het product, niet het dashboard",
+        summary:
+          "Directies kopen software om te rapporteren. Veldteams gebruiken hem om deals te sluiten. Botsen die twee, dan wint het veldteam vanzelf: door hem niet meer te openen. Ontwerp dus eerst voor hen.",
+        body: [
+          { type: "p", text: "Loop een bedrijf van vijftig man binnen en stel twee mensen dezelfde vraag: wat doet het CRM? De financieel directeur praat over zicht op de pijplijn en omzetprognoses. De veldmedewerker praat over de acht tikken die het kost om een gesprek vast te leggen. Die twee antwoorden beschrijven totaal verschillende producten." },
+          { type: "h2", text: "Waarom het kantoor de roadmap meestal wint" },
+          { type: "p", text: "Het kantoor betaalt de tool, zit bij de demo's en schrijft de eisen op. Het veldteam heeft het druk — met omzet maken. Dus de software wordt gebouwd voor de mensen die erom vroegen, niet voor de mensen die ermee moeten werken. Een halfjaar later begrijpt niemand waarom nog maar dertig procent hem gebruikt." },
+          { type: "h2", text: "Een simpele test vóór elke CRM-beslissing" },
+          { type: "ul", items: [
+            "Ga een hele dag naast een veldmedewerker zitten. Tel de tikken per bijgewerkte deal.",
+            "Zijn het er meer dan drie, dan werkt de software al tegen je.",
+            "Vraag wat diegene nodig heeft om vijf deals bij te werken tijdens het lopen van de auto naar de voordeur. Bouw dát.",
+            "Laat de financieel directeur daarna het dashboard zien, maar alleen met cijfers die het veldteam in drie tikken kan produceren.",
+          ] },
+          { type: "quote", text: "Een CRM is niet het systeem van vastlegging. Het is het systeem van handelen. Is het niet makkelijker dan wat er was, dan wordt er niets vastgelegd." },
+          { type: "p", text: "Dat is het vizier achter Philly. De dashboards kwamen pas nadat de veldflow klopte. Draai je die volgorde om, dan krijg je een museum." },
+        ],
+      },
       de: {
         title: "Das Außendienstteam ist das Produkt — nicht das Dashboard",
         summary:
@@ -671,6 +751,27 @@ export const POSTS: Insight[] = [
       { type: "p", text: "The operators who win the next capital raise are the ones whose numbers survive the due-diligence room. That is a data-architecture decision, made long before the report is due." }
     ],
     i18n: {
+      nl: {
+        title: "Het ESG-cijfer dat je assetmanager niet kan verdedigen",
+        summary:
+          "Elke vastgoedoperator produceert één keer per jaar een ESG-cijfer. Bijna niemand kan het regel voor regel verdedigen zodra een due-diligenceteam aan de draadjes trekt. Waarom het bezwijkt onder onderzoek — en hoe je het reproduceerbaar maakt vanaf de meter.",
+        body: [
+          { type: "p", text: "Elke vastgoedoperator produceert één keer per jaar een ESG-cijfer. Bijna niemand kan het regel voor regel verdedigen zodra het due-diligenceteam van een investeerder aan de draadjes gaat trekken. Het rapport oogt precies — drie decimalen, een nette grafiek — en is stilletjes onverdedigbaar." },
+          { type: "h2", text: "Waarom het cijfer bezwijkt onder onderzoek" },
+          { type: "p", text: "Het jaarlijkse ESG-rapport wordt in twee weken haastwerk samengesteld uit data die in de systemen van een stuk of twaalf beheerders leeft, elk met een eigen definitie van energieverbruik, bezetting en algemene ruimte. Totalen die op ongelijke noemers rusten ogen gezaghebbend en betekenen vrijwel niets. Degene die tekent weet dat meestal, en hoopt dat niemand doorvraagt." },
+          { type: "h2", text: "Drie vragen die een due-diligenceteam stelt" },
+          { type: "ul", items: [
+            "Van welke meter komt dit kWh-cijfer, en klopt het met de energienota?",
+            "Als twee panden dezelfde intensiteit rapporteren, delen ze dan door dezelfde noemer — verhuurbaar oppervlak, bruto oppervlak, of iets wat een beheerder zelf bedacht?",
+            "Als ik dit ene pand vanaf de bron opnieuw doorreken, kom ik dan op jouw getal uit?",
+          ] },
+          { type: "p", text: "Is het antwoord op een van die drie een spreadsheet en een telefoontje naar de beheerder, dan is het cijfer een verhaal en geen meting — en een goede analist vindt de naad binnen een middag." },
+          { type: "h2", text: "Maak van ESG een live scherm, geen jaarlijkse brandoefening" },
+          { type: "p", text: "De oplossing is geen beter rapport. De oplossing is de cijfers één keer definiëren — welke meter precies, welke noemer precies, welke periode precies — en ze doorlopend vanaf de bron berekenen, zodat het jaarrapport een schermafdruk is van iets wat het hele jaar al waar was. Wijkt het dashboard af van de factuur, dan heeft het dashboard ongelijk, en dat merk je in maart in plaats van in de dataroom." },
+          { type: "quote", text: "Een ESG-cijfer dat je één keer per jaar in elkaar zet is een verhaal. Een cijfer dat je op een willekeurige dinsdag vanaf de meter kunt reproduceren is een bezit." },
+          { type: "p", text: "De operators die de volgende financieringsronde winnen zijn de operators van wie de cijfers de dataroom overleven. Dat is een keuze in de data-architectuur, lang voordat het rapport af moet." },
+        ],
+      },
       de: {
         title: "Die ESG-Zahl, die Ihr Asset Manager nicht verteidigen kann",
         summary:
@@ -740,6 +841,27 @@ export const POSTS: Insight[] = [
       { type: "p", text: "The operators who pull ahead stop treating revenue as something you review after the week, and start treating it as something you instrument during it." }
     ],
     i18n: {
+      nl: {
+        title: "De tien minuten vóór check-in waar je marge weglekt",
+        summary:
+          "Vraag een revenue manager waar de marge zit en hij wijst naar de prijslijst. Vraag waar hij weglekt en het eerlijke antwoord is: in de tien minuten vóór check-in. De upsell die niet kwam, de kamer die uit gewoonte werd toegewezen, de prijs die te lang bleef staan.",
+        body: [
+          { type: "p", text: "Vraag een revenue manager waar de marge zit en hij wijst naar de prijslijst. Vraag waar hij weglekt en het eerlijke antwoord is: in de tien minuten vóór check-in. De upsell die niet werd aangeboden, de kamer die uit gewoonte werd toegewezen, de prijs die twee dagen te lang bleef staan. Dat wordt grotendeels op gevoel beslist, door iemand zonder instrument om die beslissing aan te toetsen." },
+          { type: "h2", text: "De waardevolste tien minuten in het pand hebben geen instrument" },
+          { type: "p", text: "Horeca is een van de laatste sectoren waar een ervaren operator per geval omzetbeslissingen neemt zonder gereedschap om ze aan te toetsen. De revenue manager kent de cijfers van deze week. Waarom die zo zijn weet hij zelden, en tegen de tijd dat hij het weet staat de prijs voor volgende week al." },
+          { type: "h2", text: "Waar het lek werkelijk zit" },
+          { type: "ul", items: [
+            "Upsells die wisselend worden aangeboden, omdat niets de receptie herinnert op het ene moment dat de gast er klaar voor staat.",
+            "Kamers die op gemak worden toegewezen in plaats van op opbrengst — de betere kamer naar een gast op standaardtarief, omdat die boven aan de lijst stond.",
+            "Prijzen die op het gevoel van de revenue manager bewegen, twee dagen nadat de markt al bewoog.",
+          ] },
+          { type: "p", text: "Geen van drieën is een probleem van je prijstool. Het zijn beslissingsproblemen aan de balie, waar de omzet daadwerkelijk ontstaat en waar vrijwel geen software op gericht is." },
+          { type: "h2", text: "Bouw het instrument, niet nog een dashboard" },
+          { type: "p", text: "De revenue manager heeft geen mooier rapport over vorige week nodig. Hij heeft een live instrument nodig dat de juiste keuze duidelijk maakt in de tien minuten dat het telt, plus tools die het vloerteam uit zichzelf opent. Draai dat twee cycli parallel aan het bestaande proces en bewijs het cijfer voordat je de standaard omzet." },
+          { type: "quote", text: "In de horeca lekt de marge niet weg in de spreadsheet. Hij lekt weg aan de balie, tien minuten vóór check-in, één onderbuikbeslissing tegelijk." },
+          { type: "p", text: "De operators die uitlopen behandelen omzet niet langer als iets wat je na afloop van de week bekijkt, maar als iets waar je tijdens die week een instrument op zet." },
+        ],
+      },
       de: {
         title: "Die zehn Minuten vor dem Check-in, in denen Ihre Marge verloren geht",
         summary:
@@ -810,6 +932,28 @@ export const POSTS: Insight[] = [
       { type: "p", text: "The asset managers who retrofit well don't have better contractors. They have better inputs — and they know which of their buildings to leave alone." }
     ],
     i18n: {
+      nl: {
+        title: "Het verduurzamingsmodel dat het pand niet overleeft",
+        summary:
+          "Elke verduurzamingsbeslissing — isolatie, warmtepomp, zon — komt met een terugverdienmodel, en bijna allemaal draaien ze op regionale gemiddelden. Daar sterft verduurzamingsgeld stilletjes. Hoe je er een bouwt vanaf de meter.",
+        body: [
+          { type: "p", text: "Elke verduurzamingsbeslissing — isolatie, warmtepomp, zon — komt met een terugverdienmodel. Bijna allemaal staan ze op regionale gemiddelden, en regionale gemiddelden zijn waar verduurzamingsgeld stilletjes sterft. Het getal ziet er financierbaar uit en beschrijft een pand dat niet het jouwe is." },
+          { type: "h2", text: "Het model is regionaal. Het pand is specifiek." },
+          { type: "p", text: "Een terugverdientijd voor een warmtepomp, berekend op 'gemiddelde' warmtevraag, veronderstelt een schil, een gebruikspatroon en een klimaat die jouw pand misschien niet deelt. Zit je er twintig procent naast op die vraag, dan wordt negen jaar terugverdientijd veertien. Of andersom, en sla je een ingreep over die zich in zes jaar had terugbetaald." },
+          { type: "h2", text: "Waar de modellen breken" },
+          { type: "ul", items: [
+            "Warmte- en koudevraag uit gemiddelden per gebouwtype, niet uit de meterhistorie van het pand zelf.",
+            "Bezetting aangenomen op ontwerpwaarde, niet op wat huurders werkelijk doen.",
+            "Energieprijzen vlak gehouden, terwijl dat de meest beweeglijke invoer van het hele model is.",
+            "Subsidies gerekend op het bedrag uit de kop, niet op waar het pand echt voor in aanmerking komt.",
+          ] },
+          { type: "p", text: "Elke aanname is op zichzelf verdedigbaar en in combinatie rampzalig. Een verduurzamingsbusinesscase is het product van vier aannames, dus een fout van twintig procent per stuk telt niet op — die vermenigvuldigt." },
+          { type: "h2", text: "Modelleer vanaf de meter, niet vanuit de brochure" },
+          { type: "p", text: "De ingrepen die zich terugbetalen zijn gemodelleerd op het eigen verbruik van het pand, de werkelijke bezetting en een prijsscenario waar je zelf in gelooft. Dat kost meer tijd dan de rekentool van de brochure. Het is ook het verschil tussen een investeringsbeslissing en een gok in een spreadsheetjasje." },
+          { type: "quote", text: "Een terugverdienmodel op regionale gemiddelden is precies over een pand dat niet bestaat. Reken het pand door dat je bezit." },
+          { type: "p", text: "De assetmanagers die goed verduurzamen hebben geen betere aannemers. Ze hebben betere invoer — en ze weten van welke panden ze af moeten blijven." },
+        ],
+      },
       de: {
         title: "Das Sanierungs-ROI-Modell, das am echten Gebäude scheitert",
         summary:
@@ -882,6 +1026,28 @@ export const POSTS: Insight[] = [
       { type: "p", text: "The revenue teams that pull ahead stop defending the channel mix and start defending the contribution per guest — a different, and much more profitable, fight." }
     ],
     i18n: {
+      nl: {
+        title: "Wat je kanaalmix verzwijgt over je beste gasten",
+        summary:
+          "Elk hotel kent zijn kanaalmix. Bijna geen enkel hotel weet wat een gast per kanaal werkelijk waard is nadat dat kanaal zijn deel heeft genomen. Dat gat, verspreid over vijf dashboards die nooit op elkaar aansluiten, is waar het margeverhaal uiteenvalt.",
+        body: [
+          { type: "p", text: "Elk hotel kent zijn kanaalmix — zoveel via OTA's, zoveel direct, zoveel zakelijk. Bijna geen enkel hotel weet wat een gast per kanaal werkelijk waard is nadat dat kanaal zijn deel heeft genomen. Daar valt het margeverhaal stilletjes uit elkaar." },
+          { type: "h2", text: "Het getal in de kop en het echte getal" },
+          { type: "p", text: "Een OTA-boeking tegen hetzelfde nachttarief als een directe boeking is niet dezelfde omzet. Haal de commissie eraf, het hogere annuleringspercentage, de lagere besteding ter plaatse en het kortere verblijf, en twee boekingen die er identiek uitzien kunnen een kwart schelen in bijdrage. Het kanaalmixrapport laat daar niets van zien." },
+          { type: "h2", text: "Wat die vijf dashboards nooit met elkaar rijmen" },
+          { type: "ul", items: [
+            "Commissie en betaalkosten — die leven bij finance, niet in het kanaalrapport.",
+            "Annuleringen en no-shows per kanaal — die leven bij operations.",
+            "Besteding ter plaatse, van eten en drinken tot spa en upsells, per kanaal — die leeft nergens in het bijzonder.",
+            "Terugkeerpercentage per kanaal — het getal dat de klantwaarde bepaalt, en dat vrijwel niemand bijhoudt.",
+          ] },
+          { type: "p", text: "Elk dashboard klopt in zichzelf en samen zijn ze nutteloos, want de werkelijke waarde van een gast is het product van getallen die nooit in dezelfde tabel staan." },
+          { type: "h2", text: "Waardeer het kanaal op bijdrage, niet op tarief" },
+          { type: "p", text: "De stap is de bijdrage per boeking per kanaal uitrekenen — na commissie, gewogen naar annuleringen, plus besteding ter plaatse en de waarde van terugkeer — en dát laten bepalen hoe hard je voor direct vecht, in plaats van het brutotarief. Soms is de OTA-gast meer waard dan je aannam. Vaker is de directe gast veel meer waard dan de prijslijst suggereert." },
+          { type: "quote", text: "Je kanaalmixrapport rangschikt boekingen op tarief. Je P&L rangschikt ze op bijdrage. Zolang die twee het oneens zijn, optimaliseer je het verkeerde getal." },
+          { type: "p", text: "De revenueteams die uitlopen stoppen met het verdedigen van de kanaalmix en beginnen de bijdrage per gast te verdedigen — een ander, en veel winstgevender, gevecht." },
+        ],
+      },
       de: {
         title: "Was Ihr Channel-Mix über Ihre besten Gäste verschweigt",
         summary:
@@ -950,6 +1116,24 @@ export const POSTS: Insight[] = [
       { type: "p", text: "When we build reporting inside Philly, we start from the decision, not the data. It forces uncomfortable conversations — 'we actually don't know what we would do if this number moved' — but those are the conversations that make the dashboard worth building." }
     ],
     i18n: {
+      nl: {
+        title: "Waarom dashboards hun directeur stilletjes voorliegen",
+        summary:
+          "De cijfers op het dashboard kloppen altijd; het kader eromheen niet. Drie patronen die schone data in een misleidend verhaal veranderen, en hoe je je eigen dashboard in een uur doorlicht.",
+        body: [
+          { type: "p", text: "Elke directeur heeft dat moment gehad: het dashboard staat groen, de vergadering loopt goed, en twee weken later valt er een klant weg of komt de kas in de knel zonder dat iemand het zag aankomen. Het dashboard had geen ongelijk. Het keek alleen niet naar het juiste." },
+          { type: "h2", text: "Drie patronen die stilletjes misleiden" },
+          { type: "ul", items: [
+            "Gemiddelden zonder spreiding — 'gemiddelde dealwaarde € 42.000' verbergt dat de helft van je omzet uit twee klanten komt.",
+            "Achterlopende indicatoren die voor voorlopende doorgaan — MRR loopt achter. Wat de directeur nodig heeft is de snelheid van de pijplijn, en die woont twee systemen verderop.",
+            "IJdele verhoudingen die uit zichzelf bewegen — de activatiegraad stijgt omdat je de lat voor wat als aanmelding telt hoger legde, niet omdat het product beter werd.",
+          ] },
+          { type: "h2", text: "Een doorlichting van een uur die je vandaag kunt doen" },
+          { type: "p", text: "Stel bij elke tegel op je dashboard twee vragen. Eén: welke directiebeslissing neem ik anders als dit getal groen wordt? Twee: wat zou er waar moeten zijn om dit getal er goed uit te laten zien terwijl het bedrijf in de problemen zit? Kun je die twee niet binnen een minuut per tegel beantwoorden, dan is die tegel versiering en geen instrument." },
+          { type: "quote", text: "De beste dashboards hebben minder tegels dan mensen verwachten. Elke tegel die geen beslissing beantwoordt, vecht om de aandacht van de tegels die dat wel doen." },
+          { type: "p", text: "Als we rapportage in Philly bouwen, beginnen we bij de beslissing en niet bij de data. Dat dwingt ongemakkelijke gesprekken af — 'we weten eigenlijk niet wat we zouden doen als dit getal beweegt' — maar dat zijn precies de gesprekken die het dashboard de moeite waard maken." },
+        ],
+      },
       de: {
         title: "Warum die meisten Operator-Dashboards ihre CEOs leise belügen",
         summary:
