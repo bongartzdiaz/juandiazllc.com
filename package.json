@@ -21,7 +21,8 @@
     "regen:pricing:check": "node scripts/regenerate-pricing.mjs --check",
     "lint:tenant-scope": "node scripts/ci/check-tenant-scope.mjs",
     "seo:report": "tsx scripts/seo-report.ts",
-    "seo:report:dry": "tsx scripts/seo-report.ts --dry"
+    "seo:report:dry": "tsx scripts/seo-report.ts --dry",
+    "seo:audit": "tsx scripts/seo-audit.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.71",
