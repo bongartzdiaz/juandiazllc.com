@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { VENTURES, getVenture } from "@/lib/ventures";
+import { VENTURES, getVenture, getVentures } from "@/lib/ventures";
 import { getSector } from "@/lib/sectors";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { AUTHOR_PERSON } from "@/lib/seo/article";
@@ -17,17 +17,19 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params;
   const l = assertLocale(locale);
-  const v = getVenture(slug);
+  const v = getVenture(slug, l);
   if (!v) return { title: "Venture not found" };
+  const titel = v.seoTitle ?? `${v.name} — ${v.tagline}`;
+  const beschrijving = v.seoDescription ?? v.summary;
   return {
-    title: `${v.name} — ${v.tagline}`,
-    description: v.summary,
+    title: titel,
+    description: beschrijving,
     alternates: buildAlternates(l, `/work/${v.slug}`),
     openGraph: {
       type: "article",
       url: `/${l}/work/${v.slug}`,
-      title: `${v.name} — ${v.tagline}`,
-      description: v.summary,
+      title: titel,
+      description: beschrijving,
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
     },
@@ -38,10 +40,10 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
   const { locale, slug } = await params;
   const l = assertLocale(locale);
   const t = (k: string) => translate(l, k);
-  const v = getVenture(slug);
+  const v = getVenture(slug, l);
   if (!v) notFound();
 
-  const others = VENTURES.filter((x) => x.slug !== v.slug).slice(0, 3);
+  const others = getVentures(l).filter((x) => x.slug !== v.slug).slice(0, 3);
   const sector = getSector(v.sectorSlug, l);
 
   const crumbs = breadcrumbSchema([

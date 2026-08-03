@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { SignOutButton } from "@/components/SignOutButton";
-import { VENTURES } from "@/lib/ventures";
+import { VENTURES, getVentures } from "@/lib/ventures";
 import Link from "next/link";
 import { buildGreeting } from "@/lib/greeting";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
@@ -317,7 +317,7 @@ export default async function AppPage({ params }: { params: Promise<{ locale: st
             dangerouslySetInnerHTML={{ __html: t("app.ventures.title") }}
           />
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {VENTURES.map((v) => (
+            {getVentures(l).map((v) => (
               <a
                 key={v.slug}
                 href={v.external}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { VENTURES } from "@/lib/ventures";
+import { getVentures } from "@/lib/ventures";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
@@ -21,6 +21,7 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const l = assertLocale(locale);
   const t = (k: string) => translate(l, k);
+  const ventures = getVentures(l);
 
   const crumbs = breadcrumbSchema([
     { name: "Home", path: `/${l}` },
@@ -31,7 +32,7 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
     path: "/work",
     name: "Work — Juan Diaz, LLC",
     description: "Live products under Juan Diaz, LLC — the five-phase playbook applied to real sectors.",
-    items: VENTURES.map((v) => ({
+    items: ventures.map((v) => ({
       name: v.name,
       url: `/${l}/work/${v.slug}`,
       description: v.tagline,
@@ -56,7 +57,7 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
             gap: 16,
           }}
         >
-          {VENTURES.map((v) => (
+          {ventures.map((v) => (
             <article
               key={v.slug}
               className="sec-card"
