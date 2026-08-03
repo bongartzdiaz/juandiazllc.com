@@ -17,7 +17,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const l = assertLocale(locale);
-  const description = translate(l, "roi.lede");
+  const description = translate(l, "meta.energyRoi.description");
   const title = translate(l, "meta.energyRoi.title");
   return {
     title,

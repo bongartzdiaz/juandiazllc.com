@@ -12,17 +12,16 @@ import { TITLE_SUFFIX, TITLE_BUDGET } from "./seo/branding";
 
 const DESC_MAX = 160;
 
-/** Posts zonder i18n: hun tekst staat in de basisvelden, dus één seo-veld
- *  dekt alle markten waarin ze verschijnen. De all-market posts hebben per
- *  taal een eigen titel nodig en komen in een aparte gate. */
-const MARKTSPECIFIEK: Insight[] = POSTS.filter((p) => !p.i18n);
+/** Alle posts. Een vertaalde titel heeft een andere lengte dan het origineel,
+ *  dus de controle loopt per markt en niet per post. */
+const ALLE: Insight[] = POSTS;
 
-describe("elke markt-specifieke insight past in de zoekresultaten", () => {
+describe("elke insight past in de zoekresultaten", () => {
   it("vindt daadwerkelijk posts om te controleren", () => {
-    expect(MARKTSPECIFIEK.length).toBeGreaterThan(10);
+    expect(ALLE.length).toBeGreaterThan(15);
   });
 
-  for (const p of MARKTSPECIFIEK) {
+  for (const p of ALLE) {
     describe(p.slug, () => {
       for (const l of insightMarkets(p)) {
         it(`${l} — titel binnen het budget`, () => {
@@ -38,16 +37,32 @@ describe("elke markt-specifieke insight past in de zoekresultaten", () => {
         });
       }
 
-      it("draagt het merk niet zelf al", () => {
-        const t = p.seo?.metaTitle ?? "";
-        expect(t, p.slug).not.toContain(TITLE_SUFFIX.trim());
-        expect(t.toLowerCase(), p.slug).not.toContain("juan diaz");
+      it("geen enkele taal draagt het merk zelf al", () => {
+        for (const l of insightMarkets(p)) {
+          const t = getInsight(p.slug, l)!.seo?.metaTitle ?? "";
+          expect(t, `${p.slug}/${l}`).not.toContain(TITLE_SUFFIX.trim());
+          expect(t.toLowerCase(), `${p.slug}/${l}`).not.toContain("juan diaz");
+        }
       });
 
       it("een seo-veld is gevuld of afwezig, nooit leeg", () => {
-        if (!p.seo) return;
-        if (p.seo.metaTitle !== undefined) expect(p.seo.metaTitle.trim(), p.slug).not.toBe("");
-        if (p.seo.metaDescription !== undefined) expect(p.seo.metaDescription.trim(), p.slug).not.toBe("");
+        for (const seo of [p.seo, ...Object.values(p.i18n ?? {}).map((v) => v?.seo)]) {
+          if (!seo) continue;
+          if (seo.metaTitle !== undefined) expect(seo.metaTitle.trim(), p.slug).not.toBe("");
+          if (seo.metaDescription !== undefined) expect(seo.metaDescription.trim(), p.slug).not.toBe("");
+        }
+      });
+
+      // Vier identieke zoektitels zouden de vier markten weer op één
+      // zoekresultaat laten concurreren.
+      it("de zoektitels verschillen per markt", () => {
+        const markten = insightMarkets(p);
+        if (markten.length < 2) return;
+        const titels = markten.map((l) => {
+          const v = getInsight(p.slug, l)!;
+          return v.seo?.metaTitle ?? v.title;
+        });
+        expect(new Set(titels).size, `dubbel: ${JSON.stringify(titels)}`).toBe(markten.length);
       });
     });
   }

@@ -7,7 +7,16 @@
 import type { Locale } from "@/lib/i18n/dict";
 
 /** Localized overrides for a post's user-facing content. */
-export type InsightL10n = { title: string; summary: string; body: InsightBlock[] };
+export type InsightL10n = {
+  title: string;
+  summary: string;
+  body: InsightBlock[];
+  /** Zoektitel en -beschrijving per taal. Nodig omdat een vertaalde titel een
+   *  andere lengte heeft dan het origineel: "Why operator CRMs fail" past,
+   *  "Warum Betreiber-CRMs in 90 Tagen scheitern" niet. Ontbreekt hij, dan
+   *  valt de pagina terug op het seo-veld van de basispost. */
+  seo?: { metaTitle?: string; metaDescription?: string };
+};
 
 export type Insight = {
   slug: string;
@@ -52,6 +61,11 @@ export const POSTS: Insight[] = [
     tag: "Systems",
     publishedAt: "2026-01-22",
     readingMinutes: 6,
+    seo: {
+      metaTitle: "Automation ROI: what actually pays back",
+      metaDescription:
+        "Most automation saves hours nobody would have spent. Three questions that separate real ROI from theatre, and one test before you buy.",
+    },
     body: [
       { type: "p", text: "Every operator I meet has a slide deck from some consultant claiming their team will save 400 hours a year. Most of the time that number is arithmetic fiction — hours that would never have been billed, meetings that would never have been booked, work that would never have been done. Real automation ROI is narrower and harsher." },
       { type: "h2", text: "The three questions that separate real ROI from theatre" },
@@ -67,6 +81,11 @@ export const POSTS: Insight[] = [
     ],
     i18n: {
       nl: {
+        seo: {
+          metaTitle: "Automatiserings-ROI: wat echt terugverdient",
+          metaDescription:
+            "De meeste automatisering bespaart uren die niemand toch al maakte. Drie vragen die echte ROI van theater scheiden, en een test vooraf.",
+        },
         title: "De automatiserings-ROI-mythe, en wat wél terugverdient",
         summary:
           "De meeste automatiseringsprojecten besparen uren die niemand toch al ging maken. Drie regels om de projecten te kiezen die de P&L echt verzetten — en één test vóór je weer een tool koopt.",
@@ -85,6 +104,11 @@ export const POSTS: Insight[] = [
         ],
       },
       de: {
+        seo: {
+          metaTitle: "Automatisierungs-ROI: was sich rechnet",
+          metaDescription:
+            "Die meiste Automatisierung spart Stunden, die niemand gearbeitet hätte. Drei Fragen, die echten ROI von Theater trennen, und ein Test vorab.",
+        },
         title: "Der Mythos vom Automatisierungs-ROI — und was sich wirklich auszahlt",
         summary:
           "Die meisten Automatisierungsprojekte sparen Stunden, die ohnehin niemand investiert hätte. Drei Regeln, um die auszuwählen, die wirklich die GuV bewegen — und ein Test, bevor Sie das nächste Tool kaufen.",
@@ -103,6 +127,11 @@ export const POSTS: Insight[] = [
         ],
       },
       es: {
+        seo: {
+          metaTitle: "ROI de automatización: qué se paga solo",
+          metaDescription:
+            "La mayoría de la automatización ahorra horas que nadie iba a dedicar. Tres preguntas que separan el ROI real del teatro, y una prueba previa.",
+        },
         title: "El mito del ROI de la automatización, y lo que de verdad se amortiza",
         summary:
           "La mayoría de los proyectos de automatización ahorran horas que nadie iba a invertir de todos modos. Tres reglas para elegir las que sí mueven la cuenta de resultados — y una prueba antes de comprar otra herramienta.",
@@ -157,6 +186,11 @@ export const POSTS: Insight[] = [
     tag: "Systems",
     publishedAt: "2026-04-08",
     readingMinutes: 6,
+    seo: {
+      metaTitle: "Why operator CRMs fail in 90 days",
+      metaDescription:
+        "A CRM the team avoids is worse than a spreadsheet. The pattern that kills adoption, and five decisions that fix it before rollout.",
+    },
     body: [
       { type: "p", text: "Every operator I talk to has a story: they bought a CRM, migrated the contacts, ran two training sessions, and within a quarter the deal pipeline was back to WhatsApp and memory. The diagnosis is almost always the same — and it is never the software's fault." },
       { type: "h2", text: "The symptom is adoption. The cause is design." },
@@ -176,6 +210,11 @@ export const POSTS: Insight[] = [
     ],
     i18n: {
       nl: {
+        seo: {
+          metaTitle: "Waarom operator-CRM's binnen 90 dagen falen",
+          metaDescription:
+            "Een CRM dat het team mijdt is slechter dan een spreadsheet. Het patroon dat de invoering nekt, en vijf keuzes die het vooraf oplossen.",
+        },
         title: "Waarom operator-CRM's het binnen 90 dagen begeven",
         summary:
           "Een CRM dat het team mijdt is slechter dan een spreadsheet. Het patroon dat de invoering nekt bij energie-, vastgoed- en horecabedrijven — en vijf keuzes die het vóór de uitrol oplossen.",
@@ -198,6 +237,11 @@ export const POSTS: Insight[] = [
         ],
       },
       de: {
+        seo: {
+          metaTitle: "Warum Betreiber-CRMs in 90 Tagen scheitern",
+          metaDescription:
+            "Ein CRM, das das Team meidet, ist schlechter als eine Tabelle. Das Muster, das die Einführung killt, und fünf Entscheidungen davor.",
+        },
         title: "Warum die meisten Operator-CRMs binnen 90 Tagen scheitern",
         summary:
           "Ein CRM, das das Team meidet, ist schlimmer als eine Tabelle. Das Muster, das die Akzeptanz in Energie-, Immobilien- und Hospitality-Betrieben tötet — und fünf Entscheidungen, die es vor dem Rollout beheben.",
@@ -220,6 +264,11 @@ export const POSTS: Insight[] = [
         ],
       },
       es: {
+        seo: {
+          metaTitle: "Por qué los CRM de operador fallan",
+          metaDescription:
+            "Un CRM que el equipo evita es peor que una hoja de cálculo. El patrón que mata la adopción, y cinco decisiones que lo arreglan antes.",
+        },
         title: "Por qué la mayoría de los CRM de operadores fracasan en 90 días",
         summary:
           "Un CRM que el equipo evita es peor que una hoja de cálculo. El patrón que mata la adopción en negocios de energía, inmobiliaria y hostelería — y cinco decisiones que lo arreglan antes del despliegue.",
@@ -278,6 +327,11 @@ export const POSTS: Insight[] = [
     tag: "Strategy",
     publishedAt: "2026-02-17",
     readingMinutes: 7,
+    seo: {
+      metaTitle: "The build-vs-buy trap for operators",
+      metaDescription:
+        "Building looks expensive until you count the workarounds. Buying looks safe until the third integration. A framework that matches reality.",
+    },
     body: [
       { type: "p", text: "Somewhere between a 50-person operator and a 500-person one, every leadership team has the same conversation: we have four vendors, three of them do not talk to each other, and our people spend an hour a day moving data between them. Do we keep buying, or do we build?" },
       { type: "h2", text: "The real question is not build vs buy" },
@@ -296,6 +350,11 @@ export const POSTS: Insight[] = [
     ],
     i18n: {
       nl: {
+        seo: {
+          metaTitle: "De bouwen-of-kopen-val voor operators",
+          metaDescription:
+            "Bouwen lijkt duur tot je de omwegen meetelt. Kopen lijkt veilig tot de derde koppeling. Een afwegingskader dat past bij de praktijk.",
+        },
         title: "De bouwen-of-kopen-val waar operators in lopen",
         summary:
           "Bouwen lijkt duur tot je de omwegen meetelt. Kopen lijkt veilig tot je bij de derde koppeling komt. Een afwegingskader dat past bij de praktijk van een operator.",
@@ -317,6 +376,11 @@ export const POSTS: Insight[] = [
         ],
       },
       de: {
+        seo: {
+          metaTitle: "Die Build-vs-Buy-Falle für Betreiber",
+          metaDescription:
+            "Bauen wirkt teuer, bis man die Umwege zählt. Kaufen wirkt sicher, bis zur dritten Schnittstelle. Ein Rahmen, der zur Praxis passt.",
+        },
         title: "Die Build-vs-Buy-Falle, in die Operatoren immer wieder tappen",
         summary:
           "Selbst bauen wirkt teuer, bis man die Workarounds zählt. Einkaufen wirkt sicher, bis zur dritten Integration. Ein Entscheidungsrahmen, der zur Realität von Operatoren passt.",
@@ -338,6 +402,11 @@ export const POSTS: Insight[] = [
         ],
       },
       es: {
+        seo: {
+          metaTitle: "La trampa de construir o comprar",
+          metaDescription:
+            "Construir parece caro hasta que cuentas los rodeos. Comprar parece seguro hasta la tercera integración. Un marco que encaja con la realidad.",
+        },
         title: "La trampa de construir o comprar en la que los operadores caen una y otra vez",
         summary:
           "Construir parece caro hasta que cuentas los apaños. Comprar parece seguro hasta la tercera integración. Un marco de decisión que encaja con la realidad del operador.",
@@ -368,6 +437,11 @@ export const POSTS: Insight[] = [
     tag: "Systems",
     publishedAt: "2026-04-15",
     readingMinutes: 5,
+    seo: {
+      metaTitle: "The field team is the product",
+      metaDescription:
+        "Executives buy software for reporting; field teams use it to close deals. When the two clash the field team wins by not opening it.",
+    },
     body: [
       { type: "p", text: "Walk into any 50-person operator and ask two people the same question: what does the CRM do? The CFO will talk about pipeline visibility and revenue forecasting. The field rep will talk about the eight taps it takes to log a call. Those two answers describe completely different products." },
       { type: "h2", text: "Why the office usually wins the roadmap fight" },
@@ -384,6 +458,11 @@ export const POSTS: Insight[] = [
     ],
     i18n: {
       nl: {
+        seo: {
+          metaTitle: "Het veldteam is het product",
+          metaDescription:
+            "Directies kopen software om te rapporteren, veldteams om te sluiten. Botsen die twee, dan wint het veldteam door hem niet te openen.",
+        },
         title: "Het veldteam is het product, niet het dashboard",
         summary:
           "Directies kopen software om te rapporteren. Veldteams gebruiken hem om deals te sluiten. Botsen die twee, dan wint het veldteam vanzelf: door hem niet meer te openen. Ontwerp dus eerst voor hen.",
@@ -403,6 +482,11 @@ export const POSTS: Insight[] = [
         ],
       },
       de: {
+        seo: {
+          metaTitle: "Das Außendienstteam ist das Produkt",
+          metaDescription:
+            "Führung kauft Software zum Berichten, der Außendienst schließt damit ab. Kollidiert beides, gewinnt das Feld, indem es sie nicht öffnet.",
+        },
         title: "Das Außendienstteam ist das Produkt — nicht das Dashboard",
         summary:
           "Führungskräfte kaufen Software fürs Reporting. Außendienstteams nutzen sie, um Deals abzuschließen. Stehen beide in Spannung, gewinnt das Außendienstteam standardmäßig — indem es sie einfach nicht mehr nutzt. Entwerfen Sie zuerst für sie.",
@@ -422,6 +506,11 @@ export const POSTS: Insight[] = [
         ],
       },
       es: {
+        seo: {
+          metaTitle: "El equipo de campo es el producto",
+          metaDescription:
+            "La dirección compra software para reportar; el equipo de campo cierra con él. Si chocan, gana el campo: deja de abrirlo.",
+        },
         title: "El equipo de campo es el producto — no el panel",
         summary:
           "Los directivos compran software para reporting. Los equipos de campo lo usan para cerrar tratos. Cuando ambos están en tensión, el equipo de campo gana por defecto — simplemente deja de usarlo. Diséñalo primero para ellos.",
@@ -794,6 +883,11 @@ export const POSTS: Insight[] = [
     tag: "Real estate",
     publishedAt: "2026-07-20",
     readingMinutes: 6,
+    seo: {
+      metaTitle: "The ESG number you can't defend",
+      metaDescription:
+        "Every real estate operator produces an ESG number once a year. Almost none survives due diligence. Make it reproducible from the meter.",
+    },
     body: [
       { type: "p", text: "Every real estate operator produces an ESG number once a year. Almost none can defend it line by line when an investor's due-diligence team starts pulling threads. The report looks precise — three decimal places, a nice chart — and it is quietly indefensible." },
       { type: "h2", text: "Why the number falls apart under scrutiny" },
@@ -812,6 +906,11 @@ export const POSTS: Insight[] = [
     ],
     i18n: {
       nl: {
+        seo: {
+          metaTitle: "Het ESG-cijfer dat niemand kan verdedigen",
+          metaDescription:
+            "Elke vastgoedoperator levert jaarlijks een ESG-cijfer. Bijna geen enkel overleeft een due diligence. Maak het reproduceerbaar vanaf de meter.",
+        },
         title: "Het ESG-cijfer dat je assetmanager niet kan verdedigen",
         summary:
           "Elke vastgoedoperator produceert één keer per jaar een ESG-cijfer. Bijna niemand kan het regel voor regel verdedigen zodra een due-diligenceteam aan de draadjes trekt. Waarom het bezwijkt onder onderzoek — en hoe je het reproduceerbaar maakt vanaf de meter.",
@@ -833,6 +932,11 @@ export const POSTS: Insight[] = [
         ],
       },
       de: {
+        seo: {
+          metaTitle: "Die ESG-Zahl, die niemand verteidigt",
+          metaDescription:
+            "Jeder Immobilienbetreiber liefert jährlich eine ESG-Zahl. Kaum eine übersteht die Due Diligence. Machen Sie sie am Zähler nachvollziehbar.",
+        },
         title: "Die ESG-Zahl, die Ihr Asset Manager nicht verteidigen kann",
         summary:
           "Jeder Immobilienbetreiber produziert einmal im Jahr eine ESG-Zahl. Kaum einer kann sie Zeile für Zeile verteidigen, sobald das Due-Diligence-Team eines Investors nachhakt. Warum die Zahl unter Prüfung zerfällt — und wie Sie sie aus dem Zähler reproduzierbar machen.",
@@ -854,6 +958,11 @@ export const POSTS: Insight[] = [
         ],
       },
       es: {
+        seo: {
+          metaTitle: "El número ESG que nadie puede defender",
+          metaDescription:
+            "Cada operador inmobiliario entrega una cifra ESG al año. Casi ninguna sobrevive a la due diligence. Hazla reproducible desde el contador.",
+        },
         title: "El número ESG que tu gestor de activos no puede defender",
         summary:
           "Todo operador inmobiliario produce un número ESG una vez al año. Casi ninguno puede defenderlo línea por línea cuando el equipo de due diligence de un inversor empieza a tirar del hilo. Por qué el número se desmorona bajo escrutinio — y cómo hacerlo reproducible desde el contador.",
@@ -884,6 +993,11 @@ export const POSTS: Insight[] = [
     tag: "Hospitality",
     publishedAt: "2026-07-20",
     readingMinutes: 5,
+    seo: {
+      metaTitle: "The ten minutes before check-in",
+      metaDescription:
+        "Hotel margin leaks at the front desk, not in the spreadsheet: the upsell not offered, the room assigned by habit, the rate held too long.",
+    },
     body: [
       { type: "p", text: "Ask a hotel revenue manager where the margin is, and they point at the rate card. Ask where it leaks, and the honest answer is the ten minutes before check-in — the upsell not offered, the room assigned by habit, the rate held two days too long. Most of that is decided on gut feel, by someone with no instrument to check the call against." },
       { type: "h2", text: "The most valuable ten minutes in the building have no instrument" },
@@ -902,6 +1016,11 @@ export const POSTS: Insight[] = [
     ],
     i18n: {
       nl: {
+        seo: {
+          metaTitle: "De tien minuten vóór check-in",
+          metaDescription:
+            "De marge lekt weg aan de balie, niet in de spreadsheet: de upsell die niet kwam, de kamer op gewoonte, de prijs die bleef staan.",
+        },
         title: "De tien minuten vóór check-in waar je marge weglekt",
         summary:
           "Vraag een revenue manager waar de marge zit en hij wijst naar de prijslijst. Vraag waar hij weglekt en het eerlijke antwoord is: in de tien minuten vóór check-in. De upsell die niet kwam, de kamer die uit gewoonte werd toegewezen, de prijs die te lang bleef staan.",
@@ -923,6 +1042,11 @@ export const POSTS: Insight[] = [
         ],
       },
       de: {
+        seo: {
+          metaTitle: "Die zehn Minuten vor dem Check-in",
+          metaDescription:
+            "Die Marge versickert an der Rezeption, nicht in der Tabelle: der Upsell ohne Angebot, das Zimmer aus Gewohnheit, der Preis zu lange gehalten.",
+        },
         title: "Die zehn Minuten vor dem Check-in, in denen Ihre Marge verloren geht",
         summary:
           "Fragen Sie einen Revenue Manager, wo die Marge steckt, zeigt er auf die Preisliste. Fragen Sie, wo sie verloren geht, ist die ehrliche Antwort: in den zehn Minuten vor dem Check-in — das nicht angebotene Upgrade, das aus Gewohnheit vergebene Zimmer, der zu lange gehaltene Preis. Meist aus dem Bauch entschieden.",
@@ -944,6 +1068,11 @@ export const POSTS: Insight[] = [
         ],
       },
       es: {
+        seo: {
+          metaTitle: "Los diez minutos antes del check-in",
+          metaDescription:
+            "El margen se escapa en recepción, no en la hoja de cálculo: el upsell que no se ofrece, la habitación por costumbre, la tarifa estancada.",
+        },
         title: "Los diez minutos antes del check-in donde se te escapa el margen",
         summary:
           "Pregunta a un revenue manager dónde está el margen y señala la tarifa. Pregunta dónde se escapa y la respuesta honesta son los diez minutos antes del check-in — el upselling no ofrecido, la habitación asignada por costumbre, la tarifa mantenida demasiado tiempo. Casi todo se decide a ojo.",
@@ -974,6 +1103,11 @@ export const POSTS: Insight[] = [
     tag: "Real estate",
     publishedAt: "2026-07-20",
     readingMinutes: 6,
+    seo: {
+      metaTitle: "The retrofit ROI model that breaks",
+      metaDescription:
+        "Insulation, heat pump, solar: almost every payback model runs on regional averages. That is where retrofit money dies. Model from the meter.",
+    },
     body: [
       { type: "p", text: "Every retrofit decision — insulation, heat pump, solar — comes with an ROI model. Almost all of them are built on regional averages, and regional averages are where retrofit money quietly dies. The number looks bankable and describes a building that isn't yours." },
       { type: "h2", text: "The model is regional. The building is specific." },
@@ -993,6 +1127,11 @@ export const POSTS: Insight[] = [
     ],
     i18n: {
       nl: {
+        seo: {
+          metaTitle: "Het verduurzamingsmodel dat breekt",
+          metaDescription:
+            "Isolatie, warmtepomp, zon: bijna elk terugverdienmodel draait op regionale gemiddelden. Daar sterft het geld. Reken vanaf de meter.",
+        },
         title: "Het verduurzamingsmodel dat het pand niet overleeft",
         summary:
           "Elke verduurzamingsbeslissing — isolatie, warmtepomp, zon — komt met een terugverdienmodel, en bijna allemaal draaien ze op regionale gemiddelden. Daar sterft verduurzamingsgeld stilletjes. Hoe je er een bouwt vanaf de meter.",
@@ -1015,6 +1154,11 @@ export const POSTS: Insight[] = [
         ],
       },
       de: {
+        seo: {
+          metaTitle: "Das Sanierungs-ROI-Modell, das bricht",
+          metaDescription:
+            "Dämmung, Wärmepumpe, Solar: fast jede Amortisationsrechnung läuft auf Regionalmittelwerten. Dort stirbt das Geld. Rechnen Sie am Zähler.",
+        },
         title: "Das Sanierungs-ROI-Modell, das am echten Gebäude scheitert",
         summary:
           "Jede Sanierungsentscheidung — Dämmung, Wärmepumpe, Solar — kommt mit einem ROI-Modell, und fast alle laufen auf regionalen Durchschnitten. Genau da verschwindet das Sanierungsgeld leise. Warum das Modell am echten Objekt scheitert, und wie Sie es aus dem Zähler bauen.",
@@ -1037,6 +1181,11 @@ export const POSTS: Insight[] = [
         ],
       },
       es: {
+        seo: {
+          metaTitle: "El modelo de ROI de reforma que falla",
+          metaDescription:
+            "Aislamiento, bomba de calor, solar: casi todo modelo de amortización usa medias regionales. Ahí muere el dinero. Modela desde el contador.",
+        },
         title: "El modelo de ROI de reforma que no sobrevive al edificio",
         summary:
           "Cada decisión de reforma —aislamiento, aerotermia, solar— viene con un modelo de ROI, y casi todos funcionan con medias regionales. Ahí es donde el dinero de la reforma desaparece en silencio. Por qué el modelo se rompe contra el activo real, y cómo construirlo desde el contador.",
@@ -1068,6 +1217,11 @@ export const POSTS: Insight[] = [
     tag: "Hospitality",
     publishedAt: "2026-07-20",
     readingMinutes: 5,
+    seo: {
+      metaTitle: "What your channel mix hides",
+      metaDescription:
+        "Every hotel knows its channel mix. Almost none knows what a guest is worth after the channel takes its cut. Price by contribution, not rate.",
+    },
     body: [
       { type: "p", text: "Every hotel knows its channel mix — this much OTA, this much direct, this much corporate. Almost none know what a guest from each channel is actually worth after the channel takes its cut. That gap is where the margin story quietly falls apart." },
       { type: "h2", text: "The headline number and the real number" },
@@ -1087,6 +1241,11 @@ export const POSTS: Insight[] = [
     ],
     i18n: {
       nl: {
+        seo: {
+          metaTitle: "Wat je kanaalmix verzwijgt",
+          metaDescription:
+            "Elk hotel kent zijn kanaalmix. Bijna geen enkel weet wat een gast waard is na de commissie. Waardeer op bijdrage, niet op tarief.",
+        },
         title: "Wat je kanaalmix verzwijgt over je beste gasten",
         summary:
           "Elk hotel kent zijn kanaalmix. Bijna geen enkel hotel weet wat een gast per kanaal werkelijk waard is nadat dat kanaal zijn deel heeft genomen. Dat gat, verspreid over vijf dashboards die nooit op elkaar aansluiten, is waar het margeverhaal uiteenvalt.",
@@ -1109,6 +1268,11 @@ export const POSTS: Insight[] = [
         ],
       },
       de: {
+        seo: {
+          metaTitle: "Was Ihr Channel-Mix verschweigt",
+          metaDescription:
+            "Jedes Hotel kennt seinen Channel-Mix. Kaum eines weiß, was ein Gast nach Provision wert ist. Bewerten Sie nach Beitrag, nicht nach Rate.",
+        },
         title: "Was Ihr Channel-Mix über Ihre besten Gäste verschweigt",
         summary:
           "Jedes Hotel kennt seinen Channel-Mix. Kaum eines weiß, was ein Gast aus jedem Kanal tatsächlich wert ist, nachdem der Kanal seinen Schnitt genommen hat. Diese Lücke — verteilt auf fünf Dashboards, die nie zusammenpassen — ist der Ort, an dem die Margengeschichte zerfällt.",
@@ -1131,6 +1295,11 @@ export const POSTS: Insight[] = [
         ],
       },
       es: {
+        seo: {
+          metaTitle: "Lo que tu mix de canales oculta",
+          metaDescription:
+            "Todo hotel conoce su mix de canales. Casi ninguno sabe cuánto vale un huésped tras la comisión. Valora por contribución, no por tarifa.",
+        },
         title: "Lo que tu mix de canales oculta sobre tus mejores huéspedes",
         summary:
           "Todo hotel conoce su mix de canales. Casi ninguno sabe cuánto vale de verdad un huésped de cada canal después de que el canal se lleve su parte. Ese hueco —repartido en cinco paneles que nunca cuadran— es donde se desmorona la historia del margen.",
@@ -1162,6 +1331,11 @@ export const POSTS: Insight[] = [
     tag: "Systems",
     publishedAt: "2026-03-11",
     readingMinutes: 6,
+    seo: {
+      metaTitle: "Why operator dashboards quietly lie",
+      metaDescription:
+        "The numbers are never wrong; the frame is. Three patterns that turn clean data into a misleading story, and a one-hour audit you can run.",
+    },
     body: [
       { type: "p", text: "Every CEO has had the moment: the dashboard looks green, the meeting goes well, and two weeks later a customer churn or a cash crunch lands that nobody saw coming. The dashboard was not wrong. It just was not looking at the right thing." },
       { type: "h2", text: "Three patterns that quietly mislead" },
@@ -1177,6 +1351,11 @@ export const POSTS: Insight[] = [
     ],
     i18n: {
       nl: {
+        seo: {
+          metaTitle: "Waarom dashboards stilletjes voorliegen",
+          metaDescription:
+            "De cijfers kloppen altijd, het kader niet. Drie patronen die schone data misleidend maken, en een doorlichting van een uur.",
+        },
         title: "Waarom dashboards hun directeur stilletjes voorliegen",
         summary:
           "De cijfers op het dashboard kloppen altijd; het kader eromheen niet. Drie patronen die schone data in een misleidend verhaal veranderen, en hoe je je eigen dashboard in een uur doorlicht.",
@@ -1195,6 +1374,11 @@ export const POSTS: Insight[] = [
         ],
       },
       de: {
+        seo: {
+          metaTitle: "Warum Dashboards leise lügen",
+          metaDescription:
+            "Die Zahlen stimmen immer, der Rahmen nicht. Drei Muster, die saubere Daten irreführend machen, und eine Prüfung in einer Stunde.",
+        },
         title: "Warum die meisten Operator-Dashboards ihre CEOs leise belügen",
         summary:
           "Die Zahlen auf dem Dashboard sind nie falsch — aber der Rahmen ist es. Drei Muster, die saubere Daten in irreführende Narrative verwandeln, und wie Sie Ihr eigenes Dashboard in unter einer Stunde prüfen.",
@@ -1213,6 +1397,11 @@ export const POSTS: Insight[] = [
         ],
       },
       es: {
+        seo: {
+          metaTitle: "Por qué los paneles mienten en voz baja",
+          metaDescription:
+            "Las cifras nunca están mal; el marco sí. Tres patrones que vuelven engañosos los datos limpios, y una auditoría de una hora.",
+        },
         title: "Por qué la mayoría de los paneles de operadores mienten en voz baja a sus CEO",
         summary:
           "Los números del panel nunca están mal — pero el encuadre sí. Tres patrones que convierten datos limpios en narrativas engañosas, y cómo auditar tu propio panel en menos de una hora.",
@@ -1248,7 +1437,7 @@ export function isInMarket(p: Insight, locale: Locale): boolean {
  *  post unchanged. `markets` is preserved so callers can still gate. */
 export function localizedInsight(p: Insight, locale: Locale): Insight {
   const t = p.i18n?.[locale];
-  return t ? { ...p, title: t.title, summary: t.summary, body: t.body } : p;
+  return t ? { ...p, title: t.title, summary: t.summary, body: t.body, seo: t.seo ?? p.seo } : p;
 }
 
 /** All posts (newest first). With a locale: only posts published in that
