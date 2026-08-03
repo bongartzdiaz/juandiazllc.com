@@ -1,4 +1,5 @@
 import type { Locale } from "@/lib/i18n/dict";
+import { defined, mergeByIndex } from "@/lib/i18n/merge";
 
 export type Sector = {
   slug: string;
@@ -490,14 +491,6 @@ export const SECTORS: Sector[] = [
   },
 ];
 
-/** Drops keys whose value is undefined so an override object can be spread
- *  over the base without an explicitly-undefined key clobbering real content.
- *  `{...base, ...{tagline: undefined}}` yields tagline: undefined — this
- *  prevents that. */
-function defined<T extends object>(o: T): Partial<T> {
-  return Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined)) as Partial<T>;
-}
-
 /** Applies a locale's overrides to a sector. Returns the base untouched when
  *  the locale has no entry, so callers never have to null-check. */
 export function localizeSector(base: Sector, locale: Locale): Sector {
@@ -511,7 +504,7 @@ export function localizeSector(base: Sector, locale: Locale): Sector {
   // supplies title/body only, so the /work cross-link survives a partial or
   // shorter translated array.
   if (proof) {
-    merged.proof = base.proof.map((p, i) => ({ ...p, ...defined(proof[i] ?? {}) }));
+    merged.proof = mergeByIndex(base.proof, proof);
   }
   return merged;
 }

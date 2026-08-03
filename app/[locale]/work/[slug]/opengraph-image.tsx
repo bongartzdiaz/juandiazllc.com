@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getVenture } from "@/lib/ventures";
+import { assertLocale } from "@/lib/i18n/metadata";
 
 // Per-venture OG image. Renders the venture name, sector badge, and
 // tagline over the brand gradient so shares to LinkedIn / Twitter /
@@ -9,8 +10,8 @@ export const alt = "Juan Diaz, LLC — Venture";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default async function OG({ params }: { params: { slug: string } }) {
-  const v = getVenture(params.slug);
+export default async function OG({ params }: { params: { locale: string; slug: string } }) {
+  const v = getVenture(params.slug, assertLocale(params.locale));
   const name = v?.name ?? "Juan Diaz, LLC";
   const tagline = v?.tagline ?? "Revenue engines for operators.";
   const sector = v?.sector ?? "Holding";

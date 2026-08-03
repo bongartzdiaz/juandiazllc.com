@@ -82,7 +82,7 @@ export default async function InsightPage(
   // links to a post that 404s under the current locale (e.g. an NL-only
   // saldering post surfaced on /de).
   const related = getAllInsights(l).filter((p) => p.slug !== post.slug).slice(0, 2);
-  const venture = getVentureForTag(post.tag);
+  const venture = getVentureForTag(post.tag, l);
   const crumbs = breadcrumbSchema([
     { name: "Home", path: `/${l}` },
     { name: "Insights", path: `/${l}/insights` },
