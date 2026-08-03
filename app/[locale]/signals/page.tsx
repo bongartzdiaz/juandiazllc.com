@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SIGNALS } from "@/lib/signals";
+import { getSignals } from "@/lib/signals";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
@@ -30,7 +30,7 @@ export default async function SignalsIndex({ params }: { params: Promise<{ local
     path: "/signals",
     name: "Signals — Juan Diaz, LLC",
     description: "Short essays on designing operator tools and shipping dashboards that survive real environments.",
-    items: SIGNALS.map((s) => ({
+    items: getSignals(l).map((s) => ({
       name: s.title,
       url: `/${l}/signals/${s.slug}`,
       description: s.excerpt,
@@ -47,7 +47,7 @@ export default async function SignalsIndex({ params }: { params: Promise<{ local
       </header>
       <section style={{ padding: "80px 40px 160px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div style={{ display: "grid", gap: 12 }}>
-          {SIGNALS.map((s) => (
+          {getSignals(l).map((s) => (
             <Link
               key={s.slug}
               href={`/signals/${s.slug}`}

@@ -1,12 +1,13 @@
 import { ImageResponse } from "next/og";
 import { getSignal } from "@/lib/signals";
+import { assertLocale } from "@/lib/i18n/metadata";
 
 export const alt = "Juan Diaz, LLC — Signal";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default async function OG({ params }: { params: { slug: string } }) {
-  const s = getSignal(params.slug);
+export default async function OG({ params }: { params: { locale: string; slug: string } }) {
+  const s = getSignal(params.slug, assertLocale(params.locale));
   const title = s?.title ?? "Juan Diaz, LLC — Signal";
   const tag = s?.tag ?? "Signals";
   const readTime = s?.readTime;

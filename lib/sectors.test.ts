@@ -161,7 +161,8 @@ describe("elke sector is in alle vier de talen af", () => {
           const v = getSector(s.slug, l)!;
           expect(v.leaks, `${s.slug}/${l} leaks`).toHaveLength(s.leaks.length);
           expect(v.playbook, `${s.slug}/${l} playbook`).toHaveLength(s.playbook.length);
-          expect(v.proof, `${s.slug}/${l} proof`).toHaveLength(s.proof.length);
+          // proof gaat door mergeByIndex; assertie hoort op de rauwe vertaling.
+          expect(s.i18n![l]!.proof, `${s.slug}/${l} proof`).toHaveLength(s.proof.length);
           expect(v.tags, `${s.slug}/${l} tags`).toHaveLength(s.tags.length);
         }
       });
