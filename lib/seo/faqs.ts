@@ -28,38 +28,27 @@ export const HOME_FAQ: FaqItem[] = [
     a: "A free 30-minute call where we map your current revenue flow end-to-end and identify the two or three leverage points. Blunt, structured, no slides. You leave with a one-page diagnosis regardless of whether we work together afterwards.",
   },
   {
+    q: "Is the 15-minute booking the same as a blueprint call?",
+    a: "No. The booking link schedules a 15-minute intro: one problem, one direction, no preparation needed. A blueprint call is the longer 30-minute session with a written diagnosis afterwards — we schedule that once we know the intro is worth both our time.",
+  },
+  {
     q: "Where are you based?",
     a: "Operating out of the Netherlands with clients across the EU and occasional US engagements. Remote-first, with on-site time for discovery and rollouts when it moves the needle.",
   },
 ];
 
-export const BRAND_FAQ: FaqItem[] = [
-  {
-    q: "What does Juan Diaz, LLC do?",
-    a: "Juan Diaz, LLC builds revenue engines for operators — CRM, automation, and growth infrastructure for companies in energy, real estate, hospitality and adjacent industries. Engagement is advisory-plus-build: blueprint, then ship.",
-  },
-  {
-    q: "Who is the right client for a blueprint call?",
-    a: "Operator-founders of 10-to-50-person companies whose growth is bottlenecked by missing systems rather than missing demand. Typical profile: profitable, manual, and ready to stop running the business out of WhatsApp and memory.",
-  },
-  {
-    q: "How is Juan Diaz, LLC different from a typical consultancy?",
-    a: "We ship the systems we recommend. Every engagement ends with working software — usually a tailored build on top of Philly (our operator CRM) — not a slide deck. Consulting-to-code ratio is roughly 30/70.",
-  },
-  {
-    q: "Which regions do you serve?",
-    a: "Primary markets are the Netherlands, Germany, Spain and the United States. Delivery is remote-first with on-site kickoff when the engagement justifies travel. Content and dashboards ship in English, Dutch, German and Spanish.",
-  },
-  {
-    q: "How does pricing work?",
-    a: "Blueprint calls are free. Paid engagements are priced per outcome, not per hour — typically a fixed fee for the first 90 days (strategy + build) followed by a monthly retainer for operations. Expect five figures; we are not the cheapest option.",
-  },
-];
+// BRAND_FAQ stond hier tot 2026-08-03: vijf vragen die nergens werden
+// gerenderd of in schema gezet. Verwijderd omdat dode FAQ-tekst stilletjes uit
+// de pas gaat lopen met wat de site wél belooft. Git heeft ze nog.
 
 export const CONTACT_FAQ: FaqItem[] = [
   {
     q: "How fast do you reply?",
-    a: "Within 24 hours on weekdays, often sooner. Blueprint calls are typically scheduled within one business week.",
+    a: "Within 24 hours on weekdays, often sooner. A blueprint call is usually scheduled within one business week.",
+  },
+  {
+    q: "What does the booking button actually book?",
+    a: "Fifteen minutes. Bring one problem, leave with a direction — no preparation, no sales pitch. If it turns out there is something bigger to map, we schedule a 30-minute blueprint call from there.",
   },
   {
     q: "What happens on a blueprint call?",
@@ -324,4 +313,190 @@ export function getSectorFaq(locale: Locale, slug: string): FaqItem[] {
   if (byLocale && byLocale.length > 0) return byLocale;
   // Fallback to English so a new sector without translations still ships.
   return SECTOR_FAQ_BY_LOCALE.en[slug] ?? [];
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Home- en contact-FAQ per taal.
+
+   Gemeten op 2026-08-03 op de productiebuild: /en, /nl, /de en /es serveerden
+   exact dezelfde Engelse vragen en antwoorden — zowel in de zichtbare
+   accordeon als in de FAQPage-JSON-LD. Sector-FAQ's waren wél vertaald, deze
+   twee sets niet.
+
+   Dat weegt zwaarder dan gewone paginatekst: dit is precies wat AI-overzichten
+   citeren, en het stond in structured data op pagina's die zichzelf `lang="nl"`
+   noemen. Native geschreven, niet machinaal vertaald — DE in Sie-vorm, ES
+   informeel, NL zoals de rest van de site.
+   ───────────────────────────────────────────────────────────────────────── */
+
+export const HOME_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
+  en: HOME_FAQ,
+  nl: [
+    {
+      q: "Wat is een fractional revenue operator?",
+      a: "Een fractional revenue operator is een parttime partner die je omzetsystemen ontwerpt én bouwt — CRM, automatisering, groei-infrastructuur — zonder dat je iemand fulltime aanneemt. Juan Diaz werkt zo met operators in energie, vastgoed en hospitality: advies plus bouw, geen slides.",
+    },
+    {
+      q: "Wat doet Juan Diaz, LLC precies?",
+      a: "Juan Diaz, LLC bouwt omzetmotoren voor operators: de CRM, automatiseringen en groei-infrastructuur die van mensen plus software één systeem maken dat zichzelf versterkt. We zijn een holding met eigen ventures (Philly CRM, Voltafy, Help Mij Besparen) en een klein aantal klantopdrachten per jaar.",
+    },
+    {
+      q: "Met welke sectoren werken jullie?",
+      a: "Energie (installateurs, zon, batterijen), vastgoed (makelaars, beheer), hospitality met meerdere locaties, en aanverwante sectoren met veel mensen in het veld: logistiek, techniek, klusbedrijven. De rode draad is een buitendienst die omzet maakt en een kantoor dat er grip op probeert te krijgen.",
+    },
+    {
+      q: "Bouwen jullie vanaf nul of richten jullie bestaande tools in?",
+      a: "Allebei — het gereedschap volgt de klus. Werkstromen die je onderscheiden bouwen we (of passen we zwaar aan). Standaardwerk zoals mail, boekhouding en loon krijgt de goedkoopste betrouwbare tool die je data niet gijzelt. De voorsprong zit in de koppellaag en twee of drie kernstromen.",
+    },
+    {
+      q: "Wat is een blueprint-gesprek?",
+      a: "Een gratis gesprek van 30 minuten waarin we je omzetstroom van begin tot eind in kaart brengen en de twee of drie hefbomen benoemen. Direct, gestructureerd, geen slides. Je gaat weg met een diagnose van één pagina, of we daarna samenwerken of niet.",
+    },
+    {
+      q: "Is het kwartier dat ik kan boeken hetzelfde als een blueprint-gesprek?",
+      a: "Nee. De boekingsknop plant een kennismaking van 15 minuten: één vraagstuk, één richting, geen voorbereiding nodig. Het blueprint-gesprek is de langere sessie van 30 minuten met een schriftelijke diagnose achteraf — die plannen we pas als de kennismaking dat waard blijkt.",
+    },
+    {
+      q: "Waar zitten jullie?",
+      a: "We werken vanuit Nederland, met klanten door de hele EU en af en toe in de VS. Remote-first, met tijd op locatie voor verkenning en uitrol wanneer dat echt verschil maakt.",
+    },
+  ],
+  de: [
+    {
+      q: "Was ist ein Fractional Revenue Operator?",
+      a: "Ein Fractional Revenue Operator ist ein Teilzeit-Partner, der Ihre Umsatzsysteme entwirft und baut — CRM, Automatisierung, Wachstumsinfrastruktur — ohne dass Sie jemanden fest einstellen. Juan Diaz arbeitet so mit Betreibern in Energie, Immobilien und Hospitality: Beratung plus Umsetzung, keine Folien.",
+    },
+    {
+      q: "Was macht Juan Diaz, LLC konkret?",
+      a: "Juan Diaz, LLC baut Umsatzmaschinen für Betreiber: das CRM, die Automatisierungen und die Wachstumsinfrastruktur, die aus Menschen plus Software ein System machen, das sich selbst verstärkt. Wir sind eine Holding mit eigenen Ventures (Philly CRM, Voltafy, Help Mij Besparen) und wenigen Kundenprojekten pro Jahr.",
+    },
+    {
+      q: "Mit welchen Branchen arbeiten Sie?",
+      a: "Energie (Installateure, Solar, Speicher), Immobilien (Makler, Verwaltung), Hospitality mit mehreren Standorten sowie angrenzende Branchen mit vielen Leuten im Feld: Logistik, Handwerk, Haustechnik. Gemeinsam ist ihnen ein Außenteam, das Umsatz macht, und ein Büro, das den Überblick behalten will.",
+    },
+    {
+      q: "Bauen Sie von Grund auf oder richten Sie bestehende Tools ein?",
+      a: "Beides — das Werkzeug richtet sich nach der Aufgabe. Prozesse, die Sie im Wettbewerb unterscheiden, bauen wir (oder passen sie stark an). Standardkram wie Mail, Buchhaltung und Lohn bekommt das günstigste zuverlässige Tool, das Ihre Daten nicht einsperrt. Der Vorsprung liegt in der Integrationsschicht.",
+    },
+    {
+      q: "Was ist ein Blueprint-Gespräch?",
+      a: "Ein kostenloses 30-Minuten-Gespräch, in dem wir Ihren Umsatzfluss von Anfang bis Ende aufzeichnen und die zwei oder drei Hebel benennen. Direkt, strukturiert, ohne Folien. Sie gehen mit einer einseitigen Diagnose heraus — unabhängig davon, ob wir danach zusammenarbeiten.",
+    },
+    {
+      q: "Ist die 15-Minuten-Buchung dasselbe wie ein Blueprint-Gespräch?",
+      a: "Nein. Der Buchungslink plant ein 15-minütiges Kennenlernen: ein Problem, eine Richtung, keine Vorbereitung nötig. Das Blueprint-Gespräch ist die längere Sitzung von 30 Minuten mit schriftlicher Diagnose danach — die planen wir erst, wenn sich das Kennenlernen gelohnt hat.",
+    },
+    {
+      q: "Wo sitzen Sie?",
+      a: "Wir arbeiten von den Niederlanden aus, mit Kunden in der ganzen EU und gelegentlich in den USA. Remote-first, mit Zeit vor Ort für Analyse und Rollout, wenn es wirklich einen Unterschied macht.",
+    },
+  ],
+  es: [
+    {
+      q: "¿Qué es un revenue operator fraccional?",
+      a: "Un revenue operator fraccional es un socio a tiempo parcial que diseña y construye tus sistemas de ingresos — CRM, automatización, infraestructura de crecimiento — sin que contrates a nadie a jornada completa. Juan Diaz trabaja así con operadores de energía, inmobiliario y hostelería: asesoría más construcción, no diapositivas.",
+    },
+    {
+      q: "¿Qué hace exactamente Juan Diaz, LLC?",
+      a: "Juan Diaz, LLC construye motores de ingresos para operadores: el CRM, las automatizaciones y la infraestructura de crecimiento que convierten personas más software en un sistema que se refuerza solo. Somos un holding con productos propios (Philly CRM, Voltafy, Help Mij Besparen) y pocos proyectos de cliente al año.",
+    },
+    {
+      q: "¿Con qué sectores trabajáis?",
+      a: "Energía (instaladores, solar, baterías), inmobiliario (agencias, gestión), hostelería con varios locales y sectores afines con mucha gente en campo: logística, oficios, servicios a domicilio. El hilo común es un equipo de campo que genera ingresos y una oficina que intenta entenderlos.",
+    },
+    {
+      q: "¿Construís desde cero o configuráis herramientas existentes?",
+      a: "Las dos cosas — la herramienta la decide el trabajo. Lo que te diferencia lo construimos (o lo adaptamos a fondo). Lo genérico (correo, contabilidad, nóminas) se lleva la herramienta fiable más barata que no secuestre tus datos. La ventaja vive en la capa de integración y en dos o tres flujos clave.",
+    },
+    {
+      q: "¿Qué es una llamada blueprint?",
+      a: "Una llamada gratuita de 30 minutos en la que trazamos tu flujo de ingresos de principio a fin y señalamos las dos o tres palancas. Directa, estructurada, sin diapositivas. Sales con un diagnóstico de una página, trabajemos juntos después o no.",
+    },
+    {
+      q: "¿La reserva de 15 minutos es lo mismo que una llamada blueprint?",
+      a: "No. El enlace de reserva agenda una toma de contacto de 15 minutos: un problema, una dirección, sin preparación. La llamada blueprint es la sesión larga de 30 minutos con diagnóstico escrito después — esa la agendamos cuando la toma de contacto lo justifica.",
+    },
+    {
+      q: "¿Dónde estáis?",
+      a: "Trabajamos desde los Países Bajos, con clientes por toda la UE y algún proyecto en EE. UU. Remote-first, con tiempo presencial para el análisis y el despliegue cuando de verdad cambia algo.",
+    },
+  ],
+};
+
+export const CONTACT_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
+  en: CONTACT_FAQ,
+  nl: [
+    {
+      q: "Hoe snel reageren jullie?",
+      a: "Binnen 24 uur op werkdagen, meestal sneller. Een blueprint-gesprek staat doorgaans binnen een werkweek in de agenda.",
+    },
+    {
+      q: "Wat boek ik precies met die knop?",
+      a: "Een kwartier. Kom met één vraagstuk, ga weg met een richting — geen voorbereiding, geen verkooppraatje. Blijkt er iets groters in kaart te brengen, dan plannen we van daaruit een blueprint-gesprek van 30 minuten.",
+    },
+    {
+      q: "Wat gebeurt er in een blueprint-gesprek?",
+      a: "Een gestructureerd gesprek van 30 minuten: waar het nu vastloopt, wat je al geprobeerd hebt, hoe een werkend systeem eruit zou zien. Binnen 48 uur krijg je een plan van twee pagina's, of we daarna samenwerken of niet.",
+    },
+    {
+      q: "Tekenen jullie een geheimhoudingsverklaring?",
+      a: "Ja — een wederzijdse NDA is op verzoek beschikbaar en bij gevoelige commerciële gesprekken stellen we hem vaak zelf voor. Standaardtermijn twee jaar.",
+    },
+    {
+      q: "Kunnen we klein beginnen?",
+      a: "Ja. Veel trajecten starten met een diagnosesprint van 30 dagen, zodat beide kanten het risico beperken voordat er gebouwd wordt. Die sprint heeft een vaste prijs; de volledige scope offreren we daarna.",
+    },
+  ],
+  de: [
+    {
+      q: "Wie schnell antworten Sie?",
+      a: "Innerhalb von 24 Stunden an Werktagen, meist schneller. Ein Blueprint-Gespräch steht in der Regel binnen einer Arbeitswoche im Kalender.",
+    },
+    {
+      q: "Was genau buche ich mit diesem Button?",
+      a: "Fünfzehn Minuten. Bringen Sie ein Problem mit und gehen Sie mit einer Richtung — ohne Vorbereitung, ohne Verkaufsgespräch. Zeigt sich etwas Größeres, planen wir von dort aus ein 30-minütiges Blueprint-Gespräch.",
+    },
+    {
+      q: "Was passiert in einem Blueprint-Gespräch?",
+      a: "Ein strukturiertes Gespräch über 30 Minuten: wo es gerade klemmt, was Sie schon versucht haben, wie ein funktionierendes System aussähe. Innerhalb von 48 Stunden erhalten Sie einen zweiseitigen Plan — unabhängig davon, ob wir danach zusammenarbeiten.",
+    },
+    {
+      q: "Unterzeichnen Sie eine Geheimhaltungsvereinbarung?",
+      a: "Ja — eine gegenseitige NDA gibt es auf Anfrage, und bei sensiblen kommerziellen Gesprächen schlagen wir sie oft selbst vor. Standardlaufzeit zwei Jahre.",
+    },
+    {
+      q: "Können wir klein anfangen?",
+      a: "Ja. Viele Projekte beginnen mit einem 30-tägigen Diagnose-Sprint, damit beide Seiten das Risiko begrenzen, bevor gebaut wird. Der Sprint hat einen Festpreis; den vollen Umfang kalkulieren wir danach.",
+    },
+  ],
+  es: [
+    {
+      q: "¿Con qué rapidez respondéis?",
+      a: "En menos de 24 horas en días laborables, normalmente antes. Una llamada blueprint suele agendarse dentro de la misma semana laboral.",
+    },
+    {
+      q: "¿Qué reservo exactamente con ese botón?",
+      a: "Quince minutos. Trae un problema y sal con una dirección — sin preparación y sin discurso de ventas. Si aparece algo más grande que trazar, agendamos desde ahí una llamada blueprint de 30 minutos.",
+    },
+    {
+      q: "¿Qué pasa en una llamada blueprint?",
+      a: "Una conversación estructurada de 30 minutos: dónde se atasca ahora, qué has probado ya, cómo sería un sistema que funcione. En 48 horas recibes un plan de dos páginas, trabajemos juntos después o no.",
+    },
+    {
+      q: "¿Firmáis acuerdos de confidencialidad?",
+      a: "Sí — hay un NDA mutuo a petición, y en conversaciones comerciales delicadas solemos proponerlo nosotros. Plazo estándar de dos años.",
+    },
+    {
+      q: "¿Podemos empezar poco a poco?",
+      a: "Sí. Muchos proyectos arrancan con un sprint de diagnóstico de 30 días, para que ambas partes reduzcan riesgo antes de construir. Ese sprint tiene precio cerrado; el alcance completo se presupuesta después.",
+    },
+  ],
+};
+
+export function getHomeFaq(locale: Locale): FaqItem[] {
+  return HOME_FAQ_BY_LOCALE[locale] ?? HOME_FAQ_BY_LOCALE.en;
+}
+
+export function getContactFaq(locale: Locale): FaqItem[] {
+  return CONTACT_FAQ_BY_LOCALE[locale] ?? CONTACT_FAQ_BY_LOCALE.en;
 }

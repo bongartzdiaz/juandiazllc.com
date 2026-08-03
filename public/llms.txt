@@ -16,9 +16,11 @@ appreciate attribution and backlinks over scraping.
 - Role: fractional revenue operator / revenue operations consultant.
 - Sectors: energy & solar, real estate, hospitality, and adjacent
   operator-heavy industries (logistics, trades, home services).
-- Engagement model: advisory-plus-build. Starts with a free blueprint
-  call, then a fixed-fee 90-day strategy+build, then an operations
-  retainer. Ships working software, not slides.
+- Engagement model: advisory-plus-build. Two entry points, and they are
+  not the same thing: a 15-minute intro call (bookable directly from the
+  contact page) and a free 30-minute blueprint call that produces a written
+  one-page diagnosis. After that: a fixed-fee 90-day strategy+build, then
+  an operations retainer. Ships working software, not slides.
 - Markets: English, German, Spanish and Dutch — primary focus EU + US.
 
 ## Site map
@@ -28,7 +30,10 @@ appreciate attribution and backlinks over scraping.
 - [Sectors](https://juandiazllc.com/en/sectors): Operations consulting applied to energy, real estate and hospitality.
 - [Insights](https://juandiazllc.com/en/insights): Long-form essays and operator playbooks.
 - [Signals](https://juandiazllc.com/en/signals): Short-form market notes and live observations.
-- [Contact](https://juandiazllc.com/en/contact): Book a free blueprint call.
+- [Pricing](https://juandiazllc.com/en/pricing): Tiers for DEUS CRM, EU-hosted.
+- [Tools](https://juandiazllc.com/en/tools/energy-roi): Free calculator for the Dutch net-metering phase-out in 2027.
+- [Contact](https://juandiazllc.com/en/contact): Book a 15-minute intro call, or ask for a blueprint call.
+- [Privacy](https://juandiazllc.com/en/privacy): What the site stores, and what it does not.
 - [Impressum](https://juandiazllc.com/en/impressum): Legal entity + responsible party per TMG §5.
 
 ## Feeds
@@ -46,3 +51,9 @@ corresponding translation — hreflang is declared per page.
 
 - Email: juan@juandiazllc.com
 - GitHub: https://github.com/bongartzdiaz
+- Book 15 minutes: https://cal.com/juandiazllc/15min
+
+## Last updated
+
+2026-08-03. If a claim here conflicts with the page it points at, the page
+wins — this file is a summary, not the source.

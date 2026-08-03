@@ -18,7 +18,7 @@ import { Countdown2027 } from "@/components/Countdown2027";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import { faqSchema } from "@/lib/seo/schema";
-import { HOME_FAQ } from "@/lib/seo/faqs";
+import { getHomeFaq } from "@/lib/seo/faqs";
 
 // Titles lead with the commercial search term ("fractional revenue
 // operator" / localized) then the brand — the home page is the primary
@@ -71,7 +71,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(HOME_FAQ)) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(getHomeFaq(l))) }}
       />
       <script
         type="application/ld+json"
@@ -93,7 +93,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <ResultsStrip />
       <Signals />
       <CtaBig />
-      <FaqSection title="Operator questions, answered" items={HOME_FAQ} />
+      <FaqSection title={translate(l, "faq.home.title")} items={getHomeFaq(l)} />
       <Contact />
     </>
   );

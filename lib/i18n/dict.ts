@@ -890,6 +890,8 @@ const en: Dict = {
   // De rekenmachine modelleert de Nederlandse salderingsregeling. "Saldering"
   // zegt een Engelse lezer niets, dus daar staat "net metering".
   "meta.energyRoi.title": "Energy ROI calculator — net metering 2027",
+  "faq.home.title": "Operator questions, answered",
+  "faq.contact.title": "Before you book a call",
 };
 
 const nl: Dict = {
@@ -1708,6 +1710,8 @@ const nl: Dict = {
     "Juan Diaz — fractional revenue operator en operations-consultant voor operators in energie, vastgoed en horeca. Bouwkundig getraind, operator-built.",
   "meta.pricing.title": "Prijzen — DEUS CRM, EU-gehost, GDPR-klaar",
   "meta.energyRoi.title": "Energie-ROI — de saldeer-som voor 2027",
+  "faq.home.title": "Vragen van operators, beantwoord",
+  "faq.contact.title": "Voordat je een gesprek plant",
 };
 
 const de: Dict = {
@@ -2526,6 +2530,8 @@ const de: Dict = {
     "Juan Diaz ist Fractional Revenue Operator und Operations-Berater für Betreiber in Energie, Immobilien und Gastgewerbe. Bauerprobt, operator-built.",
   "meta.pricing.title": "Preise — DEUS CRM, EU-gehostet, DSGVO-konform",
   "meta.energyRoi.title": "Energie-ROI-Rechner — Einspeisung ab 2027",
+  "faq.home.title": "Fragen von Betreibern, beantwortet",
+  "faq.contact.title": "Bevor Sie ein Gespräch buchen",
 };
 
 const es: Dict = {
@@ -3344,6 +3350,8 @@ const es: Dict = {
     "Juan Diaz, operador de revenue fraccional y consultor de operaciones para energía, inmobiliario y hostelería. Formado en construcción, hecho por operadores.",
   "meta.pricing.title": "Precios — DEUS CRM, alojado en EU, conforme RGPD",
   "meta.energyRoi.title": "Calculadora de ROI energético — saldo 2027",
+  "faq.home.title": "Preguntas de operadores, respondidas",
+  "faq.contact.title": "Antes de reservar una llamada",
 };
 
 export const DICT: Record<Locale, Dict> = { en, nl, de, es };

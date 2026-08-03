@@ -5,7 +5,7 @@ import { Capacity } from "@/components/Capacity";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import { faqSchema, contactPointSchema } from "@/lib/seo/schema";
-import { CONTACT_FAQ } from "@/lib/seo/faqs";
+import { getContactFaq } from "@/lib/seo/faqs";
 import { BOOKING_15MIN } from "@/lib/booking";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -32,7 +32,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(CONTACT_FAQ)) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(getContactFaq(l))) }}
       />
       <header className="page-hero">
         <div className="eyebrow">{t("contact.page.eyebrow")}</div>
@@ -193,7 +193,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
       <section style={{ padding: "20px 40px 40px", maxWidth: 760, margin: "0 auto" }}>
         <ContactForm />
       </section>
-      <FaqSection title="Before you book a call" items={CONTACT_FAQ} />
+      <FaqSection title={t("faq.contact.title")} items={getContactFaq(l)} />
     </>
   );
 }
