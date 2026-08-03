@@ -125,12 +125,17 @@ export const POSTS: Insight[] = [
   {
     slug: "whatsapp-first-funnel-nl",
     markets: ["nl"],
-    title: "Why your Dutch lead funnel should start on WhatsApp",
+    title: "Waarom je Nederlandse leadfunnel op WhatsApp begint",
     summary:
       "Nederlandse consumenten beantwoorden WhatsApp in 90 seconden en email in een week. Hoe je je funnel inricht zodat het eerste contact altijd WhatsApp is — zonder de lead kwijt te raken in de doorverwijzing.",
     tag: "Growth",
     publishedAt: "2025-12-14",
     readingMinutes: 5,
+    seo: {
+      metaTitle: "WhatsApp als eerste stap in je leadfunnel",
+      metaDescription:
+        "Nederlandse consumenten beantwoorden WhatsApp in 90 seconden en e-mail in een week. Zo richt je je funnel in zonder leads te verliezen.",
+    },
     body: [
       { type: "p", text: "Als je in Nederland B2C verkoopt en je eerste contact is nog steeds email, je verliest de helft van je funnel aan trage response. WhatsApp-response-rates liggen in Nederland rond de 80 procent, tegenover 15-20 procent voor cold email. De vraag is niet of je WhatsApp inzet, maar hoe je het zo inricht dat je schaalt zonder het persoonlijke karakter te verliezen." },
       { type: "h2", text: "De drie fasen die werken" },
@@ -247,6 +252,11 @@ export const POSTS: Insight[] = [
     tag: "Energy",
     publishedAt: "2026-03-24",
     readingMinutes: 5,
+    seo: {
+      metaTitle: "Salderingsregeling 2027 voor installateurs",
+      metaDescription:
+        "De afschaffing raakt installateurs harder dan huiseigenaren. Drie aanpassingen in je funnel die een acquisitiecrisis in 2027 voorkomen.",
+    },
     body: [
       { type: "p", text: "De afbouw van de salderingsregeling in 2027 is geen verrassing meer — de wet is rond, de communicatie loopt. Wat operators in de zonne-sector onderschatten is het effect op het koopgedrag: de impulsklant verdwijnt, de rationele klant blijft, en die stelt andere vragen." },
       { type: "h2", text: "Waar je funnel pijn gaat voelen" },
@@ -441,6 +451,11 @@ export const POSTS: Insight[] = [
     tag: "Energy",
     publishedAt: "2026-04-02",
     readingMinutes: 6,
+    seo: {
+      metaTitle: "Thuisbatterijen verkopen na 2027",
+      metaDescription:
+        "De saldering verdwijnt. De batterij-installateurs die 2027 overleven zijn de duidelijkste, niet de goedkoopste. Drie patronen die werken.",
+    },
     body: [
       { type: "p", text: "Vanaf 2027 is elke zonnepaneel-installatie een gesprek over zelfverbruik, niet over saldering. Dat klinkt technisch, maar het verandert het hele verkoopgesprek. Klanten stellen nieuwe vragen, en de meeste installateurs beantwoorden ze nog met oude antwoorden." },
       { type: "h2", text: "De drie vragen die de verkoop winnen" },
@@ -465,6 +480,11 @@ export const POSTS: Insight[] = [
     tag: "Energy",
     publishedAt: "2026-07-20",
     readingMinutes: 6,
+    seo: {
+      metaTitle: "Dynamisch energiecontract na de saldering",
+      metaDescription:
+        "Zonder saldering telt het uur waarop je teruglevert. Waarom een dynamisch contract de een honderden euro's oplevert en de ander geld kost.",
+    },
     body: [
       { type: "p", text: "Met de salderingsregeling maakte het niet uit wanneer je stroom terugleverde: elke teruggeleverde kilowattuur werd één-op-één weggestreept tegen een afgenomen kilowattuur, tegen je vaste tarief. Vanaf 2027 verdwijnt die streep. Het uur waarop je levert en het uur waarop je verbruikt worden ineens twee verschillende getallen — en precies daar zit het hele verhaal van het dynamische energiecontract." },
       { type: "h2", text: "Waarom 'dynamisch' voor de één wint en voor de ander verliest" },
@@ -495,6 +515,11 @@ export const POSTS: Insight[] = [
     tag: "Energy",
     publishedAt: "2026-07-20",
     readingMinutes: 6,
+    seo: {
+      metaTitle: "Thuisbatterij terugverdientijd 2027",
+      metaDescription:
+        "Zeven jaar staat in elke folder en geldt voor bijna niemand. Wat de terugverdientijd echt bepaalt, en hoe je hem zelf uitrekent.",
+    },
     body: [
       { type: "p", text: "Vraag drie aanbieders naar de terugverdientijd van dezelfde thuisbatterij en je krijgt drie getallen tussen de vijf en de twaalf jaar. Ze liegen geen van allen — ze rekenen alleen met verschillende aannames, en de aanname die je niet ziet, bepaalt het antwoord. Na het wegvallen van de salderingsregeling wordt dat verschil groter, niet kleiner." },
       { type: "h2", text: "Waarom er geen één terugverdientijd bestaat" },
@@ -527,6 +552,11 @@ export const POSTS: Insight[] = [
     tag: "Energy",
     publishedAt: "2026-07-20",
     readingMinutes: 5,
+    seo: {
+      metaTitle: "Salderen stopt: wat je klanten nu horen",
+      metaDescription:
+        "Het einde van de saldering is een gesprek dat je voor je concurrent voert. Welke klanten je nu belt, en drie zinnen die twijfel wegnemen.",
+    },
     body: [
       { type: "p", text: "De meeste installateurs behandelen het einde van de saldering als een voetnoot: een regel onderaan de offerte, een vraag die je beantwoordt als de klant erover begint. Dat is een gemiste kans. De klant die van jóú hoort wat er verandert — voordat hij het van het journaal of van je concurrent hoort — vertrouwt jou met de vervolgstap. De klant die het ergens anders oppikt, komt met wantrouwen terug." },
       { type: "h2", text: "De klanten die je nú belt, bepalen je 2027" },
@@ -557,6 +587,11 @@ export const POSTS: Insight[] = [
     tag: "Energy",
     publishedAt: "2026-07-20",
     readingMinutes: 6,
+    seo: {
+      metaTitle: "Heimspeicher-Amortisation 2026",
+      metaDescription:
+        "Zehn Jahre steht in jedem Angebot und gilt für kaum jemanden. Was die Amortisation eines Heimspeichers wirklich bestimmt, und wie Sie rechnen.",
+    },
     body: [
       { type: "p", text: "Fragen Sie drei Anbieter nach der Amortisationszeit desselben Heimspeichers, und Sie bekommen drei Zahlen zwischen sieben und fünfzehn Jahren. Keiner von ihnen lügt — sie rechnen nur mit unterschiedlichen Annahmen, und die Annahme, die Sie nicht sehen, entscheidet das Ergebnis. Weil die Einspeisevergütung halbjährlich weiter sinkt, wird dieser Unterschied größer, nicht kleiner." },
       { type: "h2", text: "Warum es die eine Amortisationszeit nicht gibt" },
@@ -588,6 +623,11 @@ export const POSTS: Insight[] = [
     tag: "Energy",
     publishedAt: "2026-07-20",
     readingMinutes: 6,
+    seo: {
+      metaTitle: "Dynamische Stromtarife: lohnt der Wechsel?",
+      metaDescription:
+        "Seit 2025 muss jeder Versorger einen dynamischen Tarif anbieten. Was Sie mit §14a, Smart Meter und Speicher prüfen sollten, bevor Sie wechseln.",
+    },
     body: [
       { type: "p", text: "Seit 2025 ist jeder Stromanbieter gesetzlich verpflichtet, einen dynamischen Tarif anzubieten. Damit ist der Tarif verfügbar — aber verfügbar heißt nicht vorteilhaft. Ein dynamischer Tarif rechnet stündlich zum Börsenpreis ab, und ob das für Sie ein Gewinn oder ein Verlust ist, entscheidet allein Ihr Verbrauchszeitpunkt." },
       { type: "h2", text: "Für wen sich der dynamische Tarif rechnet — und für wen nicht" },
@@ -617,6 +657,11 @@ export const POSTS: Insight[] = [
     tag: "Energy",
     publishedAt: "2026-07-20",
     readingMinutes: 5,
+    seo: {
+      metaTitle: "Einspeisevergütung: was Kunden hören",
+      metaDescription:
+        "Die halbjährliche Degression ist ein Gespräch, das Sie vor dem Wettbewerber führen. Welche Kunden Sie jetzt anrufen, und drei klare Sätze.",
+    },
     body: [
       { type: "p", text: "Die meisten Fachbetriebe behandeln die sinkende Einspeisevergütung als Fußnote: eine Zeile unten im Angebot, eine Frage, die man beantwortet, wenn der Kunde davon anfängt. Das ist eine verschenkte Chance. Der Kunde, der von Ihnen hört, was sich ändert — bevor er es aus den Nachrichten oder vom Wettbewerber hört — vertraut Ihnen den nächsten Schritt an. Der Kunde, der es woanders aufschnappt, kommt mit Misstrauen zurück." },
       { type: "h2", text: "Die Kunden, die Sie jetzt anrufen, entscheiden Ihr nächstes Jahr" },
@@ -646,6 +691,11 @@ export const POSTS: Insight[] = [
     tag: "Energy",
     publishedAt: "2026-07-20",
     readingMinutes: 6,
+    seo: {
+      metaTitle: "Rentabilidad de una batería en 2026",
+      metaDescription:
+        "Diez años pone cada presupuesto y no vale para casi nadie. Qué determina de verdad la rentabilidad de una batería en España, y cómo calcularla.",
+    },
     body: [
       { type: "p", text: "Pide a tres instaladores la rentabilidad de la misma batería y te darán tres números entre siete y catorce años. Ninguno miente: solo calculan con supuestos distintos, y el supuesto que no ves es el que decide el resultado. En España, donde la compensación de excedentes está topada y se paga poco, ese margen de error es enorme." },
       { type: "h2", text: "Por qué no existe una única rentabilidad" },
@@ -677,6 +727,11 @@ export const POSTS: Insight[] = [
     tag: "Energy",
     publishedAt: "2026-07-20",
     readingMinutes: 6,
+    seo: {
+      metaTitle: "Compensación de excedentes no es balance neto",
+      metaDescription:
+        "En España la compensación está topada y no se acumula: no es un contador que gira hacia atrás. Qué cambia eso al dimensionar tu instalación.",
+    },
     body: [
       { type: "p", text: "El error más caro del autoconsumo en España es creer que el excedente que viertes a la red se descuenta como en un contador que va hacia atrás. No es balance neto. Es compensación de excedentes, y las reglas son otras — con un tope que decide cuánta placa te conviene poner." },
       { type: "h2", text: "Compensación no es balance neto" },
@@ -706,6 +761,11 @@ export const POSTS: Insight[] = [
     tag: "Energy",
     publishedAt: "2026-07-20",
     readingMinutes: 5,
+    seo: {
+      metaTitle: "Autoconsumo: qué explicar antes de vender",
+      metaDescription:
+        "La compensación de excedentes es una conversación que ganas antes que tu competencia. A qué clientes llamar ahora, y tres frases que despejan.",
+    },
     body: [
       { type: "p", text: "La mayoría de instaladores tratan la compensación de excedentes como una nota al pie: una línea en el presupuesto, una pregunta que respondes si el cliente la saca. Es una oportunidad desperdiciada. El cliente que se entera por ti de cómo funciona de verdad —antes de oírlo del vecino o de la competencia— te confía el siguiente paso. El que lo pilla por otro lado vuelve con desconfianza." },
       { type: "h2", text: "Los clientes a los que llamas ahora deciden tu año" },
