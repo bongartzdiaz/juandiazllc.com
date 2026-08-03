@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
-import { LOCALES } from "@/lib/i18n/dict";
+import { LOCALES, type Locale } from "@/lib/i18n/dict";
 import { TITLE_SUFFIX } from "@/lib/seo/branding";
+import { getHomeFaq, getContactFaq } from "@/lib/seo/faqs";
 
 /* ---------------------------------------------------------------
    Metadata per taal — de gate
@@ -101,6 +102,44 @@ describe("metadata is per taal geschreven", () => {
         expect(t, `${route} heeft dezelfde titel in ${l} als in en`).not.toBe(enTitel);
         if (enDesc && enDesc !== "undefined") {
           expect(d, `${route} heeft dezelfde beschrijving in ${l} als in en`).not.toBe(enDesc);
+        }
+      }
+    });
+  }
+});
+
+/* ---------------------------------------------------------------
+   FAQ per taal
+
+   Gemeten op 2026-08-03: /en, /nl, /de en /es serveerden identieke Engelse
+   FAQ-vragen, zowel zichtbaar als in de FAQPage-JSON-LD. Sector-FAQ's waren
+   wél vertaald — de home- en contactset niet.
+
+   Dit weegt zwaarder dan gewone paginatekst: het is precies wat AI-overzichten
+   citeren, en het stond in structured data op pagina's die zichzelf `lang="nl"`
+   noemen. Vandaar een eigen gate.
+   --------------------------------------------------------------- */
+describe("FAQ is per taal geschreven", () => {
+  const sets: [string, (l: Locale) => { q: string; a: string }[]][] = [
+    ["home", getHomeFaq],
+    ["contact", getContactFaq],
+  ];
+
+  for (const [naam, haal] of sets) {
+    it(`${naam} — vragen en antwoorden verschillen per taal`, () => {
+      const en = haal("en");
+      expect(en.length).toBeGreaterThan(2);
+
+      for (const l of anderTalen) {
+        const vertaald = haal(l);
+        expect(vertaald.length, `${naam}-FAQ mist items in ${l}`).toBe(en.length);
+
+        for (const [i, item] of vertaald.entries()) {
+          expect(item.q, `${naam}-FAQ vraag ${i + 1} is in ${l} gelijk aan en`).not.toBe(en[i].q);
+          expect(item.a, `${naam}-FAQ antwoord ${i + 1} is in ${l} gelijk aan en`).not.toBe(en[i].a);
+          // De bron zegt: onder de 300 tekens, anders kapt de citatie
+          // midden in een zin af. Duits en Spaans lopen daar het eerst tegenaan.
+          expect(item.a.length, `${naam}-FAQ antwoord ${i + 1} [${l}] is te lang`).toBeLessThanOrEqual(360);
         }
       }
     });
