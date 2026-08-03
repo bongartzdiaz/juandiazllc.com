@@ -1281,3 +1281,51 @@ The feature is dark until legal sign-off — see MANUAL_TASKS.md.
 without exclusions also picks up `diaz-editor-gtm/` and other
 untracked scratch dirs' node_modules and reports 3 spurious file
 failures; the real suite is clean.
+
+### 2026-08-03 — SEO fase 1 + zichtbare UI-fouten + de crypto-"flake" was geen flake
+
+**PR #108 (gemerged).** Metadata per taal op alle publieke pagina's. Op
+productie serveerden ~127 van de 136 niet-Engelse URL's een Engelse `<title>`
+en `<meta description>` achter een vertaalde pagina. Nieuw: `metadata-locales.test.ts`
+(roept `generateMetadata` rechtstreeks aan, draait mee in de test-job),
+`TITLE_SUFFIX` + `TITLE_BUDGET` in `lib/seo/branding.ts`, en `meta.<route>.{title,description}`
+in `dict.ts` voor 14 paginatypes × 4 talen. Het achtervoegsel ging van
+" · Juan Diaz, LLC" (17 tekens) naar " · Juan Diaz" (12) — met 43 tekens over
+paste geen Duitse of Spaanse titel binnen de 60 die Google toont.
+
+**Twee zichtbare fouten, alle vier de talen.** `overflow-x: hidden` op
+html/body maakte van body een scroll-container, waardoor `position: sticky`
+nergens meer werkte: `.chapters` reserveerde 3200px voor een paneel dat
+wegscrolde, dus 1600px zwart scherm. Nu `overflow-x: clip` — knipt net zo
+goed, maakt géén scroll-container. **Zet dit nooit terug op `hidden`.**
+Daarnaast rende `fomo.proof.title` (bevat `<em>`) via `{t(...)}`, dus stond
+de tag als tekst op de homepage.
+
+**Fase 2, responsive.** `nav.top` is een flexbox waarin `.nav-right` niet
+krimpt; tussen 861 en 1024px werd het logo platgedrukt en wikkelde
+"Juan Diaz, LLC" naar 2 regels (EN) of 3 (DE). Opgelost met compactere nav in
+die band plus `flex: 0 0 auto; white-space: nowrap` op `.brand`. Ook 18 links
+onder de 24px van WCAG 2.2 SC 2.5.8 opgehoogd (footer, sociale links,
+taalschakelaar) — die vielen buiten de bestaande `pointer: coarse`-regel.
+
+> ⚠️ **Onder 860px is er geen hamburgermenu.** Zes pagina's (about, story,
+> services, sectors, insights, signals) zijn dan alleen via de footer
+> bereikbaar. Bestaand gat, niet in deze sessie opgelost — dat is een
+> ontwerpkeuze. Verberg dus geen navlinks verder als oplossing voor krapte.
+
+**De crypto-"flake" bestond niet.** Bovenstaande logs noemen een
+"pre-existing flake in crypto.test.ts" die "green in isolation" zou zijn.
+Dat klopt niet: hij faalde óók in isolatie, ongeveer één op de vier runs. De
+test manipuleerde het láátste base64-teken ('A'↔'B'), en dat verschilt alleen
+in opvulbits — de gedecodeerde bytes waren dan identiek, er was niets
+gemanipuleerd, en decryptie hoorde gewoon te slagen. De code was in orde, de
+test niet. Nu wordt een echte byte omgeklapt; 6 van de 6 runs groen.
+
+**Meetmethode die zich terugbetaalde.** Een scriptje dat alle 176
+sitemap-URL's ophaalt uit de draaiende productiebuild en controleert op
+zichtbare HTML-tags, lege titels/beschrijvingen, placeholders en
+hreflang-dekking. Drie keer voorkwam het een verkeerde conclusie: een
+statische codescan meldde 11 mogelijke `<em>`-lekken waarvan er 10 vals waren,
+de preloader leek schuldig maar is `opacity: 0`, en een "horizontale
+scrollbalk" op 768px bleek de statusbalk. **Alleen wat de geserveerde HTML en
+de gerenderde layout laten zien telt.**
