@@ -215,7 +215,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Nav */
 nav.top { position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; padding: 20px 32px; pointer-events: none; }
 nav.top > * { pointer-events: auto; }
-.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono), 'JetBrains Mono'; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; transition: color .3s; }
+/* flex-shrink: 0 + nowrap: het logo hoort nooit te wikkelen. Zonder dit drukt
+   .nav-right het plat zodra de ruimte krap wordt (zie de 1024px-noot verderop). */
+.brand { flex: 0 0 auto; white-space: nowrap; display: flex; align-items: center; gap: 10px; font-family: var(--font-mono), 'JetBrains Mono'; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; transition: color .3s; }
 .brand:hover svg { filter: drop-shadow(0 0 8px var(--accent)); }
 .brand svg { transition: filter .3s; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
@@ -1234,7 +1236,20 @@ footer .f-mark { color: var(--text); }
 
 /* Responsive */
 @media (max-width: 1024px) {
-  nav.top { padding: 18px 24px; }
+  nav.top { padding: 18px 16px; }
+  /* Tussen 861 en 1024px passen tien navlinks plus het logo niet naast elkaar.
+     nav.top is een flexbox waarin .nav-right niet krimpt, dus werd het logo
+     platgedrukt: "Juan Diaz, LLC" wikkelde op 1000px naar twee regels in het
+     Engels en drie in het Duits. Gemeten 2026-08-02: .nav-right vraagt 806px
+     intrinsiek, er is 952px beschikbaar, en het logo verliest.
+     Compacter maken lost het op zonder links weg te halen — die zijn onder
+     860px al onbereikbaar (geen hamburgermenu), dus daar nog meer verbergen
+     zou navigatie erger maken in plaats van beter.
+
+     Gemeten op het krapste punt (865px, Duits): met gap 16 viel "Kontakt" nog
+     19px buiten beeld — stil afgeknipt, want nav.top is fixed en body clipt.
+     Vandaar gap 14 plus de smallere padding hierboven. */
+  nav.top .nav-right { gap: 14px; font-size: 11px; }
   section { padding: 120px 28px; }
   .story { padding: 140px 28px; }
   .process { padding: 120px 28px; }
@@ -1996,7 +2011,19 @@ em { color: var(--accent); font-style: italic; font-weight: 300; letter-spacing:
   .btn { min-height: 44px; padding: 12px 20px; }
   .nav-right a,
   .philly-nav-right a { min-height: 44px; display: inline-flex; align-items: center; }
+  /* Gemeten 2026-08-02 op 375px: 18 links bleven 16-19px hoog omdat ze buiten
+     de regel hierboven vielen — de hele footernavigatie, de sociale links en de
+     telefoon/WhatsApp-regels onder het contactblok. WCAG 2.2 SC 2.5.8 vraagt
+     minimaal 24px; dit haalt de ruimere 44px van SC 2.5.5. Geldt in alle vier
+     de talen, want het is structureel en niet tekstafhankelijk. */
+  footer a,
+  .contact .subs a,
+  .countdown-full-cta { min-height: 44px; display: inline-flex; align-items: center; }
   .hud-inner > * { min-height: 36px; }
+  /* De regel hierboven vergroot alleen de directe kinderen van .hud-inner; de
+     taalschakelaar zit daar twee niveaus onder en bleef 17px. Gemeten
+     2026-08-02 op 375px. */
+  .hud-inner button { min-height: 36px; display: inline-flex; align-items: center; }
   /* Prevent iOS double-tap zoom on taps inside the app */
   a, button, .btn, .chip { touch-action: manipulation; }
 }

@@ -30,8 +30,20 @@ describe('crypto — AES-256-GCM secret encryption', () => {
   it('returns null on tampered ciphertext (GCM auth tag)', () => {
     const ct = encryptSecret('hello') ?? ''
     const parts = ct.split('.')
-    // Flip one character in the middle part
-    const tampered = [parts[0], parts[1].slice(0, -1) + (parts[1].endsWith('A') ? 'B' : 'A'), parts[2]].join('.')
+    // Manipuleer een echte byte, niet het laatste base64-teken.
+    //
+    // Dit stond hier tot 2026-08-02: `parts[1].slice(0, -1) + (endsWith('A')
+    // ? 'B' : 'A')`. Het laatste teken van een base64-groep codeert maar een
+    // deel van zijn bits; de rest is opvulling. 'A' en 'B' verschillen alleen
+    // in die opvulbits, dus de gedecodeerde bytes waren regelmatig identiek —
+    // er was dan niets gemanipuleerd en decryptie hoorde te slagen. De test
+    // viel daardoor willekeurig om, ongeveer een op de vier runs.
+    //
+    // (CLAUDE.md noemde dit een flake die "alleen interleaved" optrad. Dat
+    // klopt niet: hij faalt evengoed in isolatie.)
+    const rauw = Buffer.from(parts[1], 'base64')
+    rauw[0] ^= 0xff
+    const tampered = [parts[0], rauw.toString('base64'), parts[2]].join('.')
     expect(decryptSecret(tampered)).toBeNull()
   })
 
