@@ -217,7 +217,7 @@ nav.top { position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex
 nav.top > * { pointer-events: auto; }
 /* flex-shrink: 0 + nowrap: het logo hoort nooit te wikkelen. Zonder dit drukt
    .nav-right het plat zodra de ruimte krap wordt (zie de 1024px-noot verderop). */
-.brand { flex: 0 0 auto; white-space: nowrap; display: flex; align-items: center; gap: 10px; font-family: var(--font-mono), 'JetBrains Mono'; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; transition: color .3s; }
+.brand { position: relative; z-index: 2; flex: 0 0 auto; white-space: nowrap; display: flex; align-items: center; gap: 10px; font-family: var(--font-mono), 'JetBrains Mono'; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; transition: color .3s; }
 .brand:hover svg { filter: drop-shadow(0 0 8px var(--accent)); }
 .brand svg { transition: filter .3s; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
@@ -228,6 +228,34 @@ nav.top > * { pointer-events: auto; }
 .nav-right .auth { padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; color: var(--accent); transition: all .3s var(--ease); }
 .nav-right .auth:hover { border-color: var(--accent); background: rgba(94,255,177,.08); }
 .nav-right .auth::after { display: none; }
+
+/* Hamburger + paneel.
+   Onder 860px verdwenen zes van de negen navlinks met display:none en was er
+   niets wat ze terugbracht: about, story, services, sectors, insights en
+   signals waren alleen nog via de footer bereikbaar. De knop staat standaard
+   uit; de media query bij 860px zet hem aan en haalt .nav-right weg.
+
+   Het paneel dekt het scherm volledig af, dus er is geen achtergrond meer om
+   per ongeluk in te scrollen. Een overflow-lock op body is daarom onnodig —
+   en die zou hier riskant zijn, zie de noot bij overflow-x: clip. */
+.nav-toggle { display: none; place-items: center; min-width: 44px; min-height: 44px; position: relative; z-index: 2; background: none; border: 1px solid var(--line); border-radius: 10px; padding: 11px; cursor: pointer; color: var(--text); transition: border-color .3s var(--ease); }
+.nav-toggle:hover { border-color: var(--accent); }
+.nav-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.nav-toggle-icon { display: block; width: 22px; height: 16px; position: relative; }
+.nav-toggle-icon span { position: absolute; left: 0; right: 0; height: 2px; background: currentColor; border-radius: 2px; transition: transform .25s var(--ease), opacity .2s var(--ease); }
+.nav-toggle-icon span:nth-child(1) { top: 0; }
+.nav-toggle-icon span:nth-child(2) { top: 7px; }
+.nav-toggle-icon span:nth-child(3) { top: 14px; }
+.nav-toggle-icon.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle-icon.is-open span:nth-child(2) { opacity: 0; }
+.nav-toggle-icon.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.nav-panel { position: fixed; inset: 0; z-index: 1; background: var(--bg); padding: calc(var(--nav-h) + 8px) 16px 40px; overflow-y: auto; overscroll-behavior: contain; animation: navPanelIn .22s var(--ease); }
+.nav-panel ul { list-style: none; margin: 0; padding: 0; }
+.nav-panel a { display: flex; align-items: center; min-height: 56px; padding: 6px 4px; border-bottom: 1px solid var(--line); font-family: var(--font-mono), 'JetBrains Mono'; font-size: 18px; letter-spacing: .08em; text-transform: uppercase; color: var(--text); transition: color .25s var(--ease); }
+.nav-panel a:hover, .nav-panel a:focus-visible { color: var(--accent); }
+.nav-panel a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+@keyframes navPanelIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* Hero — deep-space canvas with aurora + nebula wash */
 .hero { position: relative; min-height: 100svh; min-height: 100vh; overflow: hidden;
@@ -1261,8 +1289,10 @@ footer .f-mark { color: var(--text); }
 }
 @media (max-width: 860px) {
   nav.top { padding: 14px 16px; }
-  nav.top .nav-right { gap: 16px; font-size: 11px; }
-  nav.top .nav-right a.hide-mobile { display: none; }
+  /* De hele balk gaat achter de knop; hem half laten staan levert alleen
+     gedrang op naast een hamburger die toch alles al bevat. */
+  nav.top .nav-right { display: none; }
+  .nav-toggle { display: grid; }
   .brand span:last-child { font-size: 11px; }
   .hero-overlay { padding: 96px 16px 28px; gap: 24px; }
   .hero-foot { flex-direction: column; align-items: flex-start; gap: 24px; }
@@ -1317,7 +1347,6 @@ footer .f-mark { color: var(--text); }
   .contact a.mail { font-size: clamp(40px, 12vw, 72px); }
 }
 @media (max-width: 420px) {
-  nav.top .nav-right a.hide-tiny { display: none; }
   .hero-overlay { padding: 88px 14px 24px; }
 }
 
