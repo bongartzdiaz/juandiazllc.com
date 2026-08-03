@@ -68,6 +68,17 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  // Search Console kan op twee manieren eigendom vaststellen. De aanbevolen
+  // route is een Domain-property met een DNS-TXT-record bij de registrar —
+  // die raakt de code niet en dekt ook subdomeinen.
+  //
+  // Dit is de terugvaloptie: bij een URL-prefix-property geeft Google een
+  // meta-tag. Zet GOOGLE_SITE_VERIFICATION in Vercel en de tag verschijnt op
+  // elke pagina; laat hem leeg en er wordt niets gerenderd. Zo hoeft er geen
+  // code te wijzigen op het moment dat de token er is.
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+    : {}),
   robots: {
     index: true,
     follow: true,
