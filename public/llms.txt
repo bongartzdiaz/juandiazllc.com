@@ -26,7 +26,7 @@ appreciate attribution and backlinks over scraping.
 ## Site map
 
 - [About](https://juandiazllc.com/en/about): Founder background, operating thesis, the fractional-operator method.
-- [Work](https://juandiazllc.com/en/work): Active ventures — Voltafy, Help Mij Besparen, Philly/DEUS CRM.
+- [Work](https://juandiazllc.com/en/work): Five active ventures — Voltafy, Performance Tracker, Help Mij Besparen, Salderingsregeling 2027, Philly/DEUS CRM.
 - [Sectors](https://juandiazllc.com/en/sectors): Operations consulting applied to energy, real estate and hospitality.
 - [Insights](https://juandiazllc.com/en/insights): Long-form essays and operator playbooks.
 - [Signals](https://juandiazllc.com/en/signals): Short-form market notes and live observations.

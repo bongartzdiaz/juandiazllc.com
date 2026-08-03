@@ -514,7 +514,7 @@ const en: Dict = {
   // in JSX so NL/DE/ES readers saw English copy.
   "work.page.eyebrow": "◉ The work",
   "work.page.title": "The playbook, <em>in motion.</em>",
-  "work.page.lede": "Each of these is the five-phase method applied to a real sector. Click through for the full build notes, or visit the live product directly.",
+  "work.page.lede": "Five live products under Juan Diaz, LLC: Voltafy, Performance Tracker, Help Mij Besparen, Salderingsregeling 2027 and Philly — each one the five-phase method applied to a real sector.",
   "work.page.cta.details": "Details →",
   "work.page.cta.visit": "Visit ↗",
   "work.status.live": "Live",
@@ -537,7 +537,7 @@ const en: Dict = {
 
   "sectors.page.eyebrow": "◉ Sectors",
   "sectors.page.title": "Where the <em>playbook</em> applies.",
-  "sectors.page.lede": "Different industries, same five phases. Each of these pages is a real survey — the common revenue leaks in the sector, how the method runs against them, and the proof points I can point to (or the slot still open for a first partner).",
+  "sectors.page.lede": "Energy, real estate, hospitality and adjacent operator industries — the same five phases against different P&Ls. Every sector page is a real survey: where revenue leaks, how the method runs against it, and what I can point to (or the slot still open for a first partner).",
 
   "insights.page.eyebrow": "◉ Insights",
   "insights.page.title": "Field notes from <em>the build</em>.",
@@ -1364,7 +1364,7 @@ const nl: Dict = {
   // ─── i18n-pariteit: publieke pagina's
   "work.page.eyebrow": "◉ Het werk",
   "work.page.title": "Het draaiboek, <em>in actie.</em>",
-  "work.page.lede": "Elk hiervan is de vijf-fase-methode toegepast op een echte sector. Klik door voor de volledige buildnotities, of ga direct naar het live product.",
+  "work.page.lede": "Vijf live producten van Juan Diaz, LLC: Voltafy, Performance Tracker, Help Mij Besparen, Salderingsregeling 2027 en Philly — elk de vijf-fase-methode toegepast op een echte sector.",
   "work.page.cta.details": "Details →",
   "work.page.cta.visit": "Bezoek ↗",
   "work.status.live": "Live",
@@ -1387,7 +1387,7 @@ const nl: Dict = {
 
   "sectors.page.eyebrow": "◉ Sectoren",
   "sectors.page.title": "Waar het <em>draaiboek</em> werkt.",
-  "sectors.page.lede": "Verschillende sectoren, dezelfde vijf fases. Elke pagina is een echte verkenning — de gebruikelijke omzetlekken in de sector, hoe de methode daartegen wordt gezet, en de proof points die ik kan aanwijzen (of het openstaande plekje voor een eerste partner).",
+  "sectors.page.lede": "Energie, vastgoed, hospitality en aanverwante operator-sectoren — dezelfde vijf fases tegen andere cijfers. Elke sectorpagina is een echte verkenning: waar de omzet weglekt, hoe de methode daartegen staat, en wat ik kan aanwijzen (of het openstaande plekje voor een eerste partner).",
 
   "insights.page.eyebrow": "◉ Insights",
   "insights.page.title": "Veldnotities uit <em>de build</em>.",
@@ -2185,7 +2185,7 @@ const de: Dict = {
   // ─── i18n-Parität: öffentliche Seiten
   "work.page.eyebrow": "◉ Die Arbeit",
   "work.page.title": "Das Drehbuch, <em>in Bewegung.</em>",
-  "work.page.lede": "Jedes davon ist die Fünf-Phasen-Methode angewandt auf einen realen Sektor. Klicken Sie für die vollständigen Buildnotizen durch — oder besuchen Sie das Live-Produkt direkt.",
+  "work.page.lede": "Fünf Live-Produkte von Juan Diaz, LLC: Voltafy, Performance Tracker, Help Mij Besparen, Salderingsregeling 2027 und Philly — jedes davon die Fünf-Phasen-Methode in einem realen Sektor.",
   "work.page.cta.details": "Details →",
   "work.page.cta.visit": "Besuchen ↗",
   "work.status.live": "Live",
@@ -2208,7 +2208,7 @@ const de: Dict = {
 
   "sectors.page.eyebrow": "◉ Sektoren",
   "sectors.page.title": "Wo das <em>Drehbuch</em> greift.",
-  "sectors.page.lede": "Verschiedene Branchen, dieselben fünf Phasen. Jede dieser Seiten ist eine echte Bestandsaufnahme — die üblichen Umsatzlecks im Sektor, wie die Methode dagegen läuft, und die Proof-Points, auf die ich verweisen kann (oder der noch freie Platz für einen ersten Partner).",
+  "sectors.page.lede": "Energie, Immobilien, Hospitality und angrenzende Betreiberbranchen — dieselben fünf Phasen, andere Zahlen. Jede Branchenseite ist eine echte Bestandsaufnahme: wo Umsatz verloren geht, wie die Methode dagegen läuft, und worauf ich verweisen kann (oder der noch freie Platz für einen ersten Partner).",
 
   "insights.page.eyebrow": "◉ Insights",
   "insights.page.title": "Feldnotizen aus <em>dem Build</em>.",
@@ -3006,7 +3006,7 @@ const es: Dict = {
   // ─── paridad i18n: páginas públicas
   "work.page.eyebrow": "◉ El trabajo",
   "work.page.title": "El manual, <em>en movimiento.</em>",
-  "work.page.lede": "Cada uno es el método de cinco fases aplicado a un sector real. Haga clic para ver las notas completas de construcción, o visite el producto en vivo directamente.",
+  "work.page.lede": "Cinco productos en marcha de Juan Diaz, LLC: Voltafy, Performance Tracker, Help Mij Besparen, Salderingsregeling 2027 y Philly — cada uno el método de cinco fases aplicado a un sector real.",
   "work.page.cta.details": "Detalles →",
   "work.page.cta.visit": "Visitar ↗",
   "work.status.live": "En vivo",
@@ -3029,7 +3029,7 @@ const es: Dict = {
 
   "sectors.page.eyebrow": "◉ Sectores",
   "sectors.page.title": "Donde el <em>manual</em> aplica.",
-  "sectors.page.lede": "Distintas industrias, las mismas cinco fases. Cada una de estas páginas es un diagnóstico real — las fugas de ingresos habituales del sector, cómo el método actúa contra ellas, y los proof points que puedo citar (o el hueco libre para un primer socio).",
+  "sectors.page.lede": "Energía, inmobiliario, hostelería y sectores operativos afines — las mismas cinco fases contra otras cuentas. Cada página de sector es un diagnóstico real: dónde se escapa el ingreso, cómo actúa el método, y qué puedo enseñar (o el hueco libre para un primer socio).",
 
   "insights.page.eyebrow": "◉ Insights",
   "insights.page.title": "Notas de campo desde <em>el build</em>.",
