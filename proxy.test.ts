@@ -263,3 +263,51 @@ describe('proxy: request id propagation', () => {
     expect(id).not.toBe('has spaces & punctuation!')
   })
 })
+
+/* ── CSP: het Plausible-script moet erlangs ───────────────────────────────
+   Op 2026-08-05 bleek dat analytics op productie nooit gewerkt heeft: het
+   script stond in de DOM, maar de CSP liet plausible.io niet toe. Dat was
+   niet te zien aan de HTML — alleen aan een netwerkopname zonder één verzoek
+   naar plausible.io en een Resource Timing-entry met transferSize 0.
+
+   Deze tests bewaken de policy zelf, zodat die stilte niet terugkomt. */
+
+function cspVan(res: Response, strikt = false): string {
+  const naam = strikt ? 'content-security-policy-report-only' : 'content-security-policy'
+  return res.headers.get(naam) ?? ''
+}
+
+function richtlijn(csp: string, naam: string): string {
+  const deel = csp.split(';').map((d) => d.trim()).find((d) => d.startsWith(naam + ' '))
+  return deel ?? ''
+}
+
+describe('proxy: CSP laat de analytics-host toe', () => {
+  it('script-src bevat plausible.io in de afgedwongen policy', async () => {
+    const res = await middleware(makeReq('https://juandiazllc.com/en'))
+    expect(richtlijn(cspVan(res), 'script-src')).toContain('https://plausible.io')
+  })
+
+  it('connect-src bevat plausible.io, anders komt de beacon niet weg', async () => {
+    const res = await middleware(makeReq('https://juandiazllc.com/en'))
+    expect(richtlijn(cspVan(res), 'connect-src')).toContain('https://plausible.io')
+  })
+
+  // Onder 'strict-dynamic' negeert de browser host-allowlists voor scripts.
+  // Hem daar toch neerzetten zou schijnzekerheid geven; connect-src valt daar
+  // niet onder en moet er juist wél in staan.
+  it('de strikte report-only policy zet de host niet in script-src', async () => {
+    const res = await middleware(makeReq('https://juandiazllc.com/en'))
+    const strikt = cspVan(res, true)
+    expect(strikt).toContain("'strict-dynamic'")
+    expect(richtlijn(strikt, 'script-src')).not.toContain('plausible.io')
+    expect(richtlijn(strikt, 'connect-src')).toContain('https://plausible.io')
+  })
+
+  it('de rest van de policy blijft dicht', async () => {
+    const csp = cspVan(await middleware(makeReq('https://juandiazllc.com/en')))
+    expect(richtlijn(csp, 'default-src')).toBe("default-src 'self'")
+    expect(richtlijn(csp, 'object-src')).toBe("object-src 'none'")
+    expect(richtlijn(csp, 'frame-ancestors')).toBe("frame-ancestors 'none'")
+  })
+})
