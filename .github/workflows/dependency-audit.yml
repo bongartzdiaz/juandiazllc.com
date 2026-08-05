@@ -1,0 +1,45 @@
+name: Dependency-audit
+
+# Poort op npm audit, met uitzonderingen die verlopen.
+# Zie security/geaccepteerde-advisories.json en lib/security/audit-gate.ts.
+#
+# Eigen workflow en niet in ci.yml, om één reden: dit moet ook draaien zónder
+# dat er een pull request langskomt. Een vervaldatum die alleen bij de
+# volgende PR afgaat is geen datum. Een `schedule` in ci.yml zou daarnaast
+# typecheck, test, i18n en tenant-scope elke nacht meetrekken zonder dat daar
+# iets aan verandert.
+#
+# Ook nuttig zonder codewijziging: een advisory kan verschijnen voor een
+# pakket dat al maanden stilstaat. Dependabot meldt dat wel, maar een melding
+# in een tabblad is geen poort — deze job faalt.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    # 05:00 UTC, een uur voor de SEO-audit, zodat de twee meldingen niet
+    # tegelijk binnenkomen.
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: deps-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # De poort leest de lockfile (`npm audit --package-lock-only`) en heeft
+      # dus geen build nodig.
+      - name: npm-audit-poort
+        run: npm run audit:deps
