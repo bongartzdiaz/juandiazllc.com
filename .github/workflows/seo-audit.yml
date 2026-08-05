@@ -39,6 +39,19 @@ jobs:
       # start. Wijkt hij af, dan meldt de audit 176 keer canonical-wijkt-af —
       # een meetfout, geen defect.
       NEXT_PUBLIC_SITE_URL: http://localhost:3200
+      # proxy.ts draait op elk niet-statisch pad en roept updateSession aan,
+      # die getSupabaseUrl() gebruikt — en die gooit op een ontbrekende env.
+      # Dat gebeurt vóór de isProtected-check, dus ook een marketingpagina
+      # valt om. De build slaagt wel; alleen de server begeeft het per
+      # request, wat het zonder de logregel in de startstap onzichtbaar maakt.
+      #
+      # 127.0.0.1:1 weigert de verbinding onmiddellijk, dus geen DNS-wachttijd
+      # en geen trage crawl. supabase-js vangt die fout af en geeft user: null,
+      # waarna /philly zou omleiden — maar dat pad zit niet in de sitemap, dus
+      # de audit raakt het niet. Echte sleutels horen hier niet: deze job leest
+      # nooit iets uit Supabase.
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:1
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: dummy-voor-ci
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
