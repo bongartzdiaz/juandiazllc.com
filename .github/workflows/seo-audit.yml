@@ -1,0 +1,101 @@
+name: SEO-audit
+
+# Twee triggers, één script (scripts/seo-audit.ts).
+#
+# Op een pull request: bouwen, `next start` in de runner, en daartegen crawlen.
+# Bewust NIET tegen de Vercel-preview: die staat achter Preview Protection en
+# geeft 302 op een anonieme fetch. Geverifieerd op 2026-08-04 tegen de preview
+# van #126 — dezelfde reden waarom de Lighthouse-workflow main-only draait.
+#
+# Op een schema: dezelfde audit tegen productie. Dat vangt wat nooit door een
+# pull request komt — een Vercel-instelling, een DNS-wijziging, een
+# leverancier die iets omzet. De unit-gates in ci.yml zien daar niets van.
+#
+# Nulmeting productie 2026-08-04: 176 pagina's, 0 fout / 0 waarschuwing /
+# 0 notitie. Slaat de geplande run aan, dan is er iets veranderd.
+
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    # 06:00 UTC = 08:00 in Nederland (zomertijd). Voor de werkdag.
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: seo-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Naam bewust kort: dit is de check die in branch protection geselecteerd
+  # wordt. Hernoemen betekent de regel opnieuw instellen.
+  audit:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Moet gelijk zijn aan de URL die we crawlen. NEXT_PUBLIC_* wordt bij de
+      # build ingebakken, dus dit hoort bij de build-stap en niet alleen bij
+      # start. Wijkt hij af, dan meldt de audit 176 keer canonical-wijkt-af —
+      # een meetfout, geen defect.
+      NEXT_PUBLIC_SITE_URL: http://localhost:3200
+      # proxy.ts draait op elk niet-statisch pad en roept updateSession aan,
+      # die getSupabaseUrl() gebruikt — en die gooit op een ontbrekende env.
+      # Dat gebeurt vóór de isProtected-check, dus ook een marketingpagina
+      # valt om. De build slaagt wel; alleen de server begeeft het per
+      # request, wat het zonder de logregel in de startstap onzichtbaar maakt.
+      #
+      # 127.0.0.1:1 weigert de verbinding onmiddellijk, dus geen DNS-wachttijd
+      # en geen trage crawl. supabase-js vangt die fout af en geeft user: null,
+      # waarna /philly zou omleiden — maar dat pad zit niet in de sitemap, dus
+      # de audit raakt het niet. Echte sleutels horen hier niet: deze job leest
+      # nooit iets uit Supabase.
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:1
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: dummy-voor-ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Generate Prisma client
+        run: npx prisma generate
+      - name: Build
+        run: npm run build
+      - name: Start productiebuild
+        run: |
+          # nohup + omleiding: zonder dat houdt de server de stdout van de stap
+          # vast en hangt de stap tot de timeout.
+          nohup npx next start -p 3200 > .next-start.log 2>&1 &
+          echo $! > .server.pid
+          for i in $(seq 1 30); do
+            if curl -sf -o /dev/null http://localhost:3200/en; then
+              echo "server op na ${i}s"; exit 0
+            fi
+            sleep 1
+          done
+          echo "server kwam niet op binnen 30s — log:"
+          cat .next-start.log
+          exit 1
+      - name: Audit
+        run: npx tsx scripts/seo-audit.ts http://localhost:3200
+      - name: Stop server
+        if: always()
+        run: kill "$(cat .server.pid)" 2>/dev/null || true
+
+  # Geen build nodig: productie draait al. Alleen npm ci voor tsx en de
+  # imports van het script.
+  audit-productie:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Audit productie
+        run: npx tsx scripts/seo-audit.ts https://juandiazllc.com
