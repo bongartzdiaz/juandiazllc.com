@@ -110,6 +110,17 @@ function genNonce(): string {
   return btoa(s)
 }
 
+/* Waar het Plausible-script vandaan komt. Dezelfde variabele als
+   components/Analytics.tsx gebruikt, zodat de policy meebeweegt als we ooit
+   zelf gaan hosten — twee losse constanten zouden vroeg of laat uiteenlopen
+   en dan blokkeert de CSP stilzwijgend de meting.
+
+   Onvoorwaardelijk toegevoegd, ook wanneer NEXT_PUBLIC_PLAUSIBLE_DOMAIN niet
+   gezet is en Analytics.tsx dus niets rendert: een allowlist-item zonder
+   bijbehorend script kost niets, terwijl de CSP laten afhangen van een env
+   die de middleware apart moet lezen wél een foutbron is. */
+const PLAUSIBLE_HOST = process.env.NEXT_PUBLIC_PLAUSIBLE_HOST ?? 'https://plausible.io'
+
 function buildCsp(nonce: string, strict: boolean): string {
   const isDev = process.env.NODE_ENV !== 'production'
   const scriptSrc = strict
@@ -117,12 +128,17 @@ function buildCsp(nonce: string, strict: boolean): string {
         "'self'",
         `'nonce-${nonce}'`,
         "'strict-dynamic'",
+        // Bewust geen PLAUSIBLE_HOST hier: onder 'strict-dynamic' negeert de
+        // browser host-allowlists volledig. Laadt dit script straks onder de
+        // strikte policy, dan moet dat via de nonce die next/script meegeeft
+        // — een host toevoegen zou schijnzekerheid zijn.
         ...(isDev ? ["'unsafe-eval'"] : []),
       ]
     : [
         "'self'",
         "'unsafe-inline'",
         `'nonce-${nonce}'`,                           // noop when unsafe-inline is present, but lets us flip to strict cheaply
+        PLAUSIBLE_HOST,
         ...(isDev ? ["'unsafe-eval'"] : []),
       ]
   const directives: Record<string, string[]> = {
@@ -136,6 +152,10 @@ function buildCsp(nonce: string, strict: boolean): string {
       ...(isDev ? ['ws:', 'wss:', 'http://localhost:*'] : []),
       'https://*.sentry.io',
       'https://*.ingest.sentry.io',
+      // Ook nodig in de strikte variant: 'strict-dynamic' geldt alleen voor
+      // script-src. Zonder deze regel laadt het script wel, maar komt de
+      // beacon naar /api/event niet weg — meten zonder resultaat.
+      PLAUSIBLE_HOST,
     ],
     'frame-ancestors': ["'none'"],
     'base-uri': ["'self'"],
