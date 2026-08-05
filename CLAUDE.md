@@ -1312,6 +1312,17 @@ taalschakelaar) — die vielen buiten de bestaande `pointer: coarse`-regel.
 > services, sectors, insights, signals) zijn dan alleen via de footer
 > bereikbaar. Bestaand gat, niet in deze sessie opgelost — dat is een
 > ontwerpkeuze. Verberg dus geen navlinks verder als oplossing voor krapte.
+>
+> **Achterhaald op 2026-08-05 door PR #126.** Onder 860px verdwijnt nu de hele
+> balk en toont een hamburgerknop alle negen links; `.hide-mobile` en
+> `.hide-tiny` bestaan niet meer. De instructie hierboven is daarmee omgekeerd
+> geldig geworden: navlinks verbergen mág onder 860px, juist omdat er een
+> paneel achter zit.
+>
+> Wat wél blijft gelden: verberg nooit een navlink zonder plek waar hij
+> terugkomt. `NAV_LINKS` in `components/Nav.tsx` is de enige lijst en voedt
+> zowel de balk als het paneel, zodat die twee niet uiteen kunnen lopen — de
+> dubbele lijst in de markup was precies hoe dit gat ontstond.
 
 **De crypto-"flake" bestond niet.** Bovenstaande logs noemen een
 "pre-existing flake in crypto.test.ts" die "green in isolation" zou zijn.
@@ -1392,6 +1403,13 @@ productie geeft `https://juandiazllc.com/nl`.
 **Blijft staan.** Geen hamburgermenu onder 860px (bestaand, ontwerpkeuze).
 Operator-acties: DNS TXT voor Search Console, Plausible-goal `Boeking 15min`,
 branch protection op main met de vier CI-jobs.
+
+> **Bijgewerkt 2026-08-05.** Het hamburgermenu is er (PR #126). De
+> operator-acties staan nog open, maar twee tellingen klopten niet: het zijn
+> vier Plausible-doelen — `Boeking 15min`, `Pricing CTA`, `Sector CTA` en
+> `Tool CTA`, alle vier al getagd in de code — en vijf CI-jobs sinds `audit`
+> erbij kwam (PR #127). Daar hoort ook de gratis Ahrefs-sleutel bij, met een
+> harde deadline op 2026-08-10.
 
 > De dekkingsnotitie bovenaan dit bestand ("~1% file coverage", april 2026)
 > gaat over `lib/philly/*` en klopt daar nog grotendeels. De marketingkant
