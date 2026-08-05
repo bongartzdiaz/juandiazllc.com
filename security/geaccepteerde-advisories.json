@@ -1,0 +1,24 @@
+{
+  "$uitleg": [
+    "Advisories die bewust zijn geaccepteerd, met een vervaldatum.",
+    "",
+    "De poort (scripts/check-npm-audit.ts, job 'deps' in ci.yml) faalt op elke",
+    "advisory van ernst high of hoger die hier niet staat. Staat hij hier wel,",
+    "dan telt hij niet mee tot de vervaldatum — daarna faalt de poort alsnog,",
+    "zodat het besluit terugkomt op de agenda in plaats van te vervagen.",
+    "",
+    "Een uitzondering die nergens meer op slaat laat de poort ook falen. Dat is",
+    "opzet: een lijst met dode regels holt de poort uit.",
+    "",
+    "Velden: advisory (GHSA-id uit de advisory-URL), reden (waarom dit nu",
+    "aanvaardbaar is, en wat het blokkeert), vervalt (ISO-datum).",
+    "",
+    "Voorbeeld van een geldige regel:",
+    "  { \"advisory\": \"GHSA-f88m-g3jw-g9cj\",",
+    "    \"reden\": \"fix vereist een major bump van X; ingepland voor sprint Y\",",
+    "    \"vervalt\": \"2026-09-01\" }",
+    "",
+    "Leeg op 2026-08-05: npm audit staat op nul, met en zonder devDependencies."
+  ],
+  "uitzonderingen": []
+}
