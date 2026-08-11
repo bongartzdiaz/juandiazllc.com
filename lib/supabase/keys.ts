@@ -1,3 +1,17 @@
+/** Het schema waarin de leadopvang van deze site woont.
+ *
+ *  `leads` en `subscribers` stonden in `public`, samen met de 95 tabellen van
+ *  het DEUS-CRM en de zes van PhilanthropyAI. Drie systemen in één schema, en
+ *  op 2026-08-11 wees een opruimscript in DEUS-SHARED die twee tabellen aan als
+ *  wegwerpbaar omdat ze snake_case heetten — de naamgeving was daar de
+ *  eigendomsgrens. Sindsdien staan ze apart, zoals Diaz Editor het al deed met
+ *  `diaz_editor`: een grens die Postgres afdwingt in plaats van een afspraak.
+ *
+ *  PostgREST serveert alleen schema's die in `pgrst.db_schemas` op de rol
+ *  `authenticator` staan. Verplaatst iemand deze tabellen nog eens, dan moet
+ *  die instelling mee — anders geeft elke insert "relation does not exist". */
+export const MARKETING_SCHEMA = "marketing";
+
 /* ---------------------------------------------------------------
    Supabase API key resolution.
 

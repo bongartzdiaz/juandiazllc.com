@@ -1,6 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { getPublishableKey, getSupabaseUrl } from "./keys";
+import { getPublishableKey, getSupabaseUrl, MARKETING_SCHEMA } from "./keys";
 
 type CookieToSet = { name: string; value: string; options?: CookieOptions };
 
@@ -10,6 +10,7 @@ export async function createClient() {
     getSupabaseUrl(),
     getPublishableKey(),
     {
+      db: { schema: MARKETING_SCHEMA },
       cookies: {
         getAll() {
           return cookieStore.getAll();
