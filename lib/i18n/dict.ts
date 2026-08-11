@@ -124,15 +124,6 @@ const en: Dict = {
   "contact.alt": "Prefer email directly?",
 
   // Login
-  "login.title.a": "Step into the world of",
-  "login.title.b": "el cazador.",
-  "login.lede": "Sign in with the credentials Juan provided you. No self-signup — accounts are provisioned per client.",
-  "login.email": "Email",
-  "login.password": "Password",
-  "login.submit": "Sign in",
-  "login.signing_in": "Signing in...",
-  "login.sso_error": "Sign-in couldn't complete. Try again or email Juan.",
-  "login.footer.a": "Need a login? Contact",
 
   // Footer / generic
   "footer.version": "v1.0",
@@ -173,9 +164,6 @@ const en: Dict = {
   "signals.read": "Read →",
 
   // Login extras
-  "login.eyebrow": "SECURE · PHILLY · OPS",
-  "login.show_pw": "Show password",
-  "login.hide_pw": "Hide password",
 
   // Story
   "story.label": "◉ 00 — Story",
@@ -1013,15 +1001,6 @@ const nl: Dict = {
   "contact.sent": "✓ Verzonden",
   "contact.alt": "Liever direct mailen?",
 
-  "login.title.a": "Stap in de wereld van",
-  "login.title.b": "el cazador.",
-  "login.lede": "Log in met de gegevens die Juan je heeft gegeven. Geen zelfregistratie — accounts worden per klant aangemaakt.",
-  "login.email": "E-mail",
-  "login.password": "Wachtwoord",
-  "login.submit": "Inloggen",
-  "login.signing_in": "Bezig met inloggen...",
-  "login.sso_error": "Inloggen is niet gelukt. Probeer opnieuw of mail Juan.",
-  "login.footer.a": "Account nodig? Contact",
 
   "footer.version": "v1.0",
   "footer.about": "Over",
@@ -1056,9 +1035,6 @@ const nl: Dict = {
 
   "signals.read": "Lezen →",
 
-  "login.eyebrow": "BEVEILIGD · PHILLY · OPS",
-  "login.show_pw": "Wachtwoord tonen",
-  "login.hide_pw": "Wachtwoord verbergen",
 
   "story.label": "◉ 00 — Verhaal",
   "story.lead.a": "De meeste bedrijven hebben geen omzetprobleem.",
@@ -1854,15 +1830,6 @@ const de: Dict = {
   "contact.sent": "✓ Gesendet",
   "contact.alt": "Lieber direkt per E-Mail?",
 
-  "login.title.a": "Treten Sie in die Welt von",
-  "login.title.b": "el cazador.",
-  "login.lede": "Melden Sie sich mit den von Juan bereitgestellten Zugangsdaten an. Keine Selbstregistrierung — Konten werden pro Kunde eingerichtet.",
-  "login.email": "E-Mail",
-  "login.password": "Passwort",
-  "login.submit": "Anmelden",
-  "login.signing_in": "Anmeldung läuft...",
-  "login.sso_error": "Anmeldung fehlgeschlagen. Versuchen Sie es erneut oder mailen Sie Juan.",
-  "login.footer.a": "Zugang benötigt? Kontakt",
 
   "footer.version": "v1.0",
   "footer.about": "Über",
@@ -1897,9 +1864,6 @@ const de: Dict = {
 
   "signals.read": "Lesen →",
 
-  "login.eyebrow": "SICHER · PHILLY · OPS",
-  "login.show_pw": "Passwort anzeigen",
-  "login.hide_pw": "Passwort ausblenden",
 
   "story.label": "◉ 00 — Story",
   "story.lead.a": "Die meisten Unternehmen haben kein Umsatzproblem.",
@@ -2695,15 +2659,6 @@ const es: Dict = {
   "contact.sent": "✓ Enviado",
   "contact.alt": "¿Prefieres escribir directamente?",
 
-  "login.title.a": "Entra en el mundo de",
-  "login.title.b": "el cazador.",
-  "login.lede": "Inicia sesión con las credenciales que Juan te proporcionó. Sin registro abierto — las cuentas se crean por cliente.",
-  "login.email": "Email",
-  "login.password": "Contraseña",
-  "login.submit": "Entrar",
-  "login.signing_in": "Entrando...",
-  "login.sso_error": "No se pudo iniciar sesión. Inténtalo de nuevo o escribe a Juan.",
-  "login.footer.a": "¿Necesitas acceso? Contacto",
 
   "footer.version": "v1.0",
   "footer.about": "Sobre",
@@ -2738,9 +2693,6 @@ const es: Dict = {
 
   "signals.read": "Leer →",
 
-  "login.eyebrow": "SEGURO · PHILLY · OPS",
-  "login.show_pw": "Mostrar contraseña",
-  "login.hide_pw": "Ocultar contraseña",
 
   "story.label": "◉ 00 — Historia",
   "story.lead.a": "La mayoría de los negocios no tienen un problema de ingresos.",

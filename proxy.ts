@@ -9,7 +9,6 @@
    Keep this fast — it runs on every single request. */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { updateSession } from '@/lib/supabase/middleware'
 
 /* ── Locale routing ───────────────────────────────────────────────
    Marketing pages live under /[locale]/..., Philly + API + auth +
@@ -248,12 +247,16 @@ export default async function middleware(req: NextRequest) {
   reqHeaders.set('x-nonce', nonce)
   reqHeaders.set('Content-Security-Policy', cspEnforced)
 
-  // Supabase auth — refresh session cookie + gate protected routes.
-  // Returns either a redirect (unauthenticated hitting a protected path)
-  // or a pass-through NextResponse carrying refreshed auth cookies.
-  // We use it as the base response so cookies propagate, then stack
-  // security headers on top before returning.
-  const res = await updateSession(req, reqHeaders)
+  // Basisrespons die de aangepaste requestheaders (nonce, request-id, CSP)
+  // doorgeeft aan server components; daarop stapelen hieronder de
+  // security-headers.
+  //
+  // Hier stond updateSession(), die de Supabase-sessiecookie ververste en
+  // /philly afschermde. Met het CRM (#134) en de inlogpagina (deze commit)
+  // weg is er niemand meer die inlogt: de leadopvang schrijft via de
+  // server- en service-client, niet namens een gebruiker. Een sessie die
+  // nooit ontstaat, hoeft ook niet ververst te worden.
+  const res = NextResponse.next({ request: { headers: reqHeaders } })
   res.headers.set('x-request-id', requestId)
 
   // Freshen the locale cookie when a locale-prefixed URL is visited so
