@@ -46,8 +46,8 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
         <h2>{t("priv.h.contact")}</h2>
         <p>{t("priv.p.contact")}</p>
 
-        <h2>{t("priv.h.dashboard")}</h2>
-        <p dangerouslySetInnerHTML={{ __html: t("priv.p.dashboard") }} />
+        <h2>{t("priv.h.newsletter")}</h2>
+        <p>{t("priv.p.newsletter")}</p>
 
         <h2>{t("priv.h.rights")}</h2>
         <p dangerouslySetInnerHTML={{ __html: t("priv.p.rights") }} />
