@@ -34,48 +34,13 @@ export async function updateSession(request: NextRequest, requestHeaders?: Heade
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // Gate protected routes. Philly is the real app — any /philly/* request
-  // without a Supabase session is redirected to /login?next=<path> so the
-  // user comes back to where they tried to go after sign-in.
-  const path = request.nextUrl.pathname;
-  // Only /philly/* is the gated CRM now. /app and /dashboard were the
-  // old merged-monorepo routes — removed after the Option A unification.
-  const isProtected = path === "/philly" || path.startsWith("/philly/");
-  // Public endpoints under /philly that uptime monitors / public webhooks
-  // need to reach without a session. Add sparingly — every entry here is
-  // a hole in the auth perimeter and must be self-defending (no PII in
-  // response, rate-limit at the route level).
-  const PUBLIC_PHILLY_PATHS = new Set<string>([
-    "/philly/api/health",
-    // Stripe webhook — server-to-server, no Supabase session cookie.
-    // Auth is the X-Stripe-Signature header verified in the route handler.
-    "/philly/api/billing/webhook",
-    // Calendar push-sync webhooks — Google + Microsoft both POST here
-    // without a session. Auth is the encrypted per-channel authSecret
-    // (Google: X-Goog-Channel-Token, Microsoft: clientState in body).
-    "/philly/api/calendar/webhook/google",
-    "/philly/api/calendar/webhook/microsoft",
-    // Cron-callable routes — the X-Cron-Secret header is the auth, but
-    // the middleware can't see headers (it only checks the Supabase
-    // cookie). Without this allowlist entry, any external scheduler is
-    // bounced to /login before the route's own auth check runs.
-    // Both routes ALSO accept admin-session callers (manual-trigger
-    // path), but session-callers don't need the allowlist anyway.
-    "/philly/api/audit/prune",
-    "/philly/api/calendar/cron/renew-channels",
-    "/philly/api/calendar/cron/prune-channels",
-    "/philly/api/users/cron/hard-purge",
-  ]);
-  if (!user && isProtected && !PUBLIC_PHILLY_PATHS.has(path)) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    url.searchParams.set("next", path + (request.nextUrl.search || ""));
-    return NextResponse.redirect(url);
-  }
+  // The call itself is the point: getUser() is what refreshes an expiring
+  // token and triggers the setAll() above, which writes the rotated cookies
+  // onto `response`. The user object is no longer read here — since the CRM
+  // moved to DEUS-SHARED this deployment has no gated routes left, so there
+  // is nothing to redirect. Dropping the call would silently stop refreshing
+  // sessions for the surfaces that still read them server-side.
+  await supabase.auth.getUser();
 
   return response;
 }

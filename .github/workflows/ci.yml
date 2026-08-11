@@ -43,8 +43,6 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - name: Generate Prisma client
-        run: npx prisma generate
       - name: Typecheck
         run: npm run typecheck
 
@@ -58,8 +56,6 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - name: Generate Prisma client
-        run: npx prisma generate
       - name: Test (vitest)
         run: npm test -- --run
 
@@ -82,21 +78,3 @@ jobs:
       - name: i18n-sleutelpariteit (en/nl/de/es)
         run: node scripts/check-i18n-parity.mjs
 
-  # A-03 — tenant-scope lint. The CRM has NO row-level security; tenant
-  # isolation is enforced entirely in application code. This gate fails the
-  # build if any *bulk* Prisma op (findMany/updateMany/deleteMany/count/
-  # aggregate/groupBy) on an organizationId-bearing model lacks an org filter
-  # and is not annotated with `// org-scope-lint-ok: <reason>`. It is the
-  # structural backstop against the A-02 class of cross-tenant leak.
-  tenant-scope:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
-      - name: Tenant-scope lint
-        run: npm run lint:tenant-scope

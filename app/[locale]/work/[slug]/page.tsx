@@ -98,14 +98,20 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
           <p>{v.summary}</p>
 
           <div style={{ marginTop: 40, display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <a
-              className="btn primary btn-mag"
-              href={v.external}
-              target={v.external.startsWith("http") ? "_blank" : undefined}
-              rel={v.external.startsWith("http") ? "noopener noreferrer" : undefined}
-            >
-              {t("work.d.visit")} {v.domain} <span className="arr">↗</span>
-            </a>
+            {/* Only link out when `external` is a real URL. /work already
+                gated on this; here it rendered unconditionally, so a venture
+                whose external is an internal path (or a route that no longer
+                exists) shipped a dead CTA. The two pages now agree. */}
+            {v.external.startsWith("http") && (
+              <a
+                className="btn primary btn-mag"
+                href={v.external}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t("work.d.visit")} {v.domain} <span className="arr">↗</span>
+              </a>
+            )}
             <LocaleLink className="btn ghost" href="/contact">
               {t("work.d.talk")} <span className="arr">→</span>
             </LocaleLink>

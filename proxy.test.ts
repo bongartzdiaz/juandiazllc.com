@@ -74,9 +74,14 @@ describe('proxy: locale redirect', () => {
     expect(res.status).not.toBe(307)
   })
 
-  it('exempts /philly — the CRM lives under its own locale-agnostic tree', async () => {
+  // The CRM used to live under /philly and was exempt from the locale prefix.
+  // It moved to its own deployment, so /philly is now an ordinary unknown path:
+  // it gets prefixed like any other and 404s. Asserting the redirect keeps the
+  // exemption from being reinstated by reflex when someone sees the 404.
+  it('no longer exempts /philly — the CRM moved out', async () => {
     const res = await middleware(makeReq('https://juandiazllc.com/philly/contacts'))
-    expect(res.status).not.toBe(307)
+    expect(res.status).toBe(307)
+    expect(res.headers.get('location')).toBe('https://juandiazllc.com/en/philly/contacts')
   })
 
   it('exempts /api/*', async () => {

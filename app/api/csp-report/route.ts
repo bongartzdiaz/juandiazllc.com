@@ -8,7 +8,7 @@
    regardless of parse outcome so browsers don't retry. */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { captureMessage } from '@/lib/philly/sentry'
+import { captureMessage } from '@/lib/sentry'
 
 export const runtime = 'nodejs'
 
