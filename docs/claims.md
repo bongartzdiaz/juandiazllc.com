@@ -63,13 +63,20 @@ page, the checkout, the pv-string-sizer README, and the edge functions
 old value across all of them before calling it done. The edge functions are the
 ones that get forgotten.
 
-**Unverified, flagged not fixed.** The partner email in `diaz-affiliate-activate`
-prints a five-step commission ladder: Solo €500, Pro €997, Team €2.500,
-Enterprise €5.000, Agency €10.000. Only Pro is covered by this file. The other
-four appear in no other surface and match no product we sell — the licence
-tiers in the database are basic/pro/lifetime/educational/enterprise/agency, and
-the only other verified price is the €500 educational Payment Link. Decide what
-that ladder should say before activating a first partner.
+**The invented commission ladder is gone. Fixed 2026-08-11, v6.** The partner
+email in `diaz-affiliate-activate` printed a five-step ladder: Solo €500, Pro
+€997, Team €2.500, Enterprise €5.000, Agency €10.000. Only Pro was covered by
+this file. "Solo" and "Team" are not tiers at all — the licence tiers in the
+database are basic/pro/lifetime/educational/enterprise/agency — and €2.500,
+€5.000 and €10.000 appear on no other surface.
+
+It now prints only prices this file verifies: Founding Beta €99, Pro €997,
+Educational €500, each times the partner's own rate. Enterprise and agency are
+described as quoted per deal at the same percentage, which is true and does not
+require a number we have not set.
+
+**Rule this leaves behind:** a partner-facing email is a price list. Every
+number in one has to trace back to this file, or be phrased as a quote.
 
 **€197 is dropped. Decided 2026-08-11 by Juan.** A 2026-07-26 session had
 recorded a move to a single tier of €197 one-time, replacing €99/€497/€997.
