@@ -189,15 +189,44 @@ Toevoegen aan de Claude-configuratie. De officiële server draait via npx:
 }
 ```
 
-> Deze snippet is **niet geverifieerd** — ik kon hem zonder inloggegevens niet
-> draaien, en het pakketnaam-veld is het soort ding dat verandert. Controleer
-> hem tegen de actuele README van DataForSEO voor je hem plakt.
+> **Pakketnaam geverifieerd op 2026-08-11:** `dataforseo-mcp-server` bestaat,
+> versie 2.9.13, beschreven als "A Model Context Protocol (MCP) server for the
+> DataForSEO API". Dat deel klopt dus.
+>
+> Wat nog steeds **niet** geverifieerd is: of de server met deze env-namen
+> daadwerkelijk start. Zonder inloggegevens kon ik hem niet draaien, en
+> `DATAFORSEO_USERNAME` versus `DATAFORSEO_LOGIN` is precies het soort verschil
+> dat pas bij de eerste run opvalt. Houd de README ernaast.
 
 **Let op de kosten.** Elk verzoek wordt afgerekend. De client geeft `cost` per
 antwoord terug en het rapport telt op; laat dat staan. De limiet is 12
 verzoeken per minuut, dus de client houdt vijf seconden tussen aanroepen aan.
 
-## Ahrefs API — deels dood, deadline is 10 aug (opnieuw gemeten 2026-08-03)
+## Ahrefs API — VERVALLEN. Niets meer doen (afgesloten 2026-08-11)
+
+> ## ⛔ Deze hele sectie is historie. Vraag geen sleutel meer aan.
+>
+> **De deadline van 10 augustus is verstreken en het endpoint is nu dood.**
+> Opnieuw gemeten op 2026-08-11:
+>
+> | endpoint | 2026-08-03 | 2026-08-11 |
+> |---|---|---|
+> | `public-domain-rating-free` | werkte, DR = 0.0 | `Insufficient plan` |
+> | `subscription-info-limits-and-usage` | `Insufficient plan` | `Insufficient plan` |
+>
+> De sleutel authenticeert nog wél — anders was het een auth-fout geweest, geen
+> plan-fout — maar hij levert niets meer op. Een nieuwe gratis sleutel aanvragen
+> lost dus ook niets op.
+>
+> **En dat hoeft ook niet.** De keuze uit het lijstje hieronder is op
+> 2026-08-03 al gemaakt: Ahrefs gaat eruit, DataForSEO komt ervoor in de
+> plaats. Zie de sectie "DataForSEO — vervangt Ahrefs" hierboven. De client
+> `lib/seo/dataforseo.ts` is af met 18 groene tests; alleen de inloggegevens
+> ontbreken nog.
+>
+> Wat hieronder staat blijft staan omdat het uitlegt hóé dit zo gekomen is, en
+> omdat de Search-Console-route eronder nog steeds geldt — GSC is de enige bron
+> voor je eigen clicks en vertoningen, en die vervangt DataForSEO niet.
 
 > **Correctie op de regel hieronder.** De vorige versie van dit blok zei dat de
 > deadline verstreken was en dat **élk** endpoint `Insufficient plan` gaf.
