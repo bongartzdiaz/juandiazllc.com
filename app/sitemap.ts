@@ -22,8 +22,10 @@ type Entry = {
 };
 
 // Emits one URL per (locale, path) combination with hreflang alternates
-// so Google sees the four-language site. Gated + auth-only routes
-// (/dashboard, /app, /login) are omitted — not crawl-worthy.
+// so Google sees the four-language site. Er zijn geen afgeschermde routes
+// meer om over te slaan: /philly, /app, /dashboard en /login zijn met het
+// CRM meeverhuisd naar zijn eigen deployment. Alles wat hier staat is
+// publiek en crawlbaar.
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 

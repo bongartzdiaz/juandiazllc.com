@@ -16,14 +16,11 @@ const nextConfig = {
   // guess the root, which can mis-trace files for the build output. This
   // repo's own dir is the correct root.
   turbopack: { root: import.meta.dirname },
-  experimental: {
-    // three is still used by components/LoginScene.tsx via a dynamic
-    // import("three") for the WebGL login background — code-split to the
-    // /login route only, so it never ships on marketing pages.
-    // lucide-react en recharts stonden hier ook in; die zaten alleen in het
-    // CRM en zijn met de dependencies mee verdwenen.
-    optimizePackageImports: ['three'],
-  },
+  // optimizePackageImports stond hier met three, lucide-react en recharts.
+  // lucide-react en recharts hoorden bij het CRM (#137); three werd alleen
+  // gebruikt door components/LoginScene.tsx, de WebGL-achtergrond van de
+  // inlogpagina, en is met die pagina meegegaan. Er blijft niets te
+  // optimaliseren over, dus het blok is weg in plaats van leeg.
 };
 
 export default nextConfig;

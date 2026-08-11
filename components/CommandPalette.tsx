@@ -32,7 +32,6 @@ export function CommandPalette() {
       { id: "nav-work", section: "Pages", label: "Work / Ventures", hint: "/work", run: go("/work") },
       { id: "nav-signals", section: "Pages", label: "Signals", hint: "/signals", run: go("/signals") },
       { id: "nav-contact", section: "Pages", label: "Contact", hint: "/contact", run: go("/contact"), keywords: ["book", "call", "email"] },
-      { id: "nav-login", section: "Pages", label: "Login", hint: "/login", run: go("/login"), keywords: ["sign in", "client"] },
       { id: "v-voltafy", section: "Ventures", label: "Voltafy", hint: "voltafy.nl", run: ext("https://voltafy.nl") },
       { id: "v-pt", section: "Ventures", label: "Performance Tracker", hint: "performancetracker.nl", run: ext("https://performancetracker.nl") },
       { id: "v-hmb", section: "Ventures", label: "Help Mij Besparen", hint: "helpmijbesparen.nl", run: ext("https://helpmijbesparen.nl") },

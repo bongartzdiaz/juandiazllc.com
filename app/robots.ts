@@ -22,13 +22,12 @@ const AI_ALLOW: string[] = [
   "/impressum",
 ];
 
-// Everything private: auth flow, API routes, Next.js internals, and the
-// dev-only preview harness. The CRM used to sit under /philly, with /app and
-// /dashboard as its signed-in surfaces; all three moved to their own
-// deployment, so there is nothing left here to disallow.
+// Everything private: API routes, Next.js internals, and the dev-only preview
+// harness. Er valt hier niets meer af te schermen aan ingelogde kant — het CRM
+// zat onder /philly met /app en /dashboard als sessieschermen, en /login was de
+// ingang. Alle vier zijn verhuisd naar hun eigen deployment.
 const PRIVATE_DISALLOW: string[] = [
   "/api/",
-  "/login",
   "/_next/",
   "/preview/",
 ];
