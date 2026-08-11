@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServiceClient } from "@/lib/supabase/service";
+import { query, queryOne } from "@/lib/db";
 import { notifyEmail, notifyTelegram, type LeadNotification } from "@/lib/notify";
 import { calBodySchema, handtekeningKlopt, tekst, type CalBody } from "@/lib/cal-webhook";
 
@@ -53,28 +53,28 @@ export async function POST(req: Request) {
   }
 
   const { triggerEvent, payload } = body;
-  const supabase = createServiceClient();
 
   // Idempotentie op cal.com's boeking-uid. Webhooks worden herhaald — bij een
   // trage response, bij een deploy, of gewoon omdat cal.com het opnieuw
   // probeert. Zonder deze controle levert elke herhaling een tweede lead en een
   // tweede Telegram-push op.
-  const { data: bestaand } = await supabase
-    .from("leads")
-    .select("id, metadata")
-    .filter("metadata->>cal_uid", "eq", payload.uid)
-    .maybeSingle();
+  const bestaand = await queryOne<{ id: string }>(
+    `select id from leads where metadata->>'cal_uid' = $1 limit 1`,
+    [payload.uid],
+  );
 
   if (triggerEvent === "BOOKING_CANCELLED") {
     // Een afzegging is informatie, geen vergissing: de lead blijft staan en
     // wordt gemarkeerd. Wie boekte en daarna afzei is nog steeds iemand die
     // interesse had.
     if (!bestaand) return NextResponse.json({ ok: true, note: "onbekende boeking" });
-    const meta = (bestaand.metadata ?? {}) as Record<string, unknown>;
-    await supabase
-      .from("leads")
-      .update({ metadata: { ...meta, cal_cancelled_at: new Date().toISOString() } })
-      .eq("id", bestaand.id);
+    // `||` voegt server-side samen. De vorige versie las metadata uit, breidde
+    // het in JS uit en schreef het geheel terug — bij twee gelijktijdige
+    // webhooks overschrijft de laatste dan de eerste. Nu niet meer.
+    await query(
+      `update leads set metadata = coalesce(metadata, '{}'::jsonb) || $2::jsonb where id = $1`,
+      [bestaand.id, JSON.stringify({ cal_cancelled_at: new Date().toISOString() })],
+    );
     return NextResponse.json({ ok: true, cancelled: true });
   }
 
@@ -108,18 +108,22 @@ export async function POST(req: Request) {
     source: "cal_15min",
   };
 
-  const { error } = await supabase.from("leads").insert({
-    ...lead,
-    metadata: {
-      cal_uid: payload.uid,
-      cal_start: payload.startTime ?? null,
-      // Herkomst uit de boekingslink (fase 3) landt hier zodra die wordt
-      // meegegeven; cal.com zet onbekende query-params in de responses.
-      herkomst: tekst(responses, "herkomst", "bron") || null,
-    },
-  });
-
-  if (error) {
+  try {
+    await query(
+      `insert into leads (name, email, company, sector, message, source, metadata)
+       values ($1, $2, $3, $4, $5, $6, $7::jsonb)`,
+      [
+        lead.name, lead.email, lead.company, lead.sector, lead.message, lead.source,
+        JSON.stringify({
+          cal_uid: payload.uid,
+          cal_start: payload.startTime ?? null,
+          // Herkomst uit de boekingslink (fase 3) landt hier zodra die wordt
+          // meegegeven; cal.com zet onbekende query-params in de responses.
+          herkomst: tekst(responses, "herkomst", "bron") || null,
+        }),
+      ],
+    );
+  } catch (error) {
     // WEL 500: hier is echt iets stuk en cal.com mag het opnieuw proberen.
     console.error("[cal] lead-insert faalde", error);
     return NextResponse.json({ ok: false, error: "insert-failed" }, { status: 500 });

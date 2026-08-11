@@ -91,6 +91,40 @@ export async function notifyEmail(payload: LeadNotification) {
       }),
     });
   } catch {
-    // Swallow — the row is safe in Supabase, email is just a nicety.
+    // Swallow — the row is already stored, email is just a nicety.
+  }
+}
+
+/* Nieuwsbriefaanmelding — korter dan een lead, en bewust apart.
+   ───────────────────────────────────────────────────────────────────────────
+   Dit liep tot 2026-08-11 via een databasetrigger die de edge function
+   `lead-notify` aanriep. Die trigger gebruikte `pg_net` en kon dus niet mee
+   naar een gewone Postgres. Belangrijker: hij was onzichtbaar — wie
+   app/actions/subscribe.ts las zag een insert en verder niets.
+
+   Een aanmelding levert alleen een adres en een herkomst op. Die door de
+   lead-vorm persen zou vier lege velden opleveren en de melding laten lijken
+   op iets wat het niet is. Vandaar een eigen, kortere tekst.
+
+   Zelfde contract als de twee hierboven: zonder env-vars stil uit, fouten
+   worden ingeslikt. */
+export async function notifySubscriber(payload: { email: string; source: string }) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;
+
+  const text =
+    `📬 Nieuwsbrief-aanmelding\n\n` +
+    `${payload.email}\n` +
+    `via: ${payload.source}`;
+
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text }),
+    });
+  } catch {
+    // Swallow — de rij staat er al.
   }
 }

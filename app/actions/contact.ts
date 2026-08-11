@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { query } from "@/lib/db";
 // Verhuisd naar lib/notify.ts op 2026-08-02, zodat de cal.com-webhook dezelfde
 // meldingen kan gebruiken. Niet geëxporteerd vanuit dit bestand: alles wat een
 // "use server"-module exporteert wordt een publiek aanroepbare server-action.
@@ -9,7 +9,7 @@ import { notifyEmail, notifyTelegram } from "@/lib/notify";
 export type ContactState = { status: "idle" | "ok" | "err"; message?: string };
 
 // Contact submission pipeline.
-// - Primary: insert into Supabase `leads` so nothing is ever lost.
+// - Primary: insert into `leads` so nothing is ever lost.
 // - Secondary: best-effort email to juan@ via Resend (only if
 //   RESEND_API_KEY is set — otherwise silently skipped). We don't
 //   fail the user if the email hop breaks, since the lead row is
@@ -45,14 +45,11 @@ export async function submitLead(
   }
 
   try {
-    const supabase = await createClient();
-    const { error } = await supabase
-      .from("leads")
-      .insert({ name, email, company, sector, message, source });
-
-    if (error) {
-      return { status: "err", message: "Something went wrong. Try again." };
-    }
+    await query(
+      `insert into leads (name, email, company, sector, message, source)
+       values ($1, $2, $3, $4, $5, $6)`,
+      [name, email, company, sector, message, source],
+    );
 
     // Fire-and-forget notifications — email + Telegram in parallel.
     // Both no-op when unconfigured and never fail the user.
