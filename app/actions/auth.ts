@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { SLO, withSpan } from "@/lib/philly/observability";
+import { SLO, withSpan } from "@/lib/observability";
 
 export type AuthState = { status: "idle" | "ok" | "err"; message?: string };
 

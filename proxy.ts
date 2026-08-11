@@ -26,7 +26,7 @@ const ONE_YEAR = 60 * 60 * 24 * 365
 
 // Paths that should NEVER get a locale prefix.
 const LOCALE_EXEMPT_PREFIXES = [
-  '/philly', '/api', '/auth', '/_next',
+  '/api', '/auth', '/_next',
   '/sitemap.xml', '/robots.txt', '/rss.xml', '/feed.json',
   '/opengraph-image', '/icon', '/favicon', '/apple-icon',
 ]

@@ -6,7 +6,7 @@
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
-    const { initSentry } = await import('./lib/philly/sentry')
+    const { initSentry } = await import('./lib/sentry')
     initSentry()
   }
   // Edge runtime (proxy.ts + edge routes) can't load @sentry/node — it
@@ -26,7 +26,7 @@ export async function onRequestError(
 ) {
   try {
     if (process.env.NEXT_RUNTIME === 'nodejs') {
-      const { captureException } = await import('./lib/philly/sentry')
+      const { captureException } = await import('./lib/sentry')
       captureException(err, {
         runtime: 'nodejs',
         path: request.path,
