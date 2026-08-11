@@ -48,6 +48,36 @@ The remaining risk is the same one repeating: four surfaces carry prices, and
 nothing enforces that they agree. When this number next changes, grep for the
 old value across all four before calling it done.
 
+**That risk fired twice more, 2026-08-11.** Both in edge functions — a surface
+nobody greps, because it lives in Supabase rather than in this repo.
+
+- `diaz-trial-init` offered "€99 (i.p.v. €1.000)" in the trial welcome email.
+  Corrected to €997, redeployed as v5, verified against the served source.
+- `diaz-affiliate-activate` said "Free Pro license (€1.000 value)" and listed
+  "Pro · €1.000" in the partner commission table. Corrected to €997,
+  redeployed as v5. Never sent — `affiliate_partners` is empty — but live.
+
+**The full surface list, for the next price change:** this file, the pricing
+page, the checkout, the pv-string-sizer README, and the edge functions
+(`diaz-trial-init`, `diaz-affiliate-activate`, `diaz-beta-checkout`). Grep the
+old value across all of them before calling it done. The edge functions are the
+ones that get forgotten.
+
+**Unverified, flagged not fixed.** The partner email in `diaz-affiliate-activate`
+prints a five-step commission ladder: Solo €500, Pro €997, Team €2.500,
+Enterprise €5.000, Agency €10.000. Only Pro is covered by this file. The other
+four appear in no other surface and match no product we sell — the licence
+tiers in the database are basic/pro/lifetime/educational/enterprise/agency, and
+the only other verified price is the €500 educational Payment Link. Decide what
+that ladder should say before activating a first partner.
+
+**€197 is dropped. Decided 2026-08-11 by Juan.** A 2026-07-26 session had
+recorded a move to a single tier of €197 one-time, replacing €99/€497/€997.
+It was never implemented anywhere — not in this repo, not in the diaz-editor
+checkout, not in `diaz-beta-checkout`, which still charges `unit_amount: 9900`.
+The prices in the table above stand: **€99 Founding Beta, €997 after.** Treat
+any €197 you find in notes or drafts as stale.
+
 ## Diaz Editor — product
 
 | Claim | Status |
