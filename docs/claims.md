@@ -48,32 +48,53 @@ The remaining risk is the same one repeating: four surfaces carry prices, and
 nothing enforces that they agree. When this number next changes, grep for the
 old value across all four before calling it done.
 
-**That risk fired twice more, 2026-08-11.** Both in edge functions — a surface
-nobody greps, because it lives in Supabase rather than in this repo.
+**First, the thing that makes every price claim here checkable: there are two
+Supabase projects.**
 
-- `diaz-trial-init` offered "€99 (i.p.v. €1.000)" in the trial welcome email.
-  Corrected to €997, redeployed as v5, verified against the served source.
-- `diaz-affiliate-activate` said "Free Pro license (€1.000 value)" and listed
-  "Pro · €1.000" in the partner commission table. Corrected to €997,
-  redeployed as v5. Never sent — `affiliate_partners` is empty — but live.
+| project | ref | what it is |
+| --- | --- | --- |
+| `diaz-editor` | `vbozelswveaxsyccvaac` | **production.** 22 tables, 25 views, 39 edge functions, 6 licences, 155 update events, 63 downloads. Functions deploy from `bongartzdiaz/diaz-editor` via GitHub Actions, so the repo is canonical. |
+| `juandiazllc` | `wbgiouuifqhasedncysw` | this site's own project. Also contains an **abandoned copy** of `diaz_editor` from May: 10 tables, 2 licences, everything else empty, functions hand-deployed and never updated since. |
+
+The installed desktop apps call the first one. That is fixed in
+`apps/editor/lib/supabase-config.ts` as `SUPABASE_PROJECT_REF`, mirrored in
+`electron/config.js`. Before writing "production does X" about Diaz Editor,
+check which ref you measured.
+
+**Why this matters for prices, 2026-08-11.** A sweep found "€99 (i.p.v.
+€1.000)" in `diaz-trial-init` and "Free Pro license (€1.000 value)" plus a
+"Pro · €1.000" commission table in `diaz-affiliate-activate`. Both were
+corrected and redeployed — **in the `juandiazllc` copy, which serves nobody.**
+
+Production was already clean. Measured against the repo that deploys it: the
+live `diaz-trial-init` and `diaz-affiliate-activate` contain no price at all;
+the partner email states the commission percentage and nothing else. No
+customer or partner ever saw €1.000 from these functions.
+
+So the €1.000 leak was real but confined to a dead duplicate. Recorded because
+the *shape* of the mistake is the point: two projects, one name, and a
+measurement taken in the wrong one reads exactly like a measurement taken in
+the right one.
 
 **The full surface list, for the next price change:** this file, the pricing
-page, the checkout, the pv-string-sizer README, and the edge functions
-(`diaz-trial-init`, `diaz-affiliate-activate`, `diaz-beta-checkout`). Grep the
-old value across all of them before calling it done. The edge functions are the
-ones that get forgotten.
+page, the checkout, the landing pages (`landing/index.html` + de/es), the
+pv-string-sizer README, and the edge functions **of project
+`vbozelswveaxsyccvaac`** — which means a PR to `bongartzdiaz/diaz-editor`, not
+a manual deploy, because CI overwrites hand-deploys on the next run.
 
-**The invented commission ladder is gone. Fixed 2026-08-11, v6.** The partner
-email in `diaz-affiliate-activate` printed a five-step ladder: Solo €500, Pro
-€997, Team €2.500, Enterprise €5.000, Agency €10.000. Only Pro was covered by
-this file. "Solo" and "Team" are not tiers at all — the licence tiers in the
-database are basic/pro/lifetime/educational/enterprise/agency — and €2.500,
-€5.000 and €10.000 appear on no other surface.
+**The invented commission ladder — same story, same dead copy.** The partner
+email in the `juandiazllc` copy of `diaz-affiliate-activate` printed a
+five-step ladder: Solo €500, Pro €997, Team €2.500, Enterprise €5.000, Agency
+€10.000. Only Pro was covered by this file. "Solo" and "Team" are not tiers at
+all — the licence tiers are basic/pro/lifetime/educational/enterprise/agency —
+and €2.500, €5.000 and €10.000 appear on no other surface. It was rewritten to
+print only verified prices, but again: in the copy nobody calls.
 
-It now prints only prices this file verifies: Founding Beta €99, Pro €997,
-Educational €500, each times the partner's own rate. Enterprise and agency are
-described as quoted per deal at the same percentage, which does not require a
-number we have not set.
+**Production never had that ladder.** The live `diaz-affiliate-activate`
+mentions no price; it shows the partner's percentage and stops. Whoever wrote
+the ladder wrote it into the duplicate only. Keep it that way — a
+partner-facing email that names a percentage cannot go stale when a price
+changes.
 
 **Enterprise and agency are sold on quote. Confirmed 2026-08-11 by Juan.** So
 those two tiers have no list price by design, not by omission — do not add one
@@ -88,11 +109,19 @@ copied from somewhere I had not looked.
 
 **Worth knowing: €997 is decided but not yet purchasable.** It appears on no
 buy-link; the landing pages sell €99 (beta) and €500 (educational) only. It is
-the price after the beta closes. A partner reading the commission table today
-cannot actually earn the €997 line yet.
+the price after the beta closes. Anyone quoting €997 today is quoting a future
+price, which is fine as long as they say so.
 
-**Rule this leaves behind:** a partner-facing email is a price list. Every
-number in one has to trace back to this file, or be phrased as a quote.
+**Two rules this leaves behind.**
+
+1. A partner- or customer-facing email is a price list. Every number in one has
+   to trace back to this file, or be phrased as a percentage or a quote. The
+   production emails already do the percentage thing — that is why they did not
+   rot.
+2. Name the project ref in any claim about Diaz Editor production. "The edge
+   function says X" is not a fact until you say *which* project's edge function.
+   Two projects carry a `diaz_editor` schema and functions with identical
+   slugs; only `vbozelswveaxsyccvaac` is reachable from an installed app.
 
 **€197 is dropped. Decided 2026-08-11 by Juan.** A 2026-07-26 session had
 recorded a move to a single tier of €197 one-time, replacing €99/€497/€997.
