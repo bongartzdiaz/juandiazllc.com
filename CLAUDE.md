@@ -1,27 +1,70 @@
 # Project memory — juandiazllc.com
 
-Next.js 16 + Prisma 7 + Supabase marketing site + Philly CRM app.
-Tests run via Vitest: `npm test`. Typecheck: `npm run typecheck`. Build: `npm run build`.
+Next.js 16 + Supabase. **Marketingsite, meer niet.** Negen dependencies,
+elf dev. Tests via Vitest: `npm test`. Typecheck: `npm run typecheck`.
+Build: `npm run build`.
 
-## SLOs (p95 latency budgets)
-Defined in `lib/philly/observability.ts` (`SLO` const). Wrap critical
-paths in `withSpan({ name, slo })` to tag Sentry spans with
-`slo.bucket` (`ok` / `slow` / `error`) and `slo.over_budget`.
+> ⚠️ **Alles onder "Session log" hieronder is gedateerd en beschrijft voor
+> een groot deel het CRM dat op 2026-08-11 uit deze repo is verwijderd.
+> Lees het als geschiedenis, niet als beschrijving van de huidige code.**
+> Wat er nu staat, staat in de twee secties direct hieronder.
 
-- `SLO.LOGIN` — 1,200 ms (auth.login, `app/actions/auth.ts`)
-- `SLO.CREATE_DEAL` — 800 ms (deal.create, `POST /api/deals`)
-- `SLO.AI_ACTION` — 15,000 ms (ai.score, `POST /api/ai/score`)
+## Wat hier NIET meer woont (2026-08-11)
 
-`withSpan` no-ops transparently when `SENTRY_DSN` is unset, so tests
-and dev don't need the SDK. Uses `Sentry.startSpan` from @sentry/node
-v9 (which ships OTel-compatible tracing built-in — we skipped
-`@vercel/otel` because of a peer-dep conflict with Sentry 9's pinned
-`@opentelemetry/resources@1.30.1`).
+Vijf PR's hebben het CRM en alles eromheen uit deze repo gehaald. Dit
+staat hier zodat een volgende sessie niet opnieuw gaat "bouwen" wat al
+verhuisd is.
 
-To add a new SLO-tracked path:
-1. Add the budget to `SLO` in `lib/philly/observability.ts`
-2. Wrap the work in `withSpan({ name: "<domain>.<op>", slo: SLO.X, op: "<category>" }, async () => { ... })`
-3. Document it in this section.
+| weg | waarheen / waarom | PR |
+|---|---|---|
+| `app/philly/*`, `lib/philly/*`, `components/philly/*`, `hooks/philly/*`, `prisma/` | het CRM leeft in `bongartzdiaz/DEUS-SHARED`, daar op **postgresql** met 95 models | #134 |
+| `app/[locale]/{app,dashboard,status}` | ingelogde surface + statuspagina die alleen `/philly/api/health` peilde | #134 |
+| 26 npm-pakketten, `scripts/migrate-to-hetzner/`, Tailwind | Tailwind had hier nooit gedraaid — 2483 regels handgeschreven CSS, nul directives | #137 |
+| `app/[locale]/login`, `app/auth/`, `app/actions/auth.ts`, `lib/observability.ts` | elke inlogbestemming wees naar iets dat weg was | #138 |
+| `lib/supabase/{middleware,client,li-client}.ts` | geen afnemers meer | #138, #140 |
+
+**De SLO-sectie die hier stond is vervallen.** Die beschreef
+`SLO.LOGIN`, `SLO.CREATE_DEAL` en `SLO.AI_ACTION` in
+`lib/philly/observability.ts`, met `withSpan`-wrappers op `auth.login`,
+`POST /api/deals` en `POST /api/ai/score`. Alle vier zijn verwijderd.
+Wil je latency-budgetten op de marketingkant, dan is dat nieuw werk, geen
+herstel. Sentry draait nog wel (`lib/sentry.ts`, alleen serverfouten;
+`sendDefaultPii` staat uit).
+
+**DEUS-SHARED is de bron voor alles wat CRM is.** De `sync-deus-shared.yml`
+die van die repo ooit een spiegel maakte, heeft nooit op main gestaan; de
+twee zijn sindsdien uit elkaar gegroeid en DEUS-SHARED loopt voor.
+
+## Het `li.*`-schema — beslissing bewaard, code weg (2026-08-11)
+
+`lib/supabase/li-client.ts` is verwijderd in #140. Het bestand had geen
+afnemers meer nadat `/philly/outreach` en `/api/outreach/*` met #134
+verdwenen, maar het droeg een beslissing die het bewaren waard is.
+
+**De beslissing (2026-05-06).** Het `li.*`-schema was bewust
+**single-tenant**: het droeg Juans eigen LinkedIn-outreachpijplijn,
+binnen DEUS getoond als operator-only dashboardfunctie. Klantorganisaties
+lazen of schreven er niet in. De afscherming zat in drie lagen:
+`requireRole(['admin','manager'])` op de muterende routes, een sidebar-ingang
+die alleen voor bepaalde industrieën verscheen, en een service-role-sleutel
+die alleen server-side bestond.
+
+**Alle drie die lagen zijn met #134 verdwenen**, samen met de routes die ze
+beschermden. Er is hier niets meer dat `li.*` benadert.
+
+**Het migratieplan, als de surface ooit opengaat voor klantorganisaties:**
+1. `organization_id`-kolom op elke `li.*`-tabel
+2. bestaande rijen backfillen naar Juans org-id
+3. elke query hard filteren op `.eq('organization_id', scope.organizationId)`
+4. Postgres-RLS als tweede slot — en let daarbij op
+   `feedback_postgrest_rpc_execute_default`: RLS alleen is niet genoeg,
+   want PostgreSQL geeft EXECUTE standaard aan PUBLIC.
+
+**Openstaande vraag.** Het `li`-schema bestaat **niet** in Supabase-project
+`wbgiouuifqhasedncysw`, terwijl `liClient()` daar wel naartoe wees
+(`getSupabaseUrl()` + `{ db: { schema: "li" } }`). Gemeten op 2026-08-11:
+alleen `public`, 120 tabellen. Waar de outreachdata werkelijk staat is
+**niet vastgesteld** — zie de memory `project_linkedin_outreach`.
 
 ## Locales
 Four supported: `en`, `nl`, `de`, `es` (see `lib/i18n/dict.ts`).
