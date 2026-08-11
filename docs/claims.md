@@ -75,6 +75,17 @@ Educational €500, each times the partner's own rate. Enterprise and agency are
 described as quoted per deal at the same percentage, which is true and does not
 require a number we have not set.
 
+Checked against a fourth surface while fixing this: the Diaz Editor landing
+pages (`landing/index.html` and the de/es variants) carry four live Stripe
+Payment Links and advertise exactly two prices — **€99 and €500**. No €2.500,
+€5.000 or €10.000 anywhere. That confirms the ladder was invented rather than
+copied from somewhere I had not looked.
+
+**Worth knowing: €997 is decided but not yet purchasable.** It appears on no
+buy-link; the landing pages sell €99 (beta) and €500 (educational) only. It is
+the price after the beta closes. A partner reading the commission table today
+cannot actually earn the €997 line yet.
+
 **Rule this leaves behind:** a partner-facing email is a price list. Every
 number in one has to trace back to this file, or be phrased as a quote.
 
