@@ -72,8 +72,13 @@ database are basic/pro/lifetime/educational/enterprise/agency — and €2.500,
 
 It now prints only prices this file verifies: Founding Beta €99, Pro €997,
 Educational €500, each times the partner's own rate. Enterprise and agency are
-described as quoted per deal at the same percentage, which is true and does not
-require a number we have not set.
+described as quoted per deal at the same percentage, which does not require a
+number we have not set.
+
+**Enterprise and agency are sold on quote. Confirmed 2026-08-11 by Juan.** So
+those two tiers have no list price by design, not by omission — do not add one
+to this table, and do not let a later sweep "fill the gap". What a partner
+earns on them is the same percentage of whatever the deal closes at.
 
 Checked against a fourth surface while fixing this: the Diaz Editor landing
 pages (`landing/index.html` and the de/es variants) carry four live Stripe
