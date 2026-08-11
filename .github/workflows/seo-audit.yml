@@ -59,8 +59,6 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - name: Generate Prisma client
-        run: npx prisma generate
       - name: Build
         run: npm run build
       - name: Start productiebuild
