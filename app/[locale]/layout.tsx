@@ -8,7 +8,13 @@ import { CommandPalette } from "@/components/CommandPalette";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { LOCALES, type Locale } from "@/lib/i18n/dict";
 import { ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
-import { AUTHOR_IMAGE_URL, ORG_LOGO_URL, PERSON_SAME_AS } from "@/lib/seo/branding";
+import {
+  AUTHOR_IMAGE_URL,
+  ORG_LOGO_URL,
+  PERSON_SAME_AS,
+  OG_IMAGES,
+  TWITTER_IMAGES,
+} from "@/lib/seo/branding";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -21,12 +27,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const l: Locale = (LOCALES as readonly string[]).includes(locale) ? (locale as Locale) : "en";
   return {
     openGraph: {
+      images: OG_IMAGES,
       siteName: "Juan Diaz, LLC",
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
     },
     twitter: {
       card: "summary_large_image",
+      images: TWITTER_IMAGES,
       title: "Juan Diaz, LLC",
       description:
         "Revenue engines for operators in energy, real estate, hospitality and adjacent.",

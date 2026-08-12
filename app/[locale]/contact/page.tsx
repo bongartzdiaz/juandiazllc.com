@@ -7,6 +7,7 @@ import { translate } from "@/lib/i18n/dict";
 import { faqSchema, contactPointSchema } from "@/lib/seo/schema";
 import { getContactFaq } from "@/lib/seo/faqs";
 import { BOOKING_15MIN } from "@/lib/booking";
+import { OG_IMAGES } from "@/lib/seo/branding";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,7 +16,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title: translate(l, "meta.contact.title"),
     description: translate(l, "meta.contact.description"),
     alternates: buildAlternates(l, "/contact"),
-    openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
+    openGraph: {
+      images: OG_IMAGES, locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
 }
 

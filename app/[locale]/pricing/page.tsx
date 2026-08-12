@@ -4,6 +4,7 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 import { translate } from "@/lib/i18n/dict";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { faqSchema, productOfferSchema, type FaqItem } from "@/lib/seo/schema";
+import { OG_IMAGES } from "@/lib/seo/branding";
 
 // DEUS pricing page — 4 tiers, per-seat €40 floor, Enterprise contact-only.
 // Spec lives in `_drafts/pricing/pricing-tiers-en.md`; CSV source-of-truth
@@ -181,6 +182,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     description,
     alternates: buildAlternates(l, "/pricing"),
     openGraph: {
+      images: OG_IMAGES,
       type: "website",
       title,
       description,

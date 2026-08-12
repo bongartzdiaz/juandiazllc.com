@@ -19,6 +19,7 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 import { translate } from "@/lib/i18n/dict";
 import { faqSchema } from "@/lib/seo/schema";
 import { getHomeFaq } from "@/lib/seo/faqs";
+import { OG_IMAGES } from "@/lib/seo/branding";
 
 // Titles lead with the commercial search term ("fractional revenue
 // operator" / localized) then the brand — the home page is the primary
@@ -40,6 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     description: translate(l, "meta.home.description"),
     alternates: buildAlternates(l, "/"),
     openGraph: {
+      images: OG_IMAGES,
       type: "website",
       title: translate(l, "meta.home.title"),
       description: translate(l, "meta.home.description"),

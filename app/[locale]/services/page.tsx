@@ -6,6 +6,7 @@ import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { faqSchema } from "@/lib/seo/schema";
 import { getServicesFaq } from "@/lib/seo/faqs";
 import { FaqSection } from "@/components/FaqSection";
+import { OG_IMAGES } from "@/lib/seo/branding";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -27,6 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     description: translate(l, "meta.services.description"),
     alternates: buildAlternates(l, "/services"),
     openGraph: {
+      images: OG_IMAGES,
       type: "website",
       url: `/${l}/services`,
       title: translate(l, "meta.services.title"),

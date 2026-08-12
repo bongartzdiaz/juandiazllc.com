@@ -5,6 +5,7 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 import { translate } from "@/lib/i18n/dict";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { collectionPageSchema } from "@/lib/seo/schema";
+import { OG_IMAGES } from "@/lib/seo/branding";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -13,7 +14,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title: translate(l, "meta.signals.title"),
     description: translate(l, "meta.signals.description"),
     alternates: buildAlternates(l, "/signals"),
-    openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
+    openGraph: {
+      images: OG_IMAGES, locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
 }
 

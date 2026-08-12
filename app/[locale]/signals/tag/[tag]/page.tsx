@@ -6,6 +6,7 @@ import { tagLabel, tagSlug } from "@/lib/i18n/tags";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
+import { OG_IMAGES } from "@/lib/seo/branding";
 
 // Tag archive pages for /signals — mirrors /insights/tag/[tag]. Every
 // distinct signal tag becomes a pre-rendered SEO surface, one per locale.
@@ -41,6 +42,7 @@ export async function generateMetadata(
     description: translate(l, "signals.tag.desc").replace("{tag}", label),
     alternates: buildAlternates(l, `/signals/tag/${tag}`),
     openGraph: {
+      images: OG_IMAGES,
       type: "website",
       url: `/${l}/signals/tag/${tag}`,
       title,
