@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { LocaleLink } from "@/components/LocaleLink";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
+import { OG_IMAGES } from "@/lib/seo/branding";
 
 // /now — https://nownownow.com convention. A public "what I'm
 // actually focused on right this quarter" page. Updated roughly
@@ -16,7 +17,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title: translate(l, "meta.now.title"),
     description: translate(l, "meta.now.description"),
     alternates: buildAlternates(l, "/now"),
-    openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
+    openGraph: {
+      images: OG_IMAGES, locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
 }
 

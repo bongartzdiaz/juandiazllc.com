@@ -49,6 +49,35 @@ export const AUTHOR_IMAGE_FALLBACK_URL = `${SITE}/icon-512.svg`;
 export const ORG_LOGO_URL = `${SITE}/icon.svg`;
 
 /**
+ * De deelafbeelding voor OpenGraph en Twitter. Wijst naar de gegenereerde
+ * route `app/opengraph-image.tsx` — gemeten op productie: HTTP 200, 88 kB PNG.
+ *
+ * WAAROM DIT EEN CONSTANTE IS, EN GEEN OVERERVING
+ *
+ * Next voegt metadata **ondiep** samen: declareert een pagina `openGraph`, dan
+ * vervángt dat object dat van de layout erboven — inclusief `images`. Elke
+ * pagina onder `app/[locale]` declareert `openGraph` om `locale` en
+ * `alternateLocale` te zetten, en liet daarmee de afbeelding van de
+ * root-layout vallen.
+ *
+ * Gemeten 2026-08-12 over alle 176 sitemap-URL's: 92 pagina's serveerden geen
+ * `og:image`, terwijl `twitter:card` overal `summary_large_image` beloofde.
+ * Daaronder de homepage, /pricing, /contact en elke sectorpagina — precies wat
+ * je in outreach deelt. De 84 die het wél goed deden waren de detailpagina's
+ * met een eigen `opengraph-image.tsx` op hetzelfde segment, plus /about.
+ *
+ * Zet dit dus in ELKE `openGraph`-declaratie. Overerven werkt hier niet, en
+ * dat is geen bug in Next maar de gedocumenteerde samenvoegregel.
+ * `metadata-locales.test.ts` bewaakt het.
+ */
+export const OG_IMAGES = [
+  { url: "/opengraph-image", width: 1200, height: 630, alt: "Juan Diaz, LLC" },
+];
+
+/** Dezelfde afbeelding in de vorm die `twitter.images` verwacht. */
+export const TWITTER_IMAGES = ["/opengraph-image"];
+
+/**
  * Het achtervoegsel dat `title.template` in app/layout.tsx aan elke paginatitel
  * plakt. Staat hier omdat de metadata-gate (metadata-locales.test.ts) hetzelfde
  * getal nodig heeft: Google kapt rond de 60 tekens, dus wat dit kost gaat af van

@@ -50,7 +50,11 @@ function statischeRoutes(): { route: string; bestand: string }[] {
   return uit.sort((a, b) => a.route.localeCompare(b.route));
 }
 
-type Md = { title?: unknown; description?: unknown };
+type Md = {
+  title?: unknown;
+  description?: unknown;
+  openGraph?: { images?: unknown } & Record<string, unknown>;
+};
 
 async function metadataVoor(bestand: string, locale: string): Promise<Md | null> {
   const mod = (await import(/* @vite-ignore */ bestand)) as {
@@ -170,6 +174,44 @@ describe("titellengte", () => {
           !!md.title && typeof md.title === "object" && "absolute" in md.title;
         const volledig = absoluut ? t : `${t}${TITLE_SUFFIX}`;
         expect(volledig.length, `${route} [${l}]: "${volledig}"`).toBeLessThanOrEqual(60);
+      }
+    });
+  }
+});
+
+describe("deelafbeelding", () => {
+  /* -------------------------------------------------------------
+     WAAROM DEZE GATE BESTAAT
+
+     Gemeten op productie 2026-08-12, alle 176 sitemap-URL's opgehaald:
+     92 pagina's serveerden GEEN og:image, terwijl twitter:card overal
+     "summary_large_image" beloofde. Daaronder de homepage, /pricing,
+     /contact en elke sectorpagina — precies wat in outreach gedeeld
+     wordt. Elke deling toonde een kale link.
+
+     De oorzaak is niet een vergeten regel maar een samenvoegregel:
+     Next voegt metadata ONDIEP samen, dus een pagina die `openGraph`
+     declareert om `locale` te zetten, gooit `images` van de layout
+     erboven weg. Zeventien pagina's deden dat.
+
+     Daarom controleert deze test elke statische route afzonderlijk,
+     en niet de layout: overerving is juist wat hier niet werkt.
+     ------------------------------------------------------------- */
+  for (const { route, bestand } of routes) {
+    it(`${route} — houdt een og:image in elke taal`, async () => {
+      for (const l of LOCALES) {
+        const md = await metadataVoor(bestand, l);
+        if (!md) continue;
+        // Geen openGraph-declaratie is prima: dan erft de pagina die van
+        // de layout, inclusief images. Declareert de pagina hem wél, dan
+        // moet de afbeelding er zelf in staan.
+        if (!md.openGraph) continue;
+        const images = (md.openGraph as { images?: unknown }).images;
+        expect(
+          Array.isArray(images) && images.length > 0,
+          `${route} [${l}]: openGraph is gedeclareerd zonder images — ` +
+            `dat overschrijft de afbeelding uit de layout. Zet OG_IMAGES erin.`,
+        ).toBe(true);
       }
     });
   }

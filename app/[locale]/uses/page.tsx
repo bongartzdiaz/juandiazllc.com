@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { LocaleLink } from "@/components/LocaleLink";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
+import { OG_IMAGES } from "@/lib/seo/branding";
 
 // /uses — https://uses.tech convention. What I actually build with.
 // Public so clients, collaborators, and hires know the stack before
@@ -17,7 +18,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title: translate(l, "meta.uses.title"),
     description: translate(l, "meta.uses.description"),
     alternates: buildAlternates(l, "/uses"),
-    openGraph: { locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
+    openGraph: {
+      images: OG_IMAGES, locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
 }
 
