@@ -11,6 +11,11 @@ different places. On 2026-07-21, live and public simultaneously:
 | AutoCAD LT price | `$455/yr` | `$575/year` — the 30-post social captions pack, EN and ES |
 | Diaz Editor regular price | `€997` | `€1,000` — pv-string-sizer README on GitHub |
 
+Three weeks later the same shape was back, just with different numbers.
+Measured 2026-08-12: the checkout charges **€197**, the homepage advertises
+four tiers (€99 / €197 / €247 / €500), and the pv-string-sizer README still
+says €99 → €997. Three surfaces, three answers, one product.
+
 Neither is a style problem. A competitor price that is wrong is misleading
 advertising, and two different prices for your own product reads as
 carelessness to exactly the buyer who is comparing carefully.
@@ -31,22 +36,43 @@ carelessness to exactly the buyer who is comparing carefully.
 
 ## Diaz Editor — pricing
 
+> ⚠️ **This table was rewritten on 2026-08-12 after measuring production.
+> The version before it described a product that is not for sale.** What
+> changed and why is in "The €197 reversal" below. Read that before quoting
+> anything here.
+
+Measured 2026-08-12 against project `vbozelswveaxsyccvaac` and the served
+`https://diazatlas.com` (HTTP 200, 113,281 bytes).
+
 | Claim | Value | Status |
 | --- | --- | --- |
-| Founding Beta price | €99, one-time | ✅ verified — `unit_amount: 9900` in `diaz-beta-checkout` |
-| Founding Beta cap | 100 spots | ✅ verified — `public_beta_status.cap = 100` |
-| Founding spots taken | 2 | ✅ verified — `public_beta_status.sold`, changes; never hardcode |
-| Regular price after beta | €997, one-time | ✅ decided 2026-07-21 — chosen over €1,000 because it already appeared on the site, pricing page and checkout |
+| Licence tier — 3 seats | €197, one-time | ✅ verified twice — `unit_amount: 19700` in the live `diaz-beta-checkout` (v28) **and** `public_beta_status.price_cents_eur = 19700` |
+| Founding tier — 1 seat | €99, one-time | ⚠️ live Payment Link (HTTP 200) labelled €99 on the homepage. The **amount at Stripe is not verified** — Stripe renders it client-side, so it cannot be read from the served page. Check the dashboard. |
+| Pro tier — 10 devices | €247, one-time | ⚠️ same: live Payment Link, label only, amount not verified |
+| Educational tier — 25 seats | €500, one-time | ⚠️ same: live Payment Link, label only, amount not verified |
+| Enterprise, agency | On quote, no list price | ✅ confirmed 2026-08-11 by Juan — by design, not omission |
+| "Regular price after beta €997" | **Not live anywhere** | ❌ appears on no page, no buy link and in no edge function. See the reversal note. |
+| Beta cap / spots taken | cap 100, sold 2 | ⚠️ the row still exists, but the `spots_left <= 0` gate was **removed on 2026-07-26** — the cap no longer stops a sale. `display_spots_left` equals the real 98, so the scarcity display is honest. |
 | Subscription | None. One-time purchase. | ✅ verified — Stripe `mode: 'payment'`, not `subscription` |
 | Updates | Lifetime | ✅ product promise, no expiry in licence issuance |
 | Trial | 14 days, no card | ✅ verified — `diaz-trial-init` |
-| Educational tier | €500 | ✅ live Payment Link on the homepage |
+| Price direction | "Introductory price — rises at v0.5" | ✅ every tier on the homepage carries this line |
 
-~~**Action:** pick €997 or €1,000 and make both surfaces agree.~~ **Done
-2026-07-21.** €997 it is; the pv-string-sizer README was corrected to match.
-The remaining risk is the same one repeating: four surfaces carry prices, and
-nothing enforces that they agree. When this number next changes, grep for the
-old value across all four before calling it done.
+~~**Action:** pick €997 or €1,000 and make both surfaces agree.~~ ~~**Done
+2026-07-21.** €997 it is; the pv-string-sizer README was corrected to match.~~
+
+> ⚠️ **Overtaken 2026-08-12.** Aligning the two surfaces on €997 was correct on
+> 2026-07-21 and obsolete five days later: the 2026-07-26 single-price decision
+> moved the checkout to €197 and nobody swept the surfaces afterwards. Measured
+> today, the pv-string-sizer README still reads *"€99 lifetime founding, then
+> €997 once"* — two prices, neither of them the one a buyer is charged. It is a
+> public repo README, so this is live and readable by anyone comparing. Fixing
+> it is blocked on the pricing decision below, not on the edit.
+
+The risk this was meant to close never closed: four surfaces carry prices and
+nothing enforces that they agree. It has now failed twice. When the number next
+changes, sweep all four and re-read each one afterwards — do not stop at the
+surface you set out to fix.
 
 **First, the thing that makes every price claim here checkable: there are two
 Supabase projects.**
@@ -102,15 +128,16 @@ to this table, and do not let a later sweep "fill the gap". What a partner
 earns on them is the same percentage of whatever the deal closes at.
 
 Checked against a fourth surface while fixing this: the Diaz Editor landing
-pages (`landing/index.html` and the de/es variants) carry four live Stripe
-Payment Links and advertise exactly two prices — **€99 and €500**. No €2.500,
-€5.000 or €10.000 anywhere. That confirms the ladder was invented rather than
-copied from somewhere I had not looked.
+pages carry four live Stripe Payment Links, and none of them is €2.500, €5.000
+or €10.000. That confirms the ladder was invented rather than copied from
+somewhere I had not looked.
 
-**Worth knowing: €997 is decided but not yet purchasable.** It appears on no
-buy-link; the landing pages sell €99 (beta) and €500 (educational) only. It is
-the price after the beta closes. Anyone quoting €997 today is quoting a future
-price, which is fine as long as they say so.
+> ⚠️ **Corrected 2026-08-12.** This paragraph originally added "and advertise
+> exactly two prices — €99 and €500". That was wrong: the four links are €99,
+> €197, €247 and €500. The check had looked for the two prices it expected and
+> reported their presence as completeness. Counting the links and reading only
+> some of their labels is how a sweep passes while missing half the ladder.
+> See "The €197 reversal" below.
 
 **Two rules this leaves behind.**
 
@@ -123,12 +150,54 @@ price, which is fine as long as they say so.
    Two projects carry a `diaz_editor` schema and functions with identical
    slugs; only `vbozelswveaxsyccvaac` is reachable from an installed app.
 
-**€197 is dropped. Decided 2026-08-11 by Juan.** A 2026-07-26 session had
-recorded a move to a single tier of €197 one-time, replacing €99/€497/€997.
-It was never implemented anywhere — not in this repo, not in the diaz-editor
-checkout, not in `diaz-beta-checkout`, which still charges `unit_amount: 9900`.
-The prices in the table above stand: **€99 Founding Beta, €997 after.** Treat
-any €197 you find in notes or drafts as stale.
+## The €197 reversal — 2026-08-12
+
+**What this file said yesterday was the opposite of what production does.**
+
+The 2026-08-11 entry read: "€197 is dropped. Decided by Juan. It was never
+implemented anywhere — not in this repo, not in the diaz-editor checkout, not
+in `diaz-beta-checkout`, which still charges `unit_amount: 9900`. The prices in
+the table above stand: €99 Founding Beta, €997 after."
+
+Every factual half of that is wrong. Measured 2026-08-12:
+
+| what was claimed | what production does |
+| --- | --- |
+| `diaz-beta-checkout` charges `unit_amount: 9900` | the live v28 in `vbozelswveaxsyccvaac` charges **19700**, `tier: 'pro'`, and writes `amount_eur: 197` to `checkout_session` |
+| "€197 was never implemented" | `diazatlas.com` carries €197 **96 times**, `/beta` **56 times**, and `public_beta_status.price_cents_eur` is **19700** |
+| "the landing pages advertise exactly two prices, €99 and €500" | four tiers with four live Payment Links: €99, €197, €247, €500 |
+| "€997 after" | €997 appears on no live page, no buy link, no edge function |
+
+**Where the 9900 came from.** It was read out of `wbgiouuifqhasedncysw` — the
+abandoned copy, which still held the pre-July version of the function. Same
+failure as the €1,000 leak recorded above, one section earlier, in the same
+week: a measurement in the dead project reads exactly like a measurement in the
+live one. The live function even carries the decision in its own comments —
+*"2026-07-26: de `spots_left <= 0`-gate is verwijderd. Er is één prijs (€197)"*
+and *"deze functie verkoopt alleen de €197-tier (unit_amount 19700, tier
+'pro'). €99 en €247 lopen via Payment Links."*
+
+**This makes the decision itself open again, not settled.** Juan agreed to drop
+€197 on the stated grounds that it existed only in stale notes. It does not —
+it is the only price the checkout charges. The decision was taken on a false
+premise, so it needs retaking against the real ladder:
+
+- [ ] Is the live four-tier ladder (€99 / €197 / €247 / €500, by seat count)
+      the intended product, or drift?
+- [ ] Does €997 still exist as a post-beta price, or is it dead? It is on no
+      surface today.
+- [ ] Three CTAs reading "€197" route to `/beta`, whose checkout charges €197 —
+      those agree. But the €99, €247 and €500 Payment Link amounts were **not
+      verified**; Stripe renders them client-side. Confirm in the dashboard that
+      each link charges what its button says.
+
+Until that is answered, quote **€197** for the standard licence, because that
+is what a buyer is actually charged. Do not quote €997.
+
+**And the rule this earns.** A price is verified when it is read from the thing
+that takes the money — the live edge function, the live DB row, or the Stripe
+dashboard — with the project ref named. A price read from a repo file, a draft,
+or a function in the wrong project is a lead, not a fact.
 
 ## Diaz Editor — product
 
