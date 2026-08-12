@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 // meldingen kan gebruiken. Niet geëxporteerd vanuit dit bestand: alles wat een
 // "use server"-module exporteert wordt een publiek aanroepbare server-action.
 import { notifyEmail, notifyTelegram } from "@/lib/notify";
+import { capField, isPlausibleEmail } from "@/lib/forms/limits";
 
 export type ContactState = { status: "idle" | "ok" | "err"; message?: string };
 
@@ -30,14 +31,17 @@ export async function submitLead(
     return { status: "ok", message: "Got it. I'll come back to you within 24 hours." };
   }
 
-  const name = String(formData.get("name") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  const company = String(formData.get("company") ?? "").trim();
-  const sector = String(formData.get("sector") ?? "").trim();
-  const message = String(formData.get("message") ?? "").trim();
-  const source = String(formData.get("source") ?? "contact_page");
+  // Elk vrij-tekstveld begrensd (zie lib/forms/limits.ts): de tabel heeft geen
+  // kolomlimiet en anon mag INSERT'en, dus zonder cap kan een bot de tabel
+  // laten opzwellen tot het opslagquotum weer knalt.
+  const name = capField(formData.get("name"), "name");
+  const email = capField(formData.get("email"), "email").toLowerCase();
+  const company = capField(formData.get("company"), "company");
+  const sector = capField(formData.get("sector"), "sector");
+  const message = capField(formData.get("message"), "message");
+  const source = capField(formData.get("source"), "source") || "contact_page";
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!isPlausibleEmail(email)) {
     return { status: "err", message: "Enter a valid email." };
   }
   if (!message || message.length < 10) {
