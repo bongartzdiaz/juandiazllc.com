@@ -162,7 +162,11 @@ function buildCsp(nonce: string, strict: boolean): string {
     'object-src': ["'none'"],
     'worker-src': ["'self'", 'blob:'],
     'manifest-src': ["'self'"],
-    ...(isDev ? {} : { 'upgrade-insecure-requests': [] }),
+    // Alleen in de AFDWINGENDE CSP. In een report-only-policy negeert de
+    // browser deze directive en logt er een waarschuwing over naar de console
+    // — gemeten 2026-08-12 kostte dat op elke pagina een Lighthouse
+    // best-practices-punt (96 i.p.v. 100). `strict` is de report-only-variant.
+    ...(isDev || strict ? {} : { 'upgrade-insecure-requests': [] }),
     'report-uri': ['/api/csp-report'],
   }
 
