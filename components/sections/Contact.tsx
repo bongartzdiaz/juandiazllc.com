@@ -17,9 +17,21 @@ export function Contact() {
         <a href="https://instagram.com/diazelcazador" target="_blank" rel="noopener noreferrer">
           Instagram — @diazelcazador
         </a>
-        <a href="https://kompasagency.nl" target="_blank" rel="noopener noreferrer">
-          Kompas Agency
-        </a>
+        {/*
+          Hier stond een link "Kompas Agency" naar kompasagency.nl. Weg op
+          2026-08-12: dit werk valt onder Juans eigen naam, niet onder dat
+          bureau, dus de link noemde een ander bedrijf als zijn kanaal.
+
+          Hij was bovendien stuk. Gemeten dezelfde dag: kompasagency.nl
+          serveert een certificaat op naam van CN=*.hostnetbv.nl — het
+          standaard-wildcard van de hoster, niet van het domein zelf. DNS
+          klopt en de server antwoordt, maar elke browser toont eerst een
+          schermvullende beveiligingswaarschuwing. Deze link stond op de
+          homepage in alle vier de talen.
+
+          Zet hier niets terug zonder te controleren dat het adres een geldig
+          certificaat op de eigen naam heeft.
+        */}
       </div>
     </section>
   );
