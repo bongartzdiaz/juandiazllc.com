@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { capField, isPlausibleEmail } from "@/lib/forms/limits";
 
 export type SubscribeState = { status: "idle" | "ok" | "err"; message?: string };
 
@@ -8,10 +9,12 @@ export async function subscribe(
   _prev: SubscribeState,
   formData: FormData
 ): Promise<SubscribeState> {
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  const source = String(formData.get("source") ?? "landing");
+  // Begrensd — zie lib/forms/limits.ts. subscribers.email + .source zijn
+  // ongelimiteerde text-kolommen met een anon-INSERT-policy.
+  const email = capField(formData.get("email"), "email").toLowerCase();
+  const source = capField(formData.get("source"), "source") || "landing";
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!isPlausibleEmail(email)) {
     return { status: "err", message: "Enter a valid email." };
   }
 
