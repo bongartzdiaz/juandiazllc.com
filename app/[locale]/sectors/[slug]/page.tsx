@@ -211,10 +211,14 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
               <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 12, letterSpacing: ".14em", color: "var(--muted-soft)" }}>
                 <em style={{ color: "var(--accent)", fontStyle: "normal" }}>0{i + 1}</em>
               </div>
-              <div style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 20, letterSpacing: "-.015em" }}>
+              {/* minWidth:0 — zonder dit houdt de grid-track z'n min-content
+                  (langste woord) aan en kan 1fr niet krimpen, waardoor de hele
+                  rij op mobiel ~428px breed werd en de tekst onder overflow-x:
+                  clip wegviel. Gemeten 2026-08-12 op 375px. Desktop onveranderd. */}
+              <div style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 20, letterSpacing: "-.015em", minWidth: 0, overflowWrap: "anywhere" }}>
                 {p.phase}
               </div>
-              <div style={{ color: "var(--muted)", fontSize: 16, lineHeight: 1.65 }}>{p.applied}</div>
+              <div style={{ color: "var(--muted)", fontSize: 16, lineHeight: 1.65, minWidth: 0 }}>{p.applied}</div>
             </div>
           ))}
         </div>
