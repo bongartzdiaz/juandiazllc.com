@@ -64,10 +64,14 @@ Measured 2026-08-12 against project `vbozelswveaxsyccvaac` and the served
 > ⚠️ **Overtaken 2026-08-12.** Aligning the two surfaces on €997 was correct on
 > 2026-07-21 and obsolete five days later: the 2026-07-26 single-price decision
 > moved the checkout to €197 and nobody swept the surfaces afterwards. Measured
-> today, the pv-string-sizer README still reads *"€99 lifetime founding, then
+> today, the pv-string-sizer README still read *"€99 lifetime founding, then
 > €997 once"* — two prices, neither of them the one a buyer is charged. It is a
-> public repo README, so this is live and readable by anyone comparing. Fixing
-> it is blocked on the pricing decision below, not on the edit.
+> public repo README, so that was live and readable by anyone comparing.
+>
+> **Fixed the same day**, once the price was confirmed:
+> `bongartzdiaz/pv-string-sizer` PR #3, merged. Both mentions now read €197.
+> Only the twice-verified figure went in; the €99 seat-tier label stayed out
+> because what that Payment Link charges is still unverified.
 
 The risk this was meant to close never closed: four surfaces carry prices and
 nothing enforces that they agree. It has now failed twice. When the number next
@@ -177,22 +181,28 @@ live one. The live function even carries the decision in its own comments —
 and *"deze functie verkoopt alleen de €197-tier (unit_amount 19700, tier
 'pro'). €99 en €247 lopen via Payment Links."*
 
-**This makes the decision itself open again, not settled.** Juan agreed to drop
-€197 on the stated grounds that it existed only in stale notes. It does not —
-it is the only price the checkout charges. The decision was taken on a false
-premise, so it needs retaking against the real ladder:
+This reopened the decision, because the original one was taken on a false
+premise: Juan agreed to drop €197 on the stated grounds that it existed only in
+stale notes. It does not — it is the only price the checkout charges.
 
-- [ ] Is the live four-tier ladder (€99 / €197 / €247 / €500, by seat count)
-      the intended product, or drift?
-- [ ] Does €997 still exist as a post-beta price, or is it dead? It is on no
-      surface today.
-- [ ] Three CTAs reading "€197" route to `/beta`, whose checkout charges €197 —
-      those agree. But the €99, €247 and €500 Payment Link amounts were **not
-      verified**; Stripe renders them client-side. Confirm in the dashboard that
-      each link charges what its button says.
+**Retaken and confirmed 2026-08-12 by Juan: the price is right as it stands.**
 
-Until that is answered, quote **€197** for the standard licence, because that
-is what a buyer is actually charged. Do not quote €997.
+- [x] The live four-tier ladder (€99 / €197 / €247 / €500, by seat count) is
+      the intended product, not drift.
+- [x] **€197 is the standard licence price.** Verified twice against
+      `vbozelswveaxsyccvaac` and confirmed by Juan. Quote this.
+- [ ] **€997 has no live surface and no stated future role.** Nothing was said
+      about reviving it, so treat it as dead until someone says otherwise — but
+      this is inference, not instruction. Do not quote it.
+- [ ] **The €99, €247 and €500 Payment Link amounts are still unverified.**
+      Stripe renders the amount client-side, so the served page cannot be read
+      — 540 kB of JS with no figure and no occurrence of "Diaz". Only the
+      dashboard settles it. Until then, the button labels are labels, not
+      confirmed prices.
+
+The second box is a measurement no one has taken, not a decision anyone is
+waiting on. It stays open because "the price is good" confirms the ladder, not
+that every link bills correctly.
 
 **And the rule this earns.** A price is verified when it is read from the thing
 that takes the money — the live edge function, the live DB row, or the Stripe
