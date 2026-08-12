@@ -13,11 +13,26 @@
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
 /**
- * Founder portrait. Used as `Person.image` in JSON-LD across about,
- * insights, signals, layout. Falls back to the 512px PWA icon (raster-
- * compatible) until a real portrait is dropped at `/public/me/portrait.jpg`.
+ * Founder portrait. Used as `Person.image` / `Organization.image` in JSON-LD
+ * across about, insights, signals, layout, article schema.
+ *
+ * WIJST NIET MEER NAAR portrait.jpg — 2026-08-12
+ *
+ * `/me/portrait.jpg` bestaat niet: gemeten op productie gaf hij 404. Daardoor
+ * verwees de JSON-LD op elke pagina naar een kapotte afbeelding (7 plekken:
+ * Organization.image overal + Person.image op /about), en Google diskwalificeert
+ * een entiteit met een niet-crawlbare `image` voor rich results en het
+ * kennispaneel. Zelfde 404 zat op /about's og:image.
+ *
+ * Tot er een echt portret staat wijzen we naar `/opengraph-image` — de
+ * gegenereerde 1200×630 PNG die wél 200 geeft (zie OG_IMAGES). Een branded
+ * raster-afbeelding, universeel geaccepteerd door zowel JSON-LD als OG.
+ *
+ * Zodra er een echte foto op `/public/me/portrait.jpg` staat: zet deze twee
+ * regels terug op `/me/portrait.jpg` en alles pakt de foto op zonder verdere
+ * wijziging.
  */
-export const AUTHOR_IMAGE_URL = `${SITE}/me/portrait.jpg`;
+export const AUTHOR_IMAGE_URL = `${SITE}/opengraph-image`;
 
 /**
  * Same as AUTHOR_IMAGE_URL but path-relative — for use in Next.js
@@ -25,7 +40,7 @@ export const AUTHOR_IMAGE_URL = `${SITE}/me/portrait.jpg`;
  * request origin. Using a path keeps preview deploys + multi-domain
  * setups working without env-var gymnastics.
  */
-export const AUTHOR_IMAGE_PATH = "/me/portrait.jpg";
+export const AUTHOR_IMAGE_PATH = "/opengraph-image";
 
 /**
  * Fallback used when the canonical asset hasn't shipped yet. The 512px
