@@ -309,6 +309,15 @@ describe('proxy: CSP laat de analytics-host toe', () => {
     expect(richtlijn(strikt, 'connect-src')).toContain('https://plausible.io')
   })
 
+  // upgrade-insecure-requests hoort ALLEEN in de afdwingende CSP. In een
+  // report-only-policy negeert de browser hem en logt een console-waarschuwing,
+  // wat op elke pagina een Lighthouse best-practices-punt kostte (2026-08-12).
+  it('report-only bevat GEEN upgrade-insecure-requests; afdwingend wél', async () => {
+    const res = await middleware(makeReq('https://juandiazllc.com/en'))
+    expect(cspVan(res, false)).toMatch(/upgrade-insecure-requests/)
+    expect(cspVan(res, true)).not.toMatch(/upgrade-insecure-requests/)
+  })
+
   it('de rest van de policy blijft dicht', async () => {
     const csp = cspVan(await middleware(makeReq('https://juandiazllc.com/en')))
     expect(richtlijn(csp, 'default-src')).toBe("default-src 'self'")

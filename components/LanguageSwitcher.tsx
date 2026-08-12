@@ -23,7 +23,10 @@ export function LanguageSwitcher() {
     <div ref={ref} style={{ position: "relative", display: "inline-flex" }}>
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label={t("lang.switch")}
+        // De zichtbare tekst is de taalcode ("EN"); die MOET in de toegankelijke
+        // naam zitten (WCAG 2.5.3 Label in Name), anders werkt spraakbediening
+        // "klik EN" niet en zakt Lighthouse a11y op label-content-name-mismatch.
+        aria-label={`${LOCALE_LABELS[locale]} — ${t("lang.switch")}`}
         aria-expanded={open}
         style={{
           fontFamily: "'JetBrains Mono'",

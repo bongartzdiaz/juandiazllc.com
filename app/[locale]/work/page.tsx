@@ -93,9 +93,12 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
                   </div>
                 </div>
 
-                <h3 style={{ fontSize: 30, fontWeight: 500, letterSpacing: "-.02em", lineHeight: 1.05, marginBottom: 14 }}>
+                {/* h2, niet h3: dit is de eerste sectie onder de page-h1. Een
+                    sprong h1→h3 zakt Lighthouse a11y op heading-order (WCAG 1.3.1).
+                    De grootte is puur styling en verandert niet. */}
+                <h2 style={{ fontSize: 30, fontWeight: 500, letterSpacing: "-.02em", lineHeight: 1.05, marginBottom: 14 }}>
                   {v.name} <span style={{ color: "var(--muted-soft)", fontWeight: 300, fontSize: 20 }}>· {v.tagline}</span>
-                </h3>
+                </h2>
 
                 <p style={{ color: "var(--muted)", fontSize: 15, lineHeight: 1.6 }}>
                   {v.summary}
