@@ -79,8 +79,8 @@ jobs:
             ${{ env.PROD_URL }}/en/about
             ${{ env.PROD_URL }}/en/contact
           configPath: ./.lighthouserc.json
-          # uploadArtifacts stond hier op true en heeft sinds 25 april 241
-          # artefacten van ~2,8 MB weggeschreven: 668 MB, waarvan niets was
+          # uploadArtifacts stond hier op true en heeft sinds 25 april 94
+          # artefacten van ~7,1 MB weggeschreven: 668 MB, waarvan niets was
           # verlopen. Dat is verreweg de grootste opslagpost van dit account —
           # de twee privérepo's samen dragen nog geen megabyte — en
           # opslagoverschrijding zet Actions op privérepo's stil terwijl een
