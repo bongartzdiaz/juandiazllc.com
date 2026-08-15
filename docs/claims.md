@@ -315,16 +315,81 @@ Diaz Editor figure and this page sells DEUS, so publishing it here would invent
 a price for the wrong product. And this file already rules on it: €997 has no
 live surface and no stated future role, do not quote it. Not done, on purpose.
 
-### Open, not decided
+### Measured against DEUS-SHARED — 2026-08-15
 
-- The feature table promises **SSO, IP allowlist, 99.5% / 99.95% uptime SLA,
-  dedicated server, white-label, custom domain**. Those are product promises
-  for a product with no paying customer. Rule 3 forbids implying traction; it
-  says nothing about promising features. Check each row against DEUS-SHARED
-  before a real prospect reads it.
-- The migration offer promises **five business days, two training sessions, 30
-  days priority support**. No migration has ever been delivered. That is an
-  offer rather than a track record, but it is still a commitment.
+Method: `git grep` against the fetched `origin/main` of `bongartzdiaz/DEUS-SHARED`
+(`59e4c71`, pushed 2026-08-13). The local clone at `C:/business/DEUS-SHARED` was
+**331 commits behind**; measuring against a checkout that stale would have
+measured code nobody runs. Nothing in that working tree was touched — `git grep
+<tree>` reads the commit directly.
+
+**The page and the code publish two different price lists.**
+
+| | `/pricing` (marketing) | `lib/philly/billing/plans.ts` (checkout path) |
+| --- | --- | --- |
+| Tiers | Starter, Professional, Business, Enterprise (4) | operator, team, business (3) |
+| Model | per seat, per month | flat per month, per org |
+| Prices | €40 / €69 / €99 / on quote | €49 / €199 / €599 |
+| Seats | **minimum** 3 / 5 / 10 / 15 | **maximum** 3 / 10 / unlimited |
+| Contacts | 5 000 / 50 000 / unlimited / unlimited | 2 000 / 25 000 / unlimited |
+
+`plans.ts` is not a draft: `app/api/billing/checkout/route.ts` reads it through
+`stripePriceIdForPlan()` to build the Stripe Checkout session. By this file's own
+standard it sits closer to the till than the marketing page does. Neither list is
+*verified* — no payment has ever been taken for DEUS — but they cannot both be
+quoted, and today the page quotes the one further from the money.
+
+**The seat number means the opposite thing on each side.** Marketing sells a
+floor: Starter bills at least three seats. The code enforces a ceiling:
+`app/api/users/route.ts` returns 403 `Seat limit reached` on the 4th user of an
+`operator` plan. A Starter customer with four colleagues reads "minimum 3" as an
+invitation to add the fourth and gets refused by the product.
+
+**Enterprise has no counterpart in code.** `PlanSlug` is
+`'operator' | 'team' | 'business'`. Every row sold only under Enterprise —
+white-label, custom domain, dedicated server, country-of-choice residency, custom
+DPA, custom integrations, phone support, 99.95% SLA — maps to nothing.
+
+**Seven of the fourteen `PlanFeature` values are declared and never read.**
+`ip_allowlist`, `scim_groups`, `api_access`, `advanced_filter`,
+`session_idle_timeout`, `signed_dpa`, `dedicated_cs` appear in `PLANS` and in no
+other non-test file. `PLAN_FEATURE_MAP` only wires seven `FEATURES` keys, and
+`hasPlanFeature()` is called from exactly one route. The plan-map's own comment
+says "the SCIM group endpoints have their own `hasPlanFeature` gate" — those
+endpoints exist and gate on `scimGate` (token auth) plus a rate limit, not on
+plan tier.
+
+**Row-by-row, for the promises flagged when this section was opened:**
+
+| Promise on `/pricing` | In DEUS-SHARED `origin/main` |
+| --- | --- |
+| SSO (SAML 2.0) | **No implementation.** No SAML/OIDC package in `package.json` — auth deps are `bcryptjs` alone. What exists is SCIM 2.0 user provisioning, which is not sign-in. One comment in the SCIM users route says "SAML/OIDC is the auth path", describing a path that is not in this repo. |
+| IP allowlist | Declared as a `PlanFeature` on `business`, consulted nowhere. |
+| Uptime SLA 99.5% / 99.95% | Not a code claim; no monitoring or credit mechanism found. Unbacked commitment. |
+| Dedicated server | Nothing in `deploy/` or `docker/` distinguishes a per-org deployment. |
+| White-label (no DEUS branding) | Only match for "white label" is a CSS comment in `Button.tsx` about ink on an accent fill. Unrelated. |
+| Custom domain | Zero matches for `customDomain` / `custom_domain`. |
+| AI deal summaries, AI task suggestions | Zero matches. `FEATURES` has enrichment, web enrichment, lead discovery, deal scoring — not these two. |
+| Audit-log retention 30 days / 1 year / unlimited | One global window: `AUDIT_RETENTION_DAYS`, default 365. Not per tier. |
+| Storage 5 / 50 / 500 GB · API requests 10k / 100k per month | No quota code of any kind. `PlanLimits` carries two numbers only: `maxUsers`, `maxContacts` — and `maxContacts` is never checked either. |
+| Custom SMTP (send via your domain) | **Backed.** `app/api/email/accounts/route.ts` stores per-org host/port with the password encrypted at rest. |
+| Outbound webhooks · REST API access | **Backed and gated.** `WEBHOOKS` resolves through the plan map to the `webhooks` PlanFeature on team and above. |
+
+**One stale pointer, worth fixing wherever it is decided.** The `plans.ts` header
+calls itself the single source of truth "matching `pricing.tier.<slug>.*` in
+`/lib/i18n/dict.ts` on the marketing side". That namespace does not exist: the
+marketing keys are `pricing.cta.{starter,pro,business,enterprise}` and
+`pricing.feat.*`. The file that claims to be canonical points at a naming scheme
+the other side never used.
+
+**Not concluded here.** This does not say the page is wrong and the code right.
+It says the two disagree on tier count, price model, price, seat direction and
+contact caps, and that most of the differentiating rows are enforced by nothing.
+Which list becomes true is a product decision.
+
+- Still open: the migration offer promises **five business days, two training
+  sessions, 30 days priority support**. No migration has ever been delivered.
+  That is an offer rather than a track record, but it is still a commitment.
 
 ## The IFC claim — how a feature that never existed reached 1,643 places
 
