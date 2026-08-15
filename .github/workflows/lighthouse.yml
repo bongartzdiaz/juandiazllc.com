@@ -79,5 +79,16 @@ jobs:
             ${{ env.PROD_URL }}/en/about
             ${{ env.PROD_URL }}/en/contact
           configPath: ./.lighthouserc.json
-          uploadArtifacts: true
+          # uploadArtifacts stond hier op true en heeft sinds 25 april 241
+          # artefacten van ~2,8 MB weggeschreven: 668 MB, waarvan niets was
+          # verlopen. Dat is verreweg de grootste opslagpost van dit account —
+          # de twee privérepo's samen dragen nog geen megabyte — en
+          # opslagoverschrijding zet Actions op privérepo's stil terwijl een
+          # publieke repo blijft draaien. Precies het patroon dat hier sinds
+          # 9 augustus zichtbaar is.
+          #
+          # De rapporten zelf gaan niet verloren: temporaryPublicStorage zet
+          # elke run op een publieke URL die in de joblog staat. Die was er al,
+          # dus de artefacten waren een tweede kopie die niemand las.
+          uploadArtifacts: false
           temporaryPublicStorage: true
