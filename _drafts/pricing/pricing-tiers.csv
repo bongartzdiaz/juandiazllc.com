@@ -5,17 +5,18 @@ Pricing,Minimum seats,3,5,10,15
 Pricing,Free trial (no credit card),14 days,14 days,14 days,Custom
 Core CRM,Contacts,✓,✓,✓,✓
 Core CRM,Deals and pipelines,✓,✓,✓,✓
-Core CRM,Tasks and reminders,✓,✓,✓,✓
+Core CRM,Kanban boards with due dates,✓,✓,✓,✓
 Core CRM,Notes and file attachments,✓,✓,✓,✓
 Core CRM,Bulk operations,,✓,✓,✓
 Core CRM,Saved views and filters,✓,✓,✓,✓
-Calendar,Google Calendar sync,✓,✓,✓,✓
-Calendar,Microsoft 365 Calendar sync,✓,✓,✓,✓
+Calendar,Calendar and events,✓,✓,✓,✓
+Email,Email templates,✓,✓,✓,✓
 Email,Custom SMTP (send via your domain),,✓,✓,✓
 AI,AI lead scoring,,✓,✓,✓
 AI,AI contact attributes (auto-fill),,✓,✓,✓
 Security,Two-factor authentication,✓,✓,✓,✓
 Security,Role-based access control,✓,✓,✓,✓
+Security,IP allowlist,✓,✓,✓,✓
 Security,Audit log retention,1 year,1 year,1 year,1 year
 Compliance,GDPR-compliant by default,✓,✓,✓,✓
 Compliance,EU-only data residency,✓,✓,✓,✓

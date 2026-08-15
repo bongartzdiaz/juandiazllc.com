@@ -66,7 +66,7 @@ const FEATURE_TABLE: FeatureSection[] = [
     rows: [
       { labelKey: "pricing.feat.core.contacts", starter: true, pro: true, business: true, enterprise: true },
       { labelKey: "pricing.feat.core.dealsAndPipelines", starter: true, pro: true, business: true, enterprise: true },
-      { labelKey: "pricing.feat.core.tasksAndReminders", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.core.kanbanBoardsWithDueDates", starter: true, pro: true, business: true, enterprise: true },
       { labelKey: "pricing.feat.core.notesAndFileAttachments", starter: true, pro: true, business: true, enterprise: true },
       { labelKey: "pricing.feat.core.bulkOperations", starter: false, pro: true, business: true, enterprise: true },
       { labelKey: "pricing.feat.core.savedViewsAndFilters", starter: true, pro: true, business: true, enterprise: true },
@@ -75,13 +75,13 @@ const FEATURE_TABLE: FeatureSection[] = [
   {
     titleKey: "pricing.sec.calendar",
     rows: [
-      { labelKey: "pricing.feat.calendar.googleCalendarSync", starter: true, pro: true, business: true, enterprise: true },
-      { labelKey: "pricing.feat.calendar.microsoft365CalendarSync", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.calendar.calendarAndEvents", starter: true, pro: true, business: true, enterprise: true },
     ],
   },
   {
     titleKey: "pricing.sec.email",
     rows: [
+      { labelKey: "pricing.feat.email.emailTemplates", starter: true, pro: true, business: true, enterprise: true },
       { labelKey: "pricing.feat.email.customSmtp", starter: false, pro: true, business: true, enterprise: true },
     ],
   },
@@ -97,6 +97,7 @@ const FEATURE_TABLE: FeatureSection[] = [
     rows: [
       { labelKey: "pricing.feat.security.twoFactorAuthentication", starter: true, pro: true, business: true, enterprise: true },
       { labelKey: "pricing.feat.security.roleBasedAccessControl", starter: true, pro: true, business: true, enterprise: true },
+      { labelKey: "pricing.feat.security.ipAllowlist", starter: true, pro: true, business: true, enterprise: true },
       { labelKey: "pricing.feat.security.auditLogRetention", starter: "1 year", pro: "1 year", business: "1 year", enterprise: "1 year" },
     ],
   },
