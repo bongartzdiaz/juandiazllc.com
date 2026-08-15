@@ -829,3 +829,8 @@ oorzaken zonder te zeggen welke het is.
       handmatige uitrol en CI-uitrol mogen niet uit elkaar lopen.
 - [ ] `Cert Expiry Watch` één keer met de hand aftrappen: vijf dagen zonder
       bewaking betekent dat een aflopend certificaat gemist kan zijn.
+- [ ] **`live-smoke` apart natrekken.** Die workflow is op 2026-08-12 toegevoegd,
+      twee dagen ná het begin van de blokkade: 55 runs, **nul geslaagd**. Hij
+      heeft dus nooit gedraaid. Bij de andere dertien mag je aannemen dat ze het
+      weer doen zodra de betaling rond is; bij deze niet — die is nog nooit
+      getest. Trap hem met de hand af en lees de uitvoer.
