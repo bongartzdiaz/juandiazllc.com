@@ -400,6 +400,11 @@ Juan's call, on the measurement above:
    (`monthlyPrice: null`, `mailto:`), so it needs no `PlanSlug`.
 3. **Unenforced rows come off the page until they are built.**
 
+> ⚠️ **Four of the calls below were wrong and were corrected the same day —
+> see "The sweep measured names, not capabilities" further down.** Email
+> templates and the IP allowlist exist and came back; the two calendar-sync rows
+> do not exist and came off.
+
 **Removed from `_drafts/pricing/pricing-tiers.csv` — 18 of 51 rows**, each one
 measured absent in `origin/main`: custom fields · real-time push sync · meeting
 links · email templates · AI deal summaries · AI task suggestions · IP allowlist
@@ -434,6 +439,54 @@ DEUS pricing artifacts carry one commit date (2026-06-05, `d597816`, a bulk
 sync), so that date records when they were copied in, not when each was written.
 **Not reconciled.** The page's numbers stand by the decision above; whether the
 commitment ladder and the min-1 solo tier should come across is open.
+
+### The sweep measured names, not capabilities — corrected 2026-08-15
+
+The sweep above searched for the identifier each feature *ought* to be called.
+Four of those guesses were wrong, three of them shipped, and they were corrected
+the same afternoon. Recorded because the failure mode is reusable, not because
+the rows matter much on their own.
+
+| Row | First call | Actual | Why the first pass missed it |
+| --- | --- | --- | --- |
+| IP allowlist | removed | **exists and is enforced** — `Organization.ipAllowlist` (CIDR list), checked inside `requireScope` at `lib/philly/auth-helpers.ts:286` via `lib/philly/ip-allowlist.ts`, with an admin API and a settings page | The grep was for the `PlanFeature` string `'ip_allowlist'`. That string really is read nowhere — but that means the *plan gate* is missing, not the feature. Absence of a gate was mistaken for absence of a capability. |
+| Email templates | removed | **exists** — `model Template` plus `/api/templates`, `/api/templates/[id]`, `/api/templates/preview` | Searched for `EmailTemplate`. The model is called `Template`. |
+| Google Calendar sync | kept | **does not exist** — no call to any provider calendar API anywhere in the repo; `CalendarEvent` has no external-id or provider field; there is an `email-sync` cron and no calendar equivalent | The Google connector requests `auth/calendar` scope, and the scope was read as the feature. A requested permission is not an implementation. |
+| Microsoft 365 Calendar sync | kept | **does not exist** — same; `Calendars.ReadWrite` is requested and never used | Same. |
+
+Also reworded: "Tasks and reminders" → **Kanban boards with due dates**. There is
+no `Task` model and no tasks endpoint; what exists is `KanbanCard` with `title`,
+`dueDate` and `assigneeId`, plus `/api/kanban` and a user-doc page. The two
+calendar rows were replaced by one honest row, **Calendar and events**, for the
+in-app calendar that does exist (`model CalendarEvent`, `/api/calendar`).
+
+**The method that would have caught all four:** start from the artifacts the
+product maintains about itself — the Prisma models, the route tree under
+`app/api/**/route.ts`, and `docs/user/en/features/*.md` — and ask which pricing
+row each one supports. Searching outward from a guessed identifier tests your
+vocabulary; searching outward from the schema tests the product.
+
+### What the page still does not mention
+
+Counted while correcting the above: **201 API routes** in `origin/main` and
+**34 user-doc pages**, against 34 rows on the pricing page — and the overlap is
+thin. Absent from the page entirely: SCIM 2.0 provisioning (Users, Groups,
+ServiceProviderConfig, ResourceTypes), a **tamper-evident audit log** with a
+hash chain and a verification endpoint that returns 409 when the chain breaks
+(`/api/admin/audit/verify`, `lib/philly/audit-verify.ts`), **ROPA export** for a
+regulator (`/api/admin/gdpr/ropa`, GDPR Art. 30), admin-initiated erasure and
+data-subject export, per-org **session idle timeout** and forced logout
+(`tokensInvalidAfter`), API keys with rotation, webhook delivery retry,
+automations, drip campaigns, lead routing and scoring, an AI command bar and
+assistant, e-signatures, SMS, dialer, kanban, pipelines, reports, a client
+portal — and three vertical modules the page never hints at: **real estate**
+(properties, valuations, MLS feeds, showings, open houses, offers, transactions,
+commissions, CMA), **hospitality** (reservations, rooms, housekeeping) and
+**philanthropy** (grants, volunteers, donor scores, impact).
+
+This is the answer to "Business does not earn its price step". It does not need
+features built or a price cut first — the page describes a fraction of the
+product. Which of these become pricing rows, and at which tier, is not decided.
 
 - Still open: the migration offer promises **five business days, two training
   sessions, 30 days priority support**. No migration has ever been delivered.

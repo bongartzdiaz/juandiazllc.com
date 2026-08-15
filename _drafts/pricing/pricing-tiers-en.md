@@ -28,7 +28,7 @@ the price you sign up at is the price you pay until you change tiers.
 |---|---|---|---|---|
 | Contacts | ✓ | ✓ | ✓ | ✓ |
 | Deals and pipelines | ✓ | ✓ | ✓ | ✓ |
-| Tasks and reminders | ✓ | ✓ | ✓ | ✓ |
+| Kanban boards with due dates | ✓ | ✓ | ✓ | ✓ |
 | Notes and file attachments | ✓ | ✓ | ✓ | ✓ |
 | Bulk operations |  | ✓ | ✓ | ✓ |
 | Saved views and filters | ✓ | ✓ | ✓ | ✓ |
@@ -37,13 +37,13 @@ the price you sign up at is the price you pay until you change tiers.
 
 | | Starter | Professional | Business | Enterprise |
 |---|---|---|---|---|
-| Google Calendar sync | ✓ | ✓ | ✓ | ✓ |
-| Microsoft 365 Calendar sync | ✓ | ✓ | ✓ | ✓ |
+| Calendar and events | ✓ | ✓ | ✓ | ✓ |
 
 ### Email
 
 | | Starter | Professional | Business | Enterprise |
 |---|---|---|---|---|
+| Email templates | ✓ | ✓ | ✓ | ✓ |
 | Custom SMTP (send via your domain) |  | ✓ | ✓ | ✓ |
 
 ### AI
@@ -59,6 +59,7 @@ the price you sign up at is the price you pay until you change tiers.
 |---|---|---|---|---|
 | Two-factor authentication | ✓ | ✓ | ✓ | ✓ |
 | Role-based access control | ✓ | ✓ | ✓ | ✓ |
+| IP allowlist | ✓ | ✓ | ✓ | ✓ |
 | Audit log retention | 1 year | 1 year | 1 year | 1 year |
 
 ### Compliance
