@@ -382,14 +382,68 @@ marketing keys are `pricing.cta.{starter,pro,business,enterprise}` and
 `pricing.feat.*`. The file that claims to be canonical points at a naming scheme
 the other side never used.
 
-**Not concluded here.** This does not say the page is wrong and the code right.
-It says the two disagree on tier count, price model, price, seat direction and
-contact caps, and that most of the differentiating rows are enforced by nothing.
-Which list becomes true is a product decision.
+**Not concluded above.** The measurement does not say the page is wrong and the
+code right. It says the two disagree on tier count, price model, price, seat
+direction and contact caps, and that most of the differentiating rows are
+enforced by nothing.
+
+### Decided 2026-08-15 — per seat, and the page only claims what exists
+
+Juan's call, on the measurement above:
+
+1. **Per seat wins.** €40 / €69 / €99 per seat per month stands. DEUS-SHARED
+   follows: rename the slugs, tie Stripe `quantity` to the seat count, turn
+   `maxUsers` from a ceiling into a floor. Reason: the whole comparative
+   argument on the page is per seat — including the corrected HubSpot figure —
+   and flat billing would make that argument incoherent.
+2. **Enterprise stays, minus what does not exist.** It never reaches checkout
+   (`monthlyPrice: null`, `mailto:`), so it needs no `PlanSlug`.
+3. **Unenforced rows come off the page until they are built.**
+
+**Removed from `_drafts/pricing/pricing-tiers.csv` — 18 of 51 rows**, each one
+measured absent in `origin/main`: custom fields · real-time push sync · meeting
+links · email templates · AI deal summaries · AI task suggestions · IP allowlist
+· SSO (SAML 2.0) · country-of-choice residency · custom colours and theme ·
+white-label · custom domain · uptime SLA · contacts cap · deals cap · storage ·
+API requests per month · dedicated server. Two rows corrected rather than
+dropped: audit-log retention is one global window (`AUDIT_RETENTION_DAYS`,
+default 365), so it reads `1 year` on every tier; saved views exist without a
+per-tier cap, so it reads ✓ on every tier. 76 orphaned `pricing.feat.*` /
+`pricing.sec.*` keys removed across four locales. Three of four tier taglines
+advertised removed features and were rewritten. FAQ 5 promised "a notification
+at 80% of any limit" — no such notification and no such limits; rewritten to
+say the bill follows the seat count and nothing else.
+
+**The consequence, stated plainly.** With the unbuilt rows gone, **Business
+differs from Professional by one thing: a private Slack channel** — €99 against
+€69 per seat. The ladder was carried by features that do not exist. Closing that
+gap means building them (SSO and IP allowlist are the obvious two) or repricing.
+Not decided here.
+
+### A third price list, found while measuring
+
+`docs/pricing/pricing-tiers-en.csv` in DEUS-SHARED is a fourth artifact nobody
+named. It is **per seat** — which independently supports the decision above —
+but with its own numbers: Operator €40 (min 1) · Team €70 (min 3) · Business
+€110 (min 10) · Enterprise (min 25), across four commitment terms (monthly,
+quarterly −10%, semi-annual −18%, annual −30%) with Stripe price IDs already
+named (`price_team_annual` and so on). A companion `seat-calculator-en.csv`
+works the scenarios. Its ICP is explicitly real estate — "solo agent",
+"brokerage", "MLS subscription" — where the marketing page is generic. All four
+DEUS pricing artifacts carry one commit date (2026-06-05, `d597816`, a bulk
+sync), so that date records when they were copied in, not when each was written.
+**Not reconciled.** The page's numbers stand by the decision above; whether the
+commitment ladder and the min-1 solo tier should come across is open.
 
 - Still open: the migration offer promises **five business days, two training
   sessions, 30 days priority support**. No migration has ever been delivered.
   That is an offer rather than a track record, but it is still a commitment.
+- Still open: FAQ 6 says data sits with "Supabase (database and authentication),
+  Vercel (application hosting)". DEUS-SHARED carries both a self-hosted
+  `deploy/Caddyfile` and a `vercel.json`, and still imports Supabase in
+  `lib/onboarding/create-org.ts`. Where DEUS actually runs cannot be settled
+  from the repo, and this is a compliance claim, so it was left untouched rather
+  than guessed at. Same for "EU-only data residency".
 
 ## The IFC claim — how a feature that never existed reached 1,643 places
 

@@ -30,9 +30,8 @@ the price you sign up at is the price you pay until you change tiers.
 | Deals and pipelines | ✓ | ✓ | ✓ | ✓ |
 | Tasks and reminders | ✓ | ✓ | ✓ | ✓ |
 | Notes and file attachments | ✓ | ✓ | ✓ | ✓ |
-| Custom fields | 10 per entity | 50 per entity | Unlimited | Unlimited |
 | Bulk operations |  | ✓ | ✓ | ✓ |
-| Saved views and filters | 5 | Unlimited | Unlimited | Unlimited |
+| Saved views and filters | ✓ | ✓ | ✓ | ✓ |
 
 ### Calendar
 
@@ -40,14 +39,11 @@ the price you sign up at is the price you pay until you change tiers.
 |---|---|---|---|---|
 | Google Calendar sync | ✓ | ✓ | ✓ | ✓ |
 | Microsoft 365 Calendar sync | ✓ | ✓ | ✓ | ✓ |
-| Real-time push sync |  | ✓ | ✓ | ✓ |
-| Meeting links on contact pages | ✓ | ✓ | ✓ | ✓ |
 
 ### Email
 
 | | Starter | Professional | Business | Enterprise |
 |---|---|---|---|---|
-| Email templates | 5 | 50 | Unlimited | Unlimited |
 | Custom SMTP (send via your domain) |  | ✓ | ✓ | ✓ |
 
 ### AI
@@ -56,8 +52,6 @@ the price you sign up at is the price you pay until you change tiers.
 |---|---|---|---|---|
 | AI lead scoring |  | ✓ | ✓ | ✓ |
 | AI contact attributes (auto-fill) |  | ✓ | ✓ | ✓ |
-| AI deal summaries |  |  | ✓ | ✓ |
-| AI task suggestions |  |  | ✓ | ✓ |
 
 ### Security
 
@@ -65,9 +59,7 @@ the price you sign up at is the price you pay until you change tiers.
 |---|---|---|---|---|
 | Two-factor authentication | ✓ | ✓ | ✓ | ✓ |
 | Role-based access control | ✓ | ✓ | ✓ | ✓ |
-| Audit log retention | 30 days | 1 year | Unlimited | Unlimited |
-| IP allowlist |  |  | ✓ | ✓ |
-| SSO (SAML 2.0) |  |  | ✓ | ✓ |
+| Audit log retention | 1 year | 1 year | 1 year | 1 year |
 
 ### Compliance
 
@@ -77,7 +69,6 @@ the price you sign up at is the price you pay until you change tiers.
 | EU-only data residency | ✓ | ✓ | ✓ | ✓ |
 | DPA available on signup | ✓ | ✓ | ✓ | ✓ |
 | DSAR export (JSON) | ✓ | ✓ | ✓ | ✓ |
-| Country-of-choice data residency |  |  |  | ✓ |
 | Custom DPA negotiation |  |  |  | ✓ |
 
 ### Branding
@@ -85,9 +76,6 @@ the price you sign up at is the price you pay until you change tiers.
 | | Starter | Professional | Business | Enterprise |
 |---|---|---|---|---|
 | Custom logo |  | ✓ | ✓ | ✓ |
-| Custom colours and theme |  |  | ✓ | ✓ |
-| White-label (no DEUS branding) |  |  |  | ✓ |
-| Custom domain |  |  |  | ✓ |
 
 ### Integrations
 
@@ -106,23 +94,12 @@ the price you sign up at is the price you pay until you change tiers.
 | Priority email (4 hour business hours) |  | ✓ | ✓ |  |
 | Private Slack channel |  |  | ✓ | ✓ |
 | Phone support |  |  |  | ✓ |
-| Uptime SLA |  |  | 99.5% | 99.95% |
-
-### Limits
-
-| | Starter | Professional | Business | Enterprise |
-|---|---|---|---|---|
-| Contacts | 5,000 | 50,000 | Unlimited | Unlimited |
-| Deals | 1,000 | 25,000 | Unlimited | Unlimited |
-| Storage | 5 GB | 50 GB | 500 GB | Custom |
-| API requests per month |  | 10,000 | 100,000 | Custom |
 
 ### Infrastructure
 
 | | Starter | Professional | Business | Enterprise |
 |---|---|---|---|---|
-| Shared multi-tenant (Hetzner Falkenstein) | ✓ | ✓ | ✓ |  |
-| Dedicated server |  |  |  | ✓ |
+| Shared multi-tenant (Hetzner Falkenstein) | ✓ | ✓ | ✓ | ✓ |
 <!-- END GENERATED:FEATURE_TABLES -->
 
 ---
