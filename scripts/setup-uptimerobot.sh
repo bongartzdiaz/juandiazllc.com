@@ -16,13 +16,20 @@ set -euo pipefail
 API="https://api.uptimerobot.com/v2/newMonitor"
 KEY="${UPTIMEROBOT_API_KEY:?Set UPTIMEROBOT_API_KEY to your read-write API key}"
 
-# type=1 = HTTP(s)   interval=300 = 5 minutes   http_method=1 = HEAD (faster)
+# type=1 = HTTP(s)   type=2 = keyword   interval=300 = 5 minutes
+#
+# The keyword branch used to send `type` twice (1 and 2) and used
+# keyword_type=1 ("exists" = alert when the word IS present), which is the
+# opposite of what a content check wants. No caller passed a keyword, so it
+# was never exercised. Rewritten below: keyword_type=2 means "not exists",
+# i.e. alert when the expected string disappears from the response.
 create() {
   local name="$1" url="$2" keyword="${3:-}"
-  local extra=""
+  local -a extra=()
   if [[ -n "$keyword" ]]; then
-    # type=2 = keyword monitor — confirms page returns expected content
-    extra="&type=2&keyword_type=1&keyword_value=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$keyword")"
+    extra=(--data "type=2" --data "keyword_type=2" --data-urlencode "keyword_value=$keyword")
+  else
+    extra=(--data "type=1")
   fi
 
   echo -n "Creating [$name] ... "
@@ -31,11 +38,10 @@ create() {
     -H "Cache-Control: no-cache" \
     --data-urlencode "api_key=$KEY" \
     --data "format=json" \
-    --data "type=1" \
     --data "interval=300" \
     --data-urlencode "friendly_name=$name" \
     --data-urlencode "url=$url" \
-    ${extra:+--data-raw "$extra"})
+    "${extra[@]}")
 
   stat=$(echo "$response" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('stat','?'))" 2>/dev/null || echo "parse_error")
   if [[ "$stat" == "ok" ]]; then
@@ -62,6 +68,36 @@ create "juandiazllc — DE insights article" \
 # Energy ROI tool (high-value conversion page per sectors/energy CTA)
 create "juandiazllc — energy ROI tool (/en)" \
   "https://juandiazllc.com/en/tools/energy-roi"
+
+# ── The lead path ───────────────────────────────────────────────────────────
+# Every monitor above fetches a static page. Those keep returning 200 while
+# the contact form silently loses every lead — which is exactly what happened
+# on 2026-08-12: PostgREST served 503 PGRST002 project-wide for hours and
+# nothing noticed. This monitor watches the layer the pages can't see.
+#
+# It requests a table that deliberately does not exist. While PostgREST is
+# healthy that is a stable 404 PGRST205, regardless of what the real schema
+# looks like. When the schema cache breaks the body becomes PGRST002 instead,
+# the keyword disappears, and UptimeRobot alerts.
+#
+# NOTE — this covers the project-wide failure only. Verifying that the
+# `marketing` schema specifically is still exposed and still refuses anon
+# SELECT needs an `Accept-Profile` header, which UptimeRobot cannot send on
+# the free plan. That check lives in scripts/check-lead-path.sh and runs from
+# .github/workflows/lead-health.yml. The two layers are complementary; neither
+# replaces the other.
+#
+# The key in the URL is the publishable/anon key. It is public by design —
+# it already ships in the browser bundle of every page on the site.
+if [[ -n "${SUPABASE_URL:-}" && -n "${SUPABASE_ANON_KEY:-}" ]]; then
+  create "juandiazllc — PostgREST alive (lead path)" \
+    "${SUPABASE_URL%/}/rest/v1/postgrest_liveness_probe?apikey=${SUPABASE_ANON_KEY}" \
+    "PGRST205"
+else
+  echo "Skipping [PostgREST alive (lead path)] — set SUPABASE_URL and"
+  echo "  SUPABASE_ANON_KEY and re-run to add it. Without this monitor the"
+  echo "  contact form can fail silently; see MANUAL_TASKS.md."
+fi
 
 echo ""
 echo "Done. View monitors at https://uptimerobot.com/dashboard"
