@@ -341,6 +341,62 @@ is single-tenant — it holds the operator's own outreach pipeline and has no
 - [ ] (at customer #2) Set `OUTREACH_OPERATOR_ORG_IDS=<operator-org-id>` in
       Vercel (production + preview).
 
+## Supabase `wbgiouuifqhasedncysw` — tien dode edge functions weghalen (2026-08-15)
+
+Gemeten 2026-08-15. Dit project draagt **dertien** edge functions. Tien ervan
+horen bij Diaz Editor en zijn de verlaten kopie uit mei; de levende versies
+draaien in `vbozelswveaxsyccvaac` en worden daar door GitHub Actions uitgerold
+vanuit `bongartzdiaz/diaz-editor`.
+
+**Weg (tien):** `diaz-affiliate-activate`, `diaz-affiliate-apply`,
+`diaz-appsumo-redeem`, `diaz-beta-checkout`, `diaz-lemon-webhook`,
+`diaz-license-issue`, `diaz-license-validate`, `diaz-release-blast`,
+`diaz-stripe-webhook`, `diaz-trial-init`.
+
+**Blijven (drie):** `lead-notify` — die stuurt de Telegram-melding bij elke
+lead. Plus `pai-vapi-webhook` en `pai-weekly-digest` voor PhilanthropyAI.
+
+**Waarom dit meer is dan opruimen.** Alle tien staan op `status: ACTIVE` met
+`verify_jwt: false`, dus ze zijn over HTTPS aan te roepen door iedereen die de
+slug raadt. Twee geven licenties uit (`diaz-license-issue`,
+`diaz-appsumo-redeem`) en drie nemen betaal-callbacks aan
+(`diaz-stripe-webhook`, `diaz-lemon-webhook`, `diaz-beta-checkout`). Ze draaien
+mei-code tegen een schema dat niet meer bestaat — `diaz_editor` is op
+2026-08-12 uit dit project gedropt — dus ze zullen eerder falen dan schade
+doen. "Faalt luid" is alleen geen beveiligingsmaatregel.
+
+Er is ook een terugkerende kostenpost. `docs/claims.md` legt vast dat een
+prijssweep in augustus €1.000 corrigeerde in twee van deze functies, in de
+kopie die niemand aanroept. Elke volgende sweep betaalt die tol opnieuw zolang
+ze er staan.
+
+**Hoe dood is dood.** Nul aanroepen van welke functie dan ook in dit project in
+de afgelopen 24 uur (`edge_logs`, het volledige venster dat de log-API geeft).
+Dat is het sterkste beschikbare bewijs, geen sluitend bewijs: 24 uur is kort,
+en `lead-notify` wordt vanuit een database-trigger via pg_net aangeroepen, wat
+mogelijk helemaal niet in het gateway-log verschijnt. Lees het als "vandaag
+heeft niets van buiten deze functies aangeroepen".
+
+**Waarom ik het niet zelf doe.** De Supabase-MCP heeft geen tool om een functie
+te verwijderen, en de lokale `supabase`-CLI is ingelogd op een ander account
+(403 op dit project). Het is een dashboard-handeling.
+
+**Doen:** Supabase-dashboard → project `wbgiouuifqhasedncysw` → Edge Functions →
+per functie → Delete. Tien keer. Geen enkele regel code in deze repo verwijst
+naar een van de tien (gecontroleerd); alleen `docs/claims.md` en
+`docs/legal/verwerkingsregister.md` noemen ze in tekst.
+
+- [ ] tien `diaz-*`-functies verwijderd uit `wbgiouuifqhasedncysw`
+
+**Los daarvan, voor als je toch in dat register kijkt.**
+`docs/legal/verwerkingsregister.md` verwijst voor deze verwerkingen naar
+`supabase/functions/…` — de broncode in de diaz-editor-repo, dus het register
+beschrijft de levende functies en blijft na het opruimen kloppen. Het noemt
+alleen **geen projectref**. Dat is precies de verwarring die dit probleem heeft
+gemaakt: twee projecten, één naam. Eén regel `vbozelswveaxsyccvaac` erbij maakt
+het register bestand tegen dezelfde fout. Niet door mij gedaan, want het is een
+juridisch document.
+
 ## Repo strategy — DEUS-SHARED is now primary for CRM (2026-05-07)
 
 Decision: future CRM (DEUS) work moves to `bongartzdiaz/DEUS-SHARED`.

@@ -84,7 +84,7 @@ Supabase projects.**
 | project | ref | what it is |
 | --- | --- | --- |
 | `diaz-editor` | `vbozelswveaxsyccvaac` | **production.** 22 tables, 25 views, 39 edge functions, 6 licences, 155 update events, 63 downloads. Functions deploy from `bongartzdiaz/diaz-editor` via GitHub Actions, so the repo is canonical. |
-| `juandiazllc` | `wbgiouuifqhasedncysw` | this site's own project. Also contains an **abandoned copy** of `diaz_editor` from May: 10 tables, 2 licences, everything else empty, functions hand-deployed and never updated since. |
+| `juandiazllc` | `wbgiouuifqhasedncysw` | this site's own project. Also carried an **abandoned copy** of `diaz_editor` from May: 10 tables, 2 licences, everything else empty, functions hand-deployed and never updated since. **The schema is gone** — dropped 2026-08-12, which took PostgREST down project-wide for hours because it was still listed in `pgrst.db_schemas`. **Ten `diaz-*` edge functions are still deployed here**, ACTIVE and unauthenticated, running May code against the schema that no longer exists. Removal is a dashboard action; see MANUAL_TASKS.md. |
 
 The installed desktop apps call the first one. That is fixed in
 `apps/editor/lib/supabase-config.ts` as `SUPABASE_PROJECT_REF`, mirrored in
