@@ -361,9 +361,57 @@ lead. Plus `pai-vapi-webhook` en `pai-weekly-digest` voor PhilanthropyAI.
 slug raadt. Twee geven licenties uit (`diaz-license-issue`,
 `diaz-appsumo-redeem`) en drie nemen betaal-callbacks aan
 (`diaz-stripe-webhook`, `diaz-lemon-webhook`, `diaz-beta-checkout`). Ze draaien
-mei-code tegen een schema dat niet meer bestaat — `diaz_editor` is op
-2026-08-12 uit dit project gedropt — dus ze zullen eerder falen dan schade
-doen. "Faalt luid" is alleen geen beveiligingsmaatregel.
+tegen schema `diaz_editor`, dat op 2026-08-12 uit dit project is gedropt — dus
+ze falen bij hun eerste databaseaanroep. "Faalt luid" is alleen geen
+beveiligingsmaatregel.
+
+> ⚠️ **Correctie 2026-08-15.** Hierboven stond eerst "ze draaien mei-code".
+> Dat klopt niet. Twee van de tien zijn op **2026-08-11** opnieuw uitgerold:
+> `diaz-trial-init` om 17:43 UTC en `diaz-affiliate-activate` om 17:57 UTC —
+> één dag vóór de schemadrop. De rest is wel van mei. Zie het blok hieronder,
+> want die twee data leiden naar iets urgenters dan dit opruimwerk.
+
+### Een uitrol van 11 augustus is in het verkeerde project geland
+
+Vergelijking van beide projecten op 2026-08-15:
+
+| functie | `wbgiouuifqhasedncysw` (fout) | `vbozelswveaxsyccvaac` (live) |
+|---|---|---|
+| `diaz-trial-init` | v5, **2026-08-11 17:43 UTC** | v30, 2026-08-04 15:29 UTC |
+| `diaz-affiliate-activate` | v6, **2026-08-11 17:57 UTC** | v23, 2026-08-04 09:28 UTC |
+
+De kopieën in het verkeerde project zijn **zeven dagen jónger** dan de live
+versies. Dit is dus geen echo van een geslaagde uitrol naar productie: op
+11 augustus is er iets aan de trial-init- en affiliate-activate-flow gewijzigd
+dat **alleen in het dode project terecht is gekomen**. Het live project heeft
+die wijziging nooit gezien.
+
+Dat is precies het gevaar dat in de memory `project_twee_supabase_projecten_diaz_editor`
+staat beschreven: twee projecten, één naam, en een uitrol die er geslaagd
+uitziet omdat hij ook geslaagd ís — alleen niet waar je hem wilde hebben.
+
+**Uitzoeken vóór het opruimen:** wat is er op 2026-08-11 rond 17:45 aan die
+twee functies veranderd, en moet dat alsnog naar `vbozelswveaxsyccvaac`? Als je
+de tien verwijdert zonder dat te doen, verdwijnt de enige kopie van die
+wijziging. **Haal ze eerst op** (`get_edge_function` of het dashboard) en bewaar
+de broncode, ook als je ze daarna weggooit.
+
+Let ook op dat het live project sinds 2026-08-04 dubbele slugs draagt:
+`diaz-license-issue` náást `license-issue`, `diaz-lemon-webhook` náást
+`lemon-webhook`, `diaz-appsumo-redeem` náást `appsumo-redeem`,
+`diaz-license-validate` náást `license-validate`, `diaz-resend-webhook` náást
+`resend-webhook`. Een hernoemactie die half is doorgevoerd. Eigen probleem,
+eigen taak — maar wel de moeite waard om te weten wélke van elk paar in Stripe
+en LemonSqueezy als webhook-URL staat.
+
+**Nog iets wat in die code zit: een levende €997.**
+`diaz-affiliate-activate` bouwt een partnermail met "Free Pro license (€997
+value)", een commissieregel `Math.round(997 * commission_rate)` en een rij
+"Educational · €500". `docs/claims.md` stelt dat €997 geen live surface heeft
+en niet geciteerd mag worden. Dit is er een, ook al is hij op dit moment
+onbereikbaar doordat de queue-query op het verdwenen schema stukloopt. Bij het
+opruimen verdwijnt dit vanzelf; staat het in de live versie ook, dan is het een
+echte claim-correctie.
 
 Er is ook een terugkerende kostenpost. `docs/claims.md` legt vast dat een
 prijssweep in augustus €1.000 corrigeerde in twee van deze functies, in de
@@ -377,6 +425,13 @@ en `lead-notify` wordt vanuit een database-trigger via pg_net aangeroepen, wat
 mogelijk helemaal niet in het gateway-log verschijnt. Lees het als "vandaag
 heeft niets van buiten deze functies aangeroepen".
 
+> **Zwakker dan het klinkt (hermeten 2026-08-15).** Het hele project heeft in
+> die 24 uur **16 regels** in `edge_logs` en 18 in `postgres_logs`. Een nul uit
+> een venster waarin bijna niets gebeurt, is nauwelijks bewijs. Het argument dat
+> wél draagt is niet het logboek maar het schema: `diaz_editor` bestaat niet
+> meer in dit project, dus elke functie die eraan hangt faalt bij haar eerste
+> query, hoe vaak ze ook wordt aangeroepen.
+
 **Waarom ik het niet zelf doe.** De Supabase-MCP heeft geen tool om een functie
 te verwijderen, en de lokale `supabase`-CLI is ingelogd op een ander account
 (403 op dit project). Het is een dashboard-handeling.
@@ -386,6 +441,12 @@ per functie → Delete. Tien keer. Geen enkele regel code in deze repo verwijst
 naar een van de tien (gecontroleerd); alleen `docs/claims.md` en
 `docs/legal/verwerkingsregister.md` noemen ze in tekst.
 
+- [ ] broncode van `diaz-trial-init` en `diaz-affiliate-activate` uit
+      `wbgiouuifqhasedncysw` bewaard, en vastgesteld of de wijziging van
+      2026-08-11 alsnog naar `vbozelswveaxsyccvaac` moet
+- [ ] in Stripe en LemonSqueezy gecontroleerd dat geen webhook-URL naar
+      `wbgiouuifqhasedncysw` wijst (anders valt een betaal-callback stil zodra
+      je verwijdert — hij faalt nu al, maar dan wel zichtbaar met een 404)
 - [ ] tien `diaz-*`-functies verwijderd uit `wbgiouuifqhasedncysw`
 
 **Los daarvan, voor als je toch in dat register kijkt.**
