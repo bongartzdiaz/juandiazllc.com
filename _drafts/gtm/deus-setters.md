@@ -28,6 +28,10 @@ precies waar Diaz Editor afvalt en DEUS niet.
 
 Op €49 houdt niemand het vol die je zou willen houden.
 
+Dat is een argument over één product tegelijk. Juan bracht op 2026-08-15 het
+tegenargument in: een setter draagt een tas, en de tas telt — DEUS, de eigen
+dienstverlening en Diaz Editor samen. Dat klopt gedeeltelijk. Zie §8.
+
 ---
 
 ## 2. Wat een DEUS-klant waard is
@@ -170,3 +174,61 @@ en het antwoord op de vraag of dit product te verkopen is.
 
 Begin met één. Een tweede erbij vóór die drie getallen bestaan, is een loonlast
 kopen bovenop dezelfde onwetendheid.
+
+---
+
+## 8. Meer dan één product in de tas
+
+Het uitgangspunt van §1 — "€49 draagt geen setter" — rekent per product. Een
+setter werkt niet per product maar per gesprek, dus wat telt is de gemengde
+waarde van alles wat hij op de agenda kan zetten. Als twee van de drie dingen
+deals van duizenden euro's dragen, is de tas gezond, ook met iets goedkoops
+erin.
+
+Dat argument staat. Het gaat alleen niet op voor alle drie op dezelfde manier.
+
+**DEUS en de eigen dienstverlening horen in dezelfde tas.** Zelfde koper — de
+eigenaar of de operationeel verantwoordelijke van een mkb-bedrijf — en ze
+versterken elkaar: het advies is de instap, DEUS is waar de operatie daarna op
+draait. Eén gesprek opent allebei. Daar is geen tweede setter voor nodig en geen
+tweede lijst.
+
+**Diaz Editor hoort er niet in, en de reden is niet de prijs.** Het is het
+kanaal. Niemand plant een gesprek van een kwartier in om een bureaubladprogramma
+van €197 te kopen — de koper neemt de afspraak niet, hoe goed het aanbod ook is.
+Dat product hoort in de zelfbedieningstrechter: de site, de vakfora waar dat
+publiek zit (photovoltaikforum.com, haustechnikdialog.de, KUBR.nl), en inhoud
+die daar landt. Een setter ervoor inzetten is niet te duur, het is het verkeerde
+gereedschap.
+
+**De bindende beperking is het ICP, niet het bedrag.** DEUS heeft vandaag
+verticalen voor vastgoed, horeca en filantropie. Diaz Editor richt zich op
+zelfstandige bouwers, timmerlieden en installateurs. Dat zijn andere bedrijven,
+andere lijsten en een andere openingszin. Een setter die drie profielen bedient,
+presteert meetbaar slechter dan een die er één bedient: je verliest precies wat
+outbound laat werken, namelijk hetzelfde bericht dat zich herhaalt tot je weet
+wat erop terugkomt.
+
+**Er is één variant waarin alle drie wél passen.** Richt op installatie- en
+aannemersbedrijven: DEUS aan de eigenaar, Diaz Editor aan de werkvoorbereider.
+Zelfde bedrijf, twee kopers, één lijst. Dat is een goede structuur — maar DEUS
+heeft geen verticaal voor de bouw. Dat is dus een bouwbesluit met echte kosten,
+geen kwestie van de tas anders inpakken.
+
+### Wat hier eerst moet, en het is geen detail
+
+**Er bestaat geen prijs voor de eigen dienstverlening.** `docs/claims.md`
+noemt er geen, de site noemt er geen. Zolang dat zo is, kan een setter er geen
+gesprekken voor boeken: er is niets om naartoe te kwalificeren, en jij staat in
+elk gesprek live een prijs te bedenken. Dat is precies hoe DEUS aan drie
+tegenstrijdige prijslijsten kwam.
+
+Dus vóór de dienstverlening de tas in gaat: één aanbod, één prijs, in
+`docs/claims.md`. Dan pas is de tas wat hij hier belooft.
+
+### Aanbeveling
+
+Eén setter, één profiel, twee producten: **DEUS en de eigen dienstverlening.**
+Diaz Editor blijft zelfbediening. Wil je die er alsnog bij, dan loopt die weg
+via een DEUS-verticaal voor de bouw — een bouwbesluit, te nemen ná de acht weken
+uit §7, niet ervoor.
