@@ -757,3 +757,75 @@ a new fine-grained PAT and update the secret — same scope as above.
 - [ ] `proxy.ts` CSRF tests — security-critical, untested.
 - [ ] `lib/i18n/metadata.ts` tests — `buildAlternates`, `ogLocale`,
       `alternateOgLocales`.
+
+## GitHub Actions ligt stil op beide privérepo's (2026-08-10)
+
+**Gemeten 2026-08-15.** Elke Actions-run in `bongartzdiaz/diaz-editor` en
+`bongartzdiaz/DEUS-SHARED` faalt vóór de eerste stap, met deze annotatie:
+
+> The job was not started because recent account payments have failed or your
+> spending limit needs to be increased. Please check the 'Billing & plans'
+> section in your settings.
+
+| | |
+|---|---|
+| laatste geslaagde run | 2026-08-09 18:38 UTC (`Weekly changelog gen`) |
+| eerste geblokkeerde run | 2026-08-10 07:02 UTC (`RSS feeds generator`, id 31364272154) |
+| geblokkeerd sindsdien | **262** runs in diaz-editor, **272** in DEUS-SHARED |
+
+### Waarom juandiazllc.com wél draait
+
+`juandiazllc.com` is **publiek**; `diaz-editor` en `DEUS-SHARED` zijn **privé**.
+Publieke repo's krijgen gratis runners, privérepo's trekken van het tegoed. Dat
+is de hele verklaring waarom de vijf poorten hier groen staan terwijl daar niets
+start — en meteen de reden dat dit vijf dagen onopgemerkt kon blijven: de repo
+waar dagelijks in gewerkt wordt, merkt er niets van.
+
+### Wat er stilstaat, en wat dat kost
+
+Veertien workflows in diaz-editor. De vier die pijn doen:
+
+- **`deploy edge functions`** — code die naar main gemerged wordt, bereikt
+  productie niet. Dit heeft op 2026-08-15 al toegeslagen: PR #527 mergde en de
+  deploy faalde; `lead-notify` v6 is met de hand uitgerold via MCP. Elke
+  volgende edge-function-wijziging vraagt dezelfde handeling. Dit is precies de
+  drift waar die workflow tegen gebouwd is.
+- **`Cert Expiry Watch (code-signing)`** — het aflopen van het
+  ondertekeningscertificaat wordt niet meer bewaakt. Voor een desktop-app die
+  als ondertekend binair bestand wordt uitgeleverd, is dat het verschil tussen
+  installeren en een SmartScreen-waarschuwing.
+- **`live-smoke`** — draaide ongeveer elk uur tegen de live site. Er kijkt nu
+  niets meer of diazatlas.com overeind staat.
+- **`Failed-deploy detector`** — de wachthond die mislukte uitrollen moet
+  opmerken, staat zelf binnen het hek.
+
+Verder dark: `Daily Juan-digest`, `Daily Metrics Pull`, `Download Stats
+Snapshot`, `Health Snapshot`, `Link Guard (live)`, `IndexNow Auto-Ping`, `RSS
+feeds generator`, `CAD Verify Gate`, `Changelog → Twitter Auto-Tweet`,
+`Typecheck Report`. In DEUS-SHARED draait `support-sla-breach-cron` elk uur —
+ook die staat stil.
+
+### Wat jij moet doen
+
+Op <https://github.com/settings/billing> (account `bongartzdiaz`):
+
+- [ ] Kijk of er een **mislukte betaling** openstaat — verlopen of geweigerde
+      kaart. Zo ja: betaalmiddel bijwerken en de openstaande factuur voldoen.
+- [ ] Kijk of de **spending limit** op nul of op het bereikte maximum staat.
+      Voor Actions op privérepo's moet die boven nul staan, anders blokkeert
+      GitHub elke run zodra het gratis tegoed op is.
+- [ ] Controleer het **verbruikte Actions-tegoed** van deze maand.
+
+Ik kan dit niet zelf lezen: `gh api user/settings/billing/actions` geeft 404 op
+dit token, en `gh api user` geeft `plan: null` — het token mist de scope. De
+annotatie op de run is dus het enige bewijs dat ik heb, en die noemt beide
+oorzaken zonder te zeggen welke het is.
+
+### Wat te controleren zodra het weer loopt
+
+- [ ] Een lege commit naar main van diaz-editor duwen en kijken of
+      `deploy edge functions` groen wordt.
+- [ ] Vergelijken of de uitgerolde `lead-notify` nog gelijk is aan main —
+      handmatige uitrol en CI-uitrol mogen niet uit elkaar lopen.
+- [ ] `Cert Expiry Watch` één keer met de hand aftrappen: vijf dagen zonder
+      bewaking betekent dat een aflopend certificaat gemist kan zijn.
