@@ -271,6 +271,61 @@ typo.
 | Ventures named as live: Voltafy, Performance Tracker, Help Mij Besparen, Salderingsregeling 2027 | ✅ real projects — but see below |
 | Client results, revenue figures, testimonials | ❌ none exist; do not imply any |
 
+## juandiazllc.com — /pricing (DEUS)
+
+Registered 2026-08-15, after a sweep found this page publishes eight price
+figures and **not one of them appeared in this file**. Rule 1 says a number
+appears here or it does not get published. The whole ladder had been live in
+four languages for months.
+
+**Our own figures.** Source: `_drafts/pricing/pricing-tiers.csv` →
+`npm run regen:pricing` → `app/[locale]/pricing/page.tsx`.
+
+| Tier | Monthly, per seat | Annual, per seat | Min seats |
+| --- | --- | --- | --- |
+| Starter | €40 | €32 | 3 |
+| Professional | €69 | €55 | 5 |
+| Business | €99 | €79 | 10 |
+| Enterprise | on quote | on quote | 15 |
+
+⚠️ **These are list prices, not verified prices.** By the standard this file
+sets in the €197 reversal — a price is verified when it is read from the thing
+that takes the money — none of them qualify, because **nothing takes money for
+DEUS.** No checkout, no Stripe product, no Payment Link; every CTA on the page
+goes to `/contact`. That is honest while the page keeps saying so, but these
+cannot be quoted the way €197 can be quoted for Diaz Editor.
+
+**The competitor claim.** Checked against HubSpot's own pricing pages on
+2026-08-15:
+
+| Product | Was in copy | Actual | Source |
+| --- | --- | --- | --- |
+| HubSpot Starter | `€20` per seat/month | **$20** per seat/month list, $7 promo at time of check | hubspot.com/pricing/crm |
+| "their Marketing Hub" | `€1,000/month` | **$800/month** Professional (3 seats); Enterprise **$3,600/month** | hubspot.com/pricing/marketing |
+
+Same failure as the Autodesk and SketchUp figures one section up, and the same
+root cause: a US vendor's price re-denominated into euros. €1,000 corresponds
+to nothing HubSpot publishes. Corrected in all four locales on 2026-08-15; the
+answer now names the tier, the currency and the check date, so the claim dates
+itself in front of the reader.
+
+**€997 does not belong on this page.** A prompt drafted 2026-08-15 asked to
+"make /pricing honest about €997". Two things are wrong with that. €997 is a
+Diaz Editor figure and this page sells DEUS, so publishing it here would invent
+a price for the wrong product. And this file already rules on it: €997 has no
+live surface and no stated future role, do not quote it. Not done, on purpose.
+
+### Open, not decided
+
+- The feature table promises **SSO, IP allowlist, 99.5% / 99.95% uptime SLA,
+  dedicated server, white-label, custom domain**. Those are product promises
+  for a product with no paying customer. Rule 3 forbids implying traction; it
+  says nothing about promising features. Check each row against DEUS-SHARED
+  before a real prospect reads it.
+- The migration offer promises **five business days, two training sessions, 30
+  days priority support**. No migration has ever been delivered. That is an
+  offer rather than a track record, but it is still a commitment.
+
 ## The IFC claim — how a feature that never existed reached 1,643 places
 
 Counted on `main` 2026-07-26: **1,643 IFC mentions across 413 files**, against
