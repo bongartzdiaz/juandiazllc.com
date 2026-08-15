@@ -47,9 +47,9 @@ Measured 2026-08-12 against project `vbozelswveaxsyccvaac` and the served
 | Claim | Value | Status |
 | --- | --- | --- |
 | Licence tier — 3 seats | €197, one-time | ✅ verified twice — `unit_amount: 19700` in the live `diaz-beta-checkout` (v28) **and** `public_beta_status.price_cents_eur = 19700` |
-| Founding tier — 1 seat | €99, one-time | ⚠️ live Payment Link (HTTP 200) labelled €99 on the homepage. The **amount at Stripe is not verified** — Stripe renders it client-side, so it cannot be read from the served page. Check the dashboard. |
-| Pro tier — 10 devices | €247, one-time | ⚠️ same: live Payment Link, label only, amount not verified |
-| Educational tier — 25 seats | €500, one-time | ⚠️ same: live Payment Link, label only, amount not verified |
+| Founding tier — 1 seat | €99, one-time | ✅ **verified 2026-08-15** — `diaz_editor.checkout_session` holds a session with `amount_eur = 99.00`, written by `captureCheckoutSession` from the Stripe session object |
+| Pro tier — 10 devices | €247, one-time | ✅ **verified 2026-08-15** — same table, `amount_eur = 247.00` |
+| Educational tier — 25 seats | €500, one-time | ✅ **verified 2026-08-15** — same table, `amount_eur = 500.00` |
 | Enterprise, agency | On quote, no list price | ✅ confirmed 2026-08-11 by Juan — by design, not omission |
 | "Regular price after beta €997" | **Not live anywhere** | ❌ appears on no page, no buy link and in no edge function. See the reversal note. |
 | Beta cap / spots taken | cap 100, sold 2 | ⚠️ the row still exists, but the `spots_left <= 0` gate was **removed on 2026-07-26** — the cap no longer stops a sale. `display_spots_left` equals the real 98, so the scarcity display is honest. |
@@ -57,6 +57,23 @@ Measured 2026-08-12 against project `vbozelswveaxsyccvaac` and the served
 | Updates | Lifetime | ✅ product promise, no expiry in licence issuance |
 | Trial | 14 days, no card | ✅ verified — `diaz-trial-init` |
 | Price direction | "Introductory price — rises at v0.5" | ✅ every tier on the homepage carries this line |
+
+> **How the three Payment Link amounts got closed, 2026-08-15.** The note above
+> said only the Stripe dashboard could settle them, because Stripe renders the
+> amount client-side. That turned out to be one route, not the only one. On
+> 2026-08-11 the webhook began writing `diaz_editor.checkout_session` rows, and
+> `captureCheckoutSession` copies `amount_eur` straight off the Stripe session
+> object. Four sessions from that day carry 99.00, 197.00, 247.00 and 500.00.
+> That is the till talking, not the label.
+>
+> The general form: when a surface refuses to be read, look for the record the
+> transaction leaves behind. It is usually closer to the money than the page is.
+>
+> ⚠️ **One caveat on those same rows.** `checkout_session.tier_requested` has a
+> CHECK constraint accepting only `light|pro|agency|enterprise`, and
+> `mapTierForCompletedSale` flattens the four real tier names onto it. Licence
+> (€197) and Pro (€247) both land on `'pro'`. The amount distinguishes them; the
+> tier column does not. Do not use `tier_requested` to count sales per product.
 
 ~~**Action:** pick €997 or €1,000 and make both surfaces agree.~~ ~~**Done
 2026-07-21.** €997 it is; the pv-string-sizer README was corrected to match.~~
