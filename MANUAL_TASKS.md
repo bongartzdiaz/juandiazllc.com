@@ -3,6 +3,49 @@
 Every item here is a one-time human action that unblocks code that's
 already shipped. Strike through (`~~...~~`) when done.
 
+## Ontvangstbevestiging aan leads aanzetten (2026-08-16)
+
+De keten staat en is gemeten: trigger → edge function → rij bijgewerkt, 34 ms
+na de insert. Er gaat alleen nog niets de deur uit, want er is geen afzender.
+Zolang dat zo is meldt de functie eerlijk `skipped:no-api-key` en blijft
+`acknowledged_at` leeg — hij doet niet alsof.
+
+Deze drie zijn secrets op de **edge functions** (Supabase → Edge Functions →
+Secrets), niet op Vercel. De functie draait los van Next.js.
+
+- [ ] `RESEND_API_KEY` — uit het Resend-dashboard. Dezelfde sleutel zet
+      meteen ook de Resend-helft van `lead-notify` aan.
+- [ ] `ACK_FROM` — bijvoorbeeld `Juan Diaz <hallo@juandiazllc.com>`.
+      **Moet een geverifieerd domein zijn** (SPF + DKIM op de DNS-zone van
+      juandiazllc.com). Een `@resend.dev`-adres wordt door de functie
+      geweigerd: Resends zandbak levert alleen aan de accounthouder, dus een
+      bevestiging aan een aanvrager zou bouncen. De weigering is code, geen
+      afspraak — zie punt 2 in de kop van `supabase/functions/lead-acknowledge/`.
+- [ ] `ACK_REPLY_TO` — optioneel. Valt terug op `ALERT_EMAIL`. Hierheen komt
+      het antwoord als iemand op de bevestiging reageert.
+
+### Losstaand, maar hoort erbij: de endpoints staan open
+
+`lead_notify_secret` staat **niet** in de vault, en beide functies draaien met
+`verify_jwt: false`. Wie de URL kent mag posten. Bij `lead-acknowledge` levert
+dat hooguit een herhaalde bevestiging aan de lead zelf op (het adres komt
+alleen uit de database); bij `lead-notify` kan een vreemde je valse Telegrams
+sturen.
+
+- [ ] Genereer een willekeurige sleutel en zet hem op twee plekken:
+      in de vault als `lead_notify_secret`, en als `LEAD_NOTIFY_SECRET` op
+      beide edge functions. De volgorde maakt niet uit — beide kanten zijn
+      zo gebouwd dat er geen venster is waarin aanroepen 401'en.
+
+### Daarna controleren
+
+```sql
+select * from marketing.lead_response;
+```
+
+`bevestigd` moet meelopen met `leads`, en `mediaan_seconden` is het getal dat
+je in verkoopgesprekken kunt noemen.
+
 ## AI contact attributes — web enrichment (2026-07-21)
 
 ### 1. Database migration (required — the code expects the column)

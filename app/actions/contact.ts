@@ -9,12 +9,30 @@ import { capField, isPlausibleEmail } from "@/lib/forms/limits";
 
 export type ContactState = { status: "idle" | "ok" | "err"; message?: string };
 
+// De taal komt uit een verborgen veld en is dus door de client te kiezen. Hij
+// bepaalt alleen in welke taal de automatische ontvangstbevestiging wordt
+// opgesteld, maar hij landt wel in de database, dus hij gaat door een
+// whitelist en niet door capField: alles buiten deze vier wordt Engels.
+const LOCALES = ["en", "nl", "de", "es"] as const;
+
+function readLocale(value: FormDataEntryValue | null): (typeof LOCALES)[number] {
+  const raw = String(value ?? "").trim().slice(0, 2).toLowerCase();
+  return (LOCALES as readonly string[]).includes(raw)
+    ? (raw as (typeof LOCALES)[number])
+    : "en";
+}
+
 // Contact submission pipeline.
 // - Primary: insert into Supabase `leads` so nothing is ever lost.
 // - Secondary: best-effort email to juan@ via Resend (only if
 //   RESEND_API_KEY is set — otherwise silently skipped). We don't
 //   fail the user if the email hop breaks, since the lead row is
 //   already persisted.
+// - Acknowledgement to the enquirer: NOT sent from here. A trigger on
+//   marketing.leads calls the edge function `lead-acknowledge`, which mails
+//   in metadata.locale's language and records when it happened. Keeping it in
+//   the database means a Vercel deploy or a cold start cannot swallow it —
+//   same reason lead-notify lives there. Source: supabase/functions/.
 // - Spam: honeypot field ("website") + min-length message. The
 //   honeypot is a hidden input that real users never touch; bots
 //   fill every field they can find. If it's non-empty, we fake-ok
@@ -40,6 +58,7 @@ export async function submitLead(
   const sector = capField(formData.get("sector"), "sector");
   const message = capField(formData.get("message"), "message");
   const source = capField(formData.get("source"), "source") || "contact_page";
+  const locale = readLocale(formData.get("locale"));
 
   if (!isPlausibleEmail(email)) {
     return { status: "err", message: "Enter a valid email." };
@@ -52,7 +71,7 @@ export async function submitLead(
     const supabase = await createClient();
     const { error } = await supabase
       .from("leads")
-      .insert({ name, email, company, sector, message, source });
+      .insert({ name, email, company, sector, message, source, metadata: { locale } });
 
     if (error) {
       return { status: "err", message: "Something went wrong. Try again." };
