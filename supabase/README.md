@@ -80,13 +80,26 @@ formulier en door een whitelist in de server-action. Ontbreekt hij, dan Engels.
 
 ### Wat hier nog open staat
 
-- **`lead_notify_secret` staat niet in de vault.** Beide functies draaien met
-  `verify_jwt: false` en zonder gedeelde sleutel, dus wie de URL kent mag
-  posten. Voor `lead-acknowledge` is dat afgevangen in de code: het
-  ontvangeradres komt uitsluitend uit de database en een onbekend id levert
-  `skipped:unknown-lead`. Voor `lead-notify` niet — een vreemde kan Juan
-  daarmee valse meldingen sturen. Zet de sleutel in de vault én als
-  `LEAD_NOTIFY_SECRET` op beide functies; de volgorde maakt niet uit.
+- **De endpoints staan half open.** Beide functies draaien met
+  `verify_jwt: false`, dus wie de URL kent mag posten. Voor `lead-acknowledge`
+  is dat afgevangen in de code: het ontvangeradres komt uitsluitend uit de
+  database en een onbekend id levert `skipped:unknown-lead`. Voor
+  `lead-notify` niet — een vreemde kan Juan daarmee valse meldingen sturen.
+
+  De vaultkant is sinds 2026-08-16 gezet (`lead_notify_secret`, 44 tekens) en
+  de database stuurt hem mee als bearer; gemeten. Wat rest is
+  `LEAD_NOTIFY_SECRET` op de functies, met díe waarde.
+
+  **De volgorde is niet vrij.** Vault eerst is veilig: zolang de functie-env
+  ongezet is, accepteert de functie elke aanroep en logt een waarschuwing.
+  Andersom breekt het — functie-env gezet terwijl de vault leeg is betekent
+  geen header, dus 401 op elke leadmelding.
+
+  > Let op: het commentaarblok in `public.notify_new_lead` beweert dat de twee
+  > "in willekeurige volgorde aangezet mogen worden zonder venster waarin
+  > aanroepen 401'en". Dat klopt in één richting niet. De claim is op
+  > 2026-08-16 nagerekend tegen de code van beide kanten; laat je er niet
+  > door verleiden de functie eerst te zetten.
 - **Er gaat nog geen bevestiging uit.** `RESEND_API_KEY` en `ACK_FROM` zijn
   ongezet. Zie MANUAL_TASKS.md; `ACK_FROM` moet een **geverifieerd domein**
   zijn, want `@resend.dev` levert alleen aan de accounthouder en wordt door de
