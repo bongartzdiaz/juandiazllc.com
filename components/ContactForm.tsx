@@ -2,7 +2,7 @@
 
 import { useActionState, useState, useEffect } from "react";
 import { submitLead, type ContactState } from "@/app/actions/contact";
-import { useT } from "@/lib/i18n/useT";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 
 // 3-step progressive intake.
 // 1) Sector (visual choice — micro-commitment, no typing)
@@ -34,7 +34,9 @@ const STAGES: Array<{ value: string; key: string }> = [
 
 export function ContactForm() {
   const [state, formAction, pending] = useActionState(submitLead, initial);
-  const t = useT();
+  // useLocale in plaats van useT: dit formulier heeft naast de vertaalfunctie
+  // ook de taalcode zelf nodig, om die met de inzending mee te sturen.
+  const { t, locale } = useLocale();
   const [step, setStep] = useState(1);
   const [sector, setSector] = useState("");
   const [stage, setStage] = useState("");
@@ -200,6 +202,13 @@ export function ContactForm() {
               name="source"
               value={`contact_page${interest ? `:interest=${interest}` : ""}:stage=${stage}`}
             />
+            {/* De taal waarin iemand het formulier invulde. Landt in
+                metadata.locale en bepaalt de taal van de automatische
+                ontvangstbevestiging (edge function lead-acknowledge). Zonder
+                dit veld valt die terug op Engels — een Nederlandse aanvrager
+                zou dan een Engelse bevestiging krijgen op een Nederlandse
+                pagina. */}
+            <input type="hidden" name="locale" value={locale} />
             {/* Honeypot */}
             <div className="hp-field" aria-hidden="true">
               <label htmlFor="website">Website (leave blank)</label>
