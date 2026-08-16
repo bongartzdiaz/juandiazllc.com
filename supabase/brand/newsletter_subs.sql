@@ -1,3 +1,23 @@
+-- ⚠️ NOOIT TOEGEPAST — NIET UITVOEREN. Gemeten op 2026-08-16 tegen
+-- Supabase-project wbgiouuifqhasedncysw: `to_regclass('public.newsletter_subs')`
+-- geeft NULL. De tabel hieronder bestaat niet en heeft nooit bestaan.
+--
+-- De nieuwsbriefinschrijvingen zijn ergens anders geland:
+-- **`marketing.subscribers`**, met een trigger `subscribers_notify_new` die
+-- `public.notify_new_lead()` aanroept. Dat is de tabel die telt.
+--
+-- Dit bestand staat er sinds PR #9 en beschrijft een ontwerp dat het niet
+-- gehaald heeft — inclusief dubbele opt-in via `confirm_token`, wat
+-- `marketing.subscribers` niet heeft. Het blijft staan omdat die
+-- opt-in-kolommen een bewuste keuze vastleggen die je terug wilt kunnen
+-- vinden als de nieuwsbrief ooit echt wordt uitgerold.
+--
+-- Wil je het alsnog bouwen, doe dat dan als migratie in
+-- `supabase/migrations/` tegen `marketing.subscribers`, niet als los script
+-- in de SQL-editor. Zie `supabase/README.md`.
+--
+-- ─────────────────────────────────────────────────────────────────────────
+--
 -- Newsletter subscribers for juandiazllc.com.
 -- Run this in the Supabase SQL editor (brand project) before the
 -- /api/newsletter action starts storing signups. Until then the
