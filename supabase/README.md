@@ -1,11 +1,17 @@
 # Supabase — `wbgiouuifqhasedncysw`
 
-Deze map bestond hier niet tot 2026-08-16. Migraties op dit project werden
-tot dan toe rechtstreeks toegepast, zonder bestand in enige repo. Dat is
-precies het patroon dat elders al een keer misging: een commentaarblok dat
-een fix beschrijft is geen bewijs dat de fix draait, en andersom draait er
-van alles waar geen bestand bij hoort. Vanaf nu landt elke migratie op dit
-project ook hier.
+De submap `migrations/` bestond hier niet tot 2026-08-16. Migraties op dit
+project werden tot dan toe rechtstreeks toegepast, zonder bestand in enige
+repo. Dat is precies het patroon dat elders al een keer misging: een
+commentaarblok dat een fix beschrijft is geen bewijs dat de fix draait, en
+andersom draait er van alles waar geen bestand bij hoort. Vanaf nu landt
+elke migratie op dit project ook hier.
+
+**`brand/newsletter_subs.sql` is géén migratie en is nooit toegepast.**
+`public.newsletter_subs` bestaat niet in de database; de inschrijvingen
+landen in `marketing.subscribers`. Het bestand staat er sinds PR #9 en
+beschrijft een ontwerp met dubbele opt-in dat het niet gehaald heeft. Het
+draagt een waarschuwingsbanner — laat die staan.
 
 ## Wat er in dit project woont
 
