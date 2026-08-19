@@ -6,11 +6,15 @@ import { translate, type Locale } from "@/lib/i18n/dict";
 //
 // WAAROM HIER EEN DATUM BIJ STAAT
 //
-// Tot 2026-08-19 stond hier `SLOTS_REMAINING = 2` met daarboven de belofte
-// dat dit géén nep-schaarstewidget is. Dat getal was sinds 2026-04-20
-// (commit 9038b9e) niet aangeraakt — vier maanden. Een hardgecodeerd getal
-// dat niemand bijwerkt ís nep-schaarste, ongeacht de bedoeling, en het stond
-// op /contact: precies de pagina waar de bezoeker beslist.
+// `SLOTS_REMAINING = 2` was sinds 2026-04-20 (commit 9038b9e) niet aangeraakt
+// terwijl er vlak boven stond dat dit géén nep-schaarstewidget is. Vier
+// maanden. Een hardgecodeerd getal dat niemand bijwerkt ís nep-schaarste,
+// ongeacht de bedoeling, en het stond op /contact: precies de pagina waar de
+// bezoeker beslist.
+//
+// Op 2026-08-19 nagekeken: het was toevallig nog steeds 2. Dat maakt het geen
+// vals signaal geweest — maar wel een ongecontroleerd signaal, en dat is een
+// kwestie van geluk, niet van beleid. Vandaar de datum hieronder.
 //
 // De bijschrift-tekst zei bovendien "één blueprint per kwartaal" terwijl de
 // balk er vier tekende. Eén van de twee moest weg; vier is de werkelijke
@@ -31,15 +35,16 @@ export const SLOTS_REMAINING = 2;
 /**
  * Datum waarop SLOTS_REMAINING voor het laatst tegen de agenda is gehouden.
  *
- * Staat bewust op de dag dat het getal werkelijk is gezet (2026-04-20), niet op
- * vandaag. Juan heeft op 2026-08-19 bevestigd dat er VIER plekken per kwartaal
- * zijn — het totaal. Hoeveel er nu nog vrij zijn is niet nagekeken, dus een
- * verse stempel zetten zou precies de fout herhalen die deze poort moet vangen.
+ * Juan heeft op 2026-08-19 twee dingen bevestigd: vier plekken per kwartaal
+ * (het totaal) en twee daarvan nog vrij. Daarvóór stond hier 2026-04-20 — het
+ * getal was 121 dagen niet aangeraakt terwijl het commentaar hierboven volhield
+ * dat dit geen nep-schaarste is.
  *
- * Gevolg: `capacity.test.ts` is rood tot iemand het echte aantal invult en deze
- * datum bijwerkt. Dat is de bedoeling, geen defect.
+ * Zet deze datum alleen bij als je het aantal werkelijk tegen de agenda hebt
+ * gehouden. Een datum bijwerken zonder te kijken is exact de fout die de poort
+ * moet vangen, en dan vangt hij niets meer.
  */
-export const LAST_VERIFIED = "2026-04-20";
+export const LAST_VERIFIED = "2026-08-19";
 
 /** Zoveel dagen mag LAST_VERIFIED oud zijn voordat de poort rood wordt. */
 export const MAX_AGE_DAYS = 30;
