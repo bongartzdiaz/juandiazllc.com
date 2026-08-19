@@ -78,10 +78,17 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
         <p>{t("services.page.lede")}</p>
       </header>
       <section style={{ padding: "80px 40px 80px", maxWidth: "var(--max)", margin: "0 auto" }}>
+        {/* De FAQ zei al "begin bij het symptoom, niet bij de dienst", terwijl
+            de kaarten erboven precies andersom waren opgebouwd. Het symptoom
+            staat nu vóór de dienstnaam, in de woorden van de bezoeker. */}
+        <p style={{ marginBottom: 24, color: "var(--muted)" }}>{t("services.symptom.lead")}</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
           {DELIVERABLES.map((d) => (
             <LocaleLink key={d.id} href={d.href} className="sec-card" data-reveal style={{ minHeight: 240 }}>
               <div>
+                <div style={{ fontFamily: "'Inter'", fontWeight: 300, fontSize: "clamp(17px, 2vw, 21px)", letterSpacing: "-.01em", marginBottom: 10 }}>
+                  “{t(`services.${d.id}.symptom`)}”
+                </div>
                 <div className="ix">— {t(`services.${d.id}.title`)}</div>
                 <p style={{ marginTop: 16 }}>{t(`services.${d.id}.body`)}</p>
               </div>
@@ -91,6 +98,28 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
             </LocaleLink>
           ))}
         </div>
+      </section>
+      {/* De koopvraag stond alleen in de FAQ onder de knop, dichtgeklapt:
+          gratis blueprint-gesprek, diagnose van één pagina, sprint tegen
+          vaste prijs, scope pas daarna. Wie dat leest boekt; wie het niet
+          ziet, boekt niet. Staat nu vóór de CTA. Geen bedrag — die komt uit
+          docs/claims.md en er staat er geen voor dit traject. */}
+      <section style={{ padding: "0 40px 72px", maxWidth: "var(--max)", margin: "0 auto" }}>
+        <h2 style={{ fontFamily: "'Inter'", fontWeight: 300, fontSize: "clamp(22px, 3vw, 32px)", letterSpacing: "-.02em", marginBottom: 28 }}>
+          {t("services.how.title")}
+        </h2>
+        <ol style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, listStyle: "none", padding: 0, margin: 0, counterReset: "how" }}>
+          {["s1", "s2", "s3"].map((s, i) => (
+            <li key={s} style={{ padding: 24, border: "1px solid var(--line)", borderRadius: 18, background: "var(--panel)" }} data-reveal>
+              <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--muted-soft)" }}>
+                {String(i + 1).padStart(2, "0")}
+              </div>
+              <div className="ix" style={{ marginTop: 10 }}>{t(`services.how.${s}.title`)}</div>
+              <p style={{ marginTop: 12 }}>{t(`services.how.${s}.body`)}</p>
+            </li>
+          ))}
+        </ol>
+        <p style={{ marginTop: 24, color: "var(--muted)" }}>{t("services.how.note")}</p>
       </section>
       <section style={{ padding: "0 40px 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div style={{ padding: 32, border: "1px solid var(--line)", borderRadius: 18, background: "linear-gradient(180deg, var(--panel), var(--bg-2))" }}>

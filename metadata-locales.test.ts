@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { LOCALES, type Locale } from "@/lib/i18n/dict";
@@ -56,10 +56,29 @@ type Md = {
   openGraph?: { images?: unknown } & Record<string, unknown>;
 };
 
+type RouteModule = {
+  generateMetadata?: (a: { params: Promise<{ locale: string }> }) => Promise<Md>;
+};
+
+/* De routemodules worden hieronder in drie describe-blokken gebruikt, samen
+   twaalf keer per route. Werden ze per aanroep geïmporteerd, dan betaalde de
+   eerste assertie die toevallig als eerste draaide de volledige transformkosten
+   van dat paginamoduul — inclusief alles wat de pagina zelf binnenhaalt.
+
+   Dat was geen theoretisch bezwaar. Met een koude vite-cache viel `/` om op
+   `Test timed out in 5000ms` (gemeten 5207ms; in CI en warm liep dezelfde test
+   in milliseconden). De homepage sleept de Globe met d3-geo en topojson mee,
+   /contact het formulier. Twee zware modulegrafen tegen de standaarddrempel van
+   vijf seconden, dus de suite was soms rood zonder dat er iets mis was.
+
+   De drempel verhogen zou dat verbergen. Hier wordt de last verplaatst naar
+   waar hij hoort: één keer inladen in de opzet, met een ruime hooktimeout. Elke
+   test meet daarna alleen nog zijn eigen assertie. */
+const modules = new Map<string, RouteModule>();
+
 async function metadataVoor(bestand: string, locale: string): Promise<Md | null> {
-  const mod = (await import(/* @vite-ignore */ bestand)) as {
-    generateMetadata?: (a: { params: Promise<{ locale: string }> }) => Promise<Md>;
-  };
+  const mod = modules.get(bestand);
+  if (!mod) throw new Error(`routemoduul niet ingeladen: ${bestand}`);
   if (typeof mod.generateMetadata !== "function") return null;
   return mod.generateMetadata({ params: Promise.resolve({ locale }) });
 }
@@ -80,6 +99,14 @@ const tekst = (v: unknown): string => {
 
 const routes = statischeRoutes();
 const anderTalen = LOCALES.filter((l) => l !== "en");
+
+beforeAll(async () => {
+  await Promise.all(
+    routes.map(async ({ bestand }) => {
+      modules.set(bestand, (await import(/* @vite-ignore */ bestand)) as RouteModule);
+    }),
+  );
+}, 120_000);
 
 describe("metadata is per taal geschreven", () => {
   it("vindt statische routes om te controleren", () => {

@@ -265,8 +265,9 @@ Set a Monday 9am recurring block. 15 min.
   Target: +50 operator-founder followers / week by week 8.
 - **Instagram insights** — story completion rate >60% = healthy,
   <40% = your content is too long / too polished.
-- **Backlinks** — `ahrefs` or `linkody` free tier. Target: +2
-  quality backlinks / month for the first 6 months.
+- **Backlinks** — OpenSEO's backlink overview (runs on DataForSEO; see
+  MANUAL_TASKS.md, route 3). Ahrefs was closed on 2026-08-11 — do not
+  reach for it. Target: +2 quality backlinks / month for the first 6 months.
 
 ---
 
