@@ -937,19 +937,29 @@ gemarkeerd.
 
 ### Wat wél nog moet, en het zit in DEUS-SHARED
 
-- [ ] **Repareer de keep-listcontrole in `20260810_drop_legacy_philly_cluster.sql`
-      vóór iemand dat script draait.** Die controle eist acht tabellen in schema
-      `public`. Twee ervan — `leads` en `subscribers` — staan daar niet meer:
-      ze zijn verhuisd naar schema `marketing` (elk 1 policy, de anon-insert).
-      Het script breekt dus af met `KEEP-LIST BROKEN: leads, subscribers`,
-      terwijl er niets mis is. Dat is een gevaarlijk soort vals alarm: de
-      voor de hand liggende reactie is de controle weghalen, en juist die
-      controle staat tussen het script en de leadopvang. Laat hem op
-      `(schema, tabel)` matchen in plaats van op naam in `public`.
-- [ ] Fase 1c is nog niet gedaan — `public.profiles` bestaat nog en de trigger
-      `on_auth_user_created` vuurt nog op `auth.users`. De guard blokkeert het
-      sloopscript daar terecht op.
-- [ ] Het DEUS-invariant klopt wel: precies 95 PascalCase-tabellen.
-- [ ] Of de zestien tabellen werkelijk weg mogen is een besluit van Juan, en
-      het hoort in DEUS-SHARED thuis, niet in deze repo. Hier is niets meer dat
-      ze aanraakt.
+- [x] **De keep-listcontrole in `20260810_drop_legacy_philly_cluster.sql`
+      repareren.** Gedaan in DEUS-SHARED PR #98, gemerged 2026-08-19 als
+      `5f95d90`.
+
+      Wat er mis was: die controle eiste acht tabellen in schema `public`,
+      maar `leads` en `subscribers` staan sinds de schema-opsplitsing in
+      `marketing`. Het script brak dus op elke run af met
+      `KEEP-LIST BROKEN: leads, subscribers` terwijl er niets mis was — en
+      dat is een gevaarlijk soort vals alarm, want de voor de hand liggende
+      reactie is juist de controle weghalen die tussen het script en de
+      leadopvang staat.
+
+      De keep-list matcht nu op `(schema, tabel)`. Twee dingen kwamen in
+      dezelfde PR mee: de verificatiequery onderaan dat script keek ook
+      alleen in `public`, en het fase-2-`pg_dump` in het runbook archiveerde
+      met `--schema=public` die twee tabellen niet terwijl het er 24 claimde.
+
+- [ ] **Fase 1c uitvoeren** — `public.profiles` bestaat nog (7 rijen) en de
+      trigger `on_auth_user_created` vuurt nog op `auth.users`. De guard
+      blokkeert het sloopscript daar terecht op.
+- [ ] **Besluiten of de zestien tabellen werkelijk weg mogen.** Dat is jouw
+      keuze en hij hoort in DEUS-SHARED thuis, niet in deze repo — hier is
+      niets meer dat ze aanraakt.
+
+Het DEUS-invariant klopt wel: precies 95 PascalCase-tabellen, gemeten
+2026-08-19. Geen actie.
