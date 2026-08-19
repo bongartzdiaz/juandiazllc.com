@@ -431,6 +431,33 @@ naar een van de tien (gecontroleerd); alleen `docs/claims.md` en
 
 - [ ] tien `diaz-*`-functies verwijderd uit `wbgiouuifqhasedncysw`
 
+**Hermeten 2026-08-19.** Alle tien staan er nog, alle tien `ACTIVE`, alle tien
+`verify_jwt: false`. Een `GET` zonder token krijgt van alle tien een 405
+`method-not-allowed` — de runtime voert ze dus uit; ze zijn warm, niet
+slapend. Drie aanvullingen op het beeld hierboven:
+
+- Het project draagt nu **veertien** functies, niet dertien: `lead-acknowledge`
+  is er op 2026-08-16 bij gekomen. Die blijft, net als `lead-notify` en de twee
+  `pai-*`.
+- Twee van de tien zijn op **2026-08-11 nog bijgewerkt** (`diaz-trial-init`,
+  `diaz-affiliate-activate`). Dat is dezelfde uitrol die in PR #163 beschreven
+  staat als in het verkeerde project geland. De kopie is dus niet alleen dood,
+  hij vangt nog steeds per ongeluk deploys op.
+- `diaz-release-blast` blijkt een eigen `x-api-key`-poort te hebben en faalt
+  dicht als de env-var ontbreekt (`headers.get()` geeft `null`, dat is nooit
+  gelijk aan `undefined`). Zo zullen er meer zijn. Dat maakt het geen open
+  deur — het risico is **secrets die in het verkeerde project staan**, niet
+  onbevoegde uitvoering.
+
+Wat ik bewust **niet** heb getoetst: of de andere negen op `POST` auth
+afdwingen. Dat vraagt een mutatie tegen een levend systeem — een licentie
+uitgeven, een Stripe-sessie openen, mail versturen — en het antwoord verandert
+de actie niet. Die blijft: weghalen.
+
+- [ ] na het verwijderen: nagaan welke secrets op deze tien stonden
+      (`RESEND_API_KEY`, `DIAZ_RELEASE_BLAST_API_KEY`, Stripe- en
+      Lemon-webhooksecrets) en die roteren als ze ook elders in gebruik zijn
+
 **Los daarvan, voor als je toch in dat register kijkt.**
 `docs/legal/verwerkingsregister.md` verwijst voor deze verwerkingen naar
 `supabase/functions/…` — de broncode in de diaz-editor-repo, dus het register
