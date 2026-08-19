@@ -211,6 +211,26 @@ stale notes. It does not — it is the only price the checkout charges.
 - [ ] **€997 has no live surface and no stated future role.** Nothing was said
       about reviving it, so treat it as dead until someone says otherwise — but
       this is inference, not instruction. Do not quote it.
+      > ⚠️ **"No edge function" was wrong — corrected 2026-08-15.** The row
+      > above and the checklist both said €997 appears in no edge function.
+      > `diaz-affiliate-activate` in `wbgiouuifqhasedncysw` carries it three
+      > times inside a partner welcome email: a heading *"Free Pro license (€997
+      > value)"*, a commission line computed as `Math.round(997 *
+      > commission_rate)`, and a table row *"Educational · €500"*. The function
+      > is `ACTIVE` and unauthenticated. It cannot currently send anything —
+      > its queue query hits schema `diaz_editor`, dropped from that project on
+      > 2026-08-12, and returns 500 first — so this is a surface that is dead
+      > rather than absent. Two different things, and the register said the
+      > wrong one. **Whether the live copy in `vbozelswveaxsyccvaac` carries the
+      > same text is not yet checked**; if it does, that is a reachable €997
+      > going out to partners and a real correction, not a cleanup. Removal of
+      > the dead copy is tracked in MANUAL_TASKS.
+      >
+      > How it was missed: the original sweep searched the repo and the live
+      > pages. Deployed edge-function source lives in neither — it is only
+      > readable through the platform API, one function at a time. A claim
+      > register that only greps the repo cannot see the code that is actually
+      > running.
 - [ ] **The €99, €247 and €500 Payment Link amounts are still unverified.**
       Stripe renders the amount client-side, so the served page cannot be read
       — 540 kB of JS with no figure and no occurrence of "Diaz". Only the
