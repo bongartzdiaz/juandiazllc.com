@@ -904,3 +904,52 @@ oorzaken zonder te zeggen welke het is.
       heeft dus nooit gedraaid. Bij de andere dertien mag je aannemen dat ze het
       weer doen zodra de betaling rond is; bij deze niet — die is nog nooit
       getest. Trap hem met de hand af en lees de uitvoer.
+
+## De Philly-restanttabellen zijn dicht, maar het sloopscript slaat vals alarm (2026-08-19)
+
+Aanleiding: de openstaande HIGH-bevinding dat `public.jobs`, `public.teams` en
+`public.job_updates` in `wbgiouuifqhasedncysw` geen tenant-isolatie hebben,
+genoteerd als blocker vóór organisatie #2. Hermeten voor er iets gebouwd werd.
+
+**De bevinding is niet meer waar.** Hij beschreef `USING(true)`-policies voor
+`authenticated`. Gemeten vandaag:
+
+| tabel | RLS | policies | grants `anon`/`authenticated` |
+|---|---|---|---|
+| `jobs` | aan | 0 | geen |
+| `teams` | aan | 0 | geen |
+| `job_updates` | aan | 0 | geen |
+
+Niet afgeleid maar geprobeerd: `set role anon` en `set role authenticated`
+geven op alle drie SQLSTATE `42501` (insufficient_privilege). Alleen
+`service_role` heeft rechten. Gedicht op 2026-07-18 door
+`scripts/sql/20260718_lockdown_legacy_philly_tables.sql` in DEUS-SHARED.
+
+**Isolatie toevoegen zou nu de verkeerde reparatie zijn.** De drie tabellen
+staan in `scripts/sql/20260810_drop_legacy_philly_cluster.sql` op de sloopijst,
+samen met `organizations`, `phily_users` en elf andere. Ze zijn restant: nul
+inserts ooit in `jobs` en `job_updates`, drie seed-rijen in `teams` uit april,
+en DEUS-SHARED `origin/main` (2026-08-16) noemt ze alleen nog in dat script en
+zijn runbook. Een `organization_id` erbij zetten breekt bovendien de
+invariantcontroles van dat script. Het lokale concept
+`migrations-review/20260605_juandiazllc_tenant_isolation.sql` is als achterhaald
+gemarkeerd.
+
+### Wat wél nog moet, en het zit in DEUS-SHARED
+
+- [ ] **Repareer de keep-listcontrole in `20260810_drop_legacy_philly_cluster.sql`
+      vóór iemand dat script draait.** Die controle eist acht tabellen in schema
+      `public`. Twee ervan — `leads` en `subscribers` — staan daar niet meer:
+      ze zijn verhuisd naar schema `marketing` (elk 1 policy, de anon-insert).
+      Het script breekt dus af met `KEEP-LIST BROKEN: leads, subscribers`,
+      terwijl er niets mis is. Dat is een gevaarlijk soort vals alarm: de
+      voor de hand liggende reactie is de controle weghalen, en juist die
+      controle staat tussen het script en de leadopvang. Laat hem op
+      `(schema, tabel)` matchen in plaats van op naam in `public`.
+- [ ] Fase 1c is nog niet gedaan — `public.profiles` bestaat nog en de trigger
+      `on_auth_user_created` vuurt nog op `auth.users`. De guard blokkeert het
+      sloopscript daar terecht op.
+- [ ] Het DEUS-invariant klopt wel: precies 95 PascalCase-tabellen.
+- [ ] Of de zestien tabellen werkelijk weg mogen is een besluit van Juan, en
+      het hoort in DEUS-SHARED thuis, niet in deze repo. Hier is niets meer dat
+      ze aanraakt.
