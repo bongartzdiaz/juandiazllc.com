@@ -1,8 +1,26 @@
 "use client";
 
-// Anonymized operator outcomes — verifiable, sector-level, no names.
-// Sits where traditional "logo wall + testimonials" would go, but
-// optimized for operators who care about numbers over logos.
+// Geanonimiseerde operator-uitkomsten — verifieerbaar, op sectorniveau, geen
+// namen. Staat waar een logowall met quotes zou staan, maar dan voor lezers die
+// cijfers zwaarder wegen dan logo's.
+//
+// WAAROM ER EEN POORT OMHEEN STAAT
+//
+// Van 2026-04-18 tot 2026-08-19 stonden deze vier cijfers live in vier talen
+// terwijl `docs/claims.md` op regel 289 het tegendeel bijhield: "Client
+// results, revenue figures, testimonials — none exist; do not imply any."
+//
+// De cijfers bleken echt (Juan, 2026-08-19). De fout zat dus niet in de
+// getallen maar in het dossier: regel 1 van claims.md is "A number appears
+// here or it does not get published", en dat was vier maanden lang niet zo.
+// Ondertussen beloofde `results.sub` de lezer wél dat elk cijfer uit een live
+// opdracht komt — een claim die voor zichzelf instaat, zonder dat iemand hem
+// nog kon controleren.
+//
+// Dat is het echte risico van dit blok: niet dat het liegt, maar dat niemand
+// het verschil kan zien. `ResultsStrip.test.ts` haalt dat verschil uit de
+// oplettendheid en zet het in de suite. Wil je een kaart toevoegen of een
+// cijfer wijzigen, dan gaat de poort rood tot het in claims.md staat.
 //
 // Rules:
 // - Never invent a number. Every metric here must be traceable to a

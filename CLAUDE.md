@@ -1320,10 +1320,17 @@ enrichment) plus two compliance defects found on the way.
 **Deliberately NOT done**: enabling `FIRECRAWL_API_KEY` anywhere.
 The feature is dark until legal sign-off — see MANUAL_TASKS.md.
 
-483/483 tests green (65 new), typecheck clean. Note `npm test`
+483/483 tests green (65 new), typecheck clean. ~~Note `npm test`
 without exclusions also picks up `diaz-editor-gtm/` and other
 untracked scratch dirs' node_modules and reports 3 spurious file
-failures; the real suite is clean.
+failures; the real suite is clean.~~
+
+> ⚠️ **Opgelost aan de bron op 2026-08-19 (PR #176).** `vitest.config.ts`
+> sloot uit met `node_modules/**`, en die glob is aan de wortel verankerd —
+> vandaar dat een scratch-map met eigen dependencies meeliep. Nu
+> `**/node_modules/**`. **Het was niet alleen ruis:** zod's hele suite telde
+> mee als de onze, dus elk testaantal in dit logboek vanaf ongeveer dit punt
+> is te hoog. Gemeten na de fix: 23 bestanden, 708 tests, nul rood.
 
 ### 2026-08-03 — SEO fase 1 + zichtbare UI-fouten + de crypto-"flake" was geen flake
 
@@ -1456,4 +1463,8 @@ branch protection op main met de vier CI-jobs.
 
 > De dekkingsnotitie bovenaan dit bestand ("~1% file coverage", april 2026)
 > gaat over `lib/philly/*` en klopt daar nog grotendeels. De marketingkant
-> staat inmiddels op 989 tests; verwar die twee niet.
+> staat inmiddels op ~~989 tests~~; verwar die twee niet.
+>
+> ⚠️ **Dat getal was opgeblazen** door de vitest-exclude hierboven (PR #176).
+> Gemeten op main na de fix, 2026-08-19: **708 tests in 23 bestanden**. Het
+> verschil is zod, niet ons werk.
