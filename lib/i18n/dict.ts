@@ -630,7 +630,7 @@ const en: Dict = {
   "fomo.capacity.eyebrow": "◉ Live capacity",
   "fomo.capacity.title": "Blueprint calendar.",
   "fomo.capacity.slotsLabel": "slots remaining",
-  "fomo.capacity.note": "One blueprint engagement per quarter. When it's full, it's full.",
+  "fomo.capacity.note": "Four blueprint engagements per quarter. When they are gone, they are gone.",
   "fomo.capacity.cta": "Book the next slot",
 
   // LiveSignals (honest portfolio state)
@@ -1471,7 +1471,7 @@ const nl: Dict = {
   "fomo.capacity.eyebrow": "◉ Live capaciteit",
   "fomo.capacity.title": "Blueprint-agenda.",
   "fomo.capacity.slotsLabel": "plekken over",
-  "fomo.capacity.note": "Eén blueprint-traject per kwartaal. Vol is vol.",
+  "fomo.capacity.note": "Vier blueprint-trajecten per kwartaal. Vol is vol.",
   "fomo.capacity.cta": "Boek de volgende plek",
 
   "fomo.proof.eyebrow": "◉ Live · nu",
@@ -2284,7 +2284,7 @@ const de: Dict = {
   "fomo.capacity.eyebrow": "◉ Live-Kapazität",
   "fomo.capacity.title": "Blueprint-Kalender.",
   "fomo.capacity.slotsLabel": "Plätze frei",
-  "fomo.capacity.note": "Ein Blueprint pro Quartal. Ausgebucht bedeutet ausgebucht.",
+  "fomo.capacity.note": "Vier Blueprints pro Quartal. Ausgebucht bedeutet ausgebucht.",
   "fomo.capacity.cta": "Nächsten Slot buchen",
 
   "fomo.proof.eyebrow": "◉ Live · gerade jetzt",
@@ -3097,7 +3097,7 @@ const es: Dict = {
   "fomo.capacity.eyebrow": "◉ Capacidad en vivo",
   "fomo.capacity.title": "Agenda de blueprint.",
   "fomo.capacity.slotsLabel": "plazas disponibles",
-  "fomo.capacity.note": "Un blueprint por trimestre. Cuando se llena, se llena.",
+  "fomo.capacity.note": "Cuatro blueprints por trimestre. Cuando se llenan, se llenan.",
   "fomo.capacity.cta": "Reservar la siguiente plaza",
 
   "fomo.proof.eyebrow": "◉ En vivo · ahora mismo",

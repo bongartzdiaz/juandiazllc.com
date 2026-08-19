@@ -52,7 +52,7 @@ export const CONTACT_FAQ: FaqItem[] = [
   },
   {
     q: "What happens on a blueprint call?",
-    a: "A 30-minute structured conversation: current bottleneck, what you've already tried, what a working system would look like. You leave with a two-page written plan within 48 hours, whether or not we work together.",
+    a: "A 30-minute structured conversation: current bottleneck, what you've already tried, what a working system would look like. You leave with a one-page diagnosis, written up within 48 hours, whether or not we work together.",
   },
   {
     q: "Do you sign NDAs?",
@@ -436,7 +436,7 @@ export const CONTACT_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
     },
     {
       q: "Wat gebeurt er in een blueprint-gesprek?",
-      a: "Een gestructureerd gesprek van 30 minuten: waar het nu vastloopt, wat je al geprobeerd hebt, hoe een werkend systeem eruit zou zien. Binnen 48 uur krijg je een plan van twee pagina's, of we daarna samenwerken of niet.",
+      a: "Een gestructureerd gesprek van 30 minuten: waar het nu vastloopt, wat je al geprobeerd hebt, hoe een werkend systeem eruit zou zien. Binnen 48 uur krijg je de diagnose van één pagina op papier, of we daarna samenwerken of niet.",
     },
     {
       q: "Tekenen jullie een geheimhoudingsverklaring?",
@@ -458,7 +458,7 @@ export const CONTACT_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
     },
     {
       q: "Was passiert in einem Blueprint-Gespräch?",
-      a: "Ein strukturiertes Gespräch über 30 Minuten: wo es gerade klemmt, was Sie schon versucht haben, wie ein funktionierendes System aussähe. Innerhalb von 48 Stunden erhalten Sie einen zweiseitigen Plan — unabhängig davon, ob wir danach zusammenarbeiten.",
+      a: "Ein strukturiertes Gespräch über 30 Minuten: wo es gerade klemmt, was Sie schon versucht haben, wie ein funktionierendes System aussähe. Innerhalb von 48 Stunden erhalten Sie die einseitige Diagnose schriftlich — unabhängig davon, ob wir danach zusammenarbeiten.",
     },
     {
       q: "Unterzeichnen Sie eine Geheimhaltungsvereinbarung?",
@@ -480,7 +480,7 @@ export const CONTACT_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
     },
     {
       q: "¿Qué pasa en una llamada blueprint?",
-      a: "Una conversación estructurada de 30 minutos: dónde se atasca ahora, qué has probado ya, cómo sería un sistema que funcione. En 48 horas recibes un plan de dos páginas, trabajemos juntos después o no.",
+      a: "Una conversación estructurada de 30 minutos: dónde se atasca ahora, qué has probado ya, cómo sería un sistema que funcione. En 48 horas recibes el diagnóstico de una página por escrito, trabajemos juntos después o no.",
     },
     {
       q: "¿Firmáis acuerdos de confidencialidad?",
