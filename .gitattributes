@@ -10,6 +10,26 @@
 *.sql       text eol=lf
 *.example   text eol=lf
 
+# Broncode is ALTIJD tekst en wordt ALTIJD als tekst gediff't, ook als er per ongeluk een control-teken in staat.
+# Zonder deze regel beslist `text=auto` per blob, en dan wordt een bestand met
+# een enkele NUL-byte als binair behandeld. Het is het `diff`-attribuut dat
+# dat bepaalt, niet `text` — `text` gaat alleen over regeleindes. Zonder `diff`: `git diff` toont dan alleen
+# "Bin 3183 -> 5121 bytes" en een review ziet de wijziging niet meer.
+#
+# Dat was hier geen hypothese. lib/forms/limits.ts droeg de null-byte-strip als
+# de byte zelf in de regex, en lib/forms/limits.test.ts droeg dezelfde byte in
+# zijn testinvoer. Beide golden als binair. Een tool die control-tekens
+# normaliseert had de afweer én zijn test tegelijk kunnen slopen, groen en
+# onzichtbaar in de diff. Zie de gate in limits.test.ts.
+*.ts        text diff
+*.tsx       text diff
+*.js        text diff
+*.jsx       text diff
+*.mjs       text diff
+*.json      text diff
+*.css       text diff
+*.md        text diff
+
 # Binary files — never normalize, never line-ending-convert.
 *.png       binary
 *.jpg       binary
