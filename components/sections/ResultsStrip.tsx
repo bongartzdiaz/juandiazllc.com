@@ -1,10 +1,36 @@
 "use client";
 
-// Anonymized operator outcomes — verifiable, sector-level, no names.
-// Sits where traditional "logo wall + testimonials" would go, but
-// optimized for operators who care about numbers over logos.
+// Geanonimiseerde operator-uitkomsten. **Sinds 2026-08-19 niet gemonteerd.**
 //
-// Rules:
+// WAAROM DIT BLOK VAN DE HOMEPAGE AF IS
+//
+// De regel hieronder stond hier vanaf dag één: "Never invent a number. Every
+// metric here must be traceable to a real engagement. If a slot needs updating,
+// delete the card rather than fudge it." De bron van de vier cijfers is nooit
+// vastgelegd — niet in dit bestand, niet in de commit die het blok bracht
+// (26b352b, 2026-04-18), nergens.
+//
+// Drie maanden later legde `docs/claims.md` het tegenovergestelde vast:
+//
+//     | Client results, revenue figures, testimonials | ❌ none exist; do not imply any |
+//
+// Twee documenten in dezelfde repo, één van de twee is onjuist. claims.md is
+// later, is geschreven tijdens een audit, en is per regel 1 van dat bestand de
+// enige bron: "A number appears here or it does not get published." Dus wint
+// claims.md tot iemand met bewijs komt.
+//
+// Wat het erger maakte dan vier losse getallen: `results.sub` beloofde de lezer
+// in vier talen dat elk cijfer uit een live opdracht komt en dat een cijfer
+// zonder onderbouwing er niet komt te staan. Een claim die zichzelf
+// verifieert is niet nét-niet-onderbouwd; hij zegt het tegendeel van wat waar
+// is.
+//
+// HET COMPONENT BLIJFT STAAN, en de vertalingen ook. De kopij deugt; alleen de
+// dekking ontbreekt. Terugzetten kost één regel in app/[locale]/page.tsx —
+// zodra de cijfers in docs/claims.md staan, mét opdracht en datum. Doe je het
+// zonder, dan wordt ResultsStrip.test.ts rood.
+//
+// Rules (ongewijzigd, ze waren goed):
 // - Never invent a number. Every metric here must be traceable to a
 //   real engagement. If a slot needs updating, delete the card rather
 //   than fudge it.

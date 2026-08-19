@@ -8,7 +8,6 @@ import { Kinetic } from "@/components/sections/Kinetic";
 import { Chapters } from "@/components/sections/Chapters";
 import { Ventures } from "@/components/sections/Ventures";
 import { Stats } from "@/components/sections/Stats";
-import { ResultsStrip } from "@/components/sections/ResultsStrip";
 import { Signals } from "@/components/sections/Signals";
 import { CtaBig } from "@/components/sections/CtaBig";
 import { Contact } from "@/components/sections/Contact";
@@ -92,7 +91,10 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         <Countdown2027 />
       </section>
       <Stats />
-      <ResultsStrip />
+      {/* Het resultatenblok is bewust niet gemonteerd. Het publiceerde vier
+          klantcijfers terwijl docs/claims.md vastlegt dat die niet bestaan.
+          Zie components/sections/ResultsStrip.tsx voor het hele verhaal;
+          ResultsStrip.test.ts bewaakt dat terugzetten alleen kan met bron. */}
       <Signals />
       <CtaBig />
       <FaqSection title={translate(l, "faq.home.title")} items={getHomeFaq(l)} />

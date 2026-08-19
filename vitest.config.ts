@@ -9,7 +9,12 @@ export default defineConfig({
   },
   test: {
     include: ["**/*.test.ts", "**/*.test.tsx"],
-    exclude: ["node_modules/**", ".next/**", "preview/**", ".claude/**"],
+    // "node_modules/**" matcht alleen de wortel. Een untracked werkmap met een
+    // eigen node_modules (diaz-editor-gtm/reel-remotion) liet daardoor zod's
+    // volledige testsuite meedraaien: drie bestanden faalden permanent en het
+    // totaal telde honderden tests van een ander project mee. Beide kanten van
+    // die meting waren onjuist.
+    exclude: ["**/node_modules/**", ".next/**", "preview/**", ".claude/**"],
     environment: "node",
   },
 });
