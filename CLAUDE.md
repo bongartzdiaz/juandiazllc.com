@@ -1472,6 +1472,30 @@ branch protection op main met de vier CI-jobs.
 > erbij kwam (PR #127). Daar hoort ook de gratis Ahrefs-sleutel bij, met een
 > harde deadline op 2026-08-10.
 
+> **Bijgewerkt 2026-08-19 — branch protection staat aan, deze actie is klaar.**
+> Op `main`: force-push en verwijderen geblokkeerd, PR verplicht met nul
+> goedkeuringen (solo-repo, je kunt je eigen PR niet goedkeuren), en vijf
+> verplichte checks — `typecheck`, `test`, `i18n`, `audit`, `deps`. Admins zijn
+> niet gebonden; dat is het ontsnappingsluik als een check buiten je schuld
+> breekt. "Branch up-to-date vereist" staat uit, anders moet je voor elke merge
+> eerst rebasen.
+>
+> **Twee checks zijn bewust níet verplicht.** `audit-productie` staat wel op
+> elke PR maar wordt altijd overgeslagen, en een check die nooit rapporteert
+> laat een PR eeuwig op "expected" staan in plaats van rood te worden. `Vercel`
+> ook niet: die deploy gaat pas ná de merge naar productie, dus een hapering
+> daar zou je merge blokkeren zonder dat er iets mis is. De vijf namen komen
+> uit drie werkelijk gedraaide PR's, niet uit de workflow-bestanden — en geen
+> van de vijf workflows heeft een `paths`-filter, dus ze draaien ook op een
+> PR die alleen een `.md` aanraakt.
+>
+> Tegelijk staat `delete_branch_on_merge` aan en zijn 88 gemergede takken
+> opgeruimd (130 → 38). Wat blijft staan is werk achter een gesloten,
+> nooit-gemergede PR.
+>
+> **Nog wél open van de operator-acties hierboven:** DNS TXT voor Search
+> Console en de vier Plausible-doelen.
+
 > De dekkingsnotitie bovenaan dit bestand ("~1% file coverage", april 2026)
 > gaat over `lib/philly/*` en klopt daar nog grotendeels. De marketingkant
 > staat inmiddels op ~~989 tests~~; verwar die twee niet.
