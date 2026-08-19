@@ -261,6 +261,65 @@ or a function in the wrong project is a lead, not a fact.
 | 9 disciplines | ✅ as listed on site |
 | Languages | EN, NL, DE, ES — server-rendered, full hreflang ✅ verified |
 
+## Diaz Editor — seats, traction and affiliate (measured 2026-08-19)
+
+This section was written on a branch (`claims/single-tier-197`, 26–28 July)
+that never became a pull request and sat unreviewed for three weeks. Its
+pricing table has been dropped: the section above supersedes it, and does so
+with better evidence. What follows is the part that never appeared anywhere
+else, re-measured against project `vbozelswveaxsyccvaac` before porting.
+
+**Everything below was checked on 2026-08-19 unless the row says otherwise.**
+
+| Claim | Value | Status |
+| --- | --- | --- |
+| Seats per tier | `basic` 1 · `pro` 3 · `lifetime` 10 · `educational` 25 · `enterprise` 100 · `agency` 999 | ✅ read from `SEATS_BY_TIER` in the deployed `license-issue`. **These are not marketing numbers.** Changing a seat count on a page without changing that constant makes the page lie about what the buyer receives |
+| Internal vs customer tier names | **They do not match. Read this before renaming.** | ⚠️ customer-facing "Licentie" (€197) is internal `pro` (3 seats); customer-facing "Pro" (€247) is internal `lifetime` (10). Aligning them touches `license-issue`, `SEATS_BY_TIER`, `mapTierForCompletedSale`, the `checkout_session.tier_requested` CHECK constraint and the licence-key codec — where the tier is a *byte* (`pro=0x02`, `lifetime=0x03`). That is a migration, not a rename |
+| Affiliate commission | **20% flat** | ✅ `diaz_editor.affiliate_partners.commission_rate` has default `0.20`. One partner row exists |
+| Traction | **Nothing may be claimed** | ❌ `beta_purchases` = **0**, `licenses` = **6**, `activations` = **1**. No external purchase has ever completed. Watch the dry form as well as the rhetorical one: *"2 kopers onboarded"* sat on four live pillars until 2026-07-27 while an audit rule reported zero, because it only searched for phrases like "trusted by" |
+| Sales switch | `diaz_editor.sales_state` — manual, currently **open** | ✅ columns `is_open` / `closed_reason`; replaced the 100-cap that would otherwise have shut the shop at sale 100 |
+
+### The repo is not the database — three cases, re-measured
+
+Found in a single afternoon on 2026-07-26. Each is a place where the
+repository asserts something production does not do. **Two still hold; the
+third has since been fixed, which is exactly why this needed re-measuring
+rather than merging.**
+
+| Repo says | Production, 2026-08-19 |
+| --- | --- |
+| `20260704_founding_cap_enforcement.sql` — a trigger caps paid seats at 100 | **Still absent.** No trigger matching `%founding_cap%` exists |
+| `20260512_security_invoker_views.sql` — `security_invoker=on` on `public_beta_status` | **Still not applied, and must stay that way.** The view runs with definer rights. `anon` has no policy on `beta_purchases`/`licenses`, so invoker rights would return 0 rows → `sold=0` → *"100 spots free"*. Applying this audit fix would recreate the dishonest counter that was removed |
+| `diaz-founding-spots` publishes `paid: 4` | ✅ **resolved 2026-07-28.** Deployed v10 is a tombstone: it returns HTTP 410 `gone` with no numbers at all. The diagnosis behind the old bug is still worth keeping — 4 of the 6 licences carry no `granted_by` key in `metadata` (verified: 2 with, 4 without), and the old code read "not granted" as "paid" |
+
+That third row is the lesson in miniature. A claim written on 26 July was
+already false by 28 July, and merging the branch unread would have published
+it as current on 19 August.
+
+### Decided, but not verifiable from here
+
+These are commercial decisions and Stripe-side configuration. The Supabase MCP
+cannot see Stripe, so they are recorded as **decisions with an open
+verification**, not as measurements. Do not quote them as verified.
+
+| Claim | Recorded | What would settle it |
+| --- | --- | --- |
+| **14-day money-back guarantee**, all tiers | decided 2026-07-26 | It is a *commercial* guarantee, not the statutory withdrawal right. The art. 16(m) waivers in `diaz-beta-checkout` stay as they are and the 14 days sit on top, voluntarily. Copy must never present the two as a trade. Confirm the site still says this |
+| **Zero coupons and zero promotion codes** in the Stripe account | two deleted 2026-07-27 — `1U25nPGG` (€901 off, no expiry, no limit) and `dOsfCD5A` "FOUNDER20" (20% forever) | Stripe dashboard. **A discount that exists in Stripe but not in this file is a liability**: it survives every copy sweep, because a sweep reads text and a coupon is configuration |
+| **No badge, credit or roadmap vote may be promised** | three were live on 2026-07-27 — a founder badge, a "Built with" credit, monthly roadmap voting; one value stack priced them at €600/yr and €100/yr | The diaz-editor repo. Status rewards are cheap to write and expensive to build — check the code before publishing one |
+
+Two more from the July sweep, kept because they are rules rather than readings:
+
+1. **Never reinstate a struck-through "was €997".** A prior price that was
+   never charged breaches the Omnibus rule that it must be the lowest price of
+   the previous 30 days. The same holds for €1,000, which was never a tier.
+2. **A sweep that only replaces amounts breaks the relations they sit in.**
+   The affiliate table once read "Solo €197 → €100 commission" and
+   "Enterprise €5,000 → €197": prices updated, commissions not. A price is
+   rarely a loose number — it hangs off a commission, a percentage or a saving.
+   Fix the generator before the output; `_inject-value-stack.py` and two
+   siblings wrote an invented "+€600" back over hand-corrected pages.
+
 ## Competitor pricing — every one needs a dated source
 
 Checked 2026-07-21 against each vendor's own checkout, US pricing in USD.
