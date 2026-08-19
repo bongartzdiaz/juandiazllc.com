@@ -1,0 +1,64 @@
+name: Lead-pad
+
+# Bewaakt de kant van de conversie die geen enkele HTML-crawl ziet.
+#
+# De SEO-audit (seo-audit.yml) haalt de 176 sitemap-URL's op en maakt van elke
+# non-200 een fout — dat dekt de pagina's. Maar die pagina's zijn statisch: ze
+# blijven 200 geven terwijl het contactformulier eronder elke lead verliest.
+# Dat gebeurde op 2026-08-12, uren achtereen, zonder één alarm.
+#
+# Deze workflow meet daarom het enige wat er dan stukgaat: of PostgREST het
+# `marketing`-schema nog serveert. Zie scripts/check-lead-path.sh voor de
+# precieze assertie en de faaltakken.
+#
+# Vier keer per dag. Vaker heeft weinig zin zolang UptimeRobot niet draait —
+# die pingt elke 5 minuten en stuurt een echte melding, terwijl een rode
+# Actions-run pas opvalt als je kijkt. Zie MANUAL_TASKS.md.
+
+on:
+  schedule:
+    # 05:00, 11:00, 17:00, 23:00 UTC. De eerste valt vóór de werkdag, zodat
+    # een storing van de nacht al bekend is bij het opstarten.
+    - cron: "0 5,11,17,23 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: lead-health
+  cancel-in-progress: false
+
+jobs:
+  lead-pad:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      # Bewust géén stille skip als de secrets ontbreken. Een groene run die
+      # niets meet is exact de storingsvorm die deze workflow moet uitbannen:
+      # het incident bleef uren onzichtbaar omdat alles er goed uitzag. Rood
+      # dwingt een keuze af — secrets zetten, of deze workflow weghalen.
+      - name: Secrets aanwezig?
+        env:
+          URL: ${{ secrets.SUPABASE_URL }}
+          KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          ontbreekt=""
+          [ -z "$URL" ] && ontbreekt="$ontbreekt SUPABASE_URL"
+          [ -z "$KEY" ] && ontbreekt="$ontbreekt SUPABASE_ANON_KEY"
+          if [ -n "$ontbreekt" ]; then
+            echo "::error::Lead-pad-bewaking staat NIET aan. Ontbrekende secrets:$ontbreekt"
+            echo ""
+            echo "Zetten (de publishable key is publiek — hij staat al in de browserbundel):"
+            echo "  gh secret set SUPABASE_URL      --body 'https://<projectref>.supabase.co'"
+            echo "  gh secret set SUPABASE_ANON_KEY --body '<publishable of anon key>'"
+            echo ""
+            echo "Projectref van de marketingsite: wbgiouuifqhasedncysw"
+            exit 1
+          fi
+          echo "Secrets aanwezig."
+
+      - name: Lead-pad bereikbaar?
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: bash scripts/check-lead-path.sh

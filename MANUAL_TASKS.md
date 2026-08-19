@@ -126,17 +126,63 @@ Setup takes ~5 minutes:
       **read-write API key** (starts with `ur`).
 - [ ] Run the setup script from the repo root:
       ```bash
-      UPTIMEROBOT_API_KEY=ur... bash scripts/setup-uptimerobot.sh
+      UPTIMEROBOT_API_KEY=ur... SUPABASE_URL=https://wbgiouuifqhasedncysw.supabase.co SUPABASE_ANON_KEY=... bash scripts/setup-uptimerobot.sh
       ```
-      This creates 5 monitors:
+      This creates 6 monitors:
       - `/en` homepage
       - `/sitemap.xml`
       - `/robots.txt`
       - `/de/insights/the-build-vs-buy-trap` (DE content / i18n routing)
       - `/en/tools/energy-roi` (high-value conversion page)
-- [ ] Confirm all 5 appear green in the dashboard within ~1 minute.
+      - **PostgREST alive (lead path)** — keyword monitor, see below
+- [ ] Confirm all 6 appear green in the dashboard within ~1 minute.
 - [ ] (Optional) Add a Slack alert contact in Dashboard → Alert Contacts so
       downtime pings #ops or similar, rather than only emailing.
+
+The sixth monitor is the one that matters most and the only one that is new.
+The other five fetch static pages, and static pages keep returning 200 while
+the contact form silently loses every lead — which is what happened on
+2026-08-12 (PostgREST answered 503 PGRST002 project-wide for hours; nothing
+noticed). The monitor requests a table that deliberately does not exist, so a
+healthy PostgREST always answers `PGRST205`. When the schema cache breaks, that
+keyword disappears and UptimeRobot alerts within 5 minutes.
+
+`SUPABASE_ANON_KEY` is the publishable/anon key. It is public by design — it
+already ships in the browser bundle of every page — so putting it in the
+monitor URL exposes nothing. Do **not** use the secret/service-role key here.
+
+If you skip the two Supabase variables the script still creates the other five
+and prints what it left out.
+
+## Lead-pad-bewaking activeren — 2 secrets (2026-08-15)
+
+`.github/workflows/lead-health.yml` draait vier keer per dag en controleert of
+PostgREST het `marketing`-schema nog serveert én of anon nog steeds *niet* uit
+`marketing.leads` mag lezen. Dat is de laag die geen enkele HTML-crawl ziet.
+
+**De workflow faalt bewust zolang deze secrets niet staan.** Een groene run die
+niets meet is precies de storingsvorm die hij moet uitbannen, dus is er geen
+stille skip. Twee commando's:
+
+```bash
+gh secret set SUPABASE_URL --body 'https://wbgiouuifqhasedncysw.supabase.co'
+```
+
+```bash
+gh secret set SUPABASE_ANON_KEY --body '<publishable of anon key uit .env.local>'
+```
+
+- [ ] Beide secrets gezet.
+- [ ] Eén keer handmatig gedraaid (`gh workflow run lead-health.yml`) en groen.
+
+Lokaal draaien kan zonder secrets — het script leest dan `.env.local`:
+
+```bash
+bash scripts/check-lead-path.sh
+```
+
+Gezond is `401` met code `42501`. Alles anders is een defect, inclusief `200`:
+dat zou betekenen dat anon de leads kan uitlezen.
 
 ## Cal.com — verplichte vragen + webhook (2026-08-02)
 
