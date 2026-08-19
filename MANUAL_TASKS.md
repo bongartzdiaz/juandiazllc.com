@@ -26,16 +26,29 @@ Secrets), niet op Vercel. De functie draait los van Next.js.
 
 ### Losstaand, maar hoort erbij: de endpoints staan open
 
-`lead_notify_secret` staat **niet** in de vault, en beide functies draaien met
-`verify_jwt: false`. Wie de URL kent mag posten. Bij `lead-acknowledge` levert
-dat hooguit een herhaalde bevestiging aan de lead zelf op (het adres komt
-alleen uit de database); bij `lead-notify` kan een vreemde je valse Telegrams
-sturen.
+Beide functies draaien met `verify_jwt: false`, dus wie de URL kent mag posten.
+Bij `lead-acknowledge` levert dat hooguit een herhaalde bevestiging aan de lead
+zelf op (het adres komt alleen uit de database); bij `lead-notify` kan een
+vreemde je valse Telegrams sturen.
 
-- [ ] Genereer een willekeurige sleutel en zet hem op twee plekken:
-      in de vault als `lead_notify_secret`, en als `LEAD_NOTIFY_SECRET` op
-      beide edge functions. De volgorde maakt niet uit — beide kanten zijn
-      zo gebouwd dat er geen venster is waarin aanroepen 401'en.
+De vaultkant staat sinds 2026-08-16 klaar: `lead_notify_secret`, 44 tekens,
+willekeurig gegenereerd. De database stuurt hem al mee als bearer bij elke
+dispatch — geverifieerd. De functies negeren hem nog, want hun eigen env-var
+is ongezet.
+
+- [ ] Supabase → Project Settings → Vault → `lead_notify_secret` → onthullen
+      en kopiëren. Zet die waarde als `LEAD_NOTIFY_SECRET` bij Edge Functions
+      → Secrets. Eén secret, hij geldt voor beide functies.
+
+> **Genereer er geen nieuwe.** De database stuurt de waarde uit de vault. Zet
+> je iets anders op de functies, dan matcht de bearer niet en geven ze 401 —
+> waarna je van een binnenkomende lead niets meer hoort.
+
+**De volgorde is niet vrij**, anders dan hier eerst stond. Vault eerst,
+functies daarna, is veilig: zolang `LEAD_NOTIFY_SECRET` ongezet is, accepteert
+de functie elke aanroep en logt alleen een waarschuwing. Andersom breekt het:
+functie-env gezet terwijl de vault leeg is, betekent geen header, dus 401 op
+elke leadmelding. Die volgorde is nu al goed gezet.
 
 ### Daarna controleren
 
