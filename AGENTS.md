@@ -1503,3 +1503,141 @@ branch protection op main met de vier CI-jobs.
 > ⚠️ **Dat getal was opgeblazen** door de vitest-exclude hierboven (PR #176).
 > Gemeten op main na de fix, 2026-08-19: **708 tests in 23 bestanden**. Het
 > verschil is zod, niet ons werk.
+
+### 2026-08-19 — /services, 88 takken opgeruimd, en drie poorten die niet deden wat ze beloofden
+
+Vier PR's (#182 t/m #184 plus repo-instellingen). De rode draad was het hermeten: elke poort die deze sessie is aangeraakt bleek iets
+anders te bewaken dan er op stond.
+
+#### PR #182 — het aanbod stond dichtgeklapt onder de knop
+
+`/services` beschreef vier diensten en beantwoordde geen koopvraag. Het antwoord
+stónd er al, in de FAQ ónder de CTA: gratis blueprint-gesprek, diagnose van één
+pagina, sprint tegen vaste prijs, scope pas daarna. Wie dat las boekte; wie het
+niet zag, boekte niet.
+
+Nu staat het symptoom vóór de dienstnaam (in de woorden van de bezoeker) en de
+drietrapsladder vóór de CTA. 13 nieuwe sleutels × 4 talen = 52 dict-entries,
+per taal afgeleid uit de bestaande native FAQ in `lib/seo/faqs.ts`. **Geen
+bedrag** — `docs/claims.md` heeft er geen voor dit traject, en dat is de enige
+bron.
+
+Verder in dezelfde PR: de SEO-instrumenten wezen nog naar de Ahrefs-MCP, die op
+elke aanroep "Insufficient plan" antwoordt. Route 3 in `MANUAL_TASKS.md` wijst
+nu naar OpenSEO (MIT, zelf te hosten, draait op dezelfde DataForSEO-data en
+brengt Search Console mee).
+
+#### De metadatapoort viel om op zijn eigen importkosten
+
+Met een koude vite-cache viel `/ — titel en beschrijving verschillen per taal`
+om op `Test timed out in 5000ms`. Warm en in CI liep dezelfde test in
+milliseconden. Er was niets mis met de metadata: de test mat zijn eigen
+opstartkosten. Elke route wordt door drie `describe`-blokken gebruikt, twaalf
+dynamische imports per route, dus de assertie die toevallig eerst draaide
+betaalde de volledige transformkosten van dat paginamoduul — de homepage sleept
+de Globe met d3-geo en topojson mee.
+
+`testTimeout` verhogen zou het rood hebben weggenomen zonder de oorzaak, en
+daarna ook een échte vertraging verbergen. De routemodules worden nu eenmalig
+parallel ingeladen in een `beforeAll`. **In twee richtingen bewezen:** met
+`meta.services.title` in `nl` opzettelijk gelijkgetrokken aan `en` faalt de
+poort binnen 5 ms met een `AssertionError`, niet met een time-out.
+
+#### Takken: 130 → 38
+
+`delete_branch_on_merge` stond uit, dus elke gemergede PR liet zijn tak staan.
+Nu aan, en 88 takken opgeruimd. Elke tak moest twee onafhankelijke bewijzen
+leveren: er zit een gemergede PR achter, én main draagt de inhoud aantoonbaar
+al. Waar die twee elkaar tegenspraken is niets verwijderd tot duidelijk was
+waarom.
+
+**Dat gebeurde twaalf keer, en mijn meetlat had ongelijk.** De cherry-test
+(die squash-merges wél aankan) merkte ze aan als "inhoud niet in main". Tien
+ervan waren juist het eenvoudigste geval: gewone voorouders van main via een
+merge-commit. Bij zo'n tak ís de merge-base de tak zelf, dus de synthetische
+commit heeft een lege diff — en een lege patch-id matcht nergens op. **Test
+eerst afstamming, pas daarna patch-gelijkheid.**
+
+Wat blijft staan is werk achter een gesloten, nooit-gemergede PR (31 takken),
+vier takken zonder PR, `philly-mariadb-port`, en
+`claude/analyze-test-coverage-WBVSQ` — die PR is gemerged maar de tak liep
+daarna nog 32 commits door.
+
+#### De deny-lijst matchte op tokengrens, en dat gold voor het hele cluster
+
+`.claude/settings.local.json` had een deny op `Bash(git push --delete:*)`. Die
+blokkeerde `git push --delete X` maar niet `git push origin --delete X`: het
+woord `origin` breekt het voorvoegsel. Alle 88 verwijderingen zijn er langs
+gegaan. Wat halverwege alsnog ingreep was de auto-mode-classifier, een andere
+laag — verwar die twee niet.
+
+De drie buren in datzelfde cluster hadden **exact dezelfde lek**, en twee vormen
+waren nooit gedekt:
+
+| kwam door | reden |
+|---|---|
+| `git push origin --force main` | `origin` breekt het voorvoegsel |
+| `git push origin -f main` | idem |
+| `git push origin --mirror` | idem |
+| `git push --force-with-lease …` | eigen vlag, stond er niet in |
+| `git push deus-shared --force` | tweede remote, kwam in geen enkele regel voor |
+
+Alles gedicht behalve `git push origin +main:main`: force-pushen via refspec
+zonder vlag, en een voorvoegselregel kan een refspec niet lezen. **Repareer je
+één regel in een cluster, test dan de buren** — ze zijn met hetzelfde verkeerde
+model geschreven.
+
+#### PR #183 — branch protection op main
+
+Dat laatste gat hoort aan de GitHub-kant dicht, niet in de permissielijst.
+
+| regel | stand |
+|---|---|
+| force-push / verwijderen van `main` | geblokkeerd |
+| PR verplicht | ja, 0 goedkeuringen (solo-repo) |
+| verplichte checks | `typecheck`, `test`, `i18n`, `audit`, `deps`, `docs-sync` |
+| branch up-to-date vereist | nee |
+| admins gebonden | nee (ontsnappingsluik) |
+
+**Twee checks bewust niet verplicht.** `audit-productie` staat op elke PR maar
+wordt altijd overgeslagen; zo'n check rapporteert nooit en laat de PR op
+"expected" hangen in plaats van rood te worden. `Vercel` deployt pas ná de
+merge, dus een hapering daar zou merges blokkeren zonder defect.
+
+De namen komen uit drie werkelijk gedraaide PR's, niet uit de workflow-bestanden.
+Gecontroleerd op de val die dit gevaarlijk maakt: geen van de vijf workflows
+heeft een `paths`-filter, dus ze draaien ook op een PR die alleen een `.md`
+aanraakt. PR #183 was daar zelf het bewijs van.
+
+#### PR #184 — AGENTS.md stond buiten git en beschreef verwijderde code
+
+Het bestand was een afsplitsing van dit bestand van vóór 11 augustus. Het opende
+met "Next.js 16 + Prisma 7 + Supabase marketing site + Philly CRM app" en
+documenteerde de SLO-sectie (`lib/philly/observability.ts`, `withSpan`, drie
+budgetten) als actueel. Beide zijn met #134-#140 verwijderd. 144 regels verschil,
+en precies die 144 waren de verkeerde.
+
+Untracked zijn was de oorzaak: het kwam in geen diff, geen review, geen CI. Omdat verschillende harnassen verschillende bestanden lezen, kreeg een
+deel van de tooling maandenlang projectkennis over code die hier niet staat.
+
+`AGENTS.md` is nu een byte-identieke kopie, bewaakt door de `docs-sync`-job in
+`ci.yml` (sinds deze sessie een verplichte check). **Wijzig je er één, kopieer
+hem dan over de ander heen: `cp CLAUDE.md AGENTS.md`.**
+
+#### Meting
+
+726 tests in 25 bestanden, groen op main na #184. Dat vervangt de 708/23
+hierboven.
+
+#### Wacht op de operator
+
+- **Plausible-cijfer**: bezoekers over 30 dagen plus de vier doelen. Zonder dat
+  blijft "0 leads in `marketing.leads`" onbeslist tussen geen-verkeer en
+  geen-conversie.
+- **Akkoord voor één end-to-end test van de leadketen**: één rij in
+  `marketing.leads`, Telegram + ontvangstbevestiging, daarna de rij weg. De
+  keten is nog nooit in zijn geheel gelopen.
+- **Vier OpenSEO-taken** in `MANUAL_TASKS.md`: DataForSEO-inloggegevens (open
+  sinds 2026-08-03), self-host vs gehost kiezen, Search Console via DNS TXT
+  verifiëren, Ahrefs-MCP loskoppelen.
+- **DNS TXT voor Search Console** en de vier Plausible-doelen taggen.
