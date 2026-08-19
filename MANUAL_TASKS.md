@@ -272,7 +272,11 @@ backlinks, concurrenten) en schat die. Je hebt ze allebei nodig.
       het totaal af): `npm run seo:report` — of `npx tsx scripts/seo-report.ts
       --markt=de` voor een andere markt.
 
-**Route 2 — MCP-server (voor ad-hoc onderzoek tijdens een sessie)**
+**Route 2 — officiële MCP-server. ACHTERHAALD door route 3 (2026-08-19)**
+
+> Route 3 hieronder doet hetzelfde plus Search Console, en is wél
+> gedocumenteerd met een werkend commando. Draai route 2 alleen als route 3
+> om een andere reden afvalt. De env-naam hieronder is nooit geverifieerd.
 
 Toevoegen aan de Claude-configuratie. De officiële server draait via npx:
 
@@ -299,6 +303,45 @@ Toevoegen aan de Claude-configuratie. De officiële server draait via npx:
 > daadwerkelijk start. Zonder inloggegevens kon ik hem niet draaien, en
 > `DATAFORSEO_USERNAME` versus `DATAFORSEO_LOGIN` is precies het soort verschil
 > dat pas bij de eerste run opvalt. Houd de README ernaast.
+
+**Route 3 — OpenSEO als schil op dezelfde DataForSEO-data (2026-08-19)**
+
+OpenSEO (`github.com/every-app/open-seo`, MIT) is geen alternatief vóór
+DataForSEO maar een client eróp — met een MCP-server, een UI, en één ding dat
+de andere twee routes niet hebben: **Search Console-data door dezelfde
+koppeling.** Dat is precies het gat dat vier alinea's hierboven staat
+beschreven ("jouw clicks en vertoningen staan alleen in Search Console").
+
+De MCP levert volgens de eigen documentatie: keyword research (volume,
+moeilijkheid, CPC), live Google-SERP, domein- en paginaranglijsten,
+SERP-concurrentievergelijking, lokale/Maps-tracking, Google Business
+Profile-audits, rank tracker, backlink-overzicht, **Search
+Console-performance**, en index- en canonical-status per URL.
+
+Twee manieren, kies er één:
+
+- [ ] **Zelf hosten (gratis, geen opslag bij derden).** Docker Desktop, dan:
+      `cp .env.example .env`, `DATAFORSEO_API_KEY` invullen (base64 van
+      `email:wachtwoord` — andere vorm dan route 1, let op), `docker compose up -d`.
+      Draait op `http://localhost:3001`. **Auth staat uit in dockermodus**, dus
+      alleen achter je eigen reverse proxy of op je eigen machine.
+      Telemetrie uit met `OPENSEO_TELEMETRY_DISABLED=1`.
+- [ ] **Gehost (`app.openseo.so`).** Sneller, maar rekent volgens de repo-README
+      **28% boven op elk DataForSEO-verzoek**.
+      ```
+      claude mcp add --transport http --scope user openseo https://app.openseo.so/mcp
+      ```
+      Deze sessie is niet-interactief, dus OAuth werkt hier niet. Voor headless
+      een sleutel maken in Settings en meegeven als header:
+      `--header "Authorization: Bearer oseo_..."`. **Zet die sleutel zelf; hij
+      hoort niet in een chat en niet in de repo.**
+
+- [ ] **Search Console-property verifiëren** (DNS TXT) als dat nog niet gedaan
+      is. Zonder die stap levert het GSC-deel niets, en dat deel is de reden om
+      route 3 boven route 2 te kiezen.
+- [ ] **Ahrefs-MCP loskoppelen** zodra OpenSEO antwoordt. Hij geeft nu
+      "Insufficient plan" op elke aanroep, en een instrument dat altijd rood
+      staat maakt de volgende storing onzichtbaar.
 
 **Let op de kosten.** Elk verzoek wordt afgerekend. De client geeft `cost` per
 antwoord terug en het rapport telt op; laat dat staan. De limiet is 12

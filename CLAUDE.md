@@ -1252,6 +1252,12 @@ working tree clean, all preview builds green.
    migration by **2026-08-01** (hard deadline), and the plan gates GSC +
    keyword data so the pulse's Part C can't run. Decide: upgrade plan or
    wire GSC directly.
+
+   > ⚠️ **Achterhaald. Beslist op 2026-08-03, afgesloten op 2026-08-11:
+   > Ahrefs gaat eruit, DataForSEO komt ervoor in de plaats.** Vraag geen
+   > Ahrefs-sleutel meer aan. Sinds 2026-08-19 loopt de MCP-kant via OpenSEO
+   > (MIT, zelf te hosten), dat op dezelfde DataForSEO-data draait en
+   > Search Console meebrengt — zie route 3 in MANUAL_TASKS.md.
 3. Optional content: a 3rd article to deepen any sector; or a 4th EU market
    only if there's a real regulatory hook (there isn't an obvious one).
 
@@ -1260,6 +1266,11 @@ is reliable). Site-health curl/WebFetch from the headless env is blocked
 by Cloudflare — the UptimeRobot task in MANUAL_TASKS.md is the fix; until
 it's set up, report the health checks as "can't verify from headless env,"
 not as failures. Ahrefs Part C = "plan insufficient / GSC not wired."
+
+> ⚠️ **Deel C draait pas als DataForSEO-inloggegevens gezet zijn.** De
+> Ahrefs-MCP antwoordt inmiddels op élke aanroep met "Insufficient plan";
+> behandel dat niet als een meting maar als een losgekoppeld instrument.
+> `npm run seo:report:dry` laat gratis zien wat een rapport zou opvragen.
 
 ### 2026-07-21 — AI contact attributes: web enrichment + compliance correction
 
