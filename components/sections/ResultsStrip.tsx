@@ -1,36 +1,28 @@
 "use client";
 
-// Geanonimiseerde operator-uitkomsten. **Sinds 2026-08-19 niet gemonteerd.**
+// Geanonimiseerde operator-uitkomsten — verifieerbaar, op sectorniveau, geen
+// namen. Staat waar een logowall met quotes zou staan, maar dan voor lezers die
+// cijfers zwaarder wegen dan logo's.
 //
-// WAAROM DIT BLOK VAN DE HOMEPAGE AF IS
+// WAAROM ER EEN POORT OMHEEN STAAT
 //
-// De regel hieronder stond hier vanaf dag één: "Never invent a number. Every
-// metric here must be traceable to a real engagement. If a slot needs updating,
-// delete the card rather than fudge it." De bron van de vier cijfers is nooit
-// vastgelegd — niet in dit bestand, niet in de commit die het blok bracht
-// (26b352b, 2026-04-18), nergens.
+// Van 2026-04-18 tot 2026-08-19 stonden deze vier cijfers live in vier talen
+// terwijl `docs/claims.md` op regel 289 het tegendeel bijhield: "Client
+// results, revenue figures, testimonials — none exist; do not imply any."
 //
-// Drie maanden later legde `docs/claims.md` het tegenovergestelde vast:
+// De cijfers bleken echt (Juan, 2026-08-19). De fout zat dus niet in de
+// getallen maar in het dossier: regel 1 van claims.md is "A number appears
+// here or it does not get published", en dat was vier maanden lang niet zo.
+// Ondertussen beloofde `results.sub` de lezer wél dat elk cijfer uit een live
+// opdracht komt — een claim die voor zichzelf instaat, zonder dat iemand hem
+// nog kon controleren.
 //
-//     | Client results, revenue figures, testimonials | ❌ none exist; do not imply any |
+// Dat is het echte risico van dit blok: niet dat het liegt, maar dat niemand
+// het verschil kan zien. `ResultsStrip.test.ts` haalt dat verschil uit de
+// oplettendheid en zet het in de suite. Wil je een kaart toevoegen of een
+// cijfer wijzigen, dan gaat de poort rood tot het in claims.md staat.
 //
-// Twee documenten in dezelfde repo, één van de twee is onjuist. claims.md is
-// later, is geschreven tijdens een audit, en is per regel 1 van dat bestand de
-// enige bron: "A number appears here or it does not get published." Dus wint
-// claims.md tot iemand met bewijs komt.
-//
-// Wat het erger maakte dan vier losse getallen: `results.sub` beloofde de lezer
-// in vier talen dat elk cijfer uit een live opdracht komt en dat een cijfer
-// zonder onderbouwing er niet komt te staan. Een claim die zichzelf
-// verifieert is niet nét-niet-onderbouwd; hij zegt het tegendeel van wat waar
-// is.
-//
-// HET COMPONENT BLIJFT STAAN, en de vertalingen ook. De kopij deugt; alleen de
-// dekking ontbreekt. Terugzetten kost één regel in app/[locale]/page.tsx —
-// zodra de cijfers in docs/claims.md staan, mét opdracht en datum. Doe je het
-// zonder, dan wordt ResultsStrip.test.ts rood.
-//
-// Rules (ongewijzigd, ze waren goed):
+// Rules:
 // - Never invent a number. Every metric here must be traceable to a
 //   real engagement. If a slot needs updating, delete the card rather
 //   than fudge it.

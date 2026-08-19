@@ -286,50 +286,52 @@ typo.
 | Sectors: energy, real estate, hospitality + adjacent | ✅ |
 | Construction-management background | ✅ |
 | Ventures named as live: Voltafy, Performance Tracker, Help Mij Besparen, Salderingsregeling 2027 | ✅ real projects — but see below |
-| Client results, revenue figures, testimonials | ❌ none exist; do not imply any |
+| Four operator outcomes (`ResultsStrip`) | ✅ confirmed real by Juan, 2026-08-19 — see the table below |
+| Revenue figures, testimonials, named customers, customer counts | ❌ none exist; do not imply any |
 
-### The four numbers that were live anyway, 2026-04-18 → 2026-08-19
+### The four operator outcomes
 
-The row above says no client results exist. The homepage published four of
-them for four months, in four languages, on the section between `Stats` and
-`Signals`:
+Published on the homepage between `Stats` and `Signals`, in all four locales.
+Anonymized in the copy by design — sector and window, no names.
 
 | Metric | Context as published | Sector | Window |
 | --- | --- | --- | --- |
-| `+38%` | lead-to-call conversion after replacing a 4-tool stack | Dutch solar installer | 90 days |
-| `3.2x` | pipeline velocity once field team and office shared deal state | NL/BE energy broker | 6 months |
+| `+38%` | lead-to-call conversion after replacing a 4-tool stack with one CRM + WhatsApp flow | Dutch solar installer | 90 days |
+| `3.2x` | pipeline velocity once field team and office shared deal state in real time | NL/BE energy broker | 6 months |
 | `−61%` | time-to-quote after automating intake → survey → proposal | Residential battery installer | Q1 rollout |
 | `€0` | additional SaaS spend; retired tools funded the rebuild | Multi-location operator | Year one |
 
-Not one appears in this file. Rule 1 says that is enough on its own.
+**Status: confirmed by Juan on 2026-08-19.** What is not yet recorded here is
+the per-engagement detail — which client, which period, and where each number
+was measured. Anonymized in the copy is fine and intended; unrecorded in this
+file is what rule 1 exists to prevent. If one of these is ever challenged, that
+detail is what answers it, so it belongs here even though it never reaches a
+page. **Open item, low effort, no deadline.**
 
-**What made it worse than four undocumented numbers.** The section's own
-subheading promised the reader, in all four languages, that *every metric comes
-from a live engagement and anything we cannot attribute does not go here*
-(`results.sub`). A claim that vouches for itself is not almost-sourced; it
-states the opposite of what the record says. The component file carried the
-same rule in its header — "Never invent a number… delete the card rather than
-fudge it" — from the commit that introduced it. Two written rules, four months,
-nobody caught it.
+#### How they went four months undocumented
 
-**Why the numbers may still be real.** The introducing commit (`26b352b`,
-2026-04-18) asserts "Every number is traceable to a real engagement —
-anonymized by default, named once the client signs off." It records no source.
-The same commit deliberately left `Testimonials` empty, "no fake names, no
-invented claims" — careful about names, not about numbers. So this is not proof
-of fabrication; it is the absence of the record that rule 1 requires.
+The row above used to read "Client results, revenue figures, testimonials —
+none exist; do not imply any", while the homepage published these four in four
+languages. Two documents in one repo, one of them wrong — and this file was the
+one that was wrong.
 
-**What was done.** The section is unmounted from the homepage. The component
-and all four locales stay in the repo intact — the copy is good, only the
-backing is missing. `components/sections/ResultsStrip.test.ts` now blocks
-remounting: every published metric must appear in this section of this file,
-and the ❌ row above must be updated at the same time. Both locks were verified
-by breaking them.
+The section's own subheading promised the reader that *every metric comes from
+a live engagement and anything we cannot attribute does not go here*
+(`results.sub`). It turns out to have been true. But nobody could tell from
+outside the claim, which is the same position as a claim that is false. The
+component file carried the same rule in its header from the commit that
+introduced it (`26b352b`, 2026-04-18: "Never invent a number… delete the card
+rather than fudge it") — and that commit recorded no source either.
 
-**What it takes to bring it back.** Per engagement: the client, the period, and
-where the number was measured. Then a row here, the ❌ row above updated, and
-one line back in `app/[locale]/page.tsx`. Anonymized in the copy is fine —
-unrecorded here is not.
+Two written rules, four months, nobody caught it. A rule that lives only in a
+comment is not a rule. So the check moved into the suite:
+`components/sections/ResultsStrip.test.ts` fails if the section is mounted
+while any published metric is missing from this section of this file, and fails
+separately if this file still denies that client results exist. Both locks were
+verified by breaking them.
+
+**Consequence for future edits.** Adding a card, or changing a number, means
+adding the row here first. That is the whole point.
 
 ## juandiazllc.com — /pricing (DEUS)
 
