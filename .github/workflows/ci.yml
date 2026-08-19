@@ -4,11 +4,19 @@ name: CI
 # pushes to main. Blocks regressions — type errors or failing tests —
 # from reaching production, since merge-to-main auto-deploys via Vercel.
 #
-# To make these checks actually BLOCK a merge, enable branch protection
-# on `main` in GitHub repo settings → Branches → require status checks
-# → select "typecheck", "test", "tenant-scope" and "i18n". (Operator step;
-# a workflow alone does not enforce a merge gate — zonder die instelling
-# is dit een rapportage, geen poort.)
+# Branch protection op `main` staat sinds 2026-08-19 aan, dus dit is een
+# poort en geen rapportage meer. Verplicht zijn: typecheck, test, i18n,
+# audit en deps. `tenant-scope` stond hier ooit genoemd maar bestaat niet
+# meer — die verdween met het CRM (#134-#140).
+#
+# Twee checks zijn bewust NIET verplicht. `audit-productie` draait op elke
+# PR maar wordt altijd overgeslagen, en een check die nooit rapporteert laat
+# een PR op "expected" hangen in plaats van rood te worden. `Vercel` deployt
+# pas na de merge, dus een hapering daar zou merges blokkeren zonder defect.
+#
+# Voeg je hier een job toe die verplicht moet worden, zet hem dan pas in de
+# branch-protection-lijst nadat je hem op een echte PR groen hebt zien komen.
+# Een naam die nooit verschijnt blokkeert elke merge, stil.
 #
 # Note: `npm run lint` is intentionally NOT gated — `next lint` was
 # removed in Next.js 16 and the script currently no-ops/errors. Migrate
@@ -78,3 +86,23 @@ jobs:
       - name: i18n-sleutelpariteit (en/nl/de/es)
         run: node scripts/check-i18n-parity.mjs
 
+  # AGENTS.md en CLAUDE.md moeten byte-identiek zijn. Verschillende harnassen
+  # lezen verschillende bestanden: sommige alleen AGENTS.md, andere alleen
+  # CLAUDE.md. Lopen ze uiteen, dan krijgt de helft van de tooling verouderde
+  # projectkennis — en dat merk je niet, want beide bestanden zien er prima uit.
+  #
+  # Dat was geen theorie: tot 2026-08-19 beschreef AGENTS.md het Philly-CRM en
+  # een SLO-sectie die in #134-#140 uit deze repo verwijderd zijn.
+  #
+  # Wijzig je er één, kopieer hem dan over de ander heen: `cp CLAUDE.md AGENTS.md`.
+  docs-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v7
+      - name: AGENTS.md is gelijk aan CLAUDE.md
+        run: |
+          if ! diff -u CLAUDE.md AGENTS.md; then
+            echo "::error::AGENTS.md en CLAUDE.md lopen uiteen. Draai: cp CLAUDE.md AGENTS.md"
+            exit 1
+          fi
