@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { VENTURES, getVenture, getVentures, getVentureForTag, localizeVenture, type Venture } from "./ventures";
 import { TITLE_SUFFIX, TITLE_BUDGET } from "./seo/branding";
-import { LOCALES, type Locale } from "./i18n/dict";
+import { DICT, LOCALES, type Locale } from "./i18n/dict";
 
 /* Zelfde opzet als sectors.test.ts: eerst het merge-gedrag, daarna een gate
    over de data. Die tweede groep is wat voorkomt dat /nl, /de en /es opnieuw
@@ -163,4 +163,120 @@ describe("elke venture is in alle vier de talen af", () => {
       });
     });
   }
+});
+
+/* Een adres alleen als er iets te bezoeken is.
+ *
+ * Philly droeg `domain: "philly.juandiazllc.com"` terwijl DNS er NXDOMAIN op
+ * geeft — gemeten 2026-08-20 via de eigen resolver én via Cloudflare DoH, dus
+ * geen lokale hapering. Dat adres stond in vier talen op /work en op de
+ * homepage, onder de zin dat je erop mag klikken en zelf mag oordelen. Wie het
+ * intypte kwam nergens uit. `external` wees intussen naar `/app`, een pad dat
+ * 404 geeft sinds de surface met #134-#140 uit deze repo verdween.
+ *
+ * Deze gate is structureel en raakt het netwerk niet: hij bewaakt dat een adres
+ * en de status elkaar niet tegenspreken. Dat een lopend domein ooit ophoudt te
+ * bestaan ziet hij niet — dat is de reachability-controle in de dagelijkse
+ * productie-audit (scripts/seo-audit.ts). Twee verschillende vragen. */
+describe("een venture toont alleen een adres als hij live is", () => {
+  it("controleert daadwerkelijk ventures", () => {
+    expect(VENTURES.length).toBeGreaterThan(3);
+  });
+
+  for (const v of VENTURES) {
+    describe(v.slug, () => {
+      it(`heeft ${v.status === "live" ? "wel" : "geen"} adres, passend bij status "${v.status}"`, () => {
+        if (v.status === "live") {
+          expect(v.domain, "een live venture zonder adres is niet te bezoeken").toBeTruthy();
+        } else {
+          expect(
+            v.domain,
+            "een adres onder een productnaam leest als 'ga maar kijken' — pas als het er is",
+          ).toBeNull();
+        }
+      });
+
+      it("laat domain en external niet uiteenlopen", () => {
+        if (v.domain === null) {
+          expect(v.external, "geen adres betekent ook niets om heen te linken").toBeNull();
+        } else {
+          expect(v.external, `external hoort https://${v.domain} te zijn`).toBe(`https://${v.domain}`);
+        }
+      });
+
+      it("wijst nooit naar een intern pad", () => {
+        // `/app` stond hier maandenlang en gaf 404. Een intern pad in dit veld
+        // is per definitie fout: het veld beschrijft waar het product woont.
+        expect(v.domain ?? "", `${v.slug} domain`).not.toMatch(/^\//);
+        expect(v.external ?? "https://x", `${v.slug} external`).toMatch(/^https:\/\//);
+      });
+    });
+  }
+});
+
+/* De kopij telt mee wat de data zegt.
+ *
+ * `work.page.lede` noemde in vier talen "vijf live producten … en Philly",
+ * terwijl `docs/claims.md` er vier noemt en Philly daar bewust niet bij staat.
+ * De status in dit bestand stond al op "shipping"; alleen de zin wist dat niet.
+ *
+ * Deze gate koppelt de twee: het telwoord in de lede moet overeenkomen met het
+ * aantal ventures dat werkelijk `status: "live"` draagt. Zet iemand een status
+ * om zonder de zin te herschrijven, dan valt hij hier om — in alle vier de
+ * talen tegelijk, want het telwoord staat per taal in de tabel hieronder.
+ *
+ * Op DICT[l] geasserteerd, niet via translate(): die valt stil terug op Engels,
+ * dus een Duitse lede die het Engelse telwoord draagt zou er werkend uitzien. */
+describe("work.page.lede telt hetzelfde als de venture-data", () => {
+  const TELWOORD: Record<Locale, Record<number, string>> = {
+    en: { 1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six" },
+    nl: { 1: "één", 2: "twee", 3: "drie", 4: "vier", 5: "vijf", 6: "zes" },
+    de: { 1: "ein", 2: "zwei", 3: "drei", 4: "vier", 5: "fünf", 6: "sechs" },
+    es: { 1: "un", 2: "dos", 3: "tres", 4: "cuatro", 5: "cinco", 6: "seis" },
+  };
+
+  const live = VENTURES.filter((v) => v.status === "live").length;
+
+  it("heeft een telwoord voor het huidige aantal", () => {
+    expect(
+      TELWOORD.en[live],
+      `${live} live ventures — vul dat telwoord aan in alle vier de talen`,
+    ).toBeDefined();
+  });
+
+  /* Alleen de eerste zin, en dat is geen kosmetiek: elke lede sluit af met de
+   * vijf-fase-methode, dus het woord "vijf" / "five" / "fünf" / "cinco" staat
+   * er sowieso in. Een controle over de hele tekst zou bij vijf live ventures
+   * slagen op het verkeerde woord — precies het geval waarvoor deze gate er is. */
+  const eersteZin = (l: Locale) => DICT[l]["work.page.lede"].split(". ")[0].toLowerCase();
+
+  for (const l of LOCALES) {
+    it(`${l} noemt er ${live}`, () => {
+      const lede = DICT[l as Locale]["work.page.lede"];
+      expect(lede, `work.page.lede ontbreekt in ${l}`).toBeTruthy();
+      expect(
+        eersteZin(l as Locale),
+        `${l} telt niet "${TELWOORD[l as Locale][live]}": "${lede}"`,
+      ).toContain(TELWOORD[l as Locale][live]);
+    });
+
+    it(`${l} noemt maar één aantal`, () => {
+      // Twee telwoorden in dezelfde zin maakt de controle hierboven waardeloos:
+      // hij zou dan slagen zolang er tóevallig eentje klopt.
+      const andere = Object.entries(TELWOORD[l as Locale])
+        .filter(([n]) => Number(n) !== live)
+        .filter(([, woord]) => eersteZin(l as Locale).includes(woord))
+        .map(([n, woord]) => `${woord} (${n})`);
+      expect(andere, `${l} draagt nog een telwoord in de openingszin`).toEqual([]);
+    });
+  }
+
+  it("noemt elke live venture bij naam", () => {
+    // Anders klopt het getal wel en de opsomming niet.
+    for (const l of LOCALES) {
+      for (const v of VENTURES.filter((x) => x.status === "live")) {
+        expect(DICT[l as Locale]["work.page.lede"], `${v.name} ontbreekt in ${l}`).toContain(v.name);
+      }
+    }
+  });
 });

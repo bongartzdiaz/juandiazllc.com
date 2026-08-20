@@ -230,7 +230,7 @@ const en: Dict = {
   "ventures.label": "◉ 03 — Ventures",
   "ventures.title.a": "The playbook,",
   "ventures.title.b": "in motion.",
-  "ventures.sub": "Live products under the holding, each one the five phases applied to a different sector. They are running today — click through and judge for yourself.",
+  "ventures.sub": "Products under the holding, each one the five phases applied to a different sector. The live ones are running today — click through and judge for yourself.",
 
   // Signals section head
   "signals.label": "◉ 04 — Signals",
@@ -513,7 +513,7 @@ const en: Dict = {
   // in JSX so NL/DE/ES readers saw English copy.
   "work.page.eyebrow": "◉ The work",
   "work.page.title": "The playbook, <em>in motion.</em>",
-  "work.page.lede": "Five live products under Juan Diaz, LLC: Voltafy, Performance Tracker, Help Mij Besparen, Salderingsregeling 2027 and Philly — each one the five-phase method applied to a real sector.",
+  "work.page.lede": "Four live products under Juan Diaz, LLC: Voltafy, Performance Tracker, Help Mij Besparen and Salderingsregeling 2027. Philly is still in build. Each one is the five-phase method applied to a real sector.",
   "work.page.cta.details": "Details →",
   "work.page.cta.visit": "Visit ↗",
   "work.status.live": "Live",
@@ -1085,7 +1085,7 @@ const nl: Dict = {
   "ventures.label": "◉ 03 — Ventures",
   "ventures.title.a": "De aanpak,",
   "ventures.title.b": "in actie.",
-  "ventures.sub": "Live producten onder de holding, elk dezelfde vijf fases toegepast op een andere sector. Ze draaien vandaag — klik erdoorheen en oordeel zelf.",
+  "ventures.sub": "Producten onder de holding, elk dezelfde vijf fases toegepast op een andere sector. Wat live staat draait vandaag — klik erdoorheen en oordeel zelf.",
 
   "signals.label": "◉ 04 — Signalen",
   "signals.title.a": "Veldnotities,",
@@ -1360,7 +1360,7 @@ const nl: Dict = {
   // ─── i18n-pariteit: publieke pagina's
   "work.page.eyebrow": "◉ Het werk",
   "work.page.title": "Het draaiboek, <em>in actie.</em>",
-  "work.page.lede": "Vijf live producten van Juan Diaz, LLC: Voltafy, Performance Tracker, Help Mij Besparen, Salderingsregeling 2027 en Philly — elk de vijf-fase-methode toegepast op een echte sector.",
+  "work.page.lede": "Vier live producten van Juan Diaz, LLC: Voltafy, Performance Tracker, Help Mij Besparen en Salderingsregeling 2027. Philly wordt nog gebouwd. Elk daarvan is de vijf-fase-methode toegepast op een echte sector.",
   "work.page.cta.details": "Details →",
   "work.page.cta.visit": "Bezoek ↗",
   "work.status.live": "Live",
@@ -1903,7 +1903,7 @@ const de: Dict = {
   "ventures.label": "◉ 03 — Ventures",
   "ventures.title.a": "Die Methode,",
   "ventures.title.b": "in Bewegung.",
-  "ventures.sub": "Live-Produkte unter der Holding, jedes dieselben fünf Phasen auf eine andere Branche angewendet. Sie laufen heute — klicken Sie sich durch und urteilen Sie selbst.",
+  "ventures.sub": "Produkte unter der Holding, jedes dieselben fünf Phasen auf eine andere Branche angewendet. Was live steht, läuft heute — klicken Sie sich durch und urteilen Sie selbst.",
 
   "signals.label": "◉ 04 — Signale",
   "signals.title.a": "Feldnotizen,",
@@ -2178,7 +2178,7 @@ const de: Dict = {
   // ─── i18n-Parität: öffentliche Seiten
   "work.page.eyebrow": "◉ Die Arbeit",
   "work.page.title": "Das Drehbuch, <em>in Bewegung.</em>",
-  "work.page.lede": "Fünf Live-Produkte von Juan Diaz, LLC: Voltafy, Performance Tracker, Help Mij Besparen, Salderingsregeling 2027 und Philly — jedes davon die Fünf-Phasen-Methode in einem realen Sektor.",
+  "work.page.lede": "Vier Live-Produkte von Juan Diaz, LLC: Voltafy, Performance Tracker, Help Mij Besparen und Salderingsregeling 2027. Philly ist noch im Bau. Jedes davon ist die Fünf-Phasen-Methode in einem realen Sektor.",
   "work.page.cta.details": "Details →",
   "work.page.cta.visit": "Besuchen ↗",
   "work.status.live": "Live",
@@ -2721,7 +2721,7 @@ const es: Dict = {
   "ventures.label": "◉ 03 — Proyectos",
   "ventures.title.a": "El método,",
   "ventures.title.b": "en marcha.",
-  "ventures.sub": "Productos vivos bajo la holding, cada uno las mismas cinco fases aplicadas a otro sector. Están funcionando hoy — entra y júzgalo tú mismo.",
+  "ventures.sub": "Productos bajo la holding, cada uno las mismas cinco fases aplicadas a otro sector. Lo que está live funciona hoy — entra y júzgalo tú mismo.",
 
   "signals.label": "◉ 04 — Señales",
   "signals.title.a": "Notas de campo,",
@@ -2996,7 +2996,7 @@ const es: Dict = {
   // ─── paridad i18n: páginas públicas
   "work.page.eyebrow": "◉ El trabajo",
   "work.page.title": "El manual, <em>en movimiento.</em>",
-  "work.page.lede": "Cinco productos en marcha de Juan Diaz, LLC: Voltafy, Performance Tracker, Help Mij Besparen, Salderingsregeling 2027 y Philly — cada uno el método de cinco fases aplicado a un sector real.",
+  "work.page.lede": "Cuatro productos vivos de Juan Diaz, LLC: Voltafy, Performance Tracker, Help Mij Besparen y Salderingsregeling 2027. Philly todavía se está construyendo. Cada uno es el método de cinco fases aplicado a un sector real.",
   "work.page.cta.details": "Detalles →",
   "work.page.cta.visit": "Visitar ↗",
   "work.status.live": "En vivo",

@@ -137,7 +137,7 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
                   >
                     {t("work.page.cta.details")}
                   </LocaleLink>
-                  {v.external.startsWith("http") && (
+                  {v.external?.startsWith("http") && (
                     <a
                       href={v.external}
                       target="_blank"

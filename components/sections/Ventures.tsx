@@ -7,7 +7,9 @@ const VENTURES = [
   { id: "v2", wide: false, href: "https://performancetracker.nl",        domain: "performancetracker.nl",        live: true,  soon: false },
   { id: "v3", wide: false, href: "https://helpmijbesparen.nl",           domain: "helpmijbesparen.nl",           live: true,  soon: false },
   { id: "v4", wide: false, href: "https://salderingsregeling2027.nl",    domain: "salderingsregeling2027.nl",    live: true,  soon: false },
-  { id: "v5", wide: true,  href: "#",                                    domain: "philly.juandiazllc.com",       live: false, soon: true  },
+  // Philly heeft nog geen adres: philly.juandiazllc.com geeft NXDOMAIN. Geen
+  // href en geen domeinnaam tot er iets te bezoeken is — zie lib/ventures.ts.
+  { id: "v5", wide: true,  href: null,                                   domain: null,                           live: false, soon: true  },
 ];
 
 export function Ventures() {
@@ -25,9 +27,9 @@ export function Ventures() {
         {VENTURES.map((v) => (
           <a
             key={v.id}
-            href={v.href}
-            target={v.href.startsWith("http") ? "_blank" : undefined}
-            rel={v.href.startsWith("http") ? "noopener noreferrer" : undefined}
+            href={v.href ?? undefined}
+            target={v.href?.startsWith("http") ? "_blank" : undefined}
+            rel={v.href?.startsWith("http") ? "noopener noreferrer" : undefined}
             className={`v-card${v.wide ? " wide" : ""}`}
             data-reveal
           >
@@ -44,11 +46,11 @@ export function Ventures() {
             </div>
             <div className="v-meta">
               <span>{v.domain}</span>
-              <div className="v-arrow">
+              {v.href && <div className="v-arrow">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                   <path d="M7 17L17 7M17 7H9M17 7V15" />
                 </svg>
-              </div>
+              </div>}
             </div>
           </a>
         ))}
