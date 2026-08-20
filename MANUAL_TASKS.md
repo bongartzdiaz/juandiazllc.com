@@ -252,7 +252,8 @@ niet te onderscheiden van "niemand klikt".
 
 Ahrefs gaat eruit. `lib/seo/dataforseo.ts` is de vervanger; hij is geschreven
 tegen de API-vorm zoals die op 2026-08-03 in de documentatie stond en heeft
-18 tests. Wat nog ontbreekt zijn de inloggegevens.
+18 tests — hertelbaar met `npx vitest run lib/seo/dataforseo.test.ts`, groen op
+2026-08-20. Wat nog ontbreekt zijn de inloggegevens.
 
 **Wat DataForSEO NIET doet:** jouw clicks en vertoningen. Die staan alleen in
 Search Console en zijn privé voor de eigenaar van de property — geen enkele
@@ -265,7 +266,9 @@ backlinks, concurrenten) en schat die. Je hebt ze allebei nodig.
       Dat is **niet** je accountwachtwoord maar een apart, gegenereerd
       wachtwoord.
 - [ ] Zet ze als `DATAFORSEO_LOGIN` en `DATAFORSEO_PASSWORD` — lokaal in
-      `.env.local`, en in Vercel als de pulse daar moet draaien.
+      `.env.local`, en in Vercel als de pulse daar moet draaien. Beide staan
+      sinds 2026-08-20 met uitleg in `.env.example`; daarvóór stonden ze
+      nergens, terwijl twee bestanden ze wel lazen.
 - [ ] Eerst kijken wat het zou opvragen, gratis:
       `npm run seo:report:dry`
 - [ ] Daarna echt (dit kost geld; het script drukt de kosten per onderdeel en
@@ -318,6 +321,10 @@ SERP-concurrentievergelijking, lokale/Maps-tracking, Google Business
 Profile-audits, rank tracker, backlink-overzicht, **Search
 Console-performance**, en index- en canonical-status per URL.
 
+**Alles hieronder is nagetrokken tegen de repo op 2026-08-20** (`every-app/open-seo`,
+MIT, 12.753 sterren, laatste push 2026-08-19, niet gearchiveerd). Waar het
+document eerder "volgens de repo-README" zei, staat nu de bron erbij.
+
 Twee manieren, kies er één:
 
 - [ ] **Zelf hosten (gratis, geen opslag bij derden).** Docker Desktop, dan:
@@ -326,22 +333,75 @@ Twee manieren, kies er één:
       Draait op `http://localhost:3001`. **Auth staat uit in dockermodus**, dus
       alleen achter je eigen reverse proxy of op je eigen machine.
       Telemetrie uit met `OPENSEO_TELEMETRY_DISABLED=1`.
-- [ ] **Gehost (`app.openseo.so`).** Sneller, maar rekent volgens de repo-README
-      **28% boven op elk DataForSEO-verzoek**.
+
+      *Geverifieerd in `compose.yaml`:* `AUTH_MODE=local_noauth` staat er hard
+      in, dus de waarschuwing klopt. De poortbinding is wél gunstiger dan
+      hierboven staat: `127.0.0.1:3001:3001`, dus hij luistert uit zichzelf al
+      niet op je netwerkinterfaces.
+
+      *Wat hier niet stond en de keuze bepaalt:* **Search Console vergt bij
+      self-host een eigen Google-OAuth-app** — Cloud-project, Search Console
+      API aanzetten, consent screen, client-ID met redirect
+      `http://localhost:3001/api/gsc/oauth/callback`, en dan drie variabelen
+      (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `BETTER_AUTH_SECRET`). De
+      eigen documentatie begroot dat op ~10 minuten. En GSC is nu juist de
+      enige reden om route 3 boven route 2 te kiezen.
+- [ ] **Gehost (`app.openseo.so`).** Sneller, maar rekent **28% boven op elk
+      DataForSEO-verzoek**. Woordelijk in de README: "The way the hosted
+      service makes money is by charging 28% extra for every request we make to
+      DataForSEO."
       ```
       claude mcp add --transport http --scope user openseo https://app.openseo.so/mcp
       ```
       Deze sessie is niet-interactief, dus OAuth werkt hier niet. Voor headless
-      een sleutel maken in Settings en meegeven als header:
-      `--header "Authorization: Bearer oseo_..."`. **Zet die sleutel zelf; hij
-      hoort niet in een chat en niet in de repo.**
+      een sleutel maken in Settings → API keys en meegeven als header:
+      `--header "Authorization: Bearer oseo_..."` (`x-api-key: oseo_...` kan
+      ook). **Zet die sleutel zelf; hij hoort niet in een chat en niet in de
+      repo.**
 
-- [ ] **Search Console-property verifiëren** (DNS TXT) als dat nog niet gedaan
-      is. Zonder die stap levert het GSC-deel niets, en dat deel is de reden om
-      route 3 boven route 2 te kiezen.
-- [ ] **Ahrefs-MCP loskoppelen** zodra OpenSEO antwoordt. Hij geeft nu
-      "Insufficient plan" op elke aanroep, en een instrument dat altijd rood
-      staat maakt de volgende storing onzichtbaar.
+**Aanbeveling: gehost, tenzij het volume groeit.** Drie redenen, in volgorde
+van gewicht:
+
+1. **De MCP is het doel, en self-host als MCP-endpoint is niet gedocumenteerd.**
+   `openseo.so/docs/mcp` noemt alleen `https://app.openseo.so/mcp`. De code
+   draagt wel MCP-routes, maar zonder gedocumenteerde self-host-URL bouw je op
+   iets dat de volgende versie stil kan verplaatsen.
+2. **GSC werkt meteen**, zonder eigen Google-OAuth-app — zie hierboven.
+3. **28% van bijna niets is bijna niets.** Het rapport doet vier verzoeken per
+   run (`npm run seo:report:dry`, gemeten). Draai je dat dagelijks, dan is de
+   opslag een rondingsverschil. Wordt het honderden verzoeken per dag, dan
+   keert die rekensom om en is self-host het waard — inclusief de tien minuten
+   OAuth-werk.
+
+Kosten om rekening mee te houden: een nieuw DataForSEO-account krijgt **$1
+gratis krediet** en de **minimale opwaardering is $50** (`docs/DATAFORSEO_API_KEY.md`).
+
+- [x] ~~**Search Console-property verifiëren** (DNS TXT)~~ — **het record staat
+      er al.** Gemeten 2026-08-20 via `dns.google`:
+      `google-site-verification=ABrD7ZNd5VJaxKfLcj9Lp5mznR-tqmKMfPTPoYQ6tKs`,
+      naast de SPF-regel. Nameservers zijn `dns1/dns2.registrar-servers.com`.
+      Wat hiermee **niet** vaststaat is of de property in Search Console ook
+      werkelijk als geverifieerd staat — dat is alleen ingelogd te zien. Kijk
+      dat na vóór je de GSC-koppeling opzet; het record is er, de laatste klik
+      misschien niet.
+
+      > Meetwaarschuwing: `nslookup -type=TXT` gaf hier stil niets terug en zou
+      > de conclusie "geen record" hebben opgeleverd. `curl` naar
+      > `https://dns.google/resolve?name=…&type=TXT` gaf het record wel.
+- [ ] **Ahrefs-connector loskoppelen** zodra OpenSEO antwoordt. Twee dingen
+      preciezer dan het hier eerder stond:
+
+      **Het is een claude.ai-connector, geen lokale MCP.** `claude mcp list`
+      toont hem als `claude.ai Ahrefs: https://api.ahrefs.com/mcp/mcp`.
+      `claude mcp remove` raakt hem dus niet — loskoppelen gaat via de
+      connector-instellingen op claude.ai.
+
+      **Hij staat op `✓ Connected` en is toch dood.** De gezondheidscontrole
+      test de verbinding, niet de toegang. Gemeten 2026-08-20 op
+      `subscription-info-limits-and-usage` — een endpoint dat volgens zijn
+      eigen beschrijving gratis is en geen units verbruikt: `{"error":
+      "Insufficient plan"}`. Een instrument dat groen meldt en niets levert is
+      erger dan een dat rood staat.
 
 **Let op de kosten.** Elk verzoek wordt afgerekend. De client geeft `cost` per
 antwoord terug en het rapport telt op; laat dat staan. De limiet is 12
