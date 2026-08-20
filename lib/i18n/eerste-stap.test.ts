@@ -43,6 +43,13 @@ const NIET_HET_AANBOD: Record<string, string> = {
     "tekstlink ónder de boekknop, wijst naar het formulier — beschrijft de route, herhaalt de naam niet",
   "pricing.outro.cta":
     "/pricing verkoopt DEUS, niet het consultancytraject: 14 dagen proberen is een ander aanbod",
+  // Deze twee wezen tot 2026-08-20 naar een mailto op een geparkeerd domein en
+  // gingen daarmee langs de leadketen heen. Nu naar /contact, om dezelfde reden
+  // uitgezonderd als de proefperiode hierboven: een migratievraag of een
+  // salesgesprek over DEUS is niet het blueprint-gesprek dat `cta.book` noemt.
+  // Ze zo hernoemen zou de FAQ tegenspreken die deze poort beschermt.
+  "pricing.migration.cta": "migratie van een bestaand CRM naar DEUS — een ander aanbod dan de blueprint",
+  "pricing.outro.alt": "salesgesprek over DEUS, naast de proefperiode-knop ernaast",
 };
 
 /** Sleutels die tot 2026-08-20 een eigen naam voor dezelfde stap droegen. */
