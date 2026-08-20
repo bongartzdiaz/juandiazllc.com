@@ -1754,6 +1754,36 @@ terwijl `lib/seo/dataforseo.ts` en `scripts/seo-report.ts` ze allebei lezen. Sta
 er nu in, met de waarschuwing dat OpenSEO dezelfde inloggegevens in een ándere
 vorm wil (`DATAFORSEO_API_KEY`, base64 van `email:wachtwoord`).
 
+#### De vier Plausible-doelen: de code is af, het dashboard niet
+
+Het logboek zei dat de vier doelen "alle vier al getagd in de code" waren. Dat
+klopt, en het is nu ook end-to-end op **productie** nagelopen in plaats van in de
+broncode. Per pagina één getagde knop aangeklikt met de uitgaande call
+onderschept en geblokkeerd, zodat er geen testdata in de echte cijfers belandt:
+
+| doel | pagina | eigenschappen |
+|---|---|---|
+| `Boeking 15min` | /contact, insight-detail, `Capacity.tsx` (2×) | `url` |
+| `Pricing CTA` | /pricing | `tier`, `url` |
+| `Sector CTA` | /sectors/[slug] | `sector`, `url` |
+| `Tool CTA` | /tools/energy-roi | `tool`, `url` |
+
+Alle vier vuren naar `plausible.io/api/event` met `d: juandiazllc.com`. Er is
+niets meer aan de code te doen; de kliks worden nu al verstuurd en door Plausible
+weggegooid omdat de doelen daar niet bestaan.
+
+Nieuw ten opzichte van de notitie: drie van de vier sturen **custom properties**
+mee, en die zijn in Plausible pas zichtbaar na aparte aanmelding. Zonder die stap
+zie je het aantal kliks wel, maar niet welke tier of sector ze opleverde.
+
+**Twee instrumenten faalden hier, allebei stil.** In de geserveerde HTML is
+`data-domain` niet te vinden — Next injecteert het script client-side, dus alleen
+de preload-link staat in de bron. Een grep leverde dus "Plausible is verkeerd
+geconfigureerd" op, terwijl de gerenderde DOM gewoon
+`data-domain="juandiazllc.com"` draagt. En de netwerk-opname van de browser-pane
+registreert alleen same-origin verzoeken, dus die toont een event naar
+`plausible.io` nooit. Meet dit in de DOM met een onderschepte `fetch`.
+
 #### Meting
 
 776 tests in 28 bestanden, 692 dict-sleutels × 4 talen. Dat vervangt de 726/25
@@ -1773,4 +1803,8 @@ Dit vervangt de lijst van 19 augustus hierboven.
 - **Ahrefs-connector loskoppelen** via claude.ai — zodra OpenSEO antwoordt.
 - **Search Console**: alleen nog nakijken of de property daadwerkelijk
   geverifieerd is. Het DNS-record is er.
-- **Vier Plausible-doelen taggen.**
+- **Vier Plausible-doelen aanmaken** in het dashboard — `Boeking 15min`,
+  `Pricing CTA`, `Sector CTA`, `Tool CTA` — plus de drie custom properties
+  (`tier`, `sector`, `tool`). Taggen is af en geverifieerd; zonder de doelen
+  worden de kliks binnengehaald en weggegooid. Exacte namen en de meting staan
+  in `MANUAL_TASKS.md`.

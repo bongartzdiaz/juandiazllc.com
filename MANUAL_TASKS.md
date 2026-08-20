@@ -234,19 +234,65 @@ create unique index concurrently if not exists leads_cal_uid_uniek
 
 Dit is een schemawijziging op productie — bewust niet zelf uitgevoerd.
 
-## Plausible — doel "Boeking 15min" aanmaken (2026-08-02)
+## Plausible — vier doelen aanmaken (2026-08-02, gemeten 2026-08-20)
 
-De boekknop op `/contact` is getagd met `plausible-event-name=Boeking+15min`.
-De `tagged-events`-variant van het script staat al aan
-(`components/Analytics.tsx`), dus de klik wordt verstuurd zodra de knop live is.
+**Plausible telt een custom event pas als het doel bestaat.** Zonder deze stap
+komen de kliks binnen en worden ze weggegooid — je ziet niets, en dat is niet te
+onderscheiden van "niemand klikt".
 
-**Maar Plausible telt een custom event pas als het doel bestaat.** Zonder deze
-stap komen de kliks binnen en worden ze weggegooid — je ziet niets, en dat is
-niet te onderscheiden van "niemand klikt".
+De code-kant is af en op productie geverifieerd (zie de meting onderaan). Wat
+ontbreekt zijn vier regels in het dashboard.
 
-- [ ] Plausible → Site Settings → **Goals** → *Add goal* → **Custom event**
-- [ ] Naam exact: `Boeking 15min` (de `+` in de class is een spatie)
-- [ ] Na de eerste echte klik controleren of hij in het dashboard verschijnt
+Plausible → Site Settings → **Goals** → *Add goal* → **Custom event**, en dan
+deze namen **exact** overnemen. De `+` in de class is een spatie; de naam in
+Plausible bevat dus een spatie.
+
+- [ ] `Boeking 15min` — boekknop, gaat naar `cal.com/juandiazllc/15min`.
+      Vier plekken: `/contact`, de insight-detailpagina, en twee in
+      `components/Capacity.tsx`.
+- [ ] `Pricing CTA` — de vier tierknoppen plus de proef- en e-mailknop op
+      `/pricing`.
+- [ ] `Sector CTA` — de contactknop op `/sectors/[slug]`.
+- [ ] `Tool CTA` — de contactknop op `/tools/energy-roi`.
+
+**Vergeet de custom properties niet.** Drie van de vier sturen naast de naam ook
+eigenschappen mee, en die zijn in Plausible pas zichtbaar als je ze apart
+aanmeldt (Site Settings → **Custom properties**):
+
+| doel | eigenschappen |
+|---|---|
+| `Pricing CTA` | `tier` (starter / pro / business / enterprise / trial / email), `url` |
+| `Sector CTA` | `sector` (de slug), `url` |
+| `Tool CTA` | `tool` (`energy-roi`), `url` |
+| `Boeking 15min` | `url` |
+
+Zonder die stap zie je wél het aantal kliks, maar niet welke tier of sector ze
+opleverde — en dat is precies waarvoor de tags zijn aangebracht.
+
+### Wat er op 2026-08-20 gemeten is
+
+De keten is end-to-end nagelopen op **productie**, niet in de code. Per pagina
+is een getagde knop aangeklikt met de uitgaande call onderschept en
+**geblokkeerd**, zodat er geen testdata in de echte cijfers belandt. Wat
+Plausible zou versturen bij een klik op de starter-tier:
+
+```json
+{"n":"Pricing CTA","d":"juandiazllc.com","u":"https://juandiazllc.com/nl/pricing",
+ "p":{"tier":"starter","url":"https://juandiazllc.com/nl/contact?interest=starter"}}
+```
+
+naar `https://plausible.io/api/event`. Alle vier de doelen vuren, met het juiste
+domein. Er is dus **niets meer aan de code te doen**: klikken worden nu al
+verstuurd en door Plausible weggegooid omdat de doelen ontbreken.
+
+> **Meetwaarschuwing, twee instrumenten faalden hier.** In de geserveerde HTML
+> is `data-domain` **niet** te vinden — Next injecteert het script client-side,
+> dus alleen de preload-link staat in de bron. Een grep op de HTML zou de
+> conclusie "Plausible is verkeerd geconfigureerd" opleveren. In de gerenderde
+> DOM staat `data-domain="juandiazllc.com"` gewoon. En de netwerk-opname van de
+> browser-pane registreert alleen same-origin verzoeken, dus die toont het
+> event naar `plausible.io` nooit. Meet dit in de DOM, met een onderschepte
+> `fetch`/`sendBeacon` — niet in de HTML en niet in het netwerkpaneel.
 
 ## DataForSEO — vervangt Ahrefs (client staat klaar, 2026-08-03)
 
