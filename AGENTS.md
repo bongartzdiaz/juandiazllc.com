@@ -1840,12 +1840,68 @@ minder tussen "verzenden" en het bevestigingsscherm.
 plekken staan, met twee verschillende gevolgen bij ontbreken. Nu is er één
 plek — de edge-function-secrets — en één plek waar je kunt zien of het werkte.
 
+#### De duurste knop op de site ging langs de leadketen heen
+
+Drie CTA's op `/pricing` wezen naar `hello@lucen.ai`: de Enterprise-tier, de
+migratiedienst en "praat met sales". Live in vier talen, op een pagina die in de
+topnav staat en in de sitemap op prioriteit 0,9.
+
+**`lucen.ai` is een geparkeerd domein.** `https://` geeft een SSL connect error
+(curl exit 35); `http://` geeft 302 met `X-Served-By: Namecheap URL Forward` naar
+`www.lucen.ai`, en dat is een parking-lander die zichzelf beschrijft als *"the
+parked domain's origin … so the market can attribute the visit"*. Er staat wel
+een MX (Namecheap-forwarding), dus post kán aankomen — of `hello@` een
+doorstuurregel heeft is van buitenaf niet vast te stellen.
+
+**De echte kosten zaten in de omleiding, niet in het adres.** Een `mailto:` slaat
+alles over wat er deze twee dagen aan de leadketen is gebouwd: geen rij in
+`marketing.leads`, dus geen `leads_notify_new`, dus geen Telegram en geen
+ontvangstbevestiging. Het spoor houdt op bij de Plausible-klik. Dat trof
+uitgerekend de lead die vanaf vijftien zitplaatsen begint.
+
+De vier tier-knoppen deden het al goed — `/contact?interest=<slug>`, uitgelezen
+door `ContactForm.tsx` en weggeschreven in `source` als
+`contact_page:interest=pro:stage=3`. De drie afwijkers volgen dat patroon nu ook
+(`enterprise`, `migration`, `sales`). Op de lokale productiebuild gemeten: nul
+mailto's, zeven formulierlinks per taal, alle vier de talen correct van
+taalprefix voorzien.
+
+**Twee poorten deden hier hun werk, en één daarvan was niet van mij.**
+
+`lib/contactadressen.test.ts` (nieuw) eist dat elk e-mailadres in geleverde code
+op juandiazllc.com staat. De strenge helft — geen `mailto:` buiten het domein —
+kent geen uitzonderingen, en die viel meteen op mijn eigen toelichting, omdat ik
+daarin `mailto:hello@lucen.ai` letterlijk had opgeschreven. De comment is
+herschreven; de poort niet verzwakt. Uitzonderingen dragen een **aantal**, zodat
+een tweede, échte vermelding in hetzelfde bestand niet stil meelift. In drie
+richtingen gebroken: mailto teruggezet, vreemd adres zonder uitzondering,
+uitzondering achterhaald — alle drie rood, daarna weer groen.
+
+`lib/i18n/eerste-stap.test.ts` (uit #187) ving de wijziging zelf op: twee knoppen
+die nu naar `/contact` wijzen droegen niet `cta.book`. Die poort voorkomt dat
+dezelfde stap opnieuw elf namen krijgt. Hier was hernoemen fout — `cta.book` is
+het blueprint-gesprek, en een migratievraag over DEUS is dat niet; de FAQ zegt in
+vier talen dat die twee verschillen. Ze staan dus in `NIET_HET_AANBOD` met reden,
+naast het precedent dat er al stond (`pricing.outro.cta`, om exact dezelfde
+reden).
+
+**Twee vragen die hierdoor open kwamen te liggen, en die van de operator zijn.**
+Er staat geen koopweg meer in deze repo — Stripe vertrok met #134, en de drie
+grep-treffers op "stripe/checkout" zijn alle drie vals (een CSS-klasse
+`.philly-stripe`, een comment, en "checkout" in een hotelcontext). En de vier
+bedragen op die pagina staan niet in `docs/claims.md`; ze komen uit
+`_drafts/pricing/pricing-tiers.csv`, wat ze afgeleid maakt, niet geverifieerd.
+
+**Mutatietesten met ongestaged werk:** hersteld uit een kopie in de scratchpad,
+niet met `git checkout --`. Die laatste herstelt vanuit de index en had het werk
+van deze sessie teruggezet naar HEAD.
+
 #### Meting
 
-776 tests in 28 bestanden, 692 dict-sleutels × 4 talen. Dat vervangt de 726/25
-hierboven. De verwijdering van `lib/notify.ts` verandert dat aantal niet: er was
-geen test die het bestand aanraakte, en dat is precies wat een ongeobserveerde
-schakel is.
+780 tests in 29 bestanden, 692 dict-sleutels × 4 talen. Dat vervangt de 776/28
+hierboven, en die weer de 726/25. De verwijdering van `lib/notify.ts` verandert
+dat aantal niet: er was geen test die het bestand aanraakte, en dat is precies
+wat een ongeobserveerde schakel is.
 
 #### Wacht op de operator — bijgewerkt 2026-08-20
 

@@ -35,13 +35,23 @@ type Tier = {
 //
 // TIERS prices + minSeats are regenerated from `_drafts/pricing/pricing-tiers.csv`
 // via `npm run regen:pricing`. ctaHref values are hand-controlled (per-tier
-// destination is a UX decision, not data). Edit pricing in the CSV, not here.
+// destination is a UX decision, not data) — de generator leest ze terug uit dit
+// bestand, dus een wijziging hier overleeft een regeneratie.
+//
+// Alle vier de tiers wijzen naar /contact?interest=<slug>. Tot 2026-08-20 ging
+// Enterprise naar een mailto op `hello@lucen.ai`, en dat kostte twee dingen:
+// lucen.ai
+// is een geparkeerd domein (Namecheap URL Forward naar een parking-lander, geen
+// werkende HTTPS), en een mailto slaat de leadketen over — geen rij in
+// marketing.leads, geen Telegram, geen spoor voorbij de Plausible-klik. Dat trof
+// uitgerekend de duurste lead op de site. Zie lib/contactadressen.test.ts.
+// Edit pricing in the CSV, not here.
 // <BEGIN GENERATED:TIERS>
 const TIERS: Tier[] = [
   { key: "starter", monthlyPrice: "€40", annualPrice: "€32", minSeats: 3, ctaHref: "/contact?interest=starter" },
   { key: "pro", monthlyPrice: "€69", annualPrice: "€55", minSeats: 5, ctaHref: "/contact?interest=pro" },
   { key: "business", monthlyPrice: "€99", annualPrice: "€79", minSeats: 10, ctaHref: "/contact?interest=business" },
-  { key: "enterprise", monthlyPrice: null, annualPrice: null, minSeats: 15, ctaHref: "mailto:hello@lucen.ai?subject=DEUS%20Enterprise%20enquiry" },
+  { key: "enterprise", monthlyPrice: null, annualPrice: null, minSeats: 15, ctaHref: "/contact?interest=enterprise" },
 ];
 // <END GENERATED:TIERS>
 
@@ -409,7 +419,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
           <p style={{ color: "var(--muted)", fontSize: 16, lineHeight: 1.65, marginBottom: 24, maxWidth: "60ch" }}>
             {t("pricing.migration.body")}
           </p>
-          <LocaleLink className="btn" href="mailto:hello@lucen.ai?subject=DEUS%20migration%20service">
+          <LocaleLink className="btn plausible-event-name=Pricing+CTA plausible-event-tier=migration" href="/contact?interest=migration">
             {t("pricing.migration.cta")} <span className="arr">→</span>
           </LocaleLink>
         </div>
@@ -480,7 +490,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
             <LocaleLink className="btn primary btn-mag plausible-event-name=Pricing+CTA plausible-event-tier=trial" href="/contact?interest=trial">
               {t("pricing.outro.cta")} <span className="arr">→</span>
             </LocaleLink>
-            <LocaleLink className="btn plausible-event-name=Pricing+CTA plausible-event-tier=email" href="mailto:hello@lucen.ai">
+            <LocaleLink className="btn plausible-event-name=Pricing+CTA plausible-event-tier=sales" href="/contact?interest=sales">
               {t("pricing.outro.alt")}
             </LocaleLink>
           </div>
