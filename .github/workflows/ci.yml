@@ -95,14 +95,36 @@ jobs:
   # een SLO-sectie die in #134-#140 uit deze repo verwijderd zijn.
   #
   # Wijzig je er één, kopieer hem dan over de ander heen: `cp CLAUDE.md AGENTS.md`.
+  # Deze job bewaakt bestanden die uit een bron worden afgeleid en daardoor stil
+  # uit de pas kunnen lopen. De prijstabel hoort hier sinds 2026-08-20 bij: die
+  # controle bestond al als `npm run regen:pricing:check`, maar stond in geen
+  # enkele workflow. Ze hier aanhaken maakt haar meteen verplicht, want
+  # `docs-sync` staat al in de branch-protection-lijst — een nieuwe job zou daar
+  # eerst met de hand bij moeten, en tot dat moment niets bewaken.
+  #
+  # Bewust GEEN `npm ci`: beide stappen lezen alleen bestanden.
   docs-sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
       - name: AGENTS.md is gelijk aan CLAUDE.md
         run: |
           if ! diff -u CLAUDE.md AGENTS.md; then
             echo "::error::AGENTS.md en CLAUDE.md lopen uiteen. Draai: cp CLAUDE.md AGENTS.md"
+            exit 1
+          fi
+      # De prijspagina en pricing-tiers-en.md worden gegenereerd uit
+      # _drafts/pricing/pricing-tiers.csv. Wijzigt iemand een bedrag in de
+      # gegenereerde TS in plaats van in de CSV, dan is de CSV geen bron meer —
+      # en `docs/claims.md` verwijst naar prijzen die dan nergens meer één
+      # herkomst hebben.
+      - name: Prijstabel is afgeleid uit de CSV
+        run: |
+          if ! node scripts/regenerate-pricing.mjs --check; then
+            echo "::error::Prijspagina loopt uit de pas met _drafts/pricing/pricing-tiers.csv. Wijzig de CSV en draai: npm run regen:pricing"
             exit 1
           fi
