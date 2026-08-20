@@ -26,7 +26,13 @@ describe("tagSlug", () => {
 describe("tagLabel", () => {
   it("geeft het vertaalde label", () => {
     expect(tagLabel("nl", "real-estate", "Real estate")).toBe("Vastgoed");
-    expect(tagLabel("de", "hospitality", "Hospitality")).toBe("Hotellerie");
+    // Was "Hotellerie" tot 2026-08-20. Dat was het derde Duitse woord voor
+    // dezelfde sector, naast Hospitality (13x) en Gastgewerbe (3x), en het
+    // stond uitgerekend in de H1 en de titel van de tagpagina. Deze regel
+    // hield het defect op zijn plek: een test die de fout vastlegt, verdedigt
+    // hem. Nu een tag die in het Duits echt anders luidt, zodat de assertie
+    // nog steeds bewijst dat er vertaald wordt en niet teruggevallen.
+    expect(tagLabel("de", "real-estate", "Real estate")).toBe("Immobilien");
     expect(tagLabel("es", "systems", "Systems")).toBe("Sistemas");
   });
 
