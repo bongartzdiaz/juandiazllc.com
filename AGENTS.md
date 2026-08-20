@@ -1896,10 +1896,134 @@ bedragen op die pagina staan niet in `docs/claims.md`; ze komen uit
 niet met `git checkout --`. Die laatste herstelt vanuit de index en had het werk
 van deze sessie teruggezet naar HEAD.
 
+#### PR #197 — een plan voor de naamzoekopdrachten, en wat er niet in staat
+
+`docs/seo-geo-plan.md`. De aanleiding was een vraag met een harde eis erin: alles
+wat met de naam te maken heeft moet op pagina 1. Dat is een entiteitsprobleem,
+geen rankingprobleem — er lopen naamgenoten rond (voetballers, een bokser) met
+decennia aan autoriteit.
+
+**§0 gaat over de instrumenten, niet over de site.** Vijf meters staan stuk of
+uit: Vercel Analytics geeft 404, er is geen Plausible-sleutel, Search Console is
+niet uitgelezen, DataForSEO heeft geen inloggegevens en Ahrefs antwoordt
+"Insufficient plan". Zolang die vijf zo staan is elke uitspraak over verkeer een
+schatting. Dat staat als stap nul in het plan en niet als voetnoot.
+
+§5 is een geordende lijst van negen punten met per punt een eigenaar. Zes zijn
+van de operator, twee zijn beslissingen, één is code — dat laatste is dit werk.
+§6 zegt wat er níet beloofd wordt: geen termijn op een SERP die door
+naamgenoten wordt bezet, geen belofte over AI-citaties, en geen cijfer zolang
+§0 openstaat.
+
+#### PR #198 — vier personen werden één
+
+De JSON-LD beschreef dezelfde mens op vier plekken en was het oneens met
+zichzelf. Gemeten, niet vermoed:
+
+| bestand | naam | url |
+|---|---|---|
+| `app/layout.tsx` | Juan Stefan Bongartz Diaz | geen |
+| `app/[locale]/layout.tsx` | Juan Stefan Diaz | /{l}/about |
+| `app/[locale]/about/page.tsx` | Juan Stefan Bongartz Diaz | /about → 307 |
+| `lib/seo/article.ts` | Juan Stefan Bongartz Diaz | /about → 307 |
+
+Geen van de vier droeg een `@id`. Zonder dat mag een crawler ze als vier losse
+personen lezen, en dan verdeelt elk signaal zich over vier knopen — precies het
+omgekeerde van wat je wilt op een naam die al verzadigd is met naamgenoten.
+
+Nu één knoop: `PERSON_ID` in `lib/seo/branding.ts`, met `name` plus
+`alternateName[]` zodat alle drie de naamvormen op dezelfde entiteit uitkomen.
+`PERSON_URL` wijst op `/en/about` en niet meer op `/about`, want dat laatste
+geeft 307 en een `url` die op een redirect uitkomt is een zwakker signaal.
+`twitter.com/juandiazllc` is uit `sameAs` gehaald: 404 via x.com, en `sameAs` is
+een verificatieveld — een dood adres daarin is een gefaalde controle, geen
+ontbrekend signaal.
+
+`lib/seo/persoon-entiteit.test.ts` telt per bestand de `Person`-knopen en eist
+evenveel verwijzingen naar `PERSON_ID`. Een nieuwe knoop zonder gedeelde `@id`
+is hoe dit gat is ontstaan en hoe het terugkomt.
+
+#### PR #199 — llms.txt droeg de claim die #188 er net had uitgehaald
+
+`public/llms.txt` is het bestand waarvan het hele doel is dat AI-assistenten het
+citeren. Er stond in:
+
+> Five active ventures — Voltafy, Performance Tracker, Help Mij Besparen,
+> Salderingsregeling 2027, Philly/DEUS CRM.
+
+Vier staan er live; Philly wordt gebouwd. PR #188 heeft die claim eerder dezelfde
+dag uit `work.page.lede` gehaald en er in vier talen een poort omheen gezet.
+**Die poort leest `dict.ts`.** Dit bestand stond in `public/`, werd door geen
+enkele test aangeraakt, en overleefde de reparatie.
+
+Daarnaast stond er `Last updated: 2026-08-03`, zeventien dagen oud.
+
+**Het is nu een route, geen bestand.** `app/llms.txt/route.ts` leest
+`lib/seo/llms.ts`, en daar komen de feiten uit de bron: de venture-regel uit
+`VENTURES`, de talen uit `LOCALES`, de naamvormen en het GitHub-adres uit
+`branding.ts`. `public/llms.txt` is verwijderd, en dat moest ook — Next serveert
+statische bestanden vóór routes met dezelfde naam, dus met allebei had de route
+nooit iets gedaan. Een van de elf poorten bewaakt precies dat, want een
+teruggezet bestand schakelt de generator uit zonder één foutmelding.
+
+**Geen telwoord meer in die regel.** Er staat nu "Live products — " plus de
+lijst. Een getal naast een lijst is een tweede bron voor hetzelfde feit, en dat
+was letterlijk het defect. Een poort houdt tegen dat het terugkomt.
+
+**De afgeleide datum bleek ouder dan de ingetypte.** Nieuwste artikel:
+2026-07-20; er stond 2026-08-03. Die datum was de dag dat iemand het bestand
+bewerkte, niet de dag van de nieuwste inhoud — de handmatige versie overdreef
+dus de versheid. Daarmee klopte mijn eigen kop ook niet: "Last updated" belooft
+iets over het hele bestand, terwijl de datum alleen artikelen meet en een
+venture-wijziging hem niet verschuift. De kop zegt nu wat hij meet.
+
+**`/llms-full.txt` is nieuw** — de volledige tekst van elk Engelstalig artikel en
+elke marktnotitie, 28 KB, zodat een assistent de bron kan lezen in plaats van
+ernaar te raden. Alleen Engels: de markt-specifieke clusters staan niet onder
+`/en` en zouden 404-URL's opleveren, dezelfde keuze als in `feed.json`.
+
+**Eén afvlakker voor twee afnemers.** Toen `cta` als bloktype werd toegevoegd
+(#82) moest `feed.json` met de hand mee. Dat werkte omdat er één afnemer was.
+`lib/seo/plattetekst.ts` is nu de enige plek die de bloktypes kent, met een
+`never`-tak die een zesde type tot compileerfout maakt in plaats van een stille
+lege string. Twee vormen uit één switch: platte tekst voor JSON Feed, waar dat
+per specificatie hoort, en markdown voor llms-full, waar de koppen blijven staan
+en de href van een `cta` overleeft — die viel in de platte vorm helemaal weg.
+
+**Zes mutaties, zes keer rood.** De onwaarheid terugzetten, de datum intypen,
+`public/llms.txt` terugzetten, een `cta` stil laten vallen, de href weghalen, en
+de dekkingscontrole een bloktype laten eisen dat niet bestaat.
+
+#### De meetlat brak twee keer, op dezelfde manier, één laag uit elkaar
+
+De telwoord-poort stond eerst als:
+
+    new RegExp(`\b${w}\b`)
+
+Dat matcht niets. In een template literal is `\b` het backspace-teken, geen
+woordgrens — de test kon per definitie niet falen, en de mutatie met "Five
+active ventures" er letterlijk in liep er groen doorheen. Alleen omdat er twee
+tests op dezelfde mutatie hoorden af te gaan en er maar één afging, viel het op.
+
+Toen ik het wilde repareren met een Python-script trapte ik in exact dezelfde
+val: `\b` in een gewone Python-string is óók een backspace. De reparatie kon de
+regel niet vinden.
+
+De oorzaak eronder is het opschrijven, niet het denken: **de heredoc halveert een
+dubbele backslash.** Wat ik als `\b` typte werd `\b` in het bestand. Enkele
+backslashes overleven; dubbele niet. De poort is daarom herschreven zonder
+escapes — `regel.split(/[^a-z]+/)` en een `Set` — en waar een letterlijke
+backslash nodig is, gaat het via een raw string.
+
+**Regel: bouw geen regex uit een template literal.** Een regex-literal
+(`/[^a-z]+/`) gaat niet door string-escaping heen en is daarmee immuun voor deze
+hele klasse. Zie ook [[feedback_verify_the_measuring_stick]] — dit is hetzelfde
+mechanisme als de shell-expansie in `"…|\$1,200"`, één laag verder naar binnen.
+
 #### Meting
 
-780 tests in 29 bestanden, 692 dict-sleutels × 4 talen. Dat vervangt de 776/28
-hierboven, en die weer de 726/25. De verwijdering van `lib/notify.ts` verandert
+796 tests in 31 bestanden, 692 dict-sleutels × 4 talen. Dat vervangt de 780/29
+van een uur eerder, en die weer de 776/28 en de 726/25. De verwijdering van `lib/notify.ts` verandert
 dat aantal niet: er was geen test die het bestand aanraakte, en dat is precies
 wat een ongeobserveerde schakel is.
 
