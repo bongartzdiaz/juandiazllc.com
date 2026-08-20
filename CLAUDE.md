@@ -2207,6 +2207,71 @@ eigen domein gezet (rood) en ENOTFOUND gedegradeerd tot waarschuwing (rood).
 Op de draaiende build in vier talen nagelopen: link, `rel`, `affiliation`,
 Duitse H1 en Duitse description.
 
+### 2026-08-20 (vervolg) — de Duitse leesbeurt: veertien zinnen, en een test die het defect verdedigde
+
+De vorige PR vond bij toeval twee kapotte Duitse woorden. Twee fouten in tien
+willekeurig gelezen sleutels is geen toeval maar een steekproef, dus is het hele
+Duitse blok uitgelezen — 696 sleutels, regel voor regel, met en/nl ernaast waar
+de bedoeling onduidelijk was.
+
+**Veertien zinnen aangepast, in drie klassen.**
+
+*Woorden die iets anders betekenen.* `Bauingenieurlich` staat op geen enkele
+woordenlijst, en `Bauingenieur` is bovendien een ander vak dan bouwmanagement —
+het stond drie keer, waaronder in de H2 van de methode-sectie op de homepage en
+in de lede van `/about`. `Produkte im Versand` en `Wir versenden bereits` gaan
+over pakketpost, niet over software uitleveren. Let op: `Versand` blijft wél
+staan in `pricing.feat.email.customSmtp`, want dáár betekent het precies wat er
+staat. Een verbod op het woord zou dat kapot hebben gemaakt.
+
+*Eén begrip, meerdere woorden.* `tag.label.hospitality` zei **Hotellerie** — een
+derde Duits woord voor dezelfde sector naast Hospitality (13×) en Gastgewerbe
+(3×), uitgerekend in de H1 en de titel van de tagpagina, terwijl de sectorpagina
+ernaast Hospitality zegt. En `Operatoren` (5×) leest in het Duits als
+wiskundige of machine-operatoren, terwijl het publiek overal elders `Betreiber`
+heet (25×). De meta-description die in #108 geschreven werd, deed het al goed;
+de pagina-lede ernaast niet.
+
+*Aanspreekvorm.* Het Duitse blok is Sie — 122 keer gemeten — met drie du-vormen
+ertussen. Dat leest als drie verschillende schrijvers.
+
+**De poort bewaakt wat mechanisch is, niet wat een lezer moet doen.**
+`lib/i18n/duits.test.ts` heeft twee regels: geen du-vormen, en geen van de vijf
+woorden die zijn teruggedraaid — elk met de reden erbij, want een verbod zonder
+reden wordt over een jaar weggehaald door iemand die niet weet waarom het er
+stond. Hij leest `DICT.de` en niet de bestanden, zodat het testbestand zichzelf
+niet laat struikelen over de woorden die het beschrijft. In drie richtingen
+gebroken: `Bauer` terug, een du-vorm terug, `Hotellerie` terug.
+
+Wat een test hier níet kan is zien of Duits klópt. Daar was de leesbeurt voor,
+en die is nu gedaan.
+
+#### Een bestaande test hield het defect op zijn plek
+
+`tags.test.ts` asserteerde `tagLabel("de","hospitality") === "Hotellerie"`. De
+poort die moest bewijzen dát er vertaald wordt, legde precies de verkeerde
+vertaling vast. Hij is niet aangepast aan het nieuwe antwoord maar verplaatst
+naar een tag die in het Duits écht anders luidt (`real-estate` → Immobilien) —
+met "Hospitality" als verwachting zou de assertie ook zijn geslaagd op een
+terugval naar het Engels, en dan bewijst hij niets meer.
+
+**Een test die de fout vastlegt, verdedigt hem.** Bij elke gele vlag hoort dus
+de vraag welke test hem tot nu toe groen hield.
+
+#### Meting
+
+807 tests in 32 bestanden, 696 dict-sleutels × 4 talen. Op de draaiende build in
+de geserveerde HTML nagelopen: `Bauingenieurlich` 0×, `Hotellerie` 0×,
+`Operatoren` 0×, `Produkte im Versand` 0×, du-vormen 0×, en de vervangingen
+staan op `/de`, `/de/about`, `/de/services`, `/de/sectors/hospitality`,
+`/de/sectors/adjacent` en `/de/insights/tag/hospitality`.
+
+**Wat blijft staan.** `priv.p.contact` belooft in vier talen dat een inzending
+"sofort als E-Mail (über Resend)" aankomt. Gemeten op 2026-08-20 doet hij dat
+niet: de edge function meldt `resend: skipped: RESEND_API_KEY unset`. Dat is
+geen vertaalfout maar een operator-actie die al op de lijst staat — tot die
+sleutel gezet is, staat er in een privacyverklaring iets dat niet gebeurt.
+
 #### Wacht op de operator — bijgewerkt 2026-08-20
 
 Dit vervangt de lijst van 19 augustus hierboven.
