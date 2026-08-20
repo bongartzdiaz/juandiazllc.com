@@ -16,8 +16,23 @@ export type Venture = {
   // Drives the /work/[slug] → /sectors/[slug] cross-link.
   sectorSlug: string;
   status: "live" | "shipping" | "reserved";
-  domain: string;
-  external: string;
+  /** Het adres waar dit ding draait, of `null` zolang het nergens draait.
+   *
+   *  Een domeinnaam onder een productnaam leest als "ga maar kijken". Philly
+   *  droeg hier `philly.juandiazllc.com` terwijl DNS er NXDOMAIN op geeft
+   *  (gemeten 2026-08-20 via de eigen resolver én via Cloudflare DoH), en dat
+   *  adres stond in vier talen op /work en op de homepage afgedrukt — onder de
+   *  zin dat je erop mag klikken en zelf mag oordelen. Wie het intypte kwam
+   *  nergens uit.
+   *
+   *  Dus: geen adres tot er iets te bezoeken is. `ventures.test.ts` bewaakt
+   *  dat, en de dagelijkse productie-audit controleert of de adressen die er
+   *  wél staan nog oplossen. */
+  domain: string | null;
+  /** Volledige https-URL naar `domain`, of `null`. Nooit een intern pad: dat
+   *  was hoe `/app` hier terechtkwam en bleef staan nadat de surface met
+   *  #134-#140 uit deze repo verdween. */
+  external: string | null;
   summary: string;
   story: string;
   phases: { title: string; body: string }[];
@@ -496,8 +511,8 @@ export const VENTURES: Venture[] = [
     sector: "Logistics / Field",
     sectorSlug: "adjacent",
     status: "shipping",
-    domain: "philly.juandiazllc.com",
-    external: "/app",
+    domain: null,
+    external: null,
     summary:
       "The stateside sibling. Field-first interface for ground teams — dispatch, routing, live status, built to stay alive on bad networks. The first product under Juan Diaz, LLC's US arm.",
     story:

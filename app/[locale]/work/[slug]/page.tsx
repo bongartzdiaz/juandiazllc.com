@@ -102,7 +102,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
                 gated on this; here it rendered unconditionally, so a venture
                 whose external is an internal path (or a route that no longer
                 exists) shipped a dead CTA. The two pages now agree. */}
-            {v.external.startsWith("http") && (
+            {v.external?.startsWith("http") && (
               <a
                 className="btn primary btn-mag"
                 href={v.external}

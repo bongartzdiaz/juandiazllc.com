@@ -13,6 +13,7 @@
 
 import { auditAlles, telPerErnst, type Pagina, type Bevinding } from "../lib/seo/audit";
 import { LOCALES } from "../lib/i18n/dict";
+import { controleerVentureAdressen } from "../lib/seo/venture-adressen";
 
 const args = process.argv.slice(2);
 const alsJson = args.includes("--json");
@@ -66,7 +67,8 @@ async function main(): Promise<void> {
     }),
   );
 
-  const bevindingen = auditAlles(paginas, basis, [...LOCALES]);
+  const extern = basis.startsWith("https://") ? await controleerVentureAdressen() : [];
+  const bevindingen = [...auditAlles(paginas, basis, [...LOCALES]), ...extern];
   const telling = telPerErnst(bevindingen);
 
   if (alsJson) {
