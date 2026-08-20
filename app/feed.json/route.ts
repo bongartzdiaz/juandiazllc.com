@@ -1,5 +1,6 @@
 import { getAllInsights } from "@/lib/insights";
 import { SIGNALS } from "@/lib/signals";
+import { PERSON_NAME, PERSON_URL } from "@/lib/seo/branding";
 
 // JSON Feed 1.1 — https://www.jsonfeed.org/version/1.1/
 // Covers BOTH /insights and /signals in one feed. RSS readers don't
@@ -37,7 +38,7 @@ function buildItems(): FeedItem[] {
       .join("\n\n"),
     date_published: new Date(p.publishedAt).toISOString(),
     tags: [p.tag],
-    authors: [{ name: "Juan Stefan Bongartz Diaz" }],
+    authors: [{ name: PERSON_NAME }],
   }));
 
   const signals: FeedItem[] = SIGNALS.map((s) => ({
@@ -56,7 +57,7 @@ function buildItems(): FeedItem[] {
       .join("\n\n"),
     date_published: new Date(s.date).toISOString(),
     tags: [s.tag],
-    authors: [{ name: "Juan Stefan Bongartz Diaz" }],
+    authors: [{ name: PERSON_NAME }],
   }));
 
   return [...insights, ...signals].sort((a, b) =>
@@ -75,7 +76,7 @@ export async function GET() {
     description:
       "Revenue-engine thinking from Juan Diaz, LLC. Essays, signals, operator ops.",
     language: "en-us",
-    authors: [{ name: "Juan Stefan Bongartz Diaz", url: SITE }],
+    authors: [{ name: PERSON_NAME, url: PERSON_URL }],
     items,
   };
 

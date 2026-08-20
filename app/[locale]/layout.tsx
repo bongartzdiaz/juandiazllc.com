@@ -12,6 +12,13 @@ import {
   AUTHOR_IMAGE_URL,
   ORG_LOGO_URL,
   PERSON_SAME_AS,
+  PERSON_NAME,
+  PERSON_ALTERNATE_NAMES,
+  PERSON_ID,
+  PERSON_URL,
+  ORG_NAME,
+  ORG_ID,
+  ORG_SAME_AS,
   OG_IMAGES,
   TWITTER_IMAGES,
 } from "@/lib/seo/branding";
@@ -47,12 +54,16 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       "hospitality revenue",
       "Voltafy",
       "salderingsregeling 2027",
-      "Juan Stefan Diaz",
-      "Juan Diaz, LLC",
+      // Alle drie de naamvormen: de volle vorm is bijna uniek, de middelste
+      // stond in de meting van 2026-08-20 al bovenaan, de korte is wat iemand
+      // intikt die de naam hoorde.
+      PERSON_NAME,
+      ...PERSON_ALTERNATE_NAMES,
+      ORG_NAME,
     ],
-    authors: [{ name: "Juan Stefan Diaz", url: SITE_URL }],
-    creator: "Juan Stefan Diaz",
-    publisher: "Juan Diaz, LLC",
+    authors: [{ name: PERSON_NAME, url: SITE_URL }],
+    creator: PERSON_NAME,
+    publisher: ORG_NAME,
     category: "business operations",
   };
 }
@@ -76,23 +87,31 @@ export default async function MainLayout({
             {
               "@context": "https://schema.org",
               "@type": "Organization",
-              name: "Juan Diaz, LLC",
+              "@id": ORG_ID,
+              name: ORG_NAME,
               alternateName: "JDL",
               url: SITE_URL,
               logo: ORG_LOGO_URL,
               image: AUTHOR_IMAGE_URL,
+              // Zelfde `@id`, naam en url als de knopen in /about en in
+              // lib/seo/article.ts — anders leest een crawler drie personen.
               founder: {
                 "@type": "Person",
-                name: "Juan Stefan Diaz",
+                "@id": PERSON_ID,
+                name: PERSON_NAME,
+                alternateName: PERSON_ALTERNATE_NAMES,
                 jobTitle: "Founder",
                 image: AUTHOR_IMAGE_URL,
-                url: `${SITE_URL}/${l}/about`,
+                url: PERSON_URL,
                 sameAs: PERSON_SAME_AS,
               },
               foundingDate: "2026",
               description:
                 "Holding company shipping revenue engines for operators in energy, real estate, hospitality and adjacent industries.",
-              sameAs: PERSON_SAME_AS,
+              // De organisatie, niet de persoon: een bedrijfspagina hoort bij de
+              // rechtspersoon. Stond tot 2026-08-20 op PERSON_SAME_AS, waardoor
+              // een persoonlijke Instagram als bedrijfsprofiel werd opgegeven.
+              sameAs: ORG_SAME_AS,
               // Delaware = the legal entity; Amsterdam = the operating base.
               // The NL block carries the local-intent signal for NL/DE/ES search.
               address: [

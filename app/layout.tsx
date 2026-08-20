@@ -28,7 +28,16 @@ import { Analytics } from "@/components/Analytics";
 import { WebVitalsReporter } from "@/components/WebVitalsReporter";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 import { LOCALES, DEFAULT_LOCALE } from "@/lib/i18n/dict";
-import { TITLE_SUFFIX } from "@/lib/seo/branding";
+import {
+  TITLE_SUFFIX,
+  PERSON_NAME,
+  PERSON_ALTERNATE_NAMES,
+  PERSON_ID,
+  PERSON_URL,
+  ORG_NAME,
+  ORG_ID,
+  ORG_SAME_AS,
+} from "@/lib/seo/branding";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -60,10 +69,10 @@ export const metadata: Metadata = {
     "revenue systems consultant",
     "construction-trained operator",
   ],
-  authors: [{ name: "Juan Stefan Bongartz Diaz", url: SITE_URL }],
-  creator: "Juan Diaz, LLC",
-  publisher: "Juan Diaz, LLC",
-  applicationName: "Juan Diaz, LLC",
+  authors: [{ name: PERSON_NAME, url: SITE_URL }],
+  creator: ORG_NAME,
+  publisher: ORG_NAME,
+  applicationName: ORG_NAME,
   category: "business",
   alternates: {
     canonical: "/",
@@ -148,15 +157,20 @@ export const viewport: Viewport = {
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Juan Diaz, LLC",
+  "@id": ORG_ID,
+  name: ORG_NAME,
   url: SITE_URL,
   logo: `${SITE_URL}/icon.svg`,
   description:
     "Holding company building revenue engines for operators in energy, real estate, hospitality and adjacent industries.",
+  // Vierde knoop die dezelfde persoon beschrijft. Draagt daarom dezelfde
+  // `@id` als /about, de taal-layout en lib/seo/article.ts.
   founder: {
     "@type": "Person",
-    name: "Juan Stefan Bongartz Diaz",
-    alternateName: "Juan Diaz",
+    "@id": PERSON_ID,
+    name: PERSON_NAME,
+    alternateName: PERSON_ALTERNATE_NAMES,
+    url: PERSON_URL,
   },
   // Areas served — Google uses this for local / regional ranking signals.
   areaServed: [
@@ -166,20 +180,15 @@ const organizationSchema = {
     { "@type": "Country", name: "United States" },
   ],
   knowsLanguage: ["en", "nl", "de", "es"],
-  sameAs: [
-    "https://github.com/bongartzdiaz",
-    "https://linkedin.com/in/juanstefan",
-    "https://linkedin.com/company/juandiazllc",
-    "https://twitter.com/juandiazllc",
-    "https://instagram.com/diazelcazador",
-  ],
+  sameAs: ORG_SAME_AS,
 };
 
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "Juan Diaz, LLC",
+  name: ORG_NAME,
   url: SITE_URL,
+  publisher: { "@id": ORG_ID },
   potentialAction: {
     "@type": "SearchAction",
     target: `${SITE_URL}/?q={search_term_string}`,

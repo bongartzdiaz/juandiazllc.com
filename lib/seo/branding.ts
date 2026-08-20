@@ -123,3 +123,78 @@ export const PERSON_SAME_AS = [
   "https://github.com/bongartzdiaz",
   "https://instagram.com/diazelcazador",
 ];
+
+/* ── De identiteit van de persoon, uit één bron ──────────────────────────
+ *
+ * Tot 2026-08-20 beschreven drie plekken dezelfde persoon en waren ze het
+ * oneens. Gemeten:
+ *
+ *   app/[locale]/layout.tsx   name "Juan Stefan Diaz"           url /{l}/about
+ *   app/[locale]/about/page   name "Juan Stefan Bongartz Diaz"  url /about
+ *   lib/seo/article.ts        name "Juan Stefan Bongartz Diaz"  url /about
+ *
+ * Drie gevolgen tegelijk. Twee verschillende namen, dus het onderscheidende
+ * woord stond in de ene knoop wel en in de andere niet. Geen enkele knoop droeg
+ * een `@id`, dus er was geen bewijs dat het één entiteit is in plaats van drie
+ * personen. En `url` wees twee van de drie keer naar /about, wat 307 geeft naar
+ * /en/about, terwijl de derde de canonieke taal-geprefixte vorm gebruikte.
+ *
+ * WAAROM ALLE DRIE DE NAMEN ERIN STAAN. Ze doen verschillend werk. De volle
+ * vorm is bijna uniek en het makkelijkst te winnen; "Juan Stefan Diaz" is de
+ * variant die in de meting van 2026-08-20 al bovenaan stond; "Juan Diaz" is wat
+ * iemand intikt die de naam hoorde, en is verzadigd met naamgenoten — een
+ * bokser, meerdere voetballers, een wijk in Panama-Stad. schema.org lost dat op
+ * met één `name` en een lijst `alternateName`, zodat het drie ingangen naar
+ * dezelfde knoop zijn in plaats van drie knopen.
+ *
+ * `PERSON_ID` is bewust taal-onafhankelijk: vier vertaalde /about-pagina's
+ * beschrijven één persoon, geen vier. De canonieke Engelse URL is de ankerplek.
+ * ------------------------------------------------------------------------ */
+
+/** Canonieke naam. De vorm die in `Person.name` staat. */
+export const PERSON_NAME = "Juan Stefan Bongartz Diaz";
+
+/** De andere twee ingangen, als `Person.alternateName`. */
+export const PERSON_ALTERNATE_NAMES = ["Juan Stefan Diaz", "Juan Diaz"];
+
+/** Stabiele knoop-identiteit. Elke Person-knoop op de site draagt deze `@id`. */
+export const PERSON_ID = `${SITE}/en/about#juan`;
+
+/** De pagina die over de persoon gaat. Taal-geprefixt, dus geen 307. */
+export const PERSON_URL = `${SITE}/en/about`;
+
+/** Naam en knoop-identiteit van de rechtspersoon. */
+export const ORG_NAME = "Juan Diaz, LLC";
+export const ORG_ID = `${SITE}#organization`;
+
+/**
+ * `sameAs` van de ORGANISATIE. Bewust een andere lijst dan `PERSON_SAME_AS`:
+ * een bedrijfspagina op LinkedIn hoort bij de rechtspersoon, een persoonlijke
+ * GitHub en Instagram bij de mens. Ze door elkaar halen vertelt Google dat het
+ * één ding is.
+ *
+ * TWITTER IS ER BEWUST UIT. `app/layout.tsx` droeg tot 2026-08-20
+ * `https://twitter.com/juandiazllc` in deze lijst. Gemeten op die datum: 404,
+ * na doorverwijzing naar `x.com/juandiazllc`. Die handle bestaat niet.
+ *
+ * Een dood adres in `sameAs` is niet neutraal. Dit is het veld waarmee Google
+ * je identiteit vérifieert: het volgt de link en kijkt of daar hetzelfde
+ * subject staat. Een 404 is dus geen ontbrekend signaal maar een mislukte
+ * controle — dezelfde fout als de venture die een hostnaam droeg die niet in
+ * DNS stond (#188). Zet er alleen profielen in die je hebt nagelopen.
+ *
+ * GITHUB EN INSTAGRAM STAAN HIER OOK NIET. Die zijn van de mens, niet van de
+ * rechtspersoon: `github.com/bongartzdiaz` is een persoonlijk account. Ze staan
+ * in `PERSON_SAME_AS`, waar ze thuishoren. Tot 2026-08-20 stonden ze in beide,
+ * en dat vertelt Google dat de persoon en het bedrijf hetzelfde ding zijn.
+ *
+ * Minder signaal is beter dan verkeerd signaal. Komt er een echte bedrijfs-X of
+ * bedrijfs-Instagram, dan hoort die hier — na hem te hebben opgevraagd.
+ *
+ * Stand 2026-08-20: linkedin/company 200, github 200, linkedin/in 200,
+ * instagram 200. Let op dat LinkedIn ook 200 geeft op een inlogmuur, dus die
+ * twee zijn van buitenaf niet hard te bewijzen — de 404 op X wél.
+ */
+export const ORG_SAME_AS = [
+  "https://linkedin.com/company/juandiazllc",
+];
