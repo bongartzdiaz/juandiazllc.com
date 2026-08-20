@@ -1,7 +1,19 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { notifyEmail, notifyTelegram, type LeadNotification } from "@/lib/notify";
 import { calBodySchema, handtekeningKlopt, tekst, type CalBody } from "@/lib/cal-webhook";
+
+/** De velden van een lead-rij die deze route zelf samenstelt.
+ *  Stond tot 2026-08-20 in lib/notify.ts; dat bestand is weg omdat de
+ *  meldingen die het verstuurde een duplicaat waren van de edge function
+ *  `lead-notify`, die aan een trigger op marketing.leads hangt. */
+type LeadRij = {
+  name: string;
+  email: string;
+  company: string;
+  sector: string;
+  message: string;
+  source: string;
+};
 
 /* ---------------------------------------------------------------
    Cal.com-webhook — een boeking wordt een lead
@@ -95,7 +107,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, skipped: "no-email" });
   }
 
-  const lead: LeadNotification = {
+  const lead: LeadRij = {
     name: tekst(responses, "name") || payload.attendees?.[0]?.name || "",
     email,
     company: tekst(responses, "company", "bedrijf"),
@@ -125,10 +137,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "insert-failed" }, { status: 500 });
   }
 
-  // Meldingen zijn best-effort en mogen de webhook nooit laten falen. Deed dat
-  // wel, dan zou cal.com blijven herhalen voor een lead die al is opgeslagen —
-  // en elke herhaling zou opnieuw proberen te mailen.
-  await Promise.all([notifyEmail(lead), notifyTelegram(lead)]);
+  // Geen meldingen hier. De insert hierboven laat trigger `leads_notify_new`
+  // vuren, die de edge function `lead-notify` aanroept — dezelfde twee kanalen
+  // die deze route tot 2026-08-20 zelf nog eens verstuurde. Dat was dus dubbel.
+  //
+  // `lead-acknowledge` slaat deze rijen bewust over: de WHEN-clausule van die
+  // trigger sluit `source like 'cal\_%'` uit, want wie via cal.com boekt heeft
+  // zijn bevestiging al van cal.com.
 
   return NextResponse.json({ ok: true, uid: payload.uid });
 }

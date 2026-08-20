@@ -1,10 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-// Verhuisd naar lib/notify.ts op 2026-08-02, zodat de cal.com-webhook dezelfde
-// meldingen kan gebruiken. Niet geëxporteerd vanuit dit bestand: alles wat een
-// "use server"-module exporteert wordt een publiek aanroepbare server-action.
-import { notifyEmail, notifyTelegram } from "@/lib/notify";
 import { capField, isPlausibleEmail } from "@/lib/forms/limits";
 
 export type ContactState = { status: "idle" | "ok" | "err"; message?: string };
@@ -23,16 +19,23 @@ function readLocale(value: FormDataEntryValue | null): (typeof LOCALES)[number] 
 }
 
 // Contact submission pipeline.
-// - Primary: insert into Supabase `leads` so nothing is ever lost.
-// - Secondary: best-effort email to juan@ via Resend (only if
-//   RESEND_API_KEY is set — otherwise silently skipped). We don't
-//   fail the user if the email hop breaks, since the lead row is
-//   already persisted.
-// - Acknowledgement to the enquirer: NOT sent from here. A trigger on
-//   marketing.leads calls the edge function `lead-acknowledge`, which mails
-//   in metadata.locale's language and records when it happened. Keeping it in
-//   the database means a Vercel deploy or a cold start cannot swallow it —
-//   same reason lead-notify lives there. Source: supabase/functions/.
+// - Deze functie doet één ding: de rij wegschrijven in marketing.leads.
+//   Alles wat daarna moet gebeuren hangt aan triggers op die tabel.
+// - Interne melding (Telegram + e-mail aan Juan): edge function `lead-notify`,
+//   via trigger `leads_notify_new`.
+// - Ontvangstbevestiging aan de aanvrager: edge function `lead-acknowledge`,
+//   via trigger `leads_acknowledge_new`, in de taal uit metadata.locale.
+//
+//   Tot 2026-08-20 stuurde deze functie zélf óók een Telegram en een e-mail,
+//   via lib/notify.ts. Dat was een volledig duplicaat van lead-notify: zelfde
+//   twee kanalen, zelfde ontvanger, op dezelfde rij. Bij correcte configuratie
+//   kreeg Juan dus alles dubbel, en bij incorrecte configuratie hoorde je van
+//   de Vercel-helft niets — die sloeg stil over (`if (!key) return`) en faalde
+//   stil (lege catch). De databasekant geeft per kanaal een reden terug en legt
+//   die vast; daarom is die de enige die overblijft.
+//
+//   Dat scheelt de bezoeker ook twee externe HTTP-aanroepen: die stonden in het
+//   request-pad, met een `await` erop en zonder timeout.
 // - Spam: honeypot field ("website") + min-length message. The
 //   honeypot is a hidden input that real users never touch; bots
 //   fill every field they can find. If it's non-empty, we fake-ok
@@ -77,12 +80,7 @@ export async function submitLead(
       return { status: "err", message: "Something went wrong. Try again." };
     }
 
-    // Fire-and-forget notifications — email + Telegram in parallel.
-    // Both no-op when unconfigured and never fail the user.
-    await Promise.all([
-      notifyEmail({ name, email, company, sector, message, source }),
-      notifyTelegram({ name, email, company, sector, message, source }),
-    ]);
+    // Geen meldingen hier: de triggers op marketing.leads doen dat. Zie de kop.
 
     return {
       status: "ok",
