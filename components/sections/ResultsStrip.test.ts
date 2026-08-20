@@ -91,6 +91,39 @@ describe("resultatenblok publiceert geen cijfer zonder bron", () => {
     expect(PAGINAS).toContain("app/[locale]/page.tsx");
   });
 
+  it("staat op de pagina's waar de beslissing valt, en nergens anders", () => {
+    /* Tot 2026-08-20 stond dit blok alleen op de homepage, terwijl /services
+     * en /contact samen nul cijfers droegen — de twee pagina's waar iemand
+     * besluit of hij een gesprek boekt. Het sterkste bezit van deze site lag
+     * als decoratie op de pagina waar niemand koopt.
+     *
+     * De lijst staat hier expliciet en niet impliciet, omdat "alleen op de
+     * homepage" ook nooit als besluit is genomen — het was gewoon de plek waar
+     * het blok geboren werd, en daarna heeft niemand er meer naar gekeken.
+     * Verplaatst iemand het, dan valt deze poort om en is de verplaatsing een
+     * keuze in plaats van een verschuiving. */
+    const HOORT_TE_STAAN: Record<string, string> = {
+      "app/[locale]/page.tsx": "homepage — staat waar een logowall met quotes zou staan",
+      "app/[locale]/services/page.tsx": "tussen de ladder en de CTA: eerst de stappen, dan het bewijs, dan de vraag",
+      "app/[locale]/contact/page.tsx": "onder het formulier, voor wie twijfelt en eraan voorbij scrollt",
+    };
+
+    const verwacht = Object.keys(HOORT_TE_STAAN).sort();
+    const ontbreekt = verwacht.filter((p) => !GEMONTEERD.includes(p));
+    const onverwacht = GEMONTEERD.filter((p) => !verwacht.includes(p));
+
+    expect(
+      ontbreekt,
+      "Het blok is van deze pagina('s) verdwenen. Dat mag, maar dan hoort de " +
+        "reden hier weg te vallen in plaats van de montage stil te verdwijnen.",
+    ).toEqual([]);
+    expect(
+      onverwacht,
+      "Het blok staat op een pagina die hier niet genoemd wordt. Zet hem in " +
+        "HOORT_TE_STAAN met een reden, zodat de volgende lezer weet waarom.",
+    ).toEqual([]);
+  });
+
   it("elk gepubliceerd cijfer staat in claims.md", () => {
     if (GEMONTEERD.length === 0) return;
     const ongedekt = CIJFERS.filter((c) => !REGIO.includes(c));

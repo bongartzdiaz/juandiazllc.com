@@ -197,17 +197,20 @@ volgens regel 1 eerst in `docs/claims.md`.
 
 ---
 
-## §4 — Vier wijzigingen die geen beslissing vragen
+## §4 — Drie wijzigingen die geen beslissing vragen
 
-Deze kunnen nu, zonder dat er een prijs of garantie vaststaat. Concrete sleutels
-staan in de bijlage.
+Deze konden nu, zonder dat er een prijs of garantie vaststaat, en zijn op
+2026-08-20 geleverd. Wat er precies is gedaan staat in de bijlage.
+
+> Hier stond eerst een vierde punt: het artefact van stap 2 benoemen. Dat is bij
+> nader inzien geen kwestie van uitvoering maar van kennis die ik niet heb — het
+> is verhuisd naar §5 als beslissing 4.
 
 | # | wijziging | waarom | raakt |
 |---|---|---|---|
 | A | de vier klantuitkomsten op `/services` en `/contact` | het bewijs staat er al, goedgekeurd en bewaakt; het staat alleen op de verkeerde pagina | mount plus poort |
-| B | `?interest=<dienst>` op de vier dienst-CTA's | `/pricing` doet dit sinds #196 en `/tools/energy-roi` ook; `/services` stuurt alles naar een kaal `/contact`, dus een advieslead is niet te onderscheiden van een bouwlead | 4 links |
+| B | `?interest=services` op de CTA van `/services` | `/pricing` doet dit sinds #196 en `/tools/energy-roi` ook; deze pagina stuurde alles naar een kaal `/contact`, dus een lead vanaf hier was niet te onderscheiden van een lead vanaf de homepage | 1 link |
 | C | één zin die zegt dat het gratis gesprek fase 2 in het klein is | het woord Blueprint staat twee keer; hernoemen kost 28 bewerkingen en sloopt óf de metafoor óf de FAQ, uitleggen kost er vier | 1 sleutel maal vier talen |
-| D | het artefact van stap 2 benoemen | stap 1 noemt een ding, stap 2 een toestand | dict maal vier talen |
 
 **A is de zwaarste van de vier** en de goedkoopste: het is een mount, geen nieuwe
 claim. `ResultsStrip` hangt al aan de poort die eist dat elk gepubliceerd cijfer
@@ -220,9 +223,9 @@ binnenkomt — de eerste keer dat de consultancy-kant überhaupt iets meet.
 
 ---
 
-## §5 — Drie beslissingen die alleen van jou kunnen komen
+## §5 — Vier beslissingen die alleen van jou kunnen komen
 
-Geen van deze drie kan uit de repo worden afgeleid, en geen van drieën mag
+Geen van deze vier kan uit de repo worden afgeleid, en geen van vieren mag
 verzonnen worden.
 
 1. **Wat kost de diagnostische sprint van 30 dagen?** Eén bedrag. Het gaat eerst
@@ -237,6 +240,11 @@ verzonnen worden.
 3. **Hoeveel trajecten draag je tegelijk?** Een getal maakt de schaarste echt en
    controleerbaar. Zonder getal is elke urgentie-zin een constructie, en dan
    hoort hij er niet te staan.
+
+4. **Wat ligt er na dertig dagen op tafel?** Eén zin. Stap 1 noemt een tastbaar
+   ding (een diagnose van één pagina), stap 2 noemt alleen een toestand. Een
+   deliverable verzinnen is dezelfde fout als een prijs verzinnen, dus dit
+   wacht op jou en niet op mij.
 
 ---
 
@@ -308,38 +316,44 @@ en 5 als beslissingen ernaast, punt 2 en 4 als taalcorrecties die meeliften.
 
 ---
 
-## Bijlage — de sleutels die zouden veranderen
+## Bijlage — wat er is uitgevoerd
 
-Niet toegepast. Dit is de lijst zodat jij kiest wat er live gaat.
+A, B en C zijn geleverd op 2026-08-20. D wacht op jou, om een andere reden dan
+hier eerst stond.
 
-### A — bewijs op de beslispagina's
+### A — bewijs op de beslispagina's · geleverd
 
-Geen nieuwe sleutels. `<ResultsStrip />` mounten in
-`app/[locale]/services/page.tsx` en `app/[locale]/contact/page.tsx`, plus een
-poort die eist dat de sectie op alle drie de pagina's staat óf op geen enkele —
-anders drift hij terug naar één pagina zonder dat iemand het merkt.
+Geen nieuwe sleutels. `<ResultsStrip />` gemount in
+`app/[locale]/services/page.tsx` (tussen de ladder en de CTA) en
+`app/[locale]/contact/page.tsx` (ná het formulier, vóór de FAQ).
 
-### B — herkomst per dienst
+De bestaande poort in `ResultsStrip.test.ts` schaalde zonder wijziging mee — hij
+telde de montages al. Er is een test bij gekomen die vastlegt op wélke pagina's
+het blok hoort te staan, met per pagina een reden. Reden voor die lijst: "alleen
+op de homepage" is nooit als besluit genomen, het was de plek waar het blok
+geboren werd. Verplaatst iemand het, dan valt de poort om en is het een keuze in
+plaats van een verschuiving.
 
-Vier `href`-waarden in `app/[locale]/services/page.tsx`, patroon overgenomen van
-`/pricing` sinds #196:
+### B — herkomst vanaf /services · geleverd, maar anders dan hier eerst stond
 
-| dienst | wordt |
-|---|---|
-| Revenue-engine builds | `/contact?interest=engine` |
-| Fractional revenue operations | `/contact?interest=fractional` |
-| Build-vs-buy advisory | `/contact?interest=advisory` |
-| Instruments for the field | `/contact?interest=instruments` |
+**De eerste versie van deze bijlage was fout.** Er stond dat de vier
+dienstkaarten naar `/contact` wijzen en dus elk een `?interest=` konden krijgen.
+Gemeten: ze wijzen naar `/work`, `/sectors`, `/insights/the-build-vs-buy-trap` en
+`/signals/instruments-not-saas`. Er is precies **één** `/contact`-link op die
+pagina, de slot-CTA.
 
-Landt in `marketing.leads.source` als `contact_page:interest=advisory:stage=…`.
-Geen dict-wijziging, geen nieuwe tekst.
+Geleverd is dus de pagina-brede variant: `/contact?interest=services`. Landt in
+`marketing.leads.source` als `contact_page:interest=services:stage=…`.
 
-### C — het herhaalde woord uitleggen in plaats van wegwerken
+**Per dienst kan niet zonder ontwerpwijziging.** Elke kaart ís al een link; een
+tweede anchor erin is ongeldige HTML. Wil je attributie per dienst, dan moet de
+kaart van link naar container met twee acties — dat is een aparte beslissing en
+staat hier niet als aanbeveling.
 
-Eén nieuwe sleutel, bijvoorbeeld `services.how.s1.note`, in vier talen: het
-gratis gesprek is fase 2 van de methode in het klein. Te tonen onder
-`services.how.s1.body`, en desgewenst als antwoordregel in de bestaande
-FAQ-vraag die intro en blueprint uit elkaar houdt.
+### C — het herhaalde woord uitleggen in plaats van wegwerken · geleverd
+
+`services.how.s1.note` in vier talen, getoond onder `services.how.s1.body`. Het
+woordenboek staat nu op 693 sleutels maal vier.
 
 **Niets hernoemen.** Gemeten: `blueprint call` staat 7 keer in de Engelse FAQ,
 maal vier talen ongeveer 28 plekken; `process.2.name` staat 4 keer en is in
@@ -351,8 +365,19 @@ verandert. Zou er ooit tóch hernoemd worden, dan is dat de poort die meeverhuis
 in plaats van eromheen — die houdt bij dat dezelfde eerste stap overal één naam
 draagt.
 
-### D — het artefact van stap 2
+### D — het artefact van stap 2 · wacht op jou
 
-`services.how.s2.title` en `services.how.s2.body` in vier talen. Nieuwe tekst kan
-pas als beslissing 1 uit §5 er is: zonder bedrag blijft de titel een vaste prijs
-beloven zonder inhoud.
+`services.how.s2.title` en `services.how.s2.body` in vier talen.
+
+**De reden die hier eerst stond klopte niet.** Ik schreef dat dit wacht op het
+bedrag uit §5. Dat is niet de blokkade: een deliverable benoemen kan prima
+zonder prijs. De echte blokkade is dat **ik niet weet wat die dertig dagen
+opleveren.** Stap 1 noemt een diagnose van één pagina; stap 2 zegt alleen dat
+beide partijen ontrisicoën. De FAQ voegt toe dat de volledige scope er daarna uit
+geoffreerd wordt, en verder staat er niets.
+
+Wat jij in die dertig dagen maakt is jouw kennis, niet af te leiden uit deze
+repo, en een deliverable verzinnen is dezelfde fout als een prijs verzinnen.
+
+**Wat ik nodig heb:** één zin over wat er aan het eind van die dertig dagen op
+tafel ligt. Dan schrijf ik het in vier talen uit.

@@ -6,6 +6,7 @@ import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { faqSchema } from "@/lib/seo/schema";
 import { getServicesFaq } from "@/lib/seo/faqs";
 import { FaqSection } from "@/components/FaqSection";
+import { ResultsStrip } from "@/components/sections/ResultsStrip";
 import { OG_IMAGES } from "@/lib/seo/branding";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
@@ -116,17 +117,44 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
               </div>
               <div className="ix" style={{ marginTop: 10 }}>{t(`services.how.${s}.title`)}</div>
               <p style={{ marginTop: 12 }}>{t(`services.how.${s}.body`)}</p>
+              {/* Blueprint staat twee keer op deze site: als fase 02 van de
+                  methode en als naam van dit gratis gesprek. Dat is geen
+                  slordigheid maar dezelfde stap op twee schalen, en dat mag de
+                  lezer niet zelf hoeven afleiden. Hernoemen zou het duurder én
+                  slechter maken — "blueprint call" staat 7 keer in de Engelse
+                  FAQ alleen, en de vijf fasen dragen de bouwkundige metafoor
+                  waar de positionering op rust. Zie docs/aanbod.md §3.5. */}
+              {s === "s1" && (
+                <p style={{ marginTop: 10, color: "var(--muted-soft)", fontSize: 14 }}>
+                  {t("services.how.s1.note")}
+                </p>
+              )}
             </li>
           ))}
         </ol>
         <p style={{ marginTop: 24, color: "var(--muted)" }}>{t("services.how.note")}</p>
       </section>
+      {/* Het bewijs stond alleen op de homepage. Deze pagina beschreef vier
+          diensten en een ladder van vier stappen, en droeg tot 2026-08-20 geen
+          enkel cijfer — terwijl docs/claims.md vier bevestigde klantuitkomsten
+          bijhoudt die al in vier talen gepubliceerd zijn. Staat hier tussen de
+          ladder en de CTA: eerst wat het kost aan stappen, dan wat het elders
+          opleverde, dan de vraag. Zie docs/aanbod.md §2. */}
+      <ResultsStrip />
       <section style={{ padding: "0 40px 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div style={{ padding: 32, border: "1px solid var(--line)", borderRadius: 18, background: "linear-gradient(180deg, var(--panel), var(--bg-2))" }}>
           <div style={{ fontFamily: "'Inter'", fontWeight: 300, fontSize: "clamp(22px, 3vw, 32px)", letterSpacing: "-.02em", marginBottom: 24 }}>
             {t("services.cta.title")}
           </div>
-          <LocaleLink className="btn primary btn-mag" href="/contact">
+          {/* Herkomst mee. /pricing doet dit sinds #196 en /tools/energy-roi
+              ook; deze pagina stuurde alles naar een kaal /contact, dus een
+              lead van hier was niet te onderscheiden van een lead vanaf de
+              homepage. ContactForm leest de parameter uit en schrijft hem weg
+              in `source` als contact_page:interest=services:stage=…
+              Per dienst zou beter zijn, maar de vier kaarten zijn zelf al
+              links naar /work, /sectors en twee artikelen — een tweede anchor
+              erin is ongeldige HTML. Dit is de pagina-brede variant. */}
+          <LocaleLink className="btn primary btn-mag" href="/contact?interest=services">
             {t("cta.book")} <span className="arr">→</span>
           </LocaleLink>
         </div>
