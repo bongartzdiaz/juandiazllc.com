@@ -640,6 +640,146 @@ product. Which of these become pricing rows, and at which tier, is not decided.
   from the repo, and this is a compliance claim, so it was left untouched rather
   than guessed at. Same for "EU-only data residency".
 
+### De beslissing van 15 augustus is niet geland — gemeten 2026-08-20
+
+De beslissing hierboven zegt: per zitplaats wint, en **DEUS-SHARED volgt** —
+slugs hernoemen, Stripe-`quantity` aan het aantal zitplaatsen koppelen,
+`maxUsers` van plafond naar ondergrens. Vijf dagen later is daar niets van
+gebeurd.
+
+Gemeten tegen `origin/main` van DEUS-SHARED (`5f95d90`, 2026-08-19). **Meet niet
+tegen de lokale werkkopie**: die stond op `efdf7da` van 18 mei, 333 commits
+achter, en gaf 165 routes waar `origin/main` er 201 heeft.
+
+| | `/pricing` op deze site | `lib/philly/billing/plans.ts` in DEUS-SHARED |
+|---|---|---|
+| niveaus | starter · pro · business · enterprise (4) | operator · team · business (3) |
+| model | per zitplaats per maand | vast bedrag per maand |
+| bedrag | €40 / €69 / €99 | €49 / €199 / €599 |
+| gebruikers | **minimum** 3 / 5 / 10 / 15 | **maximum** 3 / 10 / onbeperkt |
+| contacten | geen limiet genoemd | 2.000 / 25.000 / onbeperkt |
+| Stripe | geen koopweg in deze repo | `quantity: 1` — `app/api/billing/checkout/route.ts:116` |
+
+Minimum en maximum zijn elkaars tegendeel, en dat is niet cosmetisch. Op de
+pagina kost Starter €40 × 3 = **€120 per maand** als vloer; in de code kost
+`operator` **€49** met een plafond van drie gebruikers. Business op de pagina:
+€99 × 10 = **€990** als vloer; in de code €599 vast, onbeperkt. Beide kunnen
+niet waar zijn.
+
+**De code denkt van wel.** De kop van `plans.ts` zegt: "matching
+`pricing.tier.<slug>.*` in `/lib/i18n/dict.ts` on the marketing side". Die
+sleutelruimte bestaat hier niet — het is `pricing.t.{starter,pro,business,
+enterprise}.*`. Niet de naamruimte klopt en niet de slugs. Dat commentaar legt
+een voornemen vast, geen toestand, en leest als het tegendeel.
+
+Zolang er aan geen van beide kanten geld binnenkomt is dit latent. Het is
+dezelfde waarneming als punt 2 hierboven, van de andere kant bekeken: een prijs
+is pas geverifieerd als je hem afleest van het ding dat het geld aanneemt, en
+hier staan twee dingen klaar om verschillende bedragen aan te nemen.
+
+### Welke mogelijkheden prijsrijen worden — voorstel, gemeten 2026-08-20
+
+`origin/main`, geteld als bestanden `app/api/**/route.ts` per map. "Poort" is de
+`PlanFeature` uit `PLANS` in `plans.ts` die de mogelijkheid afschermt; leeg
+betekent dat er geen niveau-poort omheen zit.
+
+| mogelijkheid | bewijs in `origin/main` | poort | DEUS-niveau |
+|---|---|---|---|
+| SCIM 2.0 gebruikers | `app/api/scim/v2/**`, 6 routes | `scim_users` | team |
+| SCIM 2.0 groepen | eigen `hasPlanFeature`-poort op de groep-endpoints | `scim_groups` | business |
+| Sessie-timeout per organisatie | `sessionIdleTimeoutMinutes`, gelezen in `lib/philly/auth-helpers.ts:283` | `session_idle_timeout` | business |
+| Manipulatiebestendig auditlog | `/api/admin/audit/verify` + `lib/philly/audit-verify.ts` | — | — |
+| ROPA-export (AVG art. 30) | `/api/admin/gdpr/ropa` | — | — |
+| API-sleutels met rotatie | `app/api/api-keys`, 3 routes | `api_access` | team |
+| Webhooks met herlevering | `app/api/webhooks`, 5 routes | `webhooks` | team |
+| Drip-campagnes | `app/api/drip-campaigns`, 3 routes | `drip` | team |
+| AI-opdrachtbalk en assistent | `app/api/assistant`, 4 routes | `ai_command_bar` | team |
+| Automatiseringen | `app/api/automations`, 3 routes | — | — |
+| Leadroutering | `app/api/lead-routing`, 1 route | — | — |
+| E-handtekeningen | `app/api/e-signatures`, 2 routes | — | — |
+| Sms | `app/api/sms`, 2 routes | — | — |
+| Rapportages | `app/api/reports`, 1 route | — | — |
+| Klantportaal | `app/api/client-portal`, 2 routes | — | — |
+| Bellijsten met uitkomstregistratie | `app/api/dialer-lists` + `app/api/calls` | — | — |
+
+**Eén rij is met opzet anders geformuleerd dan hij in de vorige telling stond.**
+Daar heette hij *dialer*, en dat woord belooft een systeem dat nummers draait.
+Er is geen telefonieprovider in de repo — geen Twilio, geen enkele
+`app/api/{voice,twilio,telephony}`. Wat er staat is een bellijst met
+klik-om-te-bellen en registratie van uitkomst en notitie; de eigen
+gebruikersdocumentatie zegt het zelf woordelijk — `docs/user/en/features/dialer.md`
+opent met "Call list management". Een rij "Dialer" op een prijspagina zou
+dezelfde fout zijn als de twee agenda-synchronisatierijen die er in augustus
+afgingen: een naam aanzien voor een mogelijkheid.
+
+**Wat hieruit volgt voor het prijsniveau.** Voor acht van de zestien staat het
+niveau in DEUS' eigen code. Die acht vallen in twee groepen, en die groepen zijn
+precies de twee open vragen van de pagina:
+
+- **Team-poort** (SCIM-gebruikers, API-sleutels, webhooks, drip, AI-opdrachtbalk,
+  leadscoring, geavanceerd filteren) — het middenniveau.
+- **Business-poort** (SCIM-groepen, sessie-timeout, ondertekende
+  verwerkersovereenkomst, toegewezen contactpersoon, IP-allowlist) — het
+  bovenste niveau.
+
+Die tweede groep is het antwoord op "Business verdient zijn prijsstap niet".
+Niet bouwen, niet verlagen: opschrijven wat er al is.
+
+**Eén ding spreekt elkaar nu al tegen.** De IP-allowlist staat op de pagina met
+een vinkje op **alle vier** de niveaus, terwijl DEUS hem in `PLANS` uitsluitend
+aan `business` geeft. Wie op Starter tekent koopt volgens de pagina iets dat het
+product aan Starter niet geeft. Dat is geen rij die erbij moet — dat is een rij
+die nu fout staat, en het is niet aan mij welke kant meegeeft.
+
+**Wat ik níet voorstel: de drie verticale modules.** Vastgoed (20 routes:
+`properties` 7, `showings` 3, `transactions` 3, `offers` 2, `commissions` 2,
+`open-houses` 2, `cma` 1), hospitality (8: `reservations` 3, `rooms` 3,
+`housekeeping` 2) en filantropie (7: `grants` 3, `volunteers` 3, `impact` 1).
+Ze bestaan en ze zijn substantieel. Maar de pagina is generiek geschreven en het
+vierde prijslijstje in DEUS-SHARED is expliciet vastgoed-ICP — dat is een
+positioneringsvraag die hierboven al open staat, en een module op een prijslijst
+zetten beantwoordt hem stilzwijgend.
+
+**Blijft aan Juan.** Welke van de zestien rijen worden, op welk niveau, en of de
+IP-allowlist naar Business gaat of in `PLANS` naar alle niveaus. De poort in de
+code geeft een volgorde, geen besluit: DEUS heeft drie niveaus en de pagina vier,
+en welke van de vier het bovenste DEUS-niveau draagt bepaalt wat er bij €69 en
+wat er bij €99 hoort.
+
+### De knop beloofde een stap die er niet is — gerepareerd 2026-08-20
+
+Drie knoppen op `/pricing` zeiden in vier talen dat ze een proefperiode starten:
+`pricing.cta.starter`, `pricing.cta.pro` en `pricing.outro.cta` — "Start free
+trial", "Start gratis proefperiode", "Kostenlos testen", "Empieza tu prueba
+gratis". Alle drie gaan naar `/contact`. Er valt niets te starten; er staat een
+formulier. De pagina schrijft dat zelf op, in een commentaar boven `TIERS`:
+CTA's landen in de betafase op `/contact` omdat Juan klant 1 tot 5 met de hand
+aanneemt.
+
+Het aanbod was niet het probleem. De veertien dagen staan in
+`_drafts/pricing/pricing-tiers.csv` en blijven staan. Het werkwoord was het
+probleem. De drie knoppen vragen nu om de proefperiode in plaats van hem te
+starten, en `pricing.outro.body` zegt er in vier talen bij dat het opzetten met
+de hand gaat.
+
+`lib/prijsknoppen.test.ts` bewaakt het, en **schakelt zichzelf uit zodra de
+belofte waar wordt**: de regel geldt alleen voor een knop waarvan de `ctaHref`
+naar `/contact` wijst. Wijst hij naar `/signup`, dan mag het label weer zeggen
+dat het iets start. In drie richtingen gebroken: belofte terug bij een
+formulierknop (rood), belofte terug bij een `/signup`-knop (groen — de regel
+vervalt), en het veld `ctaHref` hernoemd (rood op de lege lijst, niet stil
+groen).
+
+**Drie antwoorden in de FAQ zijn niet aangeraakt**, en dat is een keuze. FAQ 2
+belooft dat opwaarderen "onmiddellijk en naar rato" gaat, FAQ 3 een
+terugbetaaltermijn van 30 dagen bij jaarbetaling, FAQ 5 een factuur die het
+aantal zitplaatsen volgt. Geen van drieën wordt door enig systeem uitgevoerd —
+er is geen factuur. Dit is dezelfde soort als de migratiebelofte hierboven: een
+toezegging, geen beschrijving. Ze bijstellen verandert het aanbod, en dat is niet
+aan mij.
+
+---
+
 ## The IFC claim — how a feature that never existed reached 1,643 places
 
 Counted on `main` 2026-07-26: **1,643 IFC mentions across 413 files**, against
