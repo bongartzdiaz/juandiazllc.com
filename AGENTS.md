@@ -2027,6 +2027,86 @@ van een uur eerder, en die weer de 776/28 en de 726/25. De verwijdering van `lib
 dat aantal niet: er was geen test die het bestand aanraakte, en dat is precies
 wat een ongeobserveerde schakel is.
 
+### 2026-08-20 (vervolg) — het bewijs lag op de pagina waar niemand koopt
+
+Aanleiding was een aanbod-diagnose met de offer-skills (`docs/aanbod.md`, #200).
+Die kwam op één bindende beperking uit, en het was niet de prijs: **geloofwaardigheid**.
+Iemand die overweegt te boeken moet geloven dat het werkt, en het bewijs dáárvoor
+bestond al — vier bevestigde klantuitkomsten in `docs/claims.md`, in vier talen
+gepubliceerd, sinds #185 met een poort eromheen. Ze stonden alleen op de
+homepage. `/services` en `/contact` droegen samen nul cijfers, terwijl dat de
+twee pagina's zijn waar de beslissing valt.
+
+#### Drie wijzigingen, waarvan er één iets meetbaars oplevert
+
+| | wat | gevolg |
+|---|---|---|
+| A | `ResultsStrip` gemonteerd op `/services` (tussen de ladder en de CTA) en `/contact` (ná het formulier, vóór de FAQ) | geen nieuwe claim — een montage van iets dat al goedgekeurd is |
+| B | de slot-CTA van `/services` wijst naar `/contact?interest=services` | vanaf nu is een lead vanaf deze pagina te onderscheiden van een lead vanaf de homepage |
+| C | `services.how.s1.note` × 4 talen | legt uit dat "Blueprint" twee dingen heet: fase 02 van de methode én dit gratis gesprek |
+
+B is het enige punt met een meetbaar gevolg. Op de draaiende build end-to-end
+nagelopen: klik op de CTA, drie stappen door het formulier, en het verborgen
+`source`-veld draagt `contact_page:interest=services:stage=blueprint`. Niets
+ingezonden — alleen de wizard doorlopen.
+
+C werd bijna het omgekeerde van wat het nu is. Mijn eerste lezing was dat
+"blueprint call" hernoemd moest worden omdat de naam dubbel bezet was.
+Hertellen draaide dat om: de term staat **7 keer in de Engelse FAQ alleen**
+(≈28 over vier talen) tegen **4** voor `process.2.name`. Hernoemen zou de
+grootste vindplaats hebben gesloopt om de kleinste te redden. Eén sleutel die
+de relatie uitlegt is goedkoper en eerlijker.
+
+#### De montagepoort noemt de pagina's, niet het aantal
+
+`ResultsStrip.test.ts` had al een poort die elk gepubliceerd cijfer tegen
+`docs/claims.md` legt. Daar staat nu `HOORT_TE_STAAN` naast: een expliciete
+lijst van drie paden, elk met de reden waarom het blok daar hoort. Verdwijnt een
+montage, dan valt de poort om; komt er een vierde bij zonder reden, ook.
+
+Dat is niet symmetrisch met "alleen op de homepage", en dat is het punt. Die
+situatie is nooit als besluit genomen — het was de plek waar het blok geboren
+werd, en daarna heeft niemand er meer naar gekeken. In twee richtingen bewezen:
+de `/contact`-montage weggehaald (rood op `ontbreekt`), en een pad uit de
+verwachtingslijst gehaald (rood op `onverwacht`).
+
+#### Twee keer had mijn eigen document ongelijk, allebei gevangen door hermeten
+
+Bijlage B beweerde dat vier dienst-CTA's naar `/contact` wijzen. Ze wijzen naar
+`/work`, `/sectors`, `/insights/the-build-vs-buy-trap` en
+`/signals/instruments-not-saas`; alleen de slot-CTA gaat naar `/contact`. Vandaar
+één pagina-brede `?interest=services` en geen vier. Per dienst zou beter zijn,
+maar de vier kaarten zíjn zelf al links — een tweede anchor daarin is ongeldige
+HTML, dus dat is een ontwerpwijziging en geen parameter.
+
+En het document telde vier NL saldering-artikelen waar er vijf staan
+(`getAllInsights("nl")` gefilterd op tag `Energy`).
+
+**Bijna een niet-defect gerapporteerd.** Ik vermoedde dat stap 2 van het
+formulier de bezoeker in verkoperstaal laat zelf-diagnosticeren. De gemeten
+labels doen precies het tegenovergestelde: "Revenue is leaking — not sure where."
+Symptoomtaal, al sinds de meerstapsversie. Eerst kijken, dan melden.
+
+#### Wat blijft liggen, en om een betere reden dan ik eerst opschreef
+
+Bijlage D — de uitleg van wat de sprint van 30 dagen oplevert — staat niet in
+deze PR. Het document zei dat die op de prijs wacht. Dat klopt niet: de blokkade
+is dat **ik niet weet wat die 30 dagen opleveren**. Dat is Juans kennis, en een
+deliverable verzinnen is dezelfde fout als een prijs verzinnen. D is daarom
+verhuisd van §4 naar §5, bij de beslissingen.
+
+#### Meting
+
+Op de draaiende build in alle vier de talen nagelopen: het blok rendert op
+`/services` en `/contact`, de DOM-volgorde is ladder → bewijs → CTA op services
+en formulier → bewijs → FAQ op contact, de notitie staat vertaald (geen Engelse
+terugval), en de CTA draagt per taal het juiste voorvoegsel. Geen console-fouten,
+geen horizontale overloop op 375 px. Een screenshot lukte niet — de browser-pane
+compositeert hier geen frames — dus dit is in de DOM gemeten, niet op het oog.
+
+797 tests in 31 bestanden, 693 dict-sleutels × 4 talen. Dat vervangt de 796/31
+en de 692 hierboven.
+
 #### Wacht op de operator — bijgewerkt 2026-08-20
 
 Dit vervangt de lijst van 19 augustus hierboven.
@@ -2050,3 +2130,19 @@ Dit vervangt de lijst van 19 augustus hierboven.
   (`tier`, `sector`, `tool`). Taggen is af en geverifieerd; zonder de doelen
   worden de kliks binnengehaald en weggegooid. Exacte namen en de meting staan
   in `MANUAL_TASKS.md`.
+
+Vier daarbij uit `docs/aanbod.md` §5. Geen ervan is uit de repo af te leiden, en
+geen ervan mag verzonnen worden.
+
+- **Wat kost de diagnostische sprint van 30 dagen?** Eén bedrag, eerst in
+  `docs/claims.md`, daarna pas in kopij. Zolang dit open staat blijft "vaste
+  prijs" een belofte zonder inhoud.
+- **Wat ligt er na die dertig dagen op tafel?** Eén zin. Stap 1 van de ladder
+  noemt een tastbaar ding (een diagnose van één pagina), stap 2 noemt alleen een
+  toestand. Hierop wacht de laatste tekstwijziging in vier talen.
+- **Draag je een garantie, en welke?** De vorm die bij dit aanbod past raakt de
+  levering van stap 2, niet de uitkomst. Jouw risico, jouw keuze; ik kan de
+  gangbare vormen naast elkaar zetten met wat elk kost als het misgaat.
+- **Hoeveel trajecten draag je tegelijk?** Een getal maakt schaarste echt en
+  controleerbaar. Zonder getal is elke urgentie-zin een constructie, en dan hoort
+  hij er niet te staan.

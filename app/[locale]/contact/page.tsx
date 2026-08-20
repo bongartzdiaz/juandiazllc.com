@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ContactForm } from "@/components/ContactForm";
 import { FaqSection } from "@/components/FaqSection";
 import { Capacity } from "@/components/Capacity";
+import { ResultsStrip } from "@/components/sections/ResultsStrip";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import { faqSchema, contactPointSchema } from "@/lib/seo/schema";
@@ -195,6 +196,12 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
       <section style={{ padding: "20px 40px 40px", maxWidth: 760, margin: "0 auto" }}>
         <ContactForm />
       </section>
+      {/* Ná het formulier, niet ervoor. Wie al besloten heeft mag niet eerst
+          langs een bewijsblok scrollen; wie twijfelt en voorbij het formulier
+          scrollt, komt het tegen vlak voordat de FAQ begint. Deze pagina droeg
+          tot 2026-08-20 geen enkel cijfer, terwijl docs/claims.md er vier
+          bijhoudt die al gepubliceerd zijn. Zie docs/aanbod.md §2. */}
+      <ResultsStrip />
       <FaqSection title={t("faq.contact.title")} items={getContactFaq(l)} />
     </>
   );
