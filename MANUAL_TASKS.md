@@ -10,6 +10,42 @@ na de insert. Er gaat alleen nog niets de deur uit, want er is geen afzender.
 Zolang dat zo is meldt de functie eerlijk `skipped:no-api-key` en blijft
 `acknowledged_at` leeg — hij doet niet alsof.
 
+> ### De keten is op 2026-08-20 voor het eerst in zijn geheel gelopen
+>
+> Niet met een SQL-insert maar via het **echte meerstapsformulier op
+> productie** (`/nl/contact`, sector Energie, drie stappen), met een
+> testinzending die daarna is verwijderd. `marketing.leads` stond op 0 rijen
+> vóór en na.
+>
+> | schakel | uitkomst |
+> |---|---|
+> | rij in `marketing.leads` | **aangekomen** — anon-INSERT komt door RLS heen |
+> | `leads_ack_is_server_owned` | `acknowledged_at`/`ack_channel` op null gezet |
+> | `leads_notify_new` → `lead-notify` | 200 — `{"telegram":"sent","resend":"skipped: RESEND_API_KEY unset"}` |
+> | `leads_acknowledge_new` → `lead-acknowledge` | 200 — `{"sent":false,"channel":"skipped:no-api-key","row_update":"ok"}` |
+>
+> Beide dispatches binnen **135 ms** na de insert (`net._http_response`).
+>
+> **Telegram werkt.** De melding is werkelijk verstuurd, niet overgeslagen. Dat
+> was tot nu toe alleen los bewezen, niet vanaf het formulier.
+>
+> **E-mail werkt nergens**, en het hangt op één ontbrekende sleutel. Zowel de
+> ontvangstbevestiging aan de aanvrager als de Resend-helft van de interne
+> melding meldt dezelfde reden. De checklist hieronder is dus geen theorie: dit
+> is precies wat er nu misgaat bij een echte lead.
+>
+> Wat hier goed aan is: `ack_channel` droeg `skipped:no-api-key`, exact zoals
+> de kolomtoelichting belooft. De keten registreert haar eigen storing in
+> plaats van stil te falen — daarom was deze diagnose een kwestie van één query
+> in plaats van speurwerk.
+>
+> **Niet vastgesteld:** of de interne melding vanuit Vercel
+> (`notifyEmail` in `lib/notify.ts`) wél aankwam. Die draait op een andere
+> `RESEND_API_KEY` — die van Vercel, niet die van de edge functions. Kijk in de
+> inbox van `diazJSBD@proton.me`: kwam er rond 13:46 UTC één interne melding
+> binnen, dan staat de Vercel-sleutel goed en ontbreekt alleen de
+> edge-function-kant. Kwam er niets, dan missen ze allebei.
+
 Deze drie zijn secrets op de **edge functions** (Supabase → Edge Functions →
 Secrets), niet op Vercel. De functie draait los van Next.js.
 

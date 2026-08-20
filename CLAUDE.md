@@ -1784,6 +1784,33 @@ geconfigureerd" op, terwijl de gerenderde DOM gewoon
 registreert alleen same-origin verzoeken, dus die toont een event naar
 `plausible.io` nooit. Meet dit in de DOM met een onderschepte `fetch`.
 
+#### De leadketen is voor het eerst in zijn geheel gelopen
+
+Via het **echte meerstapsformulier op productie**, niet via een SQL-insert — dat
+laatste had alleen het staartstuk getest. Testinzending daarna verwijderd;
+`marketing.leads` stond op 0 rijen vóór en na.
+
+| schakel | uitkomst |
+|---|---|
+| rij in `marketing.leads` | aangekomen — anon-INSERT komt door RLS heen |
+| `leads_notify_new` → `lead-notify` | 200, `{"telegram":"sent","resend":"skipped: RESEND_API_KEY unset"}` |
+| `leads_acknowledge_new` → `lead-acknowledge` | 200, `{"sent":false,"channel":"skipped:no-api-key"}` |
+
+Beide dispatches binnen 135 ms na de insert. **Telegram werkt. E-mail werkt
+nergens**, en beide helften melden dezelfde reden: de `RESEND_API_KEY` op de
+edge functions is niet gezet. Dat is één operator-actie, geen defect.
+
+De keten registreert haar eigen storing: `ack_channel` droeg `skipped:no-api-key`
+precies zoals de kolomtoelichting belooft. Daardoor was de diagnose één query in
+plaats van speurwerk. Zo hoort een schakel te falen.
+
+**Twee instrumenten faalden ook hier.** `read_page` gaf een lege boom met
+viewport 0×0 terwijl de pagina gewoon geladen was; `javascript_tool` zag alles.
+En het formulier reageerde niet op klikken — de oorzaak was mijn eigen globale
+`preventDefault` uit de Plausible-meting op dezelfde tab, die een client-side
+navigatie overleeft. Bij SPA-navigatie blijft een listener op `document` leven;
+alleen een harde reload ruimt hem op.
+
 #### Meting
 
 776 tests in 28 bestanden, 692 dict-sleutels × 4 talen. Dat vervangt de 726/25
@@ -1793,8 +1820,12 @@ hierboven.
 
 Dit vervangt de lijst van 19 augustus hierboven.
 
-- **Plausible-cijfer** en **akkoord voor één end-to-end test van de leadketen**:
-  ongewijzigd, zie het blok hierboven.
+- **Plausible-cijfer**: bezoekers over 30 dagen. Zonder dat blijft "0 leads in
+  `marketing.leads`" onbeslist tussen geen-verkeer en geen-conversie.
+- **`RESEND_API_KEY` op de edge functions** (Supabase → Edge Functions →
+  Secrets), plus `ACK_FROM` op een geverifieerd domein. Zonder die twee gaat er
+  bij een echte lead geen enkele mail de deur uit — gemeten, niet vermoed. De
+  leadketen-test hoeft niet meer; die is gelopen.
 - **DataForSEO-inloggegevens** (open sinds 2026-08-03). Zonder die twee waarden
   levert elke SEO-route niets. Zet ze zelf; de plek staat klaar in
   `.env.example`.
