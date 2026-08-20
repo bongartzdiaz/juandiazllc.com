@@ -1,4 +1,4 @@
-import { LocaleLink } from "@/components/LocaleLink";
+import { BOOKING_15MIN } from "@/lib/booking";
 import { translate, type Locale } from "@/lib/i18n/dict";
 
 // Eerlijk capaciteitssignaal: vier blueprint-opdrachten per kwartaal, en
@@ -78,9 +78,14 @@ export function Capacity({ locale, variant = "full", quarter }: Props) {
         <span className="capacity-strip-text">
           <strong>{label}</strong> — {SLOTS_REMAINING}/{TOTAL_SLOTS} {t("fomo.capacity.slotsLabel")}
         </span>
-        <LocaleLink href="/contact" className="capacity-strip-cta">
-          {t("fomo.capacity.cta")} →
-        </LocaleLink>
+        <a
+          href={BOOKING_15MIN}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="capacity-strip-cta plausible-event-name=Boeking+15min"
+        >
+          {t("cta.intro")} →
+        </a>
       </div>
     );
   }
@@ -109,9 +114,14 @@ export function Capacity({ locale, variant = "full", quarter }: Props) {
         {t("fomo.capacity.slotsLabel")}
       </p>
       <p className="capacity-note">{t("fomo.capacity.note")}</p>
-      <LocaleLink href="/contact" className="capacity-cta">
-        {t("fomo.capacity.cta")} →
-      </LocaleLink>
+      <a
+        href={BOOKING_15MIN}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="capacity-cta plausible-event-name=Boeking+15min"
+      >
+        {t("cta.intro")} →
+      </a>
     </aside>
   );
 }

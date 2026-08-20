@@ -123,7 +123,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 
         <div className="about-cta" style={{ marginTop: 48 }}>
           <LocaleLink href="/contact" className="btn primary">
-            {t("about.cta")} <span className="arr">→</span>
+            {t("cta.book")} <span className="arr">→</span>
           </LocaleLink>
         </div>
       </article>

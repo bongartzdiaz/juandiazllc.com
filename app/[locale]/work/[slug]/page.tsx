@@ -113,7 +113,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
               </a>
             )}
             <LocaleLink className="btn ghost" href="/contact">
-              {t("work.d.talk")} <span className="arr">→</span>
+              {t("cta.book")} <span className="arr">→</span>
             </LocaleLink>
           </div>
         </div>
@@ -237,7 +237,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
           />
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             <LocaleLink className="btn primary btn-mag" href="/contact">
-              {t("work.d.want.cta")} <span className="arr">→</span>
+              {t("cta.book")} <span className="arr">→</span>
             </LocaleLink>
             {sector && (
               <LocaleLink className="btn ghost" href={`/sectors/${sector.slug}`}>

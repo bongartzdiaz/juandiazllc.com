@@ -127,7 +127,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
             {t("services.cta.title")}
           </div>
           <LocaleLink className="btn primary btn-mag" href="/contact">
-            {t("services.cta.btn")} <span className="arr">→</span>
+            {t("cta.book")} <span className="arr">→</span>
           </LocaleLink>
         </div>
       </section>
