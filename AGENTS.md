@@ -1641,3 +1641,89 @@ hierboven.
   sinds 2026-08-03), self-host vs gehost kiezen, Search Console via DNS TXT
   verifiëren, Ahrefs-MCP loskoppelen.
 - **DNS TXT voor Search Console** en de vier Plausible-doelen taggen.
+
+### 2026-08-20 — een adres dat niet bestond, 56 dode sleutels, en een poort die op één platform niet kon meten
+
+Vier PR's (#188 t/m #191). Wat ze bindt: elke controle die deze dag is aangeraakt
+mat iets anders dan er op stond.
+
+#### PR #188 — Philly droeg een adres dat niet bestaat
+
+`philly.juandiazllc.com` stond als `domain` in `lib/ventures.ts` en werd op drie
+plekken gerenderd. Die hostnaam staat niet in DNS, en niets in deze repo bedient
+hem — het CRM leeft sinds #134 in `bongartzdiaz/DEUS-SHARED`. Tegelijk beweerde
+`work.page.lede` in vier talen dat er vijf producten live staan. Vier staan er
+live; Philly wordt gebouwd.
+
+`domain` en `external` zijn nu nullable, en `lib/ventures.test.ts` draagt een
+poort die het telwoord in de lede vergelijkt met `VENTURES.filter(status ===
+"live").length`.
+
+**Die poort moest twee keer geschreven worden.** De eerste versie zocht het
+telwoord in de hele lede. Elke lede eindigt op de vijf-fase-methode, dus het
+woord "vijf" staat er altijd in en de assertie kon niet falen bij vijf live
+ventures. Nu leest hij alleen de eerste zin, en eist bovendien dat er géén ander
+telwoord in die zin staat. **Scope een assertie op de zin die de claim draagt.**
+
+Bereikbaarheid wordt DNS-first gecontroleerd (`lib/seo/venture-adressen.ts`),
+alleen in de productie-audit. Op productie geverifieerd: hostnaam 0×, de valse
+claim 0×, `href="#"` 0×.
+
+#### PR #189 + #190 — 56 sleutels vertaalden kopij die niemand rendert
+
+Negentien `dash.*` beschreven `/dashboard` (weg met #134), twintig `app.*` de
+operator-hub, vier `cookie.*` een banner die verdween toen Plausible cookieloos
+werd, zes `contact.*` het formulier van vóór de meerstapsversie, en `nav.login`
+een inlog die met #138 vertrok. Dood gewicht in een woordenboek is niet neutraal:
+`cookie.body` beloofde in vier talen "a session cookie for sign-in" voor een
+sessie die niet meer bestaat, en `dash.footer` noemde het subdomein hierboven.
+
+`lib/i18n/wees-sleutels.test.ts` houdt dat voortaan tegen. Hij scant `app`,
+`components`, `lib` en `scripts` op letterlijke aanroepen én op samengestelde
+(`t(\`process.${i}.name\`)` → `/^process\.[^.]+\.name$/`); deze repo heeft 49 van
+de tweede soort.
+
+**Drie keer bleek de meetlat zelf stuk, en telkens werd dat zichtbaar door twee
+tellers naast elkaar te leggen.**
+
+| symptoom | oorzaak |
+|---|---|
+| poort verklaarde `nav.login` levend | haar eigen toelichting noemde de sleutel; testbestanden telden mee als afnemer |
+| 709 sleutels tegen 714 | `[a-zA-Z0-9._]` zat in de extractie én in de scan naar afnemers — het ontbrekende koppelteken hief zichzelf op |
+| 677 sleutels tegen 692 | `check-i18n-parity.mjs` las één sleutel per regel; de procesfases staan met vier op één regel |
+
+Die laatste betekent dat een ontbrekende Duitse `process.3.body` jarenlang
+onzichtbaar was voor de controle die daarvoor bestaat. Gefixt; het script leest
+nu ook sleutels achter een komma.
+
+**Een testbestand is geen afnemer.** Een sleutel die alleen nog in een test
+voorkomt rendert nergens. En een controle die zichzelf als bewijs accepteert is
+geen controle.
+
+#### PR #191 — de prijspoort kon op Windows niet groen worden
+
+`npm run regen:pricing:check` stond permanent rood op deze machine. Er liep
+niets uit de pas: de generator schreef zijn blokken met LF terwijl de
+doelbestanden CRLF dragen (`.gitattributes` heeft `* text=auto`,
+`core.autocrlf=true`), dus elke vergelijking meldde verschil. Draaide je de
+generator "om het te repareren", dan kreeg je gemengde regeleinden die git bij de
+volgende vergelijking weer gelijktrok.
+
+Gemeten met de oude versie uit `HEAD` naast de nieuwe: CRLF-checkout oud rood /
+nieuw groen, LF-checkout oud groen / nieuw groen. Windows-specifiek dus — op een
+runner was de oude check ook groen geweest.
+
+**Het werkelijke gat was dat hij nergens draaide.** Geen van de vijf workflows
+riep hem aan. De check hangt nu aan de bestaande `docs-sync`-job, die al in de
+branch-protection-lijst staat; een nieuwe job zou daar eerst met de hand bij
+moeten en tot dat moment niets bewaken. Wijzigt iemand een bedrag in de
+gegenereerde TS in plaats van in de CSV, dan is de CSV geen bron meer — en
+`docs/claims.md` verwijst naar prijzen die dan nergens één herkomst hebben.
+
+**Een instrument dat op één platform altijd rood staat, wordt daar niet
+gedraaid.** Het gat en de kapotte meter hielden elkaar in stand.
+
+#### Meting
+
+776 tests in 28 bestanden, 692 dict-sleutels × 4 talen. Dat vervangt de 726/25
+hierboven.

@@ -14,6 +14,17 @@
  *
  * Idempotent: running the script without CSV changes produces zero diff.
  *
+ * REGELEINDEN. Alles hieronder rekent in LF. De bestanden worden bij het lezen
+ * genormaliseerd en bij het schrijven teruggezet naar het regeleinde dat het
+ * doelbestand al droeg. Zonder dat was `--check` op een Windows-checkout
+ * permanent rood: de gegenereerde blokken kwamen er met LF uit terwijl de rest
+ * van het bestand CRLF droeg, dus elke vergelijking meldde verschil. Draaide je
+ * dan de generator "om het te repareren", dan kreeg je een bestand met gemengde
+ * regeleinden dat git via `* text=auto` weer gelijktrok — de controle kon nooit
+ * groen worden. Gemeten op 2026-08-20: page.tsx 491 -> 403 CRLF, de md 316 ->
+ * 237, en beide bestanden identiek na normalisatie. Er liep dus niets uit de
+ * pas; alleen de meetlat kon niet meten.
+ *
  * Run:
  *   node scripts/regenerate-pricing.mjs       # write outputs
  *   node scripts/regenerate-pricing.mjs --check  # exit 1 if outputs would change
@@ -37,6 +48,25 @@ const PAGE_PATH = join(ROOT, "app/[locale]/pricing/page.tsx");
 const MD_PATH = join(ROOT, "_drafts/pricing/pricing-tiers-en.md");
 
 const CHECK_MODE = process.argv.includes("--check");
+
+// ---------- Regeleinden ----------
+// Lezen levert altijd LF; schrijven zet terug naar wat het bestand al droeg.
+// Zie de toelichting bovenaan dit bestand voor waarom dit hier staat.
+function dominantEol(ruw) {
+  const crlf = (ruw.match(/\r\n/g) ?? []).length;
+  const lf = (ruw.match(/\n/g) ?? []).length;
+  // `lf` telt óók de \n binnen elke \r\n, dus losse LF's = lf - crlf.
+  return crlf * 2 > lf ? "\r\n" : "\n";
+}
+
+function leesLf(pad) {
+  const ruw = readFileSync(pad, "utf8");
+  return { tekst: ruw.replace(/\r\n/g, "\n"), eol: dominantEol(ruw) };
+}
+
+function schrijfMetEol(pad, tekst, eol) {
+  writeFileSync(pad, eol === "\r\n" ? tekst.replace(/\n/g, "\r\n") : tekst, "utf8");
+}
 
 // ---------- CSV parser ----------
 // Simple split-on-comma — no quoted commas in this data. If features
@@ -337,7 +367,7 @@ function main() {
   const sections = groupByCategory(rows);
 
   // page.tsx — regenerate TIERS + FEATURE_TABLE
-  const pageBefore = readFileSync(PAGE_PATH, "utf8");
+  const { tekst: pageBefore, eol: pageEol } = leesLf(PAGE_PATH);
   const ctaHrefs = readCtaHrefs(pageBefore);
 
   const tiersBlock = generateTiersConstant(tierMeta, ctaHrefs);
@@ -358,7 +388,7 @@ function main() {
   );
 
   // markdown — regenerate per-category tables
-  const mdBefore = readFileSync(MD_PATH, "utf8");
+  const { tekst: mdBefore, eol: mdEol } = leesLf(MD_PATH);
   const mdBlock = generateMarkdownTables(sections);
   const mdAfter = replaceBetweenMarkers(
     mdBefore,
@@ -384,13 +414,13 @@ function main() {
   }
 
   if (pageChanged) {
-    writeFileSync(PAGE_PATH, pageAfter, "utf8");
+    schrijfMetEol(PAGE_PATH, pageAfter, pageEol);
     console.log(`✓ Wrote ${PAGE_PATH}`);
   } else {
     console.log(`= No change in ${PAGE_PATH}`);
   }
   if (mdChanged) {
-    writeFileSync(MD_PATH, mdAfter, "utf8");
+    schrijfMetEol(MD_PATH, mdAfter, mdEol);
     console.log(`✓ Wrote ${MD_PATH}`);
   } else {
     console.log(`= No change in ${MD_PATH}`);
