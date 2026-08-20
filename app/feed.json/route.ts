@@ -1,6 +1,7 @@
 import { getAllInsights } from "@/lib/insights";
 import { SIGNALS } from "@/lib/signals";
 import { PERSON_NAME, PERSON_URL } from "@/lib/seo/branding";
+import { insightNaarTekst, signalNaarTekst } from "@/lib/seo/plattetekst";
 
 // JSON Feed 1.1 — https://www.jsonfeed.org/version/1.1/
 // Covers BOTH /insights and /signals in one feed. RSS readers don't
@@ -29,13 +30,7 @@ function buildItems(): FeedItem[] {
     url: `${SITE}/en/insights/${p.slug}`,
     title: p.title,
     summary: p.summary,
-    content_text: p.body
-      .map((b) => {
-        if (b.type === "p" || b.type === "h2" || b.type === "quote" || b.type === "cta") return b.text;
-        if (b.type === "ul") return b.items.map((i) => `• ${i}`).join("\n");
-        return "";
-      })
-      .join("\n\n"),
+    content_text: insightNaarTekst(p.body),
     date_published: new Date(p.publishedAt).toISOString(),
     tags: [p.tag],
     authors: [{ name: PERSON_NAME }],
@@ -46,15 +41,7 @@ function buildItems(): FeedItem[] {
     url: `${SITE}/en/signals/${s.slug}`,
     title: s.title,
     summary: s.excerpt,
-    content_text: s.body
-      .map((b) => {
-        if (b.type === "list" && Array.isArray(b.text)) {
-          return (b.text as string[]).map((i) => `• ${i}`).join("\n");
-        }
-        return typeof b.text === "string" ? b.text : "";
-      })
-      .filter(Boolean)
-      .join("\n\n"),
+    content_text: signalNaarTekst(s.body),
     date_published: new Date(s.date).toISOString(),
     tags: [s.tag],
     authors: [{ name: PERSON_NAME }],
