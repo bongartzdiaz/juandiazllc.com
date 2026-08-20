@@ -156,7 +156,7 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
             — Juan Stefan Bongartz Diaz
           </div>
           <LocaleLink className="btn primary btn-mag" href="/contact">
-            {translate(l, "signals.d.cta")} <span className="arr">→</span>
+            {translate(l, "cta.book")} <span className="arr">→</span>
           </LocaleLink>
         </div>
       </article>

@@ -133,7 +133,7 @@ export default async function EnergyRoiPage({
             className="btn primary btn-mag plausible-event-name=Tool+CTA plausible-event-tool=energy-roi"
             href="/contact?interest=energy-roi"
           >
-            {t("roi.outro.cta")} <span className="arr">→</span>
+            {t("cta.book")} <span className="arr">→</span>
           </LocaleLink>
         </div>
       </section>

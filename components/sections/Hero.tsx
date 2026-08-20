@@ -54,7 +54,7 @@ export function Hero() {
             </p>
             <div className="hero-ctas">
               <LocaleLink className="btn primary btn-mag" href="/contact">
-                {t("hero.cta.primary")} <span className="arr">→</span>
+                {t("cta.book")} <span className="arr">→</span>
               </LocaleLink>
               <LocaleLink className="btn ghost" href="/work">
                 {t("hero.cta.secondary")} <span className="arr">→</span>

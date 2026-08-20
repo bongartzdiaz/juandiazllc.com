@@ -81,7 +81,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
             target="_blank"
             rel="noopener noreferrer"
           >
-            {t("contact.book.cta")}
+            {t("cta.intro")}
           </a>
         </div>
       </section>

@@ -20,7 +20,7 @@ export function CtaBig() {
       <p className="lede" data-reveal>{t("cta.lede")}</p>
       <div className="btns" data-reveal>
         <LocaleLink className="btn primary btn-mag" href="/contact">
-          {t("cta.primary")} <span className="arr">→</span>
+          {t("cta.book")} <span className="arr">→</span>
         </LocaleLink>
         <LocaleLink className="btn ghost" href="/work">
           {t("cta.secondary")} <span className="arr">→</span>

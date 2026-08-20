@@ -187,7 +187,7 @@ export default async function InsightPage(
               target="_blank"
               rel="noopener noreferrer"
             >
-              {t("contact.book.cta")} <span className="arr">→</span>
+              {t("cta.intro")} <span className="arr">→</span>
             </a>
             <p style={{ marginTop: 12, fontSize: 14 }}>
               <LocaleLink href="/contact">{t("insights.d.want.cta")}</LocaleLink>
