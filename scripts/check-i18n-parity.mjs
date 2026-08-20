@@ -41,7 +41,14 @@ function sleutelsPerLocale() {
     const einde = i + 1 < posities.length ? posities[i + 1].start : src.length;
     const blok = src.slice(start, einde);
     const sleutels = new Set();
-    for (const m of blok.matchAll(/^\s{2,}"([^"]+)":/gm)) sleutels.add(m[1]);
+    // Een sleutel staat aan het begin van een regel óf achter een komma. Dat
+    // tweede geval stond er niet in, en daardoor telde dit script er vijftien
+    // te weinig: de vijf procesfases staan met vier sleutels op één regel
+    // (`"process.1.name": "Survey", "process.1.title.a": …`). Alleen de eerste
+    // van elke regel werd gezien, dus een ontbrekende Duitse "process.3.body"
+    // was voor deze controle onzichtbaar — precies het soort gat dat hij hoort
+    // te vinden. Vergeleken met het draaiende woordenboek: 677 tegen 692.
+    for (const m of blok.matchAll(/(?:^\s{2,}|,\s*)"([^"]+)":/gm)) sleutels.add(m[1]);
     uit.set(locale, sleutels);
   }
   return uit;
