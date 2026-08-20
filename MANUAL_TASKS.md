@@ -39,12 +39,21 @@ Zolang dat zo is meldt de functie eerlijk `skipped:no-api-key` en blijft
 > plaats van stil te falen — daarom was deze diagnose een kwestie van één query
 > in plaats van speurwerk.
 >
-> **Niet vastgesteld:** of de interne melding vanuit Vercel
-> (`notifyEmail` in `lib/notify.ts`) wél aankwam. Die draait op een andere
-> `RESEND_API_KEY` — die van Vercel, niet die van de edge functions. Kijk in de
-> inbox van `diazJSBD@proton.me`: kwam er rond 13:46 UTC één interne melding
-> binnen, dan staat de Vercel-sleutel goed en ontbreekt alleen de
-> edge-function-kant. Kwam er niets, dan missen ze allebei.
+> **Die meting stelde nog een tweede vraag, en die is inmiddels vervallen.**
+> Er liep destijds een tweede interne melding, vanuit Vercel: `lib/notify.ts`
+> stuurde bij elke inzending zélf ook een Telegram en een e-mail. Dezelfde twee
+> kanalen, dezelfde ontvanger, dezelfde rij als `lead-notify`. Bij goede
+> configuratie kreeg je dus alles dubbel; bij slechte hoorde je van die helft
+> niets, want hij sloeg stil over (`if (!key) return`) en faalde stil (lege
+> `catch`). Nagemeten of hij die middag iets afleverde is het nooit, en dat
+> hoeft ook niet meer: het bestand is op 2026-08-20 verwijderd.
+>
+> **Wat dat voor deze taak betekent:** `RESEND_API_KEY` hoefde op twee plekken
+> te staan en hoeft dat nu op één. De sleutel hieronder, op de edge functions,
+> is de enige die de leadmail verstuurt. Staat er in Vercel nog een
+> `RESEND_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` of
+> `CONTACT_NOTIFY_TO`, dan doen die niets meer — weghalen scheelt de volgende
+> lezer dezelfde verwarring.
 
 Deze drie zijn secrets op de **edge functions** (Supabase → Edge Functions →
 Secrets), niet op Vercel. De functie draait los van Next.js.

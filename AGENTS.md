@@ -1811,10 +1811,41 @@ En het formulier reageerde niet op klikken — de oorzaak was mijn eigen globale
 navigatie overleeft. Bij SPA-navigatie blijft een listener op `document` leven;
 alleen een harde reload ruimt hem op.
 
+#### De tweede meldingslaag was geen ontbrekende meting maar een duplicaat
+
+De meting hierboven liet één schakel open: kwam de interne melding vanuit Vercel
+aan? Naast de edge function stuurde `lib/notify.ts` bij elke inzending zélf ook
+een Telegram en een e-mail. Het plan was die schakel meetbaar te maken — dezelfde
+reden laten teruggeven als de edge function, en wegschrijven in `metadata`.
+
+Bij het openen van `lead-notify` bleek dat het verkeerde antwoord. Die functie
+doet **beide** kanalen al, geeft per kanaal een reden terug en logt. `notify.ts`
+stuurde dezelfde twee kanalen naar dezelfde ontvanger, over dezelfde rij. Bij
+goede configuratie kreeg Juan alles dubbel; bij slechte hoorde hij van deze helft
+niets, want hij sloeg stil over (`if (!key) return`) en faalde stil (lege
+`catch`). Meetbaar maken zou een tweede, zwakkere meting hebben opgeleverd naast
+een sterkere die er al was.
+
+`lib/notify.ts` is daarom verwijderd. Beide afnemers — `app/actions/contact.ts`
+en `app/api/cal/route.ts` — schreven de rij toch al weg, dus trigger
+`leads_notify_new` vuurde in beide gevallen al. Er valt niets weg, alleen het
+duplicaat. `app/api/cal/route.ts` droeg het `LeadNotification`-type; dat is nu
+een lokaal `LeadRij`-type in dat bestand, want het is de enige lezer.
+
+**De bezoeker merkt het ook.** Beide meldingen stonden met een `await` in het
+request-pad van de server action, zonder timeout. Twee externe HTTP-aanroepen
+minder tussen "verzenden" en het bevestigingsscherm.
+
+**En het haalt een strik uit de operator-taak.** `RESEND_API_KEY` moest op twee
+plekken staan, met twee verschillende gevolgen bij ontbreken. Nu is er één
+plek — de edge-function-secrets — en één plek waar je kunt zien of het werkte.
+
 #### Meting
 
 776 tests in 28 bestanden, 692 dict-sleutels × 4 talen. Dat vervangt de 726/25
-hierboven.
+hierboven. De verwijdering van `lib/notify.ts` verandert dat aantal niet: er was
+geen test die het bestand aanraakte, en dat is precies wat een ongeobserveerde
+schakel is.
 
 #### Wacht op de operator — bijgewerkt 2026-08-20
 
