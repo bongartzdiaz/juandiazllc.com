@@ -1723,7 +1723,54 @@ gegenereerde TS in plaats van in de CSV, dan is de CSV geen bron meer — en
 **Een instrument dat op één platform altijd rood staat, wordt daar niet
 gedraaid.** Het gat en de kapotte meter hielden elkaar in stand.
 
+#### De vier OpenSEO-taken nagetrokken
+
+Van de vier taken in `MANUAL_TASKS.md` bleek er één al gedaan en stonden er twee
+verkeerd beschreven.
+
+**Search Console — het TXT-record staat er al.** Gemeten via `dns.google`:
+`google-site-verification=ABrD7ZNd...` naast de SPF-regel. Wat daarmee níet
+vaststaat is of de property in Search Console ook als geverifieerd staat; dat is
+alleen ingelogd te zien. `nslookup -type=TXT` gaf hier stil niets terug en had de
+conclusie "geen record" opgeleverd — het derde instrument deze dag dat faalde
+zonder te klagen.
+
+**Ahrefs staat op `✓ Connected` en is dood.** De gezondheidscontrole van
+`claude mcp list` test de verbinding, niet de toegang. Gemeten op
+`subscription-info-limits-and-usage`, een endpoint dat volgens zijn eigen
+beschrijving gratis is en geen units verbruikt: `{"error": "Insufficient plan"}`.
+Het is bovendien een claude.ai-connector, geen lokale MCP — `claude mcp remove`
+raakt hem niet, loskoppelen gaat via de connector-instellingen op claude.ai.
+
+**Self-host vs gehost: gehost, tenzij het volume groeit.** De 28%-opslag klopt
+woordelijk. Twee dingen die het document niet noemde en de keuze bepalen:
+self-host als MCP-endpoint is nergens gedocumenteerd (`openseo.so/docs/mcp` kent
+alleen de gehoste URL), en Search Console vergt bij self-host een eigen
+Google-OAuth-app met drie extra variabelen. Bij vier verzoeken per rapportrun is
+28% een rondingsverschil; bij honderden per dag keert die rekensom om.
+
+**`.env.example` noemde `DATAFORSEO_LOGIN` en `DATAFORSEO_PASSWORD` niet**,
+terwijl `lib/seo/dataforseo.ts` en `scripts/seo-report.ts` ze allebei lezen. Staat
+er nu in, met de waarschuwing dat OpenSEO dezelfde inloggegevens in een ándere
+vorm wil (`DATAFORSEO_API_KEY`, base64 van `email:wachtwoord`).
+
 #### Meting
 
 776 tests in 28 bestanden, 692 dict-sleutels × 4 talen. Dat vervangt de 726/25
 hierboven.
+
+#### Wacht op de operator — bijgewerkt 2026-08-20
+
+Dit vervangt de lijst van 19 augustus hierboven.
+
+- **Plausible-cijfer** en **akkoord voor één end-to-end test van de leadketen**:
+  ongewijzigd, zie het blok hierboven.
+- **DataForSEO-inloggegevens** (open sinds 2026-08-03). Zonder die twee waarden
+  levert elke SEO-route niets. Zet ze zelf; de plek staat klaar in
+  `.env.example`.
+- **Kiezen: gehost of self-host** voor OpenSEO. Aanbeveling en onderbouwing
+  staan in `MANUAL_TASKS.md`; de keuze kost geld, dus die is aan jou.
+- **Ahrefs-connector loskoppelen** via claude.ai — zodra OpenSEO antwoordt.
+- **Search Console**: alleen nog nakijken of de property daadwerkelijk
+  geverifieerd is. Het DNS-record is er.
+- **Vier Plausible-doelen taggen.**
