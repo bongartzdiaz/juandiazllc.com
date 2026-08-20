@@ -163,6 +163,40 @@ export const PERSON_ID = `${SITE}/en/about#juan`;
 /** De pagina die over de persoon gaat. Taal-geprefixt, dus geen 307. */
 export const PERSON_URL = `${SITE}/en/about`;
 
+/* ── De tweede organisatie waar deze persoon aan vastzit ──────────────────
+ *
+ * `worksFor` hierboven draagt de rechtspersoon van deze site: Juan Diaz, LLC.
+ * Lucen AI is iets anders — een bedrijf met drie oprichters, waarvan Juan de
+ * CTO is. Dat staat woordelijk op hun eigen /about, met exact de lange
+ * naamvorm die `PERSON_NAME` draagt. Dat maakt het een controleerbare claim en
+ * geen zelfbenoeming, en daarom hoort hij in het schema.
+ *
+ * WAAROM `affiliation` EN NIET `sameAs`. `sameAs` is het veld waarmee Google
+ * verifieert dat twee adressen DEZELFDE entiteit beschrijven; een bedrijfssite
+ * beschrijft de persoon niet. Diezelfde verwarring stond tot 2026-08-20 in
+ * ORG_SAME_AS, waar persoonlijke profielen aan de rechtspersoon hingen.
+ * `affiliation` zegt wat het is: een organisatie waar deze persoon bij hoort.
+ *
+ * `worksFor` was al bezet en blijft bezet. Twee werkgevers in dat veld maakt
+ * geen van beide sterker.
+ *
+ * NAGEMETEN OP 2026-08-20. https://lucenai.eu/ geeft 200 over TLS, www 301
+ * naar de apex, en /about noemt "Juan Stefan Bongartz Diaz — Co-Founder |
+ * CTO". Let op: dit adres is NIET lucen.ai. Dat laatste komt in deze repo nog
+ * voor in de toelichting bij `lib/contactadressen.test.ts` en is een geparkeerd
+ * Namecheap-domein zonder werkende https. Twee adressen, één merknaam.
+ *
+ * De bereikbaarheid wordt bewaakt in `lib/seo/venture-adressen.ts`, dat in de
+ * dagelijkse productie-audit draait en niet in de PR-audit — een storing bij
+ * een ander mag geen merge blokkeren.
+ * ------------------------------------------------------------------------ */
+
+/** Naam van de organisatie waar de persoon medeoprichter/CTO van is. */
+export const AFFILIATIE_NAAM = "Lucen AI";
+
+/** Canoniek adres van die organisatie. Apex, https, geen slash-staart. */
+export const AFFILIATIE_URL = "https://lucenai.eu";
+
 /** Naam en knoop-identiteit van de rechtspersoon. */
 export const ORG_NAME = "Juan Diaz, LLC";
 export const ORG_ID = `${SITE}#organization`;

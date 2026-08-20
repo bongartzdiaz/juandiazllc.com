@@ -13,7 +13,7 @@
 
 import { auditAlles, telPerErnst, type Pagina, type Bevinding } from "../lib/seo/audit";
 import { LOCALES } from "../lib/i18n/dict";
-import { controleerVentureAdressen } from "../lib/seo/venture-adressen";
+import { controleerVentureAdressen, controleerEntiteitsAdressen } from "../lib/seo/venture-adressen";
 
 const args = process.argv.slice(2);
 const alsJson = args.includes("--json");
@@ -67,7 +67,11 @@ async function main(): Promise<void> {
     }),
   );
 
-  const extern = basis.startsWith("https://") ? await controleerVentureAdressen() : [];
+  // Alleen tegen productie: beide controles bellen adressen van derden, en op
+  // een lokale build zou dat elke run vertragen zonder iets te bewijzen.
+  const extern = basis.startsWith("https://")
+    ? [...(await controleerVentureAdressen()), ...(await controleerEntiteitsAdressen())]
+    : [];
   const bevindingen = [...auditAlles(paginas, basis, [...LOCALES]), ...extern];
   const telling = telPerErnst(bevindingen);
 

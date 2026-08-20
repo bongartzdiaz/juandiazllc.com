@@ -2107,6 +2107,106 @@ compositeert hier geen frames — dus dit is in de DOM gemeten, niet op het oog.
 797 tests in 31 bestanden, 693 dict-sleutels × 4 talen. Dat vervangt de 796/31
 en de 692 hierboven.
 
+### 2026-08-20 (vervolg) — twee adressen met één merknaam, en twee kapotte Duitse woorden
+
+De vraag was backlinks te maken naar "de lucenai site". Het antwoord veranderde
+twee keer tijdens het meten.
+
+#### Ik mat eerst het verkeerde domein, en dat was de repo's schuld
+
+`lucen.ai` is wat híer staat — tot #196 wezen drie CTA's op `/pricing` naar een
+mailadres op dat domein. Gemeten: geen https (geen certificaat), `http://` 302
+naar een CNAME op `parkingpage.namecheap.com`. Geparkeerd.
+
+`lucenai.eu` is de echte site: 200 over TLS, `www` 301 naar de apex, WordPress
+op LiteSpeed, Yoast, Google Workspace-mail, en er staat al een
+`google-site-verification`-TXT. Twee adressen, één merknaam, en deze repo kende
+alleen de dode.
+
+#### Elf van de zestien URL's in die sitemap zijn demo-inhoud
+
+| soort | n | wat |
+|---|---|---|
+| echte pagina's | 3 | `/`, `/about/`, `/contact/` |
+| demo-artikelen | 9 | alle negen met de titel "Blog Post Title" en als tekst `Blog post excerpt [1-2 lines]` |
+| thema-restanten | 2 | WordPress' "Sample Page" en `/global-styles/` |
+| archieven daarvan | 2 | `/category/blog/`, `/author/hashadmin/` |
+
+Plus: de homepage noemt in het feature-blok **"Philanthropy AI"** — kopij van
+een ander product, één keer in de zichtbare tekst tegen vier keer "Lucen AI".
+Er is geen `meta name="description"`; de `og:description` bevat de volledige
+paginatekst. En de negen artikeltitels eindigen op een losse `%`, een kapot
+Yoast-sjabloon.
+
+Backlinks bouwen naar een site waar tweederde placeholder is, is een stem die
+je niet terugkrijgt. Opruimen kost een uur, links verdienen kost maanden. De
+volgorde staat in `docs/lucenai-backlinks.md`; zes van de zeven stappen zijn
+operator-werk in WordPress.
+
+#### Wat er wél in code kon, en wat het waard is
+
+`lucenai.eu/about` noemt **"Juan Stefan Bongartz Diaz — Co-Founder | CTO"**
+voluit, met exact de naamvorm waar `PERSON_NAME` op leunt, en linkt niet terug.
+Deze kant kende Lucen AI helemaal niet. Die rand ligt er nu: `affiliation` in
+het `Person`-schema op `/about`, plus een zichtbare link in vier talen.
+
+**Niet in `sameAs`** — dat veld zegt "dit adres beschrijft dezelfde entiteit",
+en `lucenai.eu` beschrijft een bedrijf met drie oprichters. `worksFor` was al
+bezet door de rechtspersoon van deze site; twee werkgevers in dat veld maakt
+geen van beide sterker.
+
+Eerlijk over de waarde: **één link vanaf een domein zonder autoriteit.** De
+SEO-waarde is bijna nul, de entiteitswaarde echt maar bescheiden.
+`controleerEntiteitsAdressen` in `lib/seo/venture-adressen.ts` bewaakt de
+bereikbaarheid in de dagelijkse productie-audit, om dezelfde reden als bij de
+dode X-handle en `philly.juandiazllc.com`: een adres in een schemaveld dat 404
+geeft is geen ontbrekend signaal maar een mislukte controle.
+
+#### Onderweg: het Duitse woord voor "bouwer" is niet "Bauer"
+
+Twee vondsten in de tien sleutels die ik toevallig opensloeg, allebei op de
+oppervlakken die de naamzoekopdracht beslissen:
+
+| sleutel | stond er | betekent |
+|---|---|---|
+| `about.title.b` (de) | "— Betreiber, Bauer, Gründer." | boer |
+| `meta.home.description` (de) | "Bauerprobt, operator-built." | geen woord |
+
+De H1 van de Duitse `/about` noemde hem dus operator, **boer**, oprichter. En de
+Duitse homepage-description — de meest geserveerde Duitse zin van de site —
+droeg een niet-bestaand woord waar "Construction-trained" (en) / "Bouwkundig
+getraind" (nl) staat. Nu "Erbauer" en "Bautechnisch geschult"; die laatste komt
+op 158 tekens, onder de `DESC_MAX` van 160.
+
+**Hier past geen poort.** Een test kan niet zien of Duits klopt. Wat de
+trefkans zegt is wel iets: twee fouten in tien willekeurig gelezen sleutels, in
+een woordenboek van 696 dat niemand ooit uitgelezen heeft. Een Duitse
+leesbeurt over de meta- en about-sleutels is werk dat er nog ligt.
+
+#### Twee poorten gingen af op mijn eigen toelichting
+
+`contactadressen.test.ts` viel op `hello@lucen.ai` in een nieuwe comment in
+`branding.ts` — de uitzondering draagt een **aantal** per bestand, dus een
+tweede vermelding elders lift niet stil mee. En `persoon-entiteit.test.ts` viel
+op de volle naam die ik in een comment in `about/page.tsx` had overgeschreven.
+Beide keren was de comment fout, niet de poort. Herschreven, poorten ongemoeid.
+
+#### En één keer sloeg mijn eigen gereedschap te breed
+
+Een `.replace('--', '—')` over een heel commentaarblok raakte ook de
+streepjeslijnen eronder, en maakte er em-dash-linialen van. Zelfde familie als
+de backslash-halvering van gisteren: een vervanging die wijder toesloeg dan
+bedoeld. Regel-voor-regel herschreven, met een assertie dat er geen
+em-dash-liniaal overbleef.
+
+#### Meting
+
+803 tests in 31 bestanden, 696 dict-sleutels × 4 talen. Zes nieuwe tests voor
+`controleerEntiteitsAdressen`, in twee richtingen gebroken: het adres op het
+eigen domein gezet (rood) en ENOTFOUND gedegradeerd tot waarschuwing (rood).
+Op de draaiende build in vier talen nagelopen: link, `rel`, `affiliation`,
+Duitse H1 en Duitse description.
+
 #### Wacht op de operator — bijgewerkt 2026-08-20
 
 Dit vervangt de lijst van 19 augustus hierboven.
@@ -2146,3 +2246,8 @@ geen ervan mag verzonnen worden.
 - **Hoeveel trajecten draag je tegelijk?** Een getal maakt schaarste echt en
   controleerbaar. Zonder getal is elke urgentie-zin een constructie, en dan hoort
   hij er niet te staan.
+
+- **Zeven stappen voor lucenai.eu** in `docs/lucenai-backlinks.md` §3, waarvan
+  zes operator-werk in WordPress. De belangrijkste kost een minuut: op
+  `lucenai.eu/about` de naam van Juan linken naar `juandiazllc.com/en/about`.
+  Backlinks bouwen heeft pas zin als stap 1 t/m 3 gedaan zijn.

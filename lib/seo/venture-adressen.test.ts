@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { controleerVentureAdressen } from "./venture-adressen";
+import { controleerVentureAdressen, controleerEntiteitsAdressen } from "./venture-adressen";
+import { AFFILIATIE_URL } from "@/lib/seo/branding";
 import { VENTURES } from "@/lib/ventures";
 
 /* De controle zelf, zonder netwerk. De echte lookup draait alleen in de
@@ -91,5 +92,58 @@ describe("controleerVentureAdressen", () => {
     for (const v of zonder) {
       expect(uit.some((b) => b.detail.startsWith(v.name))).toBe(false);
     }
+  });
+});
+
+describe("controleerEntiteitsAdressen", () => {
+  /* Dit adres staat in het Person-schema op /about, in `affiliation`, en er
+     staat een zichtbare link naar toe in vier talen. Google volgt zulke velden
+     en kijkt of er iets staat; een 404 is daar geen ontbrekend signaal maar een
+     mislukte controle. Zelfde reden waarom de dode X-handle uit ORG_SAME_AS is
+     gehaald — alleen ving niets dat toen, en nu wel. */
+  it("heeft een adres om te controleren", () => {
+    expect(AFFILIATIE_URL).toMatch(/^https:\/\//);
+    expect(new URL(AFFILIATIE_URL).hostname).not.toContain("juandiazllc.com");
+  });
+
+  it("zwijgt als het adres bestaat en antwoordt", async () => {
+    expect(await controleerEntiteitsAdressen({ zoek: zoektAlles, haal: haaltAlles })).toEqual([]);
+  });
+
+  it("meldt een fout als de naam niet in DNS staat", async () => {
+    const uit = await controleerEntiteitsAdressen({ zoek: gooit("ENOTFOUND"), haal: haaltAlles });
+    expect(uit).toHaveLength(1);
+    expect(uit[0].ernst).toBe("fout");
+    expect(uit[0].soort).toBe("entiteit-adres-bestaat-niet");
+    expect(uit[0].url).toBe(AFFILIATIE_URL);
+    // De melding moet naar /about wijzen en niet naar /work: een operator die
+    // hier de venture-tekst leest gaat het verkeerde bestand openen.
+    expect(uit[0].detail).toContain("/about");
+  });
+
+  it("meldt een waarschuwing bij een HTTP-fout, geen fout", async () => {
+    const uit = await controleerEntiteitsAdressen({
+      zoek: zoektAlles,
+      haal: async () => ({ ok: false, status: 404 }),
+    });
+    expect(uit).toHaveLength(1);
+    expect(uit[0].ernst).toBe("waarschuwing");
+    expect(uit[0].soort).toBe("entiteit-adres-antwoordt-niet");
+    expect(uit[0].detail).toContain("404");
+  });
+
+  it("noemt een DNS-hapering tijdelijk in plaats van dood", async () => {
+    const uit = await controleerEntiteitsAdressen({ zoek: gooit("EAI_AGAIN"), haal: haaltAlles });
+    expect(uit[0].ernst).toBe("waarschuwing");
+    expect(uit[0].soort).toBe("entiteit-adres-onbereikbaar");
+  });
+
+  it("leest de foutcode ook uit cause, zoals fetch hem geeft", async () => {
+    const uit = await controleerEntiteitsAdressen({
+      zoek: zoektAlles,
+      haal: gooit("UND_ERR_CONNECT_TIMEOUT", "cause") as never,
+    });
+    expect(uit[0].soort).toBe("entiteit-adres-onbereikbaar");
+    expect(uit[0].detail).toContain("UND_ERR_CONNECT_TIMEOUT");
   });
 });

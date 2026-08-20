@@ -12,6 +12,8 @@ import {
   PERSON_URL,
   ORG_NAME,
   ORG_ID,
+  AFFILIATIE_NAAM,
+  AFFILIATIE_URL,
 } from "@/lib/seo/branding";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
@@ -50,6 +52,16 @@ const personSchema = {
     "@id": ORG_ID,
     name: ORG_NAME,
     url: SITE,
+  },
+  // Tweede organisatie, ander veld. Zie de toelichting bij AFFILIATIE_URL in
+  // lib/seo/branding.ts: `worksFor` is bezet door de rechtspersoon van deze
+  // site, en `sameAs` zou beweren dat lucenai.eu dezelfde entiteit beschrijft
+  // als deze pagina. Dat doet het niet — het is een bedrijf met drie
+  // oprichters waarvan Juan er een is.
+  affiliation: {
+    "@type": "Organization",
+    name: AFFILIATIE_NAAM,
+    url: AFFILIATIE_URL,
   },
   description:
     "Construction-management-trained operator turned systems-builder. Builds revenue engines for operators in energy, real estate, hospitality and adjacent industries.",
@@ -131,6 +143,20 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           {t("about.p.why2.3")}{" "}
           <LocaleLink href="/insights">{t("about.p.why2.link3")}</LocaleLink>{" "}
           {t("about.p.why2.4")}
+        </p>
+
+        {/* Een uitgaande link naar lucenai.eu, en de enige die er is. De twee
+            sites kenden elkaar niet: juandiazllc.com noemde Lucen AI nergens,
+            en lucenai.eu/about noemt hem voluit, met de lange naamvorm uit
+            `PERSON_NAME`, zonder terug te linken. Dat is een ontbrekende rand tussen twee knopen die
+            over dezelfde persoon gaan. De tegenrichting staat in
+            docs/lucenai-backlinks.md en is operator-werk. */}
+        <p>
+          {t("about.p.lucen.1")}
+          <a href={AFFILIATIE_URL} target="_blank" rel="noopener noreferrer">
+            {t("about.p.lucen.link")}
+          </a>
+          {t("about.p.lucen.2")}
         </p>
 
         <div className="about-cta" style={{ marginTop: 48 }}>
