@@ -798,7 +798,7 @@ const en: Dict = {
     "How Juan Diaz, LLC started: construction management, the crossover to revenue operations, and why I build honest software for operators.",
   // "About" alleen zou samen met het achtervoegsel "About · Juan Diaz" opleveren.
   // Vandaar "About me": de merknaam staat al achteraan.
-  "meta.about.title": "About me — fractional revenue operator",
+  "meta.about.title": "Juan Stefan Diaz — fractional revenue operator",
   "meta.about.description":
     "Construction-management-trained, Amsterdam-based. I build revenue engines for operators in energy, real estate, hospitality and adjacent sectors.",
   "meta.now.title": "Now — what I'm focused on this quarter",
@@ -1558,7 +1558,7 @@ const nl: Dict = {
   "meta.story.title": "Verhaal — bouwkundig opgeleid, zelf operator",
   "meta.story.description":
     "Hoe Juan Diaz, LLC begon: bouwmanagement, de overstap naar revenue operations, en waarom ik eerlijke software voor operators bouw.",
-  "meta.about.title": "Over mij — fractional revenue operator",
+  "meta.about.title": "Juan Stefan Diaz — revenue operator, Amsterdam",
   "meta.about.description":
     "Bouwkundig opgeleid, gevestigd in Amsterdam. Ik bouw omzetmotoren voor operators in energie, vastgoed, hospitality en aanverwante sectoren.",
   "meta.now.title": "Nu — waar ik dit kwartaal aan werk",
@@ -2314,7 +2314,7 @@ const de: Dict = {
   "meta.story.title": "Story — vom Bau zur Umsatzarbeit",
   "meta.story.description":
     "Wie Juan Diaz, LLC entstand: Baumanagement, der Wechsel zu Revenue Operations und warum ich ehrliche Software für Betreiber baue.",
-  "meta.about.title": "Über mich — Fractional Revenue Operator",
+  "meta.about.title": "Juan Stefan Diaz — Revenue Operator, Amsterdam",
   "meta.about.description":
     "Ausgebildet im Baumanagement, ansässig in Amsterdam. Ich baue Umsatzmaschinen für Betreiber in Energie, Immobilien, Hospitality und angrenzenden Branchen.",
   "meta.now.title": "Jetzt — woran ich dieses Quartal arbeite",
@@ -3070,7 +3070,7 @@ const es: Dict = {
   "meta.story.title": "Historia — de la construcción a los ingresos",
   "meta.story.description":
     "Cómo empezó Juan Diaz, LLC: gestión de obra, el salto a revenue operations y por qué construyo software honesto para operadores.",
-  "meta.about.title": "Sobre mí — revenue operator fraccional",
+  "meta.about.title": "Juan Stefan Diaz — revenue operator fraccional",
   "meta.about.description":
     "Formado en gestión de obra, con base en Ámsterdam. Construyo motores de ingresos para operadores en energía, inmobiliario, hostelería y sectores afines.",
   "meta.now.title": "Ahora — en qué estoy centrado este trimestre",

@@ -2,7 +2,17 @@ import type { Metadata } from "next";
 import { LocaleLink } from "@/components/LocaleLink";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
-import { AUTHOR_IMAGE_PATH, AUTHOR_IMAGE_URL, PERSON_SAME_AS } from "@/lib/seo/branding";
+import {
+  AUTHOR_IMAGE_PATH,
+  AUTHOR_IMAGE_URL,
+  PERSON_SAME_AS,
+  PERSON_NAME,
+  PERSON_ALTERNATE_NAMES,
+  PERSON_ID,
+  PERSON_URL,
+  ORG_NAME,
+  ORG_ID,
+} from "@/lib/seo/branding";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -29,14 +39,16 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
-  name: "Juan Stefan Bongartz Diaz",
-  alternateName: "Juan Diaz",
-  url: `${SITE}/about`,
+  "@id": PERSON_ID,
+  name: PERSON_NAME,
+  alternateName: PERSON_ALTERNATE_NAMES,
+  url: PERSON_URL,
   image: AUTHOR_IMAGE_URL,
   jobTitle: "Fractional Revenue Operator & Founder, Juan Diaz, LLC",
   worksFor: {
     "@type": "Organization",
-    name: "Juan Diaz, LLC",
+    "@id": ORG_ID,
+    name: ORG_NAME,
     url: SITE,
   },
   description:
