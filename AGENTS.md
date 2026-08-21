@@ -2885,3 +2885,180 @@ hem opnieuw op de verkeerde gronden afweegt.
 
 831 tests in 34 bestanden, was 828. Typecheck schoon, `regen:pricing:check`
 groen, productiebuild groen.
+
+
+### 2026-08-21 (vervolg) — mijn eigen uitzondering van drie dagen oud, en vijf vrijstellingen voor routes die er niet zijn
+
+Twee PR's (#210 en #211). Ze horen bij elkaar: de eerste kwam voort uit het
+natrekken van een claim die ik zélf bij #206 had opgeschreven, de tweede uit het
+nalopen van de middlewarekant van diezelfde route.
+
+#### De helft van mijn onderbouwing klopte niet
+
+Bij #206 zette ik `/api/cal` op de uitzonderingslijst voor de rem, met als reden
+dat "een vreemde niet verder komt dan een vergelijking". `handtekeningKlopt` is
+inderdaad in orde — HMAC-SHA256 over de rauwe body, hex, `timingSafeEqual` met
+een lengtecontrole ervoor, uitputtend gedekt.
+
+Maar `await req.text()` las de hele body in het geheugen **vóór** die
+vergelijking. Een vreemde kwam dus wel verder: hij kreeg een onbegrensde lezing,
+op het enige publieke endpoint zonder rem ervoor. Nu `leesBegrensd(req, 256 KB)`
+met 413 daarvoor.
+
+#### Eén uitzonderingslijst deed twee dingen
+
+Dit is de vondst die het waard is te onthouden. In `verzoeklimiet.test.ts` stond
+in de test *geen route leest de body meer onbegrensd in*:
+
+    if (ZONDER_REM[pad]) return false
+
+`ZONDER_REM` is de lijst voor de **rem**. Hij ontsloeg de route stilzwijgend óók
+van de **body-plafondcontrole** — twee verschillende zorgen op één lijst,
+waardoor de tweede controle uitstond voor precies de ene route die erop stond.
+De poort die het defect had moeten zien was door de uitzondering zelf
+uitgeschakeld.
+
+`ZONDER_REM` en `ONBEGRENSDE_BODY` staan nu los. Die tweede is leeg, en dat hoort
+zo: hij bestaat zodat een toekomstige uitzondering niet opnieuw meelift.
+
+#### Twee meetlatten die zelf stuk waren
+
+De rem-poort matchte op de module-import `@/lib/verzoeklimiet`. Zodra cal
+`leesBegrensd` uit diezelfde module haalt, zou hij als geremd gelden terwijl hij
+dat bewust niet is — de poort zou precies de route missen waar hij over gaat. Nu
+matcht hij op `maakLimiet`, de rem zelf.
+
+De body-poort ging af op mijn eigen commentaarregel die uitlegt waarom
+`req.json()` daar niet gebruikt wordt. **Derde keer deze sessie dat een tekstscan
+op prose viel** (na `contactadressen` en `persoon-entiteit`), maar de eerste keer
+dat de comment juist was en de meetlat niet. Er staat nu een commentaarstrip
+voor, met een eigen test die bewijst dat hij geen echte aanroep verbergt — anders
+is een lege overtreedslijst niet te onderscheiden van een kapot instrument. De
+strip raakt bewust geen inline `//`-staarten: een `'https://…'` in een
+stringliteral zou dan de rest van de regel wegknippen, en dát is een gemiste
+aanroep.
+
+#### De route had helemaal geen test
+
+`cal-webhook.test.ts` test de helper, niet de handler. Daarom kon de claim uit
+#206 ongemeten blijven staan: de vólgorde in de route was door niets gedekt.
+`app/api/cal/route.test.ts` roept `POST` nu rechtstreeks aan, met een
+Supabase-client die gooit — elk pad hoort te eindigen vóór de database, dus een
+pad dat er toch komt is luid in plaats van stil.
+
+Twee gevallen dragen het bewijs. Een te grote body met een **geldige**
+handtekening geeft 413 (stond het plafond ná de HMAC, dan kwam dit verzoek door
+en was de test groen om de verkeerde reden), en van 64 stukjes worden er hooguit
+5 opgehaald. Plus een geldig ondertekende body die tot 400 komt, want een route
+die álles met 413 beantwoordt zou alle andere tests halen.
+
+#### PR #211 — vijf vrijstellingen voor routes die er niet zijn
+
+Bij het nalopen van `proxy.ts` bleek de CSRF-vrijstellingslijst negen regels te
+tellen. Gemeten tegen de bestandsboom staan er onder `app/api` nog vijf routes;
+vijf lijstregels wezen naar niets:
+
+| pad | stand |
+|---|---|
+| `/api/sms/webhook` | weg met #134 |
+| `/api/webhooks/inbound/` | weg met #134 |
+| `/api/v1/` | weg met #134 |
+| `/api/auth/` | weg met #138 |
+| `/api/health` | weg met #134 |
+
+De middelste vier waren **naamruimtes**, en dat is het vervelendste soort dode
+uitzondering: hij doet vandaag niets en morgen te veel. Een toekomstige
+`/api/auth/…` zou vanaf zijn eerste dag de Origin-controle overslaan zonder dat
+iemand die keuze maakte — en de site hád auth-routes tot #138, dus dat is
+concreet en niet theoretisch.
+
+**En de match was een voorvoegselmatch**: `pathname === p || pathname.startsWith(p)`.
+Daarmee dekte `/api/cal` ook `/api/calculator` en `/api/calendar`. Op een site
+met `/tools/energy-roi` is dat geen gezochte naam. Dezelfde klasse als de
+deny-regels van 19 augustus — zie [[feedback_deny_matcht_op_tokengrens]].
+
+Nu exact, in een eigen module (`lib/csrf-vrijstelling.ts`), want een
+middlewarebestand in Next hoort alleen `default` en `config` te exporteren en een
+lijst die een poort moet uitlezen kan daar dus niet staan. Zelfde reden waarom
+`MAX_BYTES` niet uit de route te exporteren was.
+
+#### Opnieuw hield een test het defect op zijn plek
+
+`proxy.test.ts:186` asserteerde dat juist die vijf paden CSRF-vrijgesteld
+**waren**. De routes waren al maanden weg; de test verdedigde hun vrijstelling.
+Dezelfde vorm als de `Hotellerie`-assertie in `tags.test.ts` van gisteren. Hij is
+niet aangepast maar omgekeerd: de routes die er nog zijn blijven vrijgesteld, de
+vertrokken vrijstellingen geven 403, en een naam die alleen een voorvoegsel deelt
+lift niet mee.
+
+#### Een mutatie die stil niet landde
+
+Negen mutaties over de twee PR's, elke verwachte kleur vooraf vastgelegd. Dat
+laatste betaalde zich uit: de mutatie die de commentaarstrip moest slopen liep
+**groen**, en dat las als een zwakke poort. Het was iets anders — het patroon
+overspande een regeleinde en dit is een CRLF-repo, dus de vervanging deed niets.
+Met een enkelregelig anker alsnog rood.
+
+**Een mutatie die stil niet landt leest exact hetzelfde als een poort die niet
+afgaat.** Sindsdien eist het mutatiescript dat het bestand aantoonbaar verandert.
+
+Beslissend was de mutatie die met `req.text()` terug én de oude vermenging terug
+volledig groen liep: dat reproduceert het defect precies zoals het bestond.
+
+#### En de meter had een vaste offset
+
+De nieuwe route-test telt hoeveel stukjes van de body werkelijk worden opgehaald.
+Hij stond op 1 terwijl de route nog niets had gelezen — een `ReadableStream`
+trekt bij aanmaak zelf al één stuk binnen om zijn buffer te vullen
+(highWaterMark 1). Ik las dat bijna als een defect in de route. `highWaterMark: 0`
+haalt de offset weg.
+
+#### Gemeten op productie, ná controle van de deploy-SHA
+
+De eerste peiling gaf "success" bij de eerste poging, en dat was de deploy van
+#210 — niet die van #211. Bijna de verkeerde build gemeten. Pas doorgemeten toen
+de productie-SHA gelijk was aan `main`:
+
+| verzoek | uitkomst |
+|---|---|
+| `POST /api/cal`, `Origin: https://cal.com` | **503**, niet 403 — vrijstelling werkt nog |
+| `POST /api/health`, vreemde Origin | 403 |
+| `POST /api/v1/contacts`, vreemde Origin | 403 |
+| `POST /api/auth/callback`, vreemde Origin | 403 |
+| `POST /api/calculator`, vreemde Origin | 403 — voorvoegsel-lek dicht |
+| `POST /api/newsletter/confirm`, vreemde Origin | 403 — controle |
+
+#### Wat die 503 betekent, en dat is geen defect van deze PR
+
+De body is `{"ok":false,"error":"not-configured"}`. Dat is de tak voor een
+ontbrekende `CAL_WEBHOOK_SECRET`, dus die staat niet in Vercel-productie. **Als
+cal.com een boeking post, krijgt hij 503 en komt er geen rij in
+`marketing.leads`** — geen Telegram, geen ontvangstbevestiging. De boeking zelf
+staat wel gewoon in cal.com, dus er gaat geen afspraak verloren; het spoor gaat
+verloren.
+
+Wat hier níet uit volgt: of cal.com de webhook überhaupt aanroept. Dat is van
+buitenaf niet te zien. De leadketen-test van 20 augustus liep via het
+**contactformulier**, niet via dit pad — de boekingsweg is nog nooit
+end-to-end gelopen.
+
+#### Meting
+
+845 tests in 36 bestanden, was 831 in 34. tsc schoon, `regen:pricing:check`
+groen, productiebuild groen.
+
+#### Niet meegenomen
+
+`lib/sentry.ts:59` filtert nog verzoeken aan `/api/health` uit de rapportage.
+Die route bestaat niet meer, dus die tak is dood — maar het is een
+rapportagefilter en geen beveiligingsregel, en hoorde niet in een CSRF-PR.
+
+#### Erbij op de operator-lijst
+
+- **`CAL_WEBHOOK_SECRET` in Vercel-productie zetten**, en daarna nakijken of
+  cal.com de webhook werkelijk aanroept. Gemeten op 2026-08-21: het endpoint
+  antwoordt `{"ok":false,"error":"not-configured"}`. Zolang dat zo is levert een
+  boeking geen rij in `marketing.leads` op, en dus geen Telegram en geen
+  ontvangstbevestiging — terwijl "Boeking 15min" de hoofd-CTA van de site is.
+  Dezelfde vorm als de ontbrekende `RESEND_API_KEY`: de keten is gebouwd,
+  getest en donker door één ontbrekende waarde.
