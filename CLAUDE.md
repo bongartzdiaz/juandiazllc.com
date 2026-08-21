@@ -2777,3 +2777,111 @@ verwijderen uit, PR vereist.
 
 **De les erbovenop:** kijk niet alleen naar wat de deny-lijst verbiedt, maar
 naar wat de allow-lijst binnenlaat.
+
+### 2026-08-21 (vervolg) — drie beweringen in één commentaarblok, geen van drieën waar
+
+Verder met de baseline: dependencies en security headers, de twee hoeken die
+nog niet waren aangeraakt. De eerste bleek in orde, de tweede leverde de
+grootste vondst van de dag op — en die zat niet in de headers maar in de
+toelichting erboven.
+
+#### De deps-poort meet wat zijn naam belooft
+
+Nagelopen omdat een groen vinkje dat niemand ooit heeft opengeslagen precies
+het soort ding is dat deze week drie keer stuk bleek. Hier niet:
+`npm audit` staat op **nul advisories op elk ernstniveau**, productie én dev, en
+`security/geaccepteerde-advisories.json` heeft nul uitzonderingen. De poort
+draait bovendien in een eigen workflow met een `schedule`, zodat een advisory
+die zónder codewijziging verschijnt ook afgaat. Goed gebouwd.
+
+Wel achterhaald: de memory-notitie van 20 juli meldt "27 npm-vulns (4 high)" als
+open punt. Dat klopt niet meer; die notitie is bijgewerkt.
+
+#### De headers zijn sterk, en toen viel de toelichting op
+
+HSTS twee jaar met `includeSubDomains` (geen `preload` — een bewuste keuze
+waard, geen defect), CSP met `frame-ancestors 'none'`, `object-src 'none'`,
+`base-uri 'self'`, `form-action 'self'`, plus een **report-only-policy die
+strenger is dan de afgedwongen**.
+
+De toelichting in `proxy.ts` legde uit waarom die twee uit elkaar liggen. Drie
+beweringen, alle drie nagemeten op productie, alle drie onjuist.
+
+**1. "`'unsafe-inline'` blijft, want onze JSON-LD hangt ervan af."** Nee. Een
+`<script type="application/ld+json">` is een *datablok*: de browser voert hem
+nooit uit, dus `script-src` raakt hem niet. Gemeten: vijf blokken zonder nonce,
+alle vijf gewoon in de DOM en parsebaar, terwijl de nonce-policy actief was.
+
+**2. `'unsafe-inline'` deed sowieso niets.** Zodra een directive een nonce
+draagt negeert de browser hem (CSP2+). Chrome zegt het woordelijk in de
+console: *"'unsafe-inline' is ignored if either a hash or nonce value is present
+in the source list."* Bewezen met een inline script zonder nonce: geblokkeerd.
+
+De inline-comment bij de nonce zei het omgekeerde — "noop when unsafe-inline is
+present". Dat is de zwaarste van de drie, want wie dat leest concludeert dat de
+afgedwongen policy nog niets doet, terwijl hij al volledig nonce-gestuurd is.
+
+**3. "Weghalen zou elke pagina dynamisch maken — een grote SSG-regressie."**
+Die regressie is er al, om een andere reden. De nonce wordt per verzoek
+gegenereerd, dus Next rendert deze pagina's dynamisch: `Cache-Control: private,
+no-store` en `x-vercel-cache: MISS` op drie opeenvolgende verzoeken aan dezelfde
+pagina. Ook lokaal, dus het is Next en niet Vercel — ter vergelijking geeft
+`/llms.txt`, een route zonder nonce-injectie, netjes `x-nextjs-cache: HIT`.
+
+#### Wat er gewijzigd is
+
+`'unsafe-inline'` is uit `script-src` gehaald: hij veranderde niets aan het
+gedrag en liet elke scanner terecht afgaan op een policy die in werkelijkheid al
+nonce-gestuurd was. `style-src` houdt hem — daar staat géén nonce tegenover en
+React zet inline styles. Die asymmetrie is nu opzet in plaats van toeval.
+
+**Er stond geen enkele test op `unsafe-inline`.** Dat is hoe een omgekeerde
+toelichting jaren kan blijven staan. Er staan er nu drie, elk met de reden
+erbij, en de style-src-poort is er expliciet om te voorkomen dat iemand hem
+"opruimt" omdat script-src hem kwijt is — dat sloopt de opmaak van de hele site.
+
+#### Bewezen, niet aangenomen
+
+Twee mutaties, twee keer rood: `unsafe-inline` terug in script-src, en weg bij
+style-src. Daarna hersteld uit een kopie in de scratchpad, niet met
+`git checkout --` — die herstelt vanuit de index en had het werk teruggezet.
+
+Daarna tegen een echte productiebuild op poort 3200, want een unittest op de
+middleware bewijst niet dat de browser het accepteert en de fout-kosten hier
+zijn "alle JS dood". `window.next` bestaat, styles toegepast, vijf JSON-LD-
+blokken parsebaar, nul console-fouten. Plus een positieve controle: een inline
+script zónder nonce werd geblokkeerd, één mét de juiste nonce draaide.
+
+Die controle was nodig omdat mijn eerste poging — een `securitypolicyviolation`-
+listener — niets ving. Niet omdat er niets was: het event vuurt asynchroon en ik
+haalde de listener synchroon weer weg. **Een lege lijst uit een kapot instrument
+leest hetzelfde als een schone meting.**
+
+#### Drie meetvallen onderweg
+
+- De console-buffer van de browser-pane wordt **niet geleegd bij navigatie**. Ik
+  las een CSP-fout op twee verschillende pagina's en dacht even dat de site zelf
+  een script blokkeerde. Het discriminerende detail: de nonce in beide
+  meldingen was identiek, en een nonce hoort per verzoek te verschillen. Het was
+  mijn eigen experiment van een pagina eerder.
+- Python op Windows opent `/tmp/...` niet, en zijn stdout is cp1252 — allebei
+  vandaag opnieuw ingelopen. `C:/...`-paden en `PYTHONIOENCODING=utf-8`.
+- Een patch die een heel commentaarblok letterlijk matcht, brak op de
+  streepjeslijn in de kop: ik had er drie te weinig overgenomen. Anker op
+  inhoud en werk op regelbereik; tekens tellen is hoe je een patch schrijft die
+  op de volgende machine weer stukloopt.
+
+#### Wat dit voor Juan open laat
+
+De afweging zelf, en die is echt: een nonce-CSP kost alle HTML-caching. Elke
+paginaweergave is een functie-aanroep in plaats van een CDN-hit, op een site
+waarvan het hele werk SEO en snelle eerste weergave is. Het alternatief is een
+hash-gebaseerde CSP (cachebaar én streng, maar per pagina te berekenen) of de
+nonce laten vallen (cachebaar, zwakker). Dat is een architectuurkeuze, geen
+defect — hij staat nu in de code opgeschreven met de meting erbij, zodat niemand
+hem opnieuw op de verkeerde gronden afweegt.
+
+#### Meting
+
+831 tests in 34 bestanden, was 828. Typecheck schoon, `regen:pricing:check`
+groen, productiebuild groen.
