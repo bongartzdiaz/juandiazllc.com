@@ -280,3 +280,56 @@ describe("work.page.lede telt hetzelfde als de venture-data", () => {
     }
   });
 });
+
+/* Het label van een venture die nog niet draait, mag niet zeggen dat hij draait.
+ *
+ * Aanleiding. In het Nederlands stond op de Philly-kaart "In productie". In een
+ * softwarecontext leest dat als "draait in productie" — precies wat de kaart
+ * ontkent, en het stond naast vier kaarten die "Live" zeggen. De andere drie
+ * talen deden het goed: Shipping, Kommt, Próximamente.
+ *
+ * Een test kan niet zien of Nederlands klopt; dat was de leesbeurt. Wat hij wél
+ * mechanisch kan bewaken is deze ene klasse: een status-badge die het
+ * tegenovergestelde belooft van de status die hij draagt. De lijst is per taal
+ * en draagt zijn reden mee, zodat een volgende sessie hem niet weghaalt omdat
+ * niemand meer weet waarom hij er stond. */
+describe("het label voor een venture die nog niet draait", () => {
+  /** Woorden die in die taal "draait al" betekenen. */
+  const KLINKT_ALS_LIVE: Record<Locale, string[]> = {
+    en: ["live", "in production", "available"],
+    nl: ["live", "in productie", "beschikbaar"],
+    de: ["live", "in produktion", "verfügbar"],
+    es: ["en vivo", "en producción", "disponible"],
+  };
+
+  it("de lijst heeft tanden — het live-label zou er in elke taal op vallen", () => {
+    // Zonder deze controle kan de lijst leeglopen tot woorden die nergens
+    // voorkomen, en dan slaagt de poort hieronder altijd. Het live-label is de
+    // positieve controle: dát hoort er wél op te vallen.
+    for (const l of LOCALES) {
+      const live = DICT[l as Locale]["ventures.status.live"].toLowerCase();
+      expect(
+        KLINKT_ALS_LIVE[l as Locale].some((w) => live.includes(w)),
+        `${l}: "${live}" valt op geen enkel woord uit de lijst — de lijst is vacuüm`,
+      ).toBe(true);
+    }
+  });
+
+  for (const l of LOCALES) {
+    it(`${l} belooft niet dat het al draait`, () => {
+      const soon = DICT[l as Locale]["ventures.status.soon"];
+      expect(soon, `ventures.status.soon ontbreekt in ${l}`).toBeTruthy();
+      const treffers = KLINKT_ALS_LIVE[l as Locale].filter((w) => soon.toLowerCase().includes(w));
+      expect(
+        treffers,
+        `${l}: "${soon}" zegt dat het draait, op de kaart die zegt van niet`,
+      ).toEqual([]);
+    });
+  }
+
+  it("er is werkelijk een venture die dit label draagt", () => {
+    // Anders bewaakt de poort kopij die nergens rendert, en dat hoort een
+    // wees-sleutel te zijn, geen status-controle.
+    expect(VENTURES.some((v) => v.status !== "live")).toBe(true);
+  });
+});

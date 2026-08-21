@@ -960,7 +960,7 @@ const nl: Dict = {
   "nl.subscribed": "Aangemeld",
 
   "ventures.status.live": "Live",
-  "ventures.status.soon": "In productie",
+  "ventures.status.soon": "In aanbouw",
 
   "signals.read": "Lezen →",
 

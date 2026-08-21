@@ -7,6 +7,7 @@ import { Process } from "@/components/sections/Process";
 import { Kinetic } from "@/components/sections/Kinetic";
 import { Chapters } from "@/components/sections/Chapters";
 import { Ventures } from "@/components/sections/Ventures";
+import { ventureKaarten } from "@/lib/ventures";
 import { Stats } from "@/components/sections/Stats";
 import { ResultsStrip } from "@/components/sections/ResultsStrip";
 import { Signals } from "@/components/sections/Signals";
@@ -86,7 +87,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <Process />
       <Kinetic />
       <Chapters />
-      <Ventures />
+      <Ventures kaarten={ventureKaarten()} />
       <LiveSignals locale={l} />
       <section style={{ padding: "40px 40px 0", maxWidth: "var(--max)", margin: "0 auto" }}>
         <Countdown2027 />
