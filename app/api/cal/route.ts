@@ -45,7 +45,16 @@ type LeadRij = {
 // Runtime expliciet: node, want de edge-runtime heeft node:crypto niet.
 export const runtime = "nodejs";
 
-const SECRET_ENV = "CAL_WEBHOOK_SECRET";
+/* De naam staat hieronder LETTERLIJK in `process.env.CAL_WEBHOOK_SECRET`, en
+   niet meer via een `SECRET_ENV`-constante met `process.env[SECRET_ENV]`. Die
+   indirectie compileert prima en werkte ook, maar geen enkele scanner ziet er
+   een variabelenaam in — daardoor ontbrak deze sleutel in `.env.example` en
+   stond de boekingswebhook op productie stil 503 te geven. Zie
+   lib/env-voorbeeld.test.ts, die bracket-toegang nu tegenhoudt.
+
+   Voor NEXT_PUBLIC_*-variabelen is het bovendien geen stijlkwestie maar een
+   defect: Next vervangt alleen letterlijke uitdrukkingen bij het bouwen. De
+   kop van lib/supabase/keys.ts legt dat uit. */
 
 /** Ruim boven een echte levering. Een boeking met deelnemers, antwoorden op
  *  de intakevragen en metadata komt op enkele kilobytes uit; het plafond is
@@ -54,11 +63,11 @@ const SECRET_ENV = "CAL_WEBHOOK_SECRET";
 const MAX_BYTES = 256 * 1024;
 
 export async function POST(req: Request) {
-  const secret = process.env[SECRET_ENV];
+  const secret = process.env.CAL_WEBHOOK_SECRET;
   if (!secret) {
     // Niet 500: er is niets stuk, er is iets niet geconfigureerd. Zelfde
     // contract als de Stripe- en Resend-paden elders in dit project.
-    console.warn(`[cal] ${SECRET_ENV} niet gezet — webhook geweigerd`);
+    console.warn("[cal] CAL_WEBHOOK_SECRET niet gezet — webhook geweigerd");
     return NextResponse.json({ ok: false, error: "not-configured" }, { status: 503 });
   }
 
