@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { calBodySchema, handtekeningKlopt, tekst, type CalBody } from "@/lib/cal-webhook";
+import { leesBegrensd, TeGroot } from "@/lib/verzoeklimiet";
 
 /** De velden van een lead-rij die deze route zelf samenstelt.
  *  Stond tot 2026-08-20 in lib/notify.ts; dat bestand is weg omdat de
@@ -30,6 +31,13 @@ type LeadRij = {
    Telegram-pushes sturen. De handtekening wordt daarom gecontroleerd vóór de
    body wordt geparseerd, en met een constante-tijdvergelijking.
 
+   Er staat bewust GEEN rem (rate limit) op deze route — zie de toelichting bij
+   de uitzonderingslijst in lib/verzoeklimiet.test.ts. Wat er wél op staat is
+   een plafond op de body. Bij #206 schreef ik dat een vreemde hier "niet
+   verder komt dan een vergelijking"; dat klopte niet, want `req.text()` las
+   de hele body in het geheugen vóór die vergelijking. Zonder rem ervoor was
+   dat het enige onbegrensde ding aan een publiek endpoint.
+
    Bron voor het schema: cal.com/docs/developing/guides/automation/webhooks
    (nagetrokken 2026-08-02).
    --------------------------------------------------------------- */
@@ -38,6 +46,12 @@ type LeadRij = {
 export const runtime = "nodejs";
 
 const SECRET_ENV = "CAL_WEBHOOK_SECRET";
+
+/** Ruim boven een echte levering. Een boeking met deelnemers, antwoorden op
+ *  de intakevragen en metadata komt op enkele kilobytes uit; het plafond is
+ *  er om een onbegrensde lezing te stoppen, niet om krap te zitten. Te krap
+ *  kost hier een echte lead, en dat is duurder dan de bytes. */
+const MAX_BYTES = 256 * 1024;
 
 export async function POST(req: Request) {
   const secret = process.env[SECRET_ENV];
@@ -50,7 +64,16 @@ export async function POST(req: Request) {
 
   // RAUW lezen. req.json() zou de body normaliseren en dan klopt de HMAC niet
   // meer met wat cal.com heeft ondertekend.
-  const rauw = await req.text();
+  let rauw: string;
+  try {
+    rauw = await leesBegrensd(req, MAX_BYTES);
+  } catch (e) {
+    if (e instanceof TeGroot) {
+      console.warn("[cal] body boven het plafond — niets gelezen, niets geschreven");
+      return NextResponse.json({ ok: false, error: "too-large" }, { status: 413 });
+    }
+    return NextResponse.json({ ok: false, error: "unreadable-body" }, { status: 400 });
+  }
 
   if (!handtekeningKlopt(rauw, req.headers.get("x-cal-signature-256"), secret)) {
     console.warn("[cal] ongeldige of ontbrekende handtekening — niets geschreven");

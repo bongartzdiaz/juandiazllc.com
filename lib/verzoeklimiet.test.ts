@@ -138,13 +138,54 @@ describe('leesBegrensd', () => {
 
 /** Publieke routes die bewust geen rem dragen, met de reden erbij. Een
     reden is verplicht: zonder reden is dit een lijst waar dingen op
-    belanden omdat het even uitkwam. */
+    belanden omdat het even uitkwam.
+
+    DEZE LIJST GAAT ALLEEN OVER DE REM. Tot 2026-08-21 ontsloeg hij een route
+    stilzwijgend óók van de body-plafondcontrole hieronder — twee verschillende
+    zorgen op één lijst, en de tweede was daardoor onzichtbaar uitgeschakeld
+    voor de enige route die erop stond. */
 const ZONDER_REM: Record<string, string> = {
   'app/api/cal/route.ts':
-    'Cal.com-webhook. De HMAC-handtekening wordt gecontroleerd vóór de body ' +
-    'wordt geparseerd, dus een vreemde komt niet verder dan een vergelijking. ' +
-    'Een rem zou hier een echte boeking kunnen laten vallen bij een burst, en ' +
-    'een gemiste lead is duurder dan de aanroep die hij voorkomt.',
+    'Cal.com-webhook. Een rem zou hier een echte boeking kunnen laten vallen ' +
+    'bij een burst — cal.com levert herhalingen in salvo\'s — en een gemiste ' +
+    'lead is duurder dan de aanroep die hij voorkomt. Wat een vreemde hier ' +
+    'kost is begrensd: een lezing tot MAX_BYTES en één HMAC-vergelijking, ' +
+    'daarna 401 zonder dat er iets geschreven wordt.',
+}
+
+/** Publieke routes die de body onbegrensd mogen lezen. Leeg, en dat hoort zo:
+    er is geen reden te bedenken die niet ook voor de andere routes geldt.
+    Hij staat er omdat een uitzondering die ooit nodig is een eigen plek moet
+    hebben, en niet moet meeliften op de remlijst hierboven. */
+const ONBEGRENSDE_BODY: Record<string, string> = {}
+
+/** Bron zonder commentaarregels. De body-poort hieronder is een tekstscan, en
+    die viel op de toelichting in cal's route die uitlégt waarom `req.json()`
+    daar niet gebruikt wordt. De comment was juist; de meetlat kon geen code van
+    prose onderscheiden.
+
+    Bewust alleen hele commentaarregels en blokken, geen inline `//`-staarten:
+    dan zou een `'https://…'` in een stringliteral de rest van de regel
+    wegknippen en kan de poort een echte aanroep missen. Een poort die soms te
+    veel meldt is te repareren; eentje die stil te weinig meldt niet. */
+function zonderCommentaar(bron: string): string {
+  let inBlok = false
+  return bron
+    .split('\n')
+    .map((regel) => {
+      const t = regel.trim()
+      if (inBlok) {
+        if (t.includes('*/')) inBlok = false
+        return ''
+      }
+      if (t.startsWith('/*')) {
+        if (!t.includes('*/')) inBlok = true
+        return ''
+      }
+      if (t.startsWith('//') || t.startsWith('*')) return ''
+      return regel
+    })
+    .join('\n')
 }
 
 function routeBestanden(map: string, uit: string[] = []): string[] {
@@ -167,26 +208,48 @@ describe('publieke API-routes', () => {
   })
 
   it('elke route heeft een rem of staat met reden op de uitzonderingslijst', () => {
+    // Match op `maakLimiet`, niet op de module-import. Sinds cal.com's route
+    // `leesBegrensd` uit dezelfde module haalt, zou een import-match hem als
+    // geremd aanmerken terwijl hij dat bewust niet is — de poort zou dan
+    // precies de route missen waar hij over gaat.
     const zonder = routes.filter(
-      (pad) => !readFileSync(pad, 'utf8').includes('@/lib/verzoeklimiet') && !ZONDER_REM[pad],
+      (pad) => !readFileSync(pad, 'utf8').includes('maakLimiet') && !ZONDER_REM[pad],
     )
     expect(zonder, 'route zonder rem en zonder gemotiveerde uitzondering').toEqual([])
   })
 
-  it('de uitzonderingslijst bevat geen route die niet meer bestaat', () => {
+  it('de uitzonderingslijsten bevatten geen route die niet meer bestaat', () => {
     // Een uitzondering die nergens meer op slaat is stille rommel, en dekt
     // op een dag per ongeluk een nieuw bestand met dezelfde naam.
     expect(Object.keys(ZONDER_REM).filter((p) => !routes.includes(p))).toEqual([])
+    expect(Object.keys(ONBEGRENSDE_BODY).filter((p) => !routes.includes(p))).toEqual([])
   })
 
   it('geen route leest de body meer onbegrensd in', () => {
     // req.json() en req.text() lezen wat er komt. Vercel kapt rond 4,5 MB
     // af, maar dat is hun grens en geldt niet lokaal of op een andere host.
     const overtreders = routes.filter((pad) => {
-      if (ZONDER_REM[pad]) return false
-      const bron = readFileSync(pad, 'utf8')
+      if (ONBEGRENSDE_BODY[pad]) return false
+      const bron = zonderCommentaar(readFileSync(pad, 'utf8'))
       return bron.includes('req.json()') || bron.includes('req.text()')
     })
     expect(overtreders, 'leest de body zonder plafond').toEqual([])
+  })
+
+  it('de commentaarstrip verbergt geen echte aanroep', () => {
+    // Zonder deze assertie kan zonderCommentaar stilletjes alles wegvegen en
+    // slaagt de poort hierboven altijd — de klassieke lege-lijst-uit-een-kapot-
+    // instrument. Beide richtingen: prose eruit, code erin.
+    const bron = zonderCommentaar(
+      [
+        '// const a = await req.text()',
+        '/* const b = await req.json()',
+        '   nog steeds in het blok */',
+        ' * const c = await req.text()',
+        "const u = 'https://x.test//y'; const d = await req.json()",
+      ].join('\n'),
+    )
+    expect(bron).not.toContain('req.text()')
+    expect(bron).toContain('req.json()')
   })
 })
