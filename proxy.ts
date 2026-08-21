@@ -93,13 +93,39 @@ function genRequestId(): string {
 }
 
 /* ── 3. Content Security Policy ───────────────────────────────── */
-/*   Two-headed policy. The enforced header keeps 'unsafe-inline' for
-     script-src + style-src because our JSON-LD and React inline
-     styles depend on it, and dropping it would force every page to
-     become dynamic (via `headers()` for nonces) — a big SSG
-     regression. The *report-only* header mirrors a strict nonce +
-     'strict-dynamic' version and is attached alongside so we can
-     collect real violation data before enforcing it later.          */
+/* Twee koppen: een afdwingende policy en een strengere report-only ernaast,
+   zodat we echte overtredingen zien voordat we die strengere afdwingen.
+
+   Hier stond een toelichting met drie beweringen die geen van drieen klopten.
+   Op 2026-08-21 nagemeten op productie, en dit is wat er werkelijk gebeurt:
+
+   1. `'unsafe-inline'` stond in script-src "omdat de JSON-LD ervan afhangt".
+      Dat is niet zo. Een `<script type="application/ld+json">` is een
+      DATABLOK: de browser voert hem nooit uit, dus script-src raakt hem niet.
+      Gemeten: vijf JSON-LD-blokken staan in de DOM en zijn parsebaar terwijl
+      de nonce-policy actief is. Alleen style-src houdt `'unsafe-inline'`, en
+      daar is het wel echt nodig -- React zet inline styles en style-src
+      draagt geen nonce.
+
+   2. `'unsafe-inline'` deed sowieso niets. Zodra er een nonce in dezelfde
+      directive staat negeert de browser hem (CSP2+). Chrome zegt het
+      woordelijk in de console: "'unsafe-inline' is ignored if either a hash
+      or nonce value is present in the source list." Gemeten met een inline
+      script zonder nonce: geblokkeerd. De directive is daarom weggehaald --
+      hij veranderde niets aan het gedrag, en liet elke scanner afgaan op een
+      policy die in werkelijkheid al nonce-gestuurd was.
+
+   3. De "SSG-regressie" die ermee voorkomen zou worden, is er al -- om een
+      andere reden. De nonce wordt per verzoek gegenereerd, dus Next rendert
+      deze pagina's dynamisch: `Cache-Control: private, no-store` en
+      `x-vercel-cache: MISS` op elk verzoek, ook drie keer achter elkaar op
+      dezelfde pagina. Dat is de werkelijke prijs van een nonce-CSP, en hij
+      staat hier opgeschreven zodat niemand hem opnieuw op de verkeerde
+      gronden afweegt.
+
+   Wat de afdwingende policy nog van de report-only scheidt is dus alleen
+   `'strict-dynamic'` -- die negeert host-allowlists en zou `'self'` en de
+   Plausible-host buitenspel zetten.                                    */
 
 function genNonce(): string {
   const bytes = new Uint8Array(16)
@@ -135,8 +161,10 @@ function buildCsp(nonce: string, strict: boolean): string {
       ]
     : [
         "'self'",
-        "'unsafe-inline'",
-        `'nonce-${nonce}'`,                           // noop when unsafe-inline is present, but lets us flip to strict cheaply
+        // De nonce is hier het slot, niet een voorbereiding erop. Er stond
+        // `'unsafe-inline'` naast met de opmerking dat de nonce dan een noop
+        // zou zijn; dat is precies omgekeerd. Zie de toelichting hierboven.
+        `'nonce-${nonce}'`,
         PLAUSIBLE_HOST,
         ...(isDev ? ["'unsafe-eval'"] : []),
       ]

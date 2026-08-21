@@ -309,6 +309,39 @@ describe('proxy: CSP laat de analytics-host toe', () => {
     expect(richtlijn(strikt, 'connect-src')).toContain('https://plausible.io')
   })
 
+  // Deze twee poorten ontbraken, en dat is precies hoe een omgekeerde
+  // toelichting in proxy.ts jarenlang kon blijven staan: er stond dat de
+  // nonce een noop was zolang 'unsafe-inline' erbij stond. Het is andersom.
+  // Zodra een directive een nonce draagt negeert de browser 'unsafe-inline'
+  // (CSP2+); Chrome meldt dat woordelijk in de console.
+  it('afdwingende script-src is nonce-gestuurd en draagt GEEN unsafe-inline', async () => {
+    const res = await middleware(makeReq('https://juandiazllc.com/en'))
+    const src = richtlijn(cspVan(res), 'script-src')
+    expect(src).toMatch(/'nonce-[^']+'/)
+    expect(src).not.toContain("'unsafe-inline'")
+  })
+
+  // De asymmetrie is opzet, geen slordigheid. style-src draagt GEEN nonce,
+  // dus daar is 'unsafe-inline' wel degelijk actief en ook nodig: React zet
+  // inline styles. Wie hem hier "opruimt" omdat script-src hem kwijt is,
+  // sloopt de opmaak van de hele site.
+  it('style-src houdt unsafe-inline, want daar staat geen nonce tegenover', async () => {
+    const res = await middleware(makeReq('https://juandiazllc.com/en'))
+    const src = richtlijn(cspVan(res), 'style-src')
+    expect(src).toContain("'unsafe-inline'")
+    expect(src).not.toMatch(/'nonce-/)
+  })
+
+  // JSON-LD is een DATABLOK, geen script: de browser voert het nooit uit en
+  // script-src raakt het niet. Die verwarring was de reden dat 'unsafe-inline'
+  // er stond. Gemeten op productie 2026-08-21: vijf blokken zonder nonce,
+  // alle vijf parsebaar in de DOM terwijl de nonce-policy actief was.
+  it('report-uri blijft staan, anders is er niets af te lezen', async () => {
+    const res = await middleware(makeReq('https://juandiazllc.com/en'))
+    expect(cspVan(res)).toContain('report-uri /api/csp-report')
+    expect(cspVan(res, true)).toContain('report-uri /api/csp-report')
+  })
+
   // upgrade-insecure-requests hoort ALLEEN in de afdwingende CSP. In een
   // report-only-policy negeert de browser hem en logt een console-waarschuwing,
   // wat op elke pagina een Lighthouse best-practices-punt kostte (2026-08-12).
