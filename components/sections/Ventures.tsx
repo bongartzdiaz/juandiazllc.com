@@ -24,36 +24,58 @@ export function Ventures() {
         <p>{t("ventures.sub")}</p>
       </div>
       <div className="vg">
-        {VENTURES.map((v) => (
-          <a
-            key={v.id}
-            href={v.href ?? undefined}
-            target={v.href?.startsWith("http") ? "_blank" : undefined}
-            rel={v.href?.startsWith("http") ? "noopener noreferrer" : undefined}
-            className={`v-card${v.wide ? " wide" : ""}`}
-            data-reveal
-          >
-            <div className="v-head">
-              <div className="v-num">— {t(`ventures.${v.id}.cat`)}</div>
-              <div className={`v-status${v.soon ? " soon" : ""}`}>
-                <span className="d" />
-                {v.soon ? t("ventures.status.soon") : t("ventures.status.live")}
+        {VENTURES.map((v) => {
+          const klasse = `v-card${v.wide ? " wide" : ""}`;
+          const inhoud = (
+            <>
+              <div className="v-head">
+                <div className="v-num">— {t(`ventures.${v.id}.cat`)}</div>
+                <div className={`v-status${v.soon ? " soon" : ""}`}>
+                  <span className="d" />
+                  {v.soon ? t("ventures.status.soon") : t("ventures.status.live")}
+                </div>
               </div>
+              <div>
+                <h3 dangerouslySetInnerHTML={{ __html: t(`ventures.${v.id}.title`) }} />
+                <p>{t(`ventures.${v.id}.body`)}</p>
+              </div>
+              <div className="v-meta">
+                {v.domain ? <span>{v.domain}</span> : <span />}
+                {v.href && <div className="v-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                    <path d="M7 17L17 7M17 7H9M17 7V15" />
+                  </svg>
+                </div>}
+              </div>
+            </>
+          );
+
+          // Zonder bestemming is dit geen link, dus ook geen <a>. Een anchor
+          // zonder href is niet met het toetsenbord bereikbaar en draagt geen
+          // linkrol, terwijl hij er identiek uitziet als zijn buren. Sinds #188
+          // Philly's dode adres weghaalde zakte de homepage daarop van 0,95+
+          // naar 0,92 op Lighthouse' SEO (`crawlable-anchors`) — vijftien runs
+          // rood achter elkaar. De CSS hangt aan `.v-card` als klasse, niet aan
+          // `a.v-card`, dus een <div> rendert exact hetzelfde.
+          //
+          // Krijgt Philly een adres, dan wordt dit vanzelf weer een link.
+          return v.href ? (
+            <a
+              key={v.id}
+              href={v.href}
+              target={v.href.startsWith("http") ? "_blank" : undefined}
+              rel={v.href.startsWith("http") ? "noopener noreferrer" : undefined}
+              className={klasse}
+              data-reveal
+            >
+              {inhoud}
+            </a>
+          ) : (
+            <div key={v.id} className={klasse} data-reveal>
+              {inhoud}
             </div>
-            <div>
-              <h3 dangerouslySetInnerHTML={{ __html: t(`ventures.${v.id}.title`) }} />
-              <p>{t(`ventures.${v.id}.body`)}</p>
-            </div>
-            <div className="v-meta">
-              <span>{v.domain}</span>
-              {v.href && <div className="v-arrow">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-                  <path d="M7 17L17 7M17 7H9M17 7V15" />
-                </svg>
-              </div>}
-            </div>
-          </a>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
