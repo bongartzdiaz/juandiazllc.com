@@ -2697,3 +2697,83 @@ De poort staat globaal ingehaakt en de matcher raakt alleen Bash en drie
 MCP-toolvormen — niet elke aanroep, dus geen procesopstart per tool. Geen van
 de vier oppervlakken had een botsende project-lokale hook;
 `diaz-editor-work` heeft project-lokaal `deny=0` en leunt volledig op deze laag.
+
+### 2026-08-21 (vervolg) — de allow-lijst was nog nooit bekeken, en daar zat het echte gat
+
+De deny-lijst is dit jaar drie keer onderzocht: het cluster van 19 augustus, de
+tokengrens-les, en vandaag de hook eromheen. De **allow**-lijst nooit, terwijl
+die groter is — 131 regels globaal tegen 52 deny. Een te ruime allow-regel is
+bovendien stiller dan een ontbrekende deny-regel: er komt geen prompt, dus je
+merkt niet dat er iets langsging.
+
+#### Eerst het geruststellende deel
+
+Van de 203 allow-regels over vier oppervlakken zijn er **190 letterlijke
+commando's**. Maar dertien dragen een wildcard. Dat is strakker dan de omvang
+suggereert.
+
+#### `gh` had nul dekking, op alle vier de oppervlakken
+
+Geen enkele deny-regel noemt `gh`. Tegelijk staat `Bash(gh api:*)` in de
+globale allow, en de sleutel draagt `repo` + `workflow`. Geen `delete_repo`,
+dus de repo zelf kan niet weg — dat begrenst het. Maar `repo` alleen is genoeg
+voor vier dingen die **geen enkele git-regel raakt**:
+
+| via `gh api` | gevolg |
+|---|---|
+| `PATCH …/git/refs/{ref}` met `force=true` | force-push zónder één `git push` |
+| `DELETE …/git/refs/{ref}` | tak weg, `main` inbegrepen |
+| `DELETE …/branches/main/protection` | het vangnet uit #183 eraf |
+| `PATCH /repos/{o}/{r}` met `private=false` | private repo publiek — geïndexeerd is geïndexeerd |
+
+Alle 22 git-deny-regels én hookregel R1 kijken hier langs, want er komt geen
+`git push` aan te pas. En admins zijn niet gebonden aan branch protection, dus
+de eerste werkt ook op `main`.
+
+Een deny-regel kan dit niet uitdrukken: `gh api -X DELETE <pad>` en
+`gh api <pad> -X DELETE` zijn dezelfde handeling in een andere volgorde, en een
+voorvoegselregel ziet alleen de eerste. Het staat nu als **R4** in de poort,
+met GET expliciet doorgelaten — `gh api` lezend is dagelijks werk, en zeven van
+de dertien nieuwe testgevallen gaan daarover.
+
+#### Drie deny-regels suggereren dekking en doen niets
+
+Onderweg bleek dat er inmiddels drie regels staan die het refspec-gat lijken te
+dichten: `Bash(git push origin +:*)` plus dezelfde voor `deus-shared` en
+`upstream`. Twee onschadelijke commando's lieten zien dat ze leeg zijn:
+
+```
+git push origin +      -> GEWEIGERD  (losse `+`-token, matcht het voorvoegsel)
+git push origin +++    -> LIEP GEWOON (token is `+++`, matcht niet)
+```
+
+Een echte refspec is één token — `+main:main` — dus zo'n regel raakt hem nooit.
+**Dat is erger dan geen regel:** wie de lijst leest ziet `git push origin +:*`
+staan en concludeert dat het dicht is. R1 in de poort is de werkelijke
+afscherming, en die dekt bovendien elke remotenaam in plaats van de drie die
+toevallig zijn opgeschreven.
+
+Ze zijn blijven staan. Een deny-regel weghalen op Juans machine is een
+subtractieve wijziging aan zijn instellingen; de vondst hoort in het memo, niet
+in een stille verwijdering.
+
+#### Twee wildcards die aandacht verdienen maar geen regel krijgen
+
+- `Bash(npm install:*)` — installeert willekeurige pakketten met
+  postinstall-scripts, dus willekeurige code-uitvoering. Het is ook dagelijks
+  werk; een verbod zou alles breken en binnen een dag worden uitgezet.
+- `Bash(ssh root@skalo-ai.com '…:*)` — een rootshell met wildcard, op een host
+  die niet in de GROEN-lijst van `SCOPE.md` staat.
+
+Beide zijn een afweging voor Juan, geen defect dat ik kan repareren.
+
+#### Meting
+
+38 gevallen in de suite, was 23. R4 ook door het harnas heen bewezen: de
+weigering tegen een repo die niet bestáát, zodat er niets kon gebeuren als de
+poort zou falen, en de doorlaat op een GET die en passant bevestigde dat de
+branch protection intact is — zes verplichte checks, force-push uit,
+verwijderen uit, PR vereist.
+
+**De les erbovenop:** kijk niet alleen naar wat de deny-lijst verbiedt, maar
+naar wat de allow-lijst binnenlaat.
