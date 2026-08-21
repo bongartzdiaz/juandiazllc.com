@@ -2603,3 +2603,97 @@ Een 404 op ál je routes is eerder cache dan code.
 828 tests in 34 bestanden, was 811 in 33. Typecheck schoon. De vier routes ook
 tegen een draaiende server gemeten, niet alleen in tests — `proxy.ts` draait op
 `/api/*` en dat is precies de laag die unit-tests niet zien.
+
+### 2026-08-21 (vervolg) — een poort die tool-aanroepen kan weigeren, en het contract dat niemand had opgeschreven
+
+Op alle drie de oppervlakken stonden nul PreToolUse-hooks. Dat is geen
+Website-code — de bestanden staan in `~/.claude/hooks/` en de instelling in
+`~/.claude/settings.json`, dus buiten elke repo. **Het staat hier omdat een
+volgende sessie die een weigering krijgt anders alleen de foutmelding heeft en
+geen idee waar hij vandaan komt.**
+
+#### Eerst gemeten, want vier van de zes aannames waren fout
+
+Een sonde die niets blokkeerde en alleen opschreef wat hij binnenkreeg. Wat er
+uit kwam:
+
+| aspect | gemeten |
+|---|---|
+| activering | direct, **geen sessieherstart** |
+| matcher | regex met alternatie; raakt ingebouwde tools **én** `mcp__<ref>__<naam>` |
+| stdin | `tool_name`, `tool_input`, `cwd`, `permission_mode`, `session_id`, `tool_use_id` |
+| weigeren | stdout-JSON `permissionDecision="deny"` → komt binnen als `<error>reden</error>` |
+| exitcode 2 | weigert óók, maar komt binnen als **"hook error"** — leest als een kapotte poort in plaats van een besluit |
+| crash (exit 1) | **laat het commando doorgaan, volkomen stil** |
+
+Die laatste regel is de reden dat er een hartslag in zit. Een gecrashte poort
+meldt niets, dus **geen weigeringen zien bewijst niet dat er bewaakt wordt** —
+dezelfde familie als [[feedback_rood_dat_altijd_rood_staat]], maar dan
+omgekeerd: niet een alarm dat altijd afgaat, maar een alarm dat stil is
+omdat het stuk is. `echo POORT-HARTSLAG` weigert altijd; komt er niets terug,
+dan draait de poort niet.
+
+#### Drie regels, elk gekozen omdat een deny-regel hem níét kan uitdrukken
+
+Een hook die de deny-lijst nabouwt is de fout van twee lijsten die hetzelfde
+bewaken: ze lopen uit elkaar en dan bewaakt de zwakste. Deze drie passen daar
+aantoonbaar niet in.
+
+| | wat | waarom de deny-lijst hem mist |
+|---|---|---|
+| R1 | `git push … +src:dst` | force-push via refspec draagt geen vlag; een voorvoegselregel kan een refspec niet lezen. Dit is het enige gat dat 19 augustus open bleef staan toen de rest van dat cluster dichtging. |
+| R2 | outreach-automatisering | een afspraak, geen commandovorm. Juans woorden: bouw dit als harde code, niet als documentatie — tot nu toe stond het alleen in documentatie. |
+| R3 | `drop schema` / `drop database` via `execute_sql` of `apply_migration` | vergt de toolnaam én de inhoud van een parameter tegelijk |
+
+R3 is niet theoretisch. Op 1 augustus is `diaz_editor` gedropt zonder hem uit
+Exposed Schemas te halen; PostgREST gaf daarna op de hele REST-API 503
+PGRST002 en de leadopvang lag plat.
+
+#### Match op de handeling, niet op het zelfstandig naamwoord
+
+Twee keer ging mijn eigen poort af op mijn eigen werk, en beide keren was dat
+leerzaam.
+
+De sonde blokkeerde de bewerking van de sonde, omdat de heredoc die hem schreef
+de sentinel letterlijk droeg. **Bewerk de poort met het Write-gereedschap, niet
+met een Bash-heredoc.** Dat staat ook in de kop van het bestand zelf.
+
+En de eerste opzet van R2 matchte op het woord `linkedin`. Die zou
+`cat project_linkedin_outreach.md` en `grep -ril linkedin` hebben geblokkeerd —
+lezen, geen versturen. De werkende vorm eist twee dingen tegelijk: een
+netwerkcliënt **én** een berichten-endpoint. Zelfde vorm als R1: `git push`
+**én** een refspec, niet het plusteken alleen. Beide valse-treffergevallen
+staan als test in de suite, en `grep -ril linkedin` is ook live nagelopen.
+
+#### Bewezen, in beide richtingen, twee keer
+
+23 gevallen in `veiligheidspoort.test.py` — elke regel weigert zijn eigen geval
+en laat het buurgeval door — plus dezelfde drie regels nog eens **door het
+harnas heen**, want een suite bewijst de logica en niet de bedrading.
+
+Bij de live-proef heb ik voor elke regel een variant gekozen die de poort raakt
+maar onschadelijk is als hij faalt: een refspec-push naar een niet-bestaande
+remote, een `echo` die het curl-patroon draagt, en een `select` met de woorden
+erin. Een echte force-push testen zou precies het ding doen dat de regel moet
+voorkomen.
+
+Andere richting ook live: `grep -ril linkedin` gaat door, en
+`select count(*) from marketing.leads` gaf gewoon 0.
+
+#### Wat de poort níét dekt, en dat is opzet
+
+- **Koud van warm onderscheiden kan hij niet.** R2 blokkeert en legt uit; de
+  afweging blijft bij Juan. Koude e-mail naar Duitsland is alleen gedekt via de
+  bulk-verzendtools; één handgeschreven mail is niet als vorm herkenbaar.
+- **R3 dekt alleen het MCP-pad.** Een `drop schema` via `psql` vanuit Bash valt
+  erbuiten — er staan hier geen inloggegevens voor, dus dat pad bestaat niet.
+- **Geen secret-scan op Write/Edit.** Bewust weggelaten: die zou op élke
+  bewerking draaien en de valse treffers van deze zomer
+  (`YOUR_..._KEY_HERE`, `${...}`) waren talrijker dan de echte.
+- **Hij matcht op tekst**, dus hij gaat ook af op een commando dat het patroon
+  alleen noemt. Dat is de prijs van deze vorm en hij staat opgeschreven.
+
+De poort staat globaal ingehaakt en de matcher raakt alleen Bash en drie
+MCP-toolvormen — niet elke aanroep, dus geen procesopstart per tool. Geen van
+de vier oppervlakken had een botsende project-lokale hook;
+`diaz-editor-work` heeft project-lokaal `deny=0` en leunt volledig op deze laag.
