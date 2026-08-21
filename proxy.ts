@@ -9,6 +9,7 @@
    Keep this fast — it runs on every single request. */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { isCsrfVrijgesteld } from '@/lib/csrf-vrijstelling'
 
 /* ── Locale routing ───────────────────────────────────────────────
    Marketing pages live under /[locale]/..., Philly + API + auth +
@@ -57,30 +58,9 @@ function detectLocale(req: NextRequest): string {
 
 const UNSAFE_METHODS = new Set(['POST', 'PATCH', 'PUT', 'DELETE'])
 
-// Routes intentionally exposed to third parties; they authenticate via
-// signed tokens / API keys and must NOT be blocked by Origin check.
-const CSRF_EXEMPT_PREFIXES = [
-  '/api/sms/webhook',
-  '/api/webhooks/inbound/',
-  '/api/v1/',
-  '/api/auth/',          // NextAuth handles its own CSRF on internal endpoints
-  '/api/log-error',      // client-side error sink, unauthenticated, IP-limited
-  '/api/csp-report',     // browsers POST CSP violation reports (no Origin)
-  '/api/vitals',         // Web Vitals beacons, keepalive fetch (no Origin on unload)
-  '/api/health',         // uptime probe
-  // cal.com-webhook. Stuurt Origin: https://cal.com mee, dus zonder deze
-  // uitzondering krijgt élke boeking 403 en draait de handtekeningcontrole
-  // nooit. Gemeten op productie 2026-08-02, vóór deze regel:
-  //   zonder Origin  -> 503 (route werkt, secret nog niet gezet)
-  //   met Origin     -> 403 {"error":"Cross-origin request blocked"}
-  // Voldoet aan het criterium hierboven: de route authenticeert zichzelf met
-  // een HMAC-SHA256-handtekening over de rauwe body en weigert alles zonder.
-  '/api/cal',
-]
-
-function isCsrfExempt(pathname: string): boolean {
-  return CSRF_EXEMPT_PREFIXES.some(p => pathname === p || pathname.startsWith(p))
-}
+// De vrijstellingslijst staat in lib/csrf-vrijstelling.ts, met per regel de
+// reden. Hij stond hier, matchte op voorvoegsel en droeg vijf paden die met
+// het CRM zijn vertrokken -- zie de toelichting daar.
 
 /* ── 2. Request ID ────────────────────────────────────────────── */
 
@@ -238,7 +218,7 @@ export default async function middleware(req: NextRequest) {
   }
 
   // Same-origin check for unsafe API methods.
-  if (pathname.startsWith('/api/') && UNSAFE_METHODS.has(req.method) && !isCsrfExempt(pathname)) {
+  if (pathname.startsWith('/api/') && UNSAFE_METHODS.has(req.method) && !isCsrfVrijgesteld(pathname)) {
     const host = req.headers.get('host') ?? ''
     const origin = req.headers.get('origin')
     const referer = req.headers.get('referer')
