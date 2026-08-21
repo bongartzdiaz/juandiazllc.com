@@ -2509,3 +2509,97 @@ boom van main vergeleken met die van de tak: identiek.
 - **Houdt de nul-retentiebelofte stand?** Hij is Anthropic-specifiek en is de
   enige mitigatie die de DPIA noemt voor retentie bij de verwerker. Beslis
   eerst de eerste vraag; deze volgt eruit.
+
+### 2026-08-21 (vervolg) — vier baseline-bevindingen nagemeten, en drie ervan klopten niet
+
+De opvolging van de security-baseline van gisteren. Vier punten stonden op de
+lijst; bij het hermeten bleek van drie de premisse fout. Dat is het patroon van
+deze dag: niet één van de vier is uitgevoerd zoals hij was opgeschreven.
+
+#### PostgREST gaf vier functies weg via PUBLIC, niet via anon
+
+De baseline noemde "zes ongethrottelde anon-RPC's in `diaz_editor`". De ACL's
+lazen anders: twee functies droegen `anon=X`, maar álle vier droegen `=X` — en
+dat is de PUBLIC-grant, die elke rol erft. Dit is precies
+[[feedback_postgrest_rpc_execute_default]], nu ook in
+`vbozelswveaxsyccvaac`, waar `diaz_editor` in `db_schemas` staat.
+
+Gemeten vóór het intrekken, met `set role anon`: `validate_license('zzzz')` gaf
+netjes `unknown-key` terug. Een werkend orakel dat zonder limiet vertelt of een
+licentiesleutel geldig is.
+
+| functie | anon nodig? | gedaan |
+|---|---|---|
+| `validate_license` | nee — `license-validate/index.ts:108` draait op service_role | ingetrokken |
+| `capture_quiz_lead` | nee — nul client-aanroepers | ingetrokken |
+| `log_update_event` | **ja** — `electron/main.js:537` | laten staan |
+| `capture_newsletter_email` ×2 | **ja** — drie levende clients | laten staan |
+
+**De maatregel die op de lijst stond was rate limiting; de juiste maatregel was
+intrekken.** Een limiet op een endpoint dat niemand nodig heeft is een rem op een
+deur die dicht kan.
+
+#### De "dubbele" overload was geen duplicaat
+
+De lijst zei: zoek uit welke van de twee `capture_newsletter_email` live is en
+drop de andere. Beide zijn live, door verschillende clients — de 8-arg door
+`landing/_exit-intent.js` en `_tool-capture.js`, de 4-arg door
+`apps/editor/components/TradePicker.tsx`. Droppen had een echte aanroeper
+gebroken.
+
+Wat er wél mis was: van de drie plekken die één contract uitdrukken, deed er één
+niet mee. De partiële index
+(`UNIQUE (lower(email)) WHERE drip_state <> 'unsubscribed'`) en de 8-arg
+overload zijn het eens — een afgemelde rij gaat bewust met pensioen. De 4-arg
+zocht zonder dat filter, had geen e-mailvorm-controle en geen taalcorrectie,
+terwijl `newsletter_subscribers_lang_check` alleen en/nl/es/de accepteert.
+Willekeurige tekst kon dus als "adres" de drip-wachtrij in met
+`drip_state='day_0'` en `next_send_at=now()`.
+
+Bewezen in een blok dat zichzelf terugdraaide: onzin → `invalid` zonder rij,
+`lang=fr` → opgeslagen als `en`, herhaling → `already_subscribed`. Nul rijen
+vóór en na.
+
+**Bijna het omgekeerde gedaan.** Mijn eerste migratie voegde een unieke index
+toe en haalde het unsubscribed-filter uit de 8-arg, omdat ik dacht een
+afmelding-die-zichzelf-terugdraait te zien. Beide fout: de index bestónd al —
+ik had alleen `pg_constraint` bekeken, en een los unieke *index* is geen
+constraint — en hij is partieel, wat het gedrag tot ontwerp maakt in plaats van
+defect. Mijn `ON CONFLICT (lower(email))` zou bovendien gefaald hebben, want die
+matcht geen partiële index. **Kijk in de juiste catalogus voordat je "bestaat
+niet" concludeert.**
+
+Postgres weigerde de migratie zelf ook, op iets anders: de bestaande functie had
+parameter-defaults die ik niet had overgenomen. Vandaar `pg_get_function_arguments`
+in plaats van de handtekening reconstrueren.
+
+**Wat er open blijft, en van Juan is:** er is geen double-opt-in, en het ontwerp
+staat opnieuw-aanmelden na een afmelding toe. Iemand anders kan dus een afgemeld
+adres terugzetten op de lijst. Dat bijstellen verandert een toezegging.
+
+#### Twee routes zonder rem, en één die per verzoek onbeperkt kon fanout'en
+
+De baseline zei "vier van de vijf publieke routes ongethrottled". Het waren er
+twee: `log-error` en `vitals` droegen elk hun eigen kopie van een token-bucket.
+
+Het werkelijke gat zat niet in de verzoeken maar per verzoek. De Reporting API
+stuurt een array, en `csp-report` deed één `captureMessage()` per element — één
+POST met vierhonderd elementen was vierhonderd Sentry-berichten. Een limiet per
+IP doet daar niets tegen, want het blijft één verzoek. Zie #206.
+
+#### Een verouderde `.next` laat bestaande API-routes 404'en en nieuwe werken
+
+Kostte de meeste tijd van de dag. Alle vijf de routes gaven 404, inclusief `cal`
+die niet was aangeraakt — dus makkelijk te lezen als "mijn wijziging breekt het".
+Een verse `app/api/ping/route.ts` gaf 200. Dat verschil is de diagnose: de
+dev-server bedient API-routes prima, hij kende alleen deze vijf niet. `.next`
+dateerde van de dag ervoor; na `rm -rf .next` gaf csp-report 204 en cal 503.
+
+**Maak een verse route aan voordat je concludeert dat je wijziging iets brak.**
+Een 404 op ál je routes is eerder cache dan code.
+
+#### Meting
+
+828 tests in 34 bestanden, was 811 in 33. Typecheck schoon. De vier routes ook
+tegen een draaiende server gemeten, niet alleen in tests — `proxy.ts` draait op
+`/api/*` en dat is precies de laag die unit-tests niet zien.
