@@ -183,24 +183,54 @@ describe('proxy: CSRF same-origin check', () => {
     }
   })
 
-  it('exempts third-party webhook endpoints (/api/sms/webhook, /api/webhooks/inbound/*)', async () => {
-    const endpoints = [
-      '/api/sms/webhook',
-      '/api/webhooks/inbound/twilio',
-      '/api/auth/callback',
-      '/api/log-error',
-      '/api/csp-report',
-      '/api/health',
-      '/api/v1/contacts',
-    ]
-    for (const path of endpoints) {
+  // Deze test las vroeger andersom: hij asserteerde dat /api/sms/webhook,
+  // /api/webhooks/inbound/*, /api/auth/*, /api/v1/* en /api/health
+  // CSRF-vrijgesteld WAREN. Alle vijf zijn met #134/#138 verdwenen, en de
+  // test hield hun vrijstelling daarna op zijn plek — een test die het
+  // defect verdedigt, dezelfde vorm als de Hotellerie-assertie in
+  // tags.test.ts. De vrijstelling is nu weg en dit is de tegenproef.
+  it('de routes die er nog zijn blijven CSRF-vrijgesteld', async () => {
+    for (const path of ['/api/cal', '/api/log-error', '/api/csp-report', '/api/vitals']) {
       const res = await middleware(
         makeReq(`https://juandiazllc.com${path}`, {
           method: 'POST',
           headers: { host: 'juandiazllc.com', origin: 'https://third-party.example' },
         }),
       )
-      expect(res.status, `${path} should be CSRF-exempt`).not.toBe(403)
+      expect(res.status, `${path} hoort vrijgesteld te zijn`).not.toBe(403)
+    }
+  })
+
+  it('de vrijstellingen van vertrokken routes zijn ingetrokken', async () => {
+    for (const path of [
+      '/api/sms/webhook',
+      '/api/webhooks/inbound/twilio',
+      '/api/auth/callback',
+      '/api/v1/contacts',
+      '/api/health',
+    ]) {
+      const res = await middleware(
+        makeReq(`https://juandiazllc.com${path}`, {
+          method: 'POST',
+          headers: { host: 'juandiazllc.com', origin: 'https://evil.example.com' },
+        }),
+      )
+      expect(res.status, `${path} bestaat niet meer en hoort niet vrijgesteld`).toBe(403)
+    }
+  })
+
+  it('een naam die met een vrijgesteld pad begint lift niet mee', async () => {
+    // De oude matcher deed `pathname.startsWith(p)`, dus /api/cal dekte ook
+    // /api/calculator. Op een site met /tools/energy-roi is dat geen
+    // gezochte naam.
+    for (const path of ['/api/calculator', '/api/calendar', '/api/vitals-export']) {
+      const res = await middleware(
+        makeReq(`https://juandiazllc.com${path}`, {
+          method: 'POST',
+          headers: { host: 'juandiazllc.com', origin: 'https://evil.example.com' },
+        }),
+      )
+      expect(res.status, `${path} deelt alleen een voorvoegsel`).toBe(403)
     }
   })
 
