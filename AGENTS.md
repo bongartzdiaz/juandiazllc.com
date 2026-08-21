@@ -3118,3 +3118,208 @@ nergens gelezen" — precies de staat waarin hij maanden stond.
 en nul met `source like 'cal%'`. Daarmee is niet te onderscheiden of er geen
 boekingen waren of dat er wel geboekt is en de webhook 503 gaf. Dat onderscheid
 kopen kost één omgevingsvariabele.
+
+### 2026-08-21 (vervolg) — de sweep over twee databases, een endpoint dat openstond, en vijftien runs rood die niemand las
+
+De baseline afgemaakt over beide Supabase-projecten in scope, plus PR #215. De
+rode draad is dezelfde als de rest van de week: bijna elk instrument dat ik
+aanraakte gaf eerst een schoon ogende nul, en vier keer was die nul een defect
+in de meter.
+
+#### De database-kant: veel goed, en één ding dat verkeerd gelezen werd
+
+`get_advisors` op `wbgiouuifqhasedncysw` gaf 116 bevindingen: 0 ERROR, 9 WARN,
+107 INFO. Die 107 zijn allemaal `rls_enabled_no_policy`, en dat leest als een
+waarschuwing terwijl het een slot is — RLS aan zonder policy weigert alles
+behalve voor rollen met BYPASSRLS.
+
+| schema | tabellen | RLS aan | zonder policy | bereikbaar via PostgREST |
+|---|---|---|---|---|
+| `public` | 118 | 118 | 104 | ja |
+| `marketing` | 2 | 2 | 0 | ja |
+| `outreach` | 3 | 3 | 3 | **nee** |
+
+Nul tabellen met RLS uit. De 104 in `public` zijn de DEUS-tabellen (PascalCase,
+Prisma) en staan dus dicht; de 3 in `outreach` zijn helemaal onbereikbaar.
+
+**`anon` heeft in de hele blootgestelde oppervlakte precies twee rechten:**
+INSERT op `marketing.leads` en op `marketing.subscribers`, elk met één
+bijpassende policy, allebei INSERT-only met `WITH CHECK (true)` en géén
+`USING`. Wie de publishable key uit de bron plukt kan een lead indienen en zich
+inschrijven, meer niet. Geen SELECT, nergens.
+
+`current_org_id()` is nagelopen omdat vijftien `phily`-policies er volledig op
+leunen: hij leidt af uit `auth.uid()`, heeft een vastgezet `search_path` en is
+`STABLE`, waardoor de `WITH CHECK` bij een UPDATE tegen de oude waarde
+vergelijkt en een gebruiker zichzelf niet naar een andere organisatie kan
+schrijven. Niet door de client te beïnvloeden.
+
+**Storage:** `uploads` op wbgio staat **privé** met nul policies — alleen
+service_role. Dat sluit een operatoritem dat sinds 2026-08-12 openstond. Op
+vbozel staan twee publieke buckets (`content-vault` leeg, `yt-shorts` 62
+objecten, geen limiet, geen mime-beperking); publiek lezen is voor uitgaande
+video verdedigbaar, publiek schrijven kan niet omdat `storage.objects` RLS aan
+heeft met nul policies. Wel dit weten: de standaard Supabase-grants geven `anon`
+TRUNCATE op `storage.objects`, en **RLS dekt TRUNCATE niet**. Onbereikbaar hier
+omdat `storage` in geen van beide projecten in `db_schemas` staat — maar het is
+de vorm die elders wél bijt.
+
+#### PR #215 — de kaart zonder bestemming bleef een link
+
+Lighthouse CI stond op main vijftien runs achter elkaar rood, altijd hetzelfde:
+SEO 0,92 op `/en` tegen een drempel van 0,95, drie runs per keer alle drie
+0,92. Deterministisch, en niemand las het meer.
+
+Bisect gaf een exacte grens:
+
+    2026-08-19T12:14  SUCCESS  fix(sec): de afweer tegen null-bytes en zijn test
+    2026-08-20T11:27  FAILURE  fix(ventures): Philly droeg een adres dat niet bestaat
+
+PR #188 haalde terecht `philly.juandiazllc.com` weg en maakte `href` nullable,
+maar liet `<a href={v.href ?? undefined}>` staan. React laat het attribuut dan
+weg en er blijft een kale `<a>` over — Lighthouse' `crawlable-anchors`.
+
+Het SEO-effect is klein; het toegankelijkheidseffect is groter. Een anchor
+zonder href krijgt geen linkrol en is niet met het toetsenbord bereikbaar,
+terwijl hij er identiek uitziet als zijn vier buren. Nu is het een `<div>`; de
+CSS hangt aan `.v-card` als klasse en niet aan `a.v-card`, dus visueel
+verandert er niets (gemeten: 1185×420, gelijk aan de brede Voltafy-kaart).
+
+De poort is `controleerAnkers` in `lib/seo/audit.ts`, aangesloten in
+`auditPagina`, zodat hij de hele site dekt in plaats van deze component.
+**Fragmentlinks tellen bewust niet mee** — de skip-link `<a href="#main">` staat
+op elke pagina en is een geldige, bereikbare link; zou die meetellen, dan meldt
+de audit 176 valse treffers en wordt de controle binnen een week uitgezet. Eén
+van de vijf tests eist dat de controle daadwerkelijk in `auditPagina` zit,
+anders kan hij bestaan en nergens worden aangeroepen.
+
+Gemeten op een productiebuild in vier talen: 45 anchors, **0 zonder href**, vier
+v-cards als `<a>`, de vijfde als `<div>`. Daarna groen op main —
+**de eerste geslaagde Lighthouse-run in zestien pogingen.**
+
+#### Het endpoint dat openstond
+
+Tweeënvijftig edge functions over de twee projecten, en op één na staan ze
+allemaal op `verify_jwt: false`. Dat is grotendeels terecht — een Stripe-webhook
+kan geen Supabase-JWT dragen — maar het betekent dat de poort per functie in de
+code moet zitten. Dus gelezen in plaats van geteld.
+
+`lead-notify` is **fail-open**:
+
+```js
+if (LEAD_NOTIFY_SECRET) { ...401... } else { console.warn('endpoint is open') }
+```
+
+`diaz-release-blast` doet het omgekeerde en valt dicht bij een ontbrekende env.
+Beide zijn drie regels. Het verschil is of een ontbrekende configuratie leidt
+tot "niemand mag" of "iedereen mag".
+
+**Bewezen zonder één bericht te versturen.** De auth-controle staat vóór de
+JSON-parse en de verzendingen staan erna, dus een POST met ongeldige JSON en
+zonder auth-header scheidt de gevallen: `401` = dicht, `400 invalid-json` =
+open. Gemeten: 400.
+
+Vandaag kost dat Telegram-spam. Zodra `RESEND_API_KEY` gezet wordt — dat staat
+op de operatorlijst — wordt het een mailkanaal vanaf het eigen domein. **Zet
+`LEAD_NOTIFY_SECRET` dus eerst.**
+
+`lead-acknowledge` is juist voorbeeldig: die wist dat de poort openstond en is
+eromheen gebouwd — ontvangeradres uitsluitend uit de database, onbekend id
+verstuurt niets, al bevestigde rij idempotent overgeslagen, `@resend.dev` als
+afzender geweigerd. Was het adres uit de envelop gekomen, dan was dit een open
+mailrelay geweest.
+
+**Twee commentaren klopten niet**, allebei van de klasse die hier het meest
+oplevert. `notify_new_lead()` beweert dat de twee sleutels "in either order"
+aan kunnen; zet je de functiesleutel eerst, dan stuurt de trigger nog niets mee
+en valt élke melding op 401 — stil, want `net.http_post` is asynchroon en de
+fout landt in `net._http_response`. En de kop van `lead-acknowledge` zegt dat de
+sleutel niet in de vault staat, terwijl `lead_notify_secret` er sinds
+2026-08-16 wél in staat. Dat laatste maakt de reparatie triviaal: de
+triggerkant is al klaar.
+
+#### Tien dode functies op het verkeerde project
+
+`diaz_editor` bestaat niet meer op `wbgiouuifqhasedncysw` — gedropt op 1
+augustus. Toch staan er tien `diaz-*` edge functions ACTIVE en publiek die naar
+dat schema wijzen, op versie 4–11, terwijl de onderhouden versies op vbozel op
+27–36 staan. Supabase injecteert `SUPABASE_SERVICE_ROLE_KEY` in élke functie
+van een project, dus dat zijn tien onbeheerde publieke endpoints met een sleutel
+die RLS omzeilt — op het project dat `marketing.leads` en de 118 CRM-tabellen
+draagt.
+
+Binnen vbozel staat het bovendien nog vijf keer dubbel (`diaz-license-issue`
+naast `license-issue`, enzovoort), alle vijf op 3 augustus vanaf een
+CI-runner uitgerold. Exact de vorm uit `feedback_documentatie_is_de_aanroeper`:
+een webhook wordt van buiten de repo gebeld, dus een slug-mismatch is
+onzichtbaar voor elke controle die alleen eigen code leest.
+
+**Niets verwijderd.** Een uitgerolde functie weghalen is onomkeerbaar en naar
+buiten gericht, en de Lemon- en AppSumo-configuratie is van hieruit niet te
+lezen.
+
+#### Stripe: twee accounts, 25 sessies, nul betaald
+
+Twee accounts, allebei "Juan Diaz, LLC". Het gebruikte account wijst zijn
+webhook **correct** naar vbozel/`diaz-stripe-webhook`; het tweede heeft nul
+webhooks en nul sessies en slikt dus geen betalingen stil op.
+
+De betaalketen opnieuw aan de bron gemeten: **25 checkout-sessies tussen 9 mei
+en 20 augustus, nul betaald** — zes open, negentien verlopen, allemaal
+`unpaid`. Elf meer dan bij de meting van 1 augustus. De melding is niet het
+probleem; de betaalstap zelf is het.
+
+#### Vier keer brak de meetlat
+
+1. De regex over de advisor-details matchte niets van 107, omdat het detail een
+   **geëscapete backtick** draagt. Eerst 0 treffers, na een halve reparatie 12,
+   pas de derde versie gaf 107.
+2. `current_setting('pgrst.db_schemas')` gaf `public, graphql_public,
+   diaz_editor` — de instelling van de **postgres**-rol, want `execute_sql`
+   verbindt als postgres. PostgREST leest die van `authenticator`, en daar staat
+   `public, graphql_public, marketing`. Dat draaide de conclusie volledig om.
+   **Deze stond al correct in `feedback_drop_schema_breekt_postgrest`**, sinds
+   16 augustus; ik ben er alsnog in getrapt door `current_setting()` te
+   vertrouwen.
+3. Een grep op `USING(true)` gaf achttien treffers in diaz_editor, alle achttien
+   op `service_role` — een rol die al BYPASSRLS heeft, dus die policies openen
+   niets. Niet de expressie is het signaal maar het paar (rol, expressie).
+4. Twee lege uitkomsten waren pas een meting nadat de omgekeerde query bewees
+   dat het instrument kón vinden (118 rijen).
+
+#### Meting
+
+859 tests in 38 bestanden, was 854/38. Zes verplichte checks groen, Lighthouse
+groen. Eén hapering: `lib/contactadressen.test.ts` valt op een **koude**
+vite-cache om met `Test timed out in 5000ms` (108 s transformkosten koud tegen
+13 s warm) en loopt los in 776 ms. Zelfde klasse als de metadatapoort in #182 —
+de assertie meet wachttijd in de worker-pool, niet wat hij hoort te meten. In
+CI vuurde hij niet (24 s). Niet gerepareerd, wel echt.
+
+#### Erbij op de operator-lijst
+
+- **`LEAD_NOTIFY_SECRET`** zetten in Supabase → Edge Functions → Secrets, met
+  dezelfde waarde als `lead_notify_secret` in Database → Vault. Dat sluit
+  `lead-notify` én `lead-acknowledge`. **Doe dit vóór `RESEND_API_KEY`.**
+- **Leaked-password protection** aanzetten op `wbgiouuifqhasedncysw` — de enige
+  WARN uit de advisors die actie vergt.
+- **Beslissen over de tien dode `diaz-*` functies** op wbgio en de vijf dubbele
+  slugs op vbozel. Controleer eerst of Lemon/AppSumo er niet nog op wijzen.
+- **Het tweede, lege Stripe-account** sluiten of labelen.
+- Optioneel, hygiëne: `revoke execute on function public.handle_new_user(),
+  public.notify_new_lead(), public.rls_auto_enable() from public, anon,
+  authenticated;` — de drie zijn meetbaar niet aanroepbaar via RPC
+  (`0A000: trigger functions can only be called as triggers`), dus dit is
+  opruimen en geen reparatie.
+
+#### Twee stukken schuld die vandaag zichtbaar werden
+
+1. **`components/sections/Ventures.tsx` draagt een eigen VENTURES-array** naast
+   `lib/ventures.ts`. De poort `lib/ventures.test.ts` leest de tweede en dekt
+   dus niet wat de homepage werkelijk toont. Dezelfde vorm als #199, waar
+   `llms.txt` de claim nog droeg die #188 net had weggehaald. Zolang dat zo is
+   kan de homepage opnieuw iets beweren wat een gate elders al verboden heeft.
+2. **`ventures.status.soon` luidt in het Nederlands "In productie".** Dat leest
+   even goed als "draait live" en staat op de kaart die juist zegt dat er nog
+   niets te bezoeken is. Kopij-vraag, raakt vier talen, niet in deze PR
+   meegenomen.
