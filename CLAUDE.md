@@ -2316,3 +2316,117 @@ geen ervan mag verzonnen worden.
   zes operator-werk in WordPress. De belangrijkste kost een minuut: op
   `lucenai.eu/about` de naam van Juan linken naar `juandiazllc.com/en/about`.
   Backlinks bouwen heeft pas zin als stap 1 t/m 3 gedaan zijn.
+
+### 2026-08-20 (vervolg) — DEUS, de tweede pass: twee prijslijsten die elkaar tegenspreken
+
+`docs/aanbod.md` §6 zette de volgorde: eerst punt 3 — welke van de ontbrekende
+mogelijkheden prijsrijen worden en op welk niveau — omdat dat "aanbodwerk is en
+het kan nu". Bij het meten bleek die aanname niet te houden, en niet omdat de
+mogelijkheden ontbreken.
+
+#### Meet tegen `origin/main`, niet tegen de werkkopie
+
+De lokale checkout van DEUS-SHARED stond op `efdf7da` van **18 mei**, 333
+commits achter. Daar tellen 165 routes; op `origin/main` (`5f95d90`,
+2026-08-19) zijn het er 201 — precies het getal dat `claims.md` op 15 augustus
+noteerde. Een `git ls-tree`/`git grep` tegen `origin/main` meet zonder de
+werkkopie aan te raken, en dat is hier het verschil tussen een meting en een
+misverstand van drie maanden oud.
+
+#### De beslissing van 15 augustus is niet uitgevoerd
+
+`claims.md` legde die dag Juans keuze vast: per zitplaats wint, en DEUS-SHARED
+volgt — slugs hernoemen, Stripe-`quantity` aan de zitplaatsen koppelen,
+`maxUsers` van plafond naar ondergrens. Vijf dagen later staat er in
+`lib/philly/billing/plans.ts` nog steeds `operator/team/business` op
+€49/€199/€599 vast, met `maxUsers` als plafond en `quantity: 1` in de
+checkout-route.
+
+| | de pagina | DEUS-SHARED |
+|---|---|---|
+| niveaus | vier | drie |
+| model | per zitplaats | vast per maand |
+| gebruikers | **minimum** 3/5/10/15 | **maximum** 3/10/onbeperkt |
+
+Starter kost op de pagina €40 × 3 = €120 als vloer; `operator` kost €49 met een
+plafond van drie. Business: €990 tegen €599. Beide kunnen niet waar zijn.
+
+**En de code denkt dat ze overeenkomen.** De kop van `plans.ts` zegt "matching
+`pricing.tier.<slug>.*` in `/lib/i18n/dict.ts` on the marketing side". Die
+sleutelruimte bestaat hier niet; het is `pricing.t.{starter,pro,business,
+enterprise}.*`. Niet de naamruimte klopt en niet de slugs. Een commentaar dat
+een voornemen als toestand opschrijft is erger dan geen commentaar — het
+beantwoordt de vraag die je had moeten stellen.
+
+#### Zestien mogelijkheden gemeten, acht met een niveau uit de code
+
+De tabel staat in `docs/claims.md`, met per rij het bewijs (`app/api/**` en de
+`PlanFeature` die hem afschermt). Twee dingen die er niet in stonden:
+
+**De rij die "dialer" heette bestaat niet zoals hij klinkt.** Er is geen
+telefonieprovider in de repo. Wat er staat is een bellijst met klik-om-te-bellen
+en registratie van uitkomst; de eigen gebruikersdocumentatie opent met "Call
+list management". Dat is dezelfde fout als de twee agenda-synchronisatierijen
+die er in augustus afgingen — een naam aanzien voor een mogelijkheid — en
+`claims.md` had de les er zelf al bij geschreven.
+
+**De IP-allowlist staat nu al verkeerd op de pagina.** Vier vinkjes, terwijl
+`PLANS` hem uitsluitend aan `business` geeft. Dat is geen rij die erbij moet,
+maar een rij die nu iets verkoopt dat Starter niet krijgt.
+
+Welke rijen erbij komen en op welk niveau blijft aan Juan: DEUS heeft drie
+niveaus en de pagina vier, en welke van de vier het bovenste DEUS-niveau draagt
+bepaalt wat er bij €69 en wat er bij €99 hoort. De drie verticale modules (35
+routes samen) stel ik bewust niet voor — een module op een prijslijst zetten
+beantwoordt de ICP-vraag stilzwijgend.
+
+#### De knop beloofde een stap die er niet is
+
+Drie knoppen zeiden in vier talen dat ze een proefperiode starten. Alle drie
+gaan naar `/contact`. Er valt niets te starten; er staat een formulier — en de
+pagina schrijft dat zelf op, in een commentaar boven `TIERS`.
+
+Het aanbod was niet het probleem; het werkwoord was het. De knoppen vragen nu om
+de proefperiode, en `pricing.outro.body` zegt erbij dat het opzetten met de hand
+gaat.
+
+`lib/prijsknoppen.test.ts` **schakelt zichzelf uit zodra de belofte waar wordt**:
+de regel geldt alleen voor een knop waarvan de `ctaHref` naar `/contact` wijst.
+Wijst hij naar `/signup`, dan mag het label weer zeggen dat het iets start. Dat
+is opzet — een verbod dat blijft staan nadat de reden verdween, wordt over een
+jaar weggehaald door iemand die niet weet waarom het er stond.
+
+In drie richtingen gebroken: belofte terug bij een formulierknop (rood), belofte
+terug bij een `/signup`-knop (groen, de regel vervalt), en het veld `ctaHref`
+hernoemd (rood op de lege lijst, niet stil groen).
+
+Drie FAQ-antwoorden zijn **niet** aangeraakt: naar rato opwaarderen, een
+terugbetaaltermijn van 30 dagen, een factuur die de zitplaatsen volgt. Geen van
+drieën wordt door enig systeem uitgevoerd, maar het zijn toezeggingen zoals de
+migratiebelofte — bijstellen verandert het aanbod, en dat is niet aan mij.
+
+#### Meting
+
+811 tests in 33 bestanden, 696 sleutels × 4 talen (waardes gewijzigd, geen
+sleutels). Dat vervangt de 807/32. Typecheck schoon, `regen:pricing:check`
+groen. Op de productiebuild in vier talen nagelopen: de oude labels 0×, de
+nieuwe 6× per taal, en de nieuwe zin in `outro.body` staat vertaald op alle vier
+— geen Engelse terugval op `/de` en `/es`.
+
+**Eén ding om te onthouden over het schrijven zelf.** De heredoc brak voor de
+vierde keer deze sessie op inhoud met aanhalingstekens. Lange tekst gaat via het
+Write-gereedschap naar de scratchpad en daarna met Python op zijn plaats; niet
+via `<<'EOF'`.
+
+#### Erbij op de operator-lijst
+
+- **Welke van de zestien mogelijkheden worden prijsrijen, en op welk niveau?**
+  De tabel met bewijs staat in `docs/claims.md`. Acht dragen een niveau uit
+  DEUS' eigen code; de vertaling van drie DEUS-niveaus naar vier pagina-niveaus
+  is een commerciële keuze.
+- **De IP-allowlist: naar Business op de pagina, of in `PLANS` naar alle
+  niveaus?** Nu verkoopt de pagina hem aan Starter en geeft het product hem
+  alleen aan business.
+- **Voert DEUS-SHARED de beslissing van 15 augustus alsnog uit?** Zolang dat
+  niet gebeurt staan er twee prijsmodellen klaar die verschillende bedragen
+  zouden aannemen.
