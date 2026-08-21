@@ -3323,3 +3323,126 @@ CI vuurde hij niet (24 s). Niet gerepareerd, wel echt.
    even goed als "draait live" en staat op de kaart die juist zegt dat er nog
    niets te bezoeken is. Kopij-vraag, raakt vier talen, niet in deze PR
    meegenomen.
+> **Bijgewerkt 2026-08-21 — beide gesloten in #217.** De dubbele lijst is weg
+> (de kaarten komen nu als prop vanaf de servercomponent, met een tekstscan-poort
+> eromheen) en het Nederlandse label luidt "In aanbouw". Zie de sessie hieronder;
+> daar staat ook waarom de voor de hand liggende reparatie van de eerste 40 KB
+> proza naar de browser zou hebben gestuurd.
+
+### 2026-08-21 (vervolg) — de twee stukken schuld hierboven, en een meter die CR niet ziet
+
+PR #217 sluit de drie punten die aan het eind van de vorige sessie gemarkeerd
+stonden. Ze bleken één patroon te delen: elk is een plek waar de code iets
+beweert dat ergens anders al weerlegd is.
+
+#### De naïeve fix zou 40 KB proza naar de browser hebben gestuurd
+
+`components/sections/Ventures.tsx` droeg zijn eigen VENTURES-array naast die in
+`lib/ventures.ts`, met adres en statusvlag erin. De voor de hand liggende
+reparatie — importeer gewoon `VENTURES` — is fout, en niet op een subtiele
+manier: dat component draagt `"use client"`, dus het hele bestand reist mee in
+de homepage-bundel. 654 regels verhaal, fases en metrics in vier talen, voor
+vier velden per kaart. Tree-shaking helpt niet, want `VENTURES` is één
+aaneengesloten literal.
+
+**Gemeten met twee volledige builds, niet aangenomen:**
+
+| variant | client-chunks | venture-proza in client |
+|---|---|---|
+| prop vanaf de server | 1.134.682 B | nee |
+| de naïeve import | 1.174.365 B | ja, `chunks/0ajm89qakwrdi.js` |
+
++39.683 bytes ongecomprimeerd, ~3,5% van alle client-chunks. **De absentie is
+bewezen vindbaar**: dezelfde grep op dezelfde marker vindt hem wel in
+`.next/server/`. Zonder die positieve controle is "niet gevonden" niet te
+onderscheiden van een kapot zoekcommando.
+
+Het loopt nu via de server. `ventureKaarten()` levert `{slug, live, domain,
+external}`; `app/[locale]/page.tsx` is een servercomponent en geeft dat door als
+prop. Het component importeert alleen het type, en dat is bij het compileren
+weg. Wat er blijft staan is opmaak — onder welke dict-sleutel de kopij hangt en
+of de kaart over twee kolommen loopt. Geen feit over het product.
+
+#### "In productie" betekende het omgekeerde
+
+Op de Philly-kaart stond in het Nederlands "In productie". In softwarecontext
+leest dat als "draait in productie" — precies wat die kaart ontkent, en het
+stond naast vier kaarten die "Live" zeggen. Nu "In aanbouw". De andere drie
+talen deden het al goed: Shipping, Kommt, Próximamente.
+
+**Een test kan niet zien of Nederlands klopt**; dat was de leesbeurt van
+gisteren. Wat hij wél mechanisch bewaakt is deze ene klasse — een status-badge
+die het tegenovergestelde belooft van de status die hij draagt — via een
+woordenlijst per taal met de reden erbij. De lijst draagt een positieve
+controle: het live-label moet er in elke taal wél op vallen, anders is de lijst
+vacuüm en slaagt de poort altijd.
+
+Blijft staan als observatie, niet als defect: het Duitse "Kommt" is als
+status-badge ongebruikelijk Duits (`Demnächst` of `In Arbeit` ligt meer voor de
+hand), maar het is niet misleidend — het zegt niet dat het ding draait. Buiten
+de klasse die deze poort bewaakt.
+
+#### Sentry filterde een route die niet bestaat
+
+`beforeSend` gooide meldingen weg voor `/api/health`, vertrokken met #134.
+Nagetrokken over álle getrackte bestanden: dit was de laatste levende
+verwijzing. De rest is historische documentatie plus de gate uit #211, die juist
+bewaakt dát de route 403 geeft.
+
+#### De poort leest tekst, geen module — en dat is het hele punt
+
+`components/sections/Ventures.test.ts` is een tekstscan, net als
+`ResultsStrip.test.ts`. Een module-import zou een tweede lijst die ernáást staat
+niet eens kunnen zien, en dat was nu juist het defect. Hij eist: geen URL of
+domeinnaam in het component, geen eigen statusvlag, geen runtime-import van
+VENTURES, een opmaaktabel die exact de slugs uit `VENTURES` dekt, en dat de
+pagina de kaarten ook werkelijk doorgeeft. Die laatste koppelt de poort aan de
+echte pagina in plaats van aan een component dat los van alles correct is.
+
+Zes mutaties, zes keer rood, elk met precies één falende assertie. Elke mutatie
+eiste dat het bestand aantoonbaar veranderde — een mutatie die stil niet landt
+leest exact hetzelfde als een poort die niet afgaat.
+
+#### grep is hier geen CR-detector
+
+`grep -c $'\r$'` meldde **0** CR voor `lib/ventures.ts`, een bestand met 691
+CRLF. Eerder diezelfde sessie meldde hij **102** CR voor `app/[locale]/page.tsx`,
+een bestand met nul. Twee keer fout, in beide richtingen; `sed | cat -A` toont
+om dezelfde reden geen `^M`. De MSYS-tools normaliseren regeleinden vóór het
+matchen.
+
+Op dat verkeerde cijfer schreef ik op dat `page.tsx` gemengde regeleinden droeg.
+Python op de rauwe bytes zei het tegendeel: puur LF.
+
+**Dat is geen cosmetiek.** PR #191 ging over `regen:pricing:check`, die op
+Windows permanent rood stond op precies deze klasse. Die beoordelen met een
+CR-blinde meter is hoe je een verkeerde fix scheept. Meet regeleinden met
+`d.count(b'\r\n')` tegen `d.count(b'\n')`, en met niets anders.
+
+Bijvangst: `git checkout --` schrijft bij `core.autocrlf=true` een LF-bestand
+als CRLF terug. Een mutatiepatroon met `\n` dat de eerste ronde matchte, matcht
+de tweede niet meer. Maak vervangingen regeleinde-agnostisch.
+
+#### En `git add -A` is te grof in deze repo
+
+Er staan drie langlopende ongetrackte scratch-mappen (`_3dcap/`,
+`diaz-editor-gtm/`, `migrations-review/`). `git add -A` vóór de mutatieronde
+stageerde ze in één klap mee, inclusief zeven PNG's en een map met eigen
+`node_modules`. Teruggedraaid met `git reset -- <map>`; stage expliciete paden,
+of controleer direct `git diff --cached --name-only`.
+
+#### Meting
+
+871 tests in 39 bestanden, was 859/38. tsc schoon, `regen:pricing:check` groen,
+productiebuild groen en de chunks byte-identiek aan de basislijn na herstel.
+
+Op een productiebuild in alle vier de talen, in de geserveerde HTML én in de
+DOM: 5 kaarten, `A,A,A,A,DIV`, 45 ankers waarvan 0 zonder href, vier domeinen en
+Philly zonder, statuslabels Live×4 plus per taal Shipping / In aanbouw / Kommt /
+Próximamente. De Philly-`<div>` meet 1185×420, gelijk aan de brede
+Voltafy-kaart, dus de opmaak is ongewijzigd. Geen horizontale overloop.
+
+Eén CSP-fout in de console kwam van mijn eigen injectie, niet van de site: alle
+vijf de nonce-loze inline scripts zijn `application/ld+json` — datablokken die
+de browser nooit uitvoert — en elk uitvoerbaar script draagt een nonce. Zelfde
+conclusie als #209, en opnieuw pas getrokken ná meten in plaats van ervoor.
