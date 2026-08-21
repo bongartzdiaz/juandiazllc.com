@@ -3062,3 +3062,59 @@ rapportagefilter en geen beveiligingsregel, en hoorde niet in een CSRF-PR.
   ontvangstbevestiging — terwijl "Boeking 15min" de hoofd-CTA van de site is.
   Dezelfde vorm als de ontbrekende `RESEND_API_KEY`: de keten is gebouwd,
   getest en donker door één ontbrekende waarde.
+
+
+#### PR #213 — het voorbeeldbestand beschreef het CRM, en miste de sleutel die donker stond
+
+Nagelopen omdat de vorige meting één vraag openliet: waarom is
+`CAL_WEBHOOK_SECRET` nooit gezet? Het antwoord staat niet in Vercel maar in de
+repo — hij stond niet in `.env.example`, het bestand dat je erbij pakt.
+
+Gemeten klopte dat bestand in geen van beide richtingen:
+
+| | aantal |
+|---|---|
+| gelezen door code, niet gedocumenteerd | 13 |
+| gedocumenteerd, nergens gelezen | 27 |
+
+Die 27 zijn het CRM dat met #134/#138 vertrok: Prisma's `DATABASE_URL`,
+`NEXTAUTH_*`, vier `STRIPE_*`, vier `TWILIO_*`, vijf agenda-OAuth-variabelen,
+`CRON_SECRET`, `FIRECRAWL_API_KEY` en de rest. Geen ruis: wie de lijst afwerkt
+zet sleutels voor een systeem dat hier niet meer woont, en `NEXT_PUBLIC_CAL_URL`
+beloofde een terugval op mailto die niet bestaat — de boekingslink is een
+constante in `lib/booking.ts`.
+
+**Waarom geen scanner de sleutel zag.** De route las hem als
+`process.env[SECRET_ENV]`. Dat compileert prima, werkt prima, en draagt geen
+naam die een tekstscan kan vinden. Exact dezelfde blinde vlek als
+`2.envExampleDrift` in DEUS-SHARED, die ik een dag eerder repareerde: die
+matchte op `process.env.X` terwijl de providercatalogus `envVar: '…'`
+declareert, en zeven van achttien variabelen ontbraken zonder één melding.
+Twee repo's, dezelfde dag, hetzelfde mechanisme.
+
+De indirectie is weg. Voor `NEXT_PUBLIC_*` zou hij bovendien een echt defect
+zijn — Next vervangt alleen letterlijke uitdrukkingen bij het bouwen, en de kop
+van `lib/supabase/keys.ts` waarschuwde daar al voor.
+
+**De poort** (`lib/env-voorbeeld.test.ts`) bewaakt beide richtingen plus de
+indirectie: elke gelezen variabele staat gedocumenteerd, elke gedocumenteerde
+wordt gelezen, en niets leest via `process.env[…]`. Platform-variabelen
+(`NODE_ENV`, `NEXT_RUNTIME`) staan met reden op een uitzonderingslijst — ze
+horen niet in het bestand, want een lezer die ze daar ziet gaat ze zetten.
+Testbestanden tellen niet als afnemer.
+
+**De commentaarstrip is verhuisd** naar `lib/bronscan.ts`. Ik schreef hem
+diezelfde middag voor de body-poort; deze poort heeft hem ook nodig, want de kop
+van `keys.ts` noemt `process.env.NEXT_PUBLIC_X` als voorbeeld. Twee kopieën van
+dezelfde strip lopen uiteen en dan bewaakt de zwakste.
+
+**Vier mutaties, vier keer rood.** De sprekendste is bracket-toegang terugzetten:
+de sleutel is dan meteen weer onzichtbaar en geldt als "gedocumenteerd maar
+nergens gelezen" — precies de staat waarin hij maanden stond.
+
+854 tests in 38 bestanden, was 845/36.
+
+**En de leadtabel is leeg.** `marketing.leads` telt nul rijen, ook historisch,
+en nul met `source like 'cal%'`. Daarmee is niet te onderscheiden of er geen
+boekingen waren of dat er wel geboekt is en de webhook 503 gaf. Dat onderscheid
+kopen kost één omgevingsvariabele.
