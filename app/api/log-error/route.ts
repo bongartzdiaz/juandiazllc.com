@@ -11,31 +11,21 @@
 // Returns 204 on success so clients don't need to parse a body.
 
 import { NextRequest, NextResponse } from "next/server";
+import { maakLimiet, sleutelUitVerzoek, leesBegrensd, TeGroot } from "@/lib/verzoeklimiet";
 
 export const runtime = "nodejs";
 
-// Simple in-memory token bucket — good enough for a single Vercel
-// lambda instance. If we scale horizontally we'd move to Upstash
-// or similar, but at that point we'd also be on Sentry proper.
-type Bucket = { tokens: number; last: number };
-const buckets = new Map<string, Bucket>();
-const CAPACITY = Number(process.env.ERROR_LOG_RATE_CAPACITY ?? 20);
-const REFILL_PER_SEC = 0.5;
+// Was een eigen kopie van het token-bucket-algoritme; staat nu in
+// lib/verzoeklimiet.ts, samen met die van vitals. Capaciteit en snelheid
+// blijven wat ze waren.
+const limiet = maakLimiet({
+  capaciteit: Number(process.env.ERROR_LOG_RATE_CAPACITY ?? 20),
+  perSeconde: 0.5,
+});
 
-function allow(ip: string): boolean {
-  const now = Date.now();
-  const b = buckets.get(ip) ?? { tokens: CAPACITY, last: now };
-  const elapsed = (now - b.last) / 1000;
-  b.tokens = Math.min(CAPACITY, b.tokens + elapsed * REFILL_PER_SEC);
-  b.last = now;
-  if (b.tokens < 1) {
-    buckets.set(ip, b);
-    return false;
-  }
-  b.tokens -= 1;
-  buckets.set(ip, b);
-  return true;
-}
+/** stack wordt hieronder op 4000 tekens gekapt, message op 1000. Een body
+    die daar ver boven zit draagt niets bij. */
+const MAX_BYTES = 32 * 1024;
 
 async function notifySlack(payload: {
   message: string;
@@ -71,15 +61,18 @@ async function notifySlack(payload: {
 }
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  if (!allow(ip)) {
+  if (!limiet.toestaan(sleutelUitVerzoek(req))) {
     return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 });
   }
 
   let body: Record<string, unknown> = {};
   try {
-    body = await req.json();
-  } catch {
+    const text = await leesBegrensd(req, MAX_BYTES);
+    body = text ? JSON.parse(text) : {};
+  } catch (e) {
+    if (e instanceof TeGroot) {
+      return NextResponse.json({ ok: false, error: "too_large" }, { status: 413 });
+    }
     return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
 

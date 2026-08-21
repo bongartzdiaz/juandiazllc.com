@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { LOCALES, DEFAULT_LOCALE, type Locale } from "@/lib/i18n/dict";
+import { maakLimiet, sleutelUitVerzoek } from "@/lib/verzoeklimiet";
 
 // Newsletter double-opt-in confirmation endpoint.
 //
@@ -16,6 +17,15 @@ import { LOCALES, DEFAULT_LOCALE, type Locale } from "@/lib/i18n/dict";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// Elke aanroep is een query met de service-role-sleutel. Een UUIDv4 raden
+// is niet haalbaar, dus dit gaat niet over het token maar over de kosten:
+// zonder rem is dit een gratis knop om de database mee te laten werken.
+// Wie zijn eigen bevestigingslink aanklikt doet dat één keer.
+const limiet = maakLimiet({
+  capaciteit: Number(process.env.CONFIRM_RATE_CAPACITY ?? 20),
+  perSeconde: 0.2,
+});
+
 function redirectTo(req: NextRequest, locale: Locale, status: "confirmed" | "invalid") {
   const url = new URL(`/${locale}`, req.nextUrl.origin);
   url.searchParams.set("newsletter", status);
@@ -23,6 +33,10 @@ function redirectTo(req: NextRequest, locale: Locale, status: "confirmed" | "inv
 }
 
 export async function GET(req: NextRequest) {
+  if (!limiet.toestaan(sleutelUitVerzoek(req))) {
+    return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 });
+  }
+
   const token = req.nextUrl.searchParams.get("token") ?? "";
 
   if (!UUID_RE.test(token)) {

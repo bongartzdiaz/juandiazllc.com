@@ -5,12 +5,45 @@
    the pattern shows up wherever our existing logger feeds — and
    route it to Sentry when available so we see which blocked
    scripts are actually hitting users. Idempotent: returns 204
-   regardless of parse outcome so browsers don't retry. */
+   regardless of parse outcome so browsers don't retry.
+
+   BEGRENZING (2026-08-21). Dit endpoint is publiek, ongeauthenticeerd
+   en had geen enkele rem. Drie plafonds, en het middelste was het
+   werkelijke gat:
+
+   1. Verzoeken per IP — een op hol geslagen pagina kan de sink niet
+      meer vullen.
+   2. GEBEURTENISSEN PER VERZOEK. De Reporting API stuurt een ARRAY, en
+      de lus eronder deed één captureMessage() per element. Eén POST met
+      tienduizend elementen was dus tienduizend Sentry-berichten uit één
+      verzoek — een quotum dat geld kost, opgemaakt door een vreemde. De
+      limiet per IP hielp daar niets tegen, want het waren nooit meer dan
+      één verzoek.
+   3. Bytes — de body werd ongelimiteerd ingelezen, zonder plafond.
+
+   Het antwoord blijft 204 in alle gevallen behalve een te grote body,
+   want een browser die 4xx krijgt op zijn rapportage gaat opnieuw
+   proberen en dat maakt het erger. */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { captureMessage } from '@/lib/sentry'
+import { maakLimiet, sleutelUitVerzoek, leesBegrensd, TeGroot } from '@/lib/verzoeklimiet'
 
 export const runtime = 'nodejs'
+
+/** Een echte overtreding komt in trosjes bij een paginabezoek, niet in
+    honderdtallen. Ruim genoeg voor een pagina met een kapotte CSP. */
+const limiet = maakLimiet({
+  capaciteit: Number(process.env.CSP_RATE_CAPACITY ?? 30),
+  perSeconde: 1,
+})
+
+/** Meer dan dit uit één verzoek zegt niets extra's: het zijn dezelfde
+    paar directives. De rest wordt geteld, niet doorgestuurd. */
+const MAX_GEBEURTENISSEN = 10
+
+/** Een CSP-rapport is enkele honderden bytes. 64 KB is al royaal. */
+const MAX_BYTES = 64 * 1024
 
 type LegacyReport = {
   'csp-report'?: {
@@ -33,21 +66,43 @@ type ReportingApiEntry = {
 }
 
 export async function POST(req: NextRequest) {
+  if (!limiet.toestaan(sleutelUitVerzoek(req))) {
+    return new NextResponse(null, { status: 429 })
+  }
+
+  let text: string
   try {
-    const text = await req.text()
+    text = await leesBegrensd(req, MAX_BYTES)
+  } catch (e) {
+    // Wel een echte foutcode: een te grote body is geen rapport dat we
+    // stil laten vallen, en de verzender hoort te weten dat hij te veel
+    // stuurt in plaats van het te blijven proberen.
+    if (e instanceof TeGroot) return new NextResponse(null, { status: 413 })
+    return new NextResponse(null, { status: 204 })
+  }
+
+  try {
     if (!text) return new NextResponse(null, { status: 204 })
 
     const parsed = safeJson(text)
     // Reporting API sends an array of entries; legacy sends a single
     // object under "csp-report". Normalize both.
     const events = normalize(parsed)
-    for (const e of events) {
+    const doorgestuurd = events.slice(0, MAX_GEBEURTENISSEN)
+    for (const e of doorgestuurd) {
       const msg = `[csp] ${e.directive ?? 'unknown'} blocked ${e.blockedUri ?? '?'} on ${e.documentUri ?? '?'}`
       // Breadcrumb-friendly — don't spam full stack traces. Log level
       // is 'warning' because these are informational until we
       // actually enforce strict CSP.
       console.warn(msg, e)
       captureMessage(msg, 'warning')
+    }
+    if (events.length > doorgestuurd.length) {
+      // Eén regel, geen Sentry-bericht. Stil afkappen leest als "dit was
+      // alles", en dat is precies de verkeerde conclusie.
+      console.warn(
+        `[csp] ${events.length - doorgestuurd.length} van ${events.length} rapporten uit dit verzoek niet doorgestuurd (plafond ${MAX_GEBEURTENISSEN})`,
+      )
     }
     return new NextResponse(null, { status: 204 })
   } catch {

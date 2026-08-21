@@ -9,44 +9,36 @@
    flood us. */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { maakLimiet, sleutelUitVerzoek, leesBegrensd, TeGroot } from '@/lib/verzoeklimiet'
 
 export const runtime = 'nodejs'
 
-type Bucket = { tokens: number; last: number }
-const buckets = new Map<string, Bucket>()
-const CAPACITY = Number(process.env.VITALS_RATE_CAPACITY ?? 60)
-const REFILL_PER_SEC = 2
+// Was een eigen kopie van het token-bucket-algoritme; staat nu in
+// lib/verzoeklimiet.ts, samen met die van log-error. Capaciteit en
+// snelheid blijven wat ze waren.
+const limiet = maakLimiet({
+  capaciteit: Number(process.env.VITALS_RATE_CAPACITY ?? 60),
+  perSeconde: 2,
+})
 
-function allow(ip: string): boolean {
-  const now = Date.now()
-  const b = buckets.get(ip) ?? { tokens: CAPACITY, last: now }
-  const elapsed = (now - b.last) / 1000
-  b.tokens = Math.min(CAPACITY, b.tokens + elapsed * REFILL_PER_SEC)
-  b.last = now
-  if (b.tokens < 1) {
-    buckets.set(ip, b)
-    return false
-  }
-  b.tokens -= 1
-  buckets.set(ip, b)
-  return true
-}
+/** Eén metriek is een handvol getallen. 8 KB is ruim. */
+const MAX_BYTES = 8 * 1024
 
 const VALID_METRICS = new Set(['CLS', 'FCP', 'FID', 'INP', 'LCP', 'TTFB'])
 const VALID_RATINGS = new Set(['good', 'needs-improvement', 'poor'])
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
-  if (!allow(ip)) {
+  if (!limiet.toestaan(sleutelUitVerzoek(req))) {
     return new NextResponse(null, { status: 429 })
   }
 
   // sendBeacon / fetch with keepalive sends text/plain sometimes.
   let body: Record<string, unknown>
   try {
-    const text = await req.text()
+    const text = await leesBegrensd(req, MAX_BYTES)
     body = text ? JSON.parse(text) : {}
-  } catch {
+  } catch (e) {
+    if (e instanceof TeGroot) return new NextResponse(null, { status: 413 })
     return new NextResponse(null, { status: 400 })
   }
 
