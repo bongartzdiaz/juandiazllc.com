@@ -271,6 +271,40 @@ export function controleerAfbeeldingen(pagina: Pagina): Bevinding[] {
   ];
 }
 
+/** Ankers die geen link zijn: geen href, of een href waar niets achter zit.
+ *
+ *  Een `<a>` zonder href is geen link — hij is niet crawlbaar, krijgt geen
+ *  linkrol en is niet met het toetsenbord bereikbaar, terwijl hij er precies
+ *  hetzelfde uitziet als zijn buren. Dat is hoe de homepage op 2026-08-20 van
+ *  0,95+ naar 0,92 zakte op Lighthouse' SEO-categorie: PR #188 haalde terecht
+ *  een dood adres weg, maar liet `<a href={undefined}>` staan.
+ *
+ *  Fragmentlinks (`#main`) tellen NIET mee: een skip-link is een geldige,
+ *  bereikbare link naar dezelfde pagina. Alleen een kale `#` is leeg. */
+export function haalAnkers(html: string): { attrs: string; bruikbaar: boolean }[] {
+  return [...html.matchAll(/<a\b([^>]*)>/gi)].map((m) => {
+    const attrs = m[1];
+    const href = /href=["']([^"']*)["']/i.exec(attrs)?.[1];
+    const bruikbaar =
+      href !== undefined && href.trim() !== "" && href.trim() !== "#" &&
+      !/^javascript:/i.test(href.trim());
+    return { attrs: attrs.trim(), bruikbaar };
+  });
+}
+
+export function controleerAnkers(pagina: Pagina): Bevinding[] {
+  const kapot = haalAnkers(pagina.html).filter((a) => !a.bruikbaar);
+  if (kapot.length === 0) return [];
+  return [
+    {
+      ernst: "waarschuwing",
+      soort: "anker-zonder-href",
+      url: pagina.url,
+      detail: `${kapot.length} <a> zonder bruikbare href (bv. <a ${kapot[0].attrs.slice(0, 60)}>)`,
+    },
+  ];
+}
+
 /** Heeft dit JSON-LD-knooppunt een bruikbaar type? */
 function heeftType(knoop: unknown): boolean {
   if (Array.isArray(knoop)) return knoop.every(heeftType);
@@ -406,6 +440,7 @@ export function auditPagina(pagina: Pagina): Bevinding[] {
     ...controleerCanonical(pagina),
     ...controleerRedirect(pagina),
     ...controleerAfbeeldingen(pagina),
+    ...controleerAnkers(pagina),
     ...controleerJsonLd(pagina),
   ];
 }

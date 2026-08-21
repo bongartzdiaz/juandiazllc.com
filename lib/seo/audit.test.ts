@@ -13,6 +13,7 @@ import {
   controleerCanonical,
   controleerRedirect,
   controleerAfbeeldingen,
+  controleerAnkers,
   controleerJsonLd,
   vindWezen,
   controleerLocaleLozeLinks,
@@ -397,5 +398,41 @@ describe("controleerDescriptionLengte", () => {
 
   it("noteert te kort", () => {
     expect(controleerDescriptionLengte(metDesc("kort"))[0].soort).toBe("description-te-kort");
+  });
+});
+
+describe("controleerAnkers", () => {
+  it("meldt een <a> zonder href", () => {
+    // Precies de vorm die de homepage op 2026-08-20 van 0,95+ naar 0,92 bracht.
+    const b = controleerAnkers(pagina("/en", '<a class="v-card wide">Philly</a>'));
+    expect(b).toHaveLength(1);
+    expect(b[0].soort).toBe("anker-zonder-href");
+  });
+
+  it("meldt een lege href, een kale # en javascript:", () => {
+    for (const h of ['href=""', 'href="#"', 'href="javascript:void(0)"']) {
+      expect(controleerAnkers(pagina("/en", `<a ${h}>x</a>`))).toHaveLength(1);
+    }
+  });
+
+  it("laat een gewone link en een skip-link met rust", () => {
+    // #main is een geldige, bereikbare link naar dezelfde pagina. Zou die wel
+    // meetellen, dan meldt elke pagina van deze site een valse treffer en
+    // wordt de controle binnen een week uitgezet.
+    const html = '<a href="#main" class="skip">Naar inhoud</a><a href="/en/work">Werk</a>';
+    expect(controleerAnkers(pagina("/en", html))).toEqual([]);
+  });
+
+  it("telt alles en noemt een voorbeeld", () => {
+    const b = controleerAnkers(pagina("/en", "<a>een</a><a>twee</a>"));
+    expect(b[0].detail).toContain("2 <a>");
+  });
+
+  it("draait mee in auditPagina", () => {
+    // Zonder deze assertie kan de controle bestaan en nergens worden
+    // aangeroepen -- dan is hij een poort die nooit afgaat.
+    const html = "<title>T</title><h1>H</h1><a>kapot</a>";
+    const soorten = auditPagina(pagina("/en", html)).map((b) => b.soort);
+    expect(soorten).toContain("anker-zonder-href");
   });
 });
