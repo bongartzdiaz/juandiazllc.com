@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { zonderCommentaar } from './bronscan'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, sep } from 'node:path'
 import { maakLimiet, sleutelUitVerzoek, leesBegrensd, TeGroot } from './verzoeklimiet'
@@ -159,34 +160,9 @@ const ZONDER_REM: Record<string, string> = {
     hebben, en niet moet meeliften op de remlijst hierboven. */
 const ONBEGRENSDE_BODY: Record<string, string> = {}
 
-/** Bron zonder commentaarregels. De body-poort hieronder is een tekstscan, en
-    die viel op de toelichting in cal's route die uitlégt waarom `req.json()`
-    daar niet gebruikt wordt. De comment was juist; de meetlat kon geen code van
-    prose onderscheiden.
-
-    Bewust alleen hele commentaarregels en blokken, geen inline `//`-staarten:
-    dan zou een `'https://…'` in een stringliteral de rest van de regel
-    wegknippen en kan de poort een echte aanroep missen. Een poort die soms te
-    veel meldt is te repareren; eentje die stil te weinig meldt niet. */
-function zonderCommentaar(bron: string): string {
-  let inBlok = false
-  return bron
-    .split('\n')
-    .map((regel) => {
-      const t = regel.trim()
-      if (inBlok) {
-        if (t.includes('*/')) inBlok = false
-        return ''
-      }
-      if (t.startsWith('/*')) {
-        if (!t.includes('*/')) inBlok = true
-        return ''
-      }
-      if (t.startsWith('//') || t.startsWith('*')) return ''
-      return regel
-    })
-    .join('\n')
-}
+// De commentaarstrip staat in lib/bronscan.ts: de env-poort heeft hem ook
+// nodig, en twee kopieen van dezelfde strip lopen uiteen -- dan bewaakt de
+// zwakste. De dekkingstest staat bij de module zelf.
 
 function routeBestanden(map: string, uit: string[] = []): string[] {
   for (const naam of readdirSync(map)) {
@@ -234,22 +210,5 @@ describe('publieke API-routes', () => {
       return bron.includes('req.json()') || bron.includes('req.text()')
     })
     expect(overtreders, 'leest de body zonder plafond').toEqual([])
-  })
-
-  it('de commentaarstrip verbergt geen echte aanroep', () => {
-    // Zonder deze assertie kan zonderCommentaar stilletjes alles wegvegen en
-    // slaagt de poort hierboven altijd — de klassieke lege-lijst-uit-een-kapot-
-    // instrument. Beide richtingen: prose eruit, code erin.
-    const bron = zonderCommentaar(
-      [
-        '// const a = await req.text()',
-        '/* const b = await req.json()',
-        '   nog steeds in het blok */',
-        ' * const c = await req.text()',
-        "const u = 'https://x.test//y'; const d = await req.json()",
-      ].join('\n'),
-    )
-    expect(bron).not.toContain('req.text()')
-    expect(bron).toContain('req.json()')
   })
 })
