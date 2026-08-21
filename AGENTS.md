@@ -2430,3 +2430,82 @@ via `<<'EOF'`.
 - **Voert DEUS-SHARED de beslissing van 15 augustus alsnog uit?** Zolang dat
   niet gebeurt staan er twee prijsmodellen klaar die verschillende bedragen
   zouden aannemen.
+
+### 2026-08-21 — DEUS-SHARED: de provider die bediende stond nergens
+
+Twee PR's in `bongartzdiaz/DEUS-SHARED` (#99 en #100), na een auditronde over
+`origin/main` (`5f95d90`). Geen code in deze repo aangeraakt; het staat hier
+omdat de drie openstaande vragen bij de operator-lijst hieronder horen.
+
+**Meet tegen `origin/main`, en let op wélke werkkopie.** Er staan er twee:
+`C:/business/DEUS-SHARED` liep 333 commits achter (18 mei, 165 routes) en
+`C:/business/deus-shared-tmp` is de canonieke — die stond 2 commits achter en
+telt 201 routes. Ik heb de eerste in een eerder verslag als "de" checkout
+genoemd; dat klopte niet. De gepubliceerde cijfers kwamen uit `origin/main` en
+staan wel.
+
+#### Vijf bevindingen, twee gerepareerd
+
+`ResolvedChainEntry` draagt een `providerId` met het commentaar dat hij er voor
+logging staat. Er logde niets. De failoverketen wordt opgebouwd, er wordt
+gefailoverd, het antwoord komt terug — en welke verwerker de prompt heeft
+gezien verliet de resolver nooit. Een prompt draagt naam, e-mail, telefoon,
+bedrijf, notities en de tekst die een burger zelf instuurde. Bij een
+inzageverzoek is "welke partij heeft dit gezien" precies de vraag, en die was
+niet te beantwoorden — ook niet achteraf, want er was geen spoor.
+
+`logProvenance()` schrijft nu één regel per bediend verzoek. **De inhoud gaat
+er niet in**: een logregel met de prompt zou een tweede kopie van de
+persoonsgegevens zijn op een plek met een andere bewaartermijn, een groter
+defect dan wat het sluit. De test hanteert daarom een uitputtende lijst
+toegestane velden — een nieuw veld laat de poort omvallen, ook als het
+onschuldig lijkt.
+
+De tweede: `2.envExampleDrift` in `check-launch-readiness.ts` matchte op
+`process.env.X`, terwijl de providercatalogus `envVar: 'MISTRAL_API_KEY'`
+declareert en later via `env[field.envVar]` leest. **Zeven van de achttien**
+catalogusvariabelen ontbraken in `.env.example` zonder dat de poort iets
+meldde. Met de oude scanner en een verwijderde sleutel gaf hij een groen
+vinkje. Dat groene vinkje wás de blinde vlek — dezelfde soort als de
+telwoord-regex van gisteren, één laag naar buiten.
+
+#### Drie blijven liggen, en dat is opzet
+
+Welke providers persoonsgegevens mogen ontvangen; of de failover-aanvulling een
+uitgesproken voorkeur mag overrulen; en of de nul-retentiebelofte standhoudt
+bij een tweede provider. Alle drie wijzigen een toezegging aan een klant.
+Zelfde grens als bij de drie FAQ-antwoorden op `/pricing`: bijstellen verandert
+het aanbod.
+
+Ze staan met bewijs en regelnummers in
+`docs/audit/AI-PROVIDER-AUDIT-2026-08-21.md` in DEUS-SHARED, naast de vier
+eerdere ronden.
+
+**Bij het opschrijven bleek de oplossingsweg al te bestaan.**
+`SUB-PROCESSORS.md:57` draagt een checklistregel die zegt dat je bij een nieuwe
+provider éérst zijn retentiegedrag bevestigt. Hij is nooit gelopen, want er is
+nooit een tweede provider geconfigureerd. Dat kwam boven bij het hertellen: zes
+treffers op de term, vijf beloftes en één instructie. Ik had eerst vijf
+geschreven zonder het onderscheid te zien.
+
+#### Meting
+
+Alle zeven poorten lokaal, want de Actions-facturering staat stil en de
+`gates`-workflow faalt zonder te draaien. tsc 0 · i18n PASS, 4010 sleutels × 5
+talen · vitest **2607/2607** in 186 bestanden (was 2603) · launch:check 22 pass
+· 0 fail · audit:tenant schoon · be:check PASS · build groen. Na de merge de
+boom van main vergeleken met die van de tak: identiek.
+
+#### Erbij op de operator-lijst
+
+- **Welke AI-providers mogen persoonsgegevens ontvangen?** Vier kunnen het;
+  vijf juridische documenten noemen alleen Anthropic. Volgen de documenten de
+  code, of beperkt de code zich tot de documenten? Beide zijn verdedigbaar, en
+  P3 hangt aan het antwoord.
+- **Mag een platformsleutel automatisch failoverdoel worden** voor een
+  organisatie die een andere voorkeur uitsprak? Nu wel, met opzet — maar het
+  staat nergens opgeschreven als keuze, en een derde optie bestaat: alleen
+  aanvullen met providers die de organisatie zelf configureerde.
+- **Houdt de nul-retentiebelofte stand?** Hij is Anthropic-specifiek en is de
+  enige mitigatie die de DPIA noemt voor retentie bij de verwerker. Beslis
+  eerst de eerste vraag; deze volgt eruit.
