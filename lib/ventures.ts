@@ -652,3 +652,40 @@ export function getVentureForTag(tag: string, locale?: Locale) {
   const slug = TAG_TO_VENTURE[tag];
   return slug ? getVenture(slug, locale) : undefined;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Wat de homepage-kaarten nodig hebben, en niets meer.
+
+   `components/sections/Ventures.tsx` droeg tot 2026-08-21 zijn eigen lijst
+   van vijf ventures, met adres en statusvlag erin. Twee lijsten voor dezelfde
+   feiten, en `ventures.test.ts` las de andere — dus de poort die bewaakt dat
+   een venture zonder adres er ook geen toont, dekte niet wat de homepage
+   werkelijk rendert. Dezelfde vorm als #199, waar llms.txt de claim nog droeg
+   die #188 er net had uitgehaald.
+
+   Waarom een afgeleide en geen rechtstreekse import: dat component draagt
+   "use client". Leest het VENTURES zelf, dan reist dit hele bestand mee in de
+   homepage-bundel — honderden regels kopij in vier talen, voor vier velden per
+   kaart. Tree-shaking helpt daar niet, want VENTURES is één aaneengesloten
+   literal. De server-pagina roept `ventureKaarten()` aan en geeft het resultaat
+   door als prop; het component importeert alleen het type, en dat is bij het
+   compileren weg.
+   ───────────────────────────────────────────────────────────── */
+export type VentureKaart = {
+  slug: string;
+  /** `status === "live"`. De kaart toont geen pijl en geen domein als dit
+   *  onwaar is — zie de gate in `ventures.test.ts` die adres en status aan
+   *  elkaar koppelt. */
+  live: boolean;
+  domain: string | null;
+  external: string | null;
+};
+
+export function ventureKaarten(): VentureKaart[] {
+  return VENTURES.map((v) => ({
+    slug: v.slug,
+    live: v.status === "live",
+    domain: v.domain,
+    external: v.external,
+  }));
+}

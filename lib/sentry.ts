@@ -53,12 +53,6 @@ export function initSentry(): void {
       environment: process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV ?? 'development',
       release: process.env.SENTRY_RELEASE ?? process.env.GIT_COMMIT_SHA,
       tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? '0'),
-      // Don't capture requests to /api/health — they're just uptime probes
-      beforeSend(event: { request?: { url?: string } }) {
-        const url = event?.request?.url ?? ''
-        if (url.includes('/api/health')) return null
-        return event
-      },
     })
   } catch (err) {
     console.warn('[sentry] init failed:', err)
