@@ -235,16 +235,22 @@ verzonnen worden.
 2. **Draag je een garantie, en welke?** De vorm die bij dit aanbod past raakt de
    levering van stap 2, niet de uitkomst. Het is jouw risico, dus jouw keuze; ik
    kan de gangbare vormen naast elkaar zetten met wat elk kost als het misgaat,
-   maar de knoop is niet van mij.
+   maar de knoop is niet van mij. **Gedeeltelijk beantwoord op 2026-08-22:** dat
+   het bouwplan van de klant blijft en dat de sprintprijs volledig wordt
+   verrekend, is risico-omkering op de levering. Open blijft of je daarbovenop
+   iets over de uitkomst belooft.
 
 3. **Hoeveel trajecten draag je tegelijk?** Een getal maakt de schaarste echt en
    controleerbaar. Zonder getal is elke urgentie-zin een constructie, en dan
    hoort hij er niet te staan.
 
-4. **Wat ligt er na dertig dagen op tafel?** Eén zin. Stap 1 noemt een tastbaar
-   ding (een diagnose van één pagina), stap 2 noemt alleen een toestand. Een
-   deliverable verzinnen is dezelfde fout als een prijs verzinnen, dus dit
-   wacht op jou en niet op mij.
+4. ~~**Wat ligt er na dertig dagen op tafel?**~~ — **beslist 2026-08-22.** Het
+   bouwplan met een getal per fase, plus het eerste onderdeel dat al draait.
+   Allebei volledig eigendom van de klant, ook als een ander het uitvoert, en de
+   sprintprijs gaat er volledig vanaf als de bouw volgt. Vastgelegd in
+   `docs/claims.md` onder "Wat de diagnosesprint oplevert"; de kopij in vier
+   talen volgt uit dezelfde beslissing. **Onderdeel 1 (het bedrag) blijft de
+   enige blokkade voor een getal in kopij.**
 
 ---
 

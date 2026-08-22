@@ -413,6 +413,38 @@ verified by breaking them.
 **Consequence for future edits.** Adding a card, or changing a number, means
 adding the row here first. That is the whole point.
 
+### Wat de diagnosesprint oplevert — beslist 2026-08-22
+
+Tot deze datum beschreef de site de sprint van dertig dagen alleen als een
+*toestand*: "beide kanten beperken het risico voordat er gebouwd wordt". Dat
+staat in vier talen op `/services` en in twaalf FAQ-antwoorden. Het is waar,
+maar niemand kan het vasthouden. Stap 1 van de ladder noemde wél een tastbaar
+ding (een diagnose van één pagina) en stap 3 ook (een offerte, daarna een
+retainer). Stap 2 was het gat.
+
+**Beslist door Juan op 2026-08-22**, op drie punten:
+
+| | beslissing |
+| --- | --- |
+| deliverable | het bouwplan **plus het eerste onderdeel dat al draait** |
+| eigendom | volledig van de klant, ook als een ander het uitvoert |
+| verrekening | de sprintprijs gaat er **volledig** vanaf als de bouw volgt |
+
+Het bouwplan is geen nieuwe belofte. `process.2.body` beschrijft fase 2 van de
+methode al in vier talen als *"een bouwplan dat een aannemer kan lezen"* waarin
+*"elke fase een getal heeft"*, en `services.how.s1.note` zegt al dat het gratis
+gesprek diezelfde fase in het klein is. De sprint is die fase op ware grootte.
+Wat ontbrak was de verbinding, niet de inhoud.
+
+**Wat hier bewust niet staat: een bedrag.** De vaste prijs van de sprint is nog
+onbeslist — zie `docs/aanbod.md` §5.1. "Vaste prijs" mag in kopij omdat het een
+vorm beschrijft en geen getal; een bedrag mag pas nadat het hier staat.
+
+**Wat het werkende onderdeel is, wisselt per traject**, en mag daarom nergens
+in kopij benoemd worden. De belofte is dat er na dertig dagen iets draait, niet
+wat er draait. Een pagina die het invult, belooft een scope die niet is
+afgesproken.
+
 ## juandiazllc.com — /pricing (DEUS)
 
 Registered 2026-08-15, after a sweep found this page publishes eight price

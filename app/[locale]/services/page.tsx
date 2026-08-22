@@ -12,6 +12,13 @@ import { OG_IMAGES } from "@/lib/seo/branding";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
+// Welke ladderstappen een toelichting dragen. Expliciete verzameling en geen
+// opzoeking-met-terugval: `translate()` valt bij een ontbrekende sleutel terug
+// op Engels, en ontbreekt hij daar ook, dan rendert de sleutelnaam zelf op de
+// pagina. Staat s3 hier niet in, dan wordt er nooit naar een s3-notitie
+// gezocht. Zie lib/i18n/dict.ts — alleen s1 en s2 dragen een `.note`.
+const MET_NOTITIE = new Set(["s1", "s2"]);
+
 // Deliverable-framed (what I deliver), distinct from /sectors (industry-framed)
 // and the home (brand-framed) — so it captures service-intent without
 // cannibalizing either. Each card links into an existing funnel page.
@@ -124,10 +131,15 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
                   lezer niet zelf hoeven afleiden. Hernoemen zou het duurder én
                   slechter maken — "blueprint call" staat 7 keer in de Engelse
                   FAQ alleen, en de vijf fasen dragen de bouwkundige metafoor
-                  waar de positionering op rust. Zie docs/aanbod.md §3.5. */}
-              {s === "s1" && (
+                  waar de positionering op rust. Zie docs/aanbod.md §3.5.
+
+                  De notitie bij s2 draagt de twee toezeggingen die de
+                  stap omkeerbaar maken: het plan blijft van de klant, en de
+                  sprintprijs wordt verrekend. Beslist 2026-08-22, vastgelegd
+                  in docs/claims.md — "Wat de diagnosesprint oplevert". */}
+              {MET_NOTITIE.has(s) && (
                 <p style={{ marginTop: 10, color: "var(--muted-soft)", fontSize: 14 }}>
-                  {t("services.how.s1.note")}
+                  {t(`services.how.${s}.note`)}
                 </p>
               )}
             </li>
