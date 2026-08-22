@@ -146,6 +146,14 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
           ))}
         </ol>
         <p style={{ marginTop: 24, color: "var(--muted)" }}>{t("services.how.note")}</p>
+        {/* Capaciteit als werkwijze, niet als urgentie. Drie trajecten tegelijk
+            is beslist op 2026-08-22 en staat in docs/claims.md — "Garantie en
+            capaciteit". Daar staan ook de twee grenzen: een levende teller
+            ("nog N plekken vrij") bestaat nergens in deze repo en mag dus niet
+            gesuggereerd worden, en de grens knelt vandaag niet, dus een zin die
+            druk suggereert zou druk verzinnen. lib/capaciteit.test.ts bewaakt
+            allebei. */}
+        <p style={{ marginTop: 10, color: "var(--muted)" }}>{t("services.how.capaciteit")}</p>
       </section>
       {/* Het bewijs stond alleen op de homepage. Deze pagina beschreef vier
           diensten en een ladder van vier stappen, en droeg tot 2026-08-20 geen
