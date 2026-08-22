@@ -4,6 +4,7 @@ import { VENTURES } from "@/lib/ventures";
 import { SIGNALS } from "@/lib/signals";
 import { SECTORS } from "@/lib/sectors";
 import { LOCALES, type Locale } from "@/lib/i18n/dict";
+import { localesVoor } from "@/lib/i18n/enkele-taal";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -41,6 +42,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/signals", priority: 0.8, change: "weekly" },
     { path: "/insights", priority: 0.9, change: "weekly" },
     { path: "/tools/energy-roi", priority: 0.75, change: "monthly" },
+    // Alleen /nl — zie lib/i18n/enkele-taal.ts voor de reden.
+    { path: "/tools/lekkage-scan", priority: 0.75, change: "monthly", locales: localesVoor("/tools/lekkage-scan", LOCALES) },
     { path: "/pricing", priority: 0.9, change: "monthly" },
     { path: "/contact", priority: 0.7, change: "monthly" },
     { path: "/privacy", priority: 0.3, change: "yearly" },
