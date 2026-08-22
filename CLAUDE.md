@@ -3446,3 +3446,174 @@ Eén CSP-fout in de console kwam van mijn eigen injectie, niet van de site: alle
 vijf de nonce-loze inline scripts zijn `application/ld+json` — datablokken die
 de browser nooit uitvoert — en elk uitvoerbaar script draagt een nonce. Zelfde
 conclusie als #209, en opnieuw pas getrokken ná meten in plaats van ervoor.
+
+### 2026-08-22 — nul opvang met het aas al op de plank, en drie meters die iets anders zeiden dan er op stond
+
+PR #221, plus #220 die er als losse taak uitrolde. De aanleiding was een vraag om
+een leadmagneet. Bij het meten bleek dat de verkeerde vraag: er is geen
+leadmagneet-probleem maar een opvang-probleem.
+
+#### Het aas lag er al, de fuik niet
+
+| | stand, gemeten 2026-08-22 |
+|---|---|
+| nieuwsbriefformulier | bestaat, staat op **één** pagina (`/insights`) |
+| `marketing.subscribers` | **0 rijen, ooit** |
+| `marketing.leads` | **0 rijen, ooit** |
+| dubbele opt-in (`app/actions/newsletter.ts`) | dood — `newsletter_subs` bestaat in geen schema, én geen Resend-sleutel |
+| `/tools/energy-roi` | bestaat, **ongegate**, vangt niets |
+| artikelen | 21, waarvan 13 op 2026-07-20 |
+| bezoekerscijfer | onbekend — geen Plausible-doelen, geen sleutel |
+
+Dat laatste is geen detail: **nul opvang is niet te onderscheiden van nul
+bezoek.** Elke uitspraak over conversie in `docs/lead-magnet.md` staat daarom
+als verwachting opgeschreven, niet als voorspelling.
+
+#### Wat er gebouwd is, en wat er bewust niet in zit
+
+`/nl/tools/lekkage-scan` — vijftien ja/nee-vragen in vier blokken, elk blok
+gespiegeld aan een bevestigde uitkomst uit `docs/claims.md`. De uitslag is geen
+cijfer op tien maar de drie dingen die het eerst lekken, in volgorde.
+
+**Geen e-mailveld.** Een leadmagneet is een belofte die per e-mail wordt
+ingelost, en `RESEND_API_KEY` staat niet gezet. Een veld dat vandaag een PDF
+belooft levert iedereen die converteert niets — dat is slechter dan geen
+leadmagneet, want je verbrandt precies het publiek dat je net verdiende en je
+ziet het niet gebeuren. De opvang loopt via `/contact?interest=lekkage-scan`,
+en die keten is getest.
+
+**Geen bedrag.** Een voorspelde besparing kent het bedrijf niet. Een gate scant
+wat de bezoeker leest, mét een positieve controle dat het patroon werkelijk
+afgaat — anders is een lege overtreedslijst niet te onderscheiden van een kapot
+instrument.
+
+**Eén vraag staat omgekeerd.** Bij D2 telt *ja* als lek. Vijftien vragen waarbij
+nee altijd slecht is vult iemand op de automatische piloot in; dan meet je
+aandacht en niet de stack.
+
+#### `ENKELE_TAAL` — het begrip dat ontbrak
+
+De pagina bestaat alleen op `/nl`; alle vier de bevestigde engagements zijn
+NL/BE, dezelfde keuze als bij het saldering-cluster. Twee poorten hebben dat
+feit nodig: `app/sitemap.ts` (die had het begrip al, als `locales?: Locale[]`)
+en `metadata-locales.test.ts` (die het niet had, en eist dat titel en
+beschrijving per taal verschillen — onmogelijk bij een pagina die in de andere
+drie talen 404't).
+
+Die twee als losse lijsten opschrijven is de bugklasse die dit logboek het
+vaakst raakt. Vandaar `lib/i18n/enkele-taal.ts` als enige bron, en een gate die
+drie dingen eist: de pagina bestaat, hij **404't werkelijk** buiten zijn taal,
+en de sitemap zegt precies hetzelfde. Zonder die 404-eis is de lijst een
+achterdeur om een onvertaalde vierstalige pagina te verstoppen.
+
+**De uitzondering in de metadata-poort is smal, en dat is te meten.** Die
+overslaat één assertie; de twee andere lussen in dat bestand (titellengte,
+og:image) dekken de nieuwe pagina gewoon. Dat verklaart waarom de telling met 26
+steeg en niet met de 24 die ik schreef — en dat verschil natrekken was het waard,
+want een onverklaarde plus is net zo goed een signaal als een onverklaarde min.
+
+#### De poort verdiende zich terug vóór hij bestond
+
+A3 stond in `docs/lead-magnet.md` als een óf-vraag ("op één plek, óf in meerdere
+systemen") en is zo niet met ja/nee te beantwoorden. Dat viel op bij het
+schrijven van de test die eist dat elke vraag **woordelijk** in dat document
+staat. Zelfde vorm als #199, waar `public/llms.txt` een bewering bleef dragen
+die de code al had ingetrokken — een document en een implementatie die dezelfde
+tekst dragen lopen uit elkaar zonder dat iemand het merkt.
+
+#### De scan was een wees, en dat meldde de audit
+
+`scripts/seo-audit.ts`: *staat in de sitemap maar wordt nergens vandaan
+gelinkt*. Een pagina waar niets naartoe wijst is geparkeerd, niet gebouwd.
+
+Daaruit komt `components/ScanCallout.tsx`, gemonteerd op `/nl/services` en
+`/nl/tools/energy-roi`. Die poortert op `ENKELE_TAAL` en niet op een eigen
+`locale === "nl"` — dezelfde bron waaruit de pagina zijn talen haalt, dus de
+knop kán per constructie geen 404 opleveren. Een eigen check zou een tweede
+lijst zijn geweest, en dat is precies de vorm waarin dit soort gaten ontstaat.
+
+In de audit is dit een **waarschuwing**; in `lib/lekkage-scan.test.ts` is het
+een fout. Een waarschuwing komt stilletjes terug.
+
+#### Drie meters zeiden iets anders dan er op stond
+
+**Elf HTTP 500's die er niet waren.** De eerste auditrun liep tegen de
+dev-server en meldde 500 op `/nl/about`, `/es/pricing` en negen andere pagina's
+die ik niet had aangeraakt. Tegen `next start` waren ze weg: Turbopack die onder
+de crawler stond te compileren. Dit logboek schrijft die meetopstelling al voor,
+en dit is de derde keer dat het uitmaakte.
+
+**Drie 404's in de console na een schone herlading.** Uit het netwerklog bleken
+het mijn eigen sondes naar `/en`, `/de` en `/es` — die hóren te 404'en. De
+consolebuffer van de browser-pane wordt bij navigatie niet geleegd; dat stond al
+in het logboek van 21 augustus en ik trapte er opnieuw bijna in.
+
+**De aanspreekvorm meten mislukte stil.** Een blok-extractie op `dict.ts` gaf
+nul treffers voor élke vorm — `je`, `jij`, `u`, `uw`. Dat leest als een leeg
+woordenboek. Het was een kapotte extractie; op regelnummers gemeten staat er
+87× `je` en 0× `u`. Vierde keer deze week dat een lege uitkomst uit een stuk
+instrument hetzelfde leest als een schone meting.
+
+#### Gemeten
+
+Alles op de productiebuild (`next start`, poort 3200), niet op de dev-server.
+
+| | uitkomst |
+|---|---|
+| `/nl` | 200 · 1× h1 · 4 blokken · 15 vragen · 30 radio's |
+| `/en`, `/de`, `/es` | 404 |
+| hreflang | alleen `nl` + `x-default=nl` |
+| sitemap | 176 → 177 URL's, alleen `/nl` |
+| knop op `/nl/services` + `/nl/tools/energy-roi` | 1×, met taalprefix |
+| dezelfde pagina's op `/en`, `/de` | 0× |
+| mobiel 375px | geen overloop, raakdoelen 44px (WCAG 2.5.5) |
+| `seo-audit` | waarschuwingen: **0** |
+
+De uitslagvolgorde vooraf voorspeld en daarna gemeten: bij B=3, A=1 en D=1 hoort
+B → A → D, met het gelijkspel gebroken op A. Dat kwam er precies zo uit.
+
+De 177× `canonical-wijkt-af` is het bekende meetartefact — de lokale build
+draagt `NEXT_PUBLIC_SITE_URL` op poort 3000 terwijl de crawl op 3200 loopt.
+176 in het logboek, nu 177: exact +1 voor deze pagina.
+
+**899 tests in 41 bestanden**, was 871/39. Dat vervangt de 871 hierboven.
+Typecheck schoon, i18n 696 × 4, prijsgenerator groen, build groen met 207
+statische pagina's.
+
+Mutatietest op de wees-gate in twee richtingen: beide montages weg → rood op
+`expected 0 to be greater than 0`, hersteld → groen. Hersteld uit een kopie in
+de scratchpad, niet met `git checkout --` — die herstelt vanuit de index.
+
+**Geen screenshot.** De browser-pane compositeert hier geen frames, dus alles
+hierboven is in de DOM en in de geserveerde HTML gemeten, niet op het oog.
+
+#### PR #220 — het commentaar noemde een tabel die in geen schema bestaat
+
+Onderweg gevonden en als losse taak weggezet, want het was een codewijziging in
+een documentatie-PR. `components/NewsletterForm.tsx:7` zei "Writes to Supabase
+`newsletter_subs`", terwijl het formulier sinds 2026-07-21 via
+`app/actions/subscribe.ts` naar `subscribers` schrijft. De kop van
+`newsletter.ts` legt die verhuizing correct uit; de kop van het formulier is
+meeverhuisd zonder bijgewerkt te worden.
+
+Wie dat leest zoekt de opvang in de verkeerde tabel — en die tabel bestaat niet,
+dus hij vindt niets en concludeert dat er niets binnenkomt. Precies de klasse
+waar dit logboek het meest aan overhoudt.
+
+#### Voor de operator: niets nieuws, wel een volgorde
+
+`docs/lead-magnet.md` §7 voegt geen taken toe aan de lijst hieronder, maar zet
+er drie in volgorde omdat ze elkaar blokkeren:
+
+1. **De vier Plausible-doelen aanmaken.** Zonder dit is elke uitspraak over deze
+   scan een gok — de kliks worden nu binnengehaald en weggegooid.
+2. **`LEAD_NOTIFY_SECRET`.**
+3. **`RESEND_API_KEY` + `ACK_FROM`** — pas ná 2, anders geef je een publiek
+   aanroepbaar endpoint een mailkanaal vanaf het eigen domein. De scan werkt
+   zonder; de PDF-variant wacht hierop.
+
+En de beslissing die er hoe dan ook ligt: **wat ligt er na de sprint van dertig
+dagen op tafel?** De scan eindigt in een uitnodiging, en die moet een tastbaar
+ding noemen. Stap 1 van de ladder doet dat al; stap 2 noemt alleen een toestand.
+Dezelfde vraag als `docs/aanbod.md` §5, en hij komt hier terug omdat elke
+leadmagneet ergens naartoe moet leiden.
