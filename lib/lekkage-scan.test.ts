@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative, sep } from "node:path";
 import {
   BLOKKEN,
   VOLGORDE,
@@ -155,6 +155,19 @@ describe("scoor()", () => {
  * gelinkt”. Dat is daar een waarschuwing en geen fout, dus het zou een
  * volgende keer stilletjes terug kunnen komen. Hier is het een fout. */
 describe("de scan hangt ergens aan", () => {
+  /* Een telling boven nul is niet genoeg: dan mag een montage stilletjes
+   * verdwijnen zolang er nog een overblijft. Dezelfde vorm als HOORT_TE_STAAN
+   * in components/ResultsStrip.test.ts — elke plek met de reden waarom hij
+   * daar hoort, zodat verdwijnen en er-ongemotiveerd-bijkomen allebei rood zijn. */
+  const HOORT_TE_STAAN: Record<string, string> = {
+    "app/[locale]/services/page.tsx":
+      "onder de slot-CTA — lagere drempel voor wie nog niet wil boeken",
+    "app/[locale]/tools/energy-roi/page.tsx":
+      "de hoogste-intentiepagina van de site, en hij ving zelf niets",
+    "app/[locale]/insights/[slug]/page.tsx":
+      "onder de energie-artikelen (post.tag === Energy) — daar zit het ICP",
+  };
+
   const paginas = (() => {
     const uit: string[] = [];
     const loop = (map: string) => {
@@ -174,8 +187,21 @@ describe("de scan hangt ergens aan", () => {
     expect(paginas.length).toBeGreaterThan(10);
   });
 
-  it("wordt vanaf minstens één pagina gemonteerd", () => {
-    const mounts = paginas.filter((p) => readFileSync(p, "utf8").includes("<ScanCallout"));
-    expect(mounts.length, "geen enkele pagina monteert <ScanCallout>").toBeGreaterThan(0);
+  it("staat op precies de plekken waar hij hoort", () => {
+    const gevonden = paginas
+      .filter((p) => readFileSync(p, "utf8").includes("<ScanCallout"))
+      .map((p) => relative(WORTEL, p).split(sep).join("/"))
+      .sort();
+    expect(gevonden).toEqual(Object.keys(HOORT_TE_STAAN).sort());
+  });
+
+  it("hangt op de artikelpagina achter de Energy-tag", () => {
+    // Zonder die voorwaarde staat hij onder elk artikel, ook onder de
+    // real-estate- en hospitality-stukken die een ander publiek hebben.
+    const bron = readFileSync(
+      join(WORTEL, "app", "[locale]", "insights", "[slug]", "page.tsx"),
+      "utf8",
+    );
+    expect(bron).toMatch(/post\.tag === "Energy" && <ScanCallout/);
   });
 });

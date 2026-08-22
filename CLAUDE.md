@@ -3617,3 +3617,39 @@ dagen op tafel?** De scan eindigt in een uitnodiging, en die moet een tastbaar
 ding noemen. Stap 1 van de ladder doet dat al; stap 2 noemt alleen een toestand.
 Dezelfde vraag als `docs/aanbod.md` §5, en hij komt hier terug omdat elke
 leadmagneet ergens naartoe moet leiden.
+
+#### PR #222 — de scan onder de energie-artikelen, en het waren er vijf
+
+Punt 1 uit het distributieplan. `ScanCallout` hangt nu ook onder de
+insight-detailpagina, achter `post.tag === "Energy"`, tussen het boekblok en de
+venture-kaart: wie het artikel uit heeft krijgt eerst een stap van vier minuten,
+daarna pas een van een kwartier.
+
+**Het plan telde elf energie-artikelen; het zijn er vijf.** Dat getal telde de
+DE- en ES-clusters mee, maar de scan bestaat daar niet — `ScanCallout` poortert
+op dezelfde `ENKELE_TAAL` waaruit de pagina zijn talen haalt, dus daar rendert
+hij niets. Dat is precies waarom die gedeelde bron er staat: de knop kan niet
+verwijzen naar een pagina die in die taal 404't, ook niet als iemand hem op een
+vertaalde post monteert. Het document is bijgewerkt naar wat gemeten is.
+
+**De poort noemt nu de plekken in plaats van het aantal.** De eerste versie eiste
+“minstens één montage”, en dan mag er stilletjes één verdwijnen zolang er nog
+één overblijft — precies de staat waarin de homepage jarenlang de enige plek was
+voor `ResultsStrip` zonder dat dat ooit besloten was. Nu een expliciete lijst met
+per plek de reden, plus een tweede assertie dat de artikelmontage achter de
+Energy-tag hangt. Zonder die voorwaarde staat de scan onder élk artikel, ook
+onder de real-estate- en hospitality-stukken die een ander publiek hebben.
+
+Twee mutaties, twee keer rood: montage weg uit `/services` →
+`expected [ …(2) ] to deeply equal [ …(3) ]`, en de Energy-voorwaarde weg → rood
+op de tweede assertie.
+
+**`grep -c` loog voor de derde keer deze sessie.** De ruwe HTML toont twee
+treffers op de knoptekst; één daarvan zit in de RSC-payload
+(`self.__next_f.push`). Geteld op gerénderde anchors is het er één. En de
+metingen op `/nl/services` van een uur eerder telden regels in plaats van
+treffers — geminificeerde HTML is één regel, dus die “1” zei niets. Opnieuw
+gemeten met `grep -o | wc -l`: 1 anchor per NL-energiepost, 0 op de twee
+NL-niet-energieposts, 0 op de DE- en ES-posts, 0 op elke `/en`- en `/de`-variant.
+
+900 tests in 41 bestanden, was 899/41. `seo-audit` waarschuwingen: 0.
