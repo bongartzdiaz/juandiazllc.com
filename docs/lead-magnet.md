@@ -240,11 +240,17 @@ Vier kanalen liggen er per staande afspraak uit: LinkedIn-connectieverzoeken en
 DM's, koude WhatsApp, koude e-mail naar Duitsland, en formulierinzendingen bij
 doelbedrijven. Wat overblijft is genoeg, en het is warmer.
 
-1. **Content-upgrade op de elf energie-artikelen.** Contextuele upgrades
-   converteren volgens de vakbenchmarks 2-5× beter dan een generieke zijbalk.
-   Er staan elf artikelen die al bestaan en waar niets onder staat.
-2. **Op de rekentool.** `/tools/energy-roi` is de hoogste-intentiepagina van de
-   site en vangt vandaag niets.
+1. ~~**Content-upgrade op de elf energie-artikelen.**~~ **Gedaan** (#221, #222).
+   Contextuele upgrades converteren volgens de vakbenchmarks 2-5× beter dan een
+   generieke zijbalk.
+
+   Het waren er geen elf maar **vijf**. De DE- en ES-clusters tellen mee in dat
+   getal, maar de scan bestaat daar niet, dus `ScanCallout` rendert er niets —
+   hij poortert op dezelfde `ENKELE_TAAL` waaruit de pagina zijn talen haalt.
+   Gemeten op de productiebuild: 1 anchor op elk van de vijf NL-energieposts,
+   0 op de DE- en ES-posts, 0 op de niet-energieartikelen.
+2. ~~**Op de rekentool.**~~ **Gedaan** (#221). `/tools/energy-roi` is de
+   hoogste-intentiepagina van de site en ving zelf niets.
 3. **De vier bestaande klanten.** Stuur ze de scan met de vraag of hij klopt
    voor hun situatie. Dat is tegelijk het referral-gesprek, met een aanleiding
    die geen gunst vraagt.

@@ -9,6 +9,7 @@ import { LOCALES, translate } from "@/lib/i18n/dict";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { blogPostingSchema } from "@/lib/seo/article";
 import { BOOKING_15MIN } from "@/lib/booking";
+import { ScanCallout } from "@/components/ScanCallout";
 
 export async function generateStaticParams() {
   // Only pre-render (locale, slug) pairs where the post is published in that
@@ -193,6 +194,13 @@ export default async function InsightPage(
               <LocaleLink href="/contact">{t("insights.d.want.cta")}</LocaleLink>
             </p>
           </div>
+
+          {/* Lagere drempel dan het kwartier hierboven: wie nog niet wil boeken kan
+              eerst zelf meten. Alleen onder de energie-artikelen — dat is het
+              cluster waar het ICP zit. ScanCallout poortert zelf op taal, dus op de
+              Duitse en Spaanse energieposts rendert hij niets (de scan bestaat daar
+              niet) en dat is geen toeval maar dezelfde bron. */}
+          {post.tag === "Energy" && <ScanCallout locale={l} />}
 
           {venture && (
             <div className="ia-venture">
