@@ -3872,3 +3872,109 @@ Gemeten op de productiebuild, over beide pagina's die het bedrag dragen:
 prijs op `/pricing` draagt er een, gemeten over `pricing.*` in vier talen. Dat
 staat als open punt in `docs/claims.md` — het is geen reden om het hier ook weg
 te laten, maar het is wel een inconsistentie die iemand een keer moet wegnemen.
+
+#### Na de merge: wat "10 bedragen" telt, en twee meters die stil het verkeerde zeiden
+
+#225 is gemerged als `0473095`. De squash-boom is byte-identiek aan die van de
+tak (`0d893ebd`), alle poorten groen op gemergede main: tsc 0 · 904 tests in 41
+bestanden · i18n 697 × 4 · prijsgenerator groen · `CLAUDE.md` == `AGENTS.md`.
+
+**Op productie gemeten, alle vier de talen, over de hele HTML** — zichtbare
+tekst, JSON-LD én RSC-payload:
+
+    /{en,nl,de,es}/services   sprintprijs 10x per taal, 0 zonder grondslag
+    /{en,nl,de,es}/contact    sprintprijs  4x per taal, 0 zonder grondslag
+
+`MwSt..` komt 0× voor. De JSON-LD is apart nagelopen, want dat is wat Google
+leest: 6 blokken per taal, 2 bedragen, in alle vier de talen nul zonder
+grondslag.
+
+#### Het getal 10 telt de sprintprijs, niet de bedragen op de pagina
+
+De meting in het blok hierboven noteert "10 bedragen" op `/services`. Bij het
+hermeten op productie kwam daar 4 uit, en dat leest als drift terwijl er niets
+gedreven was. Het waren twee meetlatten:
+
+| | telt | uitkomst |
+|---|---|---|
+| vóór de merge | de sprintprijs, in de rauwe HTML | 10 |
+| ná de merge | elk bedrag, in de zichtbare tekst | 4 |
+
+Gelaagd uitgesplitst staat er per taal 11 in de rauwe HTML: 4 zichtbaar, 2 in de
+JSON-LD, 5 in de RSC-payload. Strikt op de sprintprijs geteld is het 10 — exact
+gelijk aan de oude meting. Het verschil van één is `€0`, dat de oude regex stil
+uitsloot omdat hij twee cijfers eiste.
+
+**Noteer dus wát je telt, niet alleen hoeveel.** Een kaal getal in een logboek
+wordt over een maand gelezen als het antwoord op de vraag die de lezer dán heeft.
+
+Het enige bedrag op die pagina's zonder grondslag is `€0`, de vierde bevestigde
+klantuitkomst uit `docs/claims.md`. Dat is een uitkomstcijfer en geen prijs; het
+hoort er geen te dragen, en `ResultsStrip.test.ts` dekt het al.
+
+#### Vercel post een commit-status, geen check-run
+
+De poller die op de deploy wachtte vroeg `commits/<sha>/check-runs` en kreeg
+niets terug voor de naam `Vercel`, terwijl `commits/<sha>/status` op `success`
+stond. Twee verschillende API's:
+
+| endpoint | draagt |
+|---|---|
+| `/check-runs` | `i18n`, `docs-sync`, `typecheck`, `deps`, `test`, `lighthouse` |
+| `/status` | **`Vercel`** |
+
+Een poller op alleen de eerste wacht eeuwig op een deploy die al klaar is, en
+meldt niets — hij blijft gewoon draaien. Dat leest hetzelfde als een deploy die
+hangt. Enumereer bij een lege uitkomst eerst beide lijsten voordat je concludeert
+dat er iets niet af is; dat kostte hier één aanroep.
+
+**Dat is gemeten, niet beredeneerd.** De poller liep door tot zijn eigen lusgrens:
+
+| | |
+|---|---|
+| pogingen | 40, over ~13 minuten |
+| `vercel=` uit `/check-runs` | **leeg, alle 40 keer** |
+| `combined=` uit `/status` | `success`, vanaf poging 1 |
+| exitcode | **0** |
+
+Geen foutmelding, geen rood, exitcode 0 — alleen een antwoord dat nooit kwam,
+terwijl de deploy die hele dertien minuten live was. Vanaf de kant van de poller
+is "nog niet klaar" niet te onderscheiden van "ik kijk op de verkeerde plek":
+allebei zien eruit als een lege uitkomst.
+
+Wat het onderscheid hier wél droeg was een tweede signaal dat aantoonbaar bewoog.
+`combined=success` stond naast een lege `vercel=`, en die twee spraken elkaar
+vanaf poging 1 tegen. Een poller die één veld leest kan niet merken dat hij het
+verkeerde veld leest.
+
+Dit is de reden dat `audit-productie` en `Vercel` bewust niet in de
+branch-protection-lijst staan — zie de sessie van 19 augustus. De twee gaten
+hangen samen: een check die via een ander endpoint rapporteert dan waar je naar
+kijkt, is voor jouw instrument onzichtbaar.
+
+#### De prijsregex hechtte over een knoopgrens
+
+De productie-sonde meldde in het Spaans een bedrag van `1 €` dat nergens op de
+pagina staat. De regex moet voor Duits en Spaans een euroteken *achter* het getal
+toestaan, en precies die losheid liet hem over een DOM-grens hechten:
+
+    ...|Despliegue Q1|€0|Gasto adicional en SaaS...
+
+Twee losse knopen, platgeslagen tot "Q1 €0", en daar matcht `1 €`. In het Engels
+en Duits staat er een woord tussen (`Q1 rollout`, `Q1-Rollout`), dus daar viel het
+niet op — de fout was er wel, hij had alleen geen aanleiding.
+
+De poort in `lib/seo/faqs.belofte.test.ts` kán dit niet krijgen: die leest losse
+waardes uit `DICT`, niet platgeslagen paginatekst. **Een regex die op een hele
+pagina losgelaten wordt heeft een andere foutklasse dan dezelfde regex op één
+veld.** Meet je op de pagina, meet dan per element of anker op de exacte
+prijsvorm, zoals de tweede ronde hier deed.
+
+#### Twee valkuilen die deze sessie voor de zoveelste keer terugkwamen
+
+`sed 's/<script[^>]*>.*<\/script>//g'` eet op geminificeerde HTML het hele
+document, want dat is één regel en `.*` is hebzuchtig. De sonde gebruikt daarom
+`re.S` met `.*?` per script-tag. En Python op Windows opent geen `/tmp/...` —
+git-bash zet dat op `C:/Users/LENOVO/AppData/Local/Temp`, te vinden met
+`pwd -W`. Allebei staan ze al eerder in dit logboek; allebei kostten ze opnieuw
+een ronde.
