@@ -60,7 +60,7 @@ export const CONTACT_FAQ: FaqItem[] = [
   },
   {
     q: "Can we start small?",
-    a: "Yes. Many engagements begin with a 30-day diagnostic sprint at €2,500. You end it with the build plan, a number on every phase, and the first component already running. Both stay yours even if someone else executes them, and the fee comes off the build price in full.",
+    a: "Yes. Many engagements begin with a 30-day diagnostic sprint at €2,500 excl. VAT. You end it with the build plan, a number on every phase, and the first component already running. Both stay yours even if someone else executes them, and the fee comes off the build price in full.",
   },
 ];
 
@@ -444,7 +444,7 @@ export const CONTACT_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
     },
     {
       q: "Kunnen we klein beginnen?",
-      a: "Ja. Veel trajecten starten met een diagnosesprint van 30 dagen voor €2.500. Je eindigt met het bouwplan, een getal per fase, en het eerste onderdeel dat al draait. Allebei blijven van jou, ook als een ander ze uitvoert, en de prijs gaat volledig van de bouw af.",
+      a: "Ja. Veel trajecten starten met een diagnosesprint van 30 dagen voor €2.500 excl. btw. Je eindigt met het bouwplan, een getal per fase, en het eerste onderdeel dat al draait. Allebei blijven van jou, ook als een ander ze uitvoert, en de prijs gaat volledig van de bouw af.",
     },
   ],
   de: [
@@ -466,7 +466,7 @@ export const CONTACT_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
     },
     {
       q: "Können wir klein anfangen?",
-      a: "Ja. Viele Projekte beginnen mit einem 30-tägigen Diagnose-Sprint für 2.500 €. Am Ende haben Sie den Bauplan mit einer Zahl je Phase und die erste laufende Komponente. Beides bleibt Ihnen, auch wenn es jemand anderes umsetzt, und der Festpreis wird auf den Aufbau voll angerechnet.",
+      a: "Ja. Viele Projekte beginnen mit einem 30-tägigen Diagnose-Sprint für 2.500 € zzgl. MwSt. Am Ende haben Sie den Bauplan mit einer Zahl je Phase und die erste laufende Komponente. Beides bleibt Ihnen, auch wenn es jemand anderes umsetzt, und der Festpreis wird auf den Aufbau voll angerechnet.",
     },
   ],
   es: [
@@ -488,7 +488,7 @@ export const CONTACT_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
     },
     {
       q: "¿Podemos empezar poco a poco?",
-      a: "Sí. Muchos proyectos arrancan con un sprint de diagnóstico de 30 días por 2.500 €. Terminas con el plan de obra, una cifra por fase, y el primer componente ya funcionando. Ambos siguen siendo tuyos aunque los ejecute otro, y el precio se descuenta íntegro de la construcción.",
+      a: "Sí. Muchos proyectos arrancan con un sprint de diagnóstico de 30 días por 2.500 € más IVA. Terminas con el plan de obra, una cifra por fase, y el primer componente ya funcionando. Ambos siguen siendo tuyos aunque los ejecute otro, y el precio se descuenta íntegro de la construcción.",
     },
   ],
 };
@@ -518,11 +518,11 @@ export const SERVICES_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
     },
     {
       q: "How does an engagement start?",
-      a: "With a free 30-minute blueprint call that ends in a one-page diagnosis. If there is real work, the usual next step is a 30-day diagnostic sprint at €2,500, which ends in the build plan and the first component already running. The full scope is quoted after that, not before.",
+      a: "With a free 30-minute blueprint call that ends in a one-page diagnosis. If there is real work, the usual next step is a 30-day diagnostic sprint at €2,500 excl. VAT, which ends in the build plan and the first component already running. The full scope is quoted after that, not before.",
     },
     {
       q: "How is this priced?",
-      a: "Per outcome, not per hour. The diagnostic sprint is €2,500, and it comes off the build price in full if the build follows. A build is a fixed fee for the first 90 days of strategy and construction, followed by a monthly retainer for operations. You get the number after the diagnosis, when it can be honest.",
+      a: "Per outcome, not per hour. The diagnostic sprint is €2,500 excl. VAT, and it comes off the build price in full if the build follows. A build is a fixed fee for the first 90 days of strategy and construction, followed by a monthly retainer for operations. You get the number after the diagnosis, when it can be honest.",
     },
     {
       q: "Do we have to replace our current CRM?",
@@ -540,11 +540,11 @@ export const SERVICES_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
     },
     {
       q: "Hoe begint een traject?",
-      a: "Met een gratis blueprint-gesprek van 30 minuten dat eindigt in een diagnose van één pagina. Is er echt werk, dan volgt meestal een diagnosesprint van 30 dagen voor €2.500, die eindigt in het bouwplan en het eerste onderdeel dat al draait. De volledige scope offreren we daarna.",
+      a: "Met een gratis blueprint-gesprek van 30 minuten dat eindigt in een diagnose van één pagina. Is er echt werk, dan volgt meestal een diagnosesprint van 30 dagen voor €2.500 excl. btw, die eindigt in het bouwplan en het eerste onderdeel dat al draait. De volledige scope offreren we daarna.",
     },
     {
       q: "Hoe wordt dit geprijsd?",
-      a: "Per uitkomst, niet per uur. De diagnosesprint kost €2.500, en dat bedrag gaat er volledig vanaf als de bouw volgt. Een build is een vaste prijs voor de eerste 90 dagen strategie en bouw, gevolgd door een maandelijkse retainer voor beheer. Het bedrag krijg je ná de diagnose, wanneer het eerlijk kan zijn.",
+      a: "Per uitkomst, niet per uur. De diagnosesprint kost €2.500 excl. btw, en dat bedrag gaat er volledig vanaf als de bouw volgt. Een build is een vaste prijs voor de eerste 90 dagen strategie en bouw, gevolgd door een maandelijkse retainer voor beheer. Het bedrag krijg je ná de diagnose, wanneer het eerlijk kan zijn.",
     },
     {
       q: "Moet ons huidige CRM eruit?",
@@ -562,11 +562,11 @@ export const SERVICES_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
     },
     {
       q: "Wie beginnt ein Projekt?",
-      a: "Mit einem kostenlosen 30-minütigen Blueprint-Gespräch, das mit einer einseitigen Diagnose endet. Gibt es echte Arbeit, folgt meist ein 30-tägiger Diagnose-Sprint für 2.500 €, der mit dem Bauplan und der ersten laufenden Komponente endet. Der volle Umfang wird danach kalkuliert.",
+      a: "Mit einem kostenlosen 30-minütigen Blueprint-Gespräch, das mit einer einseitigen Diagnose endet. Gibt es echte Arbeit, folgt meist ein 30-tägiger Diagnose-Sprint für 2.500 € zzgl. MwSt., der mit dem Bauplan und der ersten laufenden Komponente endet. Der volle Umfang wird danach kalkuliert.",
     },
     {
       q: "Wie wird das kalkuliert?",
-      a: "Nach Ergebnis, nicht nach Stunde. Der Diagnose-Sprint kostet 2.500 €, die voll angerechnet werden, wenn der Aufbau folgt. Ein Build ist ein Festpreis für die ersten 90 Tage Strategie und Umsetzung, danach ein monatliches Retainer für den Betrieb. Die Zahl bekommen Sie nach der Diagnose — dann, wenn sie ehrlich sein kann.",
+      a: "Nach Ergebnis, nicht nach Stunde. Der Diagnose-Sprint kostet 2.500 € zzgl. MwSt., die voll angerechnet werden, wenn der Aufbau folgt. Ein Build ist ein Festpreis für die ersten 90 Tage Strategie und Umsetzung, danach ein monatliches Retainer für den Betrieb. Die Zahl bekommen Sie nach der Diagnose — dann, wenn sie ehrlich sein kann.",
     },
     {
       q: "Müssen wir unser jetziges CRM ersetzen?",
@@ -584,11 +584,11 @@ export const SERVICES_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
     },
     {
       q: "¿Cómo empieza un proyecto?",
-      a: "Con una llamada blueprint gratuita de 30 minutos que termina en un diagnóstico de una página. Si hay trabajo real, lo habitual es un sprint de diagnóstico de 30 días por 2.500 €, que termina en el plan de obra y el primer componente ya funcionando. El alcance completo se presupuesta después.",
+      a: "Con una llamada blueprint gratuita de 30 minutos que termina en un diagnóstico de una página. Si hay trabajo real, lo habitual es un sprint de diagnóstico de 30 días por 2.500 € más IVA, que termina en el plan de obra y el primer componente ya funcionando. El alcance completo se presupuesta después.",
     },
     {
       q: "¿Cómo se fija el precio?",
-      a: "Por resultado, no por hora. El sprint de diagnóstico cuesta 2.500 €, y se descuenta íntegro si sigue la construcción. Una construcción es precio fijo para los primeros 90 días de estrategia y desarrollo, seguido de una cuota mensual de operación. La cifra llega tras el diagnóstico, cuando puede ser honesta.",
+      a: "Por resultado, no por hora. El sprint de diagnóstico cuesta 2.500 € más IVA, y se descuenta íntegro si sigue la construcción. Una construcción es precio fijo para los primeros 90 días de estrategia y desarrollo, seguido de una cuota mensual de operación. La cifra llega tras el diagnóstico, cuando puede ser honesta.",
     },
     {
       q: "¿Hay que sustituir nuestro CRM actual?",

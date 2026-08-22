@@ -154,6 +154,16 @@ function opmaak(bedrag: number, l: Locale): string {
   return `${punt} €`;
 }
 
+// De btw-grondslag hoort naast elk bedrag, in de vorm die in die taal gangbaar
+// is. Het Duits gebruikt bewust niet "excl.", want dat is geen Duits; `zzgl.`
+// is de zakelijke standaardafkorting. Beslist 2026-08-22, zie docs/claims.md.
+const BTW: Record<Locale, string> = {
+  en: "excl. VAT",
+  nl: "excl. btw",
+  de: "zzgl. MwSt.",
+  es: "más IVA",
+};
+
 describe("wat de diagnosesprint belooft", () => {
   it("elk antwoord dat de sprint noemt, noemt ook wat hij oplevert", () => {
     let gezien = 0;
@@ -206,6 +216,7 @@ describe("wat de diagnosesprint belooft", () => {
     expect(opmaak(2500, "nl")).toBe("€2.500");
     expect(opmaak(2500, "de")).toBe("2.500 €");
     expect(opmaak(2500, "es")).toBe("2.500 €");
+    expect(`${opmaak(2500, "de")} ${BTW.de}`).toBe("2.500 € zzgl. MwSt.");
     expect("kost €2.500 per traject".match(BEDRAGEN)).toEqual(["€2.500"]);
     expect("kostet 2.500 € pro Sprint".match(BEDRAGEN)).toEqual(["2.500 €"]);
     expect("kost €2,500. Dat is het.".match(BEDRAGEN)).toEqual(["€2,500"]);
@@ -215,10 +226,11 @@ describe("wat de diagnosesprint belooft", () => {
       const verwacht = opmaak(prijs, l);
       const kaal = (s: string) => s.replace(/\s/g, "");
 
+      const metBtw = `${verwacht} ${BTW[l]}`;
       const titel = DICT[l]["services.how.s2.title"];
       expect(
-        titel.includes(verwacht),
-        `services.how.s2.title (${l}) noemt ${verwacht} niet: "${titel}"`,
+        titel.includes(metBtw),
+        `services.how.s2.title (${l}) noemt niet "${metBtw}": "${titel}"`,
       ).toBe(true);
 
       let gezien = 0;
@@ -238,6 +250,11 @@ describe("wat de diagnosesprint belooft", () => {
                 `zegt — vraag: "${q}"`,
             ).toBe(kaal(verwacht));
           }
+          expect(
+            a.includes(metBtw),
+            `${naam}-FAQ (${l}) noemt een bedrag zonder de btw-grondslag ` +
+              `"${BTW[l]}" ernaast — vraag: "${q}"`,
+          ).toBe(true);
           gezien += gevonden.length;
         }
       }

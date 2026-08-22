@@ -445,7 +445,7 @@ vorm beschrijft en geen getal; een bedrag mag pas nadat het hier staat.
 | | waarde | status |
 | --- | --- | --- |
 | vaste prijs sprint | **€2.500** | ✅ beslist 2026-08-22 door Juan |
-| btw-behandeling | **niet vastgesteld** | ⚠️ zie hieronder |
+| btw-behandeling | **exclusief btw** | ✅ beslist 2026-08-22 door Juan |
 
 Dat bedrag is de enige bron. `lib/seo/faqs.belofte.test.ts` leest het hier uit
 en eist dat elke plek in kopij die een bedrag bij de sprint noemt, precies dit
@@ -456,17 +456,21 @@ dan híer; de poort maakt het verschil hoorbaar in plaats van stil.
 `€2,500` (en) · `€2.500` (nl) · `2.500 €` (de) · `2.500 €` (es). Het Duitse en
 Spaanse teken staat achter het getal, want dat is daar de conventie.
 
-**De btw-behandeling is niet vastgesteld en staat nergens in kopij.** Geen enkele
-prijs op deze site draagt vandaag een incl./excl.-vermelding — gemeten
-2026-08-22 over `pricing.*` in vier talen — dus €2.500 volgt die conventie. Dat
-is verdedigbaar voor een zakelijke koper, maar het is een keuze die nog niet is
-gemaakt en het verschil is 21%: €2.500 tegen €3.025.
+**De btw-behandeling is exclusief, en staat overal waar het bedrag staat.**
+Beslist op 2026-08-22. Elke plek die €2.500 noemt draagt de grondslag ernaast,
+in de vorm die in die taal gangbaar is: `excl. VAT` (en) · `excl. btw` (nl) ·
+`zzgl. MwSt.` (de) · `más IVA` (es). Het Duits gebruikt bewust niet "excl.",
+want dat is geen Duits; `zzgl.` is de zakelijke standaardafkorting.
+
+**Dit is de eerste prijs op deze site met een grondslag ernaast.** Gemeten
+2026-08-22 over `pricing.*` in vier talen droeg geen enkele andere prijs zo'n
+vermelding. Dat is een open punt voor de DEUS-prijspagina, geen reden om het
+hier ook weg te laten — het verschil is 21%: €2.500 tegen €3.025.
 
 Dit is niet theoretisch. De Educational-tier van Diaz Editor stond als €500 op
 de pagina terwijl Stripe hem exclusief afrekende, dus een school betaalde €605
 aan de kassa (zie "Diaz Editor — pricing" hierboven). Dat is met een nieuwe
-prijs hersteld, omdat `tax_behavior` bij Stripe onveranderlijk is. **Één woord
-van Juan sluit dit: inclusief of exclusief.**
+prijs hersteld, omdat `tax_behavior` bij Stripe onveranderlijk is.
 
 
 **Wat het werkende onderdeel is, wisselt per traject**, en mag daarom nergens

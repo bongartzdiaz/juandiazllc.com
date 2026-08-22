@@ -232,10 +232,9 @@ verzonnen worden.
    €2.500.** Vastgelegd in `docs/claims.md` onder "Wat de diagnosesprint
    oplevert", dat de enige bron is; `lib/seo/faqs.belofte.test.ts` leest het
    bedrag daar uit en eist dat elke plek in kopij het in de opmaak van zijn
-   eigen taal herhaalt. **Wat hier nog open staat is de btw-behandeling** —
-   inclusief of exclusief, een verschil van 21%. Geen enkele prijs op deze site
-   draagt vandaag zo'n vermelding, dus €2.500 volgt die conventie tot Juan het
-   tegendeel zegt.
+   eigen taal herhaalt. De btw-behandeling is **exclusief**, ook
+   beslist op 2026-08-22, en staat overal waar het bedrag staat — in de vorm die
+   in die taal gangbaar is.
 
 2. **Draag je een garantie, en welke?** De vorm die bij dit aanbod past raakt de
    levering van stap 2, niet de uitkomst. Het is jouw risico, dus jouw keuze; ik

@@ -3836,3 +3836,39 @@ In de DOM op 375 px, na het openvouwen van de FAQ:
 Het enige andere bedrag in de zichtbare tekst is `€0`, de vierde bevestigde
 klantuitkomst uit `claims.md` ("additional SaaS spend; retired tools funded the
 rebuild"), al gedekt door `ResultsStrip.test.ts`.
+
+#### En de btw-grondslag, in dezelfde PR
+
+Juan antwoordde tijdens de CI-run: **exclusief btw.** Dat is in #225 zelf
+meegenomen en niet in een volg-PR, want anders serveert productie een tijdje een
+bedrag zonder grondslag — precies de toestand die de Educational-tier van Diaz
+Editor €105 per verkoop kostte.
+
+**De vorm verschilt per taal en dat is geen stijlkwestie.** `excl. VAT` (en) ·
+`excl. btw` (nl) · `zzgl. MwSt.` (de) · `más IVA` (es). Het Duits gebruikt
+bewust niet "excl.", want dat is geen Duits; `zzgl.` is de zakelijke
+standaardafkorting. Eén van de vier mutaties zet de Nederlandse afkorting in de
+Duitse titel, en die gaat af.
+
+**Zestien plekken, niet één.** De grondslag staat naast élk bedrag en niet
+alleen in de titel van de ladder, want `/contact` draagt hetzelfde
+FAQ-antwoord zonder die titel ernaast. Een bedrag dat op één pagina zijn
+grondslag heeft en op een andere niet, is op die tweede pagina misleidend.
+
+Het Duits vroeg punctuatie-zorg: `zzgl. MwSt.` eindigt zelf op een punt, dus
+"…für 2.500 € zzgl. MwSt.. Am Ende" moest "…zzgl. MwSt. Am Ende" worden. Op de
+gerenderde build gemeten: `MwSt..` komt 0× voor.
+
+**Vier mutaties, vier keer rood:** grondslag weg uit de NL-titel, grondslag weg
+uit een DE FAQ-antwoord, de Nederlandse afkorting in het Duits, en grondslag weg
+uit een ES FAQ-antwoord.
+
+Gemeten op de productiebuild, over beide pagina's die het bedrag dragen:
+
+    /en /nl /de /es  services   10 bedragen, 0 zonder grondslag
+    /en /nl /de /es  contact     4 bedragen, 0 zonder grondslag
+
+**Dit is de eerste prijs op deze site met een grondslag ernaast.** Geen enkele
+prijs op `/pricing` draagt er een, gemeten over `pricing.*` in vier talen. Dat
+staat als open punt in `docs/claims.md` — het is geen reden om het hier ook weg
+te laten, maar het is wel een inconsistentie die iemand een keer moet wegnemen.
