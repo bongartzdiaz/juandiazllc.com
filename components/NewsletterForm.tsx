@@ -4,8 +4,13 @@ import { useActionState } from "react";
 import { subscribe, type SubscribeState } from "@/app/actions/subscribe";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 
-// Compact newsletter signup. Writes to Supabase `newsletter_subs`
-// with source tracking. No double-opt-in for now — we're small and
+// Compact newsletter signup. Writes to the `subscribers` table via
+// app/actions/subscribe.ts — single opt-in, no confirmation mail.
+// The double-opt-in route in app/actions/newsletter.ts, which targets
+// `newsletter_subs`, is dead code: that table exists in no schema. Its
+// file header records why, and why this form was pointed at
+// subscribe.ts on 2026-07-21.
+//
 // GDPR-wise a single opt-in is defensible when the signup intent is
 // explicit (email + deliberate click + clear scope in the label).
 // If the list ever gets big enough to migrate to Resend Audiences
