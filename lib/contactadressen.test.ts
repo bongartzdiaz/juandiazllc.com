@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
@@ -78,18 +78,48 @@ function bestanden(map: string): string[] {
 
 type Vondst = { pad: string; adres: string; regel: number };
 
+/* De boom wordt eenmaal ingelezen, niet per test.
+ *
+ * `verzamel()` liep de hele boom opnieuw af en las elk bestand opnieuw bij élke
+ * aanroep — drie keer — en compileerde binnenin een nieuwe RegExp per regel per
+ * bestand: 20.436 compiles per aanroep, 61.308 in totaal. Gemeten over 127
+ * bestanden: 433 ms voor drie aanroepen tegen 162 ms erna, met identieke
+ * uitkomst.
+ *
+ * Dat lost op zichzelf geen time-out van 5 s op, en dat is ook niet de claim.
+ * Deze test viel op 2026-08-21 om met `Test timed out in 5000ms` terwijl hij los
+ * in 776 ms draait; de oorzaak is contentie met de andere vitest-workers tijdens
+ * een koude transform (108 s koud tegen 13 s warm), dezelfde klasse als de
+ * metadatapoort in #182. Wat hier verandert is de marge: het dure werk staat nu
+ * in een `beforeAll` (budget 10 s in plaats van 5 s) en gebeurt één keer in
+ * plaats van drie, dus de speling gaat van ~11x naar ~75x. De asserties meten
+ * daarna alleen nog het filteren.
+ *
+ * Verhoog `testTimeout` hier niet. Dat neemt het rood weg zonder de oorzaak, en
+ * verbergt daarna ook een echte vertraging. */
+type Bron = { pad: string; regels: string[] };
+let BRONNEN: Bron[] = [];
+
+beforeAll(() => {
+  BRONNEN = MAPPEN.flatMap((map) =>
+    bestanden(join(WORTEL, map)).map((pad) => ({
+      pad: relative(WORTEL, pad).split(sep).join("/"),
+      regels: readFileSync(pad, "utf8").split("\n"),
+    })),
+  );
+});
+
 function verzamel(patroon: RegExp, groep: 0 | 1): Vondst[] {
   const uit: Vondst[] = [];
-  for (const map of MAPPEN) {
-    for (const pad of bestanden(join(WORTEL, map))) {
-      const relatief = relative(WORTEL, pad).split(sep).join("/");
-      const regels = readFileSync(pad, "utf8").split("\n");
-      regels.forEach((regel, i) => {
-        for (const m of regel.matchAll(new RegExp(patroon.source, "g"))) {
-          uit.push({ pad: relatief, adres: m[groep], regel: i + 1 });
-        }
-      });
-    }
+  // Eén regex voor de hele scan. `String.prototype.matchAll` kloont hem intern
+  // en zet lastIndex zelf, dus hergebruik tussen regels is veilig.
+  const re = new RegExp(patroon.source, "g");
+  for (const { pad, regels } of BRONNEN) {
+    regels.forEach((regel, i) => {
+      for (const m of regel.matchAll(re)) {
+        uit.push({ pad, adres: m[groep], regel: i + 1 });
+      }
+    });
   }
   return uit;
 }
@@ -99,6 +129,8 @@ const domeinVan = (adres: string) => adres.split("@")[1].toLowerCase();
 describe("contactadressen in geleverde code", () => {
   it("de scan vindt het eigen adres — anders meet hij niets", () => {
     // Zonder deze controle zou een kapotte regex alle tests groen maken.
+    // De eerste assertie scheidt "boom niet ingelezen" van "regex stuk".
+    expect(BRONNEN.length, "beforeAll heeft niets ingelezen").toBeGreaterThan(50);
     const eigen = verzamel(ADRES, 0).filter((v) => domeinVan(v.adres) === EIGEN_DOMEIN);
     expect(eigen.length).toBeGreaterThan(20);
   });
