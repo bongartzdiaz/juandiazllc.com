@@ -121,10 +121,38 @@ const VERREKENING: Record<Locale, RegExp> = {
   es: /se descuenta íntegro/i,
 };
 
-// Een bedrag in welke vorm dan ook.
-const BEDRAG = /(?:€|\$|\bEUR\b)\s?\d|\d[\d.,]*\s?(?:euro|EUR|€)/i;
-
 const WORTEL = join(__dirname, "..", "..");
+
+// Elk bedrag-achtig teken: "€2.500", "2.500 €", "€ 2,500".
+// Moet op een cijfer eindigen, anders eet [\d.,]* de punt aan het eind van
+// de zin op, en leest "€2,500." als een ander bedrag dan "€2,500".
+const BEDRAGEN = /(?:€\s?\d(?:[\d.,]*\d)?|\d(?:[\d.,]*\d)?\s?€)/g;
+
+// De sprintprijs komt uit docs/claims.md en nergens anders vandaan. Bewust
+// geparst en niet overgeschreven: een tweede kopie van dit getal in dit bestand
+// is precies de bugklasse die claims.md bestaat om te voorkomen. Breekt de rij,
+// dan valt deze poort luid om in plaats van een verouderd getal te bewaken.
+function sprintprijsUitClaims(): number {
+  const claims = readFileSync(join(WORTEL, "docs", "claims.md"), "utf8");
+  const m = claims.match(/\|\s*vaste prijs sprint\s*\|\s*\*\*€([\d.]+)\*\*/);
+  if (!m) {
+    throw new Error(
+      "docs/claims.md draagt geen rij `| vaste prijs sprint | **€…** |` meer, " +
+        "terwijl de site een bedrag publiceert. Herstel de rij of haal het bedrag uit de kopij.",
+    );
+  }
+  return Number(m[1].replace(/\./g, ""));
+}
+
+// Opmaak per taal, gelijk aan wat pricing.migration.title al deed: het teken
+// staat in het Duits en Spaans achter het getal.
+function opmaak(bedrag: number, l: Locale): string {
+  const punt = new Intl.NumberFormat("nl-NL").format(bedrag);
+  const komma = new Intl.NumberFormat("en-US").format(bedrag);
+  if (l === "en") return `€${komma}`;
+  if (l === "nl") return `€${punt}`;
+  return `${punt} €`;
+}
 
 describe("wat de diagnosesprint belooft", () => {
   it("elk antwoord dat de sprint noemt, noemt ook wat hij oplevert", () => {
@@ -168,31 +196,52 @@ describe("wat de diagnosesprint belooft", () => {
     }
   });
 
-  it("nergens een bedrag, want de prijs is nog niet beslist", () => {
-    // Eerst bewijzen dat de meetlat werkt. Een lege overtreedslijst uit een
-    // kapotte regex leest hetzelfde als een schone meting.
-    for (const proef of ["vanaf €2.500", "$2,500 flat", "2500 euro", "EUR 2500"]) {
-      expect(BEDRAG.test(proef), `BEDRAG matcht "${proef}" niet`).toBe(true);
-    }
-    expect(BEDRAG.test("een vaste prijs, 30 dagen"), "BEDRAG matcht te breed").toBe(false);
+  it("het bedrag komt uit docs/claims.md, in de opmaak van elke taal", () => {
+    const prijs = sprintprijsUitClaims();
+    expect(prijs, "claims.md levert geen bruikbaar getal").toBeGreaterThan(0);
+
+    // Eerst de meetlatten zelf. Een lege overtreedslijst uit een kapotte regex
+    // of een stille opmaakfout leest hetzelfde als een schone meting.
+    expect(opmaak(2500, "en")).toBe("€2,500");
+    expect(opmaak(2500, "nl")).toBe("€2.500");
+    expect(opmaak(2500, "de")).toBe("2.500 €");
+    expect(opmaak(2500, "es")).toBe("2.500 €");
+    expect("kost €2.500 per traject".match(BEDRAGEN)).toEqual(["€2.500"]);
+    expect("kostet 2.500 € pro Sprint".match(BEDRAGEN)).toEqual(["2.500 €"]);
+    expect("kost €2,500. Dat is het.".match(BEDRAGEN)).toEqual(["€2,500"]);
+    expect("dertig dagen, geen bedrag".match(BEDRAGEN)).toBe(null);
 
     for (const l of LOCALES) {
-      for (const sleutel of ["services.how.s2.body", "services.how.s2.note"] as const) {
-        const v = DICT[l][sleutel];
-        expect(BEDRAG.test(v), `${sleutel} (${l}) draagt een bedrag: "${v}"`).toBe(false);
-      }
-    }
-    for (const [naam, set] of Object.entries(FAQ_SETS)) {
-      for (const l of LOCALES) {
+      const verwacht = opmaak(prijs, l);
+      const kaal = (s: string) => s.replace(/\s/g, "");
+
+      const titel = DICT[l]["services.how.s2.title"];
+      expect(
+        titel.includes(verwacht),
+        `services.how.s2.title (${l}) noemt ${verwacht} niet: "${titel}"`,
+      ).toBe(true);
+
+      let gezien = 0;
+      for (const [naam, set] of Object.entries(FAQ_SETS)) {
         for (const { q, a } of set[l]) {
           if (!NOEMT_SPRINT[l].test(a)) continue;
+          const gevonden = a.match(BEDRAGEN) ?? [];
           expect(
-            BEDRAG.test(a),
-            `${naam}-FAQ (${l}) noemt een bedrag voor de sprint terwijl die prijs ` +
-              `nog niet in docs/claims.md staat — vraag: "${q}"`,
-          ).toBe(false);
+            gevonden.length,
+            `${naam}-FAQ (${l}) noemt de sprint van 30 dagen maar geen bedrag, ` +
+              `terwijl de prijs beslist is — vraag: "${q}"`,
+          ).toBeGreaterThan(0);
+          for (const b of gevonden) {
+            expect(
+              kaal(b),
+              `${naam}-FAQ (${l}) noemt ${b} terwijl docs/claims.md ${verwacht} ` +
+                `zegt — vraag: "${q}"`,
+            ).toBe(kaal(verwacht));
+          }
+          gezien += gevonden.length;
         }
       }
+      expect(gezien, `geen enkel FAQ-antwoord noemt het bedrag voor ${l}`).toBeGreaterThan(0);
     }
   });
 

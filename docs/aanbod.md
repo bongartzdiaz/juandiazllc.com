@@ -228,9 +228,14 @@ binnenkomt — de eerste keer dat de consultancy-kant überhaupt iets meet.
 Geen van deze vier kan uit de repo worden afgeleid, en geen van vieren mag
 verzonnen worden.
 
-1. **Wat kost de diagnostische sprint van 30 dagen?** Eén bedrag. Het gaat eerst
-   in `docs/claims.md` (regel 1), daarna pas in kopij. Zonder dit blijft
-   onderdeel 6 open en blijft een vaste prijs een belofte zonder inhoud.
+1. ~~**Wat kost de diagnostische sprint van 30 dagen?**~~ — **beslist 2026-08-22:
+   €2.500.** Vastgelegd in `docs/claims.md` onder "Wat de diagnosesprint
+   oplevert", dat de enige bron is; `lib/seo/faqs.belofte.test.ts` leest het
+   bedrag daar uit en eist dat elke plek in kopij het in de opmaak van zijn
+   eigen taal herhaalt. **Wat hier nog open staat is de btw-behandeling** —
+   inclusief of exclusief, een verschil van 21%. Geen enkele prijs op deze site
+   draagt vandaag zo'n vermelding, dus €2.500 volgt die conventie tot Juan het
+   tegendeel zegt.
 
 2. **Draag je een garantie, en welke?** De vorm die bij dit aanbod past raakt de
    levering van stap 2, niet de uitkomst. Het is jouw risico, dus jouw keuze; ik
