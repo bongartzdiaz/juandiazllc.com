@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { LOCALES, type Locale } from "@/lib/i18n/dict";
+import { ENKELE_TAAL } from "@/lib/i18n/enkele-taal";
 import { TITLE_SUFFIX } from "@/lib/seo/branding";
 import { getHomeFaq, getContactFaq, getServicesFaq } from "@/lib/seo/faqs";
 
@@ -114,6 +115,12 @@ describe("metadata is per taal geschreven", () => {
   });
 
   for (const { route, bestand } of routes) {
+    // Een route die bewust in één taal bestaat kan per definitie niet per taal
+    // verschillen. Overslaan mag hier alleen omdat lib/i18n/enkele-taal.test.ts
+    // hem STRENGER neemt: 404-poort buiten zijn taal, hreflang beperkt tot die
+    // taal, en een sitemap-entry die hetzelfde zegt. Zonder die drie zou deze
+    // regel een achterdeur zijn om een onvertaalde pagina te verstoppen.
+    if (ENKELE_TAAL[route]) continue;
     it(`${route} — titel en beschrijving verschillen per taal`, async () => {
       const en = await metadataVoor(bestand, "en");
       if (!en) return; // geen generateMetadata: niets te controleren

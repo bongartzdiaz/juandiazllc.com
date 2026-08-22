@@ -6,6 +6,7 @@ import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { faqSchema } from "@/lib/seo/schema";
 import { getServicesFaq } from "@/lib/seo/faqs";
 import { FaqSection } from "@/components/FaqSection";
+import { ScanCallout } from "@/components/ScanCallout";
 import { ResultsStrip } from "@/components/sections/ResultsStrip";
 import { OG_IMAGES } from "@/lib/seo/branding";
 
@@ -157,6 +158,9 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
           <LocaleLink className="btn primary btn-mag" href="/contact?interest=services">
             {t("cta.book")} <span className="arr">→</span>
           </LocaleLink>
+          {/* Lagere drempel dan de knop erboven: wie nog niet wil boeken kan
+              eerst zelf meten. Rendert alleen op /nl — zie ScanCallout. */}
+          <ScanCallout locale={l} />
         </div>
       </section>
       {/* De pagina beschreef vier diensten maar beantwoordde geen koopvraag.

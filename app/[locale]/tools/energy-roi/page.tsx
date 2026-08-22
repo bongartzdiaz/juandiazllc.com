@@ -5,6 +5,7 @@ import { translate } from "@/lib/i18n/dict";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { EnergyRoi, type RoiLabels } from "@/components/calculators/EnergyRoi";
 import { EnergyInsightLinks } from "@/components/EnergyInsightLinks";
+import { ScanCallout } from "@/components/ScanCallout";
 import { OG_IMAGES } from "@/lib/seo/branding";
 
 // Server wrapper for the Energy ROI calculator. Reads the translated
@@ -90,6 +91,7 @@ export default async function EnergyRoiPage({
 
       <section style={{ padding: "40px 40px 80px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <EnergyRoi labels={labels} />
+        <ScanCallout locale={l} />
         <EnergyInsightLinks locale={l} />
       </section>
 
