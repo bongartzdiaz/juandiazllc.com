@@ -3928,6 +3928,25 @@ meldt niets — hij blijft gewoon draaien. Dat leest hetzelfde als een deploy di
 hangt. Enumereer bij een lege uitkomst eerst beide lijsten voordat je concludeert
 dat er iets niet af is; dat kostte hier één aanroep.
 
+**Dat is gemeten, niet beredeneerd.** De poller liep door tot zijn eigen lusgrens:
+
+| | |
+|---|---|
+| pogingen | 40, over ~13 minuten |
+| `vercel=` uit `/check-runs` | **leeg, alle 40 keer** |
+| `combined=` uit `/status` | `success`, vanaf poging 1 |
+| exitcode | **0** |
+
+Geen foutmelding, geen rood, exitcode 0 — alleen een antwoord dat nooit kwam,
+terwijl de deploy die hele dertien minuten live was. Vanaf de kant van de poller
+is "nog niet klaar" niet te onderscheiden van "ik kijk op de verkeerde plek":
+allebei zien eruit als een lege uitkomst.
+
+Wat het onderscheid hier wél droeg was een tweede signaal dat aantoonbaar bewoog.
+`combined=success` stond naast een lege `vercel=`, en die twee spraken elkaar
+vanaf poging 1 tegen. Een poller die één veld leest kan niet merken dat hij het
+verkeerde veld leest.
+
 Dit is de reden dat `audit-productie` en `Vercel` bewust niet in de
 branch-protection-lijst staan — zie de sessie van 19 augustus. De twee gaten
 hangen samen: een check die via een ander endpoint rapporteert dan waar je naar
