@@ -262,6 +262,128 @@ describe("wat de diagnosesprint belooft", () => {
     }
   });
 
+
+  // ── Geen garantie op de uitkomst ────────────────────────────────────────
+  //
+  // Beslist 2026-08-22 (docs/claims.md, "Garantie en capaciteit"): het aanbod
+  // draagt risico-omkering op de LEVERING — het bouwplan blijft van de klant,
+  // de sprintprijs gaat van de bouw af — en belooft daarbovenop géén
+  // resultaat. Op de dag van de beslissing stond er ook niets: nul treffers in
+  // vier talen. Deze poort houdt het zo.
+  //
+  // De scan gaat over het hele woordenboek en niet alleen over de sprintkopij,
+  // want een resultaatbelofte hoort nergens op deze site. `pricing.*` is de
+  // enige uitzondering: dat is DEUS, een ander product met zijn eigen
+  // toezeggingen, en het venster van 30 dagen daar is opzet.
+  // Termen als lijst en niet als één handgeschreven regex, zodat elke term
+  // afzonderlijk bewezen kan worden. De mutatietest liet zien waarom: een
+  // alternatief uit een lange regex halen bleef onopgemerkt, omdat de
+  // positieve controles alleen de terugbetaal-helft raakten. Nu eist de poort
+  // dat élke term aantoonbaar afgaat.
+  const TERMEN: ReadonlyArray<{ term: string; bewijs: string; taal: Locale }> = [
+    { term: "guarantee", bewijs: "results guarantee", taal: "en" },
+    { term: "money.?back", bewijs: "money-back offer", taal: "en" },
+    { term: "refund", bewijs: "30-day refund window", taal: "en" },
+    { term: "no.cure.no.pay", bewijs: "no cure no pay", taal: "en" },
+    { term: "garantie", bewijs: "wij geven garantie", taal: "nl" },
+    { term: "gegarandeerd", bewijs: "resultaat gegarandeerd", taal: "nl" },
+    { term: "geld terug", bewijs: "anders geld terug", taal: "nl" },
+    { term: "terugbetaling", bewijs: "30 dagen terugbetalingsvenster", taal: "nl" },
+    { term: "garantiert", bewijs: "Ergebnis garantiert", taal: "de" },
+    { term: "Geld zur(ü|u)ck", bewijs: "sonst Geld zurück", taal: "de" },
+    { term: "(R|r)ückerstattung", bewijs: "30-Tage-Rückerstattungsfenster", taal: "de" },
+    { term: "Erstattung", bewijs: "volle Erstattung", taal: "de" },
+    { term: "garant(í|i)a", bewijs: "garantía de resultado", taal: "es" },
+    { term: "garantizad", bewijs: "resultado garantizado", taal: "es" },
+    { term: "reembolso", bewijs: "ventana de reembolso de 30 días", taal: "es" },
+    { term: "devoluci(ó|o)n", bewijs: "devolución del importe", taal: "es" },
+  ];
+  const GARANTIETAAL = new RegExp(TERMEN.map((t) => t.term).join("|"), "i");
+  // Sleutels die bewust buiten de scan vallen, met reden én aantal. Een
+  // aantal, want anders lift een tweede, échte belofte onder hetzelfde
+  // voorvoegsel stilzwijgend mee.
+  const BUITEN_SCAN: ReadonlyArray<{ voorvoegsel: string; aantal: number; reden: string }> = [
+    {
+      voorvoegsel: "pricing.",
+      aantal: 1,
+      reden:
+        "DEUS-abonnement, ander product: pricing.faq.a3 noemt bewust een " +
+        "terugbetaalvenster van 30 dagen op een jaarcontract",
+    },
+  ];
+
+  it("geen enkele plek in kopij belooft een resultaat", () => {
+    // Eerst de meetlat. Een lege overtreedslijst uit een kapot patroon leest
+    // hetzelfde als een schone meting, dus de uitzondering doet hier dubbel
+    // werk: hij is tegelijk de positieve controle.
+    for (const { term, bewijs } of TERMEN) {
+      expect(
+        new RegExp(term, "i").test(bewijs),
+        `term "${term}" gaat niet af op zijn eigen bewijs "${bewijs}" — de term is stuk`,
+      ).toBe(true);
+      expect(
+        GARANTIETAAL.test(bewijs),
+        `"${bewijs}" komt niet door GARANTIETAAL — term "${term}" is uit het patroon verdwenen`,
+      ).toBe(true);
+    }
+    expect(
+      GARANTIETAAL.test("een bouwplan met een getal per fase"),
+      "patroon gaat af op gewone kopij",
+    ).toBe(false);
+
+    // Geen enkele test kan zien dat iemand een controle weghaalt die hij niet
+    // verwacht. Vandaar een vastgelegde inventaris: een term schrappen wordt
+    // daarmee een zichtbare bewerking in plaats van stille dekkingsverlies.
+    expect(
+      TERMEN.length,
+      "de termenlijst is gewijzigd — schrap je bewust een term, pas dan dit getal aan",
+    ).toBe(16);
+    for (const l of LOCALES) {
+      expect(
+        TERMEN.filter((t) => t.taal === l).length,
+        `taal ${l} houdt te weinig termen over om een resultaatbelofte te vangen`,
+      ).toBeGreaterThanOrEqual(4);
+    }
+
+    for (const { voorvoegsel, aantal, reden } of BUITEN_SCAN) {
+      for (const l of LOCALES) {
+        const treffers = Object.entries(DICT[l]).filter(
+          ([k, v]) => k.startsWith(voorvoegsel) && GARANTIETAAL.test(v),
+        );
+        expect(
+          treffers.length,
+          `uitzondering "${voorvoegsel}" (${l}) staat op ${aantal} — gevonden ` +
+            `${treffers.length}: ${treffers.map(([k]) => k).join(", ")}. Reden: ${reden}. ` +
+            `Is dit een nieuwe belofte, beslis hem dan eerst in docs/claims.md.`,
+        ).toBe(aantal);
+      }
+    }
+
+    for (const l of LOCALES) {
+      const overtreders = Object.entries(DICT[l]).filter(
+        ([k, v]) =>
+          !BUITEN_SCAN.some(({ voorvoegsel }) => k.startsWith(voorvoegsel)) &&
+          GARANTIETAAL.test(v),
+      );
+      expect(
+        overtreders.map(([k]) => k),
+        `kopij (${l}) belooft een resultaat, terwijl docs/claims.md vastlegt dat ` +
+          `dit aanbod géén uitkomstgarantie draagt`,
+      ).toEqual([]);
+    }
+
+    for (const [naam, set] of Object.entries(FAQ_SETS)) {
+      for (const l of LOCALES) {
+        for (const { q, a } of set[l]) {
+          expect(
+            GARANTIETAAL.test(a),
+            `${naam}-FAQ (${l}) belooft een resultaat — vraag: "${q}"`,
+          ).toBe(false);
+        }
+      }
+    }
+  });
+
   // De kopij mag zijn bron niet overleven. Zelfde vorm als
   // components/sections/ResultsStrip.test.ts: daar bleef de homepage vier
   // cijfers publiceren terwijl claims.md ontkende dat ze bestonden.
@@ -271,7 +393,16 @@ describe("wat de diagnosesprint belooft", () => {
       claims.includes("Wat de diagnosesprint oplevert"),
       "docs/claims.md kent de beslissing niet meer, terwijl de site hem wel publiceert",
     ).toBe(true);
-    for (const woord of ["het eerste onderdeel dat al draait", "volledig van de klant"]) {
+    expect(
+      claims.includes("Garantie en capaciteit"),
+      "docs/claims.md kent de garantie- en capaciteitsbeslissing niet meer",
+    ).toBe(true);
+    for (const woord of [
+      "het eerste onderdeel dat al draait",
+      "volledig van de klant",
+      "garantie op de **uitkomst** | **geen**",
+      "trajecten tegelijk | **drie**",
+    ]) {
       expect(
         claims.includes(woord),
         `docs/claims.md legt "${woord}" niet vast terwijl de kopij het belooft`,

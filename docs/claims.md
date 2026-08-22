@@ -478,6 +478,51 @@ in kopij benoemd worden. De belofte is dat er na dertig dagen iets draait, niet
 wat er draait. Een pagina die het invult, belooft een scope die niet is
 afgesproken.
 
+### Garantie en capaciteit — beslist 2026-08-22
+
+De laatste twee open punten uit `docs/aanbod.md` §5.
+
+| | beslissing | status |
+| --- | --- | --- |
+| garantie op de **uitkomst** | **geen** | ✅ beslist 2026-08-22 door Juan |
+| trajecten tegelijk | **drie** | ✅ beslist 2026-08-22 door Juan |
+
+**Geen uitkomstgarantie is hier een registratie, geen reparatie.** Gemeten op
+2026-08-22 over `lib/i18n/dict.ts` en `lib/seo/faqs.ts` in vier talen: nul
+treffers op garantie-, terugbetaal- of resultaattaal in de sprintkopij. Er stond
+dus niets dat teruggedraaid moest worden. Wat het wél doet is de regel
+vastleggen: **geen enkele plek in kopij mag een resultaat beloven** — geen
+percentage, geen bedrag dat de klant zou besparen, geen "anders geld terug".
+
+De risico-omkering die er wél staat blijft, en raakt de **levering** in plaats
+van de uitkomst: het bouwplan blijft van de klant ook als een ander het
+uitvoert, en de sprintprijs gaat volledig van de bouw af. Zie "Wat de
+diagnosesprint oplevert" hierboven. Dat is een andere belofte dan een
+resultaat, en dat onderscheid is de hele reden dat dit apart is beslist.
+
+**De enige terugbetaal-belofte op deze site gaat niet over de sprint.**
+`pricing.faq.a3` noemt in vier talen een venster van 30 dagen op een
+DEUS-jaarcontract. Dat is een ander product, een andere toezegging, en hij staat
+hier alleen zodat een volgende sessie hem niet als tegenstrijdigheid leest.
+
+**Drie trajecten tegelijk maakt een schaarste-zin toelaatbaar, niet verplicht.**
+Het getal is een echte capaciteitsgrens en dus controleerbaar. Twee grenzen
+horen erbij:
+
+1. **"Nog N plekken vrij" mag niet.** Dat vergt een levende telling van lopende
+   trajecten, en die bestaat nergens in deze repo. Een getal dat niet uit een
+   bron komt is verzonnen, ook als het toevallig klopt.
+2. **De grens knelt vandaag niet.** Gemeten 2026-08-22 op Supabase-project
+   `wbgiouuifqhasedncysw`: `marketing.leads` nul rijen, `marketing.subscribers`
+   nul rijen — beide ooit. Een capaciteitszin is dan positionering: hij zegt
+   wat voor soort traject dit is, niet dat je moet opschieten. Als urgentie
+   geframed zou hij druk suggereren die er niet is, en dat is precies de vorm
+   die vertrouwen kost.
+
+Wat dus wél mag: een statische zin die de werkwijze beschrijft ("drie trajecten
+tegelijk"). Wat niet mag: een teller, een aftelklok, of een zin die suggereert
+dat er nú bijna geen plek is.
+
 ## juandiazllc.com — /pricing (DEUS)
 
 Registered 2026-08-15, after a sweep found this page publishes eight price
