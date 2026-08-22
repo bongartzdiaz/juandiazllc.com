@@ -3671,3 +3671,88 @@ In een dekkingsmeting leest een 404 precies hetzelfde als een ontbrekende
 montage. Lees de lijst uit de bron waar de poort hem ook uit leest.
 
 900 tests in 41 bestanden, was 899/41. `seo-audit` waarschuwingen: 0.
+
+#### PR #224 — wat de sprint oplevert stond al op de homepage, alleen niet aan de sprint geknoopt
+
+Het laatste openstaande punt uit `docs/aanbod.md` §5: stap 2 van de ladder noemde
+geen tastbaar ding. Wat de vraag kleiner maakte dan hij leek, is dat het antwoord
+al in de repo stond.
+
+| waar | wat er stond |
+|---|---|
+| `services.how.s1.body` | stap 1 levert "een diagnose van één pagina" — tastbaar |
+| `services.how.s1.note` | dat gratis gesprek is "de Blueprint-fase van de methode in het klein" |
+| `process.2.body` (homepage, 4 talen) | "Elke fase heeft een getal. Geen vage strategie-deck — een bouwplan dat een aannemer kan lezen." |
+
+Is het gratis gesprek fase 2 *in het klein*, dan is de sprint diezelfde fase op
+ware grootte. Het bouwplan was dus geen nieuwe belofte maar een ontbrekende
+verbinding. Wat er stond was telkens een **toestand** ("beide kanten beperken
+het risico"), in vier talen en in acht FAQ-antwoorden. Waar, maar niet vast te
+houden.
+
+**Beslist door Juan op 2026-08-22**, drie punten, eerst in `docs/claims.md` en
+pas daarna in kopij: het bouwplan **plus het eerste onderdeel dat al draait**;
+allebei volledig eigendom van de klant, ook als een ander het uitvoert; en de
+sprintprijs gaat er volledig vanaf als de bouw volgt.
+
+**Wat er bewust niet in staat is een bedrag.** De vaste prijs is nog onbeslist
+(`docs/aanbod.md` §5.1), en dat is nu de enige blokkade voor een getal in kopij.
+"Vaste prijs" mag wel: dat beschrijft een vorm. Wat het werkende onderdeel ís,
+wisselt per traject en mag daarom nergens ingevuld worden — de belofte is dat er
+na dertig dagen iets draait, niet wát er draait.
+
+#### De poort noemt de voorwaarde, niet de formulering
+
+`lib/seo/faqs.belofte.test.ts` bewaakte al één belofte over het blueprint-gesprek
+(één pagina, niet twee). Daar staat nu een tweede blok naast met vier eisen:
+een antwoord dat de sprint van dertig dagen noemt, noemt ook wat hij oplevert;
+de ladder draagt in vier talen de deliverable plus beide toezeggingen; nergens
+staat een bedrag; en `docs/claims.md` draagt de beslissing nog. Die laatste is
+de `ResultsStrip`-vorm: kopij mag zijn bron niet overleven.
+
+Twee dingen zitten er bewust in. De sprint-regex is **smal** — alleen de
+volledige aanduiding telt, zodat een prijszin als "de diagnosesprint heeft een
+vaste prijs" de deliverable niet hoeft te herhalen. En de bedrag-regex draagt
+vier positieve proeven, want een lege overtreedslijst uit een kapotte regex leest
+hetzelfde als een schone meting.
+
+**Vijf mutaties, vijf keer rood, elk met een andere assertie:** deliverable weg
+uit een NL-antwoord, `s2.note` weg voor Duits, een bedrag in de Engelse
+`s2.body`, de beslissing weg uit `claims.md`, en de sprint-regex stuk (die ging
+af op de positieve controle, `expected 6 to be 8`). Elke mutatie eiste dat het
+bestand aantoonbaar veranderde; hersteld uit een kopie in de scratchpad.
+
+#### De ladder rendert notities nu uit een verzameling, niet uit een gelijkheid
+
+`s === "s1"` is `MET_NOTITIE.has(s)` geworden. Expliciete verzameling en geen
+opzoeking-met-terugval, want `translate()` valt bij een ontbrekende sleutel terug
+op Engels en ontbreekt hij daar ook, dan rendert de sleutelnaam zelf op de
+pagina. Staat s3 niet in de verzameling, dan wordt er nooit naar een s3-notitie
+gezocht. Gemeten in de DOM: kaart 1 en 2 dragen twee alinea's, kaart 3 één, en
+`services.how.s*.note` komt 0× als kale tekst voor.
+
+#### Er luisterde al iets op 3200
+
+De eerste meting gaf nul treffers op de nieuwe kopij terwijl de bron hem wel
+droeg. Niet de build was stuk: `next start -p 3200` kreeg `EADDRINUSE`
+(errno −4091) omdat er nog een server van eerder die sessie op die poort stond,
+en mijn `until curl`-lus slaagde meteen — op de oude server. Ik mat dus een
+build van uren eerder.
+
+Dat is dezelfde klasse als de verouderde `.next`, maar één laag naar buiten: niet
+de cache was oud, de **luisteraar** was oud. Een `curl` die slaagt bewijst dat er
+iets antwoordt, niet dat jóuw proces antwoordt. Lees het startlog, of kies een
+vrije poort — ik nam 3211 in plaats van een proces te doden dat ik niet volledig
+kon toeschrijven.
+
+#### Meting
+
+904 tests in 41 bestanden, was 900/41. i18n 697 sleutels × 4, was 696 — de plus is
+`services.how.s2.note`. Typecheck schoon, prijsgenerator groen, build groen.
+`seo-audit` tegen die build: **waarschuwingen 0, notities 0**; de 177
+canonical-fouten zijn het bekende meetartefact.
+
+Op de productiebuild in vier talen gemeten: de deliverable staat in
+`services.how.s2.body`, beide toezeggingen in `s2.note`, geen kale sleutels, en
+op 375 px geen horizontale overloop (kaarten 295 px breed, kaart 2 nu 308 px hoog
+tegen 306 voor kaart 1). Geen console-fouten.

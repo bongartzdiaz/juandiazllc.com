@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { LOCALES } from "@/lib/i18n/dict";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { DICT, LOCALES, type Locale } from "@/lib/i18n/dict";
 import {
   HOME_FAQ_BY_LOCALE,
   CONTACT_FAQ_BY_LOCALE,
@@ -62,6 +64,152 @@ describe("wat het blueprint-gesprek belooft", () => {
           (l, i) => `${l}=${lengtes[i]}`,
         ).join(", ")}`,
       ).toBe(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Wat de diagnosesprint belooft — poort sinds 2026-08-22
+//
+// Tot die datum beschreef elke oppervlakte de sprint als een *toestand*
+// ("beide kanten beperken het risico voordat er gebouwd wordt") en zei geen
+// enkele wat je na dertig dagen in handen hebt. Stap 1 van de ladder noemde
+// wél een tastbaar ding en stap 3 ook; stap 2 was het gat, in vier talen en
+// op twee FAQ-sets tegelijk.
+//
+// De beslissing staat in docs/claims.md onder "Wat de diagnosesprint
+// oplevert". Deze poort bewaakt niet de formulering — die mag per taal
+// verschillen — maar drie dingen die uiteen kunnen lopen:
+//
+//   1. een antwoord dat de sprint noemt, noemt ook wat hij oplevert;
+//   2. de ladder draagt de twee toezeggingen die de stap omkeerbaar maken;
+//   3. er staat nergens een bedrag, want dat is nog niet beslist.
+//
+// Punt 3 is de rule-1-poort van docs/claims.md op deze ene belofte: "vaste
+// prijs" beschrijft een vorm en mag, een getal mag pas nadat het in claims.md
+// staat.
+
+// Noemt dit antwoord de sprint van dertig dagen? Bewust smal: alleen de
+// volledige aanduiding telt. "De diagnosesprint heeft een vaste prijs" is een
+// prijszin en hoeft de deliverable niet te herhalen.
+const NOEMT_SPRINT: Record<Locale, RegExp> = {
+  en: /30-day diagnostic sprint/i,
+  nl: /diagnosesprint van 30 dagen/i,
+  de: /30-tägige[rn]? Diagnose-Sprint/i,
+  es: /sprint de diagnóstico de 30 días/i,
+};
+
+// Noemt het het ding dat je overhoudt?
+const NOEMT_DELIVERABLE: Record<Locale, RegExp> = {
+  en: /build plan/i,
+  nl: /bouwplan/i,
+  de: /Bauplan/i,
+  es: /plan de obra/i,
+};
+
+// De twee toezeggingen uit de beslissing van 2026-08-22.
+const EIGENDOM: Record<Locale, RegExp> = {
+  en: /yours/i,
+  nl: /van jou/i,
+  de: /gehört Ihnen/i,
+  es: /es tuyo/i,
+};
+const VERREKENING: Record<Locale, RegExp> = {
+  en: /comes off it in full/i,
+  nl: /volledig vanaf/i,
+  de: /vollständig angerechnet/i,
+  es: /se descuenta íntegro/i,
+};
+
+// Een bedrag in welke vorm dan ook.
+const BEDRAG = /(?:€|\$|\bEUR\b)\s?\d|\d[\d.,]*\s?(?:euro|EUR|€)/i;
+
+const WORTEL = join(__dirname, "..", "..");
+
+describe("wat de diagnosesprint belooft", () => {
+  it("elk antwoord dat de sprint noemt, noemt ook wat hij oplevert", () => {
+    let gezien = 0;
+    for (const [naam, set] of Object.entries(FAQ_SETS)) {
+      for (const l of LOCALES) {
+        for (const { q, a } of set[l]) {
+          if (!NOEMT_SPRINT[l].test(a)) continue;
+          gezien++;
+          expect(
+            NOEMT_DELIVERABLE[l].test(a),
+            `${naam}-FAQ (${l}) noemt de sprint van 30 dagen maar niet wat hij ` +
+              `oplevert — vraag: "${q}"`,
+          ).toBe(true);
+        }
+      }
+    }
+    // Positieve controle. Zonder deze slaagt de lus ook wanneer NOEMT_SPRINT
+    // door een hernoeming nergens meer op matcht, en dan bewaakt hij niets.
+    expect(gezien, "geen enkel FAQ-antwoord noemt de sprint — is de regex stuk?").toBe(8);
+  });
+
+  it("de ladder noemt de deliverable en beide toezeggingen, in vier talen", () => {
+    for (const l of LOCALES) {
+      const body = DICT[l]["services.how.s2.body"];
+      const note = DICT[l]["services.how.s2.note"];
+      expect(body, `services.how.s2.body ontbreekt voor ${l}`).toBeTruthy();
+      expect(note, `services.how.s2.note ontbreekt voor ${l}`).toBeTruthy();
+      expect(
+        NOEMT_DELIVERABLE[l].test(body),
+        `services.how.s2.body (${l}) noemt het bouwplan niet: "${body}"`,
+      ).toBe(true);
+      expect(
+        EIGENDOM[l].test(note),
+        `services.how.s2.note (${l}) zegt niet dat het plan van de klant blijft: "${note}"`,
+      ).toBe(true);
+      expect(
+        VERREKENING[l].test(note),
+        `services.how.s2.note (${l}) noemt de verrekening niet: "${note}"`,
+      ).toBe(true);
+    }
+  });
+
+  it("nergens een bedrag, want de prijs is nog niet beslist", () => {
+    // Eerst bewijzen dat de meetlat werkt. Een lege overtreedslijst uit een
+    // kapotte regex leest hetzelfde als een schone meting.
+    for (const proef of ["vanaf €2.500", "$2,500 flat", "2500 euro", "EUR 2500"]) {
+      expect(BEDRAG.test(proef), `BEDRAG matcht "${proef}" niet`).toBe(true);
+    }
+    expect(BEDRAG.test("een vaste prijs, 30 dagen"), "BEDRAG matcht te breed").toBe(false);
+
+    for (const l of LOCALES) {
+      for (const sleutel of ["services.how.s2.body", "services.how.s2.note"] as const) {
+        const v = DICT[l][sleutel];
+        expect(BEDRAG.test(v), `${sleutel} (${l}) draagt een bedrag: "${v}"`).toBe(false);
+      }
+    }
+    for (const [naam, set] of Object.entries(FAQ_SETS)) {
+      for (const l of LOCALES) {
+        for (const { q, a } of set[l]) {
+          if (!NOEMT_SPRINT[l].test(a)) continue;
+          expect(
+            BEDRAG.test(a),
+            `${naam}-FAQ (${l}) noemt een bedrag voor de sprint terwijl die prijs ` +
+              `nog niet in docs/claims.md staat — vraag: "${q}"`,
+          ).toBe(false);
+        }
+      }
+    }
+  });
+
+  // De kopij mag zijn bron niet overleven. Zelfde vorm als
+  // components/sections/ResultsStrip.test.ts: daar bleef de homepage vier
+  // cijfers publiceren terwijl claims.md ontkende dat ze bestonden.
+  it("docs/claims.md draagt de beslissing waar deze kopij op leunt", () => {
+    const claims = readFileSync(join(WORTEL, "docs", "claims.md"), "utf8");
+    expect(
+      claims.includes("Wat de diagnosesprint oplevert"),
+      "docs/claims.md kent de beslissing niet meer, terwijl de site hem wel publiceert",
+    ).toBe(true);
+    for (const woord of ["het eerste onderdeel dat al draait", "volledig van de klant"]) {
+      expect(
+        claims.includes(woord),
+        `docs/claims.md legt "${woord}" niet vast terwijl de kopij het belooft`,
+      ).toBe(true);
     }
   });
 });
