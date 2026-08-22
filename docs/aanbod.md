@@ -228,6 +228,9 @@ binnenkomt — de eerste keer dat de consultancy-kant überhaupt iets meet.
 Geen van deze vier kan uit de repo worden afgeleid, en geen van vieren mag
 verzonnen worden.
 
+**Stand 2026-08-22: alle vier beslist.** Elke beslissing staat in
+`docs/claims.md`, dat de enige bron is; dit document verwijst er alleen naar.
+
 1. ~~**Wat kost de diagnostische sprint van 30 dagen?**~~ — **beslist 2026-08-22:
    €2.500.** Vastgelegd in `docs/claims.md` onder "Wat de diagnosesprint
    oplevert", dat de enige bron is; `lib/seo/faqs.belofte.test.ts` leest het
@@ -236,17 +239,21 @@ verzonnen worden.
    beslist op 2026-08-22, en staat overal waar het bedrag staat — in de vorm die
    in die taal gangbaar is.
 
-2. **Draag je een garantie, en welke?** De vorm die bij dit aanbod past raakt de
-   levering van stap 2, niet de uitkomst. Het is jouw risico, dus jouw keuze; ik
-   kan de gangbare vormen naast elkaar zetten met wat elk kost als het misgaat,
-   maar de knoop is niet van mij. **Gedeeltelijk beantwoord op 2026-08-22:** dat
-   het bouwplan van de klant blijft en dat de sprintprijs volledig wordt
-   verrekend, is risico-omkering op de levering. Open blijft of je daarbovenop
-   iets over de uitkomst belooft.
+2. ~~**Draag je een garantie, en welke?**~~ — **beslist 2026-08-22: geen
+   garantie op de uitkomst.** De risico-omkering op de *levering* blijft staan:
+   het bouwplan blijft van de klant ook als een ander het uitvoert, en de
+   sprintprijs gaat volledig van de bouw af. Daarbovenop wordt geen resultaat
+   beloofd. Gemeten op dezelfde dag stond er ook niets: nul treffers op
+   garantie-, terugbetaal- of resultaattaal in de sprintkopij, in vier talen.
+   Het is dus een registratie en geen reparatie — vastgelegd in
+   `docs/claims.md` onder "Garantie en capaciteit".
 
-3. **Hoeveel trajecten draag je tegelijk?** Een getal maakt de schaarste echt en
-   controleerbaar. Zonder getal is elke urgentie-zin een constructie, en dan
-   hoort hij er niet te staan.
+3. ~~**Hoeveel trajecten draag je tegelijk?**~~ — **beslist 2026-08-22: drie.**
+   Daarmee is een schaarste-zin toelaatbaar, want het getal is een echte
+   capaciteitsgrens. Twee grenzen horen erbij en staan in `docs/claims.md`:
+   "nog N plekken vrij" mag niet, want er is geen levende telling van lopende
+   trajecten; en de grens knelt vandaag niet, want `marketing.leads` staat op
+   nul rijen. Een capaciteitszin is dus positionering, geen urgentie.
 
 4. ~~**Wat ligt er na dertig dagen op tafel?**~~ — **beslist 2026-08-22.** Het
    bouwplan met een getal per fase, plus het eerste onderdeel dat al draait.

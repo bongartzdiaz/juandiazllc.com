@@ -3978,3 +3978,93 @@ document, want dat is één regel en `.*` is hebzuchtig. De sonde gebruikt daaro
 git-bash zet dat op `C:/Users/LENOVO/AppData/Local/Temp`, te vinden met
 `pwd -W`. Allebei staan ze al eerder in dit logboek; allebei kostten ze opnieuw
 een ronde.
+
+### 2026-08-22 (vervolg) — de laatste twee aanbodbeslissingen, en een poort die twee keer te zwak bleek
+
+Juan besliste §5.2 en §5.3 van `docs/aanbod.md`: **geen garantie op de uitkomst**,
+en **drie trajecten tegelijk**. Daarmee staan alle vier de beslissingen uit dat
+hoofdstuk dicht. Vastgelegd in `docs/claims.md` onder "Garantie en capaciteit";
+`aanbod.md` verwijst er alleen naar.
+
+#### Geen uitkomstgarantie was een registratie, geen reparatie
+
+Eerst gemeten of de site al ergens een resultaat belooft. Over `lib/i18n/dict.ts`
+en `lib/seo/faqs.ts` in vier talen: **nul treffers** op garantie-, terugbetaal- of
+resultaattaal in de sprintkopij. Er stond dus niets dat teruggedraaid moest
+worden — het antwoord legt een regel vast in plaats van een fout te herstellen.
+
+De enige terugbetaal-belofte op de site is `pricing.faq.a3`: een venster van 30
+dagen op een DEUS-**jaarcontract**. Ander product, andere toezegging. Die staat nu
+expliciet als uitzondering in de poort, mét reden en aantal, zodat een volgende
+sessie hem niet als tegenstrijdigheid leest en er ook geen tweede belofte
+stilzwijgend onder hetzelfde voorvoegsel meelift.
+
+Wat wél blijft is de risico-omkering op de **levering**: het bouwplan blijft van
+de klant ook als een ander het uitvoert, en de sprintprijs gaat volledig van de
+bouw af. Dat is een andere belofte dan een resultaat, en dat onderscheid is de
+reden dat dit apart beslist moest worden.
+
+#### Drie trajecten maakt een schaarste-zin toelaatbaar, niet verplicht
+
+Het getal is een echte capaciteitsgrens, dus controleerbaar. Twee grenzen staan
+in `claims.md`:
+
+1. **"Nog N plekken vrij" mag niet.** Dat vergt een levende telling van lopende
+   trajecten, en die bestaat nergens in deze repo. Een getal zonder bron is
+   verzonnen, ook als het toevallig klopt.
+2. **De grens knelt vandaag niet.** Gemeten 2026-08-22 op Supabase-project
+   `wbgiouuifqhasedncysw`: `marketing.leads` nul rijen, `marketing.subscribers`
+   nul rijen — beide ooit. Een capaciteitszin is dan positionering en geen
+   urgentie. Als urgentie geframed zou hij druk suggereren die er niet is.
+
+Er is daarom **geen kopij geschreven**. De beslissing staat vast; of hij de site
+op gaat is een aparte keuze.
+
+#### De poort ging twee keer nét niet ver genoeg, en de mutatietest wees allebei aan
+
+`lib/seo/faqs.belofte.test.ts` scant nu het hele woordenboek op resultaattaal.
+Twee keer bleek de eerste versie te zwak, en geen van beide was aan de assertie te
+zien — alleen aan een mutatie die groen bleef.
+
+**Eerst: de positieve controles dekten maar de helft van het patroon.** Een term
+uit de garantie-helft schrappen veranderde niets aan de uitkomst, want alle vier
+de controles gebruikten terugbetaal-woorden. Het patroon wordt nu uit een
+**termenlijst** gebouwd, en de poort eist dat élke term afgaat op zijn eigen
+bewijstekst. Een term die stukgaat is daarmee zichtbaar in plaats van stil.
+
+**Daarna: geen test kan zien dat je een controle wéghaalt die hij niet verwacht.**
+De hele term uit de lijst schrappen bleef groen — er was geen verwachting om
+tegen af te zetten. Dat vraagt een vastgelegde inventaris: 16 termen, minstens 4
+per taal. Een term schrappen dwingt nu een zichtbare bewerking van dat getal af.
+
+Acht mutaties, acht keer rood, elk met een ándere assertie: belofte in een
+FAQ-antwoord, belofte in een dict-sleutel, de DEUS-uitzondering weg (telt dan 0),
+een term uit de lijst, een bewijs losgekoppeld van zijn term, een taal-tag
+verschoven, de kop weg uit `claims.md`, en de rij "trajecten tegelijk" gewijzigd.
+
+#### Drie keer brak mijn eigen gereedschap, en één keer op de bekendste manier
+
+**Het tagging-script matchte op substring.** Bij het labelen van elke term met
+zijn taal koos ik de eerste treffer uit een lijst — en `"garantie"` zit ín
+`"garantiert"`, dus het Duitse woord kreeg het Nederlandse label. Duits hield
+daardoor drie termen over in plaats van vier. De inventaris-assertie die ik net
+had geschreven ving het meteen: `expected 3 to be greater than or equal to 4`.
+Een poort die zijn eigen invoer controleert, betaalt zich binnen de minuut terug.
+
+**Twee mutaties waren stuk in plaats van de poort.** `GARANTIETAAL_UIT = /zzz/i`
+tóevoegen laat `GARANTIETAAL` gewoon staan, en `"Garantie en capaciteitXX"` bevat
+nog steeds `"Garantie en capaciteit"`, dus de substring-check haalde het terecht.
+Allebei zagen ze eruit als een zwakke poort. **Leg de verwachte kleur vooraf vast
+en verklaar elke afwijking** — anders repareer je het verkeerde ding.
+
+**En de heredoc halveerde opnieuw een dubbele backslash.** Wat ik als `\\n` typte
+bereikte Python als `\n` en werd een echte newline, waardoor het mutatiescript
+niet meer compileerde. Dat staat al in dit logboek van 20 augustus; het kostte
+opnieuw een ronde. De uitweg is dezelfde: geen escapes gebruiken — hier werd de
+term simpelweg door een lege regel vervangen, wat geldige TypeScript is.
+
+#### Meting
+
+905 tests in 41 bestanden, was 904. tsc schoon, i18n 697 × 4, prijsgenerator
+groen, `CLAUDE.md` == `AGENTS.md`. Drie bestanden geraakt plus dit logboek; de
+drie langlopende scratch-mappen staan bewust buiten de commit.
