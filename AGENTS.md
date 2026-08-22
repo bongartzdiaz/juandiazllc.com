@@ -3652,4 +3652,22 @@ treffers — geminificeerde HTML is één regel, dus die “1” zei niets. Opni
 gemeten met `grep -o | wc -l`: 1 anchor per NL-energiepost, 0 op de twee
 NL-niet-energieposts, 0 op de DE- en ES-posts, 0 op elke `/en`- en `/de`-variant.
 
+**Op productie nagemeten, ná de deploy.** De eerste probe gaf nul anchors op
+élke URL, ook op `/nl/services`, dat de knop sinds #221 al droeg. Dat was geen
+defect maar een te vroege meting: de productie-deploy van `3e4efc3` was net
+aangemaakt en stond nog te bouwen. Pas met de uitgeleverde SHA gelijk aan `main`:
+
+    vijf NL-energieposts       1 anchor elk
+    twee NL-niet-energieposts  0
+    DE- en ES-energieposts     0 — ook de kale tekst `lekkage-scan` staat er niet
+    /en                        0
+    /nl/tools/lekkage-scan     200 · canonical op juandiazllc.com · hreflang nl + x-default
+    /de/tools/lekkage-scan     404
+    sitemap                    177 URL's, de scan alleen onder /nl
+
+**Twee slugs in die eerste probe bestonden niet.** Ik typte ze uit het hoofd in
+plaats van ze uit `getAllInsights("nl")` te lezen, en kreeg twee keer 404 terug.
+In een dekkingsmeting leest een 404 precies hetzelfde als een ontbrekende
+montage. Lees de lijst uit de bron waar de poort hem ook uit leest.
+
 900 tests in 41 bestanden, was 899/41. `seo-audit` waarschuwingen: 0.
