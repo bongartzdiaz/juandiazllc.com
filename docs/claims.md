@@ -440,6 +440,39 @@ Wat ontbrak was de verbinding, niet de inhoud.
 onbeslist — zie `docs/aanbod.md` §5.1. "Vaste prijs" mag in kopij omdat het een
 vorm beschrijft en geen getal; een bedrag mag pas nadat het hier staat.
 
+**De vaste prijs is beslist op 2026-08-22.**
+
+| | waarde | status |
+| --- | --- | --- |
+| vaste prijs sprint | **€2.500** | ✅ beslist 2026-08-22 door Juan |
+| btw-behandeling | **exclusief btw** | ✅ beslist 2026-08-22 door Juan |
+
+Dat bedrag is de enige bron. `lib/seo/faqs.belofte.test.ts` leest het hier uit
+en eist dat elke plek in kopij die een bedrag bij de sprint noemt, precies dit
+bedrag noemt — in de opmaak van zijn eigen taal. Wijzig je de prijs, wijzig hem
+dan híer; de poort maakt het verschil hoorbaar in plaats van stil.
+
+**Opmaak per taal**, gelijk aan wat `pricing.migration.title` al deed:
+`€2,500` (en) · `€2.500` (nl) · `2.500 €` (de) · `2.500 €` (es). Het Duitse en
+Spaanse teken staat achter het getal, want dat is daar de conventie.
+
+**De btw-behandeling is exclusief, en staat overal waar het bedrag staat.**
+Beslist op 2026-08-22. Elke plek die €2.500 noemt draagt de grondslag ernaast,
+in de vorm die in die taal gangbaar is: `excl. VAT` (en) · `excl. btw` (nl) ·
+`zzgl. MwSt.` (de) · `más IVA` (es). Het Duits gebruikt bewust niet "excl.",
+want dat is geen Duits; `zzgl.` is de zakelijke standaardafkorting.
+
+**Dit is de eerste prijs op deze site met een grondslag ernaast.** Gemeten
+2026-08-22 over `pricing.*` in vier talen droeg geen enkele andere prijs zo'n
+vermelding. Dat is een open punt voor de DEUS-prijspagina, geen reden om het
+hier ook weg te laten — het verschil is 21%: €2.500 tegen €3.025.
+
+Dit is niet theoretisch. De Educational-tier van Diaz Editor stond als €500 op
+de pagina terwijl Stripe hem exclusief afrekende, dus een school betaalde €605
+aan de kassa (zie "Diaz Editor — pricing" hierboven). Dat is met een nieuwe
+prijs hersteld, omdat `tax_behavior` bij Stripe onveranderlijk is.
+
+
 **Wat het werkende onderdeel is, wisselt per traject**, en mag daarom nergens
 in kopij benoemd worden. De belofte is dat er na dertig dagen iets draait, niet
 wat er draait. Een pagina die het invult, belooft een scope die niet is

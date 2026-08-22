@@ -3756,3 +3756,119 @@ Op de productiebuild in vier talen gemeten: de deliverable staat in
 `services.how.s2.body`, beide toezeggingen in `s2.note`, geen kale sleutels, en
 op 375 px geen horizontale overloop (kaarten 295 px breed, kaart 2 nu 308 px hoog
 tegen 306 voor kaart 1). Geen console-fouten.
+
+#### PR #225 — de prijs, en een poort die van richting omdraaide
+
+De sprint kost **€2.500**, beslist door Juan op 2026-08-22. Daarmee is
+`docs/aanbod.md` §5.1 dicht en staat het bedrag op `/services` in vier talen: in
+de titel van stap 2 en in de drie FAQ-antwoorden die de sprint noemen.
+
+**De poort van een uur eerder moest omkeren.** Die verbood *elk* bedrag in de
+sprintkopij, omdat de prijs nog niet beslist was. Nu eist hij het omgekeerde:
+elk bedrag dat bij de sprint staat is precies het bedrag uit `docs/claims.md`,
+in de opmaak van zijn eigen taal, en er moet er één staan. Dat is strikt sterker
+dan het verbod, want het dekt ook de stille variant — een prijs die in één taal
+achterblijft bij een wijziging.
+
+**Het getal wordt geparst, niet overgeschreven.** De poort leest de rij
+`| vaste prijs sprint | **€2.500** |` uit `claims.md` en leidt daar de vier
+taalvormen uit af. Een constante in het testbestand zou een tweede kopie van
+hetzelfde getal zijn geweest, en dat is precies de bugklasse waarvoor
+`claims.md` bestaat. Verdwijnt de rij, dan gooit de poort met een zin die zegt
+wat te doen, in plaats van stil een verouderd getal te bewaken.
+
+**Opmaak per taal was geen detail.** `pricing.migration.title` deed het al voor:
+`€1,500` (en) · `€1.500` (nl) · `1.500 €` (de) · `1.500 €` (es). In het Duits en
+Spaans staat het teken achter het getal. Eén van de vijf mutaties zet daarom de
+Nederlandse vorm in de Duitse titel; die gaat af.
+
+#### De poort ving zijn eigen regex
+
+Eerste run rood op `expected '€2,500.' to be '€2,500'`. `[\d.,]*` at de punt aan
+het eind van de zin mee, dus "€2,500." las als een ánder bedrag dan "€2,500". Een
+bedrag moet op een cijfer eindigen: `\d(?:[\d.,]*\d)?`. Dat geval staat nu als
+proef in de poort, want het is precies het soort verschil dat een prijscontrole
+waardeloos maakt zonder dat iemand het merkt.
+
+**Vijf mutaties, vijf keer rood:** prijs alleen in `claims.md` gewijzigd, prijs
+alleen in de NL-titel gewijzigd, bedrag weg uit een NL FAQ-antwoord, de rij weg
+uit `claims.md`, en de Nederlandse opmaak in de Duitse titel. De eerste twee zijn
+elkaars spiegelbeeld en dat is opzet: de poort moet drift in beide richtingen
+zien, niet alleen kopij die achterloopt.
+
+#### De btw-behandeling staat nergens, en dat is een keuze die nog niet gemaakt is
+
+Gemeten over `pricing.*` in vier talen: **geen enkele prijs op deze site draagt
+een incl./excl.-vermelding.** €2.500 volgt die conventie. Verdedigbaar voor een
+zakelijke koper, maar het is 21% verschil — €2.500 tegen €3.025 — en de keuze is
+niet gemaakt. Dat staat als open punt in `claims.md`, niet als aanname in kopij.
+
+Dit is niet theoretisch. De Educational-tier van Diaz Editor stond als €500 op
+de pagina terwijl Stripe hem exclusief afrekende, dus een school betaalde €605
+aan de kassa. Eén woord van Juan sluit het.
+
+#### Twee meters braken, allebei stil
+
+**Een raw string in Python at de escape niet af.** `r'...€...'` bevat
+letterlijk backslash-u, geen euroteken, dus de vervanging vond zijn anker niet en
+meldde `regex-anker 0x`. Luid, want de assertie stond er — zonder die assertie was
+het een stille no-op geweest. Euroteken sindsdien via `chr(0x20AC)` buiten de raw
+string gehouden.
+
+**`sed 's/<script[^>]*>.*<\/script>//g'` at de hele pagina op.** Geminificeerde
+HTML is één regel, dus `.*` liep van het eerste script-tag tot het laatste — dat
+is vrijwel het hele document. De uitkomst was "nul bedragen op de pagina", wat
+identiek leest aan een schone meting. Gemeten in de DOM met `innerText` staat er
+wat er hoort te staan.
+
+#### Meting
+
+904 tests in 41 bestanden en 697 sleutels × 4 — beide onveranderd, want dit zijn
+gewijzigde waardes en geen nieuwe sleutels. Typecheck schoon, prijsgenerator
+groen, build groen.
+
+In de DOM op 375 px, na het openvouwen van de FAQ:
+
+    /nl/services   €2.500  ·  kaart 02: "Diagnosesprint — 30 dagen, €2.500"
+    /de/services   2.500 € (3x)  ·  kaart 02: "Diagnose-Sprint — 30 Tage, 2.500 €"
+    beide          geen horizontale overloop, geen console-fouten
+
+Het enige andere bedrag in de zichtbare tekst is `€0`, de vierde bevestigde
+klantuitkomst uit `claims.md` ("additional SaaS spend; retired tools funded the
+rebuild"), al gedekt door `ResultsStrip.test.ts`.
+
+#### En de btw-grondslag, in dezelfde PR
+
+Juan antwoordde tijdens de CI-run: **exclusief btw.** Dat is in #225 zelf
+meegenomen en niet in een volg-PR, want anders serveert productie een tijdje een
+bedrag zonder grondslag — precies de toestand die de Educational-tier van Diaz
+Editor €105 per verkoop kostte.
+
+**De vorm verschilt per taal en dat is geen stijlkwestie.** `excl. VAT` (en) ·
+`excl. btw` (nl) · `zzgl. MwSt.` (de) · `más IVA` (es). Het Duits gebruikt
+bewust niet "excl.", want dat is geen Duits; `zzgl.` is de zakelijke
+standaardafkorting. Eén van de vier mutaties zet de Nederlandse afkorting in de
+Duitse titel, en die gaat af.
+
+**Zestien plekken, niet één.** De grondslag staat naast élk bedrag en niet
+alleen in de titel van de ladder, want `/contact` draagt hetzelfde
+FAQ-antwoord zonder die titel ernaast. Een bedrag dat op één pagina zijn
+grondslag heeft en op een andere niet, is op die tweede pagina misleidend.
+
+Het Duits vroeg punctuatie-zorg: `zzgl. MwSt.` eindigt zelf op een punt, dus
+"…für 2.500 € zzgl. MwSt.. Am Ende" moest "…zzgl. MwSt. Am Ende" worden. Op de
+gerenderde build gemeten: `MwSt..` komt 0× voor.
+
+**Vier mutaties, vier keer rood:** grondslag weg uit de NL-titel, grondslag weg
+uit een DE FAQ-antwoord, de Nederlandse afkorting in het Duits, en grondslag weg
+uit een ES FAQ-antwoord.
+
+Gemeten op de productiebuild, over beide pagina's die het bedrag dragen:
+
+    /en /nl /de /es  services   10 bedragen, 0 zonder grondslag
+    /en /nl /de /es  contact     4 bedragen, 0 zonder grondslag
+
+**Dit is de eerste prijs op deze site met een grondslag ernaast.** Geen enkele
+prijs op `/pricing` draagt er een, gemeten over `pricing.*` in vier talen. Dat
+staat als open punt in `docs/claims.md` — het is geen reden om het hier ook weg
+te laten, maar het is wel een inconsistentie die iemand een keer moet wegnemen.
