@@ -4158,3 +4158,115 @@ na de ladder-notitie. Op 375 px meet de alinea 295 × 120 px, dezelfde kleur als
 de notitie erboven, geen horizontale overloop, geen kale sleutel op de pagina. En
 op `/nl/contact` staat het bestaande capaciteitsblok ongewijzigd — "2/4 plekken
 over · Vier blueprint-trajecten per kwartaal" — zoals bedoeld.
+
+### 2026-08-23 — twee capaciteitsgetallen tot één teruggebracht, en twee gaten die daarbij opvielen
+
+PR #228 liet een openstaande vraag achter: `/contact` zei vier
+blueprint-gesprekken per kwartaal, `/services` drie trajecten tegelijk. Juan
+heeft ze gelijkgetrokken. De uitvoering was klein; wat eronder zat niet.
+
+#### Wat er stond
+
+| | `/contact` (`Capacity.tsx`) | `/services` (`services.how.capaciteit`) |
+|---|---|---|
+| getal | `TOTAL_SLOTS = 4`, `SLOTS_REMAINING = 2` | drie |
+| eenheid | gratis gesprekken **per kwartaal** | betaalde trajecten **tegelijk** |
+| bron | met de hand tegen de agenda, `LAST_VERIFIED` | `docs/claims.md` |
+
+Alleen de tweede stond als beslissing in `claims.md`. De vier was een
+componentconstante die daar nooit is beland. Gelijk zetten betekent dus niet
+"maak de cijfers hetzelfde" maar **één feit, één eenheid, één bron** — anders
+delen twee metingen een cijfer en blijft het twee metingen.
+
+Juan koos de nieuwe stand: drie trajecten tegelijk, alle drie op dit moment
+vrij. De keten loopt nu van `docs/claims.md` naar `TOTAL_SLOTS` naar
+`fomo.capacity.note`, en van `docs/claims.md` naar `services.how.capaciteit`.
+
+**De oude verificatie is mét de eenheid vervallen**, en dat is geen formaliteit.
+Die 2 was op 2026-08-19 tegen de agenda gehouden, maar hij telde geboekte
+gesprekken — niet lopende trajecten. Een verificatie geldt voor de grootheid die
+je gemeten hebt, niet voor het vakje waar het getal in staat. Vandaar een nieuw
+getal én een nieuwe datum, allebei van Juan.
+
+#### De mutatietest vond een defect in mijn eigen werk
+
+De mutatie "claims.md zegt vier" kon niet landen: **twee treffers op het anker**.
+Mijn nieuwe tabel in `claims.md` herhaalde de rij `| trajecten tegelijk |
+**drie** |` die vier regels hoger al stond. Ik had, in de commit die twee lijsten
+tot één terugbracht, een tweede lijst geschreven.
+
+Eronder zat het echte gat. De parser las met `.match()` zonder `/g`, dus hij
+pakt de **eerste** treffer en zwijgt over de rest. Vandaag klopte het toevallig
+nog omdat beide rijen hetzelfde getal droegen. Met een afwijkend getal in de
+tweede rij was het een stille leugen geweest: de poort leest er één, publiceert
+die, en meldt niets over de andere.
+
+Allebei gerepareerd — de dubbele rij eruit, en `capaciteitUitClaims()` gooit nu
+op méér dan één treffer. **Een parser die de eerste treffer pakt, moet zeggen
+hoeveel het er waren.**
+
+#### Het getal was gedekt, het woord niet
+
+Bij het nameten op de draaiende build vond ik nul treffers op "drie trajecten
+tegelijk" op `/services`. Geen meetfout: die pagina zei "drie **opdrachten**
+tegelijk", `/contact` zei "drie **trajecten** tegelijk". Hetzelfde getal, twee
+woorden, op precies de twee pagina's die één feit moesten dragen.
+
+Engels, Duits en Spaans liepen al gelijk (engagements, Mandate, encargos) —
+alleen het Nederlands week af. `claims.md` schrijft 5× "trajecten" en 0×
+"opdrachten", dus de bron besliste het.
+
+Er staat nu een poort met vier literals, één per taal. Bewust geen taalregel:
+de drift kan in elke taal ontstaan en is alleen per taal te zien. En bewust een
+positieve controle erbij, want een substringcheck die altijd waar is meet niets.
+
+#### Bewijs dat de nieuwe assertie dekking toevoegt
+
+`TOTAL_SLOTS` naar 4 zetten werd rood op de bestaande bijschrift-test, niet op
+de nieuwe. Dat leest als dubbeling. De realistische drift is anders: iemand
+verzet het getal én werkt netjes de kopij bij, maar vergeet `claims.md`.
+
+Zo gemeten, met `TOTAL_SLOTS = 4` en "vier/four/vier/cuatro" in alle vier de
+talen:
+
+| | |
+|---|---|
+| `components/capacity.test.ts` | **13/13 groen** |
+| `lib/capaciteit.test.ts` | rood — `tekent 4 plekken terwijl docs/claims.md 3 vastlegt` |
+
+De bestaande poort hield het getal alleen tegen de kopij ernáást; intern
+consistent, extern in strijd met de beslissing. **Een poort die naast zich kijkt
+in plaats van naar boven, kan niet zien dat de hele pagina afwijkt van de bron.**
+
+#### Onderweg
+
+De escape-laag brak voor de zoveelste keer: `\r\n` in een mutatie-entry
+overleefde de shell niet en leverde een `SyntaxError`. Opgelost door élke escape
+te vermijden — `chr(13) + chr(10)` en een losse constante voor de tabelrij. Dat
+is dezelfde uitweg als op 20 en 22 augustus; het patroon is inmiddels: **gaat er
+tekst met escapes door een shell-laag, schrijf hem dan zonder escapes.**
+
+En het oude slotparagraaf van `claims.md` sprak zichzelf tegen. Bovenaan stond
+de regel "geen aftellend getal zonder onderhouden bron", onderaan "wat niet mag:
+een teller". Die twee zijn niet te verenigen; de tweede is herschreven naar wat
+de sectie werkelijk bedoelt.
+
+#### Meting
+
+911 tests in 42 bestanden, was 909/42. i18n 698 × 4, ongewijzigd (alleen
+waardes). tsc schoon, prijsgenerator groen, build groen.
+
+Negen mutaties, negen keer rood met elk een andere assertie, groen na herstel,
+nul mutatiesporen achtergebleven.
+
+Op de productiebuild in vier talen, in de DOM gemeten:
+
+    /contact   balk van 3, alle drie open, "3/3 plekken over" (per taal vertaald)
+    /services  "Na het blueprint-gesprek lopen er drie trajecten tegelijk."
+    beide      zelfde telwoord, zelfde zelfstandig naamwoord, per taal
+    oude eenheid ("per kwartaal", "pro Quartal", "por trimestre")  0x
+    375 px     capaciteitsblok 295x271, zin 295x120, geen overloop, geen kale sleutel
+
+De server draaide op een poort die vooraf aantoonbaar vrij was, en het startlog
+is gelezen om te bevestigen dat het mijn eigen proces was — na de meting van 22
+augustus waar een oude luisteraar een uur oude build serveerde.

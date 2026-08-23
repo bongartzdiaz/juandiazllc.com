@@ -2,18 +2,25 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { DICT, LOCALES, type Locale } from "@/lib/i18n/dict";
-import { LAST_VERIFIED, MAX_AGE_DAYS } from "@/components/Capacity";
+import { LAST_VERIFIED, MAX_AGE_DAYS, TOTAL_SLOTS } from "@/components/Capacity";
 
-// Capaciteit staat sinds 2026-08-22 op de site: drie trajecten tegelijk.
-// Beslist door Juan, vastgelegd in docs/claims.md onder "Garantie en
-// capaciteit". Die beslissing draagt twee grenzen, en die zijn hier de kern:
+// Capaciteit staat sinds 2026-08-22 op de site. Op 2026-08-23 is het één getal
+// geworden: /contact telde vier blueprint-gesprekken per kwartaal terwijl
+// /services drie trajecten tegelijk noemde — twee eenheden voor hetzelfde
+// onderwerp, op naburige pagina's. Beide oppervlakken lezen nu hetzelfde feit
+// uit docs/claims.md, onder "Garantie en capaciteit".
 //
-//   1. een levende telling van lopende trajecten bestaat nergens in deze repo,
-//      dus "nog N plekken vrij" is per definitie verzonnen;
+// Twee grenzen horen bij dat getal, en die zijn hier de kern:
+//
+//   1. een aftellend getal mag alleen met een ONDERHOUDEN bron. Dat is geen
+//      verbod maar een voorwaarde, en components/Capacity.tsx voldoet eraan:
+//      SLOTS_REMAINING, LAST_VERIFIED en MAX_AGE_DAYS samen. De eerste versie
+//      van dit commentaar zei dat zo'n telling "nergens in deze repo bestaat" —
+//      onwaar, en precies de fout die dit bestand elders bewaakt.
 //   2. de grens knelt vandaag niet — marketing.leads stond op de dag van de
 //      beslissing op nul rijen — dus een zin die druk suggereert, verzint druk.
 //
-// De zin mag daarom de werkwijze beschrijven en verder niets.
+// De zin op /services mag daarom de werkwijze beschrijven en verder niets.
 const WORTEL = join(__dirname, "..");
 const SLEUTEL = "services.how.capaciteit";
 
@@ -36,16 +43,31 @@ function claims(): string {
   return readFileSync(join(WORTEL, "docs", "claims.md"), "utf8");
 }
 
+// Bewust `matchAll` en niet `match`. De eerste versie las met `match()` de
+// eerste treffer en zweeg over de rest — en tijdens de gelijktrekking van
+// 2026-08-23 schreef ik prompt een tweede rij met hetzelfde getal erbij. Toen
+// klopte het toevallig nog; met een afwijkend getal in de tweede rij was het
+// een stille leugen geweest, want de poort had de eerste gelezen en niets
+// gemeld. Eén feit, één rij, en dat wordt hier afgedwongen.
 function capaciteitUitClaims(): number {
-  const m = claims().match(/\|\s*trajecten tegelijk\s*\|\s*\*\*(\w+)\*\*/);
-  if (!m) {
+  const treffers = [
+    ...claims().matchAll(/\|\s*trajecten tegelijk\s*\|\s*\*\*(\w+)\*\*/g),
+  ];
+  if (treffers.length === 0) {
     throw new Error(
       "docs/claims.md draagt geen rij `| trajecten tegelijk | **…** |` meer, " +
         "terwijl de site een capaciteit publiceert. Herstel de rij of haal de zin uit de kopij.",
     );
   }
-  const n = WOORD_NAAR_GETAL[m[1].toLowerCase()];
-  if (!n) throw new Error(`onbekend telwoord in claims.md: "${m[1]}"`);
+  if (treffers.length > 1) {
+    throw new Error(
+      `docs/claims.md draagt ${treffers.length} rijen \`| trajecten tegelijk | **…** |\` ` +
+        `(${treffers.map((t) => t[1]).join(", ")}). Eén feit hoort op één plek te staan; ` +
+        "een tweede rij wordt door elke lezer die de eerste pakt stil overgeslagen.",
+    );
+  }
+  const n = WOORD_NAAR_GETAL[treffers[0][1].toLowerCase()];
+  if (!n) throw new Error(`onbekend telwoord in claims.md: "${treffers[0][1]}"`);
   return n;
 }
 
@@ -103,6 +125,58 @@ describe("de capaciteitszin", () => {
     }
   });
 
+  // Dit is de assertie die "gelijk zetten" onomkeerbaar maakt. Vóór 2026-08-23
+  // stond TOTAL_SLOTS op 4 en claims.md op drie, en géén poort merkte dat:
+  // components/capacity.test.ts hield het getal alleen tegen de kopij ernáást,
+  // dus vier plekken met "vier per kwartaal" erbij was intern consistent en
+  // extern in strijd met de beslissing. Twee lijsten die hetzelfde feit dragen,
+  // precies de bugklasse waar dit logboek het vaakst op valt.
+  // Eén feit, één woord. Bij het gelijktrekken op 2026-08-23 zei /services
+  // "drie opdrachten tegelijk" en /contact "drie trajecten tegelijk":
+  // hetzelfde getal, twee woorden, op precies de twee pagina's die één feit
+  // moesten dragen. Het getal was aan beide kanten gedekt, het zelfstandig
+  // naamwoord niet — en een lezer die twee woorden ziet mag twee grenzen
+  // vermoeden.
+  //
+  // Engels, Duits en Spaans liepen al gelijk; alleen het Nederlands week af.
+  // Dat is de reden dat dit vier literals zijn en geen taalregel: de drift kan
+  // in elke taal ontstaan en is alleen per taal te zien. Het gekozen woord
+  // volgt docs/claims.md, dat 5x "trajecten" schrijft en 0x "opdrachten".
+  const CAPACITEITSWOORD: Record<Locale, string> = {
+    en: "engagements",
+    nl: "trajecten",
+    de: "mandate",
+    es: "encargos",
+  };
+
+  it("beide oppervlakken noemen het feit met hetzelfde woord", () => {
+    // Eerst de meetlat: een substringcheck die altijd waar is, meet niets.
+    expect("Er lopen drie trajecten tegelijk.".toLowerCase().includes("trajecten")).toBe(true);
+    expect("Er lopen drie opdrachten tegelijk.".toLowerCase().includes("trajecten")).toBe(false);
+
+    for (const l of LOCALES) {
+      const woord = CAPACITEITSWOORD[l];
+      for (const k of [SLEUTEL, "fomo.capacity.note"]) {
+        const zin = DICT[l][k];
+        expect(zin, `${k} ontbreekt voor ${l}`).toBeTruthy();
+        expect(
+          zin.toLowerCase().includes(woord),
+          `${k} (${l}) noemt "${woord}" niet, terwijl het andere oppervlak hetzelfde ` +
+            `feit draagt. Eén capaciteitsfeit hoort overal hetzelfde te heten: "${zin}"`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it("de balk op /contact tekent hetzelfde aantal als docs/claims.md vastlegt", () => {
+    const n = capaciteitUitClaims();
+    expect(
+      TOTAL_SLOTS,
+      `components/Capacity.tsx tekent ${TOTAL_SLOTS} plekken terwijl docs/claims.md ` +
+        `${n} trajecten tegelijk vastlegt. Er is één bron: pas claims.md aan, niet de constante.`,
+    ).toBe(n);
+  });
+
   it("geen enkele plek in kopij verkoopt schaarste als druk", () => {
     for (const { term, bewijs } of DRUKTAAL) {
       expect(
@@ -124,10 +198,11 @@ describe("de capaciteitszin", () => {
     ).toBe(12);
 
     // `fomo.capacity.*` valt buiten de scan, en dat is geen gunst maar een
-    // voorwaarde die het waarmaakt. components/Capacity.tsx toont vier
-    // blueprint-plekken per kwartaal met het aantal dat nog vrij is, en draagt
-    // daarvoor een onderhouden bron (SLOTS_REMAINING), een houdbaarheidsdatum
-    // (LAST_VERIFIED) en een poort die rood wordt zodra die veroudert.
+    // voorwaarde die het waarmaakt. components/Capacity.tsx toont sinds
+    // 2026-08-23 hetzelfde feit als /services — drie trajecten tegelijk — met
+    // het aantal dat nog vrij is, en draagt daarvoor een onderhouden bron
+    // (SLOTS_REMAINING), een houdbaarheidsdatum (LAST_VERIFIED) en een poort
+    // die rood wordt zodra die veroudert.
     //
     // Toen deze poort werd geschreven stond in docs/claims.md dat zo’n telling
     // "nergens in deze repo bestaat". Dat was onwaar en is daar gecorrigeerd.

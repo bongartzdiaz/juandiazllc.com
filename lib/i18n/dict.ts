@@ -581,9 +581,9 @@ const en: Dict = {
 
   // Capacity
   "fomo.capacity.eyebrow": "◉ Live capacity",
-  "fomo.capacity.title": "Blueprint calendar.",
+  "fomo.capacity.title": "Room for new work.",
   "fomo.capacity.slotsLabel": "slots remaining",
-  "fomo.capacity.note": "Four blueprint engagements per quarter. When they are gone, they are gone.",
+  "fomo.capacity.note": "Three engagements run at the same time. That ceiling is my own hours.",
 
   // LiveSignals (honest portfolio state)
   "fomo.proof.eyebrow": "◉ Live · right now",
@@ -865,7 +865,7 @@ const nl: Dict = {
   "services.how.s3.title": "Scope, bouw, beheer",
   "services.how.s3.body": "Vaste prijs voor de eerste 90 dagen strategie en bouw, daarna een maandelijkse retainer voor beheer. Geoffreerd ná de diagnose, niet ervoor.",
   "services.how.note": "Geprijsd per uitkomst, niet per uur. Advies is een losse opdracht — zonder verplichting om de bouw te laten volgen.",
-  "services.how.capaciteit": "Na het blueprint-gesprek lopen er drie opdrachten tegelijk. Die grens zijn mijn eigen uren, dus een startdatum hangt af van wat er al draait — vraag ernaar en je krijgt een echte.",
+  "services.how.capaciteit": "Na het blueprint-gesprek lopen er drie trajecten tegelijk. Die grens zijn mijn eigen uren, dus een startdatum hangt af van wat er al draait — vraag ernaar en je krijgt een echte.",
   "services.more": "Bekijk meer",
   "services.cta.title": "Niet zeker welke past? Vertel me eerst het probleem.",
   "nav.insights": "Inzichten",
@@ -1371,9 +1371,9 @@ const nl: Dict = {
   "fomo.countdown.cta": "Lees de veldgids →",
 
   "fomo.capacity.eyebrow": "◉ Live capaciteit",
-  "fomo.capacity.title": "Blueprint-agenda.",
+  "fomo.capacity.title": "Ruimte voor nieuw werk.",
   "fomo.capacity.slotsLabel": "plekken over",
-  "fomo.capacity.note": "Vier blueprint-trajecten per kwartaal. Vol is vol.",
+  "fomo.capacity.note": "Er lopen drie trajecten tegelijk. Die grens zijn mijn eigen uren.",
 
   "fomo.proof.eyebrow": "◉ Live · nu",
   "fomo.proof.title": "De operatie, in <em>echte cijfers</em>.",
@@ -2133,9 +2133,9 @@ const de: Dict = {
   "fomo.countdown.cta": "Feldhandbuch lesen →",
 
   "fomo.capacity.eyebrow": "◉ Live-Kapazität",
-  "fomo.capacity.title": "Blueprint-Kalender.",
+  "fomo.capacity.title": "Platz für neue Mandate.",
   "fomo.capacity.slotsLabel": "Plätze frei",
-  "fomo.capacity.note": "Vier Blueprints pro Quartal. Ausgebucht bedeutet ausgebucht.",
+  "fomo.capacity.note": "Es laufen drei Mandate gleichzeitig. Diese Grenze sind meine eigenen Stunden.",
 
   "fomo.proof.eyebrow": "◉ Live · gerade jetzt",
   "fomo.proof.title": "Der Betrieb, in <em>echten Zahlen</em>.",
@@ -2895,9 +2895,9 @@ const es: Dict = {
   "fomo.countdown.cta": "Leer la guía →",
 
   "fomo.capacity.eyebrow": "◉ Capacidad en vivo",
-  "fomo.capacity.title": "Agenda de blueprint.",
+  "fomo.capacity.title": "Espacio para nuevos encargos.",
   "fomo.capacity.slotsLabel": "plazas disponibles",
-  "fomo.capacity.note": "Cuatro blueprints por trimestre. Cuando se llenan, se llenan.",
+  "fomo.capacity.note": "Hay tres encargos en marcha a la vez. Ese límite son mis propias horas.",
 
   "fomo.proof.eyebrow": "◉ En vivo · ahora mismo",
   "fomo.proof.title": "La operación, en <em>números reales</em>.",

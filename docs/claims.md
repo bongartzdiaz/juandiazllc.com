@@ -538,17 +538,39 @@ De regel is daarmee niet "geen aftellend getal" maar **"geen aftellend getal
 zonder onderhouden bron"**. Dat is strenger waar het moet en toelaatbaar waar
 het kan.
 
-**Twee capaciteitsgetallen op twee pagina’s, en dat is een openstaande vraag.**
-`/contact` zegt vier blueprint-plekken per kwartaal; `/services` zegt drie
-trajecten tegelijk. Ze spreken elkaar niet tegen — het eerste telt gratis
-intakegesprekken, het tweede lopend betaald werk — maar het zijn twee getallen
-over hetzelfde onderwerp in verschillende eenheden. De kopij op `/services`
-begint daarom met "na het blueprint-gesprek", zodat de lezer ziet dat het over
-de stap daarná gaat. **Of ze naast elkaar moeten blijven staan is aan Juan.**
+#### Gelijkgetrokken 2026-08-23 — één getal, één eenheid, één bron
 
-Wat dus wél mag: een statische zin die de werkwijze beschrijft ("drie trajecten
-tegelijk"). Wat niet mag: een teller, een aftelklok, of een zin die suggereert
-dat er nú bijna geen plek is.
+De twee getallen stonden in verschillende eenheden: `/contact` telde vier gratis
+blueprint-gesprekken per kwartaal, `/services` drie lopende betaalde trajecten.
+Ze spraken elkaar niet tegen, maar het waren twee getallen over hetzelfde
+onderwerp op naburige pagina's. Juan heeft ze op 2026-08-23 gelijkgetrokken.
+
+Het totaal staat al in de beslissingstabel bovenaan deze sectie en wordt hier
+bewust **niet** herhaald: twee rijen die hetzelfde getal dragen zijn precies
+de bugklasse die deze gelijktrekking wegneemt, en de parser in
+`lib/capaciteit.test.ts` leest met `.match()` de eerste treffer — een tweede
+rij met een ander getal zou stil worden overgeslagen. Er is één nieuw getal:
+
+| | waarde | bron |
+| --- | --- | --- |
+| van die trajecten nu vrij | **drie** | Juan, tegen de agenda gehouden 2026-08-23 |
+
+`/contact` en `/services` lezen sindsdien hetzelfde feit. De keten loopt van
+`docs/claims.md` naar `TOTAL_SLOTS` naar `fomo.capacity.note`, en van
+`docs/claims.md` naar `services.how.capaciteit`. `lib/capaciteit.test.ts` en
+`components/capacity.test.ts` sluiten hem aan beide kanten: verzet je het getal
+op één plek, dan valt er een poort om.
+
+**De oude verificatie is mét de eenheid vervallen.** `SLOTS_REMAINING` stond op
+2 van 4 en was op 2026-08-19 tegen de agenda gehouden — maar die 2 telde
+geboekte blueprint-gesprekken, niet lopende trajecten. Een verificatie geldt
+voor de grootheid die je gemeten hebt, niet voor het vakje waar het getal
+toevallig in staat. Vandaar een nieuw getal én een nieuwe datum, allebei van
+Juan.
+
+Wat mag: een statische zin die de werkwijze beschrijft, en een teller met een
+onderhouden bron plus een houdbaarheidsdatum. Wat niet mag: een aftelklok, of
+een zin die suggereert dat er nú bijna geen plek is.
 
 ## juandiazllc.com — /pricing (DEUS)
 
