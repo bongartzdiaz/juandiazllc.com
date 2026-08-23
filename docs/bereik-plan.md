@@ -2,7 +2,9 @@
 
 Geschreven 2026-08-23, na drie vragen op één dag: de link-buildingprompts
 implementeren, verder nichen, en meer leadmagneten maken. Ze horen bij elkaar en
-er zit een volgorde in, want twee ervan hangen aan de eerste.
+er zit een volgorde in, want twee ervan hangen aan de eerste. Op 2026-08-23 kwam
+er een vierde bij: een tweede promptpakket, over organische groei op social.
+Dat staat in §6.
 
 **§2 is op 2026-08-23 herzien.** De eerste versie beval aan te nichen op
 energie; dat bleek de verkeerde vraag. De vraag is niet welke sector, maar
@@ -41,9 +43,9 @@ citeert er niets uit.
 
 | | stand | bron |
 |---|---|---|
-| artikelen | 21, waarvan **11 met tag Energy** | `lib/insights.ts` |
+| artikelen | **23**, waarvan 11 met tag Energy | `lib/insights.ts`, herteld 2026-08-23 |
 | marktgebonden clusters | NL 6 · DE 3 · ES 3 | idem |
-| vastgoed / horeca | 2 artikelen elk | idem |
+| vastgoed / horeca | **vastgoed 4** (sinds de EPBD- en ETS2-stukken), horeca 2 | idem |
 | bevestigde klantuitkomsten | 4, waarvan **3 energie**; 2 dragen een markt (NL, NL/BE), 2 geen | `docs/claims.md` |
 | tools | 2 — `lekkage-scan` staat **alleen op /nl**, `energy-roi` in vier talen maar met een Nederlands model | `lib/i18n/enkele-taal.ts` · `components/calculators/EnergyRoi.tsx` |
 | leads ooit | **0 rijen** in `marketing.leads` | Supabase `wbgiouuifqhasedncysw` |
@@ -160,7 +162,7 @@ januari 2027 gaat bewegen om een reden buiten de operator om. Alle vier de
 condities hierboven zijn waar.
 
 **Vastgoed is de goedkoopste uitbreiding, en dat is een ander argument.** Het
-stáát al op de site, het draagt al twee artikelen, en de data is letterlijk
+stáát al op de site, het droeg al twee artikelen, en de data is letterlijk
 dezelfde data als het energiewerk — meterstanden per pand. Wat er ontbrak was
 de haak, en die is er nu: EPBD IV dwingt een eigenaar zijn eigen portefeuille
 te **rangschikken** om te weten welke panden in de slechtste 16% zitten. Dat is
@@ -190,10 +192,17 @@ Niet "welke sector", maar **welke tweede haak**. Eén erbij, niet drie:
 | optie | kosten | wat je koopt |
 |---|---|---|
 | **A — transport & logistiek** | nieuw cluster vanaf nul, nieuw publiek | de zuiverste herhaling van het patroon dat aantoonbaar werkte |
-| **B — vastgoed verdiepen** | twee artikelen staan er al, data overlapt met energie | het snelste resultaat, op een sector die al in de navigatie staat |
+| **B — vastgoed verdiepen** — **gekozen en uitgevoerd 2026-08-23** | twee artikelen stonden er al, data overlapt met energie | het snelste resultaat, op een sector die al in de navigatie staat |
 | **C — allebei** | twee clusters onderhouden naast energie | breder bereik, tragere opbouw per cluster |
 
-Mijn voorkeur is **B eerst, A daarna** — niet omdat vastgoed het grootste
+> **Stand 2026-08-23: B is uitgevoerd.** Vastgoed staat op vier artikelen, met
+> beide regelgevingshaken bij de uitvoerder nagetrokken en vastgelegd in
+> `docs/claims.md`. Twee dingen die ik hierboven schreef bleken bij die
+> verificatie onjuist: de percentages van EPBD IV staan op geen enkele
+> overheidsbron, en ETS2 is zachter dan "hard". Beide gecorrigeerd in de tabel
+> hierboven. **A staat daarmee bovenaan als volgende.**
+
+Mijn voorkeur was **B eerst, A daarna** — niet omdat vastgoed het grootste
 potentieel heeft, maar omdat het de enige is waar de haak nieuw is en de rest
 al staat. A is het sterkere verhaal en het duurdere begin.
 
@@ -213,9 +222,10 @@ het opnieuw bij de bron gecontroleerd.
 
 ---
 
-## §3 — De 36 prompts, eerlijk getrieerd
+## §3 — Het eerste promptpakket: links, eerlijk getrieerd
 
-Het pakket bestrijkt zes gebieden. Tegen déze site, vandaag:
+Het linkpakket bestrijkt zes gebieden. Tegen déze site, vandaag: (het tweede
+pakket, over social, staat in §6.)
 
 | gebied | kan het draaien? | waarom |
 |---|---|---|
@@ -308,7 +318,7 @@ blootlegde.
 2. **De bestaande twee eerst laten werken.** De scan wordt vanaf drie plekken
    gelinkt (`/nl/services`, `/nl/tools/energy-roi`, en onder elke NL-energiepost).
    De rekenmachine staat in vier talen met een model dat alleen voor NL klopt —
-   dat is beslissing 4 hieronder, niet iets om er stilzwijgend bij te doen.
+   dat is beslissing 5 hieronder, niet iets om er stilzwijgend bij te doen.
 3. **Dán een derde**, en die volgt uit §4.1: **de enquête ís de leadmagneet.** Je
    vraagt installateurs mee te doen en geeft het volledige rapport terug vóór
    publicatie. Dat levert in één beweging respondenten, e-mailadressen en het
@@ -325,7 +335,119 @@ staat. Op een lijst van nul abonnees is de opbrengst per uur werk lager dan bij
 
 ---
 
-## §6 — Beslissingen die van Juan zijn
+## §6 — Het tweede promptpakket: distributie
+
+Zevenentwintig prompts over organische groei op social, verdeeld over
+contentcreatie, community, analytics en profieloptimalisatie. Dezelfde grens als
+in §0: commercieel materiaal van derden, blijft lokaal, wordt niet geciteerd.
+
+En dezelfde eerste vraag: wat veronderstelt dit pakket dat hier niet waar is?
+
+### Welke kanalen bestaan er werkelijk
+
+| kanaal | stand | bron |
+|---|---|---|
+| LinkedIn persoonlijk, `/in/juanstefan` | bestaat | `lib/seo/branding.ts`, gemeten 2026-08-20 |
+| LinkedIn bedrijf, `/company/juandiazllc` | bestaat | idem |
+| Instagram `@diazelcazador` | 200, gemeten 2026-08-23 | `PERSON_SAME_AS` |
+| GitHub `bongartzdiaz` | 200, gemeten 2026-08-23 | idem |
+| X / Twitter | **bestaat niet** — 404, in #198 uit `sameAs` gehaald | `branding.ts` |
+| TikTok | **komt in de hele codebase niet voor** | grep |
+| YouTube | **komt in de hele codebase niet voor** | grep |
+
+Het pakket richt zich op Instagram, TikTok, X en LinkedIn. Van die vier bestaan
+er hier anderhalf: LinkedIn echt, Instagram onder een handle die
+`@diazelcazador` heet en als persoonlijk account leest, niet als B2B-kanaal voor
+operators.
+
+**LinkedIn 200 is geen bewijs van inhoud.** Die pagina's geven ook 200 achter
+een inlogmuur, en dat staat al als waarschuwing in `branding.ts`. Of daar iets
+staat, en hoe recent, is van buitenaf niet vast te stellen.
+
+### De triage
+
+| gebied | prompts | kan het draaien? |
+|---|---|---|
+| contentstrategie en kalender | ~3 | **ja**, zodra het kanaal gekozen is |
+| hergebruik van lange content | ~1 | **ja, en dit is de sterkste** — zie hieronder |
+| postcreatie per format | ~3 | **deels** — de LinkedIn-varianten wel, de TikTok-scripts niet |
+| profieloptimalisatie | ~2 | **ja**, eenmalig werk met echt rendement |
+| analytics en performance | ~5 | **nee** — er zijn geen cijfers om te analyseren |
+| community-opbouw en -beheer | ~10 | **nee** — er is geen community |
+| korte video en visuals | ~3 | **nee** — geen kanaal, en video is productiekosten, geen prompt |
+
+Grofweg **zes van de zevenentwintig** kunnen vandaag. Tien wachten op meting,
+tien op een publiek dat er nog niet is.
+
+Dat is bijna exact dezelfde uitkomst als bij het linkpakket in §3, en die
+herhaling is zelf het signaal: **beide pakketten veronderstellen een
+distributiemachine die draait.** Ze zijn geschreven voor iemand die al post, al
+meet en al volgers heeft. Het knelpunt hier ligt een stap eerder.
+
+### Waarom social hier tóch een sterker argument heeft dan links
+
+Bij links was het antwoord dat een domein zonder autoriteit pas bij hoofdstuk
+twee begint. Hier ligt het anders, en het verschil is concreet:
+
+**Er staan drieentwintig artikelen en er is nul distributie.** De inhoud bestaat.
+Wat ontbreekt is dat iemand hem ergens neerzet. Dat is geen autoriteitsprobleem
+dat kwartalen kost — dat is een gewoonte die volgende week kan beginnen.
+
+En anders dan bij backlinks werkt één kanaal wél vanaf nul: **LinkedIn, op het
+persoonlijke profiel.** Daar zit het publiek uit `docs/claims.md` letterlijk —
+installateurs, energiemakelaars, assetmanagers, NL en BE — en daar is een
+bestaand profiel dat geen opbouw vanaf niets vergt.
+
+### Eén kanaal, en waarom niet de andere drie
+
+- **Instagram** valt af op publiek en op handle. Assetmanagers en installateurs
+  zoeken daar geen operationele diagnose, en `@diazelcazador` draagt een andere
+  belofte dan `juandiazllc.com`. Dat is te repareren, maar het is merkwerk en
+  geen distributiewerk.
+- **TikTok** bestaat niet en zou vanaf nul moeten. Het formaat vraagt bovendien
+  videoproductie, en dat is de duurste vorm in dit document.
+- **X** bestaat niet, en de handle die erop leek is in #198 juist verwijderd
+  omdat hij 404 gaf. Een dood adres terugzetten is het defect dat die PR sloot.
+
+### De grens, en die is niet onderhandelbaar
+
+Posten op je eigen tijdlijn is geen koude benadering en valt buiten het verbod.
+Wat er wél onder valt, ongewijzigd: **connectieverzoeken en DM's op LinkedIn
+worden nooit geautomatiseerd**, net zomin als koude WhatsApp, koude e-mail naar
+Duitsland, formulierinzendingen bij doelbedrijven en volledig synthetische
+gepersonaliseerde video.
+
+Enkele prompts in dit pakket schuiven richting die grens — een
+onboardingreeks voor nieuwe volgers, een ambassadeursprogramma. Alles wat een
+bericht naar een individu stuurt dat er niet om vroeg, valt onder het verbod,
+ongeacht in welk pakket de prompt staat.
+
+### Wat er dan concreet gebeurt
+
+Geen nieuwe code. Het is een gewoonte, en de volgorde is dezelfde als in §5:
+
+1. **Plausible-doelen eerst.** Zonder dat is een post niet van geen-verkeer te
+   onderscheiden, en dan werkt de helft van dit pakket per definitie niet.
+2. **Profiel opruimen.** Eenmalig, twee prompts uit het pakket, echt rendement:
+   het profiel is de landingspagina van elke post.
+3. **Hergebruik in plaats van nieuw schrijven.** Drieentwintig artikelen staan
+   er. Eén artikel levert een post op; vijf artikelen leveren een maand.
+   Nieuwe inhoud bedenken terwijl bestaande inhoud ongelezen ligt is de duurste
+   volgorde.
+4. **Meten wat er gebeurt**, en dán pas de analytics-prompts, die nu leeglopen.
+
+### Wat hier niet beloofd wordt
+
+- **Geen bereikcijfer.** Er is geen basislijn, en LinkedIn-bereik hangt van meer
+  af dan van de tekst.
+- **Geen postfrequentie als belofte.** Een cadans die je niet volhoudt is
+  slechter dan geen cadans; dat is een keuze over Juans eigen uren, net als de
+  drie trajecten uit `docs/claims.md`.
+- **Geen tweede kanaal** tot het eerste aantoonbaar iets doet.
+
+---
+
+## §7 — Beslissingen die van Juan zijn
 
 1. **Welke tweede haak: transport (A), vastgoed verdiepen (B) of allebei (C)?**
    De onderbouwing en mijn voorkeur staan in §2. Dit is geen sectorkeuze maar
@@ -338,13 +460,17 @@ staat. Op een lijst van nul abonnees is de opbrengst per uur werk lager dan bij
    een domein zonder autoriteit werkt, en hij kost tijd om respondenten te vinden.
    Valt de keuze op A, dan is de vervoerder-variant even sterk als de
    installateur-variant: niemand weet wat ETS2 per kilometer gaat kosten.
-4. **De rekenmachine-route** (stond al open in `docs/seo-geo-plan.md` §3): één
+4. **Social: één kanaal, en welk?** Mijn voorstel staat in §6 — LinkedIn op het
+   persoonlijke profiel, omdat het publiek uit `docs/claims.md` daar zit en het
+   profiel al bestaat. Instagram vergt merkwerk, TikTok en X bestaan niet. Dit
+   is ook een vraag over jouw uren, niet alleen over bereik.
+5. **De rekenmachine-route** (stond al open in `docs/seo-geo-plan.md` §3): één
    tool die zich per taal aanpast, of aparte tools per markt. De DE- en
    ES-trechter loopt tot die tijd dood.
 
 ---
 
-## §7 — Wat hier niet beloofd wordt
+## §8 — Wat hier niet beloofd wordt
 
 - **Geen termijn.** Autoriteit opbouwen vanaf niets duurt kwartalen, niet weken,
   en niemand kan zeggen hoeveel.
