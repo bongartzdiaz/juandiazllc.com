@@ -1063,6 +1063,61 @@ zien waar zijn kilometercijfer vandaan komt, heeft vandaag al een probleem.
 **Wat er niet in kopij mag.** Geen indieningsdatum, geen sanctie, geen aantal
 getroffen bedrijven, en niet de suggestie dat de drempel al is verhoogd.
 
+## Reactietijd op leads — de 78% is folklore (gemeten 2026-08-23)
+
+Aanleiding: een voorstel om in kopij en outreach te schrijven dat **"78% van
+de klanten koopt bij het bedrijf dat als eerste reageert"**. Nagetrokken, en
+het antwoord is nee.
+
+**De 78% heeft geen traceerbare bron.** Elke vindplaats verwijst naar een
+"Lead Connect"-onderzoek waarvan geen rapport, geen methode en geen steekproef
+bestaat; de citaties wijzen naar elkaar. Hetzelfde geldt voor de begeleidende
+"35-50% van de verkopen gaat naar de eerste aanbieder". **Niet publiceren, in
+geen enkele vorm** — niet op de site, niet in een e-mail, niet in een
+LinkedIn-bericht.
+
+Er is wél echt onderzoek naar hetzelfde onderwerp, en het is sterker dan de
+folklore die het verdrong.
+
+| Claim | Waarde | Status |
+| --- | --- | --- |
+| Reageren binnen een uur | **bijna 7× meer kans om de lead te kwalificeren** dan een uur later; **ruim 60×** meer dan bij 24 uur of langer | ⚠️ Oldroyd, McElheran & Elkington, *The Short Life of Online Sales Leads*, **Harvard Business Review** 89(3), p. 28, 2011. Citatie geverifieerd bij de bron ([BYU ScholarsArchive](https://scholarsarchive.byu.edu/facpub/9711/)); de cijfers zijn door twee onafhankelijke secundaire bronnen bevestigd, **de volledige tekst is niet gelezen** (betaalmuur) |
+| Steekproef van datzelfde onderzoek | audit van **2.241 Amerikaanse bedrijven** met testaanvragen | ⚠️ zelfde niveau van verificatie |
+| Reageren binnen vijf minuten | **8× hogere conversie** dan vanaf zes minuten | ⚠️ XANT (voorheen InsideSales.com), *Lead Response Management* 2021 — 5,7 mln leads, 400+ bedrijven, 2018-2020. Leverancieronderzoek met gepubliceerde methode |
+| Contact leggen binnen vijf minuten | **100× hogere kans op contact**, **21× hogere kans op kwalificatie** dan bij dertig minuten | ⚠️ Oldroyd / InsideSales.com, *Lead Response Management Study* 2007 — 15.000+ leads, 6 bedrijven. Oud, en van een leverancier met een belang |
+| "78% koopt bij wie het eerst reageert" | ❌ **geen traceerbare primaire bron** | ❌ **niet publiceren** |
+| "35-50% gaat naar de eerste aanbieder" | ❌ idem | ❌ **niet publiceren** |
+| "elke minuut vertraging halveert de kans" | ❌ bestaat nergens | ❌ **niet publiceren** |
+| "boven de 15 minuten verlies je 78%" | ❌ plakt twee dingen aan elkaar die niets met elkaar te maken hebben — de 78% gaat (zelfs in de folklore) over *eerst zijn*, niet over een kwartier | ❌ **niet publiceren** |
+
+**Waarom alle rijen een ⚠️ dragen en geen ✅.** De vier bevestigde
+klantuitkomsten in dit bestand zijn van Juan zelf, gemeten in zijn eigen
+opdrachten. Deze rijen zijn dat niet: het is extern onderzoek dat ik niet in
+de volledige tekst heb kunnen lezen. Dat is een ander soort zekerheid en het
+hoort ook anders te heten.
+
+**Drie beperkingen die mee moeten als deze cijfers ergens staan.**
+
+1. **Amerikaans, en 2011 respectievelijk 2021.** Het is geen Nederlandse
+   benchmark. Wie schrijft "in de Nederlandse makelaardij blijft een lead
+   gemiddeld X uur liggen" heeft dat zelf gemeten of hij verzint het.
+2. **Het gaat over *kwalificeren*, niet over *winnen*.** "7× meer kans om de
+   lead te kwalificeren" is niet hetzelfde als "7× meer omzet". Dat verschil
+   wegschrijven is precies hoe de 78% is ontstaan.
+3. **Twee van de drie bronnen zijn van een leverancier** die software voor
+   sneller opvolgen verkoopt. De HBR-publicatie is de enige met externe
+   redactie, en dat is de reden dat hij bovenaan staat.
+
+**Wat er dus wél mag.** Eén zin met bron en jaartal erbij, als context naast
+een getal dat de lezer zelf heeft gemeten. Niet als belofte, niet als
+Nederlands gemiddelde, en niet zonder de bron erbij.
+
+**Wat er niet mag.** Een drempel verzinnen. "Langer dan 15 minuten",
+"meer dan 5 uur per week", "langer dan 48 uur" — geen van deze drie heeft een
+bron, en een drempel is precies het soort getal dat een lezer overneemt.
+De enige tijdsgrens in dit blok met een bron erachter is **één uur**, en die
+komt uit de HBR-publicatie.
+
 ## Where copy lives
 
 | Surface | Source of copy |

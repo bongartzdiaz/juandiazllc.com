@@ -3,9 +3,11 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import {
   BLOKKEN,
+  MET_METING,
   VOLGORDE,
   VRAGEN,
   alleBeantwoord,
+  duidMetingen,
   lekt,
   scoor,
   type Antwoorden,
@@ -16,13 +18,16 @@ const WORTEL = join(__dirname, "..");
 /** Het document met één spatie tussen alles — hij breekt regels op 80 tekens. */
 const DOC = readFileSync(join(WORTEL, "docs", "lead-magnet.md"), "utf8").replace(/\s+/g, " ");
 
+/** De bron voor elk cijfer dat de scan uitspreekt. Zie docs/claims.md. */
+const CLAIMS = readFileSync(join(WORTEL, "docs", "claims.md"), "utf8").replace(/\s+/g, " ");
+
 const alles = (waarde: boolean): Antwoorden =>
   Object.fromEntries(VRAGEN.map((v) => [v.id, waarde]));
 
 describe("de vragenlijst", () => {
-  it("telt vijftien vragen met unieke id's", () => {
-    expect(VRAGEN).toHaveLength(15);
-    expect(new Set(VRAGEN.map((v) => v.id)).size).toBe(15);
+  it("telt zestien vragen met unieke id's", () => {
+    expect(VRAGEN).toHaveLength(16);
+    expect(new Set(VRAGEN.map((v) => v.id)).size).toBe(16);
   });
 
   it("verdeelt ze over vier blokken die allemaal gevuld zijn", () => {
@@ -36,7 +41,7 @@ describe("de vragenlijst", () => {
     for (const v of VRAGEN) expect(geldig.has(v.blok), `${v.id} wijst naar blok ${v.blok}`).toBe(true);
   });
 
-  /* docs/lead-magnet.md §2 draagt dezelfde vijftien vragen. Twee kopieën van
+  /* docs/lead-magnet.md §2 draagt dezelfde zestien vragen. Twee kopieën van
    * één tekst lopen uit elkaar zonder dat iemand het merkt — dat is precies wat
    * er met public/llms.txt gebeurde (#199), waar het document een bewering bleef
    * dragen die de code al had ingetrokken. */
@@ -86,7 +91,7 @@ describe("lekt()", () => {
   });
 
   it("telt bij de omgekeerde vraag juist 'ja' als lek", () => {
-    // D2 staat met opzet omgekeerd: vijftien vragen waarbij nee altijd slecht is
+    // D2 staat met opzet omgekeerd: zestien vragen waarbij nee altijd slecht is
     // vult iemand op de automatische piloot in.
     expect(omgekeerd.id).toBe("D2");
     expect(lekt(omgekeerd, true)).toBe(true);
@@ -133,11 +138,29 @@ describe("scoor()", () => {
     expect(uit[0].aantal).toBe(3);
   });
 
+  /* A en C zijn de enige twee blokken van gelijke grootte, dus alleen daar kan
+   * een gelijkspel ontstaan dat noch op aandeel noch op aantal te breken is —
+   * precies het geval waarvoor de vaste volgorde in de comparator staat. De
+   * uitslag moet reproduceerbaar zijn en niet afhangen van de stabiliteit van
+   * Array#sort. */
   it("breekt gelijkspel op de vaste volgorde A→B→C→D", () => {
-    // Eén lek per blok. De uitslag moet reproduceerbaar zijn, niet afhankelijk
-    // van de stabiliteit van Array#sort — de comparator doet het expliciet.
-    const uit = scoor({ D1: false, C1: false, B1: false, A1: false });
-    expect(uit.map((l) => l.blok)).toEqual(["A", "B", "C"]);
+    const uit = scoor({ C1: false, C2: false, A1: false, A2: false });
+    expect(uit.map((l) => l.blok)).toEqual(["A", "C"]);
+    expect(uit.map((l) => l.aandeel)).toEqual([0.5, 0.5]);
+  });
+
+  /* Rangschikken op AANDEEL, niet op aantal.
+   *
+   * Zolang elk blok even veel vragen droeg waren die twee hetzelfde. Blok B
+   * heeft er vijf en blok D drie, en dan wint tellen automatisch het grootste
+   * blok: twee lekken van vijf is minder erg dan twee van drie, maar een teller
+   * ziet twee keer twee. Zonder deze assertie zou een vraag toevoegen zijn
+   * eigen blok stilzwijgend zwaarder maken — en dat is precies wat B5 deed. */
+  it("rangschikt op aandeel en niet op aantal", () => {
+    const uit = scoor({ B1: false, B2: false, D1: false, D3: false });
+    expect(uit.map((l) => l.aantal)).toEqual([2, 2]);
+    expect(uit.map((l) => l.blok)).toEqual(["D", "B"]);
+    expect(uit[0].aandeel).toBeGreaterThan(uit[1].aandeel);
   });
 
   it("noemt per lek de vragen die lekten", () => {
@@ -145,6 +168,123 @@ describe("scoor()", () => {
     expect(uit).toHaveLength(1);
     expect(uit[0].vragen.map((v) => v.id)).toEqual(["C2", "C4"]);
     expect(uit[0].lek).toBe("Hetzelfde feit wordt meermaals getypt");
+  });
+});
+
+/* De twee invulvelden.
+ *
+ * Dit is het enige deel van de scan dat een getal uitspreekt, en dus het enige
+ * deel dat aan docs/claims.md vastzit. De rest is een ja of een nee. */
+describe("de metingen", () => {
+  it("hangen aan de twee vragen die erom vragen", () => {
+    expect(MET_METING.map((v) => v.id)).toEqual(["B1", "B3"]);
+  });
+
+  /* Een opdracht of label met een getal erin is een claim die niemand heeft
+   * nagetrokken. De bron is de enige uitzondering: die noemt per definitie een
+   * jaartal en een steekproef, en dat is juist wat hem controleerbaar maakt. */
+  it("spreken zelf geen cijfers uit", () => {
+    for (const v of MET_METING) {
+      const m = v.meting!;
+      for (const [veld, tekst] of Object.entries({
+        opdracht: m.opdracht,
+        label: m.label,
+        eenheid: m.eenheid,
+        duiding: m.grens?.duiding ?? "",
+      })) {
+        expect(/[0-9]/.test(tekst), v.id + "." + veld + " draagt een cijfer: " + tekst).toBe(false);
+      }
+    }
+  });
+
+  it("controleert dat met een patroon dat kán vallen", () => {
+    // Zonder deze regel is een lege overtreedslijst niet te onderscheiden van
+    // een kapotte regex.
+    expect(/[0-9]/.test("binnen 5 minuten")).toBe(true);
+  });
+
+  /* Er is precies één grens in dit instrument, en hij draagt een bron.
+   * "Langer dan 15 minuten", "meer dan 5 uur per week" en "langer dan 48 uur"
+   * zijn alle drie voorgesteld en alle drie afgewezen: geen bron. */
+  it("dragen hooguit één grens, en die staat in docs/claims.md", () => {
+    const metGrens = MET_METING.filter((v) => v.meting?.grens);
+    expect(metGrens.map((v) => v.id)).toEqual(["B3"]);
+
+    const grens = metGrens[0].meting!.grens!;
+    expect(grens.waarde).toBe(1);
+    expect(metGrens[0].meting!.eenheid).toBe("uur");
+
+    // De bron moet terug te vinden zijn in de claim-tabel. Niet op identieke
+    // formulering — op de twee feiten die hem controleerbaar maken.
+    expect(CLAIMS).toContain("Reactietijd op leads");
+    for (const feit of ["2011", "2.241"]) {
+      expect(grens.bron, "de bron noemt " + feit + " niet").toContain(feit);
+      expect(CLAIMS, "docs/claims.md noemt " + feit + " niet").toContain(feit);
+    }
+  });
+
+  /* De 78% is folklore — docs/claims.md zegt met zoveel woorden dat hij niet
+   * gepubliceerd mag worden. Deze regel houdt hem uit de scan én uit het
+   * document, want daar zou hij als eerste terugkomen. */
+  it("dragen de onvindbare 78% nergens", () => {
+    const alleTekst = [
+      ...VRAGEN.map((v) => v.vraag + " " + v.kost),
+      ...MET_METING.map((v) => JSON.stringify(v.meting)),
+    ].join(" ");
+    expect(alleTekst).not.toContain("78");
+    expect(/\b78\s?%/.test(DOC), "docs/lead-magnet.md draagt de 78%").toBe(false);
+    // Positieve controle: het patroon valt wel op de echte vorm.
+    expect(/\b78\s?%/.test("78% koopt bij wie het eerst reageert")).toBe(true);
+  });
+
+  it("geven niets terug voor een veld dat leeg bleef", () => {
+    // Leeg is niet nul. Een uitslag die die twee door elkaar haalt vertelt
+    // iemand dat hij binnen nul uur reageert.
+    expect(duidMetingen({})).toEqual([]);
+    expect(duidMetingen({ B3: undefined })).toEqual([]);
+    expect(duidMetingen({ B3: Number.NaN })).toEqual([]);
+    expect(duidMetingen({ B3: -3 })).toEqual([]);
+  });
+
+  it("geven het getal terug zoals het is ingevuld, met de grens erbij", () => {
+    const boven = duidMetingen({ B3: 6 });
+    expect(boven).toHaveLength(1);
+    expect(boven[0].waarde).toBe(6);
+    expect(boven[0].bovenGrens).toBe(true);
+
+    expect(duidMetingen({ B3: 1 })[0].bovenGrens).toBe(false);
+    expect(duidMetingen({ B3: 0 })[0].waarde).toBe(0);
+  });
+
+  it("laten een meting zonder grens ongeduid", () => {
+    // B1 heeft er bewust geen: er bestaat geen bron voor een doorlooptijd die
+    // "goed" is, en een verzonnen drempel is erger dan geen drempel.
+    const uit = duidMetingen({ B1: 12 });
+    expect(uit).toHaveLength(1);
+    expect(uit[0].meting.grens).toBeUndefined();
+    expect(uit[0].bovenGrens).toBeUndefined();
+  });
+});
+
+/* Het document en de code tellen hetzelfde aantal vragen. */
+describe("de telling in docs/lead-magnet.md", () => {
+  const TELWOORD: Record<number, string> = {
+    14: "veertien",
+    15: "vijftien",
+    16: "zestien",
+    17: "zeventien",
+    18: "achttien",
+  };
+
+  it("noemt hetzelfde aantal als de code draagt", () => {
+    const woord = TELWOORD[VRAGEN.length];
+    expect(woord, "vul TELWOORD aan voor " + VRAGEN.length + " vragen").toBeDefined();
+    expect(DOC).toContain("De " + woord + " vragen");
+
+    for (const [n, w] of Object.entries(TELWOORD)) {
+      if (Number(n) === VRAGEN.length) continue;
+      expect(DOC.includes("De " + w + " vragen"), "het document noemt ook " + w).toBe(false);
+    }
   });
 });
 

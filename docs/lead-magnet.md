@@ -1,7 +1,7 @@
 # De leadmagneet — de lekkage-scan
 
 Wat er gebouwd wordt om e-mailadressen op te vangen, waarom dit formaat, en de
-vijftien vragen woordelijk.
+zestien vragen woordelijk.
 
 Geschreven 2026-08-22. Alles in §0 is gemeten, niet aangenomen; §8 zegt per
 uitspraak waar hij vandaan komt. De vragen in §2 zijn geschreven, niet gemeten —
@@ -63,12 +63,12 @@ bezoekers is die inzet niet te verantwoorden vóórdat er iemand blijkt te kijke
 **Waarom alleen Nederlands.** Alle vier de bevestigde engagements zijn NL/BE, en
 het ICP is dat ook. Dezelfde keuze als bij het saldering-cluster, om dezelfde
 reden: een vertaalde versie voor een markt waar geen bewijs uit komt is dunne
-inhoud, geen bereik. Vijftien vragen × vier talen is bovendien zestig
-dict-sleutels voor drie markten die dit niet gevraagd hebben.
+inhoud, geen bereik. Zestien vragen × vier talen is bovendien
+vierenzestig dict-sleutels voor drie markten die dit niet gevraagd hebben.
 
 ---
 
-## §2 — De vijftien vragen
+## §2 — De zestien vragen
 
 Ja/nee. Vier blokken, elk gespiegeld aan een van de vier bevestigde uitkomsten.
 Onder elke vraag staat wat een "nee" kost — **in woorden, nooit in een getal.**
@@ -105,6 +105,13 @@ voorstel.*
 **B1. Weet je hoeveel uur er gemiddeld tussen aanvraag en offerte zit?**
 → Bij nee kun je die tijd niet verkorten, want je zou de verbetering niet zien.
 
+> **Meting (optioneel).** Pak je laatste vijf verstuurde offertes. Tel per
+> offerte de werkdagen tussen het eerste klantcontact en het moment dat hij de
+> deur uit ging.
+> Veld: *Gemiddeld aantal werkdagen tot de offerte* · eenheid **werkdagen**.
+> **Geen grens.** Er bestaat geen bron voor een doorlooptijd die "goed" is. Het
+> getal wordt teruggegeven zoals het is ingevuld, zonder oordeel.
+
 **B2. Gaat er een offerte de deur uit zonder dat iemand gegevens overtypt uit
 een ander systeem?**
 → Bij nee betaal je twee keer: de tijd van het overtypen, en de fouten die
@@ -115,9 +122,26 @@ vakantieweek?**
 → Bij nee is je reactietijd een functie van wie er toevallig werkt. De
 aanvrager belt ondertussen de volgende.
 
+> **Meting (optioneel).** Zoek je laatste tien aanvragen op die buiten
+> kantooruren binnenkwamen. Tel de uren tot het eerste inhoudelijke antwoord van
+> een mens — een ontvangstbevestiging telt niet mee.
+> Veld: *Gemiddelde uren tot het eerste inhoudelijke antwoord* · eenheid
+> **uur** · grens **1 uur**.
+> **De enige grens in dit hele instrument met een bron erachter.** Boven een uur
+> wordt kwalificeren aantoonbaar moeilijker — Harvard Business Review, 2011,
+> audit van 2.241 bedrijven. De volledige onderbouwing en de drie beperkingen
+> staan in `docs/claims.md` onder "Reactietijd op leads". Dat is Amerikaans
+> onderzoek en het gaat over *kwalificeren*, niet over winnen; beide staan er
+> op de pagina bij.
+
 **B4. Kun je zien wélke stap in het traject de meeste tijd kost?**
 → Bij nee verbeter je op gevoel, en gevoel wijst naar de stap die het luidst
 klaagt — zelden naar de stap die het langst duurt.
+
+**B5. Kun je een klant binnen een week een tekening of calculatie laten zien,
+ook als de collega die dat maakt er niet is?**
+→ Bij nee is je doorlooptijd de agenda van één persoon. De klant merkt dat als
+stilte, en jij merkt het pas als hij niet terugbelt.
 
 ### Blok C — Dubbele invoer
 *Spiegelt: +38% lead-naar-gesprek, na vier tools vervangen door één CRM plus een
@@ -171,8 +195,12 @@ Mechanisme:
 1. Tel per blok de "nee"-antwoorden. (Bij A3 telt "meerdere systemen" als nee;
    bij D2 telt "ja" als nee — die vraag staat bewust omgekeerd, zodat het
    invullen aandacht blijft vragen.)
-2. Blokken met de meeste "nee" komen eerst.
-3. Gelijkspel breekt op een **vaste** volgorde: A → B → C → D.
+2. Blokken met het hoogste **aandeel** "nee" komen eerst — aantal gedeeld door
+   het aantal vragen in dat blok. Dat is sinds B5 een echt verschil: blok B
+   heeft er vijf en de rest vier, en op tellen zou het grootste blok
+   automatisch winnen. Drie van vijf is minder erg dan drie van vier.
+3. Gelijkspel breekt eerst op aantal, daarna op een **vaste** volgorde:
+   A → B → C → D.
 
 Punt 3 is een oordeel, geen meting. Ik heb geen bewijs dat overdracht zwaarder
 weegt dan stapelkosten; die volgorde staat er zodat de uitslag reproduceerbaar
@@ -195,7 +223,7 @@ geen diagnose — en dit publiek merkt dat verschil binnen twee vragen.
 
 ### §3.1 — Wat de scan niet kan zien
 
-Hoort onder elke uitslag, ook een slechte. Vijftien ja/nee-vragen zien geen
+Hoort onder elke uitslag, ook een slechte. Zestien ja/nee-vragen zien geen
 marge per project, geen kwaliteit van de instroom, geen bezetting, en niets over
 of de mensen het nieuwe systeem zouden gebruiken. Dat staat er zodat de scan
 zijn eigen reikwijdte draagt in plaats van hem te suggereren.
@@ -315,7 +343,7 @@ naartoe moet leiden.
 
 ### Wat hier níet gemeten is
 
-De vijftien vragen zijn geschreven, niet getest. Of ze de juiste lekken raken
+De zestien vragen zijn geschreven, niet getest. Of ze de juiste lekken raken
 blijkt pas als de vier bestaande klanten ze invullen — dat is stap 3 van §5, en
 het is met opzet de eerste stap en niet de laatste.
 
