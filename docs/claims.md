@@ -1038,6 +1038,31 @@ waarop een eigenaar het voelt niet. §2 is bijgewerkt.
 de kosten komen via het tarief binnen, de factuur splitst ze niet uit, en de
 richting is omhoog. Alles daarbuiten is prognose.
 
+### WPM — rapportage werkgebonden personenmobiliteit (gemeten 2026-08-23)
+
+De haak onder het logistiekcluster. **In werking**, anders dan EPBD en ETS2 —
+dit is de enige van de drie die vandaag al geldt.
+
+| Claim | Waarde | Status |
+| --- | --- | --- |
+| Grondslag | Besluit CO2-reductie werkgebonden personenmobiliteit | ✅ [RVO — WPM](https://www.rvo.nl/onderwerpen/rapportage-wpm/veelgestelde-vragen), gelezen 2026-08-23 |
+| In werking sinds | **1 juli 2024** | ✅ zelfde bron |
+| Wie | werkgevers met **100 of meer** werknemers | ⚠️ geldt vandaag, maar zie de rij hieronder |
+| Peildatum | was 1 juli 2024; daarna 1 januari 2025, waarover in 2026 wordt gerapporteerd | ✅ zelfde bron |
+| Waar | jaarlijks aan RVO, via een online formulier | ✅ zelfde bron |
+| Toezicht | een omgevingsdienst controleert **of** er gerapporteerd is **en de kwaliteit van de gegevens** | ✅ zelfde bron — dit is de scherpste rij en de reden dat het artikel bestaat |
+| Drempel naar 250 | ontwerp-wijzigingsbesluit van 24-04-2026 zondert het mkb uit; **het moment van inwerkingtreding is niet bekend** | ⚠️ [Rijksoverheid](https://www.rijksoverheid.nl/documenten/kamerstukken/2026/04/24/ontwerpwijzigingsbesluituitzonderenmkbvanrapportageverplichtingzakelijkenwoonwerkverkeer) — schrijf nooit dat de drempel al 250 is, en nooit een datum |
+| Indieningsdeadline per jaar | **niet nagetrokken** | ❌ geen datum publiceren |
+| Boetes of sancties | **niet nagetrokken** | ❌ niets over handhavingsgevolgen beweren |
+
+**Waarom deze haak anders is dan de twee andere.** EPBD en ETS2 leggen een
+toekomstige eis op. WPM geldt nu, en het toezicht kijkt naar datakwaliteit. Dat
+maakt hem bruikbaar zonder een toekomstvoorspelling: wie vandaag niet kan laten
+zien waar zijn kilometercijfer vandaan komt, heeft vandaag al een probleem.
+
+**Wat er niet in kopij mag.** Geen indieningsdatum, geen sanctie, geen aantal
+getroffen bedrijven, en niet de suggestie dat de drempel al is verhoogd.
+
 ## Where copy lives
 
 | Surface | Source of copy |

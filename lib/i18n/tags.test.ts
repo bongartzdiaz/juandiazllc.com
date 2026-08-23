@@ -65,6 +65,7 @@ describe("elke tag in gebruik heeft een label in vier talen", () => {
       "Energy",
       "Growth",
       "Hospitality",
+      "Logistics",
       "Method",
       "Operations",
       "Real estate",

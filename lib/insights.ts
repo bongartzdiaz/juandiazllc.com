@@ -1516,6 +1516,97 @@ export const POSTS: Insight[] = [
       { type: "p", text: "Wat wel vaststaat is de richting en de reden dat u het laat gaat zien. Het beleid is bedoeld om fossiel duurder te maken, de kosten komen via een derde binnen, en uw factuur splitst het niet uit. Dat is voldoende om nu uw basislijn op orde te brengen, en het is te weinig om nu een investering op te baseren." },
     ],
   },
+  {
+    slug: "kostprijs-per-kilometer-ets2-de-component-die-u-niet-ziet",
+    markets: ["nl"],
+    title: "Uw kostprijs per kilometer krijgt een component die u niet ziet",
+    summary:
+      "ETS2 beprijst vanaf 2027 de CO2 in wegbrandstof. De verplichting ligt bij uw brandstofleverancier, niet bij u, en die beslist zelf wanneer en hoeveel hij doorberekent. Uw tarief verraadt het niet. Wat er vaststaat, wat alleen gepland is, en waarom dit een meetprobleem is.",
+    tag: "Logistics",
+    publishedAt: "2026-08-23",
+    readingMinutes: 6,
+    seo: {
+      metaTitle: "ETS2 en uw kostprijs per kilometer",
+      metaDescription:
+        "ETS2 legt de CO2-kosten van wegbrandstof bij uw leverancier. Wat vaststaat, wat gepland is, en waarom uw eigen basislijn belangrijker is dan de prognose.",
+    },
+    body: [
+      { type: "p", text: "Vraag tien vervoerders naar hun kostprijs per kilometer en u krijgt tien getallen die met stelligheid worden gebracht. Vraag door naar de herkomst en het beeld kantelt. Het cijfer is meestal een optelsom uit drie systemen die elkaar niet kennen: de planning weet de ritten, de tankpas weet de liters, en het transportmanagementsysteem weet de opdrachten. Wie ze op elkaar legt houdt verschillen over die niemand kan verklaren." },
+      { type: "p", text: "Zolang de brandstofprijs meebeweegt met de markt is dat te overleven. U ziet de dieselprijs stijgen, u past uw tarief aan, klaar. Vanaf 2027 komt er een component bij die niet op die manier zichtbaar is." },
+
+      { type: "h2", text: "Wat er vaststaat, en wat alleen gepland is" },
+      { type: "p", text: "ETS2 beprijst de CO2 die vrijkomt bij het gebruik van fossiele brandstoffen in onder meer het wegvervoer. Vanaf 2027 vallen brandstofleveranciers eronder en moeten zij jaarlijks hun emissiecijfer opgeven in het register. De eerste veiling van rechten is op dit moment gepland voor januari 2027." },
+      { type: "p", text: "Het woord gepland staat er met opzet. Het is een voornemen, en er zit bovendien een vertraging in die vrijwel nooit wordt meegenomen: de eerste keer dat er daadwerkelijk rechten worden ingeleverd is in 2029, over de emissies van 2028. Tussen de start van de veilingen en het moment van afrekenen zit dus bijna twee jaar." },
+      { type: "p", text: "Wie u vandaag een tabel voorlegt met eurocenten per liter, extrapoleert een aanname en noemt het een prognose. Er is geen veilingprijs, dus er is geen bedrag." },
+
+      { type: "h2", text: "De verplichting ligt niet bij u, en dat is het lastige deel" },
+      { type: "p", text: "U hoeft niets te doen. Geen vergunning, geen registeraccount, geen rapportage. De verplichting ligt formeel bij de partij die u de brandstof levert. Die koopt de rechten in en verwerkt de kosten in het tarief." },
+      { type: "p", text: "Dat klinkt comfortabel en het is het tegenovergestelde. Bij een heffing die u zelf afdraagt kent u de datum, het tarief en de grondslag. Bij een kostenpost die via een derde binnenkomt kent u geen van drieen. U ziet een literprijs, en of daar CO2-kosten in zitten en hoeveel is er niet aan af te lezen." },
+      { type: "p", text: "Wanneer leveranciers gaan doorberekenen is bovendien een commerciele beslissing en geen wettelijke. Sommige beginnen zodra ze rechten inkopen. Andere spreiden het. Weer andere hebben het al verwerkt in een contract dat vorig jaar is getekend, zonder aparte regel." },
+
+      { type: "h2", text: "Waarom scherper inkopen dit niet oplost" },
+      { type: "p", text: "De reflex is begrijpelijk: langer vastzetten, meer offertes, een adviseur op de aanbesteding. Dat helpt marginaal. Maar u kunt niet beoordelen of een aanbod goed of slecht is zolang u uw eigen basislijn niet scherp heeft, en dat is precies wat er ontbreekt." },
+      { type: "p", text: "Vier vragen bepalen of u een tariefstijging kunt toerekenen of er alleen over kunt discussieren:" },
+      { type: "ul", items: [
+        "wat verbruikt elk voertuig werkelijk per honderd kilometer, gecorrigeerd voor belading en seizoen",
+        "welk deel van uw kilometers rijdt u op een contract met een vaste prijs en welk deel op de dagmarkt",
+        "welke ritten zijn doorbelastbaar aan een opdrachtgever met een brandstofclausule, en welke niet",
+        "hoe beweegt uw marge per rit als de literprijs vijf, tien of twintig procent oploopt",
+      ] },
+      { type: "p", text: "Wie die vier antwoorden heeft, ziet een stijging binnen een maand terug in de eigen cijfers en weet welke opdrachtgever hem draagt. Wie ze niet heeft, ziet een hogere factuur en begint een gesprek zonder onderbouwing." },
+
+      { type: "h2", text: "De brandstofclausule is de plek waar dit landt" },
+      { type: "p", text: "In veel vervoerscontracten zit een clausule die de brandstofprijs doorberekent aan de opdrachtgever. Die clausules verwijzen bijna altijd naar een marktindex. De vraag die u deze maand kunt stellen aan uw eigen contractenmap is of die index de CO2-component meeneemt of niet." },
+      { type: "p", text: "Ik weet het antwoord niet, en dat hangt per index en per contract af. Maar het is wel de vraag waarvan het antwoord bepaalt of deze hele kwestie uw probleem is of dat van uw klant. Hem nu stellen kost een middag. Hem in 2027 stellen kost een onderhandeling." },
+
+      { type: "h2", text: "Wat ik hier niet beweer" },
+      { type: "p", text: "Geen bedrag, geen datum waarop u het merkt, en geen uitspraak over welke leverancier wat gaat doen. De richting staat vast: het beleid is bedoeld om fossiele brandstof duurder te maken. Het moment waarop u het voelt staat niet vast, en de weg ernaartoe loopt via een commerciele beslissing van een ander." },
+      { type: "p", text: "Wat daaruit volgt is bescheiden en concreet. Dit is voldoende reden om nu uw basislijn op orde te brengen, en te weinig reden om nu een investering of een tariefaanpassing op te baseren. Het verschil tussen die twee is precies het verschil tussen voorbereid zijn en gokken." },
+    ],
+  },
+  {
+    slug: "wpm-de-omgevingsdienst-controleert-uw-cijfers-niet-uw-inzending",
+    markets: ["nl"],
+    title: "Niet of u rapporteert wordt gecontroleerd, maar of uw cijfers kloppen",
+    summary:
+      "Werkgevers met honderd of meer werknemers rapporteren sinds juli 2024 jaarlijks over zakelijk verkeer en woon-werkverkeer. Het toezicht kijkt naar de inzending en naar de kwaliteit van de gegevens. Dat tweede is waar de meeste organisaties het niet redden.",
+    tag: "Logistics",
+    publishedAt: "2026-08-23",
+    readingMinutes: 5,
+    seo: {
+      metaTitle: "WPM: het toezicht kijkt naar uw datakwaliteit",
+      metaDescription:
+        "Sinds juli 2024 rapporteren werkgevers vanaf 100 werknemers over werkgebonden mobiliteit. Een omgevingsdienst controleert ook de kwaliteit van de gegevens.",
+    },
+    body: [
+      { type: "p", text: "Er is een verplichting die al geldt terwijl de meeste aandacht uitgaat naar wat er nog aankomt. Werkgevers met honderd of meer werknemers moeten sinds 1 juli 2024 jaarlijks gegevens aanleveren over de zakelijke reizen en het woon-werkverkeer van hun personeel, via een online formulier bij de RVO." },
+      { type: "p", text: "Op zichzelf is dat een administratieve klus. Wat het interessanter maakt is het toezicht: een omgevingsdienst controleert of uw organisatie het verslag verstuurt en de kwaliteit van uw gegevens. Die tweede helft is waar dit van een formaliteit in een echt probleem verandert." },
+
+      { type: "h2", text: "Voor een vervoerder is de ironie compleet" },
+      { type: "p", text: "Een transportbedrijf verplaatst voor de kost dingen over de weg en meet dat tot op de kilometer. Dezelfde organisatie wordt gevraagd hoe haar eigen mensen op het werk komen, en dan blijkt het antwoord nergens te staan." },
+      { type: "p", text: "Niet omdat niemand het bijhoudt, maar omdat vier verschillende systemen elk een stukje hebben:" },
+      { type: "ul", items: [
+        "de leaseadministratie kent de auto's, en niet wie er wanneer mee reed",
+        "de declaraties kennen de zakelijke ritten die iemand heeft ingediend, en niet de ritten die niemand indiende",
+        "de personeelsadministratie kent de woonadressen, en die zijn geen reisgedrag",
+        "de OV-abonnementen en mobiliteitskaarten zitten bij een derde partij, in een ander formaat",
+      ] },
+      { type: "p", text: "Een verslag samenstellen uit die vier kan. Het kost een paar dagen en het lukt. Het probleem ontstaat bij de vraag die daarna komt: waar komt dit getal vandaan, en klopt het." },
+
+      { type: "h2", text: "De drempel gaat schuiven, en dat verandert de aanpak" },
+      { type: "p", text: "Er ligt een ontwerp-wijzigingsbesluit dat het mkb wil uitzonderen door de grens van honderd naar tweehonderdvijftig werknemers te verplaatsen. Het moment waarop dat ingaat is niet bekend." },
+      { type: "p", text: "Twee dingen volgen daaruit, en ze wijzen dezelfde kant op. U kunt er niet op wachten, want vandaag geldt de grens van honderd. En u kunt er geen eenmalig project van maken, want de spelregels bewegen nog. Wat u bouwt moet volgend jaar opnieuw te draaien zijn met andere invoer." },
+
+      { type: "h2", text: "Reproduceerbaar is belangrijker dan precies" },
+      { type: "p", text: "Dit is dezelfde conclusie als bij het energielabel voor gebouwen, en dat is geen toeval. Bij beide verplichtingen wordt gevraagd om een cijfer waarvan de definitie nog beweegt, uit bronnen die niet voor dat doel zijn gebouwd." },
+      { type: "p", text: "De aanpak die standhoudt bestaat uit vier dingen. Bepaal per gegevensbron wie hem beheert en hoe vaak hij ververst. Leg vast welke aannames u doet waar de data ontbreekt, in plaats van te middelen en de aanname te vergeten. Noteer bij elk cijfer de meetdatum. En zorg dat de hele bewerking herhaalbaar is, in code of in een beschreven processtap, zodat iemand anders hem volgend jaar kan draaien zonder u." },
+      { type: "p", text: "Dat laatste punt is waar de meeste organisaties het laten liggen. Het verslag van vorig jaar is gemaakt door iemand die inmiddels iets anders doet, in een spreadsheet die niemand meer helemaal begrijpt. Dat werkt precies tot het moment dat er iemand langskomt die vraagt hoe u aan een getal komt." },
+
+      { type: "h2", text: "Wat ik hier niet beweer" },
+      { type: "p", text: "Ik noem geen indieningsdatum en geen sanctie. Die heb ik niet nagetrokken, en een datum uit het hoofd citeren is in dit dossier precies de fout die u wilt vermijden. De RVO publiceert beide; controleer ze daar voordat u iets in een agenda zet." },
+      { type: "p", text: "Wat ik wel beweer is smal en toetsbaar. De verplichting geldt vandaag, het toezicht kijkt naar datakwaliteit, en de vier bronnen waaruit uw cijfer moet komen zijn niet gebouwd om samen een verslag op te leveren. Wie dat een keer goed regelt, is klaar voor de volgende versie van de regels in plaats van voor deze." },
+    ],
+  },
 ];
 
 /** Locales a post is published under (default: all four). */
