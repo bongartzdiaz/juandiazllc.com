@@ -17,7 +17,11 @@
  *    elke ingang naar een gesprek overal dezelfde naam draagt.
  * 3. Bij nul lekken staat er dat er niets gevonden is. Een scan die altijd iets
  *    vindt is een verkoopinstrument en geen diagnose, en dit publiek merkt dat
- *    verschil binnen twee vragen. */
+ *    verschil binnen twee vragen.
+ * 4. De twee invulvelden zijn OPTIONEEL en blokkeren de knop niet. Ze vragen om
+ *    een getal uit de eigen administratie, niet om een schatting — en wie dat
+ *    getal nu niet bij de hand heeft moet de scan gewoon kunnen afmaken. Een
+ *    leeg veld levert dan ook niets op in de uitslag: geen nul, geen aanname. */
 
 import { useMemo, useState } from "react";
 import { LocaleLink } from "@/components/LocaleLink";
@@ -26,21 +30,36 @@ import {
   BLOKKEN,
   VRAGEN,
   alleBeantwoord,
+  duidMetingen,
   scoor,
   type Antwoorden,
+  type Metingen,
 } from "@/lib/lekkage-scan";
 
 export function LekkageScan() {
   const t = useT();
   const [antwoorden, setAntwoorden] = useState<Antwoorden>({});
+  const [metingen, setMetingen] = useState<Metingen>({});
   const [getoond, setGetoond] = useState(false);
 
   const compleet = alleBeantwoord(antwoorden);
   const lekken = useMemo(() => scoor(antwoorden), [antwoorden]);
+  const gemeten = useMemo(() => duidMetingen(metingen), [metingen]);
   const open = VRAGEN.filter((v) => antwoorden[v.id] === undefined).length;
 
   function kies(id: string, waarde: boolean) {
     setAntwoorden((vorig) => ({ ...vorig, [id]: waarde }));
+  }
+
+  /* Een leeg veld wordt `undefined` en geen 0 — anders is "ik heb het niet
+   * opgezocht" niet te onderscheiden van "het antwoord is nul uur". */
+  function meet(id: string, ruw: string) {
+    const schoon = ruw.trim().replace(",", ".");
+    const waarde = schoon === "" ? undefined : Number(schoon);
+    setMetingen((vorig) => ({
+      ...vorig,
+      [id]: waarde !== undefined && Number.isFinite(waarde) ? waarde : undefined,
+    }));
   }
 
   return (
@@ -67,6 +86,26 @@ export function LekkageScan() {
                   </label>
                 ))}
               </div>
+              {v.meting && (
+                <div className="scan-meting">
+                  <p className="scan-meting-opdracht">{v.meting.opdracht}</p>
+                  <label className="scan-meting-veld">
+                    <span>{v.meting.label}</span>
+                    <span className="scan-meting-invoer">
+                      <input
+                        type="number"
+                        min={0}
+                        step="0.5"
+                        inputMode="decimal"
+                        value={metingen[v.id] ?? ""}
+                        onChange={(e) => meet(v.id, e.target.value)}
+                      />
+                      <span className="scan-meting-eenheid">{v.meting.eenheid}</span>
+                    </span>
+                  </label>
+                  <p className="scan-meting-uitleg">Optioneel. Sla over als je het nu niet kunt opzoeken.</p>
+                </div>
+              )}
             </fieldset>
           ))}
         </section>
@@ -83,7 +122,7 @@ export function LekkageScan() {
         </button>
         <p className="scan-teller" aria-live="polite">
           {compleet
-            ? "Alle vijftien beantwoord."
+            ? `Alle ${VRAGEN.length} beantwoord.`
             : `Nog ${open} ${open === 1 ? "vraag" : "vragen"} te gaan.`}
         </p>
       </div>
@@ -114,8 +153,7 @@ export function LekkageScan() {
                       <span className="scan-rang">{i + 1}</span> {lek.lek}
                     </h3>
                     <p className="scan-meta">
-                      {lek.aantal} van de {VRAGEN.filter((v) => v.blok === lek.blok).length} vragen
-                      onder <em>{lek.naam}</em>.
+                      {lek.aantal} van de {lek.totaal} vragen onder <em>{lek.naam}</em>.
                     </p>
                     <ul className="scan-kosten">
                       {lek.vragen.map((v) => (
@@ -126,6 +164,29 @@ export function LekkageScan() {
                 ))}
               </ol>
             </>
+          )}
+
+          {gemeten.length > 0 && (
+            <div className="scan-gemeten">
+              <h3>Wat je zelf hebt gemeten</h3>
+              {gemeten.map((m) => (
+                <div className="scan-gemeten-rij" key={m.vraag.id}>
+                  <p className="scan-gemeten-getal">
+                    {m.meting.label}: <strong>{m.waarde} {m.meting.eenheid}</strong>
+                  </p>
+                  {m.meting.grens && (
+                    <p className="scan-gemeten-duiding">
+                      {m.meting.grens.duiding}{" "}
+                      <span className="scan-gemeten-bron">{m.meting.grens.bron}</span>
+                    </p>
+                  )}
+                </div>
+              ))}
+              <p className="scan-gemeten-slot">
+                Dit zijn de enige getallen in deze scan die over jouw bedrijf gaan, en
+                je hebt ze zelf opgezocht. Alles hierboven is een ja of een nee.
+              </p>
+            </div>
           )}
 
           <div className="scan-grens">
