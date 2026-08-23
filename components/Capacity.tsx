@@ -1,24 +1,28 @@
 import { BOOKING_15MIN } from "@/lib/booking";
 import { translate, type Locale } from "@/lib/i18n/dict";
 
-// Eerlijk capaciteitssignaal: vier blueprint-opdrachten per kwartaal, en
-// hoeveel daarvan nog vrij zijn.
+// Eerlijk capaciteitssignaal: hoeveel trajecten er tegelijk lopen, en hoeveel
+// daarvan nog vrij zijn.
+//
+// DE EENHEID IS OP 2026-08-23 VERANDERD
+//
+// Dit blok telde vier blueprint-gesprekken per kwartaal, terwijl `/services`
+// drie trajecten tegelijk noemde. Twee getallen over hetzelfde onderwerp, in
+// verschillende eenheden, op naburige pagina's. Juan heeft ze gelijkgetrokken.
+//
+// Er is nu één capaciteitsfeit: **drie trajecten tegelijk**. Dat getal staat in
+// `docs/claims.md` ("Garantie en capaciteit") en nergens anders. TOTAL_SLOTS
+// wordt daar in `capacity.test.ts` tegenaan gehouden, en de bijschrifttest
+// houdt de kopij aan TOTAL_SLOTS. Eén bron, twee oppervlakken — verander je het
+// getal hier, dan valt de poort om tot het ook in claims.md staat.
 //
 // WAAROM HIER EEN DATUM BIJ STAAT
 //
-// `SLOTS_REMAINING = 2` was sinds 2026-04-20 (commit 9038b9e) niet aangeraakt
+// `SLOTS_REMAINING` was sinds 2026-04-20 (commit 9038b9e) niet aangeraakt
 // terwijl er vlak boven stond dat dit géén nep-schaarstewidget is. Vier
 // maanden. Een hardgecodeerd getal dat niemand bijwerkt ís nep-schaarste,
 // ongeacht de bedoeling, en het stond op /contact: precies de pagina waar de
 // bezoeker beslist.
-//
-// Op 2026-08-19 nagekeken: het was toevallig nog steeds 2. Dat maakt het geen
-// vals signaal geweest — maar wel een ongecontroleerd signaal, en dat is een
-// kwestie van geluk, niet van beleid. Vandaar de datum hieronder.
-//
-// De bijschrift-tekst zei bovendien "één blueprint per kwartaal" terwijl de
-// balk er vier tekende. Eén van de twee moest weg; vier is de werkelijke
-// grens, dus de tekst is aangepast (fomo.capacity.note, vier talen).
 //
 // LAST_VERIFIED is de reparatie: `capacity.test.ts` wordt rood zodra deze
 // datum ouder is dan MAX_AGE_DAYS. Dat dwingt een aanraking, en een
@@ -29,22 +33,25 @@ import { translate, type Locale } from "@/lib/i18n/dict";
 // Dit is GEEN nep-schaarstewidget en moet dat blijven. Geen timer, geen
 // "3 mensen kijken nu", en SLOTS_REMAINING nooit lager zetten dan waar de
 // agenda werkelijk staat.
-export const TOTAL_SLOTS = 4;
-export const SLOTS_REMAINING = 2;
+export const TOTAL_SLOTS = 3;
+export const SLOTS_REMAINING = 3;
 
 /**
  * Datum waarop SLOTS_REMAINING voor het laatst tegen de agenda is gehouden.
  *
- * Juan heeft op 2026-08-19 twee dingen bevestigd: vier plekken per kwartaal
- * (het totaal) en twee daarvan nog vrij. Daarvóór stond hier 2026-04-20 — het
- * getal was 121 dagen niet aangeraakt terwijl het commentaar hierboven volhield
- * dat dit geen nep-schaarste is.
+ * Op 2026-08-23 heeft Juan twee dingen bevestigd: drie trajecten tegelijk (het
+ * totaal, dezelfde grens die /services noemt) en alle drie op dit moment vrij.
+ *
+ * De vorige stand — 2 van 4 — is mét de eenheid vervallen. Die 2 telde geboekte
+ * blueprint-GESPREKKEN; dit telt lopende TRAJECTEN. Een verificatie geldt voor
+ * de grootheid die je gemeten hebt, niet voor het vakje waar het getal
+ * toevallig in staat.
  *
  * Zet deze datum alleen bij als je het aantal werkelijk tegen de agenda hebt
  * gehouden. Een datum bijwerken zonder te kijken is exact de fout die de poort
  * moet vangen, en dan vangt hij niets meer.
  */
-export const LAST_VERIFIED = "2026-08-19";
+export const LAST_VERIFIED = "2026-08-23";
 
 /** Zoveel dagen mag LAST_VERIFIED oud zijn voordat de poort rood wordt. */
 export const MAX_AGE_DAYS = 30;
