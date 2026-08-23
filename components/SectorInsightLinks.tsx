@@ -7,13 +7,17 @@ import type { Locale } from "@/lib/i18n/dict";
 // Feeds the previously-orphan real-estate/hospitality sector pages with
 // their supporting articles and passes internal-link equity into them.
 // Self-gates: returns null when the sector has no matching in-market posts
-// (e.g. `adjacent`, or a sector on a locale with no translated articles).
+// (a sector without matching posts, or a locale with no translated ones).
 //
 // Note: energy keeps its own EnergyInsightLinks (market-scoped, topic-
 // specific copy). This handles the all-market operator sectors.
 const SECTOR_TAG: Record<string, string> = {
   "real-estate": "Real estate",
   hospitality: "Hospitality",
+  // Bewust: de aangrenzende sector noemt logistiek als eerste in zijn eigen
+  // samenvatting, en het logistiek-cluster is NL-only. Op /en, /de en /es
+  // levert getAllInsights(locale) daar niets op, dus valt het blok vanzelf weg.
+  adjacent: "Logistics",
 };
 
 const HEADING: Record<Locale, { label: string; lede: string; more: string }> = {
