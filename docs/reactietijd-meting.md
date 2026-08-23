@@ -67,8 +67,12 @@ geantwoord hebben. Zie §7 — dat onderscheid is de kern van dit protocol.
 > een rechtspersoon met een op de eigen website gepubliceerd adres is
 > toegestaan onder art. 11.7 Telecommunicatiewet. De ACM is de toezichthouder.
 > Ik heb de bepaling niet tot op lid-niveau nagetrokken en ga hem hier niet
-> samenvatten alsof ik dat wel heb gedaan. **Zolang dat niet door een jurist is
-> bevestigd geldt het conservatieve pad in §7, spoor B.**
+> samenvatten alsof ik dat wel heb gedaan.
+>
+> **Status: niet bevestigd.** Die regel is de schakelaar. Zolang hij zo staat
+> ligt sjabloon B-2 in §7 stil, en de poort in `lib/reactietijd-protocol.test.ts`
+> koppelt de twee aan elkaar: je kunt de blokkade daar niet weghalen zonder
+> deze status hier ook om te zetten, en andersom evenmin.
 
 ---
 
@@ -281,18 +285,131 @@ benchmark, want dat kunnen ze controleren.
 
 ### Spoor B — ze hebben niet geantwoord
 
-**Standaard: je stuurt niets.** Er is geen sjabloon voor dit spoor, en dat is
-opzet — een sjabloon nodigt uit tot versturen.
+Hier horen twee berichten, en ze zijn niet van dezelfde soort. **B-1 is gewone
+correspondentie en mag vandaag. B-2 is marketing en ligt stil.** Dat onderscheid
+is het hele spoor; behandel ze niet als één ding.
 
-Zonder antwoord bestaat er geen briefwisseling, en dan is elke commerciële
-mail een koude mail. Of dat aan een rechtspersoon met een gepubliceerd adres
-mag, is de vraag uit §1 die ik niet heb kunnen beantwoorden. Die moet eerst
-door een jurist, en pas dan schrijven we hier een sjabloon.
+#### B-1 — de herinnering
 
-Dat is ongemakkelijk, want de bedrijven die níet antwoordden zijn precies de
-bedrijven waar het verhaal het scherpst is. Het is toch de juiste kant om op
-te vallen: bij wie zeven dagen zwijgt heb je de mínste grond om je alsnog te
-melden.
+Een onbeantwoorde vraag één keer herhalen is geen reclame. Het is wat iedereen
+doet die een bericht stuurde en niets terugkreeg, en het valt buiten de vraag
+uit §1 omdat er geen aanbod in staat.
+
+**Drie voorwaarden, alle drie:**
+
+1. **Je wilt het antwoord nog steeds echt hebben.** Wil je dat niet, dan is de
+   herinnering een voorwendsel om een deur open te krijgen, en dan stuur je hem
+   niet. Dit is de enige voorwaarde die iemand anders niet voor je kan
+   controleren.
+2. **Er staat geen aanbod in.** Geen link naar de scan, geen dienst, geen
+   cijfer, geen uitnodiging tot een gesprek.
+3. **Je noemt de meting niet.** Daar is nog niets over te zeggen zolang er geen
+   gesprek is.
+
+**Wanneer.** Dag acht, in kantooruren. De meting is dan afgesloten — §5 kapt af
+op 168 uur — dus je hoeft het tijdstip niet meer te sturen. Nu wil je juist
+gelezen worden, en dat is een ander moment dan dinsdagavond.
+
+```mail
+Onderwerp: Mijn vraag van dinsdag
+
+Goedemorgen,
+
+Vorige week dinsdagavond stuurde ik via jullie contactformulier een vraag: wie
+gaat er bij jullie over het traject van aanvraag tot offerte? Ik heb er niets
+op teruggehoord, en de kans is reëel dat het bericht niet is aangekomen.
+
+Vandaar deze ene herinnering. Is het niet aan mij besteed, dan hoor ik dat ook
+graag — dan laat ik het hierbij.
+
+Juan Diaz
+juandiazllc.com
+```
+
+**Waarom dit zonder aanbod sterker is dan met.** Antwoorden ze, dan zit je in
+spoor A en mag alles wat daar staat — de herinnering zet B om in A zonder één
+commerciële zin. Antwoorden ze niet, dan is dát het antwoord.
+
+**Eén herinnering, daarna niets.** Geen tweede, geen derde, geen ander kanaal.
+
+#### B-2 — de meting-mail (geschreven, geblokkeerd)
+
+Dit is het bericht dat de meting wél noemt. Hij staat hier uitgeschreven zodat
+je hem kunt beoordelen, en hij ligt stil tot de status in §1 omgaat.
+
+**Hij bevat geen aanbod, en toch behandel ik hem als commercieel** — hij komt
+van een partij met een belang, bij een bedrijf dat nooit om contact heeft
+gevraagd. Dat is de conservatieve lezing en die houd ik aan tot een jurist iets
+anders zegt.
+
+**De inhoudelijke keuze die hem draagt:** zeven dagen stilte is vaker een kapot
+formulier dan een traag bedrijf. Een formulier dat niets aflevert geeft geen
+signaal — niemand merkt het, want er komt precies niets binnen en dat ziet er
+hetzelfde uit als een rustige week. Daarmee is dit bericht een dienst en geen
+verwijt, en dat is niet alleen aardiger maar ook waarschijnlijker waar.
+
+```mail
+Onderwerp: Jullie contactformulier
+
+[NIET VERSTUREN — status in §1 staat op niet bevestigd]
+
+Goedemorgen,
+
+Vorige week dinsdag om 20:30 heb ik via het contactformulier op jullie site een
+vraag gesteld. Zeven dagen later was daar niets op teruggekomen, ook geen
+ontvangstbevestiging. Mijn bericht staat aan jullie kant in een inbox, of het
+is er nooit geweest. Dat kun je zelf nakijken, en dat is de reden dat ik het
+meld.
+
+Ik zeg er niets mee over hoe jullie doorgaans reageren. Dat weet ik niet, en
+met een bericht kun je dat ook niet weten. Wat ik wel weet is dat er twee
+verklaringen zijn en dat ze allebei het nakijken waard zijn. Of het formulier
+levert niets af. Of het komt aan en er kijkt buiten kantooruren niemand naar.
+
+De eerste kost je alles wat er via die weg binnenkomt. De tweede kost je alleen
+de haastigen.
+
+Nakijken kost twee minuten: vul je eigen formulier in met een privé-adres en
+kijk of er iets aankomt. Daar heb je mij niet voor nodig.
+
+Juan Diaz
+juandiazllc.com
+```
+
+**Er staat bewust geen vervolgstap in.** Geen link, geen vraag, geen
+uitnodiging. Als ze reageren zit je in spoor A en ligt alles open; reageren ze
+niet, dan heb je iemand iets nuttigs verteld en houdt het op. Een bericht dat
+niets vraagt is bovendien het enige dat je kunt sturen aan iemand die je niets
+heeft gevraagd zonder dat het schuurt.
+
+#### Wat er moet gebeuren voordat B-2 mag
+
+1. Een jurist beantwoordt de vraag uit §1: mag ongevraagde commerciële e-mail
+   naar een rechtspersoon met een op de eigen site gepubliceerd adres, onder
+   art. 11.7 Telecommunicatiewet.
+2. Komt daar een ja op — al dan niet onder voorwaarden — dan zet je **twee
+   regels** om, en geen andere:
+   - in §1: `Status: niet bevestigd` wordt de status die de jurist geeft
+   - in het sjabloon hierboven: de regel `[NIET VERSTUREN — ...]` gaat eruit
+3. De poort koppelt die twee. Haal je er één weg, dan wordt de suite rood. Dat
+   is opzet: een sjabloon dat vrijgegeven is terwijl het document nog "niet
+   bevestigd" zegt, is precies de toestand waarin iemand over een half jaar de
+   verkeerde conclusie trekt.
+
+Komt er een nee, of een ja onder voorwaarden waar je niet aan voldoet, dan
+blijft B-1 het einde van het spoor. Dat is geen verlies: één eerlijke
+herinnering en dan stoppen is een houding waar je later geen last van hebt.
+
+#### Stoppen
+
+**Elk negatief signaal is definitief.** "Graag geen mail meer", een
+afmeldverzoek, een geërgerd antwoord, een spamklacht — het bedrijf gaat op een
+niet-benaderen-lijst en komt in geen enkele volgende batch terug. Die lijst
+draagt bedrijfsnamen en valt onder dezelfde bewaarregel als het meetlog (§6):
+buiten deze repo.
+
+Ook zonder negatief signaal geldt: na B-1 stuur je niets meer, en na een
+eventuele B-2 evenmin.
 
 **Het alternatief met een ander regime:** bellen. Zakelijk koud bellen valt
 onder andere regels dan e-mail, en een gepubliceerd bedrijfsnummer is
