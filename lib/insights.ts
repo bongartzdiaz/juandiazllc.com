@@ -1420,8 +1420,102 @@ export const POSTS: Insight[] = [
         ],
       },
     },
-  }
+  },
 
+  {
+    slug: "energielabel-2030-de-meetlat-verandert-mee",
+    markets: ["nl"],
+    title: "Uw deadline is 2030. Uw meetlat verandert datzelfde jaar.",
+    summary:
+      "De slechtst presterende utiliteitsgebouwen moeten uiterlijk 1 januari 2030 op energielabel D. In datzelfde jaar wordt de labelschaal opnieuw ingedeeld en de bepalingsmethode gemoderniseerd. U plant dus tegen een getal dat gaat verschuiven, met data die u nu al niet vertrouwt.",
+    tag: "Real estate",
+    publishedAt: "2026-08-23",
+    readingMinutes: 6,
+    seo: {
+      metaTitle: "Energielabel D in 2030: de meetlat verandert mee",
+      metaDescription:
+        "Label D uiterlijk 1-1-2030 voor de slechtste utiliteitsgebouwen. In hetzelfde jaar wijzigt de labelschaal. Hoe u dan toch een rangorde bouwt die standhoudt.",
+    },
+    body: [
+      { type: "p", text: "Een portefeuille verduurzamen begint bijna altijd met dezelfde vraag: welk pand eerst? Het antwoord daarop is een rangorde, en die rangorde komt uit cijfers. Precies daar wringt het, want de meeste vastgoedeigenaren weten al jaren dat hun verbruiksdata rammelt. Zolang er geen wettelijke deadline aan hing, was dat een ongemak. Vanaf nu is het een planningsrisico." },
+
+      { type: "h2", text: "Wat er vaststaat, en het is minder dan u denkt" },
+      { type: "p", text: "De slechtst presterende utiliteitsgebouwen moeten uiterlijk 1 januari 2030 voldoen aan energielabel D. Dat is de eis zoals de RVO hem vandaag beschrijft, en het is de enige harde datum in dit dossier. De eisen voor 2033 zijn nog niet vastgesteld. En de exacte verplichtingen worden pas uiterlijk in 2027 in het Besluit bouwwerken leefomgeving opgenomen." },
+      { type: "p", text: "Lees die laatste zin nog een keer. De regels waaraan u in 2030 moet voldoen liggen pas in 2027 vast. Dat is drie jaar voorbereidingstijd voor een portefeuille waarin een enkele renovatie al snel twee jaar kost aan vergunning, aanbesteding en uitvoering." },
+      { type: "p", text: "Voor kantoren staat er wel een bruikbare aanwijzing: wie uiterlijk december 2029 op label C zit, voldoet daarmee al aan de eisen die vanaf 2033 gaan gelden. Dat is geen verplichting maar een advies van de uitvoerder zelf, en het is het enige houvast dat er nu is voor de tweede ronde." },
+
+      { type: "h2", text: "De meetlat verandert in hetzelfde jaar als de deadline" },
+      { type: "p", text: "In 2030 komt er een nieuwe indeling van het energielabel. De schaal loopt dan weer van A tot en met G en de A-labels met plussen vervallen. Tegelijk wordt een gemoderniseerde methode ingevoerd om het label te bepalen." },
+      { type: "p", text: "Dat is de kern van het probleem, en het wordt zelden zo benoemd. U plant kapitaal tegen een getal dat in het jaar van uw deadline opnieuw wordt gedefinieerd, met een andere rekenmethode eronder. Het label op uw huidige rapportage en het label waarop u straks wordt afgerekend zijn niet hetzelfde instrument." },
+      { type: "p", text: "Hoe die twee zich tot elkaar verhouden weet vandaag niemand precies, en wie beweert van wel verkoopt u iets. Wat u wel kunt doen is zorgen dat u de vertaalslag straks in een week maakt in plaats van in een kwartaal." },
+
+      { type: "h2", text: "De rangorde die u nodig heeft bestaat nog niet" },
+      { type: "p", text: "Om te weten welk pand eerst moet, heeft u per object een betrouwbaar verbruikscijfer nodig. In de praktijk staat dat verspreid over vier of vijf plekken die elkaar tegenspreken:" },
+      { type: "ul", items: [
+        "de meterstanden bij de leverancier, per aansluiting en niet per gebouw",
+        "de doorbelasting aan huurders, die vaak op oppervlakte is gebaseerd en niet op werkelijk verbruik",
+        "de labelregistratie, met een opnamedatum die jaren oud kan zijn",
+        "de rapportage van de propertymanager, opgebouwd in een spreadsheet die elk jaar opnieuw wordt gemaakt",
+        "de facturen zelf, het enige bestand dat compleet is en het minst gestructureerd",
+      ] },
+      { type: "p", text: "Vier van die vijf zijn afgeleiden. Een rangorde bouwen op afgeleiden werkt precies zolang niemand hem controleert. Zodra er een wettelijke verplichting aan hangt en een investeringsbesluit uit volgt, is de vraag niet meer of het cijfer ongeveer klopt maar of u kunt laten zien waar het vandaan komt." },
+
+      { type: "h2", text: "Reproduceerbaar is belangrijker dan precies" },
+      { type: "p", text: "Dit is de reflex die u het meeste geld bespaart, en hij is contra-intuitief. De verleiding is om te wachten tot 2027, als de eisen in het Bbl staan, en dan een adviesbureau een nulmeting te laten doen. Dat levert een rapport op dat klopt op de dag van oplevering en daarna langzaam veroudert, precies zoals het vorige rapport dat deed." },
+      { type: "p", text: "De bruikbare variant is een rangorde die u zelf opnieuw kunt draaien. Niet omdat u het beter weet dan het adviesbureau, maar omdat de invoer nog twee keer gaat veranderen: als het Bbl in 2027 de eisen vastlegt, en als in 2030 de methode wijzigt. Wie zijn rangorde in een week opnieuw kan produceren, neemt beide wijzigingen mee zonder een nieuw traject te starten." },
+      { type: "p", text: "Concreet betekent dat vier dingen. Leid het verbruik per gebouw af uit de facturen en de meterstanden, niet uit de doorbelasting. Leg bij elk cijfer vast waar het vandaan komt en op welke datum het is gemeten. Noteer welke aannames u heeft gedaan bij panden met ontbrekende data, in plaats van ze weg te middelen. En zorg dat de hele bewerking in code of in een gedocumenteerde processtap staat, zodat iemand anders hem over een jaar kan herhalen." },
+
+      { type: "h2", text: "Wat dit niet is" },
+      { type: "p", text: "Dit is geen pleidooi voor een dashboard. De meeste vastgoedportefeuilles hebben er al twee, en het probleem zit niet in de weergave maar in de herkomst van het getal. Een dashboard boven onbetrouwbare invoer maakt de onbetrouwbaarheid alleen sneller zichtbaar voor meer mensen." },
+      { type: "p", text: "Het is ook geen voorspelling over wat er in 2027 in het Bbl komt te staan. Dat weet ik niet en u ook niet. De hele redenering hierboven gaat er juist van uit dat de eisen nog schuiven, en dat is geen risico dat u wegneemt maar een eigenschap waar u omheen bouwt." },
+      { type: "p", text: "De vraag om mee te beginnen is klein genoeg om deze week te stellen. Kunt u vandaag, zonder iemand te bellen, per gebouw laten zien waar het verbruikscijfer vandaan komt en wanneer het is gemeten? Als het antwoord nee is, dan is dat het eerste dat verandert. De deadline is 2030, maar het werk begint bij de herkomst van een getal." },
+    ],
+  },
+  {
+    slug: "ets2-de-gasrekening-krijgt-een-component-erbij",
+    markets: ["nl"],
+    title: "Uw gasrekening krijgt een component erbij, en die zit niet in uw begroting",
+    summary:
+      "ETS2 beprijst vanaf 2027 de CO2 in aardgas voor gebouwen. De verplichting ligt bij uw leverancier, niet bij u, en dat maakt het lastiger in plaats van makkelijker: u ziet niet wanneer het in uw tarief terechtkomt of hoeveel het is.",
+    tag: "Real estate",
+    publishedAt: "2026-08-23",
+    readingMinutes: 5,
+    seo: {
+      metaTitle: "ETS2 en uw gasrekening: wat er echt vaststaat",
+      metaDescription:
+        "ETS2 beprijst vanaf 2027 CO2 in gebouwgas. De verplichting ligt bij de leverancier. Wat vaststaat, wat gepland is, en waarom uw tarief het pas later verraadt.",
+    },
+    body: [
+      { type: "p", text: "Er is een tweede regelgevingsspoor dat gebouwen raakt, en het werkt heel anders dan het energielabel. Waar de labelverplichting een investeringsbeslissing afdwingt, verandert dit spoor stilletjes uw exploitatie. Het heet ETS2 en het beprijst de CO2 die vrijkomt bij het gebruik van fossiele brandstoffen in de gebouwde omgeving en het wegvervoer." },
+
+      { type: "h2", text: "Wat er vaststaat, en wat alleen gepland is" },
+      { type: "p", text: "Vanaf 2027 vallen brandstofleveranciers onder ETS2 en moeten zij jaarlijks hun emissiecijfer opgeven in het register. De eerste veiling van rechten is op dit moment gepland voor januari 2027. Het woord gepland staat er niet voor de sier: het is een voornemen, geen vastgelegde datum." },
+      { type: "p", text: "En er zit een vertraging in die vrijwel niemand meeneemt. De eerste keer dat er daadwerkelijk rechten worden ingeleverd is in 2029, over de emissies van 2028. Tussen de start van de veilingen en het moment dat een leverancier moet afrekenen zit dus bijna twee jaar." },
+
+      { type: "h2", text: "De verplichting ligt niet bij u, en dat is het lastige deel" },
+      { type: "p", text: "U hoeft niets te doen. Geen vergunning, geen rapportage, geen registeraccount. De verplichting ligt formeel bij de partij die u de brandstof levert, en die koopt de rechten en verwerkt de kosten in het tarief." },
+      { type: "p", text: "Dat klinkt als goed nieuws en het is het tegenovergestelde. Bij een heffing die u zelf afdraagt weet u de datum, het tarief en de grondslag. Bij een kostenpost die via een derde binnenkomt, weet u geen van drieen. U ziet een tarief, en of daar CO2-kosten in zitten en hoeveel is niet af te lezen aan uw factuur." },
+      { type: "p", text: "Wanneer leveranciers het gaan doorberekenen is bovendien een commerciele beslissing, geen wettelijke. Sommige beginnen zodra ze rechten inkopen. Andere spreiden het uit. Weer andere hebben het al ingeprijsd in een contract dat u vorig jaar heeft getekend, zonder dat het als aparte regel zichtbaar is." },
+
+      { type: "h2", text: "Waarom dit een meetprobleem is en geen inkoopprobleem" },
+      { type: "p", text: "De gebruikelijke reactie is scherper inkopen: langer vastzetten, meer offertes, een adviseur op de tender. Dat helpt marginaal, maar het lost het onderliggende probleem niet op. U kunt namelijk niet controleren of het aanbod dat u krijgt goed of slecht is, omdat u uw eigen basislijn niet scherp heeft." },
+      { type: "ul", items: [
+        "wat verbruikt elk pand werkelijk aan gas, per maand, gecorrigeerd voor buitentemperatuur",
+        "welk deel van dat verbruik gaat naar verwarming en welk deel naar iets anders",
+        "welk deel belandt bij een huurder en welk deel blijft bij u hangen",
+        "hoe reageert die kostenpost als het tarief tien of twintig procent beweegt",
+      ] },
+      { type: "p", text: "Wie die vier antwoorden heeft, ziet een tariefstijging binnen een maand terug in zijn eigen cijfers en kan hem toerekenen. Wie ze niet heeft, ziet een hogere factuur en heeft een discussie in plaats van een analyse." },
+
+      { type: "h2", text: "Het raakvlak met het energielabel, en dat is geen toeval" },
+      { type: "p", text: "Deze twee sporen vragen om dezelfde onderliggende data. Voor de labelverplichting heeft u per gebouw een betrouwbaar verbruikscijfer nodig om een rangorde te bouwen. Voor ETS2 heeft u per gebouw een betrouwbaar gasverbruik nodig om een kostenstijging te kunnen toerekenen." },
+      { type: "p", text: "Dat is een keer werk voor twee verplichtingen, en het is de enige reden waarom ik ze in hetzelfde adem noem. Wie de dataherkomst een keer goed regelt, bedient daarmee zowel de investeringsvraag als de exploitatievraag. Wie het twee keer los oppakt, bouwt twee spreadsheets die over drie jaar niet meer met elkaar te rijmen zijn." },
+
+      { type: "h2", text: "Wat ik hier niet beweer" },
+      { type: "p", text: "Ik heb geen bedrag. Wat ETS2 per kubieke meter gaat kosten hangt af van een veilingprijs die nog niet bestaat en van hoe uw leverancier hem doorberekent. Iedere partij die u nu een tabel met eurocijfers voorlegt, extrapoleert een aanname en presenteert hem als prognose." },
+      { type: "p", text: "Wat wel vaststaat is de richting en de reden dat u het laat gaat zien. Het beleid is bedoeld om fossiel duurder te maken, de kosten komen via een derde binnen, en uw factuur splitst het niet uit. Dat is voldoende om nu uw basislijn op orde te brengen, en het is te weinig om nu een investering op te baseren." },
+    ],
+  },
 ];
 
 /** Locales a post is published under (default: all four). */

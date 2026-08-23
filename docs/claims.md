@@ -975,6 +975,69 @@ a specific outcome is not, unless the number is here with a source. The
 Performance Tracker copy was already corrected once for claiming inverter
 integrations that do not exist in the code.
 
+## Regelgeving in kopij — EPBD IV, utiliteitsbouw NL (gemeten 2026-08-23)
+
+Een wettelijke datum gedraagt zich als een prijs: hij staat in kopij, hij komt
+uit een bron, en hij schuift. Vandaar dezelfde regel — hij staat hier of hij
+gaat niet live. Aanleiding is `docs/bereik-plan.md` §2, waar EPBD IV de haak
+werd onder het vastgoedcluster.
+
+**De aanleiding om dit hier vast te leggen was een bijna-fout.** Een
+zoekresultaat gaf "slechtste 16% per 2030, slechtste 26% per 2033". Die
+percentages staan op **geen van beide** overheidsbronnen die het daadwerkelijk
+uitvoeren. Ze zijn niet gepubliceerd.
+
+| Claim | Waarde | Status |
+| --- | --- | --- |
+| Slechtst presterende utiliteitsgebouwen | **energielabel D uiterlijk 1 januari 2030** | ✅ [RVO, EPBD IV](https://www.rvo.nl/onderwerpen/wetten-en-regels-gebouwen/epbd-iv), gelezen 2026-08-23 |
+| Eisen voor 2033 | **nog niet vastgesteld** door de rijksoverheid | ✅ zelfde bron — publiceer geen getal voor 2033 |
+| Kantoren, vervroegde actie | label C uiterlijk december 2029 voldoet al aan wat vanaf 2033 gaat gelden | ✅ zelfde bron |
+| Exacte verplichtingen in het Bbl | **uiterlijk in 2027** | ✅ [Rijksoverheid, 14-07-2025](https://www.rijksoverheid.nl/actueel/nieuws/2025/07/14/energiezuiniger-bouwen-en-nieuw-energielabel-door-implementatie-europese-richtlijn) — woordelijk: "De exacte verplichtingen worden uiterlijk in 2027 in het Besluit bouwwerken leefomgeving (Bbl) opgenomen." |
+| Verbeterjaren, algemeen | "De gebouwen met de slechtste energieprestaties moeten uiterlijk in 2030 of 2033 worden verbeterd" | ✅ zelfde bron, woordelijk. Welke gebouwen in welk jaar staat er niet bij |
+| Labelschaal vanaf 2030 | schaal loopt weer **A tot en met G**; de A-labels met plussen vervallen | ✅ beide bronnen |
+| **Hoeveel plussen precies** | **de twee bronnen spreken elkaar tegen** — RVO schrijft "A+ tot en met A++++", Rijksoverheid "A+ tot en met A+++++" | ⚠️ **niet publiceren.** Schrijf "de A-labels met plussen vervallen" en tel niet |
+| Bepalingsmethode | tegelijk met de nieuwe schaal komt een gemoderniseerde bepalingsmethode | ✅ Rijksoverheid, zelfde bericht |
+| "slechtste 16%" / "slechtste 26%" | ❌ **staat op geen van beide bronnen** | ❌ **niet publiceren.** Kwam uit een samenvatting van derden, niet uit een uitvoerder |
+
+**Waarom dit meer dan hygiëne is.** De Nederlandse uitvoering drukt de eis uit
+in een **label** (D per 2030), niet in een percentage van het bestand. Dat
+verschil is precies wat een pandeigenaar kan controleren: hij kan zijn eigen
+label opzoeken, geen landelijke rangorde. Het percentage overschrijven zou de
+claim tegelijk onjuist én onbruikbaar hebben gemaakt.
+
+**Wat deze rijen niet dragen.** Geen uitspraak over kosten van verduurzaming,
+geen terugverdientijd, geen aantal panden dat het raakt. Die getallen bestaan
+hier niet, dus staan ze in geen artikel.
+
+**Houdbaarheid.** De eisen liggen pas in 2027 in het Bbl vast. Elke rij
+hierboven kan tot dat moment schuiven, en de Wkb — waar gevolgklasse 2 zonder
+datum is uitgesteld — is het bewijs dat dat gebeurt. **Hercontroleer bij de
+bron voordat je hier iets uit citeert dat ouder is dan een kwartaal.**
+
+### ETS2 en gebouwgas — gemeten 2026-08-23
+
+Het tweede spoor onder het vastgoedcluster. **Zwakker dan ik het eerst
+opschreef**, en dat verschil staat hier zodat het niet opnieuw sterker wordt
+gemaakt dan het is.
+
+| Claim | Waarde | Status |
+| --- | --- | --- |
+| Brandstofleveranciers vallen onder ETS2 | vanaf **2027**, met jaarlijkse opgave van het emissiecijfer in het register | ✅ [NEa](https://www.emissieautoriteit.nl/regelgeving/eu-ets-2/ets-2-emissierechten), gelezen 2026-08-23 |
+| Eerste veiling van rechten | januari 2027, **gepland** | ⚠️ zelfde bron. Schrijf altijd 'gepland' — het is een voornemen, geen vastgelegde datum |
+| Eerste inlevering van rechten | **2029, over de emissies van 2028** | ✅ zelfde bron. Bijna twee jaar na de veilingstart |
+| Wie is verplicht | de **brandstofleverancier**, niet de eindgebruiker | ✅ zelfde bron |
+| Doorberekening naar de klant | leveranciers verwerken de kosten in hun tarief | ⚠️ **commercieel gedrag, geen wettelijke verplichting.** Wanneer en hoeveel is niet vastgelegd en niet voorspelbaar |
+| Kosten per m³ of per kWh | **bestaat niet** | ❌ geen veilingprijs, geen doorberekeningsregel. Elke tabel met eurocijfers is een geextrapoleerde aanname |
+
+**Wat dit corrigeert.** `docs/bereik-plan.md` §2 noemde ETS2 eerst een 'harde'
+haak met januari 2027 als datum. Twee dingen kloppen daar niet aan: de veiling
+is *gepland* en de eerste inlevering is 2029. De richting staat vast, het moment
+waarop een eigenaar het voelt niet. §2 is bijgewerkt.
+
+**Bruikbaar in kopij** is daarom alleen: de verplichting ligt bij de leverancier,
+de kosten komen via het tarief binnen, de factuur splitst ze niet uit, en de
+richting is omhoog. Alles daarbuiten is prognose.
+
 ## Where copy lives
 
 | Surface | Source of copy |

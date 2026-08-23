@@ -120,10 +120,30 @@ breekt?** Drie haken nagetrokken op 2026-08-23:
 
 | markt | haak | datum | hardheid |
 |---|---|---|---|
-| transport & logistiek | **ETS2** — CO2-beprijzing op brandstof, doorberekend door leveranciers | eerste veiling **jan 2027** | **hard** |
-| vastgoed / utiliteitsbouw | **EPBD IV** — slechtste 16% niet-woningen uitgefaseerd | 2030 (en 26% in 2033), regels in het Bbl **uiterlijk 2027** | **hard, verder weg** |
-| gebouwbeheer | **ETS2** op aardgas in gebouwen | jan 2027 | **hard** |
+| transport & logistiek | **ETS2** — CO2-beprijzing op brandstof, doorberekend door leveranciers | veiling **gepland** jan 2027; eerste inlevering **2029** over 2028 | **middel** — zie de correctie hieronder |
+| vastgoed / utiliteitsbouw | **EPBD IV** — slechtst presterende utiliteitsgebouwen naar **energielabel D** | **1 januari 2030**; eisen voor 2033 nog niet vastgesteld; regels in het Bbl **uiterlijk 2027** | **hard** |
+| gebouwbeheer | **ETS2** op aardgas in gebouwen | idem als transport | **middel** |
 | bouw | Wkb gevolgklasse 2 | **uitgesteld, geen datum** — evaluatie 2027, gk2/3 pas rond 2028 | **zacht — niet als urgentie gebruiken** |
+
+> **Bijgewerkt 2026-08-23, na verificatie bij de uitvoerders.** Twee rijen zijn
+> zwakker gebleken dan ik ze eerst opschreef, en één sterker.
+>
+> **ETS2 stond op "hard, jan 2027".** De NEa zegt dat de eerste veiling *gepland*
+> is voor januari 2027 en dat de eerste inlevering van rechten pas in **2029**
+> plaatsvindt, over de emissies van 2028. De verplichting ligt bovendien bij de
+> brandstofleverancier; wanneer die het doorberekent is commercieel gedrag, geen
+> wettelijke datum. De richting staat vast, het moment niet.
+>
+> **EPBD IV stond op "slechtste 16% / 26%".** Die percentages staan op **geen van
+> beide** overheidsbronnen — ze kwamen uit een samenvatting van derden. De
+> Nederlandse uitvoering drukt de eis uit in een **label**: label D uiterlijk
+> 1 januari 2030, en de eisen voor 2033 zijn nog niet vastgesteld. Dat is de
+> sterkere formulering, want een eigenaar kan zijn eigen label opzoeken en een
+> landelijke rangorde niet.
+>
+> Beide correcties staan met bron en datum in `docs/claims.md`. **De rangschikking
+> hieronder verandert er niet door — vastgoed wordt er juist sterker van, want
+> het is nu de enige rij met een harde datum.**
 
 Die laatste rij is de reden dat deze tabel bestaat. Bouw was mijn eerste gok —
 Juan is bouwkundig getraind, de site zegt dat in vier talen, en Wkb leek de
@@ -182,7 +202,7 @@ is de stand die `docs/seo-geo-plan.md` zelf al "de slechtste" noemt.
 
 ### Bronnen
 
-- ETS2 en de start van de veilingen: [evofenedex](https://www.evofenedex.nl/actualiteiten/ets2-komt-eraan-dit-verandert-er-voor-jouw-bedrijf) · [Nederlandse Emissieautoriteit](https://www.emissieautoriteit.nl/actueel/nieuws/2025/05/14/eerste-rapportageplicht-ets-2-afgerond) · [Rabobank](https://www.rabobank.nl/kennis/d011467712-ets2-wat-is-het-en-welke-impact-heeft-het-op-huishoudens-en-bedrijven)
+- ETS2, veiling en inlevering: [NEa — ETS-2 emissierechten](https://www.emissieautoriteit.nl/regelgeving/eu-ets-2/ets-2-emissierechten) (de uitvoerder; leidend boven de rest) · [NEa, eerste rapportageplicht](https://www.emissieautoriteit.nl/actueel/nieuws/2025/05/14/eerste-rapportageplicht-ets-2-afgerond) · [evofenedex](https://www.evofenedex.nl/actualiteiten/ets2-komt-eraan-dit-verandert-er-voor-jouw-bedrijf)
 - EPBD IV en de slechtste 16% / 26%: [Rijksoverheid](https://www.rijksoverheid.nl/actueel/nieuws/2025/07/14/energiezuiniger-bouwen-en-nieuw-energielabel-door-implementatie-europese-richtlijn) · [RVO](https://www.rvo.nl/onderwerpen/wetten-en-regels-gebouwen/epbd-iv) · [DGBC](https://www.dgbc.nl/longreads/epbd-iv-verklaard-het-uitfaseren-van-slechte-energielabels-per-2030/)
 - Wkb, uitstel van gevolgklasse 2: [IPLO](https://iplo.nl/regelgeving/regels-voor-activiteiten/technische-bouwactiviteit/kwaliteitsborging/wet-kwaliteitsborging-bouwen-wkb/) · [VNG](https://vng.nl/artikelen/gefaseerde-implementatie-wkb) · [Rijksoverheid](https://www.rijksoverheid.nl/themas/bouwen-en-wonen/bouwregelgeving/meer-toezicht-in-de-bouw-via-de-wet-kwaliteitsborging-voor-het-bouwen-wkb)
 
