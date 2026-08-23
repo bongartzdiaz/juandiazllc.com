@@ -509,15 +509,42 @@ hier alleen zodat een volgende sessie hem niet als tegenstrijdigheid leest.
 Het getal is een echte capaciteitsgrens en dus controleerbaar. Twee grenzen
 horen erbij:
 
-1. **"Nog N plekken vrij" mag niet.** Dat vergt een levende telling van lopende
-   trajecten, en die bestaat nergens in deze repo. Een getal dat niet uit een
-   bron komt is verzonnen, ook als het toevallig klopt.
+1. **Een aftellend getal mag alleen met een onderhouden bron.** Dat is geen
+   verbod maar een voorwaarde, en er is al een voorbeeld dat eraan voldoet —
+   zie de correctie hieronder. Een getal zonder onderhouden bron is verzonnen,
+   ook als het toevallig klopt.
 2. **De grens knelt vandaag niet.** Gemeten 2026-08-22 op Supabase-project
    `wbgiouuifqhasedncysw`: `marketing.leads` nul rijen, `marketing.subscribers`
    nul rijen — beide ooit. Een capaciteitszin is dan positionering: hij zegt
    wat voor soort traject dit is, niet dat je moet opschieten. Als urgentie
    geframed zou hij druk suggereren die er niet is, en dat is precies de vorm
    die vertrouwen kost.
+
+#### Correctie 2026-08-22 — er stond al een capaciteitssignaal, en het is goed gebouwd
+
+Toen dit blok werd geschreven stond er dat een levende telling "nergens in deze
+repo bestaat". **Dat was onwaar.** `components/Capacity.tsx` staat sinds april
+2026 op `/contact` en toont vier blueprint-plekken per kwartaal met het aantal
+dat nog vrij is. Het draagt precies wat zo’n getal nodig heeft:
+
+| | |
+| --- | --- |
+| bron | `SLOTS_REMAINING` / `TOTAL_SLOTS`, met de hand tegen de agenda gehouden |
+| houdbaarheid | `LAST_VERIFIED` + `MAX_AGE_DAYS = 30` |
+| poort | `components/capacity.test.ts` wordt rood zodra de datum veroudert |
+| stand 2026-08-22 | 3 dagen oud, ruim binnen de termijn |
+
+De regel is daarmee niet "geen aftellend getal" maar **"geen aftellend getal
+zonder onderhouden bron"**. Dat is strenger waar het moet en toelaatbaar waar
+het kan.
+
+**Twee capaciteitsgetallen op twee pagina’s, en dat is een openstaande vraag.**
+`/contact` zegt vier blueprint-plekken per kwartaal; `/services` zegt drie
+trajecten tegelijk. Ze spreken elkaar niet tegen — het eerste telt gratis
+intakegesprekken, het tweede lopend betaald werk — maar het zijn twee getallen
+over hetzelfde onderwerp in verschillende eenheden. De kopij op `/services`
+begint daarom met "na het blueprint-gesprek", zodat de lezer ziet dat het over
+de stap daarná gaat. **Of ze naast elkaar moeten blijven staan is aan Juan.**
 
 Wat dus wél mag: een statische zin die de werkwijze beschrijft ("drie trajecten
 tegelijk"). Wat niet mag: een teller, een aftelklok, of een zin die suggereert

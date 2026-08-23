@@ -4068,3 +4068,93 @@ term simpelweg door een lege regel vervangen, wat geldige TypeScript is.
 905 tests in 41 bestanden, was 904. tsc schoon, i18n 697 × 4, prijsgenerator
 groen, `CLAUDE.md` == `AGENTS.md`. Drie bestanden geraakt plus dit logboek; de
 drie langlopende scratch-mappen staan bewust buiten de commit.
+
+### 2026-08-22 (vervolg) — de capaciteitszin, en een telling die al bestond op de pagina ernaast
+
+PR #227 legde een dag eerder vast dat er drie trajecten tegelijk lopen, zonder
+kopij te schrijven: of dat de site op moest was een aparte keuze. Die keuze is nu
+gemaakt, en bij het monteren bleek de belangrijkste aanname eronder niet te
+kloppen.
+
+#### De zin
+
+`services.how.capaciteit`, vier talen, direct na de ladder-notitie op
+`/services`. Hij beschrijft de werkwijze en verder niets — geen aftellend getal,
+geen deadline. Wat er staat is dat de grens Juans eigen uren zijn en dat een
+startdatum afhangt van wat er al draait.
+
+Het getal wordt niet overgeschreven maar uit `docs/claims.md` geparst; het
+testbestand kent alleen de vertaling van cijfer naar woord per taal. Een tweede
+kopie van dat getal is precies de bugklasse waarvoor `claims.md` bestaat.
+
+#### Mijn eigen document had ongelijk, en dat was de grootste vondst
+
+`claims.md` zei op mijn gezag dat "een levende telling van lopende trajecten
+nergens in deze repo bestaat". Bij het monteren bleek `components/Capacity.tsx`
+op `/contact` er al een te tonen: vier blueprint-trajecten per kwartaal, twee
+over. Met `LAST_VERIFIED = "2026-08-19"`, `MAX_AGE_DAYS = 30` en een eigen poort
+in `components/capacity.test.ts` — het blok verbergt zichzelf zodra de telling
+verouderd is.
+
+Dat is goed gebouwd, en het weerlegde de premisse waarop ik een verbod had
+geschreven. De keuze was dus: de site buigen naar een regel die op een onwaarheid
+stond, of het document corrigeren. Het document is gecorrigeerd en de regel
+herschreven naar wat hij werkelijk hoort te zijn — **geen aftellend getal zonder
+onderhouden bron**.
+
+**De uitzondering in de poort hangt daarom aan het feit, niet aan de naam.**
+`fomo.capacity.*` is vrijgesteld met een aantal en een reden, én met een assertie
+dat `LAST_VERIFIED` niet ouder is dan `MAX_AGE_DAYS`. Verjaart de telling, dan
+verbergt `Capacity.tsx` zich én valt de poort om. De vrijstelling overleeft het
+feit niet.
+
+**Twee getallen, twee eenheden, twee pagina's.** `/contact` zegt vier
+blueprint-trajecten per kwartaal, `/services` zegt drie opdrachten tegelijk. Ze
+staan niet op dezelfde pagina en de nieuwe zin is verankerd op "na het
+blueprint-gesprek", dus ze lezen als opeenvolgende stappen. Of ze naast elkaar
+horen te bestaan is een aanbodvraag; die staat als open punt in `claims.md` en is
+niet aan mij.
+
+#### De uitzondering telde 0 in het Engels
+
+De vrijstelling eist per taal een exact aantal treffers. In `en` kwam hij op 0
+tegen 1 in `nl`: het Engelse label "slots remaining" viel op geen enkele term uit
+de druktaal-lijst. Zonder die telling was het patroon in het Engels stil lek
+geweest — een vrijstelling die nul keer matcht ziet er hetzelfde uit als een
+patroon dat niets te vinden had. Elf termen werden er twaalf.
+
+#### Het mutatieharnas liet drie bestanden beschadigd achter
+
+Mijn uitbreiding van de `BESTANDEN`-lijst matchte niet, dus drie gemuteerde
+bestanden hadden geen back-up en bleven na afloop staan. Het enige signaal was
+"na herstel: ROOD" — wat ook een echte regressie had kunnen zijn. Gediagnosticeerd
+met `git status` plus gerichte greps, per bestand precies hersteld, daarna het
+harnas herschreven met een poort die dit onmogelijk maakt:
+
+    ongedekt = sorted({m[1] for m in MUTATIES} - set(BESTANDEN))
+    if ongedekt:
+        sys.exit("MUTEERT ZONDER BACKUP: %s" % ", ".join(ongedekt))
+
+Een harnas dat moet bewijzen dat een poort afgaat, heeft zelf ook een poort
+nodig.
+
+#### En het pad zat twee keer verkeerd
+
+`lib/capaciteit.test.ts` staat één niveau diep, niet twee zoals
+`lib/seo/*.test.ts`, dus `join(WORTEL, "..", …)` wees boven de repo uit. De
+tweede keer schreef ik hetzelfde foute model opnieuw in nieuwe code, omdat ik de
+padberekening van een buurbestand overnam. Tel de diepte, kopieer hem niet.
+
+#### Meting
+
+909 tests in 42 bestanden, was 905/41. i18n 698 × 4, was 697 — de plus is de
+nieuwe sleutel. Typecheck schoon, prijsgenerator groen, build groen.
+
+Zeven mutaties, zeven keer rood met elk een andere assertie, groen na herstel,
+nul mutatiesporen achtergebleven (gecontroleerd op alle zeven ankers).
+
+Op de productiebuild in vier talen: 1 treffer per taal, in de eigen taal, direct
+na de ladder-notitie. Op 375 px meet de alinea 295 × 120 px, dezelfde kleur als
+de notitie erboven, geen horizontale overloop, geen kale sleutel op de pagina. En
+op `/nl/contact` staat het bestaande capaciteitsblok ongewijzigd — "2/4 plekken
+over · Vier blueprint-trajecten per kwartaal" — zoals bedoeld.
