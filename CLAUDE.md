@@ -4270,3 +4270,224 @@ Op de productiebuild in vier talen, in de DOM gemeten:
 De server draaide op een poort die vooraf aantoonbaar vrij was, en het startlog
 is gelezen om te bevestigen dat het mijn eigen proces was — na de meting van 22
 augustus waar een oude luisteraar een uur oude build serveerde.
+
+### 2026-08-23 (vervolg) — zeven PR's die het logboek niet haalden, en een tweede haak die geen sector bleek
+
+Het logboek stopte bij #229. Daarna landden er zeven PR's — #230, #231, #232,
+#234, #235, #236 en #237 — die het bestand nooit hebben gehaald. Dat is precies
+de vorm die dit logboek zelf het vaakst noteert: werk dat gebeurd is en nergens
+staat, waardoor een volgende sessie het opnieuw gaat "bouwen". De inhaalslag
+staat hieronder, in de volgorde waarin het gebeurde.
+
+#### #230 en #231 — de niche stond er al, en energie was de steekproef
+
+Drie vragen op één dag: de link-buildingprompts implementeren, verder nichen,
+meer leadmagneten. Ze hangen aan elkaar, dus werd het `docs/bereik-plan.md`.
+
+**De promptpakketten blijven waar ze zijn.** Het zijn commerciële bestanden van
+derden en deze repo is publiek. Er komt niets van in code, ze kunnen niet als
+leadmagneet weg, en ze worden nergens geciteerd. Wat er wél uit mag zijn de
+uitkomsten.
+
+Het bewijs zei dat er al genicht wás en dat de positionering achterliep: drie
+van de vier bevestigde klantuitkomsten zijn energie, elf van de artikelen dragen
+die tag, en de enige werkende trechter is NL-energie.
+
+**Juans tegenwerping — hij kan meer dan energie — bleek te kloppen om een reden
+die in de repo staat.** De dienst beschrijft zichzelf in vier talen als "een
+diagnose van één pagina: waar je operatie en je cijfers uit elkaar lopen". Dat
+is geen sector maar een vorm, en alle vier de sectorpagina's beschrijven
+hetzelfde defect met een andere sector eromheen. Energie werkte niet omdát het
+energie is, maar omdat er vier dingen tegelijk waar zijn: een harde datum, een
+getal van een partij met een belang, een operatie op spreadsheets, en
+NL-specifieke regelgeving. **De datum is de motor.** De vraag is dus niet welke
+sector, maar welke markt binnenkort een datum krijgt die de rekensom breekt.
+
+Drie haken nagetrokken. ETS2 en EPBD IV hielden stand; **Wkb gevolgklasse 2 is
+uitgesteld zonder nieuwe datum** — dat was mijn eerste gok, juist omdat Juan
+bouwkundig getraind is, en de meting sloopte hem als urgentiehaak.
+
+**Vier claims sneuvelden bij het nameten, alle vier van mijzelf.** De scherpste:
+ik had "DR 0" vier keer als feit opgeschreven. Het is niet meetbaar — Ahrefs
+weigert óók zijn eigen gratis endpoint (`public-domain-rating-free`,
+"Insufficient plan"). Het staat nu als expliciete aanname met de reden erbij.
+
+En de lektabel citeerde **mijn eigen vertalingen alsof het de site-strings
+waren**. Nu woordelijk uit `lib/sectors.ts`, met een controle die alle tien
+citaten terugvindt. Zelfde klasse als de DR-0-aanname een uur eerder: **een
+citaat dat je zelf hebt geschreven is geen bron.**
+
+#### #232 — vastgoed, en twee percentages die op geen enkele overheidsbron staan
+
+Van twee naar vier artikelen, met beide haken bij de uitvoerder nagetrokken in
+plaats van bij een samenvatting. Dat verschil was niet cosmetisch:
+
+- **"slechtste 16% per 2030, 26% per 2033" staat op geen van beide
+  overheidsbronnen.** Het kwam uit een samenvatting van derden. De Nederlandse
+  uitvoering drukt de eis uit in een label — D per 1-1-2030 — en dat is
+  bovendien bruikbaarder: een eigenaar kan zijn eigen label opzoeken, een
+  landelijke rangorde niet.
+- **ETS2 stond op "hard, januari 2027".** De NEa zegt dat de veiling *gepland*
+  is en dat de eerste inlevering in 2029 valt, over 2028. Richting vast, moment
+  niet.
+
+Ook gevonden en **bewust niet gladgestreken**: RVO schrijft "A+ tot en met
+A++++", Rijksoverheid "A+ tot en met A+++++". Twee overheidsbronnen, een
+verschillend aantal plussen. `docs/claims.md` verbiedt daarom het tellen, en de
+kopij zegt alleen dát de plus-labels vervallen.
+
+#### #234 — het social-pakket, en de helft van de kanalen bestaat niet
+
+Tweede promptpakket, 27 prompts. Eerst gemeten welke kanalen er zijn: het pakket
+richt zich op Instagram, TikTok, X en LinkedIn, en daarvan bestaan er hier
+anderhalf. LinkedIn echt, Instagram onder een handle die als persoonlijk account
+leest, **X bestaat niet** — die is in #198 juist uit `sameAs` gehaald omdat hij
+404 gaf — en TikTok en YouTube komen in de hele codebase niet voor.
+
+Zes van de 27 kunnen vandaag. Tien wachten op meting, tien op een publiek dat er
+niet is. **Bijna exact dezelfde uitkomst als bij het linkpakket, en die
+herhaling is zelf het signaal:** beide pakketten veronderstellen een
+distributiemachine die draait.
+
+**De grens staat er expliciet in.** Posten op je eigen tijdlijn is geen koude
+benadering; connectieverzoeken en DM's blijven verboden, en enkele prompts in
+dit pakket schuiven daarheen.
+
+Onderweg drie tellingen hersteld die door mijn eigen vorige PR waren verlopen:
+21 artikelen waren er 23, vastgoed stond op vier en niet op twee, en optie B in
+§2 stond nog als open keuze terwijl hij net was uitgevoerd. **Binnen één dag.**
+
+#### #235 — logistiek, en een sector die nergens naar wees
+
+Twee NL-only artikelen onder een nieuwe tag `Logistics`: ETS2 op de kostprijs per
+kilometer, en WPM — de rapportageplicht die sinds 1 juli 2024 geldt, waarbij het
+toezicht niet alleen kijkt óf je rapporteert maar ook naar de **kwaliteit van je
+gegevens**. Dat laatste is de scherpste rij in `claims.md` en de reden dat het
+artikel bestaat.
+
+`claims.md` draagt per rij ook wat er **niet** gepubliceerd mag worden: geen
+indieningsdeadline, geen sanctie, geen bedrag per liter, en nergens de suggestie
+dat de drempel al 250 werknemers is — van dat ontwerp-wijzigingsbesluit is het
+moment van inwerkingtreding niet bekend. De poort in
+`lib/seo/faqs.belofte.test.ts` raakt deze kopij niet, dus de zelfbeperking staat
+in het artikel zelf.
+
+**Bewust geen nieuwe sectorpagina.** Er is geen enkele bevestigde klantuitkomst
+in transport, dus een sectorpagina zou een claim zijn die `docs/claims.md` niet
+draagt. Inhoud eerst, positionering later.
+
+Wat er onderweg opviel: **`/sectors/adjacent` wees nergens naar.** `SECTOR_TAG`
+kende alleen `real-estate` en `hospitality`, terwijl de eigen samenvatting van
+die pagina logistiek als eerste noemt. Die staat er nu in, en het blok poortert
+op `getAllInsights(locale)` — dus op `/en`, `/de` en `/es` levert het niets op
+en valt het vanzelf weg.
+
+#### #236 — horeca van twee naar vier, afgelezen in plaats van verzonnen
+
+`docs/seo-geo-plan.md` noemt twee artikelen per sector zelf "de slechtste" stand.
+Welke twee erbij komen is niet bedacht maar **afgelezen van de sectorpagina**:
+die noemt vier lekken en de twee bestaande artikelen dekten er twee. "Tooling
+voor de vloer" en "Gastdata blijft liggen" stonden er wel, zonder artikel
+erachter. Vandaar een artikel over de invoerweg — de housekeeper ziet een gebrek
+uren voordat een systeem het ziet — en een over identiteit: dezelfde gast zit als
+vier verschillende mensen in vier systemen.
+
+Beide all-market volgens de bestaande conventie. **Ik had Duits en Spaans eerst
+zonder diakrieten geschreven**, uit misplaatste voorzichtigheid over
+shell-encoding. De bestaande vertalingen dragen ze wel; gecorrigeerd vóór het
+landde.
+
+#### #237 — vier artikelen spraken de lezer met u aan, en die vier waren van mij
+
+Van de negentien Nederlandse artikelen gebruikten er vijftien "je" en vier "u",
+en die vier waren allemaal in twee dagen geschreven, door mij, in #232 en #235.
+`DICT.nl` is "je" — 87× je, nul "u" — en de sectorpagina's ook. Een lezer die
+binnen het energiecluster doorklikte werd halverwege anders aangesproken.
+
+**De mechanische pas maakte vijf grammaticafouten, en die zijn gevonden door de
+uitkomst te lézen in plaats van het scriptresultaat te vertrouwen.** Het script
+meldde netjes "55 regels aangepast, u/uw=0", en dat was waar en zei niets over
+of het Nederlands klopte:
+
+| stond er na de pas | moet zijn | waarom |
+|---|---|---|
+| `verkoop je iets` | `verkoopt je iets` | "u" was hier lijdend voorwerp, geen onderwerp |
+| `die je nodig heeft` | `… hebt` | bijzin met "u heeft" wordt "je hebt" |
+| `dat je vorig jaar heeft getekend` | `… hebt` | idem |
+| `basislijn niet scherp heeft` (2×) | `… hebt` | idem |
+
+**En eronder zat hetzelfde diakriet-defect als in #236**, nu in gepubliceerde
+Nederlandse kopij: `commerciele`, `drieen`, `discussieren`, `contra-intuitief`.
+Zeven plekken, alle zeven binnen mijn eigen vier artikelen; de vijftien oudere
+waren schoon.
+
+**Het aantal-anker in het correctiescript ving mijn eigen telling.** Ik
+verwachtte `commerciele` twee keer; het waren er drie. Het script stopte met
+`ANKER 'commerciele' komt 3x voor, verwacht 2` in plaats van door te gaan met een
+verkeerd wereldbeeld.
+
+**De slugs blijven staan.** Twee dragen "u"/"uw" in de URL. Een slug is geen
+proza, en `next.config` heeft geen `redirects()` — geverifieerd, niet aangenomen
+— dus omzetten kost twee 404's op URL's die diezelfde dag live gingen.
+
+`lib/i18n/nederlands.test.ts` bewaakt het voortaan, in dezelfde vorm als
+`duits.test.ts`: aanspreekvorm, ASCII-vormen, en een positieve controle die
+éérst bewijst dat de splitser "u" als los woord vindt maar niet in "uur" of
+"duurt". Hij leest `getAllInsights("nl")` en niet het bestand, zodat het
+testbestand zichzelf niet laat struikelen over de vormen die het beschrijft.
+
+Vijf mutaties, vijf keer rood met elk een andere assertie. Twee ervan richten
+zich op de poort zelf — hem naar `getAllInsights("en")` laten kijken en de
+splitser slopen — en beide vallen om op de je-controle, wat bewijst dat die
+controle niet leeg is.
+
+#### Drie patronen die deze dag meer dan eens terugkwamen
+
+1. **Een citaat dat je zelf hebt geschreven is geen bron.** Drie keer: de
+   DR-0-aanname, de lektabel met mijn eigen vertalingen, en de 16%/26% uit een
+   samenvatting van derden.
+2. **Mijn eigen tellingen verlopen binnen een dag.** 21 artikelen waren er 23,
+   vastgoed stond op twee en was al vier, "vier van die twaalf regels" waren er
+   elf. Machinaal hertellen kost seconden en is de enige manier die werkt.
+3. **ASCII in plaats van diakrieten, twee dagen achter elkaar.** Duits en Spaans
+   in #236, Nederlands in #237. De oorzaak is telkens dezelfde misplaatste
+   voorzichtigheid over shell-encoding, terwijl kopij hier via het
+   Write-gereedschap en een UTF-8-splice loopt en accenten gewoon overleven.
+   Er staat nu een poort op het Nederlands; Duits had er al een.
+
+#### Meting
+
+**985 tests in 43 bestanden** (was 911/42 bij #229), i18n **699 sleutels × 4**
+(was 698), tsc schoon, build groen met **220 statische pagina's**, sitemap 190.
+`CLAUDE.md` == `AGENTS.md`.
+
+Artikelen: **27**, gemeten per markt en tag in plaats van geschat.
+
+| | Energy | Real estate | Hospitality | Logistics | Systems | Strategy | Growth |
+|---|---|---|---|---|---|---|---|
+| alle markten (EN + de/es) | — | 2 | 4 | — | 4 | 1 | — |
+| alleen `/nl` | 5 | 2 | — | 2 | — | — | 1 |
+| alleen `/de` | 3 | — | — | — | — | — | — |
+| alleen `/es` | 3 | — | — | — | — | — | — |
+| **totaal** | **11** | **4** | **4** | **2** | **4** | **1** | **1** |
+
+Op productie na de merge van #237: de vier omgezette artikelen dragen 0× u/uw en
+samen 131× je, geen ASCII-vorm meer, beide "u"-slugs geven 200. Tegenproef op de
+zeventien andere NL-artikelen: samen 0× u/uw — er is dus niets omgeslagen dat
+niet omgeslagen hoorde te worden.
+
+#### Wat er open blijft
+
+**Twee beslissingen uit `docs/bereik-plan.md` §7 zijn inmiddels genomen én
+uitgevoerd** (beslissing 1 werd C — allebei de haken, met transport eerst;
+beslissing 2 werd horeca naar vier). Die zijn in deze PR uit de lijst gehaald;
+wat overblijft zijn de enquête, het social-kanaal en de rekenmachine-route.
+
+Verder ligt er één ding buiten deze repo. **De R2-poort in
+`~/.claude/hooks/` slaat te breed toe:** hij blokkeerde een read-only `curl` naar
+een LinkedIn-profielpagina, omdat hij matcht op netwerkcliënt plus het
+zelfstandig naamwoord "linkedin" in plaats van op netwerkcliënt plus een
+berichten-endpoint. De regel die hij moet bewaken — geen geautomatiseerde
+connectieverzoeken of DM's — is ongewijzigd juist. Het bestand staat buiten elke
+repo, dus het wordt niet aangeraakt zonder Juans expliciete go.
+

@@ -43,9 +43,9 @@ citeert er niets uit.
 
 | | stand | bron |
 |---|---|---|
-| artikelen | **23**, waarvan 11 met tag Energy | `lib/insights.ts`, herteld 2026-08-23 |
-| marktgebonden clusters | NL 6 · DE 3 · ES 3 | idem |
-| vastgoed / horeca | **vastgoed 4** (sinds de EPBD- en ETS2-stukken), horeca 2 | idem |
+| artikelen | **27**, waarvan 11 met tag Energy | `lib/insights.ts`, herteld 2026-08-23 |
+| marktgebonden clusters | NL 10 · DE 3 · ES 3 | idem |
+| vastgoed / horeca | **vastgoed 4** (EPBD + ETS2), **horeca 4** (#236), **logistiek 2** als nieuw NL-cluster (#235) | idem |
 | bevestigde klantuitkomsten | 4, waarvan **3 energie**; 2 dragen een markt (NL, NL/BE), 2 geen | `docs/claims.md` |
 | tools | 2 — `lekkage-scan` staat **alleen op /nl**, `energy-roi` in vier talen maar met een Nederlands model | `lib/i18n/enkele-taal.ts` · `components/calculators/EnergyRoi.tsx` |
 | leads ooit | **0 rijen** in `marketing.leads` | Supabase `wbgiouuifqhasedncysw` |
@@ -192,22 +192,31 @@ Niet "welke sector", maar **welke tweede haak**. Eén erbij, niet drie:
 | optie | kosten | wat je koopt |
 |---|---|---|
 | **A — transport & logistiek** | nieuw cluster vanaf nul, nieuw publiek | de zuiverste herhaling van het patroon dat aantoonbaar werkte |
-| **B — vastgoed verdiepen** — **gekozen en uitgevoerd 2026-08-23** | twee artikelen stonden er al, data overlapt met energie | het snelste resultaat, op een sector die al in de navigatie staat |
+| **B — vastgoed verdiepen** | twee artikelen stonden er al, data overlapt met energie | het snelste resultaat, op een sector die al in de navigatie staat |
 | **C — allebei** | twee clusters onderhouden naast energie | breder bereik, tragere opbouw per cluster |
 
-> **Stand 2026-08-23: B is uitgevoerd.** Vastgoed staat op vier artikelen, met
-> beide regelgevingshaken bij de uitvoerder nagetrokken en vastgelegd in
-> `docs/claims.md`. Twee dingen die ik hierboven schreef bleken bij die
-> verificatie onjuist: de percentages van EPBD IV staan op geen enkele
-> overheidsbron, en ETS2 is zachter dan "hard". Beide gecorrigeerd in de tabel
-> hierboven. **A staat daarmee bovenaan als volgende.**
+> **Stand 2026-08-23: het werd C, in de volgorde B → A, en allebei staan op main.**
+> Vastgoed ging van twee naar vier artikelen (#232), daarna kwam het
+> logistiek-cluster onder een nieuwe tag `Logistics` (#235). Horeca ging in
+> dezelfde reeks naar vier (#236) — de vier artikelen dekken nu de vier lekken
+> die de sectorpagina zelf noemt.
+>
+> Twee dingen die ik hierboven schreef bleken bij de verificatie onjuist: de
+> percentages van EPBD IV staan op geen enkele overheidsbron, en ETS2 is zachter
+> dan "hard" — de NEa noemt de veiling *gepland*, met de eerste inlevering in
+> 2029 over 2028. Beide gecorrigeerd in de tabel hierboven.
+>
+> **Wat deze sectie nog waard is, is de redenering en niet de keuze**: de haak is
+> een datum, niet een sector. Dat is het filter voor een eventuele derde.
 
 Mijn voorkeur was **B eerst, A daarna** — niet omdat vastgoed het grootste
-potentieel heeft, maar omdat het de enige is waar de haak nieuw is en de rest
-al staat. A is het sterkere verhaal en het duurdere begin.
+potentieel heeft, maar omdat het de enige is waar de haak nieuw was en de rest
+al stond. A is het sterkere verhaal en het duurdere begin. Zo is het ook
+gelopen.
 
-Horeca hoort in beide gevallen uit de navigatie of naar vier artikelen. Twee
-is de stand die `docs/seo-geo-plan.md` zelf al "de slechtste" noemt.
+Bewust niet meegekomen met A: **een sectorpagina voor transport.** Er is geen
+enkele bevestigde klantuitkomst in die sector, dus een sectorpagina zou een
+claim zijn die `docs/claims.md` niet draagt. Inhoud eerst, positionering later.
 
 ### Bronnen
 
@@ -449,22 +458,23 @@ Geen nieuwe code. Het is een gewoonte, en de volgorde is dezelfde als in §5:
 
 ## §7 — Beslissingen die van Juan zijn
 
-1. **Welke tweede haak: transport (A), vastgoed verdiepen (B) of allebei (C)?**
-   De onderbouwing en mijn voorkeur staan in §2. Dit is geen sectorkeuze maar
-   een keuze welke wettelijke datum je als volgende aanleiding gebruikt.
-2. **Horeca: naar vier artikelen of uit de navigatie?** Twee is de stand die
-   `docs/seo-geo-plan.md` zelf "de slechtste" noemt — genoeg om onderhoud te
-   kosten, te weinig om te ranken. Beide richtingen kunnen; ze houden én blijven
-   onderhouden is de enige uitkomst die niets oplevert.
-3. **De enquête: doen we die?** Het is de enige linkbron in dit document die op
+> **Beslist en uitgevoerd op 2026-08-23.** De eerste twee vragen die hier
+> stonden zijn beantwoord, en de uitvoering staat op main. *Welke tweede haak*
+> werd **C**: allebei, met transport eerst — vastgoed van twee naar vier
+> artikelen (#232), daarna het logistiek-cluster onder een nieuwe tag (#235).
+> *Horeca* ging **naar vier** (#236). §2 draagt nog de onderbouwing; de keuze
+> zelf is er geen meer. De drie hieronder staan wel nog open.
+
+1. **De enquête: doen we die?** Het is de enige linkbron in dit document die op
    een domein zonder autoriteit werkt, en hij kost tijd om respondenten te vinden.
-   Valt de keuze op A, dan is de vervoerder-variant even sterk als de
-   installateur-variant: niemand weet wat ETS2 per kilometer gaat kosten.
-4. **Social: één kanaal, en welk?** Mijn voorstel staat in §6 — LinkedIn op het
+   Nu A gelopen is, is de vervoerder-variant even sterk als de
+   installateur-variant: niemand weet wat ETS2 per kilometer gaat kosten, en
+   `kostprijs-per-kilometer` (#235) zegt dat zelf al met zoveel woorden.
+2. **Social: één kanaal, en welk?** Mijn voorstel staat in §6 — LinkedIn op het
    persoonlijke profiel, omdat het publiek uit `docs/claims.md` daar zit en het
    profiel al bestaat. Instagram vergt merkwerk, TikTok en X bestaan niet. Dit
    is ook een vraag over jouw uren, niet alleen over bereik.
-5. **De rekenmachine-route** (stond al open in `docs/seo-geo-plan.md` §3): één
+3. **De rekenmachine-route** (stond al open in `docs/seo-geo-plan.md` §3): één
    tool die zich per taal aanpast, of aparte tools per markt. De DE- en
    ES-trechter loopt tot die tijd dood.
 
