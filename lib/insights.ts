@@ -1607,6 +1607,234 @@ export const POSTS: Insight[] = [
       { type: "p", text: "Wat ik wel beweer is smal en toetsbaar. De verplichting geldt vandaag, het toezicht kijkt naar datakwaliteit, en de vier bronnen waaruit uw cijfer moet komen zijn niet gebouwd om samen een verslag op te leveren. Wie dat een keer goed regelt, is klaar voor de volgende versie van de regels in plaats van voor deze." },
     ],
   },
+  {
+    slug: "the-floor-knows-before-the-system-does",
+    title: "The floor knows before the system does, and nothing records it",
+    summary:
+      "A hotel's most reliable sensor is a person. The housekeeper knows a room has a problem hours before any system does. Whether that observation ever becomes a row depends entirely on how much friction stands between noticing and reporting.",
+    tag: "Hospitality",
+    publishedAt: "2026-08-23",
+    readingMinutes: 5,
+    seo: {
+      metaTitle: "The floor knows before the system does",
+      metaDescription:
+        "Frontline staff spot problems hours before any system does. Most of those observations never become rows, so the pattern behind them is never visible.",
+    },
+    body: [
+      { type: "p", text: "A hotel's most reliable sensor is a person. The housekeeper knows a room has a problem two hours before any system does: the radiator that rattles, the shower that drains slowly, the window that will not shut properly. Whether she reports it depends almost entirely on how much friction sits between noticing and recording." },
+      { type: "h2", text: "The report costs more than the observation" },
+      { type: "p", text: "In most properties the path from noticed to recorded runs through a radio call, a printed sheet, or a supervisor's memory. Each of those is a place where the observation can quietly die. Plenty of property management systems have no field for it at all, or one field called Notes that nobody reads because it fills up with everything." },
+      { type: "h2", text: "What it costs, in numbers you can check" },
+      { type: "ul", items: [
+        "The room gets sold at premium rate with a known defect, and the service recovery comes off the same P&L that booked the revenue.",
+        "The maintenance ticket is raised on the guest's complaint instead of the housekeeper's observation, so the fix lands after the review rather than before it.",
+        "The pattern never surfaces: nobody can tell you which ten rooms generate a third of your recoveries, because the observations were never rows in the first place.",
+      ] },
+      { type: "p", text: "That last one is the expensive part. A defect you fixed is a cost you can account for. A defect you cannot count is a budget line you cannot defend." },
+      { type: "h2", text: "This is not a user-experience problem" },
+      { type: "p", text: "It is tempting to read this as the staff app being ugly. It is not that. Frontline software in hospitality is usually built for the person reporting on the work rather than the person doing it, which is why it asks for a room number, a category, a severity and a photo at the exact moment someone is standing in a corridor holding a stack of towels." },
+      { type: "h2", text: "Build the capture path first" },
+      { type: "p", text: "Not another dashboard. The first thing worth building is the shortest possible capture path: one a person with full hands can complete in under ten seconds, on the device already in their pocket, in the language they actually speak. Everything downstream is a reporting question, and reporting questions get easy once the rows exist." },
+      { type: "p", text: "Run it alongside the current process for two cycles. If the number of recorded observations does not multiply, the capture path is still too long. That is the test, not whether people say they like it." },
+    ],
+    i18n: {
+      nl: {
+        seo: {
+          metaTitle: "De vloer weet het eerder dan het systeem",
+          metaDescription:
+            "De mensen op de vloer zien problemen uren voordat een systeem ze ziet. Die waarnemingen worden zelden rijen, dus het patroon erachter blijft onzichtbaar.",
+        },
+        title: "De vloer weet het eerder dan het systeem, en niets legt het vast",
+        summary:
+          "De betrouwbaarste sensor in een hotel is een mens. De housekeeper weet uren eerder dan welk systeem ook dat er iets mis is met een kamer. Of die waarneming ooit een rij wordt, hangt volledig af van hoeveel wrijving er tussen opmerken en melden zit.",
+        body: [
+          { type: "p", text: "De betrouwbaarste sensor in een hotel is een mens. De housekeeper weet twee uur eerder dan welk systeem ook dat er iets mis is met een kamer: de radiator die tikt, de douche die traag wegloopt, het raam dat niet goed sluit. Of ze het meldt hangt vrijwel volledig af van hoeveel wrijving er tussen opmerken en vastleggen zit." },
+          { type: "h2", text: "Het melden kost meer dan het zien" },
+          { type: "p", text: "In de meeste panden loopt de weg van gezien naar vastgelegd via een portofoongesprek, een geprint blad of het geheugen van een supervisor. Elk van die drie is een plek waar de waarneming stilletjes kan sneuvelen. Veel property management systemen hebben er helemaal geen veld voor, of één veld dat Notities heet en dat niemand leest omdat er alles in belandt." },
+          { type: "h2", text: "Wat het kost, in cijfers die je kunt nakijken" },
+          { type: "ul", items: [
+            "De kamer gaat voor het hoogste tarief de deur uit met een bekend gebrek, en de compensatie komt van dezelfde P&L die de omzet boekte.",
+            "De storingsmelding ontstaat op de klacht van de gast in plaats van op de waarneming van de housekeeper, dus de reparatie komt ná de review in plaats van ervoor.",
+            "Het patroon komt nooit boven: niemand kan je vertellen welke tien kamers een derde van je compensaties veroorzaken, omdat de waarnemingen nooit rijen zijn geworden.",
+          ] },
+          { type: "p", text: "Dat laatste is het dure deel. Een gebrek dat je hebt verholpen is een kostenpost die je kunt verantwoorden. Een gebrek dat je niet kunt tellen is een begrotingsregel die je niet kunt verdedigen." },
+          { type: "h2", text: "Dit is geen kwestie van een lelijke app" },
+          { type: "p", text: "Het is verleidelijk om dit te lezen als slecht ontworpen software. Dat is het niet. Systemen voor de vloer in de horeca zijn meestal gebouwd voor degene die over het werk rapporteert en niet voor degene die het doet. Vandaar dat er om een kamernummer, een categorie, een urgentie en een foto wordt gevraagd op het moment dat iemand met een stapel handdoeken op een gang staat." },
+          { type: "h2", text: "Bouw eerst de invoerweg" },
+          { type: "p", text: "Geen tweede dashboard. Het eerste wat de moeite waard is, is de kortst mogelijke invoerweg: één die iemand met volle handen binnen tien seconden afmaakt, op het apparaat dat toch al in de zak zit, in de taal die diegene werkelijk spreekt. Alles daarachter is een rapportagevraag, en rapportagevragen worden eenvoudig zodra de rijen bestaan." },
+          { type: "p", text: "Laat het twee cycli naast het bestaande proces meelopen. Vermenigvuldigt het aantal vastgelegde waarnemingen zich niet, dan is de invoerweg nog te lang. Dat is de toets, niet of mensen zeggen dat ze het prettig vinden." },
+        ],
+      },
+      de: {
+        seo: {
+          metaTitle: "Die Etage weiß es vor dem System",
+          metaDescription:
+            "Das Personal auf der Etage sieht Probleme Stunden vor jedem System. Diese Beobachtungen werden selten erfasst, und das Muster dahinter bleibt unsichtbar.",
+        },
+        title: "Die Etage weiß es vor dem System, und nichts hält es fest",
+        summary:
+          "Der zuverlässigste Sensor in einem Hotel ist ein Mensch. Das Zimmerpersonal weiß Stunden vor jedem System, dass mit einem Zimmer etwas nicht stimmt. Ob diese Beobachtung je erfasst wird, hängt allein an der Reibung zwischen Bemerken und Melden.",
+        body: [
+          { type: "p", text: "Der zuverlässigste Sensor in einem Hotel ist ein Mensch. Das Zimmerpersonal weiß zwei Stunden vor jedem System, dass mit einem Zimmer etwas nicht stimmt: der Heizkörper, der klopft, die Dusche, die langsam abläuft, das Fenster, das nicht richtig schließt. Ob es gemeldet wird, hängt fast vollständig davon ab, wie viel Reibung zwischen Bemerken und Festhalten liegt." },
+          { type: "h2", text: "Das Melden kostet mehr als das Sehen" },
+          { type: "p", text: "In den meisten Häusern führt der Weg vom Bemerkt zum Erfasst über einen Funkspruch, einen ausgedruckten Bogen oder das Gedächtnis einer Aufsicht. Jede dieser drei Stationen ist ein Ort, an dem die Beobachtung leise verschwindet. Viele Property-Management-Systeme haben dafür gar kein Feld, oder ein einziges namens Notizen, das niemand liest, weil dort alles landet." },
+          { type: "h2", text: "Was es kostet, in Zahlen, die Sie prüfen können" },
+          { type: "ul", items: [
+            "Das Zimmer wird zum höchsten Preis verkauft, obwohl der Mangel bekannt ist, und die Kulanz belastet dieselbe Ergebnisrechnung, die den Umsatz gebucht hat.",
+            "Die Störungsmeldung entsteht aus der Beschwerde des Gastes statt aus der Beobachtung des Zimmerpersonals, die Reparatur kommt also nach der Bewertung statt davor.",
+            "Das Muster wird nie sichtbar: niemand kann Ihnen sagen, welche zehn Zimmer ein Drittel Ihrer Kulanzfälle erzeugen, weil die Beobachtungen nie erfasst wurden.",
+          ] },
+          { type: "p", text: "Der letzte Punkt ist der teure. Ein behobener Mangel ist ein Kostenposten, den Sie belegen können. Ein Mangel, den Sie nicht zählen können, ist eine Budgetposition, die Sie nicht verteidigen können." },
+          { type: "h2", text: "Das ist kein Problem der Benutzeroberfläche" },
+          { type: "p", text: "Es liegt nahe, das als hässliche App zu lesen. Das ist es nicht. Software für die Etage wird im Gastgewerbe meist für diejenigen gebaut, die über die Arbeit berichten, und nicht für die, die sie leisten. Deshalb fragt sie nach Zimmernummer, Kategorie, Dringlichkeit und Foto, genau in dem Moment, in dem jemand mit einem Stapel Handtücher im Flur steht." },
+          { type: "h2", text: "Bauen Sie zuerst den Erfassungsweg" },
+          { type: "p", text: "Kein zweites Dashboard. Das Erste, was sich lohnt, ist der kürzeste mögliche Erfassungsweg: einer, den jemand mit vollen Händen in unter zehn Sekunden abschließt, auf dem Gerät, das ohnehin in der Tasche steckt, in der Sprache, die diese Person tatsächlich spricht. Alles dahinter ist eine Frage der Auswertung, und Auswertungsfragen werden einfach, sobald die Daten existieren." },
+          { type: "p", text: "Lassen Sie ihn zwei Zyklen neben dem bestehenden Prozess laufen. Vervielfacht sich die Zahl der erfassten Beobachtungen nicht, ist der Erfassungsweg noch zu lang. Das ist der Test, nicht ob die Leute sagen, dass er ihnen gefällt." },
+        ],
+      },
+      es: {
+        seo: {
+          metaTitle: "La planta lo sabe antes que el sistema",
+          metaDescription:
+            "El personal de planta detecta problemas horas antes que cualquier sistema. Esas observaciones casi nunca se registran y el patrón detrás queda invisible.",
+        },
+        title: "La planta lo sabe antes que el sistema, y nada lo registra",
+        summary:
+          "El sensor más fiable de un hotel es una persona. La camarera de pisos sabe que una habitación tiene un problema horas antes que cualquier sistema. Que esa observación llegue a registrarse depende por completo de la fricción entre verlo y comunicarlo.",
+        body: [
+          { type: "p", text: "El sensor más fiable de un hotel es una persona. La camarera de pisos sabe dos horas antes que cualquier sistema que una habitación tiene un problema: el radiador que golpea, la ducha que desagua despacio, la ventana que no cierra del todo. Que lo comunique depende casi por completo de cuánta fricción hay entre verlo y registrarlo." },
+          { type: "h2", text: "Comunicarlo cuesta más que verlo" },
+          { type: "p", text: "En la mayoría de los hoteles el camino entre verlo y dejarlo registrado pasa por una llamada de radio, una hoja impresa o la memoria de una supervisora. Cada una de esas tres es un punto donde la observación muere en silencio. Muchos sistemas de gestión hotelera no tienen ningún campo para esto, o tienen uno llamado Notas que nadie lee porque acaba conteniéndolo todo." },
+          { type: "h2", text: "Lo que cuesta, en cifras que puedes comprobar" },
+          { type: "ul", items: [
+            "La habitación se vende a tarifa alta con un defecto conocido, y la compensación sale de la misma cuenta de resultados que registró el ingreso.",
+            "El parte de mantenimiento nace de la queja del huésped y no de la observación de la camarera, así que la reparación llega después de la reseña en lugar de antes.",
+            "El patrón nunca aflora: nadie puede decirte qué diez habitaciones generan un tercio de tus compensaciones, porque las observaciones nunca llegaron a registrarse.",
+          ] },
+          { type: "p", text: "Eso último es la parte cara. Un defecto que has reparado es un coste que puedes justificar. Un defecto que no puedes contar es una partida de presupuesto que no puedes defender." },
+          { type: "h2", text: "Esto no es un problema de interfaz" },
+          { type: "p", text: "Es tentador leerlo como que la aplicación del personal es fea. No lo es. El software de planta en hostelería suele construirse para quien informa sobre el trabajo y no para quien lo hace. Por eso pide número de habitación, categoría, urgencia y foto justo en el momento en que alguien está en un pasillo con una pila de toallas en las manos." },
+          { type: "h2", text: "Construye primero el camino de captura" },
+          { type: "p", text: "No otro cuadro de mando. Lo primero que merece la pena es el camino de captura más corto posible: uno que alguien con las manos ocupadas complete en menos de diez segundos, en el dispositivo que ya lleva en el bolsillo y en el idioma que realmente habla. Todo lo que viene después es una cuestión de informes, y los informes se vuelven fáciles en cuanto existen los datos." },
+          { type: "p", text: "Déjalo correr dos ciclos junto al proceso actual. Si el número de observaciones registradas no se multiplica, el camino de captura sigue siendo demasiado largo. Esa es la prueba, y no si la gente dice que le gusta." },
+        ],
+      },
+    },
+  },
+  {
+    slug: "your-returning-guest-looks-new-to-every-system",
+    title: "Your returning guest looks new to every system you own",
+    summary:
+      "The same guest booked through an OTA, paid at the bar under a room number, joined the wifi under a personal address and reviewed under a nickname. Four systems hold four different people, and none of them is the guest.",
+    tag: "Hospitality",
+    publishedAt: "2026-08-23",
+    readingMinutes: 5,
+    seo: {
+      metaTitle: "Why your returning guest looks new",
+      metaDescription:
+        "Guest data projects fail on identity, not storage. Before any platform, decide which single field identifies a guest and capture it at every touchpoint.",
+    },
+    body: [
+      { type: "p", text: "Your returning guest booked through an online travel agent in March, paid at the bar in July under a room number, joined the wifi under a personal address and left a review under a nickname. Four systems hold four different people. None of those four is the guest." },
+      { type: "h2", text: "Personalisation projects usually solve the wrong half" },
+      { type: "p", text: "The pitch is always a platform that unifies guest data. The unspoken assumption underneath it is that the data was captured with something to unify it by. Usually it was not. The travel agent masked the email, the point of sale recorded a room number rather than a person, the wifi portal never wrote anything back, and the property management system created a fresh profile at every booking because the name was spelled slightly differently." },
+      { type: "h2", text: "The key is a decision, not a technology" },
+      { type: "p", text: "Before any tool, somebody has to answer one question: what identifies a guest here. Email is the obvious candidate and the agent channel breaks it. Phone survives more of the journey. A loyalty number works if enrolment happens at a moment the guest has a reason to enrol, which is almost never at check-in, when what they want is their key." },
+      { type: "p", text: "Whatever the answer turns out to be, it has to be captured at every touchpoint that matters and it has to be the same field every time. That is unglamorous work, and it is the whole project." },
+      { type: "h2", text: "What becomes measurable once the key exists" },
+      { type: "ul", items: [
+        "What a returning guest is actually worth against a first-time guest, net of channel cost.",
+        "Which stay-level experiences correlate with a return, and which correlate with nothing at all.",
+        "How much of your new demand is a previous guest you failed to recognise.",
+      ] },
+      { type: "p", text: "That third number is the one that moves budgets. Most properties assume a repeat rate from the loyalty programme. The real rate includes everyone who came back without ever being counted." },
+      { type: "h2", text: "Start smaller than the vendor suggests" },
+      { type: "p", text: "Pick one key. Capture it at two touchpoints rather than eight. Prove you can match a stay to a previous stay across a single month of arrivals, by hand if that is what it takes. If it fails at two touchpoints it will fail at eight, and you will have paid for a platform to store data that never joined." },
+    ],
+    i18n: {
+      nl: {
+        seo: {
+          metaTitle: "Waarom je vaste gast nieuw lijkt",
+          metaDescription:
+            "Gastdataprojecten stranden op identiteit, niet op opslag. Kies vóór elk platform één veld dat een gast identificeert en leg dat op elk contactmoment vast.",
+        },
+        title: "Je vaste gast is voor elk systeem een vreemde",
+        summary:
+          "Dezelfde gast boekte via een OTA, rekende aan de bar af op kamernummer, kwam op de wifi met een privéadres en schreef een review onder een bijnaam. Vier systemen houden vier verschillende mensen bij, en geen van die vier is de gast.",
+        body: [
+          { type: "p", text: "Je vaste gast boekte in maart via een online reisbureau, rekende in juli aan de bar af op kamernummer, kwam op de wifi met een privéadres en liet een review achter onder een bijnaam. Vier systemen houden vier verschillende mensen bij. Geen van die vier is de gast." },
+          { type: "h2", text: "Personalisatieprojecten lossen meestal de verkeerde helft op" },
+          { type: "p", text: "De pitch is altijd een platform dat gastdata samenbrengt. De onuitgesproken aanname eronder is dat die data ooit is vastgelegd mét iets om hem op samen te brengen. Meestal is dat niet gebeurd. Het reisbureau maskeerde het e-mailadres, de kassa legde een kamernummer vast en geen persoon, de wifiportal schreef nooit iets terug, en het property management systeem maakte bij elke boeking een nieuw profiel aan omdat de naam nét anders gespeld was." },
+          { type: "h2", text: "De sleutel is een beslissing, geen technologie" },
+          { type: "p", text: "Vóór elk gereedschap moet iemand één vraag beantwoorden: wat identificeert hier een gast. E-mail is de voor de hand liggende kandidaat en het OTA-kanaal breekt hem. Een telefoonnummer overleeft meer van de reis. Een loyaltynummer werkt als aanmelden gebeurt op een moment waarop de gast een reden heeft zich aan te melden, en dat is vrijwel nooit bij check-in, wanneer hij zijn sleutel wil." },
+          { type: "p", text: "Wat het antwoord ook wordt, het moet op elk contactmoment dat ertoe doet worden vastgelegd, en het moet elke keer hetzelfde veld zijn. Dat is werk zonder glans, en het is het hele project." },
+          { type: "h2", text: "Wat meetbaar wordt zodra de sleutel bestaat" },
+          { type: "ul", items: [
+            "Wat een terugkerende gast werkelijk waard is tegenover een eerste gast, na aftrek van kanaalkosten.",
+            "Welke ervaringen tijdens een verblijf samenhangen met terugkomen, en welke met helemaal niets.",
+            "Hoeveel van je nieuwe vraag een eerdere gast is die je niet hebt herkend.",
+          ] },
+          { type: "p", text: "Dat derde getal is het getal dat begrotingen verzet. De meeste hotels leiden hun herhaalpercentage af uit het loyaltyprogramma. Het echte percentage telt ook iedereen mee die terugkwam zonder ooit geteld te zijn." },
+          { type: "h2", text: "Begin kleiner dan de leverancier voorstelt" },
+          { type: "p", text: "Kies één sleutel. Leg hem vast op twee contactmomenten in plaats van acht. Bewijs dat je één maand aankomsten aan een eerder verblijf kunt koppelen, desnoods met de hand. Lukt dat niet bij twee contactmomenten, dan lukt het ook niet bij acht, en heb je betaald voor een platform dat data bewaart die nooit is samengekomen." },
+        ],
+      },
+      de: {
+        seo: {
+          metaTitle: "Warum Ihr Stammgast neu aussieht",
+          metaDescription:
+            "Gästedatenprojekte scheitern an der Identität, nicht am Speicher. Legen Sie vor jedem Werkzeug ein Feld fest und erfassen Sie es an jedem Kontaktpunkt.",
+        },
+        title: "Ihr Stammgast ist für jedes Ihrer Systeme ein Fremder",
+        summary:
+          "Derselbe Gast buchte über ein Reiseportal, zahlte an der Bar über die Zimmernummer, kam mit einer privaten Adresse ins WLAN und bewertete unter einem Spitznamen. Vier Systeme führen vier verschiedene Personen, und keine davon ist der Gast.",
+        body: [
+          { type: "p", text: "Ihr Stammgast buchte im März über ein Online-Reisebüro, zahlte im Juli an der Bar über die Zimmernummer, kam mit einer privaten Adresse ins WLAN und hinterließ eine Bewertung unter einem Spitznamen. Vier Systeme führen vier verschiedene Personen. Keine dieser vier ist der Gast." },
+          { type: "h2", text: "Personalisierungsprojekte lösen meist die falsche Hälfte" },
+          { type: "p", text: "Das Angebot ist immer eine Plattform, die Gästedaten zusammenführt. Die unausgesprochene Annahme darunter lautet, dass die Daten überhaupt mit etwas erfasst wurden, worüber man sie zusammenführen könnte. Meist war das nicht der Fall. Das Reisebüro hat die E-Mail-Adresse maskiert, die Kasse hat eine Zimmernummer erfasst und keine Person, das WLAN-Portal hat nie etwas zurückgeschrieben, und das Property-Management-System hat bei jeder Buchung ein frisches Profil angelegt, weil der Name geringfügig anders geschrieben war." },
+          { type: "h2", text: "Der Schlüssel ist eine Entscheidung, keine Technologie" },
+          { type: "p", text: "Vor jedem Werkzeug muss jemand eine Frage beantworten: was identifiziert hier einen Gast. Die E-Mail-Adresse ist der naheliegende Kandidat, und der Portalkanal zerbricht sie. Die Telefonnummer übersteht mehr von der Reise. Eine Kundennummer funktioniert, wenn die Anmeldung in einem Moment geschieht, in dem der Gast einen Grund dazu hat, und das ist so gut wie nie beim Check-in, wenn er seinen Schlüssel möchte." },
+          { type: "p", text: "Wie die Antwort auch ausfällt, sie muss an jedem relevanten Kontaktpunkt erfasst werden, und es muss jedes Mal dasselbe Feld sein. Das ist Arbeit ohne Glanz, und sie ist das ganze Projekt." },
+          { type: "h2", text: "Was messbar wird, sobald der Schlüssel existiert" },
+          { type: "ul", items: [
+            "Was ein wiederkehrender Gast im Vergleich zu einem Erstgast tatsächlich wert ist, abzüglich der Kanalkosten.",
+            "Welche Erlebnisse während eines Aufenthalts mit einer Rückkehr zusammenhängen und welche mit gar nichts.",
+            "Wie viel Ihrer neuen Nachfrage in Wahrheit ein früherer Gast ist, den Sie nicht erkannt haben.",
+          ] },
+          { type: "p", text: "Die dritte Zahl ist die, die Budgets bewegt. Die meisten Häuser leiten ihre Wiederkehrquote aus dem Treueprogramm ab. Die echte Quote schließt alle ein, die zurückkamen, ohne jemals gezählt zu werden." },
+          { type: "h2", text: "Fangen Sie kleiner an, als der Anbieter vorschlägt" },
+          { type: "p", text: "Wählen Sie einen Schlüssel. Erfassen Sie ihn an zwei Kontaktpunkten statt an acht. Weisen Sie nach, dass Sie einen Monat an Anreisen einem früheren Aufenthalt zuordnen können, notfalls von Hand. Scheitert das bei zwei Kontaktpunkten, scheitert es auch bei acht, und Sie haben für eine Plattform bezahlt, die Daten speichert, die nie zusammengefunden haben." },
+        ],
+      },
+      es: {
+        seo: {
+          metaTitle: "Por qué tu cliente habitual parece nuevo",
+          metaDescription:
+            "Los proyectos de datos de huéspedes fallan por identidad, no por almacenamiento. Elige un campo que identifique al huésped y captúralo en cada contacto.",
+        },
+        title: "Tu cliente habitual es un desconocido para cada sistema que tienes",
+        summary:
+          "El mismo huésped reservó por una agencia online, pagó en el bar con el número de habitación, entró al wifi con una dirección personal y dejó una reseña con un apodo. Cuatro sistemas guardan cuatro personas distintas, y ninguna es el huésped.",
+        body: [
+          { type: "p", text: "Tu cliente habitual reservó en marzo por una agencia de viajes online, pagó en julio en el bar con el número de habitación, entró al wifi con una dirección personal y dejó una reseña con un apodo. Cuatro sistemas guardan cuatro personas distintas. Ninguna de esas cuatro es el huésped." },
+          { type: "h2", text: "Los proyectos de personalización resuelven casi siempre la mitad equivocada" },
+          { type: "p", text: "La propuesta es siempre una plataforma que unifica los datos de huéspedes. La suposición no dicha que hay debajo es que esos datos se capturaron con algo por lo que unificarlos. Normalmente no fue así. La agencia enmascaró el correo, el punto de venta registró un número de habitación y no una persona, el portal del wifi nunca devolvió nada, y el sistema de gestión creó un perfil nuevo en cada reserva porque el nombre estaba escrito de forma ligeramente distinta." },
+          { type: "h2", text: "La clave es una decisión, no una tecnología" },
+          { type: "p", text: "Antes de cualquier herramienta alguien tiene que responder a una pregunta: qué identifica aquí a un huésped. El correo es el candidato obvio y el canal de la agencia lo rompe. El teléfono sobrevive a más partes del viaje. Un número de fidelización funciona si el alta ocurre en un momento en que el huésped tiene motivos para darse de alta, y eso casi nunca es en el check-in, cuando lo que quiere es su llave." },
+          { type: "p", text: "Sea cual sea la respuesta, hay que capturarla en cada punto de contacto que importa y tiene que ser el mismo campo siempre. Es un trabajo sin brillo, y es el proyecto entero." },
+          { type: "h2", text: "Lo que se vuelve medible en cuanto existe la clave" },
+          { type: "ul", items: [
+            "Cuánto vale de verdad un huésped que vuelve frente a uno que llega por primera vez, descontado el coste del canal.",
+            "Qué experiencias durante la estancia se relacionan con el regreso y cuáles no se relacionan con nada.",
+            "Qué parte de tu demanda nueva es en realidad un huésped anterior que no reconociste.",
+          ] },
+          { type: "p", text: "Esa tercera cifra es la que mueve presupuestos. La mayoría de los hoteles deduce su tasa de repetición del programa de fidelización. La tasa real incluye a todos los que volvieron sin que nadie los contara." },
+          { type: "h2", text: "Empieza más pequeño de lo que propone el proveedor" },
+          { type: "p", text: "Elige una clave. Captúrala en dos puntos de contacto en lugar de ocho. Demuestra que puedes enlazar un mes de llegadas con una estancia anterior, a mano si hace falta. Si falla con dos puntos de contacto también fallará con ocho, y habrás pagado por una plataforma que guarda datos que nunca llegaron a unirse." },
+        ],
+      },
+    },
+  },
 ];
 
 /** Locales a post is published under (default: all four). */
