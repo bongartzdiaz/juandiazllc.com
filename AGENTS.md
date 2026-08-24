@@ -4950,3 +4950,169 @@ Niets. Dit is code, geen configuratie.
   formaliteit: de skip-link, de Engelse deelkaart van elke taal, de
   signals-tagpagina, het commandopalet, en drie `aria-label`s die alleen een
   schermlezer hoort.
+
+### 2026-08-24 (vervolg) — vier treffers bleken er elf, en de poort die ze had moeten zien las het verkeerde bestand
+
+De vorige sessie noteerde `lib/sectors.ts:328` als losse observatie: daar stond
+"Hotellerie & Revenue", terwijl `lib/i18n/duits.test.ts` dat woord sinds 20
+augustus verbiedt. Het repareren van die ene regel bleek de kleinste helft van
+het werk.
+
+#### Het defect was scherper dan "een derde woord"
+
+De reden achter het verbod luidde dat Hotellerie een derde Duits woord was naast
+Hospitality en Gastgewerbe. Bij het hertellen — mijn eigen tellingen uit augustus
+verlopen, en dat is in dit logboek al drie keer misgegaan — bleek de rolverdeling
+in `DICT.de` volstrekt vast:
+
+| rol | woord | waar |
+|---|---|---|
+| **label** van de sector | Hospitality (14×) | `tag.label.hospitality`, `sectors.h.title.a` = **"Hospitality &"**, `sectors.h.ix`, contactformulier, hero, marquee |
+| **proza**, sector in een lopende zin | Gastgewerbe (3×) | "Betreiber in Energie, Immobilien und Gastgewerbe" |
+
+Daarmee is het geen smaakkwestie. De sectorkaart op `/de/sectors` zei
+**"Hospitality &"** en de detailpagina waar hij naartoe linkt zei **"Hotellerie &
+Revenue"**. Twee namen voor één sector, op twee pagina's die naar elkaar wijzen.
+De reparatie van 20 augustus raakte `tag.label.hospitality` en niets anders,
+omdat de poort `DICT.de` leest.
+
+#### Vier werden er elf, en het tweede woord was erger
+
+Een voormeting die de kopijmodules las in plaats van het woordenboek, gaf niet
+vier treffers maar **elf**:
+
+| bestand | woord | n |
+|---|---|---|
+| `lib/sectors.ts` (de) | Hotellerie | 4 |
+| `lib/insights.ts` (de) | Hotellerie | 1 |
+| `lib/insights.ts` (de) | **Operatoren** | **6** |
+
+Die zes staan onder hetzelfde verbod van 20 augustus — Operatoren leest in het
+Duits als wiskundige of machine-operatoren, terwijl het publiek overal elders
+Betreiber heet (25×). Twee ervan zijn de **titel en de samenvatting** van een
+Duits artikel, dus de `<title>` en de meta-description van een levende pagina.
+
+Het artikel over de tien minuten voor check-in droeg het bewijs zelf: de eerste
+alinea zegt "Hospitality ist eine der letzten Branchen", en drie blokken later
+zegt het citaat "In der Hotellerie". Eén artikel, twee woorden.
+
+#### De naamval was de val, niet het woord
+
+`Operatoren → Betreiber` is geen zoek-en-vervang. Vijf van de zes staan in de
+nominatief en houden hun vorm; **één staat in de datief**, en daar wordt het
+`Betreibern`:
+
+    ...ein Entscheidungsrahmen, der zur Realität von Betreibern passt.
+
+Dat is dezelfde klasse als de `u → je`-pas van #237, die vijf grammaticafouten
+maakte terwijl het script netjes "55 regels aangepast" meldde. De naamvallen zijn
+daarom niet bedacht maar afgelezen uit `DICT.de`, waar één zin ze allebei draagt:
+*"von Betreibern für Betreiber gebaut"*. Ook het citaat schoof mee — *in der*
+Hotellerie (vrouwelijk) werd *im* Gastgewerbe (onzijdig).
+
+Elke vervanging kreeg een eigen anker met een eigen aantal, en het patchscript
+weigert te schrijven als één anker niet landt. Een half toegepaste patch is
+erger dan geen patch.
+
+#### De derde poort, en waarom hij data leest
+
+`duits.test.ts` heeft er een blok bij dat dezelfde twee regels — aanspreekvorm en
+teruggedraaide woorden — over `sectors.ts`, `ventures.ts` en `insights.ts` legt.
+Hij leest de **geëxporteerde data** en niet de bestandstekst, om precies dezelfde
+reden als de twee poorten erboven: anders struikelt het testbestand over zijn
+eigen toelichting, waarin die woorden nu eenmaal moeten staan. Twee groene
+mutaties bewijzen dat in plaats van het aan te nemen.
+
+Twee dingen die er bewust in zitten:
+
+- **De basis-tak voor `markets: ["de"]`-artikelen.** De drie Heimspeicher-stukken
+  dragen hun Duits in de basisvelden en niet in `i18n.de`. Zonder die tak scant
+  de poort de helft van de Duitse artikelen niet, en dat zou hem stil half zo
+  sterk maken. Bewezen met een discriminerend paar: dezelfde overtreding is rood
+  mét de tak en groen zonder.
+- **Een aparte assertie die de kaart naast de pagina legt.** Die had het defect
+  van vandaag rechtstreeks gevangen; de woordenlijst deed dat alleen omdat het
+  woord toevallig ook verboden was. Een sectornaam die afwijkt zónder verboden
+  woord is nu ook rood.
+
+Vier vangnet-asserties per bron: elke bron levert aantoonbaar strings op en
+draagt aantoonbaar Sie-vormen. Zonder die twee slaagt alles op een lege lijst —
+een accessor die per ongeluk niets teruggeeft leest dan als schone kopij.
+
+#### Het mutatieharnas vond een fout in mijn eigen poort
+
+Eén mutatie werd **overgeslagen** met de melding "anker 2×". Dat was geen
+harnasfout: ik had de woordenlijst-controle in de nieuwe describe overgeschreven
+in plaats van gedeeld. Twee kopieën van dezelfde controle lopen uiteen en dan
+bewaakt de zwakste — dezelfde klasse als de rest van deze PR, één laag hoger. Nu
+staan `duTreffers()` en `verbodenTreffers()` er één keer en roepen beide poorten
+ze aan.
+
+**Een anker dat plotseling twee keer staat, is een dubbeling die je nog niet
+gezien had.**
+
+#### Twee keer voorspelde ik de verkeerde kleur, en dat was allebei leerzaam
+
+*"Zet de controle uit"* op schone kopij bleef groen, waar ik rood verwachtte. Dat
+is geen zwakke poort maar een onmogelijke mutatie: een vinder die niets zoekt
+vindt niets, en een lege lijst slaagt. De geldige vorm is tweeledig — zet de
+controle uit **én** breng de overtreding terug. Blijft dat groen, dan kwam het
+rood van die controle.
+
+Bij de tweede poging bleef één van die paren toch rood, opnieuw tegen de
+verwachting in. Reden: de sectornaam is **dubbel bewaakt**, door de woordenlijst
+én door de nieuwe naam-consistentietest. Het discriminerende paar draait daarom
+op het citaat in `insights.ts`, dat maar één controle raakt — en de dubbele
+bewaking staat er nu als eigen mutatie in, met rood als verwachte kleur.
+
+Dertien mutaties, dertien keer de voorspelde kleur, groen na herstel, nul sporen
+achtergebleven.
+
+#### Gemeten
+
+Na de reparatie leverde de voormeting over de drie kopijmodules **0
+teruggedraaide woorden en 0 du-vormen** op, met de Sie-controle op 8, 4 en 91.
+Wat er in de repo aan treffers overblijft staat uitsluitend in de toelichting van
+de poorten zelf.
+
+Op een productiebuild, met de pid van de server tegen de starttijd gecontroleerd:
+
+    /de/sectors                     "Hospitality" 14x
+    /de/sectors/hospitality         Hotellerie 0x · Operatoren 0x
+      <title>   Revenue- und Operations-Consultant Hospitality · Juan Diaz
+                58 tekens (46 + achtervoegsel, budget 48)
+      h1        Hospitality & Revenue
+      lede      Hospitality ist eine der wenigen Branchen, ...
+    /de/insights/the-ten-minutes-before-check-in    0x / 0x
+    /de/insights/the-build-vs-buy-trap              0x / 0x
+    /de/insights/the-automation-roi-myth            0x / 0x
+    /de/insights/why-operator-crms-fail             0x / 0x
+
+Zes positieve controles ernaast, want nul is pas een meting nadat het instrument
+bewees te kunnen vinden: de teller vindt Gastgewerbe op de sectorpagina,
+Betreiber in het artikel, de datiefvorm Betreibern in de meta-description, en een
+verzonnen woord niet.
+
+In de DOM op 375 px: geen horizontale overloop, geen element buiten beeld, h1 335
+× 83 px, en nul console-fouten — dat laatste ná een hartslag door de lezer, want
+een lege lijst uit een kapotte lezer leest hetzelfde als een schone meting. Een
+screenshot lukte niet; de browser-pane compositeert hier geen frames, dus dit is
+in de DOM gemeten en niet op het oog.
+
+**1047 tests in 47 bestanden**, was 1034/47 — precies +13 voor de nieuwe poort.
+tsc schoon, i18n 718 × 4 (ongewijzigd: alleen waardes), prijsgenerator groen,
+build groen.
+
+#### Wat deze poort niet ziet
+
+Of het Duits klópt — daar is een lezer voor, en die leesbeurt is op 20 augustus
+gedaan. En kopij die in een component staat in plaats van in een module; die
+klasse is van `lib/i18n/kale-tekst.test.ts`.
+
+#### Onderweg
+
+Het zevende escape-incident van deze sessie: een patchscript met backticks,
+dollartekens en backslashes in het anker ging door de shell-laag en kwam er
+ongelijk uit. Het harnas is daarna niet gepatcht maar herschreven via het
+Write-gereedschap. Anker op regels zonder speciale tekens, of schrijf het
+bestand opnieuw.

@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { DICT } from "./dict";
+import { SECTORS } from "../sectors";
+import { VENTURES } from "../ventures";
+import { POSTS } from "../insights";
 
 /* Twee poorten op het Duitse woordenboek.
  * ───────────────────────────────────────────────────────────────────────────
@@ -66,6 +69,36 @@ function woorden(zin: string): string[] {
     .filter(Boolean);
 }
 
+/* De twee controles staan hieronder EEN keer en worden door beide poorten
+ * aangeroepen. Ze stonden er even twee keer -- een kopie in het woordenboek-
+ * blok en een in het kopij-blok -- en dat is dezelfde fout als twee lijsten
+ * die hetzelfde bewaken: ze lopen uiteen en dan bewaakt de zwakste. Het
+ * mutatieharnas ving het doordat zijn anker plotseling 2x stond. */
+
+const DU_UITLEG =
+  "De Duitse site is Sie. Een du-vorm ertussen leest als een tweede " +
+  "schrijver. Wil je hier bewust van afwijken, zet dan een uitzondering " +
+  "met reden neer in plaats van de regel te verzachten.";
+
+/** Elke plek waar de lezer met du wordt aangesproken. */
+function duTreffers(strings: Array<[string, string]>): string[] {
+  return strings
+    .filter(([, v]) => woorden(v).some((w) => DU_VORMEN.includes(w)))
+    .map(([k, v]) => `${k} → "${v.slice(0, 70)}"`);
+}
+
+/** Elke plek waar een teruggedraaid woord terugstaat, met de reden erachter. */
+function verbodenTreffers(strings: Array<[string, string]>): string[] {
+  const uit: string[] = [];
+  for (const [woord, reden] of Object.entries(NIET_MEER)) {
+    const laag = woord.toLowerCase();
+    for (const [k, v] of strings) {
+      if (woorden(v).includes(laag)) uit.push(`${k} → "${woord}": ${reden}`);
+    }
+  }
+  return uit;
+}
+
 describe("het Duitse woordenboek", () => {
   /* Zonder deze twee zou alles hieronder slagen op een leeg woordenboek —
      precies de fout uit feedback_assert_niet_door_het_vangnet. */
@@ -80,26 +113,119 @@ describe("het Duitse woordenboek", () => {
   });
 
   it("spreekt de lezer nergens met du aan", () => {
-    const gevonden = waarden
-      .filter(([, v]) => woorden(v).some((w) => DU_VORMEN.includes(w)))
-      .map(([k, v]) => `${k} → "${v.slice(0, 70)}"`);
+    const gevonden = duTreffers(waarden);
 
     expect(
       gevonden,
-      "De Duitse site is Sie. Een du-vorm ertussen leest als een tweede " +
-        "schrijver. Wil je hier bewust van afwijken, zet dan een uitzondering " +
-        "met reden neer in plaats van de regel te verzachten.",
+      DU_UITLEG,
     ).toEqual([]);
   });
 
   it("draagt geen van de woorden die zijn teruggedraaid", () => {
-    const gevonden: string[] = [];
-    for (const [woord, reden] of Object.entries(NIET_MEER)) {
-      const laag = woord.toLowerCase();
-      for (const [k, v] of waarden) {
-        if (woorden(v).includes(laag)) gevonden.push(`${k} → "${woord}": ${reden}`);
-      }
-    }
+    const gevonden = verbodenTreffers(waarden);
     expect(gevonden, "Zie de reden achter elk woord.").toEqual([]);
+  });
+});
+
+/* ───────────────────────────────────────────────────────────────────────────
+ * DERDE POORT: dezelfde twee regels, op de Duitse kopij die NIET in dict.ts staat.
+ *
+ * AANLEIDING. Op 2026-08-24 stond in `lib/sectors.ts` nog "Hotellerie & Revenue"
+ * terwijl de sectorkaart ernaast — `sectors.h.title.a` in dit woordenboek — al
+ * "Hospitality &" zei. Vier dagen nadat dat woord hierboven verboden werd, en op
+ * twee pagina's die naar elkaar linken. De reparatie van 20 augustus raakte
+ * `tag.label.hospitality` en niets anders, omdat de poort hierboven `DICT.de`
+ * leest en de kopijmodules niet.
+ *
+ * Gemeten diezelfde dag stonden er ELF treffers buiten dict.ts: vier maal
+ * Hotellerie in sectors.ts, en in insights.ts één Hotellerie plus zes maal
+ * Operatoren — waaronder de titel én de samenvatting van een Duits artikel. Het
+ * is dus geen randgeval; het is de helft van de vindplaatsen.
+ *
+ * Deze poort leest de geëxporteerde data en niet de bestandstekst, om precies
+ * dezelfde reden als de twee hierboven: anders struikelt dit bestand over zijn
+ * eigen toelichting, waarin de verboden woorden nu eenmaal moeten staan.
+ *
+ * Wat hij NIET ziet: of het Duits klopt. Daar is een lezer voor. En kopij in
+ * een component in plaats van in een module — die klasse is van
+ * `lib/i18n/kale-tekst.test.ts`.
+ */
+
+type Herkomst = [pad: string, tekst: string];
+
+/** Elke string uit een boom, met het pad erheen, zodat een treffer vindbaar is. */
+function plat(x: unknown, pad: string, uit: Herkomst[] = []): Herkomst[] {
+  if (typeof x === "string") uit.push([pad, x]);
+  else if (Array.isArray(x)) x.forEach((y, i) => plat(y, `${pad}[${i}]`, uit));
+  else if (x && typeof x === "object")
+    for (const [k, y] of Object.entries(x)) plat(y, `${pad}.${k}`, uit);
+  return uit;
+}
+
+/* Let op de tweede tak bij insights: een post met `markets: ["de"]` draagt zijn
+ * Duits in de BASISvelden en niet in `i18n.de` — de drie Heimspeicher-stukken
+ * zijn zo geschreven. Zonder die tak scant deze poort de helft van de Duitse
+ * artikelen niet, en dat zou hem stil half zo sterk maken. */
+const KOPIJ: Array<[bestand: string, strings: Herkomst[]]> = [
+  ["lib/sectors.ts", SECTORS.flatMap((s) => plat(s.i18n?.de ?? {}, s.slug))],
+  ["lib/ventures.ts", VENTURES.flatMap((v) => plat(v.i18n?.de ?? {}, v.slug))],
+  [
+    "lib/insights.ts",
+    POSTS.flatMap((p) => [
+      ...plat(p.i18n?.de ?? {}, `${p.slug}:i18n`),
+      ...(p.markets?.includes("de")
+        ? plat({ title: p.title, summary: p.summary, body: p.body }, `${p.slug}:basis`)
+        : []),
+    ]),
+  ],
+];
+
+describe.each(KOPIJ)("de Duitse kopij in %s", (bestand, strings) => {
+  /* Zonder deze twee slaagt alles hieronder op een lege lijst — een accessor
+     die per ongeluk niets oplevert leest dan als schone kopij.
+     Zie feedback_assert_niet_door_het_vangnet. */
+  it("levert daadwerkelijk Duitse strings op", () => {
+    expect(strings.length, `${bestand} gaf niets terug; klopt het i18n-veld nog?`).toBeGreaterThan(
+      50,
+    );
+  });
+
+  it("is werkelijk Duits en in de Sie-vorm", () => {
+    const metSie = strings.filter(([, v]) => /\b(Sie|Ihre|Ihnen|Ihrem|Ihren|Ihr)\b/.test(v));
+    expect(metSie.length, `geen enkele Sie-vorm in ${bestand}; leest deze test wel Duits?`,
+    ).toBeGreaterThan(3);
+  });
+
+  it("spreekt de lezer nergens met du aan", () => {
+    const gevonden = duTreffers(strings);
+    expect(
+      gevonden,
+      DU_UITLEG,
+    ).toEqual([]);
+  });
+
+  it("draagt geen van de woorden die zijn teruggedraaid", () => {
+    const gevonden = verbodenTreffers(strings);
+    expect(gevonden, "Zie de reden achter elk woord.").toEqual([]);
+  });
+});
+
+describe("de sector heet in het Duits maar één ding", () => {
+  /* Dit is de assertie die het defect van 24 augustus rechtstreeks had gevangen.
+   * De sectorkaart en de sectorpagina staan in twee verschillende bestanden en
+   * niets legde ze naast elkaar; daardoor konden ze vier dagen uiteenlopen. */
+  it("noemt hospitality op de kaart en op de pagina hetzelfde", () => {
+    const kaart = de["sectors.h.title.a"]; // "Hospitality &"
+    const pagina = SECTORS.find((s) => s.slug === "hospitality")?.i18n?.de?.name;
+
+    expect(kaart, "sectors.h.title.a ontbreekt in DICT.de").toBeTruthy();
+    expect(pagina, "hospitality heeft geen Duitse naam in lib/sectors.ts").toBeTruthy();
+
+    const label = (s: string) => s.replace(/\s*[&·—-]\s*.*$/, "").trim();
+    expect(
+      label(pagina!),
+      `De sectorkaart zegt "${kaart}" en de sectorpagina "${pagina}". Dat zijn ` +
+        "twee namen voor één sector, op twee pagina's die naar elkaar linken.",
+    ).toBe(label(kaart));
   });
 });

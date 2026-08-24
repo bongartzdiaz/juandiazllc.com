@@ -123,7 +123,7 @@ export const POSTS: Insight[] = [
           { type: "h2", text: "Der Test, bevor Sie kaufen" },
           { type: "p", text: "Notieren Sie die drei wertvollsten Stunden, die Ihr Leistungsträger in einer typischen Woche verbringt. Wenn Ihre Kandidaten-Automatisierung diese drei Stunden nicht direkt berührt, ist der ROI Theater. Legen Sie sie zur Seite. Der Gewinn aus der Automatisierung einer Engpass-Person für fünf Stunden pro Woche übertrifft die Automatisierung von zehn Nicht-Engpässen für fünfzig." },
           { type: "quote", text: "Automatisierungs-ROI misst sich daran, was aus der Warteschlange verschwindet — nicht daran, was schneller erledigt wird." },
-          { type: "p", text: "Die Operatoren, die wachsen, hören auf, Aktivität mit Durchsatz zu verwechseln. Sie wollen weniger Automatisierungen, auf schärfere Ziele gerichtet, jede zahlt sich in Wochen aus, nicht in Quartalen." }
+          { type: "p", text: "Die Betreiber, die wachsen, hören auf, Aktivität mit Durchsatz zu verwechseln. Sie wollen weniger Automatisierungen, auf schärfere Ziele gerichtet, jede zahlt sich in Wochen aus, nicht in Quartalen." }
         ],
       },
       es: {
@@ -260,7 +260,7 @@ export const POSTS: Insight[] = [
           { type: "quote", text: "Wenn ein Vertriebsmitarbeiter einen Deal nicht auf dem Weg vom Parkplatz zur Haustür aktualisieren kann, verliert das CRM bereits." },
           { type: "h2", text: "Der praktische Schritt" },
           { type: "p", text: "Bevor Sie einen Anbietervertrag anfassen, notieren Sie die zehn Aktionen, die Ihr Team an einem typischen Dienstag am häufigsten ausführt. Prototypisieren Sie diese zehn Aktionen als Ein-Tipp-Abläufe. Alles, was mehr als drei Tipps braucht, wird neu gedacht. Das CRM ist nicht das System — die zehn Abläufe sind es. Alles andere ist Reporting." },
-          { type: "p", text: "Das ist dieselbe Brille, mit der ich Philly baue — das CRM, das ich an Operatoren ausliefere. Umsatz wird von Außendienstteams erzielt, also muss die Software sie als primäre Nutzer behandeln." }
+          { type: "p", text: "Das ist dieselbe Brille, mit der ich Philly baue — das CRM, das ich an Betreiber ausliefere. Umsatz wird von Außendienstteams erzielt, also muss die Software sie als primäre Nutzer behandeln." }
         ],
       },
       es: {
@@ -381,13 +381,13 @@ export const POSTS: Insight[] = [
           metaDescription:
             "Bauen wirkt teuer, bis man die Umwege zählt. Kaufen wirkt sicher, bis zur dritten Schnittstelle. Ein Rahmen, der zur Praxis passt.",
         },
-        title: "Die Build-vs-Buy-Falle, in die Operatoren immer wieder tappen",
+        title: "Die Build-vs-Buy-Falle, in die Betreiber immer wieder tappen",
         summary:
-          "Selbst bauen wirkt teuer, bis man die Workarounds zählt. Einkaufen wirkt sicher, bis zur dritten Integration. Ein Entscheidungsrahmen, der zur Realität von Operatoren passt.",
+          "Selbst bauen wirkt teuer, bis man die Workarounds zählt. Einkaufen wirkt sicher, bis zur dritten Integration. Ein Entscheidungsrahmen, der zur Realität von Betreibern passt.",
         body: [
           { type: "p", text: "Irgendwo zwischen einem Betrieb mit 50 und einem mit 500 Mitarbeitern führt jedes Führungsteam dasselbe Gespräch: Wir haben vier Anbieter, drei davon sprechen nicht miteinander, und unsere Leute verbringen täglich eine Stunde damit, Daten zwischen ihnen hin- und herzuschieben. Kaufen wir weiter ein, oder bauen wir selbst?" },
           { type: "h2", text: "Die eigentliche Frage ist nicht Build vs. Buy" },
-          { type: "p", text: "Die eigentliche Frage lautet: Welche zwei, drei Fähigkeiten sind wirklich entscheidend dafür, wie wir gewinnen — und welche fünfzehn sind Standardware, die einfach funktionieren muss? Operatoren, die das richtig machen, kaufen die Standardware (E-Mail, Kalender, Buchhaltung, Lohnabrechnung) und bauen — oder lassen bauen — eine dünne Integrationsschicht plus die zwei, drei Kern-Workflows, die sie unterscheidbar machen." },
+          { type: "p", text: "Die eigentliche Frage lautet: Welche zwei, drei Fähigkeiten sind wirklich entscheidend dafür, wie wir gewinnen — und welche fünfzehn sind Standardware, die einfach funktionieren muss? Betreiber, die das richtig machen, kaufen die Standardware (E-Mail, Kalender, Buchhaltung, Lohnabrechnung) und bauen — oder lassen bauen — eine dünne Integrationsschicht plus die zwei, drei Kern-Workflows, die sie unterscheidbar machen." },
           { type: "h2", text: "Die Falle, die ich am häufigsten sehe" },
           { type: "p", text: "Für jede Funktion das Best-of-Breed-Tool kaufen und hoffen, dass ein Zapier-Friedhof alles zusammenklebt. Das funktioniert, bis man eine echte Frage über drei davon hinweg beantworten muss — und plötzlich besteht die Antwort aus drei Stunden CSV-Exporten. Das ist die Steuer dafür, fünfzehnmal auf Nummer sicher gegangen zu sein." },
           { type: "quote", text: "Wenn es mit Ihrem aktuellen Stack länger als einen Tag dauert, eine Frage auf Vorstandsebene zu beantworten, ist Ihr Stack kein Stack mehr — er ist ein Museum." },
@@ -398,7 +398,7 @@ export const POSTS: Insight[] = [
             "Alles andere ist Standardware. Kaufen Sie das günstigste Tool, das die Aufgabe erledigt, ohne Ihre Datenverträge zu brechen.",
             "Investieren Sie das gesparte Budget in die Integrationsschicht und die drei Kern-Workflows. Dort liegt der Burggraben."
           ]},
-          { type: "p", text: "Operatoren, die das richtig machen, haben nicht länger das Gefühl, ihr Tech-Stack besitze sie. Die anderen stellen irgendwann einen Chief of Staff ein, dessen Aufgabe größtenteils darin besteht, CSVs zwischen Tools zu verschieben. Das ist ein teures Ergebnis, das man hinnehmen muss." }
+          { type: "p", text: "Betreiber, die das richtig machen, haben nicht länger das Gefühl, ihr Tech-Stack besitze sie. Die anderen stellen irgendwann einen Chief of Staff ein, dessen Aufgabe größtenteils darin besteht, CSVs zwischen Tools zu verschieben. Das ist ein teures Ergebnis, das man hinnehmen muss." }
         ],
       },
       es: {
@@ -1063,7 +1063,7 @@ export const POSTS: Insight[] = [
           { type: "p", text: "Nichts davon ist ein Problem des Preistools. Es sind Probleme der Entscheidungsunterstützung an der Front, wo das eigentliche Umsatzereignis stattfindet — und wohin kaum eine Software zeigt." },
           { type: "h2", text: "Bauen Sie das Instrument, nicht noch ein Dashboard" },
           { type: "p", text: "Der Revenue Manager braucht keinen hübscheren Bericht der letzten Woche. Er braucht ein lebendiges Instrument, das die richtige Entscheidung in den zehn Minuten offensichtlich macht, in denen sie zählt — und Frontline-Werkzeuge, die das Personal tatsächlich öffnet. Lassen Sie es zwei Zyklen parallel zum bestehenden Prozess laufen und beweisen Sie die Zahl, bevor Sie umschalten." },
-          { type: "quote", text: "In der Hotellerie geht die Marge nicht in der Tabelle verloren. Sie geht an der Rezeption verloren, zehn Minuten vor dem Check-in, eine Bauchentscheidung nach der anderen." },
+          { type: "quote", text: "Im Gastgewerbe geht die Marge nicht in der Tabelle verloren. Sie geht an der Rezeption verloren, zehn Minuten vor dem Check-in, eine Bauchentscheidung nach der anderen." },
           { type: "p", text: "Die Betreiber, die vorbeiziehen, behandeln Umsatz nicht mehr als etwas, das man nach der Woche prüft, sondern als etwas, das man während der Woche instrumentiert." }
         ],
       },

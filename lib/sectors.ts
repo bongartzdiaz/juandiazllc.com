@@ -325,13 +325,13 @@ export const SECTORS: Sector[] = [
         cta: "Prijzen op gevoel kost je geld — laten we het meten.",
       },
       de: {
-        name: "Hotellerie & Revenue",
+        name: "Hospitality & Revenue",
         tagline: "Vom Bauchgefühl zum ehrlichen Instrument.",
-        seoTitle: "Revenue- und Operations-Consultant Hotellerie",
+        seoTitle: "Revenue- und Operations-Consultant Hospitality",
         seoDescription:
-          "Revenue-Operations-Consultant für Hotellerie und Gastronomie — Kanalübersicht, ein Preisinstrument und Werkzeuge für das Team am Gast.",
+          "Revenue-Operations-Consultant für das Gastgewerbe — Kanalübersicht, ein Preisinstrument und Werkzeuge für das Team am Gast.",
         summary:
-          "Die Hotellerie ist eine der wenigen Branchen, in denen der Revenue Manager noch Fall für Fall entscheidet, ohne Instrument zum Gegenprüfen. Die größte Marge liegt in den zehn Minuten vor dem Check-in, und das meiste davon versickert im Bauchgefühl.",
+          "Hospitality ist eine der wenigen Branchen, in denen der Revenue Manager noch Fall für Fall entscheidet, ohne Instrument zum Gegenprüfen. Die größte Marge liegt in den zehn Minuten vor dem Check-in, und das meiste davon versickert im Bauchgefühl.",
         leaks: [
           { title: "Kanalchaos", body: "OTAs, Direktbuchung, Firmenraten, Saisonaktionen — verwaltet in fünf Dashboards, die nicht zusammenpassen." },
           { title: "Blind beim Umsatz", body: "Sie kennen die Zahlen dieser Woche. Sie wissen nicht, warum. Bis Sie es wissen, steht der Preis der nächsten Woche bereits." },
