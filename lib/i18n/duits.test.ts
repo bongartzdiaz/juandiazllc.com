@@ -3,6 +3,7 @@ import { DICT } from "./dict";
 import { SECTORS } from "../sectors";
 import { VENTURES } from "../ventures";
 import { POSTS } from "../insights";
+import { SIGNALS } from "../signals";
 
 /* Twee poorten op het Duitse woordenboek.
  * ───────────────────────────────────────────────────────────────────────────
@@ -166,9 +167,10 @@ function plat(x: unknown, pad: string, uit: Herkomst[] = []): Herkomst[] {
  * Duits in de BASISvelden en niet in `i18n.de` — de drie Heimspeicher-stukken
  * zijn zo geschreven. Zonder die tak scant deze poort de helft van de Duitse
  * artikelen niet, en dat zou hem stil half zo sterk maken. */
-const KOPIJ: Array<[bestand: string, strings: Herkomst[]]> = [
-  ["lib/sectors.ts", SECTORS.flatMap((s) => plat(s.i18n?.de ?? {}, s.slug))],
-  ["lib/ventures.ts", VENTURES.flatMap((v) => plat(v.i18n?.de ?? {}, v.slug))],
+const KOPIJ: Array<[bestand: string, strings: Herkomst[], minimaal: number]> = [
+  ["lib/sectors.ts", SECTORS.flatMap((s) => plat(s.i18n?.de ?? {}, s.slug)), 100],
+  ["lib/ventures.ts", VENTURES.flatMap((v) => plat(v.i18n?.de ?? {}, v.slug)), 90],
+  ["lib/signals.ts", SIGNALS.flatMap((s) => plat(s.i18n?.de ?? {}, s.slug)), 40],
   [
     "lib/insights.ts",
     POSTS.flatMap((p) => [
@@ -177,17 +179,20 @@ const KOPIJ: Array<[bestand: string, strings: Herkomst[]]> = [
         ? plat({ title: p.title, summary: p.summary, body: p.body }, `${p.slug}:basis`)
         : []),
     ]),
+    300,
   ],
 ];
 
-describe.each(KOPIJ)("de Duitse kopij in %s", (bestand, strings) => {
+describe.each(KOPIJ)("de Duitse kopij in %s", (bestand, strings, minimaal) => {
   /* Zonder deze twee slaagt alles hieronder op een lege lijst — een accessor
      die per ongeluk niets oplevert leest dan als schone kopij.
      Zie feedback_assert_niet_door_het_vangnet. */
   it("levert daadwerkelijk Duitse strings op", () => {
-    expect(strings.length, `${bestand} gaf niets terug; klopt het i18n-veld nog?`).toBeGreaterThan(
-      50,
-    );
+    expect(
+      strings.length,
+      `${bestand} gaf ${strings.length} strings terug, minder dan de ${minimaal} die er ` +
+        "horen te staan. Klopt het i18n-veld nog, of is er kopij verdwenen?",
+    ).toBeGreaterThan(minimaal);
   });
 
   it("is werkelijk Duits en in de Sie-vorm", () => {
@@ -210,22 +215,25 @@ describe.each(KOPIJ)("de Duitse kopij in %s", (bestand, strings) => {
   });
 });
 
-describe("de sector heet in het Duits maar één ding", () => {
-  /* Dit is de assertie die het defect van 24 augustus rechtstreeks had gevangen.
-   * De sectorkaart en de sectorpagina staan in twee verschillende bestanden en
-   * niets legde ze naast elkaar; daardoor konden ze vier dagen uiteenlopen. */
-  it("noemt hospitality op de kaart en op de pagina hetzelfde", () => {
-    const kaart = de["sectors.h.title.a"]; // "Hospitality &"
-    const pagina = SECTORS.find((s) => s.slug === "hospitality")?.i18n?.de?.name;
+/* De assertie die de sectorkaart naast de sectorpagina legt, stond hier. Hij
+ * is verhuisd naar `lib/sectornamen.test.ts`, want het is geen Duitse
+ * taalzorg maar een consistentiezorg over alle vier de talen — en juist die
+ * beperking liet het Nederlandse geval van 24 augustus door. Hij vergeleek
+ * bovendien alleen het deel vóór de `&`, waardoor de Duitse tweede helft
+ * (Revenue tegenover Umsatz) er ook langs kwam. */
 
-    expect(kaart, "sectors.h.title.a ontbreekt in DICT.de").toBeTruthy();
-    expect(pagina, "hospitality heeft geen Duitse naam in lib/sectors.ts").toBeTruthy();
-
-    const label = (s: string) => s.replace(/\s*[&·—-]\s*.*$/, "").trim();
-    expect(
-      label(pagina!),
-      `De sectorkaart zegt "${kaart}" en de sectorpagina "${pagina}". Dat zijn ` +
-        "twee namen voor één sector, op twee pagina's die naar elkaar linken.",
-    ).toBe(label(kaart));
+describe("de Duitse poort leest elke kopijbron", () => {
+  /* Zonder deze lijst kan een bron stil uit KOPIJ verdwijnen: de tests hierboven
+   * draaien dan gewoon door over wat er nog wél in staat en de dekking krimpt
+   * zonder dat iets rood wordt. `lib/signals.ts` stond hier tot 24 augustus niet
+   * in, en werd daardoor door geen enkele taalpoort gelezen — 53 strings per
+   * taal die niemand las. */
+  it("dekt precies de vier bestanden die Duitse kopij dragen", () => {
+    expect(KOPIJ.map(([bestand]) => bestand)).toEqual([
+      "lib/sectors.ts",
+      "lib/ventures.ts",
+      "lib/signals.ts",
+      "lib/insights.ts",
+    ]);
   });
 });

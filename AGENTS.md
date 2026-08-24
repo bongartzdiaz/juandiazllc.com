@@ -5116,3 +5116,168 @@ dollartekens en backslashes in het anker ging door de shell-laag en kwam er
 ongelijk uit. Het harnas is daarna niet gepatcht maar herschreven via het
 Write-gereedschap. Anker op regels zonder speciale tekens, of schrijf het
 bestand opnieuw.
+
+### 2026-08-24 (vervolg) — dezelfde sector onder twee namen, nu in het Nederlands
+
+De vorige PR repareerde het Duits en liet één vraag open: staat deze klasse ook
+in de andere talen? Ja, en de Nederlandse versie was erger dan de Duitse.
+
+#### Wat er stond
+
+| | kaart (`DICT`) | pagina (`lib/sectors.ts`) |
+|---|---|---|
+| nl | Hospitality **& omzet** | **Horeca** & revenue |
+| de | Hospitality **& Umsatz** | Hospitality & **Revenue** |
+
+Het Nederlands week op allebei de helften af, het Duits alleen op de tweede. Dat
+verschil is verklaarbaar en het is een les over de poort zelf: de assertie uit
+#248 stond in `lib/i18n/duits.test.ts`, keek dus alleen naar Duits, en knipte
+bovendien met `replace(/\s*[&·—-]\s*.*$/, "")` alles weg vanaf de `&`. **De helft
+die hij las was toevallig de helft die klopte.**
+
+Er is een derde naamdrager, en die stond er ook naast: `tag.label.hospitality`
+(nl) luidde "Horeca" en is de H1 én de `<title>` van
+`/nl/insights/tag/hospitality`.
+
+#### De beslissing, en wat er bewust níét is aangeraakt
+
+Juan koos het Duitse precedent: **het label wint, het moedertaalwoord blijft voor
+proza.** Drie strings om — de Nederlandse en Duitse sectornaam en het Nederlandse
+taglabel.
+
+`horeca` blijft staan in `seoTitle` en `seoDescription`, en dat is geen slordigheid
+maar het punt: een Nederlandse operator zoekt op *horeca*, niet op *hospitality*.
+Dat is zoekkopij en geen merklabel. De Duitse tegenhanger ging in #248 wél om
+(`…Consultant Hotellerie` → `…Consultant Hospitality`), omdat "Hotellerie" daar
+één van drie concurrerende woorden was; "horeca" is in het Nederlands de enige
+gangbare term.
+
+**Zichtbaar gevolg, en het staat hier zodat niemand het voor een defect aanziet:**
+op `/nl/sectors/hospitality` luidt de H1 nu "Hospitality & omzet" en opent de zin
+eronder met "Horeca is een van de weinige sectoren…". Duits doet dat inmiddels
+anders ("Hospitality ist eine der wenigen Branchen"). Die lede omzetten is één
+string en is bewust niet meegenomen — het is een aanbodkeuze, geen reparatie.
+
+#### De poort is verhuisd, verbreed en verdrievoudigd
+
+`lib/sectornamen.test.ts` (nieuw) vervangt de Duits-only assertie. Hij leest
+**alle sectoren in alle vier de talen** en vergelijkt de **hele** naam. Drie
+dingen zitten er met opzet in:
+
+- **Een normalisator met eigen tests.** Hij plakt een afbreking aan elkaar
+  (`"Vast-"` + `"goed"` = Vastgoed — de kaart rendert over twee regels) en negeert
+  het voegwoord, zodat de Spaanse pagina's `y`/`e` mogen gebruiken waar de kaarten
+  `&` schrijven. Dat is beter Spaans en geen naamverschil. Zonder de drie tests op
+  de normalisator zelf is elke groene uitkomst ook te verklaren door een
+  normalisator die alles gelijkmaakt.
+- **Een uitzondering die zijn eigen voorwaarde draagt.** `adjacent` mág afwijken
+  (de kaart is een uitnodiging — "Ergens anders" — de pagina de formele naam), en
+  de test eist dat hij in **álle** talen afwijkt. Repareert iemand hem in één
+  taal, dan is de uitzondering niet meer waar en valt de poort om in plaats van
+  stil te blijven staan.
+- **Een dekkingsassertie op de slug→voorvoegsel-tabel.** `real-estate` heet
+  `sectors.re` en `adjacent` heet `sectors.adj`; dat is niet af te leiden. Zonder
+  die assertie ontsnapt een vijfde sector stilzwijgend aan deze hele poort.
+
+De derde naamdrager is er ook bij: **het taglabel is telkens het eerste deel van
+de sectornaam.** Gemeten klopt dat in alle twaalf sector-taalcombinaties —
+Energie/Energie & zon, Vastgoed/Vastgoed, Hostelería/Hostelería e ingresos. Het is
+dus een echte regel en geen toeval, en nu een assertie.
+
+#### `lib/signals.ts` stond in geen enkele poort
+
+53 strings per taal, 159 in totaal, gelezen door niets — ook niet door de Duitse
+poort van gisteren. Erbij gezet, en het was gratis: 0 du-vormen, 0 teruggedraaide
+woorden, 12 Sie-strings als positieve controle.
+
+Het gat kon bestaan omdat `KOPIJ` zijn bronnen nergens bij naam noemde. Dat doet
+hij nu wel, met een assertie erop — **een bron kan alleen nog verdwijnen met een
+zichtbare bewerking.** Dezelfde vorm als `HOORT_TE_STAAN` in `ResultsStrip.test.ts`.
+En de gedeelde ondergrens `> 50` is een ondergrens per bron geworden: signals heeft
+er 53 en zou er nét langs zijn gekomen, om vervolgens bij het schrappen van één
+signal om de verkeerde reden om te vallen.
+
+#### Twaalf mutaties, twaalf keer de voorspelde kleur
+
+Elf rood op elf verschillende asserties, één groen als controle. De groene is de
+belangrijkste: het woord "Horeca" in een **toelichting** zetten blijft onzichtbaar,
+want deze poorten lezen de geëxporteerde data en niet de bestandstekst. Dat is
+precies waar `contactadressen.test.ts`, `persoon-entiteit.test.ts` en
+`verzoeklimiet.test.ts` eerder wél over struikelden.
+
+De sprekendste rode is de Duitse tweede helft: die mutatie zou onder de poort van
+#248 groen zijn gebleven.
+
+#### Vier meetlatten braken, allemaal op een woordgrens die de taal niet kent
+
+1. **`/\bpida\b/` matchte in `rápida`.** In JS is `\b` ASCII-gebaseerd: `á` telt
+   niet als woordkarakter, dus staat er een grens vóór `pida`. **De `u`-vlag
+   repareert dat niet en er is geen vlag die het wel doet.** De gemergede poorten
+   gebruiken `split(/[^a-zà-ÿ]+/)` en zijn immuun; mijn sonde niet. Daardoor
+   telde ik twee Spaanse usted-vormen die er niet stonden.
+2. **Een Nederlandse scan op `u` als los woord valt op "24u responstijd"** — de
+   afkorting voor *uur*, in `pricing.feat.support.*`. Dezelfde vorm, ander alfabet.
+3. **Een strikte scan op het voornaamwoord `usted` telt er vijf**, terwijl Spaans
+   het voornaamwoord meestal weglaat en het register in de werkwoordsuitgang
+   draagt. `Deje sus datos y cuénteme` bevat geen `usted` en is het wel.
+4. **De drie Spaanse `estas` waren alle drie correct.** Zonder accent is het het
+   aanwijzende "deze" ("Estas son las notas", "ninguna de estas cuatro"); de RAE
+   schrapte dat accent in 2010.
+
+Dat is de les die overblijft: **een tekstscan erft de aannames van de taal waarin
+hij geschreven is.** Elke telling is met de hand nagelezen voordat hij hier staat.
+
+#### Achtste escape-incident, en de vorm ervan is nu bekend
+
+Een heredoc halveerde `\\r\\n` tot `\r\n`, waarna Python een echte newline in een
+stringliteral zag en met een `SyntaxError` viel. Daarnaast miste een patch-anker
+met een ingebedde `\n` op een CRLF-bestand — twee keer, allebei **luid**, omdat
+elk anker een aantal draagt en het script pas aan het eind schrijft.
+
+De uitweg is inmiddels routine: het script via het Write-gereedschap, regeleinden
+via `chr(13) + chr(10)`, en lezen met genormaliseerde newlines en terugschrijven in
+het regeleinde dat het bestand had.
+
+Onderweg sloeg ook mijn eigen nacontrole aan: `"tag.label.hospitality":
+"Hospitality"` bestónd al, bij Engels en Duits. De controle eiste nul voorkomens
+waar hij een **toename van precies één** had moeten eisen. Een taallabel dat in
+vier woordenboeken staat mag in meerdere ervan dezelfde waarde dragen.
+
+#### Meting
+
+1090 tests in 48 bestanden, was 1047/47 — en de +43 is uitgesplitst: −1 verhuisde
+assertie, +4 voor signals in de Duitse poort, +1 KOPIJ-dekking, +39 in het nieuwe
+bestand. i18n 718 × 4 ongewijzigd (alleen waardes). tsc schoon, prijsgenerator
+groen, build groen.
+
+Op een productiebuild, met de pid van de server tegen het startlog gecontroleerd,
+zeven pagina's en drie positieve controles:
+
+```
+/nl/sectors                    "Hospitality & omzet" aanwezig · "Horeca &" 0x
+/nl/sectors/hospitality        h1 Hospitality & omzet
+                               title Revenue- en operations consultant horeca
+/nl/insights/tag/hospitality   h1 Schrijven over Hospitality.   (was: over Horeca)
+/de/sectors/hospitality        h1 Hospitality & Umsatz
+/en/sectors/hospitality        h1 Hospitality & revenue         (ongewijzigd)
+/es/sectors/hospitality        h1 Hostelería e ingresos         (ongewijzigd)
+```
+
+Nul afwijkingen. De teller vindt "Hospitality" 10×, "horeca" 10× en een verzonnen
+woord 0× — want nul is pas een meting nadat het instrument bewees te kunnen vinden.
+
+#### Wat hierna nog open staat
+
+- **Het Spaanse register.** Acht strings in `DICT.es` spreken de bezoeker met
+  *usted* aan, tegen 36+ met *tú*, en de kopijmodules (632 strings) dragen er nul.
+  De discriminerende meting: nl en de houden hun register vast op de
+  privacypagina, Spaans is de enige taal die daar omslaat. Het scherpste bewijs
+  staat in twee zinnen die elkaar tegenspreken — `cta.lede` zegt "Si no, **te**
+  digo quién puede", `contact.page.lede` zegt "Si no, **le** digo quién sí puede".
+  Beslist op 24 augustus: omzetten naar tú. Eigen PR.
+- **`nederlands.test.ts` leest alleen `getAllInsights("nl")`** — 283 Nederlandse
+  strings in dict, sectors, ventures en signals staan in geen poort. Verbreden is
+  bijna gratis: twee treffers, allebei de `uur`-afkorting hierboven.
+- **Er is geen Spaanse poort.**
+- **De Nederlandse lede** opent met "Horeca" onder een H1 die "Hospitality" zegt.
+  Eén string, aanbodkeuze.

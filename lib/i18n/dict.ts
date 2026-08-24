@@ -1309,7 +1309,7 @@ const nl: Dict = {
   "tag.label.strategy": "Strategie",
   "tag.label.growth": "Groei",
   "tag.label.real-estate": "Vastgoed",
-  "tag.label.hospitality": "Horeca",
+  "tag.label.hospitality": "Hospitality",
   "tag.label.logistics": "Logistiek",
   "tag.label.design": "Ontwerp",
   "tag.label.method": "Methode",
