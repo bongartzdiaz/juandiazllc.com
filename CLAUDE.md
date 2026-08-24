@@ -86,6 +86,130 @@ the 120 API routes under `app/philly/api/`, `proxy.ts` middleware (CSRF),
 2FA recovery-code flow. Start new tests with validation schemas — highest
 ROI, no mocks needed. See commit history on
 `claude/analyze-test-coverage-WBVSQ` for the full analysis.
+## Wacht op de operator — samengevoegd 2026-08-24
+
+Dit is de enige lijst. Tot vandaag stond hij op vijf plekken in het logboek: een
+blok van 20 augustus plus vier appendices "Erbij op de operator-lijst". Alle vijf
+verwijzen nu hierheen. **Schrijf aanvullingen in dit blok, niet erachter.**
+Aanvullen is goedkoper dan herzien, en zo zijn die vijf ontstaan — waarna de
+operator de bovenste las, en dat was de oudste.
+
+Niets hiervan is uit de repo af te leiden, en niets hiervan mag verzonnen worden.
+
+### De meetketen — in blokkerende volgorde
+
+1. **Vier Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
+   `Pricing CTA`, `Sector CTA`, `Tool CTA`, plus de drie custom properties
+   (`tier`, `sector`, `tool`). Taggen is af en op productie geverifieerd; zonder
+   de doelen worden de kliks binnengehaald en weggegooid. Exacte namen en de
+   meting staan in `MANUAL_TASKS.md`.
+2. **Plausible-cijfer**: bezoekers over 30 dagen. Zonder dat blijft "0 rijen in
+   `marketing.leads`" onbeslist tussen geen-verkeer en geen-conversie, en die
+   vraag ligt onder alle andere.
+3. **`SUPABASE_ANON_KEY` als repo-secret.** De workflow `Lead-pad`
+   (`.github/workflows/lead-health.yml`) draait elke zes uur en staat **twintig
+   van twintig keer rood, nooit één keer groen** — hij faalt op zijn eerste stap
+   omdat dit secret ontbreekt. `SUPABASE_URL` staat er wel, gezet op 19-08 om
+   13:33; er is toen één van de twee gezet. Eén commando, en de waarde staat in
+   je eigen `.env.local`:
+   `grep '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' .env.local | cut -d= -f2- | gh secret set SUPABASE_ANON_KEY -R bongartzdiaz/juandiazllc.com`
+   Die wachter bestaat omdat het formulier op 12 augustus urenlang elke lead
+   verloor zonder één alarm. Hij is sindsdien nooit scherp geweest.
+4. **`LEAD_NOTIFY_SECRET`** in Supabase → Edge Functions → Secrets, met dezelfde
+   waarde als `lead_notify_secret` in Database → Vault. Dat sluit `lead-notify`
+   (nu fail-open) én `lead-acknowledge`. **Vóór stap 5.**
+5. **`RESEND_API_KEY` + `ACK_FROM`** op een geverifieerd domein. Zonder die twee
+   gaat er bij een echte lead geen enkele mail de deur uit — gemeten, niet
+   vermoed. Pas ná stap 4, anders geef je een publiek aanroepbaar endpoint een
+   mailkanaal op je eigen domein.
+6. **`CAL_WEBHOOK_SECRET` in Vercel-productie**, en daarna nakijken of cal.com de
+   webhook werkelijk aanroept. Gemeten 2026-08-24: `POST /api/cal` antwoordt
+   `{"ok":false,"error":"not-configured"}`. Zolang dat zo is levert een boeking
+   geen rij op, dus geen Telegram en geen bevestiging — terwijl "Boeking 15min"
+   de hoofd-CTA van de site is.
+
+### SEO-instrumenten
+
+- **DataForSEO-inloggegevens** (open sinds 2026-08-03). Zonder die twee waarden
+  levert elke SEO-route niets. De plek staat klaar in `.env.example`.
+- **Kiezen: gehost of self-host** voor OpenSEO. Aanbeveling en onderbouwing staan
+  in `MANUAL_TASKS.md`; het kost geld, dus de keuze is aan jou.
+- **Ahrefs-connector loskoppelen** via claude.ai, zodra OpenSEO antwoordt. Hij
+  staat op `✓ Connected` en geeft op élke aanroep "Insufficient plan" — de
+  gezondheidscontrole test de verbinding, niet de toegang.
+- **Search Console**: alleen nog nakijken of de property daadwerkelijk
+  geverifieerd is. Het DNS TXT-record staat er.
+
+### Supabase en Stripe
+
+- **Leaked-password protection** aanzetten op `wbgiouuifqhasedncysw` — de enige
+  WARN uit de advisors die actie vergt.
+- **Tien dode `diaz-*` edge functions** op wbgio en **vijf dubbele slugs** op
+  vbozel. Controleer eerst of Lemon of AppSumo er niet nog op wijzen; een
+  uitgerolde functie weghalen is onomkeerbaar.
+- **Het tweede, lege Stripe-account** sluiten of labelen.
+- Optioneel, hygiëne: `revoke execute on function public.handle_new_user(),
+  public.notify_new_lead(), public.rls_auto_enable() from public, anon,
+  authenticated;` — alle drie meetbaar niet aanroepbaar via RPC, dus dit is
+  opruimen en geen reparatie.
+
+### DEUS — het prijsmodel
+
+- **Welke van de zestien mogelijkheden worden prijsrijen, en op welk niveau?** De
+  tabel met bewijs staat in `docs/claims.md`. Acht dragen een niveau uit DEUS'
+  eigen code; de vertaling van drie DEUS-niveaus naar vier pagina-niveaus is een
+  commerciële keuze.
+- **De IP-allowlist: naar Business op de pagina, of in `PLANS` naar alle
+  niveaus?** Nu verkoopt de pagina hem aan Starter terwijl het product hem alleen
+  aan business geeft.
+- **Voert DEUS-SHARED de beslissing van 15 augustus alsnog uit?** Zolang dat niet
+  gebeurt staan er twee prijsmodellen klaar die verschillende bedragen aannemen.
+
+### DEUS — AI-providers en AVG
+
+- **Welke AI-providers mogen persoonsgegevens ontvangen?** Vier kunnen het; vijf
+  juridische documenten noemen alleen Anthropic. Volgen de documenten de code, of
+  beperkt de code zich tot de documenten? Beide zijn verdedigbaar.
+- **Mag een platformsleutel automatisch failoverdoel worden** voor een organisatie
+  die een andere voorkeur uitsprak? Nu wel, met opzet, maar het staat nergens als
+  keuze opgeschreven — en er is een derde optie: alleen aanvullen met providers
+  die de organisatie zelf configureerde.
+- **Houdt de nul-retentiebelofte stand?** Anthropic-specifiek, en de enige
+  mitigatie die de DPIA noemt voor retentie bij de verwerker. Volgt uit de eerste
+  vraag; beslis die eerst.
+
+### Buiten deze repo
+
+- **Zeven stappen voor lucenai.eu** in `docs/lucenai-backlinks.md` §3, waarvan zes
+  operator-werk in WordPress. De belangrijkste kost een minuut: op
+  `lucenai.eu/about` de naam van Juan linken naar `juandiazllc.com/en/about`.
+  Backlinks bouwen heeft pas zin als stap 1 tot en met 3 gedaan zijn.
+- **De R2-poort in `~/.claude/hooks/` slaat te breed toe.** Hij blokkeerde een
+  read-only `curl` naar een LinkedIn-profielpagina, omdat hij matcht op
+  netwerkcliënt plus het woord "linkedin" in plaats van op netwerkcliënt plus een
+  berichten-endpoint. De regel die hij bewaakt — geen geautomatiseerde
+  connectieverzoeken of DM's — is ongewijzigd juist. Het bestand staat buiten elke
+  repo en wordt niet aangeraakt zonder jouw expliciete go.
+
+### Nog te beslissen, uit `docs/bereik-plan.md` §7
+
+De enquête, het social-kanaal (één kanaal, en welke), en de rekenmachine-route.
+Beslissing 1 en 2 uit dat hoofdstuk zijn genomen en uitgevoerd.
+
+### Afgevoerd — niet opnieuw opvoeren
+
+| stond op de lijst als open vraag | werkelijke stand |
+|---|---|
+| Wat kost de sprint van 30 dagen? | **€2.500 excl. btw** · beslist 2026-08-22 |
+| Wat ligt er na die dertig dagen op tafel? | het bouwplan **plus het eerste onderdeel dat al draait** · 2026-08-22 |
+| Draag je een garantie, en welke? | **geen** op de uitkomst; wél op de levering · 2026-08-22 |
+| Hoeveel trajecten draag je tegelijk? | **drie** · 2026-08-22 |
+| Akkoord voor een end-to-end leadketen-test | gelopen op 2026-08-20, via het echte formulier |
+| DNS TXT voor Search Console | het record staat er; alleen de property nog nakijken |
+
+De vier aanbod-beslissingen staan met datum in `docs/claims.md`. Ze stonden op 24
+augustus nog als open vraag in de lijst — twee dagen nadat je ze had genomen.
+
 
 ## Session log
 
@@ -1631,6 +1755,9 @@ hierboven.
 
 #### Wacht op de operator
 
+> **Achterhaald.** Samengevoegd in "Wacht op de operator" bovenaan dit
+> bestand (2026-08-24). Schrijf aanvullingen daar, niet hier.
+
 - **Plausible-cijfer**: bezoekers over 30 dagen plus de vier doelen. Zonder dat
   blijft "0 leads in `marketing.leads`" onbeslist tussen geen-verkeer en
   geen-conversie.
@@ -2274,8 +2401,16 @@ sleutel gezet is, staat er in een privacyverklaring iets dat niet gebeurt.
 
 #### Wacht op de operator — bijgewerkt 2026-08-20
 
+> **Achterhaald.** Samengevoegd in "Wacht op de operator" bovenaan dit
+> bestand (2026-08-24). Schrijf aanvullingen daar, niet hier.
+
 Dit vervangt de lijst van 19 augustus hierboven.
 
+- **Vier Plausible-doelen aanmaken** in het dashboard — `Boeking 15min`,
+  `Pricing CTA`, `Sector CTA`, `Tool CTA` — plus de drie custom properties
+  (`tier`, `sector`, `tool`). Taggen is af en geverifieerd; zonder de doelen
+  worden de kliks binnengehaald en weggegooid. Exacte namen en de meting staan
+  in `MANUAL_TASKS.md`.
 - **Plausible-cijfer**: bezoekers over 30 dagen. Zonder dat blijft "0 leads in
   `marketing.leads`" onbeslist tussen geen-verkeer en geen-conversie.
 - **`RESEND_API_KEY` op de edge functions** (Supabase → Edge Functions →
@@ -2290,11 +2425,6 @@ Dit vervangt de lijst van 19 augustus hierboven.
 - **Ahrefs-connector loskoppelen** via claude.ai — zodra OpenSEO antwoordt.
 - **Search Console**: alleen nog nakijken of de property daadwerkelijk
   geverifieerd is. Het DNS-record is er.
-- **Vier Plausible-doelen aanmaken** in het dashboard — `Boeking 15min`,
-  `Pricing CTA`, `Sector CTA`, `Tool CTA` — plus de drie custom properties
-  (`tier`, `sector`, `tool`). Taggen is af en geverifieerd; zonder de doelen
-  worden de kliks binnengehaald en weggegooid. Exacte namen en de meting staan
-  in `MANUAL_TASKS.md`.
 
 Vier daarbij uit `docs/aanbod.md` §5. Geen ervan is uit de repo af te leiden, en
 geen ervan mag verzonnen worden.
@@ -2420,6 +2550,9 @@ via `<<'EOF'`.
 
 #### Erbij op de operator-lijst
 
+> **Achterhaald.** Samengevoegd in "Wacht op de operator" bovenaan dit
+> bestand (2026-08-24). Schrijf aanvullingen daar, niet hier.
+
 - **Welke van de zestien mogelijkheden worden prijsrijen, en op welk niveau?**
   De tabel met bewijs staat in `docs/claims.md`. Acht dragen een niveau uit
   DEUS' eigen code; de vertaling van drie DEUS-niveaus naar vier pagina-niveaus
@@ -2497,6 +2630,9 @@ talen · vitest **2607/2607** in 186 bestanden (was 2603) · launch:check 22 pas
 boom van main vergeleken met die van de tak: identiek.
 
 #### Erbij op de operator-lijst
+
+> **Achterhaald.** Samengevoegd in "Wacht op de operator" bovenaan dit
+> bestand (2026-08-24). Schrijf aanvullingen daar, niet hier.
 
 - **Welke AI-providers mogen persoonsgegevens ontvangen?** Vier kunnen het;
   vijf juridische documenten noemen alleen Anthropic. Volgen de documenten de
@@ -3055,6 +3191,9 @@ rapportagefilter en geen beveiligingsregel, en hoorde niet in een CSRF-PR.
 
 #### Erbij op de operator-lijst
 
+> **Achterhaald.** Samengevoegd in "Wacht op de operator" bovenaan dit
+> bestand (2026-08-24). Schrijf aanvullingen daar, niet hier.
+
 - **`CAL_WEBHOOK_SECRET` in Vercel-productie zetten**, en daarna nakijken of
   cal.com de webhook werkelijk aanroept. Gemeten op 2026-08-21: het endpoint
   antwoordt `{"ok":false,"error":"not-configured"}`. Zolang dat zo is levert een
@@ -3297,6 +3436,9 @@ de assertie meet wachttijd in de worker-pool, niet wat hij hoort te meten. In
 CI vuurde hij niet (24 s). Niet gerepareerd, wel echt.
 
 #### Erbij op de operator-lijst
+
+> **Achterhaald.** Samengevoegd in "Wacht op de operator" bovenaan dit
+> bestand (2026-08-24). Schrijf aanvullingen daar, niet hier.
 
 - **`LEAD_NOTIFY_SECRET`** zetten in Supabase → Edge Functions → Secrets, met
   dezelfde waarde als `lead_notify_secret` in Database → Vault. Dat sluit
