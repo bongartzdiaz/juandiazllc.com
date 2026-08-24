@@ -124,7 +124,7 @@ je het meteen (§7).
 ```mail
 Onderwerp: Vraag over jullie offertetraject
 
-Goedenavond,
+Hallo,
 
 Ik ben Juan Diaz. Ik bouw meetsystemen voor bedrijven die op offertes en
 aanvragen draaien, vooral in de energie- en installatiehoek.
@@ -139,6 +139,30 @@ juandiazllc.com
 
 Kort, waar, en beantwoordbaar. Hij vraagt om een doorverwijzing, niet om een
 gesprek — dat is een lagere drempel en een eerlijker eerste stap.
+
+**De aanhef draagt geen tijdstip, en dat is opzet.** "Goedenavond" klopt om
+20:30 en is fout zodra je een minuut later verstuurt dan gepland; "Goedemorgen"
+klopt niet als de herinnering van dag acht om drie uur 's middags de deur uit
+gaat. Alle vier de sjablonen openen daarom met `Hallo,`. Eén onjuist detail in
+de eerste regel is het soort ding dat de lezer laat zien dat er een sjabloon
+onder ligt — en dan meet je de reactie op een sjabloon.
+
+**Heeft het formulier geen onderwerpveld, zet de onderwerpregel dan als eerste
+regel van het bericht**, gevolgd door een lege regel. Zo:
+
+> Vraag over jullie offertetraject
+>
+> Hallo,
+>
+> Ik ben Juan Diaz. …
+
+Niet in de aanhef proppen en niet weglaten. Weglaten lijkt onschuldig, maar de
+onderwerpregel is wat het antwoord straks herkenbaar maakt in je eigen mailbox,
+en §5 leest `verzonden` en `eerste_mens` daaruit af. Heet het veld `Betreft` of
+"Ik heb een vraag over", dan hoort de regel dáár en niet ook nog in het bericht.
+
+Welke van jouw formulieren zo'n veld hebben is een eigenschap van de batch en
+niet van het protocol; dat staat in het draaiboek naast de batch zelf.
 
 ---
 
@@ -313,7 +337,7 @@ gelezen worden, en dat is een ander moment dan dinsdagavond.
 ```mail
 Onderwerp: Mijn vraag van dinsdag
 
-Goedemorgen,
+Hallo,
 
 Vorige week dinsdagavond stuurde ik via jullie contactformulier een vraag: wie
 gaat er bij jullie over het traject van aanvraag tot offerte? Ik heb er niets
@@ -353,7 +377,7 @@ Onderwerp: Jullie contactformulier
 
 [NIET VERSTUREN — status in §1 staat op niet bevestigd]
 
-Goedemorgen,
+Hallo,
 
 Vorige week dinsdag om 20:30 heb ik via het contactformulier op jullie site een
 vraag gesteld. Zeven dagen later was daar niets op teruggekomen, ook geen
