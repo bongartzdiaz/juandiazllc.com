@@ -5281,3 +5281,164 @@ woord 0× — want nul is pas een meting nadat het instrument bewees te kunnen v
 - **Er is geen Spaanse poort.**
 - **De Nederlandse lede** opent met "Horeca" onder een H1 die "Hospitality" zegt.
   Eén string, aanbodkeuze.
+
+### 2026-08-24 (vervolg) — het Spaanse register, en een regel die twee talen tegen elkaar houdt
+
+Derde en laatste ronde in dezelfde klasse: kopij die buiten `dict.ts` woont, of
+een register dat geen enkele poort las. Het Duits was #248, de sectornamen #249,
+en dit is het Spaans.
+
+#### Wat er stond, en waarom mijn eerste twee tellingen te laag waren
+
+De Spaanse site is tú. Vierentwintig strings zeiden usted. Het scherpste bewijs
+stonden twee zinnen die elkaar tegenspraken:
+
+| sleutel | es |
+|---|---|
+| `cta.lede` | "Si no, **te** digo quién puede" |
+| `contact.page.lede` | "Si no, **le** digo quién sí puede" |
+| `cta.title.b` | "los ingresos que **estás** dejando sobre la mesa" |
+| `contact.page.title` | "los ingresos que **está** dejando sobre la mesa" |
+
+**Ik heb er eerst acht gemeld, daarna tweeëntwintig, en het zijn er
+vierentwintig.** Elke telling was met een breder instrument dan de vorige, en dat
+is precies de reden dat het getal steeg — niet omdat er iets veranderde.
+
+Waarom dit lastiger meet dan Duits: **Spaans laat het voornaamwoord meestal weg
+en draagt het register in de werkwoordsuitgang.** `Deje sus datos y cuénteme`
+bevat het woord `usted` niet en is het wel. Een scan op het voornaamwoord telde
+er vijf van de vierentwintig. En `su`/`sus` is geen bruikbaar signaal: dat is óók
+derde persoon ("su factura" van de klant), dus verbieden levert tientallen valse
+treffers op.
+
+#### De regel die het wél zag: houd het Nederlands ernaast
+
+De twee laatste vondsten — `contact.page.title` en `priv.optout.body` ("Si aun
+así **prefiere** salir, **use** el interruptor") — dragen geen `usted`, geen
+`su`, en geen werkwoordsvorm die in mijn handmatige lijst stond. Ze kwamen boven
+door een andere vraag te stellen:
+
+> waar het Nederlands de lezer informeel aanspreekt, moet het Spaans dat ook doen
+
+Dat werkt omdat het Nederlands **onafhankelijk vastlegt dát de zin de lezer
+aanspreekt**. Gemeten over het woordenboek: 72 sleutels waar nl "je/jij/jouw"
+zegt, 39 waar es geen tú-vorm draagt, en na aftrek van de al gevonden gevallen
+tien om met de hand te lezen. Zeven daarvan zijn onpersoonlijk Spaans
+(`antes de firmar`, `Ver lo que está pasando`, `No se le puede mentir a un
+edificio`), één was een gat in mijn markerlijst, en twee waren echt.
+
+#### Twee ontwerpen naast elkaar, en de strengere was de slechtere
+
+Met alleen voornaamwoorden als tú-marker bleven er 19 uitzonderingen over, met
+een werkwoordslijst erbij 8. Dat leest als "strenger is beter", en dat is het
+niet: **elf van die negentien spreken de lezer wél in tú aan, via de
+werkwoordsuitgang.** Ze op een lijst zetten met als reden "Spaans is hier
+onpersoonlijk" zou een onwaarheid vastleggen op precies de plek waar een
+volgende sessie hem vertrouwt. Een uitzonderingslijst met een onware reden is
+erger dan geen uitzonderingslijst.
+
+De prijs van de andere kant is echt en staat opgeschreven: schrijft iemand
+nieuwe tú-kopij met een werkwoord dat niet in `TU_MARKERS` staat, dan gaat de
+poort af. Dat is **luid** en heeft twee geldige oplossingen, en de foutmelding
+noemt ze allebei — de zin is usted (herschrijf hem), of de zin is tú met een
+nieuwe vorm (zet hem erbij).
+
+#### `lib/i18n/spaans.test.ts` — drie lagen die elkaar niet overlappen
+
+1. **Het voornaamwoord en tien ondubbelzinnige usted-vormen**, elk met de reden
+   en de tú-vorm die ervoor in de plaats kwam. Alleen imperatieven met een
+   aangehecht voornaamwoord (`sáltese`, `cuénteme`, `pregúntele`) — die hebben
+   geen tweede lezing.
+2. **Een expliciete lijst van vormen die BEWUST niet verboden zijn.** `quiere`
+   staat nog 5× in de kopij, `vea` 2×, `prefiere` 1×, alle drie als derde
+   persoon. Een assertie eist dat geen van deze acht in de verbodslijst
+   belandt — anders slaat de poort alarm op correcte zinnen en wordt hij binnen
+   een week uitgezet.
+3. **De gekoppelde regel** met 13 uitzonderingen, elk met de constructie erbij.
+   Plus een assertie dat een uitzondering die niet meer waar is omvalt in plaats
+   van te blijven staan.
+
+De poort valt op zijn eigen aanleiding: mijn eerste versie had bij één verboden
+vorm `"idem."` als reden staan, en de lengtecontrole op redenen gooide hem eruit.
+
+#### De Nederlandse poort las 1001 strings niet
+
+`nederlands.test.ts` las alleen `getAllInsights("nl")`. Dict, sectors, ventures
+en signals stonden in geen enkele Nederlandse poort — dezelfde vorm als
+`lib/signals.ts` gisteren. Verbreed naar alle vijf de bronnen, met per bron twee
+ondergrenzen: op het aantal strings, én op het aantal met "je" erin, zodat een
+bron die per ongeluk Engels serveert niet langs de eerste komt.
+
+**Nul te repareren, twee valse treffers.** `pricing.feat.support.*` zegt "24u
+responstijd" en "4u tijdens werkuren", en de splitser zag cijfers als
+scheidingsteken — dus "24u" werd "24" plus "u", het voornaamwoord. Cijfers horen
+bij het woord. Dat is dezelfde klasse als de accenten in de Spaanse splitser:
+**een tekstscan erft de aannames van de taal waarin hij geschreven is.**
+
+#### Vijftien mutaties, vijftien keer de voorspelde kleur
+
+Veertien rood op twaalf verschillende asserties, één groen als controle. De twee
+sprekendste zijn `contact.page.title` en `priv.optout.body` terugzetten: die
+vallen op laag 3 en zouden onder laag 1 én onder een handmatige werkwoordssweep
+groen zijn gebleven. De groene controle zet een usted-zin in een **toelichting**
+in `dict.ts` en hoort onzichtbaar te blijven, want deze poorten lezen de
+geëxporteerde data en niet de bestandstekst.
+
+#### Vier keer mat ik het verkeerde oppervlak
+
+De eerste productiemeting gaf negen missers terwijl álle "mag niet"-controles
+slaagden. Dat is intern tegenstrijdig, en dus zat de fout in de naald:
+
+1. **Ik gokte HTML-entities** (`&#225;`) waar Next rauwe UTF-8 uitlevert. Alleen
+   de accentloze naalden matchten, wat het patroon precies verborg.
+2. **`work.d.want.*` staat op `/es/work/[slug]`**, niet op de index.
+3. **`insights.d.want.*` staat op `/es/insights/[slug]`.**
+4. **`priv.optout.body` staat achter een laadwacht in een clientcomponent** en
+   zit dus helemaal niet in de geserveerde HTML — daar staat
+   `priv.optout.loading`. Alleen in de DOM te meten, ná hydratie.
+
+De vierde is de vierde keer deze maand dat het geserveerde oppervlak niet is waar
+de string staat. Het formulier op `/contact` deed het op 24 augustus ook al.
+
+#### Meting
+
+Op een productiebuild, met de poort vooraf aantoonbaar vrij en het startlog
+gelezen om te bevestigen dat het mijn eigen proces was. Tien pagina's, 34
+verwachte vormen aanwezig, 37 oude vormen verdwenen, drie positieve controles:
+
+```
+/es/privacy      /es/contact      /es/insights      /es/tools/energy-roi
+/es/work/voltafy /es/insights/…   /es              /es/story
+/nl/privacy      /en/privacy      (controles, ongewijzigd)
+
+AFWIJKINGEN: 0
+```
+
+In de DOM op `/es/privacy`: de opt-out-alinea rendert in tú, `usted` 0×, geen
+horizontale overloop, en nul consolefouten — gemeten ná een hartslag door de
+lezer, want een lege lijst uit een kapot instrument leest hetzelfde als een
+schone meting.
+
+Over alle vijf de Spaanse bronnen samen — 1328 strings — staat het
+voornaamwoord `usted` nul keer, met 116 tú-strings als positieve controle.
+
+```
+tsc --noEmit             exit 0
+vitest run               1127 tests in 49 bestanden (was 1090/48)
+i18n:check               718 sleutels × 4 (ongewijzigd: alleen waardes)
+regen:pricing:check      groen
+next build               groen
+```
+
+De +37 is uitgesplitst: 22 in de nieuwe Spaanse poort, 15 door de verbreding van
+de Nederlandse (4 → 19).
+
+#### Wat hierna nog open staat
+
+- **Er is geen Engelse poort**, en die is ook niet in deze vorm te bouwen: het
+  Engels kent het onderscheid niet dat de andere drie talen bewaken.
+- **Zeven Spaanse sleutels waar het Nederlands de lezer aanspreekt en het Spaans
+  onpersoonlijk blijft.** Dat is verdedigbaar Spaans en geen defect, maar het is
+  wel een keuze die niemand bewust heeft gemaakt.
+- **De Nederlandse lede** op `/nl/sectors/hospitality` opent nog met "Horeca"
+  onder een H1 die "Hospitality" zegt. Eén string, aanbodkeuze.
