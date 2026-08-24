@@ -298,7 +298,7 @@ export const SECTORS: Sector[] = [
     cta: "Pricing on gut feel is costing you — let's measure it.",
     i18n: {
       nl: {
-        name: "Horeca & revenue",
+        name: "Hospitality & omzet",
         tagline: "Van prijzen op onderbuik naar een eerlijk instrument.",
         seoTitle: "Revenue- en operations consultant horeca",
         seoDescription:
@@ -325,7 +325,7 @@ export const SECTORS: Sector[] = [
         cta: "Prijzen op gevoel kost je geld — laten we het meten.",
       },
       de: {
-        name: "Hospitality & Revenue",
+        name: "Hospitality & Umsatz",
         tagline: "Vom Bauchgefühl zum ehrlichen Instrument.",
         seoTitle: "Revenue- und Operations-Consultant Hospitality",
         seoDescription:
