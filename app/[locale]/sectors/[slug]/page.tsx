@@ -159,14 +159,14 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
               </div>
             </div>
             <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--accent)", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-              Run the math →
+              {translate(l, "sectors.d.roi.cta")}
             </span>
           </LocaleLink>
         )}
         {s.slug === "energy" && <EnergyInsightLinks locale={l} />}
         <SectorInsightLinks locale={l} sectorSlug={s.slug} />
-        <h2>Where <em>revenue leaks</em> in this sector.</h2>
-        <p style={{ color: "var(--muted)" }}>The five common failure modes I see when I survey a new operator in this space.</p>
+        <h2 dangerouslySetInnerHTML={{ __html: translate(l, "sectors.d.leaks.title") }} />
+        <p style={{ color: "var(--muted)" }}>{translate(l, "sectors.d.leaks.body")}</p>
 
         <div style={{ marginTop: 32, marginBottom: 48 }}>
           {s.leaks.map((l, i) => (
@@ -192,8 +192,8 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
           ))}
         </div>
 
-        <h2>The <em>playbook</em>, applied to {s.name.toLowerCase()}.</h2>
-        <p style={{ color: "var(--muted)" }}>Same five phases every time — here&apos;s what they look like in this sector.</p>
+        <h2 dangerouslySetInnerHTML={{ __html: translate(l, "sectors.d.playbook.title").replace("{sector}", s.name) }} />
+        <p style={{ color: "var(--muted)" }}>{translate(l, "sectors.d.playbook.body")}</p>
 
         <div style={{ marginTop: 32, marginBottom: 48 }}>
           {s.playbook.map((p, i) => (
@@ -223,7 +223,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
           ))}
         </div>
 
-        <h2><em>Proof</em> points.</h2>
+        <h2 dangerouslySetInnerHTML={{ __html: translate(l, "sectors.d.proof.title") }} />
         <div style={{ marginTop: 24, marginBottom: 56, display: "grid", gap: 12 }}>
           {s.proof.map((p, i) => {
             const Inner = (
@@ -249,7 +249,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
                 </div>
                 {p.href && (
                   <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--accent)", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-                    See the build →
+                    {translate(l, "sectors.d.proof.cta")}
                   </span>
                 )}
               </div>
@@ -291,10 +291,10 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
       <section style={{ padding: "80px 40px 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div className="sec-head" data-reveal style={{ marginBottom: 40 }}>
           <div>
-            <div className="label">◉ Other sectors</div>
-            <h2>Same playbook. <em>Different</em> P&amp;L.</h2>
+            <div className="label">{translate(l, "sectors.d.others.label")}</div>
+            <h2 dangerouslySetInnerHTML={{ __html: translate(l, "sectors.d.others.title") }} />
           </div>
-          <p>The method doesn&apos;t care what industry your operators run. If there&apos;s complexity and bad software, it applies.</p>
+          <p>{translate(l, "sectors.d.others.body")}</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
           {others.map((o) => (
@@ -304,14 +304,14 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
                 <h4 style={{ marginTop: 14, fontSize: 22 }}>{o.tagline}</h4>
               </div>
               <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", color: "var(--muted-soft)", textTransform: "uppercase", marginTop: 20 }}>
-                See the sector →
+                {translate(l, "sectors.d.others.cta")}
               </div>
             </LocaleLink>
           ))}
         </div>
       </section>
       {sectorFaq.length > 0 && (
-        <FaqSection title={`${s.name} — common questions`} items={sectorFaq} />
+        <FaqSection title={translate(l, "sectors.d.faq.title").replace("{sector}", s.name)} items={sectorFaq} />
       )}
     </>
   );
