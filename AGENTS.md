@@ -98,11 +98,15 @@ Niets hiervan is uit de repo af te leiden, en niets hiervan mag verzonnen worden
 
 ### De meetketen — in blokkerende volgorde
 
-1. **Vier Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
-   `Pricing CTA`, `Sector CTA`, `Tool CTA`, plus de drie custom properties
-   (`tier`, `sector`, `tool`). Taggen is af en op productie geverifieerd; zonder
-   de doelen worden de kliks binnengehaald en weggegooid. Exacte namen en de
-   meting staan in `MANUAL_TASKS.md`.
+1. **Vijf Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
+   `Pricing CTA`, `Sector CTA`, `Tool CTA` en `Contact Submitted`, plus de drie
+   custom properties (`tier`, `sector`, `tool`). Taggen is af en op productie
+   geverifieerd; zonder de doelen worden de kliks binnengehaald en weggegooid.
+   **`Contact Submitted` stond tot 2026-08-24 op geen enkele lijst**, en het is
+   het enige doel dat een conversie meet in plaats van een klik — precies het
+   cijfer dat stap 2 hieronder moet beantwoorden. Exacte namen en de meting
+   staan in `MANUAL_TASKS.md`; `lib/plausible-doelen.test.ts` houdt de lijst
+   voortaan gelijk aan de code.
 2. **Plausible-cijfer**: bezoekers over 30 dagen. Zonder dat blijft "0 rijen in
    `marketing.leads`" onbeslist tussen geen-verkeer en geen-conversie, en die
    vraag ligt onder alle andere.

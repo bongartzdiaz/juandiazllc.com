@@ -307,9 +307,10 @@ koptekstvariant ook.
 
 Drie operator-acties, in deze volgorde. Alle drie minuten werk.
 
-1. **De vier Plausible-doelen aanmaken** — `Boeking 15min`, `Pricing CTA`,
-   `Sector CTA`, `Tool CTA` — plus de drie custom properties. Taggen is af en
-   geverifieerd; zonder de doelen wordt alles weggegooid.
+1. **De vijf Plausible-doelen aanmaken** — `Boeking 15min`, `Pricing CTA`,
+   `Sector CTA`, `Tool CTA` en `Contact Submitted` — plus de drie custom
+   properties. Taggen is af en geverifieerd; zonder de doelen wordt alles
+   weggegooid. Die laatste meet de inzending zelf en niet de klik ernaartoe.
 2. **`LEAD_NOTIFY_SECRET`** in Supabase → Edge Functions → Secrets, zelfde
    waarde als `lead_notify_secret` in de Vault.
 3. **`RESEND_API_KEY` + `ACK_FROM`** — pas ná 2, anders geef je een publiek
