@@ -4761,3 +4761,192 @@ speciale tekens, en gebruik raw strings.**
 1021 tests in 46 bestanden, was 1013/45. i18n 706 sleutels × 4, was 699 — precies
 +7 voor de nieuwe sleutels. tsc schoon, `regen:pricing:check` groen, build groen,
 `CLAUDE.md` byte-identiek aan `AGENTS.md`.
+
+### 2026-08-24 (vervolg) — zeventien Engelse zinnen op de sectorpagina's, en een poort die parseert in plaats van grept
+
+Vervolg op de vorige PR. Die repareerde één plek waar geen poort keek; deze zoekt
+de rest van die klasse en zet er wél een poort op.
+
+#### Wat er stond
+
+`app/[locale]/sectors/[slug]/page.tsx` droeg zestien JSX-tekstknopen met Engels
+erin — de koppen "Where <em>revenue leaks</em> in this sector.", "The
+<em>playbook</em>, applied to…", "<em>Proof</em> points.", de lede's eronder en
+drie CTA's. Woordelijk hetzelfde op `/nl`, `/de` en `/es`. Vier sectoren maal
+vier talen is zestien URL's, alle zestien in de sitemap, alle zestien met
+hreflang naar elkaar.
+
+Onderweg kwam er een zeventiende bij, drie regels onder de laatste: de FAQ-kop
+stond als **prop**, `title={\`${s.name} — common questions\`}`. Die zag de
+nieuwe poort in zijn eerste vorm niet — daarover verderop.
+
+**Waarom vijf i18n-poorten hier langs keken.** `metadata-locales` leest
+`generateMetadata`, `wees-sleutels` en `duits`/`nederlands` lezen `DICT`, en
+`check-i18n-parity` legt de vier woordenboeken naast elkaar. Alle vijf gaan over
+**sleutels**. Een zin die nooit een sleutel kreeg heeft niets om uit de pas mee
+te lopen; hij is per constructie in evenwicht met zichzelf. Zelfde vorm als de
+server-actions een uur eerder, en als `process.env[SECRET_ENV]` dat
+`CAL_WEBHOOK_SECRET` maandenlang uit `.env.example` hield.
+
+#### Een tweede defect in dezelfde regel
+
+De playbook-kop deed `{s.name.toLowerCase()}`. Op `/de` maakte dat van
+`Immobilien` het woord `immobilien` — Duitse zelfstandige naamwoorden houden hun
+hoofdletter. Engelse zin plus verkeerd geschreven Duits zelfstandig naamwoord,
+in één kop. De `.toLowerCase()` is weg; de sleutel draagt nu een `{sector}`-plek
+en elke taal zet die op een naamvalsneutrale positie — dezelfde les als
+`Einblicke zu {tag}` van 3 augustus.
+
+#### De poort parseert, en dat sluit een hele klasse
+
+De eerste opzet was een regex op `>tekst<`. Die gaf **339 treffers** waarvan de
+meeste JS waren: `useRef<X>(null)`, pijlfuncties en vergelijkingen dragen
+allemaal `<` en `>`. Een regex kan TSX niet lezen. Met de TypeScript-parser en
+`ts.SyntaxKind.JsxText` zijn het er **86**.
+
+Dat sluit meteen de klasse die deze repo deze maand vier keer raakte: een
+tekstscan die op zijn eigen toelichting valt (`contactadressen`,
+`persoon-entiteit`, `verzoeklimiet`, `server-acties`). Een parser ziet een
+comment niet als JSX-tekst, dus er is geen commentaarstrip nodig — en dat wordt
+in twee richtingen bewezen in plaats van aangenomen: een synthetische assertie én
+een mutatie die dezelfde zin als comment in een écht bestand zet en groen moet
+blijven.
+
+#### Twee lijsten, en waarom de tweede een teller draagt
+
+`TOEGESTAAN` is structureel en permanent: eigennamen (merk, domein, adres,
+persoon, platform — op **exacte** gelijkheid, niet op substring, anders glipt
+"Juan Diaz, LLC builds systems that make operators more money" er als eigennaam
+doorheen), de root error boundary, de twee honeypots, de NL-only lekkage-scan,
+`Testimonials` dat met een lege lijst `null` teruggeeft, en de `<em>`-splitsing
+in `Story.tsx` die juist vertaalde kopij opdeelt.
+
+`ACHTERSTAND` is gemeten en niet gerepareerd, met een teller die mag krimpen en
+niet groeien. Het alternatief was ze in `TOEGESTAAN` zetten, en dat is precies
+hoe "alleen op de homepage" bij `ResultsStrip` een besluit werd dat niemand ooit
+nam: het was de plek waar het blok geboren werd en daarna keek er niemand meer
+naar.
+
+**Vier vrijstellingen dragen hun eigen voorwaarde**, zodat ze omvallen zodra het
+feit eronder verandert: `lekkage-scan` moet in `ENKELE_TAAL` staan, `TESTIMONIALS`
+moet leeg blijven, de honeypots moeten hun `aria-hidden` houden, en
+`global-error.tsx` mag `LocaleProvider` niet importeren — want dan is Engels daar
+een keuze in plaats van een gegeven.
+
+#### De preloader is niet onzichtbaar, en het logboek zei van wel
+
+Het logboek van 3 augustus noteerde dat de preloader "opacity: 0" is. Dat geldt
+voor `.preload.done`, ná de dismissal. `.preload` zelf staat
+`position: fixed; inset: 0; z-index: 300` en is tot 1,2 s zichtbaar voor élke
+bezoeker. "Booting interface" is dus een echt lek en geen vrijstelling. Het staat
+in de achterstand, samen met de skip-link — allebei in `app/layout.tsx`, buiten
+het `[locale]`-segment, dus ze vergen een andere reparatie dan `translate(l, …)`.
+
+**De verkeerde selector lezen is hetzelfde soort fout als de verkeerde catalogus
+raadplegen.** Zie de partiële index van 21 augustus.
+
+#### De deelkaart van elke taal is Engels
+
+`app/opengraph-image.tsx` leek een vrijstelling: root-scope, geen taal
+beschikbaar. Gemeten klopt dat niet. `app/[locale]/layout.tsx` zet
+`images: OG_IMAGES`, en die wijst naar `/opengraph-image` — de **root**-kaart.
+Wie `/nl` op LinkedIn deelt krijgt dus "I build the systems that make operators
+more money." Achterstand, geen vrijstelling.
+
+#### De poort miste zijn eigen pagina, drie regels lager
+
+Bij de DOM-controle stond er een vijfde h2: **"Immobilien — common questions"**.
+Een template literal als **prop**, geen tekstknoop. De blinde vlek die ik in de
+kop van de poort had opgeschreven, op precies de pagina die de poort net schoon
+had verklaard.
+
+Voor uitbreiden eerst gemeten hoe groot die klasse is. De volle attribuutscan gaf
+**53 treffers**, waarvan 16 `aria-hidden="true"`, acht `aria-labelledby` en zeven
+`htmlFor` — verwijzingen en vlaggen. Wat werkelijk kopij draagt zijn **elf
+waarden** over vier attributen (`aria-label`, `placeholder`, `title`, `alt`).
+Klein genoeg voor een poort die niet binnen een week wordt uitgezet.
+
+Wat daaruit kwam: `aria-label="Footer"` en `aria-label="Call +31 6 5314 2656"`
+staan in vier talen in het Engels. Die hoort alleen een schermlezer — precies
+waar toegankelijkheid en vertaling elkaar raken.
+
+De attribuutscanner leest **alleen letterlijke waarden**. Komt de waarde uit
+`translate(l, …)` of uit een variabele, dan is er niets letterlijks te vinden en
+hoort deze poort er ook niets over te zeggen. Dat is met een groene mutatie
+bewezen, niet aangenomen.
+
+#### Zeventien mutaties, zeventien keer de voorspelde kleur
+
+Vijftien rood op vijftien verschillende asserties, twee groen als controle. De
+twee groene dragen het bewijs dat de poort niet grept: dezelfde zin als comment
+in een echt bestand blijft onzichtbaar, en een attribuut uit `translate()` ook.
+
+Het harnas weigert te draaien als een mutatie een bestand raakt dat niet in de
+back-uplijst staat — die poort komt uit de ronde van 23 augustus, waar drie
+bestanden beschadigd achterbleven en het enige signaal "na herstel: ROOD" was.
+
+#### Drie keer was de meetlat stuk, en één keer mijn eigen transcriptie
+
+**De sonde kapt af op 90 tekens.** Ik typte de lange vrijgestelde zinnen over uit
+haar uitvoer en vulde de staarten zelf aan. Vier ervan waren fout — waar ik
+"mail" schreef staat er "drop a line to". De classificatie per bestand is
+handwerk en blijft dat; de letterlijke zinnen komen sindsdien uit de scanner.
+**Een citaat dat je zelf hebt geschreven is geen bron, ook niet als het bijna
+klopt.** Derde keer deze week.
+
+**Veertien van de zestien pagina's "faalden" bij de eerste meting**, en alle
+veertien zaten in de meetlat. De Engelse zinnen zochten ook op `/en`, waar ze de
+nieuwe waarde zijn. De tag-stripper zette een spatie op de plek van elke tag, dus
+`versickert</em>.` werd `versickert .` en matchte niet. En de sectornamen waren
+overgetypt: `Hostelería` werd `Hostería`. Die laatste komt nu uit
+`lib/sectors.ts` in plaats van uit mijn hoofd.
+
+**Daarna nog vier**, allemaal `P&amp;L` in de bron tegen `P&L` in mijn
+verwachting: de extractie decodeerde geen HTML-entities.
+
+**En de Duitse FAQ-kop meldde "NIET GEVONDEN"** omdat mijn `ä` door de shell-laag
+ging in een inline `python -c`. Vijfde escape-incident deze sessie. Op de pagina
+stond gewoon "Immobilien — häufige Fragen".
+
+#### Gemeten
+
+Zestien sectorpagina's op een productiebuild, met de server-pid tegen de starttijd
+gecontroleerd — een `curl` die slaagt bewijst dat er iets antwoordt, niet dat het
+jouw proces is.
+
+| | uitkomst |
+|---|---|
+| oude Engelse zinnen op nl/de/es | **0** over alle twaalf pagina's |
+| nieuwe kopij, zichtbare tekst | 4/4 per pagina, plus de ROI-CTA alleen op energy |
+| kale sleutelnaam op de pagina | 0 |
+| playbook-kop met de sectornaam, eigen hoofdletters | 16/16 |
+| FAQ-kop vertaald | 16/16 |
+| 375 px | geen horizontale overloop |
+| console | nul fouten — na een hartslag door de lezer |
+
+1034 tests in 47 bestanden, was 1021/46. i18n **718** sleutels × 4, was 706 —
+precies +12 voor de elf zinnen plus de FAQ-kop. tsc schoon,
+`regen:pricing:check` groen, build groen.
+
+#### Wat deze poort niet ziet
+
+Een Engelse zin in `DICT.nl` (daar is de leesbeurt voor), kopij die via een
+gewone prop van een oudercomponent binnenkomt, en attributen buiten de vier
+genoemde. Dat staat in de kop van het bestand, zodat de volgende sessie niet
+denkt dat een groen vinkje hier "alle kopij is vertaald" betekent.
+
+#### Erbij op de operator-lijst
+
+Niets. Dit is code, geen configuratie.
+
+#### Twee dingen die opvielen en buiten deze PR blijven
+
+- **`lib/sectors.ts:328` zegt "Hotellerie & Revenue".** `lib/i18n/duits.test.ts`
+  verbiedt "Hotellerie" sinds 20 augustus — met reden: het was een derde Duits
+  woord voor dezelfde sector naast Hospitality en Gastgewerbe. Die poort leest
+  `DICT.de` en niet de bestanden, dus `lib/sectors.ts` glipte erlangs. Zelfde
+  vorm als deze hele PR, één laag verder.
+- **De achterstand van 22 regels is een echte lijst met echt werk**, geen
+  formaliteit: de skip-link, de Engelse deelkaart van elke taal, de
+  signals-tagpagina, het commandopalet, en drie `aria-label`s die alleen een
+  schermlezer hoort.
