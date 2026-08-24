@@ -304,7 +304,7 @@ export const SECTORS: Sector[] = [
         seoDescription:
           "Revenue operations consultant voor hotels en horeca — kanaalinzicht, een prijsinstrument en tools voor de vloer die onderbuikbeslissingen vervangen.",
         summary:
-          "Horeca is een van de weinige sectoren waar de revenue manager nog per geval beslist zonder instrument om zich aan te toetsen. De grootste marge zit in de tien minuten vóór check-in, en het meeste daarvan lekt weg op gevoel.",
+          "Hospitality is een van de weinige sectoren waar de revenue manager nog per geval beslist zonder instrument om zich aan te toetsen. De grootste marge zit in de tien minuten vóór check-in, en het meeste daarvan lekt weg op gevoel.",
         leaks: [
           { title: "Kanaalchaos", body: "OTA's, direct, zakelijke tarieven, seizoensacties — beheerd in vijf dashboards die niet op elkaar aansluiten." },
           { title: "Blind op omzet", body: "Je kent de cijfers van deze week. Je weet niet waarom. Tegen de tijd dat je het weet, staat de prijs voor volgende week al vast." },

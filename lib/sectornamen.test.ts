@@ -192,3 +192,99 @@ describe("het taglabel draagt dezelfde naam als de sector", () => {
     }
   });
 });
+
+/* ───────────────────────────────────────────────────────────────────────────
+ * DERDE POORT: de eerste zin van de samenvatting, tegen de naam erboven.
+ *
+ * AANLEIDING. Op /nl/sectors/hospitality luidde de H1 "Hospitality & omzet" en
+ * opende de zin er direct onder met "Horeca is een van de weinige sectoren…".
+ * Twee namen voor één sector, met één regel wit ertussen. Dezelfde string voedt
+ * ook de kaart op /nl/sectors (afgekapt op 180 tekens) en `description` in de
+ * JSON-LD, dus het stond op drie oppervlakken.
+ *
+ * Het ontstond doordat #248 het Duits omzette ("Hospitality ist eine der
+ * wenigen Branchen") en #249 de Nederlandse naam, maar geen van beide de
+ * Nederlandse samenvatting: die viel buiten wat elke poort las.
+ *
+ * WAT HIER GEEN REGEL IS. "De sectornaam staat in de eerste zin" geldt NIET
+ * overal — `energy` en `adjacent` benoemen zichzelf in geen enkele taal, en dat
+ * is prima kopij. Zo'n eis zou een verzonnen regel zijn.
+ *
+ * Wat wél een regel is, en gemeten: **binnen één sector doen de vier talen
+ * hetzelfde.** real-estate benoemt zichzelf viermaal, energy en adjacent
+ * viermaal niet, en hospitality was 3-om-1 — precies de drift die dit defect
+ * maakte. Deze poort eist die overeenstemming en niet de uitkomst, zodat een
+ * bewuste herschrijving in alle vier de talen gewoon mag. */
+
+/** De samenvatting van een sector in één taal. */
+function paginaSamenvatting(slug: string, l: Locale): string {
+  const s = SECTORS.find((x) => x.slug === slug);
+  if (!s) return "";
+  return (l === "en" ? s.summary : s.i18n?.[l]?.summary) ?? "";
+}
+
+/** Alleen de eerste zin telt: verderop in een alinea mag de sectornaam vallen
+ *  zonder dat hij de kop tegenspreekt. Zonder deze inperking meet de poort
+ *  iets anders dan waar hij over gaat. */
+export function eersteZin(tekst: string): string {
+  return tekst.split(/(?<=[.!?])\s/)[0] ?? tekst;
+}
+
+/** Noemt de eerste zin van de samenvatting de sector bij zijn eigen naam? */
+export function noemtDeSector(naam: string, samenvatting: string): boolean {
+  const n = naamWoorden(naam);
+  if (n.length === 0) return false;
+  return naamWoorden(eersteZin(samenvatting)).includes(n[0]);
+}
+
+describe("de zin-lezer zelf", () => {
+  /* Zonder deze vier is elke groene uitkomst hieronder ook te verklaren door
+     een lezer die overal hetzelfde antwoord op geeft. */
+  it("herkent de sectornaam in de openingszin", () => {
+    expect(
+      noemtDeSector("Hospitality & omzet", "Hospitality is een van de weinige sectoren."),
+    ).toBe(true);
+  });
+
+  it("ziet het verschil met een tweede naam voor dezelfde sector", () => {
+    /* Dit is woordelijk het defect dat deze poort sluit. */
+    expect(
+      noemtDeSector("Hospitality & omzet", "Horeca is een van de weinige sectoren."),
+    ).toBe(false);
+  });
+
+  it("struikelt niet over accenten", () => {
+    expect(
+      noemtDeSector("Hostelería e ingresos", "La hostelería es uno de los pocos sectores."),
+    ).toBe(true);
+  });
+
+  it("leest werkelijk alleen de eerste zin", () => {
+    expect(noemtDeSector("Energie & zon", "Iets anders eerst. Energie komt hier pas.")).toBe(
+      false,
+    );
+    expect(eersteZin("Eerst dit. Dan dat.")).toBe("Eerst dit.");
+  });
+});
+
+describe("de vier talen zijn het eens of de samenvatting de sector benoemt", () => {
+  it.each(SECTORS.map((s) => s.slug))("%s", (slug) => {
+    const per = LOCALES.map((l) => {
+      const naam = paginaNaam(slug, l) ?? "";
+      const sam = paginaSamenvatting(slug, l);
+      expect(sam, `de samenvatting van ${slug} ontbreekt in ${l}`).toBeTruthy();
+      return `${l}:${noemtDeSector(naam, sam)}`;
+    });
+
+    const antwoorden = new Set(per.map((p) => p.split(":")[1]));
+    expect(
+      antwoorden.size,
+      `De talen lopen uiteen over de vraag of de samenvatting van ${slug} de ` +
+        "sector bij naam noemt. Dat is hoe /nl/sectors/hospitality een H1 " +
+        '"Hospitality & omzet" kreeg met "Horeca is een van de weinige ' +
+        'sectoren…" eronder. Kies één kant en voer hem in alle vier de talen ' +
+        "door — de poort eist overeenstemming, niet welke kant. Gemeten: " +
+        per.join("  "),
+    ).toBe(1);
+  });
+});
