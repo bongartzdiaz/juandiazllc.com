@@ -286,7 +286,7 @@ komen de kliks binnen en worden ze weggegooid — je ziet niets, en dat is niet 
 onderscheiden van "niemand klikt".
 
 De code-kant is af en op productie geverifieerd (zie de meting onderaan). Wat
-ontbreekt zijn vier regels in het dashboard.
+ontbreekt zijn vijf regels in het dashboard.
 
 Plausible → Site Settings → **Goals** → *Add goal* → **Custom event**, en dan
 deze namen **exact** overnemen. De `+` in de class is een spatie; de naam in
@@ -299,10 +299,17 @@ Plausible bevat dus een spatie.
       `/pricing`.
 - [ ] `Sector CTA` — de contactknop op `/sectors/[slug]`.
 - [ ] `Tool CTA` — de contactknop op `/tools/energy-roi`.
+- [ ] `Contact Submitted` — vuurt in `components/ContactForm.tsx` zódra een
+      inzending is geslaagd, niet bij een klik. **Dit is het enige doel dat een
+      conversie meet; de vier hierboven meten intentie.** Hij ontbrak op elke
+      lijst tot 2026-08-24, omdat hij als `window.plausible(...)` wordt
+      afgevuurd en de andere vier via een CSS-klasse — wie op de klassenaam
+      grept vindt er vier en denkt klaar te zijn.
 
-**Vergeet de custom properties niet.** Drie van de vier sturen naast de naam ook
+**Vergeet de custom properties niet.** Vier van de vijf sturen naast de naam ook
 eigenschappen mee, en die zijn in Plausible pas zichtbaar als je ze apart
-aanmeldt (Site Settings → **Custom properties**):
+aanmeldt (Site Settings → **Custom properties**). Het blijven drie namen:
+`Sector CTA` en `Contact Submitted` gebruiken allebei `sector`.
 
 | doel | eigenschappen |
 |---|---|
@@ -310,6 +317,7 @@ aanmeldt (Site Settings → **Custom properties**):
 | `Sector CTA` | `sector` (de slug), `url` |
 | `Tool CTA` | `tool` (`energy-roi`), `url` |
 | `Boeking 15min` | `url` |
+| `Contact Submitted` | `sector` (de slug, of `unknown` als de bezoeker niets koos) |
 
 Zonder die stap zie je wél het aantal kliks, maar niet welke tier of sector ze
 opleverde — en dat is precies waarvoor de tags zijn aangebracht.

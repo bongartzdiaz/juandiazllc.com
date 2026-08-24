@@ -25,10 +25,11 @@ overheen stapt is een gok met een tijdlijn eromheen.
 
 1. Plausible-dashboard: bezoekers over 30 dagen. Eén blik.
 2. Search Console: nakijken of de property geverifieerd is. Het record staat er.
-3. De vier Plausible-doelen aanmaken (`Boeking 15min`, `Pricing CTA`,
-   `Sector CTA`, `Tool CTA`) plus de drie properties `tier`, `sector`, `tool`.
-   Getagd en geverifieerd in de code; zonder de doelen worden de kliks
-   binnengehaald en weggegooid.
+3. De vijf Plausible-doelen aanmaken (`Boeking 15min`, `Pricing CTA`,
+   `Sector CTA`, `Tool CTA`, `Contact Submitted`) plus de drie properties
+   `tier`, `sector`, `tool`. Getagd en geverifieerd in de code; zonder de
+   doelen worden de kliks binnengehaald en weggegooid. `Contact Submitted` is
+   de enige die een conversie telt — zonder hem blijft stap 1 onbeslist.
 4. DataForSEO-inloggegevens, of de knoop doorhakken over OpenSEO.
 
 Zonder 1 en 2 is de rest van dit document niet te scoren.
