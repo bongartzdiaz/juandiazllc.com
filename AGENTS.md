@@ -5442,3 +5442,117 @@ de Nederlandse (4 → 19).
   wel een keuze die niemand bewust heeft gemaakt.
 - **De Nederlandse lede** op `/nl/sectors/hospitality` opent nog met "Horeca"
   onder een H1 die "Hospitality" zegt. Eén string, aanbodkeuze.
+
+### 2026-08-24 (vervolg) — de kop zei Hospitality, de zin eronder zei Horeca
+
+Het laatste openstaande punt uit #250, en het was geen aanbodkeuze meer zodra
+#249 de naam had vastgezet. Op `/nl/sectors/hospitality` luidde de H1
+"Hospitality & omzet" en opende de zin er direct onder met "Horeca is een van de
+weinige sectoren…". Twee namen voor één sector, met één regel wit ertussen.
+
+**Eén string, drie oppervlakken.** `SECTORS[…].i18n.nl.summary` voedt de
+zichtbare lede, de kaart op `/nl/sectors` (afgekapt op 180 tekens) en
+`description` in de JSON-LD. Het stond dus ook op de index en in wat Google
+leest.
+
+**Alleen het Nederlands week af.** Duits was in #248 al omgezet ("Hospitality ist
+eine der wenigen Branchen"), Engels en Spaans waren het altijd met hun eigen kop
+eens. Dat maakt het geen smaakkwestie: drie talen deden hetzelfde en één niet.
+
+#### De poort van gisteren las de helft die toevallig klopte
+
+#249 zette een naam-consistentietest neer, en die had dit moeten zien. Twee
+redenen waarom niet. Hij stond in `lib/i18n/duits.test.ts` en las dus alleen
+Duits. En hij knipte met `replace(/\s*[&·—-]\s*.*$/, "")` alles weg vanaf de `&`,
+zodat van "Hospitality & omzet" alleen "Hospitality" overbleef — precies de helft
+die al goed was. De helft die fout was, las hij niet.
+
+#### Bijna een verzonnen regel
+
+De voor de hand liggende poort is "de sectornaam staat in de eerste zin van de
+samenvatting". Gemeten klopt dat niet: `energy` en `adjacent` benoemen zichzelf
+in **geen enkele** taal, `real-estate` in alle vier. Zo'n eis zou twee sectoren
+rood maken op kopij waar niets mis mee is.
+
+Wat wél een regel is, en gemeten: **binnen één sector doen de vier talen
+hetzelfde.** hospitality stond 3-om-1, en die 1 was het defect.
+`lib/sectornamen.test.ts` eist die overeenstemming en niet de uitkomst, zodat een
+bewuste herschrijving in alle vier de talen gewoon mag.
+
+Vier zelftests eronder, want zonder die vier is elke groene uitkomst ook te
+verklaren door een lezer die overal hetzelfde antwoord geeft. De scherpste is
+woordelijk het defect: `noemtDeSector("Hospitality & omzet", "Horeca is een van
+de weinige sectoren.")` moet `false` zijn.
+
+**Drie keer blijft "horeca" staan**, met opzet: in `seoTitle`, `seoDescription`
+en `proof[0].body`. De eerste twee zijn zoekkopij — een Nederlandse operator
+zoekt op *horeca*, niet op *hospitality* — en de derde is het woord in lopende
+tekst. Zelfde precedent als het Duits, waar `de.proof[0].body` "Hotelbetrieb"
+houdt. Het Duits ging in #248 wél om in `seoTitle`, omdat "Hotellerie" daar één
+van drie concurrerende woorden was; "horeca" is in het Nederlands de enige
+gangbare term.
+
+#### Zes mutaties, zes keer de voorspelde kleur
+
+Vijf rood, één groen als controle. Mutatie 1 (nl terug naar Horeca) en mutatie 2
+(de weg van Hospitality) vallen **op dezelfde assertie vanaf tegenovergestelde
+kanten** — dat is wat "eis overeenstemming, niet de uitkomst" in de praktijk
+betekent. De groene controle zet de oude opening in een **toelichting** en hoort
+onzichtbaar te blijven, want de poort leest de geëxporteerde data.
+
+Die groene controle sloeg eerst over op `anker 0x`: mijn anker gebruikte LF
+tussen `summary:` en de string, en dit is een CRLF-repo. **Luid gefaald in plaats
+van stil groen** — daar staat die ankertelling voor.
+
+#### De meetlat brak op het spiegelbeeld van gisteren
+
+Drie van de vier talen meldden `MIS` op de H1 terwijl de lede en de JSON-LD
+klopten. Intern tegenstrijdig, dus de fout zat in de naald: de pagina levert
+`Hospitality &amp; omzet` en mijn anker droeg `&`.
+
+Gisteren gokte ik HTML-entiteiten waar Next rauwe UTF-8 levert; vandaag gokte ik
+rauw waar HTML de entiteit verplicht. De regel die beide gevallen dekt is niet
+"Next levert rauwe UTF-8", maar **HTML escapet de vijf markup-tekens (`& < > " '`)
+en verder niets** — accenten niet, een ampersand wel. Het Spaans slaagde alleen
+omdat "Hostelería e ingresos" geen `&` draagt. Decodeer dus voordat je
+vergelijkt.
+
+#### Meting
+
+Op een productiebuild, met de poort vooraf aantoonbaar vrij (`netstat` 0) en het
+startlog gelezen om te bevestigen dat het mijn eigen proces was.
+
+```
+                       h1                      openingszin        jsonld-description
+/nl/sectors/hospitality  Hospitality & omzet     Hospitality …      OK
+/de/sectors/hospitality  Hospitality & Umsatz    Hospitality …      OK
+/en/sectors/hospitality  Hospitality & revenue   Hospitality …      OK
+/es/sectors/hospitality  Hostelería e ingresos   La hostelería …    OK
+
+/nl/sectors   Hospitality 2x · Horeca 0x
+/de/sectors   Hospitality 4x · Gastgewerbe 0x
+
+AFWIJKINGEN: 0
+```
+
+Drie positieve controles ernaast, want nul is pas een meting nadat het instrument
+bewees te kunnen vinden. In de DOM op 375 px: h1 335 × 83 px, horizontale
+overloop 0, nul elementen buiten beeld, nul kale sleutels, en nul consolefouten —
+dat laatste ná een hartslag door de lezer.
+
+```
+tsc --noEmit             exit 0
+vitest run               1135 tests in 49 bestanden (was 1127/49)
+i18n:check               718 sleutels × 4 (ongewijzigd: alleen een waarde)
+regen:pricing:check      groen
+next build               groen
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +8 is vier zelftests plus vier sectoren.
+
+#### Wat hierna nog open staat
+
+Ongewijzigd ten opzichte van #250, min de Nederlandse lede: er is geen Engelse
+poort en die is in deze vorm ook niet te bouwen, en zeven Spaanse sleutels blijven
+onpersoonlijk waar het Nederlands de lezer aanspreekt.
