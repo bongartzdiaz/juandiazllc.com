@@ -106,23 +106,14 @@ Niets hiervan is uit de repo af te leiden, en niets hiervan mag verzonnen worden
 2. **Plausible-cijfer**: bezoekers over 30 dagen. Zonder dat blijft "0 rijen in
    `marketing.leads`" onbeslist tussen geen-verkeer en geen-conversie, en die
    vraag ligt onder alle andere.
-3. **`SUPABASE_ANON_KEY` als repo-secret.** De workflow `Lead-pad`
-   (`.github/workflows/lead-health.yml`) draait elke zes uur en staat **twintig
-   van twintig keer rood, nooit één keer groen** — hij faalt op zijn eerste stap
-   omdat dit secret ontbreekt. `SUPABASE_URL` staat er wel, gezet op 19-08 om
-   13:33; er is toen één van de twee gezet. Eén commando, en de waarde staat in
-   je eigen `.env.local`:
-   `grep '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' .env.local | cut -d= -f2- | gh secret set SUPABASE_ANON_KEY -R bongartzdiaz/juandiazllc.com`
-   Die wachter bestaat omdat het formulier op 12 augustus urenlang elke lead
-   verloor zonder één alarm. Hij is sindsdien nooit scherp geweest.
-4. **`LEAD_NOTIFY_SECRET`** in Supabase → Edge Functions → Secrets, met dezelfde
+3. **`LEAD_NOTIFY_SECRET`** in Supabase → Edge Functions → Secrets, met dezelfde
    waarde als `lead_notify_secret` in Database → Vault. Dat sluit `lead-notify`
-   (nu fail-open) én `lead-acknowledge`. **Vóór stap 5.**
-5. **`RESEND_API_KEY` + `ACK_FROM`** op een geverifieerd domein. Zonder die twee
+   (nu fail-open) én `lead-acknowledge`. **Vóór stap 4.**
+4. **`RESEND_API_KEY` + `ACK_FROM`** op een geverifieerd domein. Zonder die twee
    gaat er bij een echte lead geen enkele mail de deur uit — gemeten, niet
-   vermoed. Pas ná stap 4, anders geef je een publiek aanroepbaar endpoint een
+   vermoed. Pas ná stap 3, anders geef je een publiek aanroepbaar endpoint een
    mailkanaal op je eigen domein.
-6. **`CAL_WEBHOOK_SECRET` in Vercel-productie**, en daarna nakijken of cal.com de
+5. **`CAL_WEBHOOK_SECRET` in Vercel-productie**, en daarna nakijken of cal.com de
    webhook werkelijk aanroept. Gemeten 2026-08-24: `POST /api/cal` antwoordt
    `{"ok":false,"error":"not-configured"}`. Zolang dat zo is levert een boeking
    geen rij op, dus geen Telegram en geen bevestiging — terwijl "Boeking 15min"
@@ -206,6 +197,7 @@ Beslissing 1 en 2 uit dat hoofdstuk zijn genomen en uitgevoerd.
 | Hoeveel trajecten draag je tegelijk? | **drie** · 2026-08-22 |
 | Akkoord voor een end-to-end leadketen-test | gelopen op 2026-08-20, via het echte formulier |
 | DNS TXT voor Search Console | het record staat er; alleen de property nog nakijken |
+| `SUPABASE_ANON_KEY` als repo-secret | gezet 2026-08-24 12:29. `Lead-pad` daarna groen op run 32727411192 — status 401, code 42501, en dat ís de gezonde uitkomst: schema geserveerd, tabel bestaat, `anon` mag niet lezen. Eerste groene run van eenentwintig |
 
 De vier aanbod-beslissingen staan met datum in `docs/claims.md`. Ze stonden op 24
 augustus nog als open vraag in de lijst — twee dagen nadat je ze had genomen.
