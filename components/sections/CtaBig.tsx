@@ -3,13 +3,13 @@
 import { useActionState } from "react";
 import { LocaleLink } from "@/components/LocaleLink";
 import { subscribe, type SubscribeState } from "@/app/actions/subscribe";
-import { useT } from "@/lib/i18n/useT";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 
 const initial: SubscribeState = { status: "idle" };
 
 export function CtaBig() {
   const [state, formAction, pending] = useActionState(subscribe, initial);
-  const t = useT();
+  const { t, locale } = useLocale();
 
   return (
     <section className="cta-big" id="cta">
@@ -35,6 +35,9 @@ export function CtaBig() {
           disabled={state.status === "ok"}
         />
         <input type="hidden" name="source" value="cta_landing" />
+        {/* Zonder dit veld antwoordt `subscribe` in het Engels, ook op
+            /nl, /de en /es. NewsletterForm stuurde hem al mee. */}
+        <input type="hidden" name="locale" value={locale} />
         <button type="submit" disabled={pending || state.status === "ok"}>
           {state.status === "ok" ? t("cta.news.submitted") : pending ? "..." : t("cta.news.submit")}
         </button>

@@ -4629,3 +4629,135 @@ berichten-endpoint. De regel die hij moet bewaken — geen geautomatiseerde
 connectieverzoeken of DM's — is ongewijzigd juist. Het bestand staat buiten elke
 repo, dus het wordt niet aangeraakt zonder Juans expliciete go.
 
+### 2026-08-24 (vervolg) — de server-actions antwoordden in het Engels, en geen enkele i18n-poort kon dat zien
+
+Gevonden tijdens de hermeting van de leadketen, niet bij het lezen van code. Na
+een geslaagde inzending op `/nl` stond er: *"Got it. I'll come back to you within
+24 hours."* De kop erboven was wél vertaald — `contact.sent` → "✓ Verzonden" —
+en de zin eronder niet. Engels op precies het moment dat een bezoeker converteert,
+en hetzelfde op `/de` en `/es`.
+
+#### Waarom vijf bestaande i18n-poorten hier langs keken
+
+Ze lezen allemaal `dict.ts` en de componenten. Een server action geeft zijn tekst
+terug als **returnwaarde**, dus die string reist als data en niet als kopij:
+`return { status: "ok", message: "Got it…" }`. Syntactisch onvindbaar voor elke
+scanner die naar `t(...)` of naar het woordenboek kijkt.
+
+Dat is dezelfde vorm als het `plausible-event-name=`-vs-`window.plausible(...)`-gat
+van een uur eerder en als `process.env[SECRET_ENV]` dat `CAL_WEBHOOK_SECRET`
+maandenlang uit `.env.example` hield: **functioneel identiek, syntactisch
+onzichtbaar voor het instrument dat je erop loslaat.** Derde keer deze week.
+
+**De actie kende de taal trouwens al.** `readLocale()` stond er, alleen ging die
+waarde uitsluitend naar `metadata.locale` voor de bevestigingsmail. Elf regels
+verderop werd de bezoeker in het Engels toegesproken.
+
+#### Elf zinnen, vier talen, en één formulier dat de taal nooit stuurde
+
+Zeven sleutels × vier talen: `form.ok.{lead,already,subscribed}` en
+`form.err.{email,message,generic,network}`. Duits in de Sie-vorm, Spaans in tú,
+Nederlands in je — conform het bestaande woordenboek.
+
+Onderweg bleek er een tweede defect, en een groter. `components/sections/CtaBig.tsx`
+stuurde **geen `locale`** mee. Een actie die perfect vertaalt maar een formulier
+dat de taal niet meestuurt, valt terug op `"en"` en meldt daar niets over — geen
+fout, geen log. `NewsletterForm.tsx` deed het al goed met dezelfde actie, dus de
+twee afnemers van `subscribe` liepen uiteen zonder dat iets dat zag.
+
+**En er stond een tweede `LOCALES`-lijst.** `app/actions/contact.ts` droeg zijn
+eigen `["en","nl","de","es"]` naast de canonieke in `dict.ts`, met een eigen
+`readLocale`. Toen `subscribe.ts` diezelfde functie nodig had zou dat een derde
+kopie zijn geworden. Nu één `lib/i18n/form-locale.ts` die `LOCALES` uit `dict.ts`
+importeert.
+
+#### De poort, en welke assertie er werkelijk toe doet
+
+`lib/i18n/server-acties.test.ts`, acht tests. De belangrijkste is niet de scan op
+kale tekst maar deze: **elk formulier dat een taalbewuste actie aanroept, stuurt
+de taal mee.** Welke acties taalbewust zijn wordt afgeleid uit de code — wie roept
+`readLocale(formData.get("locale"))` aan — en niet ingetypt, want een tweede lijst
+naast de eerste is precies de bugklasse waarover het bestand gaat.
+
+De vrijstelling voor `app/actions/newsletter.ts` (dood: schrijft naar
+`newsletter_subs`, een tabel die in geen schema bestaat) **draagt zijn eigen
+voorwaarde**: een assertie dat het bestand nul importeurs heeft. Krijgt het er weer
+één, dan valt de vrijstelling om in plaats van stil te blijven staan.
+
+#### De poort viel meteen om, op proza
+
+Eerste run rood op `components/NewsletterForm.tsx`. Geen importeur: regel 9 is een
+**comment** — uitgerekend de comment die PR #220 repareerde — die
+`app/actions/newsletter.ts` noemt om uit te leggen waarom het formulier hem *niet*
+gebruikt. Vierde keer deze maand dat een tekstscan op proza valt, na
+`contactadressen`, `persoon-entiteit` en `verzoeklimiet`.
+
+Twee verdedigingen naast elkaar, omdat elk een geval dekt dat de ander mist:
+commentaar strippen (vangt een comment die een importregel citeert) en op
+**importsyntaxis** matchen in plaats van op het kale woord (vangt een los woord in
+echte code). Plus een positieve controle: de scanner moet aantoonbaar de twee
+levende importeurs van `subscribe` vinden — anders is zijn lege uitkomst voor een
+vrijgesteld bestand geen meting maar een kapot instrument.
+
+#### Zeven mutaties, zeven keer rood
+
+Elk op een andere assertie, groen na herstel, nul sporen achtergebleven.
+
+| mutatie | assertie die afging |
+|---|---|
+| kale tekst terug in een levende actie | geen kale gebruikerstekst |
+| Duitse sleutel weg uit `dict.ts` | sleutel in alle vier de woordenboeken |
+| Duits draagt de Engelse zin | de vier talen geven elk een eigen tekst |
+| tekstscanner gesloopt | positieve controle op kale tekst |
+| afnemer-scanner gesloopt | positieve controle op een levende import |
+| `locale`-veld weg uit `CtaBig` | elk formulier stuurt de taal mee |
+| dode actie krijgt weer een afnemer | vrijstelling heeft nul afnemers |
+
+De eerste sloeg over op een **dubbel anker**: `form.ok.lead` staat twee keer in
+`contact.ts` — de honeypot-tak en de succes-tak keren allebei met dezelfde zin
+terug. Geen defect, wel een anker dat de omliggende regel nodig had.
+
+#### Gemeten in de DOM, met een probe die niets wegschrijft
+
+De bevestigingszin testen zou een echte rij in `marketing.leads` schrijven en de
+Telegram-trigger laten vuren. De **foutzin** niet: de e-mailcontrole
+(`isPlausibleEmail`, eist een punt in het domein) ligt vóór elke databaseaanroep,
+en `a@b` komt wél door de browser en niet door de server. Dezelfde vorm als de
+401/400-probe op `lead-notify` van 21 augustus: kies een invoer die ná de controle
+maar vóór de bijwerking faalt.
+
+| | `locale`-veld | antwoord van de actie |
+|---|---|---|
+| `/nl/contact` | `nl` | Vul een geldig e-mailadres in. |
+| `/de/contact` | `de` | Bitte geben Sie eine gültige E-Mail-Adresse ein. |
+| `/es/contact` | `es` | Introduce un correo electrónico válido. |
+| `/nl` (CtaBig) | `nl` | Vul een geldig e-mailadres in. |
+| `/en` (CtaBig) | `en` | Enter a valid email. |
+
+Nagemeten op `wbgiouuifqhasedncysw`: `marketing.leads` en `marketing.subscribers`
+allebei **0 rijen, ook in de laatste twee uur**. De probe schreef niets weg.
+
+#### Twee meters die eerst het verkeerde zeiden
+
+**De geserveerde HTML draagt het formulier niet.** Een `curl | grep` op
+`name="locale"` gaf 0 in alle vier de talen — wat leest als "het veld ontbreekt".
+De positieve controle draaide dat om: `name="email"` gaf óók 0, en dat veld bestaat
+zeker. Beide formulieren zijn client-componenten die pas na hydratie mounten. Ik mat
+het verkeerde oppervlak, niet een defect. Dit staat al in het logboek van 20
+augustus voor `read_page`; het geldt net zo goed voor `curl`.
+
+**"No console logs" is pas een meting na een hartslag.** De lezer gaf leeg, ook
+zonder foutfilter. Met een eigen `console.warn` erdoorheen bleek hij te werken —
+dus die nul wás echt: nul console-fouten over de hele doorloop.
+
+Verder: twee kliks in dezelfde tick werken niet op een React-wizard (de "Verder"-knop
+is dan nog niet vrijgegeven), en de escape-laag brak opnieuw twee keer — een em-dash
+als `—` in een gewone python-string, en gehalveerde backslashes in een
+regexpatroon. Uitweg is dezelfde als op 20 en 22 augustus: **anker op regels zonder
+speciale tekens, en gebruik raw strings.**
+
+#### Meting
+
+1021 tests in 46 bestanden, was 1013/45. i18n 706 sleutels × 4, was 699 — precies
++7 voor de nieuwe sleutels. tsc schoon, `regen:pricing:check` groen, build groen,
+`CLAUDE.md` byte-identiek aan `AGENTS.md`.

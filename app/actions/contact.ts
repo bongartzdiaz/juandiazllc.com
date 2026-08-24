@@ -2,21 +2,10 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { capField, isPlausibleEmail } from "@/lib/forms/limits";
+import { translate } from "@/lib/i18n/dict";
+import { readLocale } from "@/lib/i18n/form-locale";
 
 export type ContactState = { status: "idle" | "ok" | "err"; message?: string };
-
-// De taal komt uit een verborgen veld en is dus door de client te kiezen. Hij
-// bepaalt alleen in welke taal de automatische ontvangstbevestiging wordt
-// opgesteld, maar hij landt wel in de database, dus hij gaat door een
-// whitelist en niet door capField: alles buiten deze vier wordt Engels.
-const LOCALES = ["en", "nl", "de", "es"] as const;
-
-function readLocale(value: FormDataEntryValue | null): (typeof LOCALES)[number] {
-  const raw = String(value ?? "").trim().slice(0, 2).toLowerCase();
-  return (LOCALES as readonly string[]).includes(raw)
-    ? (raw as (typeof LOCALES)[number])
-    : "en";
-}
 
 // Contact submission pipeline.
 // - Deze functie doet één ding: de rij wegschrijven in marketing.leads.
@@ -45,11 +34,18 @@ export async function submitLead(
   _prev: ContactState,
   formData: FormData
 ): Promise<ContactState> {
+  // De taal wordt hier gelezen en niet verderop bij de andere velden: de
+  // honeypot-tak hieronder keert al terug met een bericht, en dat hoort in de
+  // taal van de bezoeker te staan. Stond `locale` lager, dan was die ene tak
+  // Engels gebleven -- precies zo'n uitzondering die een poort later moet
+  // uitzonderen in plaats van bewaken.
+  const locale = readLocale(formData.get("locale"));
+
   // Honeypot: real users never fill this (hidden via CSS). Bots do.
   const honeypot = String(formData.get("website") ?? "").trim();
   if (honeypot) {
     // Pretend success so bots don't retry; skip all real side effects.
-    return { status: "ok", message: "Got it. I'll come back to you within 24 hours." };
+    return { status: "ok", message: translate(locale, "form.ok.lead") };
   }
 
   // Elk vrij-tekstveld begrensd (zie lib/forms/limits.ts): de tabel heeft geen
@@ -61,13 +57,12 @@ export async function submitLead(
   const sector = capField(formData.get("sector"), "sector");
   const message = capField(formData.get("message"), "message");
   const source = capField(formData.get("source"), "source") || "contact_page";
-  const locale = readLocale(formData.get("locale"));
 
   if (!isPlausibleEmail(email)) {
-    return { status: "err", message: "Enter a valid email." };
+    return { status: "err", message: translate(locale, "form.err.email") };
   }
   if (!message || message.length < 10) {
-    return { status: "err", message: "Tell me a bit more — at least a sentence." };
+    return { status: "err", message: translate(locale, "form.err.message") };
   }
 
   try {
@@ -77,16 +72,13 @@ export async function submitLead(
       .insert({ name, email, company, sector, message, source, metadata: { locale } });
 
     if (error) {
-      return { status: "err", message: "Something went wrong. Try again." };
+      return { status: "err", message: translate(locale, "form.err.generic") };
     }
 
     // Geen meldingen hier: de triggers op marketing.leads doen dat. Zie de kop.
 
-    return {
-      status: "ok",
-      message: "Got it. I'll come back to you within 24 hours.",
-    };
+    return { status: "ok", message: translate(locale, "form.ok.lead") };
   } catch {
-    return { status: "err", message: "Network error. Try again." };
+    return { status: "err", message: translate(locale, "form.err.network") };
   }
 }
