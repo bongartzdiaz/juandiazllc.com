@@ -6519,3 +6519,92 @@ cmp CLAUDE.md AGENTS.md  byte-identiek
 
 De +11 is de nieuwe poort. Het sleutelaantal blijft 718 omdat `form.err.network`
 niet verdween maar van naam veranderde.
+
+### 2026-08-25 (vervolg) — de aanname onder de vorige poort, en het woord dat de takken kan omdraaien
+
+De poort van een uur eerder legt vast welke storing in welke tak van onze server
+actions landt. Hij rust op één aanname over een bibliotheek die wij niet
+schrijven: **een fetch-fout komt terug als `{ error }` en wordt niet gegooid.**
+Die aanname stond alleen als meting in dit logboek en als opmerking in de kop van
+die poort. Verandert supabase-js van gedrag, dan wisselen `form.err.generic` en
+`form.err.unavailable` stil van betekenis — geen regel code verandert, de melding
+aan de bezoeker wel.
+
+#### Gemeten met een geïnjecteerde fetch, dus zonder netwerk en zonder DNS
+
+`lib/supabase/foutdoorgifte.test.ts` bouwt de client zoals `lib/supabase/server.ts`
+hem bouwt — `createServerClient` uit @supabase/ssr, hetzelfde schema — en geeft
+hem een eigen `fetch` mee. Die functie zélf aanroepen kan niet: hij leest
+`cookies()` uit next/headers en dat vergt een request-context. Vandaar een
+cookie-adapter die niets doet.
+
+Op @supabase/ssr 0.6.1, supabase-js 2.103.3 en postgrest-js 2.103.3:
+
+| invoer | uitkomst |
+|---|---|
+| fetch weigert met `TypeError('fetch failed')` | **resolve**, `error.message` = "TypeError: fetch failed" |
+| HTTP 500 met `{"message":"geweigerd"}` | resolve, `error.message` = "geweigerd" |
+| HTTP 201 | resolve, `error` = null |
+| client bouwen op een onbereikbaar adres | gooit niet |
+
+Die laatste hoort erbij en is niet decoratief: hij bewijst dat de `catch` in onze
+acties niet door supabase wordt gevuld maar door onze eigen
+`lib/supabase/keys.ts`. Zonder die regel is "de catch betekent configuratie" een
+gevolgtrekking; mét die regel is het gemeten.
+
+**De teller is de positieve controle.** "Hij gooide niet" bewijst niets: een
+client die vóór de fetch al terugkeert gooit óók niet. De geïnjecteerde fetch
+telt daarom zijn aanroepen, en de poort eist dat hij bereikt is. Eén mutatie doet
+precies dat — het antwoord veinzen zonder fetch — en die valt om op
+`expected 0 to be greater than 0`.
+
+#### Geen versiepin, en dat is opzet
+
+De voor de hand liggende toevoeging is een assertie op het major-versienummer,
+zodat een sprong naar v3 om een herlezing vraagt. Die staat er bewust niet in:
+**de gedragstests vangen de verandering zelf.** Gaat v3 gooien, dan valt de
+eerste test om. Blijft het gedrag gelijk over een major bump, dan is rood daar
+ruis — en een poort die ruis maakt wordt uitgezet. De gemeten versies staan in de
+kop als herkomst, niet als eis.
+
+#### Het woord dat de takken kan omdraaien
+
+postgrest-js kent `.throwOnError()`. Staat dat achter een insert, dan wordt een
+databasefout wél gegooid en landt hij in de `catch` — de twee takken wisselen van
+betekenis zonder dat er één regel aan die takken verandert. Dat is de goedkoopste
+manier om de reparatie van een uur eerder ongedaan te maken, en niets hield het
+tegen. Nu wel, met een tekstscan over beide acties.
+
+**Die scan draait door `zonderCommentaar`**, en de mutaties bewijzen dat dat
+dragend is in plaats van decoratief. Twee mutaties vormen een discriminerend
+paar: dezelfde overtreding in een *commentaar* blijft groen, en dezelfde
+overtreding mét de strip uitgezet wordt rood. Zonder dat paar is groen ook te
+verklaren door een scanner die niets leest — precies de vorm waarop
+`contactadressen`, `persoon-entiteit`, `verzoeklimiet` en `server-acties` eerder
+struikelden.
+
+#### En de kop van de vorige poort klopte niet meer
+
+Daar stond: "Wat deze poort NIET bewaakt: het gedrag van supabase-js zelf."
+Dat was waar tot deze commit en is nu onwaar. Die zin laten staan is de klasse
+waar dit logboek het meest aan overhoudt — een toelichting die een toestand
+beschrijft die niet meer bestaat. Hij verwijst nu naar de nieuwe poort.
+
+#### Meting
+
+Negen mutaties, negen keer de voorspelde kleur, elk rood op een ándere assertie,
+groen na herstel, nul sporen achtergebleven. Het harnas weigert te draaien als
+een mutatie een bestand raakt dat niet in de back-uplijst staat, en als een anker
+een regeleinde draagt.
+
+```
+tsc --noEmit             exit 0
+vitest run               1180 tests in 54 bestanden (was 1174/53)
+i18n:check               718 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +6 is de nieuwe poort. Geen productiecode geraakt — dit is uitsluitend een
+poort plus één gecorrigeerde toelichting, dus er valt hier niets op productie na
+te meten.
