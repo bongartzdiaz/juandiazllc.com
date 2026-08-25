@@ -144,7 +144,7 @@ uitrolde, als uitvoering van de opdracht *diaz editor er nu op zetten* van
 (10 tabellen, 2 licenties) tegen de levende database op vbozel (22 tabellen, 25
 views, 6 licenties, 3 klanten). Het schema eronder is diezelfde avond gedropt;
 de functies bleven staan omdat de MCP ze niet kan verwijderen. Ze wijzen
-sindsdien naar een schema dat er niet meer is en geven 500 bij elke aanroep.
+sindsdien naar een schema dat er niet meer is.
 
 Gemeten over alle 2158 lokale sessies: **264 uitrollen, waarvan 6 naar wbgio**,
 alle zes uit datzelfde transcript. Twee daarvan zijn positieve controles op
@@ -174,14 +174,47 @@ provider heeft dus ooit een licentie laten uitgeven. De enige onbekende is de
 AppSumo-instelling, en dat is een dashboard dat van hieruit niet te lezen is.
 
 **Eén val staat er nog wél, en die is scherper dan de tien dode functies.**
-`supabase/README.md:124` in `bongartzdiaz/diaz-editor` instrueert nog steeds om
-de Stripe-webhook te zetten op
+`supabase/README.md` in `bongartzdiaz/diaz-editor` instrueert nog steeds om de
+Stripe-webhook te zetten op
 `https://wbgiouuifqhasedncysw.supabase.co/functions/v1/diaz-stripe-webhook`
-— het dode project. Twee bestanden verderop
-staat het goed (`scripts/README-stripe-setup.md:105`: *already done —
-vbozelswveaxsyccvaac*). Wie de README volgt verlegt de betaalketen naar een
-project waarvan het schema weg is, en dat faalt stil: de functie blijft ACTIVE
-en geeft 500. Eén regel, in een andere repo.
+— het dode project. Twee bestanden verderop staat het goed
+(`scripts/README-stripe-setup.md:105`: *already done — vbozelswveaxsyccvaac*).
+Twee documenten die één feit dragen en uit elkaar zijn gelopen zonder dat iets
+dat zag.
+
+**Twee dingen die hierboven stonden, klopten niet.** Ze zijn op 2026-08-25
+nagemeten in plaats van overgeschreven, en dit is de correctie erop.
+
+*Het is geen één regel.* Gemeten op `origin/main` (`918c2268`) draagt die repo
+elf wbgio-verwijzingen die het als het levende project presenteren: acht in
+`supabase/README.md` — waaronder de kop, het projectref en de publishable key
+— en drie in `supabase/ADMIN-QUERIES.md`, waarvan de SQL-editor-link. Wat er
+óók staat en juist mag blijven: vijf in `scripts/MIGRATION-new-supabase.md`
+(dat beschrijft wbgio als bron), één historische regel in een handoff, en drie
+in scripts die wbgio juist als waarschuwing noemen.
+
+*En “geeft 500 bij elke aanroep” is te grof.* De functies daar **draaien**; ze
+weigeren netjes op hun eigen invoercontrole en lopen pas stuk zodra een
+aanroep de databaselaag bereikt. Gemeten met dezelfde aanroep op beide
+projecten, met een negatieve controle erbij zodat een lege uitkomst niet als
+schone meting kan lezen:
+
+```
+wbgio    POST /diaz-license-validate   ->  500  server-error / Invalid schema: diaz_editor
+vbozel   POST /diaz-license-validate   ->  200  unknown-key
+wbgio    POST /diaz-stripe-webhook     ->  400  missing signature
+wbgio    POST /diaz-bestaat-niet-xyz   ->  404  NOT_FOUND   (negatieve controle)
+```
+
+Dat maakt de val eerder erger dan milder: geen 404 die meteen opvalt, maar een
+endpoint dat er wél is, netjes antwoordt op alles wat de database niet raakt,
+en geen licentie uitgeeft.
+
+**Er ligt een PR voor:** `bongartzdiaz/diaz-editor#640`. Die zet een
+waarschuwingskop op beide bestanden plus een inline waarschuwing bij de
+webhook-stap, en vervangt bewust **geen enkele waarde** — of de overige
+stappen (secrets, payment-links, metadata-keys) op vbozel nog kloppen is niet
+nagemeten. Hij is niet gemerged; dat is jouw review.
 
 De vijf dubbele slugs op vbozel staan er nog en zijn alle vijf op
 **2026-08-04** aangemaakt vanaf een CI-runner
@@ -251,9 +284,10 @@ herschreven, en deze notitie is de correctie erop.
   vbozel. Wát er nog naartoe schreef: niets. Stripe en Lemon wijzen aantoonbaar
   naar vbozel; alleen de **AppSumo-instelling** is van hieruit niet te lezen —
   kijk die na, dan kunnen de tien weg. Zie de tabel hierboven.
-- **`supabase/README.md:124` in `bongartzdiaz/diaz-editor`** wijst de
-  Stripe-webhook nog naar het dode wbgio-project. Eén regel, andere repo, maar
-  wie hem volgt legt de betaalketen stil om.
+- **`bongartzdiaz/diaz-editor#640` reviewen en mergen.** `supabase/README.md`
+  daar wijst de Stripe-webhook nog naar het dode wbgio-project, en het zijn elf
+  verwijzingen over twee bestanden — niet één regel, zoals hier eerder stond.
+  De PR markeert ze; hij vervangt bewust geen waarden. Zie hierboven.
 - **Het tweede, lege Stripe-account** sluiten of labelen.
 - Optioneel, hygiëne: `revoke execute on function public.handle_new_user(),
   public.notify_new_lead(), public.rls_auto_enable() from public, anon,
