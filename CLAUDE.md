@@ -5918,3 +5918,193 @@ Ongewijzigd ten opzichte van #252, plus één nieuw punt.
 - **Zestien gekrulde dubbele aanhalingstekens.** Dezelfde vraag als de apostrof,
   nooit gesteld. Acht ervan staan in geleverde code
   (`app/[locale]/services/page.tsx`, `lib/lekkage-scan.ts` en twee testbestanden).
+
+
+### 2026-08-25 (vervolg) — de dubbele aanhalingstekens, en waarom "recht, overal" hier het verkeerde antwoord was
+
+Het punt dat #253 open liet: zestien gekrulde dubbele aanhalingstekens, waarvan
+acht in `.ts`/`.tsx`. De apostrof was net beslist met één regel — recht, overal —
+en de verleiding was die regel hier door te trekken. Dat zou twee bestanden
+hebben gesloopt.
+
+#### Dit is niet dezelfde klasse als de apostrof
+
+Bij de apostrof is elk voorkomen inwisselbaar: een krul eruit, een rechte erin,
+klaar. Bij de dubbele hangt de juiste vervanging af van **waar het teken staat**,
+en de codebase had daar al twee antwoorden op — allebei gemeten, geen van beide
+door mij bedacht:
+
+| positie | vorm | gemeten |
+|---|---|---|
+| citaat ín kopij die de bezoeker leest | de rechte, geëscaped | `dict.ts`, **38×** |
+| sier-aanhalingstekens róndom een JSX-blok | `&ldquo;` / `&rdquo;` | `Story.tsx`, `Testimonials.tsx` |
+
+Die twee zijn **niet uitwisselbaar**. In een React-tekstknoop rendert `&ldquo;`
+als letterlijke tekst; in JSX-markup rendert hij als het teken. Eén regel "alles
+recht" maakt de tweede categorie stuk, en één regel "overal entiteiten" de
+eerste. Beide overtreders waren dus uitschieters tegen een bestaande conventie,
+niet een open vraag — er viel niets te beslissen, alleen aan te sluiten.
+
+#### Vier van de zestien stonden op een plek waar een rechte de string sluit
+
+Eerst geteld per afbakening, precies zoals bij de apostrof, en die telling was
+hier niet academisch:
+
+| afbakening | n | risico |
+|---|---|---|
+| **dubbele aanhalingstekens** | **4** | een rechte `"` sluit de string |
+| enkele aanhalingstekens | 2 | geen |
+| backtick / JSX / commentaar | 2 | geen |
+
+Die vier — twee in `lib/lekkage-scan.ts`, twee in `lib/i18n/duits.test.ts` —
+konden dus niet met een tekstvervanging. `lekkage-scan.ts` draagt nu de
+geëscapete vorm (het is kopij die de bezoeker leest), `duits.test.ts` is
+overgegaan op enkele buitenquotes met rechte dubbele erin — precies wat de regel
+drie regels erboven in datzelfde bestand al deed.
+
+#### De poort dekt beide soorten, en de foutmelding wijst niet de verkeerde aan
+
+`lib/typografie.test.ts` heeft er een vierde test bij. Twee dingen zitten er met
+opzet in.
+
+**De foutmelding noemt beide vervangingen**, met de conditie erbij. Een poort die
+"gebruik de rechte" zegt, laat de volgende sessie de entiteiten in `Story.tsx`
+opruimen — en dan staat er `&ldquo;` als tekst op de homepage.
+
+**Een assertie dat de twee verzamelingen elkaar niet raken.** Zonder die kan een
+apostrof-treffer als dubbele gelden, en dan wijst de melding de verkeerde
+vervanging aan op precies het moment dat iemand hem volgt. Twee regels code, en
+ze dekken de duurste manier waarop deze poort schade kan doen.
+
+De poort heeft nog steeds **nul uitzonderingen**: `DUBBEL` wordt net als `ENKEL`
+uit codepunten opgebouwd, dus het bestand blijft zelf schoon en wordt gewoon
+meegescand. `U+201E` staat er ook in — het Duitse openende onderaanhalingsteken,
+dat `DICT.de` vandaag nul keer gebruikt. Wil iemand ooit echte Duitse
+aanhalingstekens, dan is dat een beslissing over vier talen en wordt de poort
+aangepast, niet omzeild.
+
+#### Veertien mutaties, veertien keer de voorspelde kleur
+
+Twaalf rood op zeven verschillende asserties, twee groen als controle, groen na
+herstel, nul sporen achtergebleven.
+
+Vijf mutaties richten zich op de **poort zelf**: beide codepunten verkeerd
+opbouwen, de twee verzamelingen door elkaar halen, de bronboom leegmaken, en de
+wandeling alleen nog `.tsx` laten zien. Zonder die vijf is een groene uitkomst
+ook te verklaren door een scanner die niets leest.
+
+De sprekendste rode is het **Duitse lage aanhalingsteken** in een commentaar in
+`lib/booking.ts`: die valt om, en bewijst dat de derde vorm werkelijk gedekt is
+en niet alleen de twee gangbare. De twee groene controles zetten er juist een
+rechte apostrof en een geëscapete rechte dubbele bij, en horen onzichtbaar te
+blijven.
+
+#### De meting mat eerst het scheidingsteken in plaats van de typografie
+
+De eerste productieronde meldde vier keer `MIS` op `/services` terwijl het
+faalsignaal nul was — intern tegenstrijdig, dus zat de fout in de naald. In de
+geserveerde HTML staat:
+
+```
+…margin-bottom:10px">“<!-- -->Numbers you don&#x27;t trust<!-- -->”</div>
+```
+
+**React zet bij server-rendering een leeg HTML-commentaar tussen twee
+aangrenzende tekstknopen**, om de hydratiegrens te markeren. `&ldquo;` en
+`{t(...)}` zijn precies zulke buren. Het is serialisatie en geen inhoud —
+`innerText` geeft de zin zonder — maar zonder die strip meet je het
+scheidingsteken. De strip draagt daarom een eigen positieve controle: hij moet
+aantoonbaar iets vinden, en gewone tekst ongemoeid laten.
+
+#### De verwachting is hier omgekeerd aan die van de apostrof
+
+Bij de apostrof moest de krul óók uit de geserveerde HTML verdwijnen. Hier niet,
+en dat is het hele punt: `&ldquo;` in JSX is bedoeld om als teken te renderen.
+**De bron draagt geen krul, de pagina wel.** De uitvoer is karakter-identiek aan
+vóór deze wijziging; wat verandert is uitsluitend hoe de bron hem opschrijft.
+
+Wat hier fout kán gaan is het omgekeerde — dat de entiteit als letterlijke tekst
+rendert en er `&ldquo;Numbers you…` op een verkooppagina staat, in vier talen.
+Het faalsignaal daarvoor is `&amp;ldquo;` in de rauwe HTML: dat is wat React
+uitstuurt zodra die tekst als gewone tekst wordt gerenderd.
+
+De twee gekrulde dubbele die de **clientbundel** wél draagt, komen uit
+`Story.tsx` — dezelfde entiteiten, door de compiler naar het teken opgelost. Bron
+nul, uitvoer het teken. Dat is het ontwerp, geen lek.
+
+#### Gemeten
+
+Op een productiebuild, poort vooraf aantoonbaar vrij (LISTENING 0) en het
+startlog gelezen om te bevestigen dat het mijn eigen proces was. De vier
+symptoomzinnen komen uit `DICT` en de vier dienst-id's uit `DELIVERABLES` in de
+pagina zelf — mijn eerste sonde gokte die id's en viel om op een sleutel die niet
+bestaat.
+
+```
+/{en,nl,de,es}/services   entiteit-als-tekst 0  ·  omsloten symptomen 4/4
+U+201E over alle 5 pagina's                     0
+positieve controles                             7/7
+AFWIJKINGEN                                     0
+
+client-chunks   de kost-zin: rechte quotes, 0 krul
+                gekrulde dubbele over alle 29 chunks: 2 (beide uit Story.tsx)
+```
+
+In de DOM op `/en/services`, ná hydratie: vier kaarten, alle vier omsloten door
+het echte teken, `&ldquo;` als tekst 0×, horizontale overloop 0, en nul
+consolemeldingen — dat laatste ná een hartslag door de lezer, want een lege lijst
+uit een kapotte lezer leest hetzelfde als een schone meting. Geen
+hydratiewaarschuwing, dus server en client zijn het eens.
+
+```
+tsc --noEmit             exit 0
+vitest run               1155 tests in 52 bestanden (was 1154/52)
+i18n:check               718 sleutels × 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+Gekrulde dubbele in de repo: **0 in `.ts` en `.tsx`** (was 8), 13 in markdown.
+
+#### Wat er bewust níét is omgezet
+
+- **Twaalf in `CLAUDE.md` en `AGENTS.md`** — drie logboekregels, gespiegeld over de
+  twee bestanden. Twee zijn citaten uit oudere sessieverslagen; de derde is het
+  HTML-fragment hierboven, dat het scheidingsteken alleen kan tonen door het te
+  dragen. Logboekgeschiedenis wordt hier niet herschreven.
+- **Eén U+201E in `_drafts/outreach/tier1-pitches-2026-07.md`** — de correcte
+  Duitse openingsvorm in een Duitse pitch, in een ongepubliceerde draft, en
+  buiten het `.ts`/`.tsx`-bereik van de poort.
+
+#### Tiende regeleinde-incident, en de eerste zonder shell
+
+De negen eerdere gingen over escapes die door een shell-laag halveerden of
+verdubbelden. Deze zat een laag dieper en had geen shell nodig.
+
+Bij het bijwerken van een getal in dit logboek deed ik:
+
+```python
+t = io.open('CLAUDE.md', encoding='utf-8').read()
+io.open('CLAUDE.md', 'wb').write(t.replace(oud, nieuw).encode('utf-8'))
+```
+
+`io.open` met een encoding doet **universal-newline-vertaling bij het lezen**:
+CRLF wordt LF in het geheugen. Terugschrijven in binaire modus maakt daar een
+bestandsbrede omzetting van. Gemeten na afloop: CRLF 0, LF 6084 — een diff van
+6084 regels waar er drie bedoeld waren, in een bestand dat byte-identiek moet
+blijven aan `AGENTS.md` voor een verplichte CI-check.
+
+Het viel alleen op doordat de vólgende patch een anker met een CRLF erin
+gebruikte en niet matchte. Zonder die tweede patch was het stil doorgegaan.
+
+**Lees met `newline=''` zodra je van plan bent terug te schrijven**, of blijf
+volledig in bytes. En een vervanging die geen regeleinde raakt, is geen bewijs
+dat het bestand zijn regeleinden houdt — dat bepaalt de leeslaag, niet de patch.
+
+#### Wat hierna nog open staat
+
+- **Er is geen Engelse poort**, en die is in deze vorm ook niet te bouwen. De
+  typografiepoort ligt wel over het Engels, maar bewaakt tekens en geen register.
+- **Zeven Spaanse sleutels blijven onpersoonlijk** waar het Nederlands de lezer
+  aanspreekt. Verdedigbaar Spaans; waarneming, geen defect.

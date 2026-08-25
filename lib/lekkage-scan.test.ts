@@ -291,8 +291,8 @@ describe("de telling in docs/lead-magnet.md", () => {
 /* De scan mag geen wees worden.
  *
  * scripts/seo-audit.ts meldde precies dat toen de pagina gebouwd was en er
- * nog niets naartoe linkte: “staat in de sitemap maar wordt nergens vandaan
- * gelinkt”. Dat is daar een waarschuwing en geen fout, dus het zou een
+ * nog niets naartoe linkte: "staat in de sitemap maar wordt nergens vandaan
+ * gelinkt". Dat is daar een waarschuwing en geen fout, dus het zou een
  * volgende keer stilletjes terug kunnen komen. Hier is het een fout. */
 describe("de scan hangt ergens aan", () => {
   /* Een telling boven nul is niet genoeg: dan mag een montage stilletjes

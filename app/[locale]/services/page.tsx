@@ -96,7 +96,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
             <LocaleLink key={d.id} href={d.href} className="sec-card" data-reveal style={{ minHeight: 240 }}>
               <div>
                 <div style={{ fontFamily: "'Inter'", fontWeight: 300, fontSize: "clamp(17px, 2vw, 21px)", letterSpacing: "-.01em", marginBottom: 10 }}>
-                  “{t(`services.${d.id}.symptom`)}”
+                  &ldquo;{t(`services.${d.id}.symptom`)}&rdquo;
                 </div>
                 <div className="ix">— {t(`services.${d.id}.title`)}</div>
                 <p style={{ marginTop: 16 }}>{t(`services.${d.id}.body`)}</p>
