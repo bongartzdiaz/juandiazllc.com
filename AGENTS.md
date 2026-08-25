@@ -160,10 +160,32 @@ run. **Een script over beide projecten:** vbozel kreeg op 11 augustus niets — 
 buren daar zijn 4, 12, 15 en 17 augustus. **De dashboard-editor:** de
 transcript-stempels op de seconde maken die lezing overbodig.
 
-**Wat vóór verwijderen nog moet is één ding**, en dat staat niet in deze repo:
-nakijken of Lemon of AppSumo nog naar die wbgio-slugs wijzen. De vijf dubbele
-slugs op vbozel staan er nog en zijn alle vijf op **2026-08-04** aangemaakt
-vanaf een CI-runner (`/home/runner/work/diaz-editor/…`).
+**Wat vóór verwijderen nog moet, is kleiner geworden.** Gemeten op 2026-08-25:
+
+| provider | wijst naar | bewijs |
+|---|---|---|
+| Stripe | **vbozel** | 19 rijen in `diaz_editor.processed_events`, de laatste van **23 augustus** — alle negentien `checkout.session.expired`, nul `completed` |
+| Lemon | **vbozel** | `LEMON-SQUEEZY.md` op `origin/main` noemt het endpoint tweemaal, beide keren vbozel |
+| AppSumo | **onbekend** | geen enkel document in die repo noemt een endpoint |
+
+Alle zes licenties op vbozel zijn met de hand uitgegeven: nul `stacked_codes`,
+nul die AppSumo of Lemon noemen, nul met een Stripe-payment-intent. Geen enkele
+provider heeft dus ooit een licentie laten uitgeven. De enige onbekende is de
+AppSumo-instelling, en dat is een dashboard dat van hieruit niet te lezen is.
+
+**Eén val staat er nog wél, en die is scherper dan de tien dode functies.**
+`supabase/README.md:124` in `bongartzdiaz/diaz-editor` instrueert nog steeds om
+de Stripe-webhook te zetten op
+`https://wbgiouuifqhasedncysw.supabase.co/functions/v1/diaz-stripe-webhook`
+— het dode project. Twee bestanden verderop
+staat het goed (`scripts/README-stripe-setup.md:105`: *already done —
+vbozelswveaxsyccvaac*). Wie de README volgt verlegt de betaalketen naar een
+project waarvan het schema weg is, en dat faalt stil: de functie blijft ACTIVE
+en geeft 500. Eén regel, in een andere repo.
+
+De vijf dubbele slugs op vbozel staan er nog en zijn alle vijf op
+**2026-08-04** aangemaakt vanaf een CI-runner
+(`/home/runner/work/diaz-editor/…`).
 
 **Eén datum hierboven is bijgewerkt, en het waren nooit twee gebeurtenissen.**
 De WARN-tabel zei dat `diaz_editor` op 1 augustus was gedropt; op wbgio was dat
@@ -226,9 +248,12 @@ herschreven, en deze notitie is de correctie erop.
 - **Leaked-password protection** aanzetten op `wbgiouuifqhasedncysw` — de enige
   WARN uit de advisors die actie vergt.
 - **Tien dode `diaz-*` edge functions** op wbgio en **vijf dubbele slugs** op
-  vbozel. De vraag wát er nog naartoe schreef is beantwoord (zie hierboven):
-  niets. Wat overblijft is nakijken of Lemon of AppSumo er niet nog op wijzen;
-  een uitgerolde functie weghalen is onomkeerbaar.
+  vbozel. Wát er nog naartoe schreef: niets. Stripe en Lemon wijzen aantoonbaar
+  naar vbozel; alleen de **AppSumo-instelling** is van hieruit niet te lezen —
+  kijk die na, dan kunnen de tien weg. Zie de tabel hierboven.
+- **`supabase/README.md:124` in `bongartzdiaz/diaz-editor`** wijst de
+  Stripe-webhook nog naar het dode wbgio-project. Eén regel, andere repo, maar
+  wie hem volgt legt de betaalketen stil om.
 - **Het tweede, lege Stripe-account** sluiten of labelen.
 - Optioneel, hygiëne: `revoke execute on function public.handle_new_user(),
   public.notify_new_lead(), public.rls_auto_enable() from public, anon,
