@@ -30,10 +30,11 @@ import { DICT, LOCALES } from '@/lib/i18n/dict'
    de sleutel het juiste geval beschrijft -- daar is een test voor nodig die de
    actie werkelijk aanroept met een falende client.
 
-   Wat deze poort NIET bewaakt: het gedrag van supabase-js zelf. Dat een
-   fetch-fout als `{ error }` terugkomt is hierboven gemeten, niet hier
-   afgedwongen. Verandert die bibliotheek van gedrag, dan wisselen de twee
-   takken stilzwijgend van betekenis en zegt deze test daar niets over.
+   Wat deze poort niet zelf bewaakt is het gedrag van supabase-js -- dat een
+   fetch-fout als `{ error }` terugkomt en niet wordt gegooid. Sinds 2026-08-25
+   staat dat vast in `lib/supabase/foutdoorgifte.test.ts`, met een geïnjecteerde
+   fetch. Zonder die tweede poort zouden de twee takken hier stilzwijgend van
+   betekenis kunnen wisselen zodra die bibliotheek verandert.
    ───────────────────────────────────────────────────────────── */
 
 const OUDE_NAAM = 'form.err.network'
