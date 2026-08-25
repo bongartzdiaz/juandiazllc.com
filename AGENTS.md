@@ -397,10 +397,28 @@ herschreven, en deze notitie is de correctie erop.
   connectieverzoeken of DM's — is ongewijzigd juist. Het bestand staat buiten elke
   repo en wordt niet aangeraakt zonder jouw expliciete go.
 
+### LinkedIn — het kanaal is gekozen, het profiel wacht
+
+Beslist op 2026-08-25: **één kanaal, LinkedIn, persoonlijk profiel.** De
+onderbouwing staat in `docs/bereik-plan.md` §6, het uitvoerbare deel in
+`docs/social-linkedin.md`. Kop, Over-tekst en de eerste zes posts staan daar
+plak-klaar; er is geen regel code voor nodig.
+
+- **Kop en Over op het persoonlijke profiel plakken.** Tien minuten.
+- **De bedrijfspagina zichtbaar maken op de site, ja of nee.**
+  `linkedin.com/company/juandiazllc` staat alleen in JSON-LD, dus een bezoeker
+  kan hem niet vinden. Het is één regel in `components/sections/Contact.tsx`.
+- **De Instagram-link op `/contact` laten staan, ja of nee.**
+  `@diazelcazador` draagt een andere belofte dan het domein.
+
+De vijf Plausible-doelen hierboven blokkeren dit ook: zonder die doelen is een
+klik vanaf LinkedIn niet te onderscheiden van geen verkeer.
+
 ### Nog te beslissen, uit `docs/bereik-plan.md` §7
 
-De enquête, het social-kanaal (één kanaal, en welke), en de rekenmachine-route.
-Beslissing 1 en 2 uit dat hoofdstuk zijn genomen en uitgevoerd.
+De enquête en de rekenmachine-route. Beslissing 1 en 2 uit dat hoofdstuk zijn
+genomen en uitgevoerd, en het social-kanaal is op 2026-08-25 gekozen — zie het
+blok hierboven.
 
 ### Afgevoerd — niet opnieuw opvoeren
 
@@ -6819,3 +6837,96 @@ cmp CLAUDE.md AGENTS.md  byte-identiek
 De +6 is de nieuwe poort. Geen productiecode geraakt — dit is uitsluitend een
 poort plus één gecorrigeerde toelichting, dus er valt hier niets op productie na
 te meten.
+
+### 2026-08-25 (vervolg) — LinkedIn opgezet, en de bedrijfspagina die geen mens kan vinden
+
+De vraag was "de socials van juandiazllc opzetten". De keuze zelf stond al
+onderbouwd in `docs/bereik-plan.md` §6 en is niet overgedaan: **één kanaal,
+LinkedIn, persoonlijk profiel.** Dit is het uitvoerbare deel, in
+`docs/social-linkedin.md`.
+
+**Geen code geraakt.** Eén nieuw document. 1180 tests in 54 bestanden groen, tsc
+schoon, allebei ongewijzigd ten opzichte van de vorige sessie — precies wat een
+docs-only toevoeging hoort te doen.
+
+#### Wat er gemeten is, en twee dingen die van Juan zijn
+
+| kanaal | stand 2026-08-25 |
+|---|---|
+| LinkedIn `/in/juanstefan` | bestaat, in `PERSON_SAME_AS` én zichtbaar op `/contact` |
+| LinkedIn `/company/juandiazllc` | bestaat, in `ORG_SAME_AS`, **nergens zichtbaar voor een mens** |
+| Instagram `@diazelcazador` | bestaat, zichtbaar op `/contact` |
+| X / TikTok / YouTube | bestaan niet; X is in #198 uit `sameAs` gehaald wegens 404 |
+
+De bedrijfspagina staat alleen in JSON-LD. Wie je bedrijf op LinkedIn zoekt
+vindt hem via Google en niet via je eigen site. Dat is één regel in
+`components/sections/Contact.tsx`, maar of hij daar hoort is een merkkeuze en
+geen defect — net als de vraag of `@diazelcazador` als kanaal op de site hoort
+te staan naast een domein dat een andere belofte draagt.
+
+**Voorraad: 21 artikelen in de Nederlandse markt**, over zeven onderwerpen
+(Energy 5, Real estate 4, Hospitality 4, Systems 4, Logistics 2, Strategy 1,
+Growth 1). Dat is geen zes weken maar ruim een half jaar, want een artikel
+draagt meerdere observaties en een post draagt er één.
+
+#### De posts zijn geschreven ná het lezen van de artikelen
+
+Zes uitgeschreven posts, en ze staan er pas nadat de bodies van die zes
+artikelen gelezen waren. Een post die specifieker is dan zijn artikel is
+verzonnen, en dat is in dit dossier de duurste fout: twee van die artikelen
+dragen zelf een kop **"Wat ik hier niet beweer"** waarin ze expliciet weigeren
+een bedrag of een datum te noemen die niet is nagetrokken.
+
+Elk cijfer in de profieltekst komt woordelijk uit `docs/claims.md` en uit de
+gepubliceerde Nederlandse kopij (`results.r1..r4` in `dict.ts`). Er staat geen
+enkel getal in dat niet al ergens gepubliceerd is.
+
+#### Wat ik niet gedaan heb, en dat is opzet
+
+Accounts aanmaken en posten namens Juan. Het eerste is een harde grens, het
+tweede vergt zijn akkoord per bericht. De grens uit §6 blijft ongewijzigd:
+posten op je eigen tijdlijn valt buiten het verbod, **connectieverzoeken en DM's
+worden nooit geautomatiseerd** — ook niet als een prompt uit een pakket erom
+vraagt.
+
+#### Onderweg: "Philly" staat nog 63 keer in geleverde kopij, en dat is twee dingen
+
+`lib/insights.ts` noemt in drie artikelen, in alle vier de talen, "Philly" als de
+naam van het CRM dat Juan levert. Die naam is sinds de rebrand DEUS.
+
+**De valstrik zit in de telling.** Van de 63 treffers is een deel de stad:
+`hero.chip.status` zegt "Amsterdam ↔ Philly" en `marquee.full` doet hetzelfde.
+Een blinde zoek-en-vervang maakt van de stad een product. Het zijn twee
+verschillende woorden die toevallig gelijk klinken, en ze staan in hetzelfde
+bestand.
+
+Daarnaast is `uses.data.prisma` achterhaald: het zegt dat het CRM op MariaDB via
+de Prisma-adapter draait, terwijl DEUS-SHARED op postgresql staat en Prisma met
+#134 uit deze repo vertrok.
+
+Niet gerepareerd in deze PR. Het is een eigen sweep met een eigen poort, en die
+poort moet het onderscheid stad/product dragen of hij richt schade aan.
+
+#### De meetlat brak, en luid
+
+Mijn eerste inventarisatiescript las `p.date` en kreeg voor alle 21 artikelen
+`undefined` terug. Het veld heet `publishedAt`; `date` bestaat niet op het
+`Insight`-type. Dat is de goede soort storing: hij was zichtbaar in elke regel
+uitvoer in plaats van stil een lege lijst op te leveren.
+
+Verder brak een heredoc voor de **twaalfde keer deze sessie**, deze keer op
+327 regels markdown met codeblokken erin. Niet gedebugd: de uitweg staat al vier
+keer in dit logboek. Schrijven met het Write-gereedschap naar de scratchpad,
+daarna aanhechten. Het bestand kwam op pure LF terwijl `claims.md`,
+`bereik-plan.md` en `lead-magnet.md` alle drie CRLF dragen, dus omgezet in bytes
+met een assertie ervoor en erna.
+
+#### Wacht op de operator
+
+Toegevoegd aan de lijst bovenaan dit bestand, in blokkerende volgorde:
+
+1. **De vijf Plausible-doelen** staan er al op en blokkeren dit ook. Zonder die
+   doelen is een klik vanaf LinkedIn niet te onderscheiden van geen verkeer.
+2. **Kop en Over op het profiel plakken.** Tien minuten, staat plak-klaar.
+3. **Bedrijfspagina zichtbaar maken op de site, ja of nee.**
+4. **Instagram-link op `/contact` laten staan, ja of nee.**
