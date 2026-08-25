@@ -120,7 +120,7 @@ export const VRAGEN: readonly Vraag[] = [
     id: "A3",
     blok: "A",
     vraag: "Staat de actuele status van een deal op één plek, en niet in meerdere systemen naast elkaar?",
-    kost: "Bij meerdere is er geen antwoord op “hoe staat het ervoor”, alleen meningen. Wie gelijk had blijkt pas bij de klacht.",
+    kost: "Bij meerdere is er geen antwoord op \"hoe staat het ervoor\", alleen meningen. Wie gelijk had blijkt pas bij de klacht.",
   },
   {
     id: "A4",

@@ -45,7 +45,7 @@ const NIET_MEER: Record<string, string> = {
     '"Construction-trained" / "Bouwkundig getraind" hebben.',
   Bauingenieurlich:
     "bestaat niet als bijwoord, en Bauingenieur is bovendien een ander vak " +
-    "dan bouwmanagement. Gebruik “bautechnisch”.",
+    'dan bouwmanagement. Gebruik "bautechnisch".',
   Hotellerie:
     "derde woord voor dezelfde sector naast Hospitality (13×) en " +
     "Gastgewerbe (3×). Stond in tag.label.hospitality, dus in de H1 en de " +
