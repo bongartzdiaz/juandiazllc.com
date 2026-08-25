@@ -6108,3 +6108,184 @@ dat het bestand zijn regeleinden houdt — dat bepaalt de leeslaag, niet de patc
   typografiepoort ligt wel over het Engels, maar bewaakt tekens en geen register.
 - **Zeven Spaanse sleutels blijven onpersoonlijk** waar het Nederlands de lezer
   aanspreekt. Verdedigbaar Spaans; waarneming, geen defect.
+
+### 2026-08-25 (vervolg) — de zeven Spaanse sleutels waren er drie, en de imperatief was voor elke laag onzichtbaar
+
+Het laatste openstaande punt uit #252, dat via #253 en #254 was meegesleept:
+"zeven Spaanse sleutels blijven onpersoonlijk waar het Nederlands de lezer
+aanspreekt". Bij het hermeten hield de premisse geen stand, en wat eronder lag
+was groter dan de vraag.
+
+#### Het getal zeven verliep zonder dat iemand hem hertelde
+
+`ONPERSOONLIJK` droeg er **drie**, niet zeven, en alle drie hielden stand. Het
+getal is drie PR's lang overgeschreven in plaats van gemeten — het vierde geval
+deze maand dat een cijfer uit dit logboek binnen dagen veroudert.
+
+Met een **Engelse getuige** gemeten leverde de brede sweep vijf kandidaten op,
+geen van alle bruikbaar: in alle vijf spreken nl én de de lezer óók niet aan.
+Engels is simpel gulzig met "you". Met een **Duitse getuige** kwamen er 22
+kandidaten uit, waarvan er 4 vals waren en 18 echt:
+
+| categorie | n |
+|---|---|
+| Spaans spreekt de lezer al aan met een tú-imperatief | 13 |
+| `nosotros`-vorm die de lezer insluit (`Dibujemos`, `empecemos`) | 3 |
+| bewust onpersoonlijk, al vrijgesteld (`process.1.body`) | 1 |
+| **echt uit de pas** | **1** |
+
+Die ene is `about.pr.1`: en, nl en de dragen daar een imperatief
+("skip a phase", "sla een fase over", "überspringen Sie eine Phase") en het
+Spaans een infinitief ("saltarse una fase"). Nu `sáltate una fase`.
+
+#### Het werkelijke gat: dertien sleutels die geen enkele laag kon zien
+
+Die dertien uit de eerste rij zijn geen ruis maar het defect. **Laag 1** verbiedt
+`elija`, `haga`, `traiga`, `salga`, `toque` en `cierre` niet — nagemeten, want ze
+zijn allemaal óók aanvoegende wijs, dezelfde dubbelzinnigheidsklasse als de al
+gedocumenteerde `quiere` en `vea`. **Laag 3** bekijkt die sleutels niet eens,
+omdat het Nederlands er imperatieven zonder voornaamwoord gebruikt: "Kies een
+tijdslot" spreekt de lezer aan zonder je/jij/jouw, dus de gekoppelde regel komt
+er niet aan toe.
+
+Schreef iemand `Elige` om naar `Elija`, dan meldde niets iets. Dertien sleutels,
+op de oppervlakken waar een bezoeker converteert.
+
+#### De Duitse getuige, en waarom de zinsgrens hem bruikbaar maakt
+
+Duits legt onafhankelijk vast **dát** een zin de lezer aanspreekt, want de
+beleefdheidsvorm draagt een hoofdletter: `Sie`, `Ihnen`, `Ihr(e)`. De
+dubbelzinnigheid is dat `Sie`/`Ihnen` ook "zij/hen" betekenen — en die is precies
+met de zinsgrens op te lossen, omdat aan het begin van een zin élk woord een
+hoofdletter draagt. Alleen een treffer **midden in** een zin telt.
+
+Dat is geen aanname: van de 22 treffers waren er precies 4 zinsbeginnend, en
+alle vier betekenden ze "zij/hen". De grensregel haalt die vier eruit **zonder
+één uitzondering** — een uitzonderingslijst met vier namen erin zou dezelfde
+uitkomst geven en niets verklaren.
+
+#### De markerlijst en de verbodslijst zijn asymmetrisch
+
+Dit stond impliciet in het bestand (bij `pruebas`) en staat er nu uitgeschreven,
+want het bepaalt waar dubbelzinnigheid mag zitten:
+
+- een woord bij **TU_MARKERS** maakt de poort **toegeeflijker** — het ergste
+  geval is een gemiste treffer;
+- een woord bij **NIET_MEER** maakt hem **strenger** — het ergste geval is vals
+  alarm op correcte kopij, en dan wordt de poort binnen een week uitgezet.
+
+Vandaar dat `elige`, `trae`, `toca` en `cierra` wél markers mogen zijn terwijl
+ze ook derde persoon zijn, en dat alleen ondubbelzinnige vormen erbij komen in
+de verbodslijst: `inténtelo` en `contáctenos`, allebei imperatief met aangehecht
+voornaamwoord.
+
+`Dibujemos` en `empecemos` staan in een **eigen** verzameling `WIJ_INCLUSIEF`.
+Ze werken hetzelfde — de zin betrekt de lezer erbij — maar het zijn geen
+tú-vormen, en ze tussen de tú-markers zetten legt een onwaarheid vast op precies
+de plek waar een volgende sessie hem vertrouwt. Een poort eist dat de twee
+verzamelingen elkaar niet raken.
+
+#### De poort vond zelf de veertiende sleutel, en meteen daarna mijn fout
+
+Na het toevoegen van de markers bleef er één over die ik niet had geclassificeerd:
+`five-phases.body[9].text`. Alle vier de talen dragen daar een imperatief — en
+"Ship", nl "Lever", de "Liefern **Sie**", es "Entrega" — dus `entrega` hoorde bij
+de markers.
+
+**En dat brak meteen iets anders.** De verouderingscontrole meldde binnen één run
+dat `five-phases.excerpt` "niet meer onpersoonlijk" was. Terecht: die zin luidt
+*"un edificio no se **entrega** a ojo"* — de onpersoonlijke passieve constructie,
+en mijn nieuwe marker liet hem als aanspreking gelden. Precies de prijs die ik in
+de toelichting bij de asymmetrie had opgeschreven, één minuut na het opschrijven.
+
+De reparatie is niet de marker schrappen maar de constructie uitsluiten: `se` +
+derde persoon is nooit een imperatief, want een tú-imperatief neemt `-te`. Eén
+regel, en beide detecties blijven kloppen.
+
+**Een verouderingscontrole is geen formaliteit.** Deze ving een zelfgemaakt
+gat in de run waarin het ontstond.
+
+#### De onderbouwing bij `process.1.body` klopte niet
+
+Die zei: "en zegt 'before touching anything' en es 'antes de tocar nada', allebei
+zonder onderwerp, en **alleen nl** voegt 'je' toe." Het Duits zegt daar *"bevor
+**Sie** etwas anfassen"* en spreekt de lezer dus net zo goed aan. Twee getuigen,
+niet één.
+
+Die fout was ook niet te controleren zolang er geen Duitse laag was — de
+uitzondering verdedigde zichzelf met een taal die niemand naast de zin legde.
+
+#### Eén opbouw voor drie talen
+
+Laag 3 leest de Nederlandse kant, laag 4 de Duitse. Twee eigen opbouwen zouden
+uiteenlopen en dan bewaakt de zwakste — de bugklasse waar dit logboek het vaakst
+op terugkomt. Er is nu één `kopij(taal)` waar beide uit worden afgeleid, en één
+`esSpreektAan` dat beide lagen delen.
+
+Ook de verouderingscontrole leest nu **beide** lagen. Alleen laag 3 lezen zou
+`process.1.body` als "niet meer waar" hebben aangemerkt en juist de vrijstelling
+weghalen die hem overeind houdt.
+
+#### Veertien mutaties, veertien keer de voorspelde kleur
+
+Twaalf rood, twee groen als controle, groen na herstel, nul sporen.
+
+De twee sprekendste zijn `about.pr.1` en `five-phases.body[9].text` terugzetten
+naar usted: **allebei vallen ze uitsluitend op laag 4**, want het Nederlands
+draagt er geen je/jij en laag 3 kan ze per constructie niet bereiken. Dat is het
+executeerbare bewijs dat de nieuwe laag dekking toevoegt in plaats van te
+dubbelen.
+
+Zes mutaties richten zich op de **poort zelf**: de getuige blind maken, de
+zinsgrens weghalen, de `se`-regel slopen, een wij-vorm tussen de tú-markers
+zetten, laag 4 de Nederlandse kopij laten lezen, en een marker uit de lijst
+halen. Zonder die zes is een groene uitkomst ook te verklaren door een getuige
+die niets ziet.
+
+De groene controle zet `usted` en `inténtelo` in een **commentaar** in
+`lib/signals.ts` en hoort onzichtbaar te blijven — deze poorten lezen de
+geëxporteerde data en niet de bestandstekst.
+
+Het harnas meldde één "spoor" dat er geen was: de vervanging
+`koppel(kopij("nl"))` is óók de legitieme regel voor `GEKOPPELD`. Per anker
+nagemeten in plaats van op de melding afgegaan.
+
+#### Gemeten
+
+Op een productiebuild, met de poort vooraf aantoonbaar vrij (nul sockets, niet
+alleen nul luisteraars) en het startlog gelezen om te bevestigen dat het mijn
+eigen proces was.
+
+```
+/{en,nl,de,es}/about   status 200 · eigen vorm 1x · infinitiefvorm 0x
+"saltarse una fase" over vijf /es-pagina's        0x
+positieve controles                               6/6
+AFWIJKINGEN                                       0
+```
+
+```
+tsc --noEmit             exit 0
+vitest run               1163 tests in 52 bestanden (was 1155/52)
+i18n:check               718 sleutels × 4 (ongewijzigd: alleen een waarde)
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +8 is uitgesplitst: 4 in laag 4, 3 in de nieuwe overlap-poort, 1 zelftest op
+de `se`-regel.
+
+#### Wat hierna nog open staat
+
+- **Er is geen Engelse poort**, en die is in deze vorm ook niet te bouwen: het
+  Engels kent het register-onderscheid niet dat de andere drie bewaken. Wel
+  ligt de symptoom-poort van #252 en de typografiepoort van #253/#254 over het
+  Engels — die bewaken gelijkheid en tekens, geen register.
+- **Zeven Spaanse sleutels blijven onpersoonlijk** — dat punt is hiermee
+  gesloten en vervalt. Het waren er drie, ze zijn alle drie onderbouwd, en de
+  onderbouwing is nu ook controleerbaar.
+- **Het omgekeerde net bestaat niet, en is ook niet gemeten.** Deze vier lagen
+  vinden Spaans dat de lezer níét aanspreekt terwijl een andere taal dat wel
+  doet. De andere richting — Spaans dat aanspreekt waar nl en de dat allebei
+  niet doen — ziet niemand. Of dat een defect zou zijn is bovendien de vraag;
+  het is eerder stijlverschil dan registerfout.

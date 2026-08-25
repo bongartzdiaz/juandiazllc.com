@@ -2665,7 +2665,7 @@ const es: Dict = {
   "about.focus.hosp.body": "Operadores multi-ubicación donde el front-of-house y el back-office hablan idiomas distintos. Nuestro carril: hacerles coincidir en un solo número.",
   "about.focus.adj.name": "Cerca del operador",
   "about.focus.adj.body": "Logística, oficios, home services. Cualquier cosa donde los ingresos se ganan en el campo y se pierden en la oficina porque los sistemas nunca se conocieron.",
-  "about.pr.1": "Survey, blueprint, build, commission, operate — saltarse una fase y se fuga.",
+  "about.pr.1": "Survey, blueprint, build, commission, operate — sáltate una fase y se fuga.",
   "about.pr.2": "Compra el commodity. Construye el foso.",
   "about.pr.3": "El equipo de campo es el usuario principal. El dashboard es una consecuencia.",
   "about.pr.4": "Si cuesta más de tres toques, no va a pasar.",

@@ -6,7 +6,7 @@ import { POSTS } from "../insights";
 import { SIGNALS } from "../signals";
 import { faqStrings } from "../seo/faqs";
 
-/* Drie poorten op het Spaanse register.
+/* Vier poorten op het Spaanse register.
  * ───────────────────────────────────────────────────────────────────────────
  *
  * AANLEIDING. De Spaanse site is tú, op 24 vindplaatsen na die usted zeiden.
@@ -38,11 +38,24 @@ import { faqStrings } from "../seo/faqs";
  *      `priv.optout.body`; deze regel ving ze wel, omdat het Nederlands ernaast
  *      onafhankelijk vastlegt dát de zin de lezer aanspreekt.
  *
+ *   4. De Duitse getuige. Laag 3 mist elke zin waar het Nederlands een
+ *      imperatief gebruikt: "Kies een tijdslot" spreekt de lezer aan zonder
+ *      je/jij/jouw, dus zo'n sleutel komt de gekoppelde regel niet eens
+ *      binnen. Het Duits legt datzelfde feit wel vast, want de
+ *      beleefdheidsvorm draagt daar een hoofdletter: Sie, Ihnen, Ihr(e).
+ *
+ *      De dubbelzinnigheid is dat Sie/Ihnen ook "zij/hen" betekenen. Die is
+ *      op te lossen met de zinsgrens — aan het begin van een zin draagt elk
+ *      woord een hoofdletter, dus alleen een treffer MIDDEN in een zin telt.
+ *      Gemeten op 25 augustus: van de tweeëntwintig treffers waren er precies
+ *      vier zinsbeginnend, en alle vier betekenden ze "zij/hen". De
+ *      grensregel haalt die vier eruit zonder een enkele uitzondering.
+ *
  * WAT DEZE POORT NIET ZIET. Of het Spaans klópt — daar is een lezer voor.
  * Een usted-zin waar het Nederlands de lezer niet aanspreekt. En kopij die
  * via een prop van een oudercomponent binnenkomt.
  *
- * Alle drie lezen de geëxporteerde data en niet de bestandstekst, zodat dit
+ * Alle vier lezen de geëxporteerde data en niet de bestandstekst, zodat dit
  * bestand niet struikelt over zijn eigen toelichting — waarin de verboden
  * vormen nu eenmaal moeten staan. Bewezen met een groene mutatie. */
 
@@ -90,6 +103,8 @@ const NIET_MEER: Record<string, string> = {
   introduzca: 'usted-imperatief van introducir, in roi.lede. Nu "introduce".',
   escríbanos: "zelfde vorm, kwam niet voor; staat er zodat hij niet binnensluipt.",
   déjenos: "zelfde vorm in de wij-variant; kwam niet voor en hoort dat zo te houden.",
+  inténtelo: "usted-imperatief met clitic; de tú-vorm inténtalo staat in form.err.network.",
+  contáctenos: "usted-imperatief met clitic; de tú-vorm contáctanos staat in de sector-FAQ.",
 };
 
 /* Vormen die in het Spaans ÓÓK derde persoon zijn en daarom bewust NIET op de
@@ -146,8 +161,36 @@ const TU_MARKERS = [
   // let op: "pruebas" is ook een zelfstandig naamwoord. Hier staat het als
   // werkwoord ("Pruebas bajo carga", nl "Je test onder ..."). Het marker-zijn
   // maakt de poort op dat punt iets toegeeflijker, niet valser.
+  // TÚ-IMPERATIEVEN. Deze ontbraken allemaal, en dat was het grootste gat in
+  // deze poort: een imperatief is de meest voorkomende manier waarop Spaanse
+  // UI-kopij de lezer aanspreekt, en laag 3 kon zo'n sleutel niet eens
+  // bereiken. Dertien sleutels stonden op 25 augustus voor élke laag
+  // onzichtbaar — schreef iemand `Elige` om naar `Elija`, dan meldde niets iets.
+  //
+  // Sommige zijn ook derde persoon (él elige, él trae, él toca). Dat mag hier,
+  // en het mag in NIET_MEER juist niet. De lijsten zijn asymmetrisch: een
+  // marker erbij maakt de poort TOEGEEFLIJKER — het ergste geval is een
+  // gemiste treffer. Een verbod erbij maakt hem strenger, en het ergste geval
+  // daar is vals alarm op correcte kopij, waarna de poort binnen een week
+  // wordt uitgezet. Zelfde afweging als bij "pruebas" hierboven.
+  "haz", "elige", "introduce", "trae", "sal", "toca", "cierra",
+  // "entrega" is ook zelfstandig naamwoord (levering). Zelfde afweging.
+  "entrega",
+  "compra", "construye", "parte",
+  // met aangehecht voornaamwoord — ondubbelzinnig tú
+  "inténtalo", "cuéntame", "contáctanos", "escríbeme",
   "pruebas",
 ];
+
+/* Eerste persoon meervoud die de lezer INSLUIT: "laten we ...". Dat is geen
+ * tú-vorm en geen usted-vorm maar een derde manier om de lezer erbij te
+ * betrekken, en hem tussen de tú-markers zetten zou een onwaarheid vastleggen
+ * op precies de plek waar een volgende sessie hem vertrouwt. Zelfde werking,
+ * eerlijke naam. */
+const WIJ_INCLUSIEF: Record<string, string> = {
+  dibujemos: 'insluitend "laten we tekenen" — de lezer zit in het onderwerp.',
+  empecemos: 'insluitend "laten we beginnen".',
+};
 
 /* Sleutels waar het Nederlands de lezer aanspreekt en het Spaans bewust
  * niemand aanspreekt. Elk met de constructie erbij, want zonder reden wordt
@@ -161,10 +204,12 @@ const TU_MARKERS = [
 const ONPERSOONLIJK: Record<string, string> = {
   "process.1.body":
     'infinitief als processtap: "Ver lo que realmente está pasando antes de tocar nada". ' +
-    "Hier is het NEDERLANDS de afwijkende taal: en zegt 'before touching " +
-    "anything' en es 'antes de tocar nada', allebei zonder onderwerp, en " +
-    "alleen nl voegt 'je' toe. De infinitief is bovendien de Spaanse vorm " +
-    "voor een processtap.",
+    "Het Engels zegt 'before touching anything' zonder onderwerp en het " +
+    "Spaans 'antes de tocar nada'; nl ('voordat je iets aanraakt') en de " +
+    "('bevor Sie etwas anfassen') spreken de lezer allebei wél aan. Twee " +
+    "getuigen dus, niet één — de eerdere lezing dat alleen het Nederlands " +
+    "dat deed was onjuist, en niet te controleren zolang er geen Duitse laag " +
+    "was. De infinitief is de Spaanse vorm voor een processtap.",
   "help-mij-besparen.summary":
     'derde persoon over het publiek: "que muestra a los hogares neerlandeses". ' +
     "De lezer is hier het onderwerp van de zin niet — de tool is dat, en de " +
@@ -276,35 +321,89 @@ describe("de verbodslijst blijft smal", () => {
 
 /* ── laag 3: de gekoppelde regel ──────────────────────────────────────────── */
 
-/** Elk sleutelpad waar nl informeel aanspreekt en es geen tú-vorm draagt. */
+/** Spreekt de Spaanse zin de lezer aan — met tú of insluitend wij? Eén
+ *  oordeel voor laag 3 en laag 4, want twee kopieën lopen uiteen en dan
+ *  bewaakt de zwakste. */
+function esSpreektAan(es: string): boolean {
+  const ws = woorden(es);
+  return ws.some(
+    (w, i) =>
+      /* `se` + derde persoon is de onpersoonlijke of passieve constructie en
+         nooit een imperatief — een tú-imperatief neemt -te, niet -se. Zonder
+         deze regel telt "un edificio no se entrega a ojo" als aanspreking, en
+         dan onderdrukt de marker `entrega` een echte treffer in
+         five-phases.excerpt. Gevangen door de verouderingscontrole hieronder,
+         binnen één run na het toevoegen van die marker. */
+      ws[i - 1] !== "se" &&
+      (TU_MARKERS.includes(w) || w in WIJ_INCLUSIEF),
+  );
+}
+
+/** Elk sleutelpad waar nl informeel aanspreekt en es niemand aanspreekt. */
 function ongepaard(paren: Array<[pad: string, nl: string, es: string]>): string[] {
   return paren
     .filter(([, nl]) => woorden(nl).some((w) => NL_INFORMEEL.includes(w)))
-    .filter(([, , es]) => !woorden(es).some((w) => TU_MARKERS.includes(w)))
+    .filter(([, , es]) => !esSpreektAan(es))
+    .map(([pad, , es]) => `${pad} → "${es.slice(0, 70)}"`);
+}
+
+/** Spreekt de Duitse zin de lezer aan met de beleefdheidsvorm, MIDDEN in een
+ *  zin? De hoofdletter onderscheidt Sie/Ihr van "zij/hen", en aan het begin
+ *  van een zin draagt elk woord er een — daar is het onderscheid dus weg.
+ *  Geen lookbehind: een gewone lus over de treffers leest makkelijker en werkt
+ *  overal hetzelfde. */
+function deSpreektAan(zin: string): boolean {
+  const kaal = zin.replace(/<[^>]*>/g, " ");
+  const re = /(?:Sie|Ihnen|Ihr(?:e|em|en|er|es)?)(?![A-Za-z\u00c0-\u00ff])/g;
+  for (let m = re.exec(kaal); m; m = re.exec(kaal)) {
+    // voorafgegaan door witruimte, en het teken daarvóór sluit geen zin af
+    if (/[^.!?:\s]\s+$/.test(kaal.slice(0, m.index))) return true;
+  }
+  return false;
+}
+
+/** Elk sleutelpad waar het Duits de lezer middenin een zin aanspreekt en
+ *  het Spaans niemand aanspreekt. */
+function ongepaardDuits(paren: Array<[pad: string, de: string, es: string]>): string[] {
+  return paren
+    .filter(([, de]) => deSpreektAan(de))
+    .filter(([, , es]) => !esSpreektAan(es))
     .map(([pad, , es]) => `${pad} → "${es.slice(0, 70)}"`);
 }
 
 /* De koppeling per bron. Insights doet niet mee: de Spaanse artikelen zijn
  * marktspecifiek en hebben geen Nederlandse tegenhanger onder dezelfde slug,
- * dus daar valt niets te paren. Voor die bron doet laag 1 het werk. */
-const GEKOPPELD: Array<[pad: string, nl: string, es: string]> = [
-  ...Object.keys(DICT.nl).map(
-    (k) => [k, DICT.nl[k] ?? "", DICT.es[k] ?? ""] as [string, string, string],
-  ),
-  ...[...SECTORS, ...VENTURES, ...SIGNALS].flatMap((r) => {
-    const nl = new Map(plat(r.i18n?.nl ?? {}, r.slug));
-    const es = new Map(plat(r.i18n?.es ?? {}, r.slug));
-    return [...nl].map(([pad, v]) => [pad, v, es.get(pad) ?? ""] as [string, string, string]);
-  }),
+ * dus daar valt niets te paren. Voor die bron doet laag 1 het werk.
+ *
+ * Eén opbouw voor drie talen, geen drie lijsten naast elkaar. Laag 3 leest de
+ * Nederlandse kant en laag 4 de Duitse; zouden die elk hun eigen opbouw
+ * krijgen, dan lopen ze uiteen en bewaakt de zwakste. */
+function kopij(taal: "nl" | "de" | "es"): Map<string, string> {
+  const m = new Map<string, string>();
+  const zet = (rs: Herkomst[]) => rs.forEach(([k, v]) => m.set(k, v));
+  zet(Object.entries(DICT[taal]));
+  zet(
+    [...SECTORS, ...VENTURES, ...SIGNALS].flatMap((r) =>
+      // de drie typen dragen elk een eigen L10n-vorm, dus de unie is niet
+      // met een variabele sleutel te indexeren; plat() neemt toch unknown
+      plat((r.i18n as Record<string, unknown> | undefined)?.[taal] ?? {}, r.slug),
+    ),
+  );
   /* Op pad gekoppeld en niet op index: een sector die in één taal een vraag
      mist, verschuift dan niet stilzwijgend alle antwoorden erachter. */
-  ...(() => {
-    const es = new Map(faqStrings("es"));
-    return faqStrings("nl").map(
-      ([pad, nl]) => [pad, nl, es.get(pad) ?? ""] as [string, string, string],
-    );
-  })(),
-];
+  zet(faqStrings(taal));
+  return m;
+}
+
+const ES_KOPIJ = kopij("es");
+
+/** Elke sleutel van `bron`, met de Spaanse tegenhanger ernaast. */
+function koppel(bron: Map<string, string>): Array<[string, string, string]> {
+  return [...bron].map(([pad, v]) => [pad, v, ES_KOPIJ.get(pad) ?? ""]);
+}
+
+const GEKOPPELD: Array<[pad: string, nl: string, es: string]> = koppel(kopij("nl"));
+const GEKOPPELD_DE: Array<[pad: string, de: string, es: string]> = koppel(kopij("de"));
 
 describe("waar het Nederlands de lezer aanspreekt, doet het Spaans dat ook", () => {
   const paden = new Set(GEKOPPELD.map(([p]) => p));
@@ -317,6 +416,16 @@ describe("waar het Nederlands de lezer aanspreekt, doet het Spaans dat ook", () 
   it("gaat af op een zin die de lezer met usted aanspreekt", () => {
     expect(ongepaard([["proef", "Laat je gegevens achter", "Deje sus datos"]])).toHaveLength(1);
     expect(ongepaard([["proef", "Laat je gegevens achter", "Deja tus datos"]])).toEqual([]);
+  });
+
+  it("telt een imperatief wel en dezelfde vorm achter `se` niet", () => {
+    /* De tú-imperatieven in TU_MARKERS zijn deels ook derde persoon. De
+       onderscheidende constructie is `se`; zonder die regel is elke passieve
+       zin een aanspreking. */
+    expect(esSpreektAan("Entrega los sistemas que desbloquean la cifra.")).toBe(true);
+    expect(esSpreektAan("Un edificio no se entrega a ojo.")).toBe(false);
+    expect(esSpreektAan("El método se traslada limpiamente.")).toBe(false);
+    expect(esSpreektAan("Dibujemos el plano juntos.")).toBe(true);
   });
 
   it("laat geen sleutel over buiten de uitzonderingen", () => {
@@ -333,7 +442,15 @@ describe("waar het Nederlands de lezer aanspreekt, doet het Spaans dat ook", () 
   });
 
   it("draagt geen uitzondering die niet meer waar is", () => {
-    const gemeten = new Set(ongepaard(GEKOPPELD).map((r) => r.split(" → ")[0]));
+    /* Beide lagen, want een uitzondering kan door laag 4 gedragen worden en
+       niet door laag 3 — process.1.body is precies dat geval. Alleen laag 3
+       lezen zou hem dan als "niet meer waar" aanmerken en de vrijstelling
+       weghalen die hem overeind houdt. */
+    const gemeten = new Set(
+      [...ongepaard(GEKOPPELD), ...ongepaardDuits(GEKOPPELD_DE)].map(
+        (r) => r.split(" → ")[0],
+      ),
+    );
     const verouderd = Object.keys(ONPERSOONLIJK).filter((k) => !gemeten.has(k));
     expect(
       verouderd,
@@ -368,6 +485,70 @@ describe("waar het Nederlands de lezer aanspreekt, doet het Spaans dat ook", () 
     const zonder = Object.entries(ONPERSOONLIJK).filter(([, r]) => r.trim().length < 20);
     expect(zonder.map(([k]) => k)).toEqual([]);
     expect(Object.keys(ONPERSOONLIJK).every((k) => paden.has(k))).toBe(true);
+  });
+});
+
+/* ── laag 4: de Duitse getuige ───────────────────────────────────── */
+
+describe("waar het Duits de lezer aanspreekt, doet het Spaans dat ook", () => {
+  it("leest werkelijk beide talen", () => {
+    expect(GEKOPPELD_DE.length).toBeGreaterThan(700);
+    expect(GEKOPPELD_DE.some(([, de, es]) => de && es)).toBe(true);
+    // en de getuige vindt daadwerkelijk iets in die kopij
+    expect(GEKOPPELD_DE.filter(([, de]) => deSpreektAan(de)).length).toBeGreaterThan(5);
+  });
+
+  it("telt Sie en Ihr alleen midden in een zin", () => {
+    /* Zonder deze zes is elke groene uitkomst hieronder ook te verklaren door
+       een getuige die niets ziet, of door één die overal op afgaat. */
+    expect(deSpreektAan("Wir zeigen Ihnen die Zahlen.")).toBe(true);
+    expect(deSpreektAan("Überspringen Sie eine Phase und es leckt.")).toBe(true);
+    expect(deSpreektAan("Sie sehen die Zahlen.")).toBe(false);
+    expect(deSpreektAan("Das ist es. Sie sehen es.")).toBe(false);
+    expect(deSpreektAan("Wir wissen, wenn sie kommen.")).toBe(false);
+    expect(deSpreektAan("Die Zahlen liegen bereit.")).toBe(false);
+  });
+
+  it("gaat af op een zin die de lezer met usted aanspreekt", () => {
+    expect(ongepaardDuits([["proef", "Lassen Sie Ihre Daten da", "Deje sus datos"]]))
+      .toHaveLength(1);
+    expect(ongepaardDuits([["proef", "Lassen Sie Ihre Daten da", "Deja tus datos"]]))
+      .toEqual([]);
+  });
+
+  it("laat geen sleutel over buiten de uitzonderingen", () => {
+    const over = ongepaardDuits(GEKOPPELD_DE).filter(
+      (r) => !(r.split(" → ")[0] in ONPERSOONLIJK),
+    );
+    expect(
+      over,
+      "Het Duits spreekt de lezer hier aan en het Spaans niemand. Drie geldige " +
+        "oplossingen: de zin is usted (herschrijf hem naar tú), de zin is tú met " +
+        "een vorm die nog niet in TU_MARKERS staat (zet hem erbij), of het " +
+        "Spaans is hier bewust onpersoonlijk (ONPERSOONLIJK, met de " +
+        "constructie erbij).",
+    ).toEqual([]);
+  });
+});
+
+describe("de twee manieren om de lezer aan te spreken raken elkaar niet", () => {
+  it("houdt de insluitende wij-vorm buiten TU_MARKERS", () => {
+    /* Een wij-vorm die als tú-marker genoteerd staat legt een onwaarheid vast
+       op de plek waar een volgende sessie hem vertrouwt. */
+    const dubbel = Object.keys(WIJ_INCLUSIEF).filter((w) => TU_MARKERS.includes(w));
+    expect(dubbel).toEqual([]);
+  });
+
+  it("noemt bij elke wij-vorm een reden", () => {
+    const zonder = Object.entries(WIJ_INCLUSIEF).filter(([, r]) => r.trim().length < 20);
+    expect(zonder.map(([w]) => w)).toEqual([]);
+  });
+
+  it("verbiedt geen vorm die als marker of insluitend geldt", () => {
+    const fout = Object.keys(NIET_MEER).filter(
+      (v) => TU_MARKERS.includes(v) || v in WIJ_INCLUSIEF,
+    );
+    expect(fout).toEqual([]);
   });
 });
 
