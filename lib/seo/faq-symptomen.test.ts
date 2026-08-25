@@ -21,18 +21,14 @@ import { SERVICES_FAQ_BY_LOCALE } from "./faqs";
  * Splitst iemand het routeringsantwoord in vieren, dan is dat geen defect —
  * de eis is dat de zin ergens in de SERVICES-FAQ van die taal staat.
  *
- * DE APOSTROF WORDT GENORMALISEERD, en dat is geen verzwakking om de poort
- * groen te krijgen. Gemeten op 24 augustus: `faqs.ts` schrijft 9× de rechte
- * apostrof en 0× de krul, `dict.ts` 94× recht en 11× krul. Alleen
- * `services.engine.symptom` (en) valt aan de krulkant, en `don’t` tegen
- * `don't` is een typografisch verschil en geen inhoudelijk. Welke van de twee
- * vormen huisstijl is, is een aparte vraag over de hele codebase; die wordt
- * hier niet stilzwijgend beantwoord. */
-
-/** Rechte apostrof, zodat `don’t` en `don't` als dezelfde zin tellen. */
-export function eenApostrof(tekst: string): string {
-  return tekst.replace(/[‘’]/g, "'");
-}
+ * DE VERGELIJKING IS WOORDELIJK. Tot 25 augustus stond hier een normalisator
+ * die de gekrulde apostrof (U+2019) en de rechte gelijkstelde, omdat
+ * `services.engine.symptom` (en) de
+ * enige sleutel was die een gekrulde apostrof droeg. Die vraag is inmiddels
+ * beslist — de hele codebase schrijft de rechte apostrof, bewaakt door
+ * `lib/typografie.test.ts` — dus de normalisator is weg en de vergelijking is
+ * strenger geworden. Eén zorg, één poort: gaat er ooit weer een krul in de
+ * kopij, dan valt de typografiepoort om en niet deze. */
 
 /** De slugs waarvoor `dict.ts` een symptoomzin draagt — afgeleid, niet ingetypt. */
 function symptoomSlugs(l: Locale): string[] {
@@ -45,14 +41,6 @@ function symptoomSlugs(l: Locale): string[] {
 const antwoorden = (l: Locale) => (SERVICES_FAQ_BY_LOCALE[l] ?? []).map((it) => it.a);
 
 describe("de FAQ citeert de symptoomzinnen van /services", () => {
-  it("normaliseert alleen de apostrof en verder niets", () => {
-    /* Zonder deze drie is elke groene uitkomst hieronder ook te verklaren door
-       een normalisator die te veel gelijkmaakt. */
-    expect(eenApostrof("don’t")).toBe("don't");
-    expect(eenApostrof("don't")).toBe("don't");
-    expect(eenApostrof("Números en los que no confías")).toBe("Números en los que no confías");
-  });
-
   it("leidt in elke taal dezelfde vier slugs af", () => {
     const en = symptoomSlugs("en");
     expect(
@@ -65,12 +53,12 @@ describe("de FAQ citeert de symptoomzinnen van /services", () => {
     }
   });
 
-  it("draagt elke symptoomzin ergens in de SERVICES-FAQ van diezelfde taal", () => {
+  it("draagt elke symptoomzin woordelijk in de SERVICES-FAQ van diezelfde taal", () => {
     const mis: string[] = [];
     for (const l of LOCALES) {
-      const tekst = antwoorden(l).map(eenApostrof);
+      const tekst = antwoorden(l);
       for (const slug of symptoomSlugs(l)) {
-        const zin = eenApostrof(DICT[l][`services.${slug}.symptom`] ?? "");
+        const zin = DICT[l][`services.${slug}.symptom`] ?? "";
         if (zin === "" || !tekst.some((a) => a.includes(zin))) {
           mis.push(`${l} services.${slug}.symptom :: ${zin || "(leeg)"}`);
         }
@@ -79,15 +67,16 @@ describe("de FAQ citeert de symptoomzinnen van /services", () => {
     expect(
       mis,
       "Deze symptoomzinnen staan op /services maar worden door geen enkel " +
-        "SERVICES-FAQ-antwoord in die taal geciteerd. Werk het antwoord bij in " +
-        "lib/seo/faqs.ts — of, als de zin bewust anders moet luiden, haal het " +
-        "citaat dan uit de FAQ in plaats van deze verwachting op te rekken.",
+        "SERVICES-FAQ-antwoord in die taal woordelijk geciteerd. Werk het " +
+        "antwoord bij in lib/seo/faqs.ts — of, als de zin bewust anders moet " +
+        "luiden, haal het citaat dan uit de FAQ in plaats van deze verwachting " +
+        "op te rekken.",
     ).toEqual([]);
   });
 
   it("vindt een verzonnen symptoomzin níét", () => {
     /* De vorige test slaagt ook wanneer `includes` alles waar maakt. */
-    const tekst = antwoorden("en").map(eenApostrof);
+    const tekst = antwoorden("en");
     expect(tekst.some((a) => a.includes("A vendor contract on your windowsill"))).toBe(false);
   });
 });

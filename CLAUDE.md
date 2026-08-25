@@ -5758,3 +5758,163 @@ die twee poorten kregen alleen de nieuwe bron erbij.
 - **Zeven Spaanse sleutels blijven onpersoonlijk** waar het Nederlands de lezer
   aanspreekt. Dat is verdedigbaar Spaans; het staat als waarneming en niet als
   defect.
+
+### 2026-08-25 — de apostrof recht, en een poort die zichzelf niet hoeft uit te zonderen
+
+Het laatste openstaande punt uit #252: `dict.ts` schreef 94 keer een rechte
+apostrof en elf keer een gekrulde, de andere kopijmodules uitsluitend recht.
+Welke vorm huisstijl is, was nooit beslist. **Beslist door Juan op 2026-08-25:
+recht, overal.**
+
+#### Eerst geteld, omdat één positie het gevaarlijk maakt
+
+Twintig gekrulde apostroffen in de getrackte broncode. De verdeling telde
+minder dan de vraag waarin ze stonden:
+
+| afbakening | n | risico |
+|---|---|---|
+| dubbele aanhalingstekens | 12 | geen |
+| backtick | 4 | geen |
+| geen (tekst, JSX, commentaar) | 4 | geen |
+| **enkele aanhalingstekens** | **0** | zou de string breken |
+
+Die laatste rij is de hele reden dat er geteld is voordat er iets veranderde.
+Een rechte apostrof binnen een single-quoted TS-string sluit de string; nul
+treffers daar maakt de omzetting een tekstvervanging in plaats van een
+herschrijving. De byte-rekensom bevestigde elke stap: een krul is 3 bytes UTF-8
+en een rechte 1, dus elf omzettingen moeten een bestand precies 22 bytes kleiner
+maken. `dict.ts` ging van 247.948 naar 247.926.
+
+#### De normalisator kon weg, en dat is een strengere poort
+
+`lib/seo/faq-symptomen.test.ts` uit #252 bewaakt dat de vier symptoomzinnen op
+`/services` woordelijk in de SERVICES-FAQ terugkomen. Hij droeg een
+normalisator die beide apostrofvormen gelijkstelde, omdat `dict.ts` de gekrulde
+schreef waar `faqs.ts` de rechte schreef.
+
+Die is niet weggehaald op vertrouwen. Eerst is gemeten dat de invariant
+**woordelijk** standhoudt — 16 van de 16 over vier talen en vier diensten —
+en pas daarna is de normalisator geschrapt. Zo is het een strikt strengere
+vergelijking geworden in plaats van een stille verzwakking. Vier tests werden
+er drie.
+
+#### De poort heeft geen uitzonderingslijst, en dat is een constructie
+
+Dit logboek telt vier poorten die op hun eigen toelichting struikelden:
+`contactadressen`, `persoon-entiteit`, `verzoeklimiet` en `server-acties`. De
+standaardreparatie is een commentaarstrip of een uitzondering voor het
+testbestand zelf. Allebei verzwakken de poort.
+
+Hier kon het anders. Een poort die een teken verbiedt moet dat teken normaal
+gesproken zelf dragen om te kunnen bewijzen dat hij werkt.
+`String.fromCharCode(0x2019)` bouwt het uit zijn codepunt op, dus
+`lib/typografie.test.ts` is zelf schoon en wordt gewoon meegescand. **Nul
+uitzonderingen betekent hier ook werkelijk nul** — geen lijst, geen strip, geen
+zelfvrijstelling.
+
+De prijs is dat de uitleg het teken niet mag tonen, en die prijs is meteen
+betaald: bij de eerste run viel de poort om op drie regels commentaar waarin ik
+het verschil had willen demonstreren. Dat was terecht en niet lastig — de
+oplossing is het teken benoemen (U+2019) in plaats van het te zetten. Vier keer
+eerder was zo'n treffer een defect in de meetlat; deze keer was het de meetlat
+die zijn werk deed op de auteur.
+
+#### Acht mutaties, acht keer de voorspelde kleur
+
+Zeven rood op vijf verschillende asserties, één groen als controle, groen na
+herstel, nul sporen achtergebleven.
+
+De sprekendste is een krul in een **commentaar** in `lib/booking.ts`. Die valt
+om, en dat is het executeerbare bewijs dat er geen commentaarstrip in zit — de
+poort ziet elke regel, ook de uitleg. De groene controle zet er juist een
+rechte apostrof bij en hoort onzichtbaar te blijven.
+
+Drie mutaties richten zich op de poort zelf in plaats van op de kopij: het
+codepunt verkeerd opbouwen, de bronboom leegmaken, en de bestandswandeling
+alleen nog `.tsx` laten zien. Alle drie rood, elk op een andere assertie. Zonder
+die drie zou een groene uitkomst ook te verklaren zijn door een scanner die
+niets leest.
+
+#### Wat er bewust níét is omgezet
+
+- **Zestien gekrulde dubbele aanhalingstekens** (acht in `.ts`/`.tsx`, acht in
+  de logboeken). Juan zei apostrof; dubbele aanhalingstekens zijn een aparte
+  vraag en die is niet gesteld. Ze zijn geteld en genoteerd, niet stilzwijgend
+  meegenomen.
+- **Twee logboekregels in `CLAUDE.md` en `AGENTS.md`.** Die beschrijven juist
+  dit verschil en hebben de krul nodig om hem te kunnen tonen. Markdown rendert
+  bovendien geen sitekopij, en logboekgeschiedenis wordt hier niet herschreven.
+  De derde markdown-treffer stond in `docs/claims.md` en was gewone kopij in een
+  levend document — die is wel omgezet.
+
+Dat markdown erbuiten valt staat in de kop van de poort, met de meting erbij,
+zodat een volgende sessie niet denkt dat een groen vinkje hier "de hele repo"
+betekent.
+
+#### Onderweg braken twee meters
+
+**Negende escape-incident, en de eerste in de andere richting.** Het
+mutatie-anker voor de slug-regex droeg een verdubbelde backslash waar het
+bestand er één heeft — ik overcompenseerde voor een escaping-laag die er niet
+was. Het harnas meldde `ANKER 0x` en sloeg de mutatie over in plaats van
+stilzwijgend niets te doen. Acht van de acht eerdere incidenten waren
+halveringen; deze was een verdubbeling. De uitweg is dezelfde: tel wat er in het
+bestand staat, niet wat je denkt te typen.
+
+**`netstat | grep -c ':3291 '` telt sockets, geen luisteraars.** Na het stoppen
+van de meetserver gaf die telling 44, wat leest als "de server draait nog". Het
+waren 43 TIME_WAIT-verbindingen van mijn eigen 23 curls plus één rest; LISTENING
+stond op 0. Dezelfde check gaf vóór het starten 0 en klopte toen toevallig.
+**Splits op verbindingstoestand** — anders is een poort na een meetronde altijd
+"bezet" en ga je een proces zoeken dat niet bestaat.
+
+En de productiesonde raadde opnieuw de verkeerde pagina: `sectors.d.others.body`
+staat op de vier sector-**detail**pagina's en niet op de index, dus meldde hij
+"ONTBREEKT" voor kopij die er gewoon stond. Derde keer deze maand. De sonde
+zoekt elke zin over álle opgehaalde pagina's; wat hier miste was de pagina zelf.
+
+#### Meting
+
+Op een productiebuild, met de poort vooraf aantoonbaar vrij en het startlog
+gelezen om te bevestigen dat het mijn eigen proces was.
+
+```
+23 pagina's, vier talen
+  gekrulde apostrof in de geserveerde HTML      0
+  omgezette kopij, recht en aanwezig            3 van de 3
+  positieve controles                           4 van de 4
+AFWIJKINGEN                                     0
+```
+
+De vier positieve controles staan er omdat nul pas een meting is nadat het
+instrument bewees te kunnen vinden: de teller vindt een krul als die er is,
+vindt er geen in rechte tekst, kan de doelzin op `/en/services` bereiken, en de
+entiteit-decodering werkt.
+
+```
+tsc --noEmit             exit 0
+vitest run               1154 tests in 52 bestanden (was 1152/51)
+i18n:check               718 sleutels x 4 (ongewijzigd: alleen waardes)
+regen:pricing:check      groen
+next build               groen
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +2 is uitgesplitst: +3 in de nieuwe typografiepoort, -1 in `faq-symptomen`
+doordat de normalisator en zijn zelftest samen vervielen.
+
+Gekrulde apostroffen in de repo: **0 in `.ts` en `.tsx`**, 2 in markdown (de
+twee logboekregels hierboven).
+
+#### Wat hierna nog open staat
+
+Ongewijzigd ten opzichte van #252, plus één nieuw punt.
+
+- **Er is geen Engelse poort**, en die is in deze vorm ook niet te bouwen. De
+  typografiepoort is wel het tweede net dat over het Engels ligt, maar hij
+  bewaakt een teken en geen register.
+- **Zeven Spaanse sleutels blijven onpersoonlijk** waar het Nederlands de lezer
+  aanspreekt. Verdedigbaar Spaans; waarneming, geen defect.
+- **Zestien gekrulde dubbele aanhalingstekens.** Dezelfde vraag als de apostrof,
+  nooit gesteld. Acht ervan staan in geleverde code
+  (`app/[locale]/services/page.tsx`, `lib/lekkage-scan.ts` en twee testbestanden).
