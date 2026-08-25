@@ -525,7 +525,7 @@ horen erbij:
 Toen dit blok werd geschreven stond er dat een levende telling "nergens in deze
 repo bestaat". **Dat was onwaar.** `components/Capacity.tsx` staat sinds april
 2026 op `/contact` en toont vier blueprint-plekken per kwartaal met het aantal
-dat nog vrij is. Het draagt precies wat zo’n getal nodig heeft:
+dat nog vrij is. Het draagt precies wat zo'n getal nodig heeft:
 
 | | |
 | --- | --- |

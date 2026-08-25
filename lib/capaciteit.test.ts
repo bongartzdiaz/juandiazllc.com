@@ -204,7 +204,7 @@ describe("de capaciteitszin", () => {
     // (SLOTS_REMAINING), een houdbaarheidsdatum (LAST_VERIFIED) en een poort
     // die rood wordt zodra die veroudert.
     //
-    // Toen deze poort werd geschreven stond in docs/claims.md dat zo’n telling
+    // Toen deze poort werd geschreven stond in docs/claims.md dat zo'n telling
     // "nergens in deze repo bestaat". Dat was onwaar en is daar gecorrigeerd.
     // De regel is niet "geen aftellend getal" maar "geen aftellend getal zonder
     // onderhouden bron".
