@@ -110,6 +110,7 @@ operator de bovenste leest; de lijst zelf begint eronder.
 | `marketing.leads` en `marketing.subscribers` | 0 rijen, ooit |
 | DNS TXT `juandiazllc.com` | `google-site-verification=ABrD7ZNd…` staat er, naast SPF |
 | Ahrefs `subscription-info-limits-and-usage` (gratis endpoint) | `{"error":"Insufficient plan"}` |
+| `diaz-appsumo-redeem`, code zonder dev-formaat, beide projecten | `invalid-code-format` — en die reden komt uit één tak: **dev-mode staat aan** op het levende project. Zie hieronder |
 
 De probe op de twee meldingsfuncties raakt niets: de auth-controle staat vóór de
 JSON-parse en het versturen staat erna, dus `400 invalid-json` scheidt "open" van
@@ -166,12 +167,42 @@ transcript-stempels op de seconde maken die lezing overbodig.
 |---|---|---|
 | Stripe | **vbozel** | 19 rijen in `diaz_editor.processed_events`, de laatste van **23 augustus** — alle negentien `checkout.session.expired`, nul `completed` |
 | Lemon | **vbozel** | `LEMON-SQUEEZY.md` op `origin/main` noemt het endpoint tweemaal, beide keren vbozel |
-| AppSumo | **onbekend** | geen enkel document in die repo noemt een endpoint |
+| AppSumo | **vbozel** — en de vraag was verkeerd gesteld | de koppeling is *pull*: onze functie belt AppSumo, AppSumo belt ons nooit. De twee bestanden die het endpoint wél dragen noemen allebei vbozel |
 
 Alle zes licenties op vbozel zijn met de hand uitgegeven: nul `stacked_codes`,
 nul die AppSumo of Lemon noemen, nul met een Stripe-payment-intent. Geen enkele
-provider heeft dus ooit een licentie laten uitgeven. De enige onbekende is de
-AppSumo-instelling, en dat is een dashboard dat van hieruit niet te lezen is.
+provider heeft dus ooit een licentie laten uitgeven.
+
+**De AppSumo-vraag is op 2026-08-25 beantwoord, en hij was verkeerd gesteld.**
+Er ís geen AppSumo-instelling die ergens naartoe wijst, want de koppeling loopt
+de andere kant op: `diaz-appsumo-redeem/index.ts:73` belt `api.appsumo.com`, en
+AppSumo belt ons nooit. Wat het endpoint wél draagt zijn twee bestanden, en die
+noemen allebei vbozel — `landing/redeem.html:169` en `index.live-test.ts:25`,
+met **nul** wbgio-verwijzingen. De pagina staat publiek: `diazatlas.com/redeem`
+geeft 200. Ingewisseld is er nooit iets, en de deal is nooit ingediend —
+`docs/APPSUMO-INDIENEN.md` is een leeg invulblad en de marktplaats-audit zet
+AppSumo op *Draft compleet, wacht op screenshots*. **Daarmee houdt niets de tien
+dode functies meer tegen.**
+
+**Maar dezelfde meting legde iets anders bloot, en dat is dringender.** Het
+endpoint antwoordde op beide projecten met `invalid-code-format`, en die reden
+komt uit precies één tak (regel 100): de dev-mode. Dus `APPSUMO_API_KEY` en
+`APPSUMO_API_SECRET` staan niet gezet en `APPSUMO_DEV_MODE=true` wél — op het
+levende project. De toelichting drie regels erboven benoemt precies dit gevaar:
+*nooit fail-open in productie — zonder deze vlag weigeren we (503), anders zou
+iedereen een gratis (enterprise-)lifetime-key kunnen minten*. De vlag staat aan.
+Een POST met een zelfverzonnen code in het dev-formaat, zonder enige
+authenticatie, komt daarmee langs de codecontrole en loopt door naar de uitgifte.
+
+**Dat is niet gedemonstreerd, en dat hoefde ook niet.** De drie takken geven drie
+verschillende antwoorden — `invalid-code` bij gezette sleutels,
+`invalid-code-format` in dev-mode, 503 `service-unavailable` als beide ontbreken
+— dus de gemeten reden identificeert de tak zonder dat er ooit een geldige code
+aan te pas komt. Zie [[feedback_poort_testen_zonder_bijwerking]]: kies een invoer
+die ná de controle maar vóór de bijwerking faalt.
+
+Op wbgio is het gat toevallig onschadelijk — daar is `diaz_editor` gedropt, dus
+een geldige dev-code loopt stuk op de database. Op **vbozel** niet.
 
 **Eén val staat er nog wél, en die is scherper dan de tien dode functies.**
 `supabase/README.md` in `bongartzdiaz/diaz-editor` instrueert nog steeds om de
@@ -285,12 +316,20 @@ herschreven, en deze notitie is de correctie erop.
 
 ### Supabase en Stripe
 
+- **`APPSUMO_DEV_MODE` uitzetten op `vbozelswveaxsyccvaac`** — Edge Functions →
+  Secrets. Gemeten op 2026-08-25 staat `diaz-appsumo-redeem` daar publiek open in
+  dev-mode, waarin een zelfverzonnen code in het formaat `DIAZ-APPSUMO-T3-…` langs
+  de codecontrole komt en op een gratis lifetime-licentie uitkomt. De functie is
+  ontworpen om zónder die vlag met 503 te weigeren, dus uitzetten ís de reparatie.
+  **Doe dit vóór de tien dode functies** — die zijn dood, deze leeft. Zie de
+  meting hierboven.
 - **Leaked-password protection** aanzetten op `wbgiouuifqhasedncysw` — de enige
   WARN uit de advisors die actie vergt.
 - **Tien dode `diaz-*` edge functions** op wbgio en **vijf dubbele slugs** op
   vbozel. Wát er nog naartoe schreef: niets. Stripe en Lemon wijzen aantoonbaar
-  naar vbozel; alleen de **AppSumo-instelling** is van hieruit niet te lezen —
-  kijk die na, dan kunnen de tien weg. Zie de tabel hierboven.
+  naar vbozel, en de AppSumo-vraag is op 2026-08-25 beantwoord — er ís geen
+  AppSumo-instelling, want die koppeling loopt de andere kant op. **Er staat niets
+  meer voor; de tien kunnen weg.** Zie de tabel hierboven.
 - ~~De README in `bongartzdiaz/diaz-editor` wijst de Stripe-webhook naar het
   dode project.~~ **Gemarkeerd op 2026-08-25** met #640 (`208192b`): elf
   verwijzingen over twee bestanden, allemaal voorzien van een waarschuwing.
