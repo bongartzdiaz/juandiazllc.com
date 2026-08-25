@@ -21,20 +21,35 @@
 //    functie niet. ACK_FROM moet een geverifieerd domein zijn.
 //
 // 3. Het ontvangeradres komt UITSLUITEND uit de database, nooit uit de
-//    envelop, en zonder bestaande rij wordt er niets verstuurd. Dat is geen
-//    netheid maar een slot: het endpoint draait met verify_jwt=false en de
-//    gedeelde sleutel `lead_notify_secret` staat op 2026-08-16 niet in de
-//    vault, dus iedereen die de URL kent mag posten. Zou de envelop het adres
-//    mogen bepalen, dan is dit een open mailrelay die namens Juan verstuurt.
-//    Nu kan een vreemde hooguit een bevestiging herhalen voor een lead die
-//    toch al een bevestiging zou krijgen — en punt 3b vangt zelfs dat af.
+//    envelop, en zonder bestaande rij wordt er niets verstuurd. Zou de envelop
+//    het adres mogen bepalen, dan is dit een open mailrelay die namens Juan
+//    verstuurt.
+//
+//    DE ONDERBOUWING HIERONDER IS OP 2026-08-25 GECORRIGEERD. Er stond dat
+//    `lead_notify_secret` op 2026-08-16 niet in de vault stond en dat dus
+//    iedereen die de URL kende mocht posten. Die sleutel is diezelfde dag om
+//    16:22:38 UTC alsnog toegevoegd — de regel was waar op het moment van
+//    schrijven en een paar uur later niet meer. Wat wél bleef staan was de
+//    functiekant: `LEAD_NOTIFY_SECRET` was nooit gezet, en de poort liet bij
+//    een ontbrekende sleutel dóór in plaats van te weigeren. Sinds
+//    `auth.ts` is dat fail-closed.
+//
+//    Deze eigenschap blijft desondanks staan, en niet uit netheid: hij is de
+//    tweede laag. Valt de poort ooit open — verkeerde env, een regressie —
+//    dan kan een vreemde hooguit een bevestiging herhalen voor een lead die
+//    toch al een bevestiging zou krijgen, en punt 3b vangt zelfs dat af.
 //
 // 3b. Een al bevestigde rij wordt overgeslagen. Idempotent bij herhaling.
 //
-// Altijd 200, net als lead-notify: de lead staat op dit moment al veilig in de
-// database en een non-2xx laat pg_net alleen maar opnieuw proberen tegen een
-// verkeerde instelling die een retry niet repareert. Het antwoordlichaam zegt
-// precies wat er gebeurd is en wordt door pg_net bewaard in net._http_response.
+// Altijd 200 NA DE POORT, net als lead-notify: de lead staat op dat moment al
+// veilig in de database, en het antwoordlichaam zegt precies wat er gebeurd is
+// en wordt door pg_net bewaard in net._http_response.
+//
+// Die regel gold nooit voor de poort zelf — die gaf al 405 en 401. Sinds
+// 2026-08-25 komt daar 503 `not-configured` bij, zodat een ontbrekende sleutel
+// te onderscheiden is van een verkeerde. Zie de kopnotitie van auth.ts.
+
+import { beoordeelAuth } from './auth.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? null
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? null
@@ -225,11 +240,16 @@ async function verstuur(lead: Lead, taal: Taal): Promise<string> {
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return j({ ok: false, error: 'method-not-allowed' }, 405)
 
-  if (LEAD_NOTIFY_SECRET) {
-    const auth = req.headers.get('authorization') ?? ''
-    if (!auth.includes(LEAD_NOTIFY_SECRET)) return j({ ok: false, error: 'unauthorized' }, 401)
-  } else {
-    console.warn('LEAD_NOTIFY_SECRET ongezet — endpoint staat open')
+  const oordeel = beoordeelAuth(LEAD_NOTIFY_SECRET, req.headers.get('authorization'))
+  if (!oordeel.ok) {
+    if (oordeel.error === 'not-configured') {
+      console.error(
+        '[lead-acknowledge] LEAD_NOTIFY_SECRET ontbreekt of is te kort — dit endpoint weigert ' +
+          'alles. Zet in Edge Functions -> Secrets dezelfde waarde als het vault-secret ' +
+          '`lead_notify_secret`, anders komt ook de trigger er niet doorheen.',
+      )
+    }
+    return j({ ok: false, error: oordeel.error }, oordeel.status)
   }
 
   let payload: unknown

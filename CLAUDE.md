@@ -292,8 +292,16 @@ herschreven, en deze notitie is de correctie erop.
    `marketing.leads`" onbeslist tussen geen-verkeer en geen-conversie, en die
    vraag ligt onder alle andere.
 3. **`LEAD_NOTIFY_SECRET`** in Supabase → Edge Functions → Secrets, met dezelfde
-   waarde als `lead_notify_secret` in Database → Vault. Dat sluit `lead-notify`
-   (nu fail-open) én `lead-acknowledge`. **Vóór stap 4.**
+   waarde als `lead_notify_secret` in Database → Vault. Die vault-sleutel staat
+   er sinds 2026-08-16 16:22:38 UTC (44 tekens, base64url), dus de triggerkant
+   is klaar — wat ontbreekt is de functiekant. Dit sluit `lead-notify`, dat nog
+   fail-open is. **Vóór stap 4.**
+
+   Voor `lead-acknowledge` is de code sinds 2026-08-25 fail-closed, maar dat
+   werkt pas na uitrollen. **Zet de sleutel vóór je die functie uitrolt** —
+   andersom antwoordt hij op elke lead 503 `not-configured` en schrijft hij geen
+   `ack_channel` meer weg. Vandaag kost die volgorde niets (nul leads ooit, geen
+   Resend-sleutel), maar hij blijft die.
 4. **`RESEND_API_KEY` + `ACK_FROM`** op een geverifieerd domein. Zonder die twee
    gaat er bij een echte lead geen enkele mail de deur uit — gemeten, niet
    vermoed. Pas ná stap 3, anders geef je een publiek aanroepbaar endpoint een
@@ -7067,3 +7075,136 @@ zegt in plaats van te doen alsof. `SENTRY_DSN` leegmaken (bewust uit) of een
 echte DSN zetten (aan) blijft operator-werk, en de rest van de keten — cal,
 lead-notify, Resend, de vijf Plausible-doelen, de AppSumo-vlag — is
 onveranderd wat het was.
+
+### 2026-08-25 (vervolg) — lead-acknowledge fail-closed, en mijn eigen waarschuwing sloeg op de andere functie
+
+De vorige sessie bood dit aan als volgende stap en zette er meteen een rem op:
+*fail-closed vóór het secret bestaat breekt de werkende Telegram-melding.* Die
+zin klopte niet, en dat bleek pas bij het nameten.
+
+**Telegram hoort bij `lead-notify`. Die functie woont niet in deze repo.**
+`lead-acknowledge` doet alleen de ontvangstbevestiging per e-mail, en die is
+dood zolang `RESEND_API_KEY` niet gezet is — gemeten op 20 augustus als
+`{"sent":false,"channel":"skipped:no-api-key"}`. Ik had twee functies met
+dezelfde poortvorm tot één samengevat en de eigenschap van de ene op de andere
+geplakt.
+
+#### Wat er gemeten is voordat er iets veranderde
+
+| | stand 2026-08-25 |
+|---|---|
+| vault `lead_notify_secret` op wbgio | **staat er**, sinds 16 aug 16:22:38 UTC · 44 tekens · base64url · geen witruimte |
+| trigger `leads_acknowledge_new` stuurt `Authorization: Bearer` | ja, zodra de vault leesbaar is |
+| functie-env `LEAD_NOTIFY_SECRET` | **niet gezet** — bewezen door de 400-probe |
+| aanroepers buiten de trigger | **geen**. CI raakt hem niet, `check-lead-path.sh` doet bewust alleen GET |
+| auto-deploy van edge functions in deze repo | **geen workflow** |
+
+Van de vault is alleen de **lengte en de tekenset** opgevraagd, nooit de waarde.
+
+Die laatste twee rijen maken de afweging rond: fail-closed kan vandaag niets
+breken dat werkt, want het enige dat belt is de trigger — en die draagt de
+sleutel al.
+
+#### De kopnotitie droeg een feit dat een paar uur na het schrijven verliep
+
+Punt 3 van `index.ts` zei dat `lead_notify_secret` *op 2026-08-16 niet in de
+vault staat, dus iedereen die de URL kent mag posten*. Die sleutel is diezelfde
+dag om 16:22:38 UTC alsnog toegevoegd. De regel was waar toen hij geschreven
+werd en een paar uur later niet meer — en op die achterhaalde regel rustte de
+onderbouwing van de fail-open.
+
+Wat er wél bleef staan was de functiekant. Dit is dezelfde klasse als de
+Sentry-guard van eerder vandaag: **de code vroeg of de variabele gezet was, niet
+of hij bruikbaar was.**
+
+```js
+if (LEAD_NOTIFY_SECRET) { ...401... } else { console.warn('endpoint staat open') }
+```
+
+Twee gaten in vier regels. De `else` liet dóór in plaats van te weigeren. En
+`auth.includes(SECRET)` is een substring-vergelijking: met een sleutel van één
+teken komt elke header die dat teken bevat erdoor — set-but-unusable, precies
+een `SENTRY_DSN` die op de tekst `optional` staat.
+
+#### Drie uitkomsten, en dat is opzet
+
+```
+sleutel onbruikbaar               -> 503 not-configured
+sleutel goed, header fout/afwezig -> 401 unauthorized
+beide goed                        -> door
+```
+
+Eén blanco 401 op de eerste twee is goedkoper te schrijven en duurder te
+diagnosticeren: dan is *de functie staat niet ingesteld* niet te scheiden van
+*jij stuurde de verkeerde sleutel*, en juist dat onderscheid moet met een
+onschadelijke probe te meten zijn. Zie
+[[feedback_poort_testen_zonder_bijwerking]]. Het huis doet dit al zo —
+`/api/cal` antwoordt 503 `not-configured`, `diaz-appsumo-redeem` 503
+`service-unavailable`.
+
+De ondergrens op de sleutel is 16 tekens tegen 44 in de vault. Bewust ruim
+eronder: een te strenge controle zet de keten uit op het moment dat hij aan
+hoort te gaan, en dat is een ergere fout dan de fout die gerepareerd wordt.
+Dezelfde klem als bij `dsnLooksUsable()` een paar uur eerder.
+
+#### `exclude` in tsconfig is een filter, geen muur
+
+`index.ts` opent met `Deno.serve(...)` op moduleniveau, en `tsconfig.json`
+sluit `supabase/functions` uit omdat tsc `Deno` niet kent. Daarmee lag de hele
+functie buiten élke poort in deze repo — en dat is precies waar het defect zat.
+
+De beslissing staat nu in `supabase/functions/lead-acknowledge/auth.ts`: geen
+enkele Deno-global, geen env-lezing, sleutel als parameter. Dezelfde naad als
+`initSentry(injected?)`. En omdat `lib/lead-acknowledge-auth.test.ts` hem
+importeert, **typecheckt tsc hem alsnog** — `exclude` filtert de wortelset, maar
+een geïmporteerd bestand wordt gewoon meegenomen. Stond de test naast de
+functie, dan draaide hij wel onder vitest en typecheckte niets hem: `vitest
+groen` is geen `tsc groen`, zoals #252 liet zien.
+
+#### De poort heeft twee lagen die elkaar niet overlappen
+
+De beslissing is echt uitvoerbaar getest. Maar het defect zat in de
+**bedrading**, niet in de logica — een `else`-tak die dóórliet — en een
+module-import kan die per definitie niet zien. Daarom er een tekstscan op
+`index.ts` naast, via de gedeelde `zonderCommentaar` uit `lib/bronscan.ts`.
+
+Mijn eerste versie van die scan was te zwak, en dat was aan de asserties niet te
+zien: hij pinde de **vorm van het oude defect** (`console.warn`,
+`.includes`), zodat een nieuwe fail-open met andere woorden erlangs glipte. Er
+staat nu ook een assertie op de bewaking zelf (`if (!oordeel.ok)` gevolgd door
+een `return`). Control-flow verifiëren kan een tekstscan niet — dat is zijn
+grens en die staat opgeschreven — maar de bewaking verdwijnt nu alleen nog met
+een zichtbare bewerking.
+
+#### Elf mutaties, elf keer de voorspelde kleur
+
+Tien rood op negen verschillende asserties, één groen als controle. Het
+discriminerende paar draagt het bewijs dat de strip dragend is: dezelfde
+defecttekst als **commentaar** blijft groen (10), en met de strip uitgezet wordt
+hij rood (11). Zonder dat paar is groen ook te verklaren door een scanner die
+niets leest.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1213 tests in 56 bestanden (was 1196/55)
+i18n:check               718 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +17 is de nieuwe poort. Geen kopij geraakt en geen route: dit is een edge
+function plus een poort, dus er valt hier niets in de browser na te meten.
+
+#### Wat dit niet doet
+
+**Het rolt niets uit.** Er staat geen deploy-workflow voor edge functions in
+deze repo, en uitrollen is een productieschrijfactie op het leadpad — dat blijft
+operator-werk. De code is fail-closed; de functie op Supabase draait tot die
+uitrol nog de oude, open versie.
+
+En één claim in de kop van `index.ts` is **niet** nagemeten: dat een non-2xx
+pg_net laat hertrylen. Die zin is gescopet naar het zakelijke pad in plaats van
+weggehaald, want de poort gaf al 405 en 401 — dat de regel daar niet gold is uit
+de code zelf af te lezen, los van de vraag of de premisse klopt.
