@@ -165,14 +165,21 @@ nakijken of Lemon of AppSumo nog naar die wbgio-slugs wijzen. De vijf dubbele
 slugs op vbozel staan er nog en zijn alle vijf op **2026-08-04** aangemaakt
 vanaf een CI-runner (`/home/runner/work/diaz-editor/…`).
 
-**Eén datum hierboven is bijgewerkt.** De WARN-tabel zei dat `diaz_editor` op 1
-augustus was gedropt; op wbgio was dat **11 augustus 18:19:56**. De
-migratiehistorie van dat project kent geen enkele migratie op 1 augustus — de
-reeks springt van 29 juli naar `20260811181956 verwijder_dode_diaz_editor_kopie`,
-en het transcript draagt dezelfde seconde. Het incident van 1 augustus dat in het
-logboek van 21 augustus staat (PGRST002 over de hele REST-API) is daarmee niet
-verklaard en niet nagemeten; dat blijft open. Zie
-[[feedback_drop_schema_breekt_postgrest]].
+**Eén datum hierboven is bijgewerkt, en het waren nooit twee gebeurtenissen.**
+De WARN-tabel zei dat `diaz_editor` op 1 augustus was gedropt; op wbgio was dat
+**11 augustus 18:19:56 UTC**. De migratiehistorie van dat project kent geen
+enkele migratie op 1 augustus — de reeks springt van 29 juli naar
+`20260811181956 verwijder_dode_diaz_editor_kopie`, dezelfde seconde als in het
+transcript.
+
+Het PGRST002-incident dat het logboek van 21 augustus op 1 augustus zet, is
+**dezelfde drop**: zelfde project, zelfde schema, zelfde aanleiding (*de dode
+kopie weghalen*). De hele REST-API gaf daarna 503 omdat `diaz_editor` in
+`pgrst.db_schemas` bleef staan, en dat kwam de 12e boven — vandaar die datum in
+[[feedback_drop_schema_breekt_postgrest]]. Er staat dus niets open; er stond
+één gebeurtenis onder drie data. De 1-augustusvermelding in het logboek van 21
+augustus blijft staan zoals hij is: logboekgeschiedenis wordt hier niet
+herschreven, en deze notitie is de correctie erop.
 
 
 ### De meetketen — in blokkerende volgorde
