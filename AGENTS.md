@@ -96,6 +96,55 @@ operator de bovenste las, en dat was de oudste.
 
 Niets hiervan is uit de repo af te leiden, en niets hiervan mag verzonnen worden.
 
+### Hermeten op 2026-08-25 — niets is afgevallen, twee dingen zijn scherper
+
+Elk punt hieronder dat van buitenaf meetbaar is, is op 25 augustus opnieuw
+gemeten. **Geen enkel item is afgevallen.** Deze tabel staat bovenaan omdat de
+operator de bovenste leest; de lijst zelf begint eronder.
+
+| gemeten | uitkomst |
+|---|---|
+| `POST /api/cal` op productie | 503 `{"ok":false,"error":"not-configured"}` — `CAL_WEBHOOK_SECRET` staat nog niet |
+| `lead-notify`, ongeldige JSON zonder auth | **400 `invalid-json`** — nog steeds fail-open |
+| `lead-acknowledge`, idem | 400 `invalid-json` — idem, dus `LEAD_NOTIFY_SECRET` staat niet |
+| `marketing.leads` en `marketing.subscribers` | 0 rijen, ooit |
+| DNS TXT `juandiazllc.com` | `google-site-verification=ABrD7ZNd…` staat er, naast SPF |
+| Ahrefs `subscription-info-limits-and-usage` (gratis endpoint) | `{"error":"Insufficient plan"}` |
+
+De probe op de twee meldingsfuncties raakt niets: de auth-controle staat vóór de
+JSON-parse en het versturen staat erna, dus `400 invalid-json` scheidt "open" van
+"dicht" zonder één bericht te versturen. Zie [[feedback_poort_testen_zonder_bijwerking]].
+
+**De advisors tellen nu negen WARN's, niet één — en dat is geen regressie.**
+De lijst hieronder zegt dat leaked-password de enige WARN is die actie vergt.
+Dat klopt nog steeds, maar wie de advisors opnieuw draait ziet er negen en moet
+weten waarom de andere acht kunnen wachten:
+
+| WARN | n | stand |
+|---|---|---|
+| `auth_leaked_password_protection` | 1 | **de enige die actie vergt** — staat hieronder op de lijst |
+| `*_security_definer_function_executable` | 7 | `handle_new_user`, `notify_new_lead` en `rls_auto_enable` geven `trigger` of `event_trigger` terug en zijn daarmee niet via RPC aanroepbaar; ze dragen wél de PUBLIC-grant, dus het `revoke` hieronder is opruimen. De vierde, `current_org_id()`, is echt aanroepbaar maar heeft **geen** PUBLIC-grant en geeft een ingelogde gebruiker uitsluitend zijn eigen org-id terug |
+| `extension_in_public` (`pg_net`) | 1 | de functies staan in schema `net`, en `net` staat **niet** in `pgrst.db_schemas` van de rol `authenticator` (`public, graphql_public, marketing`). `net.http_post` is dus niet via PostgREST bereikbaar en dit is geen SSRF-gat |
+
+Let op bij het zelf nameten: `current_setting('pgrst.db_schemas')` geeft de
+instelling van de rol waarmee je verbinding maakt. Via de MCP is dat `postgres`,
+en die zegt hier nog `diaz_editor` — een schema dat op 1 augustus is gedropt.
+Lees `rolconfig` van `authenticator`, niet `current_setting`. Zie
+[[feedback_drop_schema_breekt_postgrest]].
+
+**De tien dode `diaz-*` functies op wbgio: eerst uitzoeken wát er nog naartoe
+schrijft.** Alle tien bestaan ook op vbozel, daar op veel hogere versies
+(bijvoorbeeld `diaz-stripe-webhook` v11 hier tegen v36 daar). Maar twee ervan —
+`diaz-affiliate-activate` en `diaz-trial-init` — dragen op wbgio een
+`updated_at` van **2026-08-11**, tien dagen ná het droppen van `diaz_editor` op
+dat project. Of dat een uitrol was of een wijziging aan de platformkant is van
+hieruit niet vast te stellen; wat wél vaststaat is dat er in augustus nog iets
+aan die twee is geschreven. Verwijderen zonder die bron te vinden levert
+functies op die terugkomen. De vijf dubbele slugs op vbozel staan er nog en zijn
+alle vijf op **2026-08-04** aangemaakt vanaf een CI-runner
+(`/home/runner/work/diaz-editor/…`).
+
+
 ### De meetketen — in blokkerende volgorde
 
 1. **Vijf Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
