@@ -251,25 +251,25 @@ export const SECTOR_FAQ_BY_LOCALE: Record<Locale, Record<string, FaqItem[]>> = {
   es: {
     energy: [
       {
-        q: "¿Trabajan con instaladores solares y de baterías?",
+        q: "¿Trabajáis con instaladores solares y de baterías?",
         a: "Sí. Energía es nuestro sector principal — instaladores solares, distribuidores de baterías, operadores de bombas de calor e híbridos. Build típico: cualificación de leads por WhatsApp, reporte de consumo, despacho de instaladores y puesta en marcha.",
       },
       {
         q: "¿Cómo cambia la normativa española de autoconsumo el modelo?",
-        a: "El giro de compensación simplificada a baterías + excedentes desplaza la venta de precio a periodo de retorno. Su funnel necesita una capa de estudio de rendimiento, no solo un presupuesto. Construimos precisamente esa capa.",
+        a: "El giro de compensación simplificada a baterías + excedentes desplaza la venta de precio a periodo de retorno. Tu funnel necesita una capa de estudio de rendimiento, no solo un presupuesto. Construimos precisamente esa capa.",
       },
       {
-        q: "¿Pueden integrarse con ERP o herramientas de field-service existentes?",
+        q: "¿Podéis integraros con ERP o herramientas de field-service existentes?",
         a: "Sí. Integraciones habituales: Holded, Sage 50, A3, Anfix y apps de field-service a medida. Si la integración no existe, la construimos — una capa fina de sincronización que respeta cada herramienta en su dominio.",
       },
     ],
     "real-estate": [
       {
         q: "¿Es para agencias o para agentes individuales?",
-        a: "Ambos, pero el sweet spot son equipos de 3 a 25 agentes en una sola agencia. Agentes en solitario se beneficien más de herramientas estándar; las franquicias nacionales necesitan sistemas enterprise que no construimos.",
+        a: "Ambos, pero el sweet spot son equipos de 3 a 25 agentes en una sola agencia. Agentes en solitario se benefician más de herramientas estándar; las franquicias nacionales necesitan sistemas enterprise que no construimos.",
       },
       {
-        q: "¿Integran con Idealista, Fotocasa o MLS?",
+        q: "¿Integráis con Idealista, Fotocasa o MLS?",
         a: "Sí. Philly procesa feeds de Idealista, Fotocasa y MLS locales (además de IDX/RESO para EE. UU.). Cada inmueble es un objeto first-class del CRM con ofertas, visitas, jornadas abiertas y comisiones asociadas.",
       },
       {
@@ -279,7 +279,7 @@ export const SECTOR_FAQ_BY_LOCALE: Record<Locale, Record<string, FaqItem[]>> = {
     ],
     hospitality: [
       {
-        q: "¿Construyen sistemas PMS?",
+        q: "¿Construís sistemas PMS?",
         a: "No desde cero — integramos con Mews, Cloudbeds y Apaleo. Encima construimos la capa de revenue e inteligencia de huésped: pricing con IA, orquestación de upsell, funnels de reserva directa y reportes que llegan de verdad al GM.",
       },
       {
@@ -287,7 +287,7 @@ export const SECTOR_FAQ_BY_LOCALE: Record<Locale, Record<string, FaqItem[]>> = {
         a: "Trabajamos con operadores de STR con 10+ unidades. Build típico: sync de channel manager, mensajería automatizada, pricing dinámico, rotación de limpieza y un dashboard de operaciones que el equipo de campo realmente abre.",
       },
       {
-        q: "¿Pueden cubrir F&B y eventos junto a habitaciones?",
+        q: "¿Podéis cubrir F&B y eventos junto a habitaciones?",
         a: "Sí. Operadores de uso mixto (hotel boutique + restaurante + eventos privados) son uno de nuestros perfiles más valiosos. Unificamos habitaciones, cubiertos y eventos en una única vista de revenue para el GM.",
       },
     ],
@@ -301,7 +301,7 @@ export const SECTOR_FAQ_BY_LOCALE: Record<Locale, Record<string, FaqItem[]>> = {
         a: "Sí — en particular fundaciones operadas por sus patronos y financiadores medianos. Philly tiene un módulo de filantropía con scoring de donantes, ciclos de subvención, métricas de impacto y gestión de voluntarios.",
       },
       {
-        q: "¿Pueden ayudar con operaciones de family office?",
+        q: "¿Podéis ayudar con operaciones de family office?",
         a: "Sí. Builds típicos: intake de dealflow, gestión de relaciones con LPs, reporte cross-entidad, bóveda de documentos segura. No impuestos ni auditoría — para eso colaboramos con despachos.",
       },
     ],
@@ -580,7 +580,7 @@ export const SERVICES_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
   es: [
     {
       q: "¿Cuál de los cuatro servicios necesito?",
-      a: "Parte del síntoma, no del servicio. Números en los que no confías apuntan a construir el motor de ingresos. Un sistema que nadie mantiene apunta a operaciones fraccionales. Un contrato de proveedor sobre la mesa apunta a asesoría build-vs-buy. Un equipo de campo que adivina apunta a instrumentos.",
+      a: "Parte del síntoma, no del servicio. Números en los que no confías apuntan a construir el motor de ingresos. Un sistema que nadie mantiene apunta a operaciones fraccionales. Un contrato de proveedor sobre tu mesa apunta a asesoría build-vs-buy. Un equipo de campo que adivina apunta a instrumentos.",
     },
     {
       q: "¿Cómo empieza un proyecto?",
@@ -588,7 +588,7 @@ export const SERVICES_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
     },
     {
       q: "¿Cómo se fija el precio?",
-      a: "Por resultado, no por hora. El sprint de diagnóstico cuesta 2.500 € más IVA, y se descuenta íntegro si sigue la construcción. Una construcción es precio fijo para los primeros 90 días de estrategia y desarrollo, seguido de una cuota mensual de operación. La cifra llega tras el diagnóstico, cuando puede ser honesta.",
+      a: "Por resultado, no por hora. El sprint de diagnóstico cuesta 2.500 € más IVA, y se descuenta íntegro si sigue la construcción. Una construcción es precio fijo para los primeros 90 días de estrategia y desarrollo, seguido de una cuota mensual de operación. Recibes la cifra tras el diagnóstico, cuando puede ser honesta.",
     },
     {
       q: "¿Hay que sustituir nuestro CRM actual?",
@@ -612,3 +612,31 @@ export function getHomeFaq(locale: Locale): FaqItem[] {
 export function getContactFaq(locale: Locale): FaqItem[] {
   return CONTACT_FAQ_BY_LOCALE[locale] ?? CONTACT_FAQ_BY_LOCALE.en;
 }
+
+/** Elke FAQ-string van één taal, met het veldpad als sleutel.
+ *
+ *  Bestaat zodat de drie taalpoorten dit bestand kunnen lezen. Tot 24 augustus
+ *  deed geen enkele dat: 58 strings per taal die in geen poort stonden. Het
+ *  kostte wat je verwacht — de vier sector-FAQ's spraken het bedrijf met
+ *  ustedes aan terwijl HOME, CONTACT en SERVICES in ditzelfde bestand vosotros
+ *  zeiden, en dat stond er maanden.
+ *
+ *  Wordt deze lijst niet bijgewerkt bij een nieuwe *_BY_LOCALE-export, dan
+ *  leest de poort stil minder. `lib/seo/faq-dekking.test.ts` telt daarom de
+ *  exports in de bestandstekst en legt dat naast wat hier wordt uitgelezen —
+ *  een module-import kan een export die hij niet noemt per definitie niet zien. */
+export function faqStrings(locale: Locale): Array<[pad: string, waarde: string]> {
+  const uit: Array<[string, string]> = [];
+  const vlak = (naam: string, xs: FaqItem[]) =>
+    xs.forEach((it, i) => {
+      uit.push([`${naam}[${i}].q`, it.q]);
+      uit.push([`${naam}[${i}].a`, it.a]);
+    });
+  vlak("HOME", HOME_FAQ_BY_LOCALE[locale] ?? []);
+  vlak("CONTACT", CONTACT_FAQ_BY_LOCALE[locale] ?? []);
+  vlak("SERVICES", SERVICES_FAQ_BY_LOCALE[locale] ?? []);
+  const sectoren = SECTOR_FAQ_BY_LOCALE[locale] ?? {};
+  for (const slug of Object.keys(sectoren)) vlak(`SECTOR.${slug}`, sectoren[slug] ?? []);
+  return uit;
+}
+

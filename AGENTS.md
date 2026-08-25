@@ -5556,3 +5556,205 @@ De +8 is vier zelftests plus vier sectoren.
 Ongewijzigd ten opzichte van #250, min de Nederlandse lede: er is geen Engelse
 poort en die is in deze vorm ook niet te bouwen, en zeven Spaanse sleutels blijven
 onpersoonlijk waar het Nederlands de lezer aanspreekt.
+
+### 2026-08-24 (vervolg) — zeven Spaanse sleutels werden er dertien, en het bestand eronder stond in geen enkele poort
+
+De vorige ronde liet zeven Spaanse sleutels open staan: plekken waar het
+Nederlands de lezer aanspreekt en het Spaans onpersoonlijk blijft, genoteerd als
+"verdedigbaar Spaans en geen defect, maar wel een keuze die niemand bewust heeft
+gemaakt". Bij het meten groeide dat twee keer, allebei omdat de meting iets
+liet zien wat de aanname niet droeg.
+
+#### De zeven waren er dertien, en vier ervan waren nooit onpersoonlijk
+
+`ONPERSOONLIJK` in de Spaanse poort telde er dertien, niet zeven. Mijn eigen
+telling van een dag eerder was te laag — het derde geval deze maand dat een
+cijfer uit dit logboek binnen een etmaal verliep.
+
+Met het Nederlands en Engels ernaast gelegd viel de lijst in drie stukken:
+
+| | n | wat |
+|---|---|---|
+| omgezet | 6 | het Spaans was de afwijkende taal van de vier |
+| behouden | 1 | `process.1.body` — en en es hebben géén onderwerp ("before touching anything" / "antes de tocar nada"), **nl** is hier de afwijkende |
+| stond er ten onrechte op | 4 | ze spreken de lezer wél aan, met `ves`, `uses`, `superas`, `sáltate` |
+
+Die laatste vier zaten op de uitzonderingslijst omdat hun werkwoord niet in
+`TU_MARKERS` stond, en elk droeg een reden die een ándere zinsnede citeerde dan
+die waar het om ging. Dat is nu een assertie: **elke uitzondering citeert een
+fragment dat werkelijk in de Spaanse waarde staat.** Hij ging meteen af op mijn
+eigen tekst — de reden bij `process.1.body` schreef "Ver lo que está pasando"
+terwijl er "Ver lo que **realmente** está pasando" staat. Een parafrase die zich
+voordoet als citaat is precies het soort uitzondering dat een jaar later
+niemand meer kan controleren.
+
+`ONPERSOONLIJK` ging van dertien naar drie.
+
+#### De drift die ik zelf maakte, en die de productiemeting terugvond
+
+Na de zes omzettingen gaf de productiesonde `AFWIJKINGEN: 1`. "Un contrato de
+proveedor sobre la mesa" stond er nog één keer — in `lib/seo/faqs.ts`, een
+tweede kopie van een zin die ik net in `dict.ts` had veranderd.
+
+#### `lib/seo/faqs.ts` stond in geen enkele taalpoort
+
+58 strings per taal, gelezen door niets. De drie taalpoorten lezen `dict.ts`,
+`sectors.ts`, `ventures.ts`, `signals.ts` en `insights.ts`; dit bestand kwam in
+geen van die vijf lijsten voor.
+
+Het kostte wat je verwacht. De drie lagen er met de hand overheen gelegd gaven
+nul `usted`, maar **zeven echte registerdefecten**: de vier sector-FAQ's spreken
+het bedrijf met `ustedes`/`su` aan terwijl HOME, CONTACT en SERVICES in
+hetzelfde bestand `vosotros`/`tú` zeggen.
+
+| stond er | werd | precedent in ditzelfde bestand |
+|---|---|---|
+| ¿Trabajan con instaladores…? | ¿Trabajáis…? | HOME: "¿Con qué sectores trabajáis?" |
+| ¿Pueden integrarse con ERP…? | ¿Podéis integraros…? | idem |
+| ¿Integran con Idealista…? | ¿Integráis…? | idem |
+| ¿Construyen sistemas PMS? | ¿Construís…? | HOME: "¿Construís desde cero…?" |
+| ¿Pueden cubrir F&B…? | ¿Podéis cubrir…? | idem |
+| ¿Pueden ayudar con operaciones…? | ¿Podéis ayudar…? | idem |
+| Su funnel necesita… | Tu funnel necesita… | adjacent: "Si tu negocio es…" |
+
+Geen dialectkeuze dus, maar drift binnen één bestand. De site schrijft
+schiereiland-Spaans (`más IVA`, Idealista, Fotocasa), en daar is `vosotros` de
+informele meervoudsvorm en `ustedes` juist de formele — precies het register dat
+de rest van de site niet gebruikt.
+
+Daarbovenop drie losse dingen: de drift van hierboven, een taalfout die bij het
+lezen opviel (`se beneficien` → `se benefician`, aanvoegende wijs waar de
+aantonende hoort), en één echte afwijkende (`SERVICES[2].a`: en "You get the
+number", de "bekommen Sie", nl "krijg je", es onpersoonlijk → "Recibes la
+cifra").
+
+Duits en Nederlands zijn in ditzelfde bestand nagemeten en waren schoon: 0
+du-vormen, 0 teruggedraaide woorden, 28 Sie-vormen als controle; 0 u/uw, 0
+ASCII-vormen, 23 je-vormen als controle. Het gat bestond in alle drie de
+poorten, maar beet alleen in het Spaans.
+
+#### Twee nieuwe poorten, en waarom de ene een tekstscan is
+
+`faqStrings(locale)` platslaat de vier FAQ-exports tot paden met waarden, en
+hangt het bestand daarmee in alle drie de taalpoorten. De koppeling in de
+Spaanse poort gaat **op pad en niet op index**: een sector die in één taal een
+vraag mist, verschuift dan niet stilzwijgend alle antwoorden erachter.
+
+`lib/seo/faq-dekking.test.ts` bewaakt de uitlezer zelf. `faqStrings` noemt zijn
+bronnen met de hand, dus een vijfde `*_BY_LOCALE`-export die iemand vergeet toe
+te voegen laat de poort stil mínder lezen. **Een module-import kan dat per
+definitie niet zien** — hij kent alleen wat er geïmporteerd wordt; de
+bestandstekst kent de export wél. Zelfde reden als bij
+`components/sections/Ventures.test.ts`, waar een tweede lijst náást de eerste
+stond.
+
+#### De symptoomzinnen staan op twee plekken — nu met een poort eromheen
+
+De drift hierboven was geen incident maar een klasse. `/services` toont per
+dienst één symptoom uit `dict.ts`; het routeringsantwoord in de SERVICES-FAQ
+citeert diezelfde vier zinnen. Gemeten over vier talen × vier diensten klopt dat
+in **16 van de 16** — na normalisatie van de apostrof, want `dict.ts` schrijft
+`don’t` met een krul waar `faqs.ts` `don't` recht schrijft.
+
+Die normalisatie is opgeschreven met de meting erbij (`faqs.ts` 9× recht en 0×
+krul, `dict.ts` 94× recht en 11× krul) en met wat ze níét doet: welke van de
+twee vormen huisstijl is, is een vraag over de hele codebase en wordt hier niet
+stilzwijgend beantwoord.
+
+Twee dingen zitten er met opzet in. De poort eist **niet** dat één bepaald
+antwoord alle vier draagt — splitst iemand het routeringsantwoord in vieren,
+dan is dat geen defect. En de slugs worden **afgeleid** uit `dict.ts` in plaats
+van ingetypt, met een ondergrens erop, zodat een vijfde dienst niet
+stilzwijgend aan de poort ontsnapt en een kapotte afleiding niet slaagt op een
+lege lijst.
+
+#### Tien mutaties, tien keer de voorspelde kleur
+
+Negen rood op negen verschillende asserties, één groen als controle, groen na
+herstel, nul sporen achtergebleven.
+
+De sprekendste is **"Engelse symptoomzin uit de pas"**: `services.advisory.symptom`
+(en) veranderd zonder de FAQ. Die viel alleen op de nieuwe poort — Engels heeft
+geen taalpoort en kan er in deze vorm ook geen krijgen, dus niets anders had hem
+kunnen zien. Dat is het bewijs dat de poort dekking toevoegt in plaats van te
+dubbelen.
+
+De groene controle zet `usted` in een **toelichting** en hoort onzichtbaar te
+blijven, want deze poorten lezen de geëxporteerde data en niet de bestandstekst.
+Dat is waar `contactadressen.test.ts`, `persoon-entiteit.test.ts` en
+`verzoeklimiet.test.ts` eerder wél over struikelden.
+
+En de kapotte apostrof-normalisator vuurde op twee asserties tegelijk — de
+zelftest én de invariant. Dat is het executeerbare bewijs dat hij dragend is.
+
+#### `vitest` groen is geen `tsc` groen
+
+De volle suite liep 1152/1152 groen terwijl `tsc` twee fouten gaf in het nieuwe
+bestand: `LOCALES` is een readonly tuple en de cast naar `Locale[]` mag niet.
+Vitest transpileert zonder te typechecken, dus een testbestand kan compleet
+groen draaien en toch niet compileren. **Draai beide, altijd, en lees niet één
+van de twee als bewijs voor de ander.**
+
+#### Onderweg
+
+Achtste escape-incident van deze sessie: een patch met `\n`-ankers vond zijn
+doel niet in een CRLF-repo, en het patchscript kwam er door de shell-laag
+ongelijk uit. Het harnas is daarna niet gepatcht maar herschreven met het
+Write-gereedschap, en het weigert nu te draaien als een anker een regeleinde
+draagt.
+
+De eerste `next build` viel om op een mislukte Google-Fonts-fetch. Dat was een
+netwerkhapering en geen defect: de tweede run gaf exit 0. Ik had de eerste keer
+alleen de staart van de uitvoer gelezen en niet de exitcode — **een foutmelding
+in de uitvoer is geen exitcode.**
+
+En de productiesonde zoekt elke zin over álle opgehaalde pagina's in plaats van
+hem vooraf aan een pagina toe te wijzen. Dat betaalde zich meteen terug:
+"Tu funnel necesita" staat op `/es/sectors/energy` en niet op real-estate, waar
+ik hem verwachtte.
+
+#### Meting
+
+Op een productiebuild, met de oude luisteraar op 3271 eerst gestopt (die
+serveerde een build van vóór deze wijzigingen), een poort die vooraf aantoonbaar
+vrij was, en het startlog gelezen om te bevestigen dat het mijn eigen proces was.
+
+Dertien pagina's, alle 200:
+
+```
+nieuwe kopij, moet ergens staan      15 van de 15 aanwezig
+oude kopij, mag nergens meer staan   14 van de 14 verdwenen
+positieve controles                   5 van de 5
+AFWIJKINGEN                           0
+
+/es + 8 Spaanse pagina's   usted = 0   ·   tú-vormen = 136 (positieve controle)
+```
+
+```
+tsc --noEmit             exit 0
+vitest run               1152 tests in 51 bestanden (was 1135/49)
+i18n:check               718 sleutels × 4 (ongewijzigd: alleen waardes)
+regen:pricing:check      groen
+next build               groen, 220 statische pagina's
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +17 is uitgesplitst: 7 in de twee nieuwe bestanden (dekking 3, symptomen 4)
+en 10 in de drie taalpoorten, die er elk een bron bij kregen. Per bestand:
+spaans 25, nederlands 22, duits 25.
+
+Vijf bestanden gewijzigd, twee nieuw. Geen Duitse of Nederlandse kopij geraakt —
+die twee poorten kregen alleen de nieuwe bron erbij.
+
+#### Wat hierna nog open staat
+
+- **Er is geen Engelse poort**, en die is in deze vorm ook niet te bouwen: het
+  Engels kent het onderscheid niet dat de andere drie bewaken. De
+  symptoom-poort van vandaag is het eerste net dat wél over het Engels ligt,
+  maar hij bewaakt gelijkheid tussen twee bestanden en geen register.
+- **De apostrof.** `dict.ts` staat op 94 recht tegen 11 krul; de rest van de
+  kopijmodules schrijft uitsluitend recht. Welke vorm huisstijl is, is nooit
+  beslist. Kleine vraag, hele codebase.
+- **Zeven Spaanse sleutels blijven onpersoonlijk** waar het Nederlands de lezer
+  aanspreekt. Dat is verdedigbaar Spaans; het staat als waarneming en niet als
+  defect.

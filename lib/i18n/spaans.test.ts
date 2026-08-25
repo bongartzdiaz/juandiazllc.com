@@ -4,6 +4,7 @@ import { SECTORS } from "../sectors";
 import { VENTURES } from "../ventures";
 import { POSTS } from "../insights";
 import { SIGNALS } from "../signals";
+import { faqStrings } from "../seo/faqs";
 
 /* Drie poorten op het Spaanse register.
  * ───────────────────────────────────────────────────────────────────────────
@@ -126,6 +127,22 @@ const TU_MARKERS = [
   "estás", "tienes", "puedes", "quieres", "sabes", "haces", "vas", "eres",
   "necesitas", "confías", "acabas", "prefieres", "esperarías", "vendes",
   "dejas", "pierdes", "recorre", "dibuja", "ordena",
+  // Deze vier stonden tot 24 augustus NIET in de lijst, waardoor vier sleutels
+  // die de lezer wél aanspreken als "onpersoonlijk" waren vrijgesteld — en
+  // daarmee buiten de hele gekoppelde regel vielen. Elk is ondubbelzinnig tú:
+  // de derde persoon luidt ve / use / supera / sáltese.
+  "ves", "uses", "superas", "sáltate",
+  // en de drie vormen uit de omzetting van 24 augustus
+  "firmes", "comprometas", "reserves",
+  // uit lib/seo/faqs.ts, dat pas op 24 augustus in deze poort kwam
+  "has", "recibes", "terminas", "tuyos",
+  // vosotros — de informele MEERVOUDSVORM. De FAQ-vragen zijn de lezer die het
+  // bedrijf aanspreekt ("werken jullie met…"), dus hetzelfde register en een
+  // ander getal. In het schiereiland-Spaans dat deze site schrijft is ustedes
+  // daar juist de formele vorm, en vier sector-FAQ's stonden daar tot vandaag
+  // in terwijl HOME, CONTACT en SERVICES in hetzelfde bestand vosotros zeiden.
+  "trabajáis", "construís", "configuráis", "estáis", "respondéis", "firmáis",
+  "podéis", "integráis", "integraros", "contrataros",
   // let op: "pruebas" is ook een zelfstandig naamwoord. Hier staat het als
   // werkwoord ("Pruebas bajo carga", nl "Je test onder ..."). Het marker-zijn
   // maakt de poort op dat punt iets toegeeflijker, niet valser.
@@ -134,21 +151,27 @@ const TU_MARKERS = [
 
 /* Sleutels waar het Nederlands de lezer aanspreekt en het Spaans bewust
  * niemand aanspreekt. Elk met de constructie erbij, want zonder reden wordt
- * zo'n lijst een plek om een echte usted-zin in te verstoppen. */
+ * zo'n lijst een plek om een echte usted-zin in te verstoppen.
+ *
+ * Deze lijst stond op dertien en staat op drie. Zes sleutels zijn omgezet naar
+ * tú omdat en én nl de lezer daar aanspreken en alleen het Spaans niet; vier
+ * spraken de lezer altijd al aan en stonden hier alleen omdat hun werkwoord
+ * niet in TU_MARKERS stond. Wat overblijft is Spaans dat om zijn eigen reden
+ * niemand aanspreekt — en bij elk daarvan staat welke taal de afwijkende is. */
 const ONPERSOONLIJK: Record<string, string> = {
-  "services.page.lede": 'infinitief: "antes de firmar un contrato".',
-  "services.advisory.body": 'infinitieven: "antes de comprometer presupuesto", "qué comprar".',
-  "services.advisory.symptom": 'geen werkwoord: "Un contrato de proveedor sobre la mesa".',
-  "process.1.body": 'infinitieven: "Ver lo que está pasando", "Encontrar las fugas".',
-  "sp.p.teacher1": 'onpersoonlijk se: "No se le puede mentir a un edificio".',
-  "sp.p.now1": 'onpersoonlijk: "el tipo de fecha límite que permite hacer apuestas".',
-  "faq.contact.title": 'infinitief: "Antes de reservar una llamada".',
-  "voltafy.story": 'derde persoon: "la plataforma a la que se conectan los otros tres".',
-  "voltafy.phases[2].body": 'eerste persoon meervoud: "Entregamos la capa de plataforma".',
-  "help-mij-besparen.summary": 'derde persoon: "que muestra a los hogares neerlandeses".',
-  "instruments-not-saas.body[7].text": 'eerste persoon: "Cada producto que he entregado".',
-  "five-phases.excerpt": 'derde persoon: "Los jefes de obra saben algo".',
-  "five-phases.body[1].text": 'onpersoonlijk: "Un edificio no se entrega a ojo".',
+  "process.1.body":
+    'infinitief als processtap: "Ver lo que realmente está pasando antes de tocar nada". ' +
+    "Hier is het NEDERLANDS de afwijkende taal: en zegt 'before touching " +
+    "anything' en es 'antes de tocar nada', allebei zonder onderwerp, en " +
+    "alleen nl voegt 'je' toe. De infinitief is bovendien de Spaanse vorm " +
+    "voor een processtap.",
+  "help-mij-besparen.summary":
+    'derde persoon over het publiek: "que muestra a los hogares neerlandeses". ' +
+    "De lezer is hier het onderwerp van de zin niet — de tool is dat, en de " +
+    "huishoudens zijn het lijdend voorwerp.",
+  "five-phases.excerpt":
+    'derde persoon: "Los jefes de obra saben algo". De zin gaat over ' +
+    "bouwmanagers en niet over de lezer; en en nl doen daar hetzelfde.",
 };
 
 /* ── de bronnen ───────────────────────────────────────────────────────────── */
@@ -168,7 +191,21 @@ const BRONNEN: Array<[bestand: string, strings: Herkomst[], minimaal: number]> =
   ["lib/ventures.ts", VENTURES.flatMap((v) => plat(v.i18n?.es ?? {}, v.slug)), 90],
   ["lib/signals.ts", SIGNALS.flatMap((s) => plat(s.i18n?.es ?? {}, s.slug)), 40],
   ["lib/insights.ts", esInsights, 300],
+  ["lib/seo/faqs.ts", faqStrings("es"), 50],
 ];
+
+/** Uitzonderingen waarvan het aangehaalde fragment niet in de Spaanse zin
+ *  staat. Losse functie zodat de positieve controle er dezelfde weg door gaat
+ *  als de echte lijst. */
+function verkeerdGeciteerd(
+  lijst: Record<string, string>,
+  es: Map<string, string>,
+): string[] {
+  return Object.entries(lijst)
+    .map(([k, reden]) => [k, reden.match(/"([^"]+)"/)?.[1] ?? ""] as const)
+    .filter(([k, fragment]) => fragment !== "" && !(es.get(k) ?? "").includes(fragment))
+    .map(([k, fragment]) => `${k} citeert "${fragment}" maar dat staat er niet`);
+}
 
 /** Elke plek waar een teruggedraaide usted-vorm terugstaat, met de reden. */
 function verbodenTreffers(strings: Herkomst[]): string[] {
@@ -259,6 +296,14 @@ const GEKOPPELD: Array<[pad: string, nl: string, es: string]> = [
     const es = new Map(plat(r.i18n?.es ?? {}, r.slug));
     return [...nl].map(([pad, v]) => [pad, v, es.get(pad) ?? ""] as [string, string, string]);
   }),
+  /* Op pad gekoppeld en niet op index: een sector die in één taal een vraag
+     mist, verschuift dan niet stilzwijgend alle antwoorden erachter. */
+  ...(() => {
+    const es = new Map(faqStrings("es"));
+    return faqStrings("nl").map(
+      ([pad, nl]) => [pad, nl, es.get(pad) ?? ""] as [string, string, string],
+    );
+  })(),
 ];
 
 describe("waar het Nederlands de lezer aanspreekt, doet het Spaans dat ook", () => {
@@ -297,6 +342,28 @@ describe("waar het Nederlands de lezer aanspreekt, doet het Spaans dat ook", () 
     ).toEqual([]);
   });
 
+  it("citeert in elke uitzondering een fragment dat er werkelijk staat", () => {
+    /* Een reden mag een citaat lijken en het niet zijn. `process.1.body` stond
+     * hier met "Ver lo que está pasando" terwijl de kopij "Ver lo que REALMENTE
+     * está pasando" zegt — dicht genoeg om over te lezen, en zo raakt een
+     * uitzondering los van de zin die hij verdedigt.
+     *
+     * Alleen het EERSTE fragment tussen aanhalingstekens telt: dat is de
+     * aangehaalde Spaanse constructie. Wat erachter komt mag een toelichting
+     * in een andere taal zijn. */
+    const es = new Map(GEKOPPELD.map(([p, , v]) => [p, v]));
+    expect(verkeerdGeciteerd(ONPERSOONLIJK, es)).toEqual([]);
+
+    /* Positieve controle: dezelfde functie moet een verzonnen citaat betrappen,
+       anders is een lege lijst niet te onderscheiden van een kapotte check. */
+    const proef = new Map([["p", "Un edificio no se entrega a ojo."]]);
+    expect(verkeerdGeciteerd({ p: 'onpersoonlijk: "un edificio SE entrega".' }, proef)).toHaveLength(1);
+    expect(verkeerdGeciteerd({ p: 'onpersoonlijk: "no se entrega a ojo".' }, proef)).toEqual([]);
+
+    // en elke uitzondering draagt daadwerkelijk een citaat om te controleren
+    expect(Object.entries(ONPERSOONLIJK).filter(([, r]) => !/"[^"]+"/.test(r))).toEqual([]);
+  });
+
   it("noemt in elke uitzondering welke constructie het Spaans gebruikt", () => {
     const zonder = Object.entries(ONPERSOONLIJK).filter(([, r]) => r.trim().length < 20);
     expect(zonder.map(([k]) => k)).toEqual([]);
@@ -309,13 +376,14 @@ describe("de Spaanse poort leest elke kopijbron", () => {
    * dan door over wat er nog wél in staat en de dekking krimpt zonder dat iets
    * rood wordt. Zo stond `lib/signals.ts` tot 24 augustus in geen enkele
    * taalpoort — 53 strings per taal die niemand las. */
-  it("dekt precies de vijf bestanden die Spaanse kopij dragen", () => {
+  it("dekt precies de zes bestanden die Spaanse kopij dragen", () => {
     expect(BRONNEN.map(([bestand]) => bestand)).toEqual([
       "lib/i18n/dict.ts",
       "lib/sectors.ts",
       "lib/ventures.ts",
       "lib/signals.ts",
       "lib/insights.ts",
+      "lib/seo/faqs.ts",
     ]);
   });
 });
