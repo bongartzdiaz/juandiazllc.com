@@ -128,21 +128,58 @@ weten waarom de andere acht kunnen wachten:
 
 Let op bij het zelf nameten: `current_setting('pgrst.db_schemas')` geeft de
 instelling van de rol waarmee je verbinding maakt. Via de MCP is dat `postgres`,
-en die zegt hier nog `diaz_editor` — een schema dat op 1 augustus is gedropt.
+en die zegt hier nog `diaz_editor` — een schema dat op 11 augustus is gedropt.
 Lees `rolconfig` van `authenticator`, niet `current_setting`. Zie
 [[feedback_drop_schema_breekt_postgrest]].
 
-**De tien dode `diaz-*` functies op wbgio: eerst uitzoeken wát er nog naartoe
-schrijft.** Alle tien bestaan ook op vbozel, daar op veel hogere versies
-(bijvoorbeeld `diaz-stripe-webhook` v11 hier tegen v36 daar). Maar twee ervan —
-`diaz-affiliate-activate` en `diaz-trial-init` — dragen op wbgio een
-`updated_at` van **2026-08-11**, tien dagen ná het droppen van `diaz_editor` op
-dat project. Of dat een uitrol was of een wijziging aan de platformkant is van
-hieruit niet vast te stellen; wat wél vaststaat is dat er in augustus nog iets
-aan die twee is geschreven. Verwijderen zonder die bron te vinden levert
-functies op die terugkomen. De vijf dubbele slugs op vbozel staan er nog en zijn
-alle vijf op **2026-08-04** aangemaakt vanaf een CI-runner
-(`/home/runner/work/diaz-editor/…`).
+**De tien dode `diaz-*` functies op wbgio: de schrijver is gevonden, en er
+schrijft niets meer.** Dit vervangt de regel die hier stond — *eerst uitzoeken
+wát er nog naartoe schrijft* — want dat is uitgezocht.
+
+De twee `updated_at`-stempels van 2026-08-11 komen niet van buiten. Ze komen uit
+een Claude-sessie in deze repo, die via de Supabase-MCP `diaz-trial-init`
+(17:43:08 UTC) en `diaz-affiliate-activate` (17:48:00 en 17:57:57) naar wbgio
+uitrolde, als uitvoering van de opdracht *diaz editor er nu op zetten* van
+16:47. Om 18:11 bleek dat het verkeerde project: wbgio droeg een verlaten kopie
+(10 tabellen, 2 licenties) tegen de levende database op vbozel (22 tabellen, 25
+views, 6 licenties, 3 klanten). Het schema eronder is diezelfde avond gedropt;
+de functies bleven staan omdat de MCP ze niet kan verwijderen. Ze wijzen
+sindsdien naar een schema dat er niet meer is en geven 500 bij elke aanroep.
+
+Gemeten over alle 2158 lokale sessies: **264 uitrollen, waarvan 6 naar wbgio**,
+alle zes uit datzelfde transcript. Twee daarvan zijn positieve controles op
+bekend eigen werk — `lead-notify` (21 juli 16:36) en `lead-acknowledge` (16
+augustus 15:55 en 15:58) — en alle vier de stempels vallen op de seconde samen
+met de `updated_at` op de functies zelf.
+
+Drie andere kandidaten vielen af, elk op eigen bewijs. **CI:**
+`deploy-edge-functions.yml` deployt naar `SUPABASE_PROJECT_REF`, in zijn eigen
+kop gedocumenteerd als vbozel, en de vier runs van 11 augustus draaiden twee
+seconden met **nul stappen** en zonder log, tegen acht stappen bij een geslaagde
+run. **Een script over beide projecten:** vbozel kreeg op 11 augustus niets — de
+buren daar zijn 4, 12, 15 en 17 augustus. **De dashboard-editor:** de
+transcript-stempels op de seconde maken die lezing overbodig.
+
+**Wat vóór verwijderen nog moet is één ding**, en dat staat niet in deze repo:
+nakijken of Lemon of AppSumo nog naar die wbgio-slugs wijzen. De vijf dubbele
+slugs op vbozel staan er nog en zijn alle vijf op **2026-08-04** aangemaakt
+vanaf een CI-runner (`/home/runner/work/diaz-editor/…`).
+
+**Eén datum hierboven is bijgewerkt, en het waren nooit twee gebeurtenissen.**
+De WARN-tabel zei dat `diaz_editor` op 1 augustus was gedropt; op wbgio was dat
+**11 augustus 18:19:56 UTC**. De migratiehistorie van dat project kent geen
+enkele migratie op 1 augustus — de reeks springt van 29 juli naar
+`20260811181956 verwijder_dode_diaz_editor_kopie`, dezelfde seconde als in het
+transcript.
+
+Het PGRST002-incident dat het logboek van 21 augustus op 1 augustus zet, is
+**dezelfde drop**: zelfde project, zelfde schema, zelfde aanleiding (*de dode
+kopie weghalen*). De hele REST-API gaf daarna 503 omdat `diaz_editor` in
+`pgrst.db_schemas` bleef staan, en dat kwam de 12e boven — vandaar die datum in
+[[feedback_drop_schema_breekt_postgrest]]. Er staat dus niets open; er stond
+één gebeurtenis onder drie data. De 1-augustusvermelding in het logboek van 21
+augustus blijft staan zoals hij is: logboekgeschiedenis wordt hier niet
+herschreven, en deze notitie is de correctie erop.
 
 
 ### De meetketen — in blokkerende volgorde
@@ -189,8 +226,9 @@ alle vijf op **2026-08-04** aangemaakt vanaf een CI-runner
 - **Leaked-password protection** aanzetten op `wbgiouuifqhasedncysw` — de enige
   WARN uit de advisors die actie vergt.
 - **Tien dode `diaz-*` edge functions** op wbgio en **vijf dubbele slugs** op
-  vbozel. Controleer eerst of Lemon of AppSumo er niet nog op wijzen; een
-  uitgerolde functie weghalen is onomkeerbaar.
+  vbozel. De vraag wát er nog naartoe schreef is beantwoord (zie hierboven):
+  niets. Wat overblijft is nakijken of Lemon of AppSumo er niet nog op wijzen;
+  een uitgerolde functie weghalen is onomkeerbaar.
 - **Het tweede, lege Stripe-account** sluiten of labelen.
 - Optioneel, hygiëne: `revoke execute on function public.handle_new_user(),
   public.notify_new_lead(), public.rls_auto_enable() from public, anon,
