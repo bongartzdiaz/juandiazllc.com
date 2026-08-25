@@ -6397,3 +6397,125 @@ storing; hun bewijs is het uitgeleverde woordenboek en het feit dat ze langs
 dezelfde `translate(locale, ...)` lopen als de twee takken die wél end-to-end
 zijn nagelopen. En `globe.body.fallback` is in de bron en in de bundel
 geverifieerd, niet in de DOM.
+
+### 2026-08-25 (vervolg) — de tak die "netwerkfout" heet, vuurt niet op een netwerkfout
+
+De vorige meting liet twee takken van `submitLead` ongetriggerd: `form.err.generic`
+en `form.err.network`. Ze zijn allebei bereikt op een lokale productiebuild, met
+alleen de omgeving gewijzigd en verder niets, en het antwoord was omgekeerd aan
+wat de namen beloven.
+
+| build | `NEXT_PUBLIC_SUPABASE_URL` | tak die vuurde |
+|---|---|---|
+| A | een host die niet bestaat | **`form.err.generic`** — "Algo ha salido mal." |
+| B | leeg | **`form.err.network`** — "Error de red." |
+
+De naam `network` hoort bij de `catch`, en daar komt een netwerkstoring nooit:
+**supabase-js vangt een fetch-fout zelf op en geeft hem terug als `{ error }`**,
+dus die landt in de tak erboven. De `catch` is alleen bereikbaar als
+`createClient()` gooit, en dat doet hij op een ontbrekende
+`NEXT_PUBLIC_SUPABASE_URL` of publishable key — `lib/supabase/keys.ts` gooit daar
+expliciet. Configuratie dus, geen storing bij de bezoeker.
+
+Dezelfde vorm als `process.env[SECRET_ENV]` dat `CAL_WEBHOOK_SECRET` maandenlang
+uit `.env.example` hield, en als de server-actions van gisteren: iets dat
+functioneel doet wat het doet, met een naam die iets anders beschrijft. De
+naamgeving is hier de enige documentatie die er was.
+
+#### De kopij loog niet alleen over de oorzaak, hij stuurde de bezoeker in een lus
+
+Wat er in vier talen stond was "Netwerkfout. Probeer het opnieuw." — en dat
+tweede deel is het schadelijke deel. Een ontbrekende omgevingsvariabele lost niet
+op door opnieuw te verzenden; de bezoeker kan blijven klikken zonder dat het ooit
+lukt. Bij `form.err.generic` klopt dezelfde zin wél: een databasefout of een
+echte netwerkstoring kan voorbijgaan.
+
+De sleutel heet nu `form.err.unavailable` en de kopij noemt geen netwerk en
+belooft geen nieuwe poging:
+
+    en  Something is wrong on our end — it didn't go through.
+    nl  Er is iets mis aan onze kant — het is niet doorgekomen.
+    de  Auf unserer Seite stimmt etwas nicht — es ist nicht durchgekommen.
+    es  Algo va mal por nuestro lado — no se ha enviado.
+
+**Bewust geen belofte dát opnieuw proberen zinloos is.** Gemeten is dat
+configuratie de tak bereikt en netwerk niet; dat élke denkbare worp een
+configuratiefout is, is niet gemeten. De zin zegt daarom wat wél vaststaat: het
+zit aan onze kant en het is niet aangekomen.
+
+`app/actions/subscribe.ts` droeg exact dezelfde tak en is meegegaan.
+
+#### `form.err.generic` is van buitenaf niet te bereiken op productie
+
+Nagemeten op `wbgiouuifqhasedncysw` voordat ik de tak op een build ging forceren:
+`marketing.leads` draagt alleen `leads_pkey PRIMARY KEY (id)`, elke kolom is
+ongelimiteerd `text`, en `capField` strookt precies de null-bytes weg die een
+insert zouden breken. Er is dus geen invoer waarmee een bezoeker die tak haalt —
+vandaar de omgeving als hefboom in plaats van het formulier.
+
+#### De poort roept de acties werkelijk aan
+
+`app/actions/foutpaden.test.ts` (nieuw) mockt `@/lib/supabase/server` met een
+client die op commando gooit, een `{ error }` teruggeeft, of slaagt, en legt vast
+welke storing in welke tak landt — voor beide acties, in vier talen. Daarnaast
+drie asserties op de kopij zelf: de twee meldingen verschillen per taal, de
+nieuwe noemt geen netwerkstoring, en die controle gaat aantoonbaar wél af op de
+kopij zoals hij was.
+
+Waarom geen bestaande poort dit ving: de i18n-poorten controleren dat een sleutel
+bestaat, in vier talen staat en vertaald is. Of de sleutel het júiste geval
+beschrijft is met een woordenboek niet te zien. Daar is een test voor nodig die
+de actie aanroept met een falende client.
+
+Wat de poort **niet** bewaakt staat in zijn eigen kop: het gedrag van supabase-js.
+Dat een fetch-fout als `{ error }` terugkomt is hierboven gemeten, niet hier
+afgedwongen. Verandert die bibliotheek, dan wisselen de twee takken stil van
+betekenis.
+
+#### Mijn positieve controle slaagde op niets
+
+Negen mutaties met de kleur vooraf vastgelegd; acht klopten. De negende was de
+leerzame: **`NETWERKTAAL.nl` leegmaken liep groen door**, terwijl juist die lijst
+de controle draagt. De assertie luidde `expect(treffers).toHaveLength(NETWERKTAAL[l].length)`,
+en met nul termen is dat `expect([]).toHaveLength(0)` — waar, en over niets.
+
+Dat is dezelfde klasse als de garantie-poort van 22 augustus, waar een term uit
+de lijst schrappen groen bleef omdat er geen verwachting was om tegen af te
+zetten. Er staat nu een ondergrens vóór de vergelijking, en met die regel erbij
+gaat de mutatie af op `expected 0 to be greater than 0`.
+
+**Een positieve controle die uit een lijst wordt afgeleid, moet eerst eisen dat
+die lijst niet leeg is.** Anders is hij precies zo sterk als de lijst die iemand
+kan weghalen.
+
+De twee groene controles zijn de scope: de oude sleutelnaam in een *toelichting*
+in `lib/booking.ts` blijft onzichtbaar (deze poort leest `DICT`, niet de
+bestandstekst), en netwerktaal in `form.err.generic` mag gewoon — die tak vángt
+een netwerkstoring.
+
+#### Twee sporen die er geen waren
+
+Het harnas meldde na afloop twee achtergebleven mutaties in `contact.ts` en
+`subscribe.ts`. Mijn spoorcontrole matchte op `return { status: "err", message:
+translate(locale,` — de regel die de gezonde code óók draagt. Per bestand
+nageteld: contact 1× `unavailable`, 2× `generic` (één in de nieuwe toelichting),
+subscribe 1× en 1×. Tweede keer deze week dat een spoorcontrole op een prefix
+matcht die legitiem is; tel per bestand na in plaats van op de melding af te gaan.
+
+#### Meting
+
+Op productiebuilds, met de poort vooraf aantoonbaar vrij (nul sockets, gesplitst
+op verbindingstoestand) en het startlog gelezen om te bevestigen dat het mijn
+eigen proces was.
+
+```
+tsc --noEmit             exit 0
+vitest run               1174 tests in 53 bestanden (was 1163/52)
+i18n:check               718 sleutels x 4 (ongewijzigd: hernoemd, niet toegevoegd)
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +11 is de nieuwe poort. Het sleutelaantal blijft 718 omdat `form.err.network`
+niet verdween maar van naam veranderde.
