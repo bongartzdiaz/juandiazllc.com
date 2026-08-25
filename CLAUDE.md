@@ -111,6 +111,8 @@ operator de bovenste leest; de lijst zelf begint eronder.
 | DNS TXT `juandiazllc.com` | `google-site-verification=ABrD7ZNd…` staat er, naast SPF |
 | Ahrefs `subscription-info-limits-and-usage` (gratis endpoint) | `{"error":"Insufficient plan"}` |
 | `diaz-appsumo-redeem`, code zonder dev-formaat, beide projecten | `invalid-code-format` — en die reden komt uit één tak: **dev-mode staat aan** op het levende project. Zie hieronder |
+| Vercel Web-Analytics-API, beide projecten | 404 `Web Analytics not found` — ook op `diaz-atlas-editor`, dat aantoonbaar 137 bezoekers over 30 dagen heeft. De 404 is het Hobby-plan, geen meting |
+| Vercel runtime-log `juandiazllc-com` | `Invalid Sentry Dsn: optional` — `SENTRY_DSN` staat op productie op de letterlijke tekst `optional` |
 
 De probe op de twee meldingsfuncties raakt niets: de auth-controle staat vóór de
 JSON-parse en het versturen staat erna, dus `400 invalid-json` scheidt "open" van
@@ -313,6 +315,22 @@ herschreven, en deze notitie is de correctie erop.
   gezondheidscontrole test de verbinding, niet de toegang.
 - **Search Console**: alleen nog nakijken of de property daadwerkelijk
   geverifieerd is. Het DNS TXT-record staat er.
+
+### Vercel
+
+- **`SENTRY_DSN` in Vercel-productie staat op de letterlijke tekst
+  `optional`.** Gemeten op 2026-08-25 in het runtime-log: `Invalid Sentry Dsn:
+  optional`. `lib/sentry.ts:41` controleert alleen op truthy, dus de init
+  draait en valt om — **serverfouten worden niet gerapporteerd**. De regel
+  bovenaan dit bestand dat Sentry nog draait, is daarmee achterhaald.
+  Leegmaken of een echte DSN zetten is de hele reparatie.
+- **Nakijken of Web Analytics aan staat op `juandiazllc-com`** (Project
+  Settings → Analytics). Het script staat er sinds #267 en wordt door het
+  platform geserveerd (`/_vercel/insights/script.js` → 200 op productie), maar
+  of de data in het dashboard landt is van buitenaf niet te zien. **Let op bij
+  het nameten:** de Web-Analytics-API geeft op het Hobby-plan 404 op élk
+  project, ook op één met aantoonbare bezoekers. Die 404 is het plan en geen
+  meting — lees het dashboard, niet de API.
 
 ### Supabase en Stripe
 
