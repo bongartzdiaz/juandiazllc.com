@@ -6289,3 +6289,111 @@ de `se`-regel.
   doet. De andere richting — Spaans dat aanspreekt waar nl en de dat allebei
   niet doen — ziet niemand. Of dat een defect zou zijn is bovendien de vraag;
   het is eerder stijlverschil dan registerfout.
+
+### 2026-08-25 (vervolg) — de dertien nagemeten op productie, en het waren er veertien
+
+#255 sloot een detectiegat: dertien Spaanse sleutels spraken de lezer aan met
+een tú-imperatief en waren voor élke laag van de registerpoort onzichtbaar. De
+poort dekt ze sindsdien, maar ze waren nooit op de geserveerde pagina's
+nagemeten — een poort bewijst dat de bron klopt, niet dat de bezoeker het ziet.
+
+#### De sleutels komen uit de poort, niet uit het geheugen
+
+De classificatielogica is met `sed` uit `lib/i18n/spaans.test.ts` geknipt en in
+een tijdelijke sonde geplakt, niet overgetypt. Twee kopieën van dezelfde
+controle lopen uiteen en dan bewaakt de zwakste; dat is in dit logboek de
+vaakst terugkerende bugklasse.
+
+**Het zijn er veertien.** De afleiding: treffers van de Duitse getuige waarvan
+élke gematchte marker uit het imperatief-blok van #255 komt. Het logboek droeg
+beide getallen zonder ze op te tellen — de tabel telde er dertien, en een
+sectie verderop staat dat de poort "zelf de veertiende sleutel vond"
+(`five-phases.body[9].text`). Die veertiende kwam pas boven ná het toevoegen
+van de markers en is nooit bij de dertien opgeteld. De toelichting in de poort
+is gecorrigeerd; dat is de enige codewijziging in deze PR.
+
+Mijn eerste classificatie gaf 31 en dat was fout: ik telde elke zin mét een
+imperatief, ook zinnen die al een gewoon tú-woord dragen en dus nooit
+onzichtbaar waren. De vraag is niet "bevat een imperatief" maar "raakt
+uitsluitend door een nieuwe imperatief gepaard".
+
+#### Negen renderen in de geserveerde HTML
+
+46 Spaanse pagina's uit de sitemap opgehaald, en elke zin over álle pagina's
+gezocht in plaats van de pagina te raden — drie keer eerder deze maand leverde
+een geraden pagina een valse "ONTBREEKT" op.
+
+| sleutel | pagina |
+|---|---|
+| `CONTACT[1].a` | /es/contact |
+| `about.pr.2` (beide helften) | /es/about |
+| `contact.book.lede` | /es/contact |
+| `five-phases.body[9].text` | /es/signals/five-phases |
+| `form.step1.sub` | /es/contact |
+| `pricing.label.contactUs` | /es/pricing |
+| `sectors.d.roi.cta` | /es/sectors/energy |
+| `services.symptom.lead` | /es/services |
+| `uses.outro.link` | /es/uses, /es/privacy |
+
+Usted-tegenhangers over alle 46 pagina's: **0**. Zes positieve controles groen.
+
+#### De bundel bewijst hier minder dan het lijkt
+
+De vijf overige staan in de uitgeleverde client-chunk met nul usted-vormen.
+Dat is zwakker bewijs dan het oogt: `form.err.*` zijn **returnwaarden van een
+server action** via `translate()`, dus hun aanwezigheid in de chunk zegt alleen
+dat het woordenboek meegaat naar de client — wat voor alle 718 sleutels geldt.
+
+Vandaar de DOM-meting op productie, met de takken die aantoonbaar vóór de
+database terugkeren (`app/actions/contact.ts`: e-mail op regel 61, berichtlengte
+op 65, insert pas op 71):
+
+| tak | gemeten |
+|---|---|
+| `form.err.email` | "Introduce un correo electrónico válido." |
+| `form.err.message` | "Cuéntame un poco más — al menos una frase." |
+| `form.err.generic` | niet getriggerd — vergt een DB-fout |
+| `form.err.network` | niet getriggerd — vergt een netwerkfout server-side |
+
+De drempel is niet gegokt maar gelezen (`message.length < 10`); een bericht van
+twee tekens keert gegarandeerd terug vóór de insert. Nagemeten op
+`wbgiouuifqhasedncysw`: `marketing.leads` op 0 rijen totaal, 0 in het laatste
+half uur, 0 sonde-rijen.
+
+#### De globe is door de meetomgeving geblokkeerd, en dat is gemeten
+
+`globe.body.fallback` rendert alleen na een klik op een land zonder eigen kopij.
+De landen worden per animatieframe opgebouwd, en de browser-pane compositeert
+hier niet: `document.visibilityState` staat op `hidden` en er vuurden **nul**
+`requestAnimationFrame`-frames in 2,5 seconde, ook na fronting. `globe-countries`
+blijft daardoor leeg en er valt niets aan te klikken.
+
+Dat is het instrument en niet de site: `/world-110m.json` antwoordt met 200 en
+levert een Topology met `countries`, en er staat geen enkele consolefout — dat
+laatste gemeten ná een hartslag door de lezer, want een lege lijst uit een
+kapotte lezer leest hetzelfde als een schone meting.
+
+#### Drie keer brak het instrument
+
+1. **Vitest slikte `console.log`.** De sonde draaide, gaf exit 0 en produceerde
+   niets — identiek aan een sonde die niets vond. Uitvoer gaat sindsdien via
+   `writeFileSync` naar een bestand in plaats van via de reporter.
+2. **Een positieve controle stond omgekeerd.** `"zzqq" in _z` waar `not in`
+   hoort: de controle die moest bewijzen dat de teller niet álles vindt, testte
+   het tegendeel. Hij meldde zichzelf als STUK.
+3. **Elfde escape-incident.** De heredoc halveerde een dubbele backslash, waarop
+   Python op regel 2 viel. De backslash wordt nu via `chr(92)` opgebouwd. Zelfde
+   familie als 20, 22, 23 en 24 augustus; de uitweg is telkens dezelfde —
+   schrijf geen escape die door een shell-laag moet.
+
+Onderweg schreef ik in de nieuwe toelichting "voor" waar "vóór" hoort. Derde
+keer deze week dat misplaatste voorzichtigheid over shell-encoding een diakriet
+kostte, terwijl het bestand er in dezelfde alinea al drie draagt.
+
+#### Wat deze meting niet dekt
+
+`form.err.generic` en `form.err.network` zijn alleen bereikbaar bij een echte
+storing; hun bewijs is het uitgeleverde woordenboek en het feit dat ze langs
+dezelfde `translate(locale, ...)` lopen als de twee takken die wél end-to-end
+zijn nagelopen. En `globe.body.fallback` is in de bron en in de bundel
+geverifieerd, niet in de DOM.

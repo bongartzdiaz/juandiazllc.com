@@ -164,8 +164,14 @@ const TU_MARKERS = [
   // TÚ-IMPERATIEVEN. Deze ontbraken allemaal, en dat was het grootste gat in
   // deze poort: een imperatief is de meest voorkomende manier waarop Spaanse
   // UI-kopij de lezer aanspreekt, en laag 3 kon zo'n sleutel niet eens
-  // bereiken. Dertien sleutels stonden op 25 augustus voor élke laag
+  // bereiken. Veertien sleutels stonden op 25 augustus voor élke laag
   // onzichtbaar — schreef iemand `Elige` om naar `Elija`, dan meldde niets iets.
+  //
+  // Hier stond "dertien". Dat was de telling van vóór de veertiende vondst:
+  // five-phases.body[9].text kwam pas boven nadat deze markers erin stonden,
+  // en is nooit bij de dertien opgeteld. Nagemeten op productie, 25 augustus:
+  // veertien. Af te leiden door de treffers van deSpreektAan te houden
+  // waarvan elke gematchte marker uit dit blok komt.
   //
   // Sommige zijn ook derde persoon (él elige, él trae, él toca). Dat mag hier,
   // en het mag in NIET_MEER juist niet. De lijsten zijn asymmetrisch: een
