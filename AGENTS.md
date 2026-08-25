@@ -210,11 +210,18 @@ Dat maakt de val eerder erger dan milder: geen 404 die meteen opvalt, maar een
 endpoint dat er wél is, netjes antwoordt op alles wat de database niet raakt,
 en geen licentie uitgeeft.
 
-**Er ligt een PR voor:** `bongartzdiaz/diaz-editor#640`. Die zet een
-waarschuwingskop op beide bestanden plus een inline waarschuwing bij de
-webhook-stap, en vervangt bewust **geen enkele waarde** — of de overige
-stappen (secrets, payment-links, metadata-keys) op vbozel nog kloppen is niet
-nagemeten. Hij is niet gemerged; dat is jouw review.
+**Gesloten op 2026-08-25 met `bongartzdiaz/diaz-editor#640`** (gemerged als
+`208192b`). Die zet een waarschuwingskop op beide bestanden plus een inline
+waarschuwing bij de webhook-stap — die tweede omdat een kop bovenaan wordt
+overgeslagen door wie ctrl-F't naar “webhook”, en dat is de stap met de
+duurste gevolgen.
+
+**Er is bewust geen enkele waarde vervangen.** Elk projectref, elke URL en de
+publishable key staan er nog zoals ze stonden. Of de overige stappen (secrets,
+payment-links, metadata-keys) op vbozel nog kloppen is niet nagemeten, en een
+ongemeten waarde invullen leest als een meting. De val is dus gemarkeerd, niet
+gerepareerd — wie dat document ooit werkelijk wil bijwerken, moet die stappen
+eerst tegen vbozel nameten.
 
 De vijf dubbele slugs op vbozel staan er nog en zijn alle vijf op
 **2026-08-04** aangemaakt vanaf een CI-runner
@@ -284,10 +291,11 @@ herschreven, en deze notitie is de correctie erop.
   vbozel. Wát er nog naartoe schreef: niets. Stripe en Lemon wijzen aantoonbaar
   naar vbozel; alleen de **AppSumo-instelling** is van hieruit niet te lezen —
   kijk die na, dan kunnen de tien weg. Zie de tabel hierboven.
-- **`bongartzdiaz/diaz-editor#640` reviewen en mergen.** `supabase/README.md`
-  daar wijst de Stripe-webhook nog naar het dode wbgio-project, en het zijn elf
-  verwijzingen over twee bestanden — niet één regel, zoals hier eerder stond.
-  De PR markeert ze; hij vervangt bewust geen waarden. Zie hierboven.
+- ~~De README in `bongartzdiaz/diaz-editor` wijst de Stripe-webhook naar het
+  dode project.~~ **Gemarkeerd op 2026-08-25** met #640 (`208192b`): elf
+  verwijzingen over twee bestanden, allemaal voorzien van een waarschuwing.
+  Geen waarde vervangen — zie hierboven wat er daarvoor eerst gemeten moet
+  worden.
 - **Het tweede, lege Stripe-account** sluiten of labelen.
 - Optioneel, hygiëne: `revoke execute on function public.handle_new_user(),
   public.notify_new_lead(), public.rls_auto_enable() from public, anon,
