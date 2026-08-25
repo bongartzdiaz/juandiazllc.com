@@ -4,6 +4,7 @@ import { SECTORS } from "../sectors";
 import { VENTURES } from "../ventures";
 import { POSTS } from "../insights";
 import { SIGNALS } from "../signals";
+import { faqStrings } from "../seo/faqs";
 
 /* Twee poorten op het Duitse woordenboek.
  * ───────────────────────────────────────────────────────────────────────────
@@ -171,6 +172,7 @@ const KOPIJ: Array<[bestand: string, strings: Herkomst[], minimaal: number]> = [
   ["lib/sectors.ts", SECTORS.flatMap((s) => plat(s.i18n?.de ?? {}, s.slug)), 100],
   ["lib/ventures.ts", VENTURES.flatMap((v) => plat(v.i18n?.de ?? {}, v.slug)), 90],
   ["lib/signals.ts", SIGNALS.flatMap((s) => plat(s.i18n?.de ?? {}, s.slug)), 40],
+  ["lib/seo/faqs.ts", faqStrings("de"), 50],
   [
     "lib/insights.ts",
     POSTS.flatMap((p) => [
@@ -228,11 +230,12 @@ describe("de Duitse poort leest elke kopijbron", () => {
    * zonder dat iets rood wordt. `lib/signals.ts` stond hier tot 24 augustus niet
    * in, en werd daardoor door geen enkele taalpoort gelezen — 53 strings per
    * taal die niemand las. */
-  it("dekt precies de vier bestanden die Duitse kopij dragen", () => {
+  it("dekt precies de vijf bestanden die Duitse kopij dragen", () => {
     expect(KOPIJ.map(([bestand]) => bestand)).toEqual([
       "lib/sectors.ts",
       "lib/ventures.ts",
       "lib/signals.ts",
+      "lib/seo/faqs.ts",
       "lib/insights.ts",
     ]);
   });

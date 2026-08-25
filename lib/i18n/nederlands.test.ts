@@ -4,6 +4,7 @@ import { DICT } from "./dict";
 import { SECTORS } from "../sectors";
 import { VENTURES } from "../ventures";
 import { SIGNALS } from "../signals";
+import { faqStrings } from "../seo/faqs";
 
 /* Twee poorten op de Nederlandse kopij.
  * ───────────────────────────────────────────────────────────────────────────
@@ -117,6 +118,7 @@ const BRONNEN: Array<
   ["lib/sectors.ts", SECTORS.flatMap((s) => plat(s.i18n?.nl ?? {}, s.slug)), 100, 3],
   ["lib/ventures.ts", VENTURES.flatMap((v) => plat(v.i18n?.nl ?? {}, v.slug)), 90, 3],
   ["lib/signals.ts", SIGNALS.flatMap((s) => plat(s.i18n?.nl ?? {}, s.slug)), 40, 3],
+  ["lib/seo/faqs.ts", faqStrings("nl"), 50, 10],
 ];
 
 describe("de splitser zelf", () => {
@@ -202,13 +204,14 @@ describe("de Nederlandse poort leest elke kopijbron", () => {
    * dan door over wat er nog wél in staat en de dekking krimpt zonder dat iets
    * rood wordt. Dit bestand las tot 24 augustus alléén lib/insights.ts, en dat
    * was op precies deze manier onzichtbaar. */
-  it("dekt precies de vijf bestanden die Nederlandse kopij dragen", () => {
+  it("dekt precies de zes bestanden die Nederlandse kopij dragen", () => {
     expect(BRONNEN.map(([bestand]) => bestand)).toEqual([
       "lib/insights.ts",
       "lib/i18n/dict.ts",
       "lib/sectors.ts",
       "lib/ventures.ts",
       "lib/signals.ts",
+      "lib/seo/faqs.ts",
     ]);
   });
 });
