@@ -103,7 +103,7 @@ const NIET_MEER: Record<string, string> = {
   introduzca: 'usted-imperatief van introducir, in roi.lede. Nu "introduce".',
   escríbanos: "zelfde vorm, kwam niet voor; staat er zodat hij niet binnensluipt.",
   déjenos: "zelfde vorm in de wij-variant; kwam niet voor en hoort dat zo te houden.",
-  inténtelo: "usted-imperatief met clitic; de tú-vorm inténtalo staat in form.err.network.",
+  inténtelo: "usted-imperatief met clitic; de tú-vorm inténtalo staat in form.err.generic.",
   contáctenos: "usted-imperatief met clitic; de tú-vorm contáctanos staat in de sector-FAQ.",
 };
 

@@ -39,6 +39,9 @@ export async function subscribe(
 
     return { status: "ok", message: translate(locale, "form.ok.subscribed") };
   } catch {
-    return { status: "err", message: translate(locale, "form.err.network") };
+    // Zelfde tak als in contact.ts, met dezelfde meting erachter: hier landt
+    // een `createClient()` die gooit op ontbrekende configuratie, niet een
+    // netwerkstoring -- die geeft supabase-js terug als `{ error }` hierboven.
+    return { status: "err", message: translate(locale, "form.err.unavailable") };
   }
 }

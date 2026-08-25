@@ -79,6 +79,21 @@ export async function submitLead(
 
     return { status: "ok", message: translate(locale, "form.ok.lead") };
   } catch {
-    return { status: "err", message: translate(locale, "form.err.network") };
+    // Deze tak heette tot 2026-08-25 `form.err.network`, en die naam beschreef
+    // een geval dat hij niet vangt. Gemeten op twee productiebuilds, met
+    // alleen de omgeving gewijzigd:
+    //
+    //   NEXT_PUBLIC_SUPABASE_URL = onbereikbare host  ->  form.err.generic
+    //   NEXT_PUBLIC_SUPABASE_URL = leeg               ->  deze tak
+    //
+    // supabase-js vangt een fetch-fout zelf op en geeft hem terug als
+    // `{ error }`. Een netwerkstoring landt dus in de tak hierboven en komt
+    // hier nooit. Wat hier wél landt is `createClient()` dat gooit, en dat
+    // gebeurt als `getSupabaseUrl()` of `getPublishableKey()` een ontbrekende
+    // waarde ziet -- een configuratiefout, geen storing bij de bezoeker.
+    //
+    // Daarom belooft de kopij hier ook geen nieuwe poging meer: opnieuw
+    // verzenden lost een ontbrekende omgevingsvariabele niet op.
+    return { status: "err", message: translate(locale, "form.err.unavailable") };
   }
 }
