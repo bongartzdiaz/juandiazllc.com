@@ -320,10 +320,14 @@ herschreven, en deze notitie is de correctie erop.
 
 - **`SENTRY_DSN` in Vercel-productie staat op de letterlijke tekst
   `optional`.** Gemeten op 2026-08-25 in het runtime-log: `Invalid Sentry Dsn:
-  optional`. `lib/sentry.ts:41` controleert alleen op truthy, dus de init
-  draait en valt om — **serverfouten worden niet gerapporteerd**. De regel
-  bovenaan dit bestand dat Sentry nog draait, is daarmee achterhaald.
-  Leegmaken of een echte DSN zetten is de hele reparatie.
+  optional`. **Serverfouten worden niet gerapporteerd.** De regel bovenaan dit
+  bestand dat Sentry nog draait, is daarmee achterhaald.
+  De code eromheen is diezelfde dag gerepareerd: `lib/sentry.ts` vroeg op vijf
+  plekken of de variabele gezet was in plaats van of de init geslaagd was, dus
+  elke melding liep naar een niet-geïnitialiseerde client en
+  `isSentryEnabled()` gaf `true` terug. Dat faalt nu luid in plaats van stil,
+  **maar het zet de rapportage niet aan.** Leegmaken (bewust uit) of een echte
+  DSN zetten (aan) blijft operator-werk.
 - **Nakijken of Web Analytics aan staat op `juandiazllc-com`** (Project
   Settings → Analytics). Het script staat er sinds #267 en wordt door het
   platform geserveerd (`/_vercel/insights/script.js` → 200 op productie), maar
@@ -6930,3 +6934,136 @@ Toegevoegd aan de lijst bovenaan dit bestand, in blokkerende volgorde:
 2. **Kop en Over op het profiel plakken.** Tien minuten, staat plak-klaar.
 3. **Bedrijfspagina zichtbaar maken op de site, ja of nee.**
 4. **Instagram-link op `/contact` laten staan, ja of nee.**
+
+### 2026-08-25 (vervolg) — de foutrapportage stond niet uit, hij stond te liegen
+
+De opdracht was de systemen klaarzetten voordat er iets naar buiten gaat. Bij
+het hermeten van de keten bleek één regel op de operator-lijst een grotere
+lading te dragen dan hij aankondigde.
+
+#### Wat er gemeten is, voordat er iets veranderde
+
+Alles opnieuw gemeten in plaats van uit dit logboek overgeschreven:
+
+| systeem | stand 2026-08-25 |
+|---|---|
+| `POST /api/cal` op productie | 503 `{"ok":false,"error":"not-configured"}` |
+| `lead-notify`, ongeldige JSON zonder auth | 400 `invalid-json` — nog steeds fail-open |
+| `lead-acknowledge`, idem | 400 `invalid-json` |
+| negatieve controle, functie die niet bestaat | 404 `NOT_FOUND` |
+| `marketing.leads` · `marketing.subscribers` | **0 rijen, ooit** — beide |
+| advisors `wbgiouuifqhasedncysw` | 116: 0 ERROR · 9 WARN · 107 INFO, gelijk aan vanochtend |
+| `diaz-appsumo-redeem` op **vbozel** (levend) | `invalid-code-format` → **dev-mode staat nog aan** |
+
+De vier probes op de edge functions raken niets: de auth-controle staat vóór de
+JSON-parse en het versturen erna, dus `400 invalid-json` scheidt open van dicht
+zonder één bericht te versturen. De 404 op een niet-bestaande functie is de
+negatieve controle die bewijst dat die 400's echte antwoorden zijn en geen
+generiek edge-antwoord. Zie [[feedback_poort_testen_zonder_bijwerking]].
+
+Voor AppSumo geldt hetzelfde principe één laag dieper. De functie heeft drie
+takken die elk een andere reden teruggeven — `invalid-code` met sleutels,
+`invalid-code-format` in dev-mode, 503 zonder allebei — dus een code die het
+dev-formaat níét haalt identificeert de configuratie zonder dat er ooit een
+licentie ontstaat. De eerste probe gaf `missing-fields`: ik had de veldnamen
+geraden. Ze heten `appsumo_code` en `customer_email`, en dat staat in de bron.
+**Lees de veldnamen, raad ze niet** — een probe die op de verkeerde laag faalt
+meet niets.
+
+#### De vondst: een guard die vroeg of de variabele gezet was
+
+Op de operator-lijst stond dat `SENTRY_DSN` op productie de letterlijke tekst
+`optional` draagt en dat serverfouten daardoor niet gerapporteerd worden. Dat
+klopt. Wat er niet stond is dat de code eromheen het probleem verdubbelde.
+
+`initSentry()` ving de worp van `mod.init()` op en waarschuwde. Daarna
+controleerde **elke** capture-functie alleen `!process.env.SENTRY_DSN`, en
+`"optional"` is truthy. Die guard liet ze dus door naar een
+**niet-geïnitialiseerde** client, waar hun eigen lege `catch` ze opslokte. Vijf
+keer dezelfde omgekeerde vraag: *is de variabele gezet* in plaats van *is de
+init geslaagd*.
+
+**Drie toestanden, en de derde is de gevaarlijke.** DSN leeg is een schone
+no-op. DSN geldig werkt. DSN onzin ziet er geconfigureerd uit, rapporteert
+niets, en zegt het niet — `isSentryEnabled()` gaf al die tijd `true` terug. Een
+gezondheidsindicator die liegt is erger dan geen indicator.
+
+**De omvang is de hele foutenweg.** `instrumentation.ts:onRequestError` is Next
+16's foutenhaak: elke onafgevangen render- of routefout op de Node-runtime gaat
+naar `captureException`. Die weg lag stil.
+
+#### De reparatie, en waarom de vormcontrole structureel is
+
+De guard is nu `active` — of de init werkelijk slaagde — op alle vijf de
+plekken, en `isSentryEnabled()` geeft datzelfde terug. Een DSN die gezet maar
+onbruikbaar is gedraagt zich voortaan exact als een ongezette: uit, en luid.
+
+`dsnLooksUsable()` controleert de **vorm** en niet één regex over de hele
+string, want een zelfgehoste Sentry kan achter een padvoorvoegsel zitten en de
+oude vorm draagt een secret na de publieke sleutel. Allebei moeten blijven
+werken; het enige dat moet falen is een waarde die nooit een ingest-endpoint kan
+adresseren. **Dat was de echte klem:** een te strenge validator zou Sentry
+uitzetten op het moment dat Juan er een geldige DSN in zet, en dat is een
+ergere fout dan de fout die gerepareerd wordt. Vandaar vier accepteer-gevallen
+naast de zes weiger-gevallen in de poort.
+
+De DSN zelf komt niet in het foutlog. Een van de mutaties zet hem er juist wél
+in, en die gaat af.
+
+#### De poort, en wat er niet was
+
+Er stond **geen enkele test** op `lib/sentry.ts`. Dat is hoe een omgekeerde
+guard hier maanden kon blijven staan.
+
+`initSentry(injected?)` heeft een injectie-naad gekregen zodat de
+toestandsmachine te meten is zonder `@sentry/node` te laden. Zonder die naad zou
+een test die "er is niets verstuurd" beweert net zo goed kunnen slagen doordat
+de module niet resolvet — **een lege uitkomst uit een kapot instrument leest
+hetzelfde als een schone meting.** De teller op de nepclient is de positieve
+controle: bij een geldige DSN moet er wél iets aankomen, in de goede volgorde.
+
+Acht mutaties, acht keer de voorspelde kleur. Zeven rood op zeven verschillende
+asserties; de achtste is de controle en blijft groen — hij verandert de
+`environment`-terugval, iets wat de poort bewust niet vastpint. Zonder die
+controle is niet te zien of de poort overgespecificeerd is.
+
+#### Twee instrumenten braken
+
+**De Vercel-log-API haalde zijn tijdbudget niet**, twee keer, ook op een venster
+van 45 minuten. Daarmee is de `Invalid Sentry Dsn: optional` van vanochtend
+**niet opnieuw bevestigd**. Dat staat hier als kapot instrument en niet als
+herbevestigde meting; de reparatie hierboven hangt er ook niet van af, want die
+volgt uit de code en niet uit het log.
+
+**En mijn eigen grep-glob verborg de beslissende vraag.** De eerste scan zocht
+in `{app,lib,components,scripts}/**` en vond `initSentry` alleen als definitie,
+nergens als aanroep — waaruit zou volgen dat de module dood is en ik de
+verkeerde repareerde. De aanroep staat in `instrumentation.ts`, in de
+repo-wortel, buiten mijn glob. **Scope een zoekopdracht nooit smaller dan de
+vraag die je stelt**, en trek geen "bestaat niet" uit een lijst die je zelf hebt
+ingeperkt.
+
+Verder liep een recursieve `grep` vanaf `.` de drie langlopende scratch-mappen
+in (`_3dcap/`, `diaz-editor-gtm/` met eigen `node_modules`, `migrations-review/`)
+en tikte zijn timeout aan — dezelfde val als `git add -A` in deze repo.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1196 tests in 55 bestanden (was 1180/54)
+i18n:check               718 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +16 is de nieuwe poort. Geen kopij geraakt, dus er valt hier niets in de
+browser na te meten — dit is serverpad.
+
+#### Wat dit niet oplost
+
+De rapportage staat hierna nog steeds **uit**. Wat verandert is dat hij het nu
+zegt in plaats van te doen alsof. `SENTRY_DSN` leegmaken (bewust uit) of een
+echte DSN zetten (aan) blijft operator-werk, en de rest van de keten — cal,
+lead-notify, Resend, de vijf Plausible-doelen, de AppSumo-vlag — is
+onveranderd wat het was.
