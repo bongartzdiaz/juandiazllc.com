@@ -11,7 +11,7 @@ export function Footer() {
         <div className="f-mark">Juan Diaz, LLC</div>
         <div style={{ color: "var(--muted-soft)", fontSize: 11 }}>{t("footer.copyright")}</div>
       </div>
-      <nav aria-label="Footer" style={{ display: "flex", gap: 22, flexWrap: "wrap" }}>
+      <nav aria-label={t("footer.aria")} style={{ display: "flex", gap: 22, flexWrap: "wrap" }}>
         <LocaleLink href="/story">{t("nav.story")}</LocaleLink>
         <LocaleLink href="/about">{t("footer.about")}</LocaleLink>
         <LocaleLink href="/now">{t("footer.now")}</LocaleLink>
@@ -33,7 +33,7 @@ export function Footer() {
           <a
             href="tel:+31653142656"
             style={{ fontVariantNumeric: "tabular-nums" }}
-            aria-label="Call +31 6 5314 2656"
+            aria-label={`${t("contact.directline.call")} +31 6 5314 2656`}
           >
             +31 6 5314 2656
           </a>
@@ -42,7 +42,7 @@ export function Footer() {
             href="https://wa.me/message/GUH2NLTZM6LTK1"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="WhatsApp +31 6 5314 2656"
+            aria-label={`${t("contact.directline.whatsapp")} +31 6 5314 2656`}
           >
             WhatsApp
           </a>

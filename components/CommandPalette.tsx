@@ -16,7 +16,7 @@ type Cmd = {
 
 export function CommandPalette() {
   const router = useRouter();
-  const { locale, setLocale } = useLocale();
+  const { locale, setLocale, t } = useLocale();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [active, setActive] = useState(0);
@@ -109,7 +109,7 @@ export function CommandPalette() {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Command palette"
+      aria-label={t("cmdk.aria")}
       onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
       style={{
         position: "fixed",
@@ -140,7 +140,7 @@ export function CommandPalette() {
             ref={inputRef}
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search or navigate — pages, ventures, languages"
+            placeholder={t("cmdk.placeholder")}
             style={{
               flex: 1,
               background: "transparent",
@@ -161,7 +161,7 @@ export function CommandPalette() {
         <div style={{ maxHeight: "52vh", overflowY: "auto", padding: 8 }}>
           {grouped.length === 0 ? (
             <div style={{ padding: "24px 16px", color: "var(--muted)", fontFamily: "'JetBrains Mono'", fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase" }}>
-              No matches
+              {t("cmdk.empty")}
             </div>
           ) : (
             grouped.map((g) => (
@@ -211,8 +211,8 @@ export function CommandPalette() {
           )}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 16px", borderTop: "1px solid var(--line)", fontFamily: "'JetBrains Mono'", fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--muted-soft)" }}>
-          <span>↑↓ Navigate · ↵ Select</span>
-          <span>⌘K to toggle</span>
+          <span>{t("cmdk.hint.nav")}</span>
+          <span>{t("cmdk.hint.toggle")}</span>
         </div>
       </div>
     </div>

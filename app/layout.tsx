@@ -21,6 +21,7 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["300", "400", "500"],
 });
 import { Overlays } from "@/components/Overlays";
+import { SkipLink } from "@/components/SkipLink";
 import { Preloader } from "@/components/Preloader";
 import { GlobalEffects } from "@/components/GlobalEffects";
 import { BackToTop } from "@/components/BackToTop";
@@ -223,7 +224,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <LocaleProvider>
-          <a href="#main" className="skip">Skip to content</a>
+          <SkipLink />
           <Overlays />
           <Preloader />
           {children}
