@@ -110,7 +110,7 @@ operator de bovenste leest; de lijst zelf begint eronder.
 | `marketing.leads` en `marketing.subscribers` | 0 rijen, ooit |
 | DNS TXT `juandiazllc.com` | `google-site-verification=ABrD7ZNd…` staat er, naast SPF |
 | Ahrefs `subscription-info-limits-and-usage` (gratis endpoint) | `{"error":"Insufficient plan"}` |
-| `diaz-appsumo-redeem`, code zonder dev-formaat, beide projecten | `invalid-code-format` — en die reden komt uit één tak: **dev-mode staat aan** op het levende project. Zie hieronder |
+| `diaz-appsumo-redeem`, code zonder dev-formaat, beide projecten | `invalid-code-format`, waaruit ik las dat dev-mode aanstond. **Dat klopte niet** — zie de correctie hieronder. Na de uitrol van 2026-08-26: 503 `service-unavailable` |
 | Vercel Web-Analytics-API, beide projecten | 404 `Web Analytics not found` — ook op `diaz-atlas-editor`, dat aantoonbaar 137 bezoekers over 30 dagen heeft. De 404 is het Hobby-plan, geen meting |
 | Vercel runtime-log `juandiazllc-com` | `Invalid Sentry Dsn: optional` — `SENTRY_DSN` staat op productie op de letterlijke tekst `optional` |
 
@@ -205,6 +205,28 @@ die ná de controle maar vóór de bijwerking faalt.
 
 Op wbgio is het gat toevallig onschadelijk — daar is `diaz_editor` gedropt, dus
 een geldige dev-code loopt stuk op de database. Op **vbozel** niet.
+
+**De gevolgtrekking hierboven was fout, en is op 2026-08-26 gecorrigeerd.** De
+meting klopte — het endpoint gaf `invalid-code-format` — maar wat ik eruit
+las niet. Die drie-takken-redenering leest de bron in de repo, en op vbozel stond
+die bron sinds **9 mei** niet meer uitgerold: versie 22, één bestand,
+`updated_at` gelijk aan `created_at`. De gedeployde functie had **helemaal geen**
+dev-mode-controle; haar `else` was onvoorwaardelijk. Daar kwam
+`invalid-code-format` dus altijd uit, met de vlag aan of uit.
+
+Wat de twee gevallen wél scheidde was een tweede slug op hetzelfde project.
+`appsumo-redeem` — zonder voorvoegsel, v1, 4 augustus, geen map in de repo,
+door niets aangeroepen — draagt de drie-takken-versie en gaf 503
+`service-unavailable`. Daarmee stond de vlag aantoonbaar **uit**, terwijl het
+endpoint dat `landing/redeem.html` werkelijk belt onvoorwaardelijk openstond.
+Twee slugs, twee versies, één naam die op de ander lijkt.
+
+**De les: bron in de repo bewijst niets over gedeployde code.**
+`updated_at == created_at` op een edge function zegt dat hij nooit is
+heruitgerold, en dat signaal stond er de hele tijd. Het staat ook al opgeschreven
+— zie [[project_diaz_editor_repo_prod_drift]], dat precies dit voor deze repo
+vastlegt — en ik ben er alsnog in getrapt door de bron te lezen in plaats van
+het levende object.
 
 **Eén val staat er nog wél, en die is scherper dan de tien dode functies.**
 `supabase/README.md` in `bongartzdiaz/diaz-editor` instrueert nog steeds om de
@@ -346,20 +368,26 @@ herschreven, en deze notitie is de correctie erop.
 
 ### Supabase en Stripe
 
-- **`APPSUMO_DEV_MODE` uitzetten op `vbozelswveaxsyccvaac`** — Edge Functions →
-  Secrets. Gemeten op 2026-08-25 staat `diaz-appsumo-redeem` daar publiek open in
-  dev-mode, waarin een zelfverzonnen code in het formaat `DIAZ-APPSUMO-T3-…` langs
-  de codecontrole komt en op een gratis lifetime-licentie uitkomt. De functie is
-  ontworpen om zónder die vlag met 503 te weigeren, dus uitzetten ís de reparatie.
-  **Doe dit vóór de tien dode functies** — die zijn dood, deze leeft. Zie de
-  meting hierboven.
+- ~~**`APPSUMO_DEV_MODE` uitzetten op `vbozelswveaxsyccvaac`**~~ — **gesloten op
+  2026-08-26, en de reparatie was een andere dan hier stond.** De vlag stond al
+  uit; wat openstond was de gedeployde functie zelf, die sinds 9 mei op versie 22
+  hing en geen dev-mode-controle kende. `bongartzdiaz/diaz-editor#645`
+  (`22bf2b8f`) is uitgerold naar versie 23, en de probe sloeg om van 200
+  `invalid-code-format` naar 503 `service-unavailable`, met 404 op een
+  niet-bestaande slug als negatieve controle. Nul licenties uitgegeven: zes op
+  vbozel, nul van appsumo, laatste uitgifte 22 mei. **De vlag hoeft nu nergens
+  meer voor** — zet iemand hem terug aan zonder `APPSUMO_DEV_SECRET`, dan weigert
+  die tak met 503 `auth-not-configured`.
 - **Leaked-password protection** aanzetten op `wbgiouuifqhasedncysw` — de enige
   WARN uit de advisors die actie vergt.
 - **Tien dode `diaz-*` edge functions** op wbgio en **vijf dubbele slugs** op
   vbozel. Wát er nog naartoe schreef: niets. Stripe en Lemon wijzen aantoonbaar
   naar vbozel, en de AppSumo-vraag is op 2026-08-25 beantwoord — er ís geen
   AppSumo-instelling, want die koppeling loopt de andere kant op. **Er staat niets
-  meer voor; de tien kunnen weg.** Zie de tabel hierboven.
+  meer voor; de tien kunnen weg.** Zie de tabel hierboven. **Eén van de vijf is
+  inmiddels benoemd:** `appsumo-redeem` op vbozel — v1, 4 augustus, geen map in
+  de repo, door niets aangeroepen, draagt wél een service-role-sleutel. Die kan
+  weg zodra jij dat zegt; verwijderen is onomkeerbaar en naar buiten gericht.
 - ~~De README in `bongartzdiaz/diaz-editor` wijst de Stripe-webhook naar het
   dode project.~~ **Gemarkeerd op 2026-08-25** met #640 (`208192b`): elf
   verwijzingen over twee bestanden, allemaal voorzien van een waarschuwing.
@@ -408,6 +436,14 @@ herschreven, en deze notitie is de correctie erop.
   berichten-endpoint. De regel die hij bewaakt — geen geautomatiseerde
   connectieverzoeken of DM's — is ongewijzigd juist. Het bestand staat buiten elke
   repo en wordt niet aangeraakt zonder jouw expliciete go.
+- **De `supabase`-CLI op deze machine is ingelogd als
+  `roy.raainvestments@gmail.com`.** Gemeten op 2026-08-26 via `supabase projects
+  list`: zestien projecten over vijf organisaties, en **noch `vbozelswveaxsyccvaac`
+  noch `wbgiouuifqhasedncysw` zit ertussen**. Vandaar dat een uitrol via de CLI
+  faalt met 403 *"account does not have the necessary privileges"* — dat is geen
+  defect maar een verkeerd account. De MCP-verbinding heeft die rechten wél, dus
+  uitrollen kan daarlangs. Wil je het zelf via de CLI doen, dan moet je eerst als
+  jezelf inloggen, en dat **vervangt Roy's opgeslagen token** op deze machine.
 
 ### LinkedIn — het kanaal is gekozen, het profiel wacht
 
