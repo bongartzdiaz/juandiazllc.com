@@ -356,8 +356,12 @@ herschreven, en deze notitie is de correctie erop.
   plekken of de variabele gezet was in plaats van of de init geslaagd was, dus
   elke melding liep naar een niet-geïnitialiseerde client en
   `isSentryEnabled()` gaf `true` terug. Dat faalt nu luid in plaats van stil,
-  **maar het zet de rapportage niet aan.** Leegmaken (bewust uit) of een echte
-  DSN zetten (aan) blijft operator-werk.
+  **maar het zet de rapportage niet aan.**
+  **Beslist op 2026-08-26: aan.** Wat nog moet is de waarde zelf; die is van
+  jou en komt hier niet door mijn handen. Sinds #277 draagt een melding
+  vanzelf zijn commit, want `VERCEL_GIT_COMMIT_SHA` is nu de derde terugval
+  voor de release. Zet je hem bewust niet aan, maak de variabele dan **leeg**
+  in plaats van hem op een plaatsaanduiding te laten staan.
 - **Nakijken of Web Analytics aan staat op `juandiazllc-com`** (Project
   Settings → Analytics). Het script staat er sinds #267 en wordt door het
   platform geserveerd (`/_vercel/insights/script.js` → 200 op productie), maar
@@ -7420,3 +7424,133 @@ kan niet merken dat hij het verkeerde veld leest.
 Er is geen enkele operator-taak mee opgelost. `SENTRY_DSN`, de vijf
 Plausible-doelen, `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `CAL_WEBHOOK_SECRET` en
 de rest van de lijst bovenaan dit bestand staan onveranderd open. Dit was code.
+
+### 2026-08-26 (vervolg) — Sentry gaat aan, en de melding droeg geen versie
+
+Juan besliste dat de foutrapportage aan gaat. De reparatie van 25 augustus maakte
+hem eerlijk — een DSN die gezet maar onbruikbaar is gedraagt zich sindsdien als
+een ongezette, uit en luid — maar liet één ding staan dat pas bijt zodra er
+werkelijk meldingen binnenkomen.
+
+#### Twee namen voor hetzelfde feit, en niets ertussen
+
+`lib/sentry.ts` las `SENTRY_RELEASE ?? GIT_COMMIT_SHA`. Vercel zet
+`VERCEL_GIT_COMMIT_SHA`. Gemeten over `app`, `lib`, `scripts`, `.github`,
+`next.config.ts` en `package.json`: **nul treffers** op die naam. Zonder een
+handmatige toewijzing blijven allebei de terugvallen leeg, dus elke melding komt
+zonder versie binnen — en dan is *in welke deploy ging dit stuk* niet te
+beantwoorden op precies het moment dat je het vraagt.
+
+Dat is dezelfde vorm als `process.env[SECRET_ENV]`, dat `CAL_WEBHOOK_SECRET`
+maandenlang uit `.env.example` hield: functioneel werkt alles, er gaat niets
+stuk, en het instrument dat ernaar kijkt kan het niet zien.
+
+#### `??` is hier de verkeerde operator, en dat is te meten
+
+`??` valt alleen terug op `null` of `undefined`. Een omgevingsvariabele die je in
+een dashboard aanmaakt maar leeg laat, komt binnen als **lege string** en wint
+daarmee van élke terugval erachter — stil. Dezelfde klasse als een `SENTRY_DSN`
+op de tekst `optional`: gezet, en onbruikbaar.
+
+`eersteGevulde()` behandelt leeg en witruimte als niet-gezet en trimt wat het
+teruggeeft. De volgorde is expliciet eerst, platform laatst:
+
+    release: eersteGevulde(
+      process.env.SENTRY_RELEASE,
+      process.env.GIT_COMMIT_SHA,
+      process.env.VERCEL_GIT_COMMIT_SHA,
+    )
+
+**`environment` ging mee, en dat was iets meer dan de vraag.** Dezelfde
+defectklasse stond één regel hoger in dezelfde objectliteral. Repareer je één
+regel in een cluster, test dan de buren — ze zijn met hetzelfde verkeerde model
+geschreven. Dat staat sinds 19 augustus in dit logboek en het gold hier weer.
+
+#### De variabele hoort níét in `.env.example`, en dat werd door niets afgedwongen
+
+`VERCEL_GIT_COMMIT_SHA` staat in `DOOR_PLATFORM`, met reden: het platform zet
+hem, en wie hem in het voorbeeldbestand ziet gaat hem invullen — waarna het
+versielabel liegt over welke commit draait.
+
+Die regel stond alleen in de toelichting bij die lijst. **Niets controleerde
+hem**, en de twee bestaande asserties kunnen dat ook niet: een platformvariabele
+*wordt* gelezen, dus "gedocumenteerd maar nergens gelezen" blijft groen terwijl
+een lezer hem invult. Precies de klasse *een toelichting beschrijft een controle
+die niet bestaat*, die dit logboek het vaakst noteert.
+
+**Het gat is gemeten en niet aangenomen.** Met de variabele in `.env.example` en
+de nieuwe assertie eruit is die poort **6/6 groen**. Daarna rood.
+
+#### Tien mutaties, tien keer de voorspelde kleur
+
+| | mutatie | verwacht |
+|---|---|---|
+| M1 | `release` verliest de platformterugval | ROOD |
+| M2 | lege string telt weer als gezet | ROOD |
+| M3 | `environment` terug naar de `??`-keten | ROOD |
+| M4 | er wordt niet meer getrimd | ROOD |
+| M5 | volgorde omgekeerd, platform eerst | ROOD |
+| M6 | uitzondering weg uit `DOOR_PLATFORM` | ROOD |
+| M7 | platformvariabele in `.env.example` | ROOD |
+| M8 | de positieve controle zoekt de verkeerde aanroep | ROOD |
+| **M9** | **dezelfde onbekende variabele in een TOELICHTING** | **GROEN** |
+| **M10** | **dezelfde naam in ECHTE code** | **ROOD** |
+
+M9/M10 is het paar dat telt: het bewijst dat `zonderCommentaar` in die poort
+dragend is en niet decoratief. Vier eerdere tekstscans in deze repo vielen om op
+hun eigen proza.
+
+M8 richt zich op de nieuwe poort zelf. Zonder die positieve controle slaagt elke
+assertie over de `init`-argumenten ook op een `init` die nooit is aangeroepen —
+een lege uitkomst uit een kapot instrument leest hetzelfde als een schone meting.
+
+#### Wat de poort niet bewaakt
+
+Dát Vercel die naam zet. Dat is een platformfeit; verandert het, dan valt de
+terugval stil terug op `undefined` en is dat exact de toestand van vóór deze PR.
+Staat in de kop van het testbestand, zodat een groen vinkje hier niet gelezen
+wordt als "de versie komt altijd mee".
+
+#### Het tweede punt op mijn eigen lijst bestond niet
+
+Ik meldde erbij dat `lib/sentry.ts:59` nog verzoeken aan `/api/health` uit de
+rapportage filtert — een route die met #134 vertrok. Nagemeten: die tak is er
+niet. **`630de98` (#217, 21 augustus) heeft hem al weggehaald**, en het logboek
+zegt dat ook, in het blok van diezelfde dag.
+
+Waar ik naar keek was de regel *Niet meegenomen* in het blok van #211, vier PR's
+eerder. Ik heb die als openstaand overgenomen zonder verder te lezen en zonder
+het bestand te openen. Dat is de fout die hier het vaakst terugkomt, nu op het
+logboek zelf: **een notitie beschrijft de toestand van het moment waarop hij
+geschreven werd, niet die van vandaag.** Grep in het levende bestand kostte één
+aanroep.
+
+Wat er nog wél staat zijn twee bewuste verwijzingen: de assertie in
+`lib/csrf-vrijstelling.test.ts` die eist dat `/api/health` **403** geeft, en de
+toelichting in `lib/csrf-vrijstelling.ts` die uitlegt waarom die vrijstelling
+verviel. Allebei uit #211, allebei terecht.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1235 tests in 57 bestanden (was 1225/57)
+i18n:check               730 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +10 is negen in het nieuwe release-blok plus één in de env-poort. Geen kopij
+geraakt en geen route: dit is serverpad, dus er valt niets in de browser na te
+meten.
+
+Zes verplichte checks groen op de PR, en de Vercel-status apart nagekeken — die
+komt via `/status` en niet via `/check-runs`, de val van 22 augustus. Squashboom
+identiek aan die van de tak.
+
+#### Wat dit niet doet
+
+**De rapportage staat hierna nog steeds uit.** Wat er verandert is dat een
+melding straks zijn commit draagt. `SENTRY_DSN` op productie zetten blijft
+operator-werk; die waarde is van Juan.
