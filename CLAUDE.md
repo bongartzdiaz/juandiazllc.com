@@ -29,8 +29,10 @@ verhuisd is.
 `POST /api/deals` en `POST /api/ai/score`. Alle vier zijn verwijderd.
 Wil je latency-budgetten op de marketingkant, dan is dat nieuw werk, geen
 herstel. Sentry draait nog wel (`lib/sentry.ts`, alleen serverfouten;
-`sendDefaultPii` staat uit) — DSN gezet en op productie
-geverifieerd op 2026-08-26.
+`sendDefaultPii` staat uit), **maar hij rapporteert niets**: de
+`SENTRY_DSN` op productie wordt geweigerd door `dsnLooksUsable()`,
+gemeten op 2026-08-26 om 15:33 UTC. Zie de Vercel-sectie op de
+operator-lijst.
 
 **DEUS-SHARED is de bron voor alles wat CRM is.** De `sync-deus-shared.yml`
 die van die repo ooit een spiegel maakte, heeft nooit op main gestaan; de
@@ -113,7 +115,7 @@ operator de bovenste leest; de lijst zelf begint eronder.
 | Ahrefs `subscription-info-limits-and-usage` (gratis endpoint) | `{"error":"Insufficient plan"}` |
 | `diaz-appsumo-redeem`, code zonder dev-formaat, beide projecten | `invalid-code-format`, waaruit ik las dat dev-mode aanstond. **Dat klopte niet** — zie de correctie hieronder. Na de uitrol van 2026-08-26: 503 `service-unavailable` |
 | Vercel Web-Analytics-API, beide projecten | 404 `Web Analytics not found` — ook op `diaz-atlas-editor`, dat aantoonbaar 137 bezoekers over 30 dagen heeft. De 404 is het Hobby-plan, geen meting |
-| Vercel runtime-log `juandiazllc-com` | `Invalid Sentry Dsn: optional` — `SENTRY_DSN` staat op productie op de letterlijke tekst `optional`. **Achterhaald op 2026-08-26: gezet en geverifieerd, zie de Vercel-sectie hieronder** |
+| Vercel runtime-log `juandiazllc-com` | `Invalid Sentry Dsn: optional` — `SENTRY_DSN` staat op productie op de letterlijke tekst `optional`. **Bijgesteld op 2026-08-26: er staat sindsdien een andere waarde, en die wordt nog steeds geweigerd — zie de Vercel-sectie hieronder** |
 
 De probe op de twee meldingsfuncties raakt niets: de auth-controle staat vóór de
 JSON-parse en het versturen staat erna, dus `400 invalid-json` scheidt "open" van
@@ -349,30 +351,38 @@ herschreven, en deze notitie is de correctie erop.
 
 ### Vercel
 
-- ~~**`SENTRY_DSN` in Vercel-productie staat op de letterlijke tekst
-  `optional`**~~ — **gezet op 2026-08-26 en diezelfde dag op productie
-  geverifieerd. De rapportage staat aan.**
-  Gemeten op deployment `dpl_Ba974wS7M5orrm3Yo51wfWrdyK5p` (commit
-  `578e9e2`): tot **14:15:02 UTC** droeg elk verzoek de regel `[sentry] ...is
-  not a usable DSN`, vanaf **14:18:14** geen enkel meer, en het niveau sloeg
-  om van `error/serverless` naar `info/serverless`.
-  **Zonder nieuwe deploy** — beide reeksen staan onder hetzelfde
-  deployment-id, dus de waarde sloeg aan op de draaiende productie. Dat
-  weerlegt de aanname waarmee ik de meting opende, dat Vercel de variabele
-  bij de deploy inbakt.
-  **De eerste stilte was nog geen meting.** `initSentry()` opent met `if
-  (initialized) return`, dus een warme lambda zwijgt hoe dan ook — hetzelfde
-  beeld als een werkende DSN. Zes gelijktijdige verzoeken dwongen verse
-  instanties af: alle zes in het log, alle zes `cache=MISS`, alle zes zonder
-  die regel. Stilte betekent hier geslaagde init, want elk faalpad in
-  `lib/sentry.ts` logt zijn eigen regel — onbruikbare vorm, ontbrekende
-  module, of een worp uit `init()`. `active = true` is de enige tak die niets
-  zegt.
-  **Niet vastgesteld:** of er werkelijk gebeurtenissen in het Sentry-project
-  binnenkomen. De vorm klopt en `init()` gooide niet; of het project ze
-  accepteert — juiste organisatie, juist projectnummer, quota — is alleen
-  in Sentry zelf te zien. Sinds #277 draagt een melding vanzelf zijn commit,
-  want `VERCEL_GIT_COMMIT_SHA` is de derde terugval voor de release.
+- **`SENTRY_DSN` in Vercel-productie wordt geweigerd. Serverfouten worden
+  niet gerapporteerd.** Juan zette op 2026-08-26 een nieuwe waarde; die
+  is de letterlijke tekst `optional` niet meer, maar hij komt nog steeds
+  niet door `dsnLooksUsable()`.
+  Gemeten op deployment `dpl_4RT1ddsgE6tKW45xH7A6TvGuafn9`, aangemaakt om
+  **14:35:25 UTC** uit de merge van #279 — dus ruim ná het zetten.
+  Zijn **eerste** verzoeken (14:36:51, 14:37:04, 14:37:29, 14:38:30)
+  dragen alle vier de regel `[sentry] SENTRY_DSN is set but is not a
+  usable DSN`, en om 15:33:29 deed hij het opnieuw. Een verse deployment
+  is bij zijn eerste invocatie per definitie koud, dus hier is geen
+  warme-lambda-uitleg meer voor.
+  **De keten eromheen is in orde, en dat is met dezelfde probe gemeten.**
+  Eén synthetisch CSP-rapport naar `/api/csp-report` gaf 204 en logde
+  `[csp] script-src blocked https://probe.invalid/...` — de regel die
+  vlak vóór `captureMessage()` staat. De code bereikt Sentry dus; alleen
+  de waarde deugt niet.
+  **Wat er moet staan:** `https://<publicKey>@<host>/<projectId>`, precies
+  zoals Sentry hem toont onder Project Settings — Client Keys (DSN).
+  Drie dingen laten `dsnLooksUsable()` afgaan: geen `https://` ervoor,
+  geen `@` (dus geen publieke sleutel), of niets achter de laatste `/`
+  (dus geen projectnummer). Een auth-token (`sntrys_...`) en een
+  dashboard-URL zijn allebei geen DSN. Zet je hem bewust niet aan, maak
+  de variabele dan **leeg** — dan is de no-op stil in plaats van luid.
+  **Mijn verificatie van 14:20 was fout, en #279 (`0294b35`) heeft die
+  onwaarheid gemergd.** Ik las de stilte van zes gelijktijdige verzoeken
+  als bewijs dat de DSN was aangeslagen. Gelijktijdigheid dwingt
+  **parallelle** instanties af, geen **koude**: de pool droeg al warme
+  instanties uit de reeksen van 14:13:29 en 14:13:43, en `initSentry()`
+  opent met `if (initialized) return`. Die zwegen hoe dan ook.
+  **Een verse deployment is de enige betrouwbare koude probe**, want die
+  draait `register()` gegarandeerd vanaf nul. Zie
+  [[feedback_verify_the_measuring_stick]].
 - **Nakijken of Web Analytics aan staat op `juandiazllc-com`** (Project
   Settings → Analytics). Het script staat er sinds #267 en wordt door het
   platform geserveerd (`/_vercel/insights/script.js` → 200 op productie), maar
