@@ -1,21 +1,44 @@
 import { ImageResponse } from "next/og";
 import { getInsight } from "@/lib/insights";
+import { assertLocale } from "@/lib/i18n/metadata";
+import { translate } from "@/lib/i18n/dict";
+import { tagLabel, tagSlug } from "@/lib/i18n/tags";
 
-// Per-post OG image generated at build time by Next's @vercel/og.
+// Per-post OG image, gerenderd door Next's @vercel/og.
 // Matches the new darker-green palette (bg #020D0A, accent #2EC489)
 // so the card looks cohesive with the rest of the brand on Twitter,
-// LinkedIn, Slack unfurls, etc. Falls back to the site default if
-// the slug is unknown (shouldn't happen because generateStaticParams
-// restricts to known posts, but defensive).
+// LinkedIn, Slack unfurls, etc.
+//
+// De twee terugvallen hieronder zijn dragend, niet decoratief. Deze route
+// wordt NIET voorgerenderd: gemeten op 2026-08-26 draagt alleen de
+// wortelkaart een .body/.meta in .next, deze niet. Er is dus geen
+// generateStaticParams die de slug inperkt -- elke (locale, slug) die
+// iemand opvraagt bereikt deze functie. Vandaar assertLocale op de taal
+// en een undefined-tak op de post.
 
 export const alt = "Juan Diaz, LLC — Insight";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default async function OG({ params }: { params: { slug: string } }) {
-  const post = getInsight(params.slug);
+export default async function OG({
+  params,
+}: {
+  // Next 16 levert params als Promise. Hem niet awaiten geeft geen fout:
+  // .locale en .slug zijn dan undefined, assertLocale valt terug op en,
+  // en de kaart rendert stil de generieke terugval. Zo stond elke
+  // artikelkaart op de site tot 2026-08-26 -- 200 OK, geldige PNG, geen titel.
+  params: Promise<{ locale: string; slug: string }>;
+}) {
+  const { locale, slug } = await params;
+  const l = assertLocale(locale);
+  const post = getInsight(slug, l);
   const title = post?.title ?? "Juan Diaz, LLC — Insight";
-  const tag = post?.tag ?? "Insights";
+  // De canonieke tag is de routeersleutel, niet wat de lezer ziet: de
+  // tagpagina toont hem al via tagLabel. Zonder die stap staat er
+  // "Real estate" op een Duitse kaart waar de pagina "Immobilien" zegt.
+  const tag = post
+    ? tagLabel(l, tagSlug(post.tag), post.tag)
+    : translate(l, "nav.insights");
   const readingMinutes = post?.readingMinutes;
 
   return new ImageResponse(
@@ -87,11 +110,11 @@ export default async function OG({ params }: { params: { slug: string } }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             <div style={{ display: "flex", fontSize: 18, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7FA393" }}>
-              Insights
+              {translate(l, "nav.insights")}
             </div>
             {readingMinutes && (
               <div style={{ display: "flex", fontSize: 22, color: "#9ABAA9" }}>
-                {readingMinutes} min read
+                {readingMinutes} {translate(l, "insights.d.minread")}
               </div>
             )}
           </div>

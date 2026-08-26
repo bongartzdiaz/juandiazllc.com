@@ -10,8 +10,15 @@ export const alt = "Juan Diaz, LLC — Venture";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default async function OG({ params }: { params: { locale: string; slug: string } }) {
-  const v = getVenture(params.slug, assertLocale(params.locale));
+// Next 16 levert params als Promise -- zie de toelichting in de
+// insights-tegenhanger: niet awaiten faalt stil op een geldige PNG.
+export default async function OG({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}) {
+  const { locale, slug } = await params;
+  const v = getVenture(slug, assertLocale(locale));
   const name = v?.name ?? "Juan Diaz, LLC";
   const tagline = v?.tagline ?? "Revenue engines for operators.";
   const sector = v?.sector ?? "Holding";
