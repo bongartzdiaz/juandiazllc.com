@@ -1,15 +1,29 @@
 import { ImageResponse } from "next/og";
 import { getSignal } from "@/lib/signals";
 import { assertLocale } from "@/lib/i18n/metadata";
+import { translate } from "@/lib/i18n/dict";
+import { tagLabel, tagSlug } from "@/lib/i18n/tags";
 
 export const alt = "Juan Diaz, LLC — Signal";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default async function OG({ params }: { params: { locale: string; slug: string } }) {
-  const s = getSignal(params.slug, assertLocale(params.locale));
+// Next 16 levert params als Promise -- zie de toelichting in de
+// insights-tegenhanger: niet awaiten faalt stil op een geldige PNG.
+export default async function OG({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}) {
+  const { locale, slug } = await params;
+  const l = assertLocale(locale);
+  const s = getSignal(slug, l);
   const title = s?.title ?? "Juan Diaz, LLC — Signal";
-  const tag = s?.tag ?? "Signals";
+  // Signal.tag staat bewust niet in SignalL10n: het is de routeersleutel.
+  // Wat de lezer ziet loopt daarom via tagLabel, zoals op de tagpagina.
+  const tag = s
+    ? tagLabel(l, tagSlug(s.tag), s.tag)
+    : translate(l, "nav.signals");
   const readTime = s?.readTime;
 
   return new ImageResponse(
@@ -78,7 +92,7 @@ export default async function OG({ params }: { params: { locale: string; slug: s
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             <div style={{ display: "flex", fontSize: 18, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7FA393" }}>
-              Signals
+              {translate(l, "nav.signals")}
             </div>
             {readTime && (
               <div style={{ display: "flex", fontSize: 22, color: "#9ABAA9" }}>

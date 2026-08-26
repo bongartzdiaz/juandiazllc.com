@@ -218,26 +218,11 @@ const ACHTERSTAND: Record<string, { reden: string; tekst: string[] }> = {
       "Energy · Real Estate · Hospitality",
     ],
   },
-  "app/[locale]/insights/[slug]/opengraph-image.tsx": {
-    reden: "Deelkaart per artikel; staat wél in [locale] maar leest de taal niet.",
-    tekst: [
-      "Insights",
-      "min read",
-    ],
-  },
-  "app/[locale]/signals/[slug]/opengraph-image.tsx": {
-    reden:
-      "Zelfde als de insights-kaart: staat in [locale] maar leest de taal " +
-      "niet, dus elk signals-artikel deelt met een Engels label.",
-    tekst: [
-      "Signals",
-    ],
-  },
 };
 
 /* Het cijfer waar de ratel op staat. Verlagen mag altijd; verhogen betekent dat
  * er een lek bij is gekomen, en dan hoort deze regel zichtbaar in de diff. */
-const ACHTERSTAND_MAX = 7;
+const ACHTERSTAND_MAX = 4;
 
 function verzameld(lijst: typeof TOEGESTAAN): Map<string, Set<string>> {
   return new Map(
