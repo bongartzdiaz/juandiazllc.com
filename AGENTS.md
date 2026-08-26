@@ -109,7 +109,7 @@ operator de bovenste leest; de lijst zelf begint eronder.
 |---|---|
 | `POST /api/cal` op productie | 503 `{"ok":false,"error":"not-configured"}` — `CAL_WEBHOOK_SECRET` staat nog niet |
 | `lead-notify`, ongeldige JSON zonder auth | **400 `invalid-json`** — nog steeds fail-open |
-| `lead-acknowledge`, idem | 400 `invalid-json` — idem, dus `LEAD_NOTIFY_SECRET` staat niet |
+| `lead-acknowledge`, idem | 400 `invalid-json` — idem, dus `LEAD_NOTIFY_SECRET` staat niet. **Achterhaald op 2026-08-26: de fail-closed code is uitgerold en hij geeft nu 503 `not-configured` — zie stap 3 van de meetketen** |
 | `marketing.leads` en `marketing.subscribers` | 0 rijen, ooit |
 | DNS TXT `juandiazllc.com` | `google-site-verification=ABrD7ZNd…` staat er, naast SPF |
 | Ahrefs `subscription-info-limits-and-usage` (gratis endpoint) | `{"error":"Insufficient plan"}` |
@@ -322,11 +322,19 @@ herschreven, en deze notitie is de correctie erop.
    is klaar — wat ontbreekt is de functiekant. Dit sluit `lead-notify`, dat nog
    fail-open is. **Vóór stap 4.**
 
-   Voor `lead-acknowledge` is de code sinds 2026-08-25 fail-closed, maar dat
-   werkt pas na uitrollen. **Zet de sleutel vóór je die functie uitrolt** —
-   andersom antwoordt hij op elke lead 503 `not-configured` en schrijft hij geen
-   `ack_channel` meer weg. Vandaag kost die volgorde niets (nul leads ooit, geen
-   Resend-sleutel), maar hij blijft die.
+   Voor `lead-acknowledge` is die volgorde op 2026-08-26 bewust omgedraaid:
+   de fail-closed code van 25 augustus is uitgerold (v3) terwijl de sleutel
+   nog niet stond. **Die functie weigert nu alles**, de trigger inbegrepen.
+   Gemeten direct na de uitrol sloeg een POST met ongeldige JSON en zonder
+   auth-header om van `400 invalid-json` naar `503 not-configured`, met 404
+   op een niet-bestaande slug als negatieve controle en `lead-notify`
+   onveranderd op 400.
+   Vandaag kost dat niets (nul leads ooit, geen Resend-sleutel). Wat het
+   verandert: waar de functie eerst `ack_channel = 'skipped:no-api-key'`
+   wegschreef, schrijft hij nu niets en houdt `net._http_response` een 503
+   vast. Deze stap is daarmee geen opruimwerk meer maar de knop die de
+   bevestigingsketen aanzet — en hij sluit `lead-notify` in
+   dezelfde handeling, want beide lezen dezelfde sleutel.
 4. **`RESEND_API_KEY` + `ACK_FROM`** op een geverifieerd domein. Zonder die twee
    gaat er bij een echte lead geen enkele mail de deur uit — gemeten, niet
    vermoed. Pas ná stap 3, anders geef je een publiek aanroepbaar endpoint een
