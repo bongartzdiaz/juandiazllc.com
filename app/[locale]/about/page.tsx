@@ -3,8 +3,8 @@ import { LocaleLink } from "@/components/LocaleLink";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import {
-  AUTHOR_IMAGE_PATH,
   AUTHOR_IMAGE_URL,
+  ogImages,
   PERSON_SAME_AS,
   PERSON_NAME,
   PERSON_ALTERNATE_NAMES,
@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         "Construction-trained, operator-built. Revenue engines for operators in energy, real estate and hospitality.",
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
-      images: [{ url: AUTHOR_IMAGE_PATH, width: 1200, height: 1200, alt: "Juan Diaz" }],
+      images: ogImages(l),
     },
   };
 }

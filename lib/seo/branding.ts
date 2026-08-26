@@ -10,6 +10,8 @@
 // drop the file and no code change is needed — only update the constant
 // if the filename or extension changes.
 
+import type { Locale } from "@/lib/i18n/dict";
+
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
 /**
@@ -33,14 +35,6 @@ const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
  * wijziging.
  */
 export const AUTHOR_IMAGE_URL = `${SITE}/opengraph-image`;
-
-/**
- * Same as AUTHOR_IMAGE_URL but path-relative — for use in Next.js
- * Metadata API `openGraph.images[].url` which Next resolves against the
- * request origin. Using a path keeps preview deploys + multi-domain
- * setups working without env-var gymnastics.
- */
-export const AUTHOR_IMAGE_PATH = "/opengraph-image";
 
 /**
  * Fallback used when the canonical asset hasn't shipped yet. The 512px
@@ -84,13 +78,34 @@ export const ORG_LOGO_URL = `${SITE}/icon.svg`;
  * Zet dit dus in ELKE `openGraph`-declaratie. Overerven werkt hier niet, en
  * dat is geen bug in Next maar de gedocumenteerde samenvoegregel.
  * `metadata-locales.test.ts` bewaakt het.
+ *
+ * WAAROM DIT EEN FUNCTIE IS, EN GEEN CONSTANTE MEER
+ *
+ * Tot 2026-08-26 wees dit naar `/opengraph-image`, de wortelkaart. Die kaart
+ * draagt Engelse kopij, dus wie /nl of /de deelde kreeg een Engelse tagline —
+ * op elke pagina, in elke taal. Nu wijst het per taal naar
+ * `/{taal}/opengraph-image` (app/[locale]/opengraph-image.tsx).
+ *
+ * De wortelkaart blijft bestaan en is bewust NIET vertaald: hij is de
+ * entiteitsafbeelding waar AUTHOR_IMAGE_PATH naar wijst voor Person.image en
+ * Organization.image in de JSON-LD. Eén entiteit, één afbeelding — zie #198,
+ * dat vier losse Person-knopen juist tot één terugbracht.
  */
-export const OG_IMAGES = [
-  { url: "/opengraph-image", width: 1200, height: 630, alt: "Juan Diaz, LLC" },
-];
+export function ogImages(l: Locale) {
+  return [
+    {
+      url: `/${l}/opengraph-image`,
+      width: 1200,
+      height: 630,
+      alt: "Juan Diaz, LLC",
+    },
+  ];
+}
 
 /** Dezelfde afbeelding in de vorm die `twitter.images` verwacht. */
-export const TWITTER_IMAGES = ["/opengraph-image"];
+export function twitterImages(l: Locale) {
+  return [`/${l}/opengraph-image`];
+}
 
 /**
  * Het achtervoegsel dat `title.template` in app/layout.tsx aan elke paginatitel

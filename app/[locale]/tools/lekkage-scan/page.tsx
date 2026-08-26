@@ -4,7 +4,7 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 import { ENKELE_TAAL } from "@/lib/i18n/enkele-taal";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { LekkageScan } from "@/components/LekkageScan";
-import { OG_IMAGES } from "@/lib/seo/branding";
+import { ogImages } from "@/lib/seo/branding";
 
 /* De lekkage-scan — bestaat alleen op /nl.
  *
@@ -36,7 +36,7 @@ export async function generateMetadata({
     description: BESCHRIJVING,
     alternates: buildAlternates(l, PAD, TALEN),
     openGraph: {
-      images: OG_IMAGES,
+      images: ogImages(l),
       type: "website",
       title: TITEL,
       description: BESCHRIJVING,

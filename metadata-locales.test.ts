@@ -244,8 +244,21 @@ describe("deelafbeelding", () => {
         expect(
           Array.isArray(images) && images.length > 0,
           `${route} [${l}]: openGraph is gedeclareerd zonder images — ` +
-            `dat overschrijft de afbeelding uit de layout. Zet OG_IMAGES erin.`,
+            `dat overschrijft de afbeelding uit de layout. Zet ogImages(l) erin.`,
         ).toBe(true);
+
+        /* En de afbeelding moet DEZE taal dragen. Tot 2026-08-26 wees elke
+         * pagina in alle vier de talen naar dezelfde wortelkaart met Engelse
+         * kopij; de assertie hierboven zag dat niet, want die telt alleen of
+         * de lijst gevuld is. */
+        for (const img of images as Array<string | { url?: string }>) {
+          const url = typeof img === "string" ? img : (img?.url ?? "");
+          expect(
+            url.startsWith(`/${l}/`),
+            `${route} [${l}]: og:image is ${url} — die draagt de taal niet, ` +
+              `dus /nl deelt dezelfde kaart als /en. Gebruik ogImages(l).`,
+          ).toBe(true);
+        }
       }
     });
   }

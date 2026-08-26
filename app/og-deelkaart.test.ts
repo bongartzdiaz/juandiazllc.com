@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { zonderCommentaar } from "../lib/bronscan";
+import { LOCALES } from "../lib/i18n/dict";
+import { AUTHOR_IMAGE_URL, ogImages, twitterImages } from "../lib/seo/branding";
 
 /* Gate: elke deelkaart-route await zijn params.
  *
@@ -43,7 +45,7 @@ import { zonderCommentaar } from "../lib/bronscan";
  * bereiken.
  */
 
-const WORTEL = join(__dirname, "..");
+const WORTEL_DIR = join(__dirname, "..");
 
 function deelkaartRoutes(dir: string): string[] {
   return readdirSync(dir).flatMap((naam) => {
@@ -55,17 +57,35 @@ function deelkaartRoutes(dir: string): string[] {
   });
 }
 
-const ROUTES = deelkaartRoutes(join(WORTEL, "app"))
-  .map((p) => relative(WORTEL, p).split(sep).join("/"))
+const ROUTES = deelkaartRoutes(join(WORTEL_DIR, "app"))
+  .map((p) => relative(WORTEL_DIR, p).split(sep).join("/"))
   .sort();
 
 const BRON = new Map(
-  ROUTES.map((r) => [r, zonderCommentaar(readFileSync(join(WORTEL, r), "utf8"))]),
+  ROUTES.map((r) => [r, zonderCommentaar(readFileSync(join(WORTEL_DIR, r), "utf8"))]),
 );
 
 /* Een route "neemt params" zodra hij het woord in zijn code noemt. Afgeleid,
  * niet ingetypt: een vierde route die iemand toevoegt valt hier vanzelf in. */
 const MET_PARAMS = ROUTES.filter((r) => BRON.get(r)!.includes("params"));
+
+/* Elke .tsx onder een map, met zijn bron. Afgeleid en niet ingetypt, zodat
+ * een nieuwe pagina hier vanzelf in valt. */
+function tsxBronnen(dir: string): Array<{ pad: string; bron: string }> {
+  return readdirSync(dir).flatMap((naam) => {
+    const pad = join(dir, naam);
+    if (statSync(pad).isDirectory()) {
+      return naam === "node_modules" ? [] : tsxBronnen(pad);
+    }
+    if (!naam.endsWith(".tsx")) return [];
+    return [
+      {
+        pad: relative(WORTEL_DIR, pad).split(sep).join("/"),
+        bron: readFileSync(pad, "utf8"),
+      },
+    ];
+  });
+}
 
 describe("deelkaarten: params worden geawait", () => {
   /* Zonder deze twee slaagt alles hieronder op een lege lijst, en dan meet de
@@ -119,5 +139,81 @@ describe("de meetlat zelf", () => {
   it("ziet de overtreding wel in echte code", () => {
     const nep = "const l = assertLocale(" + VERBODEN + ");";
     expect(zonderCommentaar(nep)).toContain(VERBODEN);
+  });
+});
+
+/* De voorwaarde onder de vrijstelling van de wortelkaart.
+ *
+ * `app/opengraph-image.tsx` draagt Engelse kopij en staat daarom in TOEGESTAAN
+ * in lib/i18n/kale-tekst.test.ts. Die vrijstelling is alleen waar zolang de
+ * kaart niets anders is dan de entiteitsafbeelding van de JSON-LD. Wordt hij
+ * ergens weer als og:image gezet, dan deelt die pagina in vier talen dezelfde
+ * Engelse kaart en is de reden onder de vrijstelling onwaar.
+ *
+ * Een vrijstelling die zijn eigen feit overleeft is erger dan geen
+ * vrijstelling: hij legt een onwaarheid vast op precies de plek waar een
+ * volgende sessie hem vertrouwt.
+ */
+describe("de wortelkaart is alleen nog de entiteitsafbeelding", () => {
+  const WORTEL = "/opengraph" + "-image";
+  // Anker op het aanhalingsteken ervoor: een kale wortelkaart staat als
+  // "/opengraph-image" in de bron, terwijl een correcte kaart per artikel
+  // `/${l}/insights/${post.slug}/opengraph-image` is en dus een `}` ervoor
+  // draagt. Zonder dat anker meldt de poort die correcte paden als fout.
+  const KAAL = new RegExp("[\"'`]" + WORTEL);
+
+  it("er is een kaart per taal", () => {
+    expect(ROUTES).toContain("app/[locale]/opengraph-image.tsx");
+  });
+
+  it("ogImages en twitterImages dragen de taal", () => {
+    for (const l of LOCALES) {
+      const og = ogImages(l);
+      expect(og.length).toBeGreaterThan(0);
+      for (const img of og) {
+        expect(img.url, `ogImages(${l})`).toBe(`/${l}` + WORTEL);
+      }
+      for (const url of twitterImages(l)) {
+        expect(url, `twitterImages(${l})`).toBe(`/${l}` + WORTEL);
+      }
+    }
+  });
+
+  it("de vier talen krijgen vier verschillende kaarten", () => {
+    const urls = new Set(LOCALES.map((l) => ogImages(l)[0].url));
+    expect(urls.size).toBe(LOCALES.length);
+  });
+
+  it("AUTHOR_IMAGE_URL wijst nog naar de wortelkaart", () => {
+    // Dit IS de reden waarom de wortelkaart mag blijven bestaan met Engelse
+    // kopij: hij draagt Person.image en Organization.image in de JSON-LD.
+    // Wijst hij ergens anders heen, dan is de vrijstelling onwaar.
+    expect(AUTHOR_IMAGE_URL.endsWith(WORTEL)).toBe(true);
+  });
+
+  it("de kale-pad-scan matcht geen pad dat de taal wel draagt", () => {
+    // Zonder het aanhalingsteken ervoor matcht de scan de STAART van een
+    // correct pad. Beide richtingen, anders is groen ook te verklaren door
+    // een regex die niets vindt.
+    expect(KAAL.test('images: [{ url: "' + WORTEL + '" }]')).toBe(true);
+    expect(KAAL.test("url: `/${l}/insights/${post.slug}" + WORTEL + "`")).toBe(false);
+  });
+
+  it("geen bron onder app/[locale] noemt de kale wortelkaart", () => {
+    // Sterker dan alleen `images:` matchen: onder [locale] is er geen enkele
+    // legitieme reden om dat pad letterlijk te noemen. Elke vermelding is een
+    // pagina die terugvalt op de Engelse kaart.
+    const bronnen = tsxBronnen(join(WORTEL_DIR, "app", "[locale]"));
+    expect(
+      bronnen.length,
+      "geen bronnen gevonden — de wandeling is stuk, en dan slaagt de rest op niets",
+    ).toBeGreaterThan(10);
+    const overtreders = bronnen
+      .filter((b) => KAAL.test(zonderCommentaar(b.bron)))
+      .map((b) => b.pad);
+    expect(
+      overtreders,
+      "wijst weer naar de Engelse wortelkaart in plaats van ogImages(l)",
+    ).toEqual([]);
   });
 });

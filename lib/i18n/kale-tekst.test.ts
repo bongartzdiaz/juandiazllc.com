@@ -113,6 +113,24 @@ const IDENTITEIT = new Set([
  * verdween. Vandaar dat de vier redenen hieronder elk hun eigen assertie
  * hebben verderop in dit bestand. */
 const TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
+  "app/opengraph-image.tsx": {
+    reden:
+      "De wortelkaart is sinds 2026-08-26 niet meer de deelkaart van elke " +
+      "taal: ogImages(l) wijst per taal naar app/[locale]/opengraph-image.tsx. " +
+      "Wat hier overblijft is de entiteitsafbeelding waar AUTHOR_IMAGE_URL " +
+      "naar wijst voor Person.image en Organization.image in de JSON-LD. Een " +
+      "entiteit hoort een afbeelding te dragen — zie #198, dat vier losse " +
+      "Person-knopen juist tot een terugbracht. Deze vrijstelling draagt haar " +
+      "eigen voorwaarde in app/og-deelkaart.test.ts: zodra een pagina de kale " +
+      "wortelkaart weer als og:image zet, of AUTHOR_IMAGE_URL er niet meer " +
+      "naar wijst, valt die poort om.",
+    tekst: [
+      "I build the systems",
+      "that make operators",
+      "more money.",
+      "Energy · Real Estate · Hospitality",
+    ],
+  },
   "app/global-error.tsx": {
     reden:
       "Root error boundary. Vervangt het hele document zodra de root-layout " +
@@ -204,25 +222,11 @@ const TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
  * de homepage" bij ResultsStrip een besluit werd dat niemand ooit nam: het was
  * de plek waar het blok geboren werd en daarna keek er niemand meer naar. Een
  * achterstand met een teller erop blijft zichtbaar. */
-const ACHTERSTAND: Record<string, { reden: string; tekst: string[] }> = {
-  "app/opengraph-image.tsx": {
-    reden:
-      "Dit is de deelkaart van élke taal, niet alleen van de niet-getaalde " +
-      "routes: app/[locale]/layout.tsx zet images: OG_IMAGES en die wijst naar " +
-      "/opengraph-image. Wie /nl op LinkedIn deelt krijgt dus een Engelse " +
-      "tagline. Vergt vier gegenereerde kaarten of een taalparameter.",
-    tekst: [
-      "I build the systems",
-      "that make operators",
-      "more money.",
-      "Energy · Real Estate · Hospitality",
-    ],
-  },
-};
+const ACHTERSTAND: Record<string, { reden: string; tekst: string[] }> = {};
 
 /* Het cijfer waar de ratel op staat. Verlagen mag altijd; verhogen betekent dat
  * er een lek bij is gekomen, en dan hoort deze regel zichtbaar in de diff. */
-const ACHTERSTAND_MAX = 4;
+const ACHTERSTAND_MAX = 0;
 
 function verzameld(lijst: typeof TOEGESTAAN): Map<string, Set<string>> {
   return new Map(

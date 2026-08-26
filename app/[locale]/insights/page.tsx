@@ -6,7 +6,7 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 import { translate } from "@/lib/i18n/dict";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { collectionPageSchema } from "@/lib/seo/schema";
-import { OG_IMAGES } from "@/lib/seo/branding";
+import { ogImages } from "@/lib/seo/branding";
 
 // /insights — long-form writing. Primary SEO surface after the home
 // page: each post is a standalone URL with its own Article schema,
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     description: translate(l, "meta.insights.description"),
     alternates: buildAlternates(l, "/insights"),
     openGraph: {
-      images: OG_IMAGES,
+      images: ogImages(l),
       title: translate(l, "meta.insights.title"),
       description: translate(l, "meta.insights.description"),
       type: "website",

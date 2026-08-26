@@ -6,7 +6,7 @@ import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { LOCALES, translate, type Locale } from "@/lib/i18n/dict";
 import { tagLabel, tagSlug } from "@/lib/i18n/tags";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
-import { OG_IMAGES } from "@/lib/seo/branding";
+import { ogImages } from "@/lib/seo/branding";
 
 // Tag archive pages — /insights/tag/systems, /insights/tag/energy etc.
 // Each becomes a dedicated SEO surface for a topic cluster. Built
@@ -52,7 +52,7 @@ export async function generateMetadata(
     description: translate(l, "insights.tag.meta.description").replace("{tag}", label),
     alternates: buildAlternates(l, `/insights/tag/${tag}`, tagLocales(tag)),
     openGraph: {
-      images: OG_IMAGES,
+      images: ogImages(l),
       type: "website",
       url: `/${l}/insights/tag/${tag}`,
       title: translate(l, "insights.tag.meta.title").replace("{tag}", label),
