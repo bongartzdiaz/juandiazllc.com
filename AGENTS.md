@@ -99,6 +99,51 @@ operator de bovenste las, en dat was de oudste.
 
 Niets hiervan is uit de repo af te leiden, en niets hiervan mag verzonnen worden.
 
+### Hermeten op 2026-08-26 om 18:15 UTC — niets is afgevallen, één meting is scherper
+
+Alles wat van buitenaf meetbaar is, is opnieuw gemeten in plaats van uit dit
+logboek overgeschreven. **Geen enkel item is afgevallen.** Wat er wél bij komt:
+van de twee Stripe-accounts is nu bekend **welk** het lege is, en de
+`SENTRY_DSN` is opnieuw geweigerd — nu op een deployment die nóg nieuwer is dan
+die in de Vercel-sectie hieronder staat.
+
+| gemeten | uitkomst |
+|---|---|
+| `lead-notify`, ongeldige JSON zonder auth | **400 `invalid-json`** — nog steeds fail-open, `LEAD_NOTIFY_SECRET` staat niet |
+| `lead-acknowledge`, idem | **503 `not-configured`** — fail-closed, v3 uitgerold 2026-08-26 16:08:20 UTC |
+| negatieve controle, functie die niet bestaat | 404 `NOT_FOUND` — die twee antwoorden zijn dus echt |
+| `POST /api/cal` op productie | 503 `not-configured`; het runtime-log zegt woordelijk `[cal] CAL_WEBHOOK_SECRET niet gezet` |
+| `SENTRY_DSN` op productie | **nog steeds geweigerd**. `[sentry] SENTRY_DSN is set but is not a usable DSN` op deployment `dpl_4ipHxtnbVQ7iXZRa7TnxCELBFSbE`, om 18:05:38, 18:05:39 en 18:12:39 |
+| `marketing.leads` · `marketing.subscribers` | 0 rijen, ooit — allebei |
+| advisors op wbgio | 116: 0 ERROR, **9 WARN**, 107 INFO. `auth_leaked_password_protection` staat er nog |
+| PUBLIC-grant op `handle_new_user`, `notify_new_lead`, `rls_auto_enable` | alle drie **ja**; `current_org_id` correct **nee** |
+| `pgrst.db_schemas` van `authenticator` | `public, graphql_public, marketing` — ongewijzigd |
+| edge functions op wbgio | 14 stuks: de **tien dode `diaz-*`** staan er nog ACTIVE, plus 2× `pai-*` en de twee `lead-*` |
+| Ahrefs `subscription-info-limits-and-usage` (gratis endpoint) | `{"error":"Insufficient plan"}` — onveranderd |
+| DNS TXT `juandiazllc.com` | `google-site-verification=ABrD7ZNd…` staat er, naast SPF |
+| `/_vercel/insights/script.js` | 200, wordt door het platform geserveerd |
+| Stripe, twee accounts | **`acct_1T294dIhZuGx1GTG` is de levende** (laatste sessie 22 augustus, `unpaid`/`expired`); **`acct_1TPPJzS0eZH82rBo` is de lege** — nul checkout-sessies, ooit. Dat tweede is het account dat dicht of gelabeld moet |
+| `supabase projects list` | nog steeds Roy's account: 16 projecten, **noch wbgio noch vbozel** ertussen |
+| `lucenai.eu/about` | 200, **0 verwijzingen** naar `juandiazllc.com` (positieve controle: het woord "Juan" staat er 5×) |
+| `DATAFORSEO_LOGIN` / `_PASSWORD` | staan in `.env.example`, **0 regels** in de lokale `.env.local` |
+| `lib/plausible-doelen.test.ts` | groen — code, `MANUAL_TASKS.md` en dit bestand noemen dezelfde vijf doelen. De taggingkant is dus af; het dashboard blijft de open stap |
+
+De probe op de twee meldingsfuncties raakt niets: de auth-controle staat vóór de
+JSON-parse en het versturen erna, dus `400`/`503` scheidt open van dicht zonder
+één bericht te versturen. Zie [[feedback_poort_testen_zonder_bijwerking]].
+
+**Wat er niet gemeten is, en waarom.** Het Plausible-bezoekcijfer (geen sleutel),
+of de Search-Console-property werkelijk geverifieerd is (alleen ingelogd te
+zien), en of Web Analytics in het dashboard data ontvangt — de Web-Analytics-API
+geeft op het Hobby-plan 404 op élk project, ook op één met aantoonbare bezoekers,
+dus die 404 is het plan en geen meting.
+
+**Twee waarnemingen die niet op de lijst staan.** De verzoeken naar
+`/en/__sentry-probe` in het log van 18:05 en 18:12 komen **niet van mij**; ik heb
+alleen één synthetisch CSP-rapport, één `POST /api/cal`, één `HEAD /en` en het
+insights-script aangeraakt. En `origin` draagt **57 takken** — geen verweesde tak
+maar een bosje; opruimen is eigen werk en staat hier alleen genoteerd.
+
 ### Hermeten op 2026-08-25 — niets is afgevallen, twee dingen zijn scherper
 
 Elk punt hieronder dat van buitenaf meetbaar is, is op 25 augustus opnieuw
