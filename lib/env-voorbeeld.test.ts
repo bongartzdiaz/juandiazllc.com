@@ -29,6 +29,8 @@ const LOSSE = ['proxy.ts', 'next.config.ts', 'instrumentation.ts']
 const DOOR_PLATFORM: Record<string, string> = {
   NODE_ENV: 'Node/Next zetten dit zelf; handmatig zetten breekt de build-modus.',
   NEXT_RUNTIME: 'Next zet dit per runtime (nodejs | edge) tijdens het bouwen.',
+  VERCEL_GIT_COMMIT_SHA:
+    'Vercel zet dit per deploy; met de hand zetten liegt over welke commit draait.',
 }
 
 function bronBestanden(map: string, uit: string[] = []): string[] {
@@ -96,6 +98,16 @@ describe('.env.example tegenover de code', () => {
       zonderCommentaar(readFileSync(pad, 'utf8')).includes('process.env['),
     )
     expect(overtreders, 'leest env via bracket-toegang').toEqual([])
+  })
+
+  it('de platform-uitzonderingen staan NIET in .env.example', () => {
+    // De toelichting bij DOOR_PLATFORM zegt dit al, en tot 2026-08-26 dwong
+    // niets het af — de klasse 'een toelichting beschrijft een controle die
+    // niet bestaat'. De andere twee asserties vangen het niet: een
+    // platformvariabele WORDT gelezen, dus 'gedocumenteerd maar nergens
+    // gelezen' blijft groen terwijl een lezer hem gaat invullen.
+    const teveel = Object.keys(DOOR_PLATFORM).filter((naam) => voorbeeld.has(naam))
+    expect(teveel, 'platformvariabele staat in .env.example').toEqual([])
   })
 
   it('de platform-uitzonderingen dragen allemaal een reden', () => {

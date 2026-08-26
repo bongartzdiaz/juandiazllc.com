@@ -71,6 +71,25 @@ export function dsnLooksUsable(dsn: string): boolean {
 }
 
 /**
+ * De eerste waarde die werkelijk iets draagt.
+ *
+ * Niet `??`. Die valt alleen terug op null of undefined, en een
+ * omgevingsvariabele die je in een dashboard aanmaakt maar leeg laat komt
+ * binnen als lege string. Dan wint dat lege veld van elke terugval erachter
+ * en draagt een fout geen versie, zonder dat iets dat meldt. Dezelfde klasse
+ * als een SENTRY_DSN die op de tekst `optional` staat: gezet, en onbruikbaar.
+ *
+ * De DSN-tak hierboven doet dit al met `!raw || !raw.trim()`; dit trekt de
+ * rest van de init erbij.
+ */
+function eersteGevulde(...waarden: Array<string | undefined>): string | undefined {
+  for (const v of waarden) {
+    if (v && v.trim()) return v.trim()
+  }
+  return undefined
+}
+
+/**
  * @param injected test seam — pass a fake client to exercise the state
  *   machine without requiring @sentry/node. Production passes nothing.
  */
@@ -102,8 +121,20 @@ export function initSentry(injected?: SentryLike): void {
   try {
     mod.init({
       dsn,
-      environment: process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV ?? 'development',
-      release: process.env.SENTRY_RELEASE ?? process.env.GIT_COMMIT_SHA,
+      environment:
+        eersteGevulde(process.env.SENTRY_ENVIRONMENT, process.env.NODE_ENV) ??
+        'development',
+      // Volgorde: expliciet, dan de eigen variabele, dan wat het platform
+      // zelf zet. Op Vercel draagt een fout daarmee vanzelf zijn commit;
+      // daarvoor bleven alle terugvallen leeg en had geen enkele melding
+      // een versie. VERCEL_GIT_COMMIT_SHA staat bewust NIET in
+      // .env.example -- het platform zet hem, en wie hem daar ziet gaat
+      // hem invullen.
+      release: eersteGevulde(
+        process.env.SENTRY_RELEASE,
+        process.env.GIT_COMMIT_SHA,
+        process.env.VERCEL_GIT_COMMIT_SHA,
+      ),
       tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? '0'),
     })
     active = true
