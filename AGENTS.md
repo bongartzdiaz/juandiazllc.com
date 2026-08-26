@@ -29,7 +29,8 @@ verhuisd is.
 `POST /api/deals` en `POST /api/ai/score`. Alle vier zijn verwijderd.
 Wil je latency-budgetten op de marketingkant, dan is dat nieuw werk, geen
 herstel. Sentry draait nog wel (`lib/sentry.ts`, alleen serverfouten;
-`sendDefaultPii` staat uit).
+`sendDefaultPii` staat uit) — DSN gezet en op productie
+geverifieerd op 2026-08-26.
 
 **DEUS-SHARED is de bron voor alles wat CRM is.** De `sync-deus-shared.yml`
 die van die repo ooit een spiegel maakte, heeft nooit op main gestaan; de
@@ -112,7 +113,7 @@ operator de bovenste leest; de lijst zelf begint eronder.
 | Ahrefs `subscription-info-limits-and-usage` (gratis endpoint) | `{"error":"Insufficient plan"}` |
 | `diaz-appsumo-redeem`, code zonder dev-formaat, beide projecten | `invalid-code-format`, waaruit ik las dat dev-mode aanstond. **Dat klopte niet** — zie de correctie hieronder. Na de uitrol van 2026-08-26: 503 `service-unavailable` |
 | Vercel Web-Analytics-API, beide projecten | 404 `Web Analytics not found` — ook op `diaz-atlas-editor`, dat aantoonbaar 137 bezoekers over 30 dagen heeft. De 404 is het Hobby-plan, geen meting |
-| Vercel runtime-log `juandiazllc-com` | `Invalid Sentry Dsn: optional` — `SENTRY_DSN` staat op productie op de letterlijke tekst `optional` |
+| Vercel runtime-log `juandiazllc-com` | `Invalid Sentry Dsn: optional` — `SENTRY_DSN` staat op productie op de letterlijke tekst `optional`. **Achterhaald op 2026-08-26: gezet en geverifieerd, zie de Vercel-sectie hieronder** |
 
 De probe op de twee meldingsfuncties raakt niets: de auth-controle staat vóór de
 JSON-parse en het versturen staat erna, dus `400 invalid-json` scheidt "open" van
@@ -348,20 +349,30 @@ herschreven, en deze notitie is de correctie erop.
 
 ### Vercel
 
-- **`SENTRY_DSN` in Vercel-productie staat op de letterlijke tekst
-  `optional`.** Gemeten op 2026-08-25 in het runtime-log: `Invalid Sentry Dsn:
-  optional`. **Serverfouten worden niet gerapporteerd.** De regel bovenaan dit
-  bestand dat Sentry nog draait, is daarmee achterhaald.
-  De code eromheen is diezelfde dag gerepareerd: `lib/sentry.ts` vroeg op vijf
-  plekken of de variabele gezet was in plaats van of de init geslaagd was, dus
-  elke melding liep naar een niet-geïnitialiseerde client en
-  `isSentryEnabled()` gaf `true` terug. Dat faalt nu luid in plaats van stil,
-  **maar het zet de rapportage niet aan.**
-  **Beslist op 2026-08-26: aan.** Wat nog moet is de waarde zelf; die is van
-  jou en komt hier niet door mijn handen. Sinds #277 draagt een melding
-  vanzelf zijn commit, want `VERCEL_GIT_COMMIT_SHA` is nu de derde terugval
-  voor de release. Zet je hem bewust niet aan, maak de variabele dan **leeg**
-  in plaats van hem op een plaatsaanduiding te laten staan.
+- ~~**`SENTRY_DSN` in Vercel-productie staat op de letterlijke tekst
+  `optional`**~~ — **gezet op 2026-08-26 en diezelfde dag op productie
+  geverifieerd. De rapportage staat aan.**
+  Gemeten op deployment `dpl_Ba974wS7M5orrm3Yo51wfWrdyK5p` (commit
+  `578e9e2`): tot **14:15:02 UTC** droeg elk verzoek de regel `[sentry] ...is
+  not a usable DSN`, vanaf **14:18:14** geen enkel meer, en het niveau sloeg
+  om van `error/serverless` naar `info/serverless`.
+  **Zonder nieuwe deploy** — beide reeksen staan onder hetzelfde
+  deployment-id, dus de waarde sloeg aan op de draaiende productie. Dat
+  weerlegt de aanname waarmee ik de meting opende, dat Vercel de variabele
+  bij de deploy inbakt.
+  **De eerste stilte was nog geen meting.** `initSentry()` opent met `if
+  (initialized) return`, dus een warme lambda zwijgt hoe dan ook — hetzelfde
+  beeld als een werkende DSN. Zes gelijktijdige verzoeken dwongen verse
+  instanties af: alle zes in het log, alle zes `cache=MISS`, alle zes zonder
+  die regel. Stilte betekent hier geslaagde init, want elk faalpad in
+  `lib/sentry.ts` logt zijn eigen regel — onbruikbare vorm, ontbrekende
+  module, of een worp uit `init()`. `active = true` is de enige tak die niets
+  zegt.
+  **Niet vastgesteld:** of er werkelijk gebeurtenissen in het Sentry-project
+  binnenkomen. De vorm klopt en `init()` gooide niet; of het project ze
+  accepteert — juiste organisatie, juist projectnummer, quota — is alleen
+  in Sentry zelf te zien. Sinds #277 draagt een melding vanzelf zijn commit,
+  want `VERCEL_GIT_COMMIT_SHA` is de derde terugval voor de release.
 - **Nakijken of Web Analytics aan staat op `juandiazllc-com`** (Project
   Settings → Analytics). Het script staat er sinds #267 en wordt door het
   platform geserveerd (`/_vercel/insights/script.js` → 200 op productie), maar
