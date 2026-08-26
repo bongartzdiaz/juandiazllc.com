@@ -1,6 +1,10 @@
+"use client";
+
 import { Logo } from "./Logo";
+import { useT } from "@/lib/i18n/useT";
 
 export function Preloader() {
+  const t = useT();
   return (
     <div className="preload" id="preload" aria-hidden="true">
       <div className="preload-top">
@@ -13,7 +17,7 @@ export function Preloader() {
         </div>
       </div>
       <div className="preload-bottom">
-        <div className="mono" style={{ color: "var(--muted)" }}>Booting interface</div>
+        <div className="mono" style={{ color: "var(--muted)" }}>{t("preload.booting")}</div>
         <div className="preload-bar"><i /></div>
         <div className="preload-count" id="preloadCount">000</div>
       </div>

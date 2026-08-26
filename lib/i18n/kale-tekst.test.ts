@@ -205,16 +205,6 @@ const TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
  * de plek waar het blok geboren werd en daarna keek er niemand meer naar. Een
  * achterstand met een teller erop blijft zichtbaar. */
 const ACHTERSTAND: Record<string, { reden: string; tekst: string[] }> = {
-  "app/layout.tsx": {
-    reden:
-      "Root-layout, buiten het [locale]-segment. De skip-link is een " +
-      "a11y-landmark die een toetsenbordgebruiker als eerste raakt, dus " +
-      "onvertaald is hij op /nl, /de en /es een echt gebrek. Repareren vergt " +
-      "consumptie van LocaleProvider in een client component, niet translate(l).",
-    tekst: [
-      "Skip to content",
-    ],
-  },
   "app/opengraph-image.tsx": {
     reden:
       "Dit is de deelkaart van élke taal, niet alleen van de niet-getaalde " +
@@ -243,49 +233,11 @@ const ACHTERSTAND: Record<string, { reden: string; tekst: string[] }> = {
       "Signals",
     ],
   },
-  "app/[locale]/insights/tag/[tag]/page.tsx": {
-    reden: "Losse CTA op de tagpagina; de rest van die pagina is wel vertaald.",
-    tekst: [
-      "Read",
-    ],
-  },
-  "app/[locale]/signals/tag/[tag]/page.tsx": {
-    reden:
-      "De signals-tagpagina is als geheel onvertaald gebleven toen de " +
-      "insights-tagpagina dat wel werd.",
-    tekst: [
-      "piece",
-      "tagged",
-      "back to all signals",
-      "Read →",
-    ],
-  },
-  "components/CommandPalette.tsx": {
-    reden:
-      "Het commandopalet opent met ⌘K en is daarmee minder zichtbaar dan een " +
-      "pagina, maar het is wel navigatie.",
-    tekst: [
-      "No matches",
-      "↑↓ Navigate · ↵ Select",
-      "⌘K to toggle",
-    ],
-  },
-  "components/Preloader.tsx": {
-    reden:
-      "Zichtbaar. .preload staat position:fixed inset:0 z-index:300 en pas " +
-      ".preload.done draait de dekking naar 0 — de eerdere logboeknotitie dat " +
-      "de preloader opacity:0 zou zijn, las de verkeerde selector. Elke " +
-      "bezoeker ziet dit tot 1,2 s. Root-layout, dus zelfde reparatie als de " +
-      "skip-link.",
-    tekst: [
-      "Booting interface",
-    ],
-  },
 };
 
 /* Het cijfer waar de ratel op staat. Verlagen mag altijd; verhogen betekent dat
  * er een lek bij is gekomen, en dan hoort deze regel zichtbaar in de diff. */
-const ACHTERSTAND_MAX = 22;
+const ACHTERSTAND_MAX = 7;
 
 function verzameld(lijst: typeof TOEGESTAAN): Map<string, Set<string>> {
   return new Map(
@@ -383,26 +335,6 @@ const ATTR_TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
 
 /* Kopij-als-prop, gemeten en niet gerepareerd. */
 const ATTR_ACHTERSTAND: Record<string, { reden: string; tekst: string[] }> = {
-  "components/Footer.tsx": {
-    reden:
-      "Drie labels die alleen een schermlezer hoort. Een landmark dat in vier " +
-      "talen Footer heet en een belknop die Call zegt, zijn precies waar " +
-      "toegankelijkheid en vertaling elkaar raken.",
-    tekst: [
-      "aria-label=Footer",
-      "aria-label=Call +31 6 5314 2656",
-      "aria-label=WhatsApp +31 6 5314 2656",
-    ],
-  },
-  "components/CommandPalette.tsx": {
-    reden:
-      "Zelfde reden als de tekstknopen in dit bestand: het palet is als geheel " +
-      "onvertaald gebleven.",
-    tekst: [
-      "aria-label=Command palette",
-      "placeholder=Search or navigate — pages, ventures, languages",
-    ],
-  },
 };
 
 const ATTR_OK = verzameld(ATTR_TOEGESTAAN);

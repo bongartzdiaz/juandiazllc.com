@@ -87,9 +87,21 @@ export default async function SignalsTagArchivePage(
           {translate(l, "signals.tag.title")} <em>{tagLabel(l, tag, canonical)}</em>
         </h1>
         <p>
-          {posts.length} piece{posts.length === 1 ? "" : "s"} tagged{" "}
-          <em>{canonical.toLowerCase()}</em> —{" "}
-          <LocaleLink href="/signals">back to all signals</LocaleLink>.
+          <span
+            dangerouslySetInnerHTML={{
+              __html: translate(
+                l,
+                posts.length === 1
+                  ? "signals.tag.lede.one"
+                  : "signals.tag.lede.many",
+              )
+                .replace("{n}", String(posts.length))
+                .replace("{tag}", tagLabel(l, tag, canonical)),
+            }}
+          />{" "}
+          <LocaleLink href="/signals">
+            {translate(l, "signals.tag.back.inline")}
+          </LocaleLink>.
         </p>
       </header>
 
@@ -172,7 +184,7 @@ export default async function SignalsTagArchivePage(
                     alignSelf: "center",
                   }}
                 >
-                  Read →
+                  {translate(l, "card.read")} →
                 </div>
               </LocaleLink>
             ))}

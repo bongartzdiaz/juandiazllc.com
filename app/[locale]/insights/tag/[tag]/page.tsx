@@ -130,7 +130,7 @@ export default async function TagArchivePage(
               <h2 className="ic-title">{p.title}</h2>
               <p className="ic-sum">{p.summary}</p>
               <span className="ic-read">
-                Read <span className="arr">→</span>
+                {translate(l, "card.read")} <span className="arr">→</span>
               </span>
             </LocaleLink>
           ))}
