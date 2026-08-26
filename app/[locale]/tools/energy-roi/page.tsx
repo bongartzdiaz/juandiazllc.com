@@ -6,7 +6,7 @@ import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { EnergyRoi, type RoiLabels } from "@/components/calculators/EnergyRoi";
 import { EnergyInsightLinks } from "@/components/EnergyInsightLinks";
 import { ScanCallout } from "@/components/ScanCallout";
-import { OG_IMAGES } from "@/lib/seo/branding";
+import { ogImages } from "@/lib/seo/branding";
 
 // Server wrapper for the Energy ROI calculator. Reads the translated
 // `roi.*` keys via translate() and hands them to the client component
@@ -26,7 +26,7 @@ export async function generateMetadata({
     description,
     alternates: buildAlternates(l, "/tools/energy-roi"),
     openGraph: {
-      images: OG_IMAGES,
+      images: ogImages(l),
       type: "website",
       title,
       description,

@@ -11,7 +11,7 @@ import { EnergyInsightLinks } from "@/components/EnergyInsightLinks";
 import { SectorInsightLinks } from "@/components/SectorInsightLinks";
 import { faqSchema, serviceSchema } from "@/lib/seo/schema";
 import { getSectorFaq } from "@/lib/seo/faqs";
-import { OG_IMAGES } from "@/lib/seo/branding";
+import { ogImages } from "@/lib/seo/branding";
 
 export function generateStaticParams() {
   return LOCALES.flatMap((locale) => SECTORS.map((s) => ({ locale, slug: s.slug })));
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     description: seoDescription,
     alternates: buildAlternates(l, `/sectors/${s.slug}`),
     openGraph: {
-      images: OG_IMAGES,
+      images: ogImages(l),
       type: "article",
       url: `/${l}/sectors/${s.slug}`,
       title: seoTitle,

@@ -8,7 +8,7 @@ import { getServicesFaq } from "@/lib/seo/faqs";
 import { FaqSection } from "@/components/FaqSection";
 import { ScanCallout } from "@/components/ScanCallout";
 import { ResultsStrip } from "@/components/sections/ResultsStrip";
-import { OG_IMAGES } from "@/lib/seo/branding";
+import { ogImages } from "@/lib/seo/branding";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     description: translate(l, "meta.services.description"),
     alternates: buildAlternates(l, "/services"),
     openGraph: {
-      images: OG_IMAGES,
+      images: ogImages(l),
       type: "website",
       url: `/${l}/services`,
       title: translate(l, "meta.services.title"),

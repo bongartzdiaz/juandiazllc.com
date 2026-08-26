@@ -3,7 +3,6 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import {
   AUTHOR_IMAGE_URL,
-  AUTHOR_IMAGE_PATH,
   AUTHOR_IMAGE_FALLBACK_URL,
   ORG_LOGO_URL,
 } from "./branding";
@@ -56,7 +55,6 @@ function isServed(p: string): boolean {
 describe("branding-afbeeldingen bestaan", () => {
   const gevallen: [string, string][] = [
     ["AUTHOR_IMAGE_URL", AUTHOR_IMAGE_URL],
-    ["AUTHOR_IMAGE_PATH", AUTHOR_IMAGE_PATH],
     ["AUTHOR_IMAGE_FALLBACK_URL", AUTHOR_IMAGE_FALLBACK_URL],
     ["ORG_LOGO_URL", ORG_LOGO_URL],
   ];

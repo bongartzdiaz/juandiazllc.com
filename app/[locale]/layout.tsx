@@ -19,8 +19,8 @@ import {
   ORG_NAME,
   ORG_ID,
   ORG_SAME_AS,
-  OG_IMAGES,
-  TWITTER_IMAGES,
+  ogImages,
+  twitterImages,
 } from "@/lib/seo/branding";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
@@ -34,14 +34,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const l: Locale = (LOCALES as readonly string[]).includes(locale) ? (locale as Locale) : "en";
   return {
     openGraph: {
-      images: OG_IMAGES,
+      images: ogImages(l),
       siteName: "Juan Diaz, LLC",
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
     },
     twitter: {
       card: "summary_large_image",
-      images: TWITTER_IMAGES,
+      images: twitterImages(l),
       title: "Juan Diaz, LLC",
       description:
         "Revenue engines for operators in energy, real estate, hospitality and adjacent.",

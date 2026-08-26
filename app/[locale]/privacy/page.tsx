@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import { AnalyticsOptOut } from "@/components/AnalyticsOptOut";
-import { OG_IMAGES } from "@/lib/seo/branding";
+import { ogImages } from "@/lib/seo/branding";
 
 // Plain-language privacy page. Not legal advice — a statement of what
 // the site actually does with data, which is what NL/EU regulators
@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     alternates: buildAlternates(l, "/privacy"),
     robots: { index: true, follow: true },
     openGraph: {
-      images: OG_IMAGES, locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
+      images: ogImages(l), locale: ogLocale(l), alternateLocale: alternateOgLocales(l) },
   };
 }
 
