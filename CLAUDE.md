@@ -7244,3 +7244,179 @@ En één claim in de kop van `index.ts` is **niet** nagemeten: dat een non-2xx
 pg_net laat hertrylen. Die zin is gescopet naar het zakelijke pad in plaats van
 weggehaald, want de poort gaf al 405 en 401 — dat de regel daar niet gold is uit
 de code zelf af te lezen, los van de vraag of de premisse klopt.
+
+### 2026-08-26 — de achterstandslijst van 22 naar 0, in drie PR's
+
+`lib/i18n/kale-tekst.test.ts` droeg een ratel: 22 regels kopij die in vier talen
+Engels bleven, met `ACHTERSTAND_MAX` als plafond. Die lijst is nu leeg — PR #273
+haalde er vijftien af, #274 nog drie, en #275 de laatste vier. Gemeten na afloop:
+`ACHTERSTAND` en `ATTR_ACHTERSTAND` allebei `{}`, en de ratel telt ze **allebei**
+tegen `ACHTERSTAND_MAX = 0`, dus die nul dekt zowel JSX-tekst als attributen.
+
+**Wat de drie bindt is niet het onderwerp maar de blinde vlek.** Elk defect was
+functioneel gewoon aanwezig en syntactisch onzichtbaar voor het instrument dat
+ernaar keek. De vijf i18n-poorten lezen `DICT` of `generateMetadata`; een zin die
+nooit een sleutel kreeg heeft niets om uit de pas mee te lopen. Dezelfde vorm als
+de server-actions van 24 augustus en als `process.env[SECRET_ENV]`, dat
+`CAL_WEBHOOK_SECRET` maandenlang uit `.env.example` hield.
+
+#### PR #273 — vijftien regels die in de wortel-layout woonden
+
+De skip-link, de preloader, het commandopalet en twee `aria-label`s in de
+voettekst staan in `app/layout.tsx` of in clientcomponenten zonder
+`params.locale`. Daarom was er niets om te vertalen: ze hadden geen sleutel.
+
+`LocaleProvider` maakte het goedkoop. Die staat al in de wortel-layout en leidt de
+taal af uit `useParams()`, dus een clientcomponent kan hem daar consumeren.
+Vandaar `components/SkipLink.tsx`, een `"use client"` op de preloader, en `t` erbij
+in het palet — dat had `useLocale` al staan.
+
+**Onderweg een tweede defect dat niet op de lijst stond.** De signals-tagpagina
+noemt zich in haar eigen kop een spiegel van `insights/tag`, maar die tweede is
+ooit geïnternationaliseerd en deze niet. Ze rendeerde `canonical.toLowerCase()` —
+de rauwe Engelse tag, kleingemaakt, wat Duitse zelfstandige naamwoorden sloopt —
+waar de tweeling `tagLabel(l, tag, canonical)` gebruikt. Precies de klasse uit
+20 augustus, waar `.toLowerCase()` van `Immobilien` het woord `immobilien` maakte.
+
+Twaalf sleutels × vier talen, 718 → 730. Duits in de Sie-vorm, Spaans in tú,
+Nederlands in je; geen verboden woord, geen krul-apostrof.
+
+Gemeten op een productiebuild: 78 controles, **afwijkingen 0**, zes positieve
+controles waaronder een 404 op een verzonnen tagslug. Het palet rendert pas na een
+echte toetsaanslag — een synthetisch `KeyboardEvent` opent hem niet — dus die vier
+strings zijn ná ctrl+k in de DOM gemeten.
+
+#### PR #274 — `params` is een Promise, en het faalde stil
+
+De drie `opengraph-image`-routes typeerden `params` als gewoon object en lazen
+`.locale` en `.slug` er rechtstreeks vanaf. In Next 16 is `params` een Promise:
+die velden bestaan daar niet, dus beide waren `undefined`. `assertLocale` viel
+terug op `"en"`, de opzoeking gaf niets, en wat LinkedIn en Slack toonden was de
+generieke terugval.
+
+**Niet dezelfde taal — dezelfde kaart.** Gemeten op een productiebuild waren vier
+talen van hetzelfde artikel byte-identiek (54285), en twee verschillende artikelen
+in dezelfde taal ook. Na de reparatie geeft alleen nog een slug die niet bestaat
+die 54285 terug.
+
+Geen enkele poort kon dit zien, en dat is uit te schrijven: **Next genereert geen
+typevalidators voor metadata-routes** — gemeten, nul bestanden onder `.next/types`
+die `opengraph-image` noemen, terwijl 23 bestanden in `app/` `params: Promise<`
+correct typeren. Die 23 staan goed omdat iemand ze goed schreef, niet omdat een
+poort het afdwong. En de route antwoordde gewoon 200 met een geldige PNG, dus er
+ging ook niets stuk. Precies daarom stond het er zo lang.
+
+`app/og-deelkaart.test.ts` bewaakt sindsdien de bedrading en niet de logica: elke
+deelkaart-route die `params` neemt typeert hem als Promise, await hem, en leest
+geen veld rechtstreeks. **Een tekstscan en geen module-import**, want het defect
+zát in de bedrading — de default-export aanroepen slaagt bij beide vormen en
+bewijst dus niets. Zelfde afweging als bij de poort op `lead-acknowledge`.
+
+#### PR #275 — de deelkaart per taal, en twee rollen op één constante
+
+`OG_IMAGES` was een constante die naar `/opengraph-image` wees: de wortelkaart,
+met Engelse kopij. Twintig pagina's gebruikten hem, in vier talen. Wie `/nl/services`
+deelde kreeg daar de Engelse tagline. Het is nu `ogImages(l)` en wijst naar
+`/{taal}/opengraph-image`; alle twintig afnemers hadden `l` al in scope. Het was
+een constante waar een functie hoorde.
+
+De nieuwe route trekt vier regels die al in vier talen bestonden —
+`hero.title.1/2/3` en `hero.chip.sectors`. **Nul nieuwe dict-sleutels.**
+
+**Het tweede defect zat een laag dieper.** `/about` gaf `AUTHOR_IMAGE_PATH` door
+als `og:image`, terwijl die constante de entiteitsafbeelding van de JSON-LD draagt.
+Twee rollen met tegengestelde eisen:
+
+| | deelkaart | entiteitsafbeelding |
+|---|---|---|
+| per taal | moet verschillen | moet **niet** verschillen |
+| afnemer | `openGraph.images[]` | `Person.image`, `Organization.image` |
+| waarom | een Duitse lezer deelt een Duitse kaart | #198 bracht vier `Person`-knopen terug tot één `@id` |
+
+De doc-comment bij `AUTHOR_IMAGE_PATH` zei letterlijk dat hij voor
+`openGraph.images[].url` was. Na de reparatie had hij nul afnemers en is hij weg.
+
+**De vrijstelling van de Engelse wortelkaart draagt nu haar eigen voorwaarde.** Ze
+hangt aan `AUTHOR_IMAGE_URL`, die vier levende JSON-LD-afnemers heeft. Ze is
+bewust van de dode constante naar de levende verplaatst: anders was de assertie
+vacuüm geworden op precies het moment dat ze ging tellen.
+
+`metadata-locales.test.ts` eiste alleen dat de lijst niet leeg was; hij eist nu per
+afbeelding dat het pad met `/{taal}/` opent. **Die poort vond het `/about`-defect** —
+ik was er zelf overheen gelezen.
+
+De nieuwe scan viel eerst vals op twee correcte pagina's:
+`includes("/opengraph-image")` matcht ook de **staart** van
+`` `/${l}/insights/${post.slug}/opengraph-image` ``, een pad dat de taal juist wél
+draagt. Het anker is nu het aanhalingsteken ervóór, met een test in twee richtingen
+zodat groen niet ook te verklaren is door een regex die niets vindt.
+
+Acht mutaties, acht keer de voorspelde kleur. Het paar dat telt is M6/M7: hetzelfde
+pad in een **toelichting** blijft groen, in echte code wordt het rood — het
+executeerbare bewijs dat `zonderCommentaar` dragend is en niet decoratief. Vier
+eerdere tekstscans in deze repo vielen om op hun eigen proza.
+
+#### Drie instrumenten braken in #275, alle drie gevangen door een positieve controle
+
+1. **De eerste sitemap-scan gaf nul kale wortelkaarten, en dat was geen meting.**
+   Geneste `sh -c`-quoting verminkte `tr` en produceerde 570 regels uit 190 URL's.
+   Herschreven in Python om die laag weg te halen.
+2. **De tweede gaf 190 ophaalfouten.** De sitemap van een lokale build draagt
+   `localhost:3000`, en mijn regex knipte alleen de productiehost weg. De nullen
+   waren nep — de positieve controles gebruikten een vast pad en vuurden gewoon
+   `True`, en dát was het verschil.
+3. **"92 og:image met verkeerde taal" was mijn eigen controle.** Die wees de
+   artikelkaarten uit #274 af omdat ze niet op `/en/opengraph-image` eindigen,
+   terwijl ze de taal correct dragen. Met de juiste logica: 190/190.
+
+Daarnaast, bij de productiemeting: één 404 op `/nl/insights/salderingsregeling-2027`.
+Die slug bestaat niet — ik typte hem uit het hoofd in plaats van hem uit
+`getAllInsights("nl")` te lezen, exact de fout die op 22 augustus al is
+opgeschreven. En een lege uitkomst op een derde artikel was mijn grep, niet de
+pagina: de attribuutvolgorde verschilt daar, en `property="og:image"[^>]*content=`
+matcht dan niet.
+
+#### Meting
+
+Op productie ná de merge, met de uitgeleverde SHA gelijk aan main. Gerichte losse
+verzoeken, geen sweep — `SCOPE.md` verbiedt fuzzen op de Vercel-laag.
+
+```
+/opengraph-image      200   88301 bytes  ed2a058b5556
+/en/opengraph-image   200   88301 bytes  ed2a058b5556   <- gelijk, en dat hoort
+/nl/opengraph-image   200   95920 bytes  136d4367d10b
+/de/opengraph-image   200   94674 bytes  6a59fcfc6ade
+/es/opengraph-image   200  104494 bytes  1b6569bd2228
+/fr/opengraph-image   307  (negatieve controle)
+determinisme /nl 2x   identiek
+
+20 pagina's over vier talen en vier kaartsoorten:
+  og:image n != 1            0
+  twitter:image n != 1       0
+  wijst naar de kale wortel  0
+  draagt zijn eigen taal     20 / 20
+```
+
+Op de lokale productiebuild dekte dezelfde meting alle 190 sitemap-URL's: 190/190,
+nul ophaalfouten. Verdeling 98 taalkaarten + 60 artikel + 12 signal + 20 werk.
+
+```
+tsc --noEmit             exit 0
+vitest run               1225 tests in 57 bestanden (was 1213/56 bij #273)
+i18n:check               730 sleutels x 4 (was 718 vóór #273)
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+**Let op bij het lezen van de Vercel-status.** De poller gaf `success` bij de
+eerste poging, en dat is precies de vorm die op 22 augustus misleidde. Verifieer
+wát die status aanwijst: `/status` draagt de context `Vercel` met een `target_url`,
+`/check-runs` draagt de zes verplichte checks. Een poller die één van beide leest
+kan niet merken dat hij het verkeerde veld leest.
+
+#### Wat er níét is gebeurd
+
+Er is geen enkele operator-taak mee opgelost. `SENTRY_DSN`, de vijf
+Plausible-doelen, `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `CAL_WEBHOOK_SECRET` en
+de rest van de lijst bovenaan dit bestand staan onveranderd open. Dit was code.
