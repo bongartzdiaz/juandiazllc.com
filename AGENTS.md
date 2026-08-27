@@ -99,6 +99,87 @@ operator de bovenste las, en dat was de oudste.
 
 Niets hiervan is uit de repo af te leiden, en niets hiervan mag verzonnen worden.
 
+### 2026-08-27 — Supabase weigert het hele datavlak. De leadopvang ligt eruit.
+
+**Dit staat bovenaan omdat het als enige punt op deze lijst nu kapot is in
+plaats van open.** Elk verzoek aan REST en aan de edge functions, op **beide**
+projecten, antwoordt met 402:
+
+```
+Service for this project is restricted due to the following violations:
+exceed_storage_size_quota. The project owner must upgrade their plan or
+remove spend caps to restore service.
+```
+
+Het contactformulier op juandiazllc.com schrijft via precies dat REST-pad. Een
+bezoeker die nu het formulier invult krijgt `form.err.generic` terug. De hele
+keten erachter — rij in `marketing.leads` → `leads_notify_new` → Telegram —
+komt niet op gang, want de rij ontstaat niet.
+
+| gemeten, 2026-08-27 | uitkomst |
+|---|---|
+| edge functions op **wbgio** (alle 14) | 402 `exceed_storage_size_quota` |
+| edge functions op **vbozel** | 402, idem |
+| REST met de publishable key, op een echte tabel | **402** |
+| `/rest/v1/` zónder sleutel | 401 — de sleutelcontrole vuurt vóór de quotacontrole |
+| negatieve controle, slug die niet bestaat | 402 — dus de gateway, niet een functie |
+| projectstatus, beide | `ACTIVE_HEALTHY` — de database zelf leeft |
+| organisatie | `swlekxkypqmqbmtrfvld` "Juan Diaz", plan **free**, 2 projecten |
+| wbgio | 20 MB database · 1 storage-object · 13 kB · grootste tabel 296 kB |
+| vbozel | 29 MB database · **0** storage-objecten |
+| `pg_replication_slots`, beide | leeg |
+
+**Het gaat niet over datavolume.** Samen 49 MB over de hele organisatie. Geen
+replicatieslot dat WAL vasthoudt — dat was de eerste hypothese en hij is
+gemeten weerlegd. De boodschap noemt zelf wat het wél is: een plan of een spend
+cap. Dat staat op **Billing/Usage van de organisatie**, is een dashboard-pagina
+en een betaalhandeling, en is daarmee van jou. Ik heb er niets aan aangeraakt.
+
+Twee dingen om te weten bij het nameten. Die **401 op `/rest/v1/`** leest als
+"REST is gezond" en is het niet — hij komt uit de sleutelcontrole, die vóór de
+quotacontrole zit; peil een echte tabel mét de publishable key. En het
+**managementvlak werkt gewoon door**: `execute_sql`, `list_edge_functions` en
+`deploy_edge_function` antwoorden normaal terwijl het datavlak 402 geeft. Wat er
+live staat is dus wél te verifiëren, hoe het antwoordt niet.
+
+Dit is dezelfde storing als in de memory `project_supabase_402_blokkade.md`,
+inclusief de aanwijzing die daar al stond: kijk op Billing/Usage van de
+organisatie, niet in de database.
+
+**Wanneer het begon: binnen een etmaal.** Op 2026-08-26 om 18:15 UTC gaven
+dezelfde probes nog 400 en 503 — zie de hermeting hieronder.
+
+### 2026-08-27 — de tien dode `diaz-*` functies zijn onschadelijk, niet weg
+
+Verwijderen kan van deze machine niet. De Supabase-MCP heeft `list`, `get` en
+`deploy` voor edge functions en **geen delete**, en de `supabase`-CLI hier is
+ingelogd als Roy — die krijgt 403 op wbgio. Op jouw go is er daarom een 410-stub
+overheen gezet: geen database, geen netwerk, geen gebruik van de
+`SUPABASE_SERVICE_ROLE_KEY` die Supabase in élke functie injecteert.
+
+Alle tien sprongen een versie omhoog met een nieuwe sha256, binnen dezelfde
+minuut, met `verify_jwt: false` behouden zodat het antwoord van buitenaf
+meetbaar blijft. Elke stub draagt **zijn eigen slug** in het antwoord, zodat een
+probe bewijst dát díé slug de stub kreeg. De vier die moesten blijven staan —
+`lead-notify`, `lead-acknowledge`, `pai-vapi-webhook`, `pai-weekly-digest` —
+dragen nog hun oude `updated_at`. Nog steeds veertien functies.
+
+**De 410 zelf is niet waargenomen**, want het datavlak geeft 402 (zie hierboven).
+Wat er live staat is teruggelezen uit de bron via het managementvlak; hoe het
+antwoordt niet. Zodra de restrictie eraf is: `scratchpad/probe-410.sh` draait de
+tien plus een negatieve controle plus de vier die moesten blijven.
+
+**Wat er open blijft, en waarom het op deze lijst hoort.** De tien functies staan
+er nog, elk met een service-role-sleutel erin. Weghalen gaat via het dashboard,
+of via een PAT als `SUPABASE_ACCESS_TOKEN=` bij een CLI-aanroep — dat laatste
+vervangt Roy's opgeslagen login niet.
+
+**Eén vondst die niet op de lijst stond.** `diaz-affiliate-activate` had
+**geen enkele authenticatie**: geen sleutel, geen handtekening. Een POST met een
+leeg object leegde de activatiewachtrij, gaf gratis Pro-licenties uit en
+verstuurde mail. Op wbgio was dat onschadelijk omdat `diaz_editor` daar gedropt
+is. **Op vbozel staat diezelfde functie nog, en daar bestaat het schema wel.**
+
 ### Hermeten op 2026-08-26 om 18:15 UTC — niets is afgevallen, één meting is scherper
 
 Alles wat van buitenaf meetbaar is, is opnieuw gemeten in plaats van uit dit
@@ -458,14 +539,21 @@ herschreven, en deze notitie is de correctie erop.
   die tak met 503 `auth-not-configured`.
 - **Leaked-password protection** aanzetten op `wbgiouuifqhasedncysw` — de enige
   WARN uit de advisors die actie vergt.
-- **Tien dode `diaz-*` edge functions** op wbgio en **vijf dubbele slugs** op
-  vbozel. Wát er nog naartoe schreef: niets. Stripe en Lemon wijzen aantoonbaar
-  naar vbozel, en de AppSumo-vraag is op 2026-08-25 beantwoord — er ís geen
-  AppSumo-instelling, want die koppeling loopt de andere kant op. **Er staat niets
-  meer voor; de tien kunnen weg.** Zie de tabel hierboven. **Eén van de vijf is
-  inmiddels benoemd:** `appsumo-redeem` op vbozel — v1, 4 augustus, geen map in
-  de repo, door niets aangeroepen, draagt wél een service-role-sleutel. Die kan
-  weg zodra jij dat zegt; verwijderen is onomkeerbaar en naar buiten gericht.
+- **Tien dode `diaz-*` edge functions** op wbgio — **onschadelijk sinds
+  2026-08-27, maar nog niet verwijderd.** Er staat een 410-stub overheen zonder
+  database, netwerk of service-role-gebruik; de tien functies zelf staan er nog,
+  elk met die sleutel erin. Weghalen kan van deze machine niet: de MCP heeft geen
+  delete en de CLI hier is Roy. Zie het blok bovenaan deze lijst. **En vijf
+  dubbele slugs op vbozel**, waarvan er één is benoemd: `appsumo-redeem` — v1,
+  4 augustus, geen map in de repo, door niets aangeroepen, draagt wél een
+  service-role-sleutel. Die kan weg zodra jij dat zegt; verwijderen is
+  onomkeerbaar en naar buiten gericht.
+- **`diaz-affiliate-activate` op vbozel heeft geen authenticatie.** Geen sleutel,
+  geen handtekening: een POST met een leeg object leegt de activatiewachtrij,
+  geeft gratis Pro-licenties uit en verstuurt mail. Gevonden op 2026-08-27 bij
+  het lezen van de wbgio-kopie, waar het onschadelijk is omdat `diaz_editor`
+  daar gedropt is. Op vbozel bestaat dat schema wél. Niet gedemonstreerd — dat
+  zou een licentie uitgeven.
 - ~~De README in `bongartzdiaz/diaz-editor` wijst de Stripe-webhook naar het
   dode project.~~ **Gemarkeerd op 2026-08-25** met #640 (`208192b`): elf
   verwijzingen over twee bestanden, allemaal voorzien van een waarschuwing.
