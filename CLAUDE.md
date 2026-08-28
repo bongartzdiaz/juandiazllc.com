@@ -7906,3 +7906,69 @@ stappen erbij; uitvoeren is Juans handeling. En er is geen enkele operator-taak
 mee opgelost — de 402, de vijf Plausible-doelen, `LEAD_NOTIFY_SECRET`,
 `RESEND_API_KEY` en `CAL_WEBHOOK_SECRET` staan onveranderd open, en idee 5 wacht
 expliciet op de eerste drie daarvan.
+
+### 2026-08-28 (vervolg) — verse meting, een schone SEO-audit, en de vier introductieberichten
+
+Drie vragen in één: een verse blik op de stand, het marketingplan verder, en
+SEO-checks. Alles is gemeten in plaats van uit dit logboek overgeschreven.
+
+#### De verse meting
+
+| | uitkomst |
+|---|---|
+| git | schoon op `f93ffe4` (#286) |
+| Supabase-datavlak, beide projecten | **nog steeds 402** — de leadopvang ligt er nog uit |
+| productie, zes kern-URL's | 200, alle zes |
+| Ahrefs `public-domain-rating-free` | `Insufficient plan` — DR blijft onmeetbaar, ongewijzigd sinds 2026-08-23 |
+
+#### De SEO-audit: nul over de hele linie
+
+`scripts/seo-audit.ts` tegen productie: **190 pagina's, 0 fouten, 0
+waarschuwingen, 0 notities.** Dat is een uitkomst en geen kapot instrument —
+de controles zijn getest in `lib/seo/audit.test.ts`, en het rapport zegt dat
+zelf ook. Er ligt aan de technische SEO-kant niets te repareren; wat de
+zoekkant blokkeert is meten (Search Console-property nakijken, de vijf
+Plausible-doelen), en dat is operator-werk dat al op de lijst staat.
+
+#### docs/introducties.md — idee 1 uitvoerbaar gemaakt
+
+Idee 1 uit `docs/kanalen.md` (het enige dat vandaag volledig werkt) had nog
+geen teksten. Nu wel: vier plak-klare berichten, één per bevestigde klant,
+gekoppeld op sector plus venster omdat de namen bewust niet in deze repo
+staan. Elk bericht draagt het cijfer dat die klant zelf haalde — woordelijk
+uit de uitkomstentabel in `docs/claims.md` — plus precies één vraag, en geen
+aanbod, geen link, geen bijlage. Erachter staat de reageer-routine van idee 2
+als werkwijze: selectiecriteria in plaats van een verzonnen accountlijst,
+want een lijst die ik verzin is geen bron.
+
+`lib/introducties.test.ts` bewaakt het: de vier metrics worden uit de tabel
+in `claims.md` **geparst**, niet overgeschreven, en elk bericht draagt er
+precies één (bijectie, beide richtingen). Verder: geen URL in een bericht,
+precies één vraagteken, geen enkel bedrag behalve de euro-uitkomst die zelf
+in de tabel staat — dat dekt de sprintprijs zonder hem te dupliceren — de
+sectornamen zoals `results.r1..r4.sector` in `dict.ts` ze schrijft, en het
+automatiseringsverbod woordelijk aanwezig.
+
+**Zeven mutaties, zeven keer de voorspelde kleur**, groen na herstel, nul
+sporen. De groene controle is de scope-drager: een metric in de toelichting
+buiten de fenced blokken blijft onzichtbaar, want de bijectie leest de
+berichten en niet het hele bestand.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1259 tests in 60 bestanden (was 1251/59)
+seo-audit (productie)    190 pagina's · 0 / 0 / 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +8 is de nieuwe poort. Beide nieuwe bestanden puur CRLF, in bytes
+gecontroleerd.
+
+#### Wat dit niet doet
+
+**Er is niets verstuurd.** Versturen is Juans handeling, per bericht, en het
+document zegt dat zelf. Geen operator-taak opgelost: de 402, de vijf
+Plausible-doelen, `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `CAL_WEBHOOK_SECRET`
+en de vier LinkedIn-beslissingen staan onveranderd open.
