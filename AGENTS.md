@@ -166,7 +166,7 @@ dragen nog hun oude `updated_at`. Nog steeds veertien functies.
 
 **De 410 zelf is niet waargenomen**, want het datavlak geeft 402 (zie hierboven).
 Wat er live staat is teruggelezen uit de bron via het managementvlak; hoe het
-antwoordt niet. Zodra de restrictie eraf is: `scratchpad/probe-410.sh` draait de
+antwoordt niet. Zodra de restrictie eraf is: `scripts/probe-supabase-402.sh` draait de
 tien plus een negatieve controle plus de vier die moesten blijven.
 
 **Wat er open blijft, en waarom het op deze lijst hoort.** De tien functies staan
