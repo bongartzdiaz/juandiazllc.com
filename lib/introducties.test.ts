@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { DICT } from "@/lib/i18n/dict";
+import { metricsUitClaims } from "@/lib/claims-uitkomsten";
 
 // docs/introducties.md draagt vier berichten die Juan met de hand verstuurt
 // naar de vier klanten uit de uitkomstentabel in docs/claims.md. Deze poort
@@ -29,7 +30,6 @@ import { DICT } from "@/lib/i18n/dict";
 
 const WORTEL = join(__dirname, "..");
 const DOC_PAD = join(WORTEL, "docs", "introducties.md");
-const CLAIMS_PAD = join(WORTEL, "docs", "claims.md");
 
 const EURO = String.fromCharCode(0x20ac);
 const VERWACHT_AANTAL = 4;
@@ -43,31 +43,8 @@ function berichten(md: string): string[] {
   return [...md.matchAll(/\n```\n([\s\S]*?)\n```\n/g)].map((m) => m[1]);
 }
 
-/** De vier metrics uit de uitkomstentabel in docs/claims.md. Geparst uit de
-    sectie zelf, want elders in dat bestand staan ook backtick-cellen. */
-function metricsUitClaims(): string[] {
-  const md = lees(CLAIMS_PAD);
-  const start = md.indexOf("### The four operator outcomes");
-  if (start < 0) {
-    throw new Error(
-      "docs/claims.md draagt de kop '### The four operator outcomes' niet " +
-        "meer. Zet hem terug of werk deze poort bij — de berichten in " +
-        "docs/introducties.md hangen aan die tabel.",
-    );
-  }
-  const eind = md.indexOf("\n#### ", start);
-  const sectie = md.slice(start, eind < 0 ? undefined : eind);
-  const metrics = [...sectie.matchAll(/^\|\s*`([^`]+)`\s*\|/gm)].map((m) =>
-    m[1].trim(),
-  );
-  if (metrics.length !== 4) {
-    throw new Error(
-      `de uitkomstentabel in docs/claims.md telt ${metrics.length} rijen, ` +
-        "verwacht 4. Een bericht zonder rij is een claim zonder bron.",
-    );
-  }
-  return metrics;
-}
+// De metric-parser woont sinds 2026-08-28 in lib/claims-uitkomsten.ts, omdat
+// lib/partners.test.ts dezelfde tabel leest. Eén parser, twee afnemers.
 
 const DOC = lees(DOC_PAD);
 const BLOKKEN = berichten(DOC);

@@ -7972,3 +7972,87 @@ gecontroleerd.
 document zegt dat zelf. Geen operator-taak opgelost: de 402, de vijf
 Plausible-doelen, `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `CAL_WEBHOOK_SECRET`
 en de vier LinkedIn-beslissingen staan onveranderd open.
+
+### 2026-08-28 (vervolg) — de partnerteksten, en een parser die verhuisde voordat hij kon dubbelen
+
+Verder met `docs/kanalen.md`: idee 3 — doorverwijspartners, geen affiliate —
+is nu uitvoerbaar. `docs/partners.md` draagt drie berichten (installateur,
+boekhouder, energie-adviseur, de drie soorten uit §2.3) plus één
+doorstuurtekst die de partner zelf kan doorsturen. Elke tekst: één zin over
+wanneer ze aan Juan moeten denken, de lekkage-scan als enige link, en
+expliciet geen vergoeding — de beslissing uit kanalen §2.3, woordelijk.
+
+**Eerst gemeten, toen geschreven.** De 402 staat er nog (herprobe), de
+scanpagina antwoordt 200 op `/nl` en 404 op `/en` — precies wat `ENKELE_TAAL`
+belooft — en de claims in de doorstuurtekst ("vier minuten", "geen
+e-mailadres nodig", "gratis") zijn nagelezen tegen `ScanCallout.tsx` en het
+ontwerp van de scan zelf. Het document zegt er ook eerlijk bij dat het
+formulier áchter de scan nu niets wegschrijft (402) en dat bellen/mailen tot
+die tijd de vangnetroute is.
+
+#### De parser verhuisde vóórdat er een tweede kopie ontstond
+
+`lib/partners.test.ts` moet kunnen bewijzen dat er géén klantuitkomst in een
+partnertekst staat; `lib/introducties.test.ts` bewijst het omgekeerde. Beide
+hebben daarvoor de metric-parser op de uitkomstentabel in `docs/claims.md`
+nodig. Die parser stond als lokale functie in de introductiepoort — hem
+overschrijven naar de nieuwe poort zou de bugklasse zijn die dit logboek het
+vaakst noteert. Hij woont nu in `lib/claims-uitkomsten.ts`, met twee
+afnemers. Zelfde vorm als `enkele-taal.ts` en `csrf-vrijstelling.ts`.
+
+#### De poort, en twee dingen die hij afleidt in plaats van overtypt
+
+- **De scan-URL komt uit `ENKELE_TAAL`** (`lib/i18n/enkele-taal.ts`), dezelfde
+  bron als de sitemap en `ScanCallout`. Verdwijnt de route daar, dan valt de
+  poort om — een link naar een 404 kan per constructie niet ontstaan.
+- **De bronbeslissing wordt genormaliseerd gelezen.** "Geen contract en geen
+  percentage om mee te beginnen" vouwt in `kanalen.md` over een regeleinde;
+  mijn eerste grep op één regel miste hem en las als "de zin staat er niet".
+  De poort normaliseert witruimte vóór het vergelijken, met die meting als
+  reden in de comment.
+
+Verder: precies één link per blok en die is de scan; nergens een bedrag;
+nergens een van de vier metrics uit `claims.md` (die horen in
+`docs/introducties.md`); drie van de vier blokken dragen "geen vergoeding" en
+het ene blok zonder is aantoonbaar de doorstuurtekst.
+
+#### Acht mutaties, acht keer de voorspelde kleur
+
+Zeven rood op zes verschillende asserties, één groen als controle, groen na
+herstel, nul sporen. De twee die het vermelden waard zijn:
+
+- **M7 (groen)**: de scan-URL in de toelichting buiten de blokken blijft
+  onzichtbaar — de linkcontrole leest de blokken, niet het bestand.
+- **M8 (rood)**: de puntstrip uit de URL-detector slopen laat de correcte
+  link in de doorstuurtekst ("…lekkage-scan. Niets aan vast") als afwijkend
+  lezen — dezelfde val als de prijsregex van #225, en nu met een mutatie die
+  bewijst dat de strip dragend is.
+
+M6 muteert `docs/kanalen.md` in plaats van het eigen document: de beslissing
+verschuiven bij de bron maakt de partnerpoort rood. Kopij mag zijn bron niet
+overleven — de `ResultsStrip`-vorm, nu over twee documenten.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1267 tests in 61 bestanden (was 1259/60)
+i18n:check               730 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +8 is de nieuwe poort; `introducties.test.ts` bleef op 8 tests, alleen
+zijn parser importeert hij nu. Alle drie de nieuwe/geraakte bestanden puur
+CRLF, in bytes gecontroleerd.
+
+#### Wat dit niet doet
+
+**Er is niets verstuurd en niemand benaderd.** De vier gesprekken zijn Juans
+handeling, en het document zegt dat zelf. Geen operator-taak opgelost: de
+402, de vijf Plausible-doelen, `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`,
+`CAL_WEBHOOK_SECRET` en de vier LinkedIn-beslissingen staan onveranderd open.
+Van de vijf kanalen-ideeën resteert alleen idee 4 (het eigen data-stuk) als
+onuitgevoerd schrijfwerk — en dat wacht op gegevens die alleen Juan heeft:
+`claims.md` draagt de vier eindcijfers, niet het onderliggende verloop per
+traject, en een datastuk zonder die data zou verzonnen zijn.
