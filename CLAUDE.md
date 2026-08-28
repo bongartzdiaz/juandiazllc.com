@@ -7818,3 +7818,91 @@ En de vier LinkedIn-beslissingen op de operator-lijst staan onveranderd open -
 Kop en Over plakken, de bedrijfspagina zichtbaar maken of niet, de Instagram-link
 laten staan of niet. De vijf Plausible-doelen blokkeren de meting: zonder die
 doelen is een klik vanaf LinkedIn niet te onderscheiden van geen verkeer.
+
+### 2026-08-28 (vervolg) — de kanaalkeuze, en een poort die mijn eigen telfout ving
+
+`docs/kanalen.md`. De vraag was om marketingideeën; de ideeën waren het
+makkelijke deel. Wat het document draagt is de volgorde, en die volgt uit twee
+cijfers die niets met marketing te maken hebben.
+
+#### De beperking is opvang en capaciteit
+
+**Drie trajecten tegelijk** (`docs/claims.md`, beslist 2026-08-22) bij €2.500
+excl. btw per sprint. Een volle agenda is drie tot vijf gesprekken. Elk idee dat
+volume levert lost daarmee een probleem op dat niet bestaat — dat schrapt zes van
+de negen categorieën uit de bibliotheek waar de vraag uit kwam, inclusief
+advertenties, Product Hunt en lifetime deals.
+
+**En de opvang staat uit.** Het contactformulier schrijft niets weg (Supabase
+402), `marketing.leads` en `marketing.subscribers` staan op nul rijen ooit, de
+vijf Plausible-doelen bestaan niet, en `RESEND_API_KEY` en `CAL_WEBHOOK_SECRET`
+zijn niet gezet. Verkeer sturen naar een site die niets vangt en niets meet
+levert niets op waar je later iets van leert.
+
+Van de vijf ideeën werkt er daarom **precies één vandaag volledig**: de vier
+bevestigde klanten om een introductie vragen. Niet omdat het het slimste idee is,
+maar omdat het als enige de kapotte keten niet raakt — een introductie loopt over
+e-mail of telefoon en komt het formulier niet tegen. De andere vier staan met hun
+blokkade erbij in een tabel, en drie van die vier blokkades zijn van de operator.
+
+#### De poort ving twee fouten, allebei van mijzelf
+
+`lib/kanalen.test.ts` bewaakt de vijf cijfers die het document draagt maar niet
+bezit: artikelaantallen (`getAllInsights`), de capaciteitsgrens en de prijs
+(`docs/claims.md`), de vier klantuitkomsten (`results.r1..r4` in `dict.ts`) en
+het aantal posts in de wachtrij (`docs/linkedin-posts.md`).
+
+**Ik schreef "elf artikelen" waar er vijf staan.** Dat is woordelijk de fout die
+`docs/bereik-plan.md` op 2026-08-23 maakte en die het logboek al beschrijft: elf
+telt de DE- en ES-clusters mee, terwijl een Nederlandse introductie op de
+NL-markt binnenkomt en daar vijf energie-artikelen staan. Gevonden bij het
+nameten, niet bij het schrijven. De eerste mutatie in het harnas zet hem terug.
+
+**En de poort viel bij zijn eerste run om op mijn proza.** Ik schreef
+"NL/BE-energiemakelaar", `dict.ts` schrijft "NL/BE energiemakelaar". Eén
+koppelteken, en het is precies de dimensie waarin een verwijzing wegdrijft van
+zijn bron. Het document is aangepast, de poort niet verzwakt — normaliseren op
+koppeltekens zou drift toestaan in de enige dimensie waarin drift hier ontstaat.
+
+#### Tien mutaties, tien keer de voorspelde kleur
+
+Acht rood op zes verschillende asserties, twee groen als controle. De twee groene
+dragen het bewijs dat de poort gescoped is: een fout artikelaantal in **een ander
+document** blijft onzichtbaar, en een bedrag in de **proza** van `claims.md` ook
+— de prijs wordt uit de tabelrij geparst, niet uit het bestand. Zonder dat tweede
+paar is groen ook te verklaren door een parser die het hele bestand leest en
+toevallig het goede getal tegenkomt.
+
+Het parsen zelf is opzet en geen stijl: een tweede kopie van hetzelfde getal is
+precies waarvoor `claims.md` bestaat. De capaciteitsparser gooit bovendien op
+**meer dan één** treffer. Dat is de les van #229, waar `.match()` zonder `/g`
+stil de eerste rij pakte terwijl er twee stonden — vandaag klopte het toevallig
+omdat beide rijen hetzelfde getal droegen.
+
+#### Wat de poort niet ziet
+
+Of §1 nog klopt. De 402, de ontbrekende doelen en de niet-gezette secrets zijn
+metingen van buitenaf met een datum erbij; een groen vinkje hier betekent niet
+dat de stand nog geldt. Dat staat in de kop van het testbestand en in §5 van het
+document, met de verwijzing naar `scripts/probe-supabase-402.sh`.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1251 tests in 59 bestanden (was 1243/58)
+i18n:check               730 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +8 is de nieuwe poort. Geen code geraakt: dit is een document plus een poort
+erop, dus er valt niets in de browser na te meten.
+
+#### Wat dit niet doet
+
+**Er is niets uitgevoerd.** De vijf ideeën staan op volgorde met hun eerste
+stappen erbij; uitvoeren is Juans handeling. En er is geen enkele operator-taak
+mee opgelost — de 402, de vijf Plausible-doelen, `LEAD_NOTIFY_SECRET`,
+`RESEND_API_KEY` en `CAL_WEBHOOK_SECRET` staan onveranderd open, en idee 5 wacht
+expliciet op de eerste drie daarvan.
