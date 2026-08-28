@@ -7716,3 +7716,105 @@ identiek aan die van de tak.
 **De rapportage staat hierna nog steeds uit.** Wat er verandert is dat een
 melding straks zijn commit draagt. `SENTRY_DSN` op productie zetten blijft
 operator-werk; die waarde is van Juan.
+
+### 2026-08-28 - de LinkedIn-wachtrij, en een poort op een document
+
+Twaalf posts staan plak-klaar in `docs/linkedin-posts.md`. Zes stonden er al
+(uit #256), zes zijn nieuw geschreven. Ze zijn pas geschreven nadat de bodies
+van hun artikelen gelezen waren: een post die specifieker is dan zijn artikel
+is verzonnen, en twee van de gelinkte artikelen dragen zelf een kop **"Wat ik
+hier niet beweer"**.
+
+#### De posts stonden op twee plekken, en dat is de vaakst terugkerende bugklasse hier
+
+`docs/social-linkedin.md` droeg de eerste zes posts, de vorm-regels en de
+kalender. Twee documenten die een tekst dragen lopen uit elkaar, en dan bewaakt
+de zwakste. Het uitvoerbare deel woont nu in de wachtrij; `social-linkedin.md`
+houdt de redenering - welk kanaal, welk profiel, waarom de inhoud die er al ligt
+eerst aan de beurt is - en draagt **nul** artikel-URL's. Van 327 naar 166 regels.
+
+#### Twaalf URL's gemeten, met een negatieve controle ernaast
+
+Gerichte losse verzoeken op productie, geen sweep (`SCOPE.md` verbiedt fuzzen op
+de Vercel-laag). Alle twaalf **200**; `/nl/insights/deze-slug-bestaat-niet-xyz`
+gaf **404**. Zonder die 404 is een reeks 200's niet te onderscheiden van een
+catch-all.
+
+Alle twaalf lezen ook werkelijk Nederlands op `/nl`. Drie ervan zijn
+all-market-artikelen (`why-operator-crms-fail`,
+`the-esg-number-your-asset-manager-cant-defend`,
+`your-returning-guest-looks-new-to-every-system`) en die dragen hun Nederlands
+in `i18n.nl` in plaats van in de basisvelden - dus er is geen Nederlandse post
+die naar een Engels artikel linkt.
+
+#### `lib/linkedin-posts.test.ts` - een poort op een document
+
+Een dode link in een geplaatste post zie je pas nadat een lezer geklikt heeft,
+dus nooit. De poort leest de URL's uit de wachtrij en legt ze tegen
+`getAllInsights("nl")`. Verder: hooguit 3.000 tekens per post, precies een link
+per post en die op de laatste regel, geen bedrag in een post, en `social-linkedin.md`
+draagt er nul.
+
+Twee asserties zijn er alleen om de rest te kunnen vertrouwen - twaalf blokken
+gevonden, en de NL-slugverzameling is niet leeg en weigert een verzonnen slug.
+Zonder die twee slaagt elke andere assertie ook op een lege lijst.
+
+**Het getal in de kop wordt geparst, niet overgeschreven.** Ik had "1.318 tekens"
+opgeschreven voordat ik iets gemeten had; het waren er 1.232, na de vouw-reparatie
+1.233. Een meetscript ving dat. Nu eist de poort dat de kop gelijk is aan de
+gemeten maximumlengte. Zelfde klasse als de DR-0-aanname van 23 augustus: **een
+citaat dat je zelf hebt geschreven is geen bron.**
+
+#### Drie openingsregels liepen over de mobiele vouw
+
+De vorm-regel in het document zegt dat de eerste twee regels de hele post zijn.
+Post 8 opende op 154 tekens, post 9 op 145 en post 11 op 168 - alle drie
+halverwege afgekapt op een telefoon. De punchline van post 8 staat nu vooraan,
+post 9 opent met de vraag, en de eerste regel van post 11 is in tweeen gesplitst.
+Alle twaalf openen nu op maximaal 137 tekens. De vouw is **niet** op een exact
+getal gepind: LinkedIn publiceert die niet en hij verschilt per apparaat.
+
+#### Een post die bewust minder zegt dan zijn artikel
+
+Post 10 gaat over `why-operator-crms-fail`, en de slotzin van dat artikel noemt
+"het CRM dat ik aan operators lever". Philly staat in aanbouw, en #188 heeft
+precies die claim uit `work.page.lede` gehaald met een poort eromheen. De post
+noemt het product dus niet.
+
+#### Negen mutaties, negen keer de voorspelde kleur
+
+Acht rood op zeven verschillende asserties, een groen als controle. Die groene is
+de belangrijkste: hetzelfde bedrag in de **toelichting** van het document, buiten
+elk fenced blok, blijft onzichtbaar. Dat is het uitvoerbare bewijs dat de poort
+de posts leest en niet het hele bestand - vier eerdere tekstscans in deze repo
+vielen juist om op hun eigen proza.
+
+#### Onderweg
+
+Het eerste dump-script sloeg **alle `ul`-items over**, dus de lijst met vier
+dingen in het thuisbatterij-artikel was onzichtbaar en een post die daaruit was
+geschreven had de kern van het artikel gemist. Nu wandelt het elke stringliteral
+in bronvolgorde af. En de heredoc halveerde opnieuw een regex-escape (`[^"\\]`
+werd `[^"\]`, `re.PatternError`) - dat is inmiddels de twaalfde keer; scripts
+gaan via het Write-gereedschap.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1243 tests in 58 bestanden (was 1235/57)
+i18n:check               730 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +8 is de nieuwe poort. Geen code geraakt: dit is een document plus een poort
+erop, dus er valt niets in de browser na te meten.
+
+#### Wat dit niet doet
+
+**Er is niets geplaatst.** De posts staan klaar; plaatsen is Juans handeling.
+En de vier LinkedIn-beslissingen op de operator-lijst staan onveranderd open -
+Kop en Over plakken, de bedrijfspagina zichtbaar maken of niet, de Instagram-link
+laten staan of niet. De vijf Plausible-doelen blokkeren de meting: zonder die
+doelen is een klik vanaf LinkedIn niet te onderscheiden van geen verkeer.
