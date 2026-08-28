@@ -8056,3 +8056,102 @@ Van de vijf kanalen-ideeën resteert alleen idee 4 (het eigen data-stuk) als
 onuitgevoerd schrijfwerk — en dat wacht op gegevens die alleen Juan heeft:
 `claims.md` draagt de vier eindcijfers, niet het onderliggende verloop per
 traject, en een datastuk zonder die data zou verzonnen zijn.
+
+### 2026-08-28 (vervolg) — het datastuk: de intake die het gat precies maakt
+
+Idee 4 uit `docs/kanalen.md` — één stuk eigen data over wat vier operators
+kwijt waren tussen intake en offerte — stond genoteerd als "wacht op gegevens
+die alleen jij hebt". Dat bleek half waar: het artikel wacht daarop, maar het
+gat zelf was nooit precies gemaakt. `docs/datastuk.md` doet dat nu.
+
+#### Waarom er geen artikel geschreven is
+
+`docs/claims.md` draagt de vier eindcijfers (+38% · 3.2x · −61% · €0,
+bevestigd 2026-08-19) en verder niets: geen beginwaarden, geen meetbron, geen
+volumes, geen verloop per stap. Een datastuk uit alleen eindcijfers schrijven
+is het verhaal eronder verzinnen, en dat is hier de hoofdzonde. Het document
+zegt dat zelf: "Ik publiceer niets. Het stuk wordt pas geschreven nadat jouw
+antwoorden in `docs/claims.md` staan."
+
+#### Eén intake, twee doelen
+
+De 27 vragen — vijf vaste per traject (beginwaarde, eindwaarde, meetbron,
+periode, volume) plus één traject-specifieke, plus drie over de meterdata —
+zijn zo geformuleerd dat de antwoorden éérst de uitkomstentabel in
+`claims.md` in gaan. Dat is regel 1 uit kanalen §2.4, en het sluit en passant
+het open punt dat `claims.md` zelf sinds 2026-08-19 noteert: de
+per-traject-details horen daar te staan, ook al bereiken ze nooit een pagina.
+
+De kernvraag is die van traject 3: het verloop per stap — intake, schouw,
+offerte — in dagen, vóór en na. Dat is letterlijk het stuk dat kanalen §2.4
+beschrijft; zonder die rij is het niet te schrijven. "Niet meer te
+achterhalen" geldt expliciet als eerlijk antwoord.
+
+Het skelet ligt klaar met vijf koppen en `[ANTWOORD n]`-slots, en draagt
+bewust geen enkele meetwaarde. Twee verplichtingen staan er al woordelijk in:
+"vier is geen steekproef" en de kop "Wat ik hier niet beweer" — die kop
+dragen drie bestaande NL-artikelen al (kanalen zei twee; hermeten gaf drie:
+de twee ETS2-stukken plus het WPM-stuk).
+
+#### De poort parseert zijn bronnen, drie stuks
+
+`lib/datastuk.test.ts` (7 tests) leest de vier metrics via `metricsUitClaims()`
+uit `lib/claims-uitkomsten.ts` — derde afnemer van dezelfde parser, na
+introducties en partners — de sectornamen uit `results.r1..r4.sector` in
+`dict.ts`, en de grens-regel woordelijk uit `docs/kanalen.md` (genormaliseerd
+op witruimte, want die zin vouwt daar over een regeleinde — dezelfde les als
+bij de partnerpoort, gemeten 2026-08-28).
+
+Drie eisen die het document zelf niet kan bewaken: elke metric staat er
+precies één keer (een tweede voorkomen is een cijfer dat de tabel uit kroop),
+geen bedrag dat geen uitkomst is (dekt de sprintprijs zonder hem te
+dupliceren), en de intake telt 27 checkboxes — aangevinkt telt mee, want
+invullen is het doel.
+
+#### Tien mutaties, tien keer de voorspelde kleur
+
+Acht rood op acht verschillende asserties, twee groen als controle, groen na
+herstel, nul sporen. De sprekendste rode is M8: alleen het `- [ ] `-voorvoegsel
+van een vraag weghalen — de tekst blijft staan, het document oogt compleet, en
+alleen de teller ziet 26 in plaats van 27. Dat is precies de "vraag die
+stilletjes verdwijnt"-klasse.
+
+De twee groene dragen de grenzen: M9 zet een vóluit geschreven metric ("plus
+achtendertig procent") in de toelichting en blijft onzichtbaar — de
+vergelijking is letterlijk, en dat staat als bekende grens in de kop van de
+poort. M10 vinkt een checkbox aan en blijft groen: het bedoelde gebruik laat
+de poort niet afgaan.
+
+Onderweg één correctie op mijn eigen tekst: het skelet claimde "geen enkel
+cijfer" terwijl de paragraafnummers en `[ANTWOORD 3]` cijfers zijn. Nu "geen
+enkele meetwaarde" — een claim hoort niet breder te zijn dan wat waar is, ook
+niet in een toelichting.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1274 tests in 62 bestanden (was 1267/61)
+i18n:check               730 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +7 is de nieuwe poort. Beide nieuwe bestanden puur CRLF, in bytes
+gecontroleerd. Geen code geraakt: dit is een document plus een poort erop,
+dus er valt niets in de browser na te meten.
+
+#### Wat dit niet doet
+
+**Het artikel is niet geschreven.** Het kan pas nadat Juan de 27 vragen
+beantwoordt en de antwoorden in `claims.md` staan — die volgorde is de regel,
+geen vertraging. Er is niets gepubliceerd en niets verstuurd. En er is geen
+operator-taak mee opgelost: de 402, de vijf Plausible-doelen,
+`LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `CAL_WEBHOOK_SECRET` en de vier
+LinkedIn-beslissingen staan onveranderd open.
+
+Daarmee is het marketingplan uit `docs/kanalen.md` zo ver uitgevoerd als het
+zonder Juan kan: idee 1 (introducties, #287), idee 3 (partners, #288) en nu
+idee 4 als intake. Idee 2 is een routine zonder bouwwerk, idee 5 wacht op de
+opvang. De volgende stappen zijn versturen, gesprekken voeren en vragen
+beantwoorden — en dat is allemaal van Juan.
