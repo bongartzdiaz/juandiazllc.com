@@ -1,7 +1,7 @@
 "use client";
 
 // Next.js global error boundary for the BRAND side (/, /insights, /work,
-// etc.). The Philly CRM has its own under app/philly/global-error.tsx.
+// etc.). The CRM left with #134 and lives in bongartzdiaz/DEUS-SHARED.
 //
 // This file runs only on unhandled React errors that escape every
 // segment boundary — i.e. "the whole app caught fire." Keep the UI

@@ -206,7 +206,7 @@ export const POSTS: Insight[] = [
       { type: "quote", text: "If a sales rep cannot update a deal during the walk from the parking lot to the front door, the CRM is already losing." },
       { type: "h2", text: "The practical move" },
       { type: "p", text: "Before touching a vendor contract, write down the ten actions your team performs most on a typical Tuesday. Prototype those ten actions as one-tap flows. Anything that takes more than three taps gets rethought. The CRM is not the system — the ten flows are. Everything else is reporting." },
-      { type: "p", text: "That is the same lens I use when I build Philly — the CRM I ship to operators. Revenue is earned by field teams, so the software has to treat them like the primary user." }
+      { type: "p", text: "That is the same lens I use when I build DEUS — the CRM I ship to operators. Revenue is earned by field teams, so the software has to treat them like the primary user." }
     ],
     i18n: {
       nl: {
@@ -233,7 +233,7 @@ export const POSTS: Insight[] = [
           { type: "quote", text: "Kan een verkoper een deal niet bijwerken tijdens het lopen van de parkeerplaats naar de voordeur, dan verliest het CRM al." },
           { type: "h2", text: "Wat je concreet doet" },
           { type: "p", text: "Voordat je een leverancierscontract aanraakt, schrijf je de tien handelingen op die je team op een gewone dinsdag het vaakst doet. Bouw die tien als flows van één tik. Alles wat meer dan drie tikken kost gaat terug naar de tekentafel. Het CRM is niet het systeem — die tien flows zijn het systeem. De rest is rapportage." },
-          { type: "p", text: "Datzelfde vizier gebruik ik bij het bouwen van Philly, het CRM dat ik aan operators lever. De omzet wordt gemaakt door veldteams, dus de software hoort ze als hoofdgebruiker te behandelen." },
+          { type: "p", text: "Datzelfde vizier gebruik ik bij het bouwen van DEUS, het CRM dat ik aan operators lever. De omzet wordt gemaakt door veldteams, dus de software hoort ze als hoofdgebruiker te behandelen." },
         ],
       },
       de: {
@@ -260,7 +260,7 @@ export const POSTS: Insight[] = [
           { type: "quote", text: "Wenn ein Vertriebsmitarbeiter einen Deal nicht auf dem Weg vom Parkplatz zur Haustür aktualisieren kann, verliert das CRM bereits." },
           { type: "h2", text: "Der praktische Schritt" },
           { type: "p", text: "Bevor Sie einen Anbietervertrag anfassen, notieren Sie die zehn Aktionen, die Ihr Team an einem typischen Dienstag am häufigsten ausführt. Prototypisieren Sie diese zehn Aktionen als Ein-Tipp-Abläufe. Alles, was mehr als drei Tipps braucht, wird neu gedacht. Das CRM ist nicht das System — die zehn Abläufe sind es. Alles andere ist Reporting." },
-          { type: "p", text: "Das ist dieselbe Brille, mit der ich Philly baue — das CRM, das ich an Betreiber ausliefere. Umsatz wird von Außendienstteams erzielt, also muss die Software sie als primäre Nutzer behandeln." }
+          { type: "p", text: "Das ist dieselbe Brille, mit der ich DEUS baue — das CRM, das ich an Betreiber ausliefere. Umsatz wird von Außendienstteams erzielt, also muss die Software sie als primäre Nutzer behandeln." }
         ],
       },
       es: {
@@ -287,7 +287,7 @@ export const POSTS: Insight[] = [
           { type: "quote", text: "Si un comercial no puede actualizar una oportunidad mientras camina del aparcamiento a la puerta, el CRM ya está perdiendo." },
           { type: "h2", text: "El movimiento práctico" },
           { type: "p", text: "Antes de tocar un contrato con un proveedor, anota las diez acciones que tu equipo realiza más en un martes típico. Prototipa esas diez acciones como flujos de un toque. Todo lo que necesite más de tres toques se replantea. El CRM no es el sistema — los diez flujos lo son. Todo lo demás es reporting." },
-          { type: "p", text: "Esa es la misma lente con la que construyo Philly — el CRM que entrego a operadores. Los ingresos los ganan los equipos de campo, así que el software debe tratarlos como el usuario principal." }
+          { type: "p", text: "Esa es la misma lente con la que construyo DEUS — el CRM que entrego a operadores. Los ingresos los ganan los equipos de campo, así que el software debe tratarlos como el usuario principal." }
         ],
       },
     },
@@ -454,7 +454,7 @@ export const POSTS: Insight[] = [
         "Then show the CFO the dashboard — but only with data the field team can actually produce in three taps."
       ]},
       { type: "quote", text: "A CRM is not the system of record. It is the system of action. If it is not easier than what came before, nothing gets recorded." },
-      { type: "p", text: "This is the lens behind Philly. The dashboards came after we got the field flow right. If you reverse the order, you get a museum." }
+      { type: "p", text: "This is the lens behind DEUS. The dashboards came after we got the field flow right. If you reverse the order, you get a museum." }
     ],
     i18n: {
       nl: {
@@ -478,7 +478,7 @@ export const POSTS: Insight[] = [
             "Laat de financieel directeur daarna het dashboard zien, maar alleen met cijfers die het veldteam in drie tikken kan produceren.",
           ] },
           { type: "quote", text: "Een CRM is niet het systeem van vastlegging. Het is het systeem van handelen. Is het niet makkelijker dan wat er was, dan wordt er niets vastgelegd." },
-          { type: "p", text: "Dat is het vizier achter Philly. De dashboards kwamen pas nadat de veldflow klopte. Draai je die volgorde om, dan krijg je een museum." },
+          { type: "p", text: "Dat is het vizier achter DEUS. De dashboards kwamen pas nadat de veldflow klopte. Draai je die volgorde om, dan krijg je een museum." },
         ],
       },
       de: {
@@ -502,7 +502,7 @@ export const POSTS: Insight[] = [
             "Zeigen Sie dann dem CFO das Dashboard — aber nur mit Daten, die das Außendienstteam tatsächlich in drei Tipps erzeugen kann."
           ]},
           { type: "quote", text: "Ein CRM ist nicht das System der Aufzeichnung. Es ist das System des Handelns. Ist es nicht einfacher als das Vorherige, wird nichts aufgezeichnet." },
-          { type: "p", text: "Das ist die Brille hinter Philly. Die Dashboards kamen, nachdem wir den Außendienst-Ablauf richtig hatten. Kehren Sie die Reihenfolge um, bekommen Sie ein Museum." }
+          { type: "p", text: "Das ist die Brille hinter DEUS. Die Dashboards kamen, nachdem wir den Außendienst-Ablauf richtig hatten. Kehren Sie die Reihenfolge um, bekommen Sie ein Museum." }
         ],
       },
       es: {
@@ -526,7 +526,7 @@ export const POSTS: Insight[] = [
             "Luego enseña al director financiero el panel — pero solo con datos que el equipo de campo pueda producir de verdad en tres toques."
           ]},
           { type: "quote", text: "Un CRM no es el sistema de registro. Es el sistema de acción. Si no es más fácil que lo anterior, no se registra nada." },
-          { type: "p", text: "Esta es la lente detrás de Philly. Los paneles llegaron después de acertar con el flujo de campo. Si inviertes el orden, obtienes un museo." }
+          { type: "p", text: "Esta es la lente detrás de DEUS. Los paneles llegaron después de acertar con el flujo de campo. Si inviertes el orden, obtienes un museo." }
         ],
       },
     },
@@ -1347,7 +1347,7 @@ export const POSTS: Insight[] = [
       { type: "h2", text: "A one-hour audit you can run today" },
       { type: "p", text: "For each tile on your dashboard, ask two questions. One: if this number goes green, what board-level decision do I make differently? Two: what would have to be true for this number to look good while the business is actually in trouble? If you cannot answer both in under a minute per tile, that tile is decoration, not instrumentation." },
       { type: "quote", text: "The best dashboards have fewer tiles than people expect. Every tile that is not answering a decision is competing for the attention of the ones that are." },
-      { type: "p", text: "When we build reporting inside Philly, we start from the decision, not the data. It forces uncomfortable conversations — 'we actually don't know what we would do if this number moved' — but those are the conversations that make the dashboard worth building." }
+      { type: "p", text: "When we build reporting inside DEUS, we start from the decision, not the data. It forces uncomfortable conversations — 'we actually don't know what we would do if this number moved' — but those are the conversations that make the dashboard worth building." }
     ],
     i18n: {
       nl: {
@@ -1370,7 +1370,7 @@ export const POSTS: Insight[] = [
           { type: "h2", text: "Een doorlichting van een uur die je vandaag kunt doen" },
           { type: "p", text: "Stel bij elke tegel op je dashboard twee vragen. Eén: welke directiebeslissing neem ik anders als dit getal groen wordt? Twee: wat zou er waar moeten zijn om dit getal er goed uit te laten zien terwijl het bedrijf in de problemen zit? Kun je die twee niet binnen een minuut per tegel beantwoorden, dan is die tegel versiering en geen instrument." },
           { type: "quote", text: "De beste dashboards hebben minder tegels dan mensen verwachten. Elke tegel die geen beslissing beantwoordt, vecht om de aandacht van de tegels die dat wel doen." },
-          { type: "p", text: "Als we rapportage in Philly bouwen, beginnen we bij de beslissing en niet bij de data. Dat dwingt ongemakkelijke gesprekken af — 'we weten eigenlijk niet wat we zouden doen als dit getal beweegt' — maar dat zijn precies de gesprekken die het dashboard de moeite waard maken." },
+          { type: "p", text: "Als we rapportage in DEUS bouwen, beginnen we bij de beslissing en niet bij de data. Dat dwingt ongemakkelijke gesprekken af — 'we weten eigenlijk niet wat we zouden doen als dit getal beweegt' — maar dat zijn precies de gesprekken die het dashboard de moeite waard maken." },
         ],
       },
       de: {
@@ -1393,7 +1393,7 @@ export const POSTS: Insight[] = [
           { type: "h2", text: "Ein einstündiges Audit, das Sie heute durchführen können" },
           { type: "p", text: "Stellen Sie für jede Kachel Ihres Dashboards zwei Fragen. Erstens: Wenn diese Zahl grün wird, welche Entscheidung auf Vorstandsebene treffe ich anders? Zweitens: Was müsste wahr sein, damit diese Zahl gut aussieht, während das Geschäft tatsächlich in Schwierigkeiten steckt? Können Sie nicht beides in unter einer Minute pro Kachel beantworten, ist diese Kachel Dekoration, keine Instrumentierung." },
           { type: "quote", text: "Die besten Dashboards haben weniger Kacheln, als man erwartet. Jede Kachel, die keine Entscheidung beantwortet, konkurriert um die Aufmerksamkeit derer, die es tun." },
-          { type: "p", text: "Wenn wir das Reporting in Philly bauen, beginnen wir bei der Entscheidung, nicht bei den Daten. Das erzwingt unbequeme Gespräche — 'wir wissen eigentlich nicht, was wir täten, wenn sich diese Zahl bewegt' — aber genau diese Gespräche machen das Dashboard bauenswert." }
+          { type: "p", text: "Wenn wir das Reporting in DEUS bauen, beginnen wir bei der Entscheidung, nicht bei den Daten. Das erzwingt unbequeme Gespräche — 'wir wissen eigentlich nicht, was wir täten, wenn sich diese Zahl bewegt' — aber genau diese Gespräche machen das Dashboard bauenswert." }
         ],
       },
       es: {
@@ -1416,7 +1416,7 @@ export const POSTS: Insight[] = [
           { type: "h2", text: "Una auditoría de una hora que puedes hacer hoy" },
           { type: "p", text: "Para cada casilla de tu panel, haz dos preguntas. Una: si este número se pone verde, ¿qué decisión a nivel de consejo tomo distinta? Dos: ¿qué tendría que ser cierto para que este número se vea bien mientras el negocio está realmente en problemas? Si no puedes responder ambas en menos de un minuto por casilla, esa casilla es decoración, no instrumentación." },
           { type: "quote", text: "Los mejores paneles tienen menos casillas de las que la gente espera. Cada casilla que no responde a una decisión compite por la atención de las que sí." },
-          { type: "p", text: "Cuando construimos el reporting dentro de Philly, partimos de la decisión, no de los datos. Obliga a conversaciones incómodas — 'en realidad no sabemos qué haríamos si este número se moviera' — pero son esas conversaciones las que hacen que el panel merezca construirse." }
+          { type: "p", text: "Cuando construimos el reporting dentro de DEUS, partimos de la decisión, no de los datos. Obliga a conversaciones incómodas — 'en realidad no sabemos qué haríamos si este número se moviera' — pero son esas conversaciones las que hacen que el panel merezca construirse." }
         ],
       },
     },

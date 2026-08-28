@@ -13,7 +13,7 @@ export const HOME_FAQ: FaqItem[] = [
   },
   {
     q: "What does Juan Diaz, LLC actually do?",
-    a: "Juan Diaz, LLC builds revenue engines for operators — the CRM, automations and growth infrastructure that turn a team of humans plus software into a compounding system. We operate as a holding company with internal ventures (Philly CRM, Voltafy, Help Mij Besparen) and a small number of operator engagements per year.",
+    a: "Juan Diaz, LLC builds revenue engines for operators — the CRM, automations and growth infrastructure that turn a team of humans plus software into a compounding system. We operate as a holding company with internal ventures (DEUS CRM, Voltafy, Help Mij Besparen) and a small number of operator engagements per year.",
   },
   {
     q: "Which industries do you work with?",
@@ -89,11 +89,11 @@ export const SECTOR_FAQ: Record<string, FaqItem[]> = {
     },
     {
       q: "Do you integrate with MLS feeds?",
-      a: "Yes. Philly ingests MLS feeds for the Netherlands (Funda/NVM) and US (IDX/RESO). Each listing becomes a first-class object inside the CRM with offers, showings, open houses and commissions attached.",
+      a: "Yes. DEUS ingests MLS feeds for the Netherlands (Funda/NVM) and US (IDX/RESO). Each listing becomes a first-class object inside the CRM with offers, showings, open houses and commissions attached.",
     },
     {
       q: "What about sphere-of-influence (SOI) and referrals?",
-      a: "SOI is a core Philly module. It scores every past client and dormant lead on recency, referral velocity and deal propensity, then surfaces a daily shortlist of accounts to reach out to. Built for agents who want referrals without a CRM fight.",
+      a: "SOI is a core DEUS module. It scores every past client and dormant lead on recency, referral velocity and deal propensity, then surfaces a daily shortlist of accounts to reach out to. Built for agents who want referrals without a CRM fight.",
     },
   ],
   hospitality: [
@@ -117,7 +117,7 @@ export const SECTOR_FAQ: Record<string, FaqItem[]> = {
     },
     {
       q: "Is this a fit for non-profits?",
-      a: "Yes — specifically operator-run foundations and mid-size grant-makers. Philly has a philanthropy module covering donor scoring, grant lifecycles, impact metrics and volunteer rostering.",
+      a: "Yes — specifically operator-run foundations and mid-size grant-makers. DEUS has a philanthropy module covering donor scoring, grant lifecycles, impact metrics and volunteer rostering.",
     },
     {
       q: "Can you help with family-office operations?",
@@ -154,11 +154,11 @@ export const SECTOR_FAQ_BY_LOCALE: Record<Locale, Record<string, FaqItem[]>> = {
       },
       {
         q: "Integreren jullie met Funda / NVM?",
-        a: "Ja. Philly leest Funda- en NVM-feeds in (en IDX/RESO voor de VS). Elke woning wordt een eersteklas object in het CRM met biedingen, bezichtigingen, open dagen en courtages aangekoppeld.",
+        a: "Ja. DEUS leest Funda- en NVM-feeds in (en IDX/RESO voor de VS). Elke woning wordt een eersteklas object in het CRM met biedingen, bezichtigingen, open dagen en courtages aangekoppeld.",
       },
       {
         q: "Hoe zit het met warme-relatiebeheer en referrals?",
-        a: "Sphere-of-influence is een kernmodule in Philly. Scoort elke klant en slapende lead op recency, referral-snelheid en dealkans, en toont een dagelijkse shortlist. Gebouwd voor makelaars die referrals willen zonder CRM-gevecht.",
+        a: "Sphere-of-influence is een kernmodule in DEUS. Scoort elke klant en slapende lead op recency, referral-snelheid en dealkans, en toont een dagelijkse shortlist. Gebouwd voor makelaars die referrals willen zonder CRM-gevecht.",
       },
     ],
     hospitality: [
@@ -182,7 +182,7 @@ export const SECTOR_FAQ_BY_LOCALE: Record<Locale, Record<string, FaqItem[]>> = {
       },
       {
         q: "Passen non-profits hierbij?",
-        a: "Ja — met name operator-geleide stichtingen en middelgrote subsidiegevers. Philly heeft een filantropiemodule voor donorscoring, subsidie-cycli, impactmetrics en vrijwilligersplanning.",
+        a: "Ja — met name operator-geleide stichtingen en middelgrote subsidiegevers. DEUS heeft een filantropiemodule voor donorscoring, subsidie-cycli, impactmetrics en vrijwilligersplanning.",
       },
       {
         q: "Kunnen jullie helpen met family-office-operaties?",
@@ -212,11 +212,11 @@ export const SECTOR_FAQ_BY_LOCALE: Record<Locale, Record<string, FaqItem[]>> = {
       },
       {
         q: "Integrieren Sie IS24, immowelt oder MLS-Feeds?",
-        a: "Ja. Philly liest IS24-, immowelt- und vergleichbare Feeds ein (plus IDX/RESO für die USA). Jedes Objekt wird zum First-Class-Objekt im CRM, inkl. Angeboten, Besichtigungen, Tagen der offenen Tür und Provisionen.",
+        a: "Ja. DEUS liest IS24-, immowelt- und vergleichbare Feeds ein (plus IDX/RESO für die USA). Jedes Objekt wird zum First-Class-Objekt im CRM, inkl. Angeboten, Besichtigungen, Tagen der offenen Tür und Provisionen.",
       },
       {
         q: "Wie sieht es mit Empfehlungsmanagement (SOI) aus?",
-        a: "Sphere-of-Influence ist ein Kernmodul in Philly. Bewertet jeden Bestandskunden und schlafenden Lead nach Aktualität, Empfehlungsgeschwindigkeit und Abschlusswahrscheinlichkeit — und liefert täglich eine Shortlist.",
+        a: "Sphere-of-Influence ist ein Kernmodul in DEUS. Bewertet jeden Bestandskunden und schlafenden Lead nach Aktualität, Empfehlungsgeschwindigkeit und Abschlusswahrscheinlichkeit — und liefert täglich eine Shortlist.",
       },
     ],
     hospitality: [
@@ -240,7 +240,7 @@ export const SECTOR_FAQ_BY_LOCALE: Record<Locale, Record<string, FaqItem[]>> = {
       },
       {
         q: "Passt das zu gemeinnützigen Organisationen?",
-        a: "Ja — insbesondere operativ geführte Stiftungen und mittelgroße Förderer. Philly hat ein Philanthropie-Modul für Donor-Scoring, Fördercyklen, Wirkungskennzahlen und Freiwilligenplanung.",
+        a: "Ja — insbesondere operativ geführte Stiftungen und mittelgroße Förderer. DEUS hat ein Philanthropie-Modul für Donor-Scoring, Fördercyklen, Wirkungskennzahlen und Freiwilligenplanung.",
       },
       {
         q: "Können Sie bei Family-Office-Operationen helfen?",
@@ -270,11 +270,11 @@ export const SECTOR_FAQ_BY_LOCALE: Record<Locale, Record<string, FaqItem[]>> = {
       },
       {
         q: "¿Integráis con Idealista, Fotocasa o MLS?",
-        a: "Sí. Philly procesa feeds de Idealista, Fotocasa y MLS locales (además de IDX/RESO para EE. UU.). Cada inmueble es un objeto first-class del CRM con ofertas, visitas, jornadas abiertas y comisiones asociadas.",
+        a: "Sí. DEUS procesa feeds de Idealista, Fotocasa y MLS locales (además de IDX/RESO para EE. UU.). Cada inmueble es un objeto first-class del CRM con ofertas, visitas, jornadas abiertas y comisiones asociadas.",
       },
       {
         q: "¿Qué pasa con la esfera de influencia y las referencias?",
-        a: "La esfera de influencia es un módulo central en Philly. Puntúa cada cliente y lead dormido por recencia, velocidad de referencia y propensión a cerrar, y produce una lista diaria de cuentas a contactar.",
+        a: "La esfera de influencia es un módulo central en DEUS. Puntúa cada cliente y lead dormido por recencia, velocidad de referencia y propensión a cerrar, y produce una lista diaria de cuentas a contactar.",
       },
     ],
     hospitality: [
@@ -298,7 +298,7 @@ export const SECTOR_FAQ_BY_LOCALE: Record<Locale, Record<string, FaqItem[]>> = {
       },
       {
         q: "¿Encaja con entidades sin ánimo de lucro?",
-        a: "Sí — en particular fundaciones operadas por sus patronos y financiadores medianos. Philly tiene un módulo de filantropía con scoring de donantes, ciclos de subvención, métricas de impacto y gestión de voluntarios.",
+        a: "Sí — en particular fundaciones operadas por sus patronos y financiadores medianos. DEUS tiene un módulo de filantropía con scoring de donantes, ciclos de subvención, métricas de impacto y gestión de voluntarios.",
       },
       {
         q: "¿Podéis ayudar con operaciones de family office?",
@@ -338,7 +338,7 @@ export const HOME_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
     },
     {
       q: "Wat doet Juan Diaz, LLC precies?",
-      a: "Juan Diaz, LLC bouwt omzetmotoren voor operators: de CRM, automatiseringen en groei-infrastructuur die van mensen plus software één systeem maken dat zichzelf versterkt. We zijn een holding met eigen ventures (Philly CRM, Voltafy, Help Mij Besparen) en een klein aantal klantopdrachten per jaar.",
+      a: "Juan Diaz, LLC bouwt omzetmotoren voor operators: de CRM, automatiseringen en groei-infrastructuur die van mensen plus software één systeem maken dat zichzelf versterkt. We zijn een holding met eigen ventures (DEUS CRM, Voltafy, Help Mij Besparen) en een klein aantal klantopdrachten per jaar.",
     },
     {
       q: "Met welke sectoren werken jullie?",
@@ -368,7 +368,7 @@ export const HOME_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
     },
     {
       q: "Was macht Juan Diaz, LLC konkret?",
-      a: "Juan Diaz, LLC baut Umsatzmaschinen für Betreiber: das CRM, die Automatisierungen und die Wachstumsinfrastruktur, die aus Menschen plus Software ein System machen, das sich selbst verstärkt. Wir sind eine Holding mit eigenen Ventures (Philly CRM, Voltafy, Help Mij Besparen) und wenigen Kundenprojekten pro Jahr.",
+      a: "Juan Diaz, LLC baut Umsatzmaschinen für Betreiber: das CRM, die Automatisierungen und die Wachstumsinfrastruktur, die aus Menschen plus Software ein System machen, das sich selbst verstärkt. Wir sind eine Holding mit eigenen Ventures (DEUS CRM, Voltafy, Help Mij Besparen) und wenigen Kundenprojekten pro Jahr.",
     },
     {
       q: "Mit welchen Branchen arbeiten Sie?",
@@ -398,7 +398,7 @@ export const HOME_FAQ_BY_LOCALE: Record<Locale, FaqItem[]> = {
     },
     {
       q: "¿Qué hace exactamente Juan Diaz, LLC?",
-      a: "Juan Diaz, LLC construye motores de ingresos para operadores: el CRM, las automatizaciones y la infraestructura de crecimiento que convierten personas más software en un sistema que se refuerza solo. Somos un holding con productos propios (Philly CRM, Voltafy, Help Mij Besparen) y pocos proyectos de cliente al año.",
+      a: "Juan Diaz, LLC construye motores de ingresos para operadores: el CRM, las automatizaciones y la infraestructura de crecimiento que convierten personas más software en un sistema que se refuerza solo. Somos un holding con productos propios (DEUS CRM, Voltafy, Help Mij Besparen) y pocos proyectos de cliente al año.",
     },
     {
       q: "¿Con qué sectores trabajáis?",

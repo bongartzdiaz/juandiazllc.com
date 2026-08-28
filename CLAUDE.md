@@ -565,6 +565,22 @@ herschreven, en deze notitie is de correctie erop.
   authenticated;` — alle drie meetbaar niet aanroepbaar via RPC, dus dit is
   opruimen en geen reparatie.
 
+### Philly of DEUS — drie naamsbeslissingen
+
+Het CRM heet op de site sinds 2026-08-28 overal DEUS (de naam die `/pricing`
+al verkocht). Drie plekken dragen nog Philly en zijn niet door een sessie te
+beslissen — ze staan vastgepind in `lib/deus-naam.test.ts` tot jij kiest:
+
+- **De signals-zin voert Philly op als gelevérd product.** "Every product
+  I've shipped ... Voltafy. Performance Tracker. Philly." — terwijl
+  `work.page.lede` in vier talen zegt dat Philly nog gebouwd wordt (#188).
+  Wordt dat DEUS, vervalt de naam uit het rijtje, of klopt de zin niet meer?
+- **`/now` claimt "Philly CRM v1.2"** (`now.ship.1`). Naam en versienummer
+  zijn allebei niet uit de repo af te leiden; het CRM leeft in DEUS-SHARED.
+- **Blijft de US-venture zelf Philly heten?** `ventures.v5.title`, de
+  `/work/philly`-URL en `uses.op.philly` hangen aan elkaar; hernoemen kost
+  een redirect en is naar buiten gericht.
+
 ### DEUS — het prijsmodel
 
 - **Welke van de zestien mogelijkheden worden prijsrijen, en op welk niveau?** De
@@ -8155,3 +8171,142 @@ zonder Juan kan: idee 1 (introducties, #287), idee 3 (partners, #288) en nu
 idee 4 als intake. Idee 2 is een routine zonder bouwwerk, idee 5 wacht op de
 opvang. De volgende stappen zijn versturen, gesprekken voeren en vragen
 beantwoorden — en dat is allemaal van Juan.
+
+### 2026-08-28 (vervolg) — het CRM heette op de site nog Philly, en de helft van de vervangen claims was aantoonbaar onwaar
+
+Het logboek van 25 augustus noteerde "Philly staat nog 63 keer in geleverde
+kopij" als eigen sweep met eigen poort. Hermeten gaf **93** voorkomens over elf
+bestanden — het vierde cijfer uit dit logboek dat binnen dagen verliep — en
+de sweep bleek geen hernoemklus maar een ontwarring: één naam droeg drie
+identiteiten tegelijk.
+
+#### Drie identiteiten, en een levende tegenspraak
+
+| identiteit | waar | stand |
+|---|---|---|
+| het CRM dat Juan levert | drie artikelen, sector-FAQ's, `about.p.do1`, `/uses` | **hernoemd naar DEUS** |
+| de US-venture in aanbouw | `ventures.v5`, `work.page.lede`, sectorkaarten, story-tijdlijn | blijft Philly |
+| de stad | `hero.chip.status` "Amsterdam <-> Philly", `marquee.full` | blijft Philly |
+
+En `/pricing` verkocht ondertussen al "DEUS CRM, EU-hosted, GDPR-clean" — de
+site gebruikte dus twee namen voor één product, op pagina's die naar elkaar
+linken. Dezelfde vorm als Hospitality/Horeca (#248/#249): het label wint.
+Daarbovenop een directe tegenspraak: signals zegt "Every product I've
+**shipped** ... Philly" terwijl `work.page.lede` zegt dat Philly nog gebouwd
+wordt — en #188 heeft precies die claim met een poort afgedwongen.
+
+#### Eerst gemeten of de claims onder de nieuwe naam waar zijn
+
+Hernoemen maakt een claim niet waar, dus elke FAQ-claim is nagemeten op
+DEUS-SHARED `origin/main` (`964888e`, 2026-08-27), in de canonieke checkout
+`C:/business/deus-shared-tmp` — niet de verouderde werkkopie ernaast:
+
+| claim in de kopij | bewijs |
+|---|---|
+| MLS/Funda-feeds | `app/api/mls-feeds/route.ts` bestaat |
+| SOI-module | `app/api/soi/route.ts` + `app/soi/page.tsx` |
+| filantropie / donor scoring | `app/api/philanthropy/donor-scores/route.ts` + `app/philanthropy/donors/page.tsx` |
+| "runs on MariaDB via the Prisma adapter" | **onwaar** — `prisma/schema.prisma` zegt `provider = "postgresql"` |
+| "Prisma 7 + MariaDB" op `/uses` | half onwaar — Prisma `^7.5.0` klopt, MariaDB niet |
+
+De MariaDB-claim stond in vier talen in `uses.data.prisma`, met als
+onderbouwing "gekozen voor compatibiliteit met het ops-team" — een reden voor
+een keuze die niet meer bestaat. Nu: "DEUS CRM draait op PostgreSQL via
+Prisma. Bewezen techniek, niet voor trends."
+
+**48 regels gewijzigd over zes bestanden**: 12 in de drie artikelen, 16 in de
+FAQ's, 16 dict-waardes (`about.p.do1`, `about.focus.re.body`,
+`uses.data.prisma`, `uses.hw.mbp` × 4 talen), één op de `/uses`-pagina, en
+twee comments die nog naar `app/philly/*` wezen — paden die met #134
+verdwenen. De toelichting beschreef verwijderde code, de bekende klasse.
+
+#### Wat er bewust blijft staan, en waarom dat drie beslissingen zijn
+
+De stad en de venture zijn geen drift. Maar drie plekken zijn niet door mij te
+beslissen, en die staan nu op de operator-lijst: de signals-zin die Philly als
+*geleverd* opvoert, `now.ship.1` dat "Philly CRM v1.2" claimt (naam én
+versheid), en de vraag of de US-venture zelf Philly blijft heten — de
+`/work/philly`-URL en `uses.op.philly` hangen daaraan.
+
+#### De poort leest data, en de vrijstellingen dragen hun voorwaarde
+
+`lib/deus-naam.test.ts` (5 tests) leest de geëxporteerde data — een "Philly"
+in een toelichting is geen kopij en blijft onzichtbaar. Vier lagen:
+
+1. **artikelen**: 0× Philly per taal, met DEUS >= 3 als positieve controle —
+   anders is nul ook te verklaren door een lege lijst;
+2. **FAQ's** via `faqStrings(l)`: 0× Philly, DEUS aanwezig;
+3. **dict**: de sleutels waarvan de wáárde Philly draagt zijn per taal exact
+   de zes toegestane, elk met reden — een zevende valt om, en een sleutel die
+   zijn Philly verliest ook, want dan is de vrijstelling niet meer waar;
+4. **signals**: exact 1 per taal — vrijstelling met voorwaarde, tot Juan de
+   geleverd-claim beslist. Groei en stille verwijdering vergen allebei een
+   zichtbare bewerking.
+
+Plus: MariaDB 0× in dict en 0× op de `/uses`-pagina, met PostgreSQL als
+positieve controle.
+
+**De signals-laag moest één keer om.** `localizeSignal` spreidt de basis
+inclusief het `i18n`-veld, dus `JSON.stringify(getSignals(l))` draagt álle
+vertalingen mee en telt altijd 4, ongeacht de taal. De poort stript `i18n`
+vóór het tellen en meet daarmee het gerenderde oppervlak per taal — de eerste
+versie mat de opslagvorm.
+
+#### Tien mutaties, tien keer de voorspelde kleur — nadat het harnas zelf brak
+
+Negen rood op vijf verschillende asserties, één groen als controle
+(Philly in een toelichting in `insights.ts` blijft onzichtbaar), groen na
+herstel, nul sporen. De sprekendste rode zijn M4 en M6: een toegestane sleutel
+die zijn Philly verliest en een signals-Philly die stil verdwijnt — allebei
+gevallen waarin de site júist schoner lijkt, en de poort toch omvalt omdat de
+vrijstelling dan niet meer waar is.
+
+**Eerst meldden alle negen rood-mutaties STUK.** `subprocess.run(text=True)`
+decodeert op Windows met cp1252, en juist de fálende vitest-uitvoer draagt
+UTF-8-bytes — de em-dashes uit mijn eigen Nederlandse assertieberichten. Een
+groene run is kort en ASCII-veilig; een rode gooide een `UnicodeDecodeError`
+ín de capture, leverde lege uitvoer op, en las als kapotte poort. Het
+instrument brak uitsluitend op de uitkomst die het moest detecteren.
+`encoding="utf-8", errors="replace"` op de capture. Verwant aan de
+cp1252-stdout-val die hier al vaker stond, maar dit is de leesrichting.
+
+#### Gemeten
+
+Op een productiebuild (poort vooraf 0 LISTENING, startlog gelezen):
+
+```
+/en/about   'DEUS for operator CRM' aanwezig · oude frase 0x
+/nl/about   'DEUS voor operator-CRM' aanwezig
+/en/uses    PostgreSQL aanwezig · MariaDB 0x · 'DEUS DB' aanwezig
+            en de venture-link heet er nog Philly — dat hoort
+/de/uses    MariaDB 0x · 'DEUS-DB' aanwezig
+/en/sectors/real-estate   'DEUS ingests MLS' · Philly 0x
+artikel why-operator-crms-fail, 4 talen   oude CRM-frase 0x
+/en · /en/work   stad en venture dragen Philly nog — dat hoort
+positieve controles   2/2
+```
+
+Eén meetles onderweg: de eerste sonde eiste "Philly 0×" op de artikelpagina's
+en viel op de **venture-kruiskaart** (`/work/philly`, "The US ops dashboard")
+die onder elk artikel met de juiste tag rendert. Hermeten per bron: oude
+CRM-frase 0×, en de 2 overgebleven Philly's zijn exact de 2
+venture-kaart-verwijzingen (zichtbare HTML + RSC-payload), in alle vier de
+talen. Een telling zonder toeschrijving leest een terechte vermelding als lek.
+
+```
+tsc --noEmit             exit 0
+vitest run               1279 tests in 63 bestanden (was 1274/62)
+i18n:check               730 sleutels x 4 (ongewijzigd: alleen waardes)
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +5 is de nieuwe poort.
+
+#### Wat dit niet doet
+
+De drie naamsbeslissingen hierboven zijn niet genomen — ze staan op de
+operator-lijst. En er is geen operator-taak mee opgelost: de 402, de vijf
+Plausible-doelen, `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`,
+`CAL_WEBHOOK_SECRET` en de vier LinkedIn-beslissingen staan onveranderd open.

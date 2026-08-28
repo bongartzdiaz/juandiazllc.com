@@ -1,5 +1,5 @@
-// Brand-side client error sink. The Philly CRM has its own at
-// /philly/api/log-error with Sentry + pino. This one is deliberately
+// Brand-side client error sink. The CRM left with #134 and lives in
+// bongartzdiaz/DEUS-SHARED with its own sink. This one is deliberately
 // lighter: server-side log + optional Slack webhook for immediate
 // visibility. No auth (it receives errors from broken pages), but
 // rate-limited per IP so a runaway client can't flood us.
