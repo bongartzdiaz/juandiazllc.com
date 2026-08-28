@@ -39,7 +39,7 @@ const STACK: Array<{ sectionKey: string; items: Item[] }> = [
     sectionKey: "uses.sec.data",
     items: [
       { name: "Supabase", noteKey: "uses.data.supabase", url: "https://supabase.com" },
-      { name: "Prisma 7 + MariaDB", noteKey: "uses.data.prisma" },
+      { name: "Prisma 7 + PostgreSQL", noteKey: "uses.data.prisma" },
       { name: "Vercel", noteKey: "uses.data.vercel", url: "https://vercel.com" },
       { name: "Cloudflare", noteKey: "uses.data.cloudflare" },
     ],
