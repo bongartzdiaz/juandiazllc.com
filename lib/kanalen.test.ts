@@ -40,6 +40,7 @@ const WOORD: Record<string, number> = {
   twaalf: 12,
   zevenentwintig: 27,
   achtentwintig: 28,
+  negenentwintig: 29,
   drie: 3,
 };
 

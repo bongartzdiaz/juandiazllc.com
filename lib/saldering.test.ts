@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { getAllInsights, POSTS, type Insight, type InsightBlock } from "./insights";
+import { getAllInsights, POSTS } from "./insights";
+import { kopij } from "./insight-kopij";
 
 /* De poort op het NL saldering-cluster.
  * ───────────────────────────────────────────────────────────────────────────
@@ -83,21 +84,6 @@ const BODEM_TOT = (() => {
   return m[1];
 })();
 
-/** Alle zichtbare kopij van één artikel, inclusief de zoekvelden. Bewust
- *  zonder de slug: die is een URL en geen proza. */
-function kopij(p: Insight): string {
-  const uit = (b: InsightBlock): string[] => {
-    switch (b.type) {
-      case "ul":
-        return b.items;
-      case "quote":
-        return [b.text, b.cite ?? ""];
-      default:
-        return [b.text];
-    }
-  };
-  return [p.title, p.summary, p.seo?.metaTitle ?? "", p.seo?.metaDescription ?? "", ...p.body.flatMap(uit)].join(" \n ");
-}
 
 /** Het cluster: Nederlandse energie-artikelen die over saldering schrijven.
  *  Afgeleid en niet ingetypt, zodat een zesde artikel er vanzelf onder valt.
