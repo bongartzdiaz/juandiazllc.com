@@ -1063,6 +1063,48 @@ zien waar zijn kilometercijfer vandaan komt, heeft vandaag al een probleem.
 **Wat er niet in kopij mag.** Geen indieningsdatum, geen sanctie, geen aantal
 getroffen bedrijven, en niet de suggestie dat de drempel al is verhoogd.
 
+### Salderingsregeling — het einde per 2027 (gemeten 2026-08-31)
+
+De haak onder het NL-energiecluster. **Vijf artikelen leunen erop en tot vandaag
+stond er geen enkele rij over in dit bestand** — terwijl EPBD, ETS2 en WPM, alle
+drie jónger, hier wel staan. Dat gat is de reden dat in de oudste van die vijf
+"de afbouw van de salderingsregeling" stond: precies het woord dat de uitvoerder
+tegenspreekt.
+
+| Claim | Waarde | Status |
+| --- | --- | --- |
+| Grondslag | Wet beëindiging salderingsregeling (36.611) | ✅ [Eerste Kamer](https://www.eerstekamer.nl/wetsvoorstel/36611_wet_beeindiging), gelezen 2026-08-31 |
+| Aangenomen door de Eerste Kamer | **17 december 2024**, bij zitten en opstaan | ✅ zelfde bron |
+| Gepubliceerd in het Staatsblad | **29 januari 2025, nr. 17** | ✅ zelfde bron |
+| Salderen stopt | **1 januari 2027** | ✅ [Rijksoverheid](https://www.rijksoverheid.nl/themas/klimaat-milieu-en-natuur/energie-thuis/salderingsregeling) én [ACM ConsuWijzer](https://consument.acm.nl/elektriciteit-en-gas/duurzame-energie/wat-is-salderen), allebei gelezen 2026-08-31 |
+| Afbouwpad | **bestaat niet** | ✅ Rijksoverheid, woordelijk: "Eerder was het plan om deze vanaf 2025 af te bouwen. Maar het kabinet heeft besloten om de regeling in 2027 helemaal te stoppen en niet eerder af te bouwen." ⚠️ **Schrijf nooit dat de regeling wordt afgebouwd** — de wet heet beëindiging, en het afbouwvoorstel (35.594) is een ánder traject |
+| Terugleververgoeding | **tot 1 januari 2030 minstens 50%** van het kale leveringstarief — de prijs zonder energiebelasting en btw | ✅ beide bronnen. ACM woordelijk: "Tot 1 januari 2030 is dit minstens 50% van de prijs die u betaalt voor elektriciteit zonder energiebelasting en btw" |
+| Hoogte bóven dat minimum | **bepaalt de leverancier**; de ACM houdt toezicht op de redelijkheid | ✅ beide bronnen |
+| Wat er ná 1 januari 2030 geldt | **niet vastgelegd** | ✅ het minimum is expliciet tot die datum — publiceer geen percentage voor daarna |
+| Terugleverkosten | **blijven bestaan**, en leveranciers moeten ze vanaf 2027 bij zonnepaneeleigenaren in rekening brengen | ✅ ACM, woordelijk — inclusief de waarschuwing dat ze "soms hoger uitvallen dan de vergoeding voor de teruggeleverde elektriciteit" |
+| Bedrag van die terugleverkosten | **bestaat niet als landelijk getal** | ❌ per leverancier en per contract — geen euro publiceren |
+| Terugverdientijd van een thuisbatterij | **geen getal** | ❌ hangt af van drie onbekenden hierboven; de vijf artikelen noemen daarom nergens een jaartal |
+
+**Waarom de 50% de belangrijkste rij is.** Drie van de vijf artikelen vragen de
+lezer een som te maken, en tot vandaag gaf geen van drieën hem de ondergrens.
+Wie zonder die bodem rekent, komt te laag uit — en een installateur die te laag
+rekent, verkoopt een batterij op een argument dat de klant later zelf kan
+weerleggen. Het getal is bovendien kénbaar: het staat in de wet, niet in een
+prognose.
+
+**Wat deze rijen niet dragen.** Geen bedrag per kWh, geen terugverdientijd, geen
+uitspraak over hoeveel huishoudens het raakt, en geen voorspelling over de
+hoogte die leveranciers werkelijk gaan betalen. Die getallen bestaan hier niet,
+dus staan ze in geen artikel.
+
+**Houdbaarheid.** De stopdatum ligt vast in een gepubliceerde wet en schuift
+niet zomaar. De 50%-bodem loopt af op 1 januari 2030 en wat daarna geldt is
+onbeslist; de terugleverkosten zijn commercieel en bewegen doorlopend.
+**Hercontroleer de laatste drie rijen bij ACM en Rijksoverheid voordat je er
+iets uit citeert dat ouder is dan een kwartaal.** `lib/saldering.test.ts` houdt
+de kopij aan deze tabel vast, maar een poort kan niet zien dat een bron
+verandert.
+
 ## Reactietijd op leads — de 78% is folklore (gemeten 2026-08-23)
 
 Aanleiding: een voorstel om in kopij en outreach te schrijven dat **"78% van
