@@ -47,7 +47,7 @@ bestaat.
 | D3 | Help-reeks: DXF aanleveren aan onderaannemers (lagen, schaal, wat er misgaat) | nl+en | help | bestaande DXF-export-docs in de repo; PR bongartzdiaz/diaz-editor#653, wacht op merge door Juan | wachtrij |
 | D4 | Pillar: thuisbatterij intekenen na saldering — kruisverwijzing met het juandiazllc-cluster | nl | pillar | bestaand pillar thuisbatterij-ontwerp-saldering-2027; PR bongartzdiaz/diaz-editor#654, wacht op merge door Juan | wachtrij |
 | D5 | Nieuwe vs-pagina (welke concurrent?) | en+3 | vs | **eerst kiezen welke — bestaande 14 dekken de grote namen al** | wacht |
-| D6 | Blog: NEN 1010-symbolenpack v0.4.22 uitgelegd met voorbeelden | nl | blog | de release zelf + bestaande NEN 1010-pillar | klaar |
+| D6 | Blog: NEN 1010-symbolenpack v0.4.22 uitgelegd met voorbeelden | nl | blog | de release zelf (v0.4.22 + v0.4.23); de NEN 1010-pillar noemt symbolen 0x, dus de tweede bron werd de bestaande EN-post + NL-elektro-posts; PR bongartzdiaz/diaz-editor#655, wacht op merge door Juan | wachtrij |
 
 ## Vaste regels voor elke run (de machine leest dit mee)
 
