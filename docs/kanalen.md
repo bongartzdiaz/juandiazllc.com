@@ -66,7 +66,7 @@ ooit om een introductie is gevraagd. Dat is het hoogste-conversiekanaal dat er
 is, het kost nul euro, en het is als enige **onafhankelijk van de kapotte
 opvang**.
 
-Drie van de vier zitten in energie. Dat is precies de markt waar vijf artikelen,
+Drie van de vier zitten in energie. Dat is precies de markt waar zes artikelen,
 een rekenmachine en een scan al liggen — een introductie komt dus binnen op een
 plek waar het bewijs al klaarstaat.
 
@@ -120,7 +120,7 @@ Twee die het nooit doen hoort erbij.
 
 ### 4. Eén stuk eigen data
 
-**Waarom het past.** Zevenentwintig meningsartikelen leveren op een domein
+**Waarom het past.** Achtentwintig meningsartikelen leveren op een domein
 zonder autoriteit geen links op. Eén meting wel. Wat hier zeldzaam is: vier
 trajecten met echte cijfers, plus meterdata uit het werk zelf. Geanonimiseerd —
 wat vier operators werkelijk kwijt waren tussen intake en offerte — is dat een

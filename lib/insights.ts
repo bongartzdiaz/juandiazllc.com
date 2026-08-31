@@ -1835,6 +1835,48 @@ export const POSTS: Insight[] = [
       },
     },
   },
+  {
+    slug: "netcongestie-wat-het-betekent-voor-je-installatiebedrijf",
+    markets: ["nl"],
+    title: "Netcongestie: wat een vol net betekent voor je installatiebedrijf",
+    summary:
+      "Het net is vol, en sinds 1 juli 2026 geldt de prioritering in congestiegebieden ook voor kleinverbruikers. Wat dat betekent voor je intake, je offerte en het klantgesprek — en waarom de beste plek in de wachtrij er niet in staan is.",
+    tag: "Energy",
+    publishedAt: "2026-08-31",
+    readingMinutes: 5,
+    seo: {
+      metaTitle: "Netcongestie voor installatiebedrijven",
+      metaDescription:
+        "Het net is vol en de wachtrij geldt sinds 1 juli 2026 ook voor kleinverbruikers. Wat dat betekent voor je intake, je offerte en het klantgesprek.",
+    },
+    body: [
+      { type: "p", text: "Tot voor kort was de netaansluiting het sluitstuk van een project: je tekende de installatie, en ergens aan het eind regelde iemand de verzwaring. Die volgorde klopt niet meer. In een groeiend deel van Nederland is transportcapaciteit het schaarse onderdeel — en een installatiebedrijf dat daar pas achter komt als de offerte al getekend is, betaalt dat in doorlooptijd én in vertrouwen." },
+      { type: "h2", text: "Wat er precies veranderd is" },
+      { type: "p", text: "De capaciteitskaart van Netbeheer Nederland laat per gebied zien waar voldoende transportcapaciteit is en waar tekorten zijn opgetreden. In tekortgebieden staat een wachtrij van bedrijven en organisaties die niet allemaal tegelijk op het net kunnen. Sinds 1 januari 2026 verdelen netbeheerders die schaarse ruimte via het prioriteringskader van de ACM: eerst projecten die zelf ruimte op het net maken, daarna veiligheid — ziekenhuizen en politie — en daarna basisbehoeften zoals woningbouw en onderwijs." },
+      { type: "h2", text: "Wat er per 1 juli 2026 veranderde voor kleinverbruikers" },
+      { type: "p", text: "De grootste verandering voor jouw praktijk kwam op 1 juli 2026. Tot die datum gold voor kleinverbruikersaansluitingen nog de bestaande route; sindsdien vallen nieuwe aanvragen in congestiegebieden onder dezelfde systematiek als grootverbruik. Een klant met een gewone aansluiting die een verzwaring nodig heeft, kan dus in dezelfde rij belanden als het bedrijventerrein verderop." },
+      { type: "h2", text: "Het net is de eerste vraag van je intake geworden" },
+      { type: "ul", items: [
+        "Check bij elke aanvraag eerst de capaciteitskaart op het projectadres — en kijk naar afname én teruglevering, want dat zijn twee aparte vragen met twee aparte antwoorden.",
+        "Vraag transportcapaciteit of een verzwaring aan zodra het project serieus wordt, niet als de installatie al gepland staat. In de nieuwe werkwijze telt het moment van aanvragen.",
+        "Leg in je offerte vast welk deel van de doorlooptijd van de netbeheerder afhangt. Een termijn die je niet beheerst, hoort niet als belofte in je planning."
+      ]},
+      { type: "h2", text: "De eerlijke boodschap wint het klantgesprek" },
+      { type: "p", text: "De verleiding is om netcongestie klein te houden in het verkoopgesprek — het is slecht nieuws en het is niet jouw schuld. Maar de klant ontdekt het toch, en dan liever van jou aan het begin dan van de netbeheerder halverwege. Wat werkt: laat de capaciteitskaart zien tijdens de intake, benoem wat vandaag wél kan binnen de bestaande aansluiting, en maak een plan in twee fasen als de verzwaring op zich laat wachten." },
+      { type: "cta", text: "Lees het script voor dat gesprek: salderen stopt — wat je klanten nu moeten horen", href: "/insights/salderen-stopt-wat-installateurs-nu-moeten-vertellen" },
+      { type: "h2", text: "De beste plek in de wachtrij is er niet in staan" },
+      { type: "p", text: "Voor veel klanten is de echte vraag niet hoe ze sneller door de wachtrij komen, maar of ze er wel in moeten. Een huishouden of bedrijf dat meer van zijn eigen opwek zelf gebruikt — met sturing, met opslag, met slim laden — heeft vaker genoeg aan de bestaande aansluiting. Dat is geen truc; het is de rekensom die bepaalt of een verzwaring überhaupt nodig is. En het is precies het advieswerk waarmee een installatiebedrijf zich onderscheidt van de partij die alleen panelen schroeft." },
+      { type: "cta", text: "Reken per klant door wat meer eigen verbruik oplevert", href: "/tools/energy-roi" },
+      { type: "h2", text: "Wat ik hier niet beweer" },
+      { type: "ul", items: [
+        "Geen wachttijden in maanden of jaren per regio. Die verschillen per netstation en veranderen sneller dan een artikel; het actuele beeld staat op de capaciteitskaart.",
+        "Geen aantal wachtende bedrijven. Er circuleren cijfers, maar een getal dat ik niet bij de bron kan verifiëren, publiceer ik niet.",
+        "Geen voorspelling over wanneer het net in jouw regio ruimte krijgt. Netverzwaring loopt, maar tempo en volgorde zijn aan de netbeheerders."
+      ]},
+      { type: "quote", text: "Netcongestie verandert de volgorde van je werk: eerst weten wat het net kan, dan pas tekenen wat de klant wil." },
+      { type: "p", text: "Installatiebedrijven die dit inbouwen in hun intake verliezen af en toe een project aan het net. Wie het negeert verliest iets duurders: de klant die halverwege ontdekt dat de planning nooit haalbaar was. Het net wordt voorlopig niet ruimer — je proces kan wel eerlijker." }
+    ]
+  },
 ];
 
 /** Locales a post is published under (default: all four). */
