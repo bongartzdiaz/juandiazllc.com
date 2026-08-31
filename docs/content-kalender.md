@@ -29,7 +29,7 @@ bestaat.
 | --- | --- | --- | --- | --- | --- |
 | J1 | Netcongestie: wat een vol net betekent voor je installatiebedrijf (wachttijden, planning, klantcommunicatie) | nl | Energy | Netbeheer Nederland capaciteitskaart; geen bedragen; PR #293, gemerged 2026-08-31 | live |
 | J2 | Refresh: salderingsregeling-cluster nalopen op actualiteit (5 artikelen, datum 1-1-2027 nadert) | nl | Energy | Rijksoverheid + ACM ConsuWijzer + Eerste Kamer 36.611; laatst gedraaid 2026-08-31 (PR #300): "afbouw" eruit, de wettelijke bodem onder de terugleververgoeding erin, bewaakt door `lib/saldering.test.ts` | klaar |
-| J3 | WPM jaar twee: je cijfer wordt vergeleken met je eigen cijfer | nl | Logistics | RVO WPM-documentatie (FAQ + Engelse pagina); eigen WPM-artikel. Het onderwerp is bijgesteld: over *wat de eerste landelijke rapportageronde opleverde* bestaat geen nagetrokken cijfer, en `docs/claims.md` verbiedt er een te noemen. PR #301 | wachtrij |
+| J3 | WPM jaar twee: je cijfer wordt vergeleken met je eigen cijfer | nl | Logistics | RVO WPM-documentatie (FAQ + Engelse pagina); eigen WPM-artikel. Het onderwerp is bijgesteld: over *wat de eerste landelijke rapportageronde opleverde* bestaat geen nagetrokken cijfer, en `docs/claims.md` verbiedt er een te noemen. PR #301, gemerged 2026-08-31 | live |
 | J4 | Solarpflicht per Bundesland: wat de bouwplicht betekent voor Betreiber | de | Energy | landesrechtliche Solarpflichten (per land verifiëren) | klaar |
 | J5 | Refresh: DE Heimspeicher-cluster (Einspeisevergütung-degressie halfjaarlijks — cijfers verifiëren) | de | Energy | Bundesnetzagentur | klaar |
 | J6 | Refresh: ES autoconsumo-cluster (RD 244/2019 ongewijzigd? compensatie-plafond) | es | Energy | BOE / CNMC | klaar |
