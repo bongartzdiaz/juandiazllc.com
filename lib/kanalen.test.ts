@@ -36,8 +36,10 @@ function lees(pad: string): string {
 const WOORD: Record<string, number> = {
   vier: 4,
   vijf: 5,
+  zes: 6,
   twaalf: 12,
   zevenentwintig: 27,
+  achtentwintig: 28,
   drie: 3,
 };
 
