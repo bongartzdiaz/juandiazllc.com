@@ -1038,7 +1038,7 @@ waarop een eigenaar het voelt niet. §2 is bijgewerkt.
 de kosten komen via het tarief binnen, de factuur splitst ze niet uit, en de
 richting is omhoog. Alles daarbuiten is prognose.
 
-### WPM — rapportage werkgebonden personenmobiliteit (gemeten 2026-08-23)
+### WPM — rapportage werkgebonden personenmobiliteit (gemeten 2026-08-23, aangevuld 2026-08-31)
 
 De haak onder het logistiekcluster. **In werking**, anders dan EPBD en ETS2 —
 dit is de enige van de drie die vandaag al geldt.
@@ -1048,20 +1048,31 @@ dit is de enige van de drie die vandaag al geldt.
 | Grondslag | Besluit CO2-reductie werkgebonden personenmobiliteit | ✅ [RVO — WPM](https://www.rvo.nl/onderwerpen/rapportage-wpm/veelgestelde-vragen), gelezen 2026-08-23 |
 | In werking sinds | **1 juli 2024** | ✅ zelfde bron |
 | Wie | werkgevers met **100 of meer** werknemers | ⚠️ geldt vandaag, maar zie de rij hieronder |
-| Peildatum | was 1 juli 2024; daarna 1 januari 2025, waarover in 2026 wordt gerapporteerd | ✅ zelfde bron |
+| Peildatum voor de drempel | was 1 juli 2024; daarna **jaarlijks op 1 januari**. RVO woordelijk: "Vanaf 2025 kijken we jaarlijks op 1 januari naar het aantal werknemers dat u in dienst heeft." | ✅ zelfde bron, gelezen 2026-08-31 — je verplichting wordt dus elk jaar opnieuw getoetst, niet eenmalig vastgesteld |
 | Waar | jaarlijks aan RVO, via een online formulier | ✅ zelfde bron |
-| Toezicht | een omgevingsdienst controleert **of** er gerapporteerd is **en de kwaliteit van de gegevens** | ✅ zelfde bron — dit is de scherpste rij en de reden dat het artikel bestaat |
+| Toezicht | RVO woordelijk: "De omgevingsdienst controleert of er is gerapporteerd en of de gerapporteerde gegevens **geloofwaardig** zijn." | ✅ zelfde bron, gelezen 2026-08-31 — de scherpste rij, en de reden dat dit cluster bestaat. Let op bij het nameten: de [themapagina](https://www.rvo.nl/onderwerpen/rapportage-wpm) noemt alleen de inzendhelft; de FAQ en de [Engelse pagina](https://english.rvo.nl/topics/wpm, "the environment agency also checks the quality of your data") dragen allebei de tweede helft |
 | Drempel naar 250 | ontwerp-wijzigingsbesluit van 24-04-2026 zondert het mkb uit; **het moment van inwerkingtreding is niet bekend** | ⚠️ [Rijksoverheid](https://www.rijksoverheid.nl/documenten/kamerstukken/2026/04/24/ontwerpwijzigingsbesluituitzonderenmkbvanrapportageverplichtingzakelijkenwoonwerkverkeer) — schrijf nooit dat de drempel al 250 is, en nooit een datum |
-| Indieningsdeadline per jaar | **niet nagetrokken** | ❌ geen datum publiceren |
+| Indieningsdeadline per jaar | **uiterlijk 30 juni**, over het voorgaande kalenderjaar. RVO woordelijk: "Dan rapporteert u uiterlijk 30 juni van het jaar over het voorgaande jaar." | ✅ nagetrokken 2026-08-31 op twee RVO-oppervlakken: de FAQ hierboven en de [Engelse pagina](https://english.rvo.nl/topics/wpm), die voor 2025 "no later than Tuesday, June 30, 2026" zegt. **Deze rij stond tot vandaag op "niet nagetrokken"**; de kopij die dat overschreef is meegewijzigd |
+| Rapportagejaren in 2026 | RVO woordelijk: "In 2026 kunt u rapporteren over 2025 en 2024." | ✅ zelfde bron, gelezen 2026-08-31 — dit is wat een tweede ronde mogelijk maakt: twee eigen cijfers naast elkaar |
+| Verweer bij twijfel | RVO woordelijk: "Als u de uitleg in de handreiking volgt, kunt u verklaren hoe u aan uw gegevens bent gekomen. Normaal gesproken gaat de omgevingsdienst dan akkoord. Maar een garantie kunnen we niet geven." | ✅ zelfde bron, gelezen 2026-08-31 — de toets is verklaarbaarheid, en RVO weigert er expliciet een garantie op te geven. **Publiceer die weigering mee**, anders leest de handreiking als een vrijbrief |
 | Boetes of sancties | **niet nagetrokken** | ❌ niets over handhavingsgevolgen beweren |
 
 **Waarom deze haak anders is dan de twee andere.** EPBD en ETS2 leggen een
-toekomstige eis op. WPM geldt nu, en het toezicht kijkt naar datakwaliteit. Dat
-maakt hem bruikbaar zonder een toekomstvoorspelling: wie vandaag niet kan laten
-zien waar zijn kilometercijfer vandaan komt, heeft vandaag al een probleem.
+toekomstige eis op. WPM geldt nu, en het toezicht kijkt of de cijfers
+geloofwaardig zijn. Dat maakt hem bruikbaar zonder een toekomstvoorspelling:
+wie vandaag niet kan laten zien waar zijn kilometercijfer vandaan komt, heeft
+vandaag al een probleem.
 
-**Wat er niet in kopij mag.** Geen indieningsdatum, geen sanctie, geen aantal
-getroffen bedrijven, en niet de suggestie dat de drempel al is verhoogd.
+**Wat er niet in kopij mag.** Geen sanctie, geen aantal getroffen bedrijven,
+niet de suggestie dat de drempel al is verhoogd, en geen enkele uitspraak over
+**wat de eerste landelijke rapportageronde heeft opgeleverd** — dat cijfer is
+nergens nagetrokken en bestaat in dit bestand niet. De indieningsdatum mag
+sinds 2026-08-31 wel, want hij staat hierboven.
+
+**Wat er wel in kopij mag en er tot vandaag niet stond.** Het woord dat de
+uitvoerder zelf gebruikt is *geloofwaardig*, niet *juist*. Dat is een
+aannemelijkheidstoets en geen correctheidstoets, en het verschil is de hele
+haak onder het tweede artikel.
 
 ### Salderingsregeling — het einde per 2027 (gemeten 2026-08-31)
 

@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { getAllInsights, type Insight, type InsightBlock } from "@/lib/insights";
+import { getAllInsights } from "@/lib/insights";
+import { kopij } from "../insight-kopij";
 import { DICT } from "./dict";
 import { SECTORS } from "../sectors";
 import { VENTURES } from "../ventures";
@@ -40,30 +41,6 @@ import { faqStrings } from "../seo/faqs";
 
 type Herkomst = [sleutel: string, waarde: string];
 
-/** Alle zichtbare kopij van één artikel. Bewust ZONDER de slug: die is een
- *  URL en geen proza. Twee slugs dragen "u"/"uw" ("…-die-u-niet-ziet",
- *  "…-controleert-uw-cijfers-…") omdat ze al gepubliceerd waren toen de
- *  aanspreekvorm werd rechtgezet; een URL veranderen kost een 404 en er is
- *  in deze repo geen redirect-laag om hem op te vangen. */
-function kopij(p: Insight): string {
-  const uitBlok = (b: InsightBlock): string[] => {
-    switch (b.type) {
-      case "ul":
-        return b.items;
-      case "quote":
-        return [b.text, b.cite ?? ""];
-      default:
-        return [b.text];
-    }
-  };
-  return [
-    p.title,
-    p.summary,
-    p.seo?.metaTitle ?? "",
-    p.seo?.metaDescription ?? "",
-    ...p.body.flatMap(uitBlok),
-  ].join(" \n ");
-}
 
 /** Platslaan tot losse strings, met het veldpad als sleutel. */
 function plat(o: unknown, pad: string): Herkomst[] {
