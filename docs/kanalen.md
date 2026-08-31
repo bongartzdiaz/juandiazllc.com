@@ -120,7 +120,7 @@ Twee die het nooit doen hoort erbij.
 
 ### 4. Eén stuk eigen data
 
-**Waarom het past.** Negenentwintig meningsartikelen leveren op een domein
+**Waarom het past.** Dertig meningsartikelen leveren op een domein
 zonder autoriteit geen links op. Eén meting wel. Wat hier zeldzaam is: vier
 trajecten met echte cijfers, plus meterdata uit het werk zelf. Geanonimiseerd —
 wat vier operators werkelijk kwijt waren tussen intake en offerte — is dat een
