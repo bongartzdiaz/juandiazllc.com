@@ -300,6 +300,7 @@ export const POSTS: Insight[] = [
       "De afschaffing raakt installateurs harder dan huiseigenaren. Drie aanpassingen in je funnel die het verschil maken tussen een rustig 2027 en een acquisitie-crisis.",
     tag: "Energy",
     publishedAt: "2026-03-24",
+    updatedAt: "2026-08-31",
     readingMinutes: 5,
     seo: {
       metaTitle: "Salderingsregeling 2027 voor installateurs",
@@ -307,16 +308,19 @@ export const POSTS: Insight[] = [
         "De afschaffing raakt installateurs harder dan huiseigenaren. Drie aanpassingen in je funnel die een acquisitiecrisis in 2027 voorkomen.",
     },
     body: [
-      { type: "p", text: "De afbouw van de salderingsregeling in 2027 is geen verrassing meer — de wet is rond, de communicatie loopt. Wat operators in de zonne-sector onderschatten is het effect op het koopgedrag: de impulsklant verdwijnt, de rationele klant blijft, en die stelt andere vragen." },
+      { type: "p", text: "De salderingsregeling stopt op 1 januari 2027. Dat is geen aankondiging meer maar wet: de Eerste Kamer nam de Wet beëindiging salderingsregeling aan op 17 december 2024, en sinds 29 januari 2025 staat hij in het Staatsblad. Het is ook geen afbouwpad — dat plan lag er ooit en is vervangen door een harde stop. Wat operators in de zonne-sector onderschatten is het effect op het koopgedrag: de impulsklant verdwijnt, de rationele klant blijft, en die stelt andere vragen." },
       { type: "h2", text: "Waar je funnel pijn gaat voelen" },
-      { type: "p", text: "In 2024 en 2025 was zonnepanelen verkopen grotendeels een prijsgesprek. Vanaf 2026 verschuift dat naar een rendementsgesprek waarin de thuisbatterij centraal staat. Dat betekent langere sales-cycles, meer technische vragen, en meer afhakers in het offerte-stadium omdat de terugverdientijd complexer wordt." },
+      { type: "p", text: "Tot en met 2025 was zonnepanelen verkopen grotendeels een prijsgesprek. Dat is het nu niet meer: het is een rendementsgesprek geworden waarin de thuisbatterij centraal staat. Dat betekent langere sales-cycles, meer technische vragen, en meer afhakers in het offerte-stadium omdat de terugverdientijd complexer wordt." },
       { type: "h2", text: "Drie aanpassingen die het nu al oplossen" },
       { type: "ul", items: [
         "Geef elke lead een persoonlijk verbruiksrapport voordat je een prijs noemt — dat sorteert serieuze klanten van prijs-shoppers.",
         "Bouw de thuisbatterij-upsell in de eerste offerte in, niet als aparte fase. Klanten die eerst panelen dan batterij doen, komen vaak niet terug.",
         "Investeer in een contentlaag rond salderingsregeling-2027 die je eigen leads opvoedt voor het telefoongesprek. Minder objecties in het gesprek zelf."
       ]},
-      { type: "p", text: "De installateurs die nu al op deze drie punten draaien, vangen 2027 op. De rest gaat proberen de prijs verder te verlagen en merkt dat de marge weg is." }
+      { type: "p", text: "De installateurs die nu al op deze drie punten draaien, vangen 2027 op. De rest gaat proberen de prijs verder te verlagen en merkt dat de marge weg is." },
+      { type: "cta", text: "Reken een scenario door met de salderings-ROI-calculator", href: "/tools/energy-roi" },
+      { type: "h2", text: "Wat ik hier niet beweer" },
+      { type: "p", text: "Niet dat de terugleververgoeding na 2027 nul wordt. Tot 1 januari 2030 moet die minstens 50% zijn van het kale leveringstarief — de prijs die je klant voor stroom betaalt, zonder energiebelasting en btw — en de ACM houdt daar toezicht op. Hoeveel er bóven dat minimum komt bepaalt de leverancier, wat er na 2030 geldt is niet vastgelegd, en de terugleverkosten die leveranciers apart bij zonnepaneeleigenaren in rekening brengen staan daar los van. Wie met één vast bedrag rekent, rekent met een aanname." }
     ]
   },
   {
@@ -539,6 +543,7 @@ export const POSTS: Insight[] = [
       "De salderingsregeling verdwijnt. De batterij-installateurs die 2027 overleven zijn niet de goedkoopste — ze zijn de duidelijkste. Drie patronen uit succesvolle NL installateurs.",
     tag: "Energy",
     publishedAt: "2026-04-02",
+    updatedAt: "2026-08-31",
     readingMinutes: 6,
     seo: {
       metaTitle: "Thuisbatterijen verkopen na 2027",
@@ -553,7 +558,7 @@ export const POSTS: Insight[] = [
         "Wanneer heb ik mijn investering terug, met realistische energieprijzen?",
         "Wat gebeurt er als mijn verbruik over vijf jaar verandert (EV, warmtepomp)?"
       ]},
-      { type: "p", text: "Installateurs die alle drie beantwoorden met concrete cijfers uit de meterstandenrapportage van de klant, sluiten drie keer zoveel deals als installateurs die met algemene brochures werken. De asymmetrie zit in de voorbereiding, niet in de prijs." },
+      { type: "p", text: "Installateurs die alle drie beantwoorden met concrete cijfers uit de meterstandenrapportage van de klant, voeren een ander gesprek dan installateurs die met algemene brochures werken. De asymmetrie zit in de voorbereiding, niet in de prijs." },
       { type: "h2", text: "Wat helpmijbesparen.nl ziet in de pipeline" },
       { type: "p", text: "De leads die converteren hebben allemaal één ding gemeen: ze hebben een persoonlijk verbruiksrapport gezien voordat ze met een adviseur spraken. Geen rapport = prijs-shopper. Wel een rapport = serieuze koper die een partner zoekt, niet de goedkoopste offerte." },
       { type: "quote", text: "De prijsoorlog in thuisbatterijen komt eraan. De installateurs die winnen zijn degenen die al een jaar voor die oorlog een sterker narratief hebben opgebouwd." },
@@ -568,6 +573,7 @@ export const POSTS: Insight[] = [
       "Zonder saldering wordt het uur waarop je stroom teruglevert ineens belangrijk. Waarom een dynamisch contract voor de één honderden euro's oplevert en voor de ander geld kost — en hoe je het per klant doorrekent voordat je iets belooft.",
     tag: "Energy",
     publishedAt: "2026-07-20",
+    updatedAt: "2026-08-31",
     readingMinutes: 6,
     seo: {
       metaTitle: "Dynamisch energiecontract na de saldering",
@@ -583,6 +589,7 @@ export const POSTS: Insight[] = [
         "Klassiek verbruiksprofiel (overdag leeg huis, piek 's avonds): dynamisch zonder batterij kost geld ten opzichte van een vast contract.",
         "Met thuisbatterij of slimme sturing: het profiel kantelt — je schuift levering naar de dure uren en dynamisch wordt bijna altijd de betere keuze."
       ]},
+      { type: "p", text: "Één ding staat wel vast en het wordt in vrijwel elk verkoopgesprek overgeslagen: teruglevering wordt na 2027 niet gratis. Tot 1 januari 2030 moet de leverancier minstens 50% van het kale leveringstarief betalen — het tarief zonder energiebelasting en btw — en de ACM ziet daarop toe. Hoe dat minimum uitpakt op een contract waarvan de prijs per uur verschilt, schrijft de toezichthouder niet uit; dat is dus een vraag voor de leverancier en niet iets wat je uit een folder haalt. De terugleverkosten die leveranciers apart bij zonnepaneeleigenaren in rekening brengen blijven bestaan, en wat er ná 1 januari 2030 geldt is niet vastgelegd." },
       { type: "p", text: "Het punt is niet dat dynamisch goed of slecht is. Het punt is dat het antwoord per huishouden verschilt, en dat je het niet uit een brochure kunt halen. Je moet het doorrekenen met het echte verbruiksprofiel van de klant en realistische uurprijzen — niet met het jaargemiddelde dat elke aanbieder in zijn folder zet." },
       { type: "cta", text: "Reken een scenario door met de salderings-ROI-calculator", href: "/tools/energy-roi" },
       { type: "h2", text: "Drie dingen die je vastlegt vóór je een dynamisch contract aanraadt" },
@@ -603,6 +610,7 @@ export const POSTS: Insight[] = [
       "'Zeven jaar' staat in elke folder, maar dat getal geldt voor bijna niemand. Wat de terugverdientijd van een thuisbatterij écht bepaalt na het wegvallen van de saldering — en hoe je 'm voor jouw situatie uitrekent in plaats van 'm te geloven.",
     tag: "Energy",
     publishedAt: "2026-07-20",
+    updatedAt: "2026-08-31",
     readingMinutes: 6,
     seo: {
       metaTitle: "Thuisbatterij terugverdientijd 2027",
@@ -615,21 +623,24 @@ export const POSTS: Insight[] = [
       { type: "p", text: "Een thuisbatterij verdient zichzelf terug op twee manieren: méér zonnestroom zelf gebruiken in plaats van 'm bijna gratis terugleveren, en stroom opslaan als die goedkoop is om 'm te gebruiken als die duur is. Beide effecten hangen volledig af van hoe en wanneer jij verbruikt. Dezelfde batterij die bij het ene huishouden in zes jaar rond is, doet er bij het volgende dertien over." },
       { type: "ul", items: [
         "Je zelfverbruik zonder batterij — verbruik je nu al veel overdag, dan valt er minder winst te halen; verbruik je vooral 's avonds, dan doet de batterij meer.",
-        "De prijs die je krijgt voor teruglevering — die daalt na 2027 hard, en juist dáárdoor wordt opslaan aantrekkelijker dan terugleveren.",
+        "De prijs die je krijgt voor teruglevering — die ligt na 2027 lager dan het saldeervoordeel van vandaag, met een wettelijke bodem eronder: tot 1 januari 2030 minstens 50% van het kale leveringstarief, dus zonder energiebelasting en btw. Juist daardoor wordt opslaan aantrekkelijker dan terugleveren.",
+        "De terugleverkosten die je leverancier apart in rekening brengt — die verdwijnen niet, en de ACM waarschuwt zelf dat ze hoger kunnen uitvallen dan de vergoeding voor je teruggeleverde stroom.",
         "Het verschil tussen dag- en piektarief (of de spreiding op een dynamisch contract) — hoe groter de spread, hoe sneller de batterij rond is.",
         "Toekomstige apparaten — een warmtepomp of EV verandert je verbruik zo sterk dat een terugverdientijd van vandaag over drie jaar niet meer klopt."
       ]},
-      { type: "p", text: "Geen enkele van deze vier staat in de folder. Daarom is elk brochure-getal een gemiddelde van huishoudens die op jou lijken noch bestaan. De enige eerlijke terugverdientijd is die je met je eigen cijfers uitrekent." },
+      { type: "p", text: "Geen enkele van deze vijf staat in de folder. Daarom is elk brochure-getal een gemiddelde van huishoudens die op jou lijken noch bestaan. De enige eerlijke terugverdientijd is die je met je eigen cijfers uitrekent." },
       { type: "cta", text: "Bereken je eigen terugverdientijd met de salderings-ROI-calculator", href: "/tools/energy-roi" },
       { type: "h2", text: "De rekensom die wél klopt" },
       { type: "p", text: "Begin niet bij de prijs van de batterij, maar bij je eigen jaarverbruik en je verbruiksmoment. Reken uit hoeveel van je zonnestroom je nú al zelf gebruikt, en hoeveel een batterij daaraan toevoegt tegen realistische prijzen ná 2027 — niet tegen het salderingsvoordeel van vandaag dat er straks niet meer is." },
       { type: "ul", items: [
         "Neem je werkelijke jaarverbruik en je opwek, niet een schatting per vierkante meter dak.",
-        "Reken met de terugleververgoeding zoals die ná 2027 wordt, niet met het huidige saldeertarief.",
+        "Reken met de terugleververgoeding zoals die ná 2027 wordt, niet met het huidige saldeertarief. De wettelijke 50% is je ondergrens, niet je verwachting.",
         "Doe het twee keer: één keer met de energieprijzen van nu, één keer met een pessimistisch scenario. Als de batterij in beide gevallen rond komt, is het een goede beslissing."
       ]},
       { type: "quote", text: "Een terugverdientijd die je uit een folder overneemt, is een gok met andermans aannames. Eén die je zelf uitrekent, is een beslissing." },
-      { type: "p", text: "De klant die na 2027 tevreden blijft, is niet degene die de laagste prijs kreeg, maar degene die vooraf een som zag kloppen die op zijn eigen huis sloeg. Voor installateurs is dat geen extra werk — het is het verschil tussen een prijs-shopper en een koper die tekent." }
+      { type: "p", text: "De klant die na 2027 tevreden blijft, is niet degene die de laagste prijs kreeg, maar degene die vooraf een som zag kloppen die op zijn eigen huis sloeg. Voor installateurs is dat geen extra werk — het is het verschil tussen een prijs-shopper en een koper die tekent." },
+      { type: "h2", text: "Wat ik hier niet beweer" },
+      { type: "p", text: "Ik noem geen terugverdientijd in jaren en geen bedrag. De 50% is een minimum tot 1 januari 2030, geen tarief: wat je leverancier daarboven betaalt is aan hem, wat er na 2030 geldt is niet vastgelegd, en hoe hoog de terugleverkosten uitvallen verschilt per leverancier en per contract. Elk getal dat je hier zonder die drie onbekenden uit haalt, is een prognose met andermans aannames — precies waar dit stuk tegen waarschuwt." }
     ]
   },
   {
@@ -640,6 +651,7 @@ export const POSTS: Insight[] = [
       "Het einde van de salderingsregeling is geen technisch detail dat je in de offerte verstopt — het is een gesprek dat je vóór je concurrent voert. Welke klanten je nu belt, en de drie zinnen die twijfel wegnemen in plaats van 'm te voeden.",
     tag: "Energy",
     publishedAt: "2026-07-20",
+    updatedAt: "2026-08-31",
     readingMinutes: 5,
     seo: {
       metaTitle: "Salderen stopt: wat je klanten nu horen",
@@ -659,12 +671,14 @@ export const POSTS: Insight[] = [
       { type: "cta", text: "Laat de klant zijn eigen som zien met de salderings-ROI-calculator", href: "/tools/energy-roi" },
       { type: "h2", text: "Het eerlijke gesprek in drie zinnen" },
       { type: "ul", items: [
-        "Wat er verandert: 'Vanaf 2027 wordt teruggeleverde stroom niet meer één-op-één weggestreept — het moment waarop je verbruikt gaat meetellen.'",
+        "Wat er verandert: 'Vanaf 1 januari 2027 wordt teruggeleverde stroom niet meer één-op-één weggestreept. Je krijgt er nog een vergoeding voor — tot 2030 wettelijk minstens 50% van het kale leveringstarief — maar het moment waarop je verbruikt gaat meetellen.'",
         "Wat dat voor jou betekent: 'Voor jouw verbruik betekent dat concreet dít' — met een getal uit zijn eigen situatie, niet uit een folder.",
         "Wat de opties zijn: 'Je kunt niets doen, je zelfverbruik verhogen, of een batterij overwegen — laten we alle drie doorrekenen voordat je kiest.'"
       ]},
       { type: "quote", text: "De installateur die de deadline gebruikt om te verkopen, wint één deal. De installateur die 'm gebruikt om eerlijk te informeren, wint de klant én zijn buren." },
-      { type: "p", text: "Salderen stopt voor iedereen tegelijk. Het verschil tussen de installateurs die er last van hebben en de installateurs die eraan groeien, zit niet in de prijs of het product — het zit in wie het gesprek als eerste voert, en of dat gesprek eerlijk is. Begin deze week, bij de klanten die je al hebt." }
+      { type: "p", text: "Salderen stopt voor iedereen tegelijk. Het verschil tussen de installateurs die er last van hebben en de installateurs die eraan groeien, zit niet in de prijs of het product — het zit in wie het gesprek als eerste voert, en of dat gesprek eerlijk is. Begin deze week, bij de klanten die je al hebt." },
+      { type: "h2", text: "Wat ik hier niet beweer" },
+      { type: "p", text: "Niet dat je die 50% als de vergoeding mag presenteren. Het is een wettelijk minimum tot 1 januari 2030, en wat je klant werkelijk krijgt bepaalt zijn leverancier. Noem het dus als bodem en niet als bedrag, vertel erbij dat de terugleverkosten apart blijven staan, en beloof niets over de jaren na 2030 — daarvoor is niets vastgelegd. Een gesprek dat te veel belooft, kost je precies het vertrouwen dat je ermee wilde winnen." }
     ]
   },
   {
