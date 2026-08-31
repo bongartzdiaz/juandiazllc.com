@@ -42,7 +42,7 @@ bestaat.
 
 | # | onderwerp | taal | soort | haak/bron | status |
 | --- | --- | --- | --- | --- | --- |
-| D1 | Refresh: prijsvermeldingen en meta's na de Founding-prijssweep (PR #651) nalopen met `landing/_check-seo-consistency.py` | alle | onderhoud | de poort zelf | klaar |
+| D1 | Refresh: prijsvermeldingen en meta's na de Founding-prijssweep (PR #651) nalopen met `landing/_check-seo-consistency.py` | alle | onderhoud | de poort zelf; laatst gedraaid 2026-08-31: 820 paginas, 0 schendingen | klaar |
 | D2 | Pillar: van aanvraag naar offerte in 15 minuten — de werkvoorbereidings-workflow stap voor stap | nl | pillar | bestaande "15 minutes"-claim + help-artikelen | klaar |
 | D3 | Help-reeks: DXF aanleveren aan onderaannemers (lagen, schaal, wat er misgaat) | nl+en | help | bestaande DXF-export-docs in de repo | klaar |
 | D4 | Pillar: thuisbatterij intekenen na saldering — kruisverwijzing met het juandiazllc-cluster | nl | pillar | bestaand pillar thuisbatterij-ontwerp-saldering-2027 | klaar |
