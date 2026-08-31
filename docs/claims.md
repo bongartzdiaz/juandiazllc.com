@@ -1116,6 +1116,62 @@ iets uit citeert dat ouder is dan een kwartaal.** `lib/saldering.test.ts` houdt
 de kopij aan deze tabel vast, maar een poort kan niet zien dat een bron
 verandert.
 
+### Solarpflicht — bondsrecht bovenop landesrecht (gemeten 2026-08-31)
+
+De haak onder het DE-energiecluster. Tot vandaag stond er geen rij over in dit
+bestand, terwijl kalenderrij J4 het onderwerp beschreef als een **puur
+landesrechtelijk** lappendeken. Dat klopt sinds eind juli 2026 niet meer: er
+ligt sindsdien een bondslaag overheen. De rij is daarop bijgesteld.
+
+**Bron.** BGBl. 2026 I Nr. 226, uitgegeven 28 juli 2026 (ausgefertigt 23 juli
+2026) — het `Gebäudemodernisierungsgesetz` (GModG). Lokaal uit het PDF
+geëxtraheerd omdat de tekstlagen ObjStm-gecomprimeerd zijn: een fetch die de
+ruwe bytes leest ziet niets en meldt "niet vast te stellen", en dat leest
+hetzelfde als "staat er niet".
+
+**Let op bij het nameten.** `gesetze-im-internet.de` toonde op 2026-08-31 nog
+de óude Teil 8-kop, zonder het woord Solarenergie. Dat is
+consolidatie-achterstand van dat portaal en geen afwezigheid van de bepaling.
+Lees het Bundesgesetzblatt, niet de gemakskopie.
+
+| Claim | Waarde | Status |
+| --- | --- | --- |
+| Grondslag | `§ 106 Solarenergie in Gebäuden`, ingevoegd door Artikel 2 Nr. 43 GModG; Artikel 2 Nr. 42 zet het woord Solarenergie in de kop van Teil 8 | ✅ BGBl. 2026 I Nr. 226 |
+| GEG heet voortaan GModG | Artikel 1 Nr. 1; in werking **29. Juli 2026**, de dag na verkondiging (Art. 9 Abs. 1) | ✅ zelfde bron |
+| § 106 in werking | **1. Januar 2027** — Artikel 2 valt onder Art. 9 Abs. 2 | ✅ zelfde bron |
+| Trap 1 | **1. Januar 2027** — nieuw openbaar Nichtwohngebäude, en nieuw Nichtwohngebäude met meer dan 250 m² Nutzfläche | ✅ § 106 Abs. 2 |
+| Trap 2 | **1. Januar 2028** — bestaand openbaar Nichtwohngebäude boven 2 000 m², en bestaand Nichtwohngebäude boven 500 m² wanneer een Änderung nach § 36 wordt uitgevoerd én voor het hele gebouw nach § 38 wordt gerekend | ✅ zelfde lid |
+| Trap 3 | **1. Januar 2029** — bestaand openbaar Nichtwohngebäude boven 750 m² | ✅ zelfde lid |
+| Trap 4 | **1. Januar 2030** — nieuw Wohngebäude, en nieuwe overdekte parkeerplaats die fysiek aan een gebouw grenst | ✅ zelfde lid |
+| Trap 5 | **1. Januar 2031** — bestaand openbaar Nichtwohngebäude boven 250 m² | ✅ zelfde lid |
+| Ontwerpplicht | een te bouwen gebouw zo concipiëren dat het potentieel voor solar-opwekking op de standplaats geoptimaliseerd wordt | ✅ § 106 Abs. 1 — dit richt zich op het ontwerp en niet op de montage |
+| Uitzonderingen | technisch onmogelijk, functioneel niet realiseerbaar, economisch onredelijk, of in strijd met andere openbaar-rechtelijke voorschriften | ✅ § 106 Abs. 2 Satz 2 |
+| Samenloop met § 40 | Abs. 1 en 2 gelden niet wanneer voor het gebouw maatregelen nach § 40 Abs. 1 te nemen zijn — de renovatie-eisen aan bestaande Nichtwohngebäude, die vanaf 2030 en 2033 grijpen | ✅ § 106 Abs. 3, en § 40 zelf |
+| Landesrecht blijft gelden | woordelijk: "Die Länder können durch Landesrecht **weitergehende** Anforderungen an die Errichtung von Solarenergieanlagen stellen." | ✅ § 106 Abs. 4 — de bondsstaffel is een bodem en geen plafond. Dit is de scherpste rij, en de reden dat dit cluster bestaat |
+| Defensiegebouwen | uitgezonderd | ✅ § 106 Abs. 5 |
+| Land nagetrokken | **alleen Baden-Württemberg**, § 23 KlimaG BW, geconcretiseerd in de Photovoltaik-Pflicht-Verordnung | ✅ Umweltministerium Baden-Württemberg |
+| Land nagetrokken op | **31. August 2026** | ✅ dezelfde raadpleging |
+| BW — nieuw Nichtwohngebäude | sinds **1. Januar 2022** | ✅ zelfde bron |
+| BW — nieuw Wohngebäude | sinds **1. Mai 2022** | ✅ zelfde bron |
+| BW — open parkeerplaats vanaf 35 plaatsen | sinds **1. Januar 2022** | ✅ zelfde bron |
+| BW — grundlegende Dachsanierung | sinds **1. Januar 2023** | ✅ zelfde bron — **een auslöser die het bondsrecht niet kent.** Maatgevend moment is hier de Baubeginn; bij de andere gevallen de datum van de Bauantrag |
+| De overige vijftien Länder | **niet nagetrokken** | ❌ publiceer geen tabel over alle zestien |
+| Bußgeld bij overtreding van § 106 | **niet nagetrokken** | ❌ niets over handhavingsgevolgen beweren |
+| Voorgeschreven anlagengrootte in kWp | **niet nagetrokken** | ❌ geen vermogen noemen |
+
+**Wat er niet in kopij mag.** Geen overzicht van alle zestien Länder, geen
+Bußgeld, geen anlagengrootte, en niet de suggestie dat het bondsrecht het
+landesrecht vervangt — Abs. 4 zegt het omgekeerde. Wie de landelijke kant wil
+publiceren, trekt eerst dát Land bij zijn eigen uitvoerder na en zet de rij
+hier neer.
+
+**Waarom deze haak anders is dan saldering.** Saldering kent één datum voor
+iedereen. Hier hangt de datum af van gebouwsoort, oppervlakte, eigendom én
+Bundesland, en de twee lagen kunnen elkaar met jaren ontlopen: in
+Baden-Württemberg geldt de plicht bij nieuwbouw van woningen sinds mei 2022,
+terwijl de bondstrap daarvoor pas in 2030 valt. Een artikel dat alleen de
+bondsstaffel noemt, vertelt een Betreiber daar dus het verkeerde.
+
 ## Reactietijd op leads — de 78% is folklore (gemeten 2026-08-23)
 
 Aanleiding: een voorstel om in kopij en outreach te schrijven dat **"78% van

@@ -782,8 +782,57 @@ export const POSTS: Insight[] = [
         "Welche Optionen es gibt: \"Sie können nichts tun, Ihren Eigenverbrauch erhöhen oder einen Speicher prüfen — lassen Sie uns alle drei durchrechnen, bevor Sie wählen.\""
       ]},
       { type: "quote", text: "Wer die Degression nutzt, um zu verkaufen, gewinnt einen Abschluss. Wer sie nutzt, um ehrlich zu informieren, gewinnt den Kunden und seine Nachbarn." },
-      { type: "p", text: "Die Einspeisevergütung sinkt für alle gleichzeitig. Der Unterschied zwischen den Fachbetrieben, die darunter leiden, und denen, die daran wachsen, liegt nicht im Preis oder im Produkt — er liegt darin, wer das Gespräch zuerst führt und ob es ehrlich ist. Fangen Sie diese Woche an, bei den Kunden, die Sie schon haben." }
+      { type: "p", text: "Die Einspeisevergütung sinkt für alle gleichzeitig. Der Unterschied zwischen den Fachbetrieben, die darunter leiden, und denen, die daran wachsen, liegt nicht im Preis oder im Produkt — er liegt darin, wer das Gespräch zuerst führt und ob es ehrlich ist. Fangen Sie diese Woche an, bei den Kunden, die Sie schon haben." },
+      { type: "cta", text: "Ab 2027 kommt eine bundesweite Solarpflicht dazu — welche Stufe wann greift", href: "/insights/solarpflicht-ab-2027-welche-pflicht-zuerst-greift" },
     ]
+  },
+  {
+    slug: "solarpflicht-ab-2027-welche-pflicht-zuerst-greift",
+    markets: ["de"],
+    title: "Solarpflicht ab 2027: welche Pflicht bei Ihnen zuerst greift",
+    summary:
+      "Seit dem 29. Juli 2026 heißt das Gebäudeenergiegesetz Gebäudemodernisierungsgesetz, und darin steht ab dem 1. Januar 2027 eine bundesweite Solarpflicht mit einer Staffel bis 2031. Sie ersetzt das Landesrecht nicht, sie legt einen Boden darunter — und in manchen Ländern liegt die Pflicht längst höher.",
+    tag: "Energy",
+    publishedAt: "2026-08-31",
+    readingMinutes: 6,
+    seo: {
+      metaTitle: "Solarpflicht ab 2027: Bund und Länder",
+      metaDescription:
+        "Ab 1. Januar 2027 gilt eine bundesweite Solarpflicht, gestaffelt bis 2031. Was wann für welches Gebäude gilt, und warum das Landesrecht zählt.",
+    },
+    body: [
+      { type: "p", text: "Im Sommer 2026 hat sich die Rechtslage für Ihre Gebäude verschoben, ohne dass viel darüber gesprochen wurde. Das Gebäudeenergiegesetz heißt seit dem 29. Juli 2026 Gebäudemodernisierungsgesetz, und es trägt einen neuen § 106 mit der Überschrift Solarenergie in Gebäuden. Der greift ab dem 1. Januar 2027, gestaffelt bis 2031." },
+      { type: "h2", text: "Die Staffel steht im Gesetzblatt, nicht in einer Prognose" },
+      { type: "p", text: "Der Unterschied zu den meisten Übersichten im Netz ist, dass hier nichts geschätzt wird. § 106 Absatz 2 nennt fünf Stichtage, und zu jedem steht dort, welches Gebäude betroffen ist und ab welcher Nutzfläche." },
+      { type: "ul", items: [
+        "1. Januar 2027: neu errichtete öffentliche Nichtwohngebäude, und neue Nichtwohngebäude mit mehr als 250 Quadratmetern Nutzfläche.",
+        "1. Januar 2028: bestehende öffentliche Nichtwohngebäude über 2 000 Quadratmetern, und bestehende Nichtwohngebäude über 500 Quadratmetern, wenn dort eine Änderung nach § 36 ausgeführt und für das ganze Gebäude nach § 38 gerechnet wird.",
+        "1. Januar 2029: bestehende öffentliche Nichtwohngebäude über 750 Quadratmetern.",
+        "1. Januar 2030: neue Wohngebäude, und neue überdachte Parkplätze, die physisch an ein Gebäude angrenzen.",
+        "1. Januar 2031: bestehende öffentliche Nichtwohngebäude über 250 Quadratmetern.",
+      ]},
+      { type: "p", text: "Zwei Dinge daran werden leicht überlesen. Das Wohngebäude kommt zuletzt, erst 2030 — wer im Neubau von Wohnhäusern arbeitet, hat auf Bundesebene mehr Zeit, als die Schlagzeile vermuten lässt. Und im Bestand läuft die Reihenfolge von groß nach klein: erst 2 000, dann 750, dann 250 Quadratmeter. Die öffentliche Hand geht dabei jedes Mal voran." },
+      { type: "h2", text: "Wann die Pflicht nicht greift" },
+      { type: "p", text: "Absatz 2 Satz 2 nennt vier Gründe, aus denen die Pflicht entfällt: technisch unmöglich, funktional nicht realisierbar, wirtschaftlich unzumutbar, oder im Widerspruch zu anderen öffentlich-rechtlichen Vorschriften. Dazu kommt Absatz 3: die Absätze 1 und 2 gelten gar nicht, wenn für das Gebäude Maßnahmen nach § 40 Absatz 1 zu ergreifen sind — das sind die Renovierungsanforderungen an bestehende Nichtwohngebäude, die ab 2030 und 2033 greifen. Die beiden Pflichten stapeln sich also nicht." },
+      { type: "p", text: "Absatz 1 verlangt außerdem etwas, das früher ansetzt als jede Stichtagsliste: ein zu errichtendes Gebäude ist so zu konzipieren, dass sein Potenzial zur Erzeugung von Solarenergie am Standort optimiert wird. Das richtet sich an den Entwurf und nicht an die Montage." },
+      { type: "h2", text: "Warum das Landesrecht damit nicht verschwindet" },
+      { type: "p", text: "Absatz 4 sagt es ausdrücklich: die Länder können durch Landesrecht weitergehende Anforderungen an die Errichtung von Solarenergieanlagen stellen. Die Bundesstaffel ist damit ein Boden und keine Decke. Für Sie heißt das, dass die Frage nach Ihrer Pflicht zwei Ebenen hat und die strengere von beiden gilt." },
+      { type: "p", text: "Wie groß dieser Unterschied ausfallen kann, zeigt Baden-Württemberg. Dort steht die Photovoltaikpflicht in § 23 des Klimaschutz- und Klimawandelanpassungsgesetzes. Sie gilt für neue Nichtwohngebäude seit dem 1. Januar 2022, für neue Wohngebäude seit dem 1. Mai 2022 und für offene Parkplätze ab 35 Stellplätzen seit dem 1. Januar 2022. Und seit dem 1. Januar 2023 greift sie bei einer grundlegenden Dachsanierung." },
+      { type: "p", text: "Dieser letzte Fall steht in der Bundesstaffel überhaupt nicht. § 106 knüpft an Neubau an, an öffentliche Bestandsgebäude und an Änderungen nach § 36 — die Dachsanierung als eigener Auslöser kommt dort nicht vor. Ein Betrieb in Baden-Württemberg arbeitet also seit Jahren mit einem Auslöser, den das Bundesrecht nicht kennt, und für ihn ändert die Staffel im Wohnungsbau wenig." },
+      { type: "h2", text: "Was Sie pro Gebäude festhalten" },
+      { type: "ul", items: [
+        "Gebäudeart und Nutzfläche, denn beide entscheiden über den Stichtag. Bei Nichtwohngebäuden liegt die erste Schwelle schon bei 250 Quadratmetern.",
+        "Ob das Gebäude der öffentlichen Hand gehört. Diese Gebäude sind in vier der fünf Stufen zuerst an der Reihe.",
+        "Welches Bundesland, und mit welchem Auslöser. Die Dachsanierung ist der Fall, den das Bundesrecht nicht abdeckt und manches Landesrecht schon.",
+        "Ob für das Gebäude Renovierungsanforderungen nach § 40 anstehen. Dann greifen die Absätze 1 und 2 nicht.",
+      ]},
+      { type: "quote", text: "Die Frage ist nicht, ob eine Solarpflicht kommt. Sie ist, welche der beiden Ebenen bei diesem Gebäude zuerst greift." },
+      { type: "p", text: "Für Planer und Fachbetriebe ist das ein Vorsprung, der wenig kostet. Wer im ersten Gespräch sagen kann, welcher Stichtag für dieses konkrete Gebäude gilt und aus welcher der beiden Ebenen er kommt, führt ein anderes Gespräch als der Wettbewerber, der allgemein auf die Pflicht verweist. Beides steht nachlesbar im Gesetzblatt und im Landesrecht." },
+      { type: "cta", text: "Was die sinkende Einspeisevergütung für das Kundengespräch bedeutet", href: "/insights/sinkende-einspeiseverguetung-was-installateure-sagen-muessen" },
+      { type: "h2", text: "Was ich hier nicht behaupte" },
+      { type: "p", text: "Ich gebe keine Übersicht über alle sechzehn Bundesländer. Ich habe die Bundesstaffel im Bundesgesetzblatt nachgelesen und für die Landesebene ein einziges Land beim zuständigen Ministerium geprüft, Baden-Württemberg, Stand 31. August 2026. Was in Ihrem Land gilt, sehen Sie dort nach. Eine Tabelle, die ich nicht Land für Land geprüft habe, wäre genau die Art Quelle, gegen die dieser Text argumentiert." },
+      { type: "p", text: "Ich nenne auch keine Bußgeldhöhe, keine Folge einer verletzten Pflicht und keine Anlagengröße in Kilowatt-Peak: das steht nicht in dem, was ich geprüft habe. Was ich behaupte, ist schmal. Ab dem 1. Januar 2027 läuft eine bundesweite Staffel mit fünf Stichtagen, sie endet 2031, sie lässt strengeres Landesrecht ausdrücklich zu, und in mindestens einem Land greift ein Auslöser, den sie selbst nicht kennt." },
+    ],
   },
   {
     slug: "autoconsumo-con-bateria-rentabilidad-2026",
