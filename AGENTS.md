@@ -8348,3 +8348,159 @@ De drie naamsbeslissingen hierboven zijn niet genomen — ze staan op de
 operator-lijst. En er is geen operator-taak mee opgelost: de 402, de vijf
 Plausible-doelen, `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`,
 `CAL_WEBHOOK_SECRET` en de vier LinkedIn-beslissingen staan onveranderd open.
+
+### 2026-08-31 (vervolg) — de eerste volle dag van de contentmachine, en drie rijen waarvan de premisse niet klopte
+
+Twaalf PR's (#293 t/m #304) die het logboek nog niet hadden gehaald. Vier
+daarvan zijn inhoud, één is een refresh-ronde, de rest zet kalenderrijen om.
+Wat ze bindt is niet het onderwerp: **bij drie van de vier is het onderwerp
+tijdens het natrekken bijgesteld**, omdat de rij een premisse droeg die bij de
+uitvoerder niet standhield.
+
+Dat is geen toeval maar het ontwerp. `docs/content-kalender.md` schrijft voor
+dat regelgeving bij de uitvoerder wordt geverifieerd en niet bij een
+samenvatting, en een kalenderrij is bedacht vóórdat die verificatie plaatsvond.
+
+#### Wat er is uitgeleverd
+
+| rij | PR | wat |
+|---|---|---|
+| J1 | #293, #294 | netcongestie voor installatiebedrijven — NL, Energy |
+| D1 | #295 | refresh-ronde over de diazatlas-landing: 820 pagina's, 0 schendingen |
+| D2·D3·D4·D6 | #296–#299 | vier rijen naar `wachtrij`; het werk staat in `bongartzdiaz/diaz-editor` |
+| J2 | #300 | refresh van het saldering-cluster, vijf artikelen |
+| J3 | #301, #302 | WPM jaar twee — NL, Logistics |
+| J4 | #303, #304 | Solarpflicht, bondsrecht bovenop landesrecht — DE, Energy |
+
+#### Drie keer sloeg het natrekken de rij om
+
+**J2 — het woord dat in elke samenvatting staat en niet in de wet.** Het
+oudste artikel opende met "de afbouw van de salderingsregeling in 2027". De
+Rijksoverheid spreekt dat woordelijk tegen: het kabinet besloot de regeling in
+2027 *helemaal te stoppen en niet eerder af te bouwen*. De wet heet
+beëindiging (36.611, Staatsblad 29 januari 2025); het afbouwvoorstel (35.594)
+is een ander traject dat niet is doorgegaan. Het woord komt terug zodra iemand
+uit een samenvatting overschrijft, en daarom staat er nu een poort op.
+
+Zwaarder was wat er níét stond. **Geen van de vijf artikelen noemde de
+wettelijke ondergrens onder de terugleververgoeding**, terwijl drie ervan de
+lezer vragen een som te maken. Tot 1 januari 2030 is dat minstens 50% van het
+kale leveringstarief. Dat getal is kenbaar — het staat in de wet — en zonder
+die bodem komt elke som te laag uit. Een installateur die te laag rekent,
+verkoopt een batterij op een argument dat de klant later zelf kan weerleggen.
+
+**J3 — twee rijen die op "niet nagetrokken" stonden, waren wel kenbaar.** De
+indieningsdatum voor WPM is uiterlijk 30 juni over het voorgaande kalenderjaar,
+op twee RVO-oppervlakken bevestigd, en de peildatum voor de drempel is
+jaarlijks op 1 januari in plaats van eenmalig. Daardoor beloofde het eerste
+WPM-artikel iets dat niet meer klopte: géén indieningsdatum te noemen. Die
+disclaimer is bijgewerkt en verwijst nu naar het vervolgstuk.
+
+Een ❌ in `docs/claims.md` betekent *vandaag niet nagetrokken*, niet *niet
+natrekbaar*. Dat onderscheid is het verschil tussen een rij die je overneemt en
+een rij die je opnieuw meet.
+
+**J4 — een hele wetslaag erbij.** De rij beschreef Solarpflicht als een puur
+landesrechtelijk lappendeken. Sinds BGBl. 2026 I Nr. 226 ligt daar een
+bondslaag overheen. Zie het blok hierboven.
+
+Alleen **J1** hield stand zoals bedacht. Daar zat de correctie in de andere
+richting: de circulerende cijfers over wachtenden en wachttijden zijn bewust
+niet overgenomen, want ze waren bij ACM noch bij Netbeheer Nederland
+terug te vinden.
+
+#### De derde kopie die niet is ontstaan
+
+`kopij()` — de functie die titel, samenvatting, meta en alle bloktekst van een
+artikel platslaat — stond in twee poorten in dubbel en zou bij J3 een derde
+kopie krijgen. Verhuisd naar `lib/insight-kopij.ts`, met `ctaHrefs()` ernaast
+voor de kruislinkcontrole. `lib/i18n/nederlands.test.ts` en
+`lib/saldering.test.ts` verloren er samen 41 regels door en kregen er 4 terug.
+
+Bij J4 bleek die verhuizing meteen een grens te trekken: `kopij()` neemt het
+**label** van een cta mee en de **href** niet. Daardoor draagt het buurartikel
+het woord *Solarpflicht* zodra de kruislink erin staat, en moest de clusterregel
+op `§ 106` matchen in plaats van op dat woord. Een eigen test houdt die grens
+vast.
+
+#### Een refresh-rij is geen artikel, en de poort wist dat beter dan ik
+
+Mijn eerste poging zette J2 op `wachtrij`, alsof het een eenmalige publicatie
+was. `lib/content-kalender.test.ts` viel om: J2 zit in de terugvalpool
+J2/J5/J6/D1, en die pool leegtrekken is precies wat de poort verhindert. Een
+refresh-rij blijft `klaar` en noteert zijn ronde in de bron-cel — zelfde vorm
+als D1 in #295.
+
+**De poort is niet aangepast.** Hij had gelijk.
+
+#### De Diaz Editor-kant
+
+`bongartzdiaz/diaz-editor#651` is gemerged (de deelkaarten naar PNG, de
+`/index`-canonicals eruit, de meta-prijzen gelijk aan de pagina). Daarna gaf
+`landing/_check-seo-consistency.py` 820 pagina's en 0 schendingen — dat is de
+D1-ronde.
+
+**Vijf PR's staan daar open en wachten op Juan:** #647 (klantenservice,
+prijsconsistentie, zetelbeheer) plus #652, #653, #654 en #655 uit de
+D-rijen. In die repo merget Juan; deze sessie doet dat niet.
+
+#### Meting
+
+Per PR gemeten, niet achteraf gereconstrueerd:
+
+| na | bestanden | tests |
+|---|---|---|
+| J1 (#293) | 64 | 1294 |
+| J2 (#300) | 65 | 1306 |
+| J3 (#301) | 66 | 1333 |
+| J4 (#303) | 67 | 1351 |
+
+Drie nieuwe poorten: `lib/saldering.test.ts`, `lib/wpm.test.ts`,
+`lib/solarpflicht.test.ts`. Alle drie parseren hun getallen uit
+`docs/claims.md` in plaats van ze over te schrijven, en alle drie lezen de
+geëxporteerde data en niet de bestandstekst — dezelfde term in een toelichting
+blijft onzichtbaar, en dat is per poort met een groene mutatie bewezen.
+
+Mutaties over de drie: negen, dertien en twaalf, elke keer de voorspelde kleur.
+
+`tsc` 0 · i18n 730 × 4 · prijsgenerator groen · build groen ·
+`CLAUDE.md` == `AGENTS.md`, op elke PR.
+
+#### Twee dingen over het gereedschap
+
+**MSYS `sed -i` is hier geen optie op een CRLF-bestand.** Bij J4 zette één
+`sed -i` twee bestanden om van CRLF naar LF: beide kwamen op nul CRLF uit,
+`docs/kanalen.md` met 202 regels en `lib/kanalen.test.ts` met 163. Een diff
+van 202 regels waar er één bedoeld was. Het viel alleen op doordat ik bytes
+vóór en ná mat —
+`git diff --stat` had "2 files changed" gemeld en verder niets. Dit is dezelfde
+familie als het `io.open(..., encoding=...)`-incident van 25 augustus, één
+gereedschapslaag naar buiten: het lezen gebeurt in tekstmodus en het schrijven
+normaliseert.
+
+**Een anker dat vijftien keer voorkomt, moet luid overgeslagen worden.** Het
+mutatieharnas bij J4 wilde `readingMinutes: 6` muteren; dat staat vijftien keer
+in `lib/insights.ts`. Het harnas meldde `anker 15x` en sloeg over in plaats van
+de eerste treffer te pakken. Een mutatie die stil de verkeerde plek raakt, leest
+hetzelfde als een poort die niet afgaat.
+
+#### Wat dit niet doet
+
+Er is geen operator-taak mee opgelost. De Supabase-402 staat er nog — de
+leadopvang schrijft dus niets weg — en de vijf Plausible-doelen,
+`LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `CAL_WEBHOOK_SECRET`, `SENTRY_DSN` en
+de vier LinkedIn-beslissingen staan onveranderd open. Elk artikel van vandaag
+leidt naar een formulier dat vandaag niets opvangt.
+
+Van de kalender staan **J5, J6 en J7** nog op `klaar`. J5 (DE
+Einspeisevergütung-degressie) en J6 (ES autoconsumo) zijn refreshes die eerst
+bij Bundesnetzagentur en BOE nagemeten moeten worden; J7 (ETS2) is een nieuw
+artikel met NEa als bron. J8, J9 en J10 staan op `wacht`, en J10 is expliciet
+geblokkeerd tot de 27 intakevragen uit `docs/datastuk.md` beantwoord zijn.
+
+**Eén waarneming over dit bestand zelf.** De koppen staan aan het eind niet
+chronologisch: het blok van 2026-08-31 over de contentmachine zit vóór het
+blok van 2026-08-28 over de DEUS-naamgeving. Dat is zo ontstaan doordat de
+laatste toevoeging onderaan werd geplakt terwijl de vorige ertussen was gezet.
+Niet rechtgetrokken — logboekgeschiedenis wordt hier niet herschreven — maar
+wie hierna aanvult, plakt onderaan en niet op datum.
