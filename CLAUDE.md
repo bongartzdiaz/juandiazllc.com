@@ -8172,6 +8172,44 @@ idee 4 als intake. Idee 2 is een routine zonder bouwwerk, idee 5 wacht op de
 opvang. De volgende stappen zijn versturen, gesprekken voeren en vragen
 beantwoorden — en dat is allemaal van Juan.
 
+### 2026-08-31 — diazatlas-SEO gerepareerd, en een dagelijkse content-machine op twee rails
+
+Drie stukken werk, waarvan één buiten deze repo leeft en daarom hier
+genoteerd staat.
+
+**bongartzdiaz/diaz-editor#651 — open, mergen is aan Juan.** De drie
+diazatlas-defecten uit de meting van vandaag: 7 og-deelkaarten van SVG naar
+PNG (LinkedIn/WhatsApp/Facebook renderen geen SVG — elke share toonde géén
+beeld), 26 canonical/hreflang/og:url-verwijzingen weg van `/index`-redirects,
+en 22 meta's waarvan de prijs niet op de eigen pagina stond (Founding-restje:
+meta zei het ene bedrag, de zichtbare pagina 15× het andere). Plus een
+blijvende poort: `landing/_check-seo-consistency.py` — drie controles met
+zelftests, 820 pagina's, 0 schendingen; hij ving op zijn eerste run 4
+affiliates-pagina's die mijn greps hadden gemist. **De merge is door de
+permissie-classifier geweigerd** — de PR staat klaar, Juan merget, daarna
+live nameten. De prijspariteit-invariant beslist bewust níét welk bedrag
+juist is; dat is een productkeuze en die staat in de PR-body benoemd.
+
+**PR #291 (gemerged, `739d418`) — `docs/content-kalender.md` + poort.** De
+enige bron waar de dagelijkse machine uit mag werken: 16 rijen over twee
+sites, statussen klaar/wacht/wachtrij/live, refresh-terugval J2/J5/J6/D1.
+`lib/content-kalender.test.ts` (10 tests) leidt de tags af uit
+`lib/insights.ts`, eist een bron per rij en verbiedt bedragen in de
+kalender. Vijf mutaties, vijf keer de voorspelde kleur; de poort ving bij
+zijn eerste run een bedrag in mijn eigen D1-omschrijving. 1289 tests in 64
+bestanden, was 1279/63.
+
+**De machine zelf staat búiten de repo**: scheduled task
+`content-machine-dagelijks` op Juans machine
+(`~/.claude/scheduled-tasks/content-machine-dagelijks/SKILL.md`), dagelijks
+~08:15, draait alleen als de app open staat. Eén stuk per run, uitsluitend
+uit de kalender, schrijf-stack verplicht (copywriting + seo-specialist;
+NL → stop-slop-nl, EN → ai-check + humanizer), publicatie via PR —
+zelf-mergen mag alleen in déze repo bij groene checks, in diaz-editor nooit.
+Wil je de machine stoppen of verzetten: de Scheduled-sectie in de sidebar,
+niet dit bestand. **Belangrijk voor een volgende sessie: er bestaat dus al
+een dagelijkse contentrail — bouw er geen tweede naast.**
+
 ### 2026-08-28 (vervolg) — het CRM heette op de site nog Philly, en de helft van de vervangen claims was aantoonbaar onwaar
 
 Het logboek van 25 augustus noteerde "Philly staat nog 63 keer in geleverde
