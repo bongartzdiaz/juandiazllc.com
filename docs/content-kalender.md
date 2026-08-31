@@ -27,7 +27,7 @@ bestaat.
 
 | # | onderwerp | taal | tag | haak/bron | status |
 | --- | --- | --- | --- | --- | --- |
-| J1 | Netcongestie: wat een vol net betekent voor je installatiebedrijf (wachttijden, planning, klantcommunicatie) | nl | Energy | Netbeheer Nederland capaciteitskaart; geen bedragen; PR #293 | wachtrij |
+| J1 | Netcongestie: wat een vol net betekent voor je installatiebedrijf (wachttijden, planning, klantcommunicatie) | nl | Energy | Netbeheer Nederland capaciteitskaart; geen bedragen; PR #293, gemerged 2026-08-31 | live |
 | J2 | Refresh: salderingsregeling-cluster nalopen op actualiteit (5 artikelen, datum 1-1-2027 nadert) | nl | Energy | bestaande artikelen + wetgeving | klaar |
 | J3 | WPM jaar twee: wat de eerste rapportageronde leerde over datakwaliteit | nl | Logistics | RVO WPM-documentatie; eigen WPM-artikel | klaar |
 | J4 | Solarpflicht per Bundesland: wat de bouwplicht betekent voor Betreiber | de | Energy | landesrechtliche Solarpflichten (per land verifiëren) | klaar |
