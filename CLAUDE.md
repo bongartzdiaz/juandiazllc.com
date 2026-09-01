@@ -8864,3 +8864,182 @@ Geen enkele andere operator-taak is hiermee opgelost: de Supabase-402 (dus het
 contactformulier schrijft nog steeds niets weg), de zes Plausible-doelen,
 `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`, `CAL_WEBHOOK_SECRET`,
 `SENTRY_DSN` en de vier LinkedIn-beslissingen staan onveranderd open.
+
+### 2026-09-01 (vervolg) — het meet-ID in de code, en een knop die driemaal niets opleverde
+
+PR #313, gemerged als `7a46677`. Het blok hierboven sloot af met "wat openblijft
+is de knop, niet de tag". Dit is die knop, en het antwoord erop was uiteindelijk
+niet in Vercel te vinden.
+
+#### Drie keer gemeten, drie keer nul
+
+Juan zette `NEXT_PUBLIC_GA4_ID` in de projectinstellingen en klikte Redeploy.
+Daarna leverde de Vercel-API geen enkele nieuwe productie-deployment op — niet
+één, driemaal gemeten, de laatste keer 119 minuten na de vorige deployment.
+
+**Het filter is apart bewezen, want anders is nul geen meting.** Met
+`since = aangemaakt − 1 ms` gaf hetzelfde verzoek precies één rij terug, met
+`+1 ms` nul. Het filter filterde dus werkelijk; de lege uitkomst kwam niet uit
+een parameter die alles wegsneed. Een dertien minuten lopende achtergrondwacht
+op de chunk-set vond evenmin iets.
+
+Wat er niet is verklaard: waaróm die knop geen deployment-object oplevert. Dat
+staat als open punt op de operator-lijst en is van Juan.
+
+#### Een codewijziging was hier de betere route, niet de omweg
+
+`NEXT_PUBLIC_*` wordt bij het **bouwen** ingebakken. De variabele was dus nooit
+een schakelaar die zonder nieuwe build iets doet — en de enige deploy-route
+waarvan hier bewijs is dat hij werkt, is een push naar `main`. Dat maakt de
+literal in de code geen noodgreep maar de kortste weg met bewijs.
+
+    const GA4_ID = process.env.NEXT_PUBLIC_GA4_ID || "G-JL21TDX7QB";
+
+Een gezette variabele wint nog steeds, dus een testproperty kan zonder
+codewijziging. Uit zetten gaat door de literal leeg te maken; dan grijpt de
+bestaande `if (!GA4_ID) return null` en is er geen banner, geen script, geen
+cookie.
+
+**Een meet-ID is geen geheim.** Het staat publiek op élke GA4-site, en
+diazatlas draagt het al open en bloot in `landing/_compliance.js:105`. Dit is
+dus geen sleutel in een publieke repo.
+
+#### `||` en niet `??`, en de reden is scherper dan hij leek
+
+De keuze viel eerst op een gevaar dat ik niet kon wegredeneren: draagt de
+`process.env`-schil ooit een **lege string**, dan houdt `??` die vast — GA4
+staat dan stil uit en de terugval vuurt nooit. Daarna zijn beide takken van de
+bundler gemeten, op echte productiebuilds, en ze gedragen zich verschillend:
+
+| variabele | wat Turbopack ervan maakt |
+|---|---|
+| **niet gezet** | de uitdrukking blijft staan als runtime-lookup: `env.NEXT_PUBLIC_GA4_ID\|\|"G-JL21TDX7QB"` |
+| **wel gezet** | alles wordt weggevouwen tot die ene waarde; de terugval wordt niet eens meegeleverd |
+
+Alleen in de eerste tak bestaat de schil waar een lege string in kan zitten —
+en dat is precies de tak die vandaag op productie draait.
+
+#### De banner staat in géén enkele geserveerde HTML, ook niet als alles werkt
+
+Het vorige blok noemde `class="toestemming"` in de geserveerde HTML als
+faalsignaal. Dat kan niet kloppen. De component start op
+`useState(undefined)` en rendert `null` zolang de keuze `undefined` is, en op
+de server draaien effects niet — dus de banner zit er nooit in, werkend of niet.
+Wie daarop meet leest een terechte nul als een mislukte deploy.
+
+Empirisch bevestigd op alle vier de talen vóórdat de correctie in het logboek
+belandde: 0×, en dat hoort. Meet in de **DOM na hydratie**, of op buildniveau
+met een grep op het tag-id in `/_next/static/chunks/*.js`.
+
+Ook te smal was "van deze machine kan het niet, in twee onafhankelijke
+richtingen nagetrokken". Er waren meer paden dan die twee, en de Vercel-MCP
+stond er niet bij. Die heeft géén redeploy-gereedschap: `deploy_to_vercel`
+vraagt om een `files`-boom en zou de **werkkopie** uploaden als
+productie-deployment, los van de commit.
+
+#### De poort telt drie dingen in één regex
+
+    /process\.env\.NEXT_PUBLIC_GA4_ID\s*\|\|\s*"(G-[A-Z0-9]+)"/
+
+De variabele wordt gelezen, hij staat **links** (dus hij wint van de terugval),
+en de terugval is een welgevormd GA4-id. Plus een tweede assertie dat het id
+precies één keer in het bestand staat — een tweede voorkomen is een tweede
+lijst die uit elkaar loopt.
+
+De bestaande poorten bleven ongewijzigd staan en groen: geen
+`process.env[...]`-indirectie, `if (!GA4_ID) return null` aanwezig, de
+uitschakelaar vóór het laden, injectie via `createElement` en niet
+`next/script`, en de intrekknop die gtag niet aanraakt.
+
+**Vijf mutaties, vijf keer de voorspelde kleur.** De terugval weghalen, `??` in
+plaats van `||`, de terugval links zetten, en het id een tweede keer in de code:
+alle vier rood. Hetzelfde id een tweede keer in een **toelichting**: groen —
+het uitvoerbare bewijs dat de poort door `zonderCommentaar` leest en niet over
+zijn eigen uitleg struikelt.
+
+#### De deploy-wacht viel om, en dat zei niets over de deploy
+
+Na de merge draaide een script dat op een READY productie-deployment wachtte.
+Het eindigde met exitcode 1, en zijn enige geprogrammeerde faalpad luidt "geen
+deployment binnen ~13 minuten". Dat las als bevestiging van het ergste: dan zou
+óók een push naar `main` niets opleveren, en dan stond er een onwaarheid in de
+commit die ik net had gemerged.
+
+Het was iets anders. De uitvoer draagt een `HTTPError: 403` — het script had,
+anders dan de verkenner ernaast, geen `except` om zijn API-aanroep heen, dus de
+worp liep door tot buiten de lus. Het instrument brak; over de deploy zei het
+niets.
+
+**Lees de foutmelding voordat je de exitcode als antwoord neemt.** Een script
+dat crasht en een script dat zijn zoekopdracht uitput, geven allebei exit 1.
+
+#### Gemeten op productie
+
+Het tag-id kan alleen uit déze commit komen, dus zijn aanwezigheid in een chunk
+is zelf het versheidsbewijs:
+
+```
+/_next/static/chunks/19smzobtj63fe.js
+  let l=t.default.env.NEXT_PUBLIC_GA4_ID||"G-JL21TDX7QB"
+
+  tag 1x  ·  env-lookup 1x  ·  ga-disable 1x  ·  jd-toestemming-v1 1x
+```
+
+Die vorm beantwoordt twee vragen tegelijk. De build is vers, én
+`NEXT_PUBLIC_GA4_ID` stond bij het bouwen **niet** gezet — was hij gezet
+geweest, dan was het geheel weggevouwen en had de terugval er niet in gestaan.
+Juans dashboard-wijziging heeft dus nog steeds geen build bereikt.
+
+| | uitkomst |
+|---|---|
+| `/en` `/nl` `/de` `/es`, geserveerde HTML | banner 0× · tag 0× · googletagmanager 0× — zoals bedoeld |
+| positieve controle | 65× `juandiazllc` in `/en` |
+| afgedwongen `script-src` | draagt `www.googletagmanager.com` |
+| strikte report-only | draagt hem **niet** — die draait op `strict-dynamic` |
+| beide beacon-hosts | in beide policies |
+| DOM vóór elke keuze | banner aanwezig, knoppen `Weigeren` / `Toestaan`, vlag al `true`, `gtag` undefined, 0 Google-scripts |
+| DOM na weigeren | banner weg, opslag `"nee"`, vlag `true`, 0 verzoeken naar Google — vóór én na |
+| console | nul fouten, nul CSP-meldingen, ná een hartslag door de lezer |
+
+**Toestaan is op productie bewust niet geklikt.** Dat zou een echte hit in Juans
+levende property schrijven; die tak is lokaal gemeten op een build met
+`G-TESTONLY000`, wat meteen bewees dat een gezette variabele wint.
+
+#### Regeleinden zijn hier per bestand
+
+De eerste splice van `.env.example` viel om met `subsection not found`, omdat ik
+CRLF aannam. Gemeten: `.env.example` is puur LF (0 CRLF / 139 LF),
+`docs/master-todo-customer-1.md` puur CRLF (331 / 0), en `CLAUDE.md` CRLF.
+
+**Dat luide falen was de goede uitkomst.** Een lees-in-tekstmodus gevolgd door
+een schrijf-in-bytes had er stil 139 regeleinden van omgezet — precies het
+`io.open`-incident van 25 augustus. De splice detecteert het regeleinde nu per
+bestand.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1420 tests in 70 bestanden (was 1419/70)
+i18n:check               741 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +1 is de nieuwe assertie. Zes bestanden geraakt, 102 toevoegingen tegen 55
+verwijderingen; de squash-boom is byte-identiek aan die van de tak.
+
+#### Wat dit niet doet
+
+**De tag staat nu aan.** Dat is het verschil met het vorige blok, en het is de
+enige gedragswijziging: wie op productie toestemming geeft, laadt gtag.js voor
+`G-JL21TDX7QB`. Wie weigert of niets kiest, laadt niets — dat is hierboven
+gemeten.
+
+Geen enkele operator-taak is hiermee opgelost. De Supabase-402 staat er nog, dus
+het contactformulier schrijft niets weg; de zes Plausible-doelen,
+`LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`, `CAL_WEBHOOK_SECRET`,
+`SENTRY_DSN`, de vier LinkedIn-beslissingen en de vijf openstaande PR's in
+`bongartzdiaz/diaz-editor` staan onveranderd open. En de Redeploy-knop zelf
+blijft onverklaard.
