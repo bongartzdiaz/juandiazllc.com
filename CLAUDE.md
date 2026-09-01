@@ -9656,3 +9656,167 @@ onverklaarde Redeploy-knop en de vijf openstaande PR's in
 Van de kalender staan **J6** (ES autoconsumo, eerst nameten bij BOE en CNMC) en
 **J8 t/m J10** nog open; J10 is geblokkeerd tot de 27 intakevragen uit
 `docs/datastuk.md` beantwoord zijn.
+
+### 2026-09-01 (vervolg) — het overschot verkopen kan wel, en twee bedragen die geen bron hebben
+
+PR #322, gemerged als `292cb0e`. Kalenderrij J6 is de hermeting van het Spaanse
+autoconsumo-cluster: *RD 244/2019 ongewijzigd? compensatie-plafond.*
+
+#### De rij vroeg naar de datums en raakte de kernzin
+
+Het antwoord op de eigen vraag van de rij is **ja, gewijzigd** — laatste
+wijziging in werking 22/03/2026 via Real Decreto-ley 7/2026, disposición final
+decimocuarta, en Ley 9/2025 df 17 raakte art. 4.5 eerder, per 03/12/2025. Geen
+van die wijzigingen raakt de leden waarop dit cluster steunt (art. 4.2, 13.4,
+14.3). **Dat is zelf de publiceerbare bevinding**, en het is niet wat er
+uiteindelijk moest veranderen.
+
+Wat er wél moest veranderen was de zin die het cluster als kernclaim droeg:
+
+> En España no vendes tu excedente a la red: lo compensas hasta un tope.
+
+De eerste helft is onjuist. Art. 13.4 zegt woordelijk dat de producent in de
+modaliteit *no acogida a compensación* "percibirá por la energía horaria
+excedentaria vertida las contraprestaciones económicas correspondientes", en
+art. 4.2.b voegt eraan toe dat je daar **vrijwillig** voor mag kiezen — het is
+geen restcategorie voor wie niet kwalificeert. Precies de lezer die het cluster
+aanspreekt, degene die te horen krijgt niet te overdimensioneren, had daarmee
+een optie die het cluster wegliet.
+
+Wat wél klopt is het plafond, en dat blijft de kern: binnen de
+compensatiemodaliteit levert een kilowattuur boven je afname niets op.
+
+#### Twee bedragen zonder uitvoerder, geschrapt in plaats van bijgesteld
+
+Het cluster rekende met twee €/kWh-bereiken. Geen van beide is bij een
+uitvoerder na te trekken:
+
+| bereik | wat de bron werkelijk zegt |
+|---|---|
+| compensatie | art. 14.3.i: "valorada al precio horario **acordado entre las partes**"; onder PVPC een uurformule (14.3.ii). **De CNMC publiceert geen tarief** |
+| detailhandelsprijs | de CNMC publiceert dat cijfer niet; de kopij verwijst nu naar het término de energía op de eigen rekening |
+
+Structureel hetzelfde als het Duitse `rund 30 bis 35 Cent` dat bij J5 sneuvelde:
+een kopcijfer met een bron die het niet draagt.
+
+Verder aangescherpt: het plafond geldt tegen de **waarde van de van het net
+afgenomen energie**, over een **factureringsperiode van hooguit een maand** —
+niet per definitie een kalendermaand. Dat doorschuiven niet mag is een
+**afwezigheid** en geen artikel: er staat geen bepaling die het toestaat, en
+art. 14.3 begrenst per periode. Nieuw materiaal is art. 13.6, dat zegt dat
+overschot zonder geldig leveringscontract wordt afgestaan "sin ningún tipo de
+contraprestación económica vinculada a dicha cesión".
+
+**Wat níét gepubliceerd mag worden** staat als eigen rijen in `docs/claims.md`:
+de afstandsgrens voor collectief autoconsumo, elke huidige tekst van art.
+3.g.iii, en beide €/kWh-bereiken. Die 3.g.iii-rij bestaat omdat één raadpleging
+aantoonbaar de versie van vóór 2026 teruggaf.
+
+#### Twee meetvallen, allebei in `claims.md` opgeschreven
+
+**De geconsolideerde BOE-tekst wordt bijgewerkt zonder dat de pagina dat zegt.**
+Lees de gedateerde variant mee (`&p=<jjjjmmdd>&tn=1#a<artikel>`), anders krijg
+je een oudere doorsnede terug die er identiek uitziet.
+
+**Selecteer op lidnummer, niet op onderwerp.** Twee raadplegingen gaven
+verschillende tekst onder de noemer "art. 13.4"; pas een volledige dump van
+art. 13 wees uit welke klopte.
+
+Negatieve controle erbij: **RD 640/2026** (29 juli 2026) regelt
+investeringsplannen voor transport en distributie en wijzigt RD 244/2019
+uitdrukkelijk niet.
+
+#### De poort leidt zijn whitelist af in plaats van hem in te typen
+
+`lib/autoconsumo.test.ts` (12 tests) parseert de autoconsumo-sectie uit
+`docs/claims.md` en bouwt de toegestane artikelen op als **de artikelen uit de
+✅-rijen minus die uit de ❌-rijen**. Die aftrek is dragend en geen sierlijkheid:
+`3.g.iii` staat in beide — een ✅-rij noemt het als het lid dat RDL 7/2026
+df 14.1 raakt, en twee ❌-rijen verbieden het te citeren.
+
+Verder: elk gepubliceerd artikelnummer moet in die verzameling zitten, elk
+kW-getal moet uit `claims.md` komen, en de zelfbeperkingen (geen euroteken,
+geen komma-decimaal, geen afstand, niet de geschrapte kernclaim) gelden
+**cluster-breed** — over elk ES-artikel met tag Energy, niet alleen over de twee
+gewijzigde stukken. Dat is strenger en vangt drift naar het derde stuk.
+
+Drie parsers gooien als ze niets vinden, zodat een lege uitkomst niet als
+schone meting leest.
+
+#### M1 kwam groen terug waar rood voorspeld was, en dat was geen zwakke poort
+
+De mutatie veranderde `art. 13.4` in `art. 13.9` in één ✅-rij, met de bedoeling
+13.4 uit de toegestane verzameling te laten vallen. Groen. Uitgezocht in plaats
+van geaccepteerd: het artikelnummer per rij geteld gaf **3× `13.4`** in die
+sectie, want de rij *"Raakt die wijziging de claims van dit cluster?"* noemt het
+óók. De mutatie landde en mat iets anders dan bedoeld.
+
+Overgedaan met `art. 13.6 — geldt`, dat precies 1× voorkomt en door artikel 2
+wordt geciteerd: rood, op de assertie dat elk geciteerd artikel geverifieerd is.
+Netto **15 mutaties, 15 keer de voorspelde kleur.**
+
+**Een mutatie die landt maar het verkeerde meet, leest exact hetzelfde als een
+poort die niet afgaat.** Zelfde klasse als de eerdere "anker komt 2× voor".
+
+#### Het harnas telt ankers nu met een verwacht aantal
+
+De regel `{ type: "h2", text: "Lo que no afirmo aquí" },` staat identiek in alle
+drie de artikelen. Het J5-harnas eiste precies 1× en had die mutatie luid
+overgeslagen. Elke mutatie draagt nu een `n` (standaard 1); het harnas vervangt
+álle voorkomens, maar alleen als de telling exact klopt. Strikt sterker dan de
+oude regel, en de kop-mutatie raakt daarmee alle drie de artikelen tegelijk.
+
+#### Gemeten
+
+Op productie ná de merge, met de uitgeleverde deployment eerst bevestigd
+(`292cb0e`, Production, 20:14:38Z — gelijk aan `main`).
+
+De sonde meet op de **gestripte** tekst en niet op ruwe HTML. Reden: de twee
+slugs dragen bewust ASCII (`bateria`, `compensacion`, precedent #237) en die
+staan in `href`, canonical en hreflang. Een ASCII-controle op ruwe HTML slaat
+daar vals op aan.
+
+```
+MOET AANWEZIG    10 van de 10   (13.4 3x, 14.3 3x, "Lo que no afirmo aqui" 3x)
+MAG NIET         12 van de 12   (geschrapte kernclaim, 4 komma-decimalen,
+                                 afstand, 4 ASCII-vormen)
+CONTROLES         5 van de 5    (accent gevonden, verzonnen string niet,
+                                 scripts gestript, 404 op verzonnen slug,
+                                 200 op een echte)
+AFWIJKINGEN       0
+```
+
+```
+tsc --noEmit             exit 0
+vitest run               1460 tests in 73 bestanden (was 1448/72 na J5)
+i18n:check               741 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+lib/content-kalender.test.ts   10 passed
+```
+
+De +12 is de nieuwe poort. Vier bestanden, 345 toevoegingen tegen 16
+verwijderingen; squash-boom byte-identiek aan die van de tak
+(`e6fd6696e35c5589abe4ca0ffa49665d92f171e9`).
+
+#### Wat dit niet doet
+
+J6 blijft op `klaar`. Hij zit in de terugvalpool J2/J5/J6/D1 en
+`lib/content-kalender.test.ts` weigert die leeg te laten trekken; een refresh
+noteert zijn ronde in de **broncel** en verhuist niet naar `wachtrij`.
+
+De poort oordeelt niet over Spaans, en niet over de vraag of de BOE de
+geconsolideerde tekst inmiddels opnieuw heeft bijgewerkt. Blijft `claims.md`
+staan terwijl de wet verschuift, dan is hij groen en toch verouderd — daarvoor
+staat de raadpleegdatum als eigen rij in de tabel.
+
+Geen operator-taak opgelost. De Supabase-402 staat er nog, dus het
+contactformulier achter deze artikelen schrijft niets weg; de zes
+Plausible-doelen, `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`,
+`CAL_WEBHOOK_SECRET`, `SENTRY_DSN`, de vier LinkedIn-beslissingen, de
+onverklaarde Redeploy-knop en de vijf openstaande PR's in
+`bongartzdiaz/diaz-editor` staan onveranderd open.
+
+Van de kalender staan **J8, J9 en J10** nog open; J10 is geblokkeerd tot de 27
+intakevragen uit `docs/datastuk.md` beantwoord zijn.
