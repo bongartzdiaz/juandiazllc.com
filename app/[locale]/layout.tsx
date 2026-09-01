@@ -21,6 +21,7 @@ import {
   ORG_SAME_AS,
   ogImages,
   twitterImages,
+  CONTACT_EMAIL,
 } from "@/lib/seo/branding";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
@@ -120,7 +121,7 @@ export default async function MainLayout({
               ],
               contactPoint: {
                 "@type": "ContactPoint",
-                email: "juan@juandiazllc.com",
+                email: CONTACT_EMAIL,
                 contactType: "Sales",
                 availableLanguage: ["English", "Dutch", "German", "Spanish"],
               },

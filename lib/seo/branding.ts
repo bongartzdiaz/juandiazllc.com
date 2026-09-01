@@ -213,6 +213,24 @@ export const AFFILIATIE_NAAM = "Lucen AI";
 export const AFFILIATIE_URL = "https://lucenai.eu";
 
 /** Naam en knoop-identiteit van de rechtspersoon. */
+/** Het adres dat de bezoeker te zien krijgt en aanklikt.
+ *
+ * Een bron, want dit stond op 2026-09-01 op drieendertig plekken. Zestien
+ * daarvan in `dict.ts`, de rest verspreid over JSON-LD, `/llms.txt`, het
+ * commandopalet, twee formulieren en de foutgrens. Losse literals lopen uiteen
+ * zonder dat iets dat ziet; `lib/contactadres.test.ts` houdt ze voortaan gelijk.
+ *
+ * Twee bestanden importeren dit bewust NIET. `lib/i18n/dict.ts` niet, omdat
+ * branding.ts zijn `Locale`-type daar vandaan haalt en een waarde-import terug
+ * een echte cyclus zou zijn. En `app/global-error.tsx` niet, omdat de kop van
+ * dat bestand minimale afhankelijkheden eist: het is de grens die rendert als
+ * de rest stuk is. Die twee dragen de literal en worden door de poort
+ * vastgepind aan deze constante. */
+export const CONTACT_EMAIL = "info@juandiazllc.com";
+
+/** `mailto:`-vorm, zodat een href nergens met de hand wordt samengesteld. */
+export const CONTACT_MAILTO = `mailto:${CONTACT_EMAIL}`;
+
 export const ORG_NAME = "Juan Diaz, LLC";
 export const ORG_ID = `${SITE}#organization`;
 

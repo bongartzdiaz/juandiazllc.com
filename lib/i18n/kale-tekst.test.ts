@@ -96,7 +96,7 @@ const IDENTITEIT = new Set([
   "Juan Diaz, LLC · Ventures",
   "juandiazllc.com",
   "juandiazllc.com ·",
-  "juan@juandiazllc.com",
+  "info@juandiazllc.com",
   "juan",
   "Juan",
   "Juan Stefan Diaz",

@@ -90,7 +90,7 @@ Ik draag drie trajecten tegelijk. Op de uitkomst geef ik geen garantie. Op de le
 
 Ik schrijf wekelijks over verplichtingen die volgend jaar hard worden: het einde van de saldering, ETS2, energielabel 2030, WPM. juandiazllc.com/nl/insights
 
-juan@juandiazllc.com
+info@juandiazllc.com
 ```
 
 Elk cijfer hierboven komt woordelijk uit `docs/claims.md` en uit de gepubliceerde

@@ -404,7 +404,7 @@ const en: Dict = {
 
   "priv.p.newsletter": "Signing up stores your email address and which page you signed up from. Nothing else — no name, no company, and no record of what you open or click. Want off the list? Mail me and the row is deleted the same working day.",
   "priv.h.rights": "Your rights",
-  "priv.p.rights": "Under the GDPR, you can ask us for a copy of everything we hold on you, ask us to correct it, or ask us to delete it. Mail <a href=\"mailto:juan@juandiazllc.com\">juan@juandiazllc.com</a> and you will get a response within three working days.",
+  "priv.p.rights": "Under the GDPR, you can ask us for a copy of everything we hold on you, ask us to correct it, or ask us to delete it. Mail <a href=\"mailto:info@juandiazllc.com\">info@juandiazllc.com</a> and you will get a response within three working days.",
   "priv.h.changes": "Changes to this page",
   "priv.p.changes": "If we ever start doing something we did not list above, this page changes before that happens. The last update date is visible in the footer.",
 
@@ -450,7 +450,7 @@ const en: Dict = {
   "impressum.h.represented": "Represented by",
   "impressum.p.represented": "Juan Stefan Bongartz Diaz, founder and sole member.",
   "impressum.h.contact": "Contact",
-  "impressum.p.contact": "Email: <a href=\"mailto:juan@juandiazllc.com\">juan@juandiazllc.com</a>. Written correspondence via email preferred — responses within three working days.",
+  "impressum.p.contact": "Email: <a href=\"mailto:info@juandiazllc.com\">info@juandiazllc.com</a>. Written correspondence via email preferred — responses within three working days.",
   "impressum.h.responsible": "Responsible for content",
   "impressum.p.responsible": "Juan Stefan Bongartz Diaz (V.i.S.d.P.) — address available on written request for legitimate legal claims.",
   "impressum.h.dispute": "Online dispute resolution",
@@ -1230,7 +1230,7 @@ const nl: Dict = {
 
   "priv.p.newsletter": "Bij aanmelden slaan we je e-mailadres op en de pagina waarvandaan je je aanmeldde. Verder niets — geen naam, geen bedrijf, en geen registratie van wat je opent of aanklikt. Wil je eraf? Mail me en de regel wordt dezelfde werkdag verwijderd.",
   "priv.h.rights": "Jouw rechten",
-  "priv.p.rights": "Onder de AVG kun je een kopie opvragen van alles wat we van je bewaren, ons vragen het te corrigeren of ons vragen het te verwijderen. Mail <a href=\"mailto:juan@juandiazllc.com\">juan@juandiazllc.com</a> en je krijgt binnen drie werkdagen antwoord.",
+  "priv.p.rights": "Onder de AVG kun je een kopie opvragen van alles wat we van je bewaren, ons vragen het te corrigeren of ons vragen het te verwijderen. Mail <a href=\"mailto:info@juandiazllc.com\">info@juandiazllc.com</a> en je krijgt binnen drie werkdagen antwoord.",
   "priv.h.changes": "Wijzigingen aan deze pagina",
   "priv.p.changes": "Gaan we ooit iets doen dat hierboven niet staat, dan verandert deze pagina eerst. De laatste wijzigingsdatum staat in de footer.",
 
@@ -1276,7 +1276,7 @@ const nl: Dict = {
   "impressum.h.represented": "Vertegenwoordigd door",
   "impressum.p.represented": "Juan Stefan Bongartz Diaz, oprichter en enig vennoot.",
   "impressum.h.contact": "Contact",
-  "impressum.p.contact": "E-mail: <a href=\"mailto:juan@juandiazllc.com\">juan@juandiazllc.com</a>. Schriftelijke correspondentie bij voorkeur per e-mail — reactie binnen drie werkdagen.",
+  "impressum.p.contact": "E-mail: <a href=\"mailto:info@juandiazllc.com\">info@juandiazllc.com</a>. Schriftelijke correspondentie bij voorkeur per e-mail — reactie binnen drie werkdagen.",
   "impressum.h.responsible": "Verantwoordelijk voor de inhoud",
   "impressum.p.responsible": "Juan Stefan Bongartz Diaz (V.i.S.d.P.) — postadres op schriftelijk verzoek bij rechtmatige juridische claims.",
   "impressum.h.dispute": "Online geschillenbeslechting",
@@ -2024,7 +2024,7 @@ const de: Dict = {
 
   "priv.p.newsletter": "Bei der Anmeldung speichern wir Ihre E-Mail-Adresse und die Seite, von der aus Sie sich angemeldet haben. Sonst nichts — kein Name, kein Unternehmen, und keine Erfassung dessen, was Sie öffnen oder anklicken. Sie möchten wieder herunter? Schreiben Sie mir, und die Zeile wird noch am selben Werktag gelöscht.",
   "priv.h.rights": "Ihre Rechte",
-  "priv.p.rights": "Nach der DSGVO können Sie eine Kopie aller Daten anfordern, die wir über Sie speichern, deren Korrektur verlangen oder deren Löschung fordern. Schreiben Sie an <a href=\"mailto:juan@juandiazllc.com\">juan@juandiazllc.com</a> und Sie erhalten innerhalb von drei Werktagen eine Antwort.",
+  "priv.p.rights": "Nach der DSGVO können Sie eine Kopie aller Daten anfordern, die wir über Sie speichern, deren Korrektur verlangen oder deren Löschung fordern. Schreiben Sie an <a href=\"mailto:info@juandiazllc.com\">info@juandiazllc.com</a> und Sie erhalten innerhalb von drei Werktagen eine Antwort.",
   "priv.h.changes": "Änderungen an dieser Seite",
   "priv.p.changes": "Sollten wir jemals etwas tun, das oben nicht aufgeführt ist, ändert sich diese Seite vorher. Das Datum der letzten Änderung ist im Footer sichtbar.",
 
@@ -2070,7 +2070,7 @@ const de: Dict = {
   "impressum.h.represented": "Vertreten durch",
   "impressum.p.represented": "Juan Stefan Bongartz Diaz, Gründer und alleiniger Gesellschafter.",
   "impressum.h.contact": "Kontakt",
-  "impressum.p.contact": "E-Mail: <a href=\"mailto:juan@juandiazllc.com\">juan@juandiazllc.com</a>. Schriftliche Korrespondenz bevorzugt per E-Mail — Antwort innerhalb von drei Werktagen.",
+  "impressum.p.contact": "E-Mail: <a href=\"mailto:info@juandiazllc.com\">info@juandiazllc.com</a>. Schriftliche Korrespondenz bevorzugt per E-Mail — Antwort innerhalb von drei Werktagen.",
   "impressum.h.responsible": "Verantwortlich für den Inhalt",
   "impressum.p.responsible": "Juan Stefan Bongartz Diaz (V.i.S.d.P.) — ladungsfähige Anschrift auf schriftliche Anfrage bei berechtigtem rechtlichen Interesse.",
   "impressum.h.dispute": "Online-Streitbeilegung",
@@ -2818,7 +2818,7 @@ const es: Dict = {
 
   "priv.p.newsletter": "Al suscribirte guardamos tu dirección de email y la página desde la que te suscribiste. Nada más — ni nombre, ni empresa, ni registro de lo que abres o pulsas. ¿Quieres salir de la lista? Escríbeme y la fila se elimina el mismo día laborable.",
   "priv.h.rights": "Tus derechos",
-  "priv.p.rights": "Bajo el RGPD, puedes pedirnos una copia de todo lo que guardamos sobre ti, pedirnos que lo corrijamos o pedirnos que lo borremos. Escribe a <a href=\"mailto:juan@juandiazllc.com\">juan@juandiazllc.com</a> y recibirás respuesta en un plazo de tres días laborables.",
+  "priv.p.rights": "Bajo el RGPD, puedes pedirnos una copia de todo lo que guardamos sobre ti, pedirnos que lo corrijamos o pedirnos que lo borremos. Escribe a <a href=\"mailto:info@juandiazllc.com\">info@juandiazllc.com</a> y recibirás respuesta en un plazo de tres días laborables.",
   "priv.h.changes": "Cambios en esta página",
   "priv.p.changes": "Si alguna vez empezamos a hacer algo que no está enumerado arriba, esta página cambia antes. La fecha de la última actualización se ve en el pie.",
 
@@ -2864,7 +2864,7 @@ const es: Dict = {
   "impressum.h.represented": "Representada por",
   "impressum.p.represented": "Juan Stefan Bongartz Diaz, fundador y único socio.",
   "impressum.h.contact": "Contacto",
-  "impressum.p.contact": "Email: <a href=\"mailto:juan@juandiazllc.com\">juan@juandiazllc.com</a>. Correspondencia escrita preferiblemente por email — respuesta en un plazo de tres días laborables.",
+  "impressum.p.contact": "Email: <a href=\"mailto:info@juandiazllc.com\">info@juandiazllc.com</a>. Correspondencia escrita preferiblemente por email — respuesta en un plazo de tres días laborables.",
   "impressum.h.responsible": "Responsable del contenido",
   "impressum.p.responsible": "Juan Stefan Bongartz Diaz (V.i.S.d.P.) — domicilio disponible a solicitud escrita por motivos jurídicos legítimos.",
   "impressum.h.dispute": "Resolución de litigios en línea",

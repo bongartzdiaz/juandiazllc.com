@@ -3,6 +3,7 @@
 import { useActionState, useState, useEffect } from "react";
 import { submitLead, type ContactState } from "@/app/actions/contact";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/lib/seo/branding";
 
 // 3-step progressive intake.
 // 1) Sector (visual choice — micro-commitment, no typing)
@@ -240,7 +241,7 @@ export function ContactForm() {
       </form>
 
       <div className="auth-alt">
-        {t("contact.alt")} <a href="mailto:juan@juandiazllc.com">juan@juandiazllc.com</a>
+        {t("contact.alt")} <a href={CONTACT_MAILTO}>{CONTACT_EMAIL}</a>
       </div>
     </div>
   );

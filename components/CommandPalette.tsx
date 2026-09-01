@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { LOCALES, LOCALE_NAMES, type Locale } from "@/lib/i18n/dict";
+import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/lib/seo/branding";
 
 type Cmd = {
   id: string;
@@ -38,7 +39,7 @@ export function CommandPalette() {
       { id: "v-sr", section: "Ventures", label: "Salderingsregeling 2027", hint: "salderingsregeling2027.nl", run: ext("https://salderingsregeling2027.nl") },
       { id: "social-li", section: "Social", label: "LinkedIn — /juanstefan", run: ext("https://linkedin.com/in/juanstefan") },
       { id: "social-ig", section: "Social", label: "Instagram — @diazelcazador", run: ext("https://instagram.com/diazelcazador") },
-      { id: "mail", section: "Social", label: "Email Juan", hint: "juan@juandiazllc.com", run: () => { setOpen(false); window.location.href = "mailto:juan@juandiazllc.com"; } },
+      { id: "mail", section: "Social", label: "Email Juan", hint: CONTACT_EMAIL, run: () => { setOpen(false); window.location.href = CONTACT_MAILTO; } },
       ...LOCALES.map((l) => ({
         id: `lang-${l}`,
         section: "Language",

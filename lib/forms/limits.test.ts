@@ -42,7 +42,7 @@ describe("capField — begrenzing", () => {
 
 describe("isPlausibleEmail — formaat én lengte", () => {
   it("aanvaardt een gewoon adres", () => {
-    expect(isPlausibleEmail("juan@juandiazllc.com")).toBe(true);
+    expect(isPlausibleEmail("info@juandiazllc.com")).toBe(true);
   });
 
   it("wijst af boven de RFC-5321-limiet, ook als het formaat klopt", () => {
