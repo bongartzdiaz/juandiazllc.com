@@ -846,7 +846,7 @@ export const POSTS: Insight[] = [
     markets: ["es"],
     title: "Autoconsumo con batería en 2026: la rentabilidad real, no la del folleto",
     summary:
-      "\"Diez años\" pone cada presupuesto, pero eso no vale para casi nadie. Qué determina de verdad la rentabilidad de una batería en España — con la compensación de excedentes topada y barata — y cómo calcularla para tu caso en vez de creértela.",
+      "\"Diez años\" pone cada presupuesto, pero eso no vale para casi nadie. Qué determina de verdad la rentabilidad de una batería en España — con la compensación de excedentes topada — y cómo calcularla para tu caso en vez de creértela.",
     tag: "Energy",
     publishedAt: "2026-07-20",
     readingMinutes: 6,
@@ -856,25 +856,27 @@ export const POSTS: Insight[] = [
         "Diez años pone cada presupuesto y no vale para casi nadie. Qué determina de verdad la rentabilidad de una batería en España, y cómo calcularla.",
     },
     body: [
-      { type: "p", text: "Pide a tres instaladores la rentabilidad de la misma batería y te darán tres números entre siete y catorce años. Ninguno miente: solo calculan con supuestos distintos, y el supuesto que no ves es el que decide el resultado. En España, donde la compensación de excedentes está topada y se paga poco, ese margen de error es enorme." },
+      { type: "p", text: "Pide a tres instaladores la rentabilidad de la misma batería y te darán tres números entre siete y catorce años. Ninguno miente: solo calculan con supuestos distintos, y el supuesto que no ves es el que decide el resultado. En España, donde la compensación de excedentes tiene un techo legal, ese margen de error es enorme." },
       { type: "h2", text: "Por qué no existe una única rentabilidad" },
-      { type: "p", text: "Una batería gana por un único hueco: la diferencia entre lo que pagas por la energía de la red (unos 0,20-0,25 €/kWh) y lo que te compensan por el excedente que viertes (a menudo 0,05-0,10 €/kWh, y encima con un tope mensual). Cada kilovatio hora que la batería pasa de \"excedente mal pagado\" a \"autoconsumo\" vale esa diferencia. Cuánto de ese hueco aprovechas depende por completo de cuándo y cómo consumes, no de la ficha técnica de la batería." },
+      { type: "p", text: "Una batería gana por un único hueco: la diferencia entre lo que pagas por la energía de la red y lo que te compensan por el excedente que viertes, que además tiene techo. Las dos cifras están en tu factura y en tu contrato, no en un folleto: mira el término de energía que pagas y el precio de compensación que te aplica tu comercializadora. Cada kilovatio hora que la batería pasa de \"excedente mal pagado\" a \"autoconsumo\" vale esa diferencia. Cuánto de ese hueco aprovechas depende por completo de cuándo y cómo consumes, no de la ficha técnica de la batería." },
       { type: "ul", items: [
         "Tu cuota de autoconsumo sin batería — si ya consumes mucho de día, hay menos que ganar; si consumes sobre todo de noche, la batería hace más.",
-        "El tope de la compensación — no puede superar el valor de tu consumo del mes, así que el excedente de más no se paga; la batería convierte ese excedente perdido en ahorro.",
+        "El techo de la compensación — el artículo 14.3 del RD 244/2019 dice que el valor del excedente no puede superar el de la energía que consumes de la red en el periodo de facturación, y ese periodo no puede pasar de un mes; lo que sobra no se paga, y la batería convierte ese excedente perdido en ahorro.",
         "La tarifa por horas o el PVPC — con precio horario la batería puede además cargar en horas valle y cubrir las de punta, lo que acorta la cuenta.",
         "Consumos futuros — un aerotermo o un coche eléctrico cambian tanto tu perfil que una rentabilidad de hoy deja de valer en tres años."
       ]},
       { type: "p", text: "Ninguna de estas cuatro variables está en el folleto. Por eso cualquier número de catálogo es una media de hogares que ni se parecen a ti ni existen. La única rentabilidad honesta es la que calculas con tus propios datos." },
       { type: "h2", text: "La cuenta que sí cuadra" },
-      { type: "p", text: "No empieces por el precio de la batería, sino por tu consumo anual y tu momento de consumo. Calcula cuánta de tu energía solar autoconsumes ya y cuánto añade una batería, valorado con la compensación real —topada y baja—, no con un balance neto que en España no existe." },
+      { type: "p", text: "No empieces por el precio de la batería, sino por tu consumo anual y tu momento de consumo. Calcula cuánta de tu energía solar autoconsumes ya y cuánto añade una batería, valorado con la compensación que figura en tu contrato —y con su techo—, no con un balance neto que en España no existe." },
       { type: "ul", items: [
         "Usa tu consumo anual real y tu producción, no una estimación por metro cuadrado de tejado.",
-        "Calcula con la compensación real de tu comercializadora y su tope mensual, no con una cifra de balance neto.",
+        "Calcula con la compensación real de tu comercializadora y su techo por periodo de facturación, no con una cifra de balance neto.",
         "Hazlo dos veces: una con los precios de hoy y otra con un escenario pesimista. Si la batería sale a cuenta en ambos, es una buena decisión."
       ]},
       { type: "quote", text: "Una rentabilidad sacada del folleto es una apuesta con supuestos ajenos. Una que calculas tú es una decisión." },
-      { type: "p", text: "El cliente que sigue contento a los cinco años no es el del precio más bajo, sino aquel que vio de antemano una cuenta que encajaba con su propia casa. Para el instalador no es trabajo extra: es la diferencia entre un comparador de precios y un cliente que firma." }
+      { type: "p", text: "El cliente que sigue contento a los cinco años no es el del precio más bajo, sino aquel que vio de antemano una cuenta que encajaba con su propia casa. Para el instalador no es trabajo extra: es la diferencia entre un comparador de precios y un cliente que firma." },
+      { type: "h2", text: "Lo que no afirmo aquí" },
+      { type: "p", text: "No doy un precio de la electricidad ni un precio de compensación en euros por kilovatio hora. La CNMC no publica una tarifa de compensación, y el propio reglamento remite a otra cosa: en mercado libre el excedente se valora \"al precio horario acordado entre las partes\" (art. 14.3.i), y bajo PVPC sale de una fórmula horaria (art. 14.3.ii). Son cifras de tu contrato y de tu factura, no de un artículo. Lo que sí afirmo es el techo, y está en el artículo 14.3. Y una nota de alcance: toda esta cuenta supone que estás en la modalidad con excedentes acogida a compensación. Existe otra, la no acogida a compensación, en la que el excedente sí se vende (artículo 13.4); si estás en ella, los números de arriba no son los tuyos. Consultado el 1 de septiembre de 2026." },
     ]
   },
   {
@@ -894,21 +896,31 @@ export const POSTS: Insight[] = [
     body: [
       { type: "p", text: "El error más caro del autoconsumo en España es creer que el excedente que viertes a la red se descuenta como en un contador que va hacia atrás. No es balance neto. Es compensación de excedentes, y las reglas son otras — con un tope que decide cuánta placa te conviene poner." },
       { type: "h2", text: "Compensación no es balance neto" },
-      { type: "p", text: "Bajo el RD 244/2019, en la modalidad con excedentes acogida a compensación, la energía que viertes se valora y se resta del término de energía de tu factura del mes. Pero esa compensación nunca puede superar ese término: no descuenta el término de potencia, ni los impuestos, ni se guarda para el mes siguiente. El excedente que supera tu consumo del mes, sencillamente, se regala." },
+      { type: "p", text: "Bajo el RD 244/2019, en la modalidad con excedentes acogida a compensación, la energía que viertes se valora y se resta del término de energía de tu factura. El artículo 14.3 pone el techo, y conviene leerlo tal cual: el valor del excedente no puede superar el valor de la energía que has consumido de la red en el periodo de facturación, y ese periodo no puede ser mayor de un mes. No descuenta el término de potencia ni los impuestos. Y como el techo se aplica periodo a periodo y el reglamento no recoge ningún arrastre, el excedente que pasa de tu consumo no viaja al periodo siguiente: se regala." },
       { type: "ul", items: [
-        "No sobredimensiones para \"vender\" excedente — a partir de cierto punto produces energía que no se te paga.",
-        "El óptimo maximiza el autoconsumo, no la producción: cada kWh que consumes vale 0,20-0,25 €, cada kWh vertido apenas 0,05-0,10 € y con tope.",
+        "Dentro de esta modalidad, sobredimensionar no paga — pasado el techo produces energía que no se te descuenta. Vender el excedente sí es posible, pero es otra modalidad; la explico más abajo.",
+        "El óptimo maximiza el autoconsumo, no la producción: cada kWh que consumes vale lo que pagas en tu término de energía, y cada kWh vertido vale lo que te compensan, con techo. Saca las dos cifras de tu factura y de tu contrato antes de dimensionar.",
         "Una batería —o una batería virtual— es lo que convierte ese excedente perdido en valor real."
       ]},
       { type: "p", text: "La batería virtual que ofrecen algunas comercializadoras no es balance neto tampoco: es un producto comercial que guarda tu excedente como saldo en euros para usarlo en meses siguientes o en otros conceptos de la factura. Puede tener sentido, pero tiene letra pequeña — condiciones, permanencias y precios de compensación que conviene leer antes de firmar." },
+      { type: "h2", text: "La otra modalidad: vender en vez de compensar" },
+      { type: "p", text: "El RD 244/2019 no tiene una sola modalidad con excedentes, sino dos, y la segunda casi nunca se explica. Junto a la acogida a compensación existe la modalidad con excedentes no acogida a compensación, y el artículo 13.4 dice que ese productor \"percibirá por la energía horaria excedentaria vertida las contraprestaciones económicas correspondientes\". Es decir: se vende. El artículo 4.2.b añade el matiz que más cambia la conversación — se llega a esa modalidad si no cumples algún requisito de la primera, pero también si \"voluntariamente\" decides no acogerte a ella. Es una elección, no un castigo." },
+      { type: "ul", items: [
+        "Para estar en compensación tienen que darse cinco condiciones a la vez (art. 4.2.a): fuente primaria renovable, potencia total de generación asociada no superior a 100 kW, un solo contrato de suministro con la misma comercializadora donde los servicios auxiliares lo requieran, un contrato de compensación firmado según el artículo 14, y no estar en un régimen retributivo adicional o específico.",
+        "Se puede cambiar de modalidad: el artículo 4.5 lo permite, con las limitaciones que ese mismo artículo recoge.",
+        "Cuidado con quedarte sin contrato de suministro válido: el artículo 13.6 dice que en ese caso el excedente se cede \"sin ningún tipo de contraprestación económica vinculada a dicha cesión\".",
+      ]},
+      { type: "p", text: "Cuál de las dos te conviene depende de tu consumo, de tu excedente y del precio que te ofrezcan por él. Lo que no es defendible es dimensionar como si la segunda no existiera." },
       { type: "h2", text: "Qué mirar antes de dimensionar" },
       { type: "ul", items: [
         "Tu curva de consumo por horas, no solo el total anual: define cuánto excedente vas a generar realmente.",
         "El precio y el tope de compensación de tu comercializadora — es lo que decide el valor de cada kWh vertido.",
         "Si te interesa más autoconsumo directo, batería física o batería virtual: son tres formas distintas de tratar el mismo excedente, con números distintos."
       ]},
-      { type: "quote", text: "En España no vendes tu excedente a la red: lo compensas hasta un tope. Quien dimensiona sin saberlo, paga placas que trabajan gratis." },
-      { type: "p", text: "Dimensionar bien no es poner el tejado más grande posible, sino el que mejor encaja con tu consumo y tu forma de tratar el excedente. El instalador que lo explica antes de vender gana el cliente que, al entender la factura, deja de comparar solo el precio." }
+      { type: "quote", text: "En España el excedente se compensa hasta un techo, o se vende en otra modalidad. Quien dimensiona sin saber en cuál está, paga placas que trabajan gratis." },
+      { type: "p", text: "Dimensionar bien no es poner el tejado más grande posible, sino el que mejor encaja con tu consumo y tu forma de tratar el excedente. El instalador que lo explica antes de vender gana el cliente que, al entender la factura, deja de comparar solo el precio." },
+      { type: "h2", text: "Lo que no afirmo aquí" },
+      { type: "p", text: "No doy un precio en euros por kilovatio hora, ni para lo que pagas ni para lo que te compensan: la CNMC no publica una tarifa de compensación, y el propio reglamento remite al precio acordado entre las partes o a una fórmula horaria. Tampoco entro en las distancias del autoconsumo colectivo. Lo que sí está en el texto, y es lo que uso aquí, son las dos modalidades del artículo 4.2, la venta del artículo 13.4 y el techo del artículo 14.3. Consultado el 1 de septiembre de 2026, sobre el texto consolidado, cuya última modificación entró en vigor el 22 de marzo de 2026 sin tocar ninguno de esos tres artículos." },
     ]
   },
   {
@@ -937,12 +949,14 @@ export const POSTS: Insight[] = [
       { type: "p", text: "En las tres conversaciones lo más fuerte que puedes hacer no es hablar, sino calcular: enseñarle al cliente sus propios números en vez de un discurso general." },
       { type: "h2", text: "La conversación honesta en tres frases" },
       { type: "ul", items: [
-        "Qué cambia: \"En España el excedente no gira el contador hacia atrás; se compensa hasta un tope, y lo que sobra no se paga.\"",
+        "Qué cambia: \"En España el excedente no gira el contador hacia atrás. En la modalidad con compensación se descuenta de tu factura hasta un techo, y lo que pasa de ahí no se paga. Existe otra modalidad en la que el excedente sí se vende.\"",
         "Qué significa para ti: \"Para tu consumo, eso concretamente es esto\" — con un número de su propia situación, no de un folleto.",
-        "Qué opciones hay: \"Puedes no hacer nada, subir tu autoconsumo o valorar una batería —física o virtual—; calculémoslas antes de decidir.\""
+        "Qué opciones hay: \"Puedes no hacer nada, subir tu autoconsumo, valorar una batería —física o virtual— o mirar si te compensa la otra modalidad; calculémoslo antes de decidir.\"",
       ]},
       { type: "quote", text: "Quien usa la compensación para vender, gana una venta. Quien la usa para informar con honestidad, gana al cliente y a sus vecinos." },
-      { type: "p", text: "Las reglas del autoconsumo son iguales para todos a la vez. La diferencia entre los instaladores que sufren y los que crecen no está en el precio ni en el producto — está en quién tiene la conversación primero y en si es honesta. Empieza esta semana, por los clientes que ya tienes." }
+      { type: "p", text: "Las reglas del autoconsumo son iguales para todos a la vez. La diferencia entre los instaladores que sufren y los que crecen no está en el precio ni en el producto — está en quién tiene la conversación primero y en si es honesta. Empieza esta semana, por los clientes que ya tienes." },
+      { type: "h2", text: "Lo que no afirmo aquí" },
+      { type: "p", text: "No pongo aquí un precio en euros por kilovatio hora, ni para la energía de red ni para la compensación: esas dos cifras salen de la factura y del contrato de cada cliente, no de un artículo. Lo que sí es texto legal, y es lo que conviene decir bien, son las dos modalidades con excedentes del artículo 4.2 del RD 244/2019, la venta del artículo 13.4 y el techo del artículo 14.3. Consultado el 1 de septiembre de 2026." },
     ]
   },
   {
