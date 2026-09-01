@@ -1172,6 +1172,61 @@ Baden-Württemberg geldt de plicht bij nieuwbouw van woningen sinds mei 2022,
 terwijl de bondstrap daarvoor pas in 2030 valt. Een artikel dat alleen de
 bondsstaffel noemt, vertelt een Betreiber daar dus het verkeerde.
 
+### Einspeisevergütung en § 51 EEG — de negatieve-prijzen-regel (gemeten 2026-09-01)
+
+De haak onder het DE-Heimspeicher-cluster. Tot vandaag stond er over dit
+onderwerp **geen enkele rij** in dit bestand, terwijl drie Duitse artikelen
+sinds 20 juli 2026 met een vergoeding en een degressie rekenen. Eén cijfer
+daarin was verouderd, één marktcijfer is bij de uitvoerder niet na te trekken,
+en er ontbrak een wetsartikel dat de hele rekensom van het cluster raakt.
+
+**Bron.** Bundesnetzagentur voor de vergoedingssätze en het degressieritme;
+`gesetze-im-internet.de` voor de wettekst van het EEG (§ 51, § 100) en het
+EnWG (§ 14a, § 41a).
+
+**Let op bij het nameten.** Een samenvatting over de Duitse
+detailhandelsprijs voor huishoudelijke stroom levert cijfers uit
+verschillende jaren door elkaar. De Bundesnetzagentur publiceert zelf **geen**
+kopcijfer voor de eindprijs — haar consumentenpagina verwijst naar
+vergelijkingsportalen en SMARD. Publiceer dus geen Cent-bereik voor de
+eindprijs; laat de lezer zijn eigen Arbeitspreis gebruiken, die op zijn
+rekening staat.
+
+| Claim | Waarde | Status |
+| --- | --- | --- |
+| Teileinspeisung, anlagen tot 10 kW op gebouwen | **7,70 ct/kWh** | ✅ Bundesnetzagentur |
+| Volleinspeisung, zelfde klasse | **12,22 ct/kWh** | ✅ zelfde bron |
+| Geldigheidsduur van die twee sätze | **1. August 2026** tot en met **31. Januar 2027** | ✅ zelfde bron |
+| Degressieritme | **halfjaarlijks sinds 2024**, met een vast percentage per stap | ✅ zelfde bron — de eerstvolgende stap valt dus op **1. Februar 2027** |
+| Hoogte van die volgende stap | **niet vastgesteld** | ❌ noem geen bedrag voor februari 2027 |
+| Solarpaket I, +1,5 ct/kWh | **nog niet in de sätze verwerkt**, wacht op EU-staatssteungoedkeuring, en geldt vanaf 40 kW | ✅ zelfde bron — raakt de huishoudklasse tot 10 kW dus niet |
+| § 51 Abs. 1 EEG | woordelijk: "Für Zeiträume, in denen der Spotmarktpreis negativ ist, verringert sich der anzulegende Wert auf null." | ✅ gesetze-im-internet.de — **de scherpste rij, en de reden dat deze sectie bestaat** |
+| Minimumduur voor die nulstelling | **bestaat niet** — "aufeinanderfolgende Stunden" komt in § 51 niet voor; nul vanaf het eerste uur | ✅ zelfde bron |
+| Uitzondering onder 100 kW | geldt alleen "für Zeiträume vor dem Ablauf des Kalenderjahres, in dem die Anlage mit einem intelligenten Messsystem ausgestattet wird" | ✅ § 51 Abs. 2 — het slimme meetsysteem is dus zelf de trigger |
+| Uitzondering onder 2 kW | tot de Festlegung nach § 85 Abs. 2 Nr. 12 | ✅ zelfde lid |
+| Overgangsrecht | anlagen in bedrijf genomen **1. Januar 2023** tot en met **24. Februar 2025** houden de op 24. Februar 2025 geldende versie | ✅ § 100 Abs. 46 — daarmee is **25. Februar 2025** een echte grens |
+| § 41a EnWG — dynamische tarieven | woordelijk: "Die Verpflichtung nach Satz 1 gilt ab dem 1. Januar 2025 für alle Stromlieferanten." | ✅ gesetze-im-internet.de — de claim in het tarief-artikel houdt stand |
+| § 14a EnWG — steuerbare Verbrauchseinrichtungen | Wärmepumpen, niet-openbaar toegankelijke laadpunten, anlagen voor koude-opwekking of elektriciteitsopslag, Nachtstromspeicherheizungen | ✅ zelfde bron — **de opsomming noemt geen kW-drempel**, dus noem er ook geen |
+| § 100 Abs. 45 — uur- versus kwartierprijzen | **niet volledig nagetrokken** | ❌ geen uitspraak over de prijsresolutie |
+| Verlenging van de 20-jarige Zahlungszeitraum voor nul-uren | **niet vastgesteld** | ❌ beweer noch dat hij wél, noch dat hij níét verlengd wordt |
+| Detailhandelsprijs huishoudens ("rund 30 bis 35 Cent") | **bij de uitvoerder niet na te trekken** | ❌ noem geen Cent-bereik; verwijs naar de eigen Arbeitspreis |
+| Nagetrokken op | **1. September 2026** | ✅ dezelfde raadpleging |
+
+**Wat er niet in kopij mag.** Geen Cent-bereik voor de detailhandelsprijs, geen
+bedrag voor de stap van februari 2027, geen uitspraak over de verlenging van de
+Zahlungszeitraum, geen kW-drempel bij § 14a, en niet de suggestie dat de
+nulstelling pas na een aantal aaneengesloten uren begint.
+
+**Waarom § 51 de rekensom van het cluster verandert.** In een uur met een
+negatieve spotprijs levert een ingevoede kilowattuur nul op. Wie zijn
+opgeslagen kilowattuur dán zelf gebruikt, bespaart niet het verschil tussen
+7,70 cent en zijn Arbeitspreis maar zijn volledige Arbeitspreis. Het weglaten
+van dit artikel maakte de batterijcase in het Heimspeicher-stuk dus **zwakker
+dan hij is** — in een tekst die de lezer juist vraagt eerlijk te rekenen. In
+het tarief-stuk bijt het harder: dat noemt negatieve middagprijzen én het
+slimme meetsysteem, zonder te zeggen dat precies dát meetsysteem de
+nulvergoeding aanzet, met ingang van 1 januari van het jaar daarna.
+
 ## Reactietijd op leads — de 78% is folklore (gemeten 2026-08-23)
 
 Aanleiding: een voorstel om in kopij en outreach te schrijven dat **"78% van
