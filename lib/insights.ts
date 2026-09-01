@@ -1621,10 +1621,70 @@ export const POSTS: Insight[] = [
       { type: "h2", text: "De brandstofclausule is de plek waar dit landt" },
       { type: "p", text: "In veel vervoerscontracten zit een clausule die de brandstofprijs doorberekent aan de opdrachtgever. Die clausules verwijzen bijna altijd naar een marktindex. De vraag die je deze maand kunt stellen aan je eigen contractenmap is of die index de CO2-component meeneemt of niet." },
       { type: "p", text: "Ik weet het antwoord niet, en dat hangt per index en per contract af. Maar het is wel de vraag waarvan het antwoord bepaalt of deze hele kwestie je probleem is of dat van je klant. Hem nu stellen kost een middag. Hem in 2027 stellen kost een onderhandeling." },
+      { type: "cta", text: "Lees waarom de eerste afrekening pas in 2029 valt", href: "/insights/ets2-de-afrekening-valt-in-2029-je-eigen-deadline-eerder" },
 
       { type: "h2", text: "Wat ik hier niet beweer" },
       { type: "p", text: "Geen bedrag, geen datum waarop je het merkt, en geen uitspraak over welke leverancier wat gaat doen. De richting staat vast: het beleid is bedoeld om fossiele brandstof duurder te maken. Het moment waarop je het voelt staat niet vast, en de weg ernaartoe loopt via een commerciële beslissing van een ander." },
       { type: "p", text: "Wat daaruit volgt is bescheiden en concreet. Dit is voldoende reden om nu je basislijn op orde te brengen, en te weinig reden om nu een investering of een tariefaanpassing op te baseren. Het verschil tussen die twee is precies het verschil tussen voorbereid zijn en gokken." },
+    ],
+  },
+  {
+    slug: "ets2-de-afrekening-valt-in-2029-je-eigen-deadline-eerder",
+    markets: ["nl"],
+    title: "De eerste ETS2-afrekening valt in 2029, je eigen deadline dit jaar op 30 juni",
+    summary:
+      "Vanaf 2027 vallen brandstofleveranciers onder ETS2, de eerste veiling is gepland in januari 2027 en er wordt pas in 2029 afgerekend, over de emissies van 2028. Onder ETS2 heb je zelf geen verplichting. De verplichting die je dit jaar wel hebt, heeft een datum die niet schuift.",
+    tag: "Logistics",
+    publishedAt: "2026-09-01",
+    readingMinutes: 6,
+    seo: {
+      metaTitle: "ETS2: afrekenen in 2029, rapporteren in juni",
+      metaDescription:
+        "Brandstofleveranciers vallen vanaf 2027 onder ETS2 en leveren pas in 2029 rechten in, over 2028. De verplichting die dit jaar van jou is, heeft wel een datum.",
+    },
+    body: [
+      { type: "p", text: "In elk gesprek over ETS2 valt hetzelfde jaartal: 2027. Het staat in de nieuwsbrieven, in de aanbiedingen van adviseurs en in de eerste vraag die een opdrachtgever erover stelt. Dat jaartal klopt. Wat eromheen wordt aangenomen meestal niet." },
+      { type: "p", text: "Twee dingen die bij de Nederlandse Emissieautoriteit gewoon na te lezen zijn, staan haaks op de haast. De verplichting ligt niet bij jou. En het moment waarop er daadwerkelijk wordt afgerekend ligt bijna twee jaar na de datum die iedereen noemt." },
+
+      { type: "h2", text: "Wat vaststaat, en wat een voornemen is" },
+      { type: "p", text: "Vanaf 2027 vallen brandstofleveranciers onder ETS2 en voeren zij jaarlijks hun emissiecijfer op in het register. Dat is het deel dat vastligt." },
+      { type: "p", text: "De eerste veiling van rechten is gepland in januari 2027. Dat woord staat er bij de uitvoerder zelf bij, en het is geen slag om de arm." },
+      { type: "quote", text: "de eerste veiling is vooralsnog gepland in januari 2027", cite: "Nederlandse Emissieautoriteit, EU ETS-2 emissierechten" },
+      { type: "p", text: "Het moment van afrekenen ligt verder weg dan de veiling, en dat wordt vrijwel nooit meegenomen." },
+      { type: "quote", text: "De eerste inlevering voor EU ETS-2 vindt plaats in 2029, voor de emissies van 2028.", cite: "Nederlandse Emissieautoriteit, EU ETS-2 emissierechten" },
+      { type: "p", text: "Tussen de geplande start van de veilingen en de eerste keer dat een leverancier rechten inlevert zit dus bijna twee jaar. Wie zijn planning op dat ene jaartal bouwt, plant op het moment waarop iemand anders iets inkoopt, en niet op het moment waarop er wordt afgerekend." },
+
+      { type: "h2", text: "Onder ETS2 heb je zelf geen verplichting" },
+      { type: "p", text: "Geen vergunning, geen registeraccount, geen rapportage. De verplichting ligt bij de partij die je de brandstof levert. Die koopt de rechten en verwerkt de kosten in zijn tarief." },
+      { type: "p", text: "Wanneer dat gebeurt en hoeveel het is, is een commerciële beslissing en geen wettelijke. Je factuur splitst het niet uit. De richting staat vast en het bedrag niet: er is geen veilingprijs, dus elke tabel met eurocijfers is een aanname met een prognose-etiket erop." },
+      { type: "cta", text: "Lees wat dat doet met je kostprijs per kilometer", href: "/insights/kostprijs-per-kilometer-ets2-de-component-die-u-niet-ziet" },
+
+      { type: "h2", text: "De verplichting die dit jaar wel van jou is" },
+      { type: "p", text: "Er loopt een tweede regel die vaak in dezelfde adem wordt genoemd en een heel andere status heeft. Werkgevers met honderd of meer werknemers leveren sinds 1 juli 2024 jaarlijks gegevens aan bij de RVO over het zakelijke verkeer en het woon-werkverkeer van hun personeel." },
+      { type: "p", text: "Die verplichting geldt vandaag, en hij ligt wel bij jou. Er hoort een datum bij die niet schuift: je rapporteert uiterlijk 30 juni over het voorgaande kalenderjaar. In 2026 kun je aanleveren over 2025 en over 2024." },
+      { type: "p", text: "Of je eronder valt wordt bovendien elk jaar opnieuw getoetst. De RVO kijkt vanaf 2025 op 1 januari naar het aantal werknemers dat je in dienst hebt. Een bedrijf dat in de loop van een jaar over de grens groeit, zit er het jaar daarop in." },
+      { type: "p", text: "En het toezicht kijkt verder dan of je iets hebt ingestuurd." },
+      { type: "quote", text: "De omgevingsdienst controleert of er is gerapporteerd en of de gerapporteerde gegevens geloofwaardig zijn.", cite: "RVO, veelgestelde vragen rapportage WPM" },
+      { type: "cta", text: "Lees wat er verandert zodra er twee eigen jaren naast elkaar liggen", href: "/insights/wpm-jaar-twee-je-cijfer-wordt-vergeleken-met-je-eigen-cijfer" },
+
+      { type: "h2", text: "De twee vragen hetzelfde van je" },
+      { type: "p", text: "Op papier hebben ze weinig met elkaar te maken. De ene beprijst CO2 in brandstof en ligt bij je leverancier, de andere telt reisbewegingen van je personeel en ligt bij jou. Praktisch komen ze op dezelfde plek uit: een cijfer waarvan je de herkomst kunt uitleggen." },
+      { type: "p", text: "Bij de rapportageplicht staat dat met zoveel woorden in de regel. De toets is of je gegevens geloofwaardig zijn, en aannemelijkheid heeft een referentie nodig. Die referentie ben jij zelf, vorig jaar." },
+      { type: "p", text: "Bij ETS2 vraagt niemand je iets, en daar zit de asymmetrie. Jou kan gevraagd worden je eigen cijfer te verklaren. Je leverancier kun je niet vragen het zijne uit te splitsen, want die verplichting bestaat niet. Zie je straks je tarief oplopen, dan is je eigen basislijn het enige waarmee je die stijging kunt toerekenen." },
+
+      { type: "h2", text: "Wat je dit jaar kunt vastleggen" },
+      { type: "p", text: "Vier dingen, en ze kosten allemaal minder tijd nu dan straks." },
+      { type: "ul", items: [
+        "of je op 1 januari boven de drempel zat, want die toets loopt elk jaar opnieuw",
+        "welk jaar je aanlevert, en per cijfer in dat verslag één regel over waar het vandaan komt",
+        "hoe je brandstofkosten vandaag zijn opgebouwd per voertuig en per rit, zodat een stijging straks toewijsbaar is",
+        "welke van je contracten een brandstofclausule dragen, en naar welke index die verwijst",
+      ] },
+      { type: "p", text: "De eerste twee horen bij een verplichting met een datum. De laatste twee niet, en die bepalen wel of je over anderhalf jaar een gesprek voert met cijfers of zonder." },
+
+      { type: "h2", text: "Wat ik hier niet beweer" },
+      { type: "p", text: "Geen bedrag. Er is geen veilingprijs en geen regel die voorschrijft hoe een leverancier zijn kosten doorberekent, dus iedere tabel met eurocijfers per liter of per kubieke meter extrapoleert een aanname. Geen sanctie bij geen van beide verplichtingen: niet nagetrokken, dus niet opgeschreven. En niets over wat de eerste landelijke rapportageronde heeft opgeleverd, want dat cijfer heb ik niet." },
+      { type: "p", text: "Ook niet dat de veiling doorgaat op de datum die er nu staat. Gepland is gepland. Wat wel vaststaat is de volgorde: eerst vallen leveranciers eronder, dan wordt er geveild, en pas in 2029 wordt er over 2028 afgerekend. Op die volgorde kun je plannen. Op de maand niet." },
     ],
   },
   {
