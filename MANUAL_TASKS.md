@@ -312,10 +312,11 @@ Plausible bevat dus een spatie.
       afgevuurd en de andere vier via een CSS-klasse — wie op de klassenaam
       grept vindt er vier en denkt klaar te zijn.
 
-**Vergeet de custom properties niet.** Vier van de vijf sturen naast de naam ook
+**Vergeet de custom properties niet.** Vijf van de zes sturen naast de naam ook
 eigenschappen mee, en die zijn in Plausible pas zichtbaar als je ze apart
-aanmeldt (Site Settings → **Custom properties**). Het blijven drie namen:
-`Sector CTA` en `Contact Submitted` gebruiken allebei `sector`.
+aanmeldt (Site Settings → **Custom properties**). Het blijven vier namen:
+`Sector CTA` en `Contact Submitted` gebruiken allebei `sector`. Alleen
+`Boeking 15min` draagt niets boven de `url` die overal meegaat.
 
 | doel | eigenschappen |
 |---|---|

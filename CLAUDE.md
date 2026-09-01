@@ -9043,3 +9043,143 @@ het contactformulier schrijft niets weg; de zes Plausible-doelen,
 `SENTRY_DSN`, de vier LinkedIn-beslissingen en de vijf openstaande PR's in
 `bongartzdiaz/diaz-editor` staan onveranderd open. En de Redeploy-knop zelf
 blijft onverklaard.
+
+### 2026-09-01 (vervolg) — een zesde doel dat een afronding meet, en een telwoord dat op zes plekken stond
+
+PR #310, gemerged als `79fe569`. Dit blok liep achter op de rest: het is
+geschreven ná #311 en #313, en staat hier omdat werk dat gebeurd is en nergens
+staat, een volgende sessie opnieuw laat "bouwen".
+
+#### De vijf bestaande doelen tellen kliks, dit is het eerste dat een afronding telt
+
+`Boeking 15min`, `Pricing CTA`, `Sector CTA` en `Tool CTA` vuren op een klik.
+`Contact Submitted` vuurt op een geslaagde inzending. `Scan Voltooid` vuurt zodra
+de bezoeker het uitslagscherm van de lekkage-scan bereikt — zestien vragen
+verder — en draagt de eigenschap `lekken` mee met het aantal gevonden lekken als
+tekst.
+
+Die eigenschap is het punt. Zonder haar is elke afronding er één; met haar is een
+scan die nul lekken vindt te scheiden van een die er vier vindt, en dat tweede is
+precies de bezoeker die iets te bespreken heeft.
+
+#### Er zit geen e-mailveld in, en dat is geen omissie
+
+Een leadmagneet die om een adres vraagt, belooft dat er iets aankomt. Vandaag komt
+er niets aan: Supabase weigert het hele datavlak met 402, dus het formulier
+schrijft geen rij weg, en `RESEND_API_KEY` staat niet gezet, dus ook een werkende
+rij zou geen mail opleveren. Een veld toevoegen zou iedereen die converteert niets
+leveren — en juist het publiek verbranden dat je net verdiende, zonder dat je het
+ziet gebeuren.
+
+De uitslag is daarom een afdrukbaar vel van één pagina. De opvang loopt via
+`/contact?interest=lekkage-scan`.
+
+#### De printkop staat in de DOM, niet in CSS-`content`
+
+Bij het printen verschijnt er een kop met de titel, de datum en de bron
+(`juandiazllc.com/nl/tools/lekkage-scan` plus het contactadres). Die had ook via
+`::before { content: … }` gekund; dat is korter. Tekst uit `content` is alleen niet
+selecteerbaar en niet betrouwbaar door een schermlezer te bereiken. Hij hangt dus
+in de gewone DOM met `display: none` en wordt in het print-blok zichtbaar gemaakt.
+
+De datum komt uit een effect en niet uit de render, want `new Date()` tijdens
+renderen levert een hydratieverschil op tussen server en client.
+
+#### Het doel vuurde twee keer per bezoek
+
+Gemeten op een productiebuild: één bezoek gaf twee events, eerst `lekken=2` en
+daarna `lekken=3`. De oorzaak is dat de vragen ónder de uitslag blijven staan —
+de bezoeker kan een antwoord bijstellen en de uitslag past zich aan. `lekken.length`
+staat in de dependency-array, dus elke bijstelling vuurde opnieuw.
+
+De verleiding is die dependency te schrappen. Dat is fout: dan meldt het doel het
+**aantal van het eerste moment** en niet het aantal dat de bezoeker uiteindelijk
+zag, en die stille onjuistheid is erger dan een dubbele telling die je kunt zien.
+Er staat nu een ref-guard voor, die pas terugvalt wanneer het uitslagscherm wordt
+verlaten. De dependency blijft staan — de datum blijft dus meelopen, alleen het
+melden gebeurt eenmaal. Twee asserties leggen beide helften vast: hooguit één
+melding per bezoek, én `lekken.length` blijft in de dependency-array.
+
+#### "Vijftien" stond op zes plekken, en er waren er al zestien
+
+De scan telt zestien vragen. In de kopij stond zes keer het woord "vijftien" —
+twee keer op de pagina, drie keer in de component, één keer in de callout — plus
+een zevende in `docs/partners.md`, dat het getal in partnergerichte tekst
+doorgaf. Het klopte niet meer sinds vraag B5 erbij kwam.
+
+**De poort die dit bewaakte, keek naar één document.** `lib/lekkage-scan.test.ts`
+vergeleek het telwoord in `docs/lead-magnet.md` met `VRAGEN.length` en stond
+groen, terwijl de bezoeker een verkeerd getal las. De kopij zelf werd door niets
+gelezen.
+
+Nu komt het uit één bron: `telwoordNL(n)` met een tabel van twaalf tot twintig,
+en `AANTAL_WOORD` / `AANTAL_WOORD_HOOFD` afgeleid van `VRAGEN.length`. Ontbreekt
+een getal in de tabel, dan **gooit** de functie met de zin wat te doen — geen
+stille terugval op een cijfer of op Engels. Drie asserties erbij: het telwoord in
+`lead-magnet.md`, het telwoord in `partners.md`, en de eis dat de scan-kopij
+**geen** hardgecodeerd telwoord meer draagt. Die laatste draagt een positieve
+controle, want een scanner die geen telwoorden herkent vindt er ook nul.
+
+#### Acht mutaties, acht keer de voorspelde kleur
+
+Zeven rood op zeven verschillende asserties, één groen als controle. De twee die
+het vermelden waard zijn: de ref-guard weghalen (rood op "meldt hooguit eenmaal"),
+en de dependency schrappen (rood op de eigen assertie daarvoor) — dat paar is het
+bewijs dat de reparatie in beide richtingen vastligt en niet alleen de dubbele
+telling wegneemt.
+
+#### Wat ik bij het schrijven van dit blok vond: `MANUAL_TASKS.md` telt nog de oude eigenschappen
+
+Het document waaruit de operator de doelen aanmaakt, zegt:
+
+> **Vergeet de custom properties niet.** Vier van de vijf sturen naast de naam ook
+> eigenschappen mee … Het blijven drie namen: `Sector CTA` en `Contact Submitted`
+> gebruiken allebei `sector`.
+
+Gemeten in de code klopt dat niet meer. Het zijn **vijf van de zes** — alleen
+`Boeking 15min` draagt niets boven de `url` die overal meegaat — en **vier namen**:
+`tier`, `sector`, `tool` en `lekken`, waarvan `sector` gedeeld is. `CLAUDE.md` zegt in dezelfde PR
+al vier; alleen deze alinea liep achter.
+
+Dat is geen cosmetiek. Custom properties zijn in Plausible pas zichtbaar nadat ze
+apart zijn aangemeld, dus een operator die dit document afwerkt meldt er drie aan
+en mist `lekken` — de eigenschap waarvoor het zesde doel bestaat. Twee getallen
+gecorrigeerd in deze PR.
+
+**De poort kon dit per constructie niet zien.** `lib/plausible-doelen.test.ts`
+bewaakt de doel*namen* in drie richtingen — code → `MANUAL_TASKS.md`,
+`MANUAL_TASKS.md` → code, en code → `CLAUDE.md` — plus de pariteit tussen
+`CLAUDE.md` en `AGENTS.md`. Over eigenschappen zegt hij niets. De naam van het
+nieuwe doel kwam er dus onmiddellijk in; zijn eigenschap dreef stil weg.
+
+Die poort verbreden naar eigenschappen is code en geen logboekwerk, dus het staat
+hier als voorstel en niet als stille toevoeging. De vorm ligt voor de hand: de
+klasse-variant draagt de eigenschappen als data-attributen en de script-variant in
+het `props`-object, en beide zijn met dezelfde twee regexes te lezen die de
+namen al vinden.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1390 tests in 69 bestanden
+i18n:check               741 sleutels x 4
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+Twaalf bestanden geraakt, 381 toevoegingen tegen 48 verwijderingen.
+
+#### Wat dit niet doet
+
+**Het doel bestaat niet in Plausible.** `Scan Voltooid` wordt vanaf deze commit
+verstuurd en door Plausible weggegooid, net als de vijf doelen ervoor — precies de
+toestand die stap 1 van de meetketen beschrijft. Aanmaken is operator-werk, en de
+zes namen plus de vier eigenschappen staan in `MANUAL_TASKS.md`.
+
+Verder is er geen enkele operator-taak mee opgelost: de Supabase-402 (dus het
+formulier achter de scan schrijft niets weg), `LEAD_NOTIFY_SECRET`,
+`RESEND_API_KEY`, `ACK_FROM`, `CAL_WEBHOOK_SECRET`, `SENTRY_DSN`, de vier
+LinkedIn-beslissingen en de vijf openstaande PR's in `bongartzdiaz/diaz-editor`
+staan onveranderd open.
