@@ -388,3 +388,43 @@ describe('proxy: CSP laat de analytics-host toe', () => {
     expect(richtlijn(csp, 'frame-ancestors')).toBe("frame-ancestors 'none'")
   })
 })
+
+/* GA4 kwam er in september 2026 bij, en die tag stelt precies de omgekeerde
+   eis aan de twee policies. De afgedwongen variant is een host-allowlist en
+   heeft googletagmanager.com letterlijk nodig; de strikte report-only draait
+   op 'strict-dynamic' en negeert host-allowlists juist. Een host die daar wel
+   staat geeft schijnzekerheid.
+
+   connect-src valt NIET onder strict-dynamic -- dat governt alleen script-src
+   -- dus de twee beacon-hosts moeten in BEIDE varianten staan, anders slikt de
+   strikte canary elke meting en loopt /api/csp-report vol. */
+describe('proxy: CSP laat de GA4-tag toe, maar alleen waar dat werkt', () => {
+  it('script-src bevat googletagmanager in de afgedwongen policy', async () => {
+    const res = await middleware(makeReq('https://juandiazllc.com/en'))
+    expect(richtlijn(cspVan(res), 'script-src')).toContain('https://www.googletagmanager.com')
+  })
+
+  it('connect-src laat de meetverzoeken weg, in beide varianten', async () => {
+    const res = await middleware(makeReq('https://juandiazllc.com/en'))
+    for (const csp of [cspVan(res), cspVan(res, true)]) {
+      const src = richtlijn(csp, 'connect-src')
+      expect(src).toContain('https://*.google-analytics.com')
+      expect(src).toContain('https://*.analytics.google.com')
+    }
+  })
+
+  it('de strikte report-only policy zet de scripthost NIET in script-src', async () => {
+    const res = await middleware(makeReq('https://juandiazllc.com/en'))
+    const strikt = cspVan(res, true)
+    expect(strikt).toContain("'strict-dynamic'")
+    expect(richtlijn(strikt, 'script-src')).not.toContain('googletagmanager')
+  })
+
+  /* Positieve controle op de meetlat zelf: zonder deze assertie slaagt alles
+     hierboven ook op een lege of ontbrekende header. */
+  it('er staat werkelijk een policy waarin gezocht wordt', async () => {
+    const res = await middleware(makeReq('https://juandiazllc.com/en'))
+    expect(richtlijn(cspVan(res), 'script-src').length).toBeGreaterThan(20)
+    expect(richtlijn(cspVan(res), 'connect-src').length).toBeGreaterThan(20)
+  })
+})

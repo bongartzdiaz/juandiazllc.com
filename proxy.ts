@@ -126,6 +126,32 @@ function genNonce(): string {
    die de middleware apart moet lezen wél een foutbron is. */
 const PLAUSIBLE_HOST = process.env.NEXT_PUBLIC_PLAUSIBLE_HOST ?? 'https://plausible.io'
 
+/* Google Analytics 4. Alleen bereikbaar NADAT de bezoeker toestemming gaf --
+   components/Toestemming.tsx injecteert gtag.js pas op "ja". Deze twee regels
+   maken dat mogelijk; ze laden niets uit zichzelf.
+
+   Onvoorwaardelijk toegevoegd, net als PLAUSIBLE_HOST hierboven en om
+   dezelfde reden: een allowlist-item zonder script kost niets, terwijl de CSP
+   laten afhangen van een env die de middleware apart moet lezen wel een
+   foutbron is.
+
+   DE TWEE POLICIES STELLEN HIER TEGENGESTELDE EISEN, en dat verklaart waarom
+   GA4_SCRIPT_HOST alleen in de afgedwongen variant staat:
+
+     afgedwongen    host-allowlist -> googletagmanager.com MOET erin
+     report-only    strict-dynamic -> host-allowlists worden genegeerd
+
+   Toevoegen aan de strikte variant zou dus schijnzekerheid zijn, precies de
+   redenering die hieronder al bij PLAUSIBLE_HOST staat. Wat de strikte
+   variant WEL vraagt is dat een vertrouwd script het injecteert -- en dat is
+   waarom Toestemming.tsx createElement gebruikt in plaats van next/script.
+
+   De beacon-hosts staan in BEIDE varianten. strict-dynamic geldt alleen voor
+   script-src; zonder connect-src laadt gtag.js wel en komt de meting nergens
+   aan. Dezelfde val als bij Plausible, daar al een keer ingelopen. */
+const GA4_SCRIPT_HOST = 'https://www.googletagmanager.com'
+const GA4_BEACON_HOSTS = ['https://*.google-analytics.com', 'https://*.analytics.google.com']
+
 function buildCsp(nonce: string, strict: boolean): string {
   const isDev = process.env.NODE_ENV !== 'production'
   const scriptSrc = strict
@@ -146,6 +172,7 @@ function buildCsp(nonce: string, strict: boolean): string {
         // zou zijn; dat is precies omgekeerd. Zie de toelichting hierboven.
         `'nonce-${nonce}'`,
         PLAUSIBLE_HOST,
+        GA4_SCRIPT_HOST,
         ...(isDev ? ["'unsafe-eval'"] : []),
       ]
   const directives: Record<string, string[]> = {
@@ -163,6 +190,7 @@ function buildCsp(nonce: string, strict: boolean): string {
       // script-src. Zonder deze regel laadt het script wel, maar komt de
       // beacon naar /api/event niet weg — meten zonder resultaat.
       PLAUSIBLE_HOST,
+      ...GA4_BEACON_HOSTS,
     ],
     'frame-ancestors': ["'none'"],
     'base-uri': ["'self'"],
