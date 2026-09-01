@@ -75,7 +75,7 @@ export type Grens = {
 /* Een meting laat de bezoeker een getal opzoeken in zijn eigen administratie
  * in plaats van het in te schatten.
  *
- * WAAROM DIT ERBIJ IS GEKOMEN. Vijftien ja/nee-vragen leveren een mening op.
+ * WAAROM DIT ERBIJ IS GEKOMEN. Zestien ja/nee-vragen leveren een mening op.
  * Een geteld getal levert een feit op, en een feit dat de lezer zélf heeft
  * geproduceerd is het enige cijfer in dit hele instrument dat over zijn bedrijf
  * gaat. De ja/nee blijft staan: die draagt de uitslag, want een leeg veld mag
@@ -224,6 +224,46 @@ export const VRAGEN: readonly Vraag[] = [
     kost: "Bij nee is je stapel ook een beveiligingsprobleem, niet alleen een kostenpost.",
   },
 ] as const;
+
+/* Het aantal vragen als woord, afgeleid in plaats van overgeschreven.
+ *
+ * WAAROM DIT ER STAAT. Tot 2026-09-01 stond "Vijftien" hardgecodeerd op zes
+ * plekken: twee in de pagina, drie in het component, één in de callout — plus
+ * `docs/partners.md`, dat het overnam in een tekst die naar partners gaat. Er
+ * waren er toen al zestien. De telling dreef weg toen B5 erbij kwam, en de
+ * poort die dit bewaakte las alleen `docs/lead-magnet.md` — dus die bleef
+ * groen terwijl de bezoeker een verkeerd getal las.
+ *
+ * Eén bron is hier goedkoper dan een poort die zes plekken bewaakt: wie een
+ * vraag toevoegt hoeft nu geen kopij bij te werken. De poort in
+ * lekkage-scan.test.ts leest deze constante en de drie kopijbestanden, zodat
+ * een teruggezet hardgecodeerd telwoord alsnog omvalt.
+ *
+ * Gooit bij een aantal buiten de tabel. Luid falen in CI is beter dan
+ * "undefined vragen" op een levende pagina. */
+const TELWOORD_NL: Readonly<Record<number, string>> = {
+  12: "twaalf",
+  13: "dertien",
+  14: "veertien",
+  15: "vijftien",
+  16: "zestien",
+  17: "zeventien",
+  18: "achttien",
+  19: "negentien",
+  20: "twintig",
+};
+
+export function telwoordNL(n: number): string {
+  const woord = TELWOORD_NL[n];
+  if (!woord) throw new Error(`telwoordNL: vul TELWOORD_NL aan voor ${n}`);
+  return woord;
+}
+
+/** Kleine letter, voor midden in een zin. */
+export const AANTAL_WOORD = telwoordNL(VRAGEN.length);
+
+/** Hoofdletter, voor aan het begin van een zin. */
+export const AANTAL_WOORD_HOOFD = AANTAL_WOORD[0].toUpperCase() + AANTAL_WOORD.slice(1);
 
 /** Antwoord per vraag-id. `true` = ja. Ontbrekend = nog niet beantwoord. */
 export type Antwoorden = Readonly<Record<string, boolean | undefined>>;

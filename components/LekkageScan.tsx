@@ -23,10 +23,13 @@
  *    getal nu niet bij de hand heeft moet de scan gewoon kunnen afmaken. Een
  *    leeg veld levert dan ook niets op in de uitslag: geen nul, geen aanname. */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { LocaleLink } from "@/components/LocaleLink";
+import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/lib/seo/branding";
 import { useT } from "@/lib/i18n/useT";
 import {
+  AANTAL_WOORD,
+  AANTAL_WOORD_HOOFD,
   BLOKKEN,
   VRAGEN,
   alleBeantwoord,
@@ -46,6 +49,50 @@ export function LekkageScan() {
   const lekken = useMemo(() => scoor(antwoorden), [antwoorden]);
   const gemeten = useMemo(() => duidMetingen(metingen), [metingen]);
   const open = VRAGEN.filter((v) => antwoorden[v.id] === undefined).length;
+
+  /* De datum staat op het geprinte vel. Hij wordt hier gezet en niet bij het
+     renderen berekend: een uitslag die je vandaag opslaat en volgende maand
+     terugvindt, moet zeggen wanneer hij gemaakt is. Leeg tot de uitslag
+     getoond wordt, dus er is geen server/client-verschil om over te
+     struikelen. */
+  const [datum, setDatum] = useState("");
+
+  /* Zesde Plausible-doel. De vijf bestaande meten allemaal een KLIK; dit is
+     het eerste dat een AFRONDING meet. Wie alle vragen invult en de
+     uitslag leest, is een ander signaal dan wie op een knop drukt -- en dat
+     is precies de vraag "wat gebeurt er na de klik".
+
+     Het aantal lekken gaat mee als eigenschap, zodat nul lekken te scheiden
+     is van vier. Plausible wil een string, vandaar String().
+
+     Het meldt EENMAAL per bezoek. `getoond` gaat alleen naar true en de
+     vragen blijven onder de uitslag staan, dus wie daarna een antwoord
+     bijstelt verandert `lekken.length` -- een dependency van dit effect.
+     Zonder de ref hieronder telde datzelfde bezoek twee keer mee, en dan
+     meet het doel bezoekers noch afrondingen. De dependency zelf moet
+     blijven staan: zonder hem meldt het doel een verouderd aantal.
+
+     LET OP: dit doel bestaat nog niet in het Plausible-dashboard. Tot iemand
+     het daar aanmaakt wordt het binnengehaald en weggegooid, net als de vijf
+     andere. Zie MANUAL_TASKS.md. */
+  const gemeld = useRef(false);
+
+  useEffect(() => {
+    if (!getoond || !compleet) {
+      gemeld.current = false;
+      return;
+    }
+    setDatum(new Date().toLocaleDateString("nl-NL", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }));
+    if (gemeld.current) return;
+    gemeld.current = true;
+    (window as unknown as {
+      plausible?: (event: string, opts?: { props?: Record<string, string> }) => void;
+    }).plausible?.("Scan Voltooid", { props: { lekken: String(lekken.length) } });
+  }, [getoond, compleet, lekken.length]);
 
   function kies(id: string, waarde: boolean) {
     setAntwoorden((vorig) => ({ ...vorig, [id]: waarde }));
@@ -129,14 +176,26 @@ export function LekkageScan() {
 
       {getoond && compleet && (
         <section className="scan-uitslag" aria-live="polite">
+          {/* Alleen op papier zichtbaar. Zonder deze kop draagt het vel geen
+              datum en geen afzender, en dan is het over een maand een anoniem
+              A4'tje dat niemand kan thuisbrengen. Staat in de DOM en niet in
+              CSS-content, zodat het echte tekst blijft die je kunt selecteren
+              en die een schermlezer kan bereiken. */}
+          <div className="scan-printkop">
+            <p className="scan-printkop-titel">Lekkage-scan{datum ? " · " + datum : ""}</p>
+            <p className="scan-printkop-bron">
+              juandiazllc.com/nl/tools/lekkage-scan · {CONTACT_EMAIL}
+            </p>
+          </div>
+
           {lekken.length === 0 ? (
             <>
               <h2>Deze scan ziet niets lekken.</h2>
               <p>
-                Dat is een echte uitkomst en geen beleefdheid. Vijftien ja/nee-vragen
-                vinden de lekken die met overdracht, wachttijd, dubbele invoer en
-                overlappende tools te maken hebben. Zitten die goed, dan zit je
-                probleem ergens anders.
+                Dat is een echte uitkomst en geen beleefdheid. {AANTAL_WOORD_HOOFD}{" "}
+                ja/nee-vragen vinden de lekken die met overdracht, wachttijd, dubbele
+                invoer en overlappende tools te maken hebben. Zitten die goed, dan zit
+                je probleem ergens anders.
               </p>
             </>
           ) : (
@@ -193,20 +252,45 @@ export function LekkageScan() {
             <h3>Wat deze scan niet ziet</h3>
             <p>
               Geen marge per project, geen kwaliteit van de instroom, geen bezetting,
-              en niets over of je mensen een nieuw systeem zouden gebruiken. Vijftien
-              ja/nee-vragen dragen hun eigen reikwijdte, en dit is hem.
+              en niets over of je mensen een nieuw systeem zouden gebruiken.{" "}
+              {AANTAL_WOORD_HOOFD} ja/nee-vragen dragen hun eigen reikwijdte, en dit is
+              hem.
             </p>
+          </div>
+
+          <div className="scan-bewaar">
+            <h3>Neem deze uitslag mee</h3>
+            <p>
+              Eén pagina met jouw antwoorden erop. Geen e-mailadres, geen
+              account, geen lijst waar je op komt — je bewaart hem zelf, en je
+              kunt hem doorsturen naar wie er bij jou over gaat.
+            </p>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => window.print()}
+            >
+              Opslaan of printen
+            </button>
           </div>
 
           <div className="scan-cta">
             <p>
-              Wil je dit nagelopen hebben op je eigen cijfers in plaats van op vijftien
-              vragen? Dat is het blueprint-gesprek: dertig minuten, en er komt een
-              diagnose van één pagina uit.
+              Wil je dit nagelopen hebben op je eigen cijfers in plaats van op{" "}
+              {AANTAL_WOORD} vragen? Dat is het blueprint-gesprek: dertig minuten, en er
+              komt een diagnose van één pagina uit.
             </p>
             <LocaleLink href="/contact?interest=lekkage-scan" className="btn primary">
               {t("cta.book")}
             </LocaleLink>
+            {/* De directe route staat er bewust naast. Het formulier achter
+                /contact schrijft op dit moment niets weg (Supabase 402), dus
+                wie nu converteert krijgt een foutmelding. Mailen werkt altijd.
+                Zie de operator-lijst in CLAUDE.md; deze regel mag weg zodra
+                het datavlak weer schrijft. */}
+            <p className="scan-cta-direct">
+              Liever direct? <a href={CONTACT_MAILTO}>{CONTACT_EMAIL}</a>
+            </p>
           </div>
         </section>
       )}

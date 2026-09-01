@@ -1,7 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
+import { zonderCommentaar } from "./bronscan";
 import {
+  AANTAL_WOORD,
   BLOKKEN,
   MET_METING,
   VOLGORDE,
@@ -10,6 +12,7 @@ import {
   duidMetingen,
   lekt,
   scoor,
+  telwoordNL,
   type Antwoorden,
 } from "./lekkage-scan";
 
@@ -20,6 +23,9 @@ const DOC = readFileSync(join(WORTEL, "docs", "lead-magnet.md"), "utf8").replace
 
 /** De bron voor elk cijfer dat de scan uitspreekt. Zie docs/claims.md. */
 const CLAIMS = readFileSync(join(WORTEL, "docs", "claims.md"), "utf8").replace(/\s+/g, " ");
+
+/** De partnertekst leest hetzelfde aantal; hij gaat naar buiten. */
+const PARTNERS = readFileSync(join(WORTEL, "docs", "partners.md"), "utf8").replace(/\s+/g, " ");
 
 const alles = (waarde: boolean): Antwoorden =>
   Object.fromEntries(VRAGEN.map((v) => [v.id, waarde]));
@@ -266,25 +272,85 @@ describe("de metingen", () => {
   });
 });
 
-/* Het document en de code tellen hetzelfde aantal vragen. */
-describe("de telling in docs/lead-magnet.md", () => {
-  const TELWOORD: Record<number, string> = {
-    14: "veertien",
-    15: "vijftien",
-    16: "zestien",
-    17: "zeventien",
-    18: "achttien",
-  };
+/* Het aantal vragen staat op een plek, en alles leest het daar.
+ *
+ * WAAROM DEZE POORT IS VERBREED. Tot 2026-09-01 las hij alleen
+ * docs/lead-magnet.md. Dat document klopte -- het zei "De zestien vragen" --
+ * terwijl zes plekken in de geleverde kopij het woord "Vijftien" hardcodeerden,
+ * plus docs/partners.md, dat naar partners gaat. De telling dreef weg toen B5
+ * erbij kwam, en deze poort bleef groen omdat hij de andere kant op keek.
+ *
+ * De reparatie is niet het getal bijwerken maar een bron: de kopij leidt het
+ * telwoord af uit VRAGEN.length via AANTAL_WOORD. Deze poort bewaakt dat die
+ * afleiding blijft staan -- een teruggezet hardgecodeerd telwoord in een
+ * scan-oppervlak is rood, ook als het toevallig het juiste getal draagt.
+ *
+ * Hij leest de bestandstekst en niet de gerenderde uitvoer, want daar zat het
+ * defect. Een toelichting die zelf een telwoord noemt valt dus ook om. Dat is
+ * de prijs en hij is klein: schrijf AANTAL_WOORD in plaats van het woord. */
+describe("de telling van de vragen", () => {
+  /** De bestanden die de bezoeker leest. Niet de tests, niet de docs. */
+  const SCAN_KOPIJ = [
+    "app/[locale]/tools/lekkage-scan/page.tsx",
+    "components/LekkageScan.tsx",
+    "components/ScanCallout.tsx",
+  ];
 
-  it("noemt hetzelfde aantal als de code draagt", () => {
-    const woord = TELWOORD[VRAGEN.length];
-    expect(woord, "vul TELWOORD aan voor " + VRAGEN.length + " vragen").toBeDefined();
-    expect(DOC).toContain("De " + woord + " vragen");
+  /* Elk telwoord dat TELWOORD_NL kent. telwoordNL() gooit buiten die tabel,
+   * dus een ingekorte tabel valt hier luid om in plaats van stil minder te
+   * bewaken. */
+  const TELWOORDEN = Array.from({ length: 9 }, (_, i) => telwoordNL(12 + i));
 
-    for (const [n, w] of Object.entries(TELWOORD)) {
-      if (Number(n) === VRAGEN.length) continue;
+  /** Woorden, niet substrings: "veertienhonderd" is geen telwoord. */
+  const woorden = (bron: string) => new Set(bron.toLowerCase().split(/[^a-z]+/));
+
+  it("noemt in docs/lead-magnet.md hetzelfde aantal als de code draagt", () => {
+    expect(DOC).toContain("De " + AANTAL_WOORD + " vragen");
+
+    for (const w of TELWOORDEN) {
+      if (w === AANTAL_WOORD) continue;
       expect(DOC.includes("De " + w + " vragen"), "het document noemt ook " + w).toBe(false);
     }
+  });
+
+  it("noemt in docs/partners.md hetzelfde aantal", () => {
+    // Die tekst gaat naar een partner, die hem doorstuurt. Een verkeerd getal
+    // daarin is een belofte die de pagina zelf weerspreekt.
+    expect(PARTNERS).toContain(AANTAL_WOORD + " ja/nee-vragen");
+
+    for (const w of TELWOORDEN) {
+      if (w === AANTAL_WOORD) continue;
+      expect(PARTNERS.includes(w + " ja/nee-vragen"), "partners.md noemt ook " + w).toBe(false);
+    }
+  });
+
+  it("draagt in de scan-kopij geen hardgecodeerd telwoord", () => {
+    const fout: string[] = [];
+    for (const pad of SCAN_KOPIJ) {
+      const bron = readFileSync(join(WORTEL, pad), "utf8");
+      const gevonden = woorden(bron);
+      for (const w of TELWOORDEN) {
+        if (gevonden.has(w)) fout.push(pad + ": " + w);
+      }
+    }
+    expect(fout).toEqual([]);
+  });
+
+  it("leest het telwoord werkelijk uit de bron", () => {
+    // Zonder deze assertie slaagt de vorige ook op kopij die het aantal
+    // helemaal niet meer noemt -- dan is de telling stilletjes verdwenen.
+    for (const pad of SCAN_KOPIJ) {
+      const bron = readFileSync(join(WORTEL, pad), "utf8");
+      expect(bron, pad + " noemt AANTAL_WOORD niet").toContain("AANTAL_WOORD");
+    }
+  });
+
+  it("herkent een telwoord werkelijk", () => {
+    // Positieve controle: een lege overtredingslijst uit een kapotte splitser
+    // leest hetzelfde als schone kopij.
+    expect(woorden("Vijftien vragen").has("vijftien")).toBe(true);
+    expect(woorden("veertienhonderd euro").has("veertien")).toBe(false);
+    expect(TELWOORDEN).toContain(AANTAL_WOORD);
   });
 });
 
@@ -343,5 +409,58 @@ describe("de scan hangt ergens aan", () => {
       "utf8",
     );
     expect(bron).toMatch(/post\.tag === "Energy" && <ScanCallout/);
+  });
+});
+
+/* Het zesde Plausible-doel. De vijf andere meten een klik; dit meet een
+   AFRONDING, en dat is het cijfer waar de vraag "wat gebeurt er na de
+   klik" op wacht.
+
+   Waarom een poort: op 2026-09-01 vuurde dit doel TWEE keer. `getoond`
+   gaat alleen naar true en de vragen blijven onder de uitslag staan, dus
+   een bezoeker die zijn antwoord bijstelt verandert `lekken.length` -- een
+   dependency van het effect. Gemeten op een productiebuild: lekken=2
+   gevolgd door lekken=3, uit een bezoek. Een doel dat dubbel telt meet
+   bezoekers noch afrondingen.
+
+   De reparatie is een ref, en die weghalen faalt STIL: geen typefout,
+   geen rood, alleen een teller die te hoog staat. Vandaar deze poort.
+
+   Hij leest de bron ZONDER commentaar. Zonder die strip houdt de
+   toelichting in het component -- die `gemeld.current` woordelijk
+   uitlegt -- de poort vacuum groen. Dat is hier vijf keer misgegaan. */
+describe("het doel Scan Voltooid", () => {
+  const RUW = readFileSync(join(WORTEL, "components", "LekkageScan.tsx"), "utf8");
+  const CODE = zonderCommentaar(RUW);
+
+  it("vuurt het doel af, met het aantal lekken erbij", () => {
+    expect(CODE).toContain('plausible?.("Scan Voltooid"');
+    expect(CODE).toContain("lekken: String(lekken.length)");
+  });
+
+  it("meldt hooguit eenmaal per bezoek", () => {
+    const bewaking = CODE.indexOf("if (gemeld.current) return;");
+    const melding = CODE.indexOf('plausible?.("Scan Voltooid"');
+    expect(bewaking, "de ref-bewaking ontbreekt -- het doel telt dan dubbel").toBeGreaterThan(-1);
+    expect(CODE, "de ref moet op false terug als de uitslag niet meer staat").toContain(
+      "gemeld.current = false;",
+    );
+    expect(bewaking, "de bewaking staat NA de melding en houdt dus niets tegen").toBeLessThan(
+      melding,
+    );
+  });
+
+  it("houdt lekken.length in de dependency-array", () => {
+    /* De andere helft van de val. Haal je de dependency weg om het dubbel
+       tellen te stoppen, dan meldt het doel een VEROUDERD aantal -- stiller
+       en erger dan dubbel tellen. De ref lost het op, de dependency blijft. */
+    expect(CODE).toContain("[getoond, compleet, lekken.length]");
+  });
+
+  it("leest werkelijk code en niet alleen commentaar", () => {
+    /* Zonder deze twee is groen ook te verklaren door een strip die alles
+       weggooit, of door een bestand dat niet gevonden werd. */
+    expect(CODE).toContain("useEffect(");
+    expect(RUW.length).toBeGreaterThan(CODE.length);
   });
 });

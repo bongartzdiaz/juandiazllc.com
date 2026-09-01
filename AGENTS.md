@@ -430,9 +430,10 @@ herschreven, en deze notitie is de correctie erop.
 
 ### De meetketen — in blokkerende volgorde
 
-1. **Vijf Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
-   `Pricing CTA`, `Sector CTA`, `Tool CTA` en `Contact Submitted`, plus de drie
-   custom properties (`tier`, `sector`, `tool`). Taggen is af en op productie
+1. **Zes Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
+   `Pricing CTA`, `Sector CTA`, `Tool CTA`, `Contact Submitted` en
+   `Scan Voltooid`, plus de vier custom properties (`tier`, `sector`, `tool`,
+   `lekken`). Taggen is af en op productie
    geverifieerd; zonder de doelen worden de kliks binnengehaald en weggegooid.
    **`Contact Submitted` stond tot 2026-08-24 op geen enkele lijst**, en het is
    het enige doel dat een conversie meet in plaats van een klik — precies het
