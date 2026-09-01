@@ -299,6 +299,12 @@ Plausible bevat dus een spatie.
       `/pricing`.
 - [ ] `Sector CTA` — de contactknop op `/sectors/[slug]`.
 - [ ] `Tool CTA` — de contactknop op `/tools/energy-roi`.
+- [ ] `Scan Voltooid` — vuurt in `components/LekkageScan.tsx` zódra de
+      bezoeker alle vragen heeft ingevuld én de uitslag opvraagt. Het enige
+      doel dat een AFRONDING meet in plaats van een klik: wie de scan uitzit
+      is een ander signaal dan wie op een knop drukt. Draagt `lekken` als
+      eigenschap (het aantal gevonden lekken, als tekst), zodat nul te
+      scheiden is van vier.
 - [ ] `Contact Submitted` — vuurt in `components/ContactForm.tsx` zódra een
       inzending is geslaagd, niet bij een klik. **Dit is het enige doel dat een
       conversie meet; de vier hierboven meten intentie.** Hij ontbrak op elke
@@ -317,6 +323,7 @@ aanmeldt (Site Settings → **Custom properties**). Het blijven drie namen:
 | `Sector CTA` | `sector` (de slug), `url` |
 | `Tool CTA` | `tool` (`energy-roi`), `url` |
 | `Boeking 15min` | `url` |
+| `Scan Voltooid` | `lekken` (aantal gevonden lekken, als tekst) |
 | `Contact Submitted` | `sector` (de slug, of `unknown` als de bezoeker niets koos) |
 
 Zonder die stap zie je wél het aantal kliks, maar niet welke tier of sector ze

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
+import { zonderCommentaar } from "./bronscan";
 import {
   AANTAL_WOORD,
   BLOKKEN,
@@ -408,5 +409,58 @@ describe("de scan hangt ergens aan", () => {
       "utf8",
     );
     expect(bron).toMatch(/post\.tag === "Energy" && <ScanCallout/);
+  });
+});
+
+/* Het zesde Plausible-doel. De vijf andere meten een klik; dit meet een
+   AFRONDING, en dat is het cijfer waar de vraag "wat gebeurt er na de
+   klik" op wacht.
+
+   Waarom een poort: op 2026-09-01 vuurde dit doel TWEE keer. `getoond`
+   gaat alleen naar true en de vragen blijven onder de uitslag staan, dus
+   een bezoeker die zijn antwoord bijstelt verandert `lekken.length` -- een
+   dependency van het effect. Gemeten op een productiebuild: lekken=2
+   gevolgd door lekken=3, uit een bezoek. Een doel dat dubbel telt meet
+   bezoekers noch afrondingen.
+
+   De reparatie is een ref, en die weghalen faalt STIL: geen typefout,
+   geen rood, alleen een teller die te hoog staat. Vandaar deze poort.
+
+   Hij leest de bron ZONDER commentaar. Zonder die strip houdt de
+   toelichting in het component -- die `gemeld.current` woordelijk
+   uitlegt -- de poort vacuum groen. Dat is hier vijf keer misgegaan. */
+describe("het doel Scan Voltooid", () => {
+  const RUW = readFileSync(join(WORTEL, "components", "LekkageScan.tsx"), "utf8");
+  const CODE = zonderCommentaar(RUW);
+
+  it("vuurt het doel af, met het aantal lekken erbij", () => {
+    expect(CODE).toContain('plausible?.("Scan Voltooid"');
+    expect(CODE).toContain("lekken: String(lekken.length)");
+  });
+
+  it("meldt hooguit eenmaal per bezoek", () => {
+    const bewaking = CODE.indexOf("if (gemeld.current) return;");
+    const melding = CODE.indexOf('plausible?.("Scan Voltooid"');
+    expect(bewaking, "de ref-bewaking ontbreekt -- het doel telt dan dubbel").toBeGreaterThan(-1);
+    expect(CODE, "de ref moet op false terug als de uitslag niet meer staat").toContain(
+      "gemeld.current = false;",
+    );
+    expect(bewaking, "de bewaking staat NA de melding en houdt dus niets tegen").toBeLessThan(
+      melding,
+    );
+  });
+
+  it("houdt lekken.length in de dependency-array", () => {
+    /* De andere helft van de val. Haal je de dependency weg om het dubbel
+       tellen te stoppen, dan meldt het doel een VEROUDERD aantal -- stiller
+       en erger dan dubbel tellen. De ref lost het op, de dependency blijft. */
+    expect(CODE).toContain("[getoond, compleet, lekken.length]");
+  });
+
+  it("leest werkelijk code en niet alleen commentaar", () => {
+    /* Zonder deze twee is groen ook te verklaren door een strip die alles
+       weggooit, of door een bestand dat niet gevonden werd. */
+    expect(CODE).toContain("useEffect(");
+    expect(RUW.length).toBeGreaterThan(CODE.length);
   });
 });

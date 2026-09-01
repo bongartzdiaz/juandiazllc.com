@@ -2539,6 +2539,75 @@ em { color: var(--accent); font-style: italic; font-weight: 300; letter-spacing:
   .scan-keuze { width: 100%; }
   .scan-optie { flex: 1 1 0; justify-content: center; }
 }
+/* ── De uitslag als bewaarbaar vel ───────────────────────────────────
+   Printen is vandaag de enige weg waarlangs een bezoeker iets van deze
+   scan meeneemt. Het contactformulier schrijft niets weg (Supabase 402)
+   en er is geen mailkanaal (RESEND_API_KEY staat niet), dus alles wat een
+   e-mailadres vraagt levert vandaag niets op. Een vel dat de bezoeker
+   zelf opslaat heeft geen van beide nodig.
+
+   Wat er op het papier hoort: de kop met datum en afzender, de lekken,
+   de eigen metingen en de grens van de scan. Wat eraf moet: de zestien
+   vragen (samengevat in de uitslag), de paginakop, en elke knop -- een
+   knop op papier is ruis.
+
+   Het globale print-blok hierboven zet alle kleur op zwart; deze regels
+   werken daar bovenop en vechten er niet mee. */
 @media print {
-  .scan-actie { display: none !important; }
+  .scan-actie,
+  .scan-blok,
+  .scan-bewaar,
+  .scan-cta .btn,
+  .page-hero {
+    display: none !important;
+  }
+
+  /* Op het scherm is deze kop overbodig -- daar staat de site eromheen.
+     Op papier is hij het enige dat zegt wat dit vel is. */
+  .scan-printkop {
+    display: block !important;
+    border-bottom: 1px solid #000;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+  }
+  .scan-printkop-titel {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .scan-printkop-bron {
+    margin: 2px 0 0;
+    font-size: 11px;
+  }
+
+  /* Een lek mag niet over een paginagrens breken: de kost-regels eronder
+     zijn de helft van de betekenis. */
+  .scan-lekken > li,
+  .scan-gemeten-rij {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .scan-uitslag {
+    margin-top: 0;
+  }
+}
+
+/* De printkop hangt in de gewone DOM zodat hij echte, selecteerbare tekst
+   blijft; op het scherm hoort hij niet thuis. */
+.scan-printkop { display: none; }
+
+.scan-bewaar {
+  margin-top: 28px;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.scan-bewaar h3 { margin: 0 0 6px; }
+.scan-bewaar p { margin: 0 0 14px; color: var(--muted); }
+
+.scan-cta-direct {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--muted);
 }

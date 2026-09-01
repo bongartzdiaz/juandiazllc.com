@@ -158,6 +158,12 @@ const TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
     reden: "Rendert alleen op /nl/tools/lekkage-scan — zie ENKELE_TAAL.",
     tekst: [
       "Optioneel. Sla over als je het nu niet kunt opzoeken.",
+      "Lekkage-scan",
+      "juandiazllc.com/nl/tools/lekkage-scan ·",
+      "Neem deze uitslag mee",
+      "Eén pagina met jouw antwoorden erop. Geen e-mailadres, geen account, geen lijst waar je op komt — je bewaart hem zelf, en je kunt hem doorsturen naar wie er bij jou over gaat.",
+      "Opslaan of printen",
+      "Liever direct?",
       "Toon wat er lekt",
       "Deze scan ziet niets lekken.",
       "Dat is een echte uitkomst en geen beleefdheid.",

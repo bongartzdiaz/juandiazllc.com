@@ -34,7 +34,7 @@ const MAPPEN = ['app', 'components', 'lib']
     zichtbare bewerking van dit getal af — anders kan een doel stil verdwijnen
     zolang de rest nog klopt, en dat is precies de staat waarin
     `Contact Submitted` maandenlang verkeerde. */
-const VERWACHT_AANTAL = 5
+const VERWACHT_AANTAL = 6
 
 function bronBestanden(map: string, uit: string[] = []): string[] {
   if (!existsSync(map)) return uit
