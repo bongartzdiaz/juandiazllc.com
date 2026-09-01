@@ -295,8 +295,8 @@ Plausible bevat dus een spatie.
 - [ ] `Boeking 15min` — boekknop, gaat naar `cal.com/juandiazllc/15min`.
       Vier plekken: `/contact`, de insight-detailpagina, en twee in
       `components/Capacity.tsx`.
-- [ ] `Pricing CTA` — de vier tierknoppen plus de proef- en e-mailknop op
-      `/pricing`.
+- [ ] `Pricing CTA` — de vier tierknoppen plus de migratie-, proef- en
+      salesknop op `/pricing`. Zeven knoppen, geen zes.
 - [ ] `Sector CTA` — de contactknop op `/sectors/[slug]`.
 - [ ] `Tool CTA` — de contactknop op `/tools/energy-roi`.
 - [ ] `Scan Voltooid` — vuurt in `components/LekkageScan.tsx` zódra de
@@ -320,7 +320,7 @@ aanmeldt (Site Settings → **Custom properties**). Het blijven vier namen:
 
 | doel | eigenschappen |
 |---|---|
-| `Pricing CTA` | `tier` (starter / pro / business / enterprise / trial / email), `url` |
+| `Pricing CTA` | `tier` (starter / pro / business / enterprise / migration / trial / sales), `url` |
 | `Sector CTA` | `sector` (de slug), `url` |
 | `Tool CTA` | `tool` (`energy-roi`), `url` |
 | `Boeking 15min` | `url` |
