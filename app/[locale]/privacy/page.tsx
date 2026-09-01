@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/lib/i18n/metadata";
 import { translate } from "@/lib/i18n/dict";
 import { AnalyticsOptOut } from "@/components/AnalyticsOptOut";
+import { ToestemmingKnop } from "@/components/ToestemmingKnop";
 import { ogImages } from "@/lib/seo/branding";
 
 // Plain-language privacy page. Not legal advice — a statement of what
@@ -42,6 +43,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
         <h2>{t("priv.h.analytics")}</h2>
         <p>{t("priv.p.analytics")}</p>
         <div style={{ margin: "20px 0 32px" }}>
+          <ToestemmingKnop />
           <AnalyticsOptOut />
         </div>
 

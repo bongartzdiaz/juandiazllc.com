@@ -2611,3 +2611,21 @@ em { color: var(--accent); font-style: italic; font-weight: 300; letter-spacing:
   font-size: 14px;
   color: var(--muted);
 }
+
+/* ── Toestemmingsbanner ─────────────────────────────────────────
+   z-index 200: boven grain (100) en vignette (99), onder de preloader
+   (300) zodat hij niet door het opstartscherm heen prikt, en onder de
+   skip-link (400) zodat toetsenbordnavigatie er altijd langs kan. */
+.toestemming { position: fixed; left: 0; right: 0; bottom: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 18px clamp(20px, 4vw, 40px); background: rgba(6,29,22,.97); border-top: 1px solid var(--line); backdrop-filter: blur(12px); animation: toestemmingIn .35s var(--ease); }
+.toestemming-tekst { flex: 1 1 320px; }
+.toestemming-tekst strong { display: block; font-size: 14px; margin-bottom: 4px; }
+.toestemming-tekst p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; max-width: 68ch; }
+.toestemming-tekst a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+.toestemming-knoppen { display: flex; gap: 10px; flex-wrap: wrap; }
+/* Beide knoppen dezelfde .btn, dezelfde maat, geen accentkleur op een van
+   de twee. Weigeren mag niet moeilijker ogen dan accepteren. */
+.toestemming-knoppen .btn { min-height: 44px; }
+@keyframes toestemmingIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .toestemming { animation: none; } }
+@media (max-width: 560px) { .toestemming-knoppen { width: 100%; } .toestemming-knoppen .btn { flex: 1 1 auto; justify-content: center; } }
+@media print { .toestemming { display: none; } }

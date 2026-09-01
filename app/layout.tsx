@@ -26,6 +26,7 @@ import { Preloader } from "@/components/Preloader";
 import { GlobalEffects } from "@/components/GlobalEffects";
 import { BackToTop } from "@/components/BackToTop";
 import { Analytics } from "@/components/Analytics";
+import { Toestemming } from "@/components/Toestemming";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { WebVitalsReporter } from "@/components/WebVitalsReporter";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
@@ -231,6 +232,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <GlobalEffects />
           <BackToTop />
           <Analytics />
+          <Toestemming />
           <VercelAnalytics />
           <WebVitalsReporter />
         </LocaleProvider>
