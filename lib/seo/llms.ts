@@ -7,6 +7,7 @@ import {
   PERSON_ALTERNATE_NAMES,
   PERSON_NAME,
   PERSON_SAME_AS,
+  CONTACT_EMAIL,
 } from "@/lib/seo/branding";
 import { insightNaarTekst, signalNaarTekst } from "@/lib/seo/plattetekst";
 
@@ -103,7 +104,7 @@ The site is available in ${namen[standaard] ?? standaard} (default), ${overig.sl
 
 const CONTACT = `## Contact
 
-- Email: juan@juandiazllc.com
+- Email: ${CONTACT_EMAIL}
 - GitHub: ${PERSON_SAME_AS.find((u) => u.includes("github.com")) ?? ""}
 - Book 15 minutes: https://cal.com/juandiazllc/15min`;
 

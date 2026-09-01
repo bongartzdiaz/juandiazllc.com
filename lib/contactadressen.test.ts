@@ -22,7 +22,7 @@ import { join, relative, sep } from "node:path";
  *      uitgerekend de duurste lead op de site: Enterprise begint bij vijftien
  *      zitplaatsen.
  *   3. Het waren de enige drie afwijkende adressen in de hele repo. Alle
- *      zevenentwintig andere zijn `juan@juandiazllc.com`.
+ *      andere staan op `CONTACT_EMAIL` uit `lib/seo/branding.ts`.
  *
  * DE TWEEDE TEST IS DE STRENGE. Een `mailto:` is per definitie iets waar een
  * bezoeker op klikt, dus die mag nooit buiten het domein wijzen en kent geen
@@ -132,7 +132,21 @@ describe("contactadressen in geleverde code", () => {
     // De eerste assertie scheidt "boom niet ingelezen" van "regex stuk".
     expect(BRONNEN.length, "beforeAll heeft niets ingelezen").toBeGreaterThan(50);
     const eigen = verzamel(ADRES, 0).filter((v) => domeinVan(v.adres) === EIGEN_DOMEIN);
-    expect(eigen.length).toBeGreaterThan(20);
+    // Op 2026-09-01 zakte dit van 29 naar 20: het contactadres werd één
+    // constante in `lib/seo/branding.ts` en tien literals verdwenen. Een kaal
+    // getal als ondergrens moet je dan bijstellen zonder dat het iets zegt.
+    // Vandaar dat de controle nu de bestanden noemt die het adres per
+    // constructie dragen — `dict.ts` kan `branding.ts` niet importeren
+    // (cyclus) en `global-error.tsx` mag het niet (foutgrens). Zie
+    // `lib/contactadres.test.ts`, dat die twee aan de constante vastpint.
+    expect(eigen.length).toBeGreaterThanOrEqual(16);
+    const bestanden = new Set(eigen.map((v) => v.pad.replace(/\\/g, "/")));
+    for (const moet of ["lib/i18n/dict.ts", "app/global-error.tsx"]) {
+      expect(
+        [...bestanden].some((p) => p.endsWith(moet)),
+        `de scan vond geen adres in ${moet} — regex of boom stuk?`,
+      ).toBe(true);
+    }
   });
 
   it("geen mailto: wijst buiten juandiazllc.com", () => {

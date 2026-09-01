@@ -8,7 +8,7 @@ import { translate } from "@/lib/i18n/dict";
 import { faqSchema, contactPointSchema } from "@/lib/seo/schema";
 import { getContactFaq } from "@/lib/seo/faqs";
 import { BOOKING_15MIN } from "@/lib/booking";
-import { ogImages } from "@/lib/seo/branding";
+import { ogImages, CONTACT_EMAIL, CONTACT_MAILTO } from "@/lib/seo/branding";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -167,7 +167,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
               </span>
             </a>
             <a
-              href="mailto:juan@juandiazllc.com"
+              href={CONTACT_MAILTO}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -180,11 +180,11 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                 fontSize: 14,
                 fontWeight: 600,
               }}
-              aria-label={`${t("contact.directline.email")} juan@juandiazllc.com`}
+              aria-label={`${t("contact.directline.email")} ${CONTACT_EMAIL}`}
             >
               <span aria-hidden="true">✉️</span>
               <span>{t("contact.directline.email")}</span>
-              <span style={{ color: "var(--mint, #5EFFB1)" }}>juan@juandiazllc.com</span>
+              <span style={{ color: "var(--mint, #5EFFB1)" }}>{CONTACT_EMAIL}</span>
             </a>
           </div>
           <p style={{ color: "var(--muted-soft, #6a7a73)", fontSize: 12 }}>

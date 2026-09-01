@@ -83,8 +83,8 @@ export default function GlobalError({
           <p style={{ color: "#9ABAA9", lineHeight: 1.55, margin: "0 0 24px" }}>
             We have been notified automatically. Hit retry, or head back to the homepage —
             if this keeps happening, drop a line to{" "}
-            <a href="mailto:juan@juandiazllc.com" style={{ color: "#2EC489" }}>
-              juan@juandiazllc.com
+            <a href="mailto:info@juandiazllc.com" style={{ color: "#2EC489" }}>
+              info@juandiazllc.com
             </a>
             .
           </p>

@@ -38,7 +38,7 @@ describe("localeHref", () => {
   });
 
   it("laat externe adressen, ankers en protocollen met rust", () => {
-    for (const h of ["https://voltafy.nl", "http://x.nl", "//cdn.example.com/a", "mailto:juan@juandiazllc.com", "tel:+31653142656", "#contact", "?p=1"]) {
+    for (const h of ["https://voltafy.nl", "http://x.nl", "//cdn.example.com/a", "mailto:info@juandiazllc.com", "tel:+31653142656", "#contact", "?p=1"]) {
       expect(localeHref("nl", h), h).toBe(h);
     }
   });

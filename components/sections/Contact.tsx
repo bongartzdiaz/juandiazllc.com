@@ -1,14 +1,20 @@
 "use client";
 
 import { useT } from "@/lib/i18n/useT";
+import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/lib/seo/branding";
+
+// De @ draagt eigen opmaak, dus de zichtbare tekst wordt uit de constante
+// afgeleid in plaats van los opgeschreven. Anders staat het adres hier een
+// tweede keer en kan het uiteenlopen met de href erboven.
+const [MAIL_NAAM, MAIL_DOMEIN] = CONTACT_EMAIL.split("@");
 
 export function Contact() {
   const t = useT();
   return (
     <section className="contact" id="contact">
       <div className="label">{t("contact.section.label")}</div>
-      <a className="mail" href="mailto:juan@juandiazllc.com">
-        juan<em>@</em>juandiazllc.com
+      <a className="mail" href={CONTACT_MAILTO}>
+        {MAIL_NAAM}<em>@</em>{MAIL_DOMEIN}
       </a>
       <div className="subs">
         <a href="https://linkedin.com/in/juanstefan" target="_blank" rel="noopener noreferrer">
