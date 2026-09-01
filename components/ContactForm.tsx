@@ -60,9 +60,16 @@ export function ContactForm() {
   // not pageviews. The sector is attached as a prop for segmentation.
   useEffect(() => {
     if (state.status !== "ok") return;
-    (window as unknown as {
+    /* typeof, geen optionele aanroep. `?.()` valt alleen terug op null en
+       undefined; een truthy niet-functie werpt een TypeError, en dit staat
+       in een effect -- dus dat sloopt de React-boom in plaats van stil
+       niets te meten. Zie lib/plausible-aanroep.test.ts. */
+    const w = window as unknown as {
       plausible?: (event: string, opts?: { props?: Record<string, string> }) => void;
-    }).plausible?.("Contact Submitted", { props: { sector: sector || "unknown" } });
+    };
+    if (typeof w.plausible === "function") {
+      w.plausible("Contact Submitted", { props: { sector: sector || "unknown" } });
+    }
   }, [state.status, sector]);
 
   return (
