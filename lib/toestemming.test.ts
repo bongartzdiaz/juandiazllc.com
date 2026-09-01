@@ -216,6 +216,31 @@ describe("toestemming: GA4 kan niet laden zonder ja", () => {
     expect(b).not.toMatch(/process\.env\[/);
   });
 
+  /* De terugval. Het tag-id staat in de code omdat NEXT_PUBLIC_* bij het
+     BOUWEN wordt ingebakken: de variabele was nooit een schakelaar die zonder
+     nieuwe build iets doet, en de Redeploy-knop in Vercel leverde op
+     2026-09-01 twee keer geen deployment op (gemeten via de API).
+
+     Deze ene regex dekt drie dingen tegelijk: de variabele wordt gelezen, hij
+     staat LINKS -- dus hij wint van de terugval -- en de terugval is een
+     welgevormd GA4-id. En bewust ||, niet ??: wat Next voor een ONGEZETTE
+     NEXT_PUBLIC_* inbakt is hier niet gemeten, en ?? zou een ingebakken lege
+     string doorlaten. Dan doet de terugval niets en is deze hele regel een
+     stille no-op -- precies de klasse die hier het vaakst terugkomt. */
+  it("valt terug op een tag-id in de code, met de variabele ervoor", () => {
+    const b = bron(BANNER);
+    const m = b.match(/process\.env\.NEXT_PUBLIC_GA4_ID\s*\|\|\s*"(G-[A-Z0-9]+)"/);
+    expect(
+      m,
+      'verwacht process.env.NEXT_PUBLIC_GA4_ID || "G-..." : de variabele ' +
+        "links (die wint), de terugval rechts, en || in plaats van ??",
+    ).not.toBeNull();
+
+    /* Een tweede voorkomen van hetzelfde id is een tweede lijst die uit
+       elkaar loopt -- de bugklasse waar dit logboek het vaakst op terugkomt. */
+    expect(b.split(m![1]).length - 1).toBe(1);
+  });
+
   /* Zonder tag-id geen banner: een toestemmingsvraag stellen over iets dat
      niet bestaat is de bezoeker lastigvallen zonder reden. En met een keuze
      die al gemaakt is ook niet. */

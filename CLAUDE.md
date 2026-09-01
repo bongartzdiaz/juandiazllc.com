@@ -525,31 +525,31 @@ herschreven, en deze notitie is de correctie erop.
   het nameten:** de Web-Analytics-API geeft op het Hobby-plan 404 op élk
   project, ook op één met aantoonbare bezoekers. Die 404 is het plan en geen
   meting — lees het dashboard, niet de API.
-- **`NEXT_PUBLIC_GA4_ID` zetten in Vercel-productie op `G-JL21TDX7QB`.**
-  Dezelfde tag als diazatlas — geverifieerd op het levende object, niet uit
-  een bestand: `diazatlas.com/_compliance.js` regel 105 draagt hem, en de
-  regels 125-140 laten zien dat hij daar op precies dezelfde manier wordt
-  ingeladen. **Zonder deze waarde is de hele toestemmingsketen dood** en dat
-  is met opzet: `components/Toestemming.tsx` opent met
-  `if (!GA4_ID) return null`, dus er is geen banner, geen script en geen
-  meting. Een toestemmingsvraag stellen over iets dat niet bestaat is de
-  bezoeker lastigvallen zonder reden.
-  **Zetten alleen is niet genoeg — er moet een nieuwe deployment achteraan.**
-  `NEXT_PUBLIC_*` wordt bij het **bouwen** in de client-bundel gebakken, niet
-  bij het draaien. De build die nu op productie staat is gemaakt toen de
-  variabele nog niet bestond en draagt daar dus letterlijk `undefined`; hij
-  gaat nooit vanzelf iets anders doen. Drie stappen: Project Settings →
-  Environment Variables → toevoegen voor **Production**, en daarna Deployments
-  → de bovenste → Redeploy.
-  **Van deze machine kan het niet**, en dat is in twee onafhankelijke richtingen
-  nagetrokken: er staat geen `vercel`-CLI (`which vercel` vindt niets) en de
-  Vercel-MCP heeft wel project-, protectie-, deploy- en documentatiegereedschap
-  maar **geen** manier om een omgevingsvariabele te zetten.
-  Nameten kan zonder in te loggen. De banner verschijnt op elke pagina zolang
-  er nog geen keuze in `localStorage` staat onder `jd-toestemming-v1`; in de
-  geserveerde HTML is `class="toestemming"` het faalsignaal — die staat er nu
-  0×. Let op de valse vriend: het **woord** `toestemming` staat er wél één
-  keer, als componentnaam in de RSC-payload, en dat is geen gerenderde banner.
+- ~~**`NEXT_PUBLIC_GA4_ID` zetten in Vercel-productie op `G-JL21TDX7QB`.**~~
+  **Gesloten op 2026-09-01, en niet door de variabele te zetten.** Juan zette
+  hem wel, maar de Redeploy-knop leverde geen deployment op — driemaal
+  gemeten via de Vercel-API, met een controle op het filter zelf
+  (`since = aangemaakt−1ms` gaf precies één rij, `+1ms` nul, dus het filter
+  filterde werkelijk). Nul nieuwe deployments, 119 minuten na de laatste.
+  Op zijn aanwijzing staat de tag nu in de code: `Toestemming.tsx` doet
+  `process.env.NEXT_PUBLIC_GA4_ID || "G-JL21TDX7QB"`. De variabele wint nog
+  steeds als hij ooit wél doorkomt, en de tag gaat mee met de eerstvolgende
+  build vanaf `main`. **Wat openblijft is de knop, niet de tag** — dat een
+  Redeploy geen deployment-object oplevert is niet verklaard. Zolang dat zo
+  is, is een push naar `main` de enige deploy-route met bewijs dat hij werkt.
+  **Twee dingen in de vorige versie van dit blok klopten niet.** Er stond dat
+  `class="toestemming"` in de geserveerde HTML het faalsignaal is. Dat kán
+  niet: de component start op `useState(undefined)` en rendert `null` zolang
+  de keuze `undefined` is, en op de server draaien effects niet — de banner
+  staat dus in **geen enkele** geserveerde HTML, ook niet als alles werkt.
+  Wie daarop meet, leest een terechte nul als een mislukte deploy. Meet in de
+  **DOM** na hydratie, of op buildniveau met een grep op het tag-id in
+  `/_next/static/chunks/*.js`. En "van deze machine kan het niet, in twee
+  onafhankelijke richtingen nagetrokken" was te smal: er waren meer paden dan
+  die twee, en de Vercel-MCP stond er niet bij. Die heeft géén
+  redeploy-gereedschap — `deploy_to_vercel` vraagt om een `files`-boom en is
+  bedoeld voor wanneer er géén bruikbare git-remote is; hem gebruiken zou de
+  wérkkopie uploaden als productie-deployment, los van de commit.
 
 ### Supabase en Stripe
 
