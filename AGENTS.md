@@ -9507,3 +9507,152 @@ dashboard, en `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`,
 `CAL_WEBHOOK_SECRET`, `SENTRY_DSN`, de vier LinkedIn-beslissingen, de
 onverklaarde Redeploy-knop en de vijf openstaande PR's in
 `bongartzdiaz/diaz-editor` staan onveranderd open.
+
+### 2026-09-01 (vervolg) — J5, en een wetsartikel dat de rekensom van twee artikelen omkeert
+
+PR #320, gemerged als `6e825db`. Kalenderrij J5 is de halfjaarlijkse hermeting
+van de Einspeisevergütung voor het Duitse Heimspeicher-cluster.
+
+#### Het tweede onderwerp dat stand hield zoals het bedacht was
+
+Bij J2, J3 en J4 sloeg het natrekken de rij om: een woord dat in elke
+samenvatting staat en niet in de wet, twee rijen die op "niet nagetrokken"
+stonden maar wel kenbaar waren, en een hele wetslaag die er sinds vorig jaar
+overheen ligt. Hier niet — net als bij J7 was de rij precies wat hij beloofde.
+Wat er wél omging zijn de cijfers zelf.
+
+| gemeten bij de Bundesnetzagentur, 1. September 2026 | |
+|---|---|
+| Teileinspeisung, tot 10 kW op gebouwen | **7,70 ct/kWh** |
+| Volleinspeisung, zelfde klasse | 12,22 ct/kWh |
+| geldigheidsduur van die twee sätze | 1. August 2026 t/m 31. Januar 2027 |
+| degressieritme | halfjaarlijks sinds 2024 — de volgende stap valt dus op 1. Februar 2027 |
+| hoogte van die stap | **niet vastgesteld** |
+| detailhandelsprijs huishoudens | **bij de uitvoerder niet na te trekken** |
+
+#### Paragraaf 51 EEG stond in het hele cluster niet
+
+En hij grijpt in beide artikelen in. `§ 51 Abs. 1 EEG` zegt woordelijk dat de
+vergoeding op nul gaat zodra de spotmarktprijs negatief is, en `aufeinander-
+folgende Stunden` komt er niet in voor — er is dus geen minimumduur. De
+vergoeding is nul vanaf het eerste uur.
+
+In het **Heimspeicher**-stuk maakt dat de batterijcase *sterker*. In een uur met
+een negatieve prijs levert teruggeven niets op, dus is een vastgehouden kWh de
+volle detailprijs waard in plaats van het verschil tussen 7,70 ct en die
+detailprijs. Het weglaten liet de rekensom dus te laag uitkomen, in een artikel
+waarvan de these juist is dat je eerlijk moet rekenen.
+
+In het **tarief**-stuk is het scherper. Dat artikel noemde de negatieve
+middagprijzen al, en de smart meter ook, zonder op te merken dat het diezelfde
+meter is die de nul-vergoeding aanzet — vanaf 1 januari van het jaar erna.
+
+#### De eindprijs is geschrapt, niet vervangen
+
+`rund 30 bis 35 Cent` stond er als kopcijfer voor de huishoudelijke
+detailprijs. De Bundesnetzagentur publiceert dat cijfer niet: haar
+consumentenpagina verwijst naar vergelijkers en naar SMARD. Er is dus geen
+uitvoerder om het aan op te hangen, en een getal met een verzonnen bron is
+erger dan geen getal. De kopij verwijst nu naar de Arbeitspreis op de eigen
+rekening van de lezer.
+
+`docs/claims.md` draagt die zelfbeperking als rij, samen met de twee andere:
+geen bedrag voor de stap van 1. Februar 2027, en geen kW-drempel bij
+`§ 14a EnWG` — die opsomming in de wet noemt er geen.
+
+#### De poort, en waarom de verboden cluster-breed gelden
+
+`lib/einspeiseverguetung.test.ts` leest `getAllInsights` plus `kopij()` en niet
+de bestandstekst, zodat het testbestand niet over zijn eigen toelichting
+struikelt; vier eerdere tekstscans in deze repo deden dat wel. De cijfers en
+datums worden uit `claims.md` **geparseerd** in plaats van hier overgeschreven.
+
+De verboden gelden voor **elk** DE-artikel met tag Energy en niet alleen voor
+de twee gewijzigde stukken. Dat is strenger, en het vangt drift naar het
+solarpflicht-artikel dat in dezelfde tag naast ze staat.
+
+Een eigen zinsplitser met zelftest, want een naïeve split op `. ` knipt
+`1. Februar 2027` doormidden — dan meet je het scheidingsteken in plaats van de
+zin. De aanwezigheidseis staat er los naast: zonder die eis slaagt "elk
+gepubliceerd Cent-cijfer staat in claims.md" ook op nul cijfers.
+
+#### Vijftien mutaties, vijftien keer de voorspelde kleur
+
+Veertien rood op veertien verschillende asserties, één groen als controle,
+groen na herstel, nul sporen achtergebleven.
+
+Het paar dat telt is M4/M15: **het verouderde cijfer terug in de data is rood,
+diezelfde tekst in een toelichting is groen.** Dat is het uitvoerbare bewijs
+dat de poort de geëxporteerde data leest. M12, M13 en M14 richten zich op de
+poort zelf — de zinsplitser slopen, het cluster de verkeerde taal laten lezen,
+de Cent-parser niets meer laten vinden — zodat een groene uitkomst niet ook te
+verklaren is door een parser die niets leest.
+
+#### Drie keer mat ik het verkeerde, en telkens viel het op door twee tellers naast elkaar
+
+**De blokindex.** Mijn meetscript bouwde een array als
+`[titel, samenvatting, metaTitel, metaBeschrijving, ...body]` en ik rapporteerde
+"blok 8" alsof dat `body[8]` was. `p.body[8]` printen gaf een compleet andere
+alinea, zonder `14a` en zonder `Kilowatt`. De blokcontrole is daarna vervangen
+door een meting op zinsniveau met de datum-bewarende splitser, en die liet
+schoon zien dat er in geen enkele `§ 14a`-zin een kW-getal staat.
+
+**`Für` werd `Fuer`.** Ik schreef opnieuw een ASCII-transliteratie in Duitse
+kopij, en het patchscript meldde netjes dat het geslaagd was. Dat klopte ook:
+het schreef precies wat ik had opgegeven. De fout zat in wat ik opgaf, en hij
+kwam alleen boven door de uitkomst te lézen in plaats van de succesmelding te
+geloven. Vierde keer deze zomer, na #236 en #237. `Fuer Inbetriebnahmen` staat
+sindsdien als verbod in de productiesonde.
+
+**`1. August 2026` op twee pagina's.** De sonde meldde er twee waar ik er één
+verwachtte. Toegeschreven in plaats van aangenomen: de tweede is het
+solarpflicht-artikel, waar `31. August 2026` staat — en mijn zoekterm is een
+substring daarvan. Geen defect van de pagina maar een sonde die grover matcht
+dan de poort, die met een datum-regex `31. August 2026` netjes in zijn geheel
+leest. Zelfde klasse als de valse `per liter`-vlag bij ETS2.
+
+#### Gemeten
+
+Op een productiebuild, poort vooraf aantoonbaar vrij en het startlog gelezen om
+te bevestigen dat het mijn eigen proces was. Vier pagina's plus een negatieve
+controle: **afwijkingen 0**, verzonnen slug 404. Aanwezig: `7,70 Cent je
+Kilowattstunde`, de vier datums, `§ 51 EEG` op twee pagina's, `Was ich hier
+nicht behaupte` op drie, `ohne Mindestdauer`, `Arbeitspreis`. Afwezig:
+`rund 30 bis 35 Cent`, `rund 8 Cent`, `aufeinanderfolgende Stunden`,
+`Fuer Inbetriebnahmen`.
+
+```
+tsc --noEmit             exit 0
+vitest run               1448 tests in 72 bestanden (was 1436/71)
+i18n:check               741 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +12 is de nieuwe poort. `docs/claims.md` staat op 1294 CRLF, puur, in bytes
+gecontroleerd — de Write-uitvoer komt op LF binnen en wordt met een assertie
+ervoor en erna omgezet.
+
+#### Wat dit niet doet
+
+J5 blijft op `klaar`. Hij zit in de terugvalpool J2/J5/J6/D1 en
+`lib/content-kalender.test.ts` weigert die leeg te laten trekken; een refresh
+noteert zijn ronde in de **broncel** en verhuist niet naar `wachtrij`.
+
+De poort oordeelt niet over Duits, en niet over de vraag of de
+Bundesnetzagentur haar sätze inmiddels heeft bijgesteld. Blijft `claims.md`
+staan terwijl de werkelijkheid verschuift, dan is hij groen en toch verouderd —
+daar is de halfjaarlijkse ronde voor, en daarom staat de raadpleegdatum als
+eigen rij in de tabel.
+
+Geen enkele operator-taak opgelost. De Supabase-402 staat er nog, dus het
+contactformulier achter deze artikelen schrijft niets weg; de zes
+Plausible-doelen, `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`,
+`CAL_WEBHOOK_SECRET`, `SENTRY_DSN`, de vier LinkedIn-beslissingen, de
+onverklaarde Redeploy-knop en de vijf openstaande PR's in
+`bongartzdiaz/diaz-editor` staan onveranderd open.
+
+Van de kalender staan **J6** (ES autoconsumo, eerst nameten bij BOE en CNMC) en
+**J8 t/m J10** nog open; J10 is geblokkeerd tot de 27 intakevragen uit
+`docs/datastuk.md` beantwoord zijn.
