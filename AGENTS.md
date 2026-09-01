@@ -8504,3 +8504,200 @@ blok van 2026-08-28 over de DEUS-naamgeving. Dat is zo ontstaan doordat de
 laatste toevoeging onderaan werd geplakt terwijl de vorige ertussen was gezet.
 Niet rechtgetrokken — logboekgeschiedenis wordt hier niet herschreven — maar
 wie hierna aanvult, plakt onderaan en niet op datum.
+
+### 2026-09-01 — J7, en een contactadres dat op drieëndertig plekken stond
+
+Drie PR's: #306 en #307 zetten kalenderrij J7 om, #308 verving het
+contactadres. Wat ze bindt is dat in beide gevallen niet de wijziging het werk
+was maar het meten eromheen — en dat in beide gevallen de meetlat als eerste
+brak.
+
+#### J7 — het enige onderwerp dat stand hield zoals het bedacht was
+
+Bij J2, J3 en J4 sloeg het natrekken de rij om. Hier niet: de NEa-rijen in
+`docs/claims.md` stonden er sinds 2026-08-23 en het artikel publiceert wat daar
+geverifieerd staat. Twee van die rijen worden in het bestaande ETS2-cluster
+nergens uitgesproken — dat de eerste veiling **gepland** is, en dat de eerste
+inlevering pas in **2029** valt, over de emissies van 2028. Wie alleen de
+samenvattingen leest houdt 2027 over als het jaar waarin er wordt afgerekend.
+Dat scheelt twee jaar voorbereidingstijd.
+
+Wat er níét in staat: geen bedrag, geen dag in januari, geen sanctie. Alle drie
+staan als verbod in `claims.md`, en alle drie worden nu ook door een poort
+tegengehouden.
+
+#### Een cta-label trok bijna een ander artikel kapot
+
+Twee cta's uit het nieuwe artikel plus een wederkerige terug vanuit het
+bestaande kostprijs-artikel. Het label van die terugverwijzing noemt bewust
+**geen WPM**.
+
+`kopij()` telt het **label** van een cta mee en de **href** niet. Had er "WPM"
+in gestaan, dan was het oude ETS2-artikel het WPM-cluster in getrokken — en
+daar valt het om op de percentageregel, want het noemt "vijf, tien of twintig
+procent". Een artikel dat niemand had aangeraakt, kapot door een linktekst.
+
+Diezelfde asymmetrie kwam bij J4 al voor: het buurartikel draagt het woord
+*Solarpflicht* zodra de kruislink erin staat, dus die clusterregel matcht op
+`§ 106`. **Een cta-label is inhoud, een href niet** — en dat verschil bepaalt
+welke artikelen in een cluster vallen.
+
+#### `lib/ets2.test.ts` leidt zijn cluster af uit de inhoud, niet uit de tag
+
+Er is een derde ETS2-artikel (`ets2-de-gasrekening-krijgt-een-component-erbij`)
+onder tag *Real estate*. Een tagfilter had dat gemist. De poort test daarom
+`IS_ETS2` tegen `kopij(p)`, parseert zijn jaartallen uit `claims.md` in plaats
+van ze over te schrijven, en gooit als een rij niet precies één keer voorkomt.
+
+Eén regel is één keer omgekeerd na een valse treffer op mijn eigen
+samenvattingszin: "…in 2029 afgerekend, over de emissies van 2028" leest élk
+jaartal. Hij eist nu positief dat 2029 genoemd wordt.
+
+#### De probe was grover dan de poort, en meldde daarom een defect dat er niet was
+
+De productieprobe vlagde "per liter" als overtreding. Onderzocht in plaats van
+gemeld: de zin luidt *"…dus iedere tabel met eurocijfers per liter of per
+kubieke meter extrapoleert een aanname"* — ontkennend, precies wat de poort
+toestaat. Mijn probe gebruikte een kale substring; de poort gebruikt
+`PER_EENHEID` samen met `ONTKENNING`. Hermeten met de regexes van de poort zelf,
+plus zelftests: nul afwijkingen.
+
+Een tweede vermeende afwijking — twee verwijzingen naar het nieuwe artikel in
+het derde ETS2-artikel waar ik nul verwachtte — waren de automatische
+"Lees verder"-blokken. Geen bewerking, en het geeft dat ctaloze artikel juist
+een inkomend pad. **Mijn verwachting was fout, niet de pagina.**
+
+#### Het contactadres: drieëndertig plekken, en geen enkele poort zag het
+
+Juan zette het zichtbare adres om naar `info@juandiazllc.com`. Gemeten vóór er
+iets veranderde: zestien in `dict.ts` (`priv.p.rights` en `impressum.p.contact`,
+vier talen), drie op `/contact`, en de rest verspreid over het JSON-LD
+`contactPoint`, `/llms.txt`, het commandopalet, twee formulieren en de foutgrens.
+
+Mijn eerste telling zei 28. `grep -c` telt **regels**, en
+`impressum.p.contact` draagt het adres tweemaal per regel — href plus zichtbare
+tekst. Vijfde keer deze zomer dat een cijfer uit een eerste telling te laag was.
+
+**`lib/contactadressen.test.ts` bewaakt het domein en kon dit per constructie
+niet zien.** Die eist dat elk adres op juandiazllc.com staat, en `info@` en
+`juan@` staan daar allebei op. Zestien waardes konden dus stil uiteenlopen
+zonder één rood vinkje. De nieuwe poort bewaakt het **lokale deel** en is de
+aanvulling, niet de vervanger.
+
+#### Twee bestanden houden de literal, en dat is geen slordigheid
+
+| bestand | waarom niet importeren |
+|---|---|
+| `lib/i18n/dict.ts` | `branding.ts` haalt zijn `Locale`-**type** daar vandaan. Dat is een type-import en verdwijnt bij het compileren; een waarde-import terug is een echte runtime-cyclus. |
+| `app/global-error.tsx` | de kop van dat bestand eist minimale afhankelijkheden. Het is de grens die rendert als de rest stuk is, en een import erbij is een import die dán kan falen. |
+
+`lib/contactadres.test.ts` pint die twee met een **verwacht aantal** aan
+`CONTACT_EMAIL` vast. Zonder dat aantal is de pinning vacuüm: een bestand dat
+zijn adres kwijtraakt zou dan gewoon slagen. Eén mutatie zet het aantal op 15 en
+gaat af.
+
+#### De bestaande poort ging af, en dat was terecht
+
+`contactadressen.test.ts` had als positieve controle `> 20` eigen adressen. Die
+telling zakte van 29 naar 20 doordat tien literals een constante werden.
+
+De drempel is niet alleen verlaagd. **Een kaal getal als ondergrens moet je bij
+elke refactor bijstellen zonder dat het iets zegt**; de controle noemt nu de
+twee bestanden die het adres per constructie dragen. Dat is strenger in de
+dimensie die telt — een regex die maar één bestandsvorm matcht faalt nu — en
+losser in de dimensie die dreef.
+
+#### Twaalf mutaties per PR, en één die luid oversloeg
+
+Bij #308: tien rood op zeven verschillende asserties, twee groen als controle,
+groen na herstel, nul sporen. Het paar dat telt is M10/M11 — hetzelfde oude
+adres in een **toelichting** in `branding.ts`, rood met de commentaar-strip uit
+en groen met hem aan. Dat is het uitvoerbare bewijs dat `zonderCommentaar`
+dragend is en niet decoratief; vier eerdere tekstscans in deze repo vielen juist
+om op hun eigen proza.
+
+Eén mutatie sloeg **luid** over voordat hij landde: mijn comment-anker was een
+coderegel en geen commentaarregel. Dat is de goede uitkomst — een mutatie die
+stil niet landt leest exact hetzelfde als een poort die niet afgaat.
+
+#### Wat bewust niet is omgezet
+
+`_drafts/outreach/tier1-pitches-2026-07.md` noemt het oude adres als
+**afzender**-identiteit: *"Verstuurd vanaf …, persoonlijk, geen
+nieuwsbrief-tool"*. Dat omzetten zou het punt van die zin slopen. Om dezelfde
+reden is `noreply@` in de dode nieuwsbriefactie vrijgesteld in plaats van
+omgezet — met een vrijstelling die **haar eigen voorwaarde draagt**: nul
+afnemers. Krijgt `app/actions/newsletter.ts` weer een importeur, dan is het geen
+dode actie meer en valt de poort om in plaats van stil te blijven staan.
+
+#### Twee dingen over het gereedschap
+
+**Een recursieve `grep` vanaf `.` tikt hier zijn timeout aan.** De drie
+langlopende scratch-mappen (`_3dcap/`, `diaz-editor-gtm/` met eigen
+`node_modules`, `migrations-review/`) worden meegelopen. `git grep` leest alleen
+getrackte bestanden en was meteen klaar. Dezelfde val als `git add -A` in deze
+repo, en de reden dat elke commit hier expliciete paden staged.
+
+**Een nieuw bestand via het Write-gereedschap komt op pure LF.** Deze repo
+draagt CRLF (`* text=auto`, `core.autocrlf=true`). `lib/contactadres.test.ts`
+stond op 0 CRLF en 174 kale LF; omgezet in bytes met een assertie ervoor en
+erna. Verwant aan het `io.open(..., encoding=...)`-incident van 25 augustus,
+maar één laag eerder: daar normaliseerde het terugschrijven, hier het
+aanmaken.
+
+#### Gemeten
+
+Per PR gemeten, niet achteraf gereconstrueerd.
+
+| na | bestanden | tests |
+|---|---|---|
+| J7 (#306) | 68 | 1376 |
+| contactadres (#308) | 69 | 1382 |
+
+De +6 bij #308 is de nieuwe poort; `contactadressen.test.ts` kreeg een
+strengere assertie in een bestaande test en geen nieuwe.
+
+`tsc` 0 · i18n 730 × 4, ongewijzigd — alleen waardes geraakt · prijsgenerator
+groen · build groen · `CLAUDE.md` == `AGENTS.md` · squash-boom identiek aan de
+tak-boom, op beide PR's.
+
+Op productie ná de merge, met de uitgeleverde build eerst bevestigd — `/llms.txt`
+sloeg om van het oude naar het nieuwe adres, en die overgang is zelf het
+versheidsbewijs:
+
+```
+16 pagina's (contact · home · privacy · impressum × 4 talen)   afwijkingen 0
+/contact, alle vier: mailto-href 2x · aria-label 1x · oud 0x
+JSON-LD contactPoint, alle vier: 5 blokken, nieuw 1x, oud 0x
+/llms.txt: "- Email: info@juandiazllc.com"
+homepage mail-link, gerenderde tekst: 'info@juandiazllc.com'
+positieve controles 4/4, waaronder 404 op een verzonnen route
+```
+
+Die voorlaatste regel is niet decoratief. `components/sections/Contact.tsx`
+splitst het adres om de `@` eigen opmaak te geven, en dat deel wordt nu uit de
+constante afgeleid. De probe strippt het lege HTML-commentaar dat React tussen
+twee aangrenzende tekstknopen zet — zonder die strip meet je de serialisatie in
+plaats van de inhoud.
+
+#### Eén waarneming, niet gerepareerd
+
+`contactPointSchema()` in `lib/seo/schema.ts` draagt **geen** e-mailadres,
+terwijl het `contactPoint` in `app/[locale]/layout.tsx` er wel een heeft. Beide
+staan als JSON-LD op `/contact`. Geen defect van deze wijziging; het viel op bij
+het meten en staat hier genoteerd in plaats van stilzwijgend meegenomen.
+
+#### Wat dit niet doet
+
+Er is geen operator-taak mee opgelost. De Supabase-402 staat er nog, dus het
+contactformulier op `/contact` schrijft niets weg — het nieuwe adres is vandaag
+de enige weg die wél aankomt. Verder onveranderd open: de vijf Plausible-doelen,
+`LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `CAL_WEBHOOK_SECRET`, `SENTRY_DSN`, de
+vier LinkedIn-beslissingen, en in `bongartzdiaz/diaz-editor` de PR's #647, #652,
+#653, #654 en #655.
+
+Van de kalender staan **J5, J6 en J8 t/m J10** nog open. J5 (DE
+Einspeisevergütung-degressie) en J6 (ES autoconsumo) zijn refreshes die eerst
+bij Bundesnetzagentur en BOE nagemeten moeten worden en blijven daarom op
+`klaar`; J10 is geblokkeerd tot de 27 intakevragen uit `docs/datastuk.md`
+beantwoord zijn.
