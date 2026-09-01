@@ -9183,3 +9183,161 @@ formulier achter de scan schrijft niets weg), `LEAD_NOTIFY_SECRET`,
 `RESEND_API_KEY`, `ACK_FROM`, `CAL_WEBHOOK_SECRET`, `SENTRY_DSN`, de vier
 LinkedIn-beslissingen en de vijf openstaande PR's in `bongartzdiaz/diaz-editor`
 staan onveranderd open.
+
+### 2026-09-01 (vervolg) — de poort telde namen en geen eigenschappen, en het document beschreef een knop die er niet meer was
+
+PR #316, gemerged als `6080b08`. Het blok hierboven eindigde met een voorstel —
+de poort verbreden naar eigenschappen — en dit is de uitvoering. Wat er bij het
+meten bij kwam, is dat de drift ouder en groter was dan de twee getallen die
+#315 corrigeerde.
+
+#### Waarom de bestaande poort dit per constructie niet kon zien
+
+`lib/plausible-doelen.test.ts` bewaakte doel**namen** in drie richtingen: code →
+`MANUAL_TASKS.md`, `MANUAL_TASKS.md` → code, en code → `CLAUDE.md`, plus de
+pariteit met `AGENTS.md`. Over eigenschappen zei hij niets.
+
+Dat verklaart precies wat er gebeurde toen het zesde doel landde. De **naam**
+`Scan Voltooid` kwam onmiddellijk in het operatordocument terecht, want daar
+stond een poort op. Zijn **eigenschap** `lekken` had niets om uit de pas mee te
+lopen: er was geen tweede lijst die hem moest kennen. Een gat dat geen paar
+vormt, kan niet uiteenlopen — en is daarmee ook niet te meten.
+
+#### Negen asserties, over twee aanroepvormen
+
+De klasse-variant draagt de eigenschappen als data-attributen
+(`plausible-event-tier=`), de script-variant in het `props`-object. Ze worden
+gelezen met dezelfde twee regexes die de namen al vonden, uitgebreid met een
+tweede vanggroep.
+
+| assertie | bewaakt |
+|---|---|
+| beide aanroepvormen leveren eigenschappen op | positieve controle — anders slaagt de rest op een lege lijst |
+| geen eigenschapstag buiten zijn doelnaam | een losse tag telt nergens mee en zou stil verdwijnen |
+| `url` wordt nergens getagd | de grond onder `AUTOMATISCH` |
+| de tabel levert namen op, geen waarden | zonder de haakjes-strip gelden `energy-roi` en `unknown` als eigenschapsnaam |
+| per doel: code == documentatie | het defect zelf |
+| geen doel in de tabel dat de code niet kent | de andere richting |
+| de twee telwoorden in het proza | afgeleid uit de code, niet overgeschreven |
+| `CLAUDE.md` draagt dezelfde lijst plus telwoord | derde drager |
+| `CLAUDE.md` == `AGENTS.md` | pariteit |
+
+**Drie daarvan dragen een aanname in plaats van een regel**, en dat is opzet.
+`url` staat in `AUTOMATISCH` omdat Plausible hem zelf toevoegt aan een getagde
+link; gemeten staat `plausible-event-url=` **nul keer** in `app`, `components`
+en `lib`. Die nul is nu een assertie. Begint iemand `url` wél te taggen, dan
+valt de poort om in plaats van stil een lijst te publiceren waarin een
+eigenschap ontbreekt die de operator moet aanmelden.
+
+#### De waarden zijn bewust niet gepind, en de reden is scherper dan hij leek
+
+De voor de hand liggende uitbreiding is de tabel ook op de *waarden* van een
+eigenschap laten controleren — `starter / pro / business / …`. Bij het meten
+bleek waarom dat niet kan: **die waarden wonen op twee plekken, met twee
+verschillende mechanismen.**
+
+| waar | hoe |
+|---|---|
+| `TierKey` in `app/[locale]/pricing/page.tsx:22` | een lokale, niet-geëxporteerde union; de tag luidt `plausible-event-tier=${tier.key}` |
+| drie losse knoppen in dezelfde JSX | letterlijk `=migration`, `=trial`, `=sales` |
+
+De eerste is uit de tag zelf niet af te lezen — daar staat een interpolatie, geen
+waarde. Een poort op waarden zou dus zowel die union moeten importeren (hij is
+niet geëxporteerd) als de literals moeten scannen, en zou daarmee aan één
+paginabestand vastzitten. Dat is het soort koppeling dat breekt zodra iemand die
+pagina opsplitst, en dat daarna wordt uitgezet. De grens staat in de kop van het
+testbestand, zodat een volgende sessie niet denkt dat een groen vinkje hier
+"alle tags kloppen" betekent.
+
+#### Wat de drift werkelijk was: een knop die twaalf dagen weg was
+
+De aanleiding was de eigenschappen-telling, maar dezelfde regel droeg twee
+oudere fouten. Het document zei:
+
+> `Pricing CTA` — de vier tierknoppen plus de proef- en **e-mailknop** op `/pricing`.
+
+en de tabel eronder noemde `tier`-waarden `… / trial / email`.
+
+Die e-mailknop bestaat niet meer. `git log -S 'plausible-event-tier=email'` wijst
+één verwijdering aan: **`820b3ab` (#196, 20 augustus)** — de PR die op `/pricing`
+drie mailto-CTA's naar een geparkeerd domein verving door `/contact?interest=…`,
+omdat zo'n mailto de hele leadketen oversloeg. Die PR gaf de drie knoppen nieuwe
+tags (`migration`, `trial`, `sales`) en niemand werkte het operatordocument bij.
+
+Het waren dus **zeven knoppen, geen zes**, met één waarde die twaalf dagen dood
+was en twee die ontbraken. Beide regels zijn gecorrigeerd; de nieuwe poort dekt
+de eigenschapsnamen en niet de waarden, dus dit specifieke geval blijft handwerk
+— en staat daarom als meting opgeschreven in plaats van als afgedwongen regel.
+
+#### Dertien mutaties, dertien keer de voorspelde kleur
+
+Elf rood op elf verschillende asserties, twee als controlepaar, groen na
+herstel, nul sporen. Het paar dat telt:
+
+```
+M12  dezelfde tekst in een TOELICHTING       GROEN
+M13  dezelfde tekst in ECHTE code            ROOD
+```
+
+Dat is het uitvoerbare bewijs dat `zonderCommentaar` hier dragend is en niet
+decoratief. Vier eerdere tekstscans in deze repo vielen juist om op hun eigen
+proza — `contactadressen`, `persoon-entiteit`, `verzoeklimiet` en
+`server-acties` — dus die eigenschap aannemen in plaats van meten is hier
+aantoonbaar de duurste vorm van vertrouwen.
+
+Twee mutaties richten zich op de poort zelf: de haakjes-strip slopen (dan telt
+`energy-roi` als eigenschapsnaam) en de script-regex breken (dan levert
+`window.plausible()` niets meer op). Zonder die twee is een groene uitkomst ook
+te verklaren door een parser die niets leest.
+
+#### Onderweg
+
+**De poort leest zijn eigen bestand niet, en dat is niet nieuw.**
+`bronBestanden()` sluit op bestandsnaam alles met `.test.` uit — een regel uit de
+oorspronkelijke namenpoort. Daardoor tripte de nieuwe `url`-assertie niet over de
+twee voorkomens van `plausible-event-url=` in het testbestand zelf. Het is een
+werkende vrijstelling met een prijs: een tag in een testbestand is voor deze
+poort onzichtbaar. Dat kost vandaag niets, want een testbestand levert geen tags
+uit.
+
+**Het mutatieharnas gaf drie `SyntaxWarning`s die niets braken.** De ankers voor
+de twee poort-mutaties bevatten `\(` en `\{`, en dat is in een gewone
+Python-string geen geldige escape. Python laat zo'n reeks dan letterlijk staan,
+dus beide ankers matchten en beide mutaties liepen rood zoals voorspeld. Het
+werkte per ongeluk goed; in een raw string was er geen waarschuwing geweest en
+hing het ook niet aan Python-versiegedrag.
+
+**En de heredoc brak voor de vijftiende keer**, nu bij het schrijven van dit blok
+zelf: `<<'MD'` met ruim honderdzestig regels markdown erin gaf een parsefout en
+schreef nul bytes. Niet verder onderzocht — de uitweg staat al vijf keer in dit
+logboek. Lange tekst gaat via het Write-gereedschap naar de scratchpad en wordt
+daarna in bytes aangehecht.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1429 tests in 70 bestanden (was 1420/70)
+i18n:check               741 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +9 is de nieuwe poort; het bestandsaantal blijft 70 omdat de asserties in het
+bestaande testbestand landen. Zes verplichte checks groen, `Vercel` apart
+nagekeken via `/status` op deze SHA — die komt niet via `/check-runs`, de val van
+22 augustus. Squash-boom byte-identiek aan die van de tak.
+
+Twee bestanden geraakt: een testbestand en twee regels in een operatordocument.
+Geen runtime-code, dus er valt hier niets in de browser na te meten.
+
+#### Wat dit niet doet
+
+**De zes doelen bestaan nog steeds niet in Plausible.** Elke klik wordt
+binnengehaald en weggegooid, en dat blijft zo tot de operator ze aanmaakt — nu
+met een telling die klopt. Verder is er geen enkele operator-taak mee opgelost:
+de Supabase-402 (dus het contactformulier schrijft niets weg),
+`LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`, `CAL_WEBHOOK_SECRET`,
+`SENTRY_DSN`, de vier LinkedIn-beslissingen, de onverklaarde Redeploy-knop en de
+vijf openstaande PR's in `bongartzdiaz/diaz-editor` staan onveranderd open.
