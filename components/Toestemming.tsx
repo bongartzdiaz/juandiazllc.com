@@ -20,7 +20,27 @@ import {
    `process.env[NAAM]` levert op de client `undefined` op. lib/env-voorbeeld
    .test.ts dwingt dat af, na de CAL_WEBHOOK_SECRET die daar maanden door uit
    .env.example bleef. */
-const GA4_ID = process.env.NEXT_PUBLIC_GA4_ID;
+/* Het tag-id staat in de code, niet alleen in een omgevingsvariabele.
+   NEXT_PUBLIC_* wordt bij het BOUWEN ingebakken, dus de variabele was nooit
+   een schakelaar die zonder nieuwe build iets doet -- en de Redeploy-knop
+   leverde op 2026-09-01 twee keer geen deployment op (gemeten via de
+   Vercel-API). Een push naar main is de enige deploy-route met bewijs.
+
+   Een gezette NEXT_PUBLIC_GA4_ID wint nog steeds, dus een andere property
+   (een testtag) kan zonder codewijziging.
+
+   UIT zetten = deze literal leegmaken. Dan grijpt de !GA4_ID-controle
+   hieronder: geen banner, geen script, geen cookie.
+
+   Bewust || en niet ??. Gemeten op productiebuilds van 2026-09-01, en het
+   gedrag verschilt per geval. Staat de variabele NIET gezet, dan laat Next de
+   uitdrukking staan en leest hij bij het draaien uit een process.env-schil
+   die bij het bouwen is vastgezet -- `env.NEXT_PUBLIC_GA4_ID||"G-..."` staat
+   dan letterlijk in de chunk. Staat hij WEL gezet, dan vouwt hij het geheel
+   weg tot die ene waarde en wordt de terugval niet eens meegeleverd.
+   Draagt die schil ooit een LEGE string, dan houdt ?? die vast en staat GA4
+   stil uit; || valt dan alsnog terug. */
+const GA4_ID = process.env.NEXT_PUBLIC_GA4_ID || "G-JL21TDX7QB";
 
 type GtagVenster = Window & {
   dataLayer?: unknown[];
