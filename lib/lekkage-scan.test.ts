@@ -434,13 +434,13 @@ describe("het doel Scan Voltooid", () => {
   const CODE = zonderCommentaar(RUW);
 
   it("vuurt het doel af, met het aantal lekken erbij", () => {
-    expect(CODE).toContain('plausible?.("Scan Voltooid"');
+    expect(CODE).toContain('w.plausible("Scan Voltooid"');
     expect(CODE).toContain("lekken: String(lekken.length)");
   });
 
   it("meldt hooguit eenmaal per bezoek", () => {
     const bewaking = CODE.indexOf("if (gemeld.current) return;");
-    const melding = CODE.indexOf('plausible?.("Scan Voltooid"');
+    const melding = CODE.indexOf('w.plausible("Scan Voltooid"');
     expect(bewaking, "de ref-bewaking ontbreekt -- het doel telt dan dubbel").toBeGreaterThan(-1);
     expect(CODE, "de ref moet op false terug als de uitslag niet meer staat").toContain(
       "gemeld.current = false;",

@@ -36,7 +36,12 @@ export function Analytics() {
 
   return (
     <Script
-      id="plausible"
+      /* NIET id="plausible". Een element met dat id wordt via HTML named
+         access een eigenschap op window, en zolang het script niet laadt is
+         window.plausible dan het HTMLScriptElement zelf: truthy, en niet
+         aanroepbaar. Gemeten op productie 2026-09-01. De aanroepkant is
+         daarnaast gehard; zie lib/plausible-aanroep.test.ts. */
+      id="plausible-analytics"
       strategy="afterInteractive"
       data-domain={domain}
       // tagged-events variant: enables custom goal events (window.plausible(...)

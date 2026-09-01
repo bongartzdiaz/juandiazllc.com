@@ -89,9 +89,16 @@ export function LekkageScan() {
     }));
     if (gemeld.current) return;
     gemeld.current = true;
-    (window as unknown as {
+    /* typeof, geen optionele aanroep. `?.()` valt alleen terug op null en
+       undefined; een truthy niet-functie werpt een TypeError, en dit staat
+       in een effect -- dus dat sloopt de React-boom in plaats van stil
+       niets te meten. Zie lib/plausible-aanroep.test.ts. */
+    const w = window as unknown as {
       plausible?: (event: string, opts?: { props?: Record<string, string> }) => void;
-    }).plausible?.("Scan Voltooid", { props: { lekken: String(lekken.length) } });
+    };
+    if (typeof w.plausible === "function") {
+      w.plausible("Scan Voltooid", { props: { lekken: String(lekken.length) } });
+    }
   }, [getoond, compleet, lekken.length]);
 
   function kies(id: string, waarde: boolean) {
