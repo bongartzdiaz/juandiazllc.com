@@ -525,6 +525,31 @@ herschreven, en deze notitie is de correctie erop.
   het nameten:** de Web-Analytics-API geeft op het Hobby-plan 404 op élk
   project, ook op één met aantoonbare bezoekers. Die 404 is het plan en geen
   meting — lees het dashboard, niet de API.
+- **`NEXT_PUBLIC_GA4_ID` zetten in Vercel-productie op `G-JL21TDX7QB`.**
+  Dezelfde tag als diazatlas — geverifieerd op het levende object, niet uit
+  een bestand: `diazatlas.com/_compliance.js` regel 105 draagt hem, en de
+  regels 125-140 laten zien dat hij daar op precies dezelfde manier wordt
+  ingeladen. **Zonder deze waarde is de hele toestemmingsketen dood** en dat
+  is met opzet: `components/Toestemming.tsx` opent met
+  `if (!GA4_ID) return null`, dus er is geen banner, geen script en geen
+  meting. Een toestemmingsvraag stellen over iets dat niet bestaat is de
+  bezoeker lastigvallen zonder reden.
+  **Zetten alleen is niet genoeg — er moet een nieuwe deployment achteraan.**
+  `NEXT_PUBLIC_*` wordt bij het **bouwen** in de client-bundel gebakken, niet
+  bij het draaien. De build die nu op productie staat is gemaakt toen de
+  variabele nog niet bestond en draagt daar dus letterlijk `undefined`; hij
+  gaat nooit vanzelf iets anders doen. Drie stappen: Project Settings →
+  Environment Variables → toevoegen voor **Production**, en daarna Deployments
+  → de bovenste → Redeploy.
+  **Van deze machine kan het niet**, en dat is in twee onafhankelijke richtingen
+  nagetrokken: er staat geen `vercel`-CLI (`which vercel` vindt niets) en de
+  Vercel-MCP heeft wel project-, protectie-, deploy- en documentatiegereedschap
+  maar **geen** manier om een omgevingsvariabele te zetten.
+  Nameten kan zonder in te loggen. De banner verschijnt op elke pagina zolang
+  er nog geen keuze in `localStorage` staat onder `jd-toestemming-v1`; in de
+  geserveerde HTML is `class="toestemming"` het faalsignaal — die staat er nu
+  0×. Let op de valse vriend: het **woord** `toestemming` staat er wél één
+  keer, als componentnaam in de RSC-payload, en dat is geen gerenderde banner.
 
 ### Supabase en Stripe
 
@@ -8702,3 +8727,140 @@ Einspeisevergütung-degressie) en J6 (ES autoconsumo) zijn refreshes die eerst
 bij Bundesnetzagentur en BOE nagemeten moeten worden en blijven daarom op
 `klaar`; J10 is geblokkeerd tot de 27 intakevragen uit `docs/datastuk.md`
 beantwoord zijn.
+
+### 2026-09-01 (vervolg) — GA4 achter een toestemmingspoort, en de banner die in april bewust wegging
+
+PR #311, gemerged als `c41223d`. De aanleiding was één zin: dezelfde tag als op
+diazatlas mag ook hier, ze horen bij elkaar. Het werk zat niet in de tag maar in
+wat eromheen moest.
+
+#### De banner is in april met opzet verwijderd, en die reden vervalt hier
+
+Bundle 2 van 19 april haalde `components/CookieConsent.tsx` weg en herschreef
+`priv.p.cookies` en `priv.p.analytics` in vier talen, omdat Plausible cookieloos
+is en de banner daarmee juridisch theater was. Dat klopte, en het klopt niet
+meer zodra GA4 erbij komt: die zet `_ga` en `_ga_<container>`, en dat is precies
+wat ePrivacy 5(3) raakt.
+
+**Alleen het ding met de cookie zit achter de poort.** Die bepaling gaat over
+opslaan op of uitlezen van het apparaat, niet over "analytics" als categorie.
+Plausible (cookieloos, EU-gehost) en Vercel blijven daarom ongepoortd — de
+bestaande opt-out op `/privacy` staat er nog naast. Wat wél moest wijzigen is
+de belofte: twee dict-sleutels beloofden in vier talen dat er geen
+toestemmingsbanner is, en dat is nu onwaar.
+
+#### Drie keuzes met een reden
+
+**`createElement`, geen `next/script`.** De twee policies in `proxy.ts` stellen
+tegengestelde eisen. De afgedwongen variant is een host-allowlist en heeft
+`www.googletagmanager.com` letterlijk nodig; de strikte report-only draait op
+`'strict-dynamic'` en negeert host-allowlists juist. Injectie vanuit een
+Next-chunk die zijn nonce al droeg voldoet aan allebei. Met `next/script` zou de
+afgedwongen policy het toelaten en de strikte erover klagen — permanente ruis in
+de canary, via `/api/csp-report` door naar Sentry. **`connect-src` valt níét
+onder strict-dynamic**, dus beide beacon-hosts staan in beide varianten.
+
+**De uitschakelaar vóór het laden.** Google leest `ga-disable-<ID>` bij het
+*verzenden* en niet bij het laden. Daardoor werkt intrekken terwijl het script
+al draait, en dat is precies het geval dat telt — AVG art. 7 lid 3 eist dat
+intrekken net zo makkelijk is als geven. Andersom zetten kon een eerste
+`page_view` laten vertrekken voordat de vlag stond.
+
+**De versie zit in de sleutel.** `jd-toestemming-v1`. `allow_google_signals` en
+`allow_ad_personalization_signals` staan uit; gaan die ooit aan, dan is dat een
+nieuw doel en moet `TOESTEMMING_VERSIE` omhoog. Een poort legt dat vast.
+
+#### Twee lagen die elkaar niet overlappen
+
+`lib/toestemming.test.ts` doet de opslagbeslissingen via module-import en de
+bedrading via een tekstscan. Dat is geen dubbeling: het gevaarlijke defect zit
+in de **bedrading** — een `laadGa4()` die niet meer achter zijn `=== "ja"` staat,
+of een uitschakelaar die ná het laden wordt gezet — en dat is voor een import per
+definitie onzichtbaar. Vandaar ook de volgorde-assertie op de posities van beide
+aanroepen in de bron.
+
+De intrekknop op `/privacy` staat in een eigen component en **raakt het script
+niet aan**. Hij schrijft alleen de keuze weg; `Toestemming.tsx` luistert op
+hetzelfde event. Een tweede plek die gtag aanraakt zou een tweede lijst zijn die
+uit elkaar loopt, en een van de mutaties dwingt dat af.
+
+#### Gemeten met een placeholder, en dat was niet overdreven
+
+De eerste productiebuild had `G-JL21TDX7QB` ingebakken. Toestemming geven had
+daar een levende `page_view` naar de echte property gestuurd vanaf localhost —
+dus server gestopt, opnieuw gebouwd met `G-TESTONLY000`, en pas daarna gemeten.
+
+| pad | uitkomst |
+|---|---|
+| vóór elke keuze | vlag staat al op `true` (fail-closed), nul gtag-scripts, nul verzoeken naar Google |
+| weigeren | opslag `"nee"`, banner weg, `gtag` undefined, nog steeds nul GA-verzoeken |
+| toestaan | opslag `"ja"`, vlag naar `false`, één async gtag.js, nul geblokkeerde beacons |
+| intrekken | vlag terug op `true`, **zonder herlading** |
+| 375 px | horizontale overloop 0, beide knoppen 162×46 (boven de 44 van WCAG 2.5.5) |
+| console | nul CSP-fouten, nul hydratiewaarschuwingen — ná een hartslag door de lezer |
+
+Twee dingen dragen het bewijs. Dat gtag.js **werkelijk uitvoerde** blijkt uit
+`window.google_tag_manager["G-TESTONLY000"]` plus `gtm.dom`/`gtm.load` in de
+dataLayer — die duwt gtag.js zelf, niet onze stub. En dat er bij intrekken
+**geen herlading** tussen zat blijkt uit diezelfde container, die de klik
+overleefde: was er herladen, dan had het effect met opslag `"nee"` gedraaid en
+was gtag niet geladen, dus was de container weg geweest.
+
+**Die laatste meting moest over.** De eerste poging klikte de anchor op
+`/nl/privacy` aan, dat is een volledige page reload, en de `gaDisable: false`
+die eruit kwam was gewoon herinitialisatie ná die herlading. Een meting die
+niet kan onderscheiden wat hij moet onderscheiden, leest hetzelfde als een
+geslaagde meting.
+
+#### Twee mutaties waren stuk vóórdat ze iets bewezen
+
+Twintig mutaties, twintig keer de voorspelde kleur — maar pas na reparatie van
+twee die over niets maten. M18 moest de scripthost óók in de strikte tak zetten
+en voegde een **ongebruikte const** toe; die raakt die tak niet. En M2 moest de
+volgorde omkeren en **verwijderde** de uitschakelaar, wat een andere assertie
+test dan de volgorde-assertie. Allebei zagen ze eruit als een zwakke poort.
+Leg de verwachte kleur vooraf vast en verklaar elke afwijking — anders repareer
+je het verkeerde ding.
+
+#### Merge zonder de deploystatus te vertrouwen
+
+`Vercel=success` bij de eerste peiling is precies de vorm die op 22 augustus
+misleidde. Het versheidsbewijs kwam daarom uit de uitgeleverde CSP-header zelf:
+`www.googletagmanager.com` in de afgedwongen `script-src` bestaat alleen in
+deze commit. Gemeten op productie staat de asymmetrie er zoals bedoeld — de
+scripthost in de afgedwongen policy, niet in de strikte report-only, en beide
+beacon-hosts in allebei.
+
+En de feature is dark zoals ontworpen: `class="toestemming"` komt 0× voor.
+De ene treffer op het **woord** `toestemming` is de componentverwijzing in de
+RSC-payload, geen gerenderde banner — toegeschreven in plaats van aangenomen.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1419 tests in 70 bestanden (was 1390/69)
+i18n:check               741 sleutels x 4 (was 730)
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +29 is toegeschreven: `lib/toestemming.test.ts` 25 nieuw, `proxy.test.ts` van
+32 naar 36. De +11 sleutels zijn de bannerkopij plus de toestand-teksten van de
+intrekknop; de twee herschreven privacy-alinea's zijn waardes en geen nieuwe
+sleutels. Squash-boom byte-identiek aan die van de tak.
+
+#### Wat dit niet doet
+
+**De tag staat hierna nog uit**, en dat is de bedoeling tot Juan hem aanzet:
+`NEXT_PUBLIC_GA4_ID` is niet gezet in Vercel. Dat zetten kan van deze machine
+niet — geen CLI, en de MCP heeft geen gereedschap voor omgevingsvariabelen — en
+het vergt bovendien een redeploy, want `NEXT_PUBLIC_*` wordt bij het bouwen
+ingebakken. De taak staat met alle drie de stappen op de operator-lijst
+bovenaan dit bestand.
+
+Geen enkele andere operator-taak is hiermee opgelost: de Supabase-402 (dus het
+contactformulier schrijft nog steeds niets weg), de zes Plausible-doelen,
+`LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`, `CAL_WEBHOOK_SECRET`,
+`SENTRY_DSN` en de vier LinkedIn-beslissingen staan onveranderd open.
