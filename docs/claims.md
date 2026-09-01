@@ -1227,6 +1227,61 @@ het tarief-stuk bijt het harder: dat noemt negatieve middagprijzen én het
 slimme meetsysteem, zonder te zeggen dat precies dát meetsysteem de
 nulvergoeding aanzet, met ingang van 1 januari van het jaar daarna.
 
+### Autoconsumo en compensación de excedentes — RD 244/2019 (gemeten 2026-09-01)
+
+De haak onder het ES-autoconsumo-cluster. Tot vandaag stond er over dit
+onderwerp **geen enkele rij** in dit bestand, terwijl drie Spaanse artikelen
+sinds 20 juli 2026 met een compensatieplafond en met twee €/kWh-bereiken
+rekenen. Eén kernclaim van het cluster blijkt bij de wettekst onjuist, twee
+marktcijfers zijn bij de uitvoerder niet na te trekken, en de
+plafondformulering is grover dan de wet.
+
+**Bron.** De geconsolideerde tekst van het Real Decreto 244/2019 op `boe.es`,
+plus de CNMC voor de vraag of er een gepubliceerd compensatietarief bestaat.
+
+**Let op bij het nameten, twee vallen.** De geconsolideerde BOE-tekst wordt
+bijgewerkt zonder dat de pagina dat in de tekst zelf zegt; lees de gedateerde
+variant (`&p=<jjjjmmdd>&tn=1#a<artikel>`) mee, anders krijg je een oudere
+doorsnede terug die er identiek uitziet. Eén raadpleging in deze ronde gaf
+aantoonbaar de versie van vóór 2026 terug — zie de rij over art. 3.g.iii.
+En de tweede: **selecteer op lidnummer, niet op onderwerp.** Twee raadplegingen
+gaven verschillende tekst onder de noemer "art. 13.4"; pas een volledige dump
+van art. 13 wees uit welke klopte.
+
+| Claim | Waarde | Status |
+| --- | --- | --- |
+| Verkopen van overschot is mogelijk | art. 13.4, woordelijk: "El productor acogido a la modalidad de autoconsumo con excedentes no acogida a compensación, percibirá por la energía horaria excedentaria vertida las contraprestaciones económicas correspondientes, de acuerdo a la normativa en vigor." | ✅ boe.es — **de scherpste rij, en de reden dat deze sectie bestaat** |
+| Die modaliteit is een vrijwillige keuze | art. 4.2.b, woordelijk: "…que no cumplan con alguno de los requisitos para pertenecer a la modalidad con excedentes acogida a compensación **o que voluntariamente opten por no acogerse a dicha modalidad**." | ✅ zelfde bron — het is dus geen restcategorie voor wie niet kwalificeert |
+| Voorwaarden om wél in compensatie te vallen | vijf, cumulatief: hernieuwbare primaire bron; totaal gekoppeld opwekvermogen **≤ 100 kW**; één leveringscontract met dezelfde comercializadora waar hulpdiensten er een vergen; een getekend compensatiecontract volgens art. 14; en geen aanvullend of specifiek vergoedingsregime | ✅ art. 4.2.a, i tot en met v |
+| Het plafond, woordelijk | "En ningún caso, el valor económico de la energía horaria excedentaria podrá ser superior al valor económico de la energía horaria consumida de la red en el periodo de facturación, el cual no podrá ser superior a un mes." | ✅ art. 14.3 — het plafond is de **waarde van de van het net afgenomen energie**, over een **factureringsperiode van hooguit een maand**; niet per definitie een kalendermaand |
+| Waardering op de vrije markt | woordelijk: "La energía horaria excedentaria, será valorada al precio horario acordado entre las partes." | ✅ art. 14.3.i — een prijs tussen partijen, dus per contract verschillend |
+| Waardering onder PVPC | "…valorada al precio medio horario, Pmh; obtenido a partir de los resultados del mercado diario e intradiario en la hora h, menos el coste de los desvíos CDSVh" | ✅ art. 14.3.ii — een formule, geen gepubliceerd tarief |
+| Gepubliceerd €/kWh-compensatietarief bij de CNMC | **bestaat niet** — de CNMC beschrijft het mechanisme, niet een tarief | ❌ noem geen €/kWh-bereik voor de compensatie |
+| Detailhandelsprijs huishoudens ("0,20-0,25 €/kWh") | **bij de uitvoerder niet na te trekken** | ❌ noem geen €/kWh-bereik; verwijs naar het término de energía op de eigen rekening |
+| Doorschuiven naar de volgende periode | er is **geen bepaling** die het toestaat, en art. 14.3 begrenst per factureringsperiode | ✅ als afleiding — publiceer het als gevolg van het plafond, niet als eigen artikel |
+| Overschot zonder geldig leveringscontract | wordt afgestaan "sin ningún tipo de contraprestación económica vinculada a dicha cesión" | ✅ art. 13.6 — geldt bij terugval op de comercializador de referencia |
+| Wisselen van modaliteit | mag, met drie beperkingen in art. 4.5, waaronder: "…con la única excepción de un autoconsumo individual sin excedentes combinado con un autoconsumo mediante instalaciones próximas y asociadas a través de la red." | ✅ art. 4.5, geconsolideerde versie in werking 22/03/2026 |
+| Is RD 244/2019 sinds 20 juli 2026 gewijzigd? | **ja** — laatste wijziging in werking **22/03/2026**, via Real Decreto-ley 7/2026, disposición final decimocuarta (df 14.1 raakt art. 3.g.iii, df 14.2 raakt art. 4.5). Ley 9/2025 disposición final decimoséptima raakte art. 4.5 eerder, per 03/12/2025 | ✅ BOE-metadata plus de gewijzigde tekst van art. 4.5 zelf |
+| Raakt die wijziging de claims van dit cluster? | **nee** — het cluster steunt op art. 4.2 (modaliteiten), art. 13.4 en art. 14.3 (plafond en waardering), en geen van die leden is aangeraakt | ✅ zelfde raadpleging — dat is zelf de publiceerbare bevinding |
+| Afstandsgrens voor collectief autoconsumo (art. 3.g.iii) | **niet nagetrokken bij de brontekst** | ❌ noem geen afstand in km of meters |
+| Huidige tekst van art. 3.g.iii | **niet betrouwbaar verkregen** — de enige raadpleging die hem gaf, leverde aantoonbaar de versie van vóór 2026 | ❌ citeer dit lid niet |
+| Nagetrokken op | **1 september 2026** | ✅ dezelfde raadpleging |
+
+**Wat er niet in kopij mag.** Geen €/kWh-bereik voor de detailhandelsprijs en
+geen voor de compensatie, geen afstandsgrens voor collectief autoconsumo, geen
+citaat uit art. 3.g.iii, en niet de bewering dat je je overschot in Spanje niet
+kunt verkopen.
+
+**Waarom art. 13.4 de rekensom van het cluster verandert.** Het cluster draagt
+als kernzin dat je je overschot in Spanje niet verkoopt maar tot een plafond
+compenseert. De eerste helft daarvan is onjuist: er bestaat een tweede
+modaliteit waarin het overschot wél economisch vergoed wordt, en art. 4.2.b
+zegt met zoveel woorden dat je daar **vrijwillig** voor mag kiezen. Precies de
+lezer die het cluster aanspreekt — degene die te horen krijgt dat hij niet moet
+overdimensioneren — heeft daarmee een optie die het cluster wegliet. Wat wél
+klopt is het plafond, en dat blijft de kern: binnen de compensatiemodaliteit
+levert een kilowattuur boven je afname niets op.
+
 ## Reactietijd op leads — de 78% is folklore (gemeten 2026-08-23)
 
 Aanleiding: een voorstel om in kopij en outreach te schrijven dat **"78% van
