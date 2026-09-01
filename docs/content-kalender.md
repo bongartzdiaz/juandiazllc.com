@@ -33,7 +33,7 @@ bestaat.
 | J4 | Solarpflicht: welke plicht als eerste grijpt, de bondsstaffel of je Bundesland | de | Energy | BGBl. 2026 I Nr. 226 (§ 106 GModG, in werking 1-1-2027) + Umweltministerium Baden-Württemberg. Het onderwerp is bijgesteld: sinds 29 juli 2026 ligt er een bondslaag over het landesrecht, dus het is geen puur landesrechtelijk lappendeken meer. Één Land nagetrokken; de overige vijftien staan als niet-nagetrokken in `docs/claims.md`, net als Bußgeld en kWp. Bewaakt door `lib/solarpflicht.test.ts`. PR #303, gemerged 2026-08-31 | live |
 | J5 | Refresh: DE Heimspeicher-cluster (Einspeisevergütung-degressie halfjaarlijks — cijfers verifiëren) | de | Energy | Bundesnetzagentur | klaar |
 | J6 | Refresh: ES autoconsumo-cluster (RD 244/2019 ongewijzigd? compensatie-plafond) | es | Energy | BOE / CNMC | klaar |
-| J7 | ETS2 stand van zaken: veiling gepland, eerste inlevering 2029 — wat je dit jaar wél moet regelen | nl | Logistics | NEa; bestaand ETS2-artikel | klaar |
+| J7 | ETS2 stand van zaken: veiling gepland, eerste inlevering 2029 — wat je dit jaar wél moet regelen | nl | Logistics | NEa via `docs/claims.md`; de twee bestaande ETS2-artikelen. Het onderwerp hield stand zoals bedacht — anders dan bij J2, J3 en J4 was er geen bijstelling nodig. Bewaakt door `lib/ets2.test.ts`. PR #306 | wachtrij |
 | J8 | EPBD IV: de trapsgewijze eisen na label D per 2030 | nl | Real estate | Rijksoverheid/RVO; bestaand EPBD-artikel | wacht |
 | J9 | Vierde hospitality-artikel: nachtaudit als datamoment | en+de/es | Hospitality | sectorpagina-leaks; geen klantcijfers | wacht |
 | J10 | Datastuk "tussen intake en offerte" | nl | Systems | `docs/datastuk.md` — **geblokkeerd tot de 27 intakevragen beantwoord zijn** | wacht |
