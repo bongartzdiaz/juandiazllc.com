@@ -9341,3 +9341,169 @@ de Supabase-402 (dus het contactformulier schrijft niets weg),
 `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`, `CAL_WEBHOOK_SECRET`,
 `SENTRY_DSN`, de vier LinkedIn-beslissingen, de onverklaarde Redeploy-knop en de
 vijf openstaande PR's in `bongartzdiaz/diaz-editor` staan onveranderd open.
+
+### 2026-09-01 (vervolg) — het script-id claimde de naam, en `?.()` dekt die val niet af
+
+PR #318, gemerged als `10a7fa2`. De aanleiding was een meting op productie die
+niet bij deze code begon maar bij een HTML-eigenschap die niemand had gekozen.
+
+#### Een id op een script-tag is ook een naam op `window`
+
+`components/Analytics.tsx` gaf zijn script `id="plausible"`. Een element met een
+id wordt via **HTML named access** een eigenschap op `window`. Wordt er nooit een
+echte global met die naam toegekend — adblocker, offline, DNS geblokkeerd — dan
+is `window.plausible` het `HTMLScriptElement` zelf: **truthy, en niet
+aanroepbaar**.
+
+Gemeten in de DOM op `https://juandiazllc.com/nl/pricing`:
+
+```json
+{ "nu": "WERPT TypeError: p is not a function",
+  "zonderId": "undefined",
+  "zonderIdWorp": "geen worp - no-op zoals bedoeld",
+  "hersteld": "object" }
+```
+
+**`?.()` valt alleen terug op `null` en `undefined`.** Een truthy niet-functie
+werpt. En beide aanroepen staan in een `useEffect`, dus die worp sloopt de
+React-boom in plaats van stil niets te meten: `Contact Submitted` na een
+geslaagde inzending, `Scan Voltooid` op het uitslagscherm van de lekkage-scan.
+
+Dat is dezelfde klasse als de `??`-keten in `lib/sentry.ts` van 26 augustus: een
+operator die precies twee waarden afvangt, gebruikt op een plek waar een derde
+waarde bestaat. Daar was het de lege string, hier de truthy niet-functie.
+
+#### Twee reparaties, en de tweede is de dragende
+
+| | wat | waarom |
+|---|---|---|
+| A | `id="plausible"` → `id="plausible-analytics"` | haalt de oorzaak weg |
+| B | `typeof w.plausible === "function"` op beide aanroepen | **de dragende helft** — A alleen laat de val open voor het volgende `id` |
+
+Nagemeten voordat A landde: er is geen enkele lezer van `#plausible` of
+`getElementById("plausible")`, dus hernoemen breekt niets.
+
+**Bewust geen gedeelde `meldPlausible()`-helper.** Dat is de nette vorm en hij
+zou een poort slopen: `SCRIPT_MET_PROPS` in `lib/plausible-doelen.test.ts` leest
+de token vóór de `(` en de vorm van het `props`-object, dus met een helper vindt
+hij nul doelen — stil, en precies op het instrument dat de operator-lijst voedt.
+De gekozen vorm (`const w = …; if (typeof w.plausible === "function") { w.plausible(…) }`)
+houdt die regex werkend.
+
+#### De poort heeft twee lagen, en de tweede dekt de klasse
+
+`lib/plausible-aanroep.test.ts`, 7 tests.
+
+De eerste laag gaat over de aanroepen: elke aanroep heeft een **benoemde
+ontvanger** met een `typeof`-controle wiens index vóór de aanroep ligt, de
+`?.(`-vorm staat nergens in geleverde code, en de aanroepers staan op een
+expliciete lijst met een reden per bestand.
+
+De tweede laag gaat over de oorzaak in plaats van dit ene geval: **geen enkel
+literal `id` in de codebase botst met een naam die ergens uit `window` wordt
+gelezen.** Daarvoor zit er een balans-parser in die de `window as unknown as
+{...}`-casts uitleest, met named casts die in hetzelfde bestand worden opgelost —
+en die **gooit** als hij een cast niet kan lezen, in plaats van stil nul leden
+terug te geven.
+
+Dat dekt en passant `window.gtag` in `Toestemming.tsx`, dezelfde `?.()`-vorm,
+zonder die code aan te raken: daar kent onze eigen code `w.gtag` eerst toe en
+draagt geen element dat id.
+
+#### De commentaarstrip is bewezen dragend, niet aangenomen
+
+`Analytics.tsx` draagt in zijn nieuwe toelichting **allebei** de verboden
+patronen — dat moet ook, want de comment legt uit waarom het id niet zo mag
+heten. Een assertie op de echte bytes van dat bestand eist dat `ruw` beide
+patronen draagt en `zonderCommentaar(ruw)` geen van beide.
+
+Zonder die assertie is de strip decoratief tot het moment dat hij faalt. Vier
+eerdere tekstscans in deze repo vielen juist om op hun eigen proza —
+`contactadressen`, `persoon-entiteit`, `verzoeklimiet` en `server-acties`.
+
+#### Twaalf mutaties, twaalf keer de voorspelde kleur
+
+Elf rood op elf verschillende asserties, één groen als controle, groen na
+herstel, nul sporen. Het paar dat telt is M7/M12: dezelfde tekst is **rood in
+code** en **groen in een toelichting**.
+
+Vier van de twaalf richten zich op de poort zelf — `ledenVanBlok` en `idsInCode`
+niets meer laten lezen, en een tweede dynamische `window`-cast toevoegen. Zonder
+die vier is een groene uitkomst ook te verklaren door een parser die niets vindt.
+
+**M12 kostte drie pogingen, en alle drie op dezelfde laag.** Het anker was
+`/**`, en `lib/booking.ts` opent met `// Cal.com-boekingslinks.` — geen
+JSDoc-blok. Het harnas meldde `OVERGESLAGEN anker 0x` in plaats van stil niets te
+doen, en dat is de goede faalvorm. De reparatie liep daarna twee keer stuk op de
+heredoc: `\\n` kwam als `\n` aan, waarna Python een echte newline in de
+bronregel schreef. Uiteindelijk opgelost door **elke escape te vermijden** —
+`chr(10)` en `chr(34)` in plaats van `\n` en `\"`. Zestiende keer deze zomer, en
+de uitweg is inmiddels routine.
+
+#### De browsermeting mat eerst het verkeerde ding
+
+De eerste ronde vulde alle zestien vragen in, zag geen fout, en concludeerde dat
+de reparatie hield. Dat bewees niets: het uitslagscherm verschijnt pas ná een
+klik op *Toon wat er lekt*, en zonder die klik draait de `useEffect` met de
+melding helemaal niet. Mijn "uitslag zichtbaar"-heuristiek matchte bovendien op
+het woord *lek*, dat ook in de vragen staat.
+
+Opnieuw gemeten met een marker die alléén op het uitslagscherm bestaat, en met
+de klik erbij:
+
+```
+uitslagscherm aanwezig vóór de klik   false
+16 vragen beantwoord, knop geklikt
+uitslagscherm aanwezig ná de klik     true     <- de tak IS bereikt
+window.plausible                      "object", niet aanroepbaar
+fouten / unhandled rejections         0
+React-boom leeft                      ja
+```
+
+En in dezelfde tab, op dezelfde waarde: `p?.("Scan Voltooid")` werpt wél —
+`TypeError: p is not a function`. Dat paar scheidt "de guard deed zijn werk" van
+"er gebeurde toevallig niets".
+
+**De meldweg is apart bewezen levend.** Met een spy-functie in plaats van het
+element vuurt hij precies één keer: `{ naam: "Scan Voltooid", props: { lekken: "1" } }`.
+Zonder die positieve controle is een uitgebleven worp niet te onderscheiden van
+een tak die nooit draaide.
+
+**En named access is aantoonbaar werkzaam in deze browser**, want anders bewijst
+een nul niets: een ingespoten element met `id="plausible"` maakt
+`window.plausible` een object dat identiek is aan dat element, en na verwijderen
+staat hij weer op `undefined`. Onze eigen pagina draagt geen element met dat id.
+
+Op bouwniveau: `id:"plausible"` staat **0×** in de client-chunks,
+`plausible-analytics` **1×**. In de geserveerde HTML staat geen van beide — 
+`next/script` injecteert client-side, en `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` is lokaal
+niet gezet. Wie op de HTML meet leest een terechte nul als een mislukte deploy.
+
+Console: nul CSP-fouten, nul React-fouten, nul hydratiewaarschuwingen, gemeten ná
+een hartslag door de lezer. De enige meldingen zijn 404's op
+`/_vercel/insights/script.js`, dat het platform in productie serveert.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1436 tests in 71 bestanden (was 1429/70)
+i18n:check               741 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +7 is de nieuwe poort. Zes verplichte checks groen; `Vercel` apart nagekeken
+via `/status` op deze SHA, want die komt niet via `/check-runs` — de val van 22
+augustus. Squash-boom byte-identiek aan die van de tak.
+
+#### Wat dit niet doet
+
+Er is geen enkele operator-taak mee opgelost. De Supabase-402 staat er nog, dus
+`Contact Submitted` kán vandaag sowieso niet vuren — de inzending bereikt
+`status === "ok"` niet. De zes Plausible-doelen bestaan nog steeds niet in het
+dashboard, en `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`,
+`CAL_WEBHOOK_SECRET`, `SENTRY_DSN`, de vier LinkedIn-beslissingen, de
+onverklaarde Redeploy-knop en de vijf openstaande PR's in
+`bongartzdiaz/diaz-editor` staan onveranderd open.
