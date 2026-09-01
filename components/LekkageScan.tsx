@@ -27,6 +27,8 @@ import { useMemo, useState } from "react";
 import { LocaleLink } from "@/components/LocaleLink";
 import { useT } from "@/lib/i18n/useT";
 import {
+  AANTAL_WOORD,
+  AANTAL_WOORD_HOOFD,
   BLOKKEN,
   VRAGEN,
   alleBeantwoord,
@@ -133,10 +135,10 @@ export function LekkageScan() {
             <>
               <h2>Deze scan ziet niets lekken.</h2>
               <p>
-                Dat is een echte uitkomst en geen beleefdheid. Vijftien ja/nee-vragen
-                vinden de lekken die met overdracht, wachttijd, dubbele invoer en
-                overlappende tools te maken hebben. Zitten die goed, dan zit je
-                probleem ergens anders.
+                Dat is een echte uitkomst en geen beleefdheid. {AANTAL_WOORD_HOOFD}{" "}
+                ja/nee-vragen vinden de lekken die met overdracht, wachttijd, dubbele
+                invoer en overlappende tools te maken hebben. Zitten die goed, dan zit
+                je probleem ergens anders.
               </p>
             </>
           ) : (
@@ -193,16 +195,17 @@ export function LekkageScan() {
             <h3>Wat deze scan niet ziet</h3>
             <p>
               Geen marge per project, geen kwaliteit van de instroom, geen bezetting,
-              en niets over of je mensen een nieuw systeem zouden gebruiken. Vijftien
-              ja/nee-vragen dragen hun eigen reikwijdte, en dit is hem.
+              en niets over of je mensen een nieuw systeem zouden gebruiken.{" "}
+              {AANTAL_WOORD_HOOFD} ja/nee-vragen dragen hun eigen reikwijdte, en dit is
+              hem.
             </p>
           </div>
 
           <div className="scan-cta">
             <p>
-              Wil je dit nagelopen hebben op je eigen cijfers in plaats van op vijftien
-              vragen? Dat is het blueprint-gesprek: dertig minuten, en er komt een
-              diagnose van één pagina uit.
+              Wil je dit nagelopen hebben op je eigen cijfers in plaats van op{" "}
+              {AANTAL_WOORD} vragen? Dat is het blueprint-gesprek: dertig minuten, en er
+              komt een diagnose van één pagina uit.
             </p>
             <LocaleLink href="/contact?interest=lekkage-scan" className="btn primary">
               {t("cta.book")}

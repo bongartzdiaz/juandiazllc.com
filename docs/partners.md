@@ -22,7 +22,7 @@ mechanisch kan:
 1. **Eén zin die zegt wanneer ze aan je moeten denken**, in de werkwoorden van
    hún werk — niet in die van het jouwe.
 2. **De lekkage-scan als doorstuurbaar ding dat niets belooft.** De enige link
-   die erin staat. Vier minuten, vijftien ja/nee-vragen, geen e-mailadres
+   die erin staat. Vier minuten, zestien ja/nee-vragen, geen e-mailadres
    nodig — wie hem krijgt hoeft niets te kopen en niets achter te laten.
 3. **Geen vergoeding, en dat staat er expliciet in.** Geen klantcijfers, geen
    bedragen: de uitkomsten uit `docs/claims.md` horen bij de klanten die ze

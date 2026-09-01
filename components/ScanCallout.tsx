@@ -1,5 +1,6 @@
 import { LocaleLink } from "@/components/LocaleLink";
 import { ENKELE_TAAL } from "@/lib/i18n/enkele-taal";
+import { AANTAL_WOORD_HOOFD } from "@/lib/lekkage-scan";
 import type { Locale } from "@/lib/i18n/dict";
 
 /* Ingang naar de lekkage-scan. Zonder deze is die pagina een wees: hij staat
@@ -45,9 +46,9 @@ export function ScanCallout({ locale }: { locale: Locale }) {
         ◉ Vier minuten
       </div>
       <p style={{ color: "var(--muted)", fontSize: 15, lineHeight: 1.65, margin: "0 0 18px", maxWidth: "62ch" }}>
-        Vijftien ja/nee-vragen over je stack, en je ziet welke drie dingen bij jou het
-        eerst lekken. Geen e-mail, geen verkooppraat — de uitslag staat meteen op je
-        scherm.
+        {AANTAL_WOORD_HOOFD} ja/nee-vragen over je stack, en je ziet welke drie dingen
+        bij jou het eerst lekken. Geen e-mail, geen verkooppraat — de uitslag staat
+        meteen op je scherm.
       </p>
       <LocaleLink href={PAD} className="btn">
         Doe de lekkage-scan

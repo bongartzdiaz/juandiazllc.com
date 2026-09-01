@@ -4,6 +4,7 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 import { ENKELE_TAAL } from "@/lib/i18n/enkele-taal";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { LekkageScan } from "@/components/LekkageScan";
+import { AANTAL_WOORD_HOOFD } from "@/lib/lekkage-scan";
 import { ogImages } from "@/lib/seo/branding";
 
 /* De lekkage-scan — bestaat alleen op /nl.
@@ -21,8 +22,8 @@ const TALEN = ENKELE_TAAL[PAD].locales;
 
 const TITEL = "Lekkage-scan: waar je omzet weglekt";
 const BESCHRIJVING =
-  "Vijftien ja/nee-vragen over je stack. Je ziet direct welke drie dingen bij " +
-  "jou het eerst lekken. Geen e-mail nodig, geen verkooppraat.";
+  `${AANTAL_WOORD_HOOFD} ja/nee-vragen over je stack. Je ziet direct welke drie ` +
+  "dingen bij jou het eerst lekken. Geen e-mail nodig, geen verkooppraat.";
 
 export async function generateMetadata({
   params,
@@ -75,8 +76,8 @@ export default async function LekkageScanPage({
         <p>
           De omzet lekt zelden in de markt. Hij lekt tussen de tools — in de overdracht
           naar de buitendienst, in de dagen tussen aanvraag en offerte, in het adres dat
-          voor de derde keer wordt overgetypt. Vijftien vragen, en je weet welke drie
-          bij jou het eerst lekken.
+          voor de derde keer wordt overgetypt. {AANTAL_WOORD_HOOFD} vragen, en je weet
+          welke drie bij jou het eerst lekken.
         </p>
       </header>
       <LekkageScan />
