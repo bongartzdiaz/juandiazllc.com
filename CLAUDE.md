@@ -10001,3 +10001,44 @@ niet. Wat er eerst moet gebeuren is de basis verzetten van
 omzeild. Gemeten op 2026-09-02 om 14:06 UTC staat de basis er nog, er is
 **geen** `base_ref_changed` in de tijdlijn, en elke andere open PR in die repo
 staat wel op `main`. Zodra de basis klopt kan `fix/b144-reel-prijzen` weer weg.
+
+#### Naschrift 2026-09-02 laat — de basis is nooit verzet, en dat hoefde ook niet
+
+Het blok hierboven instrueert om de basis van #647 in de GitHub-UI naar `main`
+te verzetten. **Dat is tweemaal geprobeerd en tweemaal niet opgeslagen.** Volg
+die instructie dus niet opnieuw voordat je gemeten hebt dat hij werkt.
+
+Het discriminerende signaal was niet het basis-veld maar `updated_at`. Dat
+bumpt bij **elke** bewerking — titel, body, label, basis. Het stond na beide
+pogingen nog op de seconde op `2026-09-02T14:06:41Z`, dus er was geen sprake van
+een half geland veld: er kwam helemaal niets aan op die PR. Gemeten met een
+cache-buster, naast twee onafhankelijke controles (`base_ref_changed` staat niet
+in de tijdlijn; elke andere open PR in die repo staat wel op `main`).
+
+**De route eromheen kostte geen enkele bewerking aan #647.** GitHub staat twee
+PR's vanaf één tak toe zolang de basis verschilt, dus
+`bongartzdiaz/diaz-editor#659` draagt dezelfde tak met `main` als basis. Beide
+PR's wijzen op `c555f07b50ae68ec`; #647 is onaangeroerd gebleven.
+
+Waarom het uitmaakte, en dat is scherper dan "de basis stond verkeerd":
+
+```
+fix/b144-reel-prijzen...main    status=diverged   main 14 voor, 11 achter
+main...feat/support-systeem     status=ahead      ahead=50, behind=0
+merge-base(tak, main)           6a43dc74  ==  de tip van main zelf
+```
+
+Die laatste regel is het bewijs dat telt. **Main is een voorouder van de tak**,
+dus de merge naar main is een fast-forward en kan per constructie niet
+conflicteren — sterker bewijs dan `mergeable: true`, dat een berekening van
+GitHub is en stale kan zijn (dezelfde PR stond een dag eerder op `unstable`
+terwijl beide check-endpoints al `success` gaven).
+
+Eén meetkanttekening voor wie dit naslaat: de `compare`-API meldt **300**
+bestanden waar de PR er **838** zegt. Dat is de paginatiegrens van dat endpoint
+en geen tegenspraak.
+
+**Wat er open blijft:** #659 mergen en #647 sluiten is van Juan — in die repo
+merget deze sessie niet. Daarna kan `fix/b144-reel-prijzen` weg. En waarom die
+Edit-knop niets opslaat is nog steeds niet verklaard; het is dezelfde
+onverklaarde klasse als de Redeploy-knop in Vercel.
