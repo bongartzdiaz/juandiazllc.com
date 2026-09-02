@@ -42,7 +42,7 @@ bestaat.
 
 | # | onderwerp | taal | soort | haak/bron | status |
 | --- | --- | --- | --- | --- | --- |
-| D1 | Refresh: prijsvermeldingen en meta's na de Founding-prijssweep (PR #651) nalopen met `landing/_check-seo-consistency.py` | alle | onderhoud | de poort zelf; laatst gedraaid 2026-08-31: 820 paginas, 0 schendingen | klaar |
+| D1 | Refresh: prijsvermeldingen en meta's na de Founding-prijssweep (PR #651) nalopen met `landing/_check-seo-consistency.py` | alle | onderhoud | de poort zelf; ronde 2026-09-02: 820 paginas, 819 titels, 0 schendingen op vijf controles. Cross-pagina-controle erbij (geen twee pagina's delen een titel of description) die op zijn eerste run zes onvertaalde meta-descriptions vond; die zijn vertaald. Commit ligt lokaal op fix/seo-cross-pagina-dubbelen, nog niet gepusht: de pre-push-poort daar is rood op verify-edge-fn-slug-match, dat een verweesde .claude/worktrees-map van 2026-08-03 scant | klaar |
 | D2 | Pillar: van aanvraag naar offerte in 15 minuten — de werkvoorbereidings-workflow stap voor stap | nl | pillar | bestaande "15 minutes"-claim + help-artikelen; PR bongartzdiaz/diaz-editor#652, wacht op merge door Juan | wachtrij |
 | D3 | Help-reeks: DXF aanleveren aan onderaannemers (lagen, schaal, wat er misgaat) | nl+en | help | bestaande DXF-export-docs in de repo; PR bongartzdiaz/diaz-editor#653, wacht op merge door Juan | wachtrij |
 | D4 | Pillar: thuisbatterij intekenen na saldering — kruisverwijzing met het juandiazllc-cluster | nl | pillar | bestaand pillar thuisbatterij-ontwerp-saldering-2027; PR bongartzdiaz/diaz-editor#654, wacht op merge door Juan | wachtrij |
