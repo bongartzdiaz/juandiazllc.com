@@ -321,6 +321,50 @@ Two more from the July sweep, kept because they are rules rather than readings:
    Fix the generator before the output; `_inject-value-stack.py` and two
    siblings wrote an invented "+€600" back over hand-corrected pages.
 
+## Diaz Atlas — de trechter, de installer en de betaalketen (gemeten 2026-09-02)
+
+Aanleiding was een externe analyse die drie plekken aanwees waar vertrouwen
+weglekt — de onondertekende installer, de Delaware-entiteit, de merkvermenging
+— en één aanbeveling droeg: koop een EV-certificaat. Alle drie de premissen
+zijn nagemeten. Twee houden geen stand zoals ze geformuleerd waren, en de
+zwaarste rij op deze lijst stond in die analyse niet.
+
+**Wat hier niet gemeten kon worden.** Het Supabase-datavlak van beide
+projecten antwoordt met 402 `exceed_storage_size_quota` — opnieuw bevestigd
+2026-09-02 — en er is van hieruit geen Stripe-toegang. Elke rij over
+licenties, betalingen en downloads draagt daarom **de datum van zijn eigen
+oorspronkelijke meting**, niet die van vandaag. Lees ze als de laatst bekende
+stand.
+
+| Claim | Waarde | Status |
+| --- | --- | --- |
+| De Windows-installer is ondertekend | **nee** | ✅ gemeten 2026-09-02 — geen van `CSC_LINK`, `CSC_KEY_PASSWORD`, `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET` staat in de repo-secrets van `bongartzdiaz/diaz-editor`. `electron-builder.yml` draagt `verifyUpdateCodeSignature: false`, met de reden erbij: een onondertekende bundle heeft `SignerCertificate: null` en de updater weigerde daarop zijn eigen update |
+| Ondertekening moet nog gebouwd worden | **het staat al** | ✅ `build-and-release.yml` heeft een detectiestap met drie paden — Azure Trusted Signing, dan PFX, dan onondertekend mét een waarschuwing in het log — en `cert-expiry-watch.yml` opent dagelijks een issue op 30/14/7/1 dagen voor het verlopen. `signtoolOptions.publisherName` is ingevuld. Wat ontbreekt is **één secret**, geen pijplijn |
+| EV is de aan te schaffen soort | **de repo zegt zelf van niet** | ⚠️ `electron-builder.yml` noteert, met bronvermelding Microsoft Learn: sinds 2024 geeft EV geen SmartScreen-voordeel meer; kies een goedkoop OV-certificaat of Azure Trusted Signing (~$10/mnd). **Dit is een becommentarieerde bewering en geen meting.** Hij noemt zijn bron en is in minuten na te trekken; dat is niet gedaan |
+| SmartScreen verklaart de nul verkopen | **nee — de trechtervolgorde sluit dat uit** | ✅ `landing/index.html` verkoopt in vier talen trial-first ("Eerst 14 dagen gratis proberen" / "Try free for 14 days first"). SmartScreen staat dus vóór de proefperiode, niet vóór de kassa. Wie een checkout bereikte was er al langs |
+| Checkout-sessies | **25, nul betaald ooit** | ⚠️ gemeten 2026-08-25 op `vbozelswveaxsyccvaac`: 19 verlopen, 6 open, alle 25 `unpaid`. Vandaag niet hermeetbaar |
+| De keten `checkout.session.completed` → licentie → mail | **heeft in productie nooit gedraaid** | ❌ gemeten 2026-08-01. Dit is de zwaarste rij hier en hij ontbrak in de analyse. Alle zes de licenties zijn met de hand uitgegeven — zie de tractierij hierboven |
+| Downloads | **~84** — 44 `Diaz-Editor-Setup.exe`, 40 AppImage | ⚠️ gemeten 2026-07-28. Bijna de helft is Linux, en die helft ziet SmartScreen nooit |
+| Wie downloadde is te achterhalen | **nee** | ❌ alle 135 rijen in `update_events` dragen `device_fp='unknown'`, `cad_events` is leeg, en de in-app telemetrie is op 2026-07-28 verwijderd — `diaz-cad-telemetry` is sindsdien een 410-grafsteen |
+| Een campagne is per tier te meten | **nee** | ❌ de CHECK-constraint op `checkout_session.tier_requested` accepteert alleen `light`, `pro`, `agency` en `enterprise`. Licentie (€197) en Pro (€247) landen daardoor allebei op `'pro'`: de database kan niet zeggen welk product iemand wilde. **Niet gerepareerd** |
+| Delaware staat in de kopij | **op twee plekken** | ✅ in de JSON-LD (`addressCountry: "US"`, `addressRegion: "Delaware"`) en in de EULA, waar het forum de rechtbank van Delaware is. Dat tweede is een contractclausule en is te wijzigen zonder de entiteit aan te raken |
+| De merken zijn gescheiden | **ja, al volledig** | ✅ `lib/ventures.ts` op juandiazllc.com noemt vier ventures en Diaz Atlas is er geen van. De enige vermelding van diazatlas.com op de holdingsite staat in de cookie- en privacykopij, over de gedeelde GA-tag |
+
+### Twee dingen die als opgelost golden en dat niet zijn
+
+*"De achterkant staat als een huis."* Dat geldt voor de entiteit en voor
+Stripe als configuratie. Het geldt niet voor de keten die ná een betaling moet
+lopen, want die is nooit gelopen — er is geen enkele aankoop geweest waarvan
+een sleutel in een inbox is beland.
+
+*"Er rest nog één technische drempel."* De installer is inderdaad
+onondertekend, maar wat ontbreekt is een secret in een pijplijn die al staat.
+En omdat de proefperiode vóór de kassa zit, kan die drempel de nul betalingen
+niet verklaren: iedereen die een checkout bereikte, was SmartScreen al gepasseerd.
+
+De uitvoerbare volgorde staat in `docs/diaz-atlas-volgorde.md`. Die is niet op
+impact gesorteerd maar op afhankelijkheid.
+
 ## Competitor pricing — every one needs a dated source
 
 Checked 2026-07-21 against each vendor's own checkout, US pricing in USD.
