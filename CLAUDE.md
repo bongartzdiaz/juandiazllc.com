@@ -9820,3 +9820,184 @@ onverklaarde Redeploy-knop en de vijf openstaande PR's in
 
 Van de kalender staan **J8, J9 en J10** nog open; J10 is geblokkeerd tot de 27
 intakevragen uit `docs/datastuk.md` beantwoord zijn.
+
+### 2026-09-02 — vier PR's in diaz-editor, en een merge die de Duitse locale weggooide
+
+Werk in `bongartzdiaz/diaz-editor`, genoteerd hier omdat dit logboek de enige
+plek is waar het terugkomt. Drie PR's gemerged, één merge-reparatie gepusht, en
+één PR die op Juan wacht.
+
+| | wat | uitkomst |
+|---|---|---|
+| #657 | `verify-edge-fn-slug-match` las een verweesde worktree mee | gemerged `385e09b7` |
+| #658 | de SEO-poort keek alleen per pagina; zes meta's bleven Engels | gemerged `cfa2b65b` |
+| #634 | één prijs over alle lagen (B-144) plus vier backlogregels | gemerged `6a43dc74` |
+| #647 | klantenservice, prijsconsistentie, zetelbeheer | **open** — basis staat verkeerd |
+
+#### #657 — de poort las 1481 bestanden die nergens in CI komen
+
+Sectie 6 van `verify-edge-fn-slug-match.mjs` (*documentatie noemt alleen
+bestaande functies*) las 1805 `.md`-bestanden, waarvan **1481 (82%)** uit
+`.claude/worktrees/determined-jennings-0a41cb`. Die map is untracked, staat in
+`.git/info/exclude`, komt niet in `git worktree list` voor, en haar
+`.git`-bestand wijst naar een gitdir die niet bestaat. Twee README's daaruit
+noemden `stripe-webhook` en `resend-webhook` — slugs zonder map — waarop de
+pre-push-poort rood ging.
+
+**Untracked bestanden overleven een checkout**, dus die poort stond in zo'n
+werkkopie ook op `main` rood, los van welke commit dan ook.
+
+De skip is op **pad** en niet op **mapnaam**, en dat verschil is gemeten:
+`git ls-files .claude` geeft 19 getrackte bestanden, waarvan 17 `.md` die
+sectie 6 juist hoort te lezen. Een basisnaam-skip maakt de poort daar stil
+smaller — vandaag gratis (geen van die 17 noemt een functie-URL) en duur op de
+dag dat iemand een runbook in `.claude/rules/` zet.
+
+Zes mutaties, zes keer de voorspelde kleur. Het paar dat telt is M4/M5: een
+verzonnen slug in **getrackte** `.claude`-bron is rood — die bron wordt nog
+gelezen — en dezelfde overtreding plus de basisnaam-skip is **groen**. Dat is
+het uitvoerbare bewijs dat de vorm die ik eerst voorstelde de poort stil
+smaller maakt.
+
+#### #658 — drie controles die per definitie één pagina zien
+
+`landing/_check-seo-consistency.py` droeg drie controles, en alle drie zijn een
+zuivere functie van één pagina: `controleer(html)` krijgt de HTML van één
+pagina en verder niets. Daardoor kon er een klasse bestaan die geen van drieën
+kón zien — twee pagina's die dezelfde titel of description dragen.
+
+De vierde controle vond op zijn eerste run **zes onvertaalde descriptions**:
+`changelog.html` en `roadmap.html` in nl, de en es deelden woordelijk dezelfde
+Engelse `content=`, terwijl hun `<title>` netjes per taal geschreven was.
+
+**Dat is precies waarom de controle sitebreed is en niet per taal.** Een
+telling binnen `de/` geeft hier nul, want daar is elke description uniek. En de
+titels stonden diezelfde dag op 819 uniek uit 819. Alleen de kruising
+taal × onderwerp legt het bloot.
+
+Zes mutaties, zes keer de voorspelde kleur; M3, M4 en M5 richten zich op de
+controle zelf, zodat groen niet ook te verklaren is door een parser die niets
+leest.
+
+#### De merge-reparatie — `c555f07b5`
+
+Mijn oplossing van de merge `origin/main` in `feat/support-systeem` nam op acht
+bestanden onder `landing/help/` **main's inhoud wholesale** over. Gemeten waren
+die acht byte-identiek aan main, terwijl de tak er 742 regels aan had
+toegevoegd: **533 `data-de`-attributen**, `hreflang="de"` en de canonieke
+SLA-tekst (2 werkdagen in plaats van 48u). De Duitse locale van acht Engelse
+helppagina's, weg in een conflictoplossing.
+
+Main had daar **precies één regel per bestand** gewijzigd — `og-hero.svg` naar
+`og-hero.png` — dus de juiste inhoud was deterministisch af te leiden: de
+tak-versie met die ene vervanging erop. De zestien andere gewijzigde
+helppagina's voldeden daar al aan, en dat is éérst gemeten; anders had ik acht
+bestanden gerepareerd en zestien stille fouten laten staan.
+
+**Twee van mijn eigen toeschrijvingen klopten niet.** Ik had twee rode poorten
+(`verify-pillar-cta-taal`, `verify-support-sla`) op "bestaande schuld op main"
+gezet; ze waren van mijn merge en zijn groen zodra de acht bestanden hun eigen
+inhoud terughebben. En ik had in `meterkast-schema-tekenen-offline.html`
+driemaal EUR 99 naar EUR 197 gezet terwijl basis, tak én main alle drie EUR 99
+dragen — er was daar geen conflict, en B-07 in `docs/audit/05-backlog.md` noemt
+EUR 99 canoniek.
+
+De merge-boodschap zegt daarnaast dat `landing/help/keyboard-shortcuts.html`
+een eigen PR nodig heeft. Nagemeten klopt dat niet — dat bestand draagt een
+DE-knop, accepteert de taalcode `de` en schrijft nergens `document.title`. De
+correctie staat in de fix-commit; de merge-boodschap zelf is niet herschreven.
+
+#### Vier keer zei de meter iets anders dan er stond
+
+1. **"Exit code 0" van het harnas is dat van de wrapper, niet van het
+   commando.** Twee achtergrondtaken werden zo gemeld terwijl de echte code op
+   regel 1 van het log stond. De vorm die het leesbaar maakt zet
+   `echo "EXIT=$?"` met een **puntkomma** direct achter het commando en leidt
+   de uitvoer met `> log 2>&1` om. Een pipe naar `tee` meet de exitcode van
+   `tee` en geeft daarom altijd 0.
+2. **Een faalteller slaat de slotregel.** `gate: alles door` is één regel die
+   een script schrijft; `181/181 script(s) PASS, 0 FAIL` draagt teller én
+   noemer — en "0 FAIL" is óók waar voor een aggregator die nul scripts vond.
+3. **Een grep-treffer is pas een bevinding als hij is toegeschreven.** Mijn
+   scan op niet-nul faaltellers vond "540 rood", en dat bleek
+   `unknown earthing -> DIN VDE 0100-540 rood`: een normnummer binnen een
+   slagende assertie.
+4. **Twee padvertalers in één pijplijn.** Een `git show` omgeleid naar
+   `/tmp/x` slaagde, want git-bash mapt `/tmp` naar `AppData/Local/Temp`. Maar
+   Python is een native Windows-binary en zag `/tmp/x` als een pad dat niet
+   bestaat. De schrijfkant werkte, de leeskant faalde.
+
+#### `base_ref_deleted` sluit de PR, en GitHub zet de tak terug
+
+Bij het opruimen van `fix/b144-reel-prijzen` — de basis van #647 — gebeurde er
+in de tijdlijn dit, binnen twee seconden:
+
+    12:36:50Z  base_ref_deleted
+    12:36:51Z  closed
+    12:40:09Z  reopened
+
+Het verwijderen van de basis-tak sloot #647 automatisch, en bij het heropenen
+herstelde GitHub de tak. Hij staat er dus weer, op `4883201815947918f4aed818`,
+en dat is geen mislukte verwijdering maar het ontwerp.
+
+**Mijn voorspelling over het verzetten van de basis was fout.** Ik zei dat de
+diff "dramatisch zou krimpen"; gemeten scheelt het 52 bestanden:
+
+| basis | commits | bestanden | |
+|---|---|---|---|
+| `fix/b144-reel-prijzen` | 53 | 890 | +17912 / -5442 |
+| `main` | 50 | 838 | +15164 / -4803 |
+
+De merge-bases verklaren dat. `main` (`6a43dc74`) is via mijn merge al
+voorouder van HEAD, dus de drie-punts-diff tegen main is precies het takwerk;
+`fix/b144` (`4883201`) is dat ook, maar takt eerder af, dus daar komt main's
+eigen aanwas nog bovenop.
+
+**De echte reden om te verzetten is zwaarder dan de diffgrootte: de basis
+bepaalt waar een merge landt.** Blijft hij staan, dan zet één klik op Merge die
+50 commits op een dode zijtak in plaats van op `main`.
+
+#### `git worktree remove` weigert bij untracked bestanden, en dat is de poort
+
+Twee scratch-worktrees opgeruimd. De tweede weigerde wegens drie untracked
+scripts. Voordat er geforceerd werd zijn ze nagemeten: twee byte-identiek aan
+de gecommitte tak-versie, de derde identiek aan
+`ee75f1635:scripts/verify-migratie-volledigheid.mjs` — de versie van vóór de
+fix. Het verschil van 287 bytes is één byte per regel, en het bestand telt 287
+regels: puur CRLF tegen LF. `--force` is er om overgeslagen te worden nadat je
+gekeken hebt, niet ervoor.
+
+#### Meting
+
+Alle poorten lokaal, want de Actions-facturering van die repo staat stil en een
+workflow start daar geen enkele job — een rood of groen vinkje van CI zegt daar
+dus niets.
+
+```
+volle poort vóór de commit   gate: alles door — 181/181 script(s) PASS, 0 FAIL
+commit                       c555f07b5, tien bestanden, +755 / -789
+push                         zonder --no-verify; de pre-push-poort draaide erin
+                             en kwam opnieuw groen door
+remote tip                   c555f07b5 — gemeten via gh api, niet uit de
+                             push-uitvoer gelezen
+checks op die sha            /check-runs success, /status success
+```
+
+`mergeable_state` sloeg vlak na de push om naar `unstable` en stond bij
+hermeting weer op `clean`. Dat was een stale berekening en geen falende check;
+beide check-endpoints stonden al op success.
+
+#### Wat dit niet doet
+
+Er is geen enkele operator-taak mee opgelost. De Supabase-402 staat er nog, de
+zes Plausible-doelen, `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`,
+`CAL_WEBHOOK_SECRET`, `SENTRY_DSN`, de vier LinkedIn-beslissingen en de
+onverklaarde Redeploy-knop staan onveranderd open.
+
+**En #647 is niet gemerged.** In die repo merget Juan; deze sessie doet dat
+niet. Wat er eerst moet gebeuren is de basis verzetten van
+`fix/b144-reel-prijzen` naar `main`, in de GitHub-UI — de muterende
+`gh api --method PATCH` is door de classifier geweigerd en dat is niet
+omzeild. Gemeten op 2026-09-02 om 14:06 UTC staat de basis er nog, er is
+**geen** `base_ref_changed` in de tijdlijn, en elke andere open PR in die repo
+staat wel op `main`. Zodra de basis klopt kan `fix/b144-reel-prijzen` weer weg.
