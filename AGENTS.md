@@ -10042,3 +10042,156 @@ en geen tegenspraak.
 merget deze sessie niet. Daarna kan `fix/b144-reel-prijzen` weg. En waarom die
 Edit-knop niets opslaat is nog steeds niet verklaard; het is dezelfde
 onverklaarde klasse als de Redeploy-knop in Vercel.
+
+### 2026-09-02 (vervolg) — SmartScreen zit vóór de trial, en de kassa erna
+
+PR #327. De vraag was hoe de distributie aan te pakken, met een premisse erin
+die de moeite van het natrekken waard bleek: de achterkant staat als een huis,
+dus er blijft aan de voorkant nog maar één keiharde technische drempel over —
+de SmartScreen-waarschuwing bij de installer.
+
+Die premisse is half waar, en de helft die niet klopt zit in de volgorde.
+
+#### De trechter loopt andersom dan de redenering
+
+Diaz Atlas is trial-first. De installer staat **vóór** de trial, de kassa
+**erna**. Wie een checkout-sessie bereikt, is de installer dus al voorbij —
+en dat maakt SmartScreen ongeschikt als verklaring voor het cijfer dat er
+werkelijk ligt:
+
+| gemeten | uitkomst |
+|---|---|
+| checkout-sessies | **25, nul betaald ooit** (2026-08-25, `vbozelswveaxsyccvaac`) |
+| waarvan | 19 verlopen, 6 open, alle 25 `unpaid` |
+| downloads | ~84 (2026-07-28) — 44 `Diaz-Editor-Setup.exe`, 40 AppImage |
+
+Vijfentwintig mensen kwamen langs de onbeveiligde installer, langs de trial,
+tot aan een Stripe-formulier, en niemand rekende af. Een certificaat repareert
+dat niet, want die drempel lag achter hen.
+
+**Wat het wél kost is nooit gemeten**, en dat staat er zo bij. Hoeveel mensen op
+de SmartScreen-waarschuwing afhaakten is van buitenaf niet te zien: er is geen
+telemetrie op dat punt en de downloadtelling van 28 juli is een aantal
+downloads, geen aantal starts.
+
+#### De volgorde, met per stap een blokkade
+
+`docs/diaz-atlas-volgorde.md` zet vier stappen op een rij, elk met
+`**Blokkade:**` en `**Wat het afsluit:**`:
+
+1. **De betaalketen bewijzen** met één echte aankoop van €197. Blokkade: geen —
+   dit is Juans handeling. Zolang niemand ooit heeft betaald is onbewezen dat
+   de keten van kassa tot sleutel in een inbox werkt.
+2. **Ondertekenen** — één secret, en expliciet **geen** EV.
+3. **Het EULA-forum naar Nederlands recht.** Blokkade: een juridische
+   beslissing.
+4. **Dán pas distributie.** Blokkade: de `tier_requested`-CHECK-constraint, die
+   €197 en €247 allebei op `'pro'` platslaat.
+
+#### De EV-bewering blijft als bewering gelabeld
+
+Dat EV zijn SmartScreen-voordeel in 2024 verloor staat als **becommentarieerde
+regel** in `electron-builder.yml`, met een verwijzing naar Microsoft Learn.
+Een comment is geen meting. Beide documenten dragen die zin nu woordelijk, en
+de poort bindt hem — hij komt in `claims.md` en in het volgordedocument voor,
+en verdwijnt alleen nog met een zichtbare bewerking.
+
+Dat onderscheid is hier geen formaliteit. Een EV-certificaat is de duurste
+aanbeveling uit de analyse, en de onderbouwing ervoor is een regel commentaar
+in onze eigen repo.
+
+#### Twee cijfers zijn geschrapt in plaats van bewaakt
+
+Een poort maakt drift **luid**; weglaten maakt hem **onmogelijk**. Waar een
+cijfer niet dragend is voor het argument, is het weggehaald in plaats van
+geïnstrumenteerd:
+
+- **het licentieaantal** — staat al in de tractierij van 2026-08-19, dus de
+  betaalketen-rij verwijst daarheen in plaats van het te herhalen. `telwoordNL`
+  had het kunnen uitschrijven, maar die tabel loopt van twaalf tot twintig en
+  **gooit** daarbuiten; hem verbreden voor één document zou `lekkage-scan.ts`
+  aan een vreemd bestand koppelen.
+- **het aantal Plausible-doelen** — `lib/plausible-doelen.test.ts` bindt dat al
+  over drie dragers (code, `MANUAL_TASKS.md`, `CLAUDE.md`). Een vierde drager
+  worden is precies de bugklasse waar die poort voor bestaat.
+
+#### De poort parseert, hij typt niets over
+
+`lib/diaz-atlas.test.ts` (13 tests) leest zijn getallen uit `docs/claims.md` en
+**gooit** als een rij ontbreekt of meer dan eens voorkomt. Dat tweede is de les
+van #229, waar `.match()` zonder `/g` stil de eerste rij pakte terwijl er twee
+stonden — vandaag klopte het toevallig omdat beide dezelfde waarde droegen.
+
+De prijzenverzameling wordt uit de vier `tier`-rijen afgeleid, met `has("197")`
+en `has("247")` als positieve controle: zonder die twee slaagt de scan op het
+volgordedocument ook op een lege verzameling.
+
+**De poort viel bij zijn eerste run om op zijn eigen auteur.** Stap 4 schreef
+`**Blokkade, en het is een echte:**` in plaats van `**Blokkade:**`. Het
+document is aangepast, de matcher niet — losser maken zou de marker vrije tekst
+maken en de assertie leegtrekken.
+
+#### Veertien mutaties, en drie moesten eerst gerepareerd worden
+
+Veertien keer de voorspelde kleur, groen na herstel, nul sporen achtergebleven.
+Het paar dat telt is **M4/M14**: een tweede `Checkout-sessies`-rij is rood, en
+diezelfde rij **plus** een losser `eenTreffer` is groen. Dat attribueert M4's
+rood aan de strictheid van de parser in plaats van aan iets anders.
+
+De eerste ronde gaf drie afwijkingen, en alle drie zaten in het harnas:
+
+| | wat er mis was |
+|---|---|
+| M10 | escapes in een gewone Python-string — `\n` werd een echte newline, dus het anker matchte niet |
+| M13 | een anker dat een CRLF-regeleinde oversloeg |
+| M11 | **ongeldige mutatie** — `eenTreffer` van `!== 1` naar `< 1` gedraagt zich identiek zolang er géén tweede rij is |
+
+Die laatste is de leerzame. Hij liep groen, en dat las als een zwakke poort. De
+enige test die de worp raakte gebruikte een **nul**-match, en die gooit onder
+allebei de takken; de mutatie kon per constructie niets onderscheiden. **Een
+mutatie die niets kan meten leest exact hetzelfde als een poort die niet
+afgaat.** De vervanging is het paar hierboven: één mutatie bewijst dát een
+poort afgaat, het paar bewijst waaróm.
+
+M10 en M13 faalden **luid** met `anker 0x` in plaats van stil door te lopen.
+Daar staat de ankertelling in het harnas voor, en dit is de zeventiende keer
+deze zomer dat de escape-laag het brak.
+
+#### Wat de poort niet ziet
+
+Of `claims.md` zelf nog klopt. Het Supabase-datavlak geeft nog steeds 402
+`exceed_storage_size_quota` — gemeten met een gerichte probe binnen GROEN-scope,
+met een negatieve controle ernaast — dus licenties, betalingen en downloads
+zijn vandaag niet hermeetbaar. Elke rij draagt daarom **zijn eigen
+oorspronkelijke meetdatum**, niet die van vandaag. Een groen vinkje hier zegt
+dat de documenten het met elkaar eens zijn, niet dat de werkelijkheid nog zo is.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1473 tests in 74 bestanden (was 1460/73)
+i18n:check               741 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +13 is de nieuwe poort. `docs/claims.md` van 1349 naar 1393 CRLF (+44,
+precies de sectie), en alle drie de bestanden puur CRLF, in bytes gecontroleerd.
+
+Zes checks groen op de PR — `typecheck`, `test`, `i18n`, `audit`, `deps` en
+`docs-sync` — met `audit-productie` overgeslagen zoals altijd. `Vercel` apart
+nagekeken via `/status`, want die komt niet via `/check-runs`; dat is de val van
+22 augustus.
+
+#### Wat dit niet doet
+
+Er is niets aan de distributie veranderd, niets ondertekend en niets
+gepubliceerd. Geen enkele operator-taak is opgelost: de 402 staat er nog, dus
+het contactformulier schrijft nog steeds niets weg, en de zes Plausible-doelen,
+`LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`, `CAL_WEBHOOK_SECRET`,
+`SENTRY_DSN`, de vier LinkedIn-beslissingen en de twee onverklaarde knoppen
+staan onveranderd open.
+
+In `bongartzdiaz/diaz-editor` wachten **#652, #653, #654 en #655** plus **#659**
+op Juan; die vier blokkeren de kalenderrijen D2, D3, D4 en D6.
