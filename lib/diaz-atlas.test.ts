@@ -173,3 +173,91 @@ describe("de EV-bewering blijft als bewering gelabeld", () => {
     }
   });
 });
+
+/**
+ * De operator-lijst in CLAUDE.md draagt stap 1 van dit dossier.
+ *
+ * Deze poort schakelt zichzelf uit. Vinkt Juan de stap af en haalt hij de kop
+ * weg, dan vervalt de eis met hem mee — dezelfde vorm als
+ * `lib/prijsknoppen.test.ts`, waar een verbod alleen geldt zolang de reden
+ * ervoor bestaat. Een regel die blijft staan nadat zijn reden verdween, wordt
+ * over een jaar weggehaald door iemand die niet meer weet waarom hij er stond.
+ *
+ * Zolang de kop er wel staat bewaakt hij twee dingen. De lijst herhaalt cijfers
+ * uit `docs/claims.md` en mag er niet van afdrijven. En hij verwijst naar het
+ * volgordedocument in plaats van stap 2 tot en met 4 na te vertellen: twee
+ * lijsten die een volgorde dragen lopen uit elkaar, en dan bewaakt de zwakste.
+ *
+ * Alles wordt binnen het operator-blok gemeten en niet over het hele bestand.
+ * CLAUDE.md draagt honderden bedragen in het logboek, en een logboekregel mag
+ * de kop gerust citeren zonder dat deze poort daarover valt.
+ */
+describe("de operator-lijst, zolang hij dit dossier draagt", () => {
+  const OPERATOR = lees(join(WORTEL, "CLAUDE.md"));
+  const LIJSTKOP = "## Wacht op de operator";
+  const KOP = "### Diaz Atlas — de betaalketen is nooit gelopen";
+
+  /** Het operator-blok, tot de volgende kop van niveau twee. */
+  function lijst(): string {
+    const i = OPERATOR.indexOf(LIJSTKOP);
+    if (i === -1) {
+      throw new Error(
+        `CLAUDE.md draagt geen sectie \`${LIJSTKOP}\`. Is hij hernoemd? ` +
+          "Werk deze poort bij, of hij meet vanaf nu niets.",
+      );
+    }
+    const rest = OPERATOR.slice(i + LIJSTKOP.length);
+    const eind = rest.search(/^## /m);
+    return eind === -1 ? rest : rest.slice(0, eind);
+  }
+
+  const LIJST = lijst();
+  const aanwezig = LIJST.includes(KOP);
+
+  /** De sectie zelf, tot de volgende kop van niveau drie. */
+  function sectie(): string {
+    const rest = LIJST.slice(LIJST.indexOf(KOP) + KOP.length);
+    const eind = rest.search(/^### /m);
+    return eind === -1 ? rest : rest.slice(0, eind);
+  }
+
+  it("snijdt het operator-blok werkelijk uit het bestand", () => {
+    // Zonder deze controle slaagt alles hieronder ook op een lege string, en
+    // dan meet de poort niets terwijl hij groen staat.
+    expect(LIJST).toContain("### SEO-instrumenten");
+    expect(LIJST.length).toBeLessThan(OPERATOR.length / 4);
+  });
+
+  it("draagt de sectie hooguit een keer", () => {
+    const n = LIJST.split(KOP).length - 1;
+    expect(n, `de kop komt ${n}x voor in het operator-blok`).toBeLessThanOrEqual(1);
+  });
+
+  it.runIf(aanwezig)("snijdt de sectie uit het blok", () => {
+    const s = sectie();
+    expect(s.length).toBeGreaterThan(200);
+    expect(s.length).toBeLessThan(LIJST.length);
+  });
+
+  it.runIf(aanwezig)("draagt geen bedrag dat niet in de prijstabel staat", () => {
+    const prijzen = prijzenUitClaims();
+    const gevonden = [...sectie().matchAll(/€([\d.,]*\d)/g)].map((m) => m[1]);
+    expect(
+      gevonden.length,
+      "geen enkel bedrag in de sectie — is de snijder stuk?",
+    ).toBeGreaterThan(0);
+    const vreemd = gevonden.filter((b) => !prijzen.has(normaliseer(b)));
+    expect(
+      vreemd,
+      `bedrag(en) buiten de prijstabel van docs/claims.md: ${vreemd.join(", ")}`,
+    ).toEqual([]);
+  });
+
+  it.runIf(aanwezig)("herhaalt het aantal checkout-sessies zoals het register het meet", () => {
+    expect(sectie()).toContain(`${checkoutSessiesUitClaims()} checkout-sessies`);
+  });
+
+  it.runIf(aanwezig)("wijst voor de stappen erna naar het volgordedocument", () => {
+    expect(sectie()).toContain("docs/diaz-atlas-volgorde.md");
+  });
+});

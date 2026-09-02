@@ -472,6 +472,34 @@ herschreven, en deze notitie is de correctie erop.
    geen rij op, dus geen Telegram en geen bevestiging — terwijl "Boeking 15min"
    de hoofd-CTA van de site is.
 
+### Diaz Atlas — de betaalketen is nooit gelopen
+
+**Eén echte aankoop van €197 op diazatlas.com, met een echte kaart, tot en met
+de sleutel in de inbox.** Geen blokkade: dit is jouw handeling, en hij is de
+enige stap in dat dossier die vandaag kan.
+
+Waarom hij bovenaan staat. Er zijn **25 checkout-sessies en nul betaald, ooit**
+(gemeten 2026-08-25 op `vbozelswveaxsyccvaac`: 19 verlopen, 6 open, alle 25
+`unpaid`), en alle bestaande licenties zijn met de hand uitgegeven — nul
+`stacked_codes`, nul die AppSumo of Lemon noemen, nul met een
+Stripe-payment-intent. Geen enkele provider heeft dus ooit een licentie laten
+uitgeven. Dat maakt de keten van kassa tot sleutel **onbewezen**, niet kapot;
+het verschil daartussen is één transactie.
+
+Wat het afsluit: elke euro die daarna in distributie gaat, loopt door precies
+die keten. Verkeer sturen naar een kassa die je nooit hebt zien werken is de
+duurste volgorde die er is.
+
+De drie stappen erná — ondertekenen, het EULA-forum, en pas dan distributie —
+staan met hun eigen blokkade in `docs/diaz-atlas-volgorde.md`, bewaakt door
+`lib/diaz-atlas.test.ts`. Ze staan **bewust niet hier**: twee lijsten die één
+volgorde dragen lopen uit elkaar, en dan bewaakt de zwakste.
+
+**Vandaag niet zelf na te meten.** Het Supabase-datavlak geeft nog steeds 402
+`exceed_storage_size_quota`, dus de sessie- en licentietellingen hierboven zijn
+die van hun oorspronkelijke meetdatum. Zodra die restrictie eraf is, is de
+eerste vraag of er sinds 25 augustus een sessie bij is gekomen.
+
 ### SEO-instrumenten
 
 - **DataForSEO-inloggegevens** (open sinds 2026-08-03). Zonder die twee waarden
