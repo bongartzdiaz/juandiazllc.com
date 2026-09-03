@@ -10223,3 +10223,122 @@ staan onveranderd open.
 
 In `bongartzdiaz/diaz-editor` wachten **#652, #653, #654 en #655** plus **#659**
 op Juan; die vier blokkeren de kalenderrijen D2, D3, D4 en D6.
+
+### 2026-09-03 — twee onzichtbare pagina-defecten, en een positieve controle die maar de helft mat
+
+Vier PR's (#328 t/m #331). Wat de eerste drie bindt is één klasse: `GlobalEffects`
+hangt in de root-layout, en de App Router **remount die niet** bij client-side
+navigatie. Een `useEffect` met een lege afhankelijkheidslijst draait daar dus
+precies één keer per browsersessie — en alles wat hij in de DOM opzoekt, is
+daarna de DOM van de eerste pagina.
+
+#### De faalvorm is stil, en dat is het duurste eraan
+
+Bij beide defecten wordt de pagina volledig geserveerd, staat de inhoud in de
+HTML, en ontbreekt alleen een klasse. **`curl` en `grep` melden een gezonde
+pagina.** Het verschil is uitsluitend in de DOM na hydratie te zien, en dan nog
+alleen ná een navigatie — een harde herlading repareert het beeld, dus wie het
+zelf natrekt ziet niets.
+
+**#329 — vijf pagina's toonden hun inhoud niet.** `/work`, `/services`,
+`/sectors`, `/insights` en `/signals` stonden in alle vier de talen leeg onder
+de hero. De observer die `.in` toevoegt draaide één keer; wie doorklikte kreeg
+elementen die die klasse nooit kregen, en `globals.css` houdt `[data-reveal]`
+dan permanent op `opacity: 0`. De hero overleefde omdat `.page-hero` geen
+`data-reveal` draagt — vandaar dat het als "leeg onder de hero" leest en niet
+als een witte pagina.
+
+Er was bovendien **geen enkel vangnet**: twee CSS-regels en verder niets. Geen
+`prefers-reduced-motion`, geen tijdslimiet. Eén regel JavaScript was het enige
+in deze codebase dat `.in` toevoegde.
+
+**#330 — de hoofd-CTA was permanent onzichtbaar en onklikbaar.** Zelfde
+mechanisme, duurdere gevolgen. `FloatCta` rendert `null` op `/contact`, dus dat
+knooppunt wordt daar vernietigd en bij het weggaan opnieuw aangemaakt. De
+scroll-handler bleef naar het losgekoppelde knooppunt wijzen; het nieuwe kreeg
+zijn klasse `show` nooit, en de CSS zet de knop standaard op `opacity: 0` plus
+`pointer-events: none`.
+
+#### De regel is scherper dan "lege deps is fout"
+
+Zeven `opacity: 0`-kandidaten zijn geclassificeerd door telkens de **aandrijver**
+te lezen en niet de CSS: `.hero-starfield::before` (animatie), `.insight-card::before`
+(`:hover`), `.back-to-top` en de twee `.ch-*` (React-state), `.hp-field`
+(honeypot, moet verborgen blijven). Zes waren geen defect.
+
+`BackToTop` en `Chapters` gebruiken **allebei** een lege dep-array en zijn tóch
+immuun: hun listener hangt op `window` en de zichtbaarheid loopt via React-state
+door hun eigen render. Ze onthouden geen knooppunt. Het defect is dus de
+**combinatie** van selector-capture, per-pagina elementen en een verbergende
+CSS-regel.
+
+Drie poorten erop — `components/reveal.test.ts`, `components/float-cta.test.ts`
+en `components/verborgen-inhoud.test.ts`, die laatste over de klasse. Alle drie
+tekstscans en geen module-imports, want het defect zat in de **bedrading**: een
+import ziet een correct geschreven scroll-handler zonder te kunnen zien dat hij
+één keer wordt opgehangen.
+
+#### #331 — de vondst van de dag zat in een positieve controle
+
+`docs/outreach.md` en `docs/outreach-register.csv` zetten de zeven berichten uit
+#287 en #288 in een volgorde: week 1 versturen, week 2 zichtbaarheid, week 3
+opvolging, plus twee sluitend geschreven opvolgberichten en een register met de
+kolom `wie` leeg — de namen staan bewust buiten deze repo.
+
+Bij de mutatieronde kwam **M12 groen terug waar rood voorspeld was**. Die
+mutatie sloopt de kale-domeintak uit de URL-extractor van de poort. De positieve
+controle luidde:
+
+```
+expect(urls(partner).length).toBeGreaterThan(0);
+```
+
+en leest `docs/partners.md` — een bestand dat **uitsluitend** `https://`-links
+draagt. De tak die een geplakte `juandiazllc.com/contact` moet vangen was
+daarmee nooit uitgeoefend. Dat is precies de vorm die M7 injecteert, en precies
+hoe iemand een link in een bericht plakt.
+
+**Een positieve controle moet elke tak uitoefenen die hij claimt te dekken.**
+Anders is hij een halve meting die er als een hele uitziet. Er staat nu een
+zelftest op beide takken plus de leestekenstrip; daarna 13 mutaties, 13 keer de
+voorspelde kleur.
+
+Het discriminerende paar is M6/M13: hetzelfde bedrag is **rood in een fenced
+blok** en **groen in de toelichting** — het uitvoerbare bewijs dat de poort de
+berichten leest en niet het hele bestand.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1522 tests in 78 bestanden (was 1521/78 na #330)
+i18n:check               741 sleutels x 4 (ongewijzigd)
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+Per PR gemeten, niet achteraf gereconstrueerd. Zes verplichte checks groen op elke PR, met
+`Vercel` apart nagekeken via `/status` — die komt niet via `/check-runs`, de val
+van 22 augustus. Squash-boom byte-identiek aan die van de tak, alle vier.
+
+Eén valkuil onderweg: de eerste volle suite ná #330 viel om met zes time-outs en
+**nul assertiefouten**, met een wisselende falende verzameling. De kosten zaten
+in een bestandswandeling die alle 211 ts-bestanden door `zonderCommentaar`
+haalde. Er staat nu een voorfilter op de rauwe tekst voor — 1,10 s naar 157 ms —
+en dat is een optimalisatie en geen verzwakking, want `zonderCommentaar`
+**verwijdert** alleen tekens. `testTimeout` verhogen zou het rood hebben
+weggenomen zonder de oorzaak, en daarna een échte vertraging verbergen.
+
+#### Wat dit niet doet
+
+**Er is niets verstuurd en niemand benaderd.** De volgorde is een volgorde;
+versturen is Juans handeling, per bericht, en het document zegt dat zelf.
+
+Geen operator-taak opgelost. De Supabase-402 staat er nog, dus het
+contactformulier achter de gerepareerde knop schrijft niets weg — `info@juandiazllc.com`
+is vandaag de enige weg die aankomt. De zes Plausible-doelen,
+`LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`, `CAL_WEBHOOK_SECRET`,
+`SENTRY_DSN`, de vier LinkedIn-beslissingen en de twee onverklaarde knoppen
+staan onveranderd open. In `bongartzdiaz/diaz-editor` wachten **#652, #653,
+#654, #655** en **#659** op Juan.
