@@ -63,6 +63,39 @@ export function GlobalEffects() {
     };
   }, [pathname]);
 
+  // De zwevende boekknop draagt hetzelfde mechanisme, een laag verder.
+  // FloatCta rendert null op /contact, dus dat DOM-knooppunt wordt bij
+  // navigatie vernietigd en opnieuw aangemaakt. getElementById in het
+  // mount-once-effect hieronder ving het element van de EERSTE pagina:
+  // wie daarna /contact aandeed en terugging, liet de scroll-handler
+  // naar een losgekoppeld knooppunt wijzen. De knop bleef dan permanent
+  // opacity: 0 en pointer-events: none — onzichtbaar en onklikbaar, op
+  // elke pagina behalve /contact, waar hij juist hoort te ontbreken.
+  //
+  // Daarom pathname als afhankelijkheid, precies zoals bij de
+  // reveal-observer hierboven: elke navigatie pakt het knooppunt opnieuw
+  // op. Zonder die afhankelijkheid is de bug terug en meldt niets iets.
+  useEffect(() => {
+    const floatCta = document.getElementById("floatCta");
+    const cta = document.getElementById("cta");
+    const onScrollCta = () => {
+      if (!floatCta) return;
+      const past = window.scrollY > window.innerHeight * 0.9;
+      let inCta = false;
+      if (cta) {
+        const r = cta.getBoundingClientRect();
+        inCta = r.top < window.innerHeight && r.bottom > 0;
+      }
+      floatCta.classList.toggle("show", past && !inCta);
+    };
+    window.addEventListener("scroll", onScrollCta, { passive: true });
+    onScrollCta();
+
+    return () => {
+      window.removeEventListener("scroll", onScrollCta);
+    };
+  }, [pathname]);
+
   useEffect(() => {
     /* Preloader — dismiss as soon as the page is painted. The fake
        counter that used to ramp 0→100 over ~1s was gating the hero
@@ -135,22 +168,6 @@ export function GlobalEffects() {
       b.addEventListener("mouseleave", leave);
       magHandlers.set(b, { move, leave });
     });
-
-    /* Floating CTA */
-    const floatCta = document.getElementById("floatCta");
-    const cta = document.getElementById("cta");
-    const onScrollCta = () => {
-      if (!floatCta) return;
-      const past = window.scrollY > window.innerHeight * 0.9;
-      let inCta = false;
-      if (cta) {
-        const r = cta.getBoundingClientRect();
-        inCta = r.top < window.innerHeight && r.bottom > 0;
-      }
-      floatCta.classList.toggle("show", past && !inCta);
-    };
-    window.addEventListener("scroll", onScrollCta, { passive: true });
-    onScrollCta();
 
     /* Scramble text on reveal.
        Layout-stability contract (the old version scored CLS 4.2 on
@@ -275,7 +292,6 @@ export function GlobalEffects() {
       window.clearTimeout(failsafe);
       scrambleUnfreeze.forEach((id) => window.clearTimeout(id));
       window.removeEventListener("load", finish);
-      window.removeEventListener("scroll", onScrollCta);
       cards.forEach((card) => {
         const h = cardHandlers.get(card);
         if (h) card.removeEventListener("mousemove", h);
