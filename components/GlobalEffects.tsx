@@ -1,12 +1,68 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 // No block glyphs (█▓▒░) — much wider than the average letter, so a
 // scrambled line's width jumped per frame and shifted inline siblings.
 const SCR_CHARS = "!<>-_\\/[]{}—=+*^?#01";
 
+// De reveal-observer is het enige in deze codebase dat [data-reveal] weer
+// zichtbaar maakt: app/globals.css zet elk zo gemarkeerd element op
+// opacity 0, en alleen de klasse .in haalt dat weg. Daarom staat hij in
+// een eigen effect met pathname als afhankelijkheid, en niet in het
+// mount-once-effect eronder.
+//
+// WAAROM DAT MOEST. <GlobalEffects /> hangt in de root-layout, en die
+// remount nooit bij client-side navigatie in de App Router. Met een lege
+// afhankelijkheidslijst draaide querySelectorAll dus precies een keer, op
+// de DOM van de eerste pagina. Wie daarna doorklikte kreeg een pagina
+// waarvan geen enkel element ooit geobserveerd werd: de hero bleef staan
+// (die draagt geen data-reveal) en alles eronder was permanent
+// onzichtbaar. Gemeten op /nl/work, /nl/services, /nl/sectors,
+// /nl/insights en /nl/signals, in alle vier de talen.
+//
+// De noodrem meet iets anders: of de observer überhaupt rekent. Een
+// IntersectionObserver levert bij observe() een eerste notificatie voor
+// elk doel, ook voor doelen die niet snijden, dus de callback hoort
+// binnen een frame te vuren. Blijft hij stil, dan berekent de browser
+// geen intersectie en is 'niets in beeld' niet te onderscheiden van 'de
+// observer is dood'. In dat geval wint zichtbaarheid boven animatie.
+const REVEAL_NOODREM_MS = 1200;
+
 export function GlobalEffects() {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const doelen = Array.from(document.querySelectorAll("[data-reveal]"));
+    if (doelen.length === 0) return;
+
+    let heeftGerekend = false;
+    const io = new IntersectionObserver(
+      (entries) => {
+        heeftGerekend = true;
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    doelen.forEach((el) => io.observe(el));
+
+    const noodrem = window.setTimeout(() => {
+      if (heeftGerekend) return;
+      doelen.forEach((el) => el.classList.add("in"));
+    }, REVEAL_NOODREM_MS);
+
+    return () => {
+      window.clearTimeout(noodrem);
+      io.disconnect();
+    };
+  }, [pathname]);
+
   useEffect(() => {
     /* Preloader — dismiss as soon as the page is painted. The fake
        counter that used to ramp 0→100 over ~1s was gating the hero
@@ -95,20 +151,6 @@ export function GlobalEffects() {
     };
     window.addEventListener("scroll", onScrollCta, { passive: true });
     onScrollCta();
-
-    /* Reveal on scroll */
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("in");
-            io.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.12 }
-    );
-    document.querySelectorAll("[data-reveal]").forEach((el) => io.observe(el));
 
     /* Scramble text on reveal.
        Layout-stability contract (the old version scored CLS 4.2 on
@@ -252,7 +294,6 @@ export function GlobalEffects() {
           b.removeEventListener("mouseleave", h.leave);
         }
       });
-      io.disconnect();
       sio?.disconnect();
     };
   }, []);
