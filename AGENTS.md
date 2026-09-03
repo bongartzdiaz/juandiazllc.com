@@ -672,6 +672,14 @@ beslissen — ze staan vastgepind in `lib/deus-naam.test.ts` tot jij kiest:
   berichten-endpoint. De regel die hij bewaakt — geen geautomatiseerde
   connectieverzoeken of DM's — is ongewijzigd juist. Het bestand staat buiten elke
   repo en wordt niet aangeraakt zonder jouw expliciete go.
+- **Vier PR's in `bongartzdiaz/diaz-editor` wachten op jouw merge: #652,
+  #653, #654 en #655.** Ze dragen de D2-, D3-, D4- en D6-rijen uit
+  `docs/content-kalender.md`; in die repo merget deze sessie niet.
+  **Gemeten op 2026-09-03, want dit bestand had het elders mis:** #659 is
+  **gemerged** (`64ccd0d5`, 2026-09-02 15:29 UTC) en #647 is **gesloten
+  zonder merge**. De sessielog-instructie om de basis van #647 naar `main`
+  te verzetten is daarmee vervallen; logboekgeschiedenis wordt niet
+  herschreven, dus dit blok is de correctie erop.
 - **De `supabase`-CLI op deze machine is ingelogd als
   `roy.raainvestments@gmail.com`.** Gemeten op 2026-08-26 via `supabase projects
   list`: zestien projecten over vijf organisaties, en **noch `vbozelswveaxsyccvaac`
