@@ -838,6 +838,15 @@ footer .f-mark { color: var(--text); }
 /* Reveal */
 [data-reveal] { opacity: 0; transform: translateY(30px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
 [data-reveal].in { opacity: 1; transform: none; }
+/* Vangnet. [data-reveal] staat standaard op opacity 0, dus zonder de
+   observer in components/GlobalEffects.tsx is de hele body onzichtbaar
+   terwijl de HTML gewoon geserveerd wordt. Wie beweging uit heeft staan
+   krijgt de inhoud daarom onvoorwaardelijk en zonder animatie; dat is
+   tegelijk het antwoord op de vraag wat er gebeurt als die ene observer
+   niet vuurt. De runtime-noodrem in GlobalEffects dekt de rest. */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { opacity: 1; transform: none; transition: none; }
+}
 
 /* 2027 Countdown */
 .countdown { margin-top: 80px; padding: 40px; border: 1px solid var(--line); border-radius: 18px; background: radial-gradient(800px 300px at 10% 0%, rgba(94,255,177,.08), transparent 60%), linear-gradient(180deg, rgba(10,36,24,.85), rgba(6,32,26,.6)); position: relative; overflow: hidden; }
