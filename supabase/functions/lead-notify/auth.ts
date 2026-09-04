@@ -53,8 +53,10 @@
     als een SENTRY_DSN die op de letterlijke tekst `optional` staat.
 
     Gemeten op 2026-08-25 is de sleutel in de vault van
-    `wbgiouuifqhasedncysw` 44 tekens (base64url, 32 bytes), dus deze drempel
-    kan niet omvallen op de echte waarde. Bewust ruim daaronder: een te strenge
+    `wbgiouuifqhasedncysw` 44 tekens. Hermeten op 2026-09-04: het is
+    standaard base64 en geen base64url -- hij draagt `+`, `/` en `=`, geen
+    witruimte en geen regeleinde. Deze drempel kan er dus niet op omvallen.
+    Bewust ruim daaronder: een te strenge
     controle zet de keten uit op het moment dat hij aan hoort te gaan, en dat
     is een ergere fout dan de fout die hier gerepareerd wordt. */
 export const MIN_SLEUTELLENGTE = 16

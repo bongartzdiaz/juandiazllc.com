@@ -38,10 +38,10 @@ const WORTEL = fileURLToPath(new URL('..', import.meta.url))
 const INDEX = readFileSync(`${WORTEL}supabase/functions/lead-acknowledge/index.ts`, 'utf8')
 const INDEX_CODE = zonderCommentaar(INDEX)
 
-/** Zelfde vorm als het echte vault-secret: base64url, 32 bytes, 44 tekens.
-    Gemeten op wbgiouuifqhasedncysw op 2026-08-25 — alleen lengte en tekenset
+/** Zelfde vorm als het echte vault-secret: standaard base64, 32 bytes, 44 tekens.
+    Gemeten op wbgiouuifqhasedncysw op 2026-09-04 — alleen lengte en tekenset
     opgevraagd, nooit de waarde. */
-const SLEUTEL = 'K'.repeat(43) + '='
+const SLEUTEL = 'K'.repeat(20) + '+' + '/' + 'K'.repeat(21) + '='
 
 describe('sleutelIsBruikbaar', () => {
   it('weigert afwezig, leeg en witruimte', () => {

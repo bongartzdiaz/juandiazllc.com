@@ -445,7 +445,7 @@ herschreven, en deze notitie is de correctie erop.
    vraag ligt onder alle andere.
 3. **`LEAD_NOTIFY_SECRET`** in Supabase → Edge Functions → Secrets, met dezelfde
    waarde als `lead_notify_secret` in Database → Vault. Die vault-sleutel staat
-   er sinds 2026-08-16 16:22:38 UTC (44 tekens, base64url), dus de triggerkant
+   er sinds 2026-08-16 16:22:38 UTC (44 tekens, standaard base64), dus de triggerkant
    is klaar — wat ontbreekt is de functiekant. Dit sluit `lead-notify`, dat nog
    fail-open is. **Vóór stap 4.**
 

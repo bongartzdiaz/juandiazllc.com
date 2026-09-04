@@ -50,8 +50,12 @@ const INDEX_CODE = zonderCommentaar(INDEX)
 const AUTH_NOTIFY = readFileSync(`${WORTEL}supabase/functions/lead-notify/auth.ts`)
 const AUTH_ACK = readFileSync(`${WORTEL}supabase/functions/lead-acknowledge/auth.ts`)
 
-/** Zelfde vorm als het echte vault-secret: base64url, 32 bytes, 44 tekens. */
-const SLEUTEL = 'K'.repeat(43) + '='
+/** Zelfde vorm als het echte vault-secret: standaard base64, 32 bytes, 44 tekens.
+    Gemeten op wbgiouuifqhasedncysw op 2026-09-04 -- alleen lengte en tekenset
+    opgevraagd, nooit de waarde. De echte sleutel draagt `+` en `/`, dus die staan
+    hier ook in: een testsleutel die de tekenset van de echte niet haalt, bewijst
+    minder dan hij lijkt. */
+const SLEUTEL = 'K'.repeat(20) + '+' + '/' + 'K'.repeat(21) + '='
 
 describe('de twee auth.ts zijn één feit', () => {
   it('BYTE-IDENTIEK, inclusief regeleinden', () => {
