@@ -10491,10 +10491,14 @@ script, 7 voor de twee configuratiebestanden.
 - **Vercel's install-commando is niet geverifieerd.** Er is geen `vercel.json`,
   en de opmerking in `ci.yml:24-32` dat Vercel het soepelere `npm install`
   gebruikt staat er nog steeds ongemeten. Van deze machine is dat niet te zien.
-- **GitHub Actions staat niet in `dependabot.yml`.** `actions/checkout` en
-  `actions/setup-node` draaien in CI met het repo-token en zijn dezelfde klasse
-  risico, maar hoeveel PR-ruis acceptabel is, is een aparte afweging. Toevoegen
-  is één blok.
+- **De actions zijn niet op een commit-sha vastgezet.** Ze staan sinds
+  2026-09-04 wel in `dependabot.yml`, maar dragen daar geen `cooldown`:
+  GitHub ondersteunt die optie voor `github-actions` niet, gemeten in zijn
+  eigen options-reference. De wachttijd van zeven dagen dekt Actions dus
+  niet. Wat daar wel werkt is een action vastzetten op een commit-sha in
+  plaats van op een verplaatsbare tag — `actions/checkout@v7` wijst mee
+  als iemand die tag verzet. Dat raakt elke workflow en is een eigen
+  beslissing.
 
 Geen enkele operator-taak opgelost. De Supabase-402 staat er nog, dus het
 contactformulier schrijft niets weg; de zes Plausible-doelen,

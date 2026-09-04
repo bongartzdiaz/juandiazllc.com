@@ -31,6 +31,22 @@ const WORKFLOW = ".github/workflows/dependency-audit.yml";
  *  bijstellen mag, maar niet stilzwijgend. */
 const MINIMALE_WACHTTIJD_DAGEN = 7;
 
+/** Ecosystemen die géén `cooldown` mogen dragen, met de reden erbij. Een
+ *  vrijstelling zonder reden wordt over een jaar weggehaald door iemand die
+ *  niet weet waarom hij er stond.
+ *
+ *  Deze lijst draagt zijn eigen voorwaarde: elke naam erin moet werkelijk in
+ *  het bestand staan (zie de test hieronder). Verdwijnt het ecosysteem, dan
+ *  valt de vrijstelling om in plaats van stil te blijven liggen. */
+const ZONDER_WACHTTIJD: Record<string, string> = {
+  "github-actions":
+    "GitHub ondersteunt cooldown niet voor dit ecosysteem — gemeten 2026-09-04 " +
+    "in de options-reference, waar npm, bundler, cargo, docker, gomod, maven, pip " +
+    "en ruim twintig andere wel genoemd worden en github-actions niet. Een " +
+    "cooldown-blok daar wordt genegeerd of maakt de configuratie ongeldig; dat " +
+    "eerste is erger, want dan lijkt de wachttijd te gelden terwijl hij dat niet doet.",
+};
+
 /** Regels zonder commentaar. `#` binnen een YAML-waarde komt in deze twee
  *  bestanden niet voor; zou dat veranderen, dan is dat hier te zien. */
 function zonderCommentaar(inhoud: string): string[] {
@@ -40,24 +56,51 @@ function zonderCommentaar(inhoud: string): string[] {
     .filter((r) => r.trim() !== "");
 }
 
-/** Het aantal dagen achter `default-days:`. Gooit als de sleutel ontbreekt of
- *  meer dan eens voorkomt — twee waarden voor één feit is precies de vorm
- *  waarin een poort de verkeerde leest. */
-function wachttijd(inhoud: string): number {
-  const treffers = zonderCommentaar(inhoud)
-    .map((r) => /^\s*default-days:\s*(\d+)\s*$/.exec(r))
-    .filter((m): m is RegExpExecArray => m !== null);
+interface Ingang {
+  ecosysteem: string;
+  wachttijdDagen: number | null;
+}
 
-  if (treffers.length !== 1) {
-    throw new Error(
-      `verwachtte precies een regel 'default-days:' in ${DEPENDABOT}, vond er ${treffers.length}`,
-    );
+/** De `updates:`-ingangen met hun wachttijd, in bronvolgorde.
+ *
+ *  Gooit als een `default-days:` niet aan een ecosysteem is toe te wijzen, of
+ *  als één ecosysteem er twee draagt. Dat tweede is de reden dat deze functie
+ *  per blok telt en niet per bestand: twee waarden voor één feit is precies
+ *  de vorm waarin een poort de verkeerde leest. Sinds er meer dan één
+ *  ecosysteem in dit bestand staat, is "precies één per bestand" te grof. */
+function ingangen(inhoud: string): Ingang[] {
+  const uit: Ingang[] = [];
+
+  for (const regel of zonderCommentaar(inhoud)) {
+    const eco = /^\s*-\s*package-ecosystem:\s*"?([\w-]+)"?\s*$/.exec(regel);
+    if (eco) {
+      uit.push({ ecosysteem: eco[1], wachttijdDagen: null });
+      continue;
+    }
+
+    const dagen = /^\s*default-days:\s*(\d+)\s*$/.exec(regel);
+    if (dagen) {
+      const huidig = uit[uit.length - 1];
+      if (huidig === undefined) {
+        throw new Error(`'default-days:' staat voor de eerste package-ecosystem in ${DEPENDABOT}`);
+      }
+      if (huidig.wachttijdDagen !== null) {
+        throw new Error(
+          `twee regels 'default-days:' onder ecosysteem '${huidig.ecosysteem}' in ${DEPENDABOT}`,
+        );
+      }
+      huidig.wachttijdDagen = Number(dagen[1]);
+    }
   }
-  return Number(treffers[0][1]);
+
+  if (uit.length === 0) {
+    throw new Error(`geen enkele 'package-ecosystem:' gevonden in ${DEPENDABOT}`);
+  }
+  return uit;
 }
 
 describe("dependabot.yml", () => {
-  it("draagt de npm-ecosysteem-ingang", () => {
+  it("draagt de npm-ingang met een cooldown", () => {
     const regels = zonderCommentaar(lees(DEPENDABOT));
     // Positieve controle: de commentaarstrip laat werkelijk iets over.
     expect(regels.length).toBeGreaterThan(5);
@@ -65,8 +108,53 @@ describe("dependabot.yml", () => {
     expect(regels.some((r) => /^\s*cooldown:\s*$/.test(r))).toBe(true);
   });
 
-  it("wacht minstens zeven dagen op een nieuwe versie", () => {
-    expect(wachttijd(lees(DEPENDABOT))).toBeGreaterThanOrEqual(MINIMALE_WACHTTIJD_DAGEN);
+  it("draagt de github-actions-ingang", () => {
+    // Diezelfde klasse risico: die actions draaien in CI met het repo-token.
+    const namen = ingangen(lees(DEPENDABOT)).map((i) => i.ecosysteem);
+    expect(namen).toContain("github-actions");
+  });
+
+  it("elke wachttijd is minstens zeven dagen", () => {
+    const gevonden = ingangen(lees(DEPENDABOT))
+      .map((i) => i.wachttijdDagen)
+      .filter((d): d is number => d !== null);
+
+    // Zonder deze regel slaagt de lus hieronder ook op nul wachttijden.
+    expect(gevonden.length).toBeGreaterThan(0);
+    for (const dagen of gevonden) {
+      expect(dagen).toBeGreaterThanOrEqual(MINIMALE_WACHTTIJD_DAGEN);
+    }
+  });
+
+  it("elk ecosysteem heeft een wachttijd, of staat vrijgesteld met reden", () => {
+    for (const ingang of ingangen(lees(DEPENDABOT))) {
+      if (ingang.wachttijdDagen !== null) continue;
+      const reden = ZONDER_WACHTTIJD[ingang.ecosysteem];
+      expect(reden, `ecosysteem '${ingang.ecosysteem}' heeft geen cooldown en geen reden`)
+        .toBeTruthy();
+      // Een reden van drie woorden is geen reden.
+      expect(reden.length).toBeGreaterThan(40);
+    }
+  });
+
+  it("een vrijgesteld ecosysteem draagt ook werkelijk geen cooldown", () => {
+    // De andere richting. Een `cooldown` onder github-actions wordt door
+    // GitHub genegeerd, en dan claimt dit bestand een wachttijd die niet
+    // geldt. Dat is erger dan hem weglaten, dus het mag hier niet staan.
+    for (const ingang of ingangen(lees(DEPENDABOT))) {
+      if (!(ingang.ecosysteem in ZONDER_WACHTTIJD)) continue;
+      expect(
+        ingang.wachttijdDagen,
+        `'${ingang.ecosysteem}' draagt een cooldown terwijl het ecosysteem die niet ondersteunt`,
+      ).toBeNull();
+    }
+  });
+
+  it("een vrijstelling die niet meer waar is, valt om", () => {
+    const namen = ingangen(lees(DEPENDABOT)).map((i) => i.ecosysteem);
+    for (const naam of Object.keys(ZONDER_WACHTTIJD)) {
+      expect(namen, `'${naam}' staat vrijgesteld maar komt niet meer voor`).toContain(naam);
+    }
   });
 
   it("legt vast waarom die wachttijd geen security-fix ophoudt", () => {
@@ -76,11 +164,26 @@ describe("dependabot.yml", () => {
     expect(lees(DEPENDABOT)).toContain("security updates");
   });
 
-  it("wachttijd() gooit als de sleutel ontbreekt of dubbel staat", () => {
-    expect(() => wachttijd("updates:\n  - package-ecosystem: npm\n")).toThrow(/vond er 0/);
-    expect(() => wachttijd("default-days: 7\ndefault-days: 3\n")).toThrow(/vond er 2/);
-    // En een uitgecommentarieerde regel telt niet mee.
-    expect(() => wachttijd("# default-days: 7\n")).toThrow(/vond er 0/);
+  it("ingangen() gooit op elke vorm die stil de verkeerde waarde zou opleveren", () => {
+    expect(() => ingangen('updates:\n  - directory: "/"\n')).toThrow(/geen enkele/);
+    expect(() => ingangen("default-days: 7\n")).toThrow(/voor de eerste/);
+    expect(() =>
+      ingangen('  - package-ecosystem: "npm"\n    default-days: 7\n    default-days: 3\n'),
+    ).toThrow(/twee regels/);
+    // Een uitgecommentarieerde regel telt niet mee.
+    expect(ingangen('  - package-ecosystem: "npm"\n    # default-days: 7\n')[0].wachttijdDagen)
+      .toBeNull();
+    // En twee blokken worden ook werkelijk als twee gelezen, elk met de eigen
+    // waarde — zonder deze regel is een parser die alles op de laatste ingang
+    // plakt niet te onderscheiden van een die het goed doet.
+    const twee = ingangen(
+      '  - package-ecosystem: "npm"\n    cooldown:\n      default-days: 7\n' +
+        '  - package-ecosystem: "github-actions"\n',
+    );
+    expect(twee.map((i) => [i.ecosysteem, i.wachttijdDagen])).toEqual([
+      ["npm", 7],
+      ["github-actions", null],
+    ]);
   });
 });
 

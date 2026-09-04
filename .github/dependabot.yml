@@ -17,11 +17,6 @@
 # gekaapte versie komt hier alleen binnen als iemand hem bewust update én
 # de gewijzigde lockfile committeert. Deze wachttijd zorgt dat zo'n
 # handeling in het kapingsvenster geen PR oplevert om te mergen.
-#
-# NIET gedekt: GitHub Actions. `actions/checkout` en `actions/setup-node`
-# draaien in CI met het repo-token en zijn dezelfde klasse risico, maar
-# staan hier bewust nog niet in — dat is een aparte afweging over hoeveel
-# PR-ruis acceptabel is. Toevoegen is één blok.
 
 version: 2
 
@@ -54,6 +49,41 @@ updates:
 
     # Majors blijven los, want die vragen een echte beoordeling.
     open-pull-requests-limit: 5
+
+    labels:
+      - "dependencies"
+
+  # GitHub Actions. `actions/checkout` en `actions/setup-node` draaien in CI
+  # met het repo-token en zijn dezelfde klasse risico als een npm-pakket.
+  #
+  # DRAAGT GEEN `cooldown`, EN DAT KAN OOK NIET. Gemeten op 2026-09-04 in
+  # GitHub's eigen options-reference: `cooldown` is beschikbaar voor npm,
+  # bundler, cargo, docker, gomod, maven, pip en ruim twintig andere — en
+  # `github-actions` staat er niet bij. Een cooldown-blok hieronder zou dus
+  # ofwel de configuratie ongeldig maken ofwel stil genegeerd worden, en dat
+  # tweede is erger: dan lijkt de wachttijd te gelden terwijl hij dat niet doet.
+  #
+  # Wat dat betekent: de wachttijd hierboven dekt Actions niet. De verdediging
+  # die daar wél werkt is een action vastzetten op een commit-sha in plaats van
+  # een verplaatsbare tag (`actions/checkout@v7` wijst mee als die tag wordt
+  # verzet). Dat is een wijziging aan elke workflow en een eigen beslissing;
+  # hij staat hier genoteerd, niet stilzwijgend meegenomen.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Amsterdam"
+
+    # Eén PR voor alle actions samen. Het zijn er vijf workflows met een
+    # handvol actions; losse takken per bump zijn hier pure ruis.
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+    open-pull-requests-limit: 3
 
     labels:
       - "dependencies"
