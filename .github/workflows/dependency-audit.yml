@@ -43,3 +43,19 @@ jobs:
       # dus geen build nodig.
       - name: npm-audit-poort
         run: npm run audit:deps
+
+      # Tweede poort, andere vraag. De eerste vraagt of er een bekende
+      # kwetsbaarheid in zit; deze vraagt of de tarballs zijn wat de registry
+      # zegt dat ze zijn. Een gekaapt maintaineraccount publiceert een pakket
+      # dat geldig ondertekend is en dus hier doorkomt — maar een tarball die
+      # onderweg is vervangen, of een registry-mirror die iets anders serveert,
+      # niet. Gemeten op 2026-09-04: 453 van de 453 pakketten hebben een
+      # geverifieerde handtekening, 115 een attestatie. Vastzetten kost dus
+      # niets en de poort begint groen.
+      #
+      # Let op bij een rood vinkje hier: deze stap belt de registry, dus een
+      # storing daar geeft ook rood. Lees de melding voordat je concludeert
+      # dat er is geknoeid. Fail-open maken is geen optie — een
+      # handtekeningcontrole die zichzelf overslaat controleert niets.
+      - name: handtekening-poort
+        run: npm audit signatures

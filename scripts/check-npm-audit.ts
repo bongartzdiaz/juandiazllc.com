@@ -15,6 +15,7 @@ import {
   verzamelAdvisories,
   beoordeel,
   type Ernst,
+  leesAuditUitvoer,
   type Uitzondering,
 } from "../lib/security/audit-gate";
 
@@ -23,8 +24,8 @@ const drempel = ((args.find((a) => a.startsWith("--drempel="))?.split("=")[1] ??
 const jsonPad = args[args.indexOf("--json") + 1];
 
 /** npm audit geeft exitcode 1 zodra er iets gevonden is, dus de fout is hier
- *  verwachte uitvoer en geen probleem. Alleen als er niets op stdout staat is
- *  er echt iets mis. */
+ *  verwachte uitvoer en geen probleem. Of de uitvoer bruikbaar is, beoordeelt
+ *  leesAuditUitvoer() — leeg is niet het enige onbruikbare geval. */
 function haalAudit(): unknown {
   if (jsonPad && args.includes("--json")) {
     return JSON.parse(readFileSync(jsonPad, "utf8"));
@@ -39,11 +40,12 @@ function haalAudit(): unknown {
   } catch (e) {
     out = (e as { stdout?: string }).stdout ?? "";
   }
-  if (!out.trim()) {
-    console.error("npm audit gaf geen uitvoer — kon de kwetsbaarheden niet beoordelen.");
+  const gelezen = leesAuditUitvoer(out);
+  if (!gelezen.ok) {
+    console.error(gelezen.reden + " — kon de kwetsbaarheden niet beoordelen.");
     process.exit(1);
   }
-  return JSON.parse(out);
+  return gelezen.json;
 }
 
 function haalUitzonderingen(): Uitzondering[] {

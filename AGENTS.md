@@ -10350,3 +10350,154 @@ is vandaag de enige weg die aankomt. De zes Plausible-doelen,
 `SENTRY_DSN`, de vier LinkedIn-beslissingen en de twee onverklaarde knoppen
 staan onveranderd open. In `bongartzdiaz/diaz-editor` wachten **#652, #653,
 #654, #655** en **#659** op Juan.
+
+### 2026-09-04 — zeven dagen wachttijd, en een poort die op `undefined` een stacktrace gaf
+
+PR #334. De aanleiding kwam van buiten: een bericht in een groepschat over een
+gekaapt npm-maintaineraccount, met een leesscript erbij. Dat script is gedraaid
+en gaf hier niets — maar de vraag eronder (*hoe houden we dit tegen*) bleek een
+ander antwoord te hebben dan de vraag suggereerde.
+
+#### Sneller updaten is de verkeerde hefboom
+
+Een kaping duurt uren. Wie in dat venster installeert krijgt de gekaapte versie;
+wie een week achterloopt per definitie niet. **Sneller updaten vergroot de
+blootstelling aan dit type aanval, het verkleint hem niet.** De verdediging is
+een wachttijd.
+
+`.github/dependabot.yml` (nieuw) zet `cooldown.default-days: 7`. npm zelf kan dit
+niet — npm 11.8.0 kent geen `minimum-release-age` of vergelijkbare sleutel,
+alleen `--before`. Dependabot is dus de enige plek waar die wachttijd kan staan.
+
+**Wat het niet kost, en dat is de vondst die de afweging omdraait.** `cooldown`
+geldt uitsluitend voor **version updates**. Dependabot **security updates** — de
+PR's die een bekende kwetsbaarheid dichten — slaan de wachttijd over. Een
+gekaapte versie wacht dus zeven dagen; een echte CVE-fix komt meteen. Zonder dat
+onderscheid zou deze instelling een kwetsbaarheid ruilen voor een andere, en dat
+is precies hoe ik hem aanvankelijk beschreef. GitHub's eigen standaard staat
+inmiddels op drie dagen; zeven is strenger.
+
+Dit is de **tweede** laag. De eerste is dat `package-lock.json` in git staat en
+CI met `npm ci` installeert: de `integrity`-hash laat zelfs een omgewisselde
+tarball van dezelfde versie stuklopen. Een gekaapte versie komt hier alleen
+binnen als iemand hem bewust update én de gewijzigde lockfile committeert — en
+deze wachttijd zorgt dat zo'n handeling in het kapingsvenster geen PR oplevert.
+
+#### De poort faalde dicht, maar met een stacktrace in plaats van een zin
+
+Bij het meten weigerde `npm audit --package-lock-only --json` met `socket hang
+up` en schreef het woord **`undefined`** naar stdout. Die uitvoer is niet leeg,
+dus de controle op leegte liet hem door, waarna `JSON.parse("undefined")` een
+kale `SyntaxError` gooide.
+
+De poort bleef fail-closed — dat is nagemeten en niet aangenomen — maar het
+verschil tussen *de registry deed het even niet* en *de poort is stuk* was uit de
+melding niet te lezen. Op precies die twee gevallen moet een operator
+verschillend handelen.
+
+`leesAuditUitvoer()` in `lib/security/audit-gate.ts` beoordeelt de stdout nu vóór
+het parsen: leeg, letterlijk `undefined`/`null`, geen JSON-object, of onleesbare
+JSON — elk met een eigen reden. **Hij accepteert exact wat de oude code
+accepteerde.** Strikt niet losser, alleen luider.
+
+#### Twee lagen die elkaar niet overlappen
+
+De beslissing is uitvoerbaar getest via import. Maar het defect zat in de
+**bedrading** — een controle die de verkeerde vraag stelde en daarna doorliet —
+en dat kan een module-import per definitie niet zien: hij roept de functie aan en
+die is correct. Vandaar een tekstscan erbij op `scripts/check-npm-audit.ts`, die
+eist dat het antwoord ook werkelijk tot `process.exit(1)` leidt en dat
+`JSON.parse(out)` niet terugkeert. Zelfde afweging als bij de poort op
+`supabase/functions/lead-acknowledge`.
+
+#### De twee YAML-bestanden stonden in geen enkele poort
+
+`lib/security/config-poorten.test.ts` (nieuw) sluit dat. Beide verdedigingen zijn
+stil te verzwakken: de wachttijd is een cijfer, de handtekening-stap is een
+regel, en YAML werd hier door niets gelezen.
+
+**Bewust een tekstscan en geen YAML-parser.** `js-yaml` staat hier alleen als
+transitieve afhankelijkheid van eslint, niet in `package.json`. Een poort die
+daarop leunt valt stil weg bij de eerstvolgende bump — precies het soort stille
+verdwijning dat dit bestand moet voorkomen.
+
+De dagen-parser **gooit** als `default-days:` ontbreekt of meer dan eens
+voorkomt. Dat tweede is de les van #229, waar `.match()` zonder `/g` stil de
+eerste rij pakte terwijl er twee stonden.
+
+#### De handtekening-poort, met zijn eigen prijs erbij
+
+`npm audit signatures` staat nu als tweede stap in `dependency-audit.yml`. Hij
+beantwoordt een **andere vraag** dan de advisory-poort: niet of er een bekende
+kwetsbaarheid in zit, maar of de tarballs zijn wat de registry zegt dat ze zijn.
+Gemeten op 2026-09-04: **453 van de 453 handtekeningen geverifieerd, 115
+attestaties.** Vastzetten kost dus niets en de poort begint groen.
+
+**Twee dingen die erbij horen en in de workflow staan opgeschreven.** Een gekaapt
+maintaineraccount publiceert een pakket dat geldig ondertekend is en komt hier
+gewoon doorheen — deze stap vangt een vervangen tarball of een afwijkende mirror,
+niet een kaping. En hij belt de registry, dus een storing daar geeft óók rood;
+lees de melding voordat je concludeert dat er is geknoeid. Fail-open maken is
+geen optie, en een assertie verbiedt `continue-on-error` in dat hele bestand.
+
+#### Vijftien mutaties, vijftien keer de voorspelde kleur
+
+Dertien rood op dertien verschillende asserties, twee groen als controle, groen
+na herstel, nul sporen. De drie die het vermelden waard zijn:
+
+| mutatie | kleur | wat het bewijst |
+|---|---|---|
+| script laat onbruikbare uitvoer door | ROOD | de bedradingsscan is niet decoratief |
+| `undefined` in een **toelichting** in `lib/booking.ts` | GROEN | de scans lezen geëxporteerde code, niet hun eigen proza |
+| afkapgrens 200 → 150 | GROEN | de test pint het gedrag (er wordt afgekapt), niet het getal |
+
+Drie treffers bij de sporencontrole zijn per bestand toegeschreven in plaats van
+op de melding afgegaan: `registryfout`, `JSON.parse(out)` en `iets anders` staan
+alle drie uitsluitend in eigen toelichting of in bestaande proza.
+
+#### `vitest` groen is nog steeds geen `tsc` groen
+
+De suite liep 26/26 groen terwijl `tsc` twee fouten gaf: twee tests lazen
+`.reden` van de ongenauwde union `AuditUitvoer`. Vitest transpileert zonder te
+typechecken. Dat staat sinds #252 in dit logboek en het gold opnieuw — draai
+beide, en lees niet één van de twee als bewijs voor de ander.
+
+Onderweg viel mijn eigen patch-assertie om op `'onbereikbaar' not in file`: er
+stond één legitiem gebruik dat juist naar de **succes**-tak nauwt. Omdat het
+schrijven vóór de assertie gebeurt en `&&` de rest oversloeg, was de geprinte
+`TSC_EXIT=1` de exitcode van python en niet van tsc.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1540 tests in 79 bestanden (was 1522/78)
+npm audit signatures     453/453 geverifieerd, 115 attestaties
+audit:deps               0 advisories, 0 uitzonderingen
+i18n:check               741 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+next build               exit 0
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +18 is uitgesplitst: 8 voor `leesAuditUitvoer`, 3 voor de bedrading van het
+script, 7 voor de twee configuratiebestanden.
+
+#### Wat dit bewust niet doet
+
+- **`ignore-scripts` staat niet aan.** `esbuild` en `unrs-resolver` hebben hun
+  postinstall nodig voor platformbinaries, dus aanzetten vergt `npm rebuild` en
+  is een afweging voor Juan, geen reparatie.
+- **Vercel's install-commando is niet geverifieerd.** Er is geen `vercel.json`,
+  en de opmerking in `ci.yml:24-32` dat Vercel het soepelere `npm install`
+  gebruikt staat er nog steeds ongemeten. Van deze machine is dat niet te zien.
+- **GitHub Actions staat niet in `dependabot.yml`.** `actions/checkout` en
+  `actions/setup-node` draaien in CI met het repo-token en zijn dezelfde klasse
+  risico, maar hoeveel PR-ruis acceptabel is, is een aparte afweging. Toevoegen
+  is één blok.
+
+Geen enkele operator-taak opgelost. De Supabase-402 staat er nog, dus het
+contactformulier schrijft niets weg; de zes Plausible-doelen,
+`LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`, `CAL_WEBHOOK_SECRET`,
+`SENTRY_DSN`, de vier LinkedIn-beslissingen, de twee onverklaarde knoppen en de
+openstaande PR's in `bongartzdiaz/diaz-editor` staan onveranderd open.
