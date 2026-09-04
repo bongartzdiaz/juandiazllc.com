@@ -31,6 +31,25 @@ import { zonderCommentaar } from "../bronscan";
  * comment niet als JSX-tekst, dus hier is geen commentaarstrip nodig — en dat
  * wordt hieronder bewezen in plaats van aangenomen.
  *
+ * DIT BESTAND HOUDT TYPESCRIPT OP 5.
+ *
+ * Het is het enige bestand in de repo dat `typescript` importeert, en het
+ * gebruikt tien dingen uit de compiler-API. Negen daarvan bestaan in TS 7
+ * nog, onder `typescript/unstable/ast`. `createSourceFile` niet: TS 7 is de
+ * Go-port en levert helemaal geen JS-parser meer. Het gelijknamige ding in
+ * `unstable/ast` is de node-fabriek — eerste parameter
+ * `statements: readonly Statement[]`, dus je moet de AST al hebben.
+ *
+ * Gemeten op 2026-09-04 in PR #338 (5.9.3 -> 7.0.2): 17 typecheckfouten,
+ * alle zeventien hier. De rest van de codebase kwam schoon door.
+ *
+ * Daarom staat er een `ignore` op de typescript-major in
+ * `.github/dependabot.yml`, met de meting erbij. Wil je die pin optillen,
+ * dan is dat geen import-wissel maar een herschrijving op de
+ * tsconfig-gedreven `Program` uit `unstable/sync` — een API die zichzelf
+ * onstabiel noemt. `lib/typescript-pin.test.ts` bindt de twee aan elkaar,
+ * zodat de pin vervalt zodra de import hier verdwijnt.
+ *
  * WAT HIJ NIET ZIET: een Engelse zin in `DICT.nl`, kopij die via een prop
  * binnenkomt, en `title=` / `placeholder=` / `aria-label=` — dat zijn attributen
  * en geen tekstknopen. Voor die laatste bestaat nog geen poort. */
