@@ -1,0 +1,59 @@
+# Wachttijd op nieuwe versies, plus updates die niet stil blijven liggen.
+# ───────────────────────────────────────────────────────────────────────────
+# Aanleiding: een kaping van een npm-maintaineraccount duurt doorgaans uren.
+# Wie in dat venster installeert krijgt de gekaapte versie; wie een week
+# achterloopt per definitie niet. Sneller updaten vergroot de blootstelling
+# aan dit type aanval, het verkleint hem niet — de verdediging is een
+# wachttijd, geen snelheid.
+#
+# Waarom dat hier niets kost: `cooldown` geldt uitsluitend voor
+# **version updates**. Dependabot **security updates** — de PR's die een
+# bekende kwetsbaarheid dichten — slaan de wachttijd over. Een gekaapte
+# versie wacht dus zeven dagen; een echte CVE-fix komt meteen. Zonder dat
+# onderscheid zou deze instelling een kwetsbaarheid ruilen voor een andere.
+#
+# Deze wachttijd is de tweede laag, niet de eerste. De eerste is dat
+# `package-lock.json` in git staat en CI met `npm ci` installeert: een
+# gekaapte versie komt hier alleen binnen als iemand hem bewust update én
+# de gewijzigde lockfile committeert. Deze wachttijd zorgt dat zo'n
+# handeling in het kapingsvenster geen PR oplevert om te mergen.
+#
+# NIET gedekt: GitHub Actions. `actions/checkout` en `actions/setup-node`
+# draaien in CI met het repo-token en zijn dezelfde klasse risico, maar
+# staan hier bewust nog niet in — dat is een aparte afweging over hoeveel
+# PR-ruis acceptabel is. Toevoegen is één blok.
+
+version: 2
+
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Amsterdam"
+
+    # Zeven dagen. Elke gedocumenteerde npm-kaping van het afgelopen jaar is
+    # binnen uren teruggetrokken, dus zeven dagen dekt ze ruim. GitHub's eigen
+    # standaard staat op drie; dit is strenger en de prijs is nul, omdat
+    # security updates hier niet onder vallen (zie boven).
+    cooldown:
+      default-days: 7
+
+    # Eén PR voor alle minor- en patchbumps samen. De poort die telt is
+    # `npm run audit:deps` (dagelijks, faalt dicht); deze PR's zijn onderhoud
+    # en horen geen wekelijkse stroom losse takken op te leveren.
+    groups:
+      minor-en-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+    # Majors blijven los, want die vragen een echte beoordeling.
+    open-pull-requests-limit: 5
+
+    labels:
+      - "dependencies"

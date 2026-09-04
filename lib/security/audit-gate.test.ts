@@ -1,9 +1,13 @@
 import { describe, it, expect } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { zonderCommentaar } from "../bronscan";
 import {
   advisoryId,
   verzamelAdvisories,
   beoordeel,
   ernstMinstens,
+  leesAuditUitvoer,
   type Uitzondering,
 } from "./audit-gate";
 
@@ -187,5 +191,113 @@ describe("beoordeel", () => {
 
   it("zonder advisories en zonder uitzonderingen is er niets te melden", () => {
     expect(beoordeel([], [], VANDAAG)).toEqual([]);
+  });
+});
+
+/* De stdout-beoordeling van `npm audit --json`.
+
+   Waarom dit een eigen blok is: de poort faalde bij een registryfout op een
+   kale SyntaxError in plaats van op de melding die ernaast stond. De reden
+   was dat npm bij zo'n fout `undefined` naar stdout schrijft — niet-leeg, dus
+   de controle op leegte liet het door. Dat geval staat hieronder als eerste,
+   want het is de aanleiding. */
+/** Narrowt de unie zodat een test de reden kan uitlezen. Werpt wanneer de
+ *  uitvoer onverwacht geslaagd is, zodat een omgekeerd resultaat luid faalt
+ *  in plaats van stil op een vergelijking met undefined te slagen. */
+function reden(uit: ReturnType<typeof leesAuditUitvoer>): string {
+  if (uit.ok) throw new Error("verwachtte een afwijzing, kreeg geldige JSON");
+  return uit.reden;
+}
+
+describe("leesAuditUitvoer", () => {
+  it("leest een JSON-object en geeft het door", () => {
+    const uit = leesAuditUitvoer(JSON.stringify(AUDIT));
+    expect(uit.ok).toBe(true);
+    // Positieve controle: de doorgegeven waarde is werkelijk bruikbaar voor de
+    // rest van de poort. Zonder deze assertie slaagt de test ook op een
+    // functie die iets leegs teruggeeft.
+    if (!uit.ok) throw new Error("verwachtte geldige JSON, kreeg: " + uit.reden);
+    expect(verzamelAdvisories(uit.json).length).toBeGreaterThan(0);
+  });
+
+  it("weigert het woord undefined, en noemt de registry als oorzaak", () => {
+    const uit = leesAuditUitvoer("undefined");
+    expect(uit.ok).toBe(false);
+    expect(reden(uit)).toContain("undefined");
+    expect(reden(uit).toLowerCase()).toContain("registry");
+  });
+
+  it("weigert undefined ook met witruimte eromheen", () => {
+    // npm zet er een regeleinde achter; zonder trim valt dit in de
+    // niet-JSON-tak en verdwijnt de uitleg over de registry.
+    expect(leesAuditUitvoer("undefined\n").ok).toBe(false);
+    expect(reden(leesAuditUitvoer("  undefined  "))).toContain("registry");
+  });
+
+  it("weigert null", () => {
+    expect(leesAuditUitvoer("null").ok).toBe(false);
+  });
+
+  it("weigert lege uitvoer", () => {
+    expect(leesAuditUitvoer("").ok).toBe(false);
+    expect(leesAuditUitvoer("   \n  ").ok).toBe(false);
+    expect(reden(leesAuditUitvoer(""))).toContain("geen uitvoer");
+  });
+
+  it("weigert tekst die geen JSON-object is, en toont wat er wel stond", () => {
+    const uit = leesAuditUitvoer("npm ERR! code ENOTFOUND");
+    expect(uit.ok).toBe(false);
+    expect(reden(uit)).toContain("ENOTFOUND");
+  });
+
+  it("kapt een lange foutregel af in plaats van megabytes te loggen", () => {
+    const uit = leesAuditUitvoer("npm ERR! " + "x".repeat(5000));
+    expect(uit.ok).toBe(false);
+    expect(reden(uit).length).toBeLessThan(400);
+  });
+
+  it("weigert een JSON-object dat halverwege afbreekt", () => {
+    // maxBuffer-overschrijding levert precies dit op: een begin dat er goed
+    // uitziet en een einde dat ontbreekt.
+    const uit = leesAuditUitvoer('{"vulnerabilities":{"next":');
+    expect(uit.ok).toBe(false);
+    expect(reden(uit)).toContain("onleesbare JSON");
+  });
+});
+
+/* De bedrading in scripts/check-npm-audit.ts.
+
+   Waarom een tekstscan en geen import: het defect dat hierboven gerepareerd
+   is zat niet in de logica maar in de bedrading — een controle die de
+   verkeerde vraag stelde en daarna doorliet. Een module-import kan dat per
+   definitie niet zien; hij roept `leesAuditUitvoer` aan en die is correct.
+   Wat je moet kunnen zien is dat het script het antwoord ook werkelijk
+   gebruikt om te stoppen. Zelfde afweging als bij de poort op
+   supabase/functions/lead-acknowledge. */
+describe("scripts/check-npm-audit.ts", () => {
+  const ruw = readFileSync(join(__dirname, "..", "..", "scripts", "check-npm-audit.ts"), "utf8");
+  const bron = zonderCommentaar(ruw);
+
+  it("stopt zodra de uitvoer onbruikbaar is", () => {
+    // Positieve controle: de strip laat werkelijk code over.
+    expect(bron).toContain("leesAuditUitvoer");
+    expect(bron).toMatch(/if\s*\(\s*!\s*gelezen\.ok\s*\)/);
+    // En de weigering moet het proces beëindigen. Alleen loggen en doorgaan
+    // zou `JSON.parse` alsnog bereiken — de toestand van vóór deze reparatie.
+    const na = bron.slice(bron.search(/if\s*\(\s*!\s*gelezen\.ok\s*\)/));
+    expect(na.slice(0, 300)).toContain("process.exit(1)");
+  });
+
+  it("parseert de uitvoer niet meer zelf", () => {
+    // `JSON.parse(out)` was de regel die op `undefined` een kale SyntaxError
+    // gooide. Hij mag alleen nog voor het `--json <pad>`-debugpad bestaan.
+    expect(bron).not.toMatch(/JSON\.parse\(\s*out\s*\)/);
+  });
+
+  it("de scan valt niet over commentaar", () => {
+    // Zonder deze controle is groen hierboven ook te verklaren door een strip
+    // die de hele bron wegknipt.
+    expect(zonderCommentaar("// JSON.parse(out)\nconst a = 1;")).not.toContain("JSON.parse");
+    expect(zonderCommentaar("const a = 1; // JSON.parse(out)")).toContain("const a = 1;");
   });
 });

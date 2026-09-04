@@ -163,3 +163,61 @@ export function beoordeel(
 
   return bevindingen;
 }
+
+/** Uitkomst van het lezen van wat `npm audit --json` naar stdout schreef. */
+export type AuditUitvoer =
+  | { ok: true; json: unknown }
+  | { ok: false; reden: string };
+
+/** Beoordeelt de stdout van `npm audit --json` vóór het parsen.
+ *
+ *  Aanleiding, gemeten op 2026-09-04: bij een registryfout
+ *  (`socket hang up`, `audit endpoint returned an error`) schrijft npm het
+ *  woord `undefined` naar stdout en eindigt met exitcode 1. Die uitvoer is
+ *  niet leeg, dus een controle op leegte laat hem door — waarna
+ *  `JSON.parse("undefined")` een kale SyntaxError gooit. De poort faalde
+ *  daarmee nog steeds dicht, maar met een stacktrace in plaats van de zin
+ *  die uitlegt wat er aan de hand is. Dat is het verschil tussen "de
+ *  registry deed het even niet" en "de poort is stuk", en juist dat
+ *  onderscheid moet uit de melding blijken.
+ *
+ *  Deze functie accepteert exact wat de oude code accepteerde — een
+ *  JSON-object — en geeft voor al het andere een reden terug in plaats van
+ *  te werpen. Strikt niet losser, alleen luider. */
+export function leesAuditUitvoer(out: string): AuditUitvoer {
+  const t = out.trim();
+
+  if (t === "") {
+    return { ok: false, reden: "npm audit gaf geen uitvoer" };
+  }
+  // `undefined` en `null` zijn de twee vormen die npm bij een mislukte
+  // registry-aanroep achterlaat. Ze staan hier apart omdat de melding dan
+  // de oorzaak kan noemen; ze zouden anders onder de tak hieronder vallen.
+  if (t === "undefined" || t === "null") {
+    return {
+      ok: false,
+      reden:
+        "npm audit schreef letterlijk " +
+        t +
+        " — vrijwel altijd een registry- of netwerkfout, niet een defect in deze poort. Probeer opnieuw.",
+    };
+  }
+  if (!t.startsWith("{")) {
+    return { ok: false, reden: "npm audit gaf geen JSON-object, maar: " + kort(t) };
+  }
+  try {
+    return { ok: true, json: JSON.parse(t) };
+  } catch (e) {
+    return {
+      ok: false,
+      reden: "npm audit gaf onleesbare JSON: " + (e instanceof Error ? e.message : String(e)),
+    };
+  }
+}
+
+/** Eerste regel, afgekapt. De uitvoer kan tientallen megabytes zijn; die
+ *  ongefilterd in een foutmelding zetten maakt het log onleesbaar. */
+function kort(s: string): string {
+  const regel = s.split("\n", 1)[0];
+  return regel.length > 200 ? regel.slice(0, 200) + "…" : regel;
+}
