@@ -10506,15 +10506,18 @@ contactformulier schrijft niets weg; de zes Plausible-doelen,
 `SENTRY_DSN`, de vier LinkedIn-beslissingen, de twee onverklaarde knoppen en de
 openstaande PR's in `bongartzdiaz/diaz-editor` staan onveranderd open.
 
-### 2026-09-04 — zes van de zeven gemerged, en TypeScript 7 die door één poort wordt tegengehouden
+### 2026-09-04 — alle zeven afgehandeld, en TypeScript 7 die door één poort wordt tegengehouden
 
 Zeven open PR's, waarvan zes Dependabot. Vier zijn gemerged (#340 het
 Supabase-migratieplan, #342 `actions/checkout` 4→7, #335 de fail-closed poort
 op `lead-notify`, #336 de groep van veertien minor- en patchbumps). Main staat
-groen op `bcbe2fc`. #337 en #339 kregen `@dependabot rebase`: **twee
-lockfile-PR's serialiseren per definitie**, dus de tweede conflicteert zodra de
-eerste landt — dat is geen defect maar de vorm. Bij #339 herstelt diezelfde
-rebase en passant zijn **geannuleerde** `deps`-check; een check die nooit
+groen op `bcbe2fc`. #337 en #339 kregen `@dependabot rebase`, want een gemergede
+lockfile-PR kan de volgende laten conflicteren. **Dat is hier niet gebeurd.**
+Na de rebase mergede #339 schoon ná #337, omdat eslint en `@types/node`
+verschillende stukken van `package-lock.json` raken. Twee lockfile-PR's
+serialiseren dus niet per definitie, maar alleen wanneer ze elkaars regels
+raken — en dat is niet vooraf te zien, alleen te meten. Bij #339 herstelde die
+rebase wél zijn **geannuleerde** `deps`-check; een check die nooit
 rapporteert laat een PR eeuwig op `expected` staan in plaats van rood te worden,
 dezelfde vorm als `audit-productie` op 19 augustus.
 
@@ -10647,3 +10650,27 @@ staan onveranderd open. In `bongartzdiaz/diaz-editor` wachten **#652, #653,
 
 En de poort oordeelt niet over TypeScript zelf. Levert TS 7 ooit alsnog een
 JS-parser, dan is hij groen en toch verouderd — dat staat in zijn eigen kop.
+
+#### Afloop — nul open PR's
+
+| | |
+|---|---|
+| #337 | eslint 9.39.4 → 10.9.1 · `ec71249522d2` |
+| #343 | de pin plus zijn poort · `0a7b3d221abf` |
+| #339 | `@types/node` 22.19.17 → 26.4.0 · `61cd90951a89` |
+| #338 | **door Dependabot zelf gesloten**, 68 seconden na die merge |
+
+Die laatste regel is het sterkste bewijs dat de `ignore`-regel pakt, en hij komt
+niet uit een assertie van mij. De bot schreef er zijn eigen reden bij: *"Looks
+like typescript is no longer being updated by Dependabot, so this is no longer
+needed."* Ik had die sluiting bijna aan mijn eigen PR-tekst toegeschreven — daar
+stond `Sluit #338.` in — maar GitHub's sluitwoorden werken op issues en niet op
+PR's. **De tijdlijn lezen scheidde de twee.**
+
+**Main draagt nu een combinatie die door geen enkele PR is gedraaid**: eslint 10
+plus `@types/node` 26 plus de nieuwe poort. Dat kan omdat "branch up-to-date
+vereist" hier uit staat — #339's checks liepen op een basis van vóór #337. Dus
+ná de merges op main nagemeten in plaats van aangenomen: `typecheck`, `test`,
+`i18n`, `deps` en `docs-sync` groen, `Vercel` op success via `/status`, en
+`lighthouse` liep nog. `audit` staat niet in die lijst en dat hoort — die job
+hangt aan `pull_request` en draait op een push naar main niet.
