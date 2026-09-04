@@ -19,7 +19,7 @@
     "audit:deps": "tsx scripts/check-npm-audit.ts"
   },
   "dependencies": {
-    "@sentry/node": "^10.71.0",
+    "@sentry/node": "^10.72.0",
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.45.4",
     "@vercel/analytics": "^2.0.1",
