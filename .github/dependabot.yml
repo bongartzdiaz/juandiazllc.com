@@ -47,6 +47,37 @@ updates:
           - "minor"
           - "patch"
 
+    # TypeScript blijft op 5, en dat is geen achterstand maar een meting.
+    #
+    # TS 7.0.2 staat op `latest` en deze codebase checkt er bijna schoon
+    # onder: gemeten op 2026-09-04 in PR #338 gaf `tsc` 17 fouten, alle
+    # zeventien in EEN bestand — `lib/i18n/kale-tekst.test.ts`. Next 16,
+    # React en de andere 78 testbestanden kwamen er zonder klacht doorheen.
+    #
+    # Die ene poort parseert TSX met de compiler-API om letterlijke Engelse
+    # tekst in JSX te vinden (de poort die op 2026-08-24 zestien Engelse
+    # zinnen op de sectorpagina's blootlegde). In TS 7 — de Go-port —
+    # bestaat die parser niet meer in JavaScript. Gemeten in het pakket
+    # zelf: de `exports`-map wijst `"."` naar `./lib/version.cjs`, en de
+    # AST-API is verhuisd naar subpaden die letterlijk `unstable` heten.
+    # Daar staan negen van de tien dingen die de poort gebruikt — maar
+    # `createSourceFile` niet. Het gelijknamige ding in `unstable/ast` is de
+    # node-FABRIEK: zijn eerste parameter is `statements: readonly
+    # Statement[]`, dus je moet de AST al hebben. Parsen gebeurt in TS 7 in
+    # de Go-binary; de JS-kant komt er alleen bij via een tsconfig-gedreven
+    # `Program` uit `unstable/sync`. Dat is een andere poort, geen andere
+    # import.
+    #
+    # Deze regel vervalt zodra die poort geen `import ts from "typescript"`
+    # meer draagt. `lib/typescript-pin.test.ts` dwingt dat af in beide
+    # richtingen: verdwijnt de import terwijl deze regel blijft staan, dan
+    # valt die poort om in plaats van een verouderde pin stil te laten
+    # staan.
+    ignore:
+      - dependency-name: "typescript"
+        update-types:
+          - "version-update:semver-major"
+
     # Majors blijven los, want die vragen een echte beoordeling.
     open-pull-requests-limit: 5
 

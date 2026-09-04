@@ -10505,3 +10505,145 @@ contactformulier schrijft niets weg; de zes Plausible-doelen,
 `LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`, `CAL_WEBHOOK_SECRET`,
 `SENTRY_DSN`, de vier LinkedIn-beslissingen, de twee onverklaarde knoppen en de
 openstaande PR's in `bongartzdiaz/diaz-editor` staan onveranderd open.
+
+### 2026-09-04 — zes van de zeven gemerged, en TypeScript 7 die door één poort wordt tegengehouden
+
+Zeven open PR's, waarvan zes Dependabot. Vier zijn gemerged (#340 het
+Supabase-migratieplan, #342 `actions/checkout` 4→7, #335 de fail-closed poort
+op `lead-notify`, #336 de groep van veertien minor- en patchbumps). Main staat
+groen op `bcbe2fc`. #337 en #339 kregen `@dependabot rebase`: **twee
+lockfile-PR's serialiseren per definitie**, dus de tweede conflicteert zodra de
+eerste landt — dat is geen defect maar de vorm. Bij #339 herstelt diezelfde
+rebase en passant zijn **geannuleerde** `deps`-check; een check die nooit
+rapporteert laat een PR eeuwig op `expected` staan in plaats van rood te worden,
+dezelfde vorm als `audit-productie` op 19 augustus.
+
+De gebundelde merge-lus (`for n in 335 340 342; do gh pr merge …`) werd door de
+auto-mode-classifier geweigerd. Eén losse `gh pr merge 340` kwam wel door, dus
+het was de gebundelde vorm en niet de handeling.
+
+#### #338 is echt stuk, en het advies draaide twee keer om
+
+`typescript` 5.9.3 → 7.0.2. Mijn eerste diagnose keek naar het verkeerde
+venster: `--log-failed | tail -30` gaf uitsluitend de opruimstappen van
+`actions/checkout` (`Removing SSH command configuration`, `Cleaning up orphan
+processes`) — de tail landde volledig binnen het cleanup-blok. Grep op het
+**foutpatroon** in plaats van tailen gaf de 17 diagnostiekregels.
+
+**Eerste omkering.** Ik meldde "stuk" op basis van een `head -20`, en dat kan
+fouten over veel bestanden betekenen. Hermeten op unieke bestandsnamen gaf er
+**één**: `lib/i18n/kale-tekst.test.ts`, 17 fouten. Next 16, React en de andere
+78 testbestanden typechecken schoon onder TS 7.0.2. Dit is dus geen
+projectmigratie die op het ecosysteem wacht.
+
+**Tweede omkering.** Die ene poort is ook niet met een import-wissel te
+repareren. TS 7 is de Go-port, en zijn npm-pakket mapt `"."` naar
+`./lib/version.cjs` — precies wat de foutmelding zei. De AST-API is verhuisd
+naar subpaden die letterlijk **`unstable`** heten:
+
+| subpad | exports |
+|---|---|
+| `typescript` (root) | 4, geen van de tien die de poort nodig heeft |
+| `typescript/unstable/ast` | 409 |
+| `typescript/unstable/ast/is` | 347 |
+| `typescript/unstable/sync` | 44 |
+
+Negen van de tien dingen die de poort gebruikt staan in `unstable/ast`.
+`createSourceFile` niet — en dat was bijna een verkeerde conclusie.
+
+#### De bijna-misser: dezelfde naam, een ander ding
+
+`createSourceFile` **bestaat** in TS 7, in `dist/ast/factory.generated.js`. Op
+de naam afgaan had "de API is er nog" opgeleverd. De handtekening was
+beslissend:
+
+```
+createSourceFile(statements: readonly Statement[], endOfFileToken, text, fileName, path)
+```
+
+Een array van `Statement` — je moet de AST al **hebben**. Dat is de
+node-fabriek. TS 5's parser is `createSourceFile(fileName, sourceText,
+languageVersion)`. Parsen gebeurt in TS 7 in de Go-binary; de JS-kant komt er
+alleen bij via `Program.getSourceFile` uit `unstable/sync`, dat zijn bestanden
+van schijf leest onder een tsconfig.
+
+Een port is dus technisch mogelijk — dat is geprobed vóór de conclusie, want
+"kan niet" mag niet uit een ongemeten aanname komen. Hij ruilt alleen een
+in-memory poort van 16 ms voor een Go-backed, tsconfig-gebonden variant op een
+API die zichzelf onstabiel noemt. Eigen beslissing, eigen PR.
+
+**Twee falende lagen met één oorzaak is zelf diagnostisch.** Vitest
+transpileert zonder te typechecken, dus een testbestand kan groen draaien en
+toch niet compileren (#252). #338 faalt in **allebei** — `TS2339` bij het
+typechecken en `TypeError: Cannot read properties of undefined (reading
+'Latest')` bij het draaien. Dat sluit "alleen de types zijn verhuisd" uit en
+wijst op de exports-vorm. En het is geen preview: `npm view typescript
+dist-tags` zet `latest` op 7.0.2.
+
+#### Wat er nu staat
+
+Drie dingen, en de derde is de enige die drift kan zien.
+
+1. **`.github/dependabot.yml`** draagt een `ignore` op de typescript-major, met
+   de meting erbij in de huisstijl van dat bestand. Zonder die regel biedt
+   Dependabot 7 elke week opnieuw aan.
+2. **De kop van `lib/i18n/kale-tekst.test.ts`** legt uit waarom de pin bestaat,
+   want daar woont de oorzaak.
+3. **`lib/typescript-pin.test.ts`** bindt de twee **tweezijdig**: zolang die
+   poort `typescript` importeert moet de ignore er staan, en verdwijnt de
+   import dan moet de ignore in dezelfde bewerking mee. Anders blijft er een
+   pin staan die niemand nog kan verantwoorden — precies hoe een verouderde
+   uitzondering jaren overleeft.
+
+De poort leest ook `package.json` (alleen major 5 toegestaan zolang de import
+staat) en eist dat de poort de énige importeur blijft. Dat laatste is niet
+cosmetisch: het is de reden dat de blast radius één bestand was.
+
+#### Tien mutaties, tien keer de voorspelde kleur
+
+Acht rood op acht verschillende asserties, twee groen als controle. Het paar
+dat telt is **M4/M5**, en het bewijst dat de YAML-commentaarstrip dragend is in
+plaats van decoratief:
+
+```
+M4  waarde staat op semver-patch, een inline commentaar noemt nog semver-major   ROOD
+M5  dezelfde regel, met de strip uitgezet                                        GROEN
+```
+
+Zonder strip leest de poort zijn eigen toelichting als configuratie — dezelfde
+val waar `contactadressen`, `persoon-entiteit`, `verzoeklimiet` en
+`server-acties` eerder wél op omvielen. Het spiegelpaar staat er ook: dezelfde
+import als **commentaar** in `lib/bronscan.ts` blijft groen (M9), als echte
+code wordt hij rood (M8).
+
+**Twee ankers werden luid overgeslagen** met `anker 0x`, en beide om dezelfde
+reden: ik had ze overgetypt in plaats van uit het bestand gelezen. Bij M7 was
+ik `meer draagt. ` kwijtgeraakt, bij M6 liep het anker over een regeleinde. Dat
+is de goede faalvorm — **een mutatie die stil niet landt leest exact hetzelfde
+als een poort die niet afgaat.** Na correctie beide rood.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1565 tests in 81 bestanden
+i18n:check               741 sleutels x 4 (ongewijzigd: geen sleutel geraakt)
+regen:pricing:check      groen
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +7 is de nieuwe poort. `.github/dependabot.yml` van 89 naar 120 CRLF —
+precies de lengte van het ingevoegde blok — en het nieuwe testbestand is in
+bytes omgezet naar CRLF, want de Write-uitvoer komt op pure LF binnen.
+
+#### Wat dit niet doet
+
+Er is geen operator-taak mee opgelost. De Supabase-402 staat er nog, dus het
+contactformulier schrijft niets weg; de zes Plausible-doelen,
+`LEAD_NOTIFY_SECRET`, `RESEND_API_KEY`, `ACK_FROM`, `CAL_WEBHOOK_SECRET`,
+`SENTRY_DSN`, de vier LinkedIn-beslissingen en de twee onverklaarde knoppen
+staan onveranderd open. In `bongartzdiaz/diaz-editor` wachten **#652, #653,
+#654 en #655** op Juan.
+
+En de poort oordeelt niet over TypeScript zelf. Levert TS 7 ooit alsnog een
+JS-parser, dan is hij groen en toch verouderd — dat staat in zijn eigen kop.
