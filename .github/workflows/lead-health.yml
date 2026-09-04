@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Bewust géén stille skip als de secrets ontbreken. Een groene run die
       # niets meet is exact de storingsvorm die deze workflow moet uitbannen:
