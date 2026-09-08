@@ -84,6 +84,26 @@ const BODEM_TOT = (() => {
   return m[1];
 })();
 
+/* Het overstaprecht uit de ronde van 2026-09-08. De ACM verbindt het aan een
+ * voorwaarde: het geldt alleen als de huidige voorwaarden duidelijk en begrijpelijk
+ * zeggen waarom de leverancier mag wijzigen. Zonder die voorwaarde leest de zin als
+ * een onvoorwaardelijk opzegrecht, en dat is precies de belofte die de lezer bij zijn
+ * leverancier niet waargemaakt krijgt. De rij moet daarom bestaan; ontbreekt hij, dan
+ * gooit `rij()` en is de kopij zijn bron kwijt. */
+const OVERSTAP_RIJ = rij("Voorwaarden wijzigen op een contract dat over 1 januari 2027 doorloopt");
+
+const OVERSTAP = /kosteloos overstappen/i;
+const VOORWAARDE = /duidelijk en begrijpelijk/i;
+
+/* De ACM zegt woordelijk dat zij geen advies geeft over welke leverancier. Deze lijst
+ * is niet uitputtend en hoeft dat niet te zijn - hij vangt de vorm waarin het gebeurt:
+ * een naam laten vallen als voorbeeld. Groeit de lijst, dan is dat een zichtbare
+ * bewerking en geen stille verruiming. */
+const LEVERANCIERS = [
+  "Vattenfall", "Eneco", "Essent", "Greenchoice", "Vandebron", "Budget Energie",
+  "Frank Energie", "Tibber", "Zonneplan", "Pricewise", "Independer", "Gaslicht",
+];
+
 
 /** Het cluster: Nederlandse energie-artikelen die over saldering schrijven.
  *  Afgeleid en niet ingetypt, zodat een zesde artikel er vanzelf onder valt.
@@ -131,6 +151,24 @@ describe("de meetlat zelf", () => {
   it("de percentage-detector vindt een percentage en niet een kaal getal", () => {
     expect("minstens 50% van het kale leveringstarief".match(PERCENTAGE)).toEqual(["50%"]);
     expect("een terugverdientijd van 50 maanden".match(PERCENTAGE)).toBeNull();
+  });
+
+  it("de overstap-detectoren scheiden de belofte van haar voorwaarde", () => {
+    expect(OVERSTAP.test("dan kan hij kosteloos overstappen naar een andere leverancier")).toBe(true);
+    expect(OVERSTAP.test("dan kan hij overstappen zodra zijn contract afloopt")).toBe(false);
+    expect(VOORWAARDE.test("als in zijn huidige voorwaarden duidelijk en begrijpelijk staat waarom")).toBe(true);
+    expect(VOORWAARDE.test("als zijn leverancier de voorwaarden wijzigt")).toBe(false);
+  });
+
+  it("de rij die het overstaprecht draagt bestaat, en noemt de voorwaarde", () => {
+    expect(VOORWAARDE.test(OVERSTAP_RIJ)).toBe(true);
+    expect(OVERSTAP.test(OVERSTAP_RIJ)).toBe(true);
+  });
+
+  it("de leveranciersdetector vindt een naam en niet een gewoon woord", () => {
+    const vind = (s: string) => LEVERANCIERS.filter((n) => s.includes(n));
+    expect(vind("stap over naar Vattenfall")).toEqual(["Vattenfall"]);
+    expect(vind("vraag je leverancier om zijn voorwaarden")).toEqual([]);
   });
 
   it("het cluster is gevuld en bevat niet de hele NL-voorraad", () => {
@@ -184,6 +222,38 @@ describe("het saldering-cluster volgt docs/claims.md", () => {
         `${slug}: noemt ${BODEM} zonder de terugleverkosten. De ACM waarschuwt zelf dat die hoger ` +
           `kunnen uitvallen dan de vergoeding, dus de bodem alleen is de misleidende helft.`,
       ).toBe(true);
+    }
+  });
+
+  it("wie het overstaprecht noemt, noemt ook de voorwaarde eronder", () => {
+    for (const [slug, tekst] of CLUSTER) {
+      if (!OVERSTAP.test(tekst)) continue;
+      expect(
+        VOORWAARDE.test(tekst),
+        `${slug}: belooft kosteloos overstappen zonder de voorwaarde erbij. De ACM geeft dat recht ` +
+          `alleen als de huidige voorwaarden duidelijk en begrijpelijk zeggen waarom de leverancier ` +
+          `mag wijzigen. Zonder die zin is het een belofte die de lezer niet waargemaakt krijgt.`,
+      ).toBe(true);
+    }
+  });
+
+  it("minstens een artikel draagt het overstaprecht - anders bewijst de test hierboven niets", () => {
+    const met = CLUSTER.filter(([, tk]) => OVERSTAP.test(tk));
+    expect(
+      met.length,
+      "Geen enkel cluster-artikel noemt het overstaprecht meer. Dat was de vondst van ronde J2 " +
+        "(2026-09-08): vier artikelen noemden de terugleverkosten en geen enkele wat de lezer kan doen.",
+    ).toBeGreaterThanOrEqual(1);
+  });
+
+  it("noemt geen leverancier en geen vergelijker bij naam", () => {
+    for (const [slug, tekst] of CLUSTER) {
+      const gevonden = LEVERANCIERS.filter((n) => tekst.includes(n));
+      expect(
+        gevonden,
+        `${slug}: noemt ${gevonden.join(", ")}. De ACM zegt woordelijk dat zij hier geen advies over ` +
+          `geeft; een naam laten vallen is dat advies alsnog geven, zonder de meting die het draagt.`,
+      ).toEqual([]);
     }
   });
 

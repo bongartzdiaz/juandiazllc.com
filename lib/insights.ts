@@ -651,12 +651,12 @@ export const POSTS: Insight[] = [
       "Het einde van de salderingsregeling is geen technisch detail dat je in de offerte verstopt — het is een gesprek dat je vóór je concurrent voert. Welke klanten je nu belt, en de drie zinnen die twijfel wegnemen in plaats van 'm te voeden.",
     tag: "Energy",
     publishedAt: "2026-07-20",
-    updatedAt: "2026-08-31",
+    updatedAt: "2026-09-08",
     readingMinutes: 5,
     seo: {
       metaTitle: "Salderen stopt: wat je klanten nu horen",
       metaDescription:
-        "Het einde van de saldering is een gesprek dat je voor je concurrent voert. Welke klanten je nu belt, en drie zinnen die twijfel wegnemen.",
+        "Het einde van de saldering is een gesprek dat je voor je concurrent voert. Welke klanten je nu belt, drie zinnen die twijfel wegnemen, en het overstaprecht.",
     },
     body: [
       { type: "p", text: "De meeste installateurs behandelen het einde van de saldering als een voetnoot: een regel onderaan de offerte, een vraag die je beantwoordt als de klant erover begint. Dat is een gemiste kans. De klant die van jóú hoort wat er verandert — voordat hij het van het journaal of van je concurrent hoort — vertrouwt jou met de vervolgstap. De klant die het ergens anders oppikt, komt met wantrouwen terug." },
@@ -673,12 +673,17 @@ export const POSTS: Insight[] = [
       { type: "ul", items: [
         "Wat er verandert: 'Vanaf 1 januari 2027 wordt teruggeleverde stroom niet meer één-op-één weggestreept. Je krijgt er nog een vergoeding voor — tot 2030 wettelijk minstens 50% van het kale leveringstarief — maar het moment waarop je verbruikt gaat meetellen.'",
         "Wat dat voor jou betekent: 'Voor jouw verbruik betekent dat concreet dít' — met een getal uit zijn eigen situatie, niet uit een folder.",
-        "Wat de opties zijn: 'Je kunt niets doen, je zelfverbruik verhogen, of een batterij overwegen — laten we alle drie doorrekenen voordat je kiest.'"
+        "Wat de opties zijn: 'Je kunt niets doen, je zelfverbruik verhogen, een batterij overwegen, of je contract tegen het licht houden — laten we ze doorrekenen voordat je kiest.'"
       ]},
       { type: "quote", text: "De installateur die de deadline gebruikt om te verkopen, wint één deal. De installateur die 'm gebruikt om eerlijk te informeren, wint de klant én zijn buren." },
+      { type: "h2", text: "De optie die niemand noemt: het contract" },
+      { type: "p", text: "Bij die terugleverkosten stopt vrijwel elk gesprek, en dat is precies te vroeg. De Rijksoverheid zet er namelijk een grens omheen: het mogen alleen kosten zijn die de leverancier maakt om de teruggeleverde stroom te verwerken. Geen bedrag — wel een reikwijdte, en daarmee iets waar je klant een vraag over kan stellen in plaats van hem te ondergaan." },
+      { type: "p", text: "En er is een tweede handvat, en dat zit in het contract zelf. Loopt zijn contract door over 1 januari 2027 heen en wijzigt de leverancier de voorwaarden, dan mag dat volgens de ACM alleen als in zijn huidige voorwaarden duidelijk en begrijpelijk staat waarom dat mag. Gebeurt dat, dan kan hij kosteloos overstappen naar een andere leverancier. Die voorwaarde is dragend: zonder haar bestaat het recht niet, dus beloof het nooit onvoorwaardelijk." },
+      { type: "p", text: "Wat dit voor jouw gesprek betekent is klein en concreet. Vraag de klant zijn contractvoorwaarden erbij te pakken voordat je over hardware begint. Verandert er straks iets, dan weet hij dat hij een keuze heeft — en dan is de installateur die hem dat op tijd vertelde degene die hij belt." },
+      { type: "cta", text: "Wat een dynamisch contract na 2027 wel en niet oplevert", href: "/insights/dynamisch-energiecontract-na-de-salderingsregeling" },
       { type: "p", text: "Salderen stopt voor iedereen tegelijk. Het verschil tussen de installateurs die er last van hebben en de installateurs die eraan groeien, zit niet in de prijs of het product — het zit in wie het gesprek als eerste voert, en of dat gesprek eerlijk is. Begin deze week, bij de klanten die je al hebt." },
       { type: "h2", text: "Wat ik hier niet beweer" },
-      { type: "p", text: "Niet dat je die 50% als de vergoeding mag presenteren. Het is een wettelijk minimum tot 1 januari 2030, en wat je klant werkelijk krijgt bepaalt zijn leverancier. Noem het dus als bodem en niet als bedrag, vertel erbij dat de terugleverkosten apart blijven staan, en beloof niets over de jaren na 2030 — daarvoor is niets vastgelegd. Een gesprek dat te veel belooft, kost je precies het vertrouwen dat je ermee wilde winnen." }
+      { type: "p", text: "Niet dat je die 50% als de vergoeding mag presenteren. Het is een wettelijk minimum tot 1 januari 2030, en wat je klant werkelijk krijgt bepaalt zijn leverancier. Noem het dus als bodem en niet als bedrag, vertel erbij dat de terugleverkosten apart blijven staan, en beloof niets over de jaren na 2030 — daarvoor is niets vastgelegd. Over dat overstaprecht: ik beweer niet dat de leverancier je klant vooraf moet informeren — de ACM noemt de voorwaarde en het recht, geen informatieplicht, dus die belofte hoort hier niet. En welke leverancier daarna de betere is, zeg ik niet; de toezichthouder geeft dat advies zelf ook niet. Een gesprek dat te veel belooft, kost je precies het vertrouwen dat je ermee wilde winnen." }
     ]
   },
   {

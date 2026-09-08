@@ -1139,6 +1139,10 @@ tegenspreekt.
 | Terugleverkosten | **blijven bestaan**, en leveranciers moeten ze vanaf 2027 bij zonnepaneeleigenaren in rekening brengen | ✅ ACM, woordelijk — inclusief de waarschuwing dat ze "soms hoger uitvallen dan de vergoeding voor de teruggeleverde elektriciteit" |
 | Bedrag van die terugleverkosten | **bestaat niet als landelijk getal** | ❌ per leverancier en per contract — geen euro publiceren |
 | Terugverdientijd van een thuisbatterij | **geen getal** | ❌ hangt af van drie onbekenden hierboven; de vijf artikelen noemen daarom nergens een jaartal |
+| Grens aan de terugleverkosten | **alleen kosten voor het verwerken van teruggeleverde stroom** | ✅ [Rijksoverheid](https://www.rijksoverheid.nl/themas/klimaat-milieu-en-natuur/energie-thuis/salderingsregeling), gelezen 2026-09-08, woordelijk: "Dat mogen alleen kosten zijn die de energieleveranciers maken om de teruggeleverde stroom te verwerken." Geen bedrag, wel een reikwijdte |
+| Voorwaarden wijzigen op een contract dat over 1 januari 2027 doorloopt | **mag alleen als de huidige voorwaarden duidelijk en begrijpelijk zeggen waarom dat mag — en dan mag je kosteloos overstappen** | ✅ [ACM ConsuWijzer](https://consument.acm.nl/elektriciteit-en-gas/duurzame-energie/wat-is-salderen), gelezen 2026-09-08, woordelijk: "Dat mag alleen als hij duidelijk en begrijpelijk in uw huidige voorwaarden heeft opgenomen waarom hij dat mag doen. U kunt in dat geval ook kosteloos overstappen naar een andere leverancier." ⚠️ **De voorwaarde hoort er altijd bij** — zonder haar leest het als een onvoorwaardelijk opzegrecht |
+| Plicht om vooraf te informeren over zo'n wijziging | **niet aangetroffen** | ❌ de ACM noemt de voorwaarde en het overstaprecht, geen informatieplicht vooraf. Publiceer die dus niet |
+| Advies over welke leverancier | **geen** | ❌ ACM woordelijk: "Wij kunnen u hier geen advies over geven." Het cluster noemt daarom geen leveranciersnaam en geen vergelijker |
 
 **Waarom de 50% de belangrijkste rij is.** Drie van de vijf artikelen vragen de
 lezer een som te maken, en tot vandaag gaf geen van drieën hem de ondergrens.
@@ -1151,6 +1155,8 @@ prognose.
 uitspraak over hoeveel huishoudens het raakt, en geen voorspelling over de
 hoogte die leveranciers werkelijk gaan betalen. Die getallen bestaan hier niet,
 dus staan ze in geen artikel.
+
+**Hermeten op 2026-09-08 (ronde J2).** Alle elf rijen hierboven zijn opnieuw bij de uitvoerder nagelopen en hielden stand; er is niets gecorrigeerd. Wat er wel bij kwam zijn de vier rijen onderaan de tabel, en die dragen samen één vondst: **geen van de zes cluster-artikelen vertelde de lezer wat hij kán doen.** Vier noemen de terugleverkosten en zeggen alleen dát ze bestaan en hoger kunnen uitvallen dan de vergoeding. Het woord "overstappen" kwam in het hele cluster nul keer voor, en "verwerken" ook. Dat is geen stijlkwestie: de lezer krijgt een probleem beschreven zonder de twee handvatten die de uitvoerder zelf noemt.
 
 **Houdbaarheid.** De stopdatum ligt vast in een gepubliceerde wet en schuift
 niet zomaar. De 50%-bodem loopt af op 1 januari 2030 en wat daarna geldt is
