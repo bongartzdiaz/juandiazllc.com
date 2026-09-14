@@ -19,12 +19,12 @@
     "audit:deps": "tsx scripts/check-npm-audit.ts"
   },
   "dependencies": {
-    "@sentry/node": "^10.72.0",
-    "@supabase/ssr": "^0.12.5",
+    "@sentry/node": "^10.73.0",
+    "@supabase/ssr": "^0.12.6",
     "@supabase/supabase-js": "^2.45.4",
     "@vercel/analytics": "^2.0.1",
     "d3-geo": "^3.1.1",
-    "next": "^16.3.3",
+    "next": "^16.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "topojson-client": "^3.1.0",
@@ -38,7 +38,7 @@
     "@types/topojson-client": "^3.1.5",
     "@vitest/coverage-v8": "^4.1.11",
     "eslint": "^10",
-    "eslint-config-next": "^16.3.3",
+    "eslint-config-next": "^16.3.4",
     "tsx": "^4.23.13",
     "typescript": "^5",
     "vitest": "^4.1.4"
