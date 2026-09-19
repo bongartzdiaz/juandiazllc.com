@@ -38,6 +38,12 @@ export function CtaBig() {
         {/* Zonder dit veld antwoordt `subscribe` in het Engels, ook op
             /nl, /de en /es. NewsletterForm stuurde hem al mee. */}
         <input type="hidden" name="locale" value={locale} />
+        {/* Honeypot -- zelfde truc als NewsletterForm; subscribe.ts leest
+            `website` sinds 2026-09-19 en antwoordt een bot met nep-ok. */}
+        <div className="hp-field" aria-hidden="true">
+          <label htmlFor="cta-website">Website</label>
+          <input id="cta-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+        </div>
         <button type="submit" disabled={pending || state.status === "ok"}>
           {state.status === "ok" ? t("cta.news.submitted") : pending ? "..." : t("cta.news.submit")}
         </button>

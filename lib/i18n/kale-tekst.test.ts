@@ -228,6 +228,14 @@ const TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
       "Website",
     ],
   },
+  "components/sections/CtaBig.tsx": {
+    reden:
+      "Honeypot, sinds 2026-09-19 ook op het homepage-formulier: aria-hidden " +
+      "en alleen bedoeld voor de bot die het veld invult.",
+    tekst: [
+      "Website",
+    ],
+  },
   "components/sections/Testimonials.tsx": {
     reden:
       "TESTIMONIALS is bewust leeg tot er goedgekeurde quotes zijn, en het " +
@@ -484,11 +492,12 @@ describe("de vrijstellingen dragen hun eigen voorwaarde", () => {
     expect(lijst?.[1].trim()).toBe("");
   });
 
-  it("de drie honeypots staan nog achter aria-hidden", () => {
+  it("de vier honeypots staan nog achter aria-hidden", () => {
     for (const pad of [
       "components/ContactForm.tsx",
       "components/NewsletterForm.tsx",
       "components/LekkageScan.tsx",
+      "components/sections/CtaBig.tsx",
     ]) {
       const bron = readFileSync(join(WORTEL, pad), "utf8");
       expect(bron, pad).toContain('<div className="hp-field" aria-hidden="true">');
