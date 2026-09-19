@@ -10778,3 +10778,81 @@ Zolang 1 openstaat is de UI eerlijk: het veld is optioneel, de uitslag staat
 er al, en een mislukte inzending kost de bezoeker niets behalve de belofte
 van drie mails die hij niet krijgt. Dat is de reden dat het veld ná de
 uitslag staat en niet ervoor.
+
+### 2026-09-19 (vervolg) — twee halve peer-pins, en een "failed deploy" die geen productie was
+
+Vier PR's rond één merge. #353 (het e-mailveld op de scan) ging als
+`14cc3a4` naar main; daarna de Dependabot-stapel.
+
+#### Wat er gemerged is
+
+| | wat | commit |
+|---|---|---|
+| #354 | minor-en-patch-groep, 12 pakketten (o.a. `@sentry/node` 10.74, `@supabase/ssr`) | `a23bfb5` |
+| #355 | `vitest` + `@vitest/coverage-v8` **samen** naar 5.0.0, plus een Dependabot-groep | `7110a42` |
+
+#350 en #351 zijn door #355 gesloten. Nul open Dependabot-PR's.
+
+#### Waarom #350 en #351 allebei rood stonden, en dat is geen defect van vitest 5
+
+`@vitest/coverage-v8@X` heeft een **exacte** peer-pin op `vitest@X`.
+Dependabot bood de twee majors als losse PR's aan: #350 bumpte alleen
+coverage-v8, #351 alleen vitest. Elk apart is per constructie niet
+installeerbaar — `npm ci` viel op beide om met `ERESOLVE`, en daarmee
+stonden typecheck, test en deps rood en de Vercel-preview op ERROR.
+
+De reparatie is niet "wacht op een fix" maar de twee in één PR zetten.
+Gemeten lokaal en in CI op vitest 5.0.0: 1582 tests in 82 bestanden groen,
+`tsc` 0, `audit:deps` 0 advisories. Er hoefde geen regel test te wijzigen.
+
+**Waarom het terugkomt zonder ingreep.** `groups` in `dependabot.yml`
+kende alleen `minor-en-patch`; een major buiten een groep komt altijd als
+losse PR. Elke volgende vitest-major had dus opnieuw twee onmergebare
+PR's opgeleverd. Er staat nu een groep `vitest` (`vitest`, `@vitest/*`,
+update-type `major`) met de meting als reden erbij. `config-poorten` en
+`typescript-pin` lezen dat bestand en bleven groen.
+
+Dezelfde vorm geldt voor elk paar met een exacte peer-pin — eslint en
+zijn plugins, react en react-dom. Die hebben hier nog geen groep; dat is
+pas werk zodra zo'n major zich aandient.
+
+#### "Vercel deploy failed", tweemaal gemeld, tweemaal een preview
+
+Juan meldde twee keer een mislukte deploy. Beide keren gemeten via
+`commits/<sha>/status` én de Vercel-deploymentlijst: **elke
+productie-deploy van vandaag staat op READY** — `7671a49`, `14cc3a4`,
+`a23bfb5`, `7110a42`. Wat er op ERROR stond waren vier
+**preview**-deploys van de Dependabot-takken:
+
+| deploy | tak | waarom |
+|---|---|---|
+| `dpl_CT62b4…` · `dpl_4auWyJ…` | #351 / #350, eerste push | ERESOLVE |
+| `dpl_CpW5zZ…` · `dpl_FgHFAK…` | #350 / #351, **gerebased** door Dependabot na de merge van #354 | ERESOLVE, opnieuw |
+
+Die tweede rij verklaart de tweede melding: Dependabot rebaset zijn open
+takken automatisch zodra main beweegt, en elke rebase is een nieuwe
+preview-build die op dezelfde peer-pin omvalt. Dat hield op zodra #355 de
+twee PR's sloot; de takken zijn weg.
+
+**Lees bij een "failed" in de Vercel-lijst eerst de kolom `target`.**
+Een preview (`target: null`) zegt niets over de site; alleen
+`target: production` op een main-sha telt. De lijst sorteert op tijd, dus
+een kapotte preview van een tak die niemand gaat mergen staat bovenaan,
+boven de gezonde productie-deploy eronder.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1582 tests in 82 bestanden (vitest 5.0.0)
+audit:deps               0 advisories, 0 uitzonderingen
+config-poorten + typescript-pin   18/18 groen
+Vercel production 7110a42         READY
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+#### Wat dit niet doet
+
+Geen operator-taak opgelost. De Supabase-402, `RESEND_API_KEY` + `ACK_FROM`,
+het zevende Plausible-doel en de rest van de lijst bovenaan dit bestand
+staan onveranderd open.
