@@ -60,7 +60,7 @@ const OUDE_KOPIJ: Record<string, string> = {
 }
 
 type Gedrag = 'gooit' | 'db-fout' | 'duplicaat' | 'ok'
-const stuur = vi.hoisted(() => ({ gedrag: 'ok' as Gedrag }))
+const stuur = vi.hoisted(() => ({ gedrag: 'ok' as Gedrag, aanroepen: 0 }))
 
 /** Eén object dekt beide aanroepvormen: contact doet `await insert(...)`,
     subscribe doet `await insert(...).select().single()`. */
@@ -90,7 +90,14 @@ vi.mock('@/lib/supabase/server', () => ({
       select: () => ketting,
       single: () => ketting,
     }
-    return { from: () => ({ insert: () => ketting }) }
+    return {
+      from: () => ({
+        insert: () => {
+          stuur.aanroepen += 1
+          return ketting
+        },
+      }),
+    }
   },
 }))
 
@@ -102,6 +109,7 @@ function contactFormulier(locale: string): FormData {
   fd.set('locale', locale)
   fd.set('name', 'Poort')
   fd.set('email', 'poort@voorbeeld.example')
+  fd.set('company', 'Poort BV')
   fd.set('message', 'Een bericht dat lang genoeg is om de minimumlengte te halen.')
   fd.set('source', 'poort')
   return fd
@@ -185,6 +193,22 @@ describe('welke storing in welke tak landt', () => {
       expect(uit.message, l).toBe(DICT[l]['form.ok.subscribed'])
     }
   })
+})
+
+describe('naam en bedrijf zijn verplicht (2026-09-19)', () => {
+  for (const [veld, sleutel] of [['name', 'form.err.name'], ['company', 'form.err.company']] as const) {
+    it(`contact zonder ${veld} bereikt de database niet`, async () => {
+      for (const l of LOCALES) {
+        const fd = contactFormulier(l)
+        fd.set(veld, ' ')
+        stuur.aanroepen = 0
+        const uit = await submitLead({ status: 'idle' }, fd)
+        expect(uit.status, l).toBe('err')
+        expect(uit.message, l).toBe(DICT[l][sleutel])
+        expect(stuur.aanroepen, l).toBe(0)
+      }
+    })
+  }
 })
 
 describe('de kopij van de configuratietak', () => {
