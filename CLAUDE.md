@@ -10856,3 +10856,67 @@ cmp CLAUDE.md AGENTS.md  byte-identiek
 Geen operator-taak opgelost. De Supabase-402, `RESEND_API_KEY` + `ACK_FROM`,
 het zevende Plausible-doel en de rest van de lijst bovenaan dit bestand
 staan onveranderd open.
+
+### 2026-09-19 (vervolg) — D1-ronde afgerond over twee repo's, met de poort lokaal omdat CI daar niet draait
+
+Twee merges die aan elkaar hingen. #352 in deze repo noteert de D1-ronde
+van 2026-09-14 in de content-kalender en wees op `bongartzdiaz/diaz-editor#660`,
+dat de gevonden schending repareert. #352 kon pas mee zodra #660 binnen was.
+
+| | wat | commit |
+|---|---|---|
+| diaz-editor#660 | `landing/nl/blog/meterkast-schema-tekenen-offline.html`: meta zei €99, pagina €197, twee plekken | `e588ab1` |
+| #352 | kalenderrij D1, ronde 2026-09-14 | `f85c964` |
+
+#### De richting van de reparatie is €99, niet €197
+
+De pagina droeg het hogere bedrag, de meta het lagere. Welke van de twee
+klopt beslist de poort niet — dat staat sinds 2026-08-31 expliciet in
+`_check-seo-consistency.py`. Het antwoord komt uit `docs/audit/05-backlog.md`
+in die repo: B-07 noemt EUR 99 canoniek voor dit artikel, en op 2026-09-02
+is precies dezelfde vergissing (driemaal 99 → 197 in dit bestand) al eens
+teruggedraaid. #660 zet de pagina dus naar het bedrag dat de meta al had.
+
+#### Eerst de poort, dan de merge — en niet andersom
+
+`bongartzdiaz/diaz-editor` heeft geen Actions-minuten: elke workflow faalt
+daar in seconden met nul stappen, dus een vinkje zegt niets
+(zie [[project_diaz_editor_ci_draait_niet]]). De PR-head is daarom in een
+tijdelijke worktree uitgecheckt en de poort is daar gedraaid vóórdat er
+gemerged werd:
+
+```
+830 pagina's gecontroleerd, 829 titels
+0 schendingen (og-svg, index-url, meta-prijs, dubbele-titel, dubbele-description)
+```
+
+Na de merge van #660 is #352 gemerged. Die had eerst nog één rode check:
+`deps` op de sharp-advisory GHSA-rgj7-g3m4-5g8c, gemeld op 14 september.
+Main had die al gesloten met #348 (sharp 0.35.4); de tak liep achter. Main
+erin gemerged (`3147d39`), verse run groen, CLEAN.
+
+**Een rode `deps` op een oude tak is eerder achterstand dan een nieuw
+lek.** Lees de advisory-id en kijk of main hem al draagt voordat je iets
+repareert.
+
+#### Onderweg
+
+De tak van #660 stond niet in de lokale `diaz-editor-work`-checkout; de
+standaard fetch-refspec daar haalt hem niet binnen. Een expliciete
+`git fetch origin +refs/heads/<tak>:refs/remotes/origin/<tak>` wel.
+
+En `git worktree remove --force` weigerde de tijdelijke map achteraf op
+Windows met *Permission denied* — een handle uit de poort-run hield hem
+vast. De worktree is uit git geprund; de map `C:/tmp/de660` zelf blijft
+staan tot een reboot en hangt nergens meer aan.
+
+#### Stand
+
+Nul open PR's in deze repo. Vercel production op `f85c964`: READY.
+De kalender: D1 heeft zijn ronde genoteerd en blijft op `klaar` (het is een
+refresh-rij, geen eenmalige publicatie); D2 t/m D6 wachten in
+`bongartzdiaz/diaz-editor` op #652, #653, #654 en #655.
+
+Geen operator-taak opgelost. De Supabase-402, `RESEND_API_KEY` + `ACK_FROM`,
+het zevende Plausible-doel en de rest van de lijst bovenaan dit bestand
+staan onveranderd open.
