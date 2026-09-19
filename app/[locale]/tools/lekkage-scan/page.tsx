@@ -5,7 +5,7 @@ import { ENKELE_TAAL } from "@/lib/i18n/enkele-taal";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { LekkageScan } from "@/components/LekkageScan";
 import { AANTAL_WOORD_HOOFD } from "@/lib/lekkage-scan";
-import { ogImages } from "@/lib/seo/branding";
+import { CONTACT_EMAIL, CONTACT_MAILTO, ogImages } from "@/lib/seo/branding";
 
 /* De lekkage-scan — bestaat alleen op /nl.
  *
@@ -50,10 +50,14 @@ export async function generateMetadata({
 
 export default async function LekkageScanPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ uitgeschreven?: string }>;
 }) {
   const { locale } = await params;
+  // Gezet door app/api/uitschrijven/route.ts na een klik op de afmeldlink.
+  const { uitgeschreven } = await searchParams;
   const l = assertLocale(locale);
 
   // 404 buiten het Nederlands. Zonder deze poort serveert /en, /de en /es een
@@ -80,6 +84,14 @@ export default async function LekkageScanPage({
           welke drie bij jou het eerst lekken.
         </p>
       </header>
+      {uitgeschreven === "klaar" && (
+        <div className="nl-msg ok">Je staat uitgeschreven. Er komt geen mail meer.</div>
+      )}
+      {uitgeschreven === "ongeldig" && (
+        <div className="nl-msg err">
+          Deze afmeldlink werkt niet meer. Mail <a href={CONTACT_MAILTO}>{CONTACT_EMAIL}</a>.
+        </div>
+      )}
       <LekkageScan />
     </>
   );

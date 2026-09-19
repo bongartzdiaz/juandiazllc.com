@@ -430,10 +430,10 @@ herschreven, en deze notitie is de correctie erop.
 
 ### De meetketen — in blokkerende volgorde
 
-1. **Zes Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
-   `Pricing CTA`, `Sector CTA`, `Tool CTA`, `Contact Submitted` en
-   `Scan Voltooid`, plus de vier custom properties (`tier`, `sector`, `tool`,
-   `lekken`). Taggen is af en op productie
+1. **Zeven Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
+   `Pricing CTA`, `Sector CTA`, `Tool CTA`, `Contact Submitted`,
+   `Scan Voltooid` en `Uitslag Aangevraagd`, plus de vier custom properties (`tier`,
+   `sector`, `tool`, `lekken`). Taggen is af en op productie
    geverifieerd; zonder de doelen worden de kliks binnengehaald en weggegooid.
    **`Contact Submitted` stond tot 2026-08-24 op geen enkele lijst**, en het is
    het enige doel dat een conversie meet in plaats van een klik — precies het
@@ -10674,3 +10674,107 @@ ná de merges op main nagemeten in plaats van aangenomen: `typecheck`, `test`,
 `i18n`, `deps` en `docs-sync` groen, `Vercel` op success via `/status`, en
 `lighthouse` liep nog. `audit` staat niet in die lijst en dat hoort — die job
 hangt aan `pull_request` en draait op een push naar main niet.
+
+### 2026-09-19 — de scan krijgt een e-mailveld, en de opvang die het belooft staat nog uit
+
+Het leadmagneet-besluit van 22 augustus was bewust: geen e-mailveld op de
+lekkage-scan zolang er niets kan worden bezorgd. Dat besluit is niet
+teruggedraaid maar verplaatst. Het veld staat nu op het **uitslagscherm**,
+optioneel, ná de uitslag — de bezoeker krijgt zijn drie lekken hoe dan ook,
+en laat alleen een adres achter als hij de drie vervolgmails wil. Wat er
+bezorgd wordt staat woordelijk in de toestemmingstekst
+(`TOESTEMMING_TEKST` in `lib/scan-opvang.ts`): hooguit drie mails over deze
+lekken, met een afmeldlink onderaan elke mail.
+
+#### Wat er is gebouwd
+
+| stuk | waar | wat |
+|---|---|---|
+| zuivere helft | `lib/scan-opvang.ts` | constanten, `leesLekken()` (alleen `0..99`), `bouwMetadata()`; testbaar zonder mock |
+| server action | `app/actions/scan-opvang.ts` | honeypot → nep-ok, e-mailcontrole, **expliciete toestemming verplicht** (Telecommunicatiewet 11.7), insert in `marketing.subscribers` met `source = lekkage-scan` |
+| afmeldroute | `app/api/uitschrijven/route.ts` | GET met UUID-token uit `metadata.unsub_token`, idempotent op `metadata.unsubscribed_at`, redirect naar de scanpagina met `?uitgeschreven=klaar\|ongeldig` |
+| melding | `components/LekkageScan.tsx` | zevende Plausible-doel `Uitslag Aangevraagd`, eigenschap `lekken`, ref-gestuurd zodat het één keer per bezoek vuurt |
+
+**Geen DDL.** Campagne, toestemmingsmoment, toestemmingstekst, aantal lekken
+en afmeldtoken zitten in de bestaande `metadata`-jsonb. Het Supabase-datavlak
+geeft nog steeds 402, dus een migratie was vandaag sowieso niet toe te passen;
+maar ook zonder die blokkade is dit de juiste vorm — de selectie voor de drie
+mails is `source = 'lekkage-scan' and metadata->>'unsubscribed_at' is null`,
+en daar is geen kolom voor nodig.
+
+**De toestemmingstekst reist mee in de rij** (`consent_tekst` + `consent_at`).
+Wie later vraagt waar iemand precies mee heeft ingestemd, leest het uit de
+rij en niet uit een commit die inmiddels drie versies verder is.
+
+#### Eén regel die de poorten niet konden zien
+
+De eerste versie deed `.insert(...).select().single()`, precies zoals
+`app/actions/subscribe.ts`. Op 21 augustus is gemeten dat `anon` op
+`marketing.subscribers` **alleen INSERT** heeft — geen SELECT, nergens. En
+`.select()` na een insert vraagt PostgREST om `RETURNING *`, wat SELECT
+vergt. Bij een echte inzending had dat 42501 gegeven, de rij teruggedraaid,
+en de bezoeker `form.err.generic` getoond terwijl elke test groen stond: de
+mock-client geeft terug wat je hem vraagt.
+
+Nu een kale insert, dezelfde vorm als `app/actions/contact.ts` — het enige
+pad dat op 20 augustus end-to-end is gelopen. **Niet gemeten**, want het
+datavlak geeft 402; het staat hier als redenering uit de gemeten grants, niet
+als waarneming.
+
+**`subscribe.ts` draagt dezelfde `.select().single()`**, en
+`marketing.subscribers` telt nul rijen ooit. Dat is verenigbaar met "niemand
+heeft zich ooit aangemeld" én met "elke aanmelding faalde op RETURNING". Het
+nieuwsbriefformulier is nooit end-to-end gelopen. Niet in deze PR gerepareerd;
+het is een ander formulier en hoort een eigen meting te krijgen zodra de 402
+eraf is.
+
+#### Wat de poorten wél zagen
+
+`lib/contactadressen.test.ts` viel meteen om op `you@domain.com` in het nieuwe
+e-mailveld. Terecht: de placeholder is een adres buiten het eigen domein, en de
+twee zusterformulieren dragen daar elk een uitzondering met aantal voor. Die
+staat er nu ook voor `LekkageScan.tsx` — en niet als normalisatie in de poort,
+want een placeholder die stil een echt vreemd adres wordt is precies wat hij
+moet zien.
+
+`lib/plausible-doelen.test.ts` dwong de zevende doelnaam af in
+`MANUAL_TASKS.md` en `CLAUDE.md`, en `lib/i18n/kale-tekst.test.ts` de nieuwe
+sleutels in vier talen. Beide zonder eigen handeling: de poorten gingen rood
+en de bestanden volgden.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1582 tests in 82 bestanden (was 1565/81)
+i18n:check               743 sleutels x 4 (was 741 — +form.ok.scan, +form.err.consent)
+regen:pricing:check      groen
+next build               exit 0; /api/uitschrijven en de scanpagina compileren
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De scanpagina is `ƒ` (dynamisch) in de build-uitvoer omdat hij `searchParams`
+leest voor de afmeldstatus. Dat verandert niets aan wat de bezoeker krijgt —
+de nonce-CSP in `proxy.ts` rendert elke pagina al per verzoek (zie 21
+augustus).
+
+#### Wat dit niet doet, en dat is de hele funnel
+
+**Er komt vandaag geen rij aan en er gaat geen mail uit.** Drie blokkades,
+alle drie op de operator-lijst bovenaan dit bestand:
+
+1. **Supabase 402** — de insert bereikt de database niet; de bezoeker krijgt
+   `form.err.generic`. De afmeldroute geeft om dezelfde reden 503 zolang
+   `SUPABASE_SERVICE_ROLE_KEY` niet gezet is.
+2. **`RESEND_API_KEY` + `ACK_FROM`** — de drie vervolgmails bestaan als
+   belofte in de toestemmingstekst en nergens als code. Ze zijn bewust niet
+   geschreven zolang niets ze kan versturen: een mail-template zonder
+   verzendpad is een tweede lijst die uit de pas gaat lopen met de belofte.
+3. **Het zevende Plausible-doel** `Uitslag Aangevraagd` bestaat niet in het
+   dashboard; het wordt vanaf deze commit verstuurd en weggegooid, net als
+   de zes ervoor.
+
+Zolang 1 openstaat is de UI eerlijk: het veld is optioneel, de uitslag staat
+er al, en een mislukte inzending kost de bezoeker niets behalve de belofte
+van drie mails die hij niet krijgt. Dat is de reden dat het veld ná de
+uitslag staat en niet ervoor.
