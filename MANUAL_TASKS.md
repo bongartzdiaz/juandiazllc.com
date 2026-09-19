@@ -229,6 +229,72 @@ bash scripts/check-lead-path.sh
 Gezond is `401` met code `42501`. Alles anders is een defect, inclusief `200`:
 dat zou betekenen dat anon de leads kan uitlezen.
 
+## De drie scan-mails live zetten — vier Vercel-variabelen (2026-09-19)
+
+De lekkage-scan belooft in zijn toestemmingstekst hooguit drie mails, elk met
+een afmeldlink. Die belofte heeft sinds 2026-09-19 code achter zich:
+`app/api/campagne/scan-reeks/route.ts`, dagelijks om 08:00 UTC aangeroepen door
+de Vercel-cron uit `vercel.json`. De route leest `marketing.subscribers` met
+`source = 'lekkage-scan'`, rekent per rij uit welke mail aan de beurt is (dag
+0, 3 en 7 na de toestemming), verstuurt via Resend en stempelt de rij. Twee
+runs op één dag sturen niets dubbel; een gemiste dag wordt ingehaald.
+
+Tot deze vier variabelen staan, antwoordt de route eerlijk **503
+`not-configured`** en gaat er niets uit. Dat is ook de probe: zolang je op
+productie `GET /api/campagne/scan-reeks` doet zonder header en 503 terugkrijgt,
+staat hij dicht. Met `CRON_SECRET` gezet en zonder header wordt dat 401 — dan
+is de sleutel er en is alleen de aanroeper fout.
+
+Alle vier op **Vercel → Project → Settings → Environment Variables**,
+Production. Ze zijn geen `NEXT_PUBLIC_*`, dus geen rebuild nodig; een redeploy
+is genoeg — en let op: de Redeploy-knop leverde op 2026-09-01 driemaal geen
+deployment op (zie CLAUDE.md), een push naar `main` wel.
+
+- [ ] `CRON_SECRET` — minstens 16 tekens, willekeurig. Vercel stuurt hem zelf
+      als `Authorization: Bearer …` mee zodra hij in het project staat; jij
+      zet hem alleen. Korter dan 16 tekens telt als niet gezet (503).
+- [ ] `RESEND_API_KEY` — dezelfde Resend-sleutel als bij de edge functions
+      hierboven, maar dit is een **tweede plek**: de cron draait op Vercel,
+      niet op Supabase. De sleutel bij de edge functions bereikt deze route
+      niet.
+- [ ] `CAMPAGNE_FROM` — bijvoorbeeld `Juan Diaz <juan@juandiazllc.com>`. Op een
+      in Resend geverifieerd domein; een `@resend.dev`-afzender wordt door
+      `lib/email/resend.ts` geweigerd vóór er iets de deur uit gaat, om
+      dezelfde reden als bij `ACK_FROM`. Antwoorden komen op `info@` binnen
+      (`reply_to` staat vast op `CONTACT_EMAIL`).
+- [ ] `SUPABASE_SECRET_KEY` — de service-sleutel van `wbgiouuifqhasedncysw`.
+      `anon` mag op `marketing.subscribers` alleen INSERT; lezen en stempelen
+      vergt de service role. Ontbreekt hij, dan 503. Staat er al een
+      `SUPABASE_SERVICE_ROLE_KEY`, dan leest de code die ook.
+
+**Volgorde ten opzichte van de rest.** Dit kan pas iets opleveren als de
+Supabase-402 eraf is — anders komt er nooit een rij met `source =
+'lekkage-scan'` binnen om naar te mailen. En het is onafhankelijk van
+`LEAD_NOTIFY_SECRET`: dit pad loopt niet via de edge functions en niet via de
+trigger.
+
+### Daarna controleren
+
+Eén echte doorloop: de scan op `/nl/tools/lekkage-scan` invullen, op het
+uitslagscherm een eigen adres achterlaten met het vinkje aan, en daarna:
+
+```sql
+select id, email, metadata->>'consent_at' as consent, metadata->'verzonden' as verzonden
+from marketing.subscribers
+where source = 'lekkage-scan'
+order by created_at desc limit 5;
+```
+
+Direct na de inzending is `verzonden` leeg. Na de eerstvolgende cron-run (of
+een handmatige `GET` met de juiste bearer) hoort `verzonden` `{"1": "<tijd>"}`
+te dragen en mail 1 in de inbox te staan, met een werkende afmeldlink
+onderaan. Klik die link: `metadata.unsubscribed_at` wordt gezet en de
+volgende run slaat de rij over. Daarna de testrij verwijderen.
+
+Het zevende Plausible-doel (`Uitslag Aangevraagd`, hieronder) meet het opgeven
+van het adres; deze mails meten niets — wie wil weten of ze aankomen kijkt in
+het Resend-dashboard.
+
 ## Cal.com — verplichte vragen + webhook (2026-08-02)
 
 De ontvanger staat klaar op `POST /api/cal`. Hij doet **niets** zolang deze twee
@@ -279,7 +345,7 @@ create unique index concurrently if not exists leads_cal_uid_uniek
 
 Dit is een schemawijziging op productie — bewust niet zelf uitgevoerd.
 
-## Plausible — vier doelen aanmaken (2026-08-02, gemeten 2026-08-20)
+## Plausible — zeven doelen aanmaken (2026-08-02, gemeten 2026-08-20)
 
 **Plausible telt een custom event pas als het doel bestaat.** Zonder deze stap
 komen de kliks binnen en worden ze weggegooid — je ziet niets, en dat is niet te

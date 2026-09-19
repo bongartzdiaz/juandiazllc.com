@@ -18,9 +18,11 @@ import { SCAN_BRON, TOESTEMMING_WAARDE, bouwMetadata, leesLekken } from "@/lib/s
  *   toestemming, het aantal lekken en een uitschrijftoken. Het token is het
  *   enige dat /api/uitschrijven accepteert.
  *
- * Wat hier NIET gebeurt: er gaat geen mail uit. Dat blijft zo tot
- * RESEND_API_KEY en ACK_FROM op de edge functions staan; dit formulier
- * belooft dat ook niet. De rij is het product. */
+ * Wat hier NIET gebeurt: er gaat vanuit deze action geen mail uit. De drie
+ * beloofde mails verstuurt de cron-route app/api/campagne/scan-reeks/route.ts,
+ * dagelijks, zodra CRON_SECRET, RESEND_API_KEY en CAMPAGNE_FROM (plus de
+ * Supabase-servicesleutel) in Vercel staan. Tot die tijd is de rij het
+ * product, en de belofte in de toestemmingstekst wacht. */
 
 export type ScanOpvangState = { status: "idle" | "ok" | "err"; message?: string };
 

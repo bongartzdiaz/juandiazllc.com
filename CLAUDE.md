@@ -514,6 +514,10 @@ eerste vraag of er sinds 25 augustus een sessie bij is gekomen.
 
 ### Vercel
 
+- **Vier variabelen voor de drie scan-mails** (toegevoegd 2026-09-19): `CRON_SECRET`, `RESEND_API_KEY`, `CAMPAGNE_FROM`, `SUPABASE_SECRET_KEY` in
+  Vercel-productie. Tot die staan antwoordt `GET /api/campagne/scan-reeks`
+  503 `not-configured` en gaat er niets uit. Volledige uitleg, probe en
+  controlequery in `MANUAL_TASKS.md`. Pas zinvol als de Supabase-402 eraf is.
 - **`SENTRY_DSN` in Vercel-productie wordt geweigerd. Serverfouten worden
   niet gerapporteerd.** Juan zette op 2026-08-26 een nieuwe waarde; die
   is de letterlijke tekst `optional` niet meer, maar hij komt nog steeds
@@ -10920,3 +10924,107 @@ refresh-rij, geen eenmalige publicatie); D2 t/m D6 wachten in
 Geen operator-taak opgelost. De Supabase-402, `RESEND_API_KEY` + `ACK_FROM`,
 het zevende Plausible-doel en de rest van de lijst bovenaan dit bestand
 staan onveranderd open.
+
+### 2026-09-19 (vervolg) — de drie beloofde mails bestaan nu als code, en het nieuwsbriefformulier had nooit kunnen werken
+
+De toestemmingstekst van de lekkage-scan belooft sinds vanochtend "hooguit
+drie mails over deze lekken, met een afmeldlink onderaan elke mail". Die
+belofte bestond alleen als tekst: het logboekblok erboven zegt letterlijk dat
+de mails bewust niet geschreven zijn zolang niets ze kan versturen. Dat is
+omgedraaid. De mails, de planning en de verzendweg staan nu in de repo, en wat
+ontbreekt is uitsluitend configuratie — vier variabelen in Vercel, en een
+Supabase-datavlak dat geen 402 meer geeft.
+
+#### Wat er is gebouwd
+
+| stuk | waar | wat |
+|---|---|---|
+| kopij + planning | `lib/email/scan-reeks.ts` | drie mails (dag 0, 3, 7 na toestemming), afmeldlink in tekst én html, `bepaalVolgende()` en `markeerVerzonden()` als zuivere functies |
+| verzenden | `lib/email/resend.ts` | één POST naar Resend zonder SDK; `fetchImpl` injecteerbaar; weigert een `@resend.dev`-afzender vóór het netwerk, net als `lead-acknowledge` |
+| cron | `app/api/campagne/scan-reeks/route.ts` + `vercel.json` | dagelijks 08:00 UTC; rem → `CRON_SECRET` (kort of leeg = 503, fout = 401) → `RESEND_API_KEY` + `CAMPAGNE_FROM` → service-sleutel → per rij versturen en stempelen |
+
+**Geen DDL, opnieuw.** De verzendstempels leven in `metadata.verzonden` als
+`{"1": "<tijd>", "2": …}`. De selectie is `source = 'lekkage-scan'`, de rest
+gebeurt in code. Dat is de vorm die ook zonder werkend datavlak te bouwen en
+te testen was, en dat was vandaag de enige vorm die bestond.
+
+**De stempel komt ná de verzending, niet ervoor.** Faalt Resend, dan blijft
+de rij ongestempeld en probeert de volgende run het opnieuw. Faalt de stempel
+nadat de mail weg is, dan logt de route dat luid als de ene fout die dubbel
+kan kosten. Twee runs op één dag sturen niets dubbel; een gemiste dag haalt
+de laagste openstaande mail in en niet de hoogste.
+
+#### Wat de poorten zagen, en wat ze niet konden zien
+
+De route-test draait tegen een nep-tabel in het geheugen met tellers op
+`select`, `update` en op de gestubde `fetch`. Die tellers zijn de positieve
+controle: "niets verstuurd" is pas een meting als aantoonbaar is dat de fetch
+niet bereikt is. Elke poortvolgorde is met een eigen test vastgelegd, zodat
+503 en 401 niet stil van plaats kunnen wisselen — dat onderscheid is precies
+wat een onschadelijke probe op productie moet kunnen lezen.
+
+De rem in die route is gekeyed op `x-forwarded-for`. De test stuurt daarom
+per verzoek een ander IP uit een teller, geen random: twee gelijke lotingen
+zouden een 429 opleveren die als een defect in de route leest.
+
+Vier mutaties, vier keer de voorspelde kleur: afmeldlink uit de mailtekst
+(rood op drie asserties tegelijk, in twee testbestanden), een euroteken in een
+onderwerpregel (rood), de 503- en 401-tak omgedraaid (rood), en hetzelfde
+euroteken in een toelichting (groen — de poort leest de gebouwde mails, niet
+de bestandstekst).
+
+#### De regel die vanochtend al fout was, stond in een tweede bestand
+
+`app/actions/subscribe.ts` — het nieuwsbriefformulier — deed
+`.insert(...).select().single()`. Op 21 augustus is gemeten dat `anon` op
+`marketing.subscribers` alleen INSERT heeft, en `.select()` na een insert
+vraagt om `RETURNING *`, wat SELECT vergt. Elke aanmelding via dat formulier
+had dus op 42501 moeten stuklopen, terwijl de test groen stond omdat de mock
+teruggeeft wat je hem vraagt. Het blok van vanochtend noteerde dat als
+waarneming en repareerde alleen de scan-actie; nu is `subscribe.ts` ook een
+kale insert.
+
+**Dat maakt "nul rijen ooit" in `marketing.subscribers` minder dubbelzinnig
+dan het was.** Tot vandaag was dat verenigbaar met "niemand heeft zich ooit
+aangemeld" én met "elke aanmelding faalde". Het tweede is nu uitgesloten voor
+de toekomst; over het verleden zegt het niets, en dat staat hier zo.
+
+#### Onderweg
+
+`lib/seo/branding.ts` exporteert nu `SITE_URL` als alias van `SITE`, omdat
+de mailkopij absolute links nodig heeft en die naam elders al werd verwacht.
+En de kop van `app/actions/scan-opvang.ts` zei nog dat er geen mail uitgaat
+"zolang niets ze kan versturen" — die zin beschreef een toestand die met deze
+commit niet meer bestaat en is herschreven naar wat er nu wél gebeurt en
+onder welke voorwaarden.
+
+`MANUAL_TASKS.md` draagt een nieuw blok met de vier Vercel-variabelen, de
+probe die "dicht" van "verkeerde sleutel" scheidt, en de controlequery voor
+de eerste echte doorloop. De Plausible-kop daar zei nog "vier doelen" boven
+een lijst van zeven; dat is gelijkgetrokken.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1607 tests in 85 bestanden (was 1582/82)
+i18n:check               743 sleutels x 4 (ongewijzigd)
+regen:pricing:check      groen
+next build               exit 0; /api/campagne/scan-reeks compileert als ƒ
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De +25 is uitgesplitst: 12 voor kopij en planning, 6 voor de Resend-laag, 7
+voor de route. Alle zeven nieuwe bestanden zijn in bytes naar CRLF omgezet;
+`.env.example` is en blijft puur LF.
+
+#### Wat dit niet doet, en dat is de hele go-live
+
+Er gaat vandaag geen mail uit. De route antwoordt op productie 503
+`not-configured` tot `CRON_SECRET`, `RESEND_API_KEY`, `CAMPAGNE_FROM` en
+`SUPABASE_SECRET_KEY` in Vercel staan — en ook dán is er niets om naar te
+mailen zolang het Supabase-datavlak 402 geeft, want de rij met
+`source = 'lekkage-scan'` ontstaat niet. De volledige lijst staat bovenaan
+dit bestand; wat er vandaag bij kwam is uitsluitend het Vercel-blok in
+`MANUAL_TASKS.md`. Het zevende Plausible-doel bestaat nog steeds niet in het
+dashboard.

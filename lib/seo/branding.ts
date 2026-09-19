@@ -14,6 +14,10 @@ import type { Locale } from "@/lib/i18n/dict";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://juandiazllc.com";
 
+/** Absolute oorsprong van de site, voor links die buiten een pagina reizen
+ *  (mails, feeds). Binnen een pagina volstaat een pad. */
+export const SITE_URL = SITE;
+
 /**
  * Founder portrait. Used as `Person.image` / `Organization.image` in JSON-LD
  * across about, insights, signals, layout, article schema.
