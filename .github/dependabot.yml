@@ -47,6 +47,17 @@ updates:
           - "minor"
           - "patch"
 
+      # vitest en @vitest/* delen een exacte peer-pin: coverage-v8@X eist
+      # vitest@X. Twee losse major-PR's kunnen dus geen van beide
+      # installeren (gemeten 2026-09-19: #350 en #351 vielen allebei om op
+      # ERESOLVE in `npm ci`). Samen in een PR wel.
+      vitest:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+        update-types:
+          - "major"
+
     # TypeScript blijft op 5, en dat is geen achterstand maar een meting.
     #
     # TS 7.0.2 staat op `latest` en deze codebase checkt er bijna schoon
