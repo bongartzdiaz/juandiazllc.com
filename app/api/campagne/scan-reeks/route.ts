@@ -56,6 +56,16 @@ function bearerKlopt(header: string | null, secret: string): boolean {
   return timingSafeEqual(verwacht, gekregen);
 }
 
+/** Elke 503 logt WELKE variabele ontbreekt -- alleen de naam, nooit de
+    waarde of de lengte ervan. Het antwoord naar buiten blijft identiek, zodat
+    een aanroeper zonder Bearer niets over de configuratie leert; het
+    Vercel-runtime-log wel. Tot 2026-09-19 zwegen alle drie de takken, en was
+    "503 not-configured" op productie niet te herleiden tot één variabele. */
+function nietGeconfigureerd(reden: string) {
+  console.warn(`[scan-reeks] not-configured: ${reden}`);
+  return NextResponse.json({ ok: false, error: "not-configured" }, { status: 503 });
+}
+
 type Rij = { id: string; email: string; metadata: Record<string, unknown> | null };
 
 export async function GET(req: NextRequest) {
@@ -65,7 +75,7 @@ export async function GET(req: NextRequest) {
 
   const cronSecret = process.env.CRON_SECRET?.trim() ?? "";
   if (cronSecret.length < MIN_SECRET_LENGTE) {
-    return NextResponse.json({ ok: false, error: "not-configured" }, { status: 503 });
+    return nietGeconfigureerd(`CRON_SECRET ontbreekt of is korter dan ${MIN_SECRET_LENGTE}`);
   }
   if (!bearerKlopt(req.headers.get("authorization"), cronSecret)) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
@@ -73,15 +83,17 @@ export async function GET(req: NextRequest) {
 
   const apiKey = process.env.RESEND_API_KEY?.trim() ?? "";
   const from = process.env.CAMPAGNE_FROM?.trim() ?? "";
-  if (!apiKey || !from) {
-    return NextResponse.json({ ok: false, error: "not-configured" }, { status: 503 });
+  if (!apiKey) return nietGeconfigureerd("RESEND_API_KEY leeg");
+  if (!from) return nietGeconfigureerd("CAMPAGNE_FROM leeg");
+  if (/@resend\.dev>?$/i.test(from)) {
+    return nietGeconfigureerd("CAMPAGNE_FROM is een @resend.dev-sandboxadres");
   }
 
   let admin;
   try {
     admin = createServiceClient();
   } catch {
-    return NextResponse.json({ ok: false, error: "not-configured" }, { status: 503 });
+    return nietGeconfigureerd("SUPABASE_SECRET_KEY ontbreekt (service client)");
   }
 
   const nu = new Date();
