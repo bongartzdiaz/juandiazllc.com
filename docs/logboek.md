@@ -10493,3 +10493,55 @@ diaz-editor-ronde als stap 4.
   alleen de `overrides` aanpassen + `bun install` is de veilige bump.
 - `cat > /dev/null` zonder invoer in een samengesteld commando wacht
   eeuwig op stdin; de hele keten erna leek "niets te doen".
+
+### 2026-09-19 (vervolg) — v0.4.49 staat op de spiegel, lokaal gebouwd; stap 4 klaargezet
+
+**Release.** `bun run dist` liep op deze machine twee keer stuk vóór
+electron-builder aan de beurt was, beide keren door toestand die CI nooit
+ziet: twee verweesde workspace-symlinks in `node_modules/@repo`
+(`eslint-config`, `typescript-config`, uit mei, de mappen bestaan niet
+meer) lieten `gen-third-party-licenses.mjs` op `ENOENT` vallen, en `npx
+electron-builder` weigerde op een npm-`EOVERRIDE` (react-override tegen
+directe dependency) terwijl de lokale bin gewoon werkt. Symlinks verwijderd,
+`./node_modules/.bin/electron-builder --win` direct aangeroepen: exit 0
+om 20:52. `node --check` op de gebundelde `electron/trial-dialog.js` groen,
+bundle-`package.json` 0.4.49, sha512 in `latest.yml` gelijk aan de exe.
+
+Op `bongartzdiaz/diaz-editor-releases` staat `v0.4.49` sinds 19:01 UTC als
+*Latest*, niet-draft, vijf assets: `Diaz-Editor-0.4.49-Setup.exe`,
+`Diaz-Editor-Setup.exe` (de vaste naam die `/dl/windows` in
+`landing/vercel.json` verwacht), `.blockmap`, `-portable.exe`, `latest.yml`.
+Gemeten van buitenaf: `diazatlas.com/dl/windows` → 302 →
+`releases/download/v0.4.49/Diaz-Editor-Setup.exe` → **200**, en
+`releases/latest/download/latest.yml` zegt `version: 0.4.49`.
+
+Twee grenzen. **Ongesigneerd**: geen `CSC_*`/`AZURE_*` op deze machine;
+SmartScreen waarschuwt, staat in de release-notes, 0.4.48 was ook
+ongesigneerd. **Geen Linux-assets**: AppImage/deb zijn op Windows niet te
+bouwen, dus `/dl/linux` (→ `latest/download/Diaz-Editor-x86_64.AppImage`)
+geeft nu **404** tot er een Linux-build is. De 0.4.48-AppImage crashte op
+dezelfde regel, dus er was voor Linux al geen werkende versie.
+
+**Stap 4, klaargezet en niet uitgevoerd.** Het levende object
+`diaz-affiliate-activate` op vbozel (v23, `verify_jwt: false`, geen
+api-key-check) is gelezen. De kop van de bron benoemt het gat zelf sinds
+29 juli en laat de keuze bij Juan. Twee dingen die scherper zijn dan "geen
+auth":
+
+1. De **respons lekt de licentiesleutel** naar de aanroeper:
+   `results[].license_key` gaat terug in de JSON. Een anonieme POST met
+   `{"partner_id": "<bekend id>"}` vervroegt dus niet alleen een activering,
+   hij krijgt de gratis Pro-sleutel van die partner in handen. De impact is
+   begrensd tot rijen met `status='active'` en `sample_license_key is null`,
+   maar dat is precies de rij die op het punt staat een sleutel te krijgen.
+2. Hij belt `diaz-license-issue` met `DIAZ_LICENSE_API_KEY` uit env — de
+   gate die dáár wel staat, wordt hier dus omzeild door de functie zelf.
+
+Voorstel voor morgen, in volgorde: (a) `x-api-key`-check met dezelfde
+sleutel als `diaz-license-issue`, fail-closed 503 als de env-var ontbreekt,
+401 bij mismatch; (b) `license_key` uit de respons halen (de partner krijgt
+hem per mail, de aanroeper hoeft hem niet); (c) uitzoeken wie de functie nu
+aanroept — cron of handmatig — vóór (a) live gaat, anders breekt de
+activering stil. Daarna de rate-limiting op de vier anon-aanroepbare
+SECURITY DEFINER-RPC's. Gemeten aanroepers staan nog nergens; dat is de
+eerste vraag van morgen.
