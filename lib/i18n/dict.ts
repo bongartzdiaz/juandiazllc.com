@@ -402,7 +402,16 @@ const en: Dict = {
 
   "priv.h.newsletter": "The newsletter",
 
-  "priv.p.newsletter": "Signing up stores your email address and which page you signed up from. Nothing else — no name, no company, and no record of what you open or click. Want off the list? Mail me and the row is deleted the same working day.",
+  "priv.p.newsletter": "Signing up stores your email address, the page you signed up from, your language, the exact consent sentence you saw next to the button, and a random unsubscribe token. No name, no company, and no record of what you open or click. Every email carries an unsubscribe link at the bottom; one click removes you. Emails are sent through Resend, which keeps delivery logs for 30 days.",
+
+  "priv.h.scan": "The revenue-leak scan",
+  "priv.p.scan": "The scan runs in your browser; nothing is sent until you choose to leave your email. If you do, we store the address, your language, the number of leaks found, the consent sentence you ticked, and an unsubscribe token, in the same Supabase database as the newsletter. You then get at most three emails about those leaks, sent through Resend, each with an unsubscribe link. That is the whole list: your answers to the individual questions are not stored.",
+
+  "priv.h.booking": "Booking a call",
+  "priv.p.booking": "The booking button opens Cal.com, a separate service with its own privacy policy. What you enter there (name, email, chosen slot) lives at Cal.com and in my calendar. When a booking lands, Cal.com tells this site about it so I get a notification; that message contains the same name, email and slot, and is stored in our Supabase database.",
+
+  "priv.h.hosting": "Hosting, errors and processors",
+  "priv.p.hosting": "The site runs on Vercel (servers in Frankfurt). Vercel keeps request logs (IP address, URL, timestamp) for a short period for security and debugging; that is the only place your IP address is written down. Server-side errors go to Sentry with personal data switched off: no IP, no cookies, no form contents. The full list of companies that can touch data you leave here: Vercel (hosting), Supabase (database, EU), Resend (email), Cal.com (bookings), Telegram (a notification to my phone when you contact me), Plausible (analytics, EU), Vercel Web Analytics, and Google Analytics only if you allow it. Nothing is sold, shared with advertisers, or used to train anything.",
   "priv.h.rights": "Your rights",
   "priv.p.rights": "Under the GDPR, you can ask us for a copy of everything we hold on you, ask us to correct it, or ask us to delete it. Mail <a href=\"mailto:info@juandiazllc.com\">info@juandiazllc.com</a> and you will get a response within three working days.",
   "priv.h.changes": "Changes to this page",
@@ -1243,7 +1252,16 @@ const nl: Dict = {
 
   "priv.h.newsletter": "De nieuwsbrief",
 
-  "priv.p.newsletter": "Bij aanmelden slaan we je e-mailadres op en de pagina waarvandaan je je aanmeldde. Verder niets — geen naam, geen bedrijf, en geen registratie van wat je opent of aanklikt. Wil je eraf? Mail me en de regel wordt dezelfde werkdag verwijderd.",
+  "priv.p.newsletter": "Bij aanmelden slaan we op: je e-mailadres, de pagina waarvandaan je je aanmeldde, je taal, de exacte toestemmingszin die naast de knop stond, en een willekeurig afmeldtoken. Geen naam, geen bedrijf, en geen registratie van wat je opent of aanklikt. Onderaan elke mail staat een afmeldlink; één klik en je bent eraf. De mails gaan via Resend, dat afleverlogs 30 dagen bewaart.",
+
+  "priv.h.scan": "De omzetlek-scan",
+  "priv.p.scan": "De scan draait in je browser; er wordt niets verstuurd totdat je zelf je e-mailadres achterlaat. Doe je dat, dan bewaren we het adres, je taal, het aantal gevonden lekken, de toestemmingszin die je aanvinkte en een afmeldtoken, in dezelfde Supabase-database als de nieuwsbrief. Je krijgt dan hooguit drie mails over die lekken, via Resend, elk met een afmeldlink. Dat is de hele lijst: je antwoorden op de losse vragen worden niet opgeslagen.",
+
+  "priv.h.booking": "Een gesprek inplannen",
+  "priv.p.booking": "De boekingsknop opent Cal.com, een aparte dienst met een eigen privacybeleid. Wat je daar invult (naam, e-mail, gekozen tijdslot) staat bij Cal.com en in mijn agenda. Zodra een boeking binnenkomt, meldt Cal.com dat aan deze site zodat ik een melding krijg; dat bericht bevat dezelfde naam, e-mail en tijdslot en wordt in onze Supabase-database opgeslagen.",
+
+  "priv.h.hosting": "Hosting, fouten en verwerkers",
+  "priv.p.hosting": "De site draait op Vercel (servers in Frankfurt). Vercel bewaart verzoeklogs (IP-adres, URL, tijdstip) kort, voor beveiliging en foutopsporing; dat is de enige plek waar je IP-adres wordt vastgelegd. Serverfouten gaan naar Sentry met persoonsgegevens uit: geen IP, geen cookies, geen formulierinhoud. De volledige lijst van bedrijven die gegevens kunnen aanraken die je hier achterlaat: Vercel (hosting), Supabase (database, EU), Resend (e-mail), Cal.com (boekingen), Telegram (een melding op mijn telefoon als je contact opneemt), Plausible (analytics, EU), Vercel Web Analytics, en Google Analytics alleen als je dat toestaat. Niets wordt verkocht, gedeeld met adverteerders of gebruikt om iets te trainen.",
   "priv.h.rights": "Jouw rechten",
   "priv.p.rights": "Onder de AVG kun je een kopie opvragen van alles wat we van je bewaren, ons vragen het te corrigeren of ons vragen het te verwijderen. Mail <a href=\"mailto:info@juandiazllc.com\">info@juandiazllc.com</a> en je krijgt binnen drie werkdagen antwoord.",
   "priv.h.changes": "Wijzigingen aan deze pagina",
@@ -2052,7 +2070,16 @@ const de: Dict = {
 
   "priv.h.newsletter": "Der Newsletter",
 
-  "priv.p.newsletter": "Bei der Anmeldung speichern wir Ihre E-Mail-Adresse und die Seite, von der aus Sie sich angemeldet haben. Sonst nichts — kein Name, kein Unternehmen, und keine Erfassung dessen, was Sie öffnen oder anklicken. Sie möchten wieder herunter? Schreiben Sie mir, und die Zeile wird noch am selben Werktag gelöscht.",
+  "priv.p.newsletter": "Bei der Anmeldung speichern wir Ihre E-Mail-Adresse, die Seite, von der Sie sich angemeldet haben, Ihre Sprache, den genauen Einwilligungssatz neben dem Button und ein zufälliges Abmelde-Token. Kein Name, keine Firma, keine Aufzeichnung, was Sie öffnen oder anklicken. Jede E-Mail trägt unten einen Abmeldelink; ein Klick genügt. Der Versand läuft über Resend, das Zustellprotokolle 30 Tage aufbewahrt.",
+
+  "priv.h.scan": "Der Umsatzleck-Scan",
+  "priv.p.scan": "Der Scan läuft in Ihrem Browser; nichts wird gesendet, bis Sie selbst Ihre E-Mail-Adresse hinterlassen. Tun Sie das, speichern wir die Adresse, Ihre Sprache, die Zahl der gefundenen Lecks, den angekreuzten Einwilligungssatz und ein Abmelde-Token, in derselben Supabase-Datenbank wie den Newsletter. Sie erhalten dann höchstens drei E-Mails zu diesen Lecks, über Resend, jede mit Abmeldelink. Das ist die ganze Liste: Ihre Antworten auf die einzelnen Fragen werden nicht gespeichert.",
+
+  "priv.h.booking": "Ein Gespräch buchen",
+  "priv.p.booking": "Der Buchungsbutton öffnet Cal.com, einen eigenständigen Dienst mit eigener Datenschutzerklärung. Was Sie dort eingeben (Name, E-Mail, gewählter Termin) liegt bei Cal.com und in meinem Kalender. Geht eine Buchung ein, meldet Cal.com das dieser Website, damit ich eine Benachrichtigung bekomme; diese Nachricht enthält dieselben Angaben und wird in unserer Supabase-Datenbank gespeichert.",
+
+  "priv.h.hosting": "Hosting, Fehler und Auftragsverarbeiter",
+  "priv.p.hosting": "Die Website läuft auf Vercel (Server in Frankfurt). Vercel speichert Anfrageprotokolle (IP-Adresse, URL, Zeitstempel) kurzzeitig zur Sicherheit und Fehlersuche; das ist die einzige Stelle, an der Ihre IP-Adresse festgehalten wird. Serverfehler gehen an Sentry, mit abgeschalteten personenbezogenen Daten: keine IP, keine Cookies, keine Formularinhalte. Die vollständige Liste der Unternehmen, die mit hier hinterlassenen Daten in Berührung kommen können: Vercel (Hosting), Supabase (Datenbank, EU), Resend (E-Mail), Cal.com (Buchungen), Telegram (eine Benachrichtigung auf mein Telefon, wenn Sie Kontakt aufnehmen), Plausible (Analytics, EU), Vercel Web Analytics und Google Analytics nur mit Ihrer Zustimmung. Nichts wird verkauft, an Werbetreibende weitergegeben oder zum Trainieren verwendet.",
   "priv.h.rights": "Ihre Rechte",
   "priv.p.rights": "Nach der DSGVO können Sie eine Kopie aller Daten anfordern, die wir über Sie speichern, deren Korrektur verlangen oder deren Löschung fordern. Schreiben Sie an <a href=\"mailto:info@juandiazllc.com\">info@juandiazllc.com</a> und Sie erhalten innerhalb von drei Werktagen eine Antwort.",
   "priv.h.changes": "Änderungen an dieser Seite",
@@ -2861,7 +2888,16 @@ const es: Dict = {
 
   "priv.h.newsletter": "El boletín",
 
-  "priv.p.newsletter": "Al suscribirte guardamos tu dirección de email y la página desde la que te suscribiste. Nada más — ni nombre, ni empresa, ni registro de lo que abres o pulsas. ¿Quieres salir de la lista? Escríbeme y la fila se elimina el mismo día laborable.",
+  "priv.p.newsletter": "Al suscribirte guardamos tu dirección de correo, la página desde la que te suscribiste, tu idioma, la frase exacta de consentimiento que aparecía junto al botón y un token aleatorio de baja. Sin nombre, sin empresa y sin registro de lo que abres o pulsas. Cada correo lleva un enlace de baja al pie; un clic y estás fuera. Los correos se envían mediante Resend, que conserva registros de entrega durante 30 días.",
+
+  "priv.h.scan": "El escáner de fugas de ingresos",
+  "priv.p.scan": "El escáner funciona en tu navegador; no se envía nada hasta que tú decides dejar tu correo. Si lo haces, guardamos la dirección, tu idioma, el número de fugas detectadas, la frase de consentimiento que marcaste y un token de baja, en la misma base de datos Supabase que el boletín. Recibirás como máximo tres correos sobre esas fugas, mediante Resend, cada uno con enlace de baja. Esa es toda la lista: tus respuestas a las preguntas individuales no se guardan.",
+
+  "priv.h.booking": "Reservar una llamada",
+  "priv.p.booking": "El botón de reserva abre Cal.com, un servicio independiente con su propia política de privacidad. Lo que dejas allí (tu nombre, tu correo, la franja elegida) queda en Cal.com y en mi agenda. Cuando entra una reserva, Cal.com avisa a este sitio para que reciba una notificación; ese mensaje contiene los mismos datos y se guarda en nuestra base de datos Supabase.",
+
+  "priv.h.hosting": "Alojamiento, errores y encargados",
+  "priv.p.hosting": "El sitio se ejecuta en Vercel (servidores en Fráncfort). Vercel conserva registros de peticiones (dirección IP, URL, marca de tiempo) durante poco tiempo por seguridad y depuración; es el único lugar donde se anota tu IP. Los errores del servidor van a Sentry con los datos personales desactivados: sin IP, sin cookies, sin contenido de formularios. La lista completa de empresas que pueden tocar los datos que dejas aquí: Vercel (alojamiento), Supabase (base de datos, UE), Resend (correo), Cal.com (reservas), Telegram (una notificación a mi teléfono cuando contactas), Plausible (analítica, UE), Vercel Web Analytics y Google Analytics solo si lo permites. Nada se vende, se comparte con anunciantes ni se usa para entrenar nada.",
   "priv.h.rights": "Tus derechos",
   "priv.p.rights": "Bajo el RGPD, puedes pedirnos una copia de todo lo que guardamos sobre ti, pedirnos que lo corrijamos o pedirnos que lo borremos. Escribe a <a href=\"mailto:info@juandiazllc.com\">info@juandiazllc.com</a> y recibirás respuesta en un plazo de tres días laborables.",
   "priv.h.changes": "Cambios en esta página",
