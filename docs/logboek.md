@@ -10381,3 +10381,115 @@ campagne-selectie ze straks op dezelfde manier kan lezen als de scanrijen.
 Er komt vandaag geen rij aan: Supabase geeft 402, en `CRON_SECRET`,
 `RESEND_API_KEY`, `CAMPAGNE_FROM` en `SUPABASE_SECRET_KEY` staan niet in
 Vercel. Het zevende Plausible-doel bestaat nog steeds niet in het dashboard.
+
+
+### 2026-09-19 (vervolg) — de leadketen staat, de audit over beide systemen, en de installer die al sinds augustus crasht
+
+Vijf onderwerpen in één sessie. Ze staan hier in de volgorde waarin ze
+elkaar bleken te blokkeren, niet in de volgorde waarin ze zijn gevraagd.
+
+#### 1. De campagnevariabelen landden niet, en de reden was de pagina
+
+`CRON_SECRET`, `RESEND_API_KEY`, `CAMPAGNE_FROM` en `SUPABASE_SECRET_KEY`
+waren op Vercel gezet, en `scan-reeks` bleef 503 `not-configured` geven.
+De route zei alleen dát er iets ontbrak, niet wát. #362 (`ba2044c`) laat
+elke 503-tak nu de **naam** van de variabele loggen, nooit de waarde;
+`route.test.ts` bewaakt dat per tak, inclusief dat een gestubde waarde
+niet in het log terechtkomt. Vier lege commits (#363, #364, #365, #367)
+waren nodig omdat Vercel-variabelen per deployment worden ingebakken en
+de Redeploy-knop, zoals op 2026-09-01 al gemeten, geen deployment oplevert.
+
+De variabele die uiteindelijk doorkwam, kwam door via de exacte
+project-pagina (`juandiazllc-com`, niet `diaz-juandiazllc`). Gemeten na
+de laatste deploy: `scan-reeks` antwoordt **401** — dus `CRON_SECRET` is
+goed en ≥16 tekens; de latere poorten (Resend, from-adres, service-client)
+zijn pas meetbaar als de cron om 08:00 UTC met Bearer belt. Het log noemt
+dan de eerste ontbrekende naam.
+
+Op Supabase wbgio is `LEAD_NOTIFY_SECRET` gezet: `lead-notify` én
+`lead-acknowledge` geven nu **401** op een POST zonder auth (was 400
+fail-open en 503 fail-closed). Daarna, met expliciet akkoord, één echte
+inzending via het productieformulier: rij in `marketing.leads`, Telegram
+binnen 104 ms. De testrij blijft staan op Juans aanwijzing.
+
+Wat er nog ontbreekt voor de bevestigingsmail naar de inzender:
+`RESEND_API_KEY` + `ACK_FROM` (+ `ALERT_EMAIL`) in wbgio → Edge Functions
+→ Secrets. Zonder die twee schrijft `lead-acknowledge` niets.
+
+#### 2. Contactformulier: naam en bedrijf verplicht
+
+#366 (`f6f2e43`). Server: `app/actions/contact.ts` weigert `name` en
+`company` korter dan 2 tekens met `form.err.name` / `form.err.company`,
+in vier talen. Formulier: `required minLength={2}` en een `*` in het
+label. `foutpaden.test.ts` bewijst dat een spatie als naam of bedrijf de
+insert niet bereikt (`stuur.aanroepen === 0`).
+
+#### 3. De audit — vijf vragen, twee systemen, één stap per keer
+
+Gevraagd: browser-lekken van secrets, user-id of rol uit het request in
+plaats van de sessie, RLS uit of zonder policies, sign-out die alleen een
+cookie wist, en enumeratie via verschillende foutmeldingen. Op
+juandiazllc.com bestaat er geen login meer (#138), dus vraag 2, 4 en 5
+vervallen daar; vraag 1 en 3 zijn gemeten en schoon. Op vbozel
+(Diaz Atlas) niet.
+
+| stap | wat | waar |
+|---|---|---|
+| 1 | grant-laag vbozel dichtgezet: `select` weg voor `anon`/`authenticated` op `downloads`, `cad_events`, `sales_state`, `welcome_email_templates`, `request_rate_limit`, `validate_rate_limit` en de view `update_adoption`; default privileges voor nieuwe tabellen idem; `execute` weg op de drie trigger-functies | migratie `diaz_editor_grants_dichtzetten` op vbozel |
+| 2 | privacyverklaring juandiazllc: scan, boeking (Cal.com), hosting/fouten (Vercel, Sentry) en de volledige verwerkerslijst, plus een herschreven nieuwsbriefalinea, vier talen | #368 (`0e9db6c`), 751 sleutels × 4 |
+| 3 | privacyverklaring diazatlas: vijf verwerkingen die de code al deed maar de verklaring niet noemde (download-klik, cheat-sheet/nieuwsbrief, partneraanvraag, attributie, feedback), vier talen, versie 1.1. Voor drie ervan bestond géén bewaarmechanisme; `prune_marketing_rows()` + cron `diaz_marketing_prune` 04:23 handhaaft ze nu | `bongartzdiaz/diaz-editor#663` (`19ec4b0e1`), migratie `marketing_retention` op vbozel |
+| deps | 54 high/critical advisories → 0: next 16.3.5 + tien overrides; build was rood door een verweesde `@types/react@19.2.2` in workspace-`node_modules`, niet door de bump | `bongartzdiaz/diaz-editor#661` (`510c941a6`) |
+
+`scripts/verify-retention-promises.mjs` in diaz-editor eist voor elke
+termijn in `privacy.html` een mechanisme; de vijf nieuwe rijen staan er
+met categorie (drie FUNCTIE, één BROWSER, één PLATFORM). Dat is de poort
+die stap 3 afdwong.
+
+**Open uit de audit, nog niet gedaan:** `diaz-affiliate-activate` op
+vbozel heeft geen authenticatie (een lege POST geeft Pro-licenties uit),
+en de vier anon-aanroepbare SECURITY DEFINER-RPC's hebben geen
+rate-limiting. Dat is stap 4.
+
+#### 4. De installer op diazatlas.com crasht sinds 5 augustus bij het starten
+
+Juans screenshot: geïnstalleerde 0.4.48, `electron/trial-dialog.js:11
+SyntaxError: missing ) after argument list`, direct bij openen. Op main
+is dat bestand sinds 11 augustus gerepareerd (`node --check` groen op
+`19ec4b0e1`), maar op de publieke spiegel `bongartzdiaz/diaz-editor-releases`
+is `v0.4.48` van 5 augustus nog steeds *Latest*. Iedereen die sinds
+augustus downloadde, kreeg een app die niet opent. Dat verklaart het gat
+tussen ~100 downloads en nul trials scherper dan de trechter-blinde vlek
+van juli.
+
+Tag `v0.4.49` is gezet en gepusht (package.json stond al op 0.4.49).
+Workflow-run **35461758113**: `build (ubuntu-latest)` en `build
+(windows-latest)` beide `failure` met **nul stappen**, 3 seconden,
+`publish-release` overgeslagen. Dat is het bekende beeld: privérepo,
+Actions-minuten op.
+
+**Beslist door Juan: niet afhankelijk zijn van GitHub Actions.** De
+release wordt op deze machine gebouwd met `bun run dist` (icon → Next
+build met `DIAZ_DESKTOP=1` → licenties → `electron-builder --win`, nsis +
+portable) en met `gh release create` op de spiegel gezet. Op deze machine
+staan geen `CSC_*`/`AZURE_*`-secrets, dus de exe is **ongesigneerd**;
+`CODE-SIGNING.md` beschrijft signing als nog te activeren, dus dat is
+geen stap terug ten opzichte van 0.4.48. Wat de spiegel nodig heeft naast
+de twee exe's: `latest.yml` en de `.blockmap`, anders vindt
+`electron-updater` de versie niet. Zie het vervolgblok voor de uitkomst.
+
+Ook nog open: de downloadpagina geeft de installer zonder e-mail of
+bedrijfsnaam. Juan wil die gate. Niet gebouwd; hoort bij dezelfde
+diaz-editor-ronde als stap 4.
+
+#### Meetregels van deze sessie
+
+- Vercel-MCP: de env-endpoints geven 403 voor deze connector; alleen
+  `get_runtime_logs` werkt (team `team_QAwcHAtET2Zib27AC8dlWsYm`). Een
+  variabele is dus alleen via de route zelf te meten, vandaar #362.
+- De hook op force-push (R1) sloeg af op de tekst "(2)" in een
+  commitbericht gecombineerd met een push in hetzelfde commando. Push
+  apart van `gh pr create`.
+- `bun update` zonder scope trok react naar 19.3 en brak Radix-types;
+  alleen de `overrides` aanpassen + `bun install` is de veilige bump.
+- `cat > /dev/null` zonder invoer in een samengesteld commando wacht
+  eeuwig op stdin; de hele keten erna leek "niets te doen".
