@@ -25,9 +25,12 @@ export async function subscribe(
     const supabase = await createClient();
     const { error } = await supabase
       .from("subscribers")
-      .insert({ email, source })
-      .select()
-      .single();
+      // Kale insert. `anon` heeft op marketing.subscribers alleen INSERT
+      // (gemeten 2026-08-21); een `.select()` erachter vraagt RETURNING en
+      // dus SELECT, wat 42501 geeft en de rij terugdraait terwijl elke test
+      // groen blijft -- de mock geeft terug wat je vraagt. Zelfde vorm als
+      // contact.ts en scan-opvang.ts.
+      .insert({ email, source });
 
     if (error) {
       // Duplicate → still treat as success for the user
