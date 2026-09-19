@@ -11028,3 +11028,83 @@ mailen zolang het Supabase-datavlak 402 geeft, want de rij met
 dit bestand; wat er vandaag bij kwam is uitsluitend het Vercel-blok in
 `MANUAL_TASKS.md`. Het zevende Plausible-doel bestaat nog steeds niet in het
 dashboard.
+
+### 2026-09-19 (vervolg) — het nieuwsbriefformulier kon nooit afmelden, en de honeypot werd door niets gelezen
+
+Na de scan-reeks van vanmiddag was het nieuwsbriefformulier de andere helft
+van de opvang. Die schreef sinds juli `{ email, source }` weg en verder niets.
+Twee gaten die daaruit volgen, allebei gemeten in de code en niet vermoed.
+
+**`/api/uitschrijven` kon een nieuwsbriefrij nooit vinden.** Die route zoekt
+op `metadata.unsub_token`, en een nieuwsbriefrij had geen `metadata`. Dat
+terwijl `nl.sub` in vier talen belooft dat afmelden één klik is. De belofte
+stond op het formulier, de route bestond, en de twee raakten elkaar niet.
+
+**`NewsletterForm.tsx` droeg sinds juli een honeypot die `subscribe.ts` nooit
+las.** Het veld `website` stond netjes achter `aria-hidden`, en de actie keek
+er niet naar. Een bot vulde het in en werd gewoon ingeschreven.
+
+#### Wat er is gebouwd
+
+| stuk | waar | wat |
+|---|---|---|
+| zuivere helft | `lib/nieuwsbrief.ts` | `bouwNieuwsbriefMetadata()` met dezelfde veldnamen als `lib/scan-opvang.ts`: `unsub_token`, `consent_at`, `consent_tekst`, `locale`, `campagne = 'nieuwsbrief'` |
+| actie | `app/actions/subscribe.ts` | honeypot vóór de e-mailcontrole (nep-ok, woordelijk het gewone succesbericht), metadata in de insert, insert blijft kaal |
+| homepage | `components/sections/CtaBig.tsx` | honeypot erbij — dat formulier had er nog geen |
+| poort | `app/actions/subscribe.test.ts` | vangt de insert-payload af, 10 tests |
+
+**Geen vinkje op de nieuwsbrief, en dat is een keuze.** De scan vraagt
+expliciete toestemming omdat het adres ná een uitslag wordt gevraagd die de
+bezoeker al heeft: een tweede handeling. Een nieuwsbriefformulier is zelf de
+handeling. Wat we vastleggen is welke tekst de bezoeker zag toen hij op
+Aanmelden klikte — `cta.news.hint` op de homepage, `nl.sub` overal anders —
+zodat "waar heeft deze persoon mee ingestemd" uit de rij te lezen is.
+
+**Die tekst wordt server-side afgeleid uit `source` en `locale`, nooit uit
+een clientveld.** Een verborgen input met de toestemmingstekst erin zou
+betekenen dat een client kiest wat er als toestemming in de rij komt.
+
+#### Wat de poorten zagen
+
+`lib/i18n/kale-tekst.test.ts` viel meteen om op het woord "Website" in het
+nieuwe honeypot-label van `CtaBig.tsx`. Terecht; de twee zusterhoneypots
+dragen daar elk een uitzondering met reden. Die staat er nu ook voor CtaBig,
+en de test die de honeypots achter `aria-hidden` bewaakt telt er nu vier.
+
+De payload-poort heeft een tekstscan naast zich, want een mock slikt een
+`.select()` na de insert net zo goed als een kale insert. Op 2026-08-21 is
+gemeten dat `anon` op `marketing.subscribers` alleen INSERT heeft; een
+`.select()` zou 42501 geven terwijl de test groen blijft. De scan eist dat
+`.select()` en `.single()` nergens in de actie staan, met `.insert({` als
+positieve controle.
+
+Zeven mutaties, zeven keer de voorspelde kleur: metadata weg, honeypot-check
+weg, homepage krijgt `nl.sub`, vast token, honeypot-veld weg uit CtaBig,
+`.select()` terug — alle zes rood; `.select()` in een toelichting groen.
+Hersteld uit een kopie in de scratchpad, backups byte-identiek.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1617 tests in 86 bestanden (was 1607/85)
+i18n:check               743 sleutels x 4 (ongewijzigd)
+regen:pricing:check      groen
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+#### Wat dit niet doet, en één open punt
+
+`/api/uitschrijven` redirect na afloop naar `/nl/tools/lekkage-scan`, voor
+élke rij, ook een Duitse nieuwsbriefinschrijving. Dat is de enige pagina die
+de afmeldstatus toont; een nieuwsbriefafmelding hoort ergens anders te
+landen. Niet in deze PR — het is een routekeuze en geen reparatie.
+
+Of Vercel de cron uit `vercel.json` werkelijk heeft geregistreerd is van
+deze machine niet te zien; dat staat in het dashboard onder Settings → Cron
+Jobs. Er bestaan nog geen nieuwsbriefmails; de metadata is er zodat een
+campagne-selectie ze straks op dezelfde manier kan lezen als de scanrijen.
+
+Er komt vandaag geen rij aan: Supabase geeft 402, en `CRON_SECRET`,
+`RESEND_API_KEY`, `CAMPAGNE_FROM` en `SUPABASE_SECRET_KEY` staan niet in
+Vercel. Het zevende Plausible-doel bestaat nog steeds niet in het dashboard.
