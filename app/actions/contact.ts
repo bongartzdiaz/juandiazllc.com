@@ -58,8 +58,16 @@ export async function submitLead(
   const message = capField(formData.get("message"), "message");
   const source = capField(formData.get("source"), "source") || "contact_page";
 
+  // Naam en bedrijf verplicht sinds 2026-09-19: een lead zonder naam of
+  // bedrijf is niet op te volgen, en het formulier zei al 24 uur reactie toe.
+  if (name.length < 2) {
+    return { status: "err", message: translate(locale, "form.err.name") };
+  }
   if (!isPlausibleEmail(email)) {
     return { status: "err", message: translate(locale, "form.err.email") };
+  }
+  if (company.length < 2) {
+    return { status: "err", message: translate(locale, "form.err.company") };
   }
   if (!message || message.length < 10) {
     return { status: "err", message: translate(locale, "form.err.message") };

@@ -160,8 +160,8 @@ export function ContactForm() {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div>
-                <label htmlFor="name">{t("form.step3.name")}</label>
-                <input id="name" name="name" type="text" autoComplete="name" />
+                <label htmlFor="name">{t("form.step3.name")} *</label>
+                <input id="name" name="name" type="text" autoComplete="name" required minLength={2} />
               </div>
               <div>
                 <label htmlFor="email">{t("form.step3.email")} *</label>
@@ -177,8 +177,8 @@ export function ContactForm() {
             </div>
 
             <div>
-              <label htmlFor="company">{t("contact.company")}</label>
-              <input id="company" name="company" type="text" autoComplete="organization" />
+              <label htmlFor="company">{t("contact.company")} *</label>
+              <input id="company" name="company" type="text" autoComplete="organization" required minLength={2} />
             </div>
 
             <label htmlFor="message">{t("form.step3.note")}</label>
