@@ -15,15 +15,24 @@ import { REEKS_BRON } from "@/lib/email/scan-reeks";
 
 type Rij = { id: string; email: string; source: string; metadata: Record<string, unknown> };
 
-const tabel: { rijen: Rij[]; selects: number; updates: number; dbBereikt: boolean } = {
+const tabel: {
+  rijen: Rij[];
+  selects: number;
+  updates: number;
+  dbBereikt: boolean;
+  clientFaalt: boolean;
+} = {
   rijen: [],
   selects: 0,
   updates: 0,
   dbBereikt: false,
+  clientFaalt: false,
 };
 
 vi.mock("@/lib/supabase/service", () => ({
   createServiceClient: () => {
+    // Zonder SUPABASE_SECRET_KEY gooit de echte client; de vlag speelt dat na.
+    if (tabel.clientFaalt) throw new Error("SUPABASE_SECRET_KEY ontbreekt");
     tabel.dbBereikt = true;
     return {
       from: (naam: string) => {
@@ -105,6 +114,7 @@ beforeEach(() => {
   tabel.selects = 0;
   tabel.updates = 0;
   tabel.dbBereikt = false;
+  tabel.clientFaalt = false;
   vi.stubEnv("CRON_SECRET", SECRET);
   vi.stubEnv("RESEND_API_KEY", "re_test");
   vi.stubEnv("CAMPAGNE_FROM", "Juan <juan@juandiazllc.com>");
@@ -146,6 +156,69 @@ describe("poorten, in volgorde, en allemaal vóór de database", () => {
     // Zonder auth blijft het 401, niet 503: de sleutelcontrole komt eerst.
     expect((await GET(req("Bearer fout"))).status).toBe(401);
     expect(tabel.dbBereikt).toBe(false);
+  });
+});
+
+describe("elke 503 noemt de variabele in het log, nooit de waarde", () => {
+  /* Van buiten zijn de drie 503-takken niet uit elkaar te houden -- dat is
+     bewust, een aanroeper zonder Bearer mag niets over de configuratie
+     leren. Het runtime-log moet het wél kunnen. Tot 2026-09-19 zwegen alle
+     takken, en stond productie op "503 not-configured" zonder dat te
+     herleiden was welke van de vier variabelen ontbrak. */
+  const gevallen: Array<{ naam: string; opzet: () => void; verwacht: string; geheim: string }> = [
+    { naam: "CRON_SECRET", opzet: () => vi.stubEnv("CRON_SECRET", "xyz"), verwacht: "CRON_SECRET", geheim: "xyz" },
+    { naam: "RESEND_API_KEY", opzet: () => vi.stubEnv("RESEND_API_KEY", ""), verwacht: "RESEND_API_KEY", geheim: "re_test" },
+    { naam: "CAMPAGNE_FROM leeg", opzet: () => vi.stubEnv("CAMPAGNE_FROM", ""), verwacht: "CAMPAGNE_FROM leeg", geheim: "juan@juandiazllc.com" },
+    {
+      naam: "CAMPAGNE_FROM sandbox",
+      opzet: () => vi.stubEnv("CAMPAGNE_FROM", "Test <onboarding@resend.dev>"),
+      verwacht: "CAMPAGNE_FROM is een @resend.dev",
+      geheim: "onboarding@resend.dev",
+    },
+    { naam: "SUPABASE_SECRET_KEY", opzet: () => { tabel.clientFaalt = true; }, verwacht: "SUPABASE_SECRET_KEY", geheim: "re_test" },
+  ];
+
+  for (const g of gevallen) {
+    it(`${g.naam} → 503 + één warn met de naam`, async () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      try {
+        g.opzet();
+        const res = await GET(req(`Bearer ${SECRET}`));
+        expect(res.status).toBe(503);
+        expect(await res.json()).toEqual({ ok: false, error: "not-configured" });
+        expect(warn).toHaveBeenCalledTimes(1);
+        const regel = String(warn.mock.calls[0][0]);
+        expect(regel).toContain("[scan-reeks] not-configured: " + g.verwacht);
+        // De waarde zelf, of het geheim uit de andere variabelen, staat er niet in.
+        expect(regel).not.toContain(g.geheim);
+        expect(regel).not.toContain(SECRET);
+        expect(fetchTeller.aanroepen).toBe(0);
+      } finally {
+        warn.mockRestore();
+      }
+    });
+  }
+
+  it("een gezonde configuratie logt niets", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const res = await GET(req(`Bearer ${SECRET}`));
+      expect(res.status).toBe(200);
+      expect(warn).not.toHaveBeenCalled();
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it("de sandbox-afzender wordt vóór de database geweigerd", async () => {
+    vi.stubEnv("CAMPAGNE_FROM", "x@resend.dev");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      await GET(req(`Bearer ${SECRET}`));
+      expect(tabel.dbBereikt).toBe(false);
+    } finally {
+      warn.mockRestore();
+    }
   });
 });
 
