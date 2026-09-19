@@ -430,10 +430,10 @@ herschreven, en deze notitie is de correctie erop.
 
 ### De meetketen — in blokkerende volgorde
 
-1. **Zes Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
-   `Pricing CTA`, `Sector CTA`, `Tool CTA`, `Contact Submitted` en
-   `Scan Voltooid`, plus de vier custom properties (`tier`, `sector`, `tool`,
-   `lekken`). Taggen is af en op productie
+1. **Zeven Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
+   `Pricing CTA`, `Sector CTA`, `Tool CTA`, `Contact Submitted`,
+   `Scan Voltooid` en `Uitslag Aangevraagd`, plus de vier custom properties (`tier`,
+   `sector`, `tool`, `lekken`). Taggen is af en op productie
    geverifieerd; zonder de doelen worden de kliks binnengehaald en weggegooid.
    **`Contact Submitted` stond tot 2026-08-24 op geen enkele lijst**, en het is
    het enige doel dat een conversie meet in plaats van een klik — precies het
@@ -10674,3 +10674,185 @@ ná de merges op main nagemeten in plaats van aangenomen: `typecheck`, `test`,
 `i18n`, `deps` en `docs-sync` groen, `Vercel` op success via `/status`, en
 `lighthouse` liep nog. `audit` staat niet in die lijst en dat hoort — die job
 hangt aan `pull_request` en draait op een push naar main niet.
+
+### 2026-09-19 — de scan krijgt een e-mailveld, en de opvang die het belooft staat nog uit
+
+Het leadmagneet-besluit van 22 augustus was bewust: geen e-mailveld op de
+lekkage-scan zolang er niets kan worden bezorgd. Dat besluit is niet
+teruggedraaid maar verplaatst. Het veld staat nu op het **uitslagscherm**,
+optioneel, ná de uitslag — de bezoeker krijgt zijn drie lekken hoe dan ook,
+en laat alleen een adres achter als hij de drie vervolgmails wil. Wat er
+bezorgd wordt staat woordelijk in de toestemmingstekst
+(`TOESTEMMING_TEKST` in `lib/scan-opvang.ts`): hooguit drie mails over deze
+lekken, met een afmeldlink onderaan elke mail.
+
+#### Wat er is gebouwd
+
+| stuk | waar | wat |
+|---|---|---|
+| zuivere helft | `lib/scan-opvang.ts` | constanten, `leesLekken()` (alleen `0..99`), `bouwMetadata()`; testbaar zonder mock |
+| server action | `app/actions/scan-opvang.ts` | honeypot → nep-ok, e-mailcontrole, **expliciete toestemming verplicht** (Telecommunicatiewet 11.7), insert in `marketing.subscribers` met `source = lekkage-scan` |
+| afmeldroute | `app/api/uitschrijven/route.ts` | GET met UUID-token uit `metadata.unsub_token`, idempotent op `metadata.unsubscribed_at`, redirect naar de scanpagina met `?uitgeschreven=klaar\|ongeldig` |
+| melding | `components/LekkageScan.tsx` | zevende Plausible-doel `Uitslag Aangevraagd`, eigenschap `lekken`, ref-gestuurd zodat het één keer per bezoek vuurt |
+
+**Geen DDL.** Campagne, toestemmingsmoment, toestemmingstekst, aantal lekken
+en afmeldtoken zitten in de bestaande `metadata`-jsonb. Het Supabase-datavlak
+geeft nog steeds 402, dus een migratie was vandaag sowieso niet toe te passen;
+maar ook zonder die blokkade is dit de juiste vorm — de selectie voor de drie
+mails is `source = 'lekkage-scan' and metadata->>'unsubscribed_at' is null`,
+en daar is geen kolom voor nodig.
+
+**De toestemmingstekst reist mee in de rij** (`consent_tekst` + `consent_at`).
+Wie later vraagt waar iemand precies mee heeft ingestemd, leest het uit de
+rij en niet uit een commit die inmiddels drie versies verder is.
+
+#### Eén regel die de poorten niet konden zien
+
+De eerste versie deed `.insert(...).select().single()`, precies zoals
+`app/actions/subscribe.ts`. Op 21 augustus is gemeten dat `anon` op
+`marketing.subscribers` **alleen INSERT** heeft — geen SELECT, nergens. En
+`.select()` na een insert vraagt PostgREST om `RETURNING *`, wat SELECT
+vergt. Bij een echte inzending had dat 42501 gegeven, de rij teruggedraaid,
+en de bezoeker `form.err.generic` getoond terwijl elke test groen stond: de
+mock-client geeft terug wat je hem vraagt.
+
+Nu een kale insert, dezelfde vorm als `app/actions/contact.ts` — het enige
+pad dat op 20 augustus end-to-end is gelopen. **Niet gemeten**, want het
+datavlak geeft 402; het staat hier als redenering uit de gemeten grants, niet
+als waarneming.
+
+**`subscribe.ts` draagt dezelfde `.select().single()`**, en
+`marketing.subscribers` telt nul rijen ooit. Dat is verenigbaar met "niemand
+heeft zich ooit aangemeld" én met "elke aanmelding faalde op RETURNING". Het
+nieuwsbriefformulier is nooit end-to-end gelopen. Niet in deze PR gerepareerd;
+het is een ander formulier en hoort een eigen meting te krijgen zodra de 402
+eraf is.
+
+#### Wat de poorten wél zagen
+
+`lib/contactadressen.test.ts` viel meteen om op `you@domain.com` in het nieuwe
+e-mailveld. Terecht: de placeholder is een adres buiten het eigen domein, en de
+twee zusterformulieren dragen daar elk een uitzondering met aantal voor. Die
+staat er nu ook voor `LekkageScan.tsx` — en niet als normalisatie in de poort,
+want een placeholder die stil een echt vreemd adres wordt is precies wat hij
+moet zien.
+
+`lib/plausible-doelen.test.ts` dwong de zevende doelnaam af in
+`MANUAL_TASKS.md` en `CLAUDE.md`, en `lib/i18n/kale-tekst.test.ts` de nieuwe
+sleutels in vier talen. Beide zonder eigen handeling: de poorten gingen rood
+en de bestanden volgden.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1582 tests in 82 bestanden (was 1565/81)
+i18n:check               743 sleutels x 4 (was 741 — +form.ok.scan, +form.err.consent)
+regen:pricing:check      groen
+next build               exit 0; /api/uitschrijven en de scanpagina compileren
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+De scanpagina is `ƒ` (dynamisch) in de build-uitvoer omdat hij `searchParams`
+leest voor de afmeldstatus. Dat verandert niets aan wat de bezoeker krijgt —
+de nonce-CSP in `proxy.ts` rendert elke pagina al per verzoek (zie 21
+augustus).
+
+#### Wat dit niet doet, en dat is de hele funnel
+
+**Er komt vandaag geen rij aan en er gaat geen mail uit.** Drie blokkades,
+alle drie op de operator-lijst bovenaan dit bestand:
+
+1. **Supabase 402** — de insert bereikt de database niet; de bezoeker krijgt
+   `form.err.generic`. De afmeldroute geeft om dezelfde reden 503 zolang
+   `SUPABASE_SERVICE_ROLE_KEY` niet gezet is.
+2. **`RESEND_API_KEY` + `ACK_FROM`** — de drie vervolgmails bestaan als
+   belofte in de toestemmingstekst en nergens als code. Ze zijn bewust niet
+   geschreven zolang niets ze kan versturen: een mail-template zonder
+   verzendpad is een tweede lijst die uit de pas gaat lopen met de belofte.
+3. **Het zevende Plausible-doel** `Uitslag Aangevraagd` bestaat niet in het
+   dashboard; het wordt vanaf deze commit verstuurd en weggegooid, net als
+   de zes ervoor.
+
+Zolang 1 openstaat is de UI eerlijk: het veld is optioneel, de uitslag staat
+er al, en een mislukte inzending kost de bezoeker niets behalve de belofte
+van drie mails die hij niet krijgt. Dat is de reden dat het veld ná de
+uitslag staat en niet ervoor.
+
+### 2026-09-19 (vervolg) — twee halve peer-pins, en een "failed deploy" die geen productie was
+
+Vier PR's rond één merge. #353 (het e-mailveld op de scan) ging als
+`14cc3a4` naar main; daarna de Dependabot-stapel.
+
+#### Wat er gemerged is
+
+| | wat | commit |
+|---|---|---|
+| #354 | minor-en-patch-groep, 12 pakketten (o.a. `@sentry/node` 10.74, `@supabase/ssr`) | `a23bfb5` |
+| #355 | `vitest` + `@vitest/coverage-v8` **samen** naar 5.0.0, plus een Dependabot-groep | `7110a42` |
+
+#350 en #351 zijn door #355 gesloten. Nul open Dependabot-PR's.
+
+#### Waarom #350 en #351 allebei rood stonden, en dat is geen defect van vitest 5
+
+`@vitest/coverage-v8@X` heeft een **exacte** peer-pin op `vitest@X`.
+Dependabot bood de twee majors als losse PR's aan: #350 bumpte alleen
+coverage-v8, #351 alleen vitest. Elk apart is per constructie niet
+installeerbaar — `npm ci` viel op beide om met `ERESOLVE`, en daarmee
+stonden typecheck, test en deps rood en de Vercel-preview op ERROR.
+
+De reparatie is niet "wacht op een fix" maar de twee in één PR zetten.
+Gemeten lokaal en in CI op vitest 5.0.0: 1582 tests in 82 bestanden groen,
+`tsc` 0, `audit:deps` 0 advisories. Er hoefde geen regel test te wijzigen.
+
+**Waarom het terugkomt zonder ingreep.** `groups` in `dependabot.yml`
+kende alleen `minor-en-patch`; een major buiten een groep komt altijd als
+losse PR. Elke volgende vitest-major had dus opnieuw twee onmergebare
+PR's opgeleverd. Er staat nu een groep `vitest` (`vitest`, `@vitest/*`,
+update-type `major`) met de meting als reden erbij. `config-poorten` en
+`typescript-pin` lezen dat bestand en bleven groen.
+
+Dezelfde vorm geldt voor elk paar met een exacte peer-pin — eslint en
+zijn plugins, react en react-dom. Die hebben hier nog geen groep; dat is
+pas werk zodra zo'n major zich aandient.
+
+#### "Vercel deploy failed", tweemaal gemeld, tweemaal een preview
+
+Juan meldde twee keer een mislukte deploy. Beide keren gemeten via
+`commits/<sha>/status` én de Vercel-deploymentlijst: **elke
+productie-deploy van vandaag staat op READY** — `7671a49`, `14cc3a4`,
+`a23bfb5`, `7110a42`. Wat er op ERROR stond waren vier
+**preview**-deploys van de Dependabot-takken:
+
+| deploy | tak | waarom |
+|---|---|---|
+| `dpl_CT62b4…` · `dpl_4auWyJ…` | #351 / #350, eerste push | ERESOLVE |
+| `dpl_CpW5zZ…` · `dpl_FgHFAK…` | #350 / #351, **gerebased** door Dependabot na de merge van #354 | ERESOLVE, opnieuw |
+
+Die tweede rij verklaart de tweede melding: Dependabot rebaset zijn open
+takken automatisch zodra main beweegt, en elke rebase is een nieuwe
+preview-build die op dezelfde peer-pin omvalt. Dat hield op zodra #355 de
+twee PR's sloot; de takken zijn weg.
+
+**Lees bij een "failed" in de Vercel-lijst eerst de kolom `target`.**
+Een preview (`target: null`) zegt niets over de site; alleen
+`target: production` op een main-sha telt. De lijst sorteert op tijd, dus
+een kapotte preview van een tak die niemand gaat mergen staat bovenaan,
+boven de gezonde productie-deploy eronder.
+
+#### Meting
+
+```
+tsc --noEmit             exit 0
+vitest run               1582 tests in 82 bestanden (vitest 5.0.0)
+audit:deps               0 advisories, 0 uitzonderingen
+config-poorten + typescript-pin   18/18 groen
+Vercel production 7110a42         READY
+cmp CLAUDE.md AGENTS.md  byte-identiek
+```
+
+#### Wat dit niet doet
+
+Geen operator-taak opgelost. De Supabase-402, `RESEND_API_KEY` + `ACK_FROM`,
+het zevende Plausible-doel en de rest van de lijst bovenaan dit bestand
+staan onveranderd open.

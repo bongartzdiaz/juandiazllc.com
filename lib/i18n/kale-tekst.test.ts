@@ -171,6 +171,8 @@ const TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
       "Waar lekt het bij jou?",
       "De omzet lekt zelden in de markt. Hij lekt tussen de tools — in de overdracht naar de buitendienst, in de dagen tussen aanvraag en offerte, in het adres dat voor de derde keer wordt overgetypt.",
       "vragen, en je weet welke drie bij jou het eerst lekken.",
+      "Je staat uitgeschreven. Er komt geen mail meer.",
+      "Deze afmeldlink werkt niet meer. Mail",
     ],
   },
   "components/LekkageScan.tsx": {
@@ -180,7 +182,10 @@ const TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
       "Lekkage-scan",
       "juandiazllc.com/nl/tools/lekkage-scan ·",
       "Neem deze uitslag mee",
-      "Eén pagina met jouw antwoorden erop. Geen e-mailadres, geen account, geen lijst waar je op komt — je bewaart hem zelf, en je kunt hem doorsturen naar wie er bij jou over gaat.",
+      "Eén pagina met jouw antwoorden erop. Je bewaart hem zelf, en je kunt hem doorsturen naar wie er bij jou over gaat.",
+      "Wil je er de komende weken drie mails over? Per lek één: wat het kost, wat je er zelf aan kunt doen, en wanneer het tijd is voor hulp. Laat dan hieronder je adres achter. Zonder vinkje gebeurt er niets.",
+      "E-mailadres",
+      "Website",
       "Opslaan of printen",
       "Liever direct?",
       "Toon wat er lekt",
@@ -349,6 +354,12 @@ const ATTR_TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
     reden: "Rendert alleen op /nl, dus Nederlands is hier de keuze -- ENKELE_TAAL.",
     tekst: ["aria-label=Lekkage-scan"],
   },
+  "components/LekkageScan.tsx": {
+    reden:
+      "Derde vormvoorbeeld van een adres, in het opvangformulier op het " +
+      "uitslagscherm. Leest in elke taal hetzelfde.",
+    tekst: ["placeholder=you@domain.com"],
+  },
 };
 
 /* Kopij-als-prop, gemeten en niet gerepareerd. */
@@ -473,8 +484,12 @@ describe("de vrijstellingen dragen hun eigen voorwaarde", () => {
     expect(lijst?.[1].trim()).toBe("");
   });
 
-  it("de twee honeypots staan nog achter aria-hidden", () => {
-    for (const pad of ["components/ContactForm.tsx", "components/NewsletterForm.tsx"]) {
+  it("de drie honeypots staan nog achter aria-hidden", () => {
+    for (const pad of [
+      "components/ContactForm.tsx",
+      "components/NewsletterForm.tsx",
+      "components/LekkageScan.tsx",
+    ]) {
       const bron = readFileSync(join(WORTEL, pad), "utf8");
       expect(bron, pad).toContain('<div className="hp-field" aria-hidden="true">');
     }

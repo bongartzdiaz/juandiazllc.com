@@ -5,10 +5,13 @@
  *
  * DRIE DINGEN DIE OPZET ZIJN, ZODAT NIEMAND ZE "REPAREERT":
  *
- * 1. Geen e-mailveld. docs/lead-magnet.md §4 zet de e-mail achter de
- *    PDF-variant, en die wacht op RESEND_API_KEY. Een veld dat vandaag een PDF
- *    belooft is precies de gebroken belofte waar §4 voor waarschuwt. De opvang
- *    loopt via de contactroute hieronder, en die is meetbaar: elke lead draagt
+ * 1. Het e-mailveld is OPTIONEEL en staat pas op het uitslagscherm. De scan
+ *    zelf blijft zonder adres te doen; wie zijn adres achterlaat vraagt om
+ *    hooguit drie mails over zijn eigen lekken, met een aangevinkt vakje als
+ *    toestemming (Telecommunicatiewet 11.7). De actie schrijft naar
+ *    marketing.subscribers met source=lekkage-scan; zie app/actions/scan-opvang.ts.
+ *    Er belooft niets een PDF, dus er is geen belofte die op RESEND_API_KEY
+ *    wacht. De contactroute hieronder blijft ernaast staan en draagt
  *    `interest=lekkage-scan` in `source`.
  * 2. De kopij is hardgecodeerd Nederlands, niet via dict.ts. De pagina bestaat
  *    alleen op /nl (zie lib/i18n/enkele-taal.ts) — zelfde precedent als
@@ -23,10 +26,12 @@
  *    getal nu niet bij de hand heeft moet de scan gewoon kunnen afmaken. Een
  *    leeg veld levert dan ook niets op in de uitslag: geen nul, geen aanname. */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { LocaleLink } from "@/components/LocaleLink";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/lib/seo/branding";
-import { useT } from "@/lib/i18n/useT";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { vraagUitslagAan, type ScanOpvangState } from "@/app/actions/scan-opvang";
+import { TOESTEMMING_TEKST, TOESTEMMING_WAARDE } from "@/lib/scan-opvang";
 import {
   AANTAL_WOORD,
   AANTAL_WOORD_HOOFD,
@@ -40,7 +45,7 @@ import {
 } from "@/lib/lekkage-scan";
 
 export function LekkageScan() {
-  const t = useT();
+  const { locale, t } = useLocale();
   const [antwoorden, setAntwoorden] = useState<Antwoorden>({});
   const [metingen, setMetingen] = useState<Metingen>({});
   const [getoond, setGetoond] = useState(false);
@@ -100,6 +105,31 @@ export function LekkageScan() {
       w.plausible("Scan Voltooid", { props: { lekken: String(lekken.length) } });
     }
   }, [getoond, compleet, lekken.length]);
+
+  /* De optionele opvang. Het formulier post naar een server action; de
+     uitkomst komt terug als state en rendert onder het veld. Zevende
+     Plausible-doel `Uitslag Aangevraagd`, met dezelfde eigenschap `lekken`,
+     zodat een aanvraag met vier lekken te scheiden is van een met nul.
+     Zelfde ref-guard als hierboven: eenmaal per geslaagde inzending. */
+  const [opvang, opvangActie, opvangBezig] = useActionState(vraagUitslagAan, {
+    status: "idle",
+  } as ScanOpvangState);
+  const aangevraagdGemeld = useRef(false);
+
+  useEffect(() => {
+    if (opvang.status !== "ok") {
+      aangevraagdGemeld.current = false;
+      return;
+    }
+    if (aangevraagdGemeld.current) return;
+    aangevraagdGemeld.current = true;
+    const w = window as unknown as {
+      plausible?: (event: string, opts?: { props?: Record<string, string> }) => void;
+    };
+    if (typeof w.plausible === "function") {
+      w.plausible("Uitslag Aangevraagd", { props: { lekken: String(lekken.length) } });
+    }
+  }, [opvang.status, lekken.length]);
 
   function kies(id: string, waarde: boolean) {
     setAntwoorden((vorig) => ({ ...vorig, [id]: waarde }));
@@ -268,10 +298,54 @@ export function LekkageScan() {
           <div className="scan-bewaar">
             <h3>Neem deze uitslag mee</h3>
             <p>
-              Eén pagina met jouw antwoorden erop. Geen e-mailadres, geen
-              account, geen lijst waar je op komt — je bewaart hem zelf, en je
+              Eén pagina met jouw antwoorden erop. Je bewaart hem zelf, en je
               kunt hem doorsturen naar wie er bij jou over gaat.
             </p>
+            <p>
+              Wil je er de komende weken drie mails over? Per lek één: wat het
+              kost, wat je er zelf aan kunt doen, en wanneer het tijd is voor
+              hulp. Laat dan hieronder je adres achter. Zonder vinkje gebeurt
+              er niets.
+            </p>
+            <form className="nl-form scan-opvang" action={opvangActie}>
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="lekken" value={String(lekken.length)} />
+              <label className="sr-only" htmlFor="scan-email">
+                E-mailadres
+              </label>
+              <input
+                id="scan-email"
+                name="email"
+                type="email"
+                placeholder="you@domain.com"
+                required
+                autoComplete="email"
+              />
+              <label className="scan-toestemming">
+                <input
+                  type="checkbox"
+                  name="toestemming"
+                  value={TOESTEMMING_WAARDE}
+                />
+                <span>{TOESTEMMING_TEKST}</span>
+              </label>
+              <div className="hp-field" aria-hidden="true">
+                <label htmlFor="scan-website">Website</label>
+                <input
+                  id="scan-website"
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
+              <button type="submit" className="btn primary" disabled={opvangBezig}>
+                {opvangBezig ? "Bezig…" : "Stuur me de drie mails"}
+              </button>
+              {opvang.status !== "idle" && (
+                <div className={`nl-msg ${opvang.status}`}>{opvang.message}</div>
+              )}
+            </form>
             <button
               type="button"
               className="btn"
@@ -290,11 +364,8 @@ export function LekkageScan() {
             <LocaleLink href="/contact?interest=lekkage-scan" className="btn primary">
               {t("cta.book")}
             </LocaleLink>
-            {/* De directe route staat er bewust naast. Het formulier achter
-                /contact schrijft op dit moment niets weg (Supabase 402), dus
-                wie nu converteert krijgt een foutmelding. Mailen werkt altijd.
-                Zie de operator-lijst in CLAUDE.md; deze regel mag weg zodra
-                het datavlak weer schrijft. */}
+            {/* De directe route staat er bewust naast: wie liever mailt dan
+                een formulier invult, moet dat kunnen zonder te zoeken. */}
             <p className="scan-cta-direct">
               Liever direct? <a href={CONTACT_MAILTO}>{CONTACT_EMAIL}</a>
             </p>
