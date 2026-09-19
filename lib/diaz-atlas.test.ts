@@ -225,7 +225,11 @@ describe("de operator-lijst, zolang hij dit dossier draagt", () => {
     // Zonder deze controle slaagt alles hieronder ook op een lege string, en
     // dan meet de poort niets terwijl hij groen staat.
     expect(LIJST).toContain("### SEO-instrumenten");
-    expect(LIJST.length).toBeLessThan(OPERATOR.length / 4);
+    // Het snijden zelf: de lijst stopt bij de volgende kop van niveau twee
+    // en is dus korter dan het bestand. Geen verhouding -- sinds 2026-09-19
+    // woont het logboek in docs/logboek.md en is de lijst het grootste blok.
+    expect(LIJST).not.toMatch(/^## /m);
+    expect(LIJST.length).toBeLessThan(OPERATOR.length);
   });
 
   it("draagt de sectie hooguit een keer", () => {
