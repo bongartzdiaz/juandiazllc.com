@@ -285,3 +285,56 @@ describe("per rij", () => {
     expect(String(body.htmlContent)).toContain("/api/uitschrijven?token=");
   });
 });
+
+/* De ROI-mail loopt in dezelfde run, na de scan-reeks, met dezelfde telling. */
+
+function roiRij(id: string, extra: Record<string, unknown> = {}): Rij {
+  return {
+    id,
+    email: `${id}@voorbeeld.test`,
+    source: "energy-roi",
+    metadata: {
+      locale: "nl",
+      consent_at: consentVanaf(0),
+      unsub_token: `10000000-0000-4000-8000-0000000000${id.charCodeAt(0) % 90 + 10}`,
+      roi: { consumption: 3500, withBattery: 0, savingsNoBat: 441, paybackNoBat: 11.3 },
+      ...extra,
+    },
+  };
+}
+
+describe("energy-roi: één mail per rij", () => {
+  it("stuurt, stempelt, en is idempotent — naast de scan-reeks in dezelfde telling", async () => {
+    tabel.rijen = [rij("a", 0), roiRij("r"), roiRij("s", { verzonden: consentVanaf(1) })];
+    const res = await GET(req(`Bearer ${SECRET}`));
+    expect(await res.json()).toEqual({ ok: true, bekeken: 3, verzonden: 2, overgeslagen: 1, mislukt: 0 });
+    expect(fetchTeller.naar.sort()).toEqual(["a@voorbeeld.test", "r@voorbeeld.test"]);
+    expect(typeof tabel.rijen[1].metadata.verzonden).toBe("string");
+
+    stubFetch();
+    const res2 = await GET(req(`Bearer ${SECRET}`));
+    expect(await res2.json()).toMatchObject({ verzonden: 0, overgeslagen: 3 });
+  });
+
+  it("zonder token of zonder getallen: mislukt, niet gemaild", async () => {
+    tabel.rijen = [roiRij("r", { unsub_token: undefined }), roiRij("s", { roi: undefined })];
+    const res = await GET(req(`Bearer ${SECRET}`));
+    expect(await res.json()).toMatchObject({ verzonden: 0, mislukt: 2 });
+    expect(fetchTeller.aanroepen).toBe(0);
+    expect(tabel.updates).toBe(0);
+  });
+
+  it("de mail staat in de taal van de rij en draagt de berekening en de afmeldlink", async () => {
+    tabel.rijen = [roiRij("r", { locale: "de" })];
+    let body: Record<string, unknown> = {};
+    vi.stubGlobal("fetch", async (_u: unknown, init?: RequestInit) => {
+      body = JSON.parse(String(init?.body));
+      return new Response("{}", { status: 201 });
+    });
+    await GET(req(`Bearer ${SECRET}`));
+    expect(String(body.htmlContent)).toContain('lang="de"');
+    expect(String(body.textContent)).toContain("3.500");
+    expect(String(body.textContent)).toContain("/api/uitschrijven?token=");
+    expect(String(body.subject)).toContain("11,3");
+  });
+});

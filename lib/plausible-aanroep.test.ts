@@ -74,6 +74,7 @@ const BRONNEN = MAPPEN.flatMap((m) => bronBestanden(join(WORTEL, m))).map((pad) 
 const AANROEPERS: Record<string, string> = {
   "components/ContactForm.tsx": "Contact Submitted -- de conversie na een geslaagde inzending",
   "components/LekkageScan.tsx": "Scan Voltooid -- de afronding van de lekkage-scan",
+  "components/calculators/EnergyRoi.tsx": "Berekening Aangevraagd -- het opgegeven adres onder de ROI-uitkomst (2026-09-20)",
 };
 
 /** Elke aanroep op een `.plausible`-lid, met of zonder optionele vorm. */

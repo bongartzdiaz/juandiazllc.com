@@ -64,6 +64,10 @@ const UITZONDERINGEN: Record<string, { aantal: number; reden: string }> = {
     aantal: 1,
     reden: "Placeholder in het e-mailveld, geen bestaand adres.",
   },
+  "components/calculators/EnergyRoi.tsx:you@domain.com": {
+    aantal: 1,
+    reden: "Placeholder in het e-mailveld van de ROI-opvang (2026-09-20), geen bestaand adres.",
+  },
 };
 
 function bestanden(map: string): string[] {
