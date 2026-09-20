@@ -6,6 +6,7 @@ import { capField, isPlausibleEmail } from "@/lib/forms/limits";
 import { translate } from "@/lib/i18n/dict";
 import { readLocale } from "@/lib/i18n/form-locale";
 import { SCAN_BRON, TOESTEMMING_WAARDE, bouwMetadata, leesLekken } from "@/lib/scan-opvang";
+import { TOESTEMMING_TEKSTEN, isScanTaal } from "@/lib/lekkage-scan-taal";
 
 /* Opvang na de lekkage-scan.
  *
@@ -56,7 +57,16 @@ export async function vraagUitslagAan(
       .insert({
         email,
         source: SCAN_BRON,
-        metadata: bouwMetadata({ locale, lekken, nu: new Date(), token: randomUUID() }),
+        metadata: bouwMetadata({
+          locale,
+          lekken,
+          nu: new Date(),
+          token: randomUUID(),
+          // De tekst die de bezoeker werkelijk zag. Buiten de drie scantalen
+          // kan dit formulier niet renderen; valt het toch zo binnen, dan
+          // staat er de Nederlandse, dezelfde als vóór 2026-09-20.
+          consentTekst: TOESTEMMING_TEKSTEN[isScanTaal(locale) ? locale : "nl"],
+        }),
       });
     // Bewust geen .select(): anon heeft op marketing.subscribers alleen INSERT
     // (gemeten 2026-08-21), en RETURNING vergt SELECT. Dezelfde vorm als

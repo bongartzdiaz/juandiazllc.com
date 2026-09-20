@@ -58,12 +58,15 @@ export function bouwMetadata(invoer: {
   lekken: number | null;
   nu: Date;
   token: string;
+  /** De toestemmingstekst zoals de bezoeker hem zag. Sinds 2026-09-20 in
+   *  drie talen (lib/lekkage-scan-taal.ts); zonder opgave de Nederlandse. */
+  consentTekst?: string;
 }): ScanMetadata {
   return {
     locale: invoer.locale,
     campagne: SCAN_CAMPAGNE,
     consent_at: invoer.nu.toISOString(),
-    consent_tekst: TOESTEMMING_TEKST,
+    consent_tekst: invoer.consentTekst ?? TOESTEMMING_TEKST,
     lekken: invoer.lekken,
     unsub_token: invoer.token,
   };

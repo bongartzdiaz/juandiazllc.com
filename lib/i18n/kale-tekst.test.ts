@@ -164,53 +164,6 @@ const TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
       "Go home",
     ],
   },
-  "app/[locale]/tools/lekkage-scan/page.tsx": {
-    reden: "Bestaat bewust alleen op /nl — zie ENKELE_TAAL.",
-    tekst: [
-      "Gratis · vier minuten · geen e-mail",
-      "Waar lekt het bij jou?",
-      "De omzet lekt zelden in de markt. Hij lekt tussen de tools — in de overdracht naar de buitendienst, in de dagen tussen aanvraag en offerte, in het adres dat voor de derde keer wordt overgetypt.",
-      "vragen, en je weet welke drie bij jou het eerst lekken.",
-      "Je staat uitgeschreven. Er komt geen mail meer.",
-      "Deze afmeldlink werkt niet meer. Mail",
-    ],
-  },
-  "components/LekkageScan.tsx": {
-    reden: "Rendert alleen op /nl/tools/lekkage-scan — zie ENKELE_TAAL.",
-    tekst: [
-      "Optioneel. Sla over als je het nu niet kunt opzoeken.",
-      "Lekkage-scan",
-      "juandiazllc.com/nl/tools/lekkage-scan ·",
-      "Neem deze uitslag mee",
-      "Eén pagina met jouw antwoorden erop. Je bewaart hem zelf, en je kunt hem doorsturen naar wie er bij jou over gaat.",
-      "Wil je er de komende weken drie mails over? Per lek één: wat het kost, wat je er zelf aan kunt doen, en wanneer het tijd is voor hulp. Laat dan hieronder je adres achter. Zonder vinkje gebeurt er niets.",
-      "E-mailadres",
-      "Website",
-      "Opslaan of printen",
-      "Liever direct?",
-      "Toon wat er lekt",
-      "Deze scan ziet niets lekken.",
-      "Dat is een echte uitkomst en geen beleefdheid.",
-      "ja/nee-vragen vinden de lekken die met overdracht, wachttijd, dubbele invoer en overlappende tools te maken hebben. Zitten die goed, dan zit je probleem ergens anders.",
-      "van de",
-      "vragen onder",
-      "Wat je zelf hebt gemeten",
-      "Dit zijn de enige getallen in deze scan die over jouw bedrijf gaan, en je hebt ze zelf opgezocht. Alles hierboven is een ja of een nee.",
-      "Wat deze scan niet ziet",
-      "Geen marge per project, geen kwaliteit van de instroom, geen bezetting, en niets over of je mensen een nieuw systeem zouden gebruiken.",
-      "ja/nee-vragen dragen hun eigen reikwijdte, en dit is hem.",
-      "Wil je dit nagelopen hebben op je eigen cijfers in plaats van op",
-      "vragen? Dat is het blueprint-gesprek: dertig minuten, en er komt een diagnose van één pagina uit.",
-    ],
-  },
-  "components/ScanCallout.tsx": {
-    reden: "Poortert zelf op ENKELE_TAAL en rendert dus alleen op /nl.",
-    tekst: [
-      "◉ Vier minuten",
-      "ja/nee-vragen over je stack, en je ziet welke drie dingen bij jou het eerst lekken. Geen e-mail, geen verkooppraat — de uitslag staat meteen op je scherm.",
-      "Doe de lekkage-scan",
-    ],
-  },
   "components/ContactForm.tsx": {
     reden:
       "Honeypot: staat in een div met aria-hidden=true en wordt door geen " +
@@ -219,6 +172,14 @@ const TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
     tekst: [
       "Website (leave blank)",
     ],
+  },
+  "components/LekkageScan.tsx": {
+    reden:
+      "Honeypot in het optionele e-mailveld van de scan, zelfde constructie als " +
+      "in ContactForm: aria-hidden, tabIndex -1, alleen de bot leest het. Alle " +
+      "andere kopij van dit component komt sinds 2026-09-20 uit " +
+      "lib/lekkage-scan-taal.ts, in drie talen.",
+    tekst: ["Website"],
   },
   "components/NewsletterForm.tsx": {
     reden:
@@ -365,18 +326,6 @@ const ATTR_TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
       "Zelfde vormvoorbeeld als in ContactForm: het toont de vorm van een " +
       "adres en leest in elke taal hetzelfde.",
     tekst: ["placeholder=you@domain.com"],
-  },
-  "components/ScanCallout.tsx": {
-    reden: "Rendert alleen op /nl, dus Nederlands is hier de keuze -- ENKELE_TAAL.",
-    tekst: ["aria-label=Lekkage-scan"],
-  },
-  "components/LekkageScan.tsx": {
-    reden:
-      "Vormvoorbeeld van een adres, in het opvangformulier op het " +
-      "uitslagscherm. Nederlands, want de pagina bestaat alleen op /nl " +
-      "(lib/i18n/enkele-taal.ts) en een Engels voorbeeld las daar als een " +
-      "vergeten vertaling.",
-    tekst: ["placeholder=jij@bedrijf.nl"],
   },
   "components/calculators/EnergyRoi.tsx": {
     reden:

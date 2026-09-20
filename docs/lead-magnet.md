@@ -362,3 +362,158 @@ Precies de klasse waar dit logboek het meest aan overhoudt: een commentaar dat
 een gedrag beschrijft dat er niet is. Wie het leest zoekt de opvang in de
 verkeerde tabel — en die tabel bestaat niet, dus hij vindt niets en concludeert
 dat er niets binnenkomt.
+
+## §9 — Dezelfde scan voor EN en DE (2026-09-20)
+
+Beslist door Juan op 2026-09-20: de lekkage-scan ook voor Engels en Duits, als
+tweede leadmagneet naast de ROI-rekenmachine. Route: `/en/tools/leak-scan` en
+`/de/tools/leak-scan` — een eigen slug, want "lekkage-scan" op een Engelse
+pagina is geen vertaling. Spaans krijgt niets: daar is geen cluster en geen
+bewijs. Welke talen de route draagt staat in `lib/i18n/enkele-taal.ts`.
+
+**Wat er níet verandert.** De zestien vragen, de vier blokken, het
+scoremechanisme, de ene grens (HBR 2011, één uur) en de opvang zijn dezelfde
+als in §2 tot en met §4. De vragen zijn taal- en sectoronafhankelijk: ze gaan
+over de vórm van het lek (`docs/bereik-plan.md` §2), en de ene bron eronder is
+Amerikaans onderzoek. `lib/lekkage-scan-taal.ts` legt de vertaling over de
+Nederlandse structuur heen en `lib/lekkage-scan-taal.test.ts` meet dat de drie
+talen dezelfde ids, dezelfde metingen en dezelfde grenswaarde dragen. Wat hier
+staat is dezelfde afspraak als voor §2: elke vraag hieronder moet letterlijk
+gelijk zijn aan de code, en de test valt om als dat niet zo is.
+
+**Wat wél per taal is.** De kopij om de vragen heen (hero, uitslag, toestemming,
+placeholders), de drie mails van de reeks en de bestemming van de afmeldlink.
+Een rij in `marketing.subscribers` draagt zijn taal in `metadata.locale`; een rij
+zonder taal is Nederlands, zoals elke rij van vóór deze datum. Duits spreekt met
+Sie. De consenttekst die bij de rij wordt opgeslagen is die van de taal waarin
+hij is aangevinkt (`consent_tekst`).
+
+### §9.1 — De vragen in het Engels
+
+#### Blok A — Handover
+*3.2× pipeline velocity, once field and office shared one deal status.*
+
+**A1. Can your field team see the status of an open request without calling someone?**
+→ If no, every status change travels through a person. Every handover is a moment it can stall, and you can't see which one it was.
+
+**A2. Does the office know within an hour that a site visit is done?**
+→ If no, the quote starts only when someone happens to hear about it. That wait is written down nowhere, so it never gets shorter.
+
+**A3. Is the current status of a deal in one place, and not in several systems side by side?**
+→ If several, there is no answer to "where does this stand", only opinions. Who was right shows up at the complaint.
+
+**A4. Can a colleague take over the open requests of a sick technician without a handover meeting?**
+→ If no, the status sits in a head. Sickness, holiday and resignation are then the same risk under a different name.
+
+
+#### Blok B — Response time
+*−61% time-to-quote, after automating intake → site visit → proposal.*
+
+**B1. Do you know how many hours, on average, sit between request and quote?**
+→ If no, you can't shorten that time, because you wouldn't see the improvement.
+
+**B2. Does a quote go out without someone retyping data from another system?**
+→ If no, you pay twice: the time spent retyping, and the errors that creep in and only show at the customer.
+
+**B3. Does an enquirer get a reply within 24 hours, including at weekends and in a holiday week?**
+→ If no, your response time is a function of who happens to be working. Meanwhile the enquirer calls the next one.
+
+**B4. Can you see which step in the process takes the most time?**
+→ If no, you improve on gut feel, and gut feel points at the step that complains loudest — rarely the step that takes longest.
+
+**B5. Can you show a customer a drawing or calculation within a week, even when the colleague who makes it is away?**
+→ If no, your lead time is one person's calendar. The customer experiences that as silence, and you only notice when they don't call back.
+
+
+#### Blok C — Double entry
+*+38% lead-to-conversation, after replacing four tools with one CRM plus a WhatsApp flow.*
+
+**C1. Is the name and address of a new enquiry typed only once?**
+→ If no, two versions of the same customer exist immediately, and nothing decides which one is real.
+
+**C2. Are WhatsApp conversations with customers stored somewhere a colleague can find them?**
+→ If no, the customer history sits on a private phone. When that person leaves, it walks out the door.
+
+**C3. Does an enquiry from your website land automatically in the system you work in?**
+→ If no, the enquiry exists only once someone copies it over, and there is no alarm on that step.
+
+**C4. Do you know, for every lead, where it came from?**
+→ If no, every statement about what works is a guess. You then stop the channel that is least loud, not the one that yields least.
+
+
+#### Blok D — Stacked costs
+*€0 extra SaaS spend — the tools switched off paid for the rebuild.*
+
+**D1. Do you know off the top of your head how many software subscriptions you have and what they cost per month together?**
+→ If no, that stack grows one loose decision at a time, and nobody ever decides to let it grow.
+
+**D2. Is there a tool you pay for that someone opens less than once a week?**
+→ If yes, you pay for a habit nobody has any more. That is the cheapest saving there is, and the easiest to forget.
+
+**D3. When an employee leaves, can you revoke all their access within a day?**
+→ If no, your stack is a security problem too, not just a cost line.
+
+### §9.2 — Die Fragen auf Deutsch
+
+#### Blok A — Übergabe
+*3,2× Pipeline-Geschwindigkeit, sobald Außendienst und Büro denselben Deal-Status teilten.*
+
+**A1. Kann Ihr Außendienst den Status einer laufenden Anfrage sehen, ohne jemanden anzurufen?**
+→ Bei Nein reist jede Statusänderung über einen Menschen. Jede Übergabe ist ein Moment, an dem sie liegen bleiben kann, und Sie sehen nicht, welcher es war.
+
+**A2. Weiß das Büro innerhalb einer Stunde, dass eine Besichtigung abgeschlossen ist?**
+→ Bei Nein beginnt das Angebot erst, wenn jemand zufällig davon hört. Diese Wartezeit steht nirgends, also wird sie auch nie kürzer.
+
+**A3. Steht der aktuelle Status eines Deals an einer Stelle, und nicht in mehreren Systemen nebeneinander?**
+→ Bei mehreren gibt es keine Antwort auf "wie steht es", nur Meinungen. Wer recht hatte, zeigt sich bei der Beschwerde.
+
+**A4. Kann ein Kollege die laufenden Anfragen eines kranken Monteurs ohne Übergabegespräch übernehmen?**
+→ Bei Nein sitzt der Status in einem Kopf. Krankheit, Urlaub und Kündigung sind dann dasselbe Risiko unter anderem Namen.
+
+
+#### Blok B — Reaktionszeit
+*−61 % Zeit bis zum Angebot, nach Automatisierung von Anfrage → Besichtigung → Vorschlag.*
+
+**B1. Wissen Sie, wie viele Stunden im Schnitt zwischen Anfrage und Angebot liegen?**
+→ Bei Nein können Sie diese Zeit nicht verkürzen, denn Sie würden die Verbesserung nicht sehen.
+
+**B2. Geht ein Angebot raus, ohne dass jemand Daten aus einem anderen System abtippt?**
+→ Bei Nein zahlen Sie doppelt: die Zeit fürs Abtippen, und die Fehler, die sich einschleichen und erst beim Kunden auffallen.
+
+**B3. Bekommt ein Anfragender innerhalb von 24 Stunden eine Antwort, auch am Wochenende oder in einer Urlaubswoche?**
+→ Bei Nein ist Ihre Reaktionszeit eine Funktion davon, wer gerade arbeitet. Der Anfragende ruft derweil den Nächsten an.
+
+**B4. Können Sie sehen, welcher Schritt im Ablauf die meiste Zeit kostet?**
+→ Bei Nein verbessern Sie nach Gefühl, und das Gefühl zeigt auf den Schritt, der am lautesten klagt — selten auf den, der am längsten dauert.
+
+**B5. Können Sie einem Kunden innerhalb einer Woche eine Zeichnung oder Kalkulation zeigen, auch wenn der Kollege, der sie erstellt, nicht da ist?**
+→ Bei Nein ist Ihre Durchlaufzeit der Kalender einer Person. Der Kunde erlebt das als Stille, und Sie merken es erst, wenn er nicht zurückruft.
+
+
+#### Blok C — Doppelte Eingabe
+*+38 % Lead-zu-Gespräch, nachdem vier Tools durch ein CRM plus einen WhatsApp-Flow ersetzt wurden.*
+
+**C1. Werden Name und Adresse einer neuen Anfrage nur einmal getippt?**
+→ Bei Nein gibt es sofort zwei Versionen desselben Kunden, und nichts entscheidet, welche die echte ist.
+
+**C2. Liegen WhatsApp-Gespräche mit Kunden dort, wo ein Kollege sie wiederfindet?**
+→ Bei Nein liegt die Kundenhistorie auf einem privaten Telefon. Beim Weggang geht sie mit zur Tür hinaus.
+
+**C3. Landet eine Anfrage über Ihre Website automatisch in dem System, in dem Sie arbeiten?**
+→ Bei Nein existiert die Anfrage erst, wenn jemand sie überträgt, und auf diesem Schritt steht kein Alarm.
+
+**C4. Wissen Sie bei jedem Lead, woher er kam?**
+→ Bei Nein ist jede Aussage darüber, was funktioniert, geraten. Sie stellen dann den Kanal ein, der am leisesten ist, nicht den, der am wenigsten bringt.
+
+
+#### Blok D — Stapelkosten
+*0 € zusätzliche SaaS-Ausgaben — die abgeschalteten Tools finanzierten den Umbau.*
+
+**D1. Wissen Sie aus dem Kopf, wie viele Software-Abos Sie haben und was sie zusammen pro Monat kosten?**
+→ Bei Nein wächst dieser Stapel mit jeder Einzelentscheidung, und niemand beschließt je, ihn wachsen zu lassen.
+
+**D2. Gibt es ein Tool, für das Sie zahlen und das seltener als einmal pro Woche von jemandem geöffnet wird?**
+→ Bei Ja zahlen Sie für eine Gewohnheit, die niemand mehr hat. Das ist die billigste Einsparung, die es gibt, und die am leichtesten vergessene.
+
+**D3. Können Sie beim Weggang eines Mitarbeiters innerhalb eines Tages alle seine Zugänge entziehen?**
+→ Bei Nein ist Ihr Stapel auch ein Sicherheitsproblem, nicht nur ein Kostenpunkt.

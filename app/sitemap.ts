@@ -44,6 +44,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/tools/energy-roi", priority: 0.75, change: "monthly" },
     // Alleen /nl — zie lib/i18n/enkele-taal.ts voor de reden.
     { path: "/tools/lekkage-scan", priority: 0.75, change: "monthly", locales: localesVoor("/tools/lekkage-scan", LOCALES) },
+    { path: "/tools/leak-scan", priority: 0.75, change: "monthly", locales: localesVoor("/tools/leak-scan", LOCALES) },
     { path: "/pricing", priority: 0.9, change: "monthly" },
     { path: "/contact", priority: 0.7, change: "monthly" },
     { path: "/privacy", priority: 0.3, change: "yearly" },

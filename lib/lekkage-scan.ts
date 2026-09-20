@@ -259,6 +259,28 @@ export function telwoordNL(n: number): string {
   return woord;
 }
 
+/* Dezelfde tabel voor de twee talen van /tools/leak-scan (2026-09-20). Zelfde
+ * bereik, zelfde luide fout buiten de tabel. Nederlands blijft via telwoordNL
+ * lopen zodat de bestaande poorten in lekkage-scan.test.ts ongewijzigd
+ * dezelfde bron lezen. */
+const TELWOORD: Readonly<Record<"en" | "de", Readonly<Record<number, string>>>> = {
+  en: {
+    12: "twelve", 13: "thirteen", 14: "fourteen", 15: "fifteen", 16: "sixteen",
+    17: "seventeen", 18: "eighteen", 19: "nineteen", 20: "twenty",
+  },
+  de: {
+    12: "zwölf", 13: "dreizehn", 14: "vierzehn", 15: "fünfzehn", 16: "sechzehn",
+    17: "siebzehn", 18: "achtzehn", 19: "neunzehn", 20: "zwanzig",
+  },
+};
+
+export function telwoord(n: number, taal: "nl" | "en" | "de"): string {
+  if (taal === "nl") return telwoordNL(n);
+  const woord = TELWOORD[taal][n];
+  if (!woord) throw new Error(`telwoord: vul TELWOORD.${taal} aan voor ${n}`);
+  return woord;
+}
+
 /** Kleine letter, voor midden in een zin. */
 export const AANTAL_WOORD = telwoordNL(VRAGEN.length);
 
@@ -288,8 +310,8 @@ export function lekt(vraag: Vraag, antwoord: boolean | undefined): boolean {
   return vraag.omgekeerd ? antwoord === true : antwoord === false;
 }
 
-export function alleBeantwoord(antwoorden: Antwoorden): boolean {
-  return VRAGEN.every((v) => antwoorden[v.id] !== undefined);
+export function alleBeantwoord(antwoorden: Antwoorden, vragen: readonly Vraag[] = VRAGEN): boolean {
+  return vragen.every((v) => antwoorden[v.id] !== undefined);
 }
 
 /* De uitslag: de drie blokken die het meest lekken, meeste eerst.
@@ -310,12 +332,17 @@ export function alleBeantwoord(antwoorden: Antwoorden): boolean {
  * Blokken zonder lek vallen weg. Bij nul lekken is het antwoord een lege lijst,
  * en dat hoort ook zo: een scan die altijd iets vindt is een verkoopinstrument
  * en geen diagnose. */
-export function scoor(antwoorden: Antwoorden, max = 3): Lek[] {
+export function scoor(
+  antwoorden: Antwoorden,
+  max = 3,
+  alleVragen: readonly Vraag[] = VRAGEN,
+  blokken: readonly Blok[] = BLOKKEN,
+): Lek[] {
   const rang = (b: BlokId) => VOLGORDE.indexOf(b);
 
-  return BLOKKEN.map((blok) => {
-    const totaal = VRAGEN.filter((v) => v.blok === blok.id).length;
-    const vragen = VRAGEN.filter((v) => v.blok === blok.id && lekt(v, antwoorden[v.id]));
+  return blokken.map((blok) => {
+    const totaal = alleVragen.filter((v) => v.blok === blok.id).length;
+    const vragen = alleVragen.filter((v) => v.blok === blok.id && lekt(v, antwoorden[v.id]));
     return {
       blok: blok.id,
       naam: blok.naam,
@@ -357,9 +384,9 @@ export type MetingUitslag = {
  * verschil tussen "gemeten" en "leeg gelaten", en de uitslag mag die twee niet
  * door elkaar halen. Een negatieve of onmogelijke invoer valt om dezelfde reden
  * weg: dan is er niet gemeten maar getypt. */
-export function duidMetingen(metingen: Metingen): MetingUitslag[] {
+export function duidMetingen(metingen: Metingen, vragen: readonly Vraag[] = VRAGEN): MetingUitslag[] {
   const uit: MetingUitslag[] = [];
-  for (const vraag of MET_METING) {
+  for (const vraag of vragen.filter((v) => v.meting)) {
     const waarde = metingen[vraag.id];
     if (waarde === undefined || !Number.isFinite(waarde) || waarde < 0) continue;
     const meting = vraag.meting!;

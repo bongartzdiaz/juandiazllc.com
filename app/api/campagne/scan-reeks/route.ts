@@ -8,6 +8,7 @@ import {
   bepaalVolgende,
   bouwMail,
   markeerVerzonden,
+  taalVan,
 } from "@/lib/email/scan-reeks";
 import { CONTACT_EMAIL } from "@/lib/seo/branding";
 import { ROI_BRON, type RoiGetallen } from "@/lib/roi-opvang";
@@ -139,7 +140,7 @@ export async function GET(req: NextRequest) {
     }
 
     const lekken = typeof metadata.lekken === "number" ? metadata.lekken : null;
-    const mail = bouwMail(nr, { lekken, unsub_token: token });
+    const mail = bouwMail(nr, { lekken, unsub_token: token, taal: taalVan(metadata) });
 
     const uitkomst = await verstuur(
       { from, to: rij.email, replyTo: CONTACT_EMAIL, ...mail },
