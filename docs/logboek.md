@@ -10731,3 +10731,82 @@ Tot de uitrol draait op wbgio de oude code, die `RESEND_API_KEY` leest.
 
 Gemeten vóór de PR: `npm test` 1632/1632, `tsc --noEmit` schoon, `deno
 check` op beide functies schoon, mail 1 gerenderd op 640 px in de browser.
+
+### 2026-09-20 (2) — secrets uit Vault op wbgio; migratie live, uitrol wacht op een verse sessie
+
+**Beslissing eerder op de dag, nu ook hier uitgevoerd:** Supabase-beheer
+via de MCP, geen PAT in een terminal. De MCP kan geen
+Edge-Function-secrets zetten, Vault wel — via SQL. #374 (`3938dd8e`) is
+de wbgio-kant van wat #671/#672 op vbozel deden.
+
+**Wat er in #374 zit.**
+
+- `supabase/migrations/20260920150000_geheim_uit_vault_service_role.sql`:
+  `public.geheim_uit_vault(naam text)`, SECURITY DEFINER, `search_path =
+  ''`, EXECUTE alleen voor `service_role`. Op vbozel stond de wrapper in
+  `diaz_editor`, dat PostgREST niet serveert. Hier staat hij in `public`,
+  en dat ís de exposed schema: zonder de revoke op `public`, `anon` en
+  `authenticated` zou `POST /rest/v1/rpc/geheim_uit_vault` met de
+  publishable key elk Vault-secret teruggeven. Dezelfde code, ander risico.
+- `supabase/functions/_shared/geheim.ts`: `geheim(uitEnv, vaultNaam)` —
+  env-var wint, anders Vault, anders `null` met een logregel. De
+  env-lezing staat letterlijk in de aanroep
+  (`geheim(Deno.env.get('BREVO_API_KEY'), 'brevo_api_key')`) omdat
+  `lib/env-voorbeeld.test.ts` op die string grep't. Drie Deno-tests.
+- `lead-notify` en `lead-acknowledge` lezen `BREVO_API_KEY` →
+  `brevo_api_key` en `LEAD_NOTIFY_SECRET` → `lead_notify_secret`.
+- `MANUAL_TASKS.md` en `CLAUDE.md`/`AGENTS.md`: meetketen stap 3 is geen
+  dashboardstap meer, stap 4 wijst naar Vault.
+
+**`lead_notify_secret` stond al 35 dagen in Vault.** Sinds 2026-08-16
+stuurde de trigger hem mee als bearer; de functies lazen een lege env-var.
+Stap 3 van de meetketen was nooit een ontbrekend secret maar een
+ontbrekende lezer. Dat sluit nu met migratie + uitrol, zonder dat de
+waarde ooit door een chat of dashboard gaat.
+
+**CI was eerst rood, en mijn lokale meting had het gemist.** Vitest pakte
+`_shared/geheim.test.ts` op en Node's ESM-loader weigert een
+`https:`-import (`Only URLs with a scheme in: file and data are
+supported`). Lokaal had ik `npm test | tail -6` gelezen, en die staart
+draagt de FAIL-regel niet. Fix in dezelfde PR: `supabase/functions/**`
+uit `vitest.config.ts`; Deno-tests draaien met `deno test --no-lock`. CI
+heeft nog geen deno-stap, dus die drie tests draaien alleen lokaal.
+Les: lees de `Test Files`-regel, niet de staart.
+
+**Migratie toegepast op wbgio via `apply_migration`, en nagemeten:**
+
+| rol | EXECUTE op `public.geheim_uit_vault(text)` |
+|---|---|
+| `anon` | false |
+| `authenticated` | false |
+| PUBLIC (`has_function_privilege(0, …)`) | false |
+| `service_role` | true |
+| `postgres` | true |
+
+`vault.decrypted_secrets`: `lead_notify_secret` aanwezig, `brevo_api_key`
+**niet** — die komt uit het Brevo-dashboard en is Juans insert.
+
+**Uitrol niet gelukt, zelfde oorzaak als vanmiddag op vbozel.** De
+MCP-connector levert in deze sessie geen parameterschema voor
+`deploy_edge_function` (`{type: object}`); `verify_jwt` en `files` komen
+als tekst aan en Zod weigert vóór de server: `expected boolean, received
+string` / `expected array, received string`. Niets veranderd op wbgio:
+`lead-notify` staat op v6 (Resend-code, 2026-09-03), `lead-acknowledge`
+op v3, `ezbr_sha256` ongewijzigd. `reconnect_session_connector` werkt
+alleen op status `failed`, en Supabase staat op `connected`. Verse sessie
+nodig — geen PAT, dat is de beslissing van vandaag.
+
+Wat die sessie moet sturen: `index.ts`, `auth.ts` (byte-identiek aan
+live, teruggelezen), `../_shared/brevo.ts`, `../_shared/geheim.ts`,
+`../_shared/huisstijl.ts`, `verify_jwt: false`. Het live
+`entrypoint_path` is `…/source/index.ts`, dus `../_shared/` landt naast
+`source/` — precies waar de import naar wijst. Onbewezen tot de eerste
+geslaagde uitrol; er is geen precedent met `_shared` via de MCP.
+
+**Probe daarna:** POST met ongeldige JSON zonder header → **401**
+(`lead-notify` nu 400 fail-open, `lead-acknowledge` 503). Pas meetbaar
+als de 402 op de organisatie eraf is.
+
+Gemeten: `npm test` 1632/1632 (87 bestanden, na de exclude), `tsc
+--noEmit` schoon, `deno test --no-lock` 3/3, `deno check --no-lock` op
+beide functies schoon, `CLAUDE.md`/`AGENTS.md` byte-identiek.
