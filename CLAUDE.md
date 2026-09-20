@@ -456,13 +456,13 @@ herschreven, en deze notitie is de correctie erop.
    auth-header om van `400 invalid-json` naar `503 not-configured`, met 404
    op een niet-bestaande slug als negatieve controle en `lead-notify`
    onveranderd op 400.
-   Vandaag kost dat niets (nul leads ooit, geen Resend-sleutel). Wat het
+   Vandaag kost dat niets (nul leads ooit, geen Brevo-sleutel). Wat het
    verandert: waar de functie eerst `ack_channel = 'skipped:no-api-key'`
    wegschreef, schrijft hij nu niets en houdt `net._http_response` een 503
    vast. Deze stap is daarmee geen opruimwerk meer maar de knop die de
    bevestigingsketen aanzet — en hij sluit `lead-notify` in
    dezelfde handeling, want beide lezen dezelfde sleutel.
-4. **`RESEND_API_KEY` + `ACK_FROM`** op een geverifieerd domein. Zonder die twee
+4. **`BREVO_API_KEY` + `ACK_FROM` + `NOTIFY_FROM`** op een in Brevo geauthenticeerd domein (Resend is sinds 2026-09-20 uit de code; zie `MANUAL_TASKS.md`, bovenste blok). Zonder die twee
    gaat er bij een echte lead geen enkele mail de deur uit — gemeten, niet
    vermoed. Pas ná stap 3, anders geef je een publiek aanroepbaar endpoint een
    mailkanaal op je eigen domein.
@@ -514,7 +514,7 @@ eerste vraag of er sinds 25 augustus een sessie bij is gekomen.
 
 ### Vercel
 
-- **Vier variabelen voor de drie scan-mails** (toegevoegd 2026-09-19): `CRON_SECRET`, `RESEND_API_KEY`, `CAMPAGNE_FROM`, `SUPABASE_SECRET_KEY` in
+- **Vier variabelen voor de drie scan-mails** (toegevoegd 2026-09-19): `CRON_SECRET`, `BREVO_API_KEY`, `CAMPAGNE_FROM`, `SUPABASE_SECRET_KEY` in
   Vercel-productie. Tot die staan antwoordt `GET /api/campagne/scan-reeks`
   503 `not-configured` en gaat er niets uit. Volledige uitleg, probe en
   controlequery in `MANUAL_TASKS.md`. Pas zinvol als de Supabase-402 eraf is.

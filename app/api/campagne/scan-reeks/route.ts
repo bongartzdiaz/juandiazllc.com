@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
 import { createServiceClient } from "@/lib/supabase/service";
 import { maakLimiet, sleutelUitVerzoek } from "@/lib/verzoeklimiet";
-import { verstuur } from "@/lib/email/resend";
+import { FREEMAIL_RE, verstuur } from "@/lib/email/brevo";
 import {
   REEKS_BRON,
   bepaalVolgende,
@@ -17,7 +17,7 @@ import { CONTACT_EMAIL } from "@/lib/seo/branding";
  * `Authorization: Bearer <CRON_SECRET>`. De route leest de rijen in
  * `marketing.subscribers` met `source = 'lekkage-scan'`, laat
  * lib/email/scan-reeks.ts uitrekenen welke mail voor welke rij aan de beurt
- * is, verstuurt die via lib/email/resend.ts en schrijft de verzenddatum terug
+ * is, verstuurt die via lib/email/brevo.ts en schrijft de verzenddatum terug
  * in `metadata.verzonden`. Twee runs op één dag versturen niets dubbel; een
  * gemiste dag wordt de volgende run ingehaald.
  *
@@ -27,9 +27,10 @@ import { CONTACT_EMAIL } from "@/lib/seo/branding";
  *                     fout → 401. Twee antwoorden, zodat "niet ingesteld" van
  *                     "verkeerde sleutel" te scheiden is met een onschadelijke
  *                     probe;
- *   3. RESEND_API_KEY + CAMPAGNE_FROM — zonder die twee is er niets te
+ *   3. BREVO_API_KEY + CAMPAGNE_FROM — zonder die twee is er niets te
  *                     versturen; liever 503 dan een run die elke rij "mislukt"
- *                     meldt;
+ *                     meldt. Een afzender op een gratis maildomein wordt hier
+ *                     al geweigerd, om dezelfde reden als in de helper;
  *   4. service-sleutel — `anon` mag op deze tabel alleen INSERT, dus lezen en
  *                     bijwerken vergt de service role.
  *
@@ -81,12 +82,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
-  const apiKey = process.env.RESEND_API_KEY?.trim() ?? "";
+  const apiKey = process.env.BREVO_API_KEY?.trim() ?? "";
   const from = process.env.CAMPAGNE_FROM?.trim() ?? "";
-  if (!apiKey) return nietGeconfigureerd("RESEND_API_KEY leeg");
+  if (!apiKey) return nietGeconfigureerd("BREVO_API_KEY leeg");
   if (!from) return nietGeconfigureerd("CAMPAGNE_FROM leeg");
-  if (/@resend\.dev>?$/i.test(from)) {
-    return nietGeconfigureerd("CAMPAGNE_FROM is een @resend.dev-sandboxadres");
+  if (FREEMAIL_RE.test(from)) {
+    return nietGeconfigureerd("CAMPAGNE_FROM staat op een gratis maildomein");
   }
 
   let admin;

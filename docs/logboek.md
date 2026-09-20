@@ -10668,3 +10668,66 @@ anon-RPC's met rem en zonder uuid-lek, de downloadgate live.
 
 **Wat er van stap 4 nog open is:** niets op vbozel. Buiten scope van de
 stap: Linux-build (`/dl/linux` 404) en `RESEND_API_KEY` + `ACK_FROM` op wbgio.
+
+
+### 2026-09-20 — Resend eruit, Brevo erin; de mails krijgen een huisstijl
+
+Beslist door Juan, dezelfde middag: "resend niet meer, we gaan brevo
+gebruiken", eerst juandiazllc.com, templates in code, Brevo alleen als
+verzend-API. Eén PR in deze repo; diaz-editor volgt apart.
+
+**Wat er is verwisseld.** `lib/email/resend.ts` is weg; `lib/email/brevo.ts`
+heeft dezelfde aanroepvorm (`verstuur(mail, { apiKey })`) en dezelfde vier
+uitkomsten, met één verschil in de weigering: geen `sandbox-sender` meer
+maar `freemail-sender`. Brevo heeft geen zandbak; wat het wél toelaat is
+versturen vanaf een gmail-adres, en dat is de val. Gemeten via de
+Brevo-connector: het account kent precies één geverifieerde afzender,
+`Juan Diaz, LLC <bongartzdiaz@gmail.com>`. Een mail van dat adres via Brevo's
+servers faalt op Gmails eigen DMARC en landt in de spam van de lead. De helper
+weigert daarom elke afzender op gmail/hotmail/outlook/yahoo/icloud/proton
+vóór het netwerk, en de route weigert `CAMPAGNE_FROM` op dezelfde grond met
+503 en de naam in het log.
+
+**De edge functions delen nu code.** `lead-acknowledge` en `lead-notify`
+importeren `../_shared/brevo.ts` en `../_shared/huisstijl.ts`, byte-identiek
+aan `lib/email/`. `lib/email/gedeeld.test.ts` bewaakt dat, zoals
+`lead-notify-auth.test.ts` dat voor `auth.ts` doet, en controleert dat de
+gedeelde bestanden niets importeren — anders bundelt Deno ze niet. `deno
+check` op beide functies: groen. `lead-notify` kende een standaardafzender
+`onboarding@resend.dev`; die is vervangen door een verplichte `NOTIFY_FROM`,
+want een standaardwaarde die stil in de spam belandt is erger dan een
+`skipped: NOTIFY_FROM unset` in `net._http_response`.
+
+**De huisstijl.** Eén omhulsel (`omhulsel()`): bosgroene kopband met
+wordmark en de accentlijn van de site, lichte body, één knop per mail,
+preheader voor de inbox-preview, kleine lettertjes met de afmeldlink. Geen
+afbeeldingen — SVG rendert niet in Gmail en een kapotte logo-tegel is erger
+dan geen. Vier verzendpaden gebruiken het: de drie scan-mails, de
+ontvangstbevestiging in vier talen, de interne melding, en de dode dubbele
+opt-in in `newsletter.ts`.
+
+**De kopij.** Onderwerpen personaliseren op het aantal lekken ("3 lekken
+gevonden. Tel er deze week één"), mail 2 opent met de conclusie ("Het lek
+zit niet in het werk. Het zit in het wachten"), mail 3 zegt dat hij de
+laatste is. Elke mail heeft één knop die de stap ís: mail 1 en 2 een
+mailto met voorgevuld onderwerp (`Scan: mijn getal`, `Scan: de stap zonder
+eigenaar`), mail 3 het blueprint-gesprek. De bevestiging aan een lead heeft
+als knop de 15-minutenlink van cal.com, dezelfde als `lib/booking.ts` — als
+constante in de functie, want die kan `lib/` niet lezen. Geen bedragen, geen
+percentages; de poort in `scan-reeks.test.ts` leest de gebouwde mails, niet
+de bestandstekst.
+
+**Privacy.** `priv.p.contact`, `.newsletter`, `.scan` en `.hosting` noemen
+nu Brevo (EU) in vier talen. De zin "bewaart afleverlogs 30 dagen" is niet
+overgezet: dat was Resends cijfer, en het cijfer van Brevo is niet gemeten.
+`pricing.faq.a6` noemt Resend nog als verwerker van DEUS; dat is
+DEUS-SHARED, niet deze repo.
+
+**Wat er nu op Juan wacht** staat bovenaan `MANUAL_TASKS.md`: domein
+authenticeren in Brevo, afzenders op dat domein, `BREVO_API_KEY` op twee
+plekken (Supabase Edge Secrets met `ACK_FROM` + `NOTIFY_FROM`; Vercel met
+`CAMPAGNE_FROM`), en beide edge functions opnieuw uitrollen met zijn PAT.
+Tot de uitrol draait op wbgio de oude code, die `RESEND_API_KEY` leest.
+
+Gemeten vóór de PR: `npm test` 1632/1632, `tsc --noEmit` schoon, `deno
+check` op beide functies schoon, mail 1 gerenderd op 640 px in de browser.

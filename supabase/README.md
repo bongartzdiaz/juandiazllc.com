@@ -60,7 +60,7 @@ Een rij in `marketing.leads` zet twee triggers in beweging, allebei via pg_net:
 
 | trigger | roept aan | voor wie |
 |---|---|---|
-| `leads_notify_new` | `lead-notify` | Juan — Telegram, en Resend zodra dat kan |
+| `leads_notify_new` | `lead-notify` | Juan — Telegram, en e-mail via Brevo zodra `BREVO_API_KEY` + `NOTIFY_FROM` staan |
 | `leads_acknowledge_new` | `lead-acknowledge` | de aanvrager — ontvangstbevestiging in zijn eigen taal |
 
 Gemeten 2026-08-16: beide vertrekken **34 ms** na de insert.
@@ -100,10 +100,13 @@ formulier en door een whitelist in de server-action. Ontbreekt hij, dan Engels.
   > aanroepen 401'en". Dat klopt in één richting niet. De claim is op
   > 2026-08-16 nagerekend tegen de code van beide kanten; laat je er niet
   > door verleiden de functie eerst te zetten.
-- **Er gaat nog geen bevestiging uit.** `RESEND_API_KEY` en `ACK_FROM` zijn
-  ongezet. Zie MANUAL_TASKS.md; `ACK_FROM` moet een **geverifieerd domein**
-  zijn, want `@resend.dev` levert alleen aan de accounthouder en wordt door de
-  functie geweigerd.
+- **Er gaat nog geen bevestiging uit.** `BREVO_API_KEY` en `ACK_FROM` zijn
+  ongezet (sinds 2026-09-20 Brevo; daarvoor `RESEND_API_KEY`). Zie
+  MANUAL_TASKS.md; `ACK_FROM` moet op een **in Brevo geauthenticeerd domein**
+  staan, want een afzender op gmail/outlook wordt door `_shared/brevo.ts`
+  geweigerd. De twee functies delen `_shared/brevo.ts` en
+  `_shared/huisstijl.ts`, byte-identiek aan `lib/email/`; `lib/email/gedeeld.test.ts`
+  bewaakt dat.
 
 ## Werkwijze
 

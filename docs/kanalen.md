@@ -33,7 +33,7 @@ die de drie trajecten nodig hebben.
 | contactformulier | schrijft niets weg — Supabase antwoordt 402 op het hele datavlak |
 | `marketing.leads` · `marketing.subscribers` | **0 rijen, ooit** — beide |
 | de vijf Plausible-doelen (`MANUAL_TASKS.md`) | bestaan niet in het dashboard; kliks worden binnengehaald en weggegooid |
-| `RESEND_API_KEY` + `ACK_FROM` | niet gezet — bij een echte lead gaat er geen mail de deur uit |
+| `BREVO_API_KEY` + `ACK_FROM` (tot 2026-09-20 `RESEND_API_KEY`) | niet gezet — bij een echte lead gaat er geen mail de deur uit |
 | `CAL_WEBHOOK_SECRET` | niet gezet — een boeking laat geen spoor na |
 
 De 402 is een facturatietoestand op de Supabase-organisatie en geen
@@ -144,12 +144,12 @@ en hebben samen **nul adressen** opgeleverd: `marketing.subscribers` telt nul
 rijen, ooit. Dat is de goedkoopste conversiewinst op de site.
 
 **Waarom hij onderaan staat.** Hij is als enige volledig geblokkeerd. Zonder
-`RESEND_API_KEY` beloof je een PDF die niemand krijgt, en dat verbrandt precies
+`BREVO_API_KEY` beloof je een PDF die niemand krijgt, en dat verbrandt precies
 het publiek dat je net verdiende — zonder dat je het ziet gebeuren. Zolang de
 402 staat schrijft het formulier bovendien niets weg.
 
 **Eerste stappen, in deze volgorde.** Eerst de restrictie eraf, dan
-`LEAD_NOTIFY_SECRET`, dan `RESEND_API_KEY` + `ACK_FROM`, dan pas een
+`LEAD_NOTIFY_SECRET`, dan `BREVO_API_KEY` + `ACK_FROM`, dan pas een
 opvangstap in de tools bouwen. Die volgorde staat al in de operator-lijst in
 `CLAUDE.md` en is daar onderbouwd: een mailkanaal op het eigen domein hangen aan
 een endpoint dat nog publiek aanroepbaar is, is de verkeerde volgorde.
@@ -182,7 +182,7 @@ operator.
 | 2 | reageren op LinkedIn | niets om te doen; wél om te meten (Plausible-doelen) |
 | 3 | doorverwijspartners | niets om te doen; wél om te meten |
 | 4 | eigen data-stuk | niets, behalve tijd |
-| 5 | opvang in de tools | 402 · `LEAD_NOTIFY_SECRET` · `RESEND_API_KEY` |
+| 5 | opvang in de tools | 402 · `LEAD_NOTIFY_SECRET` · `BREVO_API_KEY` |
 
 ---
 

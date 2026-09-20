@@ -5,7 +5,7 @@
 // server action already writes the row; this makes sure somebody hears about it.
 //
 // Two channels, both optional and independent — whichever is configured runs:
-//   Resend:   RESEND_API_KEY + ALERT_EMAIL (+ RESEND_FROM)
+//   Brevo:    BREVO_API_KEY + ALERT_EMAIL + NOTIFY_FROM (tot 2026-09-20: Resend)
 //   Telegram: TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID
 //
 // Always answers 200 with a per-channel report. A notifier that 500s would make
@@ -35,10 +35,14 @@
 // poort zelf gold het al niet: die gaf 405.
 
 import { beoordeelAuth } from './auth.ts'
+import { verstuur } from '../_shared/brevo.ts'
+import { citaatHtml, omhulsel } from '../_shared/huisstijl.ts'
 
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? null
+const BREVO_API_KEY = Deno.env.get('BREVO_API_KEY') ?? null
 const ALERT_EMAIL = Deno.env.get('ALERT_EMAIL') ?? null
-const RESEND_FROM = Deno.env.get('RESEND_FROM') ?? 'Juan Diaz LLC <onboarding@resend.dev>'
+// Geen standaardwaarde meer: de oude (`onboarding@resend.dev`) was Resends
+// zandbak. Een afzender hoort op het geauthenticeerde domein, zoals ACK_FROM.
+const NOTIFY_FROM = Deno.env.get('NOTIFY_FROM') ?? null
 const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN') ?? null
 const TELEGRAM_CHAT_ID = Deno.env.get('TELEGRAM_CHAT_ID') ?? null
 const LEAD_NOTIFY_SECRET = Deno.env.get('LEAD_NOTIFY_SECRET') ?? null
@@ -67,41 +71,65 @@ function fallback(v: unknown): string {
   return s || '—'
 }
 
-async function notifyResend(lead: Lead): Promise<string> {
-  if (!RESEND_API_KEY) return 'skipped: RESEND_API_KEY unset'
+async function notifyBrevo(lead: Lead): Promise<string> {
+  if (!BREVO_API_KEY) return 'skipped: BREVO_API_KEY unset'
   if (!ALERT_EMAIL) return 'skipped: ALERT_EMAIL unset'
-  try {
-    const html = `<!doctype html><html><body style="font-family:-apple-system,sans-serif;line-height:1.55;color:#222">
-      <h2 style="margin:0 0 4px">New lead — juandiazllc.com</h2>
-      <p style="color:#666;margin:0 0 20px">${esc(lead.created_at ?? new Date().toISOString())}</p>
-      <table cellpadding="6" style="border-collapse:collapse;font-size:15px">
-        <tr><td><strong>Name</strong></td><td>${esc(fallback(lead.name))}</td></tr>
-        <tr><td><strong>Email</strong></td><td><a href="mailto:${esc(lead.email)}">${esc(fallback(lead.email))}</a></td></tr>
-        <tr><td><strong>Company</strong></td><td>${esc(fallback(lead.company))}</td></tr>
-        <tr><td><strong>Sector</strong></td><td>${esc(fallback(lead.sector))}</td></tr>
-        <tr><td><strong>Source</strong></td><td>${esc(fallback(lead.source))}</td></tr>
-      </table>
-      <h3 style="margin:24px 0 6px">Message</h3>
-      <div style="white-space:pre-wrap;background:#f6f8f7;padding:14px;border-radius:8px">${esc(fallback(lead.message))}</div>
-    </body></html>`
+  if (!NOTIFY_FROM) return 'skipped: NOTIFY_FROM unset'
 
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from: RESEND_FROM,
-        to: ALERT_EMAIL,
-        reply_to: lead.email || undefined,
-        subject: `New lead — ${fallback(lead.name)}${lead.company ? ' @ ' + lead.company : ''}`,
-        html,
-      }),
-    })
-    if (!res.ok) return `failed: ${res.status} ${(await res.text()).slice(0, 200)}`
-    return 'sent'
-  } catch (err) {
-    return `error: ${(err as Error).message}`
-  }
+  const rij = (k: string, v: unknown) =>
+    `<tr><td style="padding:6px 10px 6px 0;color:#5F6F67;font-size:14px;white-space:nowrap">${esc(k)}</td><td style="padding:6px 0;font-size:15px">${esc(fallback(v))}</td></tr>`
+  const tabel = `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px;border-collapse:collapse">${[
+    rij('Name', lead.name),
+    `<tr><td style="padding:6px 10px 6px 0;color:#5F6F67;font-size:14px">Email</td><td style="padding:6px 0;font-size:15px"><a href="mailto:${esc(lead.email)}" style="color:#1A8B60">${esc(fallback(lead.email))}</a></td></tr>`,
+    rij('Company', lead.company),
+    rij('Sector', lead.sector),
+    rij('Source', lead.source),
+    rij('Received', lead.created_at ?? new Date().toISOString()),
+  ].join('')}</table>`
+
+  const text = [
+    `New lead — juandiazllc.com`,
+    ``,
+    `Name:     ${fallback(lead.name)}`,
+    `Email:    ${fallback(lead.email)}`,
+    `Company:  ${fallback(lead.company)}`,
+    `Sector:   ${fallback(lead.sector)}`,
+    `Source:   ${fallback(lead.source)}`,
+    `Received: ${fallback(lead.created_at ?? new Date().toISOString())}`,
+    ``,
+    fallback(lead.message),
+  ].join('\n')
+
+  const html = omhulsel({
+    taal: 'en',
+    kop: 'New lead',
+    preheader: `${fallback(lead.name)}${lead.company ? ' @ ' + lead.company : ''}: ${fallback(lead.message).slice(0, 120)}`,
+    blokken: [
+      tabel,
+      `<p style="margin:0 0 6px;font-size:13px;letter-spacing:.4px;text-transform:uppercase;color:#5F6F67">Message</p>`,
+      citaatHtml(fallback(lead.message)),
+    ],
+    groet: ['Reply to this email to answer the lead directly.'],
+    voet: 'Internal notification from the contact form on juandiazllc.com.',
+  })
+
+  const r = await verstuur(
+    {
+      from: NOTIFY_FROM,
+      to: ALERT_EMAIL,
+      replyTo: lijktOpEmail(lead.email) ? String(lead.email).trim() : ALERT_EMAIL,
+      onderwerp: `New lead — ${fallback(lead.name)}${lead.company ? ' @ ' + lead.company : ''}`,
+      text,
+      html,
+    },
+    { apiKey: BREVO_API_KEY },
+  )
+  return r.ok ? 'sent' : `failed: ${r.reden}`
 }
+
+// Bewust ruim: verzendfilter voor reply-to, geen validatie.
+const lijktOpEmail = (v: unknown): boolean =>
+  typeof v === 'string' && /^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(v.trim())
 
 async function notifyTelegram(lead: Lead): Promise<string> {
   if (!TELEGRAM_BOT_TOKEN) return 'skipped: TELEGRAM_BOT_TOKEN unset'
@@ -147,13 +175,13 @@ Deno.serve(async (req) => {
   // lead object, so it can be invoked directly for a smoke test.
   const lead: Lead = payload?.record ?? payload?.lead ?? payload ?? {}
 
-  const [resend, telegram] = await Promise.all([notifyResend(lead), notifyTelegram(lead)])
-  const delivered = resend === 'sent' || telegram === 'sent'
+  const [email, telegram] = await Promise.all([notifyBrevo(lead), notifyTelegram(lead)])
+  const delivered = email === 'sent' || telegram === 'sent'
 
-  console.log(`lead-notify: resend=${resend} telegram=${telegram}`)
+  console.log(`lead-notify: email=${email} telegram=${telegram}`)
 
   // 200 even when nothing was delivered: the lead row is already safe, and a
   // non-2xx would only make pg_net retry against a misconfiguration that a
   // retry cannot fix. The report says exactly what happened.
-  return j({ ok: true, delivered, channels: { resend, telegram } })
+  return j({ ok: true, delivered, channels: { email, telegram } })
 })
