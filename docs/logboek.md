@@ -11088,3 +11088,85 @@ geen meting.
 **Testideeën, pas zodra Plausible meet:** outro-titel als vraag (nu) tegen
 stelling; opvangknop *Email me the calculation* tegen *Keep this
 calculation*; op de scan de opvang vóór of ná de printknop.
+
+### 2026-09-20 (8) — de lekkage-scan voor EN en DE op /tools/leak-scan (#384)
+
+Juans opdracht, na de copy-pass: *maak de tweede quiz voor EN/DE*, en
+halverwege: *zodra die 100% werkt stuur de links en rond de dag af*. Eén PR,
+[#384](https://github.com/bongartzdiaz/juandiazllc.com/pull/384), gemerged als
+`64926b08`.
+
+**De keuze: vertalen, niet bouwen.** Een tweede scan met andere vragen zou
+een tweede bron nodig hebben, en de ene grens die de scan draagt (HBR 2011,
+één uur) is Amerikaans onderzoek — geen Nederlandse norm, dus ook geen reden
+om hem voor Engels of Duits te vervangen. De zestien vragen gaan over de vórm
+van het lek (`docs/bereik-plan.md` §2), niet over een markt. Dus: dezelfde
+structuur, dezelfde ids, dezelfde metingen, dezelfde grenswaarde, en een
+vertaling eroverheen. `lib/lekkage-scan-taal.ts` legt die met `vragenVoor(taal)`
+over `VRAGEN`/`BLOKKEN` heen en gooit als een vraag of een meting in de
+vertaling ontbreekt of afwijkt — een vertaling die stil een vraag mist zou de
+score verschuiven zonder dat iets het zag.
+
+**Eigen slug.** `/tools/leak-scan` voor `en` en `de`; de Nederlandse blijft
+`/tools/lekkage-scan`. Een Nederlandse slug op een Engelse pagina is geen
+vertaling. Spaans krijgt niets: geen cluster, geen bewijs. `ENKELE_TAAL` draagt
+de route met die reden, de pagina 404't erbuiten, en de sitemap-poort in
+`enkele-taal.test.ts` sloeg meteen aan toen de route er wel was maar de sitemap
+hem nog niet droeg.
+
+**Wat er wél per taal is.** De kopij om de vragen heen (`TEKSTEN`: hero, uitslag,
+opvang, placeholders `you@company.com` / `sie@firma.de`), de consenttekst die bij
+de rij wordt opgeslagen (`consent_tekst` in de taal waarin hij is aangevinkt),
+de drie mails van de reeks (`EN_KOPIJ`, `DE_KOPIJ` naast `NL_KOPIJ`), en de
+bestemming van de afmeldlink. De taal van een rij is `metadata.locale`
+(`taalVan()`); een rij zonder taal is Nederlands, zoals elke rij van vóór
+vandaag. Mail 3 leidt naar `/<taal>/contact?interest=lekkage-scan` — de
+interest-parameter blijft Nederlands, want daar hangt de opvang aan. Duits met
+Sie, en de poort meet dat (`du|dein|dich|dir` nul treffers over kopij én vragen).
+
+**Vijf poorten sloegen aan, en twee daarvan op iets dat geen fout was.**
+
+- *kale-tekst* zag 31 dode vrijstellingen: de kopij die daar met naam was
+  vrijgesteld stond niet meer in het component. Weggehaald; wat bleef is het
+  honeypot-label "Website", met dezelfde reden als in `ContactForm`.
+- *contactadressen* wilde de drie placeholders elk met naam en reden.
+- *lekkage-scan* eiste `AANTAL_WOORD` in het component, maar dat draagt geen
+  telwoord meer en hoort dat ook niet. De lijst heet nu `NOEMT_AANTAL` en dekt
+  alleen de bestanden die het getal werkelijk noemen; daarnaast eist de poort
+  letterlijk `telwoord(VRAGEN.length, "en")` en `"de"` in het tekstenbestand,
+  zodat een hardgecodeerd *sixteen* in de vorige test valt. Diezelfde poort
+  vangt ook commentaar — `zestien` in een `/* */` — en dat is terecht: een
+  getal in een commentaar veroudert net zo hard als in kopij.
+- De dependency-poort op het `useEffect` wilde het letterlijke
+  `[getoond, compleet, lekken.length]`; er staat nu `taal` bij, en dat hoort
+  ook, want de uitslag rendert opnieuw als de taal wisselt.
+- En twee terechte treffers die geen fout waren: *Stapelkosten* is ook Duits,
+  *Ja* is *Ja*. In plaats van de vergelijking te versoepelen staan die twee nu
+  met naam op een `COGNAAT`-lijst in `lekkage-scan-taal.test.ts`. Een
+  onvertaalde regel kan er niet stil op meeliften.
+
+**Nieuwe poorten.** `lib/lekkage-scan-taal.test.ts` (16): per taal dezelfde
+ids, blokken, `omgekeerd`, metingen en grenswaarde; elke EN/DE-vraag staat
+letterlijk in `docs/lead-magnet.md` §9 (dezelfde afspraak als voor de
+Nederlandse in §2); elke tekst is vertaald behalve de benoemde cognaten; Sie.
+`scan-reeks.test.ts` loopt de belofte uit de toestemmingstekst — drie mails,
+afmeldlink in tekst én html, geen bedrag of percentage, gesprek in de eigen
+taal, geen `{…}`-placeholder — nu ook over `en` en `de`, en houdt vast dat
+`bouwMail` zonder `taal` Nederlands geeft. Suite van 1648 naar 1680, typecheck
+schoon, build groen met beide routes.
+
+**Gemeten op de Vercel-preview vóór de merge**, met een share-cookie en zonder
+één inzending: `/en` en `/de` `/tools/leak-scan` 200 met `lang` en eigen
+`<title>`/`<h1>`; `/es` en `/nl` op die slug 404; `/nl/tools/lekkage-scan`
+200; callout op `/en` en `/de` `/tools/energy-roi` (*Take the leak scan*,
+*Leak-Scan machen*), nul treffers op `/es`; sitemap met alle drie. In de
+browser alle zestien vragen op *No*/*Nein* gezet en de knop geklikt: uitslag
+met drie lekken in de goede taal, nul Nederlandse restwoorden, nul *du*.
+
+**Op productie na de merge:** 45 seconden na de merge gaf `/en/tools/leak-scan` 200 (de 404 die Juan intussen zag was de lopende deploy); daarna `/de` 200, `/es` en `/nl` op die slug 404, `/nl/tools/lekkage-scan` 200, de callout op beide energy-roi-pagina's met de eigen knoptekst, en beide URL's in de sitemap. Eén meting, meteen na de deploy, dus alleen de server-HTML — de scan zelf is op de preview doorgeklikt, niet op productie.
+
+**Wat dit niet is.** Geen A/B, geen bewijs dat de scan in Engels of Duits leads
+oplevert — dat kan pas als Plausible meet en de vier Vercel-variabelen staan,
+en dat is de operator-lijst. Wat het wél is: de tweede leadmagneet staat in
+drie talen live met dezelfde opvang en dezelfde reeks, en niets ervan is een
+tweede bron van waarheid.
