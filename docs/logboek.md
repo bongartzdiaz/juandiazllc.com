@@ -10810,3 +10810,48 @@ als de 402 op de organisatie eraf is.
 Gemeten: `npm test` 1632/1632 (87 bestanden, na de exclude), `tsc
 --noEmit` schoon, `deno test --no-lock` 3/3, `deno check --no-lock` op
 beide functies schoon, `CLAUDE.md`/`AGENTS.md` byte-identiek.
+
+### 2026-09-20 (3) — #672 gemerged, MCP-uitrol tweede keer geweigerd, poort lokaal gemeten
+
+**#672 gemerged** in diaz-editor als `f21a29bc7` (`BREVO_API_KEY` uit Vault
+voor dertien mailfuncties). CI draait daar niet, dus het vinkje zegt niets;
+de poorten liepen lokaal via de pre-push hook. Een merge rolt daar niets uit.
+
+**`deploy_edge_function` opnieuw geprobeerd op wbgio, opnieuw Zod.** Zelfde
+twee fouten (`verify_jwt` string, `files` string), client-side, dus niets
+geraakt. Eén ding om niet te herhalen: die tweede poging stuurde alleen
+`index.ts`, zonder de `_shared`-bestanden. Had Zod hem doorgelaten, dan had
+de bundler op de ontbrekende imports moeten struikelen — maar dat is een
+aanname over de server. Bij de echte uitrol: altijd alle vijf.
+
+**De poort lokaal gemeten, op de hele module.** `lib/lead-notify-auth.test.ts`
+toetst `beoordeelAuth` als pure functie; dit toetst `index.ts` inclusief het
+top-level `await geheim(...)`. Poort 8000 is op deze machine bezet door een
+andere dienst die op elke POST *There was a problem with authentication*
+antwoordt — mijn eerste meting hoorde díe, niet deno. Vandaar een wrapper in
+de scratchpad die `Deno.serve` op 8765 bindt en dan `index.ts` importeert.
+
+| run | invoer | antwoord |
+|---|---|---|
+| geen sleutel, geen Vault-bereik | zonder header | **503** `not-configured` |
+| idem | met header | 503 `not-configured` |
+| sleutel via env (28 tekens) | zonder header | **401** `unauthorized` |
+| idem | verkeerde header | 401 `unauthorized` |
+| idem | juiste header, kapotte JSON | **400** `invalid-json` |
+
+Log bij run 1, letterlijk: `[geheim] vault-lezing van lead_notify_secret
+mislukt — SUPABASE_URL/SERVICE_ROLE_KEY ontbreekt`, en daarna `Listening`.
+Dat de Vault-fout de boot niet breekt was tot nu bedoeld, niet gezien. Run
+2 logt alleen `brevo_api_key`: staat de env-var, dan wordt Vault niet eens
+geprobeerd.
+
+**Wat lokaal niet kan: de echte Vault-RPC.** `.env.local` draagt de URL maar
+geen service-role-sleutel (gemeten met een script dat alleen `aanwezig:
+false` print). En al stond hij er — het datavlak geeft 402, dus
+`rpc('geheim_uit_vault')` zou ook vanaf een Supabase-runtime `null`
+opleveren en de functie op 503 zetten. Dat pad is pas te bewijzen als de
+facturatieblokkade eraf is.
+
+Stand: wbgio live v6/v3 (Resend-code), vbozel dertien functies op de code
+van vóór #669. Uitrol: verse sessie, MCP, per functie de volledige
+bestandslijst.
