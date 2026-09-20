@@ -419,8 +419,8 @@ const en: Dict = {
 
   // Energy ROI tool (/tools/energy-roi)
   "roi.eyebrow": "◉ Tool",
-  "roi.title": "The honest <em>salderings-math</em> for 2027.",
-  "roi.lede": "Type in your consumption, your panels, your battery. Get three numbers: what your system would save under salderingsregeling, what it will save after the 2027 phase-out, and how a battery changes the payback. No cookies, no email capture, no lead form — just the math.",
+  "roi.title": "What your panels still earn <em>after 1 January 2027</em>.",
+  "roi.lede": "Enter your consumption, your panels and, if you have one, your battery. You get three numbers: what the system saves under net metering today, what is left once net metering ends on 1 January 2027, and what a battery does to the payback. The math is free and asks for nothing. Keeping it is the only thing that takes an email, and only if you ask.",
   "roi.inputs": "Your setup",
   "roi.results": "What it means",
   "roi.f.consumption": "Yearly consumption (kWh)",
@@ -460,9 +460,9 @@ const en: Dict = {
   "roi.mail.slot": "If a quote does not survive these numbers, that is worth a conversation. Reply to this email or book 15 minutes.",
   "roi.mail.knop": "Book 15 minutes",
   "roi.mail.voet": "You asked for this email on {datum} via the ROI calculator on juandiazllc.com. Rough model, not financial advice. No further emails will follow. Unsubscribe: {link}",
-  "roi.outro.eyebrow": "◉ Want this wired into your funnel?",
-  "roi.outro.title": "If you sell panels or batteries, <em>your prospects are running this math</em>.",
-  "roi.outro.body": "The installers winning post-2027 are the ones whose funnel tells the honest story before the customer does. We build that layer — per-lead consumption reports, battery payback pages, and CRM-attached quotes that update when the tariffs move.",
+  "roi.outro.eyebrow": "◉ If you sell the panels",
+  "roi.outro.title": "Your prospects are running this math. <em>Does your quote survive it?</em>",
+  "roi.outro.body": "Thirty minutes, free. We put your own numbers next to this model, and you leave with a one-page diagnosis of where your operation and your figures disagree. The page is yours to keep. If you want the fix built, the next step is a fixed-price sprint of thirty days.",
 
   // Impressum (legal notice — required under German TMG §5 / DSA art. 12)
   "impressum.eyebrow": "◉ Legal notice",
@@ -1283,8 +1283,8 @@ const nl: Dict = {
 
   // Energy ROI tool (/tools/energy-roi)
   "roi.eyebrow": "◉ Tool",
-  "roi.title": "De eerlijke <em>saldeer-som</em> voor 2027.",
-  "roi.lede": "Vul je verbruik, je panelen en eventueel je batterij in. Je krijgt drie cijfers terug: wat je installatie onder de salderingsregeling oplevert, wat er na de afschaffing op 1 januari 2027 van overblijft, en hoe een batterij de terugverdientijd beïnvloedt. Geen cookies, geen e-mail, geen formulier — alleen de som.",
+  "roi.title": "Wat je panelen nog opleveren <em>na 1 januari 2027</em>.",
+  "roi.lede": "Vul je verbruik, je panelen en eventueel je batterij in. Je krijgt drie cijfers terug: wat je installatie nu onder de salderingsregeling oplevert, wat ervan overblijft als salderen op 1 januari 2027 stopt, en wat een batterij met de terugverdientijd doet. De som is gratis en vraagt niets. Alleen als je hem wilt bewaren vraagt hij één e-mailadres, en alleen dan.",
   "roi.inputs": "Jouw situatie",
   "roi.results": "Wat het betekent",
   "roi.f.consumption": "Jaarverbruik (kWh)",
@@ -1324,9 +1324,9 @@ const nl: Dict = {
   "roi.mail.slot": "Overleeft een offerte deze getallen niet, dan is dat een gesprek waard. Antwoord op deze mail of plan 15 minuten.",
   "roi.mail.knop": "Plan 15 minuten",
   "roi.mail.voet": "Je vroeg deze mail aan op {datum} via de ROI-rekenmachine op juandiazllc.com. Grof model, geen financieel advies. Er volgen geen verdere mails. Afmelden: {link}",
-  "roi.outro.eyebrow": "◉ Dit in je eigen funnel?",
-  "roi.outro.title": "Als je panelen of batterijen verkoopt, <em>draait je prospect deze som al</em>.",
-  "roi.outro.body": "De installateurs die na 2027 winnen zijn die waarvan de funnel het eerlijke verhaal vóór de klant vertelt. Wij bouwen die laag — lead-specifieke verbruiksrapporten, batterij-terugverdienpagina's en CRM-gekoppelde offertes die meebewegen met de tarieven.",
+  "roi.outro.eyebrow": "◉ Verkoop jij de panelen?",
+  "roi.outro.title": "Je prospect draait deze som al. <em>Overleeft jouw offerte hem?</em>",
+  "roi.outro.body": "Dertig minuten, gratis. We leggen jouw eigen cijfers naast dit model, en je gaat weg met een diagnose van één pagina: waar je operatie en je cijfers uit elkaar lopen. Die pagina houd je. Wil je het gerepareerd hebben, dan is de volgende stap een sprint van dertig dagen tegen een vaste prijs.",
 
   // Impressum / colofon (vereist onder Duitse TMG §5 / EU DSA art. 12)
   "impressum.eyebrow": "◉ Colofon",
@@ -2115,8 +2115,8 @@ const de: Dict = {
 
   // Energy ROI tool (/tools/energy-roi)
   "roi.eyebrow": "◉ Tool",
-  "roi.title": "Die ehrliche <em>Einspeise-Rechnung</em> für 2027.",
-  "roi.lede": "Geben Sie Ihren Verbrauch, Ihre Anlage und optional Ihren Speicher ein. Sie erhalten drei Zahlen: was Ihre Anlage unter der niederländischen Salderingsregeling spart, was nach deren Abschaffung am 1. Januar 2027 übrig bleibt, und wie ein Speicher die Amortisation verändert. Keine Cookies, keine E-Mail, kein Formular — nur die Rechnung.",
+  "roi.title": "Was Ihre Anlage <em>nach dem 1. Januar 2027</em> noch einbringt.",
+  "roi.lede": "Geben Sie Ihren Verbrauch, Ihre Anlage und optional Ihren Speicher ein. Sie erhalten drei Zahlen: was die Anlage heute unter der niederländischen Salderingsregeling spart, was übrig bleibt, wenn diese am 1. Januar 2027 endet, und was ein Speicher mit der Amortisation macht. Die Rechnung ist kostenlos und verlangt nichts. Nur wer sie behalten will, gibt eine E-Mail-Adresse an, und nur dann.",
   "roi.inputs": "Ihr Setup",
   "roi.results": "Was das bedeutet",
   "roi.f.consumption": "Jahresverbrauch (kWh)",
@@ -2156,9 +2156,9 @@ const de: Dict = {
   "roi.mail.slot": "Übersteht ein Angebot diese Zahlen nicht, ist das ein Gespräch wert. Antworten Sie auf diese E-Mail oder buchen Sie 15 Minuten.",
   "roi.mail.knop": "15 Minuten buchen",
   "roi.mail.voet": "Sie haben diese E-Mail am {datum} über den ROI-Rechner auf juandiazllc.com angefordert. Grobes Modell, keine Finanzberatung. Es folgen keine weiteren E-Mails. Abmelden: {link}",
-  "roi.outro.eyebrow": "◉ Das im eigenen Funnel?",
-  "roi.outro.title": "Wer Module oder Speicher verkauft, <em>bei dem rechnet der Kunde das schon durch</em>.",
-  "roi.outro.body": "Die Installateure, die nach 2027 gewinnen, sind die, deren Funnel die ehrliche Geschichte vor dem Kunden erzählt. Wir bauen diese Schicht — lead-spezifische Verbrauchsreports, Speicher-Amortisationsseiten und CRM-gekoppelte Angebote, die sich mit den Tarifen bewegen.",
+  "roi.outro.eyebrow": "◉ Verkaufen Sie die Module?",
+  "roi.outro.title": "Ihr Interessent rechnet das bereits durch. <em>Hält Ihr Angebot stand?</em>",
+  "roi.outro.body": "Dreißig Minuten, kostenlos. Wir legen Ihre eigenen Zahlen neben dieses Modell, und Sie gehen mit einer einseitigen Diagnose: wo Ihr Betrieb und Ihre Zahlen auseinanderlaufen. Die Seite behalten Sie. Soll es behoben werden, ist der nächste Schritt ein dreißigtägiger Sprint zum Festpreis.",
 
   // Impressum (Pflichtangaben nach § 5 TMG / DSA Art. 12)
   "impressum.eyebrow": "◉ Impressum",
@@ -2947,8 +2947,8 @@ const es: Dict = {
 
   // Energy ROI tool (/tools/energy-roi)
   "roi.eyebrow": "◉ Herramienta",
-  "roi.title": "La <em>aritmética honesta</em> del saldo neto 2027.",
-  "roi.lede": "Introduce tu consumo, tus paneles y, si procede, tu batería. Obtendrás tres cifras: lo que ahorra tu sistema bajo el salderingsregeling neerlandés, lo que queda tras su retirada el 1 de enero de 2027, y cómo una batería afecta al retorno. Sin cookies, sin email, sin formulario — solo la cuenta.",
+  "roi.title": "Lo que tus paneles siguen rindiendo <em>después del 1 de enero de 2027</em>.",
+  "roi.lede": "Introduce tu consumo, tus paneles y, si la tienes, tu batería. Obtienes tres cifras: lo que ahorra tu sistema hoy bajo el salderingsregeling neerlandés, lo que queda cuando termine el 1 de enero de 2027, y qué hace una batería con el retorno. La cuenta es gratis y no pide nada. Solo si quieres guardarla pide un email, y solo entonces.",
   "roi.inputs": "Tu configuración",
   "roi.results": "Qué significa",
   "roi.f.consumption": "Consumo anual (kWh)",
@@ -2988,9 +2988,9 @@ const es: Dict = {
   "roi.mail.slot": "Si un presupuesto no sobrevive a estos números, merece una conversación. Responde a este correo o reserva 15 minutos.",
   "roi.mail.knop": "Reservar 15 minutos",
   "roi.mail.voet": "Pediste este correo el {datum} mediante la calculadora ROI en juandiazllc.com. Modelo aproximado, no es asesoramiento financiero. No seguirán más correos. Darse de baja: {link}",
-  "roi.outro.eyebrow": "◉ ¿Esto en tu propio funnel?",
-  "roi.outro.title": "Si vendes paneles o baterías, <em>tu prospecto ya está haciendo esta cuenta</em>.",
-  "roi.outro.body": "Los instaladores que ganarán tras 2027 son aquellos cuyo funnel cuenta la historia honesta antes que el cliente. Construimos esa capa — informes de consumo por lead, páginas de retorno con batería y presupuestos conectados al CRM que se actualizan cuando cambian las tarifas.",
+  "roi.outro.eyebrow": "◉ ¿Vendes los paneles?",
+  "roi.outro.title": "Tu prospecto ya está haciendo esta cuenta. <em>¿La resiste tu presupuesto?</em>",
+  "roi.outro.body": "Treinta minutos, gratis. Ponemos tus propios números junto a este modelo y te llevas un diagnóstico de una página: dónde se separan tu operación y tus cifras. La página es tuya. Si quieres arreglarlo, el siguiente paso es un sprint de treinta días a precio fijo.",
 
   // Aviso legal / Impressum (requisitos bajo § 5 TMG alemán / art. 12 DSA)
   "impressum.eyebrow": "◉ Aviso legal",

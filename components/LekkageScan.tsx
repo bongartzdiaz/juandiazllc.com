@@ -317,7 +317,7 @@ export function LekkageScan() {
                 id="scan-email"
                 name="email"
                 type="email"
-                placeholder="you@domain.com"
+                placeholder="jij@bedrijf.nl"
                 required
                 autoComplete="email"
               />

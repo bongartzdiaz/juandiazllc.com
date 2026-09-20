@@ -372,9 +372,11 @@ const ATTR_TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
   },
   "components/LekkageScan.tsx": {
     reden:
-      "Derde vormvoorbeeld van een adres, in het opvangformulier op het " +
-      "uitslagscherm. Leest in elke taal hetzelfde.",
-    tekst: ["placeholder=you@domain.com"],
+      "Vormvoorbeeld van een adres, in het opvangformulier op het " +
+      "uitslagscherm. Nederlands, want de pagina bestaat alleen op /nl " +
+      "(lib/i18n/enkele-taal.ts) en een Engels voorbeeld las daar als een " +
+      "vergeten vertaling.",
+    tekst: ["placeholder=jij@bedrijf.nl"],
   },
   "components/calculators/EnergyRoi.tsx": {
     reden:
