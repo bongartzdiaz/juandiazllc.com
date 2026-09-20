@@ -99,55 +99,33 @@ operator de bovenste las, en dat was de oudste.
 
 Niets hiervan is uit de repo af te leiden, en niets hiervan mag verzonnen worden.
 
-### 2026-08-27 — Supabase weigert het hele datavlak. De leadopvang ligt eruit.
+### ~~2026-08-27 — Supabase weigert het hele datavlak~~ — gesloten 2026-09-20
 
-**Dit staat bovenaan omdat het als enige punt op deze lijst nu kapot is in
-plaats van open.** Elk verzoek aan REST en aan de edge functions, op **beide**
-projecten, antwoordt met 402:
+**De 402 is weg.** Juan heeft de facturatie van de organisatie in orde gemaakt
+(*usage billing van supabase is gewoon goed*, 2026-09-20). Gemeten diezelfde
+avond met `scripts/probe-supabase-402.sh`, dat nergens naartoe schrijft:
 
-```
-Service for this project is restricted due to the following violations:
-exceed_storage_size_quota. The project owner must upgrade their plan or
-remove spend caps to restore service.
-```
+| gemeten, 2026-09-20 | 27 aug | nu |
+|---|---|---|
+| slug die niet bestaat, beide projecten | 402 | **404** |
+| REST `marketing.leads` met de publishable key | 402 | **401 `42501`** — gezond: schema geserveerd, `anon` mag niet lezen |
+| `lead-notify` / `lead-acknowledge`, ongeldige JSON zonder header | 402 | **401 / 401** |
+| de tien `diaz-*`-stubs op wbgio | 402 | **410, elk met zijn eigen slug** |
+| vbozel `diaz-license-validate` | 402 | 400 `missing-license-key` |
 
-Het contactformulier op juandiazllc.com schrijft via precies dat REST-pad. Een
-bezoeker die nu het formulier invult krijgt `form.err.generic` terug. De hele
-keten erachter — rij in `marketing.leads` → `leads_notify_new` → Telegram —
-komt niet op gang, want de rij ontstaat niet.
+Wat er van dat blok blijft staan, staat op zijn eigen plek: de leadketen in de
+meetketen hieronder (stap 3 is dicht), de stubs in het `diaz-*`-blok, en de
+Atlas-tellingen in het Atlas-blok — alle drie op 2026-09-20 hermeten. Eén lead
+is er inmiddels: 2026-09-19 17:22, `contact_page:stage=survey`, Juans eigen
+test, `ack_channel = 'skipped:no-api-key'` na 104 ms. De keten loopt tot aan
+de Brevo-sleutel. De volledige meting staat in het logboek van 2026-09-20 (5).
 
-| gemeten, 2026-08-27 | uitkomst |
-|---|---|
-| edge functions op **wbgio** (alle 14) | 402 `exceed_storage_size_quota` |
-| edge functions op **vbozel** | 402, idem |
-| REST met de publishable key, op een echte tabel | **402** |
-| `/rest/v1/` zónder sleutel | 401 — de sleutelcontrole vuurt vóór de quotacontrole |
-| negatieve controle, slug die niet bestaat | 402 — dus de gateway, niet een functie |
-| projectstatus, beide | `ACTIVE_HEALTHY` — de database zelf leeft |
-| organisatie | `swlekxkypqmqbmtrfvld` "Juan Diaz", plan **free**, 2 projecten |
-| wbgio | 20 MB database · 1 storage-object · 13 kB · grootste tabel 296 kB |
-| vbozel | 29 MB database · **0** storage-objecten |
-| `pg_replication_slots`, beide | leeg |
+De twee meetvallen uit het oude blok blijven waar: `/rest/v1/` zónder sleutel
+geeft 401 en leest als gezond terwijl het dat niet bewijst — peil een echte
+tabel mét de publishable key — en het managementvlak (`execute_sql`,
+`deploy_edge_function`) werkt door terwijl het datavlak weigert. Zie de memory
+`project_supabase_402_blokkade.md`.
 
-**Het gaat niet over datavolume.** Samen 49 MB over de hele organisatie. Geen
-replicatieslot dat WAL vasthoudt — dat was de eerste hypothese en hij is
-gemeten weerlegd. De boodschap noemt zelf wat het wél is: een plan of een spend
-cap. Dat staat op **Billing/Usage van de organisatie**, is een dashboard-pagina
-en een betaalhandeling, en is daarmee van jou. Ik heb er niets aan aangeraakt.
-
-Twee dingen om te weten bij het nameten. Die **401 op `/rest/v1/`** leest als
-"REST is gezond" en is het niet — hij komt uit de sleutelcontrole, die vóór de
-quotacontrole zit; peil een echte tabel mét de publishable key. En het
-**managementvlak werkt gewoon door**: `execute_sql`, `list_edge_functions` en
-`deploy_edge_function` antwoorden normaal terwijl het datavlak 402 geeft. Wat er
-live staat is dus wél te verifiëren, hoe het antwoordt niet.
-
-Dit is dezelfde storing als in de memory `project_supabase_402_blokkade.md`,
-inclusief de aanwijzing die daar al stond: kijk op Billing/Usage van de
-organisatie, niet in de database.
-
-**Wanneer het begon: binnen een etmaal.** Op 2026-08-26 om 18:15 UTC gaven
-dezelfde probes nog 400 en 503 — zie de hermeting hieronder.
 
 ### 2026-08-27 — de tien dode `diaz-*` functies zijn onschadelijk, niet weg
 
@@ -164,10 +142,12 @@ probe bewijst dát díé slug de stub kreeg. De vier die moesten blijven staan �
 `lead-notify`, `lead-acknowledge`, `pai-vapi-webhook`, `pai-weekly-digest` —
 dragen nog hun oude `updated_at`. Nog steeds veertien functies.
 
-**De 410 zelf is niet waargenomen**, want het datavlak geeft 402 (zie hierboven).
-Wat er live staat is teruggelezen uit de bron via het managementvlak; hoe het
-antwoordt niet. Zodra de restrictie eraf is: `scripts/probe-supabase-402.sh` draait de
-tien plus een negatieve controle plus de vier die moesten blijven.
+**De 410 is op 2026-09-20 waargenomen**, zodra de 402 eraf was:
+`scripts/probe-supabase-402.sh` gaf op alle tien `410` met de eigen slug in het
+antwoord, `404` op de negatieve controle, en de vier blijvers antwoordden als
+zichzelf (`pai-vapi-webhook` 400 `invalid json`, `pai-weekly-digest` 200,
+`lead-notify` en `lead-acknowledge` 401). Tot die dag was wat er live stond
+alleen teruggelezen uit de bron via het managementvlak.
 
 **Wat er open blijft, en waarom het op deze lijst hoort.** De tien functies staan
 er nog, elk met een service-role-sleutel erin. Weghalen gaat via het dashboard,
@@ -450,11 +430,15 @@ herschreven, en deze notitie is de correctie erop.
    `lead_notify_secret` zelf uit Vault via `public.geheim_uit_vault()` —
    SECURITY DEFINER, EXECUTE alleen voor `service_role` (migratie
    `20260920150000`, helper `supabase/functions/_shared/geheim.ts`). Een
-   env-var wint nog als hij staat, maar er hoeft er geen te staan. Wat deze
-   stap sluit is dus: migratie toepassen op wbgio + beide functies uitrollen,
-   allebei via de Supabase-MCP (geen PAT, geen CLI — beslist 2026-09-20). Die
-   vault-sleutel staat er sinds 2026-08-16 16:22:38 UTC (44 tekens), dus de
-   triggerkant was al klaar. **Vóór stap 4.**
+   env-var wint nog als hij staat, maar er hoeft er geen te staan.
+   **Gemeten 2026-09-20 avond: de env-var stáát.** De live `lead-notify` v6 en
+   `lead-acknowledge` v3 kennen geen Vault en geven allebei 401 op ongeldige
+   JSON zonder header — dat kan alleen uit `LEAD_NOTIFY_SECRET`. **Deze stap
+   is dicht.** De migratie staat op wbgio; wat nog open is, is de uitrol van
+   beide functies via de Supabase-MCP in een verse sessie met alleen Supabase
+   aan (geen PAT, geen CLI — beslist 2026-09-20), en dat is onderhoud
+   (rotatie zonder dashboard), geen blokkade meer. Die vault-sleutel staat er
+   sinds 2026-08-16 16:22:38 UTC (44 tekens). **Vóór stap 4.**
 
    Voor `lead-acknowledge` is die volgorde op 2026-08-26 bewust omgedraaid:
    de fail-closed code van 25 augustus is uitgerold (v3) terwijl de sleutel
@@ -502,10 +486,14 @@ staan met hun eigen blokkade in `docs/diaz-atlas-volgorde.md`, bewaakt door
 `lib/diaz-atlas.test.ts`. Ze staan **bewust niet hier**: twee lijsten die één
 volgorde dragen lopen uit elkaar, en dan bewaakt de zwakste.
 
-**Vandaag niet zelf na te meten.** Het Supabase-datavlak geeft nog steeds 402
-`exceed_storage_size_quota`, dus de sessie- en licentietellingen hierboven zijn
-die van hun oorspronkelijke meetdatum. Zodra die restrictie eraf is, is de
-eerste vraag of er sinds 25 augustus een sessie bij is gekomen.
+**Hermeten op 2026-09-20, nadat de 402 eraf was.** `diaz_editor.checkout_session`
+op vbozel telt **11 rijen, alle `expired`**, laatste 2026-08-22 12:53 UTC,
+**nul sinds 25 augustus**. Licenties: nog steeds 6, laatste 2026-05-22, nul met
+een Stripe-payment-intent. Er is dus niets bij gekomen en niets veranderd. Let
+op: de "25 sessies, 19 verlopen, 6 open" hierboven zijn Stripe-statussen
+(`unpaid`/`expired`) en komen van de Stripe-kant; de tabel draagt er 11. Welke
+van de twee de andere mist is niet uitgezocht — het antwoord op de vraag die
+hier stond is hoe dan ook *nee*.
 
 ### SEO-instrumenten
 
@@ -524,7 +512,8 @@ eerste vraag of er sinds 25 augustus een sessie bij is gekomen.
 - **Vier variabelen voor de drie scan-mails** (toegevoegd 2026-09-19): `CRON_SECRET`, `BREVO_API_KEY`, `CAMPAGNE_FROM`, `SUPABASE_SECRET_KEY` in
   Vercel-productie. Tot die staan antwoordt `GET /api/campagne/scan-reeks`
   503 `not-configured` en gaat er niets uit. Volledige uitleg, probe en
-  controlequery in `MANUAL_TASKS.md`. Pas zinvol als de Supabase-402 eraf is.
+  controlequery in `MANUAL_TASKS.md`. Sinds 2026-09-20 ook de enige
+  blokkade voor de ROI-mail van #378 (`source=energy-roi`, zelfde cron).
 - **`SENTRY_DSN` in Vercel-productie wordt geweigerd. Serverfouten worden
   niet gerapporteerd.** Juan zette op 2026-08-26 een nieuwe waarde; die
   is de letterlijke tekst `optional` niet meer, maar hij komt nog steeds
@@ -624,6 +613,12 @@ eerste vraag of er sinds 25 augustus een sessie bij is gekomen.
   verwijzingen over twee bestanden, allemaal voorzien van een waarschuwing.
   Geen waarde vervangen — zie hierboven wat er daarvoor eerst gemeten moet
   worden.
+- **`pai-weekly-digest` op wbgio antwoordt 200 op een POST zonder enige
+  header** (`{"ok":true,"calls":0,"email_sent":false}`, gemeten 2026-09-20 door
+  de 402-probe, die hem alleen als "geen 410"-controle aanroept). Er ging niets
+  uit omdat er nul calls waren, maar de functie liep wél. Of hij een
+  cron-secret hoort te eisen (Vault draagt `pai_cron_secret`) is niet
+  uitgezocht; noteer het vóór de probe hem nog eens aanroept met data erachter.
 - **Het tweede, lege Stripe-account** sluiten of labelen.
 - Optioneel, hygiëne: `revoke execute on function public.handle_new_user(),
   public.notify_new_lead(), public.rls_auto_enable() from public, anon,
