@@ -14,7 +14,10 @@ export default defineConfig({
     // volledige testsuite meedraaien: drie bestanden faalden permanent en het
     // totaal telde honderden tests van een ander project mee. Beide kanten van
     // die meting waren onjuist.
-    exclude: ["**/node_modules/**", ".next/**", "preview/**", ".claude/**"],
+    // supabase/functions/** is Deno: https-imports en Deno.test. Node's ESM-
+    // loader weigert een https-specifier, dus vitest zou elk Deno-testbestand
+    // als FAIL tellen. Die draaien met `deno test --no-lock supabase/functions`.
+    exclude: ["**/node_modules/**", ".next/**", "preview/**", ".claude/**", "supabase/functions/**"],
     environment: "node",
   },
 });

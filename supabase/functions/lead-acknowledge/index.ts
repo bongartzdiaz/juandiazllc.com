@@ -52,15 +52,16 @@
 
 import { beoordeelAuth } from './auth.ts'
 import { verstuur as verstuurBrevo } from '../_shared/brevo.ts'
+import { geheim } from '../_shared/geheim.ts'
 import { alineaHtml, citaatHtml, knopHtml, omhulsel } from '../_shared/huisstijl.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? null
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? null
-const BREVO_API_KEY = Deno.env.get('BREVO_API_KEY') ?? null
+const BREVO_API_KEY = await geheim(Deno.env.get('BREVO_API_KEY'), 'brevo_api_key')
 const ACK_FROM = Deno.env.get('ACK_FROM') ?? null
 const ACK_REPLY_TO = Deno.env.get('ACK_REPLY_TO') ?? Deno.env.get('ALERT_EMAIL') ?? null
 // Dezelfde sleutel als lead-notify: één interne DB→functie-sleutel, niet twee.
-const LEAD_NOTIFY_SECRET = Deno.env.get('LEAD_NOTIFY_SECRET') ?? null
+const LEAD_NOTIFY_SECRET = await geheim(Deno.env.get('LEAD_NOTIFY_SECRET'), 'lead_notify_secret')
 
 type Taal = 'en' | 'nl' | 'de' | 'es'
 const TALEN: Taal[] = ['en', 'nl', 'de', 'es']

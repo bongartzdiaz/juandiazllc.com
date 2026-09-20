@@ -26,17 +26,27 @@ Volgorde:
 - [ ] **`BREVO_API_KEY`** — Brevo → SMTP & API → API Keys. Eén sleutel, op
       **twee plekken**, want de cron draait op Vercel en de bevestiging op
       Supabase:
-      1. Supabase `wbgiouuifqhasedncysw` → Edge Functions → Secrets, samen met
-         `ACK_FROM` (bevestiging aan de lead) en `NOTIFY_FROM` (interne melding
-         aan `ALERT_EMAIL`). Beide op het geauthenticeerde domein.
+      1. Supabase `wbgiouuifqhasedncysw` → **Vault**, niet Edge Functions →
+         Secrets. Sinds de vault-route (migratie `20260920150000`) lezen
+         `lead-notify` en `lead-acknowledge` de sleutel uit
+         `public.geheim_uit_vault('brevo_api_key')`. Eén keer in de SQL-editor:
+         `select vault.create_secret('<sleutel>', 'brevo_api_key');`
+         Controle zonder de waarde te zien:
+         `select name, length(decrypted_secret) from vault.decrypted_secrets where name = 'brevo_api_key';`
+         Een env-var `BREVO_API_KEY` op de functies wint nog steeds als hij
+         staat, maar hoeft niet meer. `ACK_FROM` (bevestiging aan de lead) en
+         `NOTIFY_FROM` (interne melding aan `ALERT_EMAIL`) blijven wél
+         Edge-Function-secrets — geen geheimen, alleen adressen op het
+         geauthenticeerde domein.
       2. Vercel → `juandiazllc-com` → Environment Variables → Production, samen
          met `CAMPAGNE_FROM`.
 - [ ] **Beide edge functions opnieuw uitrollen** na de merge: `lead-notify` en
-      `lead-acknowledge` lezen nu `../_shared/brevo.ts` en `../_shared/huisstijl.ts`.
-      Vanaf deze machine met jouw PAT als env-var (nooit in `.env` of de repo):
-      `supabase functions deploy lead-acknowledge --project-ref wbgiouuifqhasedncysw --no-verify-jwt`
-      en hetzelfde voor `lead-notify`. Tot de uitrol draait de oude code, die
-      `RESEND_API_KEY` leest en dus `skipped:no-api-key` blijft melden.
+      `lead-acknowledge` lezen nu `../_shared/brevo.ts`, `../_shared/huisstijl.ts`
+      en `../_shared/geheim.ts`. Uitrol gaat via de Supabase-MCP
+      (`deploy_edge_function`, `verify_jwt: false`, de drie `_shared`-bestanden
+      erbij) — geen PAT, geen CLI; zie de memory `feedback_beheer_via_mcp_geen_pat`.
+      Tot de uitrol draait de oude code, die `RESEND_API_KEY` leest en dus
+      `skipped:no-api-key` blijft melden.
 
 **Probe zonder bijwerking.** Ná de uitrol, mét `LEAD_NOTIFY_SECRET` maar
 zonder `BREVO_API_KEY`: een lead levert `ack_channel = 'skipped:no-api-key'`.
@@ -131,9 +141,14 @@ willekeurig gegenereerd. De database stuurt hem al mee als bearer bij elke
 dispatch — geverifieerd. De functies negeren hem nog, want hun eigen env-var
 is ongezet.
 
-- [ ] Supabase → Project Settings → Vault → `lead_notify_secret` → onthullen
+- [x] ~~Supabase → Project Settings → Vault → `lead_notify_secret` → onthullen
       en kopiëren. Zet die waarde als `LEAD_NOTIFY_SECRET` bij Edge Functions
-      → Secrets. Eén secret, hij geldt voor beide functies.
+      → Secrets.~~ **Vervallen op 2026-09-20.** Beide functies lezen
+      `lead_notify_secret` nu zelf uit Vault via `public.geheim_uit_vault()`
+      (migratie `20260920150000`, `supabase/functions/_shared/geheim.ts`). De
+      waarde hoeft nergens meer heen — trigger en functie lezen dezelfde rij.
+      Wat nog moet: de migratie toepassen op wbgio en de twee functies
+      uitrollen, allebei via de MCP. Daarna sluit `lead-notify` vanzelf.
 
 > **Genereer er geen nieuwe.** De database stuurt de waarde uit de vault. Zet
 > je iets anders op de functies, dan matcht de bearer niet en geven ze 401 —
