@@ -56,9 +56,9 @@ const UITZONDERINGEN: Record<string, { aantal: number; reden: string }> = {
     aantal: 1,
     reden: "Placeholder in het e-mailveld, geen bestaand adres.",
   },
-  "components/LekkageScan.tsx:you@domain.com": {
+  "components/LekkageScan.tsx:jij@bedrijf.nl": {
     aantal: 1,
-    reden: "Placeholder in het optionele e-mailveld op het uitslagscherm, geen bestaand adres.",
+    reden: "Placeholder in het optionele e-mailveld op het uitslagscherm, geen bestaand adres. Nederlands, want de pagina bestaat alleen op /nl (2026-09-20).",
   },
   "components/NewsletterForm.tsx:you@domain.com": {
     aantal: 1,
