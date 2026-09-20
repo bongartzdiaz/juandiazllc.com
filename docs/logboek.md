@@ -10891,3 +10891,85 @@ Staat in de memory `feedback_beheer_via_mcp_geen_pat`, samen met de regel
 dat een deploy altijd de volledige bestandslijst stuurt.
 
 #376 (`9fa54907`) gemerged. Nul open PR's in beide repo's.
+
+### 2026-09-20 (5) — 402 is weg, leadketen leeft, en de rekenmachine vangt nu op (#378)
+
+**Eerst de hermeting, want Juan zei dat billing goed stond en het logboek
+zei 402.** Gemeten met probes zonder bijwerking:
+
+| probe | 27 aug | nu |
+|---|---|---|
+| REST `marketing.leads`, publishable key | 402 | **401 `42501`** — gezond: schema geserveerd, `anon` mag niet lezen |
+| `lead-notify`, ongeldige JSON, geen header | 402 (daarvoor 400 fail-open) | **401 `unauthorized`** |
+| `lead-acknowledge`, idem | 402 (daarvoor 503) | **401 `unauthorized`** |
+| slug die niet bestaat | 402 | 404 |
+| vbozel `diaz-license-validate` | 402 | 400 `missing-license-key` |
+
+De twee 401's betekenen dat de **live** v6/v3 een bruikbare
+`LEAD_NOTIFY_SECRET` lezen — dat kan alleen via de env-var, want de
+Vault-code is nog niet uitgerold. Juan heeft die dus gezet. **Meetketen stap
+3 is dicht, vóór de uitrol.** De Vault-route blijft zinvol (geen dashboard
+bij rotatie) maar blokkeert niets meer.
+
+En er ís een lead: 2026-09-19 17:22, `contact_page:stage=survey`, Juans
+eigen test. Rij → trigger → `lead-acknowledge` → `ack_channel =
+'skipped:no-api-key'` na 104 ms. De keten loopt; alleen de Brevo-sleutel
+ontbreekt. Het 402-blok bovenaan de operator-lijst is daarmee achterhaald;
+die lijst wordt in een volgende PR opgeschoond, niet hier.
+
+**Dan bouwen — Juan koos "lead magnets".** Stand in de code:
+
+| magneet | vangt op | leads ooit |
+|---|---|---|
+| `/tools/lekkage-scan` (NL) | e-mail → `subscribers`, 3 mails via cron | 0 |
+| `/tools/energy-roi` (4 talen) | **niets** — knop naar `/contact` | 0 |
+| contactformulier | `marketing.leads` | 1 |
+
+`docs/bereik-plan.md` §5 zei het al: eerst de bestaande twee laten werken.
+De rekenmachine was het gat: iemand rekent, krijgt een getal, en er blijft
+niets van hem achter. #378 (`9583368`) zet daar één formulier onder — *mail
+me deze berekening* — op het patroon van de scan-opvang.
+
+- `lib/roi-opvang.ts`: `ROI_VELDEN` met grens per veld; `leesGetal` maakt
+  onzin, leeg, `Infinity` en buiten-grens **`null`, nooit 0**. De 18
+  getallen komen via hidden inputs en zijn dus invoer van buiten — een
+  mail met "€ 0 besparing" omdat iemand `abc` invulde is erger dan "—".
+- `app/actions/roi-opvang.ts`: honeypot, toestemming verplicht, rij in
+  `marketing.subscribers` met `source=energy-roi`, `metadata.roi`,
+  `unsub_token`. Geen mail vanuit de action.
+- `lib/email/roi-mail.ts`: één mail in de taal van de rij. De labels zijn
+  letterlijk de `roi.f.*`/`roi.sc.*`-keys van de pagina — één bron.
+  Batterijregels alleen als de batterij aanstond. Onderwerp draagt de
+  terugverdientijd van het gekozen scenario.
+- `scan-reeks`-cron: tweede lus voor `source=energy-roi`, zelfde poorten
+  en telling, één stempel `verzonden`. Pad blijft: `vercel.json` en
+  `MANUAL_TASKS.md` wijzen ernaar.
+- Plausible `Berekening Aangevraagd` `{tool: energy-roi}` — het achtste
+  doel; `MANUAL_TASKS.md` en `CLAUDE.md`/`AGENTS.md` bijgewerkt omdat de
+  doelen-poort dat eist.
+
+**Zeven poorten gingen rood op deze ene feature**, en geen ervan was een
+bug: Spaans-register (`configuraste`, `hiciste`, `pediste`, `envíame`,
+`responde`, `reserva` erbij in `TU_MARKERS`), kale tekst (honeypot +
+placeholder), contactadressen (placeholder), wees-sleutels (verdween zodra
+de afnemers bestonden), Plausible-aanroep (nieuwe aanroeper met reden),
+Plausible-doelen (7 → 8). Elk vroeg een uitzondering mét reden of een
+bijgewerkt getal. Precies wat die poorten moeten doen.
+
+**Eén meetval onderweg:** de eerste lokale probe van `lead-notify` op poort
+8000 hoorde niet deno maar Docker (`com.docker.backend.exe`, PID 143224,
+antwoordt *There was a problem with authentication* op elke POST). Dezelfde
+PID houdt 3000 bezet, dus de browser-preview kon niet; `next build` schoon
+met de route erin is het compilatiebewijs.
+
+Gemeten: 1650 tests (89 bestanden), `tsc` stil, `next build` schoon.
+
+**Wat de bezoeker nu krijgt:** onder de scenario's "Bewaar deze berekening",
+e-mailveld, vinkje *Ja, mail me deze berekening. Verder geen mails*, knop.
+De rij wordt opgeslagen; de mail wacht op dezelfde vier Vercel-variabelen
+als de scan-reeks. Eerlijk, net als daar.
+
+**Op Juan:** Plausible-doel aanmaken; `BREVO_API_KEY`, `CAMPAGNE_FROM`,
+`CRON_SECRET`, `SUPABASE_SECRET_KEY` op Vercel; `brevo_api_key` in Vault op
+beide projecten; Brevo-domein. Uitrol van de Vault-functies: verse sessie
+met alleen Supabase aan.
