@@ -11033,3 +11033,58 @@ Gemeten: 1650 tests groen, `CLAUDE.md` = `AGENTS.md` byte-identiek. Memory
 `project_supabase_402_blokkade.md` bijgewerkt: twee keer voorgekomen, twee
 keer via Billing/Usage van de org opgeheven — bij een derde keer niet meten
 wat er "op staat", meteen naar het dashboard.
+
+### 2026-09-20 (7) — copy/CRO-pass op de twee tool-pagina's: drie van de vijf vondsten waren claims (#382)
+
+Juan vroeg na #378 of de copy, branding en funnels klopten. Het eerlijke
+antwoord was: de tools meten niets (geen Plausible-doelen) en sturen niets
+(geen Vercel-vars), dus "winnend" kan niemand zeggen. Advies was meten eerst,
+dan copy. Juan koos de copy-pass nu. Gedaan met `copywriting` + `cro` als
+kader en `docs/claims.md` als grens.
+
+**Wat de pass vond**, op gewicht:
+
+| # | vondst | soort |
+|---|---|---|
+| 1 | `roi.lede` beloofde in vier talen *no email capture, no lead form* — terwijl #378 er die avond een e-mailformulier onder zette | tegenspraak, eigen gat |
+| 2 | EN-lede: *the 2027 phase-out*. `claims.md`: **schrijf nooit dat de regeling wordt afgebouwd** — de wet heet beëindiging, het afbouwvoorstel (35.594) is een ander traject | claims |
+| 3 | `roi.outro.body` beloofde *per-lead consumption reports, battery payback pages, CRM-attached quotes*. `claims.md`: het werkende onderdeel wisselt per traject en mag nergens in kopij staan. Plus *the installers winning post-2027…* zonder bron | claims |
+| 4 | Kop *The honest salderings-math for 2027* — Nederlands jargon in EN/DE/ES; slim boven duidelijk | copy |
+| 5 | Scan: `you@domain.com` als placeholder op een pagina die alleen op `/nl` bestaat | klein |
+
+Drie van de vijf zijn geen stijl maar claims: de pagina beloofde dingen die
+het aanbod niet draagt. Een prospect die boekt op "CRM-attached quotes" en
+een diagnose van één pagina krijgt, is een verloren lead mét reden.
+
+**Wat er nu staat** (EN; NL/DE/ES gelijkwaardig, DE Sie, ES tú):
+
+- Kop: *What your panels still earn <em>after 1 January 2027</em>.* De datum
+  is de motor van dit cluster (`docs/bereik-plan.md` §2), dus hij hoort in
+  de kop, en de uitkomst ervoor.
+- Lede: drie cijfers, *once net metering ends on 1 January 2027*, dan *The
+  math is free and asks for nothing. Keeping it is the only thing that takes
+  an email, and only if you ask.*
+- Outro: eyebrow *If you sell the panels* · titel *Your prospects are running
+  this math. <em>Does your quote survive it?</em>* · body zegt wat het
+  gesprek werkelijk is — dertig minuten, gratis, diagnose van één pagina
+  (`services.how.s1`), pagina houd je, daarna een sprint van dertig dagen
+  tegen vaste prijs. Geen bedrag (dan eist `faqs.belofte.test` de exacte
+  opmaak), geen onderdelen.
+- Knop blijft `cta.book`: `eerste-stap.test` eist één naam voor elke ingang
+  naar een gesprek.
+
+**Bewust niet aangeraakt.** De scan zelf: de vier ontwerpkeuzes staan bovenin
+`LekkageScan.tsx` met *zodat niemand ze repareert*, en de kopij is concreet
+en eerlijk (nul lekken = nul lekken, geen verkoopinstrument). De
+formulierplaatsing op de ROI-pagina: onder de uitkomst, na de waarde.
+
+Twee poorten bijgesteld met reden voor de NL-placeholder (`contactadressen`,
+`kale-tekst`). 1650 tests groen. #382 (`ccc36e53`) gemerged; na de
+main-deploy de nieuwe kop op productie gemeten in alle vier de talen. De
+scan-placeholder is van buitenaf niet te zien: dat formulier rendert pas ná
+de uitslag, dus hij staat niet in de server-HTML — nul treffers daar is
+geen meting.
+
+**Testideeën, pas zodra Plausible meet:** outro-titel als vraag (nu) tegen
+stelling; opvangknop *Email me the calculation* tegen *Keep this
+calculation*; op de scan de opvang vóór of ná de printknop.
