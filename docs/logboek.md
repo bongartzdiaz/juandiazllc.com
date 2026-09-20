@@ -10855,3 +10855,39 @@ facturatieblokkade eraf is.
 Stand: wbgio live v6/v3 (Resend-code), vbozel dertien functies op de code
 van vóór #669. Uitrol: verse sessie, MCP, per functie de volledige
 bestandslijst.
+
+### 2026-09-20 (4) — waarom de MCP-uitrol faalt: geen schema op álle connectors
+
+Juan vroeg het uit te zoeken. Drie tooldefinities uit drie bronnen naast
+elkaar gelegd:
+
+| tool | bron | schema |
+|---|---|---|
+| Vercel `list_projects` | claude.ai-connector | `{type: object}`, beschrijving = de naam |
+| Brevo `lists_get_lists` | claude.ai-connector | idem |
+| Supabase `deploy_edge_function` | claude.ai-connector | idem |
+| `ccd_pr get_status` | desktop-app | volledig JSON-schema |
+| `ccd_connectors reconnect…` | desktop-app | volledig schema |
+
+**Het is niet Supabase.** In deze sessie komen álle claude.ai-connectors
+binnen als stubs zonder parameterschema. Zonder schema stuurt de harness
+elk argument als tekst. Tools met alleen string-parameters merken dat niet
+— `execute_sql`, `apply_migration` en `get_edge_function` werkten daarom
+gewoon. `deploy_edge_function` heeft een boolean en een array, en de
+Zod-validatie aan de connectorkant weigert daar een string. Client-side,
+dus nooit iets half uitgerold; `ezbr_sha256` op de live functies bleef
+gelijk na drie pogingen.
+
+**Vermoedelijke trigger, niet bewezen.** `session_connectors_status` telt
+21 verbonden connectors met samen ~600 tools (Vercel 212, Ahrefs 135,
+Shopify 42, Canva 32, Gmail 30, Supabase 29). De sessies waarin de deploy
+wél werkte (21 juli, 16 en 26 augustus) waren kleiner. Uit/aan laadt
+dezelfde stubs opnieuw; `reconnect_session_connector` werkt alleen op
+status `failed` en Supabase staat op `connected`.
+
+**Remedie:** verse sessie met alleen Supabase aan (eventueel GitHub erbij).
+Werkt de deploy daar ook niet, dan is deze lezing fout en hoort dat hier.
+Staat in de memory `feedback_beheer_via_mcp_geen_pat`, samen met de regel
+dat een deploy altijd de volledige bestandslijst stuurt.
+
+#376 (`9fa54907`) gemerged. Nul open PR's in beide repo's.
