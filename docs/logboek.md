@@ -10644,3 +10644,27 @@ een verwijdering — eerst vragen of het token elders nog dienst doet.
 - deploy van `diaz-affiliate-activate` + secret (zie boven)
 - Linux-build: `/dl/linux` geeft 404 sinds `v0.4.49` (alleen op Linux/CI te bouwen)
 - `RESEND_API_KEY` + `ACK_FROM` in wbgio Edge Secrets (juandiazllc-bevestigingsmail)
+
+### 2026-09-20 (vervolg) — `diaz-affiliate-activate` dicht: 200 → 503 → 401
+
+Juan rolde de repo-versie uit vanuit PowerShell met een PAT als env-var
+(`$env:SUPABASE_ACCESS_TOKEN`, daarna verwijderd; Roy's token in Credential
+Manager blijft ongemoeid). De eerste poging was een bash-regel met `&&` in
+PowerShell 5.1 en draaide niet — de parser-fout leest als "gedraaid" als je
+alleen naar de prompt kijkt. Gemeten na de tweede poging: v24, drie
+bestanden meegegaan (index + `_shared/require-secret.ts` +
+`_shared/mail-blocklist.ts`).
+
+| moment | anonieme POST | verkeerde `x-api-key` | slug bestaat niet |
+|---|---|---|---|
+| vóór deploy (v23) | 200 `no pending activations` | — | 404 |
+| na deploy, geen secret | **503 `auth-not-configured`** | 503 | 404 |
+| na `AFFILIATE_ACTIVATE_SECRET` | **401 `unauthorized`** | 401 | 404 |
+
+De probe raakt niets: `partner_id` bestaat niet, en de auth-check zit vóór
+de databasequery. Audit stap 4 is hiermee op vbozel afgerond: affiliate-
+activate achter een fail-closed gate zonder sleutel in de respons, de vier
+anon-RPC's met rem en zonder uuid-lek, de downloadgate live.
+
+**Wat er van stap 4 nog open is:** niets op vbozel. Buiten scope van de
+stap: Linux-build (`/dl/linux` 404) en `RESEND_API_KEY` + `ACK_FROM` op wbgio.
