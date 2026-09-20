@@ -10973,3 +10973,63 @@ als de scan-reeks. Eerlijk, net als daar.
 `CRON_SECRET`, `SUPABASE_SECRET_KEY` op Vercel; `brevo_api_key` in Vault op
 beide projecten; Brevo-domein. Uitrol van de Vault-functies: verse sessie
 met alleen Supabase aan.
+
+### 2026-09-20 (6) — het 402-blok gesloten, en de probe vond iets dat niet op de lijst stond (#380)
+
+Juan: *ruim het 402-blok in CLAUDE.md op*. Dat blok stond bovenaan de
+operator-lijst als het enige punt dat "kapot" was in plaats van open. Sinds
+blok (5) was het achterhaald. Opruimen is hier niet schrappen: alles wat van
+dat blok afhing is eerst opnieuw gemeten, daarna pas herschreven.
+
+**Eerst de probe die het blok zelf beloofde.** `scripts/probe-supabase-402.sh`
+— schrijft nergens naartoe, negatieve controle erbij — gaf exit 0:
+
+| | verwacht | gemeten |
+|---|---|---|
+| slug die niet bestaat, beide projecten | 404 | 404 / 404 |
+| de tien `diaz-*`-stubs op wbgio | 410 met eigen slug | **10× 410, 10× slug-ok** |
+| `pai-vapi-webhook` | geen 410 | 400 `invalid json` |
+| `pai-weekly-digest` | geen 410 | **200** `{"ok":true,"calls":0,"email_sent":false}` |
+| `lead-notify` / `lead-acknowledge` | 401 of 503 | 401 / 401 |
+
+Sinds 2026-08-27 stond er dat de 410 "niet waargenomen" was — de stubs waren
+uit de bron teruggelezen via het managementvlak, hoe ze antwoordden niet. Nu
+wel: alle tien, elk met de eigen slug in het antwoord.
+
+**Dan de Atlas-vraag die het blok openliet:** *is er sinds 25 augustus een
+sessie bij gekomen?* Alleen-lezen via `execute_sql` op vbozel:
+`diaz_editor.checkout_session` telt **11 rijen, alle `expired`**, laatste
+2026-08-22 12:53 UTC, nul sinds 25 augustus. Licenties 6, laatste 22 mei, nul
+met een Stripe-payment-intent. Antwoord: nee. Wat wél opviel: de lijst zei
+"25 sessies, 19 verlopen, 6 open" — dat zijn Stripe-statussen (`unpaid`,
+`expired`) en dus de Stripe-kant; de tabel draagt er 11. Welke van de twee de
+andere mist is **niet uitgezocht** en staat zo in de lijst.
+
+**Wat er in #380 (`883e6c9d`) veranderde**, op vier plekken in
+`CLAUDE.md`/`AGENTS.md`:
+
+1. Het 402-blok: doorgestreepte kop, korte tabel 27 aug → 20 sep, de twee
+   meetvallen behouden (401 op `/rest/v1/` zonder sleutel leest als gezond;
+   managementvlak werkt door terwijl het datavlak weigert). De rest verwijst
+   naar de plek waar het hoort.
+2. `diaz-*`-blok: 410 waargenomen.
+3. Meetketen stap 3: **dicht**. Live v6/v3 geven 401 zonder header en kennen
+   geen Vault, dus `LEAD_NOTIFY_SECRET` staat als env-var. De Vault-uitrol is
+   daarmee onderhoud (rotatie zonder dashboard), geen blokkade.
+4. Atlas: de hermeting hierboven, inclusief het 25-versus-11-verschil.
+
+Plus de Vercel-regel: de vier variabelen blokkeren nu ook de ROI-mail van #378
+(zelfde cron), en de voorwaarde "pas zinvol als de 402 eraf is" vervalt.
+
+**Eén waarneming die niet op de lijst stond.** De probe roept de vier
+"blijvers" alleen aan als controle dat ze géén 410 geven. `pai-weekly-digest`
+antwoordde **200 op een POST zonder enige header** en liep zijn logica door:
+nul calls, dus geen mail. Vault draagt `pai_cron_secret`; of de functie die
+hoort te eisen is niet uitgezocht. Het staat nu onder Supabase op de lijst,
+met precies die grens, zodat de volgende probe hem niet nog eens aanroept
+met data erachter.
+
+Gemeten: 1650 tests groen, `CLAUDE.md` = `AGENTS.md` byte-identiek. Memory
+`project_supabase_402_blokkade.md` bijgewerkt: twee keer voorgekomen, twee
+keer via Billing/Usage van de org opgeheven — bij een derde keer niet meten
+wat er "op staat", meteen naar het dashboard.
