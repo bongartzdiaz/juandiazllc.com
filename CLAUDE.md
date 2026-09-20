@@ -443,11 +443,17 @@ herschreven, en deze notitie is de correctie erop.
 2. **Plausible-cijfer**: bezoekers over 30 dagen. Zonder dat blijft "0 rijen in
    `marketing.leads`" onbeslist tussen geen-verkeer en geen-conversie, en die
    vraag ligt onder alle andere.
-3. **`LEAD_NOTIFY_SECRET`** in Supabase → Edge Functions → Secrets, met dezelfde
-   waarde als `lead_notify_secret` in Database → Vault. Die vault-sleutel staat
-   er sinds 2026-08-16 16:22:38 UTC (44 tekens, standaard base64), dus de triggerkant
-   is klaar — wat ontbreekt is de functiekant. Dit sluit `lead-notify`, dat nog
-   fail-open is. **Vóór stap 4.**
+3. ~~**`LEAD_NOTIFY_SECRET`** in Supabase → Edge Functions → Secrets, met dezelfde
+   waarde als `lead_notify_secret` in Database → Vault.~~ **Sinds 2026-09-20
+   geen dashboardstap meer.** `lead-notify` en `lead-acknowledge` lezen
+   `lead_notify_secret` zelf uit Vault via `public.geheim_uit_vault()` —
+   SECURITY DEFINER, EXECUTE alleen voor `service_role` (migratie
+   `20260920150000`, helper `supabase/functions/_shared/geheim.ts`). Een
+   env-var wint nog als hij staat, maar er hoeft er geen te staan. Wat deze
+   stap sluit is dus: migratie toepassen op wbgio + beide functies uitrollen,
+   allebei via de Supabase-MCP (geen PAT, geen CLI — beslist 2026-09-20). Die
+   vault-sleutel staat er sinds 2026-08-16 16:22:38 UTC (44 tekens), dus de
+   triggerkant was al klaar. **Vóór stap 4.**
 
    Voor `lead-acknowledge` is die volgorde op 2026-08-26 bewust omgedraaid:
    de fail-closed code van 25 augustus is uitgerold (v3) terwijl de sleutel
@@ -462,7 +468,7 @@ herschreven, en deze notitie is de correctie erop.
    vast. Deze stap is daarmee geen opruimwerk meer maar de knop die de
    bevestigingsketen aanzet — en hij sluit `lead-notify` in
    dezelfde handeling, want beide lezen dezelfde sleutel.
-4. **`BREVO_API_KEY` + `ACK_FROM` + `NOTIFY_FROM`** op een in Brevo geauthenticeerd domein (Resend is sinds 2026-09-20 uit de code; zie `MANUAL_TASKS.md`, bovenste blok). Zonder die twee
+4. **`brevo_api_key` in Vault** (SQL-editor: `select vault.create_secret('<sleutel>', 'brevo_api_key')`, dezelfde route als stap 3) **+ `ACK_FROM` + `NOTIFY_FROM`** als Edge-Function-secrets, op een in Brevo geauthenticeerd domein (Resend is sinds 2026-09-20 uit de code; zie `MANUAL_TASKS.md`, bovenste blok). Zonder die twee
    gaat er bij een echte lead geen enkele mail de deur uit — gemeten, niet
    vermoed. Pas ná stap 3, anders geef je een publiek aanroepbaar endpoint een
    mailkanaal op je eigen domein.

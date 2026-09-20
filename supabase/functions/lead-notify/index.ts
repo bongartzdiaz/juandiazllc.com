@@ -36,16 +36,17 @@
 
 import { beoordeelAuth } from './auth.ts'
 import { verstuur } from '../_shared/brevo.ts'
+import { geheim } from '../_shared/geheim.ts'
 import { citaatHtml, omhulsel } from '../_shared/huisstijl.ts'
 
-const BREVO_API_KEY = Deno.env.get('BREVO_API_KEY') ?? null
+const BREVO_API_KEY = await geheim(Deno.env.get('BREVO_API_KEY'), 'brevo_api_key')
 const ALERT_EMAIL = Deno.env.get('ALERT_EMAIL') ?? null
 // Geen standaardwaarde meer: de oude (`onboarding@resend.dev`) was Resends
 // zandbak. Een afzender hoort op het geauthenticeerde domein, zoals ACK_FROM.
 const NOTIFY_FROM = Deno.env.get('NOTIFY_FROM') ?? null
 const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN') ?? null
 const TELEGRAM_CHAT_ID = Deno.env.get('TELEGRAM_CHAT_ID') ?? null
-const LEAD_NOTIFY_SECRET = Deno.env.get('LEAD_NOTIFY_SECRET') ?? null
+const LEAD_NOTIFY_SECRET = await geheim(Deno.env.get('LEAD_NOTIFY_SECRET'), 'lead_notify_secret')
 
 interface Lead {
   id?: string
