@@ -14,11 +14,12 @@
 //    reden in `ack_channel`. Anders zou de responstijdstatistiek meten hoe
 //    snel we het proberen in plaats van hoe snel de aanvrager iets hoort.
 //
-// 2. Verzenden vanaf een `@resend.dev`-adres wordt geweigerd. Dat is Resends
-//    zandbak-afzender: die levert alleen aan de accounthouder zelf. Aan een
-//    willekeurige aanvrager bouncet hij, of komt aan als iets wat niet van
-//    Juan lijkt. `lead-notify` mag hem gebruiken (die mailt naar Juan), deze
-//    functie niet. ACK_FROM moet een geverifieerd domein zijn.
+// 2. Verzenden vanaf een gratis maildomein (gmail, outlook, ...) wordt
+//    geweigerd, in `_shared/brevo.ts`. Brevo laat het toe, maar de DMARC-regels
+//    van die domeinen zetten zo'n mail in de spam of laten hem bouncen — bij
+//    een willekeurige aanvrager, niet bij Juan zelf. ACK_FROM moet een in
+//    Brevo geauthenticeerd domein zijn (DKIM + DMARC op juandiazllc.com).
+//    Tot 2026-09-20 liep dit via Resend, met dezelfde regel voor `@resend.dev`.
 //
 // 3. Het ontvangeradres komt UITSLUITEND uit de database, nooit uit de
 //    envelop, en zonder bestaande rij wordt er niets verstuurd. Zou de envelop
@@ -50,10 +51,12 @@
 // te onderscheiden is van een verkeerde. Zie de kopnotitie van auth.ts.
 
 import { beoordeelAuth } from './auth.ts'
+import { verstuur as verstuurBrevo } from '../_shared/brevo.ts'
+import { alineaHtml, citaatHtml, knopHtml, omhulsel } from '../_shared/huisstijl.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? null
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? null
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? null
+const BREVO_API_KEY = Deno.env.get('BREVO_API_KEY') ?? null
 const ACK_FROM = Deno.env.get('ACK_FROM') ?? null
 const ACK_REPLY_TO = Deno.env.get('ACK_REPLY_TO') ?? Deno.env.get('ALERT_EMAIL') ?? null
 // Dezelfde sleutel als lead-notify: één interne DB→functie-sleutel, niet twee.
@@ -92,51 +95,75 @@ function taalVan(lead: Lead): Taal {
   return TALEN.includes(kort) ? kort : 'en'
 }
 
+// Dezelfde link als lib/booking.ts (BOOKING_15MIN). Edge functions kunnen
+// niets buiten supabase/functions/ importeren; verandert de link, dan hier ook.
+const BOEKLINK = 'https://cal.com/juandiazllc/15min'
+
 interface Tekst {
   onderwerp: string
+  kop: string
   groet: (naam: string) => string
   inleiding: string
   jeSchreef: string
   sector: string
+  sneller: string
+  knop: string
   slot: string
+  voet: string
 }
 
 const COPY: Record<Taal, Tekst> = {
   en: {
-    onderwerp: 'Your message arrived — Juan Diaz',
+    onderwerp: "Got it. You'll hear from me within 24 hours",
+    kop: 'Message received',
     groet: (n) => (n ? `Hi ${n},` : 'Hi,'),
     inleiding:
-      'This is an automatic confirmation that your message came through. The reply will be mine, within 24 hours.',
-    jeSchreef: 'You wrote',
+      'Your message came through. This confirmation is automatic; the reply is not: it comes from me, within 24 hours, and it answers what you actually asked.',
+    jeSchreef: 'What you wrote',
     sector: 'Sector',
-    slot: 'Reply to this email if you want to add anything.',
+    sneller: 'Want it sooner? Pick 15 minutes in my calendar and we talk it through instead of typing.',
+    knop: 'Book 15 minutes',
+    slot: 'Anything to add? Reply to this email; it lands in my inbox.',
+    voet: 'You received this because you used the contact form on juandiazllc.com. One message, no series.',
   },
   nl: {
-    onderwerp: 'Je bericht is binnen — Juan Diaz',
+    onderwerp: 'Binnen. Je hoort binnen 24 uur van me',
+    kop: 'Bericht ontvangen',
     groet: (n) => (n ? `Hoi ${n},` : 'Hoi,'),
     inleiding:
-      'Dit is een automatische bevestiging dat je bericht is aangekomen. Het antwoord komt van mij, binnen 24 uur.',
-    jeSchreef: 'Je schreef',
+      'Je bericht is aangekomen. Deze bevestiging is automatisch; het antwoord niet: dat komt van mij, binnen 24 uur, en gaat over wat je werkelijk vroeg.',
+    jeSchreef: 'Wat je schreef',
     sector: 'Sector',
-    slot: 'Wil je iets toevoegen, antwoord dan op deze mail.',
+    sneller: 'Liever sneller? Kies een kwartier in mijn agenda, dan bespreken we het in plaats van te typen.',
+    knop: 'Plan 15 minuten',
+    slot: 'Wil je iets toevoegen? Antwoord op deze mail; die komt bij mij binnen.',
+    voet: 'Je krijgt dit omdat je het contactformulier op juandiazllc.com gebruikte. Eén bericht, geen reeks.',
   },
   de: {
-    onderwerp: 'Ihre Nachricht ist angekommen — Juan Diaz',
+    onderwerp: 'Angekommen. Sie hören innerhalb von 24 Stunden von mir',
+    kop: 'Nachricht erhalten',
     groet: (n) => (n ? `Guten Tag ${n},` : 'Guten Tag,'),
     inleiding:
-      'Dies ist eine automatische Bestätigung, dass Ihre Nachricht angekommen ist. Die Antwort kommt von mir, innerhalb von 24 Stunden.',
-    jeSchreef: 'Sie schrieben',
+      'Ihre Nachricht ist angekommen. Diese Bestätigung ist automatisch, die Antwort nicht: Sie kommt von mir, innerhalb von 24 Stunden, und geht auf das ein, was Sie tatsächlich gefragt haben.',
+    jeSchreef: 'Was Sie geschrieben haben',
     sector: 'Branche',
-    slot: 'Wenn Sie etwas ergänzen möchten, antworten Sie auf diese E-Mail.',
+    sneller: 'Lieber schneller? Wählen Sie 15 Minuten in meinem Kalender, dann besprechen wir es statt zu tippen.',
+    knop: '15 Minuten buchen',
+    slot: 'Möchten Sie etwas ergänzen? Antworten Sie auf diese E-Mail; sie landet bei mir.',
+    voet: 'Sie erhalten diese E-Mail, weil Sie das Kontaktformular auf juandiazllc.com genutzt haben. Eine Nachricht, keine Serie.',
   },
   es: {
-    onderwerp: 'Tu mensaje ha llegado — Juan Diaz',
+    onderwerp: 'Recibido. Tendrás noticias mías en menos de 24 horas',
+    kop: 'Mensaje recibido',
     groet: (n) => (n ? `Hola ${n},` : 'Hola,'),
     inleiding:
-      'Esta es una confirmación automática de que tu mensaje ha llegado. La respuesta será mía, en menos de 24 horas.',
-    jeSchreef: 'Escribiste',
+      'Tu mensaje ha llegado. Esta confirmación es automática; la respuesta no: la escribo yo, en menos de 24 horas, y responde a lo que realmente preguntaste.',
+    jeSchreef: 'Lo que escribiste',
     sector: 'Sector',
-    slot: 'Si quieres añadir algo, responde a este correo.',
+    sneller: '¿Lo quieres antes? Elige 15 minutos en mi agenda y lo hablamos en vez de escribirlo.',
+    knop: 'Reservar 15 minutos',
+    slot: '¿Quieres añadir algo? Responde a este correo; me llega directamente.',
+    voet: 'Recibes esto porque usaste el formulario de contacto de juandiazllc.com. Un mensaje, sin serie.',
   },
 }
 
@@ -148,17 +175,25 @@ function bouwMail(lead: Lead, taal: Taal): { subject: string; text: string; html
 
   const regels = [t.groet(naam), '', t.inleiding, '', `${t.jeSchreef}:`, bericht]
   if (sector) regels.push('', `${t.sector}: ${sector}`)
-  regels.push('', t.slot, '', 'Juan Diaz', 'juandiazllc.com')
+  regels.push('', t.sneller, `${t.knop}: ${BOEKLINK}`, '', t.slot, '', 'Juan Diaz', 'juandiazllc.com', '', t.voet)
 
-  const html = `<!doctype html><html lang="${taal}"><body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;color:#1a1a1a;max-width:560px">
-  <p>${esc(t.groet(naam))}</p>
-  <p>${esc(t.inleiding)}</p>
-  <p style="margin:0 0 6px;color:#666;font-size:14px">${esc(t.jeSchreef)}:</p>
-  <div style="white-space:pre-wrap;background:#f5f7f6;padding:14px;border-radius:8px">${esc(bericht)}</div>
-  ${sector ? `<p style="color:#666;font-size:14px">${esc(t.sector)}: ${esc(sector)}</p>` : ''}
-  <p>${esc(t.slot)}</p>
-  <p style="margin-top:28px">Juan Diaz<br><a href="https://juandiazllc.com">juandiazllc.com</a></p>
-</body></html>`
+  const blokken = [
+    alineaHtml(t.groet(naam)),
+    alineaHtml(t.inleiding),
+    `<p style="margin:0 0 6px;font-size:13px;letter-spacing:.4px;text-transform:uppercase;color:#5F6F67">${esc(t.jeSchreef)}</p>`,
+    citaatHtml(bericht),
+  ]
+  if (sector) blokken.push(`<p style="margin:0 0 16px;font-size:14px;color:#5F6F67">${esc(t.sector)}: ${esc(sector)}</p>`)
+  blokken.push(alineaHtml(t.sneller), knopHtml({ tekst: t.knop, url: BOEKLINK }), alineaHtml(t.slot))
+
+  const html = omhulsel({
+    taal,
+    kop: t.kop,
+    preheader: t.inleiding,
+    blokken,
+    groet: ['Juan Diaz', 'juandiazllc.com'],
+    voet: esc(t.voet),
+  })
 
   return { subject: t.onderwerp, text: regels.join('\n'), html }
 }
@@ -210,31 +245,25 @@ async function schrijfUitkomst(id: string, kanaal: string, gelukt: boolean): Pro
 }
 
 async function verstuur(lead: Lead, taal: Taal): Promise<string> {
-  if (!RESEND_API_KEY) return 'skipped:no-api-key'
+  if (!BREVO_API_KEY) return 'skipped:no-api-key'
   if (!ACK_FROM) return 'skipped:no-from-address'
-  // Zie kopnotitie, punt 2.
-  if (/@resend\.dev>?\s*$/i.test(ACK_FROM)) return 'skipped:sandbox-sender'
   if (!lijktOpEmail(lead.email)) return 'skipped:no-recipient'
 
-  try {
-    const { subject, text, html } = bouwMail(lead, taal)
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from: ACK_FROM,
-        to: String(lead.email).trim(),
-        reply_to: ACK_REPLY_TO ?? undefined,
-        subject,
-        text,
-        html,
-      }),
-    })
-    if (!res.ok) return `failed:${res.status} ${(await res.text()).slice(0, 160)}`
-    return 'email'
-  } catch (err) {
-    return `failed:${(err as Error).message.slice(0, 160)}`
-  }
+  const { subject, text, html } = bouwMail(lead, taal)
+  // Zie kopnotitie, punt 2: een freemail-afzender wordt in de helper geweigerd.
+  const r = await verstuurBrevo(
+    {
+      from: ACK_FROM,
+      to: String(lead.email).trim(),
+      replyTo: ACK_REPLY_TO ?? ACK_FROM,
+      onderwerp: subject,
+      text,
+      html,
+    },
+    { apiKey: BREVO_API_KEY },
+  )
+  if (!r.ok) return r.reden === 'freemail-sender' ? 'skipped:freemail-sender' : `failed:${r.reden}`
+  return 'email'
 }
 
 Deno.serve(async (req) => {

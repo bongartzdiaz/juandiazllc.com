@@ -9,7 +9,7 @@ import { REEKS_BRON } from "@/lib/email/scan-reeks";
    tweede run niets dubbel stuurt.
 
    De Supabase-client is een nep-tabel in het geheugen die telt hoe vaak hij
-   is aangeraakt. De fetch naar Resend is gestubd op `globalThis` en telt ook.
+   is aangeraakt. De fetch naar Brevo is gestubd op `globalThis` en telt ook.
    Beide tellers zijn de positieve controle: "niets verstuurd" is pas een
    meting als aantoonbaar is dat de fetch niet bereikt is. */
 
@@ -75,8 +75,8 @@ function stubFetch(status = 200) {
   vi.stubGlobal("fetch", async (_url: unknown, init?: RequestInit) => {
     fetchTeller.aanroepen += 1;
     const body = JSON.parse(String(init?.body ?? "{}"));
-    fetchTeller.naar.push(body.to);
-    return new Response(JSON.stringify({ id: "em_1" }), { status });
+    fetchTeller.naar.push(body.to[0].email);
+    return new Response(JSON.stringify({ messageId: "<1@brevo>" }), { status });
   });
 }
 
@@ -116,7 +116,7 @@ beforeEach(() => {
   tabel.dbBereikt = false;
   tabel.clientFaalt = false;
   vi.stubEnv("CRON_SECRET", SECRET);
-  vi.stubEnv("RESEND_API_KEY", "re_test");
+  vi.stubEnv("BREVO_API_KEY", "xkeysib-test");
   vi.stubEnv("CAMPAGNE_FROM", "Juan <juan@juandiazllc.com>");
   stubFetch();
 });
@@ -147,10 +147,10 @@ describe("poorten, in volgorde, en allemaal vóór de database", () => {
     expect(fetchTeller.aanroepen).toBe(0);
   });
 
-  it("RESEND_API_KEY of CAMPAGNE_FROM ontbreekt → 503, ná de auth", async () => {
-    vi.stubEnv("RESEND_API_KEY", "");
+  it("BREVO_API_KEY of CAMPAGNE_FROM ontbreekt → 503, ná de auth", async () => {
+    vi.stubEnv("BREVO_API_KEY", "");
     expect((await GET(req(`Bearer ${SECRET}`))).status).toBe(503);
-    vi.stubEnv("RESEND_API_KEY", "re_test");
+    vi.stubEnv("BREVO_API_KEY", "xkeysib-test");
     vi.stubEnv("CAMPAGNE_FROM", "");
     expect((await GET(req(`Bearer ${SECRET}`))).status).toBe(503);
     // Zonder auth blijft het 401, niet 503: de sleutelcontrole komt eerst.
@@ -167,15 +167,15 @@ describe("elke 503 noemt de variabele in het log, nooit de waarde", () => {
      herleiden was welke van de vier variabelen ontbrak. */
   const gevallen: Array<{ naam: string; opzet: () => void; verwacht: string; geheim: string }> = [
     { naam: "CRON_SECRET", opzet: () => vi.stubEnv("CRON_SECRET", "xyz"), verwacht: "CRON_SECRET", geheim: "xyz" },
-    { naam: "RESEND_API_KEY", opzet: () => vi.stubEnv("RESEND_API_KEY", ""), verwacht: "RESEND_API_KEY", geheim: "re_test" },
+    { naam: "BREVO_API_KEY", opzet: () => vi.stubEnv("BREVO_API_KEY", ""), verwacht: "BREVO_API_KEY", geheim: "xkeysib-test" },
     { naam: "CAMPAGNE_FROM leeg", opzet: () => vi.stubEnv("CAMPAGNE_FROM", ""), verwacht: "CAMPAGNE_FROM leeg", geheim: "juan@juandiazllc.com" },
     {
-      naam: "CAMPAGNE_FROM sandbox",
-      opzet: () => vi.stubEnv("CAMPAGNE_FROM", "Test <onboarding@resend.dev>"),
-      verwacht: "CAMPAGNE_FROM is een @resend.dev",
-      geheim: "onboarding@resend.dev",
+      naam: "CAMPAGNE_FROM freemail",
+      opzet: () => vi.stubEnv("CAMPAGNE_FROM", "Juan Diaz, LLC <bongartzdiaz@gmail.com>"),
+      verwacht: "CAMPAGNE_FROM staat op een gratis maildomein",
+      geheim: "bongartzdiaz@gmail.com",
     },
-    { naam: "SUPABASE_SECRET_KEY", opzet: () => { tabel.clientFaalt = true; }, verwacht: "SUPABASE_SECRET_KEY", geheim: "re_test" },
+    { naam: "SUPABASE_SECRET_KEY", opzet: () => { tabel.clientFaalt = true; }, verwacht: "SUPABASE_SECRET_KEY", geheim: "xkeysib-test" },
   ];
 
   for (const g of gevallen) {
@@ -210,8 +210,8 @@ describe("elke 503 noemt de variabele in het log, nooit de waarde", () => {
     }
   });
 
-  it("de sandbox-afzender wordt vóór de database geweigerd", async () => {
-    vi.stubEnv("CAMPAGNE_FROM", "x@resend.dev");
+  it("de freemail-afzender wordt vóór de database geweigerd", async () => {
+    vi.stubEnv("CAMPAGNE_FROM", "x@gmail.com");
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     try {
       await GET(req(`Bearer ${SECRET}`));
@@ -270,14 +270,18 @@ describe("per rij", () => {
 
   it("de mail draagt afzender, reply-to en afmeldlink", async () => {
     tabel.rijen = [rij("a", 0)];
-    let body: Record<string, string> = {};
+    let body: Record<string, unknown> = {};
+    let headers: Record<string, string> = {};
     vi.stubGlobal("fetch", async (_u: unknown, init?: RequestInit) => {
       body = JSON.parse(String(init?.body));
-      return new Response("{}", { status: 200 });
+      headers = init?.headers as Record<string, string>;
+      return new Response("{}", { status: 201 });
     });
     await GET(req(`Bearer ${SECRET}`));
-    expect(body.from).toBe("Juan <juan@juandiazllc.com>");
-    expect(body.reply_to).toBe("info@juandiazllc.com");
-    expect(body.text).toContain("/api/uitschrijven?token=");
+    expect(headers["api-key"]).toBe("xkeysib-test");
+    expect(body.sender).toEqual({ name: "Juan", email: "juan@juandiazllc.com" });
+    expect(body.replyTo).toEqual({ email: "info@juandiazllc.com" });
+    expect(String(body.textContent)).toContain("/api/uitschrijven?token=");
+    expect(String(body.htmlContent)).toContain("/api/uitschrijven?token=");
   });
 });

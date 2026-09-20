@@ -3,6 +3,54 @@
 Every item here is a one-time human action that unblocks code that's
 already shipped. Strike through (`~~...~~`) when done.
 
+## Brevo in plaats van Resend — domein authenticeren, drie sleutels (2026-09-20)
+
+Alle mail van de site loopt sinds 2026-09-20 via Brevo. Resend is uit de code:
+`lib/email/brevo.ts` (campagne, Vercel) en `supabase/functions/_shared/brevo.ts`
+(edge functions) zijn byte-identiek en delen één regel: **een afzender op een
+gratis maildomein wordt geweigerd** vóór er iets de deur uit gaat. Gemeten via
+de Brevo-connector: het account heeft precies één geverifieerde afzender,
+`Juan Diaz, LLC <bongartzdiaz@gmail.com>`. Die komt door die regel niet heen —
+met opzet. Een mail van een gmail-adres via Brevo's servers faalt op Gmails
+eigen DMARC en landt in de spam van precies de lead die je wilt bereiken.
+
+Volgorde:
+
+- [ ] **Domein authenticeren** in Brevo → Senders, Domains & Dedicated IPs →
+      Domains → `juandiazllc.com`. Brevo geeft twee DNS-records (DKIM `CNAME`
+      of `TXT`, plus een `TXT` voor de Brevo-code) en wil een DMARC-record.
+      Zonder deze stap is elke afzender hieronder een spam-kandidaat.
+- [ ] **Afzenders** aanmaken op dat domein: `Juan Diaz <juan@juandiazllc.com>`
+      en `Juan Diaz <noreply@juandiazllc.com>`. `info@juandiazllc.com` blijft
+      het reply-to-adres; dat hoeft geen afzender te zijn.
+- [ ] **`BREVO_API_KEY`** — Brevo → SMTP & API → API Keys. Eén sleutel, op
+      **twee plekken**, want de cron draait op Vercel en de bevestiging op
+      Supabase:
+      1. Supabase `wbgiouuifqhasedncysw` → Edge Functions → Secrets, samen met
+         `ACK_FROM` (bevestiging aan de lead) en `NOTIFY_FROM` (interne melding
+         aan `ALERT_EMAIL`). Beide op het geauthenticeerde domein.
+      2. Vercel → `juandiazllc-com` → Environment Variables → Production, samen
+         met `CAMPAGNE_FROM`.
+- [ ] **Beide edge functions opnieuw uitrollen** na de merge: `lead-notify` en
+      `lead-acknowledge` lezen nu `../_shared/brevo.ts` en `../_shared/huisstijl.ts`.
+      Vanaf deze machine met jouw PAT als env-var (nooit in `.env` of de repo):
+      `supabase functions deploy lead-acknowledge --project-ref wbgiouuifqhasedncysw --no-verify-jwt`
+      en hetzelfde voor `lead-notify`. Tot de uitrol draait de oude code, die
+      `RESEND_API_KEY` leest en dus `skipped:no-api-key` blijft melden.
+
+**Probe zonder bijwerking.** Ná de uitrol, mét `LEAD_NOTIFY_SECRET` maar
+zonder `BREVO_API_KEY`: een lead levert `ack_channel = 'skipped:no-api-key'`.
+Mét sleutel maar met `ACK_FROM` op gmail: `skipped:freemail-sender` — de rij
+zegt zelf waarom er niets uitging. Voor de campagne: `GET
+/api/campagne/scan-reeks` zonder header geeft 503 zolang een van de vier
+ontbreekt, en het Vercel-runtime-log noemt de variabele bij naam.
+
+**Wat er NIET is veranderd.** `pricing.faq.a6` op `/pricing` noemt Resend nog
+als e-mailverwerker van **DEUS** — dat is het CRM in DEUS-SHARED, geen code
+in deze repo. Klopt die zin nog? Dat is een vraag aan DEUS-SHARED, niet aan
+deze migratie.
+
+
 ## Ontvangstbevestiging aan leads aanzetten (2026-08-16)
 
 De keten staat en is gemeten: trigger → edge function → rij bijgewerkt, 34 ms
@@ -58,14 +106,16 @@ Zolang dat zo is meldt de functie eerlijk `skipped:no-api-key` en blijft
 Deze drie zijn secrets op de **edge functions** (Supabase → Edge Functions →
 Secrets), niet op Vercel. De functie draait los van Next.js.
 
-- [ ] `RESEND_API_KEY` — uit het Resend-dashboard. Dezelfde sleutel zet
-      meteen ook de Resend-helft van `lead-notify` aan.
-- [ ] `ACK_FROM` — bijvoorbeeld `Juan Diaz <hallo@juandiazllc.com>`.
-      **Moet een geverifieerd domein zijn** (SPF + DKIM op de DNS-zone van
-      juandiazllc.com). Een `@resend.dev`-adres wordt door de functie
-      geweigerd: Resends zandbak levert alleen aan de accounthouder, dus een
-      bevestiging aan een aanvrager zou bouncen. De weigering is code, geen
-      afspraak — zie punt 2 in de kop van `supabase/functions/lead-acknowledge/`.
+- [ ] `BREVO_API_KEY` — uit het Brevo-dashboard (tot 2026-09-20: `RESEND_API_KEY`).
+      Dezelfde sleutel zet meteen ook de mailhelft van `lead-notify` aan; die
+      heeft daarnaast `NOTIFY_FROM` nodig.
+- [ ] `ACK_FROM` — bijvoorbeeld `Juan Diaz <juan@juandiazllc.com>`.
+      **Moet een in Brevo geauthenticeerd domein zijn** (DKIM + DMARC op de
+      DNS-zone van juandiazllc.com). Een afzender op gmail/outlook/yahoo wordt
+      door `_shared/brevo.ts` geweigerd (`skipped:freemail-sender`): de
+      DMARC-regels van die domeinen zetten zo'n mail in de spam van de
+      aanvrager. De weigering is code, geen afspraak — zie punt 2 in de kop
+      van `supabase/functions/lead-acknowledge/`.
 - [ ] `ACK_REPLY_TO` — optioneel. Valt terug op `ALERT_EMAIL`. Hierheen komt
       het antwoord als iemand op de bevestiging reageert.
 
@@ -236,7 +286,7 @@ een afmeldlink. Die belofte heeft sinds 2026-09-19 code achter zich:
 `app/api/campagne/scan-reeks/route.ts`, dagelijks om 08:00 UTC aangeroepen door
 de Vercel-cron uit `vercel.json`. De route leest `marketing.subscribers` met
 `source = 'lekkage-scan'`, rekent per rij uit welke mail aan de beurt is (dag
-0, 3 en 7 na de toestemming), verstuurt via Resend en stempelt de rij. Twee
+0, 3 en 7 na de toestemming), verstuurt via Brevo en stempelt de rij. Twee
 runs op één dag sturen niets dubbel; een gemiste dag wordt ingehaald.
 
 Tot deze vier variabelen staan, antwoordt de route eerlijk **503
@@ -253,14 +303,14 @@ deployment op (zie CLAUDE.md), een push naar `main` wel.
 - [ ] `CRON_SECRET` — minstens 16 tekens, willekeurig. Vercel stuurt hem zelf
       als `Authorization: Bearer …` mee zodra hij in het project staat; jij
       zet hem alleen. Korter dan 16 tekens telt als niet gezet (503).
-- [ ] `RESEND_API_KEY` — dezelfde Resend-sleutel als bij de edge functions
+- [ ] `BREVO_API_KEY` — dezelfde Brevo-sleutel als bij de edge functions
       hierboven, maar dit is een **tweede plek**: de cron draait op Vercel,
       niet op Supabase. De sleutel bij de edge functions bereikt deze route
       niet.
 - [ ] `CAMPAGNE_FROM` — bijvoorbeeld `Juan Diaz <juan@juandiazllc.com>`. Op een
-      in Resend geverifieerd domein; een `@resend.dev`-afzender wordt door
-      `lib/email/resend.ts` geweigerd vóór er iets de deur uit gaat, om
-      dezelfde reden als bij `ACK_FROM`. Antwoorden komen op `info@` binnen
+      in Brevo geauthenticeerd domein; een afzender op een gratis maildomein
+      wordt door `lib/email/brevo.ts` geweigerd vóór er iets de deur uit
+      gaat, om dezelfde reden als bij `ACK_FROM`. Antwoorden komen op `info@` binnen
       (`reply_to` staat vast op `CONTACT_EMAIL`).
 - [ ] `SUPABASE_SECRET_KEY` — de service-sleutel van `wbgiouuifqhasedncysw`.
       `anon` mag op `marketing.subscribers` alleen INSERT; lezen en stempelen
@@ -293,7 +343,7 @@ volgende run slaat de rij over. Daarna de testrij verwijderen.
 
 Het zevende Plausible-doel (`Uitslag Aangevraagd`, hieronder) meet het opgeven
 van het adres; deze mails meten niets — wie wil weten of ze aankomen kijkt in
-het Resend-dashboard.
+het Brevo-dashboard (Transactional → Logs).
 
 ## Cal.com — verplichte vragen + webhook (2026-08-02)
 

@@ -2,7 +2,7 @@
  * worden.
  *
  * Dit bestand is de zuivere helft: geen netwerk, geen database, geen env.
- * Het verzenden staat in lib/email/resend.ts, het selecteren van rijen en het
+ * Het verzenden staat in lib/email/brevo.ts, de vorm in lib/email/huisstijl.ts, het selecteren van rijen en het
  * bijwerken van `metadata.verzonden` in app/api/campagne/scan-reeks/route.ts.
  * Zo is de kopij en de planning te testen zonder één mock.
  *
@@ -25,6 +25,7 @@
 
 import { CONTACT_EMAIL, SITE_URL } from "@/lib/seo/branding";
 import { SCAN_BRON } from "@/lib/scan-opvang";
+import { alineaHtml, knopHtml, omhulsel, type Knop } from "@/lib/email/huisstijl";
 
 export type MailNr = 1 | 2 | 3;
 
@@ -68,22 +69,56 @@ function lekkenZin(lekken: number | null): string {
 }
 
 /* De kopij. Nederlands, je-vorm, zoals de scanpagina zelf. Elke mail heeft
- * één vraag of één stap; wie drie dingen tegelijk krijgt doet er nul. */
+ * één vraag of één stap, en één knop die precies die stap is; wie drie
+ * dingen tegelijk krijgt doet er nul. De eerste regel van elke mail staat
+ * óók als preheader in de inbox, dus die regel moet op zichzelf staan.
+ *
+ * Mail 1 en 2 vragen om een antwoord per mail (mailto met een voorgevuld
+ * onderwerp, zodat het antwoord te herkennen is). Mail 3 leidt naar het
+ * gesprek. Er is met opzet geen "lees meer op de site": de reeks is de
+ * inhoud, niet een wegwijzer ernaartoe. */
+
+function onderwerp1(lekken: number | null): string {
+  if (lekken === null) return "Je scanuitslag, en één ding om deze week te tellen";
+  if (lekken === 0) return "Geen lek gevonden. Eén telling om dat te bewijzen";
+  if (lekken === 1) return "Eén lek gevonden. Tel hem deze week";
+  return `${lekken} lekken gevonden. Tel er deze week één`;
+}
+
+const ONDERWERPEN: Readonly<Record<Exclude<MailNr, 1>, string>> = {
+  2: "Het lek zit niet in het werk. Het zit in het wachten",
+  3: "Eén pagina die zegt waar het lekt (laatste mail)",
+};
+
+export function onderwerp(nr: MailNr, invoer: MailInvoer): string {
+  return nr === 1 ? onderwerp1(invoer.lekken) : ONDERWERPEN[nr];
+}
+
+/** Antwoord-knop: mailto naar het contactadres met een onderwerp dat de mail
+ *  aanwijst, zodat een antwoord uit deze reeks in de inbox te herkennen is. */
+function antwoordKnop(tekst: string, ref: string): Knop {
+  return {
+    tekst,
+    url: `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Scan: ${ref}`)}`,
+  };
+}
 
 function alinea1(invoer: MailInvoer): string[] {
   return [
     lekkenZin(invoer.lekken),
     "Die uitslag stond op je scherm en is nu weg. Dit is hem in één zin: wat lekt, lekt op de overdracht tussen mensen, niet op de mensen zelf. De status van een deal leeft in hoofden, een aanvraag wacht tot iemand hem ziet, hetzelfde feit wordt twee keer getypt.",
     "Eén ding voor deze week. Kies het bovenste lek en tel het. Niet schatten: tellen. Hoeveel werkdagen zaten er tussen de laatste tien aanvragen en de offerte? Hoeveel uur tot het eerste antwoord? Een geteld getal is het enige cijfer over je bedrijf dat niet van een leverancier komt.",
+    "Stuur me dat getal als je het hebt. Ik zeg je wat het meestal betekent, en dat is geen verkooppraatje: het is één zin terug.",
     "Over drie dagen krijg je één mail over wat dat getal meestal laat zien. Daarna nog één, en dan houdt het op.",
   ];
 }
 
 function alinea2(): string[] {
   return [
-    "Wie de vorige mail las en heeft geteld, ziet nu meestal hetzelfde: de tijd zit niet in het werk maar in het wachten ertussen. De aanvraag komt binnen, blijft liggen tot de juiste persoon terug is, gaat naar een schouw die in een agenda staat die niemand deelt, en de offerte wordt getypt uit een notitie die al twee keer is overgetypt.",
+    "Wie heeft geteld, ziet nu bijna altijd hetzelfde: de tijd zit niet in het werk maar in het wachten ertussen.",
+    "De aanvraag komt binnen, blijft liggen tot de juiste persoon terug is, gaat naar een schouw die in een agenda staat die niemand deelt, en de offerte wordt getypt uit een notitie die al twee keer is overgetypt.",
     "Dat is geen mensenprobleem. Het is een overdrachtsprobleem, en overdrachten laten zich meten. Waar het getal het grootst is, zit het eerste lek. Bijna altijd is dat de stap waar niemand eigenaar van is.",
-    "De vraag voor vandaag is dus niet hoe je sneller wordt, maar welke stap geen eigenaar heeft. Schrijf die ene stap op. Meer hoeft niet.",
+    "De vraag voor vandaag is dus niet hoe je sneller wordt, maar welke stap geen eigenaar heeft. Schrijf die ene stap op en stuur hem me. Meer hoeft niet.",
   ];
 }
 
@@ -97,16 +132,25 @@ function alinea3(): string[] {
   ];
 }
 
-const ONDERWERPEN: Readonly<Record<MailNr, string>> = {
-  1: "Je scanuitslag, en één ding om deze week te tellen",
-  2: "Waar de tijd blijft tussen aanvraag en offerte",
-  3: "Eén pagina die zegt waar het lekt",
+function knop(nr: MailNr): Knop {
+  switch (nr) {
+    case 1:
+      return antwoordKnop("Stuur me je getal", "mijn getal");
+    case 2:
+      return antwoordKnop("Stuur me die ene stap", "de stap zonder eigenaar");
+    case 3:
+      return { tekst: "Plan het blueprint-gesprek", url: `${SITE_URL}${GESPREK_PAD}` };
+  }
+}
+
+const KOPPEN: Readonly<Record<MailNr, string>> = {
+  1: "Lekkage-scan · 1 van 3",
+  2: "Lekkage-scan · 2 van 3",
+  3: "Lekkage-scan · 3 van 3",
 };
 
-function voettekst(token: string): string[] {
-  return [
-    `Je krijgt deze mail omdat je na de lekkage-scan op juandiazllc.com je adres achterliet. Afmelden: ${afmeldLink(token)}`,
-  ];
+function voettekst(token: string): string {
+  return `Je krijgt deze mail omdat je na de lekkage-scan op juandiazllc.com je adres achterliet. Afmelden: ${afmeldLink(token)}`;
 }
 
 function alinea(nr: MailNr, invoer: MailInvoer): string[] {
@@ -120,37 +164,23 @@ function alinea(nr: MailNr, invoer: MailInvoer): string[] {
   }
 }
 
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-/** Zet een kale URL in een alinea om naar een link; verder blijft de tekst
- *  tekst. Bewust geen markdown-parser: twee vormen van dezelfde kopij lopen
- *  uit elkaar, en de tekstversie is de bron. */
-function naarHtmlAlinea(s: string): string {
-  const veilig = escapeHtml(s);
-  return `<p>${veilig.replace(/https?:\/\/[^\s]+/g, (url) => `<a href="${url}">${url}</a>`)}</p>`;
-}
-
 export function bouwMail(nr: MailNr, invoer: MailInvoer): Mail {
   const body = alinea(nr, invoer);
   const voet = voettekst(invoer.unsub_token);
   const groet = ["Juan", CONTACT_EMAIL];
 
-  const text = [...body, "", ...groet, "", ...voet].join("\n");
-  const html = [
-    `<!doctype html><html lang="nl"><body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;color:#1a1a1a;max-width:560px">`,
-    ...body.map(naarHtmlAlinea),
-    `<p>Juan<br>${CONTACT_EMAIL}</p>`,
-    `<p style="font-size:12px;color:#666">${naarHtmlAlinea(voet[0]).slice(3, -4)}</p>`,
-    `</body></html>`,
-  ].join("\n");
+  const text = [body.join("\n\n"), "", ...groet, "", voet].join("\n");
+  const html = omhulsel({
+    taal: "nl",
+    kop: KOPPEN[nr],
+    preheader: body[0],
+    blokken: [...body.map(alineaHtml), knopHtml(knop(nr))],
+    groet,
+    // alineaHtml zet de afmeld-URL om naar een link en escapet de rest.
+    voet: alineaHtml(voet).replace(/^<p[^>]*>/, "").replace(/<\/p>$/, ""),
+  });
 
-  return { onderwerp: ONDERWERPEN[nr], text, html };
+  return { onderwerp: onderwerp(nr, invoer), text, html };
 }
 
 /* Planning. */
