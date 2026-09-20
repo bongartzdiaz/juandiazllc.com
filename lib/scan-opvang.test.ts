@@ -1,54 +1,80 @@
 import { describe, it, expect } from 'vitest'
 import {
-  MAX_LEKKEN,
   SCAN_BRON,
   SCAN_CAMPAGNE,
   TOESTEMMING_TEKST,
   TOESTEMMING_WAARDE,
+  bouwLeadBericht,
   bouwMetadata,
-  leesLekken,
+  leesAntwoorden,
 } from './scan-opvang'
+import { VRAGEN, scoor } from './lekkage-scan'
 
 /* ─────────────────────────────────────────────────────────────
    De zuivere helft van de scan-opvang.
 
-   Dit bestand test wat er zonder Supabase te meten is: hoe het `lekken`-veld
-   van het formulier wordt gelezen, en wat er precies in `metadata` belandt.
-   De takken van de server action zelf staan in app/actions/scan-opvang.test.ts;
-   die heeft een gemockte client nodig en meet iets anders.
+   Dit bestand test wat er zonder Supabase te meten is: hoe de meegestuurde
+   antwoorden worden gelezen, wat het bericht aan Juan draagt, en wat er
+   precies in `metadata` belandt. De takken van de server action zelf staan
+   in app/actions/scan-opvang.test.ts, met een gemockte client.
 
-   Waarom `leesLekken` een eigen poort verdient: het veld komt uit een hidden
-   input en is dus invoer van buiten, niet een waarde die de component
-   garandeert. De onderscheidende eis is dat "0" een echte uitslag is (nul
-   lekken gevonden) en dat onzin `null` wordt — niet 0. Wie die twee door
-   elkaar haalt, publiceert later een campagnesegment waarin iedere
-   kapotte inzending als "nul lekken" meetelt.
+   Waarom `leesAntwoorden` een eigen poort verdient: het veld komt uit een
+   hidden input en is dus invoer van buiten, niet een waarde die de component
+   garandeert. Sinds de gate (2026-09-20) rekent de server de uitslag zelf
+   uit; een half of vervalst antwoordenobject moet `null` worden en geen
+   uitslag met nul lekken opleveren.
    ───────────────────────────────────────────────────────────── */
 
-describe('leesLekken', () => {
-  it('leest een geldig aantal, nul inbegrepen', () => {
-    expect(leesLekken('0')).toBe(0)
-    expect(leesLekken('1')).toBe(1)
-    expect(leesLekken('16')).toBe(16)
+describe('leesAntwoorden', () => {
+  const alles = Object.fromEntries(VRAGEN.map((v) => [v.id, v.id.startsWith('B')]))
+
+  it('leest een volledig antwoordenobject', () => {
+    expect(leesAntwoorden(JSON.stringify(alles))).toEqual(alles)
   })
 
-  it('weigert alles wat geen geheel getal van hooguit twee cijfers is', () => {
-    for (const waarde of ['', ' ', '-1', '1.5', '01e2', 'zes', '100', '999']) {
-      expect(leesLekken(waarde), waarde).toBeNull()
+  it('weigert alles wat geen volledig object met booleans is', () => {
+    const zonderEen: Record<string, boolean> = { ...alles }
+    delete zonderEen[VRAGEN[0].id]
+    for (const waarde of [
+      '', ' ', 'null', '[]', '{}', '"A1"', '{"A1":true',
+      JSON.stringify(zonderEen),
+      JSON.stringify({ ...alles, A1: 'ja' }),
+      JSON.stringify({ ...alles, A1: 1 }),
+      JSON.stringify({ ...alles, Z9: true }),
+      JSON.stringify(alles) + ' '.repeat(2000),
+    ]) {
+      expect(leesAntwoorden(waarde), waarde.slice(0, 40)).toBeNull()
     }
   })
 
   it('weigert een waarde die geen string is', () => {
     // FormData.get() geeft een File terug bij een bestandsveld, en null bij
-    // een veld dat niet bestaat. Geen van beide mag als getal gelden.
-    expect(leesLekken(null)).toBeNull()
-    expect(leesLekken(undefined)).toBeNull()
-    expect(leesLekken(3)).toBeNull()
+    // een veld dat niet bestaat.
+    expect(leesAntwoorden(null)).toBeNull()
+    expect(leesAntwoorden(undefined)).toBeNull()
+    expect(leesAntwoorden(alles)).toBeNull()
+  })
+})
+
+describe('bouwLeadBericht', () => {
+  it('noemt taal, aantal, en per lek naam, breuk en vraag-ids', () => {
+    const lekken = scoor(Object.fromEntries(VRAGEN.map((v) => [v.id, false])))
+    const b = bouwLeadBericht(lekken, 'de')
+    expect(b).toMatch(/^Lekkage-scan \(de\): 3 lekken\./)
+    for (const l of lekken) {
+      expect(b).toContain(`${l.naam} — ${l.aantal}/${l.totaal}`)
+      for (const v of l.vragen) expect(b).toContain(v.id)
+    }
+    expect(b.split('\n')).toHaveLength(4)
   })
 
-  it('accepteert de bovengrens en weigert wat erboven ligt', () => {
-    expect(leesLekken(String(MAX_LEKKEN))).toBe(MAX_LEKKEN)
-    expect(leesLekken(String(MAX_LEKKEN + 1))).toBeNull()
+  it('nul lekken is een zin, geen lege lijst', () => {
+    expect(bouwLeadBericht([], 'nl')).toBe('Lekkage-scan (nl): nul lekken gevonden.')
+  })
+
+  it('geen bedrag en geen percentage — dat mag ook niet in een Telegram', () => {
+    const lekken = scoor(Object.fromEntries(VRAGEN.map((v) => [v.id, false])))
+    expect(bouwLeadBericht(lekken, 'nl')).not.toMatch(/€|%/)
   })
 })
 

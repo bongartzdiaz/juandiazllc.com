@@ -26,25 +26,25 @@ const KOPIJ = {
   nl: {
     eyebrow: "◉ Vier minuten",
     p:
-      `${AANTAL_WOORD_HOOFD} ja/nee-vragen over je stack, en je ziet welke drie dingen ` +
-      "bij jou het eerst lekken. Geen e-mail, geen verkooppraat — de uitslag staat " +
-      "meteen op je scherm.",
+      `${AANTAL_WOORD_HOOFD} ja/nee-vragen over je stack. Laat je naam, bedrijf en ` +
+      "e-mailadres achter en je ziet welke drie dingen bij jou het eerst lekken — " +
+      "en je hoort binnen 24 uur van me.",
     knop: "Doe de lekkage-scan",
   },
   en: {
     eyebrow: "◉ Four minutes",
     p:
-      `${hoofd(telwoord(VRAGEN.length, "en"))} yes/no questions about your stack, and you see which three ` +
-      "things leak first in your business. No email, no sales pitch — the result is " +
-      "on your screen straight away.",
+      `${hoofd(telwoord(VRAGEN.length, "en"))} yes/no questions about your stack. Leave your name, ` +
+      "company and email and you see which three things leak first in your business — " +
+      "and you hear from me within 24 hours.",
     knop: "Take the leak scan",
   },
   de: {
     eyebrow: "◉ Vier Minuten",
     p:
-      `${hoofd(telwoord(VRAGEN.length, "de"))} Ja/Nein-Fragen zu Ihrem Stack, und Sie sehen, welche drei ` +
-      "Dinge bei Ihnen zuerst lecken. Keine E-Mail, kein Verkaufsgespräch — das Ergebnis " +
-      "steht sofort auf Ihrem Bildschirm.",
+      `${hoofd(telwoord(VRAGEN.length, "de"))} Ja/Nein-Fragen zu Ihrem Stack. Hinterlassen Sie Name, ` +
+      "Firma und E-Mail-Adresse, und Sie sehen, welche drei Dinge bei Ihnen zuerst lecken — " +
+      "und Sie hören innerhalb von 24 Stunden von mir.",
     knop: "Leak-Scan machen",
   },
 } as const;

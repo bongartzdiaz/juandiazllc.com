@@ -6,14 +6,16 @@
  *
  * DRIE DINGEN DIE OPZET ZIJN, ZODAT NIEMAND ZE "REPAREERT":
  *
- * 1. Het e-mailveld is OPTIONEEL en staat pas op het uitslagscherm. De scan
- *    zelf blijft zonder adres te doen; wie zijn adres achterlaat vraagt om
- *    hooguit drie mails over zijn eigen lekken, met een aangevinkt vakje als
- *    toestemming (Telecommunicatiewet 11.7). De actie schrijft naar
- *    marketing.subscribers met source=lekkage-scan; zie app/actions/scan-opvang.ts.
- *    Er belooft niets een PDF, dus er is geen belofte die op een mailsleutel
- *    wacht. De contactroute hieronder blijft ernaast staan en draagt
- *    `interest=lekkage-scan` in `source`.
+ * 1. De uitslag staat achter een GATE: naam, bedrijf en e-mailadres, en dan
+ *    pas de drie lekken. Sinds 2026-09-20 (avond), op Juans woord — *so that
+ *    you can actually get leads*. Tot die avond was het adres optioneel en
+ *    stond de uitslag meteen op het scherm; docs/lead-magnet.md §10 legt de
+ *    omkering vast. De actie schrijft de lead naar marketing.leads (Telegram
+ *    en bevestiging via de triggers daar) en, alleen met het losse vinkje,
+ *    het adres naar marketing.subscribers voor de reeks van drie mails
+ *    (Telecommunicatiewet 11.7: de gate koopt de uitslag, niet de reeks).
+ *    Zie app/actions/scan-opvang.ts. De contactroute onderaan blijft ernaast
+ *    staan en draagt `interest=lekkage-scan` in `source`.
  * 2. De kopij komt uit TEKSTEN[taal] en niet uit dict.ts. Tot 2026-09-20
  *    bestond de scan alleen op /nl en stond alles hier hardgecodeerd; sinds
  *    /tools/leak-scan (en, de) draagt lib/lekkage-scan-taal.ts de drie talen
@@ -110,15 +112,22 @@ export function LekkageScan({ taal }: { taal: ScanTaal }) {
     }
   }, [getoond, compleet, lekken.length, taal]);
 
-  /* De optionele opvang. Het formulier post naar een server action; de
-     uitkomst komt terug als state en rendert onder het veld. Zevende
-     Plausible-doel `Uitslag Aangevraagd`, met dezelfde eigenschap `lekken`,
-     zodat een aanvraag met vier lekken te scheiden is van een met nul.
-     Zelfde ref-guard als hierboven: eenmaal per geslaagde inzending. */
+  /* De gate. Het formulier post naar een server action; pas op `ok` rendert
+     de uitslag eronder. Zevende Plausible-doel `Uitslag Aangevraagd`, met
+     dezelfde eigenschap `lekken`, zodat een aanvraag met vier lekken te
+     scheiden is van een met nul. Zelfde ref-guard als hierboven: eenmaal per
+     geslaagde inzending. */
   const [opvang, opvangActie, opvangBezig] = useActionState(vraagUitslagAan, {
     status: "idle",
   } as ScanOpvangState);
   const aangevraagdGemeld = useRef(false);
+  const uitslagZichtbaar = getoond && compleet && opvang.status === "ok";
+  /* Alle antwoorden gaan als JSON mee; de server rekent de uitslag
+     zelf uit voor het bericht aan Juan, uit dezelfde antwoorden. */
+  const antwoordenJson = useMemo(
+    () => JSON.stringify(Object.fromEntries(vragen.map((v) => [v.id, antwoorden[v.id] ?? false]))),
+    [antwoorden, vragen],
+  );
 
   useEffect(() => {
     if (opvang.status !== "ok") {
@@ -213,7 +222,78 @@ export function LekkageScan({ taal }: { taal: ScanTaal }) {
         </p>
       </div>
 
-      {getoond && compleet && (
+      {getoond && compleet && !uitslagZichtbaar && (
+        <section className="scan-gate" aria-live="polite">
+          <h2>{T.gateKop}</h2>
+          <p>{T.gateP}</p>
+          <form className="nl-form scan-opvang" action={opvangActie}>
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="antwoorden" value={antwoordenJson} />
+            <label className="sr-only" htmlFor="scan-name">
+              {T.naamLabel}
+            </label>
+            <input
+              id="scan-name"
+              name="name"
+              type="text"
+              placeholder={T.naamPlaceholder}
+              required
+              minLength={2}
+              autoComplete="name"
+            />
+            <label className="sr-only" htmlFor="scan-company">
+              {T.bedrijfLabel}
+            </label>
+            <input
+              id="scan-company"
+              name="company"
+              type="text"
+              placeholder={T.bedrijfPlaceholder}
+              required
+              minLength={2}
+              autoComplete="organization"
+            />
+            <label className="sr-only" htmlFor="scan-email">
+              {T.emailLabel}
+            </label>
+            <input
+              id="scan-email"
+              name="email"
+              type="email"
+              placeholder={T.placeholder}
+              required
+              autoComplete="email"
+            />
+            <p className="scan-reeks">{T.reeksP}</p>
+            <label className="scan-toestemming">
+              <input
+                type="checkbox"
+                name="toestemming"
+                value={TOESTEMMING_WAARDE}
+              />
+              <span>{T.toestemming}</span>
+            </label>
+            <div className="hp-field" aria-hidden="true">
+              <label htmlFor="scan-website">Website</label>
+              <input
+                id="scan-website"
+                name="website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </div>
+            <button type="submit" className="btn primary" disabled={opvangBezig}>
+              {opvangBezig ? T.bezig : T.knopUitslag}
+            </button>
+            {opvang.status === "err" && (
+              <div className="nl-msg err">{opvang.message}</div>
+            )}
+          </form>
+        </section>
+      )}
+
+      {uitslagZichtbaar && (
         <section className="scan-uitslag" aria-live="polite">
           {/* Alleen op papier zichtbaar. Zonder deze kop draagt het vel geen
               datum en geen afzender, en dan is het over een maand een anoniem
@@ -281,46 +361,7 @@ export function LekkageScan({ taal }: { taal: ScanTaal }) {
           <div className="scan-bewaar">
             <h3>{T.bewaarKop}</h3>
             <p>{T.bewaarP1}</p>
-            <p>{T.bewaarP2}</p>
-            <form className="nl-form scan-opvang" action={opvangActie}>
-              <input type="hidden" name="locale" value={locale} />
-              <input type="hidden" name="lekken" value={String(lekken.length)} />
-              <label className="sr-only" htmlFor="scan-email">
-                {T.emailLabel}
-              </label>
-              <input
-                id="scan-email"
-                name="email"
-                type="email"
-                placeholder={T.placeholder}
-                required
-                autoComplete="email"
-              />
-              <label className="scan-toestemming">
-                <input
-                  type="checkbox"
-                  name="toestemming"
-                  value={TOESTEMMING_WAARDE}
-                />
-                <span>{T.toestemming}</span>
-              </label>
-              <div className="hp-field" aria-hidden="true">
-                <label htmlFor="scan-website">Website</label>
-                <input
-                  id="scan-website"
-                  name="website"
-                  type="text"
-                  tabIndex={-1}
-                  autoComplete="off"
-                />
-              </div>
-              <button type="submit" className="btn primary" disabled={opvangBezig}>
-                {opvangBezig ? T.bezig : T.knopStuur}
-              </button>
-              {opvang.status !== "idle" && (
-                <div className={`nl-msg ${opvang.status}`}>{opvang.message}</div>
-              )}
-            </form>
+            {opvang.reeks && <div className="nl-msg ok">{T.reeksBevestigd}</div>}
             <button
               type="button"
               className="btn"

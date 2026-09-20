@@ -359,15 +359,24 @@ export type ScanTeksten = {
   gemetenSlot: string;
   grensKop: string;
   grensP: string;
-  /** De opvang. */
-  bewaarKop: string;
-  bewaarP1: string;
-  bewaarP2: string;
+  /** De gate: na de vragen, vóór de uitslag (sinds 2026-09-20). */
+  gateKop: string;
+  gateP: string;
+  naamLabel: string;
+  naamPlaceholder: string;
+  bedrijfLabel: string;
+  bedrijfPlaceholder: string;
   emailLabel: string;
   placeholder: string;
+  /** De optionele reeks, als los vinkje onder de gate. */
+  reeksP: string;
   toestemming: string;
-  knopStuur: string;
+  reeksBevestigd: string;
+  knopUitslag: string;
   bezig: string;
+  /** Onder de uitslag. */
+  bewaarKop: string;
+  bewaarP1: string;
   knopPrint: string;
   /** De uitnodiging. */
   ctaP: string;
@@ -377,9 +386,9 @@ export type ScanTeksten = {
 const NL: ScanTeksten = {
   titel: "Lekkage-scan: waar je omzet weglekt",
   beschrijving:
-    `${AANTAL_WOORD_HOOFD} ja/nee-vragen over je stack. Je ziet direct welke drie ` +
-    "dingen bij jou het eerst lekken. Geen e-mail nodig, geen verkooppraat.",
-  eyebrow: "Gratis · vier minuten · geen e-mail",
+    `${AANTAL_WOORD_HOOFD} ja/nee-vragen over je stack. Laat je naam, bedrijf en ` +
+    "e-mailadres achter en je ziet welke drie dingen bij jou het eerst lekken.",
+  eyebrow: `Gratis · vier minuten · ${AANTAL_WOORD} vragen`,
   kop: "Waar lekt het bij jou?",
   lede:
     "De omzet lekt zelden in de markt. Hij lekt tussen de tools — in de overdracht " +
@@ -414,21 +423,30 @@ const NL: ScanTeksten = {
     "Geen marge per project, geen kwaliteit van de instroom, geen bezetting, " +
     "en niets over of je mensen een nieuw systeem zouden gebruiken. " +
     `${AANTAL_WOORD_HOOFD} ja/nee-vragen dragen hun eigen reikwijdte, en dit is hem.`,
+  gateKop: "Voor wie is deze uitslag?",
+  gateP:
+    "Laat je naam, bedrijf en e-mailadres achter en je uitslag staat direct " +
+    "hieronder: de drie plekken waar het bij jou het eerst lekt, met per vraag " +
+    "wat een nee kost. Ik lees elke uitslag zelf en je hoort binnen 24 uur van me.",
+  naamLabel: "Naam",
+  naamPlaceholder: "Je naam",
+  bedrijfLabel: "Bedrijf",
+  bedrijfPlaceholder: "Je bedrijf",
+  emailLabel: "E-mailadres",
+  placeholder: "jij@bedrijf.nl",
+  reeksP:
+    "Wil je er de komende weken drie mails over? Per lek één: wat het " +
+    "kost, wat je er zelf aan kunt doen, en wanneer het tijd is voor " +
+    "hulp. Zonder vinkje gebeurt er niets.",
+  // Dezelfde string als de opslag gebruikt; scan-reeks.test.ts leest hem daar.
+  toestemming: TOESTEMMING_TEKST,
+  reeksBevestigd: "De drie mails komen eraan, elk met een afmeldlink onderaan.",
+  knopUitslag: "Toon mijn uitslag",
+  bezig: "Bezig…",
   bewaarKop: "Neem deze uitslag mee",
   bewaarP1:
     "Eén pagina met jouw antwoorden erop. Je bewaart hem zelf, en je " +
     "kunt hem doorsturen naar wie er bij jou over gaat.",
-  bewaarP2:
-    "Wil je er de komende weken drie mails over? Per lek één: wat het " +
-    "kost, wat je er zelf aan kunt doen, en wanneer het tijd is voor " +
-    "hulp. Laat dan hieronder je adres achter. Zonder vinkje gebeurt " +
-    "er niets.",
-  emailLabel: "E-mailadres",
-  placeholder: "jij@bedrijf.nl",
-  // Dezelfde string als de opslag gebruikt; scan-reeks.test.ts leest hem daar.
-  toestemming: TOESTEMMING_TEKST,
-  knopStuur: "Stuur me de drie mails",
-  bezig: "Bezig…",
   knopPrint: "Opslaan of printen",
   ctaP:
     "Wil je dit nagelopen hebben op je eigen cijfers in plaats van op " +
@@ -443,9 +461,9 @@ const N_EN_HOOFD = N_EN[0].toUpperCase() + N_EN.slice(1);
 const EN_TEKSTEN: ScanTeksten = {
   titel: "Leak scan: where your revenue leaks",
   beschrijving:
-    `${N_EN_HOOFD} yes/no questions about your stack. You see straight away which three ` +
-    "things leak first in your business. No email needed, no sales pitch.",
-  eyebrow: "Free · four minutes · no email",
+    `${N_EN_HOOFD} yes/no questions about your stack. Leave your name, company and ` +
+    "email and you see which three things leak first in your business.",
+  eyebrow: `Free · four minutes · ${N_EN} questions`,
   kop: "Where does it leak in your business?",
   lede:
     "Revenue rarely leaks in the market. It leaks between the tools — in the handover " +
@@ -479,20 +497,30 @@ const EN_TEKSTEN: ScanTeksten = {
     "No margin per project, no quality of inbound, no capacity, " +
     "and nothing about whether your people would use a new system. " +
     `${N_EN_HOOFD} yes/no questions carry their own reach, and this is it.`,
+  gateKop: "Who is this result for?",
+  gateP:
+    "Leave your name, company and email and your result appears right below: " +
+    "the three places where your business leaks first, with what a no costs " +
+    "per question. I read every result myself and you hear from me within 24 hours.",
+  naamLabel: "Name",
+  naamPlaceholder: "Your name",
+  bedrijfLabel: "Company",
+  bedrijfPlaceholder: "Your company",
+  emailLabel: "Email address",
+  placeholder: "you@company.com",
+  reeksP:
+    "Want three emails about it over the coming weeks? One per leak: what it " +
+    "costs, what you can do about it yourself, and when it is time for " +
+    "help. Without the tick, nothing happens.",
+  toestemming:
+    "Yes, send me at most three emails about these leaks. Every email has an unsubscribe link at the bottom.",
+  reeksBevestigd: "The three emails are on their way, each with an unsubscribe link at the bottom.",
+  knopUitslag: "Show my result",
+  bezig: "One moment…",
   bewaarKop: "Take this result with you",
   bewaarP1:
     "One page with your answers on it. You keep it yourself, and you " +
     "can forward it to whoever owns this at your company.",
-  bewaarP2:
-    "Want three emails about it over the coming weeks? One per leak: what it " +
-    "costs, what you can do about it yourself, and when it is time for " +
-    "help. Then leave your address below. Without the tick, nothing happens.",
-  emailLabel: "Email address",
-  placeholder: "you@company.com",
-  toestemming:
-    "Yes, send me at most three emails about these leaks. Every email has an unsubscribe link at the bottom.",
-  knopStuur: "Send me the three emails",
-  bezig: "Sending…",
   knopPrint: "Save or print",
   ctaP:
     "Want this checked against your own numbers instead of " +
@@ -507,9 +535,9 @@ const N_DE_HOOFD = N_DE[0].toUpperCase() + N_DE.slice(1);
 const DE_TEKSTEN: ScanTeksten = {
   titel: "Leak-Scan: wo Ihr Umsatz versickert",
   beschrijving:
-    `${N_DE_HOOFD} Ja/Nein-Fragen zu Ihrem Stack. Sie sehen sofort, welche drei ` +
-    "Dinge bei Ihnen zuerst lecken. Keine E-Mail nötig, kein Verkaufsgespräch.",
-  eyebrow: "Kostenlos · vier Minuten · keine E-Mail",
+    `${N_DE_HOOFD} Ja/Nein-Fragen zu Ihrem Stack. Hinterlassen Sie Name, Firma und ` +
+    "E-Mail-Adresse, und Sie sehen, welche drei Dinge bei Ihnen zuerst lecken.",
+  eyebrow: `Kostenlos · vier Minuten · ${N_DE} Fragen`,
   kop: "Wo leckt es bei Ihnen?",
   lede:
     "Umsatz versickert selten im Markt. Er versickert zwischen den Tools — in der Übergabe " +
@@ -544,20 +572,31 @@ const DE_TEKSTEN: ScanTeksten = {
     "Keine Marge pro Projekt, keine Qualität des Zulaufs, keine Auslastung, " +
     "und nichts darüber, ob Ihre Leute ein neues System nutzen würden. " +
     `${N_DE_HOOFD} Ja/Nein-Fragen tragen ihre eigene Reichweite, und das ist sie.`,
+  gateKop: "Für wen ist dieses Ergebnis?",
+  gateP:
+    "Hinterlassen Sie Name, Firma und E-Mail-Adresse, und Ihr Ergebnis steht direkt " +
+    "darunter: die drei Stellen, an denen es bei Ihnen zuerst leckt, mit dem, was " +
+    "ein Nein pro Frage kostet. Ich lese jedes Ergebnis selbst, und Sie hören " +
+    "innerhalb von 24 Stunden von mir.",
+  naamLabel: "Name",
+  naamPlaceholder: "Ihr Name",
+  bedrijfLabel: "Firma",
+  bedrijfPlaceholder: "Ihre Firma",
+  emailLabel: "E-Mail-Adresse",
+  placeholder: "sie@firma.de",
+  reeksP:
+    "Möchten Sie in den nächsten Wochen drei E-Mails dazu? Pro Leck eine: was es " +
+    "kostet, was Sie selbst dagegen tun können, und wann es Zeit für " +
+    "Hilfe ist. Ohne Häkchen passiert nichts.",
+  toestemming:
+    "Ja, senden Sie mir höchstens drei E-Mails zu diesen Lecks. Am Ende jeder E-Mail steht ein Abmeldelink.",
+  reeksBevestigd: "Die drei E-Mails sind unterwegs, jede mit Abmeldelink am Ende.",
+  knopUitslag: "Mein Ergebnis anzeigen",
+  bezig: "Einen Moment…",
   bewaarKop: "Nehmen Sie dieses Ergebnis mit",
   bewaarP1:
     "Eine Seite mit Ihren Antworten. Sie bewahren sie selbst auf und " +
     "können sie an die Person weiterleiten, die bei Ihnen dafür zuständig ist.",
-  bewaarP2:
-    "Möchten Sie in den nächsten Wochen drei E-Mails dazu? Pro Leck eine: was es " +
-    "kostet, was Sie selbst dagegen tun können, und wann es Zeit für " +
-    "Hilfe ist. Dann hinterlassen Sie unten Ihre Adresse. Ohne Häkchen passiert nichts.",
-  emailLabel: "E-Mail-Adresse",
-  placeholder: "sie@firma.de",
-  toestemming:
-    "Ja, senden Sie mir höchstens drei E-Mails zu diesen Lecks. Am Ende jeder E-Mail steht ein Abmeldelink.",
-  knopStuur: "Die drei E-Mails senden",
-  bezig: "Wird gesendet…",
   knopPrint: "Speichern oder drucken",
   ctaP:
     "Möchten Sie das an Ihren eigenen Zahlen prüfen lassen statt an " +

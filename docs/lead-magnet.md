@@ -42,7 +42,7 @@ gevangen.
 |---|---|
 | formaat | assessment, direct op het scherm ingevuld en gescoord |
 | koperfase | overweging — hij weet dát het lekt, niet wáár |
-| levering | direct zichtbaar; e-mail optioneel voor de PDF-versie |
+| levering | direct zichtbaar; e-mail optioneel voor de PDF-versie — **omgedraaid op 2026-09-20, zie §10** |
 | taal | **alleen Nederlands** |
 | inspanning | 4-8 uur schrijven, 4-8 uur bouwen op bestaande plumbing |
 
@@ -247,6 +247,7 @@ Telegram, geen bevestiging. Het spoor houdt dan op bij de klik.
 | | keuze | reden |
 |---|---|---|
 | gate | **geen** op de scan; e-mail pas ná de uitslag, voor de PDF | een gate vóór de uitkomst kost je de mensen die nog niet weten of dit voor hen is |
+| *sinds 2026-09-20* | *harde gate: naam, bedrijf, e-mail vóór de uitslag* | *§10 — Juans keuze, de afweging hierboven blijft waar* |
 | velden | e-mail alleen | elk extra veld kost conversie, en er is geen conversie om weg te geven |
 | levering | uitslag direct op het scherm | omzeilt de kapotte e-mailschakel volledig |
 
@@ -517,3 +518,48 @@ hij is aangevinkt (`consent_tekst`).
 
 **D3. Können Sie beim Weggang eines Mitarbeiters innerhalb eines Tages alle seine Zugänge entziehen?**
 → Bei Nein ist Ihr Stapel auch ein Sicherheitsproblem, nicht nur ein Kostenpunkt.
+
+## §10 — De gate (2026-09-20, avond): de uitslag is de ruil voor de lead
+
+Dit draait §1 en de tabel in §4 om, en dat staat hier met naam. Juans
+opdracht, dezelfde avond als §9: *the results should you get after details* —
+*so that you can actually get leads*. Gekozen: een harde gate, met naam,
+bedrijf en e-mailadres, in alle drie de talen.
+
+**Wat er verandert.** Na de zestien vragen en de knop komt geen uitslag maar
+een kaart: naam, bedrijf, e-mailadres, en daaronder — los, niet
+voorgevinkt — het vinkje voor de drie mails. Pas als de server `ok` zegt
+rendert de uitslag. De rij die dat oplevert is een **lead** in
+`marketing.leads`, met `source = lekkage-scan` en als bericht de uitslag zelf
+(drie lekken, per lek de bloknaam, de breuk en de vraag-ids), uitgerekend op
+de server uit de meegestuurde antwoorden — niet uit een getal dat de browser
+opgaf. De triggers op die tabel doen de rest: Telegram naar Juan
+(`lead-notify`) en de ontvangstbevestiging aan de bezoeker
+(`lead-acknowledge`, "binnen 24 uur"). De pagina zegt dat laatste nu ook
+zelf, zodat de bevestiging geen verrassing is.
+
+**Wat er niet verandert.** De reeks van drie mails blijft een aparte,
+ondubbelzinnige toestemming (Tw 11.7). De gate koopt de uitslag, niet de
+reeks: zonder vinkje komt er geen rij in `marketing.subscribers`, en de
+toestemmingstekst blijft woordelijk dezelfde. De vragen, de score, de ene
+grens en de printversie zijn ongewijzigd.
+
+**Wat het kost, en dat is de afweging uit §4 in omgekeerde richting.** Een
+gate vóór de uitkomst kost de mensen die nog niet weten of dit voor hen is;
+dat stond er en het blijft waar. Wat ertegenover staat is dat er tot vandaag
+nul rijen uit de scan zijn gekomen en dat een uitslag zonder naam voor Juan
+niets is om op te volgen. Zodra Plausible meet (`Scan Voltooid` tegen
+`Uitslag Aangevraagd`) is de afhaak op de gate een getal, en dan is dit een
+beslissing die je kunt herzien op cijfers in plaats van op smaak.
+
+**Wat de poorten bewaken.** `app/actions/scan-opvang.test.ts`: zonder naam,
+bedrijf, adres of volledige antwoorden bereikt niets de database; met vinkje
+twee rijen in de volgorde leads → subscribers; een dubbel adres in de reeks is
+geen fout; een kapotte reeks laat de lead staan en toont de uitslag toch.
+`lib/scan-opvang.test.ts`: `leesAntwoorden` weigert alles wat geen volledig
+booleans-object is, en het Telegram-bericht draagt geen euro en geen procent.
+
+**Eén ding om te weten.** De ontvangstbevestiging is dezelfde als die van het
+contactformulier ("je bericht is aangekomen, binnen 24 uur"), terwijl een
+scan-lead niets heeft gevraagd. Een eigen tekst per `source` zit in
+`lead-acknowledge` en gaat mee met de eerstvolgende uitrol via de MCP.
