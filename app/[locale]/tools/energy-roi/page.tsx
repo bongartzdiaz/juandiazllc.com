@@ -72,6 +72,12 @@ export default async function EnergyRoiPage({
     productionLine: t("roi.production"),
     years: t("roi.years"),
     smallprint: t("roi.smallprint"),
+    opvangKop: t("roi.opvang.kop"),
+    opvangP: t("roi.opvang.p"),
+    opvangToestemming: t("roi.opvang.toestemming"),
+    opvangKnop: t("roi.opvang.knop"),
+    opvangBezig: t("roi.opvang.bezig"),
+    emailLabel: t("nl.email"),
   };
 
   const crumbs = breadcrumbSchema([
@@ -90,7 +96,7 @@ export default async function EnergyRoiPage({
       </header>
 
       <section style={{ padding: "40px 40px 80px", maxWidth: "var(--max)", margin: "0 auto" }}>
-        <EnergyRoi labels={labels} />
+        <EnergyRoi labels={labels} locale={l} />
         <ScanCallout locale={l} />
         <EnergyInsightLinks locale={l} />
       </section>

@@ -410,14 +410,14 @@ create unique index concurrently if not exists leads_cal_uid_uniek
 
 Dit is een schemawijziging op productie — bewust niet zelf uitgevoerd.
 
-## Plausible — zeven doelen aanmaken (2026-08-02, gemeten 2026-08-20)
+## Plausible — acht doelen aanmaken (2026-08-02, gemeten 2026-08-20; achtste erbij 2026-09-20)
 
 **Plausible telt een custom event pas als het doel bestaat.** Zonder deze stap
 komen de kliks binnen en worden ze weggegooid — je ziet niets, en dat is niet te
 onderscheiden van "niemand klikt".
 
 De code-kant is af en op productie geverifieerd (zie de meting onderaan). Wat
-ontbreekt zijn zeven regels in het dashboard.
+ontbreekt zijn acht regels in het dashboard.
 
 Plausible → Site Settings → **Goals** → *Add goal* → **Custom event**, en dan
 deze namen **exact** overnemen. De `+` in de class is een spatie; de naam in
@@ -448,11 +448,19 @@ Plausible bevat dus een spatie.
       is de rij die in `marketing.subscribers` belandt en waar de drie
       mails later naartoe gaan. Draagt `lekken` als eigenschap, dezelfde
       naam als `Scan Voltooid`, zodat de twee naast elkaar te leggen zijn.
+- [ ] `Berekening Aangevraagd` — vuurt in `components/calculators/EnergyRoi.tsx`
+      zodra de bezoeker onder de uitkomst van `/tools/energy-roi` zijn adres
+      achterlaat en toestemming geeft (2026-09-20). Tweede doel dat een
+      OPGEGEVEN ADRES meet; de rij krijgt `source = 'energy-roi'` en de cron
+      stuurt er één mail met de berekening naartoe. Draagt `tool`
+      (`energy-roi`), dezelfde eigenschap als `Tool CTA`, zodat klik en
+      inzending op dezelfde tool naast elkaar te leggen zijn.
 
-**Vergeet de custom properties niet.** Zes van de zeven sturen naast de naam ook
+**Vergeet de custom properties niet.** Zeven van de acht sturen naast de naam ook
 eigenschappen mee, en die zijn in Plausible pas zichtbaar als je ze apart
 aanmeldt (Site Settings → **Custom properties**). Het blijven vier namen:
-`Sector CTA` en `Contact Submitted` gebruiken allebei `sector`. Alleen
+`Sector CTA` en `Contact Submitted` gebruiken allebei `sector`, `Tool CTA` en
+`Berekening Aangevraagd` allebei `tool`. Alleen
 `Boeking 15min` draagt niets boven de `url` die overal meegaat.
 
 | doel | eigenschappen |
@@ -463,6 +471,7 @@ aanmeldt (Site Settings → **Custom properties**). Het blijven vier namen:
 | `Boeking 15min` | `url` |
 | `Scan Voltooid` | `lekken` (aantal gevonden lekken, als tekst) |
 | `Uitslag Aangevraagd` | `lekken` (aantal gevonden lekken, als tekst) |
+| `Berekening Aangevraagd` | `tool` (`energy-roi`) |
 | `Contact Submitted` | `sector` (de slug, of `unknown` als de bezoeker niets koos) |
 
 Zonder die stap zie je wél het aantal kliks, maar niet welke tier of sector ze

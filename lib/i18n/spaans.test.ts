@@ -158,6 +158,11 @@ const TU_MARKERS = [
   // in terwijl HOME, CONTACT en SERVICES in hetzelfde bestand vosotros zeiden.
   "trabajáis", "construís", "configuráis", "estáis", "respondéis", "firmáis",
   "podéis", "integráis", "integraros", "contrataros",
+  // uit de ROI-opvang en -mail van 2026-09-20: pretérito tú ("configuraste",
+  // "hiciste", "pediste"), de enclitische imperatief "envíame", en de tú-
+  // imperatieven "responde"/"reserva". Die laatste twee zijn ook een
+  // zelfstandig naamwoord (la reserva) — zelfde toegeeflijkheid als "pruebas".
+  "configuraste", "hiciste", "pediste", "envíame", "responde", "reserva",
   // let op: "pruebas" is ook een zelfstandig naamwoord. Hier staat het als
   // werkwoord ("Pruebas bajo carga", nl "Je test onder ..."). Het marker-zijn
   // maakt de poort op dat punt iets toegeeflijker, niet valser.

@@ -430,9 +430,10 @@ herschreven, en deze notitie is de correctie erop.
 
 ### De meetketen — in blokkerende volgorde
 
-1. **Zeven Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
+1. **Acht Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
    `Pricing CTA`, `Sector CTA`, `Tool CTA`, `Contact Submitted`,
-   `Scan Voltooid` en `Uitslag Aangevraagd`, plus de vier custom properties (`tier`,
+   `Scan Voltooid`, `Uitslag Aangevraagd` en `Berekening Aangevraagd`
+   (2026-09-20, de ROI-opvang), plus de vier custom properties (`tier`,
    `sector`, `tool`, `lekken`). Taggen is af en op productie
    geverifieerd; zonder de doelen worden de kliks binnengehaald en weggegooid.
    **`Contact Submitted` stond tot 2026-08-24 op geen enkele lijst**, en het is

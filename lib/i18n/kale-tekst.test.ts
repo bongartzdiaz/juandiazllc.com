@@ -228,6 +228,14 @@ const TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
       "Website",
     ],
   },
+  "components/calculators/EnergyRoi.tsx": {
+    reden:
+      "Honeypot in het opvangformulier onder de uitkomst (2026-09-20), zelfde " +
+      "reden als NewsletterForm: aria-hidden, alleen voor de bot.",
+    tekst: [
+      "Website",
+    ],
+  },
   "components/sections/CtaBig.tsx": {
     reden:
       "Honeypot, sinds 2026-09-19 ook op het homepage-formulier: aria-hidden " +
@@ -366,6 +374,12 @@ const ATTR_TOEGESTAAN: Record<string, { reden: string; tekst: string[] }> = {
     reden:
       "Derde vormvoorbeeld van een adres, in het opvangformulier op het " +
       "uitslagscherm. Leest in elke taal hetzelfde.",
+    tekst: ["placeholder=you@domain.com"],
+  },
+  "components/calculators/EnergyRoi.tsx": {
+    reden:
+      "Vierde vormvoorbeeld van een adres, in de ROI-opvang onder de " +
+      "uitkomst (2026-09-20). Leest in elke taal hetzelfde.",
     tekst: ["placeholder=you@domain.com"],
   },
 };

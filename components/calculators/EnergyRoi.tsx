@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { vraagBerekeningAan, type RoiOpvangState } from "@/app/actions/roi-opvang";
+import { TOESTEMMING_WAARDE, type RoiVeld } from "@/lib/roi-opvang";
 
 // Energy ROI calculator — honest math under the Dutch 2027 salderings-
 // regeling phase-out. Three scenarios: pre-2027 baseline, post-2027 no
@@ -12,6 +14,12 @@ import { useMemo, useState } from "react";
 //   3500 kWh/year consumption, 4 kWp system, €0.30/kWh consumer price,
 //   €0.05/kWh post-2027 feed-in, €5000 installed system price.
 // Self-consumption jumps from ~30% (no battery) to ~65% (10 kWh battery).
+//
+// Opvang (2026-09-20): onder de uitkomst staat één formulier — "mail me deze
+// berekening". De getallen gaan als hidden inputs mee naar
+// app/actions/roi-opvang.ts, want ze bestaan nergens anders dan hier in de
+// browser. De actie bewaart ze in marketing.subscribers; de cron mailt ze.
+// Zie lib/roi-opvang.ts voor de grenzen waarbinnen een waarde telt.
 
 export type RoiLabels = {
   inputs: string;
@@ -39,9 +47,15 @@ export type RoiLabels = {
   productionLine: string;
   years: string;
   smallprint: string;
+  opvangKop: string;
+  opvangP: string;
+  opvangToestemming: string;
+  opvangKnop: string;
+  opvangBezig: string;
+  emailLabel: string;
 };
 
-type Props = { labels: RoiLabels };
+type Props = { labels: RoiLabels; locale: string };
 
 function eur(n: number): string {
   if (!isFinite(n)) return "—";
@@ -53,7 +67,27 @@ function years(n: number): string {
   return n.toFixed(1);
 }
 
-export function EnergyRoi({ labels }: Props) {
+export function EnergyRoi({ labels, locale }: Props) {
+  const [opvang, opvangActie, opvangBezig] = useActionState<RoiOpvangState, FormData>(
+    vraagBerekeningAan,
+    { status: "idle" },
+  );
+
+  // Plausible-doel `Berekening Aangevraagd` met eigenschap `tool`, één keer
+  // per geslaagde inzending — dezelfde vorm als `Uitslag Aangevraagd` in
+  // LekkageScan.tsx. Het doel staat in MANUAL_TASKS.md en CLAUDE.md;
+  // lib/plausible-doelen.test.ts houdt die drie gelijk.
+  const gemeld = useRef(false);
+  useEffect(() => {
+    if (opvang.status !== "ok" || gemeld.current) return;
+    gemeld.current = true;
+    const w = window as unknown as {
+      plausible?: (event: string, opts?: { props?: Record<string, string> }) => void;
+    };
+    if (typeof w.plausible === "function") {
+      w.plausible("Berekening Aangevraagd", { props: { tool: "energy-roi" } });
+    }
+  }, [opvang.status]);
   const [consumption, setConsumption] = useState(3500);
   const [systemSize, setSystemSize] = useState(4);
   const [systemPrice, setSystemPrice] = useState(5000);
@@ -107,6 +141,27 @@ export function EnergyRoi({ labels }: Props) {
     scNoBat,
     scWithBat,
   ]);
+
+  const getallen: Record<RoiVeld, number> = {
+    consumption,
+    systemSize,
+    systemPrice,
+    consumerPrice,
+    feedInPrice,
+    yieldPerKwp,
+    withBattery: withBattery ? 1 : 0,
+    batterySize,
+    batteryPrice,
+    scNoBat,
+    scWithBat,
+    production: r.production,
+    savingsSald: r.savingsSald,
+    savingsNoBat: r.savingsNoBat,
+    savingsWithBat: r.savingsWithBat,
+    paybackSald: r.paybackSald,
+    paybackNoBat: r.paybackNoBat,
+    paybackWithBat: r.paybackWithBat,
+  };
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
@@ -248,10 +303,55 @@ export function EnergyRoi({ labels }: Props) {
             {labels.productionLine.replace("{kwh}", Math.round(r.production).toLocaleString("nl-NL"))}
           </div>
           <p style={{ color: "var(--muted)", fontSize: 13, lineHeight: 1.6, marginTop: 16 }}>{labels.smallprint}</p>
+
+          <div style={{ marginTop: 28, paddingTop: 22, borderTop: "1px solid var(--line)" }}>
+            <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--muted-soft)", marginBottom: 8 }}>
+              {labels.opvangKop}
+            </div>
+            <p style={{ color: "var(--muted)", fontSize: 14, lineHeight: 1.6, margin: "0 0 14px" }}>{labels.opvangP}</p>
+            <form className="nl-form roi-opvang" action={opvangActie}>
+              <input type="hidden" name="locale" value={locale} />
+              {roiVelden(getallen).map(([veld, waarde]) => (
+                <input key={veld} type="hidden" name={veld} value={waarde} />
+              ))}
+              <label className="sr-only" htmlFor="roi-email">
+                {labels.emailLabel}
+              </label>
+              <input
+                id="roi-email"
+                name="email"
+                type="email"
+                placeholder="you@domain.com"
+                required
+                autoComplete="email"
+              />
+              <label className="scan-toestemming">
+                <input type="checkbox" name="toestemming" value={TOESTEMMING_WAARDE} />
+                <span>{labels.opvangToestemming}</span>
+              </label>
+              <div className="hp-field" aria-hidden="true">
+                <label htmlFor="roi-website">Website</label>
+                <input id="roi-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+              </div>
+              <button type="submit" disabled={opvangBezig}>
+                {opvangBezig ? labels.opvangBezig : labels.opvangKnop}
+              </button>
+              {opvang.status !== "idle" && (
+                <div className={`nl-msg ${opvang.status}`}>{opvang.message}</div>
+              )}
+            </form>
+          </div>
         </div>
       </div>
     </div>
   );
+}
+
+/** De getallen als tekst voor de hidden inputs. Oneindig (terugverdientijd
+ *  bij nul besparing) wordt een lege string, en die leest de actie als
+ *  `null` — dezelfde "—" die het scherm toont. */
+function roiVelden(g: Record<RoiVeld, number>): Array<[RoiVeld, string]> {
+  return (Object.keys(g) as RoiVeld[]).map((k) => [k, Number.isFinite(g[k]) ? String(g[k]) : ""]);
 }
 
 function ScenarioCard({

@@ -10,8 +10,11 @@ import {
   markeerVerzonden,
 } from "@/lib/email/scan-reeks";
 import { CONTACT_EMAIL } from "@/lib/seo/branding";
+import { ROI_BRON, type RoiGetallen } from "@/lib/roi-opvang";
+import { bouwRoiMail, markeerRoiVerzonden, roiMailNodig } from "@/lib/email/roi-mail";
 
-/* De cron achter de drie scan-mails.
+/* De cron achter de drie scan-mails — en sinds 2026-09-20 ook achter de ene
+ * ROI-mail.
  *
  * Vercel roept deze route dagelijks aan (vercel.json, `0 8 * * *`) met
  * `Authorization: Bearer <CRON_SECRET>`. De route leest de rijen in
@@ -20,6 +23,12 @@ import { CONTACT_EMAIL } from "@/lib/seo/branding";
  * is, verstuurt die via lib/email/brevo.ts en schrijft de verzenddatum terug
  * in `metadata.verzonden`. Twee runs op één dag versturen niets dubbel; een
  * gemiste dag wordt de volgende run ingehaald.
+ *
+ * Daarna hetzelfde voor `source = 'energy-roi'`: één mail per rij, met de
+ * berekening uit `metadata.roi`, in de taal uit `metadata.locale`. Zelfde
+ * poorten, zelfde afzender, zelfde telling — de route blijft één cron met
+ * één sleutel, en het pad `scan-reeks` blijft staan omdat vercel.json en
+ * MANUAL_TASKS.md ernaar wijzen.
  *
  * Volgorde van de poorten, bewust:
  *   1. rem          — een vreemde die de URL kent kost hooguit één vergelijking;
@@ -152,6 +161,69 @@ export async function GET(req: NextRequest) {
       // De mail is weg maar het stempel niet gezet: de volgende run zou hem
       // opnieuw sturen. Luid loggen; dit is de ene fout die dubbel kan kosten.
       console.error("[scan-reeks] stempel niet gezet:", rij.id, nr, updateErr.message);
+      telling.mislukt += 1;
+      continue;
+    }
+
+    telling.verzonden += 1;
+  }
+
+  /* De ROI-mail: één per rij. */
+
+  const roi = await admin
+    .from("subscribers")
+    .select("id, email, metadata")
+    .eq("source", ROI_BRON)
+    .limit(MAX_PER_RUN);
+
+  if (roi.error) {
+    console.error("[scan-reeks] select energy-roi failed:", roi.error.message);
+    return NextResponse.json({ ok: false, error: "db" }, { status: 500 });
+  }
+
+  for (const rij of (roi.data ?? []) as Rij[]) {
+    telling.bekeken += 1;
+    const metadata = rij.metadata ?? {};
+    if (!roiMailNodig(metadata)) {
+      telling.overgeslagen += 1;
+      continue;
+    }
+
+    const token = metadata.unsub_token;
+    const getallen = metadata.roi;
+    if (typeof token !== "string" || !token || typeof getallen !== "object" || getallen === null) {
+      // Zonder token geen afmeldlink; zonder getallen geen berekening. In
+      // beide gevallen is er niets eerlijks te versturen. Luid, en overslaan.
+      console.error("[scan-reeks] energy-roi rij zonder token of getallen:", rij.id);
+      telling.mislukt += 1;
+      continue;
+    }
+
+    const mail = bouwRoiMail({
+      locale: typeof metadata.locale === "string" ? metadata.locale : "en",
+      roi: getallen as RoiGetallen,
+      consent_at: typeof metadata.consent_at === "string" ? metadata.consent_at : "",
+      unsub_token: token,
+    });
+
+    const uitkomst = await verstuur(
+      { from, to: rij.email, replyTo: CONTACT_EMAIL, ...mail },
+      { apiKey },
+    );
+
+    if (!uitkomst.ok) {
+      console.error("[scan-reeks] energy-roi verzenden mislukt:", rij.id, uitkomst.reden);
+      telling.mislukt += 1;
+      continue;
+    }
+
+    const { error: updateErr } = await admin
+      .from("subscribers")
+      .update({ metadata: markeerRoiVerzonden(metadata, nu) })
+      .eq("id", rij.id);
+
+    if (updateErr) {
+      console.error("[scan-reeks] energy-roi stempel niet gezet:", rij.id, updateErr.message);
       telling.mislukt += 1;
       continue;
     }
