@@ -4,27 +4,23 @@ import { assertLocale, buildAlternates, ogLocale, alternateOgLocales } from "@/l
 import { ENKELE_TAAL } from "@/lib/i18n/enkele-taal";
 import { breadcrumbSchema } from "@/lib/breadcrumb";
 import { LekkageScan } from "@/components/LekkageScan";
-import { SCAN_PAD, TEKSTEN } from "@/lib/lekkage-scan-taal";
+import { SCAN_PAD, TEKSTEN, isScanTaal } from "@/lib/lekkage-scan-taal";
 import { CONTACT_EMAIL, CONTACT_MAILTO, ogImages } from "@/lib/seo/branding";
 
-/* De lekkage-scan — de Nederlandse route.
+/* De lekkage-scan voor EN en DE — beslist door Juan op 2026-09-20.
  *
- * Tot 2026-09-20 was dit de enige; de reden stond in lib/i18n/enkele-taal.ts
- * en docs/lead-magnet.md §1 (alle vier de bevestigde engagements zijn NL/BE).
- * Sinds die dag staat dezelfde scan voor EN en DE op /tools/leak-scan — een
- * eigen slug, want een Nederlandse slug op een Engelse pagina is geen
- * vertaling. De kopij loopt niet via dict.ts maar via
- * lib/lekkage-scan-taal.ts, waar de drie talen naast elkaar staan mét de
- * vragen; lib/i18n/wees-sleutels.test.ts zou zestig dict-sleutels voor twee
- * routes terecht als dood gewicht zien. Het telwoord in de kopij komt daar
- * uit AANTAL_WOORD_HOOFD; lekkage-scan.test.ts bewaakt dat. */
+ * Dezelfde vragen als /nl/tools/lekkage-scan (het aantal komt uit VRAGEN.length), hetzelfde
+ * scoremechanisme, dezelfde opvang. Een eigen slug omdat "lekkage-scan" op
+ * een Engelse pagina geen vertaling is. Welke talen deze route draagt staat
+ * in lib/i18n/enkele-taal.ts, en buiten die talen 404't hij — anders serveert
+ * /es een Engelse pagina onder een Spaanse hreflang.
+ *
+ * De vragen zelf zijn taal- en sectoronafhankelijk: ze gaan over de vorm van
+ * het lek (docs/bereik-plan.md §2), en de ene bron eronder is Amerikaans
+ * onderzoek. Zie lib/lekkage-scan-taal.ts. */
 
-const PAD = SCAN_PAD.nl;
+const PAD = SCAN_PAD.en;
 const TALEN = ENKELE_TAAL[PAD].locales;
-const T = TEKSTEN.nl;
-
-const TITEL = T.titel;
-const BESCHRIJVING = T.beschrijving;
 
 export async function generateMetadata({
   params,
@@ -33,15 +29,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const l = assertLocale(locale);
+  const T = TEKSTEN[isScanTaal(l) ? l : "en"];
   return {
-    title: TITEL,
-    description: BESCHRIJVING,
+    title: T.titel,
+    description: T.beschrijving,
     alternates: buildAlternates(l, PAD, TALEN),
     openGraph: {
       images: ogImages(l),
       type: "website",
-      title: TITEL,
-      description: BESCHRIJVING,
+      title: T.titel,
+      description: T.beschrijving,
       url: `/${l}${PAD}`,
       locale: ogLocale(l),
       alternateLocale: alternateOgLocales(l),
@@ -49,7 +46,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function LekkageScanPage({
+export default async function LeakScanPage({
   params,
   searchParams,
 }: {
@@ -61,15 +58,14 @@ export default async function LekkageScanPage({
   const { uitgeschreven } = await searchParams;
   const l = assertLocale(locale);
 
-  // 404 buiten het Nederlands. Zonder deze poort serveert /en, /de en /es een
-  // Nederlandse pagina onder een Engelse hreflang — dunne inhoud met een
-  // verkeerd taalsignaal erbij.
-  if (!TALEN.includes(l)) notFound();
+  // 404 buiten en/de. Zie ENKELE_TAAL en lib/i18n/enkele-taal.test.ts.
+  if (!TALEN.includes(l) || !isScanTaal(l)) notFound();
+  const T = TEKSTEN[l];
 
   const crumbs = breadcrumbSchema([
     { name: "Home", path: `/${l}` },
     { name: "Tools", path: `/${l}${PAD}` },
-    { name: TITEL, path: `/${l}${PAD}` },
+    { name: T.titel, path: `/${l}${PAD}` },
   ]);
 
   return (
@@ -88,7 +84,7 @@ export default async function LekkageScanPage({
           {T.uitgeschrevenOngeldig} <a href={CONTACT_MAILTO}>{CONTACT_EMAIL}</a>.
         </div>
       )}
-      <LekkageScan taal="nl" />
+      <LekkageScan taal={l} />
     </>
   );
 }

@@ -9,8 +9,11 @@ import {
   bepaalVolgende,
   markeerVerzonden,
   REEKS_BRON,
+  gesprekPad,
+  taalVan,
 } from "./scan-reeks";
 import { SCAN_BRON, TOESTEMMING_TEKST } from "@/lib/scan-opvang";
+import { SCAN_TALEN, TOESTEMMING_TEKSTEN } from "@/lib/lekkage-scan-taal";
 
 /* Wat de toestemmingstekst belooft, moet de kopij en de planning waarmaken:
    hooguit drie mails, elk met een afmeldlink, geen bedragen. Deze poort leest
@@ -77,6 +80,81 @@ describe("de belofte uit de toestemmingstekst", () => {
 
   it("de bron voor de selectie is dezelfde als die van de inschrijving", () => {
     expect(REEKS_BRON).toBe(SCAN_BRON);
+  });
+});
+
+/* Sinds 2026-09-20 bestaat de reeks in drie talen. De belofte is per taal
+   dezelfde, dus de poort hierboven loopt hier nog eens over en en de. De
+   Nederlandse tak hierboven blijft staan zoals hij was: zonder `taal` moet
+   bouwMail Nederlands geven, want elke rij van vóór die datum heeft geen
+   locale in zijn metadata. */
+describe("dezelfde belofte in en en de", () => {
+  const VERBODEN = /€|\beuro\b|\d\s?%|\bprocent\b|\bpercent\b|\bProzent\b/i;
+  const DRIE = { nl: /drie mails/, en: /three emails/, de: /drei E-Mails/ } as const;
+
+  it("de toestemmingstekst belooft in elke taal drie mails", () => {
+    for (const taal of SCAN_TALEN) {
+      expect(TOESTEMMING_TEKSTEN[taal], taal).toMatch(DRIE[taal]);
+    }
+    expect(TOESTEMMING_TEKSTEN.nl).toBe(TOESTEMMING_TEKST);
+  });
+
+  for (const taal of ["en", "de"] as const) {
+    describe(taal, () => {
+      const in_ = (lekken: number | null) => ({ lekken, unsub_token: TOKEN, taal });
+
+      it("drie mails, elk met afmeldlink in tekst én html", () => {
+        for (const nr of MAIL_NRS) {
+          const m = bouwMail(nr, in_(3));
+          const link = afmeldLink(TOKEN);
+          expect(m.text).toContain(link);
+          expect(m.html).toContain(`href="${link}"`);
+        }
+      });
+
+      it("geen bedrag of percentage", () => {
+        for (const nr of MAIL_NRS) {
+          for (const lekken of [null, 0, 1, 3]) {
+            const m = bouwMail(nr, in_(lekken));
+            expect(m.onderwerp).not.toMatch(VERBODEN);
+            expect(m.text).not.toMatch(VERBODEN);
+          }
+        }
+      });
+
+      it("is werkelijk vertaald: geen Nederlandse kopij, geen open placeholder", () => {
+        const nl = bouwMail(1, { lekken: 3, unsub_token: TOKEN });
+        for (const nr of MAIL_NRS) {
+          const m = bouwMail(nr, in_(3));
+          expect(m.onderwerp).not.toBe(bouwMail(nr, { lekken: 3, unsub_token: TOKEN }).onderwerp);
+          expect(m.text).not.toContain("afmelden");
+          expect(m.text).not.toMatch(/\{[a-zA-Z_]+\}/);
+          expect(m.html).not.toMatch(/\{[a-zA-Z_]+\}/);
+        }
+        expect(nl.text).toContain("lek");
+      });
+
+      it("mail 3 leidt naar het gesprek in dezelfde taal", () => {
+        const pad = gesprekPad(taal);
+        expect(pad).toBe(`/${taal}/contact?interest=lekkage-scan`);
+        expect(bouwMail(3, in_(3)).text).toContain(pad);
+        expect(bouwMail(3, in_(3)).text).not.toContain(GESPREK_PAD);
+        expect(bouwMail(1, in_(3)).text).not.toContain(pad);
+      });
+    });
+  }
+
+  it("taalVan: alleen de drie scantalen, alles anders is Nederlands", () => {
+    expect(taalVan({ locale: "en" })).toBe("en");
+    expect(taalVan({ locale: "de" })).toBe("de");
+    expect(taalVan({ locale: "nl" })).toBe("nl");
+    expect(taalVan({ locale: "es" })).toBe("nl");
+    expect(taalVan({})).toBe("nl");
+    expect(taalVan({ locale: 7 })).toBe("nl");
+  });
+
+  it("zonder taal is de mail Nederlands — de rijen van vóór 2026-09-20", () => {
+    expect(bouwMail(1, invoer).text).toBe(bouwMail(1, { ...invoer, taal: "nl" }).text);
   });
 });
 

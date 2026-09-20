@@ -18,7 +18,16 @@ export const ENKELE_TAAL: Record<string, { locales: Locale[]; reden: string }> =
     reden:
       "Alle vier de bevestigde engagements in docs/claims.md zijn NL/BE en het ICP is dat ook. " +
       "Dezelfde keuze als bij het saldering-cluster: een vertaalde versie voor een markt waar " +
-      "geen bewijs uit komt is dunne inhoud, geen bereik.",
+      "geen bewijs uit komt is dunne inhoud, geen bereik. Sinds 2026-09-20 draagt " +
+      "/tools/leak-scan dezelfde scan voor en en de, op Juans beslissing; de Nederlandse slug " +
+      "blijft de Nederlandse.",
+  },
+  "/tools/leak-scan": {
+    locales: ["en", "de"],
+    reden:
+      "Beslist door Juan op 2026-09-20: de lekkage-scan ook voor EN en DE, als tweede leadmagneet " +
+      "naast de ROI-rekenmachine. Eigen slug, want een Nederlandse slug op een Engelse pagina is " +
+      "geen vertaling. Geen es: daar is geen cluster en geen bewijs.",
   },
 };
 

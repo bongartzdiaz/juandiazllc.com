@@ -1,7 +1,8 @@
 "use client";
 
-/* De lekkage-scan. Vragen en scoremechanisme staan in lib/lekkage-scan.ts;
- * dit bestand is alleen opmaak en toestand.
+/* De lekkage-scan. Vragen en scoremechanisme staan in lib/lekkage-scan.ts,
+ * de kopij per taal in lib/lekkage-scan-taal.ts; dit bestand is alleen
+ * opmaak en toestand.
  *
  * DRIE DINGEN DIE OPZET ZIJN, ZODAT NIEMAND ZE "REPAREERT":
  *
@@ -10,12 +11,13 @@
  *    hooguit drie mails over zijn eigen lekken, met een aangevinkt vakje als
  *    toestemming (Telecommunicatiewet 11.7). De actie schrijft naar
  *    marketing.subscribers met source=lekkage-scan; zie app/actions/scan-opvang.ts.
- *    Er belooft niets een PDF, dus er is geen belofte die op RESEND_API_KEY
+ *    Er belooft niets een PDF, dus er is geen belofte die op een mailsleutel
  *    wacht. De contactroute hieronder blijft ernaast staan en draagt
  *    `interest=lekkage-scan` in `source`.
- * 2. De kopij is hardgecodeerd Nederlands, niet via dict.ts. De pagina bestaat
- *    alleen op /nl (zie lib/i18n/enkele-taal.ts) — zelfde precedent als
- *    components/EnergyInsightLinks.tsx. Het knoplabel is de uitzondering: dat
+ * 2. De kopij komt uit TEKSTEN[taal] en niet uit dict.ts. Tot 2026-09-20
+ *    bestond de scan alleen op /nl en stond alles hier hardgecodeerd; sinds
+ *    /tools/leak-scan (en, de) draagt lib/lekkage-scan-taal.ts de drie talen
+ *    naast elkaar, met de vragen erbij. Het knoplabel is de uitzondering: dat
  *    komt uit `cta.book`, omdat lib/i18n/eerste-stap.test.ts terecht eist dat
  *    elke ingang naar een gesprek overal dezelfde naam draagt.
  * 3. Bij nul lekken staat er dat er niets gevonden is. Een scan die altijd iets
@@ -31,12 +33,9 @@ import { LocaleLink } from "@/components/LocaleLink";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/lib/seo/branding";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { vraagUitslagAan, type ScanOpvangState } from "@/app/actions/scan-opvang";
-import { TOESTEMMING_TEKST, TOESTEMMING_WAARDE } from "@/lib/scan-opvang";
+import { TOESTEMMING_WAARDE } from "@/lib/scan-opvang";
+import { TEKSTEN, vragenVoor, type ScanTaal } from "@/lib/lekkage-scan-taal";
 import {
-  AANTAL_WOORD,
-  AANTAL_WOORD_HOOFD,
-  BLOKKEN,
-  VRAGEN,
   alleBeantwoord,
   duidMetingen,
   scoor,
@@ -44,16 +43,21 @@ import {
   type Metingen,
 } from "@/lib/lekkage-scan";
 
-export function LekkageScan() {
+const DATUM_LOCALE: Record<ScanTaal, string> = { nl: "nl-NL", en: "en-GB", de: "de-DE" };
+
+export function LekkageScan({ taal }: { taal: ScanTaal }) {
   const { locale, t } = useLocale();
+  const T = TEKSTEN[taal];
+  const { vragen, blokken } = useMemo(() => vragenVoor(taal), [taal]);
+
   const [antwoorden, setAntwoorden] = useState<Antwoorden>({});
   const [metingen, setMetingen] = useState<Metingen>({});
   const [getoond, setGetoond] = useState(false);
 
-  const compleet = alleBeantwoord(antwoorden);
-  const lekken = useMemo(() => scoor(antwoorden), [antwoorden]);
-  const gemeten = useMemo(() => duidMetingen(metingen), [metingen]);
-  const open = VRAGEN.filter((v) => antwoorden[v.id] === undefined).length;
+  const compleet = alleBeantwoord(antwoorden, vragen);
+  const lekken = useMemo(() => scoor(antwoorden, 3, vragen, blokken), [antwoorden, vragen, blokken]);
+  const gemeten = useMemo(() => duidMetingen(metingen, vragen), [metingen, vragen]);
+  const open = vragen.filter((v) => antwoorden[v.id] === undefined).length;
 
   /* De datum staat op het geprinte vel. Hij wordt hier gezet en niet bij het
      renderen berekend: een uitslag die je vandaag opslaat en volgende maand
@@ -87,7 +91,7 @@ export function LekkageScan() {
       gemeld.current = false;
       return;
     }
-    setDatum(new Date().toLocaleDateString("nl-NL", {
+    setDatum(new Date().toLocaleDateString(DATUM_LOCALE[taal], {
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -104,7 +108,7 @@ export function LekkageScan() {
     if (typeof w.plausible === "function") {
       w.plausible("Scan Voltooid", { props: { lekken: String(lekken.length) } });
     }
-  }, [getoond, compleet, lekken.length]);
+  }, [getoond, compleet, lekken.length, taal]);
 
   /* De optionele opvang. Het formulier post naar een server action; de
      uitkomst komt terug als state en rendert onder het veld. Zevende
@@ -148,16 +152,16 @@ export function LekkageScan() {
 
   return (
     <div className="scan">
-      {BLOKKEN.map((blok) => (
+      {blokken.map((blok) => (
         <section className="scan-blok" key={blok.id}>
           <h2 className="scan-blok-naam">{blok.naam}</h2>
-          {VRAGEN.filter((v) => v.blok === blok.id).map((v) => (
+          {vragen.filter((v) => v.blok === blok.id).map((v) => (
             <fieldset className="scan-vraag" key={v.id}>
               <legend>{v.vraag}</legend>
               <div className="scan-keuze">
                 {[
-                  { label: "Ja", waarde: true },
-                  { label: "Nee", waarde: false },
+                  { label: T.ja, waarde: true },
+                  { label: T.nee, waarde: false },
                 ].map((k) => (
                   <label className="scan-optie" key={k.label}>
                     <input
@@ -187,7 +191,7 @@ export function LekkageScan() {
                       <span className="scan-meting-eenheid">{v.meting.eenheid}</span>
                     </span>
                   </label>
-                  <p className="scan-meting-uitleg">Optioneel. Sla over als je het nu niet kunt opzoeken.</p>
+                  <p className="scan-meting-uitleg">{T.metingOptioneel}</p>
                 </div>
               )}
             </fieldset>
@@ -202,12 +206,10 @@ export function LekkageScan() {
           disabled={!compleet}
           onClick={() => setGetoond(true)}
         >
-          Toon wat er lekt
+          {T.knopToon}
         </button>
         <p className="scan-teller" aria-live="polite">
-          {compleet
-            ? `Alle ${VRAGEN.length} beantwoord.`
-            : `Nog ${open} ${open === 1 ? "vraag" : "vragen"} te gaan.`}
+          {compleet ? T.alleBeantwoord : T.nogTeGaan(open)}
         </p>
       </div>
 
@@ -219,29 +221,18 @@ export function LekkageScan() {
               CSS-content, zodat het echte tekst blijft die je kunt selecteren
               en die een schermlezer kan bereiken. */}
           <div className="scan-printkop">
-            <p className="scan-printkop-titel">Lekkage-scan{datum ? " · " + datum : ""}</p>
-            <p className="scan-printkop-bron">
-              juandiazllc.com/nl/tools/lekkage-scan · {CONTACT_EMAIL}
-            </p>
+            <p className="scan-printkop-titel">{T.printkopTitel}{datum ? " · " + datum : ""}</p>
+            <p className="scan-printkop-bron">{T.printkopBron}</p>
           </div>
 
           {lekken.length === 0 ? (
             <>
-              <h2>Deze scan ziet niets lekken.</h2>
-              <p>
-                Dat is een echte uitkomst en geen beleefdheid. {AANTAL_WOORD_HOOFD}{" "}
-                ja/nee-vragen vinden de lekken die met overdracht, wachttijd, dubbele
-                invoer en overlappende tools te maken hebben. Zitten die goed, dan zit
-                je probleem ergens anders.
-              </p>
+              <h2>{T.nulKop}</h2>
+              <p>{T.nulP}</p>
             </>
           ) : (
             <>
-              <h2>
-                {lekken.length === 1
-                  ? "Dit lekt bij jou het eerst"
-                  : `Dit lekt bij jou het eerst — ${lekken.length} plekken, belangrijkste bovenaan`}
-              </h2>
+              <h2>{lekken.length === 1 ? T.lekKopEen : T.lekKopMeer(lekken.length)}</h2>
               <ol className="scan-lekken">
                 {lekken.map((lek, i) => (
                   <li key={lek.blok}>
@@ -249,7 +240,7 @@ export function LekkageScan() {
                       <span className="scan-rang">{i + 1}</span> {lek.lek}
                     </h3>
                     <p className="scan-meta">
-                      {lek.aantal} van de {lek.totaal} vragen onder <em>{lek.naam}</em>.
+                      {T.lekMeta(lek.aantal, lek.totaal)} <em>{lek.naam}</em>.
                     </p>
                     <ul className="scan-kosten">
                       {lek.vragen.map((v) => (
@@ -264,7 +255,7 @@ export function LekkageScan() {
 
           {gemeten.length > 0 && (
             <div className="scan-gemeten">
-              <h3>Wat je zelf hebt gemeten</h3>
+              <h3>{T.gemetenKop}</h3>
               {gemeten.map((m) => (
                 <div className="scan-gemeten-rij" key={m.vraag.id}>
                   <p className="scan-gemeten-getal">
@@ -278,46 +269,30 @@ export function LekkageScan() {
                   )}
                 </div>
               ))}
-              <p className="scan-gemeten-slot">
-                Dit zijn de enige getallen in deze scan die over jouw bedrijf gaan, en
-                je hebt ze zelf opgezocht. Alles hierboven is een ja of een nee.
-              </p>
+              <p className="scan-gemeten-slot">{T.gemetenSlot}</p>
             </div>
           )}
 
           <div className="scan-grens">
-            <h3>Wat deze scan niet ziet</h3>
-            <p>
-              Geen marge per project, geen kwaliteit van de instroom, geen bezetting,
-              en niets over of je mensen een nieuw systeem zouden gebruiken.{" "}
-              {AANTAL_WOORD_HOOFD} ja/nee-vragen dragen hun eigen reikwijdte, en dit is
-              hem.
-            </p>
+            <h3>{T.grensKop}</h3>
+            <p>{T.grensP}</p>
           </div>
 
           <div className="scan-bewaar">
-            <h3>Neem deze uitslag mee</h3>
-            <p>
-              Eén pagina met jouw antwoorden erop. Je bewaart hem zelf, en je
-              kunt hem doorsturen naar wie er bij jou over gaat.
-            </p>
-            <p>
-              Wil je er de komende weken drie mails over? Per lek één: wat het
-              kost, wat je er zelf aan kunt doen, en wanneer het tijd is voor
-              hulp. Laat dan hieronder je adres achter. Zonder vinkje gebeurt
-              er niets.
-            </p>
+            <h3>{T.bewaarKop}</h3>
+            <p>{T.bewaarP1}</p>
+            <p>{T.bewaarP2}</p>
             <form className="nl-form scan-opvang" action={opvangActie}>
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="lekken" value={String(lekken.length)} />
               <label className="sr-only" htmlFor="scan-email">
-                E-mailadres
+                {T.emailLabel}
               </label>
               <input
                 id="scan-email"
                 name="email"
                 type="email"
-                placeholder="jij@bedrijf.nl"
+                placeholder={T.placeholder}
                 required
                 autoComplete="email"
               />
@@ -327,7 +302,7 @@ export function LekkageScan() {
                   name="toestemming"
                   value={TOESTEMMING_WAARDE}
                 />
-                <span>{TOESTEMMING_TEKST}</span>
+                <span>{T.toestemming}</span>
               </label>
               <div className="hp-field" aria-hidden="true">
                 <label htmlFor="scan-website">Website</label>
@@ -340,7 +315,7 @@ export function LekkageScan() {
                 />
               </div>
               <button type="submit" className="btn primary" disabled={opvangBezig}>
-                {opvangBezig ? "Bezig…" : "Stuur me de drie mails"}
+                {opvangBezig ? T.bezig : T.knopStuur}
               </button>
               {opvang.status !== "idle" && (
                 <div className={`nl-msg ${opvang.status}`}>{opvang.message}</div>
@@ -351,23 +326,19 @@ export function LekkageScan() {
               className="btn"
               onClick={() => window.print()}
             >
-              Opslaan of printen
+              {T.knopPrint}
             </button>
           </div>
 
           <div className="scan-cta">
-            <p>
-              Wil je dit nagelopen hebben op je eigen cijfers in plaats van op{" "}
-              {AANTAL_WOORD} vragen? Dat is het blueprint-gesprek: dertig minuten, en er
-              komt een diagnose van één pagina uit.
-            </p>
+            <p>{T.ctaP}</p>
             <LocaleLink href="/contact?interest=lekkage-scan" className="btn primary">
               {t("cta.book")}
             </LocaleLink>
             {/* De directe route staat er bewust naast: wie liever mailt dan
                 een formulier invult, moet dat kunnen zonder te zoeken. */}
             <p className="scan-cta-direct">
-              Liever direct? <a href={CONTACT_MAILTO}>{CONTACT_EMAIL}</a>
+              {T.liever} <a href={CONTACT_MAILTO}>{CONTACT_EMAIL}</a>
             </p>
           </div>
         </section>

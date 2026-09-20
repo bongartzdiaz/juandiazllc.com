@@ -13,6 +13,7 @@ import {
   lekt,
   scoor,
   telwoordNL,
+  telwoord,
   type Antwoorden,
 } from "./lekkage-scan";
 
@@ -289,17 +290,29 @@ describe("de metingen", () => {
  * defect. Een toelichting die zelf een telwoord noemt valt dus ook om. Dat is
  * de prijs en hij is klein: schrijf AANTAL_WOORD in plaats van het woord. */
 describe("de telling van de vragen", () => {
-  /** De bestanden die de bezoeker leest. Niet de tests, niet de docs. */
+  /** De bestanden die de bezoeker leest. Niet de tests, niet de docs.
+   *  Sinds 2026-09-20 staat de kopij van het component in
+   *  lib/lekkage-scan-taal.ts (drie talen); het component zelf draagt geen
+   *  telwoord meer en hoort dat ook niet te doen. */
   const SCAN_KOPIJ = [
     "app/[locale]/tools/lekkage-scan/page.tsx",
+    "app/[locale]/tools/leak-scan/page.tsx",
     "components/LekkageScan.tsx",
     "components/ScanCallout.tsx",
+    "lib/lekkage-scan-taal.ts",
   ];
+
+  /** Waar het telwoord werkelijk genoemd wordt, en dus uit de bron moet komen. */
+  const NOEMT_AANTAL = ["components/ScanCallout.tsx", "lib/lekkage-scan-taal.ts"];
 
   /* Elk telwoord dat TELWOORD_NL kent. telwoordNL() gooit buiten die tabel,
    * dus een ingekorte tabel valt hier luid om in plaats van stil minder te
    * bewaken. */
-  const TELWOORDEN = Array.from({ length: 9 }, (_, i) => telwoordNL(12 + i));
+  const TELWOORDEN = Array.from({ length: 9 }, (_, i) => [
+    telwoordNL(12 + i),
+    telwoord(12 + i, "en"),
+    telwoord(12 + i, "de"),
+  ]).flat();
 
   /** Woorden, niet substrings: "veertienhonderd" is geen telwoord. */
   const woorden = (bron: string) => new Set(bron.toLowerCase().split(/[^a-z]+/));
@@ -339,10 +352,15 @@ describe("de telling van de vragen", () => {
   it("leest het telwoord werkelijk uit de bron", () => {
     // Zonder deze assertie slaagt de vorige ook op kopij die het aantal
     // helemaal niet meer noemt -- dan is de telling stilletjes verdwenen.
-    for (const pad of SCAN_KOPIJ) {
+    for (const pad of NOEMT_AANTAL) {
       const bron = readFileSync(join(WORTEL, pad), "utf8");
       expect(bron, pad + " noemt AANTAL_WOORD niet").toContain("AANTAL_WOORD");
     }
+    // De twee andere talen lezen hetzelfde getal via telwoord(), uit
+    // dezelfde bron; een hardgecodeerd "sixteen" valt in de vorige test.
+    const taal = readFileSync(join(WORTEL, "lib/lekkage-scan-taal.ts"), "utf8");
+    expect(taal).toContain('telwoord(VRAGEN.length, "en")');
+    expect(taal).toContain('telwoord(VRAGEN.length, "de")');
   });
 
   it("herkent een telwoord werkelijk", () => {
@@ -454,7 +472,7 @@ describe("het doel Scan Voltooid", () => {
     /* De andere helft van de val. Haal je de dependency weg om het dubbel
        tellen te stoppen, dan meldt het doel een VEROUDERD aantal -- stiller
        en erger dan dubbel tellen. De ref lost het op, de dependency blijft. */
-    expect(CODE).toContain("[getoond, compleet, lekken.length]");
+    expect(CODE).toContain("[getoond, compleet, lekken.length, taal]");
   });
 
   it("leest werkelijk code en niet alleen commentaar", () => {
