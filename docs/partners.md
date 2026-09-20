@@ -22,8 +22,9 @@ mechanisch kan:
 1. **Eén zin die zegt wanneer ze aan je moeten denken**, in de werkwoorden van
    hún werk — niet in die van het jouwe.
 2. **De lekkage-scan als doorstuurbaar ding dat niets belooft.** De enige link
-   die erin staat. Vier minuten, zestien ja/nee-vragen, geen e-mailadres
-   nodig — wie hem krijgt hoeft niets te kopen en niets achter te laten.
+   die erin staat. Vier minuten, zestien ja/nee-vragen; wie hem krijgt hoeft
+   niets te kopen. Sinds 2026-09-20 laat hij naam, bedrijf en e-mailadres
+   achter voor de uitslag — dat staat in de tekst, niet verstopt.
 3. **Geen vergoeding, en dat staat er expliciet in.** Geen klantcijfers, geen
    bedragen: de uitkomsten uit `docs/claims.md` horen bij de klanten die ze
    haalden (`docs/introducties.md`), niet in een partnertekst.
@@ -44,7 +45,7 @@ dan aan mij. De binnenkant van zulke bedrijven bouwen is precies wat ik doe.
 
 Je hoeft niets te beloven. Er staat een gratis zelfscan op mijn site die je zo
 kunt doorsturen: https://juandiazllc.com/nl/tools/lekkage-scan — vier minuten,
-geen e-mailadres nodig, en ze zien zelf waar het lekt.
+ze laten hun naam en e-mail achter en zien zelf waar het lekt.
 
 Geen vergoeding, geen contract. En het werkt twee kanten op: vraagt iemand mij
 om een goede installateur, dan noem ik jou.
@@ -66,7 +67,7 @@ er ook voor jou leesbaarder van.
 
 Doorsturen kan zonder iets te beloven:
 https://juandiazllc.com/nl/tools/lekkage-scan — een gratis zelfscan van vier
-minuten, geen e-mailadres nodig.
+minuten; naam en e-mail achterlaten, uitslag op het scherm.
 
 Geen vergoeding, geen contract. En andersom geldt hetzelfde: vraagt iemand mij
 om een boekhouder, dan noem ik jou.
@@ -86,7 +87,7 @@ omdat de opvolging hapert — leads kwijt, offertes te laat, alles in losse
 spreadsheets — denk dan aan mij.
 
 Doorsturen kan vrijblijvend: https://juandiazllc.com/nl/tools/lekkage-scan —
-een gratis zelfscan van vier minuten, geen e-mailadres nodig.
+een gratis zelfscan van vier minuten; naam en e-mail achterlaten, uitslag op het scherm.
 
 Geen vergoeding, geen contract. En andersom: vraagt iemand mij om
 energie-advies, dan noem ik jou.

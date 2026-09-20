@@ -1,5 +1,17 @@
-/* De opvang achter de lekkage-scan: wat er in `marketing.subscribers` komt te
- * staan als een bezoeker na de uitslag zijn adres achterlaat.
+/* De opvang achter de lekkage-scan.
+ *
+ * Sinds 2026-09-20 (avond) is de scan gegate: na de zestien vragen laat de
+ * bezoeker naam, bedrijf en e-mailadres achter, en dán pas staat de uitslag op
+ * het scherm. Juans woorden: *so that you can actually get leads*. Dat draait
+ * de keuze uit docs/lead-magnet.md §1 om; §10 daar legt vast waarom.
+ *
+ * Twee rijen, elk met eigen grond:
+ * - `marketing.leads` — altijd. Dit is de lead: naam, bedrijf, adres en als
+ *   bericht de uitslag zelf, zodat Juan op Telegram ziet wát er lekt. De
+ *   triggers op die tabel doen de rest (lead-notify, lead-acknowledge).
+ * - `marketing.subscribers` — alleen met het vinkje. Dat is de mailreeks, en
+ *   die mag alleen met ondubbelzinnige, losse toestemming (Tw 11.7). De gate
+ *   koopt de uitslag, niet de reeks.
  *
  * Dit bestand draagt alleen de zuivere helft — constanten en een functie die
  * de metadata-rij bouwt — zodat de server action ernaast (app/actions/
@@ -12,7 +24,9 @@
  * uitschrijftoken en campagne passen in `metadata` zonder DDL — en DDL op het
  * levende project is een operator-handeling, geen codewijziging. */
 
-/** Waarde van `source` in de rij; de campagnes filteren hierop. */
+import { VRAGEN, type Antwoorden, type Lek, type Vraag } from "@/lib/lekkage-scan";
+
+/** Waarde van `source` in beide rijen; de campagnes filteren hierop. */
 export const SCAN_BRON = "lekkage-scan";
 
 /** Naam van de campagne waar deze inschrijving bij hoort. Wijzigt zodra er een
@@ -20,10 +34,44 @@ export const SCAN_BRON = "lekkage-scan";
  *  tweede belandt. */
 export const SCAN_CAMPAGNE = "lekkage-scan-2026-09";
 
-/** Het formulier stuurt het aantal gevonden lekken mee als tekst (dezelfde
- *  waarde als de Plausible-eigenschap `lekken`). Boven dit getal is het geen
- *  scanuitslag meer maar invoer van buiten. */
-export const MAX_LEKKEN = 99;
+/** Het formulier stuurt de zestien antwoorden mee als JSON in een hidden
+ *  input. De server rekent de uitslag zelf uit (`scoor`), zodat wat Juan op
+ *  Telegram ziet uit de antwoorden komt en niet uit een getal dat de browser
+ *  opgaf. Alles wat geen volledig, geldig antwoordenobject is wordt `null`. */
+export function leesAntwoorden(waarde: unknown, vragen: readonly Vraag[] = VRAGEN): Antwoorden | null {
+  if (typeof waarde !== "string" || waarde.length > 2000) return null;
+  let ruw: unknown;
+  try {
+    ruw = JSON.parse(waarde);
+  } catch {
+    return null;
+  }
+  if (!ruw || typeof ruw !== "object" || Array.isArray(ruw)) return null;
+  const obj = ruw as Record<string, unknown>;
+  const ids = new Set(vragen.map((v) => v.id));
+  for (const [k, v] of Object.entries(obj)) {
+    if (!ids.has(k) || typeof v !== "boolean") return null;
+  }
+  const antwoorden: Record<string, boolean> = {};
+  for (const id of ids) {
+    const v = obj[id];
+    if (typeof v !== "boolean") return null;
+    antwoorden[id] = v;
+  }
+  return antwoorden;
+}
+
+/** Het bericht in de lead-rij: de uitslag in één regel per lek, in het
+ *  Nederlands, want Juan leest hem. De taal van de bezoeker staat erbij
+ *  zodat het antwoord in de goede taal gaat. */
+export function bouwLeadBericht(lekken: readonly Lek[], taal: string): string {
+  const kop = `Lekkage-scan (${taal})`;
+  if (lekken.length === 0) return `${kop}: nul lekken gevonden.`;
+  const regels = lekken.map(
+    (l, i) => `${i + 1}. ${l.naam} — ${l.aantal}/${l.totaal}: ${l.vragen.map((v) => v.id).join(", ")}`,
+  );
+  return `${kop}: ${lekken.length} ${lekken.length === 1 ? "lek" : "lekken"}.\n${regels.join("\n")}`;
+}
 
 /** De waarde die de toestemmingscheckbox moet dragen. Een checkbox zonder
  *  `value` stuurt "on"; een expliciete waarde maakt de controle leesbaar in de
@@ -38,14 +86,6 @@ export type ScanMetadata = {
   lekken: number | null;
   unsub_token: string;
 };
-
-/** Leest het `lekken`-veld: alleen een geheel getal van 0 t/m MAX_LEKKEN
- *  telt; alles anders wordt `null`, niet 0 — nul is een echte uitslag. */
-export function leesLekken(waarde: unknown): number | null {
-  if (typeof waarde !== "string" || !/^\d{1,2}$/.test(waarde)) return null;
-  const n = Number(waarde);
-  return n <= MAX_LEKKEN ? n : null;
-}
 
 /** De tekst die naast het vakje staat. Hij gaat mee de rij in, zodat later
  *  vaststaat waar iemand precies mee heeft ingestemd — de tekst op de pagina
