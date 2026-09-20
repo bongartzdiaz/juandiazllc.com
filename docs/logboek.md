@@ -10545,3 +10545,102 @@ aanroept — cron of handmatig — vóór (a) live gaat, anders breekt de
 activering stil. Daarna de rate-limiting op de vier anon-aanroepbare
 SECURITY DEFINER-RPC's. Gemeten aanroepers staan nog nergens; dat is de
 eerste vraag van morgen.
+
+### 2026-09-20 — audit stap 4 op vbozel, de downloadgate, en Roy's token van de machine
+
+Alles in `bongartzdiaz/diaz-editor` en op Supabase-project vbozel; in deze
+repo alleen dit blok. Drie PR's daar gemerged: #664, #665, #666.
+
+#### Stap 4, deel 1 — `diaz-affiliate-activate`: code klaar, deploy op Juan
+
+Eerste vraag van de dag was wie hem aanroept. Antwoord: **niemand**. Geen
+cron (`cron.job` op vbozel: zes jobs, geen ervan raakt de functie), geen
+verwijzing in `landing/`, `electron/` of `apps/`. Alleen de audit-docs, de
+poorten en de functie zelf. De repo-versie met `requireSecret` (fail-closed
+op `AFFILIATE_ACTIVATE_SECRET`) stond sinds 10 augustus klaar en was nooit
+uitgerold — B-79 uit `docs/audit/05-backlog.md`, dezelfde drift als
+[[project_diaz_editor_repo_prod_drift]]. Nulmeting op de gedeployde v23:
+anonieme POST met niet-bestaand `partner_id` → **200**.
+
+#664 (`4fb5f9a28`) haalt daarbovenop de licentiesleutel uit de respons: alleen
+`license_key_tail` (laatste vier tekens). De partner krijgt de sleutel per
+mail en hij staat in de rij; een gelogde respons droeg tot nu toe een
+werkende Pro-licentie.
+
+**Uitrollen lukte niet, op twee manieren.** De MCP-connector verliest hier
+het schema van `deploy_edge_function` en geeft `files` als tekst door in
+plaats van als lijst (`ZodError: expected array, received string`, tweemaal).
+De CLI was Roy. Wat er moet gebeuren is één commando met Juans PAT als
+env-var, nooit in `.env` of de repo:
+
+```
+SUPABASE_ACCESS_TOKEN=<pat> supabase functions deploy diaz-affiliate-activate --project-ref vbozelswveaxsyccvaac --no-verify-jwt
+```
+
+Daarna `AFFILIATE_ACTIVATE_SECRET` in Edge Function Secrets. Meetketen:
+anonieme POST 200 → 503 `auth-not-configured` (na deploy) → 401 (na secret).
+Tot dan staat de functie open zoals hij stond; er zijn nul pending partners.
+
+#### Stap 4, deel 2 — de vier anon-RPC's: rem erop en één lek dicht
+
+`capture_newsletter_email` (twee overloads), `log_update_event` en
+`unsubscribe_newsletter`: alle vier SECURITY DEFINER, door `anon` aanroepbaar,
+nul rem — terwijl `diaz_editor.check_rate_limit()` al bestond en door niets
+werd gebruikt (`request_rate_limit`: 0 rijen, ooit). Migratie
+`rpc_rate_limits` (#665, `d1edd136f`) op vbozel: 5/uur per IP + 3/etmaal per
+adres (capture), 20/uur per apparaat + 60/uur per IP (update-events), 30/uur
+per IP (afmelden). IP uit `x-forwarded-for` via `request.headers`; buiten
+PostgREST één bucket. Vormcontrole gaat vóór de teller.
+
+**Het lek dat erbij kwam.** `already_subscribed` gaf het uuid van de bestaande
+abonnee terug aan wie zijn e-mailadres kende, en `unsubscribe_newsletter(uuid)`
+gebruikt precies dat uuid als enige sleutel: iemand anders afmelden kostte
+twee anonieme calls. De aanroepers lezen alleen `status`; het id is nu overal
+null. De afmeldlink in de drip-mail komt uit de tabel, niet uit de RPC.
+
+Gemeten in een teruggedraaide transactie: `created` → `already_subscribed` →
+`already_subscribed` (4-arg) → `rate_limited` → `invalid` (telt niet mee),
+alle ids null. Via PostgREST drie afmeld-calls met een random uuid: teller 3
+op het echte client-IP, dus de header komt door.
+
+#### De downloadgate — live
+
+#666 (`554b4fecf`): `/download` toont eerst een formulier (e-mail, bedrijf,
+honeypot), de knoppen staan op `hidden` tot de RPC `created` of
+`already_subscribed` zegt. Zacht: `/dl/windows` blijft bestaan voor de
+help-pagina's en de updater, en de exe staat toch publiek op de spiegel — het
+formulier vraagt om gegevens, het bewaakt geen geheim. Serverkant is een RPC
+(`request_download`, migratie `20260920b`) en geen edge function, om de reden
+hierboven. Rij in `newsletter_subscribers` met `source=download`, bedrijf en
+platform in `metadata`, `drip_state=day_0`; het formulier zegt dat erbij.
+Zelfde rem, geen uuid terug. Privacy 1.2: de nieuwsbriefrij noemt het
+formulier, bedrijfsnaam en platform in vier talen; `verify-retention-promises`
+20/20.
+
+Gemeten van buitenaf na de Vercel-deploy (`X-Vercel-Cache: MISS`):
+`id="dl-gate"` en `id="dl-grid" hidden` staan in de geserveerde HTML. Vanuit
+de browser, in DE: leeg bedrijf → foutmelding, geldig → rij op vbozel met
+`company=Poort GmbH`, `lang=de`; probe-rij daarna verwijderd, tabel op 0.
+
+#### Roy's CLI-token is van deze machine
+
+Juan vroeg om zekerheid dat Roy's login niets van hem kan raken. Gemeten: de
+`supabase`-CLI bewaart één token per machine, in Windows Credential Manager
+onder `Supabase CLI:supabase`, nergens in een repo of `.env`. Twee
+identiteiten, twee opslagplaatsen: MCP (claude.ai, Juan) en CLI (Roy). Geen
+conflict in de zin van toegang — wel elke deploy die stil met 403 faalt.
+
+Op zijn vraag verwijderd: `cmdkey /delete` → `Credential deleted
+successfully`, `supabase projects list` → `Access token not provided`.
+**Daarna bleek hij dat token nog nodig te hebben** voor HMB-werk in een
+andere Claude-sessie. De waarde is nooit gezien en niet terug te zetten;
+herstel is `supabase login` als Roy in die sessie. Voor Diaz-werk:
+`SUPABASE_ACCESS_TOKEN` als env-var per commando, dan blijft Credential
+Manager van Roy. Les: een verwijdering die "uitsluiten" heet, is nog steeds
+een verwijdering — eerst vragen of het token elders nog dienst doet.
+
+#### Nog open, allemaal op Juan
+
+- deploy van `diaz-affiliate-activate` + secret (zie boven)
+- Linux-build: `/dl/linux` geeft 404 sinds `v0.4.49` (alleen op Linux/CI te bouwen)
+- `RESEND_API_KEY` + `ACK_FROM` in wbgio Edge Secrets (juandiazllc-bevestigingsmail)
