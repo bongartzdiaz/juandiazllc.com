@@ -11170,3 +11170,69 @@ oplevert — dat kan pas als Plausible meet en de vier Vercel-variabelen staan,
 en dat is de operator-lijst. Wat het wél is: de tweede leadmagneet staat in
 drie talen live met dezelfde opvang en dezelfde reeks, en niets ervan is een
 tweede bron van waarheid.
+
+### 2026-09-20 (9) — de scan achter een gate: naam, bedrijf, e-mail, dan de uitslag (#386)
+
+Na #384 stuurde Juan de links en kwam terug met: *the results should you get
+after details — so that you can actually get leads*. Nagevraagd welke vorm,
+want dit draait `docs/lead-magnet.md` §1 om en de kopij in drie talen beloofde
+*geen e-mail*. Antwoord: harde gate, naam + bedrijf + e-mail. Eén PR,
+[#386](https://github.com/bongartzdiaz/juandiazllc.com/pull/386).
+
+**Wat de gate is.** Na de zestien vragen en de knop verschijnt geen uitslag
+maar een kaart: naam, bedrijf, e-mailadres, en daaronder los en niet
+voorgevinkt het vinkje voor de drie mails. Pas als de server `ok` zegt
+rendert de uitslag; wie het formulier niet invult ziet hem niet.
+
+**Waar de lead landt.** Niet meer alleen in `subscribers`: de actie schrijft
+eerst een rij in `marketing.leads` met `source = lekkage-scan`, naam,
+bedrijf, adres, en als bericht de uitslag zelf — drie lekken, per lek de
+bloknaam, de breuk en de vraag-ids, in het Nederlands, want Juan leest hem
+op Telegram. De triggers op die tabel doen de rest, precies zoals bij het
+contactformulier: `lead-notify` naar Telegram, `lead-acknowledge` naar de
+bezoeker. Daarna, en alleen met het vinkje, de `subscribers`-rij voor de
+reeks; de gate koopt de uitslag, niet de reeks (Tw 11.7). Een dubbel adres
+in de reeks is geen fout; een kapotte reeks laat de lead staan en toont de
+uitslag toch, met `reeks: false`.
+
+**De uitslag komt van de server.** Het component stuurt de zestien antwoorden
+als JSON mee, `leesAntwoorden` weigert alles wat geen volledig object met
+booleans is (half, vervalst, een string erin, een id die niet bestaat, te
+lang), en `scoor()` rekent op de server. Een getal dat de browser opgaf telt
+niet meer — het oude `lekken`-veld is weg, met `leesLekken` en `MAX_LEKKEN`.
+
+**Kopij.** *Geen e-mail* is overal weg: `TEKSTEN` in drie talen (eyebrow nu
+*Gratis · vier minuten · zestien vragen*, uit `AANTAL_WOORD`), de
+`ScanCallout`, en vier plekken in `docs/partners.md` die partners lieten
+doorsturen met de belofte *geen e-mailadres nodig*. De gate zegt *je hoort
+binnen 24 uur van me* — niet als nieuwe belofte maar omdat
+`lead-acknowledge` dat toch al mailt op elke rij die niet met `cal_` begint.
+Die bevestiging is die van het contactformulier (*je bericht is
+aangekomen*), terwijl een scan-lead niets heeft gevraagd; een eigen tekst per
+`source` zit in de edge function en gaat mee met de MCP-uitrol in de verse
+sessie.
+
+**Poorten.** `app/actions/scan-opvang.test.ts` (12, nieuw, gemockte client):
+zonder naam, bedrijf, adres of volledige antwoorden bereikt niets de
+database; volgorde leads → subscribers; honeypot schrijft niets en geeft geen
+reeks; db-fout op de lead is een fout. `lib/scan-opvang.test.ts` herschreven
+op `leesAntwoorden` en `bouwLeadBericht` (geen euro, geen procent in het
+Telegram-bericht). De telwoord-poort ving nog één *zestien* in een commentaar
+in het component. Suite 1695, typecheck schoon, build groen.
+
+**Gemeten op de preview, zonder rij.** Alle zestien op *No*, knop: de gate
+staat er (`name*`, `company*`, `email*`, `toestemming`, honeypot, twee
+hidden), de uitslag niet. Naam en bedrijf ingevuld, e-mail `poort@x` — komt
+langs de browser, valt op `isPlausibleEmail` op de server: *Enter a valid
+email.* terug, gate blijft, uitslag blijft weg, nul rijen. Dat is de
+round-trip tot vlak vóór de insert; een echte inzending schrijft naar
+productie en is niet gedaan.
+
+**Op productie na de merge:** de nieuwe kopij stond binnen een minuut op alle drie de scanpagina's (200; eyebrow *Gratis · vier minuten · zestien vragen* / *Free · four minutes · sixteen questions* / *Kostenlos · vier Minuten · sechzehn Fragen*, nul treffers meer op *geen e-mail*). Server-HTML alleen; de gate zelf is client-gerenderd en op de preview doorgeklikt.
+
+**Wat dit kost, en dat is opgeschreven in §10.** Een gate vóór de uitkomst
+kost de mensen die nog niet weten of dit voor hen is — dat stond in §4 en
+het blijft waar. Ertegenover: nul rijen uit de scan tot vandaag, en een
+uitslag zonder naam is voor Juan niets om op te volgen. Zodra Plausible
+meet is `Scan Voltooid` tegen `Uitslag Aangevraagd` de afhaak op de gate,
+en dan is dit een beslissing op cijfers.
