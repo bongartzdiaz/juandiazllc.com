@@ -11496,3 +11496,26 @@ eerst tegen `BREVO_API_KEY`/`CAMPAGNE_FROM` aan, die op dit project
 ontbreken (blok 6). Afgaan is pas te bewijzen met de variabelen én een
 subscriber. Het cron-item van blok (5) is daarmee gereduceerd tot: dezelfde
 vier variabelen op dit project.
+
+### 2026-09-21 (8) — Vercel-variabelen geparkeerd
+
+Na blok (6) en (7) nog drie keer "gezet" van Juan (in het paneel, in het
+paneel, in Vercel), drie keer dezelfde meting: `/api/v9/projects/
+juandiazllc-com/env` als `bongartzdiaz@gmail.com`, zonder cache, 12
+variabelen, nieuwste `SUPABASE_SERVICE_ROLE_KEY` 2026-09-19 17:15 UTC.
+`POST /api/cal` om 18:1x UTC: 503 `not-configured`. Het paneelformulier
+bleef elke keer onaangeraakt (Value 0 tekens); screenshots van het paneel
+liepen de hele sessie op een time-out, dus het paneel was aan Juans kant
+vermoedelijk niet zichtbaar.
+
+Geen vijfde build gemaakt: zonder de variabele op dít project verandert
+een build niets. Om te sluiten ontbreekt één gegeven — de URL van de
+pagina waar Juan de vier zet. **Geparkeerd op Juans woord ("is goed").**
+
+Tussendoor gedaan zonder blokkade: `MANUAL_TASKS.md` Brevo-blok
+bijgewerkt (#401).
+
+Hervatten: URL van die pagina vergelijken met
+`vercel.com/bongartzdiaz-2377s-projects/juandiazllc-com/settings/environment-variables`;
+staan de vier daar, dan één build (docs-PR) en `POST /api/cal` meten —
+verwacht antwoord: geen 503 meer, en 401 op de handtekening.
