@@ -495,7 +495,17 @@ herschreven, en deze notitie is de correctie erop.
    Juan heeft `contact@brevo.com` op 2026-09-21 expliciet om
    *transactional email sending (SMTP/API)* gevraagd, met de 403-tekst
    erbij. **Wacht op Brevo's antwoord; meet daarna de API, niet het
-   dashboard.** Logboek 2026-09-21 (3).
+   dashboard.** Logboek 2026-09-21 (3). **Geparkeerd 2026-09-21 13:00 UTC.**
+   Brevo bevestigde drie keer ("gevalideerd", "gevalideerd", "SMTP
+   geactiveerd"); de API gaf om 11:58, 12:22, 12:25 en 12:55 UTC telkens
+   dezelfde 403. Dertig minuten na de laatste bevestiging ook, dus geen
+   propagatie. De sleutel hoort bij `organization_id 6a1841a36b61a0b9a405832a`,
+   `user_id 11325829` — pin dat in de volgende mail, want support kan een
+   andere organisatie hebben geactiveerd. Uitweg als het blijft hangen:
+   nieuw Brevo-account op `juan@juandiazllc.com` (de vier DNS-records
+   blijven geldig) met een nieuwe sleutel via `vault.update_secret`. Hervatten:
+   eerst `/v3/smtp/email` vanuit Postgres, bij 201 de POST op rij
+   `0c2e53dc…`. Logboek 2026-09-21 (4).
 5. **`CAL_WEBHOOK_SECRET` in Vercel-productie**, en daarna nakijken of cal.com de
    webhook werkelijk aanroept. Gemeten 2026-08-24: `POST /api/cal` antwoordt
    `{"ok":false,"error":"not-configured"}`. Zolang dat zo is levert een boeking
