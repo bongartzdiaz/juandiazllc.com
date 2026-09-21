@@ -11415,3 +11415,35 @@ via een sessie), daarna dezelfde twee metingen.
 **Geparkeerd** op Juans woord, 13:00 UTC. Rij `0c2e53dc…` ligt met
 `ack_channel = 'failed:http-403'` en `acknowledged_at` leeg; geen
 idempotentie-blokkade bij hervatten.
+
+### 2026-09-21 (5) — alle funnels gemeten: opvang werkt, opvolging niet
+
+Vraag van Juan na het parkeren van Brevo: *werken alle funnels en de lead
+magnets?* Gemeten om 13:27 UTC, alleen met GET's, ongeldige POST's en
+leesquery's — niets weggeschreven, niets verstuurd.
+
+| pad | meting |
+|---|---|
+| `/en`, `/en/contact`, `/en/pricing`, `/en/tools/energy-roi`, `/en/tools/leak-scan`, `/nl/tools/lekkage-scan` | 200 |
+| `/en/tools/lekkage-scan` | 404 — juist: EN/DE zitten op `/tools/leak-scan` sinds 20 sep |
+| `GET /api/campagne/scan-reeks` zonder header | **401 `unauthorized`** — was 503; `CRON_SECRET` staat dus. Of `BREVO_API_KEY`, `CAMPAGNE_FROM`, `SUPABASE_SECRET_KEY` staan is van buiten niet te zien: die controle zit ná de auth |
+| `POST /api/cal` met `{}` | 503 `not-configured` — `CAL_WEBHOOK_SECRET` staat nog niet |
+| `/api/newsletter/confirm`, `/api/uitschrijven` zonder token | 302 |
+| Vercel runtime-log, productie, 19–21 sep, tekst `campagne` | **één regel: mijn probe van 13:26**. Op 20 en 21 sep om 08:00 UTC geen cron-aanroep. Of de cron werkelijk gepland staat is alleen in het dashboard te zien |
+| Vercel env-vars via MCP | 403 `projectEnvVars` — het token mag de namen niet lezen |
+| `marketing.leads` | 1 rij (Juans test, 19 sep, `contact_page:stage=survey`, `ack_channel = 'failed:http-403'`) |
+| `marketing.subscribers` | 0 rijen, ooit |
+| RLS `marketing.*` | `leads_public_insert` en `subscribers_public_insert`, INSERT voor `anon, authenticated` — de opvang van scan, ROI en nieuwsbrief kan schrijven |
+
+**Uitkomst.** Elke funnel schrijft zijn rij weg en `lead-notify` geeft een
+Telegram. Wat de lead terugkrijgt is in elke funnel niets: contact-,
+scan- en ROI-bevestiging, nieuwsbrief-opt-in en de scan-reeks hangen
+allemaal aan Brevo (403, geparkeerd in blok 4), de boeking-CTA levert
+zonder `CAL_WEBHOOK_SECRET` geen rij op, en de cron heeft in twee slots
+niets gelogd. Niet gemeten: of één bezoeker ooit een scan of berekening
+afmaakte — 0 subscribers en 1 lead die van Juan is; zonder de
+Plausible-doelen is dat niet van "geen verkeer" te scheiden.
+
+**Wat er open staat, in volgorde:** Brevo-activatie (sluit vijf mails in
+één keer), `CAL_WEBHOOK_SECRET`, cron + drie variabelen nakijken in het
+Vercel-dashboard. Staat in CLAUDE.md bovenaan de meetketen.
