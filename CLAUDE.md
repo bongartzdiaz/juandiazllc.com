@@ -487,7 +487,15 @@ herschreven, en deze notitie is de correctie erop.
    dezelfde POST opnieuw (rij `0c2e53dc…`, `acknowledged_at` nog leeg, dus
    geen idempotentie-blokkade) en het antwoord moet `sent:true,
    channel:email` zijn. `ack_channel` op die rij draagt nu `failed:http-403`.
-   Logboek 2026-09-21 (2).
+   Logboek 2026-09-21 (2). **Hermeten 11:38 UTC na Juans "activatie is
+   binnen": nog steeds dezelfde 403.** Wat Brevo vrijgaf was de
+   accountvalidatie; de SMTP/transactional-activatie is een tweede,
+   handmatige vrijgave die het dashboard nergens toont (de
+   Transactional-wizard kent alleen *Configuration* en *Verification*).
+   Juan heeft `contact@brevo.com` op 2026-09-21 expliciet om
+   *transactional email sending (SMTP/API)* gevraagd, met de 403-tekst
+   erbij. **Wacht op Brevo's antwoord; meet daarna de API, niet het
+   dashboard.** Logboek 2026-09-21 (3).
 5. **`CAL_WEBHOOK_SECRET` in Vercel-productie**, en daarna nakijken of cal.com de
    webhook werkelijk aanroept. Gemeten 2026-08-24: `POST /api/cal` antwoordt
    `{"ok":false,"error":"not-configured"}`. Zolang dat zo is levert een boeking

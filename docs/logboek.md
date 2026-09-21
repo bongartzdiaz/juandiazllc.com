@@ -11349,3 +11349,35 @@ de `message` van Brevo in het log zetten (niet in het antwoord) — maar niet
 vandaag.
 
 **Open:** SMTP-activatie bij Brevo. Daarna dezelfde POST, en `sent:true`.
+
+### 2026-09-21 (3) — "activatie is binnen" was de verkeerde vrijgave; mail naar Brevo
+
+Juan meldde dat de activatie binnen was. Dezelfde POST op rij `0c2e53dc…`
+(11:33 en 11:38 UTC): `failed:http-403`, en de directe verzending vanuit
+Postgres gaf opnieuw woordelijk *Your SMTP account is not yet activated.
+Please contact us at contact@brevo.com to request activation*
+(`permission_denied`). Tussendoor één keer een time-out van 8 s op Brevo's
+kant; `/v3/smtp/statistics/events` voor Juans adres gaf `{}` — niets
+verzonden, dus de time-out was traagheid, geen stille verzending. Met 25 s
+kwam dezelfde 403.
+
+**Waar het dashboard misleidt.** In het browserpaneel nagekeken:
+*SMTP & API* toont server, poort, login en één Master-Password-sleutel,
+zonder activatiestatus. *Transactional* opent nog in de opstartwizard —
+stap 1 *Configuration*, stap 2 *Verification* met *Waiting for log* — en
+dat log blijft leeg zolang elke verzending op 403 stukloopt. Nergens een
+knop of vlag voor de activatie. Wat Juan als "binnen" zag was de
+accountvalidatie (banner weg); de SMTP/transactional-vrijgave is een
+tweede, handmatige stap van Brevo's compliance-team, en de API is de enige
+plek waar je die kunt meten.
+
+**Handeling.** Juan heeft `contact@brevo.com` gemaild met de vraag om
+*transactional email sending (SMTP/API)* te activeren, met de letterlijke
+403-tekst, het geauthenticeerde domein en het gebruik (bevestiging aan
+contactformulier-inzenders plus interne melding, laag volume, geen
+marketing).
+
+**Open:** Brevo's antwoord. Daarna: eerst `/v3/smtp/email` vanuit Postgres
+als probe (dat is het enige dat de vlag aantoont), dan de POST op de rij, en
+`sent:true` sluit stap 4. Niets in de wizard aangeraakt; geen mail de deur
+uit, ook niet uit de probes.
