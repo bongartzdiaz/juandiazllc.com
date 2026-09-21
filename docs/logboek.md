@@ -11290,3 +11290,62 @@ auth-controle staat vóór de JSON-parse, zie
 **Stap 3 van de meetketen is dicht**, in code én in de uitrol. Stap 4
 (`brevo_api_key` in Vault, `ACK_FROM` + `NOTIFY_FROM` als secrets) blijft
 de knop die de mail werkelijk laat lopen.
+
+### 2026-09-21 (2) — stap 4 tot aan Brevo: drie weigeringen, alle drie buiten de repo
+
+`brevo_api_key` stond al in Vault (Juan, 10:23:34 UTC; 89 tekens, `xkeysib-`).
+Gemeten zonder de waarde te lezen: `length(geheim_uit_vault('brevo_api_key'))`
+= 89, onbekende naam geeft `null`, EXECUTE alleen voor `postgres` en
+`service_role`, SECURITY DEFINER aan. Dus de functie kán hem lezen en
+PostgREST-rollen niet.
+
+**De echte run.** Eén rij ligt klaar: Juans test van 19 september 17:22,
+`ack_channel = 'skipped:no-api-key'`, `acknowledged_at` leeg. De POST ging
+vanuit Postgres met `net.http_post`, met de bearer uit
+`vault.decrypted_secrets` in dezelfde statement — dezelfde weg als de trigger,
+en de sleutel komt nergens door de chat. Drie rondes:
+
+| ronde | Brevo zegt | oorzaak | gefixt door |
+|---|---|---|---|
+| 1 | `401 unrecognised IP address 2a05:d018:…` | IP-allowlist aan, op de **sleutel** én op het **account** | Juan, Brevo-dashboard, twee plekken |
+| 2 | `403` | domein nooit geauthenticeerd; Brevo kende alleen `bongartzdiaz@gmail.com` als afzender en nul domeinen | ik, via de browser: domein in Brevo, vier records in Namecheap |
+| 3 | `403 permission_denied — Your SMTP account is not yet activated. Please contact us at contact@brevo.com` | handmatige vrijgave door Brevo | **open — Juans handeling** |
+
+Ronde 1 was pas te zien door de sleutel rechtstreeks tegen `/v3/account` te
+zetten; `brevo.ts` gooit het antwoordlichaam weg en geeft alleen `http-401`.
+Een verkeerde sleutel had *Key not found* gegeven — deze was goed. Na het
+uitzetten op alleen de sleutel bleef het 401 met dezelfde tekst; de melding
+zelf verwijst naar de accountpagina, en daar stond hij ook nog aan.
+
+Ronde 2: `/v3/senders` gaf één afzender, `/v3/senders/domains` gaf nul. Domein
+toegevoegd in Brevo (handmatig, niet de Entri-koppeling — die vraagt OAuth op
+Namecheap). Records, allemaal in Namecheap Advanced DNS gezet en daarna via
+Cloudflare-DoH teruggelezen:
+
+```
+TXT   @                   brevo-code:4d886a23590868ddf3ef3bd122e8a05e
+CNAME brevo1._domainkey   b1.juandiazllc-com.dkim.brevo.com
+CNAME brevo2._domainkey   b2.juandiazllc-com.dkim.brevo.com
+TXT   _dmarc              v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com
+```
+
+De auto-mode-poort hield het derde record tegen (*DNS / Domain / Cert
+Changes*); na Juans go ging het door. Bestaande records ongemoeid: A `@` naar
+Vercel, CNAME `www`, SPF `include:spf.privateemail.com`, Google-TXT,
+`privateemail._domainkey`. Brevo: *Authenticated* binnen een minuut.
+
+Ronde 3 kwam pas boven door de verzending zelf vanuit Postgres na te doen
+(`/v3/smtp/email`, afzender `Juan Diaz <juan@juandiazllc.com>` uit
+`MANUAL_TASKS.md`, ontvanger Juan zelf) — met lichaam. Niets verstuurd; Brevo
+weigert vóór de verzending. `ack_channel` op de rij draagt nu `failed:http-403`,
+`acknowledged_at` blijft leeg, zoals ontworpen.
+
+**Wat stap 4 werkelijk was.** In CLAUDE.md stond: sleutel in Vault, twee
+secrets. Dat klopte en het was niet genoeg. Een verzendleverancier heeft drie
+eigen poorten die van onze kant onzichtbaar zijn en die alle drie dicht stonden.
+`brevo.ts` maakt dat erger dan nodig: `http-403` zonder lichaam dwingt tot een
+losse reproductie om de reden te zien. Dat is een verbetering voor de helper —
+de `message` van Brevo in het log zetten (niet in het antwoord) — maar niet
+vandaag.
+
+**Open:** SMTP-activatie bij Brevo. Daarna dezelfde POST, en `sent:true`.
