@@ -16,15 +16,15 @@ eigen DMARC en landt in de spam van precies de lead die je wilt bereiken.
 
 Volgorde:
 
-- [ ] **Domein authenticeren** in Brevo → Senders, Domains & Dedicated IPs →
+- [x] ~~**Domein authenticeren**~~ **gedaan 2026-09-21 11:2x UTC** — `juandiazllc.com` staat op *Authenticated* (Brevo-code-TXT, twee DKIM-CNAME's, `_dmarc p=none` in Namecheap). Ook de IP-allowlist moest uit, op sleutel én account: Supabase heeft geen vaste IP's. Logboek 2026-09-21 (2). Oorspronkelijke stap: in Brevo → Senders, Domains & Dedicated IPs →
       Domains → `juandiazllc.com`. Brevo geeft twee DNS-records (DKIM `CNAME`
       of `TXT`, plus een `TXT` voor de Brevo-code) en wil een DMARC-record.
       Zonder deze stap is elke afzender hieronder een spam-kandidaat.
-- [ ] **Afzenders** aanmaken op dat domein: `Juan Diaz <juan@juandiazllc.com>`
+- [ ] **Afzenders** aanmaken op dat domein (`ACK_FROM` stáát als edge-function-secret, gemeten 2026-09-21; of beide afzenders in Brevo zelf bestaan is niet nagekeken): `Juan Diaz <juan@juandiazllc.com>`
       en `Juan Diaz <noreply@juandiazllc.com>`. `info@juandiazllc.com` blijft
       het reply-to-adres; dat hoeft geen afzender te zijn.
 - [ ] **`BREVO_API_KEY`** — Brevo → SMTP & API → API Keys. Eén sleutel, op
-      **twee plekken**, want de cron draait op Vercel en de bevestiging op
+      **twee plekken** — **plek 1 (Vault) is gedaan 2026-09-21 10:23 UTC, 89 tekens; plek 2 (Vercel) staat op 2026-09-21 15:4x nog níét op `juandiazllc-com`, zie CLAUDE.md-blok van 2026-09-21 en logboek (6)**, want de cron draait op Vercel en de bevestiging op
       Supabase:
       1. Supabase `wbgiouuifqhasedncysw` → **Vault**, niet Edge Functions →
          Secrets. Sinds de vault-route (migratie `20260920150000`) lezen
@@ -40,13 +40,20 @@ Volgorde:
          geauthenticeerde domein.
       2. Vercel → `juandiazllc-com` → Environment Variables → Production, samen
          met `CAMPAGNE_FROM`.
-- [ ] **Beide edge functions opnieuw uitrollen** na de merge: `lead-notify` en
+- [x] ~~**Beide edge functions opnieuw uitrollen**~~ **gedaan 2026-09-21**: `lead-acknowledge` v7 (10:42 UTC), `lead-notify` v9 (10:44 UTC), probe 401/401 met 404 als negatieve controle — logboek 2026-09-21 (1). Oorspronkelijke stap: na de merge: `lead-notify` en
       `lead-acknowledge` lezen nu `../_shared/brevo.ts`, `../_shared/huisstijl.ts`
       en `../_shared/geheim.ts`. Uitrol gaat via de Supabase-MCP
       (`deploy_edge_function`, `verify_jwt: false`, de drie `_shared`-bestanden
       erbij) — geen PAT, geen CLI; zie de memory `feedback_beheer_via_mcp_geen_pat`.
       Tot de uitrol draait de oude code, die `RESEND_API_KEY` leest en dus
       `skipped:no-api-key` blijft melden.
+
+**Wat er ná deze vier nog in de weg staat (2026-09-21).** Brevo weigert
+transactionele mail met `403 permission_denied — Your SMTP account is not
+yet activated`, ook na drie bevestigingen van support en dertig minuten
+wachten. Geparkeerd 13:00 UTC; organisatie-id `6a1841a36b61a0b9a405832a`,
+`user_id 11325829`. Hervatten: eerst `/v3/smtp/email` vanuit Postgres, bij
+201 de POST op rij `0c2e53dc…`. Logboek 2026-09-21 (2)–(4).
 
 **Probe zonder bijwerking.** Ná de uitrol, mét `LEAD_NOTIFY_SECRET` maar
 zonder `BREVO_API_KEY`: een lead levert `ack_channel = 'skipped:no-api-key'`.
