@@ -173,3 +173,33 @@ describe('index.ts gebruikt de poort werkelijk', () => {
     expect(INDEX_CODE).not.toContain('DRIE EIGENSCHAPPEN DIE BEWUST ZO ZIJN')
   })
 })
+
+/* Sinds 2026-09-21 kiest de functie de mailtekst op `source`. Wat hier vast
+   moet staan: de waarde is dezelfde als die van de server action, de rij
+   wordt mét `source` gelezen (anders valt elke scan-lead stil terug op de
+   contacttekst), en de scan-tekst citeert het `message`-veld niet — dat is
+   de Nederlandse Telegram-samenvatting, geen tekst voor de bezoeker. */
+describe('index.ts kiest de tekst op source', () => {
+  it('de bron heet hetzelfde als in lib/scan-opvang.ts', async () => {
+    const { SCAN_BRON } = await import('./scan-opvang')
+    expect(INDEX_CODE).toContain(`const SCAN_BRON = '${SCAN_BRON}'`)
+    expect(INDEX_CODE).toMatch(/lead\.source === SCAN_BRON/)
+  })
+
+  it('leest source mee uit de rij', () => {
+    expect(INDEX_CODE).toMatch(/select=id,name,email,sector,message,source,metadata,acknowledged_at/)
+  })
+
+  it('de scan-tekst bestaat in de drie scantalen en citeert het bericht niet', () => {
+    const begin = INDEX_CODE.indexOf('function bouwScanMail(')
+    const eind = INDEX_CODE.indexOf('function bouwMail(')
+    expect(begin).toBeGreaterThan(0)
+    expect(eind).toBeGreaterThan(begin)
+    const scan = INDEX_CODE.slice(begin, eind)
+    expect(scan).not.toContain('lead.message')
+    expect(scan).not.toContain('citaatHtml(')
+    for (const taal of ['nl', 'en', 'de']) expect(INDEX_CODE).toMatch(new RegExp(`SCAN_COPY[^]*?\n  ${taal}: \{`))
+    // POSITIEVE CONTROLE: de contacttekst citeert wél.
+    expect(INDEX_CODE.slice(eind)).toContain('citaatHtml(bericht)')
+  })
+})
