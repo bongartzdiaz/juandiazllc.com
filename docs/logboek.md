@@ -11447,3 +11447,34 @@ Plausible-doelen is dat niet van "geen verkeer" te scheiden.
 **Wat er open staat, in volgorde:** Brevo-activatie (sluit vijf mails in
 één keer), `CAL_WEBHOOK_SECRET`, cron + drie variabelen nakijken in het
 Vercel-dashboard. Staat in CLAUDE.md bovenaan de meetketen.
+
+### 2026-09-21 (6) — CAL_WEBHOOK_SECRET: vier builds, vier keer 503
+
+Juan zette de variabele na de funnel-meting van blok (5). Elke keer een
+docs-PR als build, elke keer dezelfde uitkomst:
+
+| build | commit | oorzaak volgens Juan | log van die build |
+|---|---|---|---|
+| `dpl_4gsmznm5…` 13:38 | #395 | gezet ná build #394 | `[cal] CAL_WEBHOOK_SECRET niet gezet` |
+| `dpl_993vKG9W…` 13:50 | #396 | stond op Preview | idem |
+| `dpl_SvWFmquu…` 14:02 | #397 | waarde was leeg | idem |
+| `dpl_4wtB7cDh…` 15:25 | #398 | "ingesteld en werkt" | 503 om 15:33:52 |
+
+Tussen build 3 en 4 met het browserpaneel ingelogd als `bongartzdiaz@gmail.com`
+(één team, `bongartzdiaz-2377s-projects`) rechtstreeks `/api/v9/projects/…/env`
+bevraagd: `juandiazllc-com` telt **12** variabelen, nieuwste 2026-09-19 17:15
+(`SUPABASE_SERVICE_ROLE_KEY`); geen `CAL_WEBHOOK_SECRET`, `BREVO_API_KEY`,
+`CAMPAGNE_FROM`, `SUPABASE_SECRET_KEY`, `NEWSLETTER_FROM` — ook niet op
+`diaz-atlas-editor` of `diaz-juandiazllc`. Het MCP-token mag env-vars niet
+lezen (403); de paneel-sessie wel. De deployment-aliases bewijzen dat dit
+project `juandiazllc.com` serveert.
+
+Juan zegt dat de vier op "het verkeerde project" stonden en daarna "hier";
+de API zag ze op geen moment. Meest waarschijnlijk een tweede Vercel-account;
+niet vastgesteld. Een formulier voor `CAL_WEBHOOK_SECRET` (Production,
+Secret) stond klaar in het paneel; niet gebruikt.
+
+**Bijvangst uit de env-lijst.** `NEXT_GA4_ID` heet verkeerd (code leest
+`NEXT_PUBLIC_GA4_ID`) — dat verklaart 1 september, niet de Redeploy-knop.
+Een rij met als náám `sb_publishable_mmIi…` (sleutelwaarde in het naamveld).
+`NEXTAUTH_*` en `ANTHROPIC_API_KEY` zijn CRM-overblijfsels. Opruimwerk.
