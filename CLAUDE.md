@@ -464,10 +464,30 @@ herschreven, en deze notitie is de correctie erop.
    vast. Deze stap is daarmee geen opruimwerk meer maar de knop die de
    bevestigingsketen aanzet — en hij sluit `lead-notify` in
    dezelfde handeling, want beide lezen dezelfde sleutel.
-4. **`brevo_api_key` in Vault** (SQL-editor: `select vault.create_secret('<sleutel>', 'brevo_api_key')`, dezelfde route als stap 3) **+ `ACK_FROM` + `NOTIFY_FROM`** als Edge-Function-secrets, op een in Brevo geauthenticeerd domein (Resend is sinds 2026-09-20 uit de code; zie `MANUAL_TASKS.md`, bovenste blok). Zonder die twee
+4. ~~**`brevo_api_key` in Vault** (SQL-editor: `select vault.create_secret('<sleutel>', 'brevo_api_key')`, dezelfde route als stap 3) **+ `ACK_FROM` + `NOTIFY_FROM`** als Edge-Function-secrets, op een in Brevo geauthenticeerd domein~~ (Resend is sinds 2026-09-20 uit de code; zie `MANUAL_TASKS.md`, bovenste blok). Zonder die twee
    gaat er bij een echte lead geen enkele mail de deur uit — gemeten, niet
    vermoed. Pas ná stap 3, anders geef je een publiek aanroepbaar endpoint een
    mailkanaal op je eigen domein.
+   **Aan onze kant dicht op 2026-09-21, en de stap was te klein
+   opgeschreven.** Gemeten met de echte rij (Juans test van 19 september)
+   door `lead-acknowledge` v7, via `net.http_post` vanuit Postgres zoals de
+   trigger het doet: `brevo_api_key` stond in Vault (10:23 UTC, 89 tekens,
+   `xkeysib-`-vorm, leesbaar via `geheim_uit_vault`, EXECUTE alleen
+   postgres + service_role), `ACK_FROM` stáát (anders `skipped:no-from-address`).
+   Daarna weigerde **Brevo** drie keer op rij, elk om een andere reden die
+   niet in de repo zichtbaar is: (a) IP-allowlist op de **sleutel** én op het
+   **account** — Supabase heeft geen vaste IP's, beide moesten uit; (b) het
+   domein was nooit geauthenticeerd — `juandiazllc.com` staat sinds 11:2x UTC
+   op *Authenticated* met Brevo-code-TXT, twee DKIM-CNAME's
+   (`brevo1/2._domainkey`) en `_dmarc` `p=none` in Namecheap; (c) **het
+   SMTP-account is niet geactiveerd**: `403 permission_denied — Your SMTP
+   account is not yet activated. Please contact us at contact@brevo.com`.
+   Dat laatste is een handmatige vrijgave door Brevo. **Dit is de enige
+   resterende blokkade**, en hij is niet van ons. Zodra Brevo activeert:
+   dezelfde POST opnieuw (rij `0c2e53dc…`, `acknowledged_at` nog leeg, dus
+   geen idempotentie-blokkade) en het antwoord moet `sent:true,
+   channel:email` zijn. `ack_channel` op die rij draagt nu `failed:http-403`.
+   Logboek 2026-09-21 (2).
 5. **`CAL_WEBHOOK_SECRET` in Vercel-productie**, en daarna nakijken of cal.com de
    webhook werkelijk aanroept. Gemeten 2026-08-24: `POST /api/cal` antwoordt
    `{"ok":false,"error":"not-configured"}`. Zolang dat zo is levert een boeking
