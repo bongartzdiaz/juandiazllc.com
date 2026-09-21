@@ -418,7 +418,7 @@ Wat de lead terugkrijgt is nergens iets. Drie knoppen, in deze volgorde:
 | knop | wat het aanzet | stand |
 |---|---|---|
 | **Brevo SMTP-activatie** (bij Brevo, stap 4 hieronder) | contact-, scan- en ROI-bevestiging, nieuwsbrief-opt-in, scan-reeks | 403, geparkeerd |
-| **`CAL_WEBHOOK_SECRET`** in Vercel-productie (stap 5) | boeking → rij → Telegram; de hoofd-CTA meet nu niets | `POST /api/cal` → 503 |
+| **`CAL_WEBHOOK_SECRET`** in Vercel-productie (stap 5) | boeking → rij → Telegram; de hoofd-CTA meet nu niets | **gezet door Juan op 2026-09-21 ná de build van 13:31 UTC** (`dpl_M57r24Xy…`, #394). Gemeten 13:34 en 13:35: nog 503, en dat is verwacht — Vercel bakt env-vars in bij de build. Deze PR is de nieuwe deployment; meet daarna |
 | **Cron nakijken** in Vercel → Settings → Cron Jobs, plus `BREVO_API_KEY`, `CAMPAGNE_FROM`, `SUPABASE_SECRET_KEY` | scan-reeks en ROI-mail | `CRON_SECRET` stáát (route geeft 401, geen 503 meer); de andere drie zijn van buiten niet te zien en het MCP-token mag env-vars niet lezen (403). **Geen cron-aanroep in het runtime-log op 20 en 21 sep 08:00 UTC** |
 
 Cijfers: 1 lead ooit (Juans test), 0 subscribers ooit. Of dat geen verkeer
