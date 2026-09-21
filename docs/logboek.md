@@ -11236,3 +11236,57 @@ het blijft waar. Ertegenover: nul rijen uit de scan tot vandaag, en een
 uitslag zonder naam is voor Juan niets om op te volgen. Zodra Plausible
 meet is `Scan Voltooid` tegen `Uitslag Aangevraagd` de afhaak op de gate,
 en dan is dit een beslissing op cijfers.
+
+### 2026-09-21 (1) — lead-acknowledge en lead-notify uitgerold, stap 3 dicht
+
+Route A, zoals op 20 september besloten: verse sessie, alleen de
+Supabase-connector aan, geen PAT, geen CLI. Eerst het instrument: het schema
+van `deploy_edge_function` was volledig (`verify_jwt: boolean`, `files:
+[{name, content}]`), geen stub. Toen pas uitrollen.
+
+**Nulmeting**, gelezen uit `list_edge_functions` vóór de eerste upload:
+`lead-acknowledge` v6 sha `7c7058044a82…e74a34` (2026-08-26 16:08:20 UTC),
+`lead-notify` v8 sha `c09b79469c0c…23a0aa` (2026-09-04 15:45:13 UTC). Beide
+al `verify_jwt: false`. CLAUDE.md zei "v6 en v3" — dat waren stempels van
+vóór de secret-wijzigingen, die elke versie van álle functies ophogen; het
+blok is gecorrigeerd.
+
+**Uitrol** vanaf `main` op `b0e868a`, werkboom schoon onder `supabase/`.
+Per functie vijf bestanden: `index.ts`, `auth.ts`, en de drie `_shared`
+onder exact de naam `../_shared/brevo.ts` / `geheim.ts` / `huisstijl.ts`,
+omdat `index.ts` ze zo importeert. Geen `deno.json`: `geheim.ts` haalt
+supabase-js via een esm.sh-URL.
+
+| functie | ná | updated_at |
+|---|---|---|
+| `lead-acknowledge` | v7 · `f1e1c6be2b4d64d8079e336be1db8b575150a4defd220b65bde8e976fc2897c3` | 2026-09-21 10:42:25 UTC |
+| `lead-notify` | v9 · `c9e96ba8b7e0131a9940edf3a3134bbff4deb54df6cd5a66d0e2e20ee9f6f34d` | 2026-09-21 10:44:36 UTC |
+
+**Bewijs is de inhoud, niet het versienummer.** `get_edge_function` op beide:
+`lead-acknowledge` draagt `const SCAN_BRON = 'lekkage-scan'` en `import {
+geheim } from '../_shared/geheim.ts'`; de bundel bevat `source/index.ts`,
+`source/auth.ts` en `_shared/{brevo,geheim,huisstijl}.ts` — Supabase lost de
+`../`-naam op naar een map náást `source/`, precies waar de import naartoe
+wijst. Een kale `_shared/geheim.ts` als uploadnaam was in `source/_shared/`
+beland en had de import gebroken. `lead-notify` idem, met `geheim(…,
+'lead_notify_secret')` en `'brevo_api_key'`.
+
+**De probe**, ongeldige JSON zonder header, POST:
+
+```
+lead-acknowledge       401 {"ok":false,"error":"unauthorized"}
+lead-notify            401 {"ok":false,"error":"unauthorized"}
+slug-bestaat-niet-xyz  404 NOT_FOUND   (negatieve controle)
+```
+
+Beide nieuwe versies zijn koud gestart en de poort staat dicht. 401 en geen
+503 zegt dat `geheim()` bij de koude start een bruikbare
+`LEAD_NOTIFY_SECRET` kreeg — uit de env-var, want die wint als hij staat.
+De Vault-tak (`geheim_uit_vault` als service_role) is daarmee **niet**
+bewezen; dat kan pas als de env-var ooit weg is. Niets verstuurd: de
+auth-controle staat vóór de JSON-parse, zie
+[[feedback_poort_testen_zonder_bijwerking]].
+
+**Stap 3 van de meetketen is dicht**, in code én in de uitrol. Stap 4
+(`brevo_api_key` in Vault, `ACK_FROM` + `NOTIFY_FROM` als secrets) blijft
+de knop die de mail werkelijk laat lopen.

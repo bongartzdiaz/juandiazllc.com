@@ -434,11 +434,22 @@ herschreven, en deze notitie is de correctie erop.
    **Gemeten 2026-09-20 avond: de env-var stáát.** De live `lead-notify` v6 en
    `lead-acknowledge` v3 kennen geen Vault en geven allebei 401 op ongeldige
    JSON zonder header — dat kan alleen uit `LEAD_NOTIFY_SECRET`. **Deze stap
-   is dicht.** De migratie staat op wbgio; wat nog open is, is de uitrol van
+   is dicht.** De migratie staat op wbgio. ~~Wat nog open is, is de uitrol van
    beide functies via de Supabase-MCP in een verse sessie met alleen Supabase
-   aan (geen PAT, geen CLI — beslist 2026-09-20), en dat is onderhoud
-   (rotatie zonder dashboard), geen blokkade meer. Die vault-sleutel staat er
-   sinds 2026-08-16 16:22:38 UTC (44 tekens). **Vóór stap 4.**
+   aan (geen PAT, geen CLI — beslist 2026-09-20).~~ **Uitgerold op
+   2026-09-21**, vanaf `b0e868a`, via `deploy_edge_function` met de volledige
+   bestandslijst (`index.ts`, `auth.ts`, `../_shared/{brevo,geheim,huisstijl}.ts`):
+   `lead-acknowledge` v7 sha `f1e1c6be…2897c3` (10:42:25 UTC),
+   `lead-notify` v9 sha `c9e96ba8…f6f34d` (10:44:36 UTC). Inhoud
+   teruggelezen met `get_edge_function` (`SCAN_BRON`, `_shared/geheim.ts` in
+   de bundel), daarna de probe: ongeldige JSON zonder header geeft op beide
+   **401**, met 404 op een verzonnen slug als negatieve controle. 401 en geen
+   503 betekent: `geheim()` had een bruikbare sleutel — uit de env-var, want
+   die wint; de Vault-tak is pas bewezen als de env-var ooit weggaat. Die
+   vault-sleutel staat er sinds 2026-08-16 16:22:38 UTC (44 tekens). Wat er
+   hier eerder stond, "v6 en v3", waren stempels van vóór de secret-wijzigingen
+   die elke versie ophogen; vlak vóór de uitrol stonden ze op v8 en v6.
+   **Stap 3 is dicht, in code én in de uitrol. Vóór stap 4.**
 
    Voor `lead-acknowledge` is die volgorde op 2026-08-26 bewust omgedraaid:
    de fail-closed code van 25 augustus is uitgerold (v3) terwijl de sleutel
