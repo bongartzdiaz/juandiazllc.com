@@ -11381,3 +11381,37 @@ marketing).
 als probe (dat is het enige dat de vlag aantoont), dan de POST op de rij, en
 `sent:true` sluit stap 4. Niets in de wizard aangeraakt; geen mail de deur
 uit, ook niet uit de probes.
+
+### 2026-09-21 (4) — Brevo geparkeerd: drie bevestigingen, vier keer 403
+
+Na blok (3) drie antwoorden van Brevo, en na elk een meting van
+`/v3/smtp/email` vanuit Postgres (afzender `juan@juandiazllc.com`, ontvanger
+Juan, geen mail eruit want Brevo weigert vóór verzending):
+
+| Brevo zei | gemeten | uitkomst |
+|---|---|---|
+| "account gevalideerd" | 11:58:58 UTC | 403 `permission_denied`, *not yet activated* |
+| "account gevalideerd" (2e keer) | 12:22:52, na 14 min wachten | idem |
+| "SMTP nu geactiveerd" | 12:25:32 | idem |
+| — | 12:55:50, 30 min na die bevestiging | idem |
+
+Dertig minuten sluit propagatie uit. Wat Brevo heeft omgezet is niet de vlag
+die déze sleutel tegenhoudt. Eén verklaring die de mail niet uitsluit:
+support activeerde een andere organisatie. `GET /v3/account` op de
+Vault-sleutel geeft `organization_id 6a1841a36b61a0b9a405832a`,
+`user_id 11325829`, `bongartzdiaz@gmail.com`, plan free. Dat id hoort in de
+volgende mail.
+
+**Wat er niet kapot is.** Alles aan onze kant is gemeten en dicht: Vault →
+`geheim_uit_vault` → functie, `ACK_FROM` gezet, IP-allowlist uit, domein
+geauthenticeerd. De keten stopt op één externe vlag.
+
+**Uitweg als het blijft hangen.** Een nieuw Brevo-account op
+`juan@juandiazllc.com`: het domein is al geauthenticeerd en de vier
+DNS-records in Namecheap blijven geldig voor elk Brevo-account dat het domein
+claimt. Nieuwe sleutel via `vault.update_secret` in de SQL-editor (Juan, niet
+via een sessie), daarna dezelfde twee metingen.
+
+**Geparkeerd** op Juans woord, 13:00 UTC. Rij `0c2e53dc…` ligt met
+`ack_channel = 'failed:http-403'` en `acknowledged_at` leeg; geen
+idempotentie-blokkade bij hervatten.
