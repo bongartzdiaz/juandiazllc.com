@@ -7,6 +7,14 @@
 //
 // Aangeroepen door trigger `leads_acknowledge_new` op marketing.leads.
 //
+// TWEE BRONNEN, TWEE TEKSTEN (sinds 2026-09-21). De rij draagt `source`.
+// Alles wat niet `lekkage-scan` is, is het contactformulier en krijgt de
+// tekst "je bericht is aangekomen", met het bericht geciteerd. Een rij uit de
+// lekkage-scan (#386: de gate) heeft niets gevraagd; die krijgt "je uitslag
+// ligt bij mij", met het aantal lekken uit `metadata.lekken` en zónder het
+// `message`-veld — dat is de Nederlandse samenvatting voor Telegram, met
+// Nederlandse bloknamen, en de bezoeker las de scan in zijn eigen taal.
+//
 // DRIE EIGENSCHAPPEN DIE BEWUST ZO ZIJN:
 //
 // 1. `acknowledged_at` wordt ALLEEN gezet als er echt een mail uit is gegaan.
@@ -72,8 +80,14 @@ interface Lead {
   email?: string | null
   sector?: string | null
   message?: string | null
+  source?: string | null
   metadata?: Record<string, unknown> | null
 }
+
+// Dezelfde waarde als SCAN_BRON in lib/scan-opvang.ts; lib/lead-acknowledge-auth.test.ts
+// bewaakt dat ze gelijk blijven. Edge functions kunnen niets buiten
+// supabase/functions/ importeren.
+const SCAN_BRON = 'lekkage-scan'
 
 const j = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } })
@@ -168,7 +182,99 @@ const COPY: Record<Taal, Tekst> = {
   },
 }
 
+interface ScanTekst {
+  onderwerp: string
+  kop: string
+  groet: (naam: string) => string
+  inleiding: string
+  gevonden: (n: number | null) => string
+  sneller: string
+  knop: string
+  slot: string
+  voet: string
+}
+
+// De scan bestaat in nl, en en de (lib/lekkage-scan-taal.ts). Een rij met een
+// andere locale kan hier niet uit het formulier komen; valt hij toch binnen,
+// dan Engels — zelfde terugval als taalVan().
+const SCAN_COPY: Partial<Record<Taal, ScanTekst>> = {
+  nl: {
+    onderwerp: 'Je uitslag ligt bij mij. Binnen 24 uur hoor je wat ik als eerste zou aanpakken',
+    kop: 'Uitslag ontvangen',
+    groet: (n) => (n ? `Hoi ${n},` : 'Hoi,'),
+    inleiding:
+      'Je vulde de lekkage-scan in en vroeg je uitslag aan. Die staat in je browser; deze mail bevestigt dat hij ook bij mij ligt. Binnen 24 uur krijg je van mij één ding terug: welk lek ik als eerste zou dichten, en waarom dat.',
+    gevonden: (n) => (n === null ? 'Je uitslag staat in je browser.' : n === 0 ? 'Gevonden: nul lekken.' : n === 1 ? 'Gevonden: één lek.' : `Gevonden: ${n} lekken.`),
+    sneller: 'Liever direct? Kies een kwartier in mijn agenda, dan lopen we de uitslag samen door.',
+    knop: 'Plan 15 minuten',
+    slot: 'Wil je iets toevoegen? Antwoord op deze mail; die komt bij mij binnen.',
+    voet: 'Je krijgt dit omdat je op juandiazllc.com je uitslag van de lekkage-scan aanvroeg. Eén bericht; de drie mails over de lekken komen alleen als je dat aanvinkte.',
+  },
+  en: {
+    onderwerp: "Your result is with me. Within 24 hours you'll hear what I'd fix first",
+    kop: 'Result received',
+    groet: (n) => (n ? `Hi ${n},` : 'Hi,'),
+    inleiding:
+      "You completed the leak scan and asked for your result. It's in your browser; this email confirms it's with me too. Within 24 hours you get one thing back from me: which leak I'd close first, and why that one.",
+    gevonden: (n) => (n === null ? 'Your result is in your browser.' : n === 0 ? 'Found: no leaks.' : n === 1 ? 'Found: one leak.' : `Found: ${n} leaks.`),
+    sneller: 'Rather talk it through? Pick 15 minutes in my calendar and we go over the result together.',
+    knop: 'Book 15 minutes',
+    slot: 'Anything to add? Reply to this email; it lands in my inbox.',
+    voet: 'You received this because you requested your leak-scan result on juandiazllc.com. One message; the three emails about the leaks only come if you ticked that box.',
+  },
+  de: {
+    onderwerp: 'Ihr Ergebnis liegt bei mir. Innerhalb von 24 Stunden hören Sie, was ich zuerst angehen würde',
+    kop: 'Ergebnis erhalten',
+    groet: (n) => (n ? `Guten Tag ${n},` : 'Guten Tag,'),
+    inleiding:
+      'Sie haben den Leck-Scan ausgefüllt und Ihr Ergebnis angefordert. Es steht in Ihrem Browser; diese E-Mail bestätigt, dass es auch bei mir liegt. Innerhalb von 24 Stunden bekommen Sie von mir eine Sache zurück: welches Leck ich zuerst schließen würde, und warum dieses.',
+    gevonden: (n) => (n === null ? 'Ihr Ergebnis steht in Ihrem Browser.' : n === 0 ? 'Gefunden: keine Lecks.' : n === 1 ? 'Gefunden: ein Leck.' : `Gefunden: ${n} Lecks.`),
+    sneller: 'Lieber direkt besprechen? Wählen Sie 15 Minuten in meinem Kalender, dann gehen wir das Ergebnis gemeinsam durch.',
+    knop: '15 Minuten buchen',
+    slot: 'Möchten Sie etwas ergänzen? Antworten Sie auf diese E-Mail; sie landet bei mir.',
+    voet: 'Sie erhalten diese E-Mail, weil Sie auf juandiazllc.com Ihr Ergebnis des Leck-Scans angefordert haben. Eine Nachricht; die drei E-Mails zu den Lecks kommen nur, wenn Sie das angekreuzt haben.',
+  },
+}
+
+function lekkenVan(lead: Lead): number | null {
+  const v = lead.metadata && typeof lead.metadata === 'object'
+    ? (lead.metadata as Record<string, unknown>).lekken
+    : undefined
+  return typeof v === 'number' && Number.isInteger(v) && v >= 0 ? v : null
+}
+
+function bouwScanMail(lead: Lead, taal: Taal): { subject: string; text: string; html: string } {
+  const t = SCAN_COPY[taal] ?? SCAN_COPY.en!
+  const naam = String(lead.name ?? '').trim()
+  const gevonden = t.gevonden(lekkenVan(lead))
+
+  const regels = [t.groet(naam), '', t.inleiding, '', gevonden, '', t.sneller, `${t.knop}: ${BOEKLINK}`, '', t.slot, '', 'Juan Diaz', 'juandiazllc.com', '', t.voet]
+
+  const html = omhulsel({
+    taal,
+    kop: t.kop,
+    preheader: t.inleiding,
+    blokken: [
+      alineaHtml(t.groet(naam)),
+      alineaHtml(t.inleiding),
+      `<p style="margin:0 0 16px;font-size:16px;font-weight:600">${esc(gevonden)}</p>`,
+      alineaHtml(t.sneller),
+      knopHtml({ tekst: t.knop, url: BOEKLINK }),
+      alineaHtml(t.slot),
+    ],
+    groet: ['Juan Diaz', 'juandiazllc.com'],
+    voet: esc(t.voet),
+  })
+
+  return { subject: t.onderwerp, text: regels.join('\n'), html }
+}
+
 function bouwMail(lead: Lead, taal: Taal): { subject: string; text: string; html: string } {
+  if (lead.source === SCAN_BRON) return bouwScanMail(lead, taal)
+  return bouwContactMail(lead, taal)
+}
+
+function bouwContactMail(lead: Lead, taal: Taal): { subject: string; text: string; html: string } {
   const t = COPY[taal]
   const naam = String(lead.name ?? '').trim()
   const bericht = String(lead.message ?? '').trim()
@@ -204,7 +310,7 @@ async function leesLead(id: string): Promise<Lead | null> {
   if (!SUPABASE_URL || !SERVICE_ROLE_KEY) return null
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/leads?id=eq.${encodeURIComponent(id)}&select=id,name,email,sector,message,metadata,acknowledged_at&limit=1`,
+      `${SUPABASE_URL}/rest/v1/leads?id=eq.${encodeURIComponent(id)}&select=id,name,email,sector,message,source,metadata,acknowledged_at&limit=1`,
       {
         headers: {
           apikey: SERVICE_ROLE_KEY,
