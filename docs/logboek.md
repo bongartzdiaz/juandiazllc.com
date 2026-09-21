@@ -11478,3 +11478,21 @@ Secret) stond klaar in het paneel; niet gebruikt.
 `NEXT_PUBLIC_GA4_ID`) — dat verklaart 1 september, niet de Redeploy-knop.
 Een rij met als náám `sb_publishable_mmIi…` (sleutelwaarde in het naamveld).
 `NEXTAUTH_*` en `ANTHROPIC_API_KEY` zijn CRM-overblijfsels. Opruimwerk.
+
+### 2026-09-21 (7) — cron nagekeken: staat aan, afgaan onbewezen
+
+Via de Vercel-API met de paneelsessie (`/api/v9/projects/prj_WWoBa9gz…`,
+de instellingenpagina zelf rendert niet zolang het paneel verborgen is):
+
+| | gemeten 15:4x UTC |
+|---|---|
+| definitie | `/api/campagne/scan-reeks`, `0 8 * * *`, aanwezig in live deployment `dpl_4wtB7cDh…` |
+| projectstatus | `enabledAt` 2026-04-18, `disabledAt` null — aan |
+| `updatedAt` | 15:40 UTC, de deploy van #399 |
+
+Dat het runtime-log op 20 en 21 sep om 08:00 leeg was, zegt niets: met 0
+rijen in `marketing.subscribers` heeft de route niets te doen en hij loopt
+eerst tegen `BREVO_API_KEY`/`CAMPAGNE_FROM` aan, die op dit project
+ontbreken (blok 6). Afgaan is pas te bewijzen met de variabelen én een
+subscriber. Het cron-item van blok (5) is daarmee gereduceerd tot: dezelfde
+vier variabelen op dit project.
