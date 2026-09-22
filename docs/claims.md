@@ -474,6 +474,36 @@ adverteerde ik zelf"* is een andere claim dan *"dit deed ik voor een klant"*,
 en voor een fractional operator is de eerste eerder sterker dan zwakker. Het
 moet alleen als zodanig gelabeld staan.
 
+**Diaz Editor hoort hier ook bij — beslist 2026-09-22** (*"the case studies
+that were made from diaz editor are also good"*). Met één harde grens die uit
+dit bestand zelf volgt.
+
+**Diaz Editor heeft nooit een betalende externe klant gehad.** Gemeten op
+`vbozelswveaxsyccvaac`: nul betalingen ooit, 25 checkout-sessies waarvan geen
+enkele betaald, zes licenties die alle zes met de hand zijn uitgegeven — nul
+via Stripe, AppSumo of Lemon. Niets in een casestudy mag dus klantadoptie,
+klantaantallen of omzet suggereren. Dat is geen voorzichtigheid maar de
+voorwaarde: een gepubliceerde klantclaim die met één query weerlegd wordt, kost
+meer dan hij oplevert.
+
+**En er bestaat nog geen ingevulde casestudy.** Er ligt een template
+(`CASE-STUDY-TEMPLATE-2026-05-25.md`, voor klantinterviews van acht vragen) en
+`landing/case-studies/` is leeg — nul bestanden. Wat er wél ligt is uitgewerkt
+werk dát met de editor gemaakt is, zoals het plan voor een woning van 300 m² in
+Colombia: normonderzoek NSR-10, memoria descriptiva, bestek, fasering,
+Scene JSON en DXF-export, 23 bestanden.
+
+Dat tweede is het sterkere materiaal voor deze site, en het is een ander soort
+claim: **een capaciteitsdemonstratie, geen klantresultaat.** "Dit is wat er met
+dit gereedschap te maken is, van norm tot DXF" staat op eigen benen en heeft
+geen klant nodig. Zodra het als *klant*casestudy leest, botst het met de rij
+hierboven en met de meting in deze sectie.
+
+**Open, en niet door een sessie te beslissen:** welke van de twee bedoelt Juan?
+Het uitgewerkte werk (Casa 300 m² en soortgelijk), of klantcasestudy's uit de
+template? Die tweede bestaan niet en kunnen niet bestaan zolang er geen
+betalende klant is. Vraag het vóór er kopij geschreven wordt.
+
 **Wat er per casestudy in dit bestand komt te staan voordat er kopij is:**
 
 | veld | waarom |

@@ -852,15 +852,35 @@ repo horen.
   berichten-endpoint. De regel die hij bewaakt — geen geautomatiseerde
   connectieverzoeken of DM's — is ongewijzigd juist. Het bestand staat buiten elke
   repo en wordt niet aangeraakt zonder jouw expliciete go.
-- **In `bongartzdiaz/diaz-editor` staat nog één PR open: #639** (weekrapport
-  W34, 24 augustus). Die is **niet door mergen te sluiten** — zijn eigen body
-  zegt *data pending*, want er is geen read-connector. Mergen publiceert een
-  leeg rapport.
+- ~~**In `bongartzdiaz/diaz-editor` staat nog één PR open: #639.** Die is niet
+  door mergen te sluiten — mergen publiceert een leeg rapport.~~ **Gemerged op
+  2026-09-22 (`aec3ea7c3`); er staat daar nu niets meer open. En die
+  waarschuwing was fout.**
 
-  **Zes andere zijn gesloten, vier daarvan op 2026-09-22.** #652 (`fa86f410`),
+  Hij is gelezen vanaf de PR-titel, niet vanaf de diff, en twee keer herhaald
+  voordat het bestand openging. Wat #639 toevoegt is **één markdown-bestand**,
+  `reports/weekly-traffic/2026-W34.md`. Dat staat **buiten `landing/`** en wordt
+  dus niet geserveerd — de URL geeft 404 — en `reports/` droeg al `weekly-seo`
+  en `weekly-sales`. Er wordt niets gepubliceerd. Het is een intern logboek van
+  een geblokkeerde run dat eerlijk *data pending* meldt, en dat is de
+  real-stats-only-regel die wérkt, niet een overtreding ervan.
+
+  Wat hij wél meebracht: 312 indexeerbare URL's in `landing/sitemap.xml`, het
+  ruime crawl-beleid in `robots.txt`, en een correctie op een eerdere aanname —
+  *"site = 0 organic by design"* gold alleen voor de bewust-noindex `/cad`-
+  pagina's, niet voor de marketing-surface.
+
+  **En hij wijst naar iets dat al op deze lijst staat.** #639 noemt **Search
+  Console als prioriteit 1**, omdat GSC de enige organic-bron is die
+  consent-vrij meet; GA4 en Vercel Insights ondertellen structureel door de
+  EU/UK/CA default-deny. Onder *SEO-instrumenten* hieronder staat het
+  TXT-record al als geplaatst met alleen de verificatie open. Dat is dus
+  dezelfde knop als waar het weekrapport op wacht.
+
+  **Zeven andere zijn gesloten, vijf daarvan op 2026-09-22.** #652 (`fa86f410`),
   #654 (`c843db65`) en #655 (`77a25563`) waren al op 2026-09-04 gemerged — de
   lijst zei tot 22 september dat ze wachtten. Op 2026-09-22 kwamen erbij:
-  **#624** (`540b3e1b`), **#656** (`2367aff7d`) en **#653** (`a9195a7d7`).
+  **#624** (`540b3e1b`), **#656** (`2367aff7d`), **#653** (`a9195a7d7`) en **#639** (`aec3ea7c3`).
 
   | PR | wat het droeg | wat er bij het mergen bovenkwam |
   |---|---|---|
@@ -910,6 +930,21 @@ niet zijn, en dat is precies wat regel 1 van `claims.md` moet voorkomen. Een
 casestudy over een eigen venture is sterk genoeg op eigen benen — "dit bouwde
 en draaide ik zelf" is een andere claim dan "dit deed ik voor een klant", niet
 een zwakkere.
+
+**Diaz Editor hoort er sinds 2026-09-22 ook bij** (*"the case studies that
+were made from diaz editor are also good"*), en daar zit een harde grens aan:
+**dat product heeft nooit een betalende externe klant gehad** — nul betalingen
+ooit, 25 checkout-sessies waarvan geen enkele betaald, zes handmatig
+uitgegeven licenties. Niets mag dus klantadoptie of omzet suggereren.
+
+**En er is een open vraag die een sessie niet kan beslissen.** Er bestaat een
+template voor klantcasestudy's (`CASE-STUDY-TEMPLATE-2026-05-25.md`) en
+`landing/case-studies/` is **leeg, nul bestanden**. Wat er wél ligt is
+uitgewerkt werk dát met de editor is gemaakt — het plan voor een woning van
+300 m² in Colombia: NSR-10-onderzoek, memoria, bestek, fasering, Scene JSON,
+DXF, 23 bestanden. Dat is een **capaciteitsdemonstratie, geen klantresultaat**,
+en als zodanig sterker materiaal voor deze site. **Welke van de twee bedoel
+je?** Zonder dat antwoord wordt er geen kopij geschreven.
 
 **Wat er per casestudy nodig is voordat er één regel kopij geschreven wordt.**
 Zonder deze vijf is het een verzonnen getal, en verzonnen getallen zijn precies
