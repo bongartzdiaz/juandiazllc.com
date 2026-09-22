@@ -34,15 +34,22 @@ import { translate, type Locale } from "@/lib/i18n/dict";
 // "3 mensen kijken nu", en SLOTS_REMAINING nooit lager zetten dan waar de
 // agenda werkelijk staat.
 export const TOTAL_SLOTS = 3;
-export const SLOTS_REMAINING = 3;
+export const SLOTS_REMAINING = 2;
 
 /**
  * Datum waarop SLOTS_REMAINING voor het laatst tegen de agenda is gehouden.
  *
  * Op 2026-08-23 heeft Juan twee dingen bevestigd: drie trajecten tegelijk (het
  * totaal, dezelfde grens die /services noemt) en alle drie op dit moment vrij.
- * Op 2026-09-22 opnieuw bevestigd door Juan ("3 vrij"), nadat de poort die
- * ochtend was verlopen (30,4 dagen) en CI op elke PR rood stond.
+ *
+ * Op 2026-09-22 is dat twee keer aangeraakt, en de tweede keer telt. 's Ochtends
+ * bevestigde Juan "3 vrij" nadat de poort was verlopen (30,4 dagen) en CI op
+ * elke PR rood stond (#406). Later diezelfde dag heeft hij het getal herzien
+ * naar **2 van 3**. Er is dus één traject bezet; het totaal is niet veranderd.
+ *
+ * Dat de datum daarbij gelijk blijft, is juist: LAST_VERIFIED zegt wanneer er
+ * tegen de agenda is gekeken, niet wanneer het getal voor het laatst veranderde.
+ * Een herziening op dezelfde dag verzet die datum niet.
  *
  * De vorige stand — 2 van 4 — is mét de eenheid vervallen. Die 2 telde geboekte
  * blueprint-GESPREKKEN; dit telt lopende TRAJECTEN. Een verificatie geldt voor
