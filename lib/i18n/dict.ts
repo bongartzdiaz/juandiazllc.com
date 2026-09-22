@@ -1737,7 +1737,12 @@ const nl: Dict = {
   "meta.home.description":
     "Juan Diaz — fractional revenue operator en operations-consultant voor operators in energie, vastgoed en horeca. Bouwkundig getraind, operator-built.",
   "meta.pricing.title": "Prijzen — DEUS CRM, EU-gehost, GDPR-klaar",
-  "meta.energyRoi.title": "Energie-ROI — de saldeer-som voor 2027",
+  // Drie van de vier talen dragen het werkwoord waar iemand op zoekt
+  // (calculator / Rechner / Calculadora). Het Nederlands droeg tot
+  // 2026-09-22 "de saldeer-som", een woord dat in deze hele repo precies
+  // één keer voorkwam: hier. Ook de pagina zelf gebruikt het niet.
+  // Zie docs/keyword-doelen.md §2; bewaakt door lib/zoekwoorden.test.ts.
+  "meta.energyRoi.title": "Salderingsregeling 2027 berekenen — gratis tool",
   "meta.energyRoi.description": "Reken door wat het einde van de salderingsregeling in 2027 je kost, met en zonder thuisbatterij. Gratis, zonder aanmelding, cijfers per situatie.",
   "faq.home.title": "Vragen van operators, beantwoord",
   "faq.contact.title": "Voordat je een gesprek plant",

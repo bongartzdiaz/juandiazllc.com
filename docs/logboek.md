@@ -11666,3 +11666,75 @@ lezen; nu staat het er als verklaring in plaats van als gevolgtrekking.
 
 `lucenai.eu` staat nog op 0 en is geen code: publiceren, LiteSpeed-cache legen,
 hermeten.
+
+### 2026-09-22 (4) — zoekwoorden gemeten op beide sites; één titel veranderd
+
+Opdracht: *also for juandiazllc and diazatals both sites needs betetr keyword
+targeting.* Van buitenaf gemeten met alleen GET's, `example.com` als negatieve
+controle. Alles staat in `docs/keyword-doelen.md`; dit is wat eruit kwam.
+
+**Wat er veranderd is: één titel.** `/tools/energy-roi` droeg in drie van de
+vier talen het woord waarmee je zo'n pagina zoekt — calculator, Rechner,
+Calculadora. Het Nederlands droeg "Energie-ROI — de saldeer-som voor 2027".
+Dat woord kwam in deze hele repo precies één keer voor: in die titel. De
+pagina eronder gebruikt het niet, de beschrijving niet, de artikelen niet.
+(`lib/insights.ts` draagt wél "saldeervoordeel" en "saldeertarief" — echte
+woorden.) Staat nu op **Salderingsregeling 2027 berekenen — gratis tool**, 47
+tekens tegen een `TITLE_BUDGET` van 48. `lib/zoekwoorden.test.ts` bewaakt
+lengte, een actiewoord per taal, de wettelijke naam in het Nederlands, en dat
+de vier titels verschillen.
+
+**De poort struikelde eerst over zijn eigen toelichting.** De eerste versie
+scande `dict.ts` als tekst op "saldeer-som" en faalde — want mijn nieuwe
+commentaar in dat bestand legt uit waarom het woord weg is, en noemt het dus.
+Dezelfde bugklasse die `lib/einspeiseverguetung.test.ts` in zijn kop al
+beschrijft: vier eerdere tekstscans in deze repo deden precies dit. Nu op de
+waarden van `DICT`, niet op de bestandstekst.
+
+**Drie valse alarmen in de meetlat, alle drie van mij.** De eerste
+was de zwaarste: een GET op `diazatlas.com/pricing` gaf 200 en exact dezelfde
+113.112 bytes als de homepage, en daaruit las ik "twee URL's, één pagina".
+`urllib` volgde de omleiding. Zonder volgen: **307** naar `/#pricing`. De
+conclusie blijft dezelfde — er is geen prijspagina — maar de reden is een
+andere, en `/nl/pricing` en `/de/pricing` blijken niet eens om te leiden maar
+te 404'en.
+
+De twee andere waren kleiner. Een regex die
+`name="description"` vóór `content=` eiste meldde ontbrekende descriptions op
+diazatlas — die pagina's zetten `content=` eerst, de descriptions staan er.
+En dezelfde extractie strippte `<br>` en maakte van de Atlas-H1
+`15 minutes.Sketch.`; op het scherm staat daar een regelafbreking. Geen van
+drieën is een sitefout. Zie [[feedback_verify_the_measuring_stick]].
+
+**Wat er gemeten is en blijft liggen** — vijf items, nu op de operatorlijst in
+`CLAUDE.md`:
+
+| vondst | bewijs |
+|---|---|
+| `diazatlas.com` heeft geen prijspagina | `/pricing` geeft **307** naar `/#pricing` (`landing/vercel.json:121`); `/nl/pricing`, `/de/pricing` en `/features` geven 404 |
+| drie van de vier Atlas-titels lopen over 60 tekens | en 58 · es 61 · nl 67 · **de 77** — de Duitse verliest daarmee precies "€197 Lebenslang", het hele abonnement-argument |
+| drie eigen pagina's op "salderingsregeling 2027" | het exact-match-domein, `/nl/work/salderingsregeling-2027` en de rekenmachine. De derde is nu gedifferentieerd; de eerste twee dragen bijna dezelfde titel |
+| `besparenbelgie.online` heet "Besparen Belgie" | twee woorden, terwijl de description eronder zonnepanelen, thuisbatterijen en België noemt |
+| `performancetracker.nl` en de portfoliopagina beschrijven iets anders | domein: "Team prestaties, real-time inzicht". Portfolio hier: "Live opbrengst … voor zonne-eigenaren en installateurs" |
+| `/nl/pricing` zegt GDPR waar de NL-lezer AVG zegt | de DE-pagina gebruikt DSGVO wél als eigen term |
+
+De laatste twee zijn bewust niet aangeraakt. De Performance-Tracker-mismatch
+is een claim, geen zoekwoord: welke van de twee waar is, is van buitenaf niet
+te zien, en een gok invullen is precies wat `docs/claims.md` moet voorkomen.
+GDPR-of-AVG loopt door de hele NL-kopij, de juridische pagina's en
+`/pricing.md` — één beslissing, niet één string.
+
+**Wat er níét in dit document staat: volumes.** Geen DataForSEO-sleutel, geen
+Ahrefs-abonnement (`Insufficient plan` op het gratis endpoint), Search Console
+niet aantoonbaar geverifieerd, Plausible-doelen nog niet aangemaakt. Een
+verzonnen volume leest als een meting en wordt binnen een maand feit. Wat wél
+gemeten is: welke woorden er staan, hoe lang ze zijn, en welke eigen pagina's
+elkaar in de weg zitten. Dat was genoeg voor alle zes de rijen hierboven.
+
+**Wat er goed staat en dus niet aangeraakt is.** De vier sectorpagina's openen
+al met dienst plus sector ("Operations consultant energie & zon"). De
+lekkage-scan houdt zijn merknaam: hij wordt bereikt vanaf de site, LinkedIn en
+de scan-reeks, niet via zoek. De Atlas-longtail is af — 321 URL's in de
+sitemap, vier talen, `/download` scherp getiteld op 56 tekens.
+
+Poorten: typecheck schoon, 1739 tests over 95 bestanden groen.

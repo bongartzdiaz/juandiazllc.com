@@ -784,6 +784,41 @@ beslissen — ze staan vastgepind in `lib/deus-naam.test.ts` tot jij kiest:
   mitigatie die de DPIA noemt voor retentie bij de verwerker. Volgt uit de eerste
   vraag; beslis die eerst.
 
+### Zoekwoorden — vijf beslissingen uit de meting van 2026-09-22
+
+De volledige meting staat in `docs/keyword-doelen.md`. Eén titel is die dag
+veranderd (de NL-rekenmachine, bewaakt door `lib/zoekwoorden.test.ts`); deze
+vijf zijn bewust blijven liggen omdat ze een keuze vragen of in een andere
+repo horen.
+
+- **GDPR of AVG in de Nederlandse kopij.** `/nl/pricing` heet "Prijzen — DEUS
+  CRM, EU-gehost, GDPR-klaar". De Nederlandse wet heet de AVG, en dat is wat
+  een Nederlandse inkoper intikt; de Duitse pagina gebruikt DSGVO wél als
+  eigen term. Het is geen string maar een keuze die door de hele NL-kopij,
+  de juridische pagina's en `/pricing.md` loopt.
+- **Drie eigen pagina's op "salderingsregeling 2027".** Het exact-match-domein
+  `salderingsregeling2027.nl`, de portfoliopagina `/nl/work/
+  salderingsregeling-2027` en de rekenmachine. De rekenmachine is
+  gedifferentieerd ("berekenen"); de eerste twee dragen bijna dezelfde titel.
+  Hertitelen maakt één pagina bewust zwakker op die term — alleen verstandig
+  als je weet welke van de twee vandaag gevonden wordt, en dat vergt de
+  Search-Console-verificatie die hierboven al openstaat.
+- **`performancetracker.nl` en de portfoliopagina beschrijven verschillende
+  producten.** Het domein zegt "Team prestaties, real-time inzicht"; de
+  portfoliopagina hier zegt "Live opbrengst, verliesanalyse … voor
+  zonne-eigenaren en installateurs". Geen zoekwoordkwestie maar een claim die
+  niet klopt. Welke van de twee waar is, is niet van buitenaf te zien, en een
+  gok invullen is precies wat `docs/claims.md` moet voorkomen.
+- **`diazatlas.com` heeft geen prijspagina.** `/pricing` geeft **307** naar
+  `/#pricing` (regel in `landing/vercel.json:121`); `/nl/pricing`,
+  `/de/pricing` en `/features` geven 404. Er is dus geen URL die op een
+  prijsvraag kan staan, voor een product waarvan "geen abonnement" het hele
+  argument is. Plus: drie van de vier homepagetitels lopen over 60
+  tekens, en de Duitse verliest daardoor precies "€197 Lebenslang". Werk in
+  `bongartzdiaz/diaz-editor`.
+- **`besparenbelgie.online` heet "Besparen Belgie".** Twee woorden. De
+  meta-description eronder is wél scherp. Eén regel in het template.
+
 ### Buiten deze repo
 
 - **Zeven stappen voor lucenai.eu** in `docs/lucenai-backlinks.md` §3, waarvan zes
