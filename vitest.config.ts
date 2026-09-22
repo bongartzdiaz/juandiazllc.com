@@ -14,6 +14,11 @@ export default defineConfig({
     // volledige testsuite meedraaien: drie bestanden faalden permanent en het
     // totaal telde honderden tests van een ander project mee. Beide kanten van
     // die meting waren onjuist.
+    // Die werkmap is op 2026-09-22 verplaatst naar `../_scratch/`, dus het
+    // voorbeeld is niet meer ter plekke na te meten. De regel blijft staan:
+    // hij is de reden dat een volgende werkmap in de wortel geen tests van een
+    // ander project binnenhaalt, en een uitzondering die pas terugkomt als het
+    // misgaat, is geen uitzondering.
     // supabase/functions/** is Deno: https-imports en Deno.test. Node's ESM-
     // loader weigert een https-specifier, dus vitest zou elk Deno-testbestand
     // als FAIL tellen. Die draaien met `deno test --no-lock supabase/functions`.
