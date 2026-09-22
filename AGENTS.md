@@ -859,10 +859,28 @@ repo horen.
   Alleen **#653** (help: DXF aanleveren aan onderaannemers, EN + NL) staat nog
   open, sinds 31 augustus.
 
-  Ongenoemd op deze lijst en ook open: **#624** (twee Spaanse pillars zonder
-  accenten, live in title/meta/JSON-LD — 21 augustus), **#639** (weekrapport
-  W34, wacht op een read-connector — 24 augustus) en **#656** (Dependabot,
-  acht action-updates — 1 september). In die repo merget deze sessie niet.
+  Ongenoemd op deze lijst en ook open: ~~**#624**~~ **gemerged 2026-09-22**
+  (`540b3e1b`), **#639** (weekrapport W34, wacht op een read-connector — 24
+  augustus) en **#656** (Dependabot, acht action-updates — 1 september).
+
+  **#624 droeg twee dingen.** De accenten waarvoor hij in augustus was geopend
+  (twee Spaanse pillars stonden zonder accenten live, ook in title, meta en
+  JSON-LD), plus een reparatie die bij het oplossen van het conflict bovenkwam:
+  de **uren-rekensom liep een prijswijziging achter, in drie talen**. De
+  herijking van 2026-08-22 bracht twintig bestanden op één AutoCAD-prijs en
+  `verify-concurrentprijzen.mjs` bewaakt dat — maar drie pillars rekenen die
+  prijs óók om naar werkuren, en die afgeleide bleef op de oude prijs staan:
+  ES 43 i.p.v. 48 (1.715/40), NL 31 en 30 i.p.v. 35, DE 30 i.p.v. 32. Telkens
+  in de og:description en de eerste alinea, terwijl de tabel en het FAQ-schema
+  op diezelfde pagina het juiste getal droegen. Gesloten met een poort die de
+  uitkomst uit prijs ÷ tarief afleidt (`verify-uren-rekensom.mjs`, tien
+  mutaties). Gemeten op productie in drie talen, met negatieve controles.
+
+  ~~In die repo merget deze sessie niet.~~ **Die regel staat nog, met één
+  uitzondering die op 2026-09-22 is gebruikt: een expliciete opdracht van Juan
+  ("merge #624") gaat erboven.** De regel blijft dus de standaard — een sessie
+  merget daar niet uit zichzelf — maar ze is geen weigering wanneer jij het
+  vraagt.
   **Gemeten op 2026-09-03, want dit bestand had het elders mis:** #659 is
   **gemerged** (`64ccd0d5`, 2026-09-02 15:29 UTC) en #647 is **gesloten
   zonder merge**. De sessielog-instructie om de basis van #647 naar `main`
