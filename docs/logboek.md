@@ -12201,3 +12201,83 @@ advertentiecijfer buiten die ene week, en nul metingen voor Performance Tracker.
 Dat is een uitkomst, geen tekortkoming van de zoekslag — maar het betekent dat
 "resultaten van HMB, Voltafy, SEO en ads" vandaag neerkomt op één
 advertentieweek plus een netwerkdiagnose.
+
+### 2026-09-22 (11) — de skalo-claims weg, en een kapot certificaat op www
+
+**De over-ons-claim is gerepareerd, in `mistersocial99/skalo-seo#194`.** Wat de
+operator-lijst als "40 van de 55" droeg, was een augustusmeting; opnieuw geteld
+op 22 september staat het zo:
+
+| claim | sites |
+|---|---:|
+| "wij kopen of lenen systemen, testen ze onafhankelijk" | 39 |
+| diezelfde claim in de JSON-LD als `Organization`-description | 50 |
+| weegtabel voor een beoordeling die niet plaatsvindt | 47 |
+| "ons redactieteam bestaat uit energietechnici, journalisten" | 38 |
+| enige vermelding van AI | **0** |
+
+**De patch van 11 augustus bestond al en is nooit gemerged.** Het logboek van
+die dag meldt *"een geteste patch voor 24 bestanden"*, geblokkeerd op drie
+velden die op Roy wachtten. Zes weken later stonden alle claims er nog. Vandaar
+dat deze reparatie die drie velden **opnieuw leeg laat** en de rest wel doet:
+een patch die op een ontbrekend antwoord wacht, wacht eeuwig.
+
+**Vier vallen onderweg, en drie ervan hadden de reparatie stil kunnen breken.**
+
+*Een nul uit een blokkadepagina.* De eerste meting op drie live sites gaf op
+twee ervan nul treffers, wat als "al gerepareerd" leest. Het waren
+Cloudflare-uitdagingen: 403, 5.444 bytes, `<title>Just a moment...`. De
+positieve controle ving het — grep op `redactie` en `over ons` gaf daar
+óók nul.
+
+*Een regex die niets vond en toch slaagde.* `re.sub` dat niet matcht geeft de
+tekst ongewijzigd terug en meldt niets. Het patroon eiste `publiceren eerlijke`
+met een spatie, terwijl er een regeleinde plus inspringing staat. Het script
+rapporteerde zes geslaagde categorieën terwijl de hoofdclaim op 39 sites bleef
+staan. Alleen een **onafhankelijke** controle van de einduitkomst ving dat.
+
+*Een poort die afging op zijn eigen oplossing.* De vervangtekst begon met
+*"Wij testen producten niet zelf"*, en het verbodspatroon is `Wij testen`. 41
+treffers, allemaal de reparatie zelf. Opgelost door de tekst te herschrijven
+naar *"Wij voeren zelf geen producttests uit"*, niet door de poort een
+uitzondering te geven. Een uitzondering voor goedgekeurde tekst is precies de
+plek waar een echte claim zich later verstopt.
+
+*Zesenvijftig identieke compileerfouten.* `esbuild --loader=tsx` geldt alleen
+voor stdin; voor bestanden leidt esbuild het af uit de extensie. Alle 56
+faalden met dezelfde regel, en dat is het handtekeningpatroon van een kapot
+instrument, niet van 56 kapotte bestanden.
+
+**Wat de meting opleverde en niet op de lijst stond.** Een reparatie die alleen
+op "kopen of lenen" had gezocht, had de drie concreetste claims laten staan:
+*"Wij testen elke thermostaat minimaal 4 weken in een testwoning"*
+(slimmethermostaatgids.nl), plus eigen tests op laadpaal-gids.nl en
+noodstroom-thuis.nl. En de inkomsten-alinea's spreken elkaar netwerkbreed
+tegen: sommige sites zeggen *"uitsluitend uit redactionele bronnen"*, andere
+noemen *"affiliate-partnerships"*. Die zijn bewust onaangeroerd gelaten en in
+de PR apart gemeld; welke waar is, is van buitenaf niet vast te stellen.
+
+**En toen het certificaat.** Juan meldde dat Instagram beide domeinen als
+onveilig markeert en vermoedde het beveiligingscertificaat. Dat vermoeden
+klopt, voor één van de twee: `www.juandiazllc.com` geeft
+`curl: (60) SEC_E_WRONG_PRINCIPAL`, want het geserveerde certificaat draagt
+alleen `DNS:juandiazllc.com` in zijn SAN. De oorzaak is geen verlopen
+certificaat maar een **ontbrekend domein**: DNS wijst `www` naar Vercel, en het
+Vercel-project kent alleen de apex plus de `.vercel.app`. `DEPLOY.md:28` zegt
+al die tijd dat `www` erbij hoort.
+
+**De vijfde val zat in dezelfde meting.** `openssl s_client` gaf op die kapotte
+host `Verify return code: 0 (ok)`. Dat is geen tegenspraak: `s_client`
+controleert standaard de keten en niet de hostnaam. De keten ís in orde. Wie
+daarop afgaat, leest een kapotte host als gezond — meet met `curl`.
+
+Zetten kan van hier niet: `add_project_domain` geeft **403 `forbidden`**,
+dezelfde muur als bij het lezen van env-vars. Het staat als één handeling op de
+operator-lijst. `diazatlas.com` is op alle vier de controles schoon, dus als
+Instagram dat óók markeert heeft dat een andere oorzaak — hermeet na het zetten
+voordat je concludeert dat het opgelost is.
+
+**En Juan sloot een open vraag.** *"case studies so work I did with results we
+got"*: een casestudy vraagt werk én een gemeten uitkomst. De
+HMB-advertentieweek heeft allebei. De skalo-diagnose heeft het werk en nog geen
+resultaat, en is daarmee materiaal en geen casestudy.
