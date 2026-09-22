@@ -3,7 +3,7 @@
  * Regenerate pricing-page outputs from `_drafts/pricing/pricing-tiers.csv`.
  *
  * The CSV is the single source-of-truth for tier prices, min-seats, and
- * the feature × tier matrix. Two derived outputs are regenerated here:
+ * the feature × tier matrix. Three derived outputs are regenerated here:
  *
  *   1. `app/[locale]/pricing/page.tsx`
  *      - TIERS constant (monthlyPrice, annualPrice, minSeats per tier)
@@ -11,6 +11,11 @@
  *
  *   2. `_drafts/pricing/pricing-tiers-en.md`
  *      - Per-category feature tables (Markdown) between the GENERATED markers
+ *
+ *   3. `public/pricing.md` (sinds 2026-09-22)
+ *      - Geheel gegenereerd, geen markers: prijslijst voor AI-assistenten en
+ *        inkoop-agents, geserveerd op https://juandiazllc.com/pricing.md.
+ *        Leest de sprintprijs uit docs/claims.md. Zie generatePricingMd.
  *
  * Idempotent: running the script without CSV changes produces zero diff.
  *
@@ -46,6 +51,12 @@ const ROOT = join(__dirname, "..");
 const CSV_PATH = join(ROOT, "_drafts/pricing/pricing-tiers.csv");
 const PAGE_PATH = join(ROOT, "app/[locale]/pricing/page.tsx");
 const MD_PATH = join(ROOT, "_drafts/pricing/pricing-tiers-en.md");
+// 3. `public/pricing.md` — machine-leesbare prijslijst voor AI-assistenten en
+//    inkoop-agents (zie de toelichting bij generatePricingMd). Volledig
+//    gegenereerd, geen markers: het bestand heeft geen handgeschreven deel.
+const PUBLIC_MD_PATH = join(ROOT, "public/pricing.md");
+const CLAIMS_PATH = join(ROOT, "docs/claims.md");
+const SITE = "https://juandiazllc.com";
 
 const CHECK_MODE = process.argv.includes("--check");
 
@@ -329,6 +340,142 @@ function generateMarkdownTables(sections) {
   return lines.join("\n");
 }
 
+// ---------- /pricing.md ----------
+// WAAROM. Een AI-assistent of inkoop-agent die "wat kost DEUS" of "wat kost
+// Juan Diaz" beantwoordt, leest liever één plat bestand dan een gerenderde
+// pagina met vier talen en een toggle. Dit is de conventie naast robots.txt en
+// llms.txt: /pricing.md op de root. Google zegt dat het niet nodig is voor AI
+// Overviews; ChatGPT, Claude en Perplexity halen er wél structuur uit, en het
+// kost de pagina niets.
+//
+// WAAROM HIER EN NIET MET DE HAND. Een prijslijst die je apart bijhoudt loopt
+// uit de pas — precies de klasse fout die `--check` in CI voor page.tsx al
+// afvangt. Dus: dezelfde CSV, dezelfde run, dezelfde controle. De sprintprijs
+// is de enige waarde die niet in de CSV staat; die komt uit docs/claims.md,
+// met dezelfde regex als lib/seo/faqs.belofte.test.ts, zodat er nergens een
+// tweede kopie van dat getal ontstaat.
+//
+// Bewust géén datum in het bestand: die zou elke run een diff opleveren en
+// `--check` rood maken terwijl er niets veranderde. Versheid volgt uit CI.
+const TIER_LABEL = {
+  starter: "Starter",
+  pro: "Professional",
+  business: "Business",
+  enterprise: "Enterprise",
+};
+const TIER_CSV_COL = {
+  starter: "Starter",
+  pro: "Professional",
+  business: "Business",
+  enterprise: "Enterprise",
+};
+// pricing.migration.title in lib/i18n/dict.ts draagt hetzelfde bedrag;
+// lib/pricing-md.test.ts houdt de twee gelijk.
+const MIGRATION_EUR = 1500;
+
+function sprintprijsUitClaims() {
+  const claims = readFileSync(CLAIMS_PATH, "utf8");
+  const m = claims.match(/\|\s*vaste prijs sprint\s*\|\s*\*\*€([\d.]+)\*\*/);
+  if (!m) {
+    throw new Error(
+      "docs/claims.md draagt geen rij `| vaste prijs sprint | **€…** |` meer; " +
+        "zonder dat bedrag kan public/pricing.md niet gegenereerd worden."
+    );
+  }
+  return Number(m[1].replace(/\./g, ""));
+}
+
+function euroEn(n) {
+  return `€${n.toLocaleString("en-US")}`;
+}
+
+function generatePricingMd(tierMeta, rows, sections, sprintEur) {
+  const trial = rows.find((r) => r.Feature.startsWith("Free trial"));
+  const out = [];
+  out.push("# Pricing — Juan Diaz, LLC (juandiazllc.com)");
+  out.push("");
+  out.push(
+    "Machine-readable pricing for AI assistants and buying agents. Generated from"
+  );
+  out.push(
+    "`_drafts/pricing/pricing-tiers.csv` and `docs/claims.md` by `scripts/regenerate-pricing.mjs`;"
+  );
+  out.push(
+    "a CI check fails when this file and the human pricing page drift apart."
+  );
+  out.push("");
+  out.push(`- Human page: ${SITE}/en/pricing (also /nl, /de, /es)`);
+  out.push(`- Services page: ${SITE}/en/services`);
+  out.push(`- Contact: ${SITE}/en/contact`);
+  out.push("- Currency: EUR. Prices exclude VAT.");
+  out.push("- If this file and a page disagree, the page wins.");
+  out.push("");
+  out.push("## Services — Juan Diaz, fractional revenue operator");
+  out.push("");
+  out.push("Priced per outcome, not per hour. Advisory is a standalone engagement; the build does not have to follow.");
+  out.push("");
+  out.push("### Blueprint call");
+  out.push("- Price: free");
+  out.push("- Duration: 30 minutes");
+  out.push("- Deliverable: a one-page diagnosis of where the operation and the numbers disagree");
+  out.push(`- Book: ${SITE}/en/contact`);
+  out.push("");
+  out.push("### Diagnostic sprint");
+  out.push(`- Price: ${euroEn(sprintEur)} fixed, excl. VAT`);
+  out.push("- Duration: 30 days");
+  out.push("- Deliverable: the build plan with a number on every phase, plus the first component already running");
+  out.push("- Ownership: the plan is the client's, even if someone else executes it");
+  out.push("- Credit: if the build follows, the sprint fee comes off it in full");
+  out.push("");
+  out.push("### Scope, build, operate");
+  out.push("- Price: fixed fee for the first 90 days of strategy and build, then a monthly retainer for operations");
+  out.push("- Quoted after the diagnostic sprint, not before");
+  out.push("- Capacity: three engagements run at the same time; start date depends on what is already running");
+  out.push("");
+  out.push("## DEUS CRM — per-seat tiers (EU-hosted)");
+  out.push("");
+  out.push("The price you sign up at is the price you pay until you change tiers. No usage limits, no overage fees, no AI credits, no per-API charges: the bill depends on the number of seats only.");
+  out.push("");
+  for (const t of tierMeta) {
+    const col = TIER_CSV_COL[t.key];
+    out.push(`### ${TIER_LABEL[t.key]}`);
+    if (t.monthlyPrice) {
+      out.push(`- Price: ${t.monthlyPrice} per seat per month (monthly billing) | ${t.annualPrice} per seat per month (annual billing, 20% off)`);
+    } else {
+      out.push(`- Price: custom, per organisation rather than per seat — contact ${SITE}/en/contact?interest=enterprise`);
+    }
+    out.push(`- Minimum seats: ${t.minSeats}`);
+    if (trial) out.push(`- Free trial (no credit card): ${trial[col]}`);
+    const included = [];
+    for (const section of sections) {
+      for (const row of section.rows) {
+        const v = row[col];
+        if (v === "") continue;
+        included.push(v === "✓" ? row.Feature : `${row.Feature}: ${cellToMd(v)}`);
+      }
+    }
+    out.push(`- Included: ${included.join("; ")}`);
+    out.push("");
+  }
+  out.push("### Optional: migration service");
+  out.push(`- Price: ${euroEn(MIGRATION_EUR)} one-time`);
+  out.push("- Scope: migration from Pipedrive, HubSpot, Salesforce or a spreadsheet, run for you; five business days; two training sessions; first 30 days priority support");
+  out.push("");
+  out.push("### Billing rules");
+  out.push("- Annual billing pays the year upfront at 20% off; monthly billing is charged every 30 days at the full rate.");
+  out.push("- Upgrades are immediate and prorated; downgrades take effect at the next billing cycle, without data loss.");
+  out.push("- AI features are included from Professional upwards; the LLM cost is absorbed in the tier price.");
+  // Woordelijk uit pricing.faq.a6 (en); de sub-verwerkerslijst is daar nog
+  // "being finalised", dus hier niet meer beweren dan de pagina doet.
+  out.push("- Hosting and service providers: Supabase (database and authentication), Vercel (application hosting), Stripe Payments Europe Ltd in Ireland (payments). AI-assisted contact enrichment is processed by Anthropic in the United States. Shared multi-tenant infrastructure on Hetzner (Falkenstein) on every tier.");
+  out.push("");
+  out.push("## Feature table");
+  out.push("");
+  out.push(generateMarkdownTables(sections));
+  out.push("");
+  return out.join("\n");
+}
+
 // ---------- Marker-replace helpers ----------
 // Line-based marker replacement. Finds the line containing the BEGIN
 // marker substring and the line containing the END marker substring,
@@ -397,16 +544,29 @@ function main() {
     mdBlock
   );
 
+  // public/pricing.md — volledig gegenereerd. Bestaat het nog niet (eerste
+  // run), dan is "voor" leeg en telt het als gewijzigd.
+  let publicBefore = "";
+  let publicEol = "\n";
+  try {
+    ({ tekst: publicBefore, eol: publicEol } = leesLf(PUBLIC_MD_PATH));
+  } catch {
+    /* eerste run: bestand ontbreekt nog */
+  }
+  const publicAfter = generatePricingMd(tierMeta, rows, sections, sprintprijsUitClaims());
+
   const pageChanged = pageAfter !== pageBefore;
   const mdChanged = mdAfter !== mdBefore;
+  const publicChanged = publicAfter !== publicBefore;
 
   if (CHECK_MODE) {
-    if (pageChanged || mdChanged) {
+    if (pageChanged || mdChanged || publicChanged) {
       console.error(
         "✗ Generated outputs do not match CSV. Run `npm run regen:pricing` to fix."
       );
       if (pageChanged) console.error("  - page.tsx out of sync");
       if (mdChanged) console.error("  - pricing-tiers-en.md out of sync");
+      if (publicChanged) console.error("  - public/pricing.md out of sync");
       process.exit(1);
     }
     console.log("✓ Generated outputs match CSV.");
@@ -424,6 +584,12 @@ function main() {
     console.log(`✓ Wrote ${MD_PATH}`);
   } else {
     console.log(`= No change in ${MD_PATH}`);
+  }
+  if (publicChanged) {
+    schrijfMetEol(PUBLIC_MD_PATH, publicAfter, publicEol);
+    console.log(`✓ Wrote ${PUBLIC_MD_PATH}`);
+  } else {
+    console.log(`= No change in ${PUBLIC_MD_PATH}`);
   }
 }
 

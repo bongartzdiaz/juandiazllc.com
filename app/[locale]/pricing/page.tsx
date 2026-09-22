@@ -168,7 +168,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title,
     description,
-    alternates: buildAlternates(l, "/pricing"),
+    alternates: {
+      ...buildAlternates(l, "/pricing"),
+      // /pricing.md is de machine-leesbare prijslijst (public/, gegenereerd
+      // door scripts/regenerate-pricing.mjs). Eén link per taalvariant naar
+      // hetzelfde Engelse bestand: een agent die deze pagina leest, vindt zo
+      // de platte versie zonder te raden. Zie lib/pricing-md.test.ts.
+      types: { "text/markdown": "/pricing.md" },
+    },
     openGraph: {
       images: ogImages(l),
       type: "website",
