@@ -408,16 +408,21 @@ augustus blijft staan zoals hij is: logboekgeschiedenis wordt hier niet
 herschreven, en deze notitie is de correctie erop.
 
 
-### 2026-09-22 — de capaciteitspoort is verlopen: `npm test` is rood op elke PR
+### ~~2026-09-22 — de capaciteitspoort is verlopen~~ — gesloten dezelfde dag
 
-`components/Capacity.tsx` draagt `SLOTS_REMAINING = 3` en
-`LAST_VERIFIED = "2026-08-23"`; de poort (`Capacity.test.ts`,
-`capaciteit.test.ts`) staat op maximaal 30 dagen en is op 2026-09-22 om
-ongeveer 10:00 UTC verlopen (30,4 dagen). **Tot dit is bijgewerkt faalt
-`npm test` op `main` en op elke PR.** De poort vraagt één ding: klopt "3 van
-3 vrij" nog tegen de agenda? Een datum bijwerken zonder dat antwoord is
-precies wat hij moet vangen, dus dat is niet gedaan. Antwoord ("3 vrij" of
-een ander getal) → getal en datum in `components/Capacity.tsx`, klaar.
+De poort stond op `LAST_VERIFIED = "2026-08-23"` en was die ochtend verlopen
+(30,4 dagen), waardoor `npm test` op `main` en op elke PR faalde. **Gesloten met
+#406 (`a3d703c`): Juan bevestigde "3 vrij", dus `SLOTS_REMAINING` bleef 3 en
+`LAST_VERIFIED` ging naar `2026-09-22`.** Gemeten op 2026-09-22: beide poorten
+groen (19 tests), de datum is nul dagen oud en het venster loopt tot
+**2026-10-22**.
+
+Dit blok bleef staan nadat het al gesloten was, en dat is precies het risico dat
+bovenaan deze lijst beschreven staat — de operator leest de bovenste regel en
+handelt ernaar. De poort zelf is ongewijzigd: hij vraagt één ding, namelijk of
+"3 van 3 vrij" nog tegen de agenda klopt. Een datum bijwerken zónder dat
+antwoord is exact de fout die hij moet vangen; dat staat ook in de toelichting
+bij `LAST_VERIFIED` zelf.
 
 ### 2026-09-22 — GEO: het product was onvindbaar; twee PR's, één hermeting
 
