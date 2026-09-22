@@ -1416,8 +1416,9 @@ inserts ooit in `jobs` en `job_updates`, drie seed-rijen in `teams` uit april,
 en DEUS-SHARED `origin/main` (2026-08-16) noemt ze alleen nog in dat script en
 zijn runbook. Een `organization_id` erbij zetten breekt bovendien de
 invariantcontroles van dat script. Het lokale concept
-`migrations-review/20260605_juandiazllc_tenant_isolation.sql` is als achterhaald
-gemarkeerd.
+`20260605_juandiazllc_tenant_isolation.sql` is als achterhaald gemarkeerd. Het
+staat sinds 2026-09-22 niet meer in de repo-wortel maar in
+`../_scratch/migrations-review/`, buiten elke repo.
 
 ### Wat wél nog moet, en het zit in DEUS-SHARED
 
