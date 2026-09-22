@@ -1008,6 +1008,42 @@ Zie [[feedback_welk_document_liegt]]: toen stonden er vier echte klantcijfers op
 de site die in `claims.md` ontbraken, en ik haalde ze weg in plaats van te
 vragen. Daarom deze keer eerst zoeken, dan vragen, en pas dan schrijven.
 
+### 2026-09-22 — de skalo-claims zijn gemerged maar staan nog live
+
+**`mistersocial99/skalo-seo#194` is gemerged** (`7ca83ee96`): 55 sites plus het
+sjabloon, met `scripts/check_over_ons_claims.py` als poort erbij. **Op de sites
+zelf staat de oude claim nog.** Gemeten op `thuisbatterijmagazine.nl/over-ons/`
+direct na de merge: `kopen of lenen` = 1, `journalist` = 1,
+`AI-ondersteuning` = 0, met `redactie` = 1 als positieve controle zodat een
+blokkadepagina niet als schone meting kan lezen.
+
+**Dat is geen fout maar de uitrol.** `deploy-site.yml` staat op
+`disabled_manually`, dus GitHub rolt daar niets uit. De sites worden gebouwd en
+uitgerold door de nachtmotor op de server (`142.93.140.18`, `/opt/skalo-seo`),
+die uit de repo trekt.
+
+**Wat daaraan onzeker is, en het is niet van hier te beslissen.** De nachtmotor
+bouwt een site als hij daar een artikel voor schrijft. Sites die vannacht geen
+artikel krijgen, worden mogelijk niet herbouwd, en dan blijft de claim daar
+staan. De keten is bovendien niet betrouwbaar: in de week van 12 tot 16
+september lag hij drie nachten plat (`ALL_FAILED`) en draaide daarna twee
+nachten half, waarvan één met 5 van de 55 sites.
+
+**Dus: meet morgen na, en meet breed.** Eén site is geen bewijs voor 55.
+`bash` met een lus over de domeinen, met `redactie` als positieve controle per
+site, want een deel van het netwerk staat achter Cloudflare en geeft dan 403 met
+`Just a moment...` — dat leest als nul treffers en dus als opgelost. Blijft de
+claim staan op sites die geen artikel kregen, dan is een handmatige herbouw op
+de server de enige weg.
+
+**Let op bij het lezen van de vinkjes op die repo.** Alle jobs daar geven
+`failure` met **nul stappen** en zonder log; GitHub weigert de
+Actions-facturatie. Eén valstrik: `Overlapwacht` staat in de runlijst op
+`success` terwijl zijn enige job `failure` is, omdat die job als
+niet-blokkerend is opgezet. Het vinkje op runniveau zegt daar dus niets, in
+allebei de richtingen. De controles op #194 zijn lokaal gedraaid: esbuild 56 van
+56 met een positieve controle, en de poort mutatiegetest.
+
 ### 2026-09-22 — `www.juandiazllc.com` heeft geen geldig certificaat
 
 **Eén handeling in Vercel, en het is de enige stap die dit oplost.** Voeg
