@@ -39,6 +39,9 @@ import {
   PERSON_URL,
   ORG_NAME,
   ORG_ID,
+  ZUSTERMERK_ID,
+  ZUSTERMERK_NAAM,
+  ZUSTERMERK_URL,
   ORG_SAME_AS,
 } from "@/lib/seo/branding";
 
@@ -183,6 +186,15 @@ const organizationSchema = {
     { "@type": "Country", name: "United States" },
   ],
   knowsLanguage: ["en", "nl", "de", "es"],
+  // Het merk waaronder deze rechtspersoon de Diaz Editor verkoopt. Zie de
+  // toelichting bij ZUSTERMERK_URL in lib/seo/branding.ts: `brand` en niet
+  // `sameAs`, want diazatlas.com beschrijft een product en niet dit bedrijf.
+  brand: {
+    "@type": "Organization",
+    "@id": ZUSTERMERK_ID,
+    name: ZUSTERMERK_NAAM,
+    url: ZUSTERMERK_URL,
+  },
   sameAs: ORG_SAME_AS,
 };
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { controleerVentureAdressen, controleerEntiteitsAdressen } from "./venture-adressen";
-import { AFFILIATIE_URL } from "@/lib/seo/branding";
+import { AFFILIATIE_URL, ZUSTERMERK_URL } from "@/lib/seo/branding";
 import { VENTURES } from "@/lib/ventures";
 
 /* De controle zelf, zonder netwerk. De echte lookup draait alleen in de
@@ -101,24 +101,32 @@ describe("controleerEntiteitsAdressen", () => {
      en kijkt of er iets staat; een 404 is daar geen ontbrekend signaal maar een
      mislukte controle. Zelfde reden waarom de dode X-handle uit ORG_SAME_AS is
      gehaald — alleen ving niets dat toen, en nu wel. */
-  it("heeft een adres om te controleren", () => {
-    expect(AFFILIATIE_URL).toMatch(/^https:\/\//);
-    expect(new URL(AFFILIATIE_URL).hostname).not.toContain("juandiazllc.com");
+  /* Twee adressen sinds 2026-09-22: het affiliatie-adres (lucenai.eu) en het
+     zustermerk (diazatlas.com, in `brand` van het Organization-schema). Beide
+     dragen een zichtbare link op /about, dus beide dezelfde controle. */
+  it("heeft adressen om te controleren, en ze zijn extern", () => {
+    for (const u of [AFFILIATIE_URL, ZUSTERMERK_URL]) {
+      expect(u).toMatch(/^https:\/\//);
+      expect(new URL(u).hostname).not.toContain("juandiazllc.com");
+    }
+    expect(AFFILIATIE_URL).not.toBe(ZUSTERMERK_URL);
   });
 
   it("zwijgt als het adres bestaat en antwoordt", async () => {
     expect(await controleerEntiteitsAdressen({ zoek: zoektAlles, haal: haaltAlles })).toEqual([]);
   });
 
-  it("meldt een fout als de naam niet in DNS staat", async () => {
+  it("meldt een fout per adres dat niet in DNS staat", async () => {
     const uit = await controleerEntiteitsAdressen({ zoek: gooit("ENOTFOUND"), haal: haaltAlles });
-    expect(uit).toHaveLength(1);
-    expect(uit[0].ernst).toBe("fout");
-    expect(uit[0].soort).toBe("entiteit-adres-bestaat-niet");
-    expect(uit[0].url).toBe(AFFILIATIE_URL);
-    // De melding moet naar /about wijzen en niet naar /work: een operator die
-    // hier de venture-tekst leest gaat het verkeerde bestand openen.
-    expect(uit[0].detail).toContain("/about");
+    // Beide adressen falen in deze opstelling: de lus slaat er geen over.
+    expect(uit.map((b) => b.url).sort()).toEqual([AFFILIATIE_URL, ZUSTERMERK_URL].sort());
+    for (const b of uit) {
+      expect(b.ernst).toBe("fout");
+      expect(b.soort).toBe("entiteit-adres-bestaat-niet");
+      // De melding moet naar /about wijzen en niet naar /work: een operator die
+      // hier de venture-tekst leest gaat het verkeerde bestand openen.
+      expect(b.detail).toContain("/about");
+    }
   });
 
   it("meldt een waarschuwing bij een HTTP-fout, geen fout", async () => {
@@ -126,10 +134,12 @@ describe("controleerEntiteitsAdressen", () => {
       zoek: zoektAlles,
       haal: async () => ({ ok: false, status: 404 }),
     });
-    expect(uit).toHaveLength(1);
-    expect(uit[0].ernst).toBe("waarschuwing");
-    expect(uit[0].soort).toBe("entiteit-adres-antwoordt-niet");
-    expect(uit[0].detail).toContain("404");
+    expect(uit).toHaveLength(2);
+    for (const b of uit) {
+      expect(b.ernst).toBe("waarschuwing");
+      expect(b.soort).toBe("entiteit-adres-antwoordt-niet");
+      expect(b.detail).toContain("404");
+    }
   });
 
   it("noemt een DNS-hapering tijdelijk in plaats van dood", async () => {

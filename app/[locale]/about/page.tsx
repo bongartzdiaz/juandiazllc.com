@@ -12,6 +12,7 @@ import {
   PERSON_URL,
   ORG_NAME,
   ORG_ID,
+  ZUSTERMERK_URL,
   AFFILIATIE_NAAM,
   AFFILIATIE_URL,
 } from "@/lib/seo/branding";
@@ -157,6 +158,20 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             {t("about.p.lucen.link")}
           </a>
           {t("about.p.lucen.2")}
+        </p>
+
+        {/* De tweede uitgaande link, en de wederhelft van een paar. Sinds
+            diaz-editor#687 (live 2026-09-22) linken de about-pagina's van
+            diazatlas.com "Juan Diaz LLC" hierheen; tot vandaag wees niets op
+            deze site terug. Eén redactionele plek, geen voetlink op elke
+            pagina — zie docs/backlink-strategie.md §1 voor waarom dat
+            onderscheid ertoe doet. */}
+        <p>
+          {t("about.p.atlas.1")}
+          <a href={ZUSTERMERK_URL} target="_blank" rel="noopener noreferrer">
+            {t("about.p.atlas.link")}
+          </a>
+          {t("about.p.atlas.2")}
         </p>
 
         <div className="about-cta" style={{ marginTop: 48 }}>
