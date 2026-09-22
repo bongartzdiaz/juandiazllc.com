@@ -515,9 +515,77 @@ betalende klant is. Vraag het vóór er kopij geschreven wordt.
 | de ingreep | zonder ingreep is het een grafiek, geen casestudy |
 | venture of klant | expliciet, en zichtbaar in de kopij |
 
-**Stand op 2026-09-22: geen van die cijfers is hier bekend.** De beslissing is
-genomen, het dossier is leeg. Tot het gevuld is kan er geen casestudy
-gepubliceerd worden, en dat is het hele punt van regel 1.
+**Stand op 2026-09-22, na het doorzoeken van de drie Obsidian-vaults**
+(`Mr Diaz`, `Mr Diaz - HMB`, `Mr Diaz - PerformanceTracker`, 782 notities). Er
+staat veel gemeten materiaal in, maar **precies een meting heeft de vorm van een
+casestudy**: een nulpunt, een ingreep, en een uitkomst. De rest is diagnose.
+
+#### HMB — Meta-advertenties, week 28 tegen week 29 (juli 2026)
+
+| veld | waarde |
+| --- | --- |
+| het cijfer | **kosten per registratie −22,6%** (€ 8,91 → € 6,90) terwijl de uitgaven **+91,1%** stegen (€ 668,23 → € 1.276,73) |
+| de bron | Meta Ads Manager, account `932039344875575`, via de HMB data-hub; pipeline uit GoHighLevel "HMB NIEUW", gereconcilieerd met nexus-prod |
+| de meetperiode | week 28 (6–12 juli) tegen week 29 (13–18 juli) |
+| het nulpunt | week 28 |
+| de ingreep | advertentiebudget bijna verdubbeld op de campagne "Thuisbatterijen plus" |
+| venture of klant | **eigen venture** (Help Mij Besparen) |
+
+Bron: `Mr Diaz - HMB/10-Projecten/HMB/Weekrapport-HMB-wk29-2026.md`.
+
+**Drie voorbehouden, en ze staan grotendeels in het rapport zelf.**
+
+1. **Week 29 was een lopende week.** Peildatum 18 juli; het rapport zegt dat de
+   definitieve cijfers na zondag 19 juli volgen. Dat vervolgrapport bestaat niet —
+   er is **één** weekrapport in alle drie de vaults. De cijfers zijn dus voorlopig.
+2. **Zes dagen tegen zeven.** Daardoor zijn de volumecijfers (+97,5% CRM-leads,
+   +166,7% buitendienst-afspraken) **niet** vergelijkbaar. De ratio's wél —
+   kosten per registratie, CTR, CPM — en het rapport zegt dat met zoveel woorden.
+   **Publiceer dus de ratio, niet het volume.**
+3. **Twee weken zijn geen trend.** Er is geen derde meetpunt.
+
+**Wat er bewust níét uit mag.** Dezelfde week: 42,4% van de leads gaf een
+onbruikbaar telefoonnummer en 47,5% werd niet bereikt. "+97,5% leads" naast die
+twee cijfers overleeft de eerste vervolgvraag niet.
+
+#### Voltafy / skalo — een diagnose, geen resultaat
+
+Juan is sinds **10 augustus 2026** eindverantwoordelijk voor het skalo-netwerk:
+55 Nederlandse nichesites plus 23 provinciedomeinen, met een nachtmotor die per
+site één artikel per nacht schrijft. De gemeten richting sindsdien is **omlaag** —
+vertoningen −39% in de week van 12 tot 16 september bij vlakke kliks, en sessies
+−22% in de week 5 tot 11 september bij organisch −2%.
+
+Wat er wél sterk is, is de audit. Gemeten, niet vermoed:
+
+- het SERP-onderzoek faalt **stil sinds 24 april**: 109 nachten, waarin ruim
+  5.000 artikelen zijn geschreven zonder de bron die het promptlabel
+  "DIT IS DE BELANGRIJKSTE BRON" droeg
+- **172 bijna-dubbele slug-paren** binnen sites, net onder de drempel van de poort
+  die ervoor staat, plus **456 paren tussen sites**, waar die poort niet kijkt
+- de leadtoewijzing was van 50 naar **113 van de 132** te herstellen door een veld
+  te lezen dat er al stond
+
+Dat is **een diagnose, geen resultaat**, en daarmee een ander soort claim: *"dit
+vond ik toen ik een netwerk van 55 sites overnam"*. Voor een fractional operator
+is dat verkoopbaar materiaal — maar het is niet *"dit verbeterde ik"*, en het mag
+nooit zo gaan lezen.
+
+> ⚠️ **En er ligt een blokkade vóór elke publiciteit die naar dat netwerk wijst.**
+> Op **40 van de 55 sites** staat: *"Wij kopen of lenen systemen, testen ze
+> onafhankelijk en publiceren eerlijke beoordelingen."* Op 53 sites staat dat de
+> redactie uit energietechnici en journalisten bestaat. Op **nul** sites staat dat
+> er met AI-ondersteuning wordt geschreven, en de claim staat óók in de JSON-LD
+> als `Organization`-description, dus machineleesbaar. Zolang dat zo is, trekt een
+> casestudy die naar skalo verwijst aandacht naar een onjuiste claim op 40
+> domeinen. Eerst die pagina's, dan de publiciteit.
+
+#### Wat er niet gevonden is
+
+Geen SEO-resultaat voor **helpmijbesparen.nl** zelf, geen advertentiecijfer buiten
+die ene week, en geen enkele meting voor Performance Tracker. Zoeken op
+weekrapporten over alle drie de vaults geeft één treffer, en dat is de HMB-week
+hierboven.
 
 `components/sections/ResultsStrip.test.ts` bewaakt al dat een gepubliceerd
 getal in dit bestand staat; daar hoeft voor deze beslissing niets bij gebouwd

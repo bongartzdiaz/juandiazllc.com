@@ -12135,3 +12135,69 @@ DXF" — en dat staat op eigen benen zonder klant. Het tweede bestaat niet.
 Gevraagd vóór er kopij komt, in plaats van te gokken en een claim te
 publiceren die met één query weerlegd wordt. Zie
 [[feedback_welk_document_liegt]].
+
+### 2026-09-22 (10) — de vaults doorzocht: één casestudy, één diagnose, één blokkade
+
+Juan: *all numbers and data is saved in my files and obsidian brain — you can
+look it up*. Dat klopte, en het was breder dan verwacht: drie vaults, 782
+notities. Wat er niet in zat is wat een casestudy nodig heeft.
+
+**De eerste zoekslag gaf een vals positief, en die vorm is het opschrijven waard.**
+Een grep op metriekwoorden (`CTR`, `%`, `€`, `conversie`) gaf ongeveer 25
+treffers, en bijna allemaal waren het **plannen**: `project_gameplan_30dagen`,
+`Backlink-strategy-90d-2026-05-11`, `Diaz-Editor-Backlink-Strategy-2026-Q2`. Een
+streefcijfer leest in een grep precies als een behaald cijfer — zelfde woorden,
+zelfde eenheid, zelfde zinsbouw. Wat de twee scheidt is **structuur**: een echte
+meting noemt haar bron en haar venster. Daarop zoeken in plaats van op getallen
+bracht het terug tot één weekrapport in alle drie de vaults.
+
+**Wat er wél staat.** `Mr Diaz - HMB/10-Projecten/HMB/Weekrapport-HMB-wk29-2026.md`:
+Meta-advertenties, week 28 tegen week 29 juli. Uitgaven van € 668,23 naar
+€ 1.276,73 (+91,1%) terwijl de **kosten per registratie 22,6% zakten**, van
+€ 8,91 naar € 6,90. Bron erbij (account `932039344875575`, GoHighLevel-pipeline
+"HMB NIEUW"), ingreep erbij (budget bijna verdubbeld op "Thuisbatterijen plus"),
+nulpunt erbij. Dat is de volledige zes-veldenrij uit `docs/claims.md`.
+
+**En ik las die ingreep eerst mis.** Een grep op wijzigingswoorden gaf niets in
+de kop-structuur, waaruit ik concludeerde dat het rapport wel uitkomsten
+vastlegde maar niet wát er veranderd was. Dat stond er wél — in actiepunt 3,
+onder het kopje *volgende week*, waar een ingreep van *afgelopen* week niet
+verwacht wordt: *"Het budget is bijna verdubbeld bij dalende kosten per
+registratie."* De grep zocht op de goede woorden in de verkeerde sectie. Vandaar
+dat het hele blok alsnog woordelijk is gelezen voordat er iets in `claims.md`
+kwam.
+
+**Twee voorbehouden die het rapport zelf al draagt**, en dat pleit voor het
+rapport. Week 29 telt **zes** dagen tegen zeven in week 28, dus de volumecijfers
+(+97,5% CRM-leads, +166,7% buitendienst-afspraken) vergelijken ongelijke
+perioden; de ratio's niet. En de peildatum is 18 juli met week 29 nog lopend —
+het aangekondigde definitieve rapport bestaat niet. De cijfers zijn dus
+voorlopig. In `claims.md` staat daarom: **publiceer de ratio, niet het volume.**
+
+**Wat er bewust niet uit mag.** Dezelfde week: 42,4% onbruikbare telefoonnummers,
+47,5% niet bereikt. "+97,5% leads" naast die twee overleeft de eerste
+vervolgvraag niet.
+
+**Voltafy levert geen resultaat maar een diagnose.** Juan nam het skalo-netwerk
+over op 10 augustus; de gemeten richting sindsdien is omlaag (vertoningen −39%
+bij vlakke kliks, 12–16 september; sessies −22% bij organisch −2%, 5–11
+september). De audit eronder is sterk — SERP-onderzoek dat **stil faalt sinds 24
+april**, 109 nachten waarin ruim 5.000 artikelen blind zijn geschreven, 172
+bijna-dubbele slug-paren binnen sites en 456 ertussen, leadtoewijzing van 50 naar
+113 van de 132 te herstellen uit een veld dat er al stond. Dat is *"dit vond
+ik"*, niet *"dit verbeterde ik"*. Verkoopbaar voor een fractional operator, maar
+als een ander soort claim, en het mag nooit als het tweede gaan lezen.
+
+**De vondst die niemand zocht, en die vóór de kopij hoort.** Op **40 van de 55
+skalo-sites** staat dat de redactie systemen koopt of leent en onafhankelijk
+test; op 53 dat ze uit energietechnici en journalisten bestaat; op **nul** dat er
+met AI-ondersteuning wordt geschreven. De claim staat ook in de JSON-LD als
+`Organization`-description, dus machineleesbaar. Een casestudy die naar skalo
+wijst, trekt aandacht naar een onjuiste claim op veertig domeinen. Dat staat nu
+als eerste punt op de operator-lijst, vóór de twee redactionele keuzes.
+
+**Niet gevonden:** geen SEO-resultaat voor helpmijbesparen.nl zelf, geen
+advertentiecijfer buiten die ene week, en nul metingen voor Performance Tracker.
+Dat is een uitkomst, geen tekortkoming van de zoekslag — maar het betekent dat
+"resultaten van HMB, Voltafy, SEO en ads" vandaag neerkomt op één
+advertentieweek plus een netwerkdiagnose.

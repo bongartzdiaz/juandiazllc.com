@@ -914,7 +914,7 @@ repo horen.
   uitrollen kan daarlangs. Wil je het zelf via de CLI doen, dan moet je eerst als
   jezelf inloggen, en dat **vervangt Roy's opgeslagen token** op deze machine.
 
-### 2026-09-22 — HMB- en Voltafy-resultaten als casestudy: de cijfers ontbreken
+### 2026-09-22 — HMB- en Voltafy-resultaten als casestudy: één cijfer kan, en er ligt een blokkade onder het tweede
 
 Juan: *je kan resultaten van HMB, Voltafy, SEO en ads ook gebruiken als
 casestudy's voor juandiazllc*. Dat is een beslissing, en hij is genoteerd in
@@ -964,10 +964,47 @@ bijgesteld worden, en `components/sections/ResultsStrip.test.ts` bewaakt al dat
 een gepubliceerd getal in dat bestand staat. Die poort wordt hier dus niet
 opnieuw gebouwd — hij dekt dit al, zolang de cijfers erin komen te staan.
 
-**Blokkade: de cijfers.** Lever ze aan zoals hierboven, dan is de kopij een
-kwestie van schrijven. Zie [[feedback_welk_document_liegt]]: toen stonden er
-vier echte klantcijfers op de site die in `claims.md` ontbraken, en ik haalde
-ze weg in plaats van te vragen. Daarom deze keer eerst de vraag.
+**De cijfers zijn gezocht en deels gevonden — in jouw eigen vaults.** Juan:
+*all numbers and data is saved in my files and obsidian brain, you can look it
+up*. Dat klopte. Alle drie de vaults zijn doorzocht (`Mr Diaz`,
+`Mr Diaz - HMB`, `Mr Diaz - PerformanceTracker`, samen 782 notities); de
+volledige uitkomst met bronverwijzingen staat in `docs/claims.md`. In het kort:
+
+- **Eén meting heeft de vorm van een casestudy.** HMB Meta-advertenties, week 28
+  tegen week 29 juli 2026: de uitgaven bijna verdubbeld (+91,1%) terwijl de
+  **kosten per registratie 22,6% zakten** (€ 8,91 → € 6,90). Nulpunt, ingreep en
+  bron staan er allemaal bij.
+- **Publiceer daarvan de ratio, niet het volume.** Week 29 telt zes dagen tegen
+  zeven, dus "+97,5% leads" en "+166,7% afspraken" vergelijken ongelijke
+  perioden. Het rapport zegt dat zelf. En het waren voorlopige cijfers: peildatum
+  18 juli, en het aangekondigde definitieve rapport is er nooit gekomen.
+- **Voltafy levert geen resultaatcijfer maar een diagnose.** Je nam het
+  skalo-netwerk op 10 augustus over; de richting sindsdien is omlaag. Wat er wél
+  ligt is een sterke audit — SERP-onderzoek dat stil faalde sinds 24 april, ruim
+  5.000 artikelen die daardoor blind zijn geschreven, 628 kannibaliserende
+  slug-paren. Dat is *"dit vond ik"*, niet *"dit verbeterde ik"*. Verkoopbaar,
+  maar als een ander soort claim.
+
+**Twee dingen die jij moet beslissen, en één die eerst moet.**
+
+1. ⚠️ **Eerst dit: pas de over-ons-pagina's op skalo aan, vóór er publiciteit
+   naar dat netwerk wijst.** Op **40 van de 55 sites** staat dat de redactie
+   systemen koopt of leent en onafhankelijk test; op 53 dat ze uit
+   energietechnici en journalisten bestaat; op **nul** dat er met AI wordt
+   geschreven. De claim staat ook machineleesbaar in de JSON-LD. Een casestudy
+   die naar skalo verwijst, trekt aandacht naar een onjuiste claim op veertig
+   domeinen. Dit staat niet in `docs/claims.md` als keuze — het is werk in een
+   andere repo, en het hoort vóór de kopij.
+2. **Wil je de HMB-advertentieweek gepubliceerd hebben met de voorbehouden
+   erbij, of wacht je op een tweede meetpunt?** Twee weken zijn geen trend, en
+   het cijfer is voorlopig. Met de voorbehouden erbij is het eerlijk en dun; een
+   derde week maakt het sterk.
+3. **Wordt de skalo-diagnose een casestudy?** Dat vraagt een andere pagina dan
+   een resultaatstrip: het verhaal is de vondst, niet de verbetering.
+
+Zie [[feedback_welk_document_liegt]]: toen stonden er vier echte klantcijfers op
+de site die in `claims.md` ontbraken, en ik haalde ze weg in plaats van te
+vragen. Daarom deze keer eerst zoeken, dan vragen, en pas dan schrijven.
 
 ### LinkedIn — het kanaal is gekozen, het profiel wacht
 
