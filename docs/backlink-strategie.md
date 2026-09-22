@@ -45,6 +45,19 @@ naar juandiazllc.com.** Twee noemen hem wel bij naam, zonder link.
 
 Herhaal de meting met `bash scripts/backlink-inventory.sh`.
 
+**Stand later op 2026-09-22.** Juan meldde beide links gezet; van buitenaf is
+**geen van beide zichtbaar**, en dat is per site een andere reden:
+
+| site | meting | wat er nog moet |
+|---|---|---|
+| `diazatlas.com/about` | 0 links; `git log` op `bongartzdiaz/diaz-editor` kent geen wijziging aan `landing/` | de site bouwt uit die repo, dus de link moet dáár staan: **PR [#687](https://github.com/bongartzdiaz/diaz-editor/pull/687)** zet hem op de vier about-pagina's (en/nl/de/es) plus `founder.sameAs` in het schema. Mergen en de deploy afwachten |
+| `lucenai.eu/about` | 0 links, óók bij een verzoek dat de LiteSpeed-cache mist (`?v=…` geeft geen `X-LiteSpeed-Cache: hit`, dus dat is een verse render) | de bewerking is niet gepubliceerd, of staat in een blok dat niet rendert. Publiceren, daarna LiteSpeed-cache legen, dan hermeten |
+
+De meting die dit vaststelt is één commando en raakt niets:
+`bash scripts/backlink-inventory.sh`. Een link die in het beheerscherm staat
+maar niet in de HTML, telt niet — dezelfde regel als overal in deze repo: meet
+het levende object, niet de bron.
+
 **Waarom dit de eerste laag is.** Een vermelding zonder link is de goedkoopste
 backlink die bestaat: de tekst staat er al, er ontbreekt één `<a>`. En deze
 sites gaan écht over dezelfde persoon of hetzelfde bedrijf — dat is de

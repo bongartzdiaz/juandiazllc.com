@@ -11611,3 +11611,38 @@ bijwerken, CI weer groen. (2) #403 en #404 mergen. (3) `lucenai.eu/about`
 en `diazatlas.com/about`: de naam linken — vijf minuten, de enige twee
 backlinkstappen die vandaag iets meetbaars veranderen. (4) Search Console
 verifiëren. (5) Hermeting van de tien vragen in de eerste week van december.
+
+### 2026-09-22 (2) — "links gezet" was nog niet zichtbaar; één PR, één publicatie
+
+Juan meldde de twee backlinks gezet (lucenai.eu en diazatlas.com). Hermeten met
+`scripts/backlink-inventory.sh`: **beide nog 0**, en per site een andere reden.
+
+**diazatlas.com** bouwt uit `bongartzdiaz/diaz-editor`; die repo kende geen
+wijziging aan `landing/` (laatste commit 2026-09-21 16:50 UTC, een video-audit).
+Daarom zelf gedaan: **#687** zet "Juan Diaz LLC" in de copyrightregel van de
+vier about-pagina's (en/nl/de/es) als link naar `juandiazllc.com/<taal>/about`,
+plus `founder.sameAs` in het Organization-schema naar het Person-knooppunt.
+De sitebrede voet in `_compliance.js` (133 pagina's) blijft bewust zonder link:
+acht domeinen met dezelfde voetlink lezen als een netwerk.
+
+**lucenai.eu** gaf 0 bij een verzoek met querystring, en dat antwoord droeg
+géén `X-LiteSpeed-Cache: hit` — het was dus een verse render, geen cache. De
+bewerking is niet gepubliceerd of staat in een blok dat niet rendert.
+
+**Valkuil bij #687, voor de volgende worktree.** De pre-push-poort viel om op
+`Cannot find module '@juandiazllc/core/schema'`. Turbo meldde `FULL TURBO` op
+een cache-hit terwijl `packages/core/dist` in de verse worktree leeg was — het
+verving de uitvoer niet. `turbo run build --filter=./packages/* --force`
+herstelt dat; daarna alle vijf de gate-stappen groen. Niets met de wijziging te
+maken, en het had makkelijk als "mijn HTML brak de tests" kunnen lezen. Let ook
+op: `npx turbo` faalt daar met `EOVERRIDE` (react-override); gebruik de binary
+uit `node_modules/.bin`.
+
+**Vondst, niet aangeraakt.** De voet van diazatlas linkt naar
+`linkedin.com/company/juan-diaz-llc`; `ORG_SAME_AS` hier draagt
+`linkedin.com/company/juandiazllc`. Twee slugs voor één bedrijfspagina — welke
+de echte is, is alleen ingelogd te zien.
+
+**Eerder deze dag gemerged:** #406 (capaciteit, Juan bevestigde 3 van 3 vrij),
+#403 (`/pricing.md`, live 200 `text/markdown`), #404 (definitiezin, live op
+`/en/pricing`), #405 (docs).

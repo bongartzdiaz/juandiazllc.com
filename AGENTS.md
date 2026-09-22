@@ -445,10 +445,14 @@ minuten:
 
 - **`lucenai.eu/about`**: de naam "Juan Stefan Bongartz Diaz" (6× op de
   pagina) linken naar `https://juandiazllc.com/en/about`. Stond al als stap 4
-  in `docs/lucenai-backlinks.md`.
-- **`diazatlas.com/about` en de voet**: "Juan Diaz LLC (Delaware, USA)"
-  linken naar hetzelfde adres — één PR in `bongartzdiaz/diaz-editor`,
-  `landing/`.
+  in `docs/lucenai-backlinks.md`. **Juan meldde dit gezet op 2026-09-22; de
+  gerenderde pagina draagt de link niet**, ook niet bij een verzoek dat de
+  LiteSpeed-cache mist. Publiceren, cache legen, dan
+  `bash scripts/backlink-inventory.sh`.
+- **`diazatlas.com/about` en de voet**: gedaan in
+  `bongartzdiaz/diaz-editor#687` (vier about-pagina's + `founder.sameAs`),
+  **wacht op merge en deploy**. De sitebrede voet in `_compliance.js` blijft
+  bewust zonder link.
 - Daarna, per site één redactionele plek, géén sitebrede voet: auteursblok op
   `salderingsregeling2027.nl` en `besparenbelgie.online`, colofonregel op
   `voltafy.nl` en `performancetracker.nl`. `helpmijbesparen.nl` is een klant:
