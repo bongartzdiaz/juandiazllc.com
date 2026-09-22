@@ -168,7 +168,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title,
     description,
-    alternates: buildAlternates(l, "/pricing"),
+    alternates: {
+      ...buildAlternates(l, "/pricing"),
+      // /pricing.md is de machine-leesbare prijslijst (public/, gegenereerd
+      // door scripts/regenerate-pricing.mjs). Eén link per taalvariant naar
+      // hetzelfde Engelse bestand: een agent die deze pagina leest, vindt zo
+      // de platte versie zonder te raden. Zie lib/pricing-md.test.ts.
+      types: { "text/markdown": "/pricing.md" },
+    },
     openGraph: {
       images: ogImages(l),
       type: "website",
@@ -196,7 +203,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
   const product = productOfferSchema({
     locale: l,
     productName: "DEUS",
-    productDescription: t("pricing.lede"),
+    productDescription: t("pricing.definitie"),
     tiers: TIERS.filter((tier) => tier.monthlyPrice !== null).map((tier) => ({
       name: t(`pricing.t.${tier.key}.name`),
       description: t(`pricing.t.${tier.key}.tagline`),
@@ -218,10 +225,18 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(product) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(faqs)) }} />
 
-      {/* Hero */}
+      {/* Hero. De definitiezin staat als eerste alinea onder de H1, vóór de
+          lede: een AI-assistent die "wat is DEUS, wat kost het" beantwoordt,
+          haalt één zelfstandige zin op en niet een pagina. Gemeten
+          2026-09-22 op Perplexity: "I can't find any reliable information
+          about a DEUS CRM by Juan Diaz LLC or its per-seat pricing" — terwijl
+          de titel DEUS noemt en de H1 niet. Zelfde zin gaat als description
+          in het Product-schema (was de lede, die het product niet noemt).
+          lib/pricing-definitie.test.ts houdt de getallen gelijk aan de CSV. */}
       <header className="page-hero">
         <div className="eyebrow">{t("pricing.eyebrow")}</div>
         <h1 dangerouslySetInnerHTML={{ __html: t("pricing.title") }} />
+        <p>{t("pricing.definitie")}</p>
         <p>{t("pricing.lede")}</p>
       </header>
 
