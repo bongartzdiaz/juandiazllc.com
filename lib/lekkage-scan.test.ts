@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
-import { zonderCommentaar } from "./bronscan";
+import { leesBron, zonderCommentaar } from "./bronscan";
 import {
   AANTAL_WOORD,
   BLOKKEN,
@@ -20,13 +20,13 @@ import {
 const WORTEL = join(__dirname, "..");
 
 /** Het document met één spatie tussen alles — hij breekt regels op 80 tekens. */
-const DOC = readFileSync(join(WORTEL, "docs", "lead-magnet.md"), "utf8").replace(/\s+/g, " ");
+const DOC = leesBron(join(WORTEL, "docs", "lead-magnet.md")).replace(/\s+/g, " ");
 
 /** De bron voor elk cijfer dat de scan uitspreekt. Zie docs/claims.md. */
-const CLAIMS = readFileSync(join(WORTEL, "docs", "claims.md"), "utf8").replace(/\s+/g, " ");
+const CLAIMS = leesBron(join(WORTEL, "docs", "claims.md")).replace(/\s+/g, " ");
 
 /** De partnertekst leest hetzelfde aantal; hij gaat naar buiten. */
-const PARTNERS = readFileSync(join(WORTEL, "docs", "partners.md"), "utf8").replace(/\s+/g, " ");
+const PARTNERS = leesBron(join(WORTEL, "docs", "partners.md")).replace(/\s+/g, " ");
 
 const alles = (waarde: boolean): Antwoorden =>
   Object.fromEntries(VRAGEN.map((v) => [v.id, waarde]));
@@ -340,7 +340,7 @@ describe("de telling van de vragen", () => {
   it("draagt in de scan-kopij geen hardgecodeerd telwoord", () => {
     const fout: string[] = [];
     for (const pad of SCAN_KOPIJ) {
-      const bron = readFileSync(join(WORTEL, pad), "utf8");
+      const bron = leesBron(join(WORTEL, pad));
       const gevonden = woorden(bron);
       for (const w of TELWOORDEN) {
         if (gevonden.has(w)) fout.push(pad + ": " + w);
@@ -353,12 +353,12 @@ describe("de telling van de vragen", () => {
     // Zonder deze assertie slaagt de vorige ook op kopij die het aantal
     // helemaal niet meer noemt -- dan is de telling stilletjes verdwenen.
     for (const pad of NOEMT_AANTAL) {
-      const bron = readFileSync(join(WORTEL, pad), "utf8");
+      const bron = leesBron(join(WORTEL, pad));
       expect(bron, pad + " noemt AANTAL_WOORD niet").toContain("AANTAL_WOORD");
     }
     // De twee andere talen lezen hetzelfde getal via telwoord(), uit
     // dezelfde bron; een hardgecodeerd "sixteen" valt in de vorige test.
-    const taal = readFileSync(join(WORTEL, "lib/lekkage-scan-taal.ts"), "utf8");
+    const taal = leesBron(join(WORTEL, "lib/lekkage-scan-taal.ts"));
     expect(taal).toContain('telwoord(VRAGEN.length, "en")');
     expect(taal).toContain('telwoord(VRAGEN.length, "de")');
   });
@@ -413,7 +413,7 @@ describe("de scan hangt ergens aan", () => {
 
   it("staat op precies de plekken waar hij hoort", () => {
     const gevonden = paginas
-      .filter((p) => readFileSync(p, "utf8").includes("<ScanCallout"))
+      .filter((p) => leesBron(p).includes("<ScanCallout"))
       .map((p) => relative(WORTEL, p).split(sep).join("/"))
       .sort();
     expect(gevonden).toEqual(Object.keys(HOORT_TE_STAAN).sort());
@@ -422,9 +422,8 @@ describe("de scan hangt ergens aan", () => {
   it("hangt op de artikelpagina achter de Energy-tag", () => {
     // Zonder die voorwaarde staat hij onder elk artikel, ook onder de
     // real-estate- en hospitality-stukken die een ander publiek hebben.
-    const bron = readFileSync(
+    const bron = leesBron(
       join(WORTEL, "app", "[locale]", "insights", "[slug]", "page.tsx"),
-      "utf8",
     );
     expect(bron).toMatch(/post\.tag === "Energy" && <ScanCallout/);
   });
@@ -448,7 +447,7 @@ describe("de scan hangt ergens aan", () => {
    toelichting in het component -- die `gemeld.current` woordelijk
    uitlegt -- de poort vacuum groen. Dat is hier vijf keer misgegaan. */
 describe("het doel Scan Voltooid", () => {
-  const RUW = readFileSync(join(WORTEL, "components", "LekkageScan.tsx"), "utf8");
+  const RUW = leesBron(join(WORTEL, "components", "LekkageScan.tsx"));
   const CODE = zonderCommentaar(RUW);
 
   it("vuurt het doel af, met het aantal lekken erbij", () => {

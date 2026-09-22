@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "./seo/branding";
-import { zonderCommentaar } from "./bronscan";
+import { leesBronZonderCommentaar, zonderCommentaar } from "./bronscan";
 
 /* Gate: één contactadres, één bron.
  *
@@ -126,7 +126,7 @@ describe("contactadres", () => {
     const afwijkend: string[] = [];
     for (const pad of geleverdeCode()) {
       const naam = rel(pad);
-      const bron = zonderCommentaar(readFileSync(pad, "utf8"));
+      const bron = leesBronZonderCommentaar(pad);
       const gevonden = [...bron.matchAll(ADRESSEN)].map((m) => m[0]);
       const vrij = UITZONDERINGEN[naam];
       for (const adres of gevonden) {
@@ -152,7 +152,7 @@ describe("contactadres", () => {
 
   it("de twee bestanden die de literal dragen, dragen precies CONTACT_EMAIL", () => {
     for (const [naam, { aantal, reden }] of Object.entries(PINT_LITERAL)) {
-      const bron = zonderCommentaar(readFileSync(join(WORTEL, naam), "utf8"));
+      const bron = leesBronZonderCommentaar(join(WORTEL, naam));
       const n = bron.split(CONTACT_EMAIL).length - 1;
       expect(n, `${naam} draagt CONTACT_EMAIL ${n}x, verwacht ${aantal} (${reden})`).toBe(
         aantal,
@@ -166,7 +166,7 @@ describe("contactadres", () => {
     // van stil te blijven staan.
     const importeurs = geleverdeCode().filter((pad) => {
       if (rel(pad) === "app/actions/newsletter.ts") return false;
-      const bron = zonderCommentaar(readFileSync(pad, "utf8"));
+      const bron = leesBronZonderCommentaar(pad);
       return /from\s+["'][^"']*actions\/newsletter["']/.test(bron);
     });
     expect(importeurs.map(rel)).toEqual([]);

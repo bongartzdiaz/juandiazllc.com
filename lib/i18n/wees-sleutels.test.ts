@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { DICT } from "./dict";
+import { leesBron } from "@/lib/bronscan";
 
 /* Gate: elke sleutel in het woordenboek heeft een afnemer.
  *
@@ -71,7 +72,7 @@ const BRONNEN = MAPPEN.flatMap((m) => bestanden(join(WORTEL, m)))
   .filter((p) => p !== DICT_PAD)
   .map((p) => relative(WORTEL, p).split(sep).join("/"));
 
-const BRON = BRONNEN.map((p) => readFileSync(join(WORTEL, p), "utf8")).join("\n");
+const BRON = BRONNEN.map((p) => leesBron(join(WORTEL, p))).join("\n");
 
 /** `t(`process.${i}.name`)` -> /^process\.[^.]+\.name$/ */
 const PATRONEN = [

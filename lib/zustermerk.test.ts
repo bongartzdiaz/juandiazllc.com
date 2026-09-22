@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
+import {  } from "node:fs";
 import { join } from "node:path";
 import { DICT, LOCALES } from "./i18n/dict";
 import { ZUSTERMERK_NAAM, ZUSTERMERK_URL, ZUSTERMERK_ID, AFFILIATIE_URL } from "./seo/branding";
+import { leesBron } from "@/lib/bronscan";
 
 /* Poort: het paar juandiazllc.com ↔ diazatlas.com blijft wederzijds, en blijft
  * één redactionele plek.
@@ -35,8 +36,8 @@ import { ZUSTERMERK_NAAM, ZUSTERMERK_URL, ZUSTERMERK_ID, AFFILIATIE_URL } from "
  * in de dagelijkse productie-audit, die merkt dat het adres zelf verdwijnt. */
 
 const WORTEL = join(__dirname, "..");
-const ABOUT = readFileSync(join(WORTEL, "app", "[locale]", "about", "page.tsx"), "utf8");
-const LAYOUT = readFileSync(join(WORTEL, "app", "layout.tsx"), "utf8");
+const ABOUT = leesBron(join(WORTEL, "app", "[locale]", "about", "page.tsx"));
+const LAYOUT = leesBron(join(WORTEL, "app", "layout.tsx"));
 
 /** Elk bestand onder app/ en components/ dat de hostnaam letterlijk draagt. */
 function bestandenMetHost(): string[] {
@@ -55,7 +56,7 @@ function bestandenMetHost(): string[] {
         continue;
       }
       if (!/\.(tsx?|mdx?)$/.test(naam) || naam.includes(".test.")) continue;
-      if (readFileSync(pad, "utf8").includes(host)) uit.push(pad.slice(WORTEL.length + 1).replace(/\\/g, "/"));
+      if (leesBron(pad).includes(host)) uit.push(pad.slice(WORTEL.length + 1).replace(/\\/g, "/"));
     }
   }
   return uit.sort();

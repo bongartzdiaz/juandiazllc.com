@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
+import { leesBron } from "@/lib/bronscan";
 
 /* Poort: elk e-mailadres dat de bezoeker bereikt staat op juandiazllc.com.
  *
@@ -120,7 +121,7 @@ beforeAll(() => {
   BRONNEN = MAPPEN.flatMap((map) =>
     bestanden(join(WORTEL, map)).map((pad) => ({
       pad: relative(WORTEL, pad).split(sep).join("/"),
-      regels: readFileSync(pad, "utf8").split("\n"),
+      regels: leesBron(pad).split("\n"),
     })),
   );
 });

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
+import { leesBron } from "@/lib/bronscan";
 
 /* Poort: het resultatenblok mag alleen op een pagina staan als elk cijfer dat
  * het publiceert in docs/claims.md is terug te vinden.
@@ -68,10 +69,10 @@ const PAGINAS = tsxBestanden(join(WORTEL, "app"))
 
 /* Op de naam matchen zou ook het commentaar raken dat uitlegt waaróm het blok
  * er niet staat. Alleen een echte JSX-montage telt. */
-const GEMONTEERD = PAGINAS.filter((p) => /<ResultsStrip[\s/>]/.test(readFileSync(join(WORTEL, p), "utf8")));
+const GEMONTEERD = PAGINAS.filter((p) => /<ResultsStrip[\s/>]/.test(leesBron(join(WORTEL, p))));
 
-const CIJFERS = gepubliceerdeCijfers(readFileSync(COMPONENT, "utf8"));
-const REGIO = juandiazRegio(readFileSync(CLAIMS, "utf8"));
+const CIJFERS = gepubliceerdeCijfers(leesBron(COMPONENT));
+const REGIO = juandiazRegio(leesBron(CLAIMS));
 
 describe("resultatenblok publiceert geen cijfer zonder bron", () => {
   /* Zonder deze drie zou een verplaatst bestand of een hernoemd veld de poort

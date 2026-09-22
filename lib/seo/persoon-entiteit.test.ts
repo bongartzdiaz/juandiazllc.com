@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import {
   PERSON_NAME,
@@ -11,6 +11,7 @@ import {
   ORG_NAME,
   ORG_SAME_AS,
 } from "./branding";
+import { leesBron } from "@/lib/bronscan";
 
 /* Poort: de site beschrijft één persoon, niet vier.
  *
@@ -67,7 +68,7 @@ function geleverdeBestanden(): { pad: string; tekst: string }[] {
     for (const pad of bestanden(join(WORTEL, map))) {
       uit.push({
         pad: relative(WORTEL, pad).split(sep).join("/"),
-        tekst: readFileSync(pad, "utf8"),
+        tekst: leesBron(pad),
       });
     }
   }

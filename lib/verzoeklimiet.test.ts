@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { zonderCommentaar } from './bronscan'
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { leesBron, leesBronZonderCommentaar, zonderCommentaar } from './bronscan'
+import { readdirSync, statSync } from 'node:fs'
 import { join, sep } from 'node:path'
 import { maakLimiet, sleutelUitVerzoek, leesBegrensd, TeGroot } from './verzoeklimiet'
 
@@ -189,7 +189,7 @@ describe('publieke API-routes', () => {
     // geremd aanmerken terwijl hij dat bewust niet is — de poort zou dan
     // precies de route missen waar hij over gaat.
     const zonder = routes.filter(
-      (pad) => !readFileSync(pad, 'utf8').includes('maakLimiet') && !ZONDER_REM[pad],
+      (pad) => !leesBron(pad).includes('maakLimiet') && !ZONDER_REM[pad],
     )
     expect(zonder, 'route zonder rem en zonder gemotiveerde uitzondering').toEqual([])
   })
@@ -206,7 +206,7 @@ describe('publieke API-routes', () => {
     // af, maar dat is hun grens en geldt niet lokaal of op een andere host.
     const overtreders = routes.filter((pad) => {
       if (ONBEGRENSDE_BODY[pad]) return false
-      const bron = zonderCommentaar(readFileSync(pad, 'utf8'))
+      const bron = leesBronZonderCommentaar(pad)
       return bron.includes('req.json()') || bron.includes('req.text()')
     })
     expect(overtreders, 'leest de body zonder plafond').toEqual([])

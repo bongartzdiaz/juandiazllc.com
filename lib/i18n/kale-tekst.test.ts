@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import ts from "typescript";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { ENKELE_TAAL } from "./enkele-taal";
-import { zonderCommentaar } from "../bronscan";
+import { leesBron, zonderCommentaar } from "../bronscan";
 
 /* Gate: geen letterlijke gebruikerstekst in JSX.
  *
@@ -372,13 +372,13 @@ describe("geen kale gebruikerstekst in JSX", () => {
   it("elke treffer staat op IDENTITEIT, TOEGESTAAN of ACHTERSTAND", () => {
     const onbekend: string[] = [];
     for (const pad of BRONNEN) {
-      for (const tekst of kaleTekst(readFileSync(join(WORTEL, pad), "utf8"), pad)) {
+      for (const tekst of kaleTekst(leesBron(join(WORTEL, pad)), pad)) {
         if (IDENTITEIT.has(tekst)) continue;
         if (OK.get(pad)?.has(tekst)) continue;
         if (NOG.get(pad)?.has(tekst)) continue;
         onbekend.push(`${pad}: ${tekst}`);
       }
-      for (const attr of kaleAttributen(readFileSync(join(WORTEL, pad), "utf8"), pad)) {
+      for (const attr of kaleAttributen(leesBron(join(WORTEL, pad)), pad)) {
         if (ATTR_OK.get(pad)?.has(attr)) continue;
         if (ATTR_NOG.get(pad)?.has(attr)) continue;
         onbekend.push(`${pad}: ${attr}`);
@@ -389,7 +389,7 @@ describe("geen kale gebruikerstekst in JSX", () => {
 
   it("de sectorpagina draagt er geen meer", () => {
     const pad = "app/[locale]/sectors/[slug]/page.tsx";
-    expect(kaleTekst(readFileSync(join(WORTEL, pad), "utf8"), pad)).toEqual([]);
+    expect(kaleTekst(leesBron(join(WORTEL, pad)), pad)).toEqual([]);
   });
 
   it("geen dode regel: elke vrijstelling komt nog werkelijk voor", () => {
@@ -401,7 +401,7 @@ describe("geen kale gebruikerstekst in JSX", () => {
       [ATTR_ACHTERSTAND, "ATTR_ACHTERSTAND"],
     ] as const) {
       for (const [pad, v] of Object.entries(lijst)) {
-        const bron = readFileSync(join(WORTEL, pad), "utf8");
+        const bron = leesBron(join(WORTEL, pad));
         const gevonden = new Set(
           naam.startsWith("ATTR_")
             ? kaleAttributen(bron, pad)
@@ -446,10 +446,7 @@ describe("de vrijstellingen dragen hun eigen voorwaarde", () => {
   });
 
   it("Testimonials rendert nog steeds niets", () => {
-    const bron = readFileSync(
-      join(WORTEL, "components/sections/Testimonials.tsx"),
-      "utf8",
-    );
+    const bron = leesBron(join(WORTEL, "components/sections/Testimonials.tsx"));
     expect(bron).toContain("if (TESTIMONIALS.length === 0) return null;");
     const lijst = zonderCommentaar(bron).match(
       /const TESTIMONIALS: Testimonial\[\] = \[([\s\S]*?)\];/,
@@ -464,7 +461,7 @@ describe("de vrijstellingen dragen hun eigen voorwaarde", () => {
       "components/LekkageScan.tsx",
       "components/sections/CtaBig.tsx",
     ]) {
-      const bron = readFileSync(join(WORTEL, pad), "utf8");
+      const bron = leesBron(join(WORTEL, pad));
       expect(bron, pad).toContain('<div className="hp-field" aria-hidden="true">');
     }
   });
@@ -472,7 +469,7 @@ describe("de vrijstellingen dragen hun eigen voorwaarde", () => {
   it("global-error valt nog buiten LocaleProvider", () => {
     // Een global-error die de provider zou importeren kan hem ook gebruiken,
     // en dan is Engels daar een keuze in plaats van een gegeven.
-    const bron = readFileSync(join(WORTEL, "app/global-error.tsx"), "utf8");
+    const bron = leesBron(join(WORTEL, "app/global-error.tsx"));
     expect(zonderCommentaar(bron)).not.toContain("LocaleProvider");
   });
 });
