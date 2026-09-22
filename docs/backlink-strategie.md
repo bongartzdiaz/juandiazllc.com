@@ -33,7 +33,7 @@ naar juandiazllc.com.** Twee noemen hem wel bij naam, zonder link.
 | adres | status | links → jdllc | naam zonder link | wat het is |
 |---|---|---|---|---|
 | `lucenai.eu/about` | 200 | 0 | **6** | Lucen AI; Juan staat er als "Co-Founder \| CTO" |
-| `diazatlas.com/about` | 200 | 0 | **18** | Diaz Atlas; "Juan Diaz LLC (Delaware, USA)" in de voet, in vier talen |
+| `diazatlas.com/about` | 200 | **2** (sinds `diaz-editor#687`, live 2026-09-22) | 18 | Diaz Atlas; "Juan Diaz LLC (Delaware, USA)" in de voet, in vier talen |
 | `diazatlas.com` | 200 | 0 | 13 | idem, home |
 | `voltafy.nl` | 200 | 0 | 0 | venture |
 | `performancetracker.nl` | 200 | 0 | 0 | venture |
@@ -50,7 +50,7 @@ Herhaal de meting met `bash scripts/backlink-inventory.sh`.
 
 | site | meting | wat er nog moet |
 |---|---|---|
-| `diazatlas.com/about` | 0 links; `git log` op `bongartzdiaz/diaz-editor` kent geen wijziging aan `landing/` | de site bouwt uit die repo, dus de link moet dáár staan: **PR [#687](https://github.com/bongartzdiaz/diaz-editor/pull/687)** zet hem op de vier about-pagina's (en/nl/de/es) plus `founder.sameAs` in het schema. Mergen en de deploy afwachten |
+| `diazatlas.com/about` | ~~0 links~~ → **gesloten 2026-09-22.** #687 gemerged (`8de26388`), deployment `dpl_HezUD9nq…`; de pagina draagt nu de link én `founder.sameAs`, en `/nl/`, `/de/`, `/es/` elk hun eigen taalvariant | niets — dit is de eerste backlink naar juandiazllc.com die er ooit stond |
 | `lucenai.eu/about` | 0 links, óók bij een verzoek dat de LiteSpeed-cache mist (`?v=…` geeft geen `X-LiteSpeed-Cache: hit`, dus dat is een verse render) | de bewerking is niet gepubliceerd, of staat in een blok dat niet rendert. Publiceren, daarna LiteSpeed-cache legen, dan hermeten |
 
 De meting die dit vaststelt is één commando en raakt niets:
@@ -77,7 +77,7 @@ links die kloppen slaan meer links die dat niet doen.
 | # | waar | wat | naar | eigenaar | kost |
 |---|---|---|---|---|---|
 | 1 | `lucenai.eu/about` | de naam "Juan Stefan Bongartz Diaz" linken | `https://juandiazllc.com/en/about` | operator, WordPress | 1 minuut. Staat al als stap 4 in `docs/lucenai-backlinks.md` §3 |
-| 2 | `diazatlas.com/about` en de voet | "Juan Diaz LLC (Delaware, USA)" linken, één keer per pagina | `https://juandiazllc.com/en/about` | repo `bongartzdiaz/diaz-editor`, `landing/` | 1 PR |
+| 2 | ~~`diazatlas.com/about`~~ **gedaan 2026-09-22** (`diaz-editor#687`): vier about-pagina's, elk naar de eigen taalvariant, plus `founder.sameAs` | `https://juandiazllc.com/<taal>/about` | — | — |
 | 3 | `salderingsregeling2027.nl`, `besparenbelgie.online` | een **auteursblok** onder elk artikel: naam + één zin + link | `https://juandiazllc.com/nl/about` | die repo's | 1 component per site |
 | 4 | `voltafy.nl`, `performancetracker.nl` | "Gebouwd door Juan Diaz LLC" in het colofon of op de about-pagina | `https://juandiazllc.com/nl/about` (of `/en/`) | die repo's | 1 regel per site |
 
@@ -171,7 +171,7 @@ backlinkstrategie zonder Search Console is een strategie zonder scorebord.
 |---|---|---|---|
 | 1 | `lucenai.eu/about`: de naam linken | operator | geen |
 | 2 | Search Console verifiëren (TXT staat er) | operator | geen |
-| 3 | `diazatlas.com`: "Juan Diaz LLC" linken in about + voet | PR in diaz-editor | geen |
+| 3 | ~~`diazatlas.com`~~ **gedaan** (`diaz-editor#687`, live 2026-09-22) | — | — |
 | 4 | auteursblok op de twee contentsites | PR per site | geen |
 | 5 | colofonregel op de twee ventures | PR per site | geen |
 | 6 | de rekenmachine aan de drie partnerprofielen geven | operator, met `docs/partners.md` | Brevo (de opvang achter de tool) |

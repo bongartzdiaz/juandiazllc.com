@@ -11646,3 +11646,23 @@ de echte is, is alleen ingelogd te zien.
 **Eerder deze dag gemerged:** #406 (capaciteit, Juan bevestigde 3 van 3 vrij),
 #403 (`/pricing.md`, live 200 `text/markdown`), #404 (definitiezin, live op
 `/en/pricing`), #405 (docs).
+
+### 2026-09-22 (3) — de eerste backlink staat
+
+`bongartzdiaz/diaz-editor#687` gemerged (`8de26388`), deployment
+`dpl_HezUD9nq…`. Gemeten op productie zodra hij READY was: `diazatlas.com/about`
+draagt `<a href="https://juandiazllc.com/en/about">Juan Diaz LLC</a>` plus
+`"sameAs": "https://juandiazllc.com/en/about"` in het Organization-schema, en
+`/nl/about`, `/de/about`, `/es/about` elk één link naar hun eigen taalvariant.
+`scripts/backlink-inventory.sh`: die rij ging van 0 naar 2, de negatieve
+controle bleef 0.
+
+**Dat is de eerste link naar juandiazllc.com vanaf een ander domein, ooit.**
+De waarde is bescheiden — één domein zonder autoriteit — maar de entiteitswinst
+is echt: "Juan Diaz" op diazatlas en het `Person`-knooppunt hier zijn nu
+expliciet één ding in plaats van twee naamgenoten. Perplexity gebruikte dat
+verband vanochtend al (meting 1, vraag 2) door het impressum van diazatlas te
+lezen; nu staat het er als verklaring in plaats van als gevolgtrekking.
+
+`lucenai.eu` staat nog op 0 en is geen code: publiceren, LiteSpeed-cache legen,
+hermeten.
