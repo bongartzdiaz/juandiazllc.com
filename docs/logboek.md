@@ -12003,3 +12003,80 @@ draagt het niet; het zijn de og:description en de eerste alinea. En ik meldde de
 suite als 181/184 met drie rode; hij is nu 185/185 inclusief die drie. De
 zwervende `deno.lock` verklaart er één, de andere twee niet — niet uitgezocht,
 dus het oude getal is achterhaald en niet verklaard.
+
+### 2026-09-22 (9) — vier merges, en een casestudy-beslissing zonder cijfers
+
+**De merges.** Juan gaf ze één voor één: #624, #417, #656, #653. Alle vier
+gemeten op productie ná de merge, niet aangenomen.
+
+| PR | repo | commit | wat er bij het mergen bovenkwam |
+|---|---|---|---|
+| #624 | diaz-editor | `540b3e1b` | de uren-rekensom liep een prijswijziging achter, in drie talen |
+| #417 | juandiazllc.com | `0d45e9c2` | — (documentatie) |
+| #656 | diaz-editor | `2367aff7d` | CI draait daar niet, dus het vinkje bewees niets |
+| #653 | diaz-editor | `a9195a7d7` | de Engelse help-pagina droeg een Nederlandse CTA |
+
+**#656 — wat er in plaats van CI is gedaan.** Acht GitHub-Action-majors, 36
+workflows. Het groene vinkje op die PR was Vercel; de Actions-minuten van die
+repo zijn op, dus elke workflow faalt daar in drie seconden met nul stappen.
+Een Dependabot-PR is precies het geval waarin CI je vangnet is. In plaats
+daarvan zijn de vijf gepinde SHA's tegen de upstream-tags nagemeten —
+`actions/checkout@v7.0.1` → `3d3c42e5aac5` enzovoort, alle vijf goed, met een
+verzonnen SHA als negatieve controle. Ik had `@v7` eerst als verdacht
+aangemerkt omdat checkout bij mij op v4/v5 stond; dat was mijn kennis van vier
+maanden oud, niet de PR. De diff raakt niets buiten `.github/workflows/`.
+**Let op:** die bumps zijn vandaag inert omdat er niets draait. Ze worden pas
+live zodra de minuten terug zijn, en dat is dan de eerste run waarin een
+breaking change van drie majors tegelijk opduikt.
+
+**#653 — de poort ving een echte fout in de PR.** Het conflict had dezelfde
+vorm als bij #624: main had `data-de=` op alle regels van de 2D-help-lijst
+gezet, de tak van 31 augustus voegde er een regel aan toe. Opgelost als main
+levert de bestaande regels, de PR de nieuwe — met alleen `data-nl`, want de
+PR-titel belooft EN + NL en een conflictoplossing verzint geen Duitse kopij.
+Daarna sloeg `verify-pillar-cta-taal.mjs` aan: de **Engelse** nieuwe pagina
+droeg een Nederlands CTA-blok en linkte naar `/nl/pillar/`. Die poort is groen
+op kale main (12/12), dus de fout zat in de PR. Niets vertaald — de Engelse
+tekst stond al in `data-cta-en` en `data-cta-en-href` van het blok zelf.
+
+**Eén val onderweg, gevangen door een assertie en niet door een teller.** Mijn
+eerste versie van die reparatie zocht de link met `\bhref="`. Dat matcht óók
+binnen `data-cta-es-href="` — een koppelteken is geen woordteken, dus de
+woordgrens ligt precies vóór `href`. Het script verving het Spaanse attribuut
+in plaats van de levende link: **één vervanging, teller op 1, en toch het
+verkeerde**. Wat het ving was een assertie die controleerde dát
+`data-cta-es-href` nog wees waar het wees. Een telling zegt hoeveel er
+veranderde, nooit wát — en hier gaven die twee antwoorden een ander oordeel.
+
+**Twee probes die mij in de luren legden, allebei mijn eigen schuld.** De
+eerste poll naar de nieuwe pagina gaf vijf keer 404; er waren op dat moment 33
+seconden verstreken sinds de merge, en mijn "wachten" tussen de pogingen
+duurden niets. En `/help/` geeft **308** naar `/help`; zonder `-L` las ik de
+15-byte redirect-body en concludeerde dat de nieuwe regel én alle `data-de` uit
+de index verdwenen waren. Met redirect gevolgd: nieuwe regel op zijn plek, vier
+Duitse labels intact.
+
+**De casestudy-beslissing.** Juan: *je kan resultaten van HMB, Voltafy, SEO en
+ads ook gebruiken als casestudy's voor juandiazllc*. Genoteerd in
+`docs/claims.md` én op de operator-lijst, met één onderscheid erbij dat niet
+terug te draaien is zodra het gepubliceerd staat: **Voltafy en Help Mij
+Besparen zijn eigen ventures, geen klanten.** Ze staan zo ook in claims.md; de
+vier uitkomsten in `ResultsStrip` zijn wél klantresultaten en bewust
+geanonimiseerd. Een eigen-venture-resultaat dat als klantresultaat leest,
+suggereert klanten die er niet zijn — terwijl "dit bouwde en rankte ik zelf"
+voor een fractional operator eerder sterker is dan zwakker.
+
+**Er is geen cijfer opgeschreven, want er is er geen.** Wat er nodig is staat
+per casestudy in claims.md: het cijfer, de bron, de meetperiode, het nulpunt,
+de ingreep, en venture-of-klant. Zonder die zes is het een verzonnen getal.
+`ResultsStrip.test.ts` bewaakt al dat een gepubliceerd getal in claims.md
+staat, dus daar hoeft niets bij gebouwd te worden.
+
+Dit is bewust de omgekeerde volgorde van [[feedback_welk_document_liegt]]: toen
+stonden er vier echte klantcijfers op de site die in claims.md ontbraken en
+haalde ik ze weg in plaats van te vragen. Nu eerst de vraag, dan de kopij.
+
+**Het diaz-editor-blok op de operator-lijst is herschreven, niet aangevuld.**
+Er lagen drie lagen doorhalingen overheen. De kop van die lijst waarschuwt
+precies daarvoor — *aanvullen is goedkoper dan herzien, en zo zijn die vijf
+ontstaan* — dus de stand staat er nu, en de geschiedenis hier.

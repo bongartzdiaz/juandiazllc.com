@@ -852,40 +852,39 @@ repo horen.
   berichten-endpoint. De regel die hij bewaakt — geen geautomatiseerde
   connectieverzoeken of DM's — is ongewijzigd juist. Het bestand staat buiten elke
   repo en wordt niet aangeraakt zonder jouw expliciete go.
-- ~~**Vier PR's in `bongartzdiaz/diaz-editor` wachten op jouw merge: #652,
-  #653, #654 en #655.**~~ **Het is er één, en er staan er drie andere open.**
-  Gemeten op 2026-09-22: #652 (`fa86f410`), #654 (`c843db65`) en #655
-  (`77a25563`) zijn op **2026-09-04** gemerged, binnen twee minuten van elkaar.
-  Alleen **#653** (help: DXF aanleveren aan onderaannemers, EN + NL) staat nog
-  open, sinds 31 augustus.
+- **In `bongartzdiaz/diaz-editor` staat nog één PR open: #639** (weekrapport
+  W34, 24 augustus). Die is **niet door mergen te sluiten** — zijn eigen body
+  zegt *data pending*, want er is geen read-connector. Mergen publiceert een
+  leeg rapport.
 
-  Ongenoemd op deze lijst en ook open: ~~**#624**~~ **gemerged 2026-09-22**
-  (`540b3e1b`), **#639** (weekrapport W34, wacht op een read-connector — 24
-  augustus) en **#656** (Dependabot, acht action-updates — 1 september).
+  **Zes andere zijn gesloten, vier daarvan op 2026-09-22.** #652 (`fa86f410`),
+  #654 (`c843db65`) en #655 (`77a25563`) waren al op 2026-09-04 gemerged — de
+  lijst zei tot 22 september dat ze wachtten. Op 2026-09-22 kwamen erbij:
+  **#624** (`540b3e1b`), **#656** (`2367aff7d`) en **#653** (`a9195a7d7`).
 
-  **#624 droeg twee dingen.** De accenten waarvoor hij in augustus was geopend
-  (twee Spaanse pillars stonden zonder accenten live, ook in title, meta en
-  JSON-LD), plus een reparatie die bij het oplossen van het conflict bovenkwam:
-  de **uren-rekensom liep een prijswijziging achter, in drie talen**. De
-  herijking van 2026-08-22 bracht twintig bestanden op één AutoCAD-prijs en
-  `verify-concurrentprijzen.mjs` bewaakt dat — maar drie pillars rekenen die
-  prijs óók om naar werkuren, en die afgeleide bleef op de oude prijs staan:
-  ES 43 i.p.v. 48 (1.715/40), NL 31 en 30 i.p.v. 35, DE 30 i.p.v. 32. Telkens
-  in de og:description en de eerste alinea, terwijl de tabel en het FAQ-schema
-  op diezelfde pagina het juiste getal droegen. Gesloten met een poort die de
-  uitkomst uit prijs ÷ tarief afleidt (`verify-uren-rekensom.mjs`, tien
-  mutaties). Gemeten op productie in drie talen, met negatieve controles.
+  | PR | wat het droeg | wat er bij het mergen bovenkwam |
+  |---|---|---|
+  | #624 | accenten op twee Spaanse pillars | de **uren-rekensom liep een prijswijziging achter, in drie talen** |
+  | #656 | acht GitHub-Action-majors | CI draait daar niet, dus het groene vinkje bewees niets — de vijf gepinde SHA's zijn tegen de upstream-tags nagemeten |
+  | #653 | DXF-help EN + NL | de **Engelse** pagina droeg een Nederlandse CTA en linkte naar `/nl/pillar/` |
 
-  ~~In die repo merget deze sessie niet.~~ **Die regel staat nog, met één
-  uitzondering die op 2026-09-22 is gebruikt: een expliciete opdracht van Juan
-  ("merge #624") gaat erboven.** De regel blijft dus de standaard — een sessie
-  merget daar niet uit zichzelf — maar ze is geen weigering wanneer jij het
-  vraagt.
-  **Gemeten op 2026-09-03, want dit bestand had het elders mis:** #659 is
-  **gemerged** (`64ccd0d5`, 2026-09-02 15:29 UTC) en #647 is **gesloten
-  zonder merge**. De sessielog-instructie om de basis van #647 naar `main`
-  te verzetten is daarmee vervallen; logboekgeschiedenis wordt niet
-  herschreven, dus dit blok is de correctie erop.
+  **De vondst onder #624 is de belangrijkste van de drie.** De herijking van
+  2026-08-22 bracht twintig bestanden op één AutoCAD-prijs en
+  `verify-concurrentprijzen.mjs` bewaakt dat sindsdien — maar drie pillars
+  rekenen die prijs óók om naar werkuren, en die afgeleide bleef op de oude
+  prijs staan: ES 43 i.p.v. 48 (= 1.715/40), NL 31 en 30 i.p.v. 35, DE 30
+  i.p.v. 32. Telkens in de og:description en de eerste alinea, terwijl de tabel
+  en het FAQ-schema op diezelfde pagina het juiste getal droegen. **Een
+  bewaakte invoer zegt niets over een onbewaakte uitkomst.** Gesloten met
+  `verify-uren-rekensom.mjs`, die de uitkomst uit prijs ÷ tarief afleidt in
+  plaats van een getal vast te pinnen; tien mutaties, waarvan er twee een fout
+  in die poort zelf aanwezen. Alle drie gemeten op productie, met negatieve
+  controles.
+
+  **Over mergen in die repo.** De vuistregel is dat een sessie daar niet uit
+  zichzelf merget; een expliciete opdracht van jou gaat erboven, en dat is op
+  2026-09-22 drie keer gebeurd. De regel is dus geen weigering — hij bepaalt
+  alleen wie begint.
 - **De `supabase`-CLI op deze machine is ingelogd als
   `roy.raainvestments@gmail.com`.** Gemeten op 2026-08-26 via `supabase projects
   list`: zestien projecten over vijf organisaties, en **noch `vbozelswveaxsyccvaac`
@@ -894,6 +893,46 @@ repo horen.
   defect maar een verkeerd account. De MCP-verbinding heeft die rechten wél, dus
   uitrollen kan daarlangs. Wil je het zelf via de CLI doen, dan moet je eerst als
   jezelf inloggen, en dat **vervangt Roy's opgeslagen token** op deze machine.
+
+### 2026-09-22 — HMB- en Voltafy-resultaten als casestudy: de cijfers ontbreken
+
+Juan: *je kan resultaten van HMB, Voltafy, SEO en ads ook gebruiken als
+casestudy's voor juandiazllc*. Dat is een beslissing, en hij is genoteerd in
+`docs/claims.md`. Wat hem tegenhoudt is dat de cijfers hier niet bestaan.
+
+**Eén onderscheid dat vooraf vastligt, want het is niet terug te draaien zodra
+het gepubliceerd staat.** Voltafy en Help Mij Besparen zijn **eigen ventures**,
+geen klanten — zo staan ze ook in `docs/claims.md` ("Ventures named as live").
+De vier bestaande uitkomsten op de homepage zijn wél klantresultaten, bewust
+geanonimiseerd. Die twee soorten mogen niet door elkaar lopen: een
+eigen-venture-resultaat dat als klantresultaat leest, suggereert klanten die er
+niet zijn, en dat is precies wat regel 1 van `claims.md` moet voorkomen. Een
+casestudy over een eigen venture is sterk genoeg op eigen benen — "dit bouwde
+en draaide ik zelf" is een andere claim dan "dit deed ik voor een klant", niet
+een zwakkere.
+
+**Wat er per casestudy nodig is voordat er één regel kopij geschreven wordt.**
+Zonder deze vijf is het een verzonnen getal, en verzonnen getallen zijn precies
+waarvoor dit dossier bestaat:
+
+1. **het cijfer zelf** en waar het vandaan komt (Search Console, Plausible,
+   GA4, de advertentiebeheerder, een Supabase-query);
+2. **de meetperiode**, begin- en einddatum;
+3. **het nulpunt** — waartegen is het een verbetering;
+4. **wat er precies is gedaan** in die periode, want zonder ingreep is het
+   geen casestudy maar een grafiek;
+5. **eigen venture of klant**, expliciet.
+
+**Wat er daarna gebeurt.** De rij `Revenue figures, testimonials, named
+customers, customer counts | ❌ none exist` in `docs/claims.md` moet dan
+bijgesteld worden, en `components/sections/ResultsStrip.test.ts` bewaakt al dat
+een gepubliceerd getal in dat bestand staat. Die poort wordt hier dus niet
+opnieuw gebouwd — hij dekt dit al, zolang de cijfers erin komen te staan.
+
+**Blokkade: de cijfers.** Lever ze aan zoals hierboven, dan is de kopij een
+kwestie van schrijven. Zie [[feedback_welk_document_liegt]]: toen stonden er
+vier echte klantcijfers op de site die in `claims.md` ontbraken, en ik haalde
+ze weg in plaats van te vragen. Daarom deze keer eerst de vraag.
 
 ### LinkedIn — het kanaal is gekozen, het profiel wacht
 
