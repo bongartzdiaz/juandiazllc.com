@@ -457,6 +457,42 @@ verified by breaking them.
 **Consequence for future edits.** Adding a card, or changing a number, means
 adding the row here first. That is the whole point.
 
+### Casestudy's uit eigen ventures — beslist 2026-09-22
+
+**Beslist door Juan op 2026-09-22:** resultaten uit Help Mij Besparen en
+Voltafy — SEO en advertenties — mogen als casestudy op juandiazllc.com.
+
+**Dit zijn eigen ventures, geen klanten.** Ze staan hierboven als *"Ventures
+named as live"*, en de vier uitkomsten in `ResultsStrip` zijn iets anders: die
+komen uit klantopdrachten en zijn bewust geanonimiseerd. Die twee soorten mogen
+niet door elkaar lopen. Een eigen-venture-resultaat dat als klantresultaat
+leest, suggereert klanten die er niet zijn — en de rij hierboven zegt
+uitdrukkelijk dat er geen genoemde klanten of klantaantallen bestaan.
+
+Dat is geen beperking maar een positionering: *"dit bouwde, rankte en
+adverteerde ik zelf"* is een andere claim dan *"dit deed ik voor een klant"*,
+en voor een fractional operator is de eerste eerder sterker dan zwakker. Het
+moet alleen als zodanig gelabeld staan.
+
+**Wat er per casestudy in dit bestand komt te staan voordat er kopij is:**
+
+| veld | waarom |
+| --- | --- |
+| het cijfer | — |
+| de bron | Search Console, Plausible, GA4, de advertentiebeheerder, een query |
+| de meetperiode | begin- en einddatum, geen "recent" |
+| het nulpunt | waartegen is het een verbetering |
+| de ingreep | zonder ingreep is het een grafiek, geen casestudy |
+| venture of klant | expliciet, en zichtbaar in de kopij |
+
+**Stand op 2026-09-22: geen van die cijfers is hier bekend.** De beslissing is
+genomen, het dossier is leeg. Tot het gevuld is kan er geen casestudy
+gepubliceerd worden, en dat is het hele punt van regel 1.
+
+`components/sections/ResultsStrip.test.ts` bewaakt al dat een gepubliceerd
+getal in dit bestand staat; daar hoeft voor deze beslissing niets bij gebouwd
+te worden, zolang de cijfers hier landen vóór ze op een pagina landen.
+
 ### Wat de diagnosesprint oplevert — beslist 2026-08-22
 
 Tot deze datum beschreef de site de sprint van dertig dagen alleen als een
