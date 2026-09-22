@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { join } from "node:path";
-import { zonderCommentaar } from "@/lib/bronscan";
+import { leesBron, zonderCommentaar } from "@/lib/bronscan";
 
 // Vijf pagina's serveerden hun inhoud en toonden hem niet: /nl/work,
 // /nl/services, /nl/sectors, /nl/insights en /nl/signals, in alle vier de
@@ -41,7 +41,7 @@ const CSS_PAD = join(WORTEL, "app", "globals.css");
 const LAYOUT_PAD = join(WORTEL, "app", "layout.tsx");
 
 function lees(pad: string): string {
-  return readFileSync(pad, "utf8").replace(/\r\n/g, "\n");
+  return leesBron(pad).replace(/\r\n/g, "\n");
 }
 
 const RUW = lees(EFFECTS_PAD);

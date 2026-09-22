@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
+import { readdirSync, statSync, existsSync } from "node:fs";
 import { join, relative, sep } from "node:path";
-import { zonderCommentaar } from "./bronscan";
+import { leesBron, leesBronZonderCommentaar, zonderCommentaar } from "./bronscan";
 
 /* ─────────────────────────────────────────────────────────────
    `window.plausible` mag nooit als functie worden aangenomen.
@@ -64,8 +64,8 @@ function bronBestanden(map: string, uit: string[] = []): string[] {
 
 const BRONNEN = MAPPEN.flatMap((m) => bronBestanden(join(WORTEL, m))).map((pad) => ({
   naam: relative(WORTEL, pad).split(sep).join("/"),
-  ruw: readFileSync(pad, "utf8"),
-  code: zonderCommentaar(readFileSync(pad, "utf8")),
+  ruw: leesBron(pad),
+  code: leesBronZonderCommentaar(pad),
 }));
 
 /** Elk bestand dat `window.plausible` in scriptvorm aanroept, met de reden.

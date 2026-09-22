@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { zonderCommentaar } from "./bronscan";
+import { leesBron, zonderCommentaar } from "./bronscan";
 
 /* Gate: de typescript-pin en zijn reden blijven bij elkaar.
  *
@@ -39,7 +39,7 @@ const MAPPEN = ["app", "components", "lib", "scripts"];
 const IMPORT_TS = /(?:^|\n)\s*import\s+[^\n;]*\bfrom\s*["']typescript["']/;
 
 function lees(rel: string): string {
-  return readFileSync(join(WORTEL, rel), "utf8");
+  return leesBron(join(WORTEL, rel));
 }
 
 function bronBestanden(map: string): string[] {

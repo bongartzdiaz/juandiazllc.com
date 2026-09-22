@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { DICT, LOCALES, type Locale } from "./dict";
+import { leesBron } from "@/lib/bronscan";
 
 /* Gate: elke ingang naar een gesprek heet overal hetzelfde.
  *
@@ -98,7 +99,7 @@ function eersteStapLinks(): Link[] {
   const sleutel = /(?:\bt|translate)\(\s*(?:l\s*,\s*)?"([a-z][a-zA-Z0-9._]*)"/;
 
   for (const bestand of BESTANDEN) {
-    const bron = readFileSync(join(WORTEL, bestand), "utf8");
+    const bron = leesBron(join(WORTEL, bestand));
     for (const m of bron.matchAll(href)) {
       const na = bron.slice(m.index! + m[0].length);
       const eindes = [na.indexOf("</LocaleLink>"), na.indexOf("</a>")].filter((i) => i >= 0);

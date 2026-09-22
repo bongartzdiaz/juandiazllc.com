@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs'
+import { readdirSync, statSync, existsSync } from 'node:fs'
 import { join, sep } from 'node:path'
-import { zonderCommentaar } from './bronscan'
+import { leesBron, leesBronZonderCommentaar, zonderCommentaar } from './bronscan'
 
 /* ─────────────────────────────────────────────────────────────
    `.env.example` moet zeggen wat de code werkelijk leest.
@@ -53,7 +53,7 @@ const bestanden = [...MAPPEN.flatMap((m) => bronBestanden(m)), ...LOSSE.filter(e
     en dat is geen variabele. */
 const gelezen = new Map<string, string[]>()
 for (const pad of bestanden) {
-  const bron = zonderCommentaar(readFileSync(pad, 'utf8'))
+  const bron = leesBronZonderCommentaar(pad)
   for (const m of bron.matchAll(/process\.env\.([A-Z_][A-Z0-9_]*)/g)) {
     const lijst = gelezen.get(m[1]) ?? []
     if (!lijst.includes(pad)) lijst.push(pad)
@@ -62,7 +62,7 @@ for (const pad of bestanden) {
 }
 
 const voorbeeld = new Set(
-  [...readFileSync('.env.example', 'utf8').matchAll(/^([A-Z_][A-Z0-9_]*)=/gm)].map((m) => m[1]),
+  [...leesBron('.env.example').matchAll(/^([A-Z_][A-Z0-9_]*)=/gm)].map((m) => m[1]),
 )
 
 describe('.env.example tegenover de code', () => {
@@ -95,7 +95,7 @@ describe('.env.example tegenover de code', () => {
     // vinden. Voor NEXT_PUBLIC_* is het bovendien een echt defect, want Next
     // vervangt alleen letterlijke uitdrukkingen bij het bouwen.
     const overtreders = bestanden.filter((pad) =>
-      zonderCommentaar(readFileSync(pad, 'utf8')).includes('process.env['),
+      leesBronZonderCommentaar(pad).includes('process.env['),
     )
     expect(overtreders, 'leest env via bracket-toegang').toEqual([])
   })

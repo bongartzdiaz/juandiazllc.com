@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
-import { zonderCommentaar } from "../lib/bronscan";
+import { leesBron, leesBronZonderCommentaar, zonderCommentaar } from "../lib/bronscan";
 import { LOCALES } from "../lib/i18n/dict";
 import { AUTHOR_IMAGE_URL, ogImages, twitterImages } from "../lib/seo/branding";
 
@@ -62,7 +62,7 @@ const ROUTES = deelkaartRoutes(join(WORTEL_DIR, "app"))
   .sort();
 
 const BRON = new Map(
-  ROUTES.map((r) => [r, zonderCommentaar(readFileSync(join(WORTEL_DIR, r), "utf8"))]),
+  ROUTES.map((r) => [r, leesBronZonderCommentaar(join(WORTEL_DIR, r))]),
 );
 
 /* Een route "neemt params" zodra hij het woord in zijn code noemt. Afgeleid,
@@ -81,7 +81,7 @@ function tsxBronnen(dir: string): Array<{ pad: string; bron: string }> {
     return [
       {
         pad: relative(WORTEL_DIR, pad).split(sep).join("/"),
-        bron: readFileSync(pad, "utf8"),
+        bron: leesBron(pad),
       },
     ];
   });

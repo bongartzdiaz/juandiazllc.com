@@ -11803,3 +11803,74 @@ Wie hier weer tegenaan loopt: het is geen defect op `main`. Zet de scratchmap
 buiten de repo of draai met een hogere `testTimeout`. Zie
 [[feedback_verify_the_measuring_stick]] — een rode suite die per run iets
 anders meldt, meet de machine en niet de code.
+
+### 2026-09-22 (6) — de testtimeouts: mijn verklaring van blok (5) was fout
+
+Juan: *fix the diaz-editor-gtm timeout issue.*
+
+**Eerst de correctie, want die staat gemerged op `main`.** Blok (5) hierboven
+zegt dat `main` rood leek omdat `diaz-editor-gtm/` met 10.668 ongetrackte
+bestanden in de wortel staat en de repo-brede scanners daar doorheen lopen. Dat
+klopt niet, in twee richtingen nagemeten:
+
+| gemeten | uitkomst |
+|---|---|
+| de wortels van alle 20 wandelende poorten | `join(WORTEL, <map>)` met map ∈ {app, components, lib, scripts} — **nooit de repo-wortel** |
+| `_3dcap/**`, `diaz-editor-gtm/**`, `migrations-review/**` toevoegen aan vitests `exclude` | collectie 2489/2640/2693 ms ónveranderd tegen 2981/3009/3451 ms **mét** de uitsluiting — geen winst |
+| de 159 `*.test.ts` in die mappen | alle 159 onder `node_modules`, dus al uitgesloten; er worden 95 testbestanden verzameld, zoals verwacht |
+| drie volle runs op een stille machine, standaardgrens | **3× groen, 1739 tests** — de flakiness reproduceert niet |
+| drie gelijktijdige `npx vitest run` | **1 faler** — en dáár is hij |
+
+De scratchmap raakt de poorten dus niet. Wat er wel aan de hand was: CPU-druk
+tegen een grens die niemand gekozen heeft.
+
+**De echte oorzaak, en hij zat in de poorten zelf.** Veertien poorten lopen de
+bronboom af en zoeken de broncode door als tekst. De wándeling staat in de
+meeste al op modulniveau en gebeurt dus één keer; het **lezen** niet. Dat staat
+in een hulpfunctie die per `it()` wordt aangeroepen, dus bij twee tests gingen
+dezelfde 244 bestanden (2,0 MiB) twee keer van schijf, bij vier tests vier keer.
+Gemeten: wandelen kost 23,2 ms, lezen 149,4 ms. De zwaarste test stond op
+1666 ms tegen een standaard van 5000 ms — drie keer marge, genoeg voor een
+stille machine en niet genoeg voor een bezette.
+
+**Twee sloten, en het tweede is niet overbodig — dat is nagemeten.**
+
+1. `leesBron` en `leesBronZonderCommentaar` in `lib/bronscan.ts`: één lezing per
+   pad per proces. Toegepast op alle 20 wandelende poorten (53 leesplekken).
+   De traagste test gaat van 1666 ms naar **670 ms**.
+2. Een expliciete `testTimeout: 20000` in `vitest.config.ts`, met de meting in
+   de toelichting ernaast.
+
+| | 5000 ms | deze grens |
+|---|---|---|
+| 3 gelijktijdige runs | vóór: 1 faler · **ná: 3× groen** | — |
+| 6 gelijktijdige runs | **29 timeouts over 6 runs** | **6× groen, 0 timeouts** |
+
+De lezing verlegt de drempel dus van drie naar ergens tussen drie en zes; ze
+haalt hem niet weg. Wie alleen slot 1 had gelezen en de zesvoudige run nooit
+had gedraaid, had opgeschreven dat het opgelost was.
+
+**De poort erop: `lib/bronscan-lezen.test.ts`, vijf controles.** Dat `leesBron`
+werkelijk onthoudt (bewezen door het bestand te verwijderen tussen twee
+aanroepen — in de tijdelijke map van het OS, nooit in de repo), dat geen enkele
+wandelende poort nog rechtstreeks met `readFileSync(…, 'utf8')` leest, en dat
+de `testTimeout` expliciet blijft staan. Vier mutaties, vier keer rood: grens
+weg, memoisatie weg, en twee keer een rechtstreekse lezing teruggezet.
+
+**Die mutatietest ving twee fouten in de poort zelf, en dat is het punt ervan.**
+De eerste versie van de regex was `readFileSync\([^)]*['"]utf-?8['"]`, en die
+breekt af op het sluithaakje van `join(` — dus
+`readFileSync(join(WORTEL, pad), "utf8")` kwam er ongezien doorheen, precies de
+vorm die in deze repo voorkomt. Met de verruimde regex vielen er meteen **twee
+plekken uit die mijn eigen omzetting had gemist**: de meerregelige aanroepen in
+`kale-tekst.test.ts:449` en `lekkage-scan.test.ts:425`, waar `"utf8",` met een
+komma erachter staat. En de poort wees **zichzelf** aan, want haar regex draagt
+de tekst waarop hij matcht — dezelfde val als
+[[feedback_assert_niet_door_het_vangnet]].
+
+Eindstand: **96 bestanden, 1744 tests, groen**, typecheck schoon.
+
+**Wat hier niet is gedaan.** De scratchmappen staan nog in de repo-wortel. Ze
+kosten de poorten niets, dus verplaatsen is opruimwerk en geen reparatie — en
+een ongetrackte werkmap verplaatsen is Juans beslissing, niet die van een
+sessie.

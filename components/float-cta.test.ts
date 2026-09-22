@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { join } from "node:path";
-import { zonderCommentaar } from "@/lib/bronscan";
+import { leesBron, zonderCommentaar } from "@/lib/bronscan";
 
 // De zwevende boekknop, gerepareerd op 2026-09-03. Zusterpoort van
 // components/reveal.test.ts: zelfde klasse, een laag dieper.
@@ -38,7 +38,7 @@ const CSS_PAD = join(WORTEL, "app", "globals.css");
 const LAYOUT_PAD = join(WORTEL, "app", "[locale]", "layout.tsx");
 
 function lees(pad: string): string {
-  return readFileSync(pad, "utf8").replace(/\r\n/g, "\n");
+  return leesBron(pad).replace(/\r\n/g, "\n");
 }
 
 const RUW = lees(EFFECTS_PAD);

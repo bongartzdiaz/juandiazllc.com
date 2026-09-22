@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs'
+import { readdirSync, statSync, existsSync } from 'node:fs'
 import { join, sep } from 'node:path'
-import { zonderCommentaar } from './bronscan'
+import { leesBron, leesBronZonderCommentaar, zonderCommentaar } from './bronscan'
 
 /* ─────────────────────────────────────────────────────────────
    De gedocumenteerde doelen moeten zijn wat de code werkelijk afvuurt.
@@ -63,7 +63,7 @@ function doelenUitCode(): { klasse: Set<string>; script: Set<string> } {
   const script = new Set<string>()
   for (const map of MAPPEN) {
     for (const pad of bronBestanden(join(WORTEL, map))) {
-      const bron = zonderCommentaar(readFileSync(pad, 'utf8'))
+      const bron = leesBronZonderCommentaar(pad)
       for (const m of bron.matchAll(VIA_KLASSE)) klasse.add(m[1].replace(/\+/g, ' '))
       for (const m of bron.matchAll(VIA_SCRIPT)) script.add(m[1])
     }
@@ -75,7 +75,7 @@ function doelenUitCode(): { klasse: Set<string>; script: Set<string> } {
     Ontbreekt een markering, dan gooit dit — een parser die stil de eerste of
     geen treffer pakt, publiceert een verouderde lijst zonder het te melden. */
 function doelenUitDocumentatie(): string[] {
-  const tekst = readFileSync(join(WORTEL, 'MANUAL_TASKS.md'), 'utf8')
+  const tekst = leesBron(join(WORTEL, 'MANUAL_TASKS.md'))
   const START = 'deze namen **exact** overnemen'
   const EIND = '**Vergeet de custom properties niet.**'
   for (const [naam, mark] of [['START', START], ['EIND', EIND]] as const) {
@@ -121,7 +121,7 @@ describe('Plausible-doelen: code en documentatie zeggen hetzelfde', () => {
   it('elk doel staat ook in de operator-lijst in CLAUDE.md', () => {
     // CLAUDE.md is wat een volgende sessie leest. Staat een doel alleen in
     // MANUAL_TASKS.md, dan komt het niet op de lijst die de operator afwerkt.
-    const claude = readFileSync(join(WORTEL, 'CLAUDE.md'), 'utf8')
+    const claude = leesBron(join(WORTEL, 'CLAUDE.md'))
     const ontbreekt = [...inCode].filter((d) => !claude.includes(`\`${d}\``)).sort()
     expect(ontbreekt, 'niet in de canonieke operator-lijst').toEqual([])
   })
@@ -129,8 +129,8 @@ describe('Plausible-doelen: code en documentatie zeggen hetzelfde', () => {
   it('CLAUDE.md en AGENTS.md dragen dezelfde lijst', () => {
     // `docs-sync` bewaakt byte-gelijkheid van het hele bestand; deze assertie
     // faalt met een leesbare reden in plaats van een kale diff.
-    const a = readFileSync(join(WORTEL, 'CLAUDE.md'), 'utf8')
-    const b = readFileSync(join(WORTEL, 'AGENTS.md'), 'utf8')
+    const a = leesBron(join(WORTEL, 'CLAUDE.md'))
+    const b = leesBron(join(WORTEL, 'AGENTS.md'))
     for (const doel of inCode) {
       expect(a.split(`\`${doel}\``).length, `${doel} in CLAUDE.md`).toBe(
         b.split(`\`${doel}\``).length,
@@ -250,7 +250,7 @@ function eigenschappenUitCode(): Vondst {
 
   for (const map of MAPPEN) {
     for (const pad of bronBestanden(join(WORTEL, map))) {
-      const bron = zonderCommentaar(readFileSync(pad, 'utf8'))
+      const bron = leesBronZonderCommentaar(pad)
 
       for (const m of bron.matchAll(KLASSE_MET_PROPS)) {
         const set = zorgVoor(m[1].replace(/\+/g, ' '))
@@ -281,7 +281,7 @@ function eigenschappenUitCode(): Vondst {
     anders telt een backticked WAARDE (`energy-roi`, `unknown`) als naam mee.
     Een assertie hieronder pint die conventie vast. */
 function eigenschappenUitDocumentatie(): { perDoel: Map<string, string[]>; proza: string } {
-  const tekst = readFileSync(join(WORTEL, 'MANUAL_TASKS.md'), 'utf8')
+  const tekst = leesBron(join(WORTEL, 'MANUAL_TASKS.md'))
   const START = '**Vergeet de custom properties niet.**'
   const EIND = 'Zonder die stap zie je'
   for (const [naam, mark] of [['START', START], ['EIND', EIND]] as const) {
@@ -310,7 +310,7 @@ function eigenschappenUitDocumentatie(): { perDoel: Map<string, string[]>; proza
     logboekblokken verderop zeggen "drie custom properties" en die mogen niet
     meetellen, want logboekgeschiedenis wordt hier niet herschreven. */
 function eigenschappenUitOperatorLijst(bestand: string): string[] {
-  const tekst = readFileSync(join(WORTEL, bestand), 'utf8')
+  const tekst = leesBron(join(WORTEL, bestand))
   const MARK = 'custom properties ('
   const n = tekst.split(MARK).length - 1
   if (n !== 1) {
@@ -389,7 +389,7 @@ describe('Plausible-eigenschappen: code, MANUAL_TASKS.md en CLAUDE.md zeggen het
   })
 
   it('CLAUDE.md draagt dezelfde eigenschappen, met hetzelfde telwoord', () => {
-    const claude = readFileSync(join(WORTEL, 'CLAUDE.md'), 'utf8')
+    const claude = leesBron(join(WORTEL, 'CLAUDE.md'))
     expect(eigenschappenUitOperatorLijst('CLAUDE.md')).toEqual([...alleNamen].sort())
     expect(claude, 'telwoord in de meetketen').toContain(
       `de ${woord(alleNamen.size)} custom properties (`,

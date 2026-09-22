@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs'
+import { readdirSync, existsSync, statSync } from 'node:fs'
 import { join, sep } from 'node:path'
-import { zonderCommentaar } from '../bronscan'
+import { leesBron, leesBronZonderCommentaar, zonderCommentaar } from '../bronscan'
 import { DICT, LOCALES } from './dict'
 
 /* ─────────────────────────────────────────────────────────────
@@ -50,7 +50,7 @@ function actieBestanden(): string[] {
 }
 
 function bron(naam: string): string {
-  return zonderCommentaar(readFileSync(join(ACTIES, naam), 'utf8'))
+  return leesBronZonderCommentaar(join(ACTIES, naam))
 }
 
 /** Importeert deze bron `app/actions/<stam>`, statisch of dynamisch?
@@ -74,7 +74,7 @@ function afnemersVan(stam: string): string[] {
   return ['app', 'components', 'lib']
     .flatMap((m) => alleBronnen(join(WORTEL, m)))
     .filter((p) => !p.includes('/app/actions/'))
-    .filter((p) => importeertActie(zonderCommentaar(readFileSync(p, 'utf8')), stam))
+    .filter((p) => importeertActie(leesBronZonderCommentaar(p), stam))
     .map((p) => p.slice(wortel.length + 1))
 }
 
@@ -156,7 +156,7 @@ describe('server actions antwoorden in de taal van de bezoeker', () => {
     const zonderVeld: string[] = []
     for (const stam of taalbewust) {
       for (const afnemer of afnemersVan(stam)) {
-        const markup = readFileSync(join(WORTEL, afnemer), 'utf8')
+        const markup = leesBron(join(WORTEL, afnemer))
         if (!/name=["']locale["']/.test(markup)) zonderVeld.push(`${afnemer} -> ${stam}`)
       }
     }

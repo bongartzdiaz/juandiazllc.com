@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
+import { leesBron } from "@/lib/bronscan";
 
 /* Conventiegate: marketingcode gebruikt LocaleLink, niet next/link.
  *
@@ -51,7 +52,7 @@ describe("marketingcode linkt via LocaleLink", () => {
   it("geen enkel bestand importeert next/link buiten de uitzonderingen", () => {
     const overtreders = BESTANDEN.filter((p) => {
       if (p in UITZONDERINGEN) return false;
-      return /from "next\/link"/.test(readFileSync(join(WORTEL, p), "utf8"));
+      return /from "next\/link"/.test(leesBron(join(WORTEL, p)));
     });
     expect(overtreders, `gebruik LocaleLink in: ${overtreders.join(", ")}`).toEqual([]);
   });
@@ -61,7 +62,7 @@ describe("marketingcode linkt via LocaleLink", () => {
     // lijst stilletjes uit tot hij de gate uitholt.
     for (const [pad, reden] of Object.entries(UITZONDERINGEN)) {
       expect(BESTANDEN, `${pad} bestaat niet meer — haal de uitzondering weg`).toContain(pad);
-      expect(readFileSync(join(WORTEL, pad), "utf8"), `${pad} (${reden})`).toMatch(/from "next\/link"/);
+      expect(leesBron(join(WORTEL, pad)), `${pad} (${reden})`).toMatch(/from "next\/link"/);
     }
   });
 });

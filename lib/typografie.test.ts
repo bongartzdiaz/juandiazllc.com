@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
+import { leesBron } from "@/lib/bronscan";
 
 /* Typografische aanhalingstekens horen niet in de bron.
  * ───────────────────────────────────────────────────────────────────────────
@@ -95,7 +96,7 @@ const BRONNEN = MAPPEN.flatMap((m) => bestanden(join(WORTEL, m))).map((p) =>
 function treffers(paden: string[], tekens: string[]): string[] {
   const uit: string[] = [];
   for (const pad of paden) {
-    const regels = readFileSync(join(WORTEL, pad), "utf8").split("\n");
+    const regels = leesBron(join(WORTEL, pad)).split("\n");
     regels.forEach((regel, i) => {
       if (tekens.some((k) => regel.includes(k))) {
         uit.push(`${pad}:${i + 1}  ${regel.trim().slice(0, 90)}`);
