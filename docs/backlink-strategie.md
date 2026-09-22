@@ -72,27 +72,43 @@ Daarom per site **één redactionele plek** (about-pagina, colofon, auteursblok)
 staat — de naam, of het bedrijf, niet "revenue operations consultant". Minder
 links die kloppen slaan meer links die dat niet doen.
 
-### 1.1 De vier die vandaag kunnen, op volgorde
+### 1.1 Nog één, en het waren er vier
+
+**Ingeperkt door Juan op 2026-09-22: alleen `juandiazllc.com` en
+`diazatlas.com`.** Rij 3 en 4 hieronder zijn daarmee vervallen — ze staan er
+nog, doorgehaald, omdat een geschrapte optie die spoorloos verdwijnt over een
+maand opnieuw wordt voorgesteld. Het paar staat: diazatlas → juandiazllc sinds
+`diaz-editor#687`, de tegenrichting sinds `#409`, en beide kanten zijn op
+productie gemeten.
+
+Wat daarmee ook vervalt: het auteurssignaal uit rij 3 (twee contentsites in de
+energiesector onder één auteursnaam). Dat was de sterkste kaart van deze laag
+en hij wordt niet gespeeld. De entiteitswinst die overblijft komt uit het paar
+zelf plus `lucenai.eu`, en die is kleiner — zie §1.2.
+
 
 | # | waar | wat | naar | eigenaar | kost |
 |---|---|---|---|---|---|
 | 1 | `lucenai.eu/about` | de naam "Juan Stefan Bongartz Diaz" linken | `https://juandiazllc.com/en/about` | operator, WordPress | 1 minuut. Staat al als stap 4 in `docs/lucenai-backlinks.md` §3 |
 | 2 | ~~`diazatlas.com/about`~~ **gedaan 2026-09-22** (`diaz-editor#687`): vier about-pagina's, elk naar de eigen taalvariant, plus `founder.sameAs` | `https://juandiazllc.com/<taal>/about` | — | — |
-| 3 | `salderingsregeling2027.nl`, `besparenbelgie.online` | een **auteursblok** onder elk artikel: naam + één zin + link | `https://juandiazllc.com/nl/about` | die repo's | 1 component per site |
-| 4 | `voltafy.nl`, `performancetracker.nl` | "Gebouwd door Juan Diaz LLC" in het colofon of op de about-pagina | `https://juandiazllc.com/nl/about` (of `/en/`) | die repo's | 1 regel per site |
+| ~~3~~ | ~~`salderingsregeling2027.nl`, `besparenbelgie.online`~~ | ~~auteursblok onder elk artikel~~ | — | **vervallen 2026-09-22** | — |
+| ~~4~~ | ~~`voltafy.nl`, `performancetracker.nl`~~ | ~~colofonregel~~ | — | **vervallen 2026-09-22** | — |
 
-Rij 3 is meer dan een link. Een auteursblok op twee contentsites in de
-energiesector is een **auteurssignaal**: dezelfde persoon, met dezelfde
-naamvormen als in `lib/seo/branding.ts` (`PERSON_ALTERNATE_NAMES`), verbonden
-aan artikelen over salderen en besparen. Dat is E-E-A-T waar een crawler het
-kan zien, en het is de reden dat `/about` het doeladres is en niet de home:
-`/about#juan` is het `Person`-knooppunt in het schema.
+De reden dat `/about` het doeladres is en niet de home, geldt onverkort voor
+rij 1: `/about#juan` is het `Person`-knooppunt in het schema, en dat is waar
+een crawler de naamvormen uit `lib/seo/branding.ts` (`PERSON_ALTERNATE_NAMES`)
+aan één persoon knoopt.
 
-**Wat niet zonder te vragen mag: `helpmijbesparen.nl`.** Dat is een klant.
-Een "gebouwd door"-regel in de voet is gangbaar, maar het is hún site en hún
-beslissing. Vragen, niet zetten.
+**`helpmijbesparen.nl` stond hier als "vragen, niet zetten" en valt nu ook
+buiten de inperking.** Het is een klant van Kompas Agency; de vraag is niet
+gesteld en hoeft niet gesteld te worden.
 
 ### 1.2 Wat deze laag oplevert, eerlijk
+
+**Na de inperking van 2026-09-22 zijn het er twee**, niet vier tot zes: het
+paar juandiazllc ↔ diazatlas, plus `lucenai.eu` zodra die gepubliceerd is. De
+alinea hieronder beschreef de oude omvang en blijft staan omdat de redenering
+erin niet verandert — alleen de schaal.
 
 Vier tot zes links vanaf domeinen die zelf weinig autoriteit dragen. De
 SEO-waarde is klein. De **entiteitswaarde** is echt: het verbindt de knopen

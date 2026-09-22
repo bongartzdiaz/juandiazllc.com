@@ -11738,3 +11738,68 @@ de scan-reeks, niet via zoek. De Atlas-longtail is af — 321 URL's in de
 sitemap, vier talen, `/download` scherp getiteld op 56 tekens.
 
 Poorten: typecheck schoon, 1739 tests over 95 bestanden groen.
+
+### 2026-09-22 (5) — vier PR's gemerged, en het linkwerk is ingeperkt tot twee sites
+
+Juan: *merge #409 #410 #688 #689* en *only juandiazllc and diazatlas.com.*
+
+**Gemerged, in deze volgorde, alle vier met `--squash --delete-branch`:**
+
+| PR | repo | wat | squash |
+|---|---|---|---|
+| #409 | juandiazllc.com | `/about` linkt naar Diaz Atlas; `brand` in het Organization-schema | `64360c2` |
+| #410 | juandiazllc.com | NL-rekenmachinetitel + `lib/zoekwoorden.test.ts` + `docs/keyword-doelen.md` | `a0dbe1e` |
+| #688 | diaz-editor | about-pagina's noemen en linken Lucen AI, met `affiliation` | `937cc26e` |
+| #689 | diaz-editor | de vier homepagetitels volgen regel 5 + `verify-titel-zoekwoorden.mjs` | `a3e1ebc8` |
+
+#410 en #689 gingen allebei na hun voorganger van `unknown` naar `clean`
+zonder conflict, hoewel #409 en #410 dezelfde `CLAUDE.md` raken — ze zaten in
+verschillende secties.
+
+**Op productie gemeten na de uitrol**, met `example.com` als negatieve
+controle (die gaf 0 op beide merken):
+
+| gemeten | uitkomst |
+|---|---|
+| `diazatlas.com/` | `CAD for trades · €197 once, no subscription · Diaz Editor` |
+| `diazatlas.com/nl/` | `CAD-software zzp · €197 levenslang, geen abo · Diaz Editor` |
+| `diazatlas.com/de/` | `CAD einmalig kaufen · €197, kein Abo · Diaz Editor` |
+| `diazatlas.com/es/` | `CAD para autónomos · 197€ un pago, sin cuotas · Diaz Editor` |
+| `juandiazllc.com/nl/tools/energy-roi` | `Salderingsregeling 2027 berekenen — gratis tool · Juan Diaz` |
+| diazatlas → juandiazllc | 2× op `/about` (sinds #687) |
+| juandiazllc → diazatlas | 6× op elk van de vier `/about`-pagina's; `diazatlas.com#organization` 2× op de home |
+| diazatlas → lucenai | alle vier de about-pagina's, elk met `affiliation` in het schema |
+
+**De inperking.** *Only juandiazllc and diazatlas.com* schrapt de vier andere
+eigen domeinen uit het linkplan: `salderingsregeling2027.nl`,
+`besparenbelgie.online`, `voltafy.nl` en `performancetracker.nl`, plus de
+klantvraag over `helpmijbesparen.nl`. Doorgehaald in plaats van verwijderd in
+`docs/backlink-strategie.md` §1.1, `docs/keyword-doelen.md` §5 en de
+operatorlijst — een geschrapte optie die spoorloos verdwijnt, wordt over een
+maand opnieuw voorgesteld.
+
+Wat daarmee ook vervalt is het auteursblok op de twee energie-contentsites.
+Dat was de sterkste kaart van die laag: dezelfde persoon, dezelfde naamvormen
+uit `lib/seo/branding.ts`, onder artikelen over salderen en besparen. §1.2 gaat
+daarmee van "vier tot zes links" naar twee.
+
+**Één rij uit §5 blijft staan en valt niet onder de inperking.**
+`performancetracker.nl` zegt "Team prestaties, real-time inzicht"; de
+portfoliopagina op juandiazllc.com zegt "Live opbrengst … voor zonne-eigenaren
+en installateurs". Dat gaat niet over backlinks maar over een pagina op ons
+eigen domein die een product beschrijft dat daar niet te vinden is. Welke van
+de twee waar is, is van buitenaf niet te zien.
+
+**`main` leek rood na de merge, en dat was mijn werkkopie.** Drie achtereen
+volgende volledige runs gaven 10, 4 en 7 falers — telkens andere. De
+foutmelding was `Test timed out in 5000ms`, geen enkele assertie. Oorzaak:
+`diaz-editor-gtm/` staat ongetrackt in de repo-wortel met **10.668 bestanden**,
+tegen 400 getrackte, en de repo-brede scanners slaan alleen `node_modules` en
+`.next` over. Elke boomwandeling loopt dus door 27× zoveel bestanden en tikt
+af en toe tegen de limiet. Met `--testTimeout=30000`: **95 bestanden, 1739
+tests, alles groen.** CI checkt schoon uit en was op beide PR's groen.
+
+Wie hier weer tegenaan loopt: het is geen defect op `main`. Zet de scratchmap
+buiten de repo of draai met een hogere `testTimeout`. Zie
+[[feedback_verify_the_measuring_stick]] — een rode suite die per run iets
+anders meldt, meet de machine en niet de code.

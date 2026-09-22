@@ -216,6 +216,14 @@ Abo" (41).
 
 ## 5. De eigen domeinen eromheen
 
+**Ingeperkt door Juan op 2026-09-22: alleen `juandiazllc.com` en
+`diazatlas.com`.** Wat hieronder staat is daarmee een meting en geen
+takenlijst. Het blijft staan omdat het gemeten is en omdat één rij een
+feitelijke fout in onze éigen kopij aanwijst — zie `performancetracker.nl`
+onderaan deze sectie. Die rij gaat niet over zoekwoorden en valt niet onder de
+inperking: hij zegt dat een pagina op `juandiazllc.com` een product beschrijft
+dat op dat domein niet te vinden is.
+
 Gemeten op dezelfde dag, dezelfde manier.
 
 | domein | titel | oordeel |
@@ -225,7 +233,7 @@ Gemeten op dezelfde dag, dezelfde manier.
 | `performancetracker.nl` | Performance Tracker — Voltara | zwak, en er is iets anders aan de hand — zie hieronder |
 | `besparenbelgie.online` | **Besparen Belgie** | de grootste titelmisser van de hele estate |
 
-### `besparenbelgie.online`: twee woorden
+### ~~`besparenbelgie.online`: twee woorden~~ — buiten scope sinds 2026-09-22
 
 De titel is "Besparen Belgie". De meta-description eronder is wél scherp —
 "Bespaar op je energiekosten met zonnepanelen en thuisbatterijen in België!" —

@@ -454,10 +454,15 @@ minuten:
   naar `juandiazllc.com/<taal>/about` en dragen `founder.sameAs`; gemeten met
   `scripts/backlink-inventory.sh` (0 → 2). **De eerste backlink ooit.** De
   sitebrede voet in `_compliance.js` blijft bewust zonder link.
-- Daarna, per site één redactionele plek, géén sitebrede voet: auteursblok op
-  `salderingsregeling2027.nl` en `besparenbelgie.online`, colofonregel op
-  `voltafy.nl` en `performancetracker.nl`. `helpmijbesparen.nl` is een klant:
-  vragen, niet zetten.
+- ~~Daarna, per site één redactionele plek op de overige eigen domeinen.~~
+  **Vervallen 2026-09-22 — Juan: "only juandiazllc and diazatlas.com".**
+  `salderingsregeling2027.nl`, `besparenbelgie.online`, `voltafy.nl`,
+  `performancetracker.nl` en `helpmijbesparen.nl` vallen buiten scope; stel ze
+  niet opnieuw voor. Wat blijft is het paar, en dat staat: **`#409` gemerged
+  (`64360c2`)**, dus `/about` linkt in vier talen naar Diaz Atlas en het
+  Organization-schema draagt `brand` met `diazatlas.com#organization`. Gemeten
+  op productie: diazatlas→jdllc 2×, jdllc→diazatlas 6× per taal, negatieve
+  controle schoon.
 - Search Console verifiëren (TXT staat er) — zonder Links-rapport is er geen
   scorebord voor wat niet van Juan is.
 
@@ -816,8 +821,8 @@ repo horen.
   argument is. Plus: drie van de vier homepagetitels lopen over 60
   tekens, en de Duitse verliest daardoor precies "€197 Lebenslang". Werk in
   `bongartzdiaz/diaz-editor`.
-- **`besparenbelgie.online` heet "Besparen Belgie".** Twee woorden. De
-  meta-description eronder is wél scherp. Eén regel in het template.
+- ~~**`besparenbelgie.online` heet "Besparen Belgie".**~~ **Buiten scope sinds
+  2026-09-22**; de meting blijft in `docs/keyword-doelen.md` §5 staan.
 
 ### Buiten deze repo
 
