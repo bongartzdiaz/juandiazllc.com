@@ -11519,3 +11519,95 @@ Hervatten: URL van die pagina vergelijken met
 `vercel.com/bongartzdiaz-2377s-projects/juandiazllc-com/settings/environment-variables`;
 staan de vier daar, dan één build (docs-PR) en `POST /api/cal` meten —
 verwacht antwoord: geen 503 meer, en 401 op de handtekening.
+
+### 2026-09-22 (1) — funnels, SEO/GEO en backlinks: gemeten, twee GEO-gaten gedicht, één poort verlopen
+
+Opdracht van Juan: *werk maar alvast verder zodat de funnels werken, de
+landingpagina's correct zijn en de leadmagnets klaarstaan; SEO- en GEO-machine
+helemaal klaar en werkend; backlinkstrategie; proven and working.* Zonder
+Juan-input, alles gemeten, niets verzonnen.
+
+**Wat er hermeten is, en ongewijzigd staat.** Brevo `/v3/smtp/email` vanuit
+Postgres om 09:48 UTC: nog steeds 403 `permission_denied`, 21 uur na
+"activatie is binnen" — geen antwoord van support in Gmail, geen verzonden
+mail naar contact@brevo.com vanaf bongartzdiaz@gmail.com, drie ongelezen
+"Verify a new IP"-meldingen. `POST /api/cal` 503 `not-configured`. Vercel-MCP
+403 op env-listing. Beide staan geparkeerd in de operator-lijst; hier niets
+nieuws.
+
+**De SEO-kant is schoon, en dat is gemeten, niet aangenomen.**
+`npx tsx scripts/seo-audit.ts` op productie: 196 pagina's, 0 fouten, 0
+waarschuwingen, 0 notities. Eigen crawl over de sitemap: hreflang met
+x-default op elke pagina (een eerste run meldde 190× "geen hreflang" — de
+regex was hoofdlettergevoelig en Next rendert `hrefLang=`; de ruwe HTML
+droeg vijf tags overal), OG-tags overal, 232 interne linkdoelen, 0 niet-200.
+robots.txt laat de AI-crawlers toe, `llms.txt` en `llms-full.txt` (33,5 KB)
+antwoorden 200, `Person` draagt `alternateName`.
+
+**De citatie-nulmeting is gedaan** (`docs/geo-citatie-nulmeting.md`, punt 9
+van `seo-geo-plan.md` §5). Tien vaste vragen, Perplexity zonder login,
+12:13–12:24 lokale tijd. **2 van 10 geciteerd, precies de twee
+entiteitsvragen** — "Who is Juan Stefan Diaz" gaf een correcte samenvatting
+met juandiazllc.com 4× en diazatlas.com 1×. Vraag 3, *"What is DEUS CRM by
+Juan Diaz LLC and what does it cost per seat?"*, gaf woordelijk *"I can't find
+any reliable information about a DEUS CRM by Juan Diaz LLC or its per-seat
+pricing"* — terwijl `/pricing` Product + AggregateOffer + FAQPage draagt en
+DEUS in de titel heeft. De H1 zei "Four tiers. One promise." en de lede
+noemde het product niet: er was geen zelfstandige alinea om op te halen. De
+acht onderwerpvragen (fractional revenue operator, RevOps voor installateurs,
+EU-CRM onder €50 in EN en DE, salderen 2027 ×2, omzetlek installatiebedrijf)
+noemden ons geen van alle; bij de twee rekentool-vragen wonnen vier
+Nederlandse zonnepaneeldomeinen.
+
+**Twee code-PR's uit die meting.** #403: `/pricing.md`, machine-leesbare
+prijslijst als derde uitvoer van `regenerate-pricing.mjs` — zelfde CSV,
+zelfde `--check` in CI, sprintprijs uit `docs/claims.md` via dezelfde regex
+als `faqs.belofte.test.ts`, bewust zonder datum; llms.txt linkt ernaar,
+`/pricing` draagt `rel=alternate type=text/markdown`; poort
+`lib/pricing-md.test.ts`. #404: `pricing.definitie` in vier talen als eerste
+alinea onder de H1 en als Product-description ("DEUS is a CRM for small sales
+teams, built and run by Juan Diaz, LLC. Hosted only in the EU … from €40 a
+month, 14-day free trial"); poort `lib/pricing-definitie.test.ts` leest €40
+uit het TIERS-blok en 14 uit de CSV. Beide op de dev-server geverifieerd.
+`/pricing.md` was 404 op productie vóór deze sessie; `humans.txt` 200.
+
+**Backlinks: nulmeting en strategie** (`docs/backlink-strategie.md`,
+`scripts/backlink-inventory.sh`). Ahrefs geeft "Insufficient plan" ook op het
+gratis DR-endpoint; Search Console niet geverifieerd; dus geen extern
+nulpunt. Wat wél te meten was: **acht eigen domeinen, nul links naar
+juandiazllc.com.** `lucenai.eu/about` noemt Juan 6× zonder link,
+`diazatlas.com/about` 18× ("Juan Diaz LLC (Delaware, USA)" in de voet, vier
+talen) zonder link; `philanthropyai.eu` is een 301 naar lucenai.eu;
+`example.com` als negatieve controle 0/0. Het script is herhaalbaar en raakt
+niets. De strategie: eerst die vermeldingen linken (één redactionele plek per
+site, géén sitebrede voet — acht domeinen met dezelfde voetlink zijn een
+netwerk), dan de rekenmachine als uitleenbare tool bij de drie
+partnerprofielen, dan het datastuk; geen gekochte of geruilde links, geen
+directories, geen aantallen beloven.
+
+**Eén poort is vandaag verlopen, en dat is geen fout van deze sessie.**
+`components/Capacity.test.ts` en `lib/capaciteit.test.ts` zijn rood op
+`main`: `LAST_VERIFIED = "2026-08-23"` is 30,4 dagen oud, max 30. De poort
+vraagt of `SLOTS_REMAINING = 3` nog klopt tegen de agenda; een datum
+bijwerken zonder te kijken is precies wat hij moet vangen, dus dat is niet
+gedaan. **Tot Juan het getal bevestigt, is `npm test` rood op elke PR.**
+De repo kent geen engagement die via de site binnenkwam (één lead ooit,
+Juans test), maar trajecten kunnen buitenom beginnen.
+
+**Eén onnauwkeurigheid in `MANUAL_TASKS.md`, genoteerd, niet gerepareerd:**
+"503 zolang een van de vier ontbreekt" klopt niet voor `CRON_SECRET` — die
+wordt als eerste gecontroleerd en geeft 401, en die 401 stáát al (gemeten
+2026-09-21). De andere drie zijn van buiten niet te zien.
+
+**Niet gedaan, en waarom.** Geen humanizer-pass over de kopij: de
+schrijfstack-regel zegt `ai-check` eerst en `humanizer` verwijdert elke
+gedachtestreep — dat is een stemwijziging over 766 sleutels × 4 talen en
+geen sessiebeslissing. Wel gemeten wat een assistent ophaalt (de
+nulmeting), en dat bleek structuur, geen toon. Geen markdown-parallel per
+artikel: eerst hermeten of de artikelen opgehaald worden.
+
+**Hervatten.** (1) Juan: "3 vrij" of een ander getal → `LAST_VERIFIED`
+bijwerken, CI weer groen. (2) #403 en #404 mergen. (3) `lucenai.eu/about`
+en `diazatlas.com/about`: de naam linken — vijf minuten, de enige twee
+backlinkstappen die vandaag iets meetbaars veranderen. (4) Search Console
+verifiëren. (5) Hermeting van de tien vragen in de eerste week van december.
