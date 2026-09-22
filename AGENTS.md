@@ -987,14 +987,16 @@ volledige uitkomst met bronverwijzingen staat in `docs/claims.md`. In het kort:
 
 **Twee dingen die jij moet beslissen, en één die eerst moet.**
 
-1. ⚠️ **Eerst dit: pas de over-ons-pagina's op skalo aan, vóór er publiciteit
-   naar dat netwerk wijst.** Op **40 van de 55 sites** staat dat de redactie
-   systemen koopt of leent en onafhankelijk test; op 53 dat ze uit
-   energietechnici en journalisten bestaat; op **nul** dat er met AI wordt
-   geschreven. De claim staat ook machineleesbaar in de JSON-LD. Een casestudy
-   die naar skalo verwijst, trekt aandacht naar een onjuiste claim op veertig
-   domeinen. Dit staat niet in `docs/claims.md` als keuze — het is werk in een
-   andere repo, en het hoort vóór de kopij.
+1. ~~⚠️ **Eerst dit: pas de over-ons-pagina's op skalo aan.**~~ **Buiten scope
+   sinds 2026-09-22** — zie het scope-blok hieronder. De meting blijft staan
+   omdat hij de casestudy-vraag raakt: op **40 van de 55 sites** staat dat de
+   redactie systemen koopt of leent en onafhankelijk test, op 53 dat ze uit
+   energietechnici en journalisten bestaat, op **nul** dat er met AI wordt
+   geschreven, en de claim staat ook machineleesbaar in de JSON-LD.
+   **De afweging verschuift daarmee naar de kopij hier:** een casestudy op
+   juandiazllc.com die naar dat netwerk verwijst, trekt aandacht naar een
+   claim die op veertig domeinen niet klopt. Dat is nu een reden om in de
+   kopij niet naar skalo te wijzen, niet een reden om daar te gaan werken.
 2. **Wil je de HMB-advertentieweek gepubliceerd hebben met de voorbehouden
    erbij, of wacht je op een tweede meetpunt?** Twee weken zijn geen trend, en
    het cijfer is voorlopig. Met de voorbehouden erbij is het eerlijk en dun; een
@@ -1008,7 +1010,51 @@ Zie [[feedback_welk_document_liegt]]: toen stonden er vier echte klantcijfers op
 de site die in `claims.md` ontbraken, en ik haalde ze weg in plaats van te
 vragen. Daarom deze keer eerst zoeken, dan vragen, en pas dan schrijven.
 
-### 2026-09-22 — de skalo-claims zijn gemerged maar staan nog live
+### 2026-09-22 — accountscope: alleen bongartzdiaz
+
+Juan: *"op dit claude account alleen bongartzdiaz doen juandiazllc en diazatlas
+deus — tenzij ik anders zeg."*
+
+**Binnen scope:** `bongartzdiaz/juandiazllc.com`, `bongartzdiaz/diaz-editor`
+(= diazatlas.com) en `bongartzdiaz/DEUS-SHARED`.
+
+**Buiten scope:** `mistersocial99/skalo-seo` en de 55 skalo-sites, plus
+Voltafy, Help Mij Besparen, Performance Tracker, BesparenBE en
+salderingsregeling2027. Niet uit zichzelf oppakken en niet voorstellen.
+
+**Wat dat betekent voor de casestudy's.** juandiazllc.com is Juans **eigen**
+casestudy: *"die resultaten waren bedoeld voor juandiazllc als werkresultaten"*.
+Cijfers uit HMB, Voltafy of skalo blijven dus bruikbaar als **materiaal** voor
+de kopij hier — ze staan met bron en voorbehoud in `docs/claims.md` — maar ze
+zijn geen aanleiding om in die repo's te gaan werken.
+
+**De skalo-hermeting van morgen vervalt daarmee.** Die stond hieronder als
+openstaande taak; hij wordt niet uitgevoerd. Pak hem niet alsnog op.
+
+### 2026-09-22 — skalo: #194 blijft staan, de revert is weer ingetrokken
+
+**Eindstand: `#194` is gemerged en blijft gemerged. Er staat niets van dit
+account open in die repo.** Raak hem niet aan; zie het scope-blok hierboven.
+
+De weg ernaartoe, kort, zodat niemand hem opnieuw aflegt. Juan vroeg *"wat je
+op mrsocial gezet hebt haal dat eruit"* en koos voor terugdraaien via een PR.
+Die is gemaakt — `#199`, een schone revert van `7ca83ee96`: 57 bestanden, geen
+conflicten met #196/#197/#198, na afloop gemeten op kopen-of-lenen 39 en
+AI-vermelding 0, met de 55 bestaande over-ons-pagina's als positieve controle.
+Daarna: *"delete that from his github — only bongartzdiaz"*. De PR is gesloten
+en de tak verwijderd.
+
+**Wat dat netto betekent.** De correctie van #194 blijft in die repo staan: de
+claim dat de redactie systemen koopt en onafhankelijk test is er weg, de
+AI-vermelding staat erin. Of dat op de 55 sites ook live komt hangt aan de
+nachtmotor op `142.93.140.18`, en dat is niet van hier te zien en niet van hier
+te sturen.
+
+**Wat er niet meer kan.** De merge-commit van #194 staat in de historie van die
+repo. Die eruit halen vraagt een nieuwe commit, en juist dat is wat hier niet
+meer gebeurt. Wil Juan het alsnog terug, dan is dat werk voor een sessie met
+die repo in scope.
+
 
 **`mistersocial99/skalo-seo#194` is gemerged** (`7ca83ee96`): 55 sites plus het
 sjabloon, met `scripts/check_over_ons_claims.py` als poort erbij. **Op de sites
