@@ -11874,3 +11874,48 @@ Eindstand: **96 bestanden, 1744 tests, groen**, typecheck schoon.
 kosten de poorten niets, dus verplaatsen is opruimwerk en geen reparatie — en
 een ongetrackte werkmap verplaatsen is Juans beslissing, niet die van een
 sessie.
+
+### 2026-09-22 (7) — de operator-lijst hermeten: vier regels stonden verkeerd
+
+Juan: *what's still open on the operator list* — en in plaats van het bestand
+voor te lezen zijn de punten die van buitenaf meetbaar zijn opnieuw gemeten.
+Gemeten om **14:14 UTC**, alles read-only.
+
+| gemeten | uitkomst | stond er |
+|---|---|---|
+| `POST /api/cal`, ongeldige JSON | **503 `not-configured`** | klopt — nog steeds open |
+| `GET /api/campagne/scan-reeks` | **401 `unauthorized`** | *"antwoordt 503 tot alle vier staan"* — **fout** |
+| `lucenai.eu/about` | 200, **0 links** naar juandiazllc.com, "Juan" 3× | klopt — en scherper (zie hieronder) |
+| #403 / #404 hier | **allebei gemerged**, 10:38 en 10:40 | *"Mergen: #403 en #404"* — **achterhaald** |
+| #652 / #653 / #654 / #655 in diaz-editor | **drie gemerged op 2026-09-04**, alleen #653 open | *"vier wachten op jouw merge"* — **fout** |
+| open PR's in diaz-editor | #653, plus **#624, #639, #656** | die drie stonden op geen enkele lijst |
+| open PR's hier | **nul** | — |
+
+**Vier correcties, alle vier doorgehaald in plaats van verwijderd** (#416):
+
+1. **GEO.** #403 (`5a16e13`) en #404 (`c135a8b`) zijn vanochtend gemerged. Wat
+   van dat blok overblijft is de hermeting van de tien vragen in december.
+2. **lucenai.** Nog steeds nul links — maar de positieve controle is scherper
+   geworden: het woord "Juan" staat er nu **3×** tegen **5×** op 26 augustus.
+   De pagina is dus wél gewijzigd sinds die meting, alleen zonder de link. Dat
+   sluit "de cache loopt achter" uit; wat er gepubliceerd is, draagt de link
+   niet.
+3. **Vercel-scanmails.** De regel zei dat de route 503 geeft zolang alle vier de
+   variabelen ontbreken. Hij geeft 401, en dat kan alleen met `CRON_SECRET`
+   gezet. De funnel-tabel van 2026-09-21 wist dat al; deze regel liep
+   erachteraan. **Twee plekken die één feit dragen en uit elkaar lopen** —
+   dezelfde vorm als de Stripe-webhook-README in diaz-editor.
+4. **diaz-editor-PR's.** Drie van de vier zijn achttien dagen geleden gemerged,
+   binnen twee minuten van elkaar. En er staan er drie open die de lijst nooit
+   genoemd heeft, de oudste van 21 augustus (#624: twee Spaanse pillars zonder
+   accenten, live in title, meta en JSON-LD).
+
+**Het patroon is hetzelfde als vanochtend bij de capaciteitspoort (#414), en de
+lijst waarschuwt er zelf voor in zijn eigen kop:** *"waarna de operator de
+bovenste las, en dat was de oudste."* Een afgesloten punt dat blijft staan kost
+niet alleen aandacht — het maakt de lijst als geheel minder geloofwaardig,
+waardoor de punten die wél open zijn ook minder serieus gelezen worden.
+
+**Wat dit niet is.** Geen hermeting van de hele lijst. De Supabase-,
+Stripe-, DEUS- en naamsbeslissingen zijn niet aangeraakt: die zijn niet van
+buitenaf meetbaar of vragen een beslissing, niet een meting.
