@@ -432,7 +432,8 @@ entiteitsvragen.** "What is DEUS CRM by Juan Diaz LLC and what does it cost
 per seat?" gaf *"I can't find any reliable information"*. Daaruit #403
 (`/pricing.md`) en #404 (definitiezin als eerste alinea op `/pricing`).
 
-- **Mergen: #403 en #404.**
+- ~~**Mergen: #403 en #404.**~~ **Allebei gemerged op 2026-09-22**, `5a16e13`
+  (10:38 UTC) en `c135a8b` (10:40 UTC).
 - **Hermeting van de tien vragen in de eerste week van december 2026**,
   dezelfde vragen, dezelfde notatie. Niet eerder: een week na een
   herindexering zegt niets.
@@ -454,6 +455,11 @@ minuten:
   gerenderde pagina draagt de link niet**, ook niet bij een verzoek dat de
   LiteSpeed-cache mist. Publiceren, cache legen, dan
   `bash scripts/backlink-inventory.sh`.
+  **Hermeten 2026-09-22 om 14:14 UTC: nog steeds nul.** De pagina geeft 200 en
+  draagt **0** links naar `juandiazllc.com`. Let op de positieve controle: het
+  woord "Juan" staat er nu **3×** tegen 5× op 26 augustus, dus de pagina is
+  wél gewijzigd — alleen niet met de link erin. Dit is dus geen cache die
+  achterloopt maar een publicatie die de link niet draagt.
 - ~~**`diazatlas.com/about`**~~ **gesloten 2026-09-22**: `diaz-editor#687`
   gemerged (`8de26388`) en live. De vier about-pagina's linken "Juan Diaz LLC"
   naar `juandiazllc.com/<taal>/about` en dragen `founder.sameAs`; gemeten met
@@ -638,10 +644,15 @@ hier stond is hoe dan ook *nee*.
 ### Vercel
 
 - **Vier variabelen voor de drie scan-mails** (toegevoegd 2026-09-19): `CRON_SECRET`, `BREVO_API_KEY`, `CAMPAGNE_FROM`, `SUPABASE_SECRET_KEY` in
-  Vercel-productie. Tot die staan antwoordt `GET /api/campagne/scan-reeks`
-  503 `not-configured` en gaat er niets uit. Volledige uitleg, probe en
-  controlequery in `MANUAL_TASKS.md`. Sinds 2026-09-20 ook de enige
-  blokkade voor de ROI-mail van #378 (`source=energy-roi`, zelfde cron).
+  Vercel-productie. Volledige uitleg, probe en controlequery in
+  `MANUAL_TASKS.md`. Sinds 2026-09-20 ook de enige blokkade voor de ROI-mail
+  van #378 (`source=energy-roi`, zelfde cron).
+  **Er staat er inmiddels één.** Deze regel zei dat de route 503
+  `not-configured` geeft zolang alle vier ontbreken; gemeten op 2026-09-22 om
+  14:14 UTC geeft `GET /api/campagne/scan-reeks` **401 `unauthorized`**, en dat
+  kan alleen als `CRON_SECRET` gezet is. De funnel-tabel van 2026-09-21 zei dat
+  al; deze regel liep erachteraan. De andere drie zijn van buitenaf niet te
+  zien — 401 bewijst de sleutel, niet de mailconfiguratie.
 - **`SENTRY_DSN` in Vercel-productie wordt geweigerd. Serverfouten worden
   niet gerapporteerd.** Juan zette op 2026-08-26 een nieuwe waarde; die
   is de letterlijke tekst `optional` niet meer, maar hij komt nog steeds
@@ -841,9 +852,17 @@ repo horen.
   berichten-endpoint. De regel die hij bewaakt — geen geautomatiseerde
   connectieverzoeken of DM's — is ongewijzigd juist. Het bestand staat buiten elke
   repo en wordt niet aangeraakt zonder jouw expliciete go.
-- **Vier PR's in `bongartzdiaz/diaz-editor` wachten op jouw merge: #652,
-  #653, #654 en #655.** Ze dragen de D2-, D3-, D4- en D6-rijen uit
-  `docs/content-kalender.md`; in die repo merget deze sessie niet.
+- ~~**Vier PR's in `bongartzdiaz/diaz-editor` wachten op jouw merge: #652,
+  #653, #654 en #655.**~~ **Het is er één, en er staan er drie andere open.**
+  Gemeten op 2026-09-22: #652 (`fa86f410`), #654 (`c843db65`) en #655
+  (`77a25563`) zijn op **2026-09-04** gemerged, binnen twee minuten van elkaar.
+  Alleen **#653** (help: DXF aanleveren aan onderaannemers, EN + NL) staat nog
+  open, sinds 31 augustus.
+
+  Ongenoemd op deze lijst en ook open: **#624** (twee Spaanse pillars zonder
+  accenten, live in title/meta/JSON-LD — 21 augustus), **#639** (weekrapport
+  W34, wacht op een read-connector — 24 augustus) en **#656** (Dependabot,
+  acht action-updates — 1 september). In die repo merget deze sessie niet.
   **Gemeten op 2026-09-03, want dit bestand had het elders mis:** #659 is
   **gemerged** (`64ccd0d5`, 2026-09-02 15:29 UTC) en #647 is **gesloten
   zonder merge**. De sessielog-instructie om de basis van #647 naar `main`
