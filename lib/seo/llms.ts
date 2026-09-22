@@ -82,7 +82,7 @@ function paginas(): string {
     ["Sectors", "/en/sectors", "Operations consulting applied to energy, real estate and hospitality."],
     ["Insights", "/en/insights", "Long-form essays and operator playbooks."],
     ["Signals", "/en/signals", "Short-form market notes and live observations."],
-    ["Pricing", "/en/pricing", "Tiers for DEUS CRM, EU-hosted."],
+    ["Pricing", "/en/pricing", "Tiers for DEUS CRM, EU-hosted. Machine-readable version: /pricing.md (services + all tiers, generated from the same source as the page)."],
     ["Tools", "/en/tools/energy-roi", "Free calculator for the Dutch net-metering phase-out in 2027."],
     ["Contact", "/en/contact", "Book a 15-minute intro call, or ask for a blueprint call."],
     ["Privacy", "/en/privacy", "What the site stores, and what it does not."],
@@ -126,7 +126,7 @@ export function bouwLlmsTxt(): string {
     PREAMBULE,
     WAT_JUAN_DOET,
     paginas(),
-    `## Feeds\n\n- [RSS](${SITE}/rss.xml)\n- [JSON Feed](${SITE}/feed.json)\n- [Full text of every article](${SITE}/llms-full.txt)`,
+    `## Feeds\n\n- [RSS](${SITE}/rss.xml)\n- [JSON Feed](${SITE}/feed.json)\n- [Full text of every article](${SITE}/llms-full.txt)\n- [Pricing, machine-readable](${SITE}/pricing.md)`,
     talen(),
     CONTACT,
     `## Last updated\n\nNewest article: ${laatsteInhoudsdatum()}. This index is generated from the site at build time rather than maintained by hand, so its facts track the pages — but the date above tracks articles only, not the site map or the positioning above it.
