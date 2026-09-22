@@ -809,10 +809,11 @@ repo horen.
   zonne-eigenaren en installateurs". Geen zoekwoordkwestie maar een claim die
   niet klopt. Welke van de twee waar is, is niet van buitenaf te zien, en een
   gok invullen is precies wat `docs/claims.md` moet voorkomen.
-- **`diazatlas.com/pricing` is byte voor byte de homepage** — 200, 113.112
-  bytes, dezelfde sha256, canonical naar `/`. Er is dus geen prijspagina voor
-  een product waarvan "geen abonnement" het hele argument is. `/features` en
-  `/prijzen` geven 404. Plus: drie van de vier homepagetitels lopen over 60
+- **`diazatlas.com` heeft geen prijspagina.** `/pricing` geeft **307** naar
+  `/#pricing` (regel in `landing/vercel.json:121`); `/nl/pricing`,
+  `/de/pricing` en `/features` geven 404. Er is dus geen URL die op een
+  prijsvraag kan staan, voor een product waarvan "geen abonnement" het hele
+  argument is. Plus: drie van de vier homepagetitels lopen over 60
   tekens, en de Duitse verliest daardoor precies "€197 Lebenslang". Werk in
   `bongartzdiaz/diaz-editor`.
 - **`besparenbelgie.online` heet "Besparen Belgie".** Twee woorden. De

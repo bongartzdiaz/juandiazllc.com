@@ -11691,19 +11691,27 @@ Dezelfde bugklasse die `lib/einspeiseverguetung.test.ts` in zijn kop al
 beschrijft: vier eerdere tekstscans in deze repo deden precies dit. Nu op de
 waarden van `DICT`, niet op de bestandstekst.
 
-**Twee valse alarmen in de meetlat, allebei van mij.** Een regex die
+**Drie valse alarmen in de meetlat, alle drie van mij.** De eerste
+was de zwaarste: een GET op `diazatlas.com/pricing` gaf 200 en exact dezelfde
+113.112 bytes als de homepage, en daaruit las ik "twee URL's, één pagina".
+`urllib` volgde de omleiding. Zonder volgen: **307** naar `/#pricing`. De
+conclusie blijft dezelfde — er is geen prijspagina — maar de reden is een
+andere, en `/nl/pricing` en `/de/pricing` blijken niet eens om te leiden maar
+te 404'en.
+
+De twee andere waren kleiner. Een regex die
 `name="description"` vóór `content=` eiste meldde ontbrekende descriptions op
 diazatlas — die pagina's zetten `content=` eerst, de descriptions staan er.
 En dezelfde extractie strippte `<br>` en maakte van de Atlas-H1
 `15 minutes.Sketch.`; op het scherm staat daar een regelafbreking. Geen van
-beide is een sitefout. Zie [[feedback_verify_the_measuring_stick]].
+drieën is een sitefout. Zie [[feedback_verify_the_measuring_stick]].
 
 **Wat er gemeten is en blijft liggen** — vijf items, nu op de operatorlijst in
 `CLAUDE.md`:
 
 | vondst | bewijs |
 |---|---|
-| `diazatlas.com/pricing` is byte voor byte de homepage | beide 200, beide 113.112 bytes, sha256 `898bfff19cf2734b…`, canonical naar `/`. `/features` en `/prijzen` 404 |
+| `diazatlas.com` heeft geen prijspagina | `/pricing` geeft **307** naar `/#pricing` (`landing/vercel.json:121`); `/nl/pricing`, `/de/pricing` en `/features` geven 404 |
 | drie van de vier Atlas-titels lopen over 60 tekens | en 58 · es 61 · nl 67 · **de 77** — de Duitse verliest daarmee precies "€197 Lebenslang", het hele abonnement-argument |
 | drie eigen pagina's op "salderingsregeling 2027" | het exact-match-domein, `/nl/work/salderingsregeling-2027` en de rekenmachine. De derde is nu gedifferentieerd; de eerste twee dragen bijna dezelfde titel |
 | `besparenbelgie.online` heet "Besparen Belgie" | twee woorden, terwijl de description eronder zonnepanelen, thuisbatterijen en België noemt |

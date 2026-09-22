@@ -152,19 +152,33 @@ Beslissing voor Juan, na de Search-Console-verificatie.
 
 ## 4. diazatlas.com — twee harde vondsten
 
-### `/pricing` is byte voor byte de homepage
+### Er is geen prijspagina, alleen een sprong naar een anker
 
-Gemeten: `https://diazatlas.com/` en `https://diazatlas.com/pricing` geven
-allebei 200, allebei 113.112 bytes, dezelfde sha256 (`898bfff19cf2734b…`). De
-canonical op `/pricing` wijst naar `/`.
+**Eerst gemeten, en fout gelezen.** Een GET op `https://diazatlas.com/pricing`
+gaf 200 en exact dezelfde 113.112 bytes als de homepage, met dezelfde sha256
+(`898bfff19cf2734b…`). Daaruit las ik "twee URL's, één pagina". Wat er
+werkelijk gebeurde is dat `urllib` de omleiding volgde.
 
-Geen duplicate-contentprobleem dus — maar ook geen prijspagina. Wie zoekt op
+**Hermeten zonder de omleiding te volgen:**
+
+| URL | uitkomst |
+|---|---|
+| `/pricing` | **307** → `/#pricing` |
+| `/features` | 404 |
+| `/nl/pricing` | 404 |
+| `/de/pricing` | 404 |
+
+De regel staat in `landing/vercel.json:121`. Er is dus geen prijspagina en
+geen URL die op een prijsvraag kan staan — alleen een sprong naar een anker
+op de homepage, en die sprong bestaat alleen in het Engels. Zie
+[[feedback_verify_the_measuring_stick]]: een client die omleidingen volgt,
+laat een 307 eruitzien als een 200.
+
+Wie zoekt op
 "Diaz Editor price", "CAD software eenmalig kopen" of "CAD zonder abonnement
 prijs" komt uit op een homepage. Voor een product van €197 eenmalig, waarvan
 het hele onderscheid mét de markt "geen abonnement" is, is dat de duurste
 ontbrekende pagina die er is.
-
-`/prijzen` bestaat niet (404). `/features` bestaat niet (404).
 
 **Te doen in `bongartzdiaz/diaz-editor`:** een echte `landing/pricing.html`
 met een eigen titel, eigen H1, de vergelijking eenmalig-versus-abonnement en
