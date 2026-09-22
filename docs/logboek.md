@@ -11919,3 +11919,87 @@ waardoor de punten die wél open zijn ook minder serieus gelezen worden.
 **Wat dit niet is.** Geen hermeting van de hele lijst. De Supabase-,
 Stripe-, DEUS- en naamsbeslissingen zijn niet aangeraakt: die zijn niet van
 buitenaf meetbaar of vragen een beslissing, niet een meting.
+
+### 2026-09-22 (8) — #624 opgelost en gemerged, plus een afgeleide die dertig dagen fout stond
+
+Juan: *fix the Spanish accents in diaz-editor #624*, daarna *fix the 43/48 horas
+mismatch too*, daarna *merge #624*. Drie opdrachten, één PR.
+
+**Het conflict.** #624 stond sinds 21 augustus op CONFLICTING. De twaalf
+conflicthunks verschilden op twee assen tegelijk: `main` had op 2026-08-22 de
+Autodesk-prijzen hermeten (AutoCAD LT 480→540 USD, AutoCAD 1.865→2.095, plus
+alle afgeleide bedragen) en `/beta`→`/es/beta` gerepareerd; de PR zette alleen
+accenten. De PR-kant kiezen draait gemeten prijzen terug, de main-kant kiezen
+gooit de PR weg. Opgelost als: **main is de inhoud, de accenten komen uit de
+PR**, met drie asserties — ontdaan van diakrieten byte-identiek aan main, 138
+adressen onaangeraakt, en er is werkelijk iets veranderd. De maskering was nodig
+omdat de woordkaart `autonomos → autónomos` bevat en dat woord ook in de slugs
+staat.
+
+**De vondst die niet in de opdracht zat.** Bij het lezen bleek `main` zelf
+"48 horas" te zeggen in de kop, de tabel en het FAQ-schema, en "43 horas" in de
+og:description en de eerste alinea. Dat is geen accent, dus buiten de scope van
+de merge — opgeschreven in het merge-bericht en daarna als aparte opdracht
+teruggekomen.
+
+**Waarom 48 en niet 43, en waarom het er zes waren.** De pagina noemt zijn eigen
+invoer: ~1.927 euro en 40 euro/uur. 1927/40 = 48,2. De prijs van vóór de
+herijking was 1.865 USD → ~1.715 euro → 42,9. **43 is dus letterlijk de
+rekensom van de oude prijs.** Dezelfde meting over alle vier de talen gaf:
+
+| pagina | tarief | verwacht | stond er |
+|---|---|---|---|
+| ES pillar | 40 €/u | 48,2 u | **43** in og + intro |
+| NL pillar | 55 €/u | 35,0 u | **31** in og + intro, **30** in de kop |
+| DE pillar | 60 €/u | 32,1 u | **30** in de intro |
+
+Elk van de drie droeg het júïste getal al in zijn eigen tabel en FAQ-schema. Het
+waren dus drie pagina's die zichzelf tegenspraken, op precies de plek die een
+zoekmachine toont.
+
+**Bijna een valse vondst.** De DE-pagina zegt "99 Euro". Dat is géén verouderde
+prijs maar de Founding-tier, consistent over tien plekken (99/197/247 voor 1/3/10
+plaatsen), en `verify-founding-price-canonical.mjs` is er groen op.
+
+**De poort, en wat de mutatietest eraan verbeterde.**
+`verify-uren-rekensom.mjs` toetst niet "staat er 48" — dan verloopt hij bij de
+eerste prijswijziging en zijn we terug bij af. Hij leest prijs en uurtarief uit
+de rekensom-sectie zelf. Twee fouten in mijn eigen poort kwamen alleen door te
+muteren boven water:
+
+1. **De eerste versie was groen en toch stuk.** Hij zocht prijs en tarief over de
+   hele pagina en koppelde op `landing/vs/opensolar.html` "3.750 euro" aan
+   "197 euro" — de prijs van Diaz Editor, geen uurtarief. Vier van de zeven
+   pagina's werden verkeerd gelezen; dat hij groen bleef was puur geluk, want
+   die vier dragen geen uren-claim bij AutoCAD. Nu begint hij bij de kop van de
+   rekensom, met een plausibiliteitsband (20–150 €/uur) als tweede slot.
+2. **Hij miste de DE-intro.** "30 Handwerker-Stunden" zet een samenstellend deel
+   tussen het cijfer en de eenheid; daar matchte het patroon niet op — één van
+   de zes fouten waarvoor hij geschreven is. Zonder mutatietest was die poort
+   met dat gat gemerged.
+
+Tien mutaties, alle tien zoals bedoeld: zeven rood (elk van de zes fouten plus
+een gewijzigde prijs en een gewijzigd tarief), twee groen (AutoCAD **LT** houdt
+zijn eigen 9 uur naast de 35 van het volle abo; een onschuldige herformulering),
+en één die de poort zelf sloopt door de kop te hernoemen — die móét toets 1
+zien, anders gaat hij stil uit.
+
+**Waarom het één PR werd.** Ik had een losse PR aangeboden. Die zou ES-regel 9
+en 99 raken — exact de twee regels die #624 al bewerkt — en dus frontaal
+botsen met de PR die net was ontconflicteerd. Twee commits op één tak is
+goedkoper dan een conflict oplossen dat je zelf maakt.
+
+**Gemerged als `540b3e1b`** op Juans expliciete opdracht. De regel *in die repo
+merget deze sessie niet* staat nog als standaard; een expliciete opdracht gaat
+erboven. 185/185 verify-scripts groen. Gemeten op productie in drie talen, met
+negatieve controles: ES `48 horas` 4× en `43 horas` 0× terwijl BricsCAD's
+"543 euros" er nog staat, NL `35 uur` 2× en `31 uur` 0× terwijl AutoCAD LT's
+"9 uur per jaar" er nog staat, DE `30 Handwerker` 0× terwijl "99 Euro" 14×
+onaangeroerd is.
+
+**Eén correctie op mijn eigen rapportage.** Ik meldde eerst dat het cijfer in de
+`description` en de `og:description` stond. De `<meta name="description">`
+draagt het niet; het zijn de og:description en de eerste alinea. En ik meldde de
+suite als 181/184 met drie rode; hij is nu 185/185 inclusief die drie. De
+zwervende `deno.lock` verklaart er één, de andere twee niet — niet uitgezocht,
+dus het oude getal is achterhaald en niet verklaard.
