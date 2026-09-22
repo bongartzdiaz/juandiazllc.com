@@ -999,12 +999,87 @@ volledige uitkomst met bronverwijzingen staat in `docs/claims.md`. In het kort:
    erbij, of wacht je op een tweede meetpunt?** Twee weken zijn geen trend, en
    het cijfer is voorlopig. Met de voorbehouden erbij is het eerlijk en dun; een
    derde week maakt het sterk.
-3. **Wordt de skalo-diagnose een casestudy?** Dat vraagt een andere pagina dan
-   een resultaatstrip: het verhaal is de vondst, niet de verbetering.
+3. ~~**Wordt de skalo-diagnose een casestudy?**~~ **Beantwoord op 2026-09-22:**
+   *"case studies so work I did with results we got"*. Werk én resultaat, dus
+   nog niet — de diagnose heeft het eerste en niet het tweede. Zie het blok
+   hieronder.
 
 Zie [[feedback_welk_document_liegt]]: toen stonden er vier echte klantcijfers op
 de site die in `claims.md` ontbraken, en ik haalde ze weg in plaats van te
 vragen. Daarom deze keer eerst zoeken, dan vragen, en pas dan schrijven.
+
+### 2026-09-22 — `www.juandiazllc.com` heeft geen geldig certificaat
+
+**Eén handeling in Vercel, en het is de enige stap die dit oplost.** Voeg
+`www.juandiazllc.com` toe aan het project `juandiazllc-com` (team
+`bongartzdiaz-2377s-projects`), met een redirect naar `juandiazllc.com`.
+Vercel geeft dan zelf een certificaat uit. Ik kan het niet zetten: de
+MCP-verbinding leest wel maar schrijft niet, en geeft **403 `forbidden`** op
+`add_project_domain` — dezelfde muur als bij het lezen van env-vars.
+
+**Wat er gemeten is, op 2026-09-22.** Juan meldde dat Instagram
+`juandiazllc.com` en `diazatlas.com` als onveilig markeert en vermoedde het
+beveiligingscertificaat. Dat vermoeden klopt, voor één van de twee:
+
+| host | uitkomst |
+|---|---|
+| `juandiazllc.com` | 307, certificaat geldig t/m 19 nov |
+| **`www.juandiazllc.com`** | **`curl: (60) SEC_E_WRONG_PRINCIPAL`** — het geserveerde certificaat draagt alleen `DNS:juandiazllc.com` in zijn SAN, dus de hostnaam klopt niet |
+| `diazatlas.com` | 200, certificaat geldig t/m 8 dec |
+| `www.diazatlas.com` | 308, **eigen** certificaat mét `www` in de SAN |
+
+**De oorzaak is geen verlopen certificaat maar een ontbrekend domein.** DNS
+voor `www.juandiazllc.com` wijst naar Vercel (`76.76.21.123`), maar het
+Vercel-project kent maar twee domeinen: `juandiazllc.com` en
+`juandiazllc-com.vercel.app`. Vercel krijgt dus een verzoek voor een hostnaam
+die het niet kent, serveert het apex-certificaat, en de hostnaamcontrole faalt.
+
+**En `DEPLOY.md:28` zegt al jaren dat het er hoort te staan**: *"Production
+domain: `juandiazllc.com` + `www.juandiazllc.com`"*. De DNS is daar ook naar
+gezet. Alleen de Vercel-kant is nooit toegevoegd. Twee documenten die één feit
+dragen en uit elkaar zijn gelopen zonder dat iets dat zag — zie
+[[feedback_documentatie_is_de_aanroeper]].
+
+**Let op bij het zelf nameten: `openssl s_client` zegt hier `Verify return
+code: 0 (ok)` op de kapotte host.** Dat is geen tegenspraak. `s_client`
+controleert standaard alleen de **keten**, niet de **hostnaam**; daarvoor is
+`-verify_hostname` nodig. De keten ís in orde — het is een echt Let's
+Encrypt-certificaat — alleen staat de gevraagde naam er niet in. Meet met
+`curl`, dat de hostnaam wél controleert, of je leest een kapotte host als
+gezond.
+
+**Wat hiermee níét verklaard is.** Alle vier de controles op `diazatlas.com`
+zijn schoon, dus als Instagram dat domein óók markeert, heeft dat een andere
+oorzaak. Kandidaten die van hier niet te meten zijn: Meta's eigen
+reputatielijst, of Google Safe Browsing. Beide zijn alleen ingelogd te zien, en
+Meta heeft een eigen formulier om een markering te betwisten. **Meet dus na het
+zetten van het www-domein opnieuw voordat je concludeert dat het opgelost is.**
+
+**Over de suggestie om naar gratis Cloudflare te verhuizen.** Dat lost dit ook
+op, want Cloudflare geeft automatisch een certificaat voor `www`. Maar het is
+een productie-DNS-verhuizing om een ontbrekende subdomein-regel te repareren,
+en daarmee een veel groter risico dan de fout zelf. Vercel doet hier al
+hetzelfde werk gratis. Aanbeveling: zet het domein erbij, en houd een
+platformverhuizing apart voor een reden die op zichzelf staat.
+
+### 2026-09-22 — wat een casestudy is, beslist door Juan
+
+*"case studies so work I did with results we got"*. Dat sluit de derde open
+vraag uit het blok hierboven. Een casestudy vraagt **allebei**: werk dat jij
+hebt gedaan, én een uitkomst die gemeten is.
+
+Daarmee ligt het zo:
+
+- **De HMB-advertentieweek kwalificeert.** Werk: het budget bijna verdubbeld.
+  Resultaat: kosten per registratie 22,6% omlaag. Allebei aanwezig, met bron en
+  meetperiode. Zie `docs/claims.md`.
+- **De skalo-diagnose kwalificeert nog niet.** Het werk is er (de audit), het
+  resultaat niet — de gemeten richting sinds de overdracht is omlaag. Zodra een
+  reparatie een cijfer laat bewegen, wordt het er wél een. Tot dan is het
+  materiaal, geen casestudy.
+
+Dat betekent ook dat de vraag *"wordt de skalo-diagnose een casestudy"* van de
+lijst af kan. Het antwoord is: nog niet, en er is een duidelijke voorwaarde.
 
 ### LinkedIn — het kanaal is gekozen, het profiel wacht
 
