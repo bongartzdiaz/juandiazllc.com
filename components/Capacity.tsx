@@ -41,6 +41,8 @@ export const SLOTS_REMAINING = 3;
  *
  * Op 2026-08-23 heeft Juan twee dingen bevestigd: drie trajecten tegelijk (het
  * totaal, dezelfde grens die /services noemt) en alle drie op dit moment vrij.
+ * Op 2026-09-22 opnieuw bevestigd door Juan ("3 vrij"), nadat de poort die
+ * ochtend was verlopen (30,4 dagen) en CI op elke PR rood stond.
  *
  * De vorige stand — 2 van 4 — is mét de eenheid vervallen. Die 2 telde geboekte
  * blueprint-GESPREKKEN; dit telt lopende TRAJECTEN. Een verificatie geldt voor
@@ -51,7 +53,7 @@ export const SLOTS_REMAINING = 3;
  * gehouden. Een datum bijwerken zonder te kijken is exact de fout die de poort
  * moet vangen, en dan vangt hij niets meer.
  */
-export const LAST_VERIFIED = "2026-08-23";
+export const LAST_VERIFIED = "2026-09-22";
 
 /** Zoveel dagen mag LAST_VERIFIED oud zijn voordat de poort rood wordt. */
 export const MAX_AGE_DAYS = 30;
