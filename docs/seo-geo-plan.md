@@ -238,6 +238,15 @@ theorie over citeerbaarheid; dat is een citatie.
 - Een vaste vragenlijst vastleggen in `docs/` en per kwartaal aflopen.
 - De markdown-parallel pas daarna; eerst meten of het iets oplevert.
 
+**Stand 2026-09-22.** Gat 1 en 3 zijn dicht sinds 2026-08-20 (`lib/seo/llms.ts`
+genereert beide, de datum komt uit de nieuwste inhoud). Gat 4 is dicht: de
+vragenlijst en de eerste meting staan in `docs/geo-citatie-nulmeting.md` —
+2 van 10 geciteerd, precies de twee entiteitsvragen; het product (vraag 3)
+was voor Perplexity onvindbaar. Daaruit volgden #403 (`/pricing.md`) en #404
+(een definitiezin als eerste alinea op `/pricing`). Gat 2, de
+markdown-parallel per artikel, blijft bewust liggen tot een hermeting laat
+zien dat de artikelen wél opgehaald maar niet geciteerd worden.
+
 ---
 
 ## 5. Volgorde

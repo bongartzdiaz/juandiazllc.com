@@ -408,6 +408,54 @@ augustus blijft staan zoals hij is: logboekgeschiedenis wordt hier niet
 herschreven, en deze notitie is de correctie erop.
 
 
+### 2026-09-22 — de capaciteitspoort is verlopen: `npm test` is rood op elke PR
+
+`components/Capacity.tsx` draagt `SLOTS_REMAINING = 3` en
+`LAST_VERIFIED = "2026-08-23"`; de poort (`Capacity.test.ts`,
+`capaciteit.test.ts`) staat op maximaal 30 dagen en is op 2026-09-22 om
+ongeveer 10:00 UTC verlopen (30,4 dagen). **Tot dit is bijgewerkt faalt
+`npm test` op `main` en op elke PR.** De poort vraagt één ding: klopt "3 van
+3 vrij" nog tegen de agenda? Een datum bijwerken zonder dat antwoord is
+precies wat hij moet vangen, dus dat is niet gedaan. Antwoord ("3 vrij" of
+een ander getal) → getal en datum in `components/Capacity.tsx`, klaar.
+
+### 2026-09-22 — GEO: het product was onvindbaar; twee PR's, één hermeting
+
+Citatie-nulmeting in `docs/geo-citatie-nulmeting.md` (tien vaste vragen,
+Perplexity zonder login): **2 van 10 geciteerd, precies de twee
+entiteitsvragen.** "What is DEUS CRM by Juan Diaz LLC and what does it cost
+per seat?" gaf *"I can't find any reliable information"*. Daaruit #403
+(`/pricing.md`) en #404 (definitiezin als eerste alinea op `/pricing`).
+
+- **Mergen: #403 en #404.**
+- **Hermeting van de tien vragen in de eerste week van december 2026**,
+  dezelfde vragen, dezelfde notatie. Niet eerder: een week na een
+  herindexering zegt niets.
+- ChatGPT, Claude en AI Overview zijn niet gemeten (login). Wil je die
+  kolommen, dan zijn het dezelfde tien vragen; het document zegt hoe.
+
+### 2026-09-22 — backlinks: acht eigen domeinen, nul links
+
+`docs/backlink-strategie.md` + `scripts/backlink-inventory.sh` (alleen GET).
+Geen extern nulpunt: Ahrefs "Insufficient plan" ook op het gratis
+DR-endpoint, Search Console niet geverifieerd. Wat wél gemeten is: **geen
+van Juans acht sites linkt naar juandiazllc.com**; twee noemen hem zonder
+link. De twee stappen die vandaag iets meetbaars veranderen, samen vijf
+minuten:
+
+- **`lucenai.eu/about`**: de naam "Juan Stefan Bongartz Diaz" (6× op de
+  pagina) linken naar `https://juandiazllc.com/en/about`. Stond al als stap 4
+  in `docs/lucenai-backlinks.md`.
+- **`diazatlas.com/about` en de voet**: "Juan Diaz LLC (Delaware, USA)"
+  linken naar hetzelfde adres — één PR in `bongartzdiaz/diaz-editor`,
+  `landing/`.
+- Daarna, per site één redactionele plek, géén sitebrede voet: auteursblok op
+  `salderingsregeling2027.nl` en `besparenbelgie.online`, colofonregel op
+  `voltafy.nl` en `performancetracker.nl`. `helpmijbesparen.nl` is een klant:
+  vragen, niet zetten.
+- Search Console verifiëren (TXT staat er) — zonder Links-rapport is er geen
+  scorebord voor wat niet van Juan is.
+
 ### 2026-09-21 — alle funnels gemeten: opvang werkt, opvolging niet
 
 Gemeten 13:27 UTC zonder bijwerking (logboek 2026-09-21 (5)). Elke funnel
