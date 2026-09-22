@@ -1,7 +1,7 @@
 import { lookup } from "node:dns/promises";
 import type { Bevinding } from "./audit";
 import { VENTURES } from "@/lib/ventures";
-import { AFFILIATIE_NAAM, AFFILIATIE_URL } from "@/lib/seo/branding";
+import { AFFILIATIE_NAAM, AFFILIATIE_URL, ZUSTERMERK_NAAM, ZUSTERMERK_URL } from "@/lib/seo/branding";
 
 /* Bestaan de adressen die we afdrukken nog?
    ───────────────────────────────────────────────────────────────────────────
@@ -123,35 +123,50 @@ export async function controleerVentureAdressen(
 
    Aparte functie en geen extra rij in de lijst hierboven: de zin die de
    operator moet lezen is een andere, en een venture-melding over een
-   affiliatie-adres stuurt hem naar /work in plaats van naar /about. */
+   affiliatie-adres stuurt hem naar /work in plaats van naar /about.
+
+   TWEE ADRESSEN SINDS 2026-09-22. `ZUSTERMERK_URL` (diazatlas.com) staat in
+   `brand` van het Organization-schema en draagt een zichtbare link op /about,
+   precies zoals het affiliatie-adres. Dezelfde belofte, dus dezelfde controle
+   — met een eigen zin, want het schemaveld en de reparatie verschillen. */
+type Entiteitsadres = { naam: string; url: string; veld: string };
+
+const ENTITEITSADRESSEN: Entiteitsadres[] = [
+  { naam: AFFILIATIE_NAAM, url: AFFILIATIE_URL, veld: "`affiliation` in het Person-schema op /about" },
+  { naam: ZUSTERMERK_NAAM, url: ZUSTERMERK_URL, veld: "`brand` in het Organization-schema" },
+];
+
 export async function controleerEntiteitsAdressen(
   { zoek = lookup as Zoeker, haal = fetch as Haler }: { zoek?: Zoeker; haal?: Haler } = {},
 ): Promise<Bevinding[]> {
-  const r = await bereikbaar(AFFILIATIE_URL, { zoek, haal });
+  const uit: Bevinding[] = [];
 
-  if (r.soort === "bestaat-niet") {
-    return [{
-      ernst: "fout",
-      soort: "entiteit-adres-bestaat-niet",
-      url: AFFILIATIE_URL,
-      detail: `/about draagt ${AFFILIATIE_NAAM} in \`affiliation\` en linkt er in vier talen naartoe, maar ${new URL(AFFILIATIE_URL).hostname} bestaat niet in DNS (${r.code}). Haal de link en het schemaveld weg of wijs ze naar het adres dat wel bestaat.`,
-    }];
+  for (const a of ENTITEITSADRESSEN) {
+    const r = await bereikbaar(a.url, { zoek, haal });
+
+    if (r.soort === "bestaat-niet") {
+      uit.push({
+        ernst: "fout",
+        soort: "entiteit-adres-bestaat-niet",
+        url: a.url,
+        detail: `/about draagt ${a.naam} in ${a.veld} en linkt er in vier talen naartoe, maar ${new URL(a.url).hostname} bestaat niet in DNS (${r.code}). Haal de link en het schemaveld weg of wijs ze naar het adres dat wel bestaat.`,
+      });
+    } else if (r.soort === "antwoordt-niet") {
+      uit.push({
+        ernst: "waarschuwing",
+        soort: "entiteit-adres-antwoordt-niet",
+        url: a.url,
+        detail: `${a.naam} staat in ${a.veld}, maar het adres geeft HTTP ${r.status}.`,
+      });
+    } else if (r.soort === "onbereikbaar") {
+      uit.push({
+        ernst: "waarschuwing",
+        soort: "entiteit-adres-onbereikbaar",
+        url: a.url,
+        detail: `${a.naam}: ${r.reden}. Kan tijdelijk zijn — kijk of hij morgen weg is.`,
+      });
+    }
   }
-  if (r.soort === "antwoordt-niet") {
-    return [{
-      ernst: "waarschuwing",
-      soort: "entiteit-adres-antwoordt-niet",
-      url: AFFILIATIE_URL,
-      detail: `${AFFILIATIE_NAAM} staat in het Person-schema op /about, maar het adres geeft HTTP ${r.status}.`,
-    }];
-  }
-  if (r.soort === "onbereikbaar") {
-    return [{
-      ernst: "waarschuwing",
-      soort: "entiteit-adres-onbereikbaar",
-      url: AFFILIATIE_URL,
-      detail: `${AFFILIATIE_NAAM}: ${r.reden}. Kan tijdelijk zijn — kijk of hij morgen weg is.`,
-    }];
-  }
-  return [];
+
+  return uit;
 }

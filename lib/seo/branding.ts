@@ -216,6 +216,41 @@ export const AFFILIATIE_NAAM = "Lucen AI";
 /** Canoniek adres van die organisatie. Apex, https, geen slash-staart. */
 export const AFFILIATIE_URL = "https://lucenai.eu";
 
+/* ------------------------------------------------------------------------
+ * HET ZUSTERMERK — diazatlas.com
+ *
+ * Diaz Atlas is geen ander bedrijf. Het is de merknaam waaronder Juan Diaz,
+ * LLC de Diaz Editor verkoopt, en het Organization-knooppunt op dat domein
+ * zegt dat zelf: `"name": "Diaz Atlas", "legalName": "Juan Diaz LLC"`.
+ *
+ * WAAROM `brand` EN NIET `sameAs` OF `subOrganization`. `sameAs` zou beweren
+ * dat diazatlas.com deze pagina beschrijft; dat doet het niet, het beschrijft
+ * een product. `subOrganization` maakt er een organisatie-eenheid van, en dat
+ * is een verzinsel bij een LLC van één persoon. `brand` is letterlijk wat
+ * schema.org ervoor heeft: "the brand(s) maintained by an organization".
+ *
+ * DE TEGENRICHTING STAAT ER AL. Sinds `bongartzdiaz/diaz-editor#687` (live
+ * 2026-09-22) linken de vier about-pagina's van diazatlas.com "Juan Diaz LLC"
+ * naar `juandiazllc.com/<taal>/about` en draagt hun `founder` een `sameAs`
+ * naar het Person-knooppunt hier. Deze kant was de ontbrekende helft — gemeten
+ * met `scripts/backlink-inventory.sh` en vastgelegd in
+ * `docs/backlink-strategie.md`.
+ *
+ * De bereikbaarheid wordt bewaakt in `lib/seo/venture-adressen.ts`, samen met
+ * het affiliatie-adres hierboven en om dezelfde reden: een adres dat we
+ * afdrukken en dat niet bestaat, is een mislukte controle.
+ * ------------------------------------------------------------------------ */
+
+/** Merknaam waaronder deze rechtspersoon de Diaz Editor verkoopt. */
+export const ZUSTERMERK_NAAM = "Diaz Atlas";
+
+/** Canoniek adres van dat merk. Apex, https, geen slash-staart. */
+export const ZUSTERMERK_URL = "https://diazatlas.com";
+
+/** `@id` van het Organization-knooppunt dáár, zodat de twee grafen elkaar
+ *  bij naam noemen in plaats van bij toeval. */
+export const ZUSTERMERK_ID = `${ZUSTERMERK_URL}#organization`;
+
 /** Naam en knoop-identiteit van de rechtspersoon. */
 /** Het adres dat de bezoeker te zien krijgt en aanklikt.
  *
