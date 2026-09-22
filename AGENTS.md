@@ -1044,7 +1044,75 @@ niet-blokkerend is opgezet. Het vinkje op runniveau zegt daar dus niets, in
 allebei de richtingen. De controles op #194 zijn lokaal gedraaid: esbuild 56 van
 56 met een positieve controle, en de poort mutatiegetest.
 
-### 2026-09-22 — `www.juandiazllc.com` heeft geen geldig certificaat
+### ~~2026-09-22 — `www.juandiazllc.com` heeft geen geldig certificaat~~ — gesloten dezelfde dag
+
+**Het domein staat erop en het certificaat is geldig.** Gemeten direct na de
+wijziging met `curl`, omdat dat de hostnaam controleert:
+
+| gemeten | uitkomst |
+|---|---|
+| `https://www.juandiazllc.com/` | **308** naar `https://juandiazllc.com/`, `ssl_verify=0` |
+| dezelfde keten met `-L` | eindigt op `https://juandiazllc.com/en`, **200**, twee hops, `ssl_verify=0` |
+| `https://juandiazllc.com/` | 307 naar `/en`, `ssl_verify=0` — de apex serveert zelf |
+| negatieve controle `nope.juandiazllc.com` | resolvet niet (`curl: (6)`), dus de uitkomst op `www` is echt en geen wildcard |
+
+`ssl_verify=0` is curls volledige controle **inclusief hostnaam** — precies de
+controle die hieronder nog `SEC_E_WRONG_PRINCIPAL` gaf.
+
+**Eindstand in het project**, gelezen via `list_project_domains` en niet van de
+pagina:
+
+| domein | stand |
+|---|---|
+| `www.juandiazllc.com` | 308 naar `juandiazllc.com` |
+| `juandiazllc.com` | Production, **geen** redirect |
+| `juandiazllc-com.vercel.app` | Production |
+
+**Onderweg heeft de apex een kwartier de verkeerde kant op gewezen, en dat is
+de les uit dit blok.** Het venster "Add Domains" draagt een vinkje *"Redirect
+apex domains to www (recommended)"* dat aan staat. Ik zette het uit met
+`form_input`, de schermafdruk vlak vóór het versturen liet het uit zien, en
+tóch kwam `juandiazllc.com` eruit met `redirect: www.juandiazllc.com, 308`.
+`form_input` zet de DOM-waarde; de state van React bleef `true`, en het
+versturen gebruikt die state. Het vinkje sprong in een eerdere schermafdruk al
+zichtbaar terug — dat signaal stond er, en ik las het als een hertekening in
+plaats van als de waarheid.
+
+Gevolg zolang het stond: elke verwijzing naar de apex — het sitemap, de
+JSON-LD, en de backlink die diezelfde dag vanaf `diazatlas.com` is gelegd —
+bouncete naar `www`. Gevonden door ná het versturen de **API** te bevragen in
+plaats van de pagina te lezen, en teruggedraaid via Edit op de apexrij. **Een
+schermafdruk van een React-formulier bewijst niet wat er verstuurd wordt. Alleen
+de uitkomst bij de server doet dat.** Zie [[feedback_form_input_is_geen_react_state]].
+
+**Het venster is niet betrouwbaar te bedienen, het inline Edit-formulier wél.**
+De keuzelijsten in "Add Domains" worden búíten het venster getekend, als een
+eigen `dialog` ernaast. Een klik op een optie telt daardoor als een klik buiten
+het venster en sluit het hele formulier — dat kostte drie pogingen voordat de
+oorzaak zichtbaar was in de accessibility-boom. Toetsenbordselectie committeert
+er niet, en typen in het bestemmingsveld liet de renderer meermaals vastlopen.
+Wat wél werkt: het domein toevoegen **zonder** redirect, en de redirect daarna
+zetten via **Edit** op de rij zelf. Dat formulier staat inline, heeft geen
+venster om te sluiten, en daar werkt de keuzelijst gewoon.
+
+**De MCP-muur staat nog.** `add_project_domain` geeft nog steeds **403
+`forbidden`**: het token leest wel en schrijft niet. Lezen ging wél, en dat is
+precies wat deze wijziging heeft geverifieerd — inclusief de fout onderweg.
+
+**"DNS Change Recommended" op `www` is een aanbeveling, geen fout.** Vercel
+vraagt om `CNAME www ccb12fba14130019.vercel-dns-017.com.`, maar zegt er zelf
+bij dat de oude records blijven werken. De API zet het domein op `verified:
+true` en het certificaat is uitgegeven. Er is niets te doen, tenzij je mee wilt
+met de nieuwe IP-reeks.
+
+**Wat openblijft: `diazatlas.com`.** Alle vier de controles daar waren al
+schoon, dus de Instagram-markering op dát domein heeft een andere oorzaak en is
+met deze wijziging niet geraakt. Meet opnieuw voordat je concludeert dat het
+opgelost is.
+
+**Hieronder staat de diagnose van vóór de reparatie.** Hij klopte, op één punt
+na: de stap was niet met één handeling te zetten.
+
 
 **Eén handeling in Vercel, en het is de enige stap die dit oplost.** Voeg
 `www.juandiazllc.com` toe aan het project `juandiazllc-com` (team

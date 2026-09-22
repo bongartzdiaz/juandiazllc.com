@@ -12281,3 +12281,63 @@ voordat je concludeert dat het opgelost is.
 got"*: een casestudy vraagt werk én een gemeten uitkomst. De
 HMB-advertentieweek heeft allebei. De skalo-diagnose heeft het werk en nog geen
 resultaat, en is daarmee materiaal en geen casestudy.
+
+### 2026-09-22 (12) — www staat erop, en de apex wees een kwartier de verkeerde kant op
+
+**Opdracht:** *merge 422 / and use claude browser to setup vercel corretly.*
+#422 is gemerged (`423b9aa`). De Vercel-kant staat, en de weg ernaartoe is het
+opschrijven waard — niet omdat hij lang was, maar omdat er onderweg iets live
+kapot is gegaan dat ik bijna niet had gezien.
+
+**Eindstand, gelezen via `list_project_domains` en niet van de pagina:**
+`www.juandiazllc.com` 308 naar `juandiazllc.com`, de apex op Production zonder
+redirect, `juandiazllc-com.vercel.app` op Production. Met `curl` nagemeten:
+`www` geeft 308, de keten eindigt op `/en` met 200, en `ssl_verify=0` op elke
+hop — curls volledige controle inclusief hostnaam, precies de controle die
+eerder `SEC_E_WRONG_PRINCIPAL` gaf. Negatieve controle: `nope.juandiazllc.com`
+resolvet niet, dus het is geen wildcard die alles opvangt.
+
+**De fout.** Het venster "Add Domains" draagt een vinkje *"Redirect apex domains
+to www (recommended)"* dat aan staat. Ik zette het uit met `form_input`, de
+schermafdruk vlak vóór het versturen liet het uit zien, en toch kwam
+`juandiazllc.com` eruit met `redirect: www.juandiazllc.com, 308`. `form_input`
+zet de **DOM**-waarde; de **state** van React bleef `true`, en de submit leest
+die state. Vijftien minuten lang bouncete daardoor elke verwijzing naar de apex
+naar `www` — het sitemap, de JSON-LD, en de backlink die diezelfde ochtend
+vanaf `diazatlas.com` is gelegd.
+
+Wat het ving was de gewoonte om ná het versturen de **API** te bevragen in
+plaats van de pagina te lezen. Teruggedraaid via Edit op de apexrij, daarna
+opnieuw gemeten. **Een schermafdruk van een React-formulier bewijst niet wat er
+verstuurd wordt.** Het signaal stond er trouwens al: het vinkje sprong in een
+eerdere hertekening zichtbaar terug aan, en ik las dat als een hertekening in
+plaats van als de waarheid. Zie
+[[feedback_form_input_is_geen_react_state]].
+
+**Waarom het zoveel pogingen kostte.** De keuzelijsten in dat venster worden
+**buiten** het venster getekend — in de accessibility-boom een eigen `dialog`
+náást de echte. Een klik op een optie telt daardoor als een klik búíten het
+venster en sluit het hele formulier. Dat gebeurde drie keer voordat de oorzaak
+zichtbaar werd, en de eerste keer schreef ik het op als een mis-klik. Verder:
+toetsenbordselectie committeert er niet, en typen in het bestemmingsveld liet
+de renderer meermaals volledig vastlopen (`Page.captureScreenshot` in time-out
+terwijl de DOM nog antwoordde).
+
+**Wat wél werkt, voor de volgende keer:** voeg het domein toe **zonder**
+redirect — dat raakt geen enkele keuzelijst — en zet de redirect daarna via
+**Edit** op de rij zelf. Dat formulier staat inline, heeft geen venster om te
+sluiten, en daar werkt de keuzelijst gewoon in één klik.
+
+**Twee routes die af vielen.** De Vercel-MCP geeft **403 `forbidden`** op
+`add_project_domain`: het token leest wel en schrijft niet, dezelfde muur als
+bij env-vars. En er staat geen `vercel`-CLI op deze machine; er één installeren
+en inloggen vraagt om inloggegevens, en die typ ik niet in.
+
+**"DNS Change Recommended" op `www` is een aanbeveling, geen fout.** Vercel
+vraagt om `CNAME www ccb12fba14130019.vercel-dns-017.com.` maar zegt er zelf bij
+dat de oude records blijven werken; de API zet het domein op `verified: true`
+en het certificaat is uitgegeven.
+
+**Wat openblijft:** `diazatlas.com`. De vier controles daar waren al schoon, dus
+als Instagram dat domein óók markeert heeft dat een andere oorzaak, en die is
+met deze wijziging niet geraakt.
