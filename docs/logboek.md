@@ -12341,3 +12341,121 @@ en het certificaat is uitgegeven.
 **Wat openblijft:** `diazatlas.com`. De vier controles daar waren al schoon, dus
 als Instagram dat domein óók markeert heeft dat een andere oorzaak, en die is
 met deze wijziging niet geraakt.
+
+### 2026-09-22 (13) — de nav van diazatlas brak tussen twee getallen
+
+Juan vroeg of beide sites goed staan op alle apparaten. Het antwoord was nee,
+voor één van de twee. **`juandiazllc.com` is schoon** — negen pagina/breedte-
+combinaties op 360, 375, 753 en 885 px over `/en`, `/nl/pricing`,
+`/en/contact`, `/en/work`, `/de/pricing` en `/en/about`, overal nul overloop.
+**`diazatlas.com` brak in twee banden**, en op één pagina op elke telefoon.
+
+Gemeten met `documentElement.scrollWidth - clientWidth`, met een filter dat
+elementen binnen een `overflow-x`-voorouder wegstreept — anders telt elke
+bedoelde scrollcontainer mee als een fout.
+
+| gemeten op productie | overloop |
+|---|---|
+| `/` op 753px | **211px** |
+| `/` op 885px | 79px |
+| `/` op 375px | 17px |
+| `/` op 360px | 32px |
+| `/about` op 375px | **295px** |
+| `/changelog` op 360px | 76px |
+
+**Een meta-viewporttag is geen bewijs van goed staan.** Beide sites dragen
+`width=device-width, initial-scale=1`; de fout zit in de opmaak eronder, en
+die tag verbergt hem eerder dan dat hij hem oplost.
+
+**De oorzaak staat op één regel.** `landing/index.html:262` verbergt
+`nav .links` op `max-width: 640px`, terwijl de nav zelf 964 tot 985px nodig
+heeft. Tussen die twee getallen loopt de CTA van het scherm. En **het vaste
+breekpunt is de bug zelf**, niet het getal erin: de benodigde breedte
+verschilt per taal, dus elk getal dat je invult is voor drie van de vier
+talen verkeerd.
+
+**Daarom is de reparatie structureel.** `nav .right` krimpt nooit
+(`flex: 0 0 auto`), `nav .links` is het enige dat meegeeft — `min-width: 0`
+plus `overflow-x: auto` met verborgen scrollbar. Geen vertaling kan de CTA
+daarmee nog van het scherm duwen; het menu wordt afgeknipt in zijn eigen vak.
+Onder het breekpunt zakt de nav door een compacte ladder: kleinere padding,
+op 420px valt de merknaam weg (`font-size: 0`, met een `aria-label` op de link
+erbij zodat hij leesbaar blijft voor wie hem niet ziet), en ellipsis op de CTA
+als laatste redmiddel.
+
+**Het waren twee families en een weeskind.** Een eerste grep vond vier
+pagina's; een zoektocht binnen `<nav>` vond er negen. De inline-pagina's
+breken op 640, `_vs-styles.css` (changelog, find-your-fit, roadmap, quiz,
+upgrade) op **720** — dat is daar bewust gebleven, want op 640 zetten zou het
+gedrag van vijf pagina's verschuiven voor een probleem dat ze niet hebben. En
+`about.html` verborg zijn links op **geen enkele** breedte; die kreeg het blok
+dat hij nooit had.
+
+Vier inhoudelijke overlopen gingen mee, allemaal van vóór dit werk: tabellen
+in `roadmap` en `affiliates` scrollen nu binnen hun eigen kader
+(`display: block; overflow-x: auto`), lange tekst in `changelog`, `beta` en
+`about` breekt af met `overflow-wrap: break-word` — bewust niet `anywhere`,
+dat verandert de min-content-berekening — en de voetlinks van `beta` en
+`affiliates` wrappen.
+
+**Wat er onderweg fout ging, en het is de moeite waard.** Ik zette
+`flex: 0 0 auto` op `.brand` om te voorkomen dat de merknaam zou krimpen. Dat
+maakte het erger: lokaal 33px overloop op 430px waar productie er nul had. De
+merknaam **wrapt** namelijk naar twee regels en vloert daardoor op 98px;
+vastzetten haalt die wrap weg en groeit hem naar 146px. Een flexitem heeft
+standaard `min-width: auto` en zakt niet onder zijn langste woord — maar
+alleen zolang het mág wrappen. De regel is eruit en de reden staat als
+commentaar in de CSS, zodat niemand hem terugzet.
+
+**Twee meetvallen, allebei geraakt.** De iframe-harnas is ~15px pessimistisch
+door zijn eigen scrollbar: `fr.style.width = 430` levert `clientWidth` 415, en
+de restanten die daaruit volgen zijn geen fouten. Hermeten op echte viewports
+320/425/460/520 gaf overal nul. En CSS-specificiteit wordt bij gelijke stand
+door bronvolgorde beslist, dus alle toegevoegde media queries staan vlak vóór
+de eerste `</style>` — eerder ingevoegd waren ze dood geweest tegen een
+`nav .cta` die later in het bestand staat.
+
+**Geverifieerd over 468 combinaties** — 9 pagina's × 13 breedtes (320–1280) ×
+4 talen: nul overloop, met een positieve controle waarbij de pre-fix
+`index.html` náást de gefixte werd geserveerd. Dezelfde meter vlagde de oude
+pagina nog steeds (41px @320, 163px @753) terwijl de nieuwe in diezelfde run
+zweeg.
+
+**De eigen poort gaf 171/185, en dat getal betekende niets tot het een nulpunt
+had.** Veertien scripts rood. In plaats van te gokken of dat van mij kwam, is
+dezelfde poort gedraaid in een verse worktree op `aec3ea7c3` — zelfde commit,
+en net zo goed zonder `node_modules`, want anders vergelijk je twee
+omgevingen in plaats van twee bomen. Uitkomst: **exact dezelfde veertien
+namen, `diff` leeg.** Het zijn de bun-, deno- en dependency-suites. Rood dat
+altijd rood staat, precies het patroon uit
+[[feedback_rood_dat_altijd_rood_staat]] — en het blijft daar staan, want het
+is eigen werk in die repo, niet in deze reparatie.
+
+**Gemerged op Juans woord** als `bf9de70e0` (#690), squash, tak verwijderd; er
+staat nu niets meer open in `bongartzdiaz/diaz-editor`. De checks op die PR
+waren **Vercel, geen Actions** — daarom zeiden ze wél iets: de Actions-minuten
+van die repo zijn op, maar Vercel bouwt daarbuiten om. Zie
+[[project_diaz_editor_ci_draait_niet]] voor waarom een groen vinkje daar
+normaal niets bewijst.
+
+**De preview was niet te meten, dus is productie gemeten.** De
+preview-deployment staat achter Vercel-beveiliging en gaf 302 op elk pad;
+inloggen doe ik niet. Tien seconden na de merge serveerde productie de
+reparatie al, en toen is de hele lijst hermeten op het levende object in
+plaats van op het bestand — [[project_diaz_editor_repo_prod_drift]].
+
+| hermeten op diazatlas.com, ná de deploy | vóór | nu |
+|---|---|---|
+| `/` op 753px | 211px | **0** |
+| `/` op 870px | 46px | **0** |
+| `/` op 375px | 17px | **0** |
+| `/` op 360px | 32px | **0** |
+| `/about` op 375px | 295px | **0** |
+| `/changelog` op 360px | 76px | **0** |
+
+**Met een positieve controle op productie zelf**, want zes nullen op rij lezen
+net zo goed als een kapot instrument: een ingespoten element van 2000px gaf
+**1640** overloop, na verwijderen weer **0**. Die controle is client-side en
+raakt de site niet. Op 753px staan logo, menu, EN/NL/ES/DE en
+"€197 eenmalig →" allemaal op het scherm, met het menu netjes afgeknipt in
+zijn eigen vak.
