@@ -449,10 +449,11 @@ minuten:
   gerenderde pagina draagt de link niet**, ook niet bij een verzoek dat de
   LiteSpeed-cache mist. Publiceren, cache legen, dan
   `bash scripts/backlink-inventory.sh`.
-- **`diazatlas.com/about` en de voet**: gedaan in
-  `bongartzdiaz/diaz-editor#687` (vier about-pagina's + `founder.sameAs`),
-  **wacht op merge en deploy**. De sitebrede voet in `_compliance.js` blijft
-  bewust zonder link.
+- ~~**`diazatlas.com/about`**~~ **gesloten 2026-09-22**: `diaz-editor#687`
+  gemerged (`8de26388`) en live. De vier about-pagina's linken "Juan Diaz LLC"
+  naar `juandiazllc.com/<taal>/about` en dragen `founder.sameAs`; gemeten met
+  `scripts/backlink-inventory.sh` (0 → 2). **De eerste backlink ooit.** De
+  sitebrede voet in `_compliance.js` blijft bewust zonder link.
 - Daarna, per site één redactionele plek, géén sitebrede voet: auteursblok op
   `salderingsregeling2027.nl` en `besparenbelgie.online`, colofonregel op
   `voltafy.nl` en `performancetracker.nl`. `helpmijbesparen.nl` is een klant:
