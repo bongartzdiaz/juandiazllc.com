@@ -12080,3 +12080,58 @@ haalde ik ze weg in plaats van te vragen. Nu eerst de vraag, dan de kopij.
 Er lagen drie lagen doorhalingen overheen. De kop van die lijst waarschuwt
 precies daarvoor — *aanvullen is goedkoper dan herzien, en zo zijn die vijf
 ontstaan* — dus de stand staat er nu, en de geschiedenis hier.
+
+### 2026-09-22 (10) — #639 gemerged, en mijn bezwaar ertegen was fout
+
+**De correctie eerst.** De operator-lijst zei dat #639 *niet door mergen te
+sluiten* was omdat mergen "een leeg rapport publiceert". Dat klopte niet, en ik
+heb het twee keer herhaald voordat ik het bestand opende.
+
+Wat #639 toevoegt is **één markdown-bestand**,
+`reports/weekly-traffic/2026-W34.md`. Dat staat **buiten `landing/`** — de
+gedeployde map — en wordt dus niet geserveerd: de URL geeft 404, en `reports/`
+droeg al `weekly-seo` en `weekly-sales`. Er wordt niets gepubliceerd. Het is
+een intern logboek van een geblokkeerde run dat eerlijk *data pending* meldt,
+en dat is de real-stats-only-regel die wérkt, niet een overtreding ervan.
+Gemerged als `aec3ea7c3`; beide repo's staan nu op nul open PR's.
+
+**Twee keer dezelfde fout op één dag, in tegengestelde richting.** Eerder las
+ik bron in de repo en concludeerde iets over wat er gedeployd stond; hier las
+ik een PR-titel en concludeerde iets over wat er in de diff stond. Beide keren
+was het artefact één commando ver. Het signaal zit in de formulering: "mergen
+publiceert een leeg rapport" is een bewering over een bestand dat ik nooit had
+geopend. **Een bezwaar dat twee keer herhaald wordt, is één keer natrekken
+waard.**
+
+Wat #639 wél meebracht: 312 indexeerbare URL's in `landing/sitemap.xml`, het
+ruime crawl-beleid in `robots.txt`, en een correctie op een eerdere aanname —
+*"site = 0 organic by design"* gold alleen voor de bewust-noindex `/cad`-
+pagina's. En hij wijst naar iets dat al op de lijst stond: **Search Console als
+prioriteit 1**, omdat GSC de enige consent-vrije organic-bron is; GA4 en Vercel
+ondertellen structureel door de EU/UK/CA default-deny.
+
+### Diaz Editor bij de casestudy-scope — en de vraag die eronder ligt
+
+Juan: *also the case studies that were made from diaz editor are also good*.
+Genoteerd in `docs/claims.md` en op de lijst. Twee dingen zijn gemeten voordat
+er iets is opgeschreven.
+
+**Er bestaat geen ingevulde casestudy.** Er ligt een template voor
+klantinterviews (`CASE-STUDY-TEMPLATE-2026-05-25.md`, acht vragen, €50
+cadeaubon) en `landing/case-studies/` is **leeg — nul bestanden**. Wat er wél
+ligt is uitgewerkt werk dát met de editor gemaakt is: het plan voor een woning
+van 300 m² in Colombia, 23 bestanden met NSR-10-onderzoek, memoria descriptiva,
+bestek, fasering, Scene JSON en DXF-export.
+
+**En Diaz Editor heeft nooit een betalende externe klant gehad** — nul
+betalingen ooit, 25 checkout-sessies waarvan geen enkele betaald, zes licenties
+alle zes met de hand uitgegeven. Klantcasestudy's uit die template kunnen dus
+niet bestaan: er is niemand om te interviewen.
+
+Daarmee ligt er een vraag die een sessie niet kan beslissen: bedoelt Juan het
+uitgewerkte werk, of klantverhalen? Het eerste is een **capaciteits-
+demonstratie** — "dit is wat er met dit gereedschap te maken is, van norm tot
+DXF" — en dat staat op eigen benen zonder klant. Het tweede bestaat niet.
+Gevraagd vóór er kopij komt, in plaats van te gokken en een claim te
+publiceren die met één query weerlegd wordt. Zie
+[[feedback_welk_document_liegt]].
