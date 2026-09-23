@@ -75,6 +75,8 @@ const AANROEPERS: Record<string, string> = {
   "components/ContactForm.tsx": "Contact Submitted -- de conversie na een geslaagde inzending",
   "components/LekkageScan.tsx": "Scan Voltooid -- de afronding van de lekkage-scan",
   "components/calculators/EnergyRoi.tsx": "Berekening Aangevraagd -- het opgegeven adres onder de ROI-uitkomst (2026-09-20)",
+  "components/sections/CtaBig.tsx": "Nieuwsbrief -- de opt-in onder de homepage-CTA (2026-09-23)",
+  "components/NewsletterForm.tsx": "Nieuwsbrief -- de opt-in op /insights (2026-09-23)",
 };
 
 /** Elke aanroep op een `.plausible`-lid, met of zonder optionele vorm. */

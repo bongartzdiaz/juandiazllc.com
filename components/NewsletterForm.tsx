@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { subscribe, type SubscribeState } from "@/app/actions/subscribe";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 
@@ -38,6 +38,23 @@ export function NewsletterForm({
   const { locale, t } = useLocale();
   const resolvedHeadline = headline ?? t("nl.headline");
   const resolvedSub = sub ?? t("nl.sub");
+
+  // Vuurt zodra de opt-in is geslaagd, niet bij een klik -- net als
+  // `Contact Submitted`. Zonder dit doel was een inschrijving alleen in
+  // `marketing.subscribers` te zien en nergens in het dashboard.
+  //
+  // `typeof`, geen `?.()`: die vorm valt alleen terug op null en undefined, en
+  // een truthy niet-functie werpt hier binnen een effect. Zie
+  // lib/plausible-aanroep.test.ts.
+  useEffect(() => {
+    if (state.status !== "ok") return;
+    const w = window as unknown as {
+      plausible?: (event: string, opts?: { props?: Record<string, string> }) => void;
+    };
+    if (typeof w.plausible === "function") {
+      w.plausible("Nieuwsbrief", { props: { bron: source } });
+    }
+  }, [state.status]);
 
   return (
     <div className={compact ? "nl-card compact" : "nl-card"}>

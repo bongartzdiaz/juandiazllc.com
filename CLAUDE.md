@@ -495,11 +495,12 @@ of geen conversie is, beslissen de Plausible-doelen van stap 1.
 
 ### De meetketen — in blokkerende volgorde
 
-1. **Acht Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
+1. **Negen Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
    `Pricing CTA`, `Sector CTA`, `Tool CTA`, `Contact Submitted`,
-   `Scan Voltooid`, `Uitslag Aangevraagd` en `Berekening Aangevraagd`
-   (2026-09-20, de ROI-opvang), plus de vier custom properties (`tier`,
-   `sector`, `tool`, `lekken`). Taggen is af en op productie
+   `Scan Voltooid`, `Uitslag Aangevraagd`, `Berekening Aangevraagd`
+   (2026-09-20, de ROI-opvang) en `Nieuwsbrief` (2026-09-23, de opt-in die
+   tot die dag niets afvuurde), plus de vijf custom properties (`tier`,
+   `sector`, `tool`, `lekken`, `bron`). Taggen is af en op productie
    geverifieerd; zonder de doelen worden de kliks binnengehaald en weggegooid.
    **`Contact Submitted` stond tot 2026-08-24 op geen enkele lijst**, en het is
    het enige doel dat een conversie meet in plaats van een klik — precies het

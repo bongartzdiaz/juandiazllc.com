@@ -1,15 +1,36 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { LocaleLink } from "@/components/LocaleLink";
 import { subscribe, type SubscribeState } from "@/app/actions/subscribe";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
+
+// Eén plek voor de bron, zodat het verborgen veld en het doel niet uit
+// elkaar kunnen lopen: de database en Plausible dragen dezelfde waarde.
+const BRON = "cta_landing";
 
 const initial: SubscribeState = { status: "idle" };
 
 export function CtaBig() {
   const [state, formAction, pending] = useActionState(subscribe, initial);
   const { t, locale } = useLocale();
+
+  // Vuurt zodra de opt-in is geslaagd, niet bij een klik -- net als
+  // `Contact Submitted`. Zonder dit doel was een inschrijving alleen in
+  // `marketing.subscribers` te zien en nergens in het dashboard.
+  //
+  // `typeof`, geen `?.()`: die vorm valt alleen terug op null en undefined, en
+  // een truthy niet-functie werpt hier binnen een effect. Zie
+  // lib/plausible-aanroep.test.ts.
+  useEffect(() => {
+    if (state.status !== "ok") return;
+    const w = window as unknown as {
+      plausible?: (event: string, opts?: { props?: Record<string, string> }) => void;
+    };
+    if (typeof w.plausible === "function") {
+      w.plausible("Nieuwsbrief", { props: { bron: BRON } });
+    }
+  }, [state.status]);
 
   return (
     <section className="cta-big" id="cta">
@@ -34,7 +55,7 @@ export function CtaBig() {
           required
           disabled={state.status === "ok"}
         />
-        <input type="hidden" name="source" value="cta_landing" />
+        <input type="hidden" name="source" value={BRON} />
         {/* Zonder dit veld antwoordt `subscribe` in het Engels, ook op
             /nl, /de en /es. NewsletterForm stuurde hem al mee. */}
         <input type="hidden" name="locale" value={locale} />
