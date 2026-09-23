@@ -732,7 +732,13 @@ hier stond is hoe dan ook *nee*.
   meer voor** — zet iemand hem terug aan zonder `APPSUMO_DEV_SECRET`, dan weigert
   die tak met 503 `auth-not-configured`.
 - **Leaked-password protection** aanzetten op `wbgiouuifqhasedncysw` — de enige
-  WARN uit de advisors die actie vergt.
+  WARN uit de advisors die actie vergt. **Nog steeds uit, gemeten 2026-09-23.**
+  De advisors staan die dag op **0 ERROR, 3 WARN, 108 INFO** — niet op de negen
+  WARN's van 26 augustus. Wat wegviel zijn de zes
+  `security_definer`-WARN's die met de revoke hierboven zijn opgelost; wat
+  blijft is deze, plus `extension_in_public` (`pg_net`) en
+  `current_org_id`. Die laatste twee zijn hierboven al beoordeeld en vergen
+  niets.
 - **Tien dode `diaz-*` edge functions** op wbgio — **onschadelijk sinds
   2026-08-27, maar nog niet verwijderd.** Er staat een 410-stub overheen zonder
   database, netwerk of service-role-gebruik; de tien functies zelf staan er nog,
@@ -760,10 +766,19 @@ hier stond is hoe dan ook *nee*.
   cron-secret hoort te eisen (Vault draagt `pai_cron_secret`) is niet
   uitgezocht; noteer het vóór de probe hem nog eens aanroept met data erachter.
 - **Het tweede, lege Stripe-account** sluiten of labelen.
-- Optioneel, hygiëne: `revoke execute on function public.handle_new_user(),
-  public.notify_new_lead(), public.rls_auto_enable() from public, anon,
-  authenticated;` — alle drie meetbaar niet aanroepbaar via RPC, dus dit is
-  opruimen en geen reparatie.
+- ~~Optioneel, hygiëne: `revoke execute on function …`~~ **Al gebeurd,
+  gemeten 2026-09-23.** De ACL's van `handle_new_user`, `notify_new_lead` en
+  `rls_auto_enable` dragen alleen nog `postgres`, `service_role` (en bij de
+  eerste `supabase_auth_admin`) — geen PUBLIC-regel meer, en `proacl` is niet
+  null, dus ook niet de standaard-grant.
+
+  **Meet dit via `proacl`, niet via `has_function_privilege('public', …)`.**
+  Die helper geeft hier op alle drie `false`, maar dat leest identiek aan een
+  helper die PUBLIC helemaal niet kan zien. De positieve controle die dat
+  onderscheid maakt: `pg_catalog.lower` heeft `proacl = null` en geeft `true`.
+  Onafhankelijke bevestiging langs een tweede weg: de advisors telden op
+  26 augustus **zeven** `*_security_definer_function_executable`-WARN's en nu
+  nog **één** (`current_org_id`, die geen PUBLIC-grant heeft en bedoeld is).
 
 ### Philly of DEUS — drie naamsbeslissingen
 
@@ -831,12 +846,19 @@ repo horen.
   zonne-eigenaren en installateurs". Geen zoekwoordkwestie maar een claim die
   niet klopt. Welke van de twee waar is, is niet van buitenaf te zien, en een
   gok invullen is precies wat `docs/claims.md` moet voorkomen.
-- **`diazatlas.com` heeft geen prijspagina.** `/pricing` geeft **307** naar
-  `/#pricing` (regel in `landing/vercel.json:121`); `/nl/pricing`,
-  `/de/pricing` en `/features` geven 404. Er is dus geen URL die op een
-  prijsvraag kan staan, voor een product waarvan "geen abonnement" het hele
-  argument is. Werk in `bongartzdiaz/diaz-editor`; de drie 404's en de 307
-  zijn hermeten op **2026-09-23** en staan er nog.
+- ~~**`diazatlas.com` heeft geen prijspagina.**~~ **Gesloten 2026-09-23** met
+  `diaz-editor#702` (`733a1998f`): `/pricing`, `/nl/pricing`, `/de/pricing`
+  en `/es/pricing` geven alle vier **200**, met eigen canonical, titels van
+  54/53/50/55 tekens en JSON-LD met de vijf tiers. De redirect naar
+  `/#pricing` is uit `landing/vercel.json`; `#704` liet de nav erheen wijzen.
+  Gemeten op productie, met 404 op een verzonnen pad als negatieve controle.
+
+  **Let op hoe dit blok eruitzag.** Er stond "hermeten op 2026-09-23 en staan
+  er nog" — een verse meting die diezelfde dag door #702 werd omvergelopen.
+  Een datum maakt een regel niet waar; hij zegt alleen wanneer hij waar wás.
+
+- **`/features` geeft nog 404.** Dat deel blijft open en is het enige dat van
+  het blok hierboven overblijft. Werk in `bongartzdiaz/diaz-editor`.
 
   **De titelklacht die hier stond, is vervallen.** Er stond dat drie van de
   vier homepagetitels over 60 tekens lopen en dat de Duitse daardoor precies
