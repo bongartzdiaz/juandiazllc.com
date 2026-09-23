@@ -119,8 +119,8 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
         </div>
       </header>
 
-      <section style={{ padding: "60px 40px 40px", maxWidth: "var(--max)", margin: "0 auto" }}>
-        <div className="stats" data-reveal style={{ borderRadius: 16 }}>
+      <section style={{ padding: "60px var(--section-pad-x) 40px", maxWidth: "var(--max)", margin: "0 auto" }}>
+        <div className="stats stats-text" data-reveal style={{ borderRadius: 16 }}>
           {v.metrics.map((m, i) => (
             <div key={i} className="stat">
               <div className="n" style={{ fontSize: "clamp(28px, 4vw, 44px)" }}>{m.value}</div>
@@ -151,10 +151,9 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
           {v.phases.map((p, i) => (
             <div
               key={i}
+              className="tl-row"
               style={{
                 display: "grid",
-                gridTemplateColumns: "60px 140px 1fr",
-                gap: 24,
                 padding: "24px 0",
                 borderTop: "1px solid var(--line)",
                 alignItems: "baseline",
@@ -248,7 +247,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
         </div>
       </article>
 
-      <section style={{ padding: "80px 40px 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
+      <section style={{ padding: "80px var(--section-pad-x) 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div className="sec-head" data-reveal style={{ marginBottom: 40 }}>
           <div>
             <div className="label">{t("work.d.related.label")}</div>
@@ -259,7 +258,7 @@ export default async function VenturePage({ params }: { params: Promise<{ locale
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))",
             gap: 16,
           }}
         >

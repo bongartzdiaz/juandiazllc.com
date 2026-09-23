@@ -107,7 +107,7 @@ export default async function SignalsTagArchivePage(
 
       <section
         style={{
-          padding: "40px 40px 140px",
+          padding: "40px var(--section-pad-x) 140px",
           maxWidth: "var(--max)",
           margin: "0 auto",
         }}
@@ -122,10 +122,9 @@ export default async function SignalsTagArchivePage(
               <LocaleLink
                 key={s.slug}
                 href={`/signals/${s.slug}`}
+                className="signal-row"
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "180px 1fr auto",
-                  gap: 32,
                   padding: "32px 28px",
                   border: "1px solid var(--line)",
                   borderRadius: 16,

@@ -199,10 +199,9 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
           {s.playbook.map((p, i) => (
             <div
               key={i}
+              className="tl-row"
               style={{
                 display: "grid",
-                gridTemplateColumns: "60px 140px 1fr",
-                gap: 24,
                 padding: "22px 0",
                 borderTop: "1px solid var(--line)",
                 alignItems: "baseline",
@@ -288,7 +287,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
         </div>
       </article>
 
-      <section style={{ padding: "80px 40px 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
+      <section style={{ padding: "80px var(--section-pad-x) 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div className="sec-head" data-reveal style={{ marginBottom: 40 }}>
           <div>
             <div className="label">{translate(l, "sectors.d.others.label")}</div>
@@ -296,7 +295,7 @@ export default async function SectorPage({ params }: { params: Promise<{ locale:
           </div>
           <p>{translate(l, "sectors.d.others.body")}</p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(260px, 100%), 1fr))", gap: 16 }}>
           {others.map((o) => (
             <LocaleLink key={o.slug} href={`/sectors/${o.slug}`} className="sec-card" data-reveal style={{ minHeight: 200 }}>
               <div>

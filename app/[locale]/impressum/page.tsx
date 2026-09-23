@@ -30,7 +30,7 @@ export default async function ImpressumPage({ params }: { params: Promise<{ loca
       </header>
       <section
         className="long"
-        style={{ padding: "20px 40px 140px", maxWidth: 760, margin: "0 auto" }}
+        style={{ padding: "20px var(--section-pad-x) 140px", maxWidth: 760, margin: "0 auto" }}
       >
         <h2>{t("impressum.h.company")}</h2>
         <p>{t("impressum.p.company")}</p>

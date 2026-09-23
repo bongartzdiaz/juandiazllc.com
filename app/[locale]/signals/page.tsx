@@ -47,16 +47,15 @@ export default async function SignalsIndex({ params }: { params: Promise<{ local
         <h1 dangerouslySetInnerHTML={{ __html: t("signals.page.title") }} />
         <p>{t("signals.page.lede")}</p>
       </header>
-      <section style={{ padding: "80px 40px 160px", maxWidth: "var(--max)", margin: "0 auto" }}>
+      <section style={{ padding: "80px var(--section-pad-x) 160px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div style={{ display: "grid", gap: 12 }}>
           {getSignals(l).map((s) => (
             <LocaleLink
               key={s.slug}
               href={`/signals/${s.slug}`}
+              className="signal-row"
               style={{
                 display: "grid",
-                gridTemplateColumns: "180px 1fr auto",
-                gap: 32,
                 padding: "32px 28px",
                 border: "1px solid var(--line)",
                 borderRadius: 16,

@@ -35,7 +35,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
       </header>
       <section
         className="long"
-        style={{ padding: "20px 40px 140px", maxWidth: 760, margin: "0 auto" }}
+        style={{ padding: "20px var(--section-pad-x) 140px", maxWidth: 760, margin: "0 auto" }}
       >
         <h2>{t("priv.h.cookies")}</h2>
         <p>{t("priv.p.cookies")}</p>

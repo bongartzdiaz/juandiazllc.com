@@ -95,13 +95,13 @@ export default async function EnergyRoiPage({
         <p>{t("roi.lede")}</p>
       </header>
 
-      <section style={{ padding: "40px 40px 80px", maxWidth: "var(--max)", margin: "0 auto" }}>
+      <section style={{ padding: "40px var(--section-pad-x) 80px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <EnergyRoi labels={labels} locale={l} />
         <ScanCallout locale={l} />
         <EnergyInsightLinks locale={l} />
       </section>
 
-      <section style={{ padding: "40px 40px 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
+      <section style={{ padding: "40px var(--section-pad-x) 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div
           style={{
             padding: 36,
