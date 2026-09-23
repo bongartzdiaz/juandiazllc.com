@@ -49,6 +49,11 @@ const BROADCAST_MAILS = 3;
 
 const AFMELDREGEL = /Liever geen berichten meer van mij|Afmelden:/;
 
+/** De afzenderregel onder elk bericht: "Juan Diaz LLC · <adres>", met de site
+    er optioneel achter. De groep vangt het adres zelf, zodat de poort kan zien
+    of er twaalf keer hetzelfde staat. */
+const ADRESREGEL = /^Juan Diaz LLC · (.+?)(?: · juandiazllc\.com)?$/m;
+
 function lees(pad: string): string {
   return readFileSync(pad, "utf8").replace(/\r\n/g, "\n");
 }
@@ -183,6 +188,37 @@ describe("docs/koude-outreach.md", () => {
       .filter(({ b }) => vraagt(b) && !AFMELDREGEL.test(b))
       .map(({ i }) => `bericht ${i + 1}`);
     expect(zonder, "vraagt om een reactie maar draagt geen afmeldregel").toEqual([]);
+  });
+
+  it("draagt onder elk bericht hetzelfde fysieke postadres", () => {
+    // CAN-SPAM eist een fysiek postadres in elk commercieel bericht. Dat geldt
+    // ook voor de broadcast: toestemming waiveert de toestemming, niet het
+    // adres. Een abonnee in Ohio heeft er evenveel recht op als een koude
+    // prospect, dus deze poort telt alle twaalf blokken, niet alleen de negen.
+    const adres = (b: string) => b.match(ADRESREGEL)?.[1];
+
+    // Positieve controle in beide richtingen: de detector moet aantoonbaar
+    // iets kunnen vinden en aantoonbaar iets kunnen missen.
+    expect(adres("Juan\nJuan Diaz LLC · 1 Main St, Dover DE · juandiazllc.com")).toBe(
+      "1 Main St, Dover DE",
+    );
+    expect(adres("Juan\nJuan Diaz LLC · 1 Main St, Dover DE")).toBe("1 Main St, Dover DE");
+    expect(adres("Juan\njuandiazllc.com")).toBeUndefined();
+
+    const zonder = BLOKKEN.map((b, i) => ({ b, i }))
+      .filter(({ b }) => !adres(b))
+      .map(({ i }) => `bericht ${i + 1}`);
+    expect(zonder, "commercieel bericht zonder fysiek postadres").toEqual([]);
+
+    // Een adres, niet twaalf varianten. Twee verschillende adressen onder
+    // dezelfde reeks is precies het soort drift dat niemand opmerkt.
+    const gevonden = [...new Set(BLOKKEN.map((b) => adres(b) ?? ""))];
+    expect(gevonden, "twee verschillende adressen onder de berichten").toHaveLength(1);
+
+    // Een placeholder leest als een adres maar is er geen, en een adres zonder
+    // cijfer is geen adres. Beide zouden de telling hierboven overleven.
+    expect(gevonden[0], "placeholder in plaats van een adres").not.toMatch(/[[\]]/);
+    expect(gevonden[0], "adres zonder huisnummer of postcode").toMatch(/\d/);
   });
 
   it("stelt in elk koud eerste bericht precies één vraag", () => {

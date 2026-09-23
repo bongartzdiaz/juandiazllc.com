@@ -45,9 +45,17 @@ De ACM handhaaft actief, met de bewijslast bij de verzender en een
 boetemaximum van €900.000 of 1% van de omzet.
 
 En **CAN-SPAM eist een fysiek postadres in élk commercieel bericht**, niet
-alleen in het eerste. Daarom draagt elk bericht hieronder een adresregel.
-Die staat als `[postadres]` in de kopij: het adres van de LLC hoort niet
-verzonnen te worden, en staat niet in deze repo.
+alleen in het eerste — en toestemming heft dat niet op. Een broadcast naar
+iemand die zich zelf heeft ingeschreven draagt het adres dus net zo goed als
+een koud bericht. Sinds 2026-09-23 staat het er: het adres van de registered
+agent van Juan Diaz LLC in Dover, Delaware. Een postadres onder een
+commerciële mail is openbaar van aard, en dat is precies wat de wet eist.
+
+**Eén ding om na te gaan vóór het eerste bericht de deur uit gaat.** Veel
+Delaware-agents sturen alleen betekeningen en staatsstukken door, geen gewone
+post. Reageert iemand per brief, of controleert een ontvangende partij het
+adres, dan moet daar iets aankomen. Doet de agent dat niet, dan is een
+commerciële postbus de betere keuze — CAN-SPAM aanvaardt die expliciet.
 
 **Welke entiteit.** Standaard gaat het vanuit **Juan Diaz LLC**. Wie liever
 met een Europese partij contracteert, kan dat — dat is een
@@ -76,7 +84,7 @@ dan thuis, en dat hoort hier te staan.
 
 ## §2 — De vorm
 
-Vijf regels. Ze wijken bewust af van `docs/introducties.md`, want daar bestaat
+Zes regels. Ze wijken bewust af van `docs/introducties.md`, want daar bestaat
 een gedeelde herinnering en hier niet.
 
 1. **Open bij hun probleem, niet bij mijn resultaat.** Een koude lezer heeft
@@ -88,8 +96,9 @@ een gedeelde herinnering en hier niet.
 5. **Afmeldregel in elke e-mail.** Bij opt-out is dat geen beleefdheid maar de
    voorwaarde waaronder het bericht mag.
 6. **Afzender en postadres onder elk bericht.** CAN-SPAM eist het fysieke
-   adres in élk commercieel bericht; `[postadres]` invullen vóór het eerste
-   bericht de deur uit gaat.
+   adres in élk commercieel bericht, de broadcast inbegrepen.
+   `lib/koude-outreach.test.ts` gaat rood zodra een bericht het kwijtraakt, of
+   zodra er twee verschillende adressen onder de twaalf komen te staan.
 
 Toon: je, kort, concreet. Dezelfde stem als de site.
 
@@ -122,7 +131,7 @@ Waar blijft een lead bij [bedrijf] hangen — bij het terugbellen, of bij het
 inplannen van de schouw?
 
 Juan Diaz
-Juan Diaz LLC · [postadres] · juandiazllc.com
+Juan Diaz LLC · 1111B S Governors Ave STE 92236, Dover, DE 19904, USA · juandiazllc.com
 
 Liever geen berichten meer van mij? Eén regel terug en ik haal je eruit.
 ```
@@ -142,7 +151,7 @@ Wil je zien hoe dat eruitziet als het wel ergens staat:
 juandiazllc.com/nl/work
 
 Juan
-Juan Diaz LLC · [postadres]
+Juan Diaz LLC · 1111B S Governors Ave STE 92236, Dover, DE 19904, USA
 
 Liever geen berichten meer van mij? Eén regel terug en ik haal je eruit.
 ```
@@ -160,7 +169,7 @@ Mocht het later gaan knellen: ik doe dit in sprints van 30 dagen, vaste prijs
 Succes met [bedrijf].
 
 Juan
-Juan Diaz LLC · [postadres]
+Juan Diaz LLC · 1111B S Governors Ave STE 92236, Dover, DE 19904, USA
 ```
 
 ---
@@ -184,7 +193,7 @@ Als je buitendienst vandaag iets afspreekt bij een klant, wanneer weet kantoor
 dat bij [bedrijf] — meteen, of aan het eind van de dag?
 
 Juan Diaz
-Juan Diaz LLC · [postadres] · juandiazllc.com
+Juan Diaz LLC · 1111B S Governors Ave STE 92236, Dover, DE 19904, USA · juandiazllc.com
 
 Liever geen berichten meer van mij? Eén regel terug en ik haal je eruit.
 ```
@@ -203,7 +212,7 @@ je snelheid.
 Hoe ik dat aanpak staat hier: juandiazllc.com/nl/work
 
 Juan
-Juan Diaz LLC · [postadres]
+Juan Diaz LLC · 1111B S Governors Ave STE 92236, Dover, DE 19904, USA
 
 Liever geen berichten meer van mij? Eén regel terug en ik haal je eruit.
 ```
@@ -221,7 +230,7 @@ tegelijk. Je hoort niets meer tot je zelf iets laat weten.
 Succes.
 
 Juan
-Juan Diaz LLC · [postadres]
+Juan Diaz LLC · 1111B S Governors Ave STE 92236, Dover, DE 19904, USA
 ```
 
 ---
@@ -245,7 +254,7 @@ Hoe lang duurt het bij [bedrijf] tussen een aanvraag en een offerte de deur
 uit?
 
 Juan Diaz
-Juan Diaz LLC · [postadres] · juandiazllc.com
+Juan Diaz LLC · 1111B S Governors Ave STE 92236, Dover, DE 19904, USA · juandiazllc.com
 
 Liever geen berichten meer van mij? Eén regel terug en ik haal je eruit.
 ```
@@ -264,7 +273,7 @@ dezelfde gegevens opnieuw worden ingevoerd.
 Voorbeelden: juandiazllc.com/nl/work
 
 Juan
-Juan Diaz LLC · [postadres]
+Juan Diaz LLC · 1111B S Governors Ave STE 92236, Dover, DE 19904, USA
 
 Liever geen berichten meer van mij? Eén regel terug en ik haal je eruit.
 ```
@@ -282,7 +291,7 @@ Verder hoor je niets meer van me.
 Succes met [bedrijf].
 
 Juan
-Juan Diaz LLC · [postadres]
+Juan Diaz LLC · 1111B S Governors Ave STE 92236, Dover, DE 19904, USA
 ```
 
 ---
@@ -328,7 +337,7 @@ Vier dingen die ik heb zien werken, geanonimiseerd maar echt gemeten:
 Volgende week stuur ik hoe dat eerste getal tot stand kwam, stap voor stap.
 
 Juan Diaz
-juandiazllc.com
+Juan Diaz LLC · 1111B S Governors Ave STE 92236, Dover, DE 19904, USA · juandiazllc.com
 
 Afmelden: [afmeldlink]
 ```
@@ -359,6 +368,7 @@ De vraag die dit oplevert voor jou: hoeveel aanvragen van vorige maand zijn
 nooit teruggebeld? Als dat getal nergens staat, is dat het antwoord.
 
 Juan
+Juan Diaz LLC · 1111B S Governors Ave STE 92236, Dover, DE 19904, USA
 
 Afmelden: [afmeldlink]
 ```
@@ -386,6 +396,7 @@ juandiazllc.com/nl/contact.
 Geen reactie is ook een antwoord; dan hoor je hierna alleen nog de gewone mail.
 
 Juan
+Juan Diaz LLC · 1111B S Governors Ave STE 92236, Dover, DE 19904, USA
 
 Afmelden: [afmeldlink]
 ```
