@@ -102,7 +102,7 @@ export default async function TagArchivePage(
 
       <section
         style={{
-          padding: "40px 40px 140px",
+          padding: "40px var(--section-pad-x) 140px",
           maxWidth: "var(--max)",
           margin: "0 auto",
         }}
@@ -110,7 +110,7 @@ export default async function TagArchivePage(
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(340px, 100%), 1fr))",
             gap: 14,
           }}
         >

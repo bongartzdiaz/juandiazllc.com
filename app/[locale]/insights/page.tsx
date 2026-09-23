@@ -66,7 +66,7 @@ export default async function InsightsIndex({ params }: { params: Promise<{ loca
 
       <section
         style={{
-          padding: "40px 40px 140px",
+          padding: "40px var(--section-pad-x) 140px",
           maxWidth: "var(--max)",
           margin: "0 auto",
         }}

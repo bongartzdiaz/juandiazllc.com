@@ -215,7 +215,7 @@ export function EnergyRoi({ labels, locale }: Props) {
         padding: 28,
       }}
     >
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 32 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: 32 }}>
         <div>
           <div
             style={{

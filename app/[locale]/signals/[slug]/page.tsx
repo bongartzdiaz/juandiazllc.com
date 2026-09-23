@@ -161,8 +161,8 @@ export default async function SignalPage({ params }: { params: Promise<{ locale:
         </div>
       </article>
 
-      <section style={{ padding: "40px 40px 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <section style={{ padding: "40px var(--section-pad-x) 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
+        <div className="prevnext" style={{ display: "grid" }}>
           {prev ? (
             <LocaleLink
               href={`/signals/${prev.slug}`}

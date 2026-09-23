@@ -51,11 +51,11 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
         <p>{t("work.page.lede")}</p>
       </header>
 
-      <section style={{ padding: "80px 40px 160px", maxWidth: "var(--max)", margin: "0 auto" }}>
+      <section style={{ padding: "80px var(--section-pad-x) 160px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
             gap: 16,
           }}
         >

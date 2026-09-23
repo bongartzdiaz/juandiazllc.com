@@ -241,11 +241,11 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
       </header>
 
       {/* Tier cards */}
-      <section style={{ padding: "40px 40px 60px", maxWidth: "var(--max)", margin: "0 auto" }}>
+      <section style={{ padding: "40px var(--section-pad-x) 60px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(260px, 100%), 1fr))",
             gap: 16,
           }}
         >
@@ -330,7 +330,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
       </section>
 
       {/* Feature comparison tables, one per category */}
-      <section style={{ padding: "20px 40px 80px", maxWidth: "var(--max)", margin: "0 auto" }}>
+      <section style={{ padding: "20px var(--section-pad-x) 80px", maxWidth: "var(--max)", margin: "0 auto" }}>
         {FEATURE_TABLE.map((section) => (
           <div key={section.titleKey} style={{ marginBottom: 36 }}>
             <h3
@@ -398,7 +398,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
       </section>
 
       {/* Migration upsell */}
-      <section style={{ padding: "40px 40px 60px", maxWidth: "var(--max)", margin: "0 auto" }}>
+      <section style={{ padding: "40px var(--section-pad-x) 60px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div
           style={{
             padding: 36,
@@ -441,7 +441,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
       </section>
 
       {/* FAQ accordion — 6 questions, native <details> for crawlability + no-JS support */}
-      <section style={{ padding: "40px 40px 60px", maxWidth: "var(--max)", margin: "0 auto" }}>
+      <section style={{ padding: "40px var(--section-pad-x) 60px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <h2
           style={{
             fontFamily: "'JetBrains Mono'",
@@ -465,7 +465,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
       </section>
 
       {/* Outro CTA */}
-      <section style={{ padding: "40px 40px 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
+      <section style={{ padding: "40px var(--section-pad-x) 140px", maxWidth: "var(--max)", margin: "0 auto" }}>
         <div
           style={{
             padding: 36,

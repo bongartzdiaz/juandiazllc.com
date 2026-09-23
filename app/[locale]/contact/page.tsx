@@ -42,7 +42,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
         <h1 dangerouslySetInnerHTML={{ __html: t("contact.page.title") }} />
         <p>{t("contact.page.lede")}</p>
       </header>
-      <section style={{ padding: "60px 40px 20px", maxWidth: 760, margin: "0 auto" }}>
+      <section style={{ padding: "60px var(--section-pad-x) 20px", maxWidth: 760, margin: "0 auto" }}>
         <Capacity locale={l} />
       </section>
 
@@ -52,7 +52,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
           één klik, het formulier eronder vraagt zeven velden. */}
       <section
         aria-labelledby="book-heading"
-        style={{ padding: "20px 40px 0", maxWidth: 760, margin: "0 auto" }}
+        style={{ padding: "20px var(--section-pad-x) 0", maxWidth: 760, margin: "0 auto" }}
       >
         <div
           style={{
@@ -90,7 +90,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
       <section
         aria-labelledby="directline-heading"
         style={{
-          padding: "20px 40px",
+          padding: "20px var(--section-pad-x)",
           maxWidth: 760,
           margin: "0 auto",
         }}
@@ -193,7 +193,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
         </div>
       </section>
 
-      <section style={{ padding: "20px 40px 40px", maxWidth: 760, margin: "0 auto" }}>
+      <section style={{ padding: "20px var(--section-pad-x) 40px", maxWidth: 760, margin: "0 auto" }}>
         <ContactForm />
       </section>
       {/* Ná het formulier, niet ervoor. Wie al besloten heeft mag niet eerst

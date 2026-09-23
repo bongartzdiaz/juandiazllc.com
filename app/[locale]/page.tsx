@@ -89,7 +89,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <Chapters />
       <Ventures kaarten={ventureKaarten()} />
       <LiveSignals locale={l} />
-      <section style={{ padding: "40px 40px 0", maxWidth: "var(--max)", margin: "0 auto" }}>
+      <section style={{ padding: "40px var(--section-pad-x) 0", maxWidth: "var(--max)", margin: "0 auto" }}>
         <Countdown2027 />
       </section>
       <Stats />

@@ -48,8 +48,8 @@ export default async function SectorsIndex({ params }: { params: Promise<{ local
         <h1 dangerouslySetInnerHTML={{ __html: t("sectors.page.title") }} />
         <p>{t("sectors.page.lede")}</p>
       </header>
-      <section style={{ padding: "80px 40px 160px", maxWidth: "var(--max)", margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
+      <section style={{ padding: "80px var(--section-pad-x) 160px", maxWidth: "var(--max)", margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))", gap: 16 }}>
           {sectors.map((s) => (
             <LocaleLink key={s.slug} href={`/sectors/${s.slug}`} className="sec-card" data-reveal style={{ minHeight: 340 }}>
               <div>
