@@ -834,9 +834,24 @@ repo horen.
   `/#pricing` (regel in `landing/vercel.json:121`); `/nl/pricing`,
   `/de/pricing` en `/features` geven 404. Er is dus geen URL die op een
   prijsvraag kan staan, voor een product waarvan "geen abonnement" het hele
-  argument is. Plus: drie van de vier homepagetitels lopen over 60
-  tekens, en de Duitse verliest daardoor precies "€197 Lebenslang". Werk in
-  `bongartzdiaz/diaz-editor`.
+  argument is. Werk in `bongartzdiaz/diaz-editor`; de drie 404's en de 307
+  zijn hermeten op **2026-09-23** en staan er nog.
+
+  **De titelklacht die hier stond, is vervallen.** Er stond dat drie van de
+  vier homepagetitels over 60 tekens lopen en dat de Duitse daardoor precies
+  "€197 Lebenslang" verliest. Dat is op 2026-09-22 gerepareerd en bewaakt:
+  `scripts/verify-titel-zoekwoorden.mjs` in diaz-editor toetst het formaat uit
+  `docs/SEO-STANDARDS.md` regel 5 en geeft 31 PASS, 0 FAIL. Gemeten op
+  productie, 2026-09-23: **en 57, nl 58, de 50, es 59 tekens** — alle vier
+  binnen de grens, en de Duitse draagt de prijs gewoon ("CAD einmalig kaufen ·
+  €197, kein Abo · Diaz Editor").
+
+  **Let op bij het nameten: tel tekens, geen bytes.** `${#t}` in bash telt
+  UTF-8-bytes, en elke `·` kost er één extra, elke `€` twee. Dat is precies
+  +4 per titel, waardoor alle vier te lang lijken en drie van de vier over de
+  grens. En volg de redirect: `https://diazatlas.com/nl/` geeft 308, dus zonder
+  `-L` lees je een lege body en een titel van nul tekens. Beide fouten zijn op
+  2026-09-23 gemaakt, achter elkaar, op deze regel.
 - ~~**`besparenbelgie.online` heet "Besparen Belgie".**~~ **Buiten scope sinds
   2026-09-22**; de meting blijft in `docs/keyword-doelen.md` §5 staan.
 
