@@ -462,12 +462,21 @@ Plausible bevat dus een spatie.
       stuurt er één mail met de berekening naartoe. Draagt `tool`
       (`energy-roi`), dezelfde eigenschap als `Tool CTA`, zodat klik en
       inzending op dezelfde tool naast elkaar te leggen zijn.
+- [ ] `Nieuwsbrief` — vuurt in `components/sections/CtaBig.tsx` (homepage) en
+      `components/NewsletterForm.tsx` (/insights) zodra een opt-in slaagt
+      (2026-09-23). Derde doel dat een OPGEGEVEN ADRES meet. Het ontbrak tot
+      die dag volledig: beide formulieren schreven wel een rij naar
+      `marketing.subscribers` maar vuurden niets af, dus een inschrijving was
+      alleen in de database te zien. Draagt `bron` — dezelfde waarde als het
+      `source`-veld dat naar de database gaat, zodat een uitsplitsing hier
+      1-op-1 naast `select source, count(*) from marketing.subscribers` legt.
 
-**Vergeet de custom properties niet.** Zeven van de acht sturen naast de naam ook
+**Vergeet de custom properties niet.** Acht van de negen sturen naast de naam ook
 eigenschappen mee, en die zijn in Plausible pas zichtbaar als je ze apart
-aanmeldt (Site Settings → **Custom properties**). Het blijven vier namen:
+aanmeldt (Site Settings → **Custom properties**). Het blijven vijf namen:
 `Sector CTA` en `Contact Submitted` gebruiken allebei `sector`, `Tool CTA` en
-`Berekening Aangevraagd` allebei `tool`. Alleen
+`Berekening Aangevraagd` allebei `tool`, en `Nieuwsbrief` draagt als enige
+`bron`. Alleen
 `Boeking 15min` draagt niets boven de `url` die overal meegaat.
 
 | doel | eigenschappen |
@@ -480,6 +489,7 @@ aanmeldt (Site Settings → **Custom properties**). Het blijven vier namen:
 | `Uitslag Aangevraagd` | `lekken` (aantal gevonden lekken, als tekst) |
 | `Berekening Aangevraagd` | `tool` (`energy-roi`) |
 | `Contact Submitted` | `sector` (de slug, of `unknown` als de bezoeker niets koos) |
+| `Nieuwsbrief` | `bron` (`cta_landing` op de homepage, `insights_index` op /insights) |
 
 Zonder die stap zie je wél het aantal kliks, maar niet welke tier of sector ze
 opleverde — en dat is precies waarvoor de tags zijn aangebracht.
