@@ -37,9 +37,10 @@
  * Chrome-pad overschrijven kan met CHROME_PAD=...
  */
 import { spawn } from "node:child_process";
-import { readFileSync, writeFileSync, rmSync } from "node:fs";
+import { readFileSync, writeFileSync, rmSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, basename } from "node:path";
+import { verouderdeProfielen } from "./sweep-profielen.mjs";
 
 const [urlBestand, basis, breedtenArg, uitPad] = process.argv.slice(2);
 const URLS = readFileSync(urlBestand, "utf8").split("\n").map((s) => s.trim()).filter(Boolean);
@@ -49,7 +50,42 @@ const CHROME = process.env.CHROME_PAD
 const POORT = 9223;
 const PROFIEL = join(tmpdir(), "sweep-profiel-" + Date.now());
 
+// Profielen die eerdere runs hebben laten staan. Zie sweep-profielen.mjs:
+// `chrome.kill()` keerde meteen terug en de `rmSync` erna botste op de
+// bestandsloks van Windows, waarna een lege catch de fout opslikte.
+// Gemeten op 2026-09-23: 18 profielen, samen 1,3 GB.
+for (const naam of verouderdeProfielen(readdirSync(tmpdir()), Date.now(), basename(PROFIEL))) {
+  try { rmSync(join(tmpdir(), naam), { recursive: true, force: true }); } catch {}
+}
+
 const slaap = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Chrome afsluiten en het profiel weghalen -- in die volgorde, en met
+ * bewijs dat de eerste stap af is.
+ *
+ * `kill()` stuurt alleen een signaal en komt onmiddellijk terug. De oude
+ * versie deed `rmSync` op de regel daarna, dus terwijl Chrome de bestanden
+ * nog open had. Op Windows faalt dat, en de lege `catch {}` maakte die fout
+ * onzichtbaar. Daarom nu: wachten op het werkelijke einde, daarna opnieuw
+ * proberen, en klagen als het alsnog niet lukt.
+ */
+async function opruimen(proces) {
+  if (proces && proces.exitCode === null && !proces.killed) proces.kill();
+  if (proces && proces.exitCode === null) {
+    await Promise.race([
+      new Promise((r) => proces.once("exit", r)),
+      slaap(5000), // niet eindeloos blijven hangen op een vastgelopen Chrome
+    ]);
+  }
+  // Ook na afsluiten geeft Windows de lock niet altijd meteen vrij.
+  for (let poging = 1; poging <= 5; poging++) {
+    try { rmSync(PROFIEL, { recursive: true, force: true }); return true; }
+    catch { await slaap(300 * poging); }
+  }
+  console.warn(`[sweep] profiel niet verwijderd, ruim handmatig op: ${PROFIEL}`);
+  return false;
+}
 
 // ── de meting zelf ────────────────────────────────────────────────────────
 // `documentElement.scrollWidth - clientWidth` werkt hier NIET. `html, body`
@@ -160,7 +196,7 @@ for (let i = 0; i < 40 && !doelUrl; i++) {
     if (pagina) doelUrl = pagina.webSocketDebuggerUrl;
   } catch {}
 }
-if (!doelUrl) { chrome.kill(); throw new Error("Chrome gaf geen debug-doel"); }
+if (!doelUrl) { await opruimen(chrome); throw new Error("Chrome gaf geen debug-doel"); }
 
 const cdp = await verbind(doelUrl);
 await cdp.stuur("Page.enable");
@@ -256,6 +292,5 @@ for (const [pad, n] of [...perUrl.entries()].sort((a, b) => b[1] - a[1]).slice(0
   console.log(`  ${pad}  ${n}x, ergste ${ergste.overflow}px @${ergste.vw}${inh}  ${d ? d.sel : ""} "${d ? d.tekst : ""}"`);
 }
 
-chrome.kill();
-try { rmSync(PROFIEL, { recursive: true, force: true }); } catch {}
+await opruimen(chrome);
 process.exit(0);
