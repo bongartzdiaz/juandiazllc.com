@@ -12459,3 +12459,128 @@ net zo goed als een kapot instrument: een ingespoten element van 2000px gaf
 raakt de site niet. Op 753px staan logo, menu, EN/NL/ES/DE en
 "€197 eenmalig →" allemaal op het scherm, met het menu netjes afgeknipt in
 zijn eigen vak.
+
+### 2026-09-23 (1) — de meter gaf nul omdat hij hier niets kan meten
+
+**De conclusie van gisteren was fout, en de reden is erger dan de fout.** Aan
+het eind van 2026-09-22 stond hier dat juandiazllc.com geen responsive-
+problemen had. Dat was de uitkomst van `documentElement.scrollWidth -
+clientWidth`, en die uitdrukking is op déze site structureel 0: `html, body`
+dragen `overflow-x: clip` (`globals.css:50`, bewuste keuze van 2026-08-02 —
+`hidden` maakt een scroll-container en breekt `position: sticky`). De browser
+knipt de overloop weg vóórdat de meter hem kan zien.
+
+Een kapotte pagina leest daardoor als schoon. Op productie gemeten: de
+klassieke meter gaf **0** terwijl er **elf** elementen werkelijk werden
+afgeknipt.
+
+**En geknipt is erger dan een scrollbalk.** Bij een scrollbalk staat de inhoud
+er nog; je kunt ernaartoe. Bij `clip` is hij weg voor iedereen die hem niet
+toevallig op een breder scherm heeft gezien.
+
+Dit is [[feedback_verify_the_measuring_stick]], maar een slag dieper dan de
+vorige keer: het instrument was niet stuk, het was ongeschikt. Nul was een
+eerlijk antwoord op de verkeerde vraag.
+
+#### Wat er werkelijk stond
+
+`scripts/responsive-sweep.mjs` meet daarom niet de scrollbreedte maar de
+elementen zelf: alles onder `body`, en wat daarvan buiten het venster valt.
+De wandeling naar boven stopt vóór `body` en `documentElement`, anders wist de
+root-clip precies datgene uit wat je zoekt. Alleen de buitenste dader wordt
+gemeld, want een kind erft de overloop van zijn ouder en één fout zou anders
+als dertig tellen.
+
+| gemeten, 196 sitemap-URL's × 25 breedtes × 4 talen | nulmeting | na de reparatie |
+|---|---|---|
+| combinaties | 4900 | 4900 |
+| gevallen met overloop | **902** | **0** |
+| gemist door fouten | 0 | 0 |
+| positieve controle (2000px erin → eruit) | 1610 → 0 | 1610 → 0 |
+
+Die positieve controle is niet optioneel. Nullen op rij lezen net zo goed als
+een kapot instrument — en dat is letterlijk wat er gisteren gebeurde. Eén
+combinatie (`/de` @ 601px) viel in de hoofdrun weg op een CDP-time-out; het
+script zet dat in een `fouten`-lijst in plaats van het te verzwijgen, en die
+ene is apart nagemeten. 25/25 schoon, 0 gemist. "195 schoon plus één waar ik
+niet gekeken heb" is een ander verhaal dan "196 schoon".
+
+Nul dependencies erbij: Node 24 draagt `WebSocket`, dus Chrome gaat via het
+DevTools-protocol. `Emulation.setDeviceMetricsOverride` stuurt media queries
+als een echt venster — geen iframe, dus geen scrollbalk-pessimisme van 15px en
+geen `frame-ancestors`-gedoe.
+
+#### Vijf oorzaken, en vier zijn dezelfde fout
+
+Een vast getal waar een meebuigende waarde hoort.
+
+1. **`minmax(320px, 1fr)` belooft een track van mínstens 320px.** Acht stuks
+   over negen bestanden. Nu `minmax(min(320px, 100%), 1fr)`.
+2. **Drie vaste rasters stonden inline, en een inline style kan geen media
+   query dragen.** De signalenrij, de tijdlijnrij, de vorige/volgende-
+   navigatie. De `gap` moest meeverhuizen, anders won de inline waarde het van
+   de media query en stond er een gat onder elkaar.
+3. **Drie breekpunten waren afgesteld op het Duits terwijl het Spaans breder
+   is.** De nav vraagt 1175px voluit en 959px compact; de grenzen stonden op
+   1024 en 860. De HUD vraagt 876px; de grens stond op 720. De nav is
+   gecentreerd, dus daartussen viel hij aan béíde kanten buiten beeld.
+4. **`.btn` is `nowrap`** — terecht voor een knoplabel, fout voor de inline-CTA
+   in artikelen, die er een hele zin in zet. In het Nederlands 730px breed in
+   een kader van 441px.
+5. **`.stat .n` is een displayveld voor een kort teken**: `Live`, `2024`, `NL`.
+   De Duitse vertaling zet er `Niederländisch` in.
+
+#### Twee eigen fouten, allebei op tijd gevangen
+
+**De vijfde oorzaak wilde ik met `overflow-wrap: break-word` repareren. Dat had
+niets gedaan.** `break-word` laat een woord wél wikkelen maar verlaagt de
+min-content-breedte niet, en juist die vloer is hier het probleem: `1fr` is
+`minmax(auto, 1fr)` en weigert te krimpen tot onder min-content. Alleen
+`anywhere` verlaagt hem.
+
+Het bestand wist dat verschil al: de koppenlijst bovenaan draagt `anywhere`
+(koppen staan in grid- en flexcellen, waar min-content telt), de prozalijst
+eronder draagt `break-word` (een alinea voelt die vloer niet). `.stat .n` is
+kop-achtig en hoorde altijd al in die eerste lijst. De reparatie was dus geen
+vondst maar een bestaande conventie waar één selector buiten was gevallen.
+
+**En de controle op de gebouwde bundel gaf elf keer NEE.** Elf gelijke nee's is
+waarschijnlijker een kapotte probe dan elf mislukte reparaties, en dat was het
+ook: de pagina linkt twee stylesheets en ik pakte de eerste — het fontbestand
+van 9 KB. Met allebei erbij: elf keer ja. Daarna dook hetzelfde patroon nóg een
+keer op, want de minifier schrijft `>*:nth-child` als `>:nth-child` en mijn
+grep op de HUD-regel vond niets. De regel stond er gewoon, op 900px.
+
+#### De zijpadding van 27 secties loopt nu door het eigen token
+
+`--section-pad-x: clamp(20px, 4vw, 40px)` bestond al en `section` gebruikte
+hem; 27 secties overschreven dat met een harde `40px` inline. Onder 1000px is
+`4vw` kleiner dan 40px, dus daar was het token smaller: op een telefoon van
+320px kreeg de inhoud 240px in plaats van 280px. Boven 1000px verandert er
+niets, want daar klemt de clamp op diezelfde 40px.
+
+**Twee van de 29 treffers bleven staan, en dat is het hele punt.** Op de
+contactkaart (`40px 36px`) en de foutpagina (`40px 20px`) is die 40px de
+*verticale* waarde. Een script dat op de tekst `40px` matcht had allebei
+platgedrukt. Daarom lezen zowel het script als de poort de waarde uit: bij twee
+of drie waarden is de zijkant de tweede, bij vier de tweede en de vierde.
+
+#### Twee poorten, en de tweede is echt afgegaan
+
+`lib/responsive-maten.test.ts` vangt oorzaak 1 en de padding — de twee die in
+de bron te zien zijn. Met een bestandstelling erbij zodat een kapot pad niet
+als "nul overtredingen" leest, en met een mutatietest die ook gedraaid is: het
+token op één regel terugdraaien liet de poort afgaan mét bestand en
+regelnummer. Vóór het muteren is alles gestaged, want `git checkout --`
+herstelt uit de index en had ongestaged werk teruggegooid naar HEAD — zie
+[[feedback_stage_voor_je_muteert]].
+
+De andere vier oorzaken kan geen unittest zien; daarvoor moet er gerenderd
+worden. Dat is de sweep.
+
+**Wat hierna veroudert:** de breekpunten zijn getallen, afgesteld op de
+breedste taal. Groeit een vertaling, dan schuift de grens mee en ziet alleen de
+sweep dat. Draai hem na elke wijziging aan de nav-kopij, de HUD of een raster.
+
+`npm test` 1750 groen over 97 bestanden, `npm run typecheck` schoon,
+`npm run build` schoon. **PR #426**, nog niet gemerged.
