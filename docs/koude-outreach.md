@@ -102,6 +102,14 @@ een gedeelde herinnering en hier niet.
 
 Toon: je, kort, concreet. Dezelfde stem als de site.
 
+**Onderwerpregels.** Elk eerste bericht en elke afsluiter draagt zijn eigen
+regel; hij staat per bericht boven het blok. De opvolging krijgt er bewust
+geen: die gaat als antwoord in de thread van het eerste bericht, zodat de
+lezer de context meteen terugziet. De regels zijn klein geschreven en
+letterlijk — ze dekken wat het bericht vraagt, want een onderwerpregel die
+iets anders belooft is in de VS verboden (CAN-SPAM) en hier gewoon oneerlijk.
+Om dezelfde reden nooit een vals `Re:` op een eerste bericht.
+
 **Twee opvolgingen, daarna stopt het spoor.** Warm netwerk krijgt er één
 (`docs/outreach.md` §3); koud krijgt er twee, omdat er geen relatie is om te
 beschadigen. Drie is spam.
@@ -118,6 +126,8 @@ Bewijs: **+38%** lead-naar-gesprek, 90 dagen, na vier losse tools vervangen
 door één CRM met WhatsApp-flow.
 
 ### A1 — eerste bericht
+
+Onderwerp: waar leads blijven hangen bij [bedrijf]
 
 ```
 Hoi [naam],
@@ -138,6 +148,8 @@ Liever geen berichten meer van mij? Eén regel terug en ik haal je eruit.
 
 ### A2 — opvolging, acht werkdagen later
 
+Verstuur als antwoord in dezelfde thread als A1 (Re:), geen eigen onderwerp.
+
 ```
 Hoi [naam],
 
@@ -157,6 +169,8 @@ Liever geen berichten meer van mij? Eén regel terug en ik haal je eruit.
 ```
 
 ### A3 — afsluiter, twaalf werkdagen na A2
+
+Onderwerp: laatste van mij
 
 ```
 Hoi [naam],
@@ -181,6 +195,8 @@ dezelfde dealstatus realtime deelden.
 
 ### B1 — eerste bericht
 
+Onderwerp: wat buiten al weet en kantoor nog niet
+
 ```
 Hoi [naam],
 
@@ -200,6 +216,8 @@ Liever geen berichten meer van mij? Eén regel terug en ik haal je eruit.
 
 ### B2 — opvolging, acht werkdagen later
 
+Verstuur als antwoord in dezelfde thread als B1 (Re:), geen eigen onderwerp.
+
 ```
 Hoi [naam],
 
@@ -218,6 +236,8 @@ Liever geen berichten meer van mij? Eén regel terug en ik haal je eruit.
 ```
 
 ### B3 — afsluiter, twaalf werkdagen na B2
+
+Onderwerp: laatste van mij
 
 ```
 Hoi [naam],
@@ -242,6 +262,8 @@ overdracht intake → schouw → offerte.
 
 ### C1 — eerste bericht
 
+Onderwerp: hoeveel dagen van aanvraag naar offerte?
+
 ```
 Hoi [naam],
 
@@ -261,6 +283,8 @@ Liever geen berichten meer van mij? Eén regel terug en ik haal je eruit.
 
 ### C2 — opvolging, acht werkdagen later
 
+Verstuur als antwoord in dezelfde thread als C1 (Re:), geen eigen onderwerp.
+
 ```
 Hoi [naam],
 
@@ -279,6 +303,8 @@ Liever geen berichten meer van mij? Eén regel terug en ik haal je eruit.
 ```
 
 ### C3 — afsluiter, twaalf werkdagen na C2
+
+Onderwerp: laatste van mij
 
 ```
 Hoi [naam],
