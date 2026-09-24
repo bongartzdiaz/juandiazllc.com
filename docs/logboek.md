@@ -12584,3 +12584,39 @@ sweep dat. Draai hem na elke wijziging aan de nav-kopij, de HUD of een raster.
 
 `npm test` 1750 groen over 97 bestanden, `npm run typecheck` schoon,
 `npm run build` schoon. **PR #426**, nog niet gemerged.
+
+### 2026-09-24 — EN-reeks gemerged, Plausible op beide domeinen, meetketen stap 1 dicht
+
+**#436 gemerged (`efcf003`)**: `docs/koude-outreach-en.md`, negen Engelse
+berichten voor VS/VK, met acht EN-testen in `lib/koude-outreach.test.ts`.
+De mutatietest legde een gat bloot dat in béíde talen zat: de sectorcheck
+matcht op de ruwe vorm uit claims.md (`+38%`), en een geleend cijfer zonder
+teken ("went up 38%" in spoor B) glipte erdoor terwijl de cijfercheck hem
+doorliet omdat het getal op zichzelf legitiem is. Gedicht met een
+per-spoor-blokkencheck op genormaliseerde vorm, in allebei de reeksen.
+Elf mutanten rood (de tekenloze leen in EN én NL), 1787 tests, typecheck
+schoon.
+
+**Plausible juandiazllc.com: de meetketen-stap 1 is dicht én bewezen.**
+Negen doelen plus vijf properties aangemaakt (23 sep avond/24 sep), en
+vandaag end-to-end gemeten: CTA-klik op /en/pricing verstuurt
+`{"n":"Pricing CTA","p":{"tier":"starter"}}` naar plausible.io/api/event,
+en het dashboard toont de conversie (1 unique, 3 total). Twee meetvallen
+onderweg: het netwerklog van het browserpaneel vangt alleen same-origin
+verzoeken — zelfs de script-GET naar plausible.io ontbrak terwijl
+`window.plausible` draaide — en het Goals-paneel rendert níéts (ook geen
+lege staat) tot je het tabblad aanklikt. De betrouwbare meting was een
+gepatchte `fetch` in de pagina zelf. Let op: de site is pas 24 sep in
+Plausible geregistreerd — historisch verkeer bestaat daar niet, de
+30-dagenteller begint vandaag op nul. Account op 30-dagen-trial.
+
+**Plausible diazatlas.com: `diaz-editor#709` gemerged (`64633dede`) en live
+gemeten.** `_compliance.js` injecteert Plausible in hetzelfde consentblok
+als Vercel en GA4 (non-strict meteen, EU/UK/CA na opt-in), de banner
+benoemt nu alle drie ("Vercel, GA4, Plausible" — de oude tekst zei alleen
+Vercel terwijl GA4 al laadde), /privacy noemt Plausible 12× over vier
+talen, CSP laat plausible.io toe. Op productie gemeten: injectie,
+CSP-header en privacy alle drie aanwezig. Het dashboard staat klaar op
+nul; de eerste pageview komt van de eerste echte bezoeker (het
+browserpaneel weigert diazatlas.com, dus van hier was hij niet te
+zetten). Doelen daar bewust nog niet — eerst meten wat binnenkomt.
