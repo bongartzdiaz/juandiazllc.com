@@ -12632,3 +12632,54 @@ ref-klik van het paneel op de bannerknop registreerde niets; pas een
 `btn.click()` via JS deed het. Niet uitgezocht waarom — als een echte
 bezoeker hetzelfde zou hebben, is dat een consent-bug, dus bij de eerste
 echte EU-bezoeker zonder opt-in-rij even nameten.
+
+### 2026-09-24 (2) — spoor A leeggetrokken: negen koude mails de deur uit
+
+**Negen van de twaalf spoor-A-kandidaten hebben vandaag A1-EN ontvangen**,
+allemaal vanaf info@juandiazllc.com via de Private Email-webmail, op Juans
+expliciete go per batch. Brooklyn SolarWorks (19:39) en A&R Solar (19:42)
+gingen als eersten; de overige zeven zijn eerst als concept klaargezet
+("niet verstuurd we moeten meer klaarzetten"), in de Drafts-map nageteld,
+en na "verstuur ze alle zeven" tussen 20:03 en 20:07 verstuurd: Sun
+Valley, TruNorth, Ipsun, Exact, EDGE, StraightUp (t.a.v. Dane) en
+Paradise (t.a.v. Marty). Elk bericht is de A1-EN uit
+`docs/koude-outreach-en.md` woordelijk, met alleen aanhef en bedrijfsnaam
+ingevuld; onderwerp `where leads get stuck`, het Dover-postadres en de
+afmeldregel erin, en de "Sent securely from Private Email"-reclame eruit
+(Juans aanwijzing: professioneel, geen promo).
+
+**Verificatie na afloop:** de Sent-map draagt alle negen adressen precies
+één keer, de Drafts-map gaf "No messages found" — het tellertje in de
+zijbalk zei nog 1, maar dat cijfer liep de hele avond achter op de
+werkelijke inhoud en is weergave, geen voorraad.
+
+**Twee vallen van de webmail, allebei gevangen vóór schade.** (1) Bij het
+klaarzetten van Exact Solar stapelden vijf lege compose-vensters zich op
+en raakte de invoer verstrooid; vier lege vensters dicht, het venster met
+de To-chip afgemaakt, niets dubbel opgeslagen. (2) Bij het versturen
+heropende de leesweergave twee keer een stale kopie van een net verzonden
+draft (TruNorth en daarna Exact) — EditDraft op een achtergebleven pane
+opent een duplicaat dat er klikklaar uitziet. Beide keren betrapt door de
+ontvanger in het To-veld te controleren vóór de Send-klik, en weggegooid.
+De les voor de volgende sessie: **na elke Send eerst terug naar de
+mappenlijst en de ontvanger van het volgende concept verifiëren; de
+leesweergave naast een compose-venster is niet te vertrouwen.** Ook vast
+patroon gebleven: elke lange type-actie in de body geeft een
+CDP-timeout van 30 s terwijl de tekst wél landt — 10-20 s wachten en een
+schermafdruk nemen is de check, opnieuw typen is dubbel werk.
+
+**Register bijgewerkt** (`C:/business/Juan Diaz LLC/outreach/register-spoor-A.csv`,
+buiten de repo): alle negen dragen `1e bericht 2026-09-24 A1-EN` en
+`opvolging A2-EN gepland 2026-10-06`, met het gebruikte adres in de
+notitie. Let op bij het bewerken: het bestand is **LF**, niet CRLF — een
+script dat op `
+` splitst wijzigt nul rijen en de assert op het
+aantal ving dat vandaag.
+
+**Wat overblijft van spoor A:** YellowLite en Stellar (geen publiek
+mailadres, alleen formulieren), en Positive Energy (site geeft hier 403;
+Juans eigen check). **Wat nu telt:** de inbox — elke reactie is een lead,
+elke afmelding wordt per direct gehonoreerd (CAN-SPAM), een bounce krijgt
+geen tweede poging; Sun Valley ging naar een marketing@-adres en is de
+meest waarschijnlijke bounce. **Maandag 6 oktober: A2-EN klaarzetten**
+voor iedereen zonder reactie, vanuit hetzelfde postvak.
