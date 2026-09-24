@@ -47,7 +47,7 @@ const EURO = String.fromCharCode(0x20ac);
 const KOUDE_BERICHTEN = 9;
 const BROADCAST_MAILS = 3;
 
-const AFMELDREGEL = /Liever geen berichten meer van mij|Afmelden:/;
+const AFMELDREGEL = /Liever geen berichten meer van mij|Afmelden:|Prefer not to hear from me/;
 
 /** De afzenderregel onder elk bericht: "Juan Diaz LLC · <adres>", met de site
     er optioneel achter. De groep vangt het adres zelf, zodat de poort kan zien
@@ -142,6 +142,28 @@ describe("docs/koude-outreach.md", () => {
       );
       if (!sectie.includes(eigen)) fout.push(`§${n} draagt zijn eigen metric ${eigen} niet`);
       if (vreemde.length) fout.push(`§${n} leent ${vreemde.join(", ")}`);
+    }
+    expect(fout).toEqual([]);
+  });
+
+  it("laat elk koud spoor in zijn BLOKKEN alleen het eigen cijfer dragen", () => {
+    // De sectortest hierboven matcht op de ruwe vorm uit claims.md ("+38%"),
+    // en een geleend cijfer dat het teken laat vallen ("ging 38% omhoog" in
+    // spoor B) glipt daar tussendoor — terwijl de blokkencheck hem doorlaat
+    // omdat het getal op zichzelf legitiem is. Gevonden met een mutant op
+    // 2026-09-24. Daarom hier: per spoor van drie blokken alleen het
+    // GENORMALISEERDE eigen cijfer, en verder niets.
+    const kern = (t: string) =>
+      t.replace(/^[+−-]/, "").replace(/\s+/g, "").toLowerCase();
+    const cijfers = (t: string) =>
+      [...t.matchAll(/[+−-]?\d+(?:[.,]\d+)?\s*(?:%|x\b)/g)].map((m) => kern(m[0]));
+    const fout: string[] = [];
+    for (let g = 0; g < 3; g++) {
+      const eigen = kern(METRICS[g]);
+      const gezien = [...new Set(KOUD.slice(g * 3, g * 3 + 3).flatMap(cijfers))];
+      const vreemd = gezien.filter((c) => c !== eigen);
+      if (vreemd.length) fout.push(`spoor ${"ABC"[g]} draagt ${vreemd.join(", ")}`);
+      if (!gezien.includes(eigen)) fout.push(`spoor ${"ABC"[g]} mist ${eigen}`);
     }
     expect(fout).toEqual([]);
   });
@@ -277,5 +299,148 @@ describe("docs/koude-outreach.md", () => {
     expect(belooft("wij garanderen een hogere conversie")).toBe(true);
     expect(belooft("ik geef geen garantie op het resultaat")).toBe(false);
     expect(belooft(DOC)).toBe(false);
+  });
+});
+
+// ─── De Engelse reeks ────────────────────────────────────────────────────────
+// docs/koude-outreach-en.md draagt dezelfde drie sporen voor de VS en het VK,
+// de twee markten waar koude e-mail zonder voorafgaande toestemming mag.
+// Zelfde cijfers, zelfde postadres, Engelse afmeldregel. Wat hier extra
+// bewaakt wordt: dat de twee documenten niet uit elkaar drijven op het ene
+// feit dat ze delen — het postadres. Twee documenten die één feit dragen
+// lopen uit elkaar zonder dat iets dat ziet.
+
+const DOC_EN = lees(join(WORTEL, "docs", "koude-outreach-en.md"));
+const BLOKKEN_EN = blokken(DOC_EN);
+
+describe("docs/koude-outreach-en.md", () => {
+  it("levert negen berichten op, drie sporen van drie", () => {
+    expect(BLOKKEN_EN).toHaveLength(9);
+    for (const s of ["## Spoor A", "## Spoor B", "## Spoor C"]) {
+      expect(DOC_EN).toContain(s);
+    }
+    // Geen broadcast: het document zegt zelf waarom. Een blok erbij is een
+    // beslissing, en dan beweegt dit getal in dezelfde commit mee.
+  });
+
+  it("geeft elk spoor het cijfer van zijn eigen sector", () => {
+    const grens = ["## Spoor A", "## Spoor B", "## Spoor C", "## Herkomst"];
+    const fout: string[] = [];
+    for (let i = 0; i < 3; i++) {
+      const start = DOC_EN.indexOf(grens[i]);
+      const eind = DOC_EN.indexOf(grens[i + 1]);
+      expect(start, `${grens[i]} ontbreekt`).toBeGreaterThan(0);
+      expect(eind, `${grens[i + 1]} ontbreekt`).toBeGreaterThan(start);
+      const sectie = DOC_EN.slice(start, eind);
+      const eigen = METRICS[i];
+      const vreemde = METRICS.filter((m) => m !== eigen).filter((m) =>
+        sectie.includes(m),
+      );
+      if (!sectie.includes(eigen)) fout.push(`${grens[i]} draagt ${eigen} niet`);
+      if (vreemde.length) fout.push(`${grens[i]} leent ${vreemde.join(", ")}`);
+    }
+    expect(fout).toEqual([]);
+  });
+
+  it("laat elk spoor in zijn BLOKKEN alleen het eigen cijfer dragen", () => {
+    // Zelfde gat als in de NL-reeks: "went up 38%" zonder teken leende het
+    // cijfer van spoor A zonder dat de sectortest het zag. Per spoor van
+    // drie blokken alleen het genormaliseerde eigen cijfer.
+    const kern = (t: string) =>
+      t.replace(/^[+−-]/, "").replace(/\s+/g, "").toLowerCase();
+    const cijfers = (t: string) =>
+      [...t.matchAll(/[+−-]?\d+(?:[.,]\d+)?\s*(?:%|x\b)/g)].map((m) => kern(m[0]));
+    const fout: string[] = [];
+    for (let g = 0; g < 3; g++) {
+      const eigen = kern(METRICS[g]);
+      const gezien = [...new Set(BLOKKEN_EN.slice(g * 3, g * 3 + 3).flatMap(cijfers))];
+      const vreemd = gezien.filter((c) => c !== eigen);
+      if (vreemd.length) fout.push(`spoor ${"ABC"[g]} draagt ${vreemd.join(", ")}`);
+      if (!gezien.includes(eigen)) fout.push(`spoor ${"ABC"[g]} mist ${eigen}`);
+    }
+    expect(fout).toEqual([]);
+  });
+
+  it("draagt in de berichten geen prestatiecijfer of bedrag dat claims.md niet kent", () => {
+    const kern = (t: string) =>
+      t.replace(/^[+−-]/, "").replace(/\s+/g, "").toLowerCase();
+    const cijfers = (t: string) =>
+      [...t.matchAll(/[+−-]?\d+(?:[.,]\d+)?\s*(?:%|x\b)/g)].map((m) => kern(m[0]));
+    // Positieve controle in beide richtingen.
+    expect(cijfers("went up 38% and 3.2x faster")).toEqual(["38%", "3.2x"]);
+    expect(cijfers("in 90 days, with four systems")).toEqual([]);
+
+    const toegestaan = new Set(METRICS.map(kern));
+    const vreemd = [...new Set(BLOKKEN_EN.flatMap(cijfers))].filter(
+      (c) => !toegestaan.has(c),
+    );
+    expect(vreemd, "prestatiecijfer zonder rij in claims.md").toEqual([]);
+
+    // Bedragen: Engelse notatie (€2,500) tegen de Nederlandse rij (€2.500).
+    // Vergelijk op kale cijfers, anders vlagt de poort zijn eigen
+    // notatiekeuze — het document legt die keuze zelf uit.
+    const kaal = (t: string) => t.replace(/[^0-9]/g, "");
+    const bedragen = (t: string) =>
+      [...t.matchAll(new RegExp(EURO + "\\s?\\d(?:[\\d.,]*\\d)?", "g"))].map((m) =>
+        kaal(m[0]),
+      );
+    expect(bedragen(`fixed price of ${EURO}2,500 excl. VAT`)).toEqual(["2500"]);
+    expect(bedragen("thirty days, no amount")).toEqual([]);
+    const bedragToegestaan = new Set([
+      ...METRICS.filter((m) => m.startsWith(EURO)).map(kaal),
+      "2500",
+    ]);
+    const vreemdBedrag = [...new Set(BLOKKEN_EN.flatMap(bedragen))].filter(
+      (b) => !bedragToegestaan.has(b),
+    );
+    expect(vreemdBedrag, "bedrag zonder rij in claims.md").toEqual([]);
+  });
+
+  it("geeft elke e-mail een Engelse afmeldregel, behalve de afsluiters", () => {
+    expect(AFMELDREGEL.test("Prefer not to hear from me again? One line back.")).toBe(true);
+    const vraagt = (b: string) => b.includes("?") || b.includes("juandiazllc.com");
+    const zonder = BLOKKEN_EN.map((b, i) => ({ b, i }))
+      .filter(({ b }) => vraagt(b) && !AFMELDREGEL.test(b))
+      .map(({ i }) => `bericht ${i + 1}`);
+    expect(zonder, "vraagt om een reactie maar draagt geen afmeldregel").toEqual([]);
+  });
+
+  it("stelt in elke opener precies één vraag", () => {
+    const zonderAfmelding = (b: string) =>
+      b.split("\n").filter((r) => !AFMELDREGEL.test(r)).join("\n");
+    const openers = [BLOKKEN_EN[0], BLOKKEN_EN[3], BLOKKEN_EN[6]].map(zonderAfmelding);
+    const fout = openers
+      .map((b, i) => ({ n: ["A1", "B1", "C1"][i], vragen: (b.match(/\?/g) ?? []).length }))
+      .filter((x) => x.vragen !== 1)
+      .map((x) => `${x.n}: ${x.vragen} vraagtekens`);
+    expect(fout).toEqual([]);
+  });
+
+  it("draagt onder elk bericht hetzelfde postadres als de Nederlandse reeks", () => {
+    const adres = (b: string) => b.match(ADRESREGEL)?.[1] ?? "";
+    const en = [...new Set(BLOKKEN_EN.map(adres))];
+    expect(en, "twee verschillende adressen in de Engelse reeks").toHaveLength(1);
+    expect(en[0], "bericht zonder adresregel").not.toBe("");
+    // Cross-doc: één feit, twee documenten. Drijven ze uit elkaar, dan is
+    // minstens één van de twee fout, en niemand ziet welke.
+    const nl = [...new Set(BLOKKEN.map(adres))];
+    expect(en[0]).toBe(nl[0]);
+  });
+
+  it("houdt de verwijzing naar de juridische grens, en Duitsland dicht", () => {
+    expect(DOC_EN).toContain("koude-outreach.md");
+    expect(DOC_EN).toMatch(/Duitsland/);
+    expect(DOC_EN).toMatch(/UWG/);
+  });
+
+  it("belooft geen uitkomst", () => {
+    const belooft = (t: string) =>
+      /\bguaranteed\b|\bwe guarantee\b|\bguarantee of\b/i.test(
+        t.replace(/\bno guarantee\b/gi, ""),
+      );
+    expect(belooft("guaranteed more leads")).toBe(true);
+    expect(belooft("we guarantee a higher conversion")).toBe(true);
+    expect(belooft("I give no guarantee of the outcome")).toBe(false);
+    expect(belooft(DOC_EN)).toBe(false);
   });
 });
