@@ -33,10 +33,15 @@ niemand vertalen.
 **Ik verstuur niets.** Versturen is jouw handeling, per bericht. Het register
 woont buiten deze repo (`docs/outreach-register.csv` is alleen de sjabloon).
 
-**Onderwerpregels** — CAN-SPAM eist dat de onderwerpregel niet misleidt. Kort
-en letterlijk werkt: `follow-up at [company]` voor de opvolgingen, en voor de
-openers per spoor: `where leads get stuck` (A), `field-to-office lag` (B),
-`inquiry-to-quote time` (C).
+**Onderwerpregels** — CAN-SPAM eist dat de onderwerpregel niet misleidt; elke
+regel hieronder dekt letterlijk de vraag die het bericht stelt. Openers en
+afsluiters dragen hun eigen regel, per bericht boven het blok. De opvolgingen
+krijgen er bewust geen: die gaan als antwoord in de bestaande thread, met het
+eerste bericht als context. Nooit een vals `Re:` op een eerste bericht.
+
+De negen A1-EN's die op 2026-09-24 zijn verstuurd dragen nog het oude
+`where leads get stuck` zonder bedrijfsnaam; hun opvolging blijft in die
+threads. De regels hieronder gelden voor elk nieuw eerste bericht.
 
 ---
 
@@ -46,6 +51,8 @@ Bewijs: **+38%** lead-to-call, 90 dagen — *Dutch solar installer*, uit
 `docs/claims.md`.
 
 ### A1-EN — eerste bericht
+
+Onderwerp: where leads get stuck at [company]
 
 ```
 Hi [name],
@@ -67,6 +74,8 @@ Prefer not to hear from me again? One line back and I'll take you out.
 
 ### A2-EN — opvolging, acht werkdagen later
 
+Verstuur als antwoord in dezelfde thread als A1-EN (Re:), geen eigen onderwerp.
+
 ```
 Hi [name],
 
@@ -85,6 +94,8 @@ Prefer not to hear from me again? One line back and I'll take you out.
 ```
 
 ### A3-EN — afsluiter, twaalf werkdagen na A2
+
+Onderwerp: last one from me
 
 ```
 Hi [name],
@@ -109,6 +120,8 @@ Bewijs: **3.2x** pipeline velocity, 6 maanden — *NL/BE energy broker*, uit
 
 ### B1-EN — eerste bericht
 
+Onderwerp: what the field knows before the office does
+
 ```
 Hi [name],
 
@@ -128,6 +141,8 @@ Prefer not to hear from me again? One line back and I'll take you out.
 
 ### B2-EN — opvolging, acht werkdagen later
 
+Verstuur als antwoord in dezelfde thread als B1-EN (Re:), geen eigen onderwerp.
+
 ```
 Hi [name],
 
@@ -146,6 +161,8 @@ Prefer not to hear from me again? One line back and I'll take you out.
 ```
 
 ### B3-EN — afsluiter, twaalf werkdagen na B2
+
+Onderwerp: last one from me
 
 ```
 Hi [name],
@@ -170,6 +187,8 @@ uit `docs/claims.md`.
 
 ### C1-EN — eerste bericht
 
+Onderwerp: how long from inquiry to quote at [company]?
+
 ```
 Hi [name],
 
@@ -189,6 +208,8 @@ Prefer not to hear from me again? One line back and I'll take you out.
 
 ### C2-EN — opvolging, acht werkdagen later
 
+Verstuur als antwoord in dezelfde thread als C1-EN (Re:), geen eigen onderwerp.
+
 ```
 Hi [name],
 
@@ -207,6 +228,8 @@ Prefer not to hear from me again? One line back and I'll take you out.
 ```
 
 ### C3-EN — afsluiter, twaalf werkdagen na C2
+
+Onderwerp: last one from me
 
 ```
 Hi [name],

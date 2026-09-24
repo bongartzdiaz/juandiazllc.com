@@ -258,6 +258,29 @@ describe("docs/koude-outreach.md", () => {
     expect(fout).toEqual([]);
   });
 
+  it("pint de onderwerpregels vast, en houdt de opvolging in de thread", () => {
+    // De onderwerpregel is het enige dat de ontvanger ziet voor het openen,
+    // en CAN-SPAM (VS) plus de eerlijkheidsnorm (NL) eisen dat hij de inhoud
+    // dekt. Elke regel hier is gekozen omdat hij letterlijk de vraag van het
+    // bericht draagt; wegdrijven is dus een beslissing, geen redactie. De
+    // opvolgingen dragen bewust geen eigen regel — die gaan als antwoord in
+    // dezelfde thread — en een eerste bericht mag nooit een vals "Re:"
+    // dragen, want dat is precies de misleiding die de wet verbiedt.
+    const koudDoc = DOC.slice(0, SPLITS);
+    const onderwerpen = [...koudDoc.matchAll(/^Onderwerp: (.+)$/gm)].map((m) => m[1]);
+    expect(onderwerpen).toEqual([
+      "waar leads blijven hangen bij [bedrijf]",
+      "laatste van mij",
+      "wat buiten al weet en kantoor nog niet",
+      "laatste van mij",
+      "hoeveel dagen van aanvraag naar offerte?",
+      "laatste van mij",
+    ]);
+    for (const o of onderwerpen) expect(o).not.toMatch(/^re:/i);
+    const inThread = koudDoc.match(/antwoord in dezelfde thread/g) ?? [];
+    expect(inThread, "elke opvolging hoort in de thread van zijn opener").toHaveLength(3);
+  });
+
   it("houdt de juridische grens in het document", () => {
     // Verdwijnt §1, dan leest de rest als een gewone campagne en gaat hij naar
     // adressen die niet mogen. Dit is de enige sectie waarvan het weghalen
@@ -425,6 +448,24 @@ describe("docs/koude-outreach-en.md", () => {
     // minstens één van de twee fout, en niemand ziet welke.
     const nl = [...new Set(BLOKKEN.map(adres))];
     expect(en[0]).toBe(nl[0]);
+  });
+
+  it("pint de onderwerpregels vast, en houdt de opvolging in de thread", () => {
+    // Zelfde contract als de Nederlandse reeks. De negen A1-EN's van
+    // 2026-09-24 dragen nog het oude "where leads get stuck"; dat is
+    // geschiedenis in hun threads, geen reden om hier iets open te laten.
+    const onderwerpen = [...DOC_EN.matchAll(/^Onderwerp: (.+)$/gm)].map((m) => m[1]);
+    expect(onderwerpen).toEqual([
+      "where leads get stuck at [company]",
+      "last one from me",
+      "what the field knows before the office does",
+      "last one from me",
+      "how long from inquiry to quote at [company]?",
+      "last one from me",
+    ]);
+    for (const o of onderwerpen) expect(o).not.toMatch(/^re:/i);
+    const inThread = DOC_EN.match(/antwoord in dezelfde thread/g) ?? [];
+    expect(inThread, "elke opvolging hoort in de thread van zijn opener").toHaveLength(3);
   });
 
   it("houdt de verwijzing naar de juridische grens, en Duitsland dicht", () => {
