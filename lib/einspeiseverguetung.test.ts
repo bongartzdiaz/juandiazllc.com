@@ -177,6 +177,18 @@ describe("de zelfbeperkingen uit claims.md worden nagekomen", () => {
     for (const [slug, t] of TEKST) expect(t, slug).not.toContain("rund 8 Cent");
   });
 
+  it("belooft geen degressiestap na 2026 en laat de satz van een bestaande anlage niet dalen", () => {
+    // Hermeting 2026-09-24: de Bundesnetzagentur publiceert de saetze nog maar tot
+    // 31. Dezember 2026 en noemt het EEG 2023 tot die dag anwendbar. Een stap op
+    // 1. Februar 2027 volgt daar niet meer uit.
+    for (const [slug, t] of TEKST) {
+      expect(t, slug).not.toContain("31. Januar 2027");
+      expect(t, slug).not.toContain("1. Februar 2027");
+      expect(t, slug).not.toMatch(/sinkt f(ü|ue)r alle gleichzeitig/);
+      expect(t, slug).not.toMatch(/wird jedes Halbjahr weniger/);
+    }
+  });
+
   it("suggereert geen minimumduur voor de nulstelling", () => {
     for (const [slug, t] of TEKST) {
       expect(t, slug).not.toMatch(/aufeinanderfolgend/i);
@@ -205,7 +217,10 @@ describe("de zelfbeperkingen uit claims.md worden nagekomen", () => {
     // weggehaald door iemand die niet weet waarom het er stond.
     const s = sectie();
     expect(s).toMatch(/Hoogte van die volgende stap \| \*\*niet vastgesteld\*\*/);
-    expect(s).toMatch(/Zahlungszeitraum[^|]*\| \*\*niet vastgesteld\*\*/);
+    // De verlenging is op 2026-09-24 beantwoord (paragraaf 51a EEG); wat blijft
+    // verboden is een aantal dagen noemen, en na 2026 een satz of een stap.
+    expect(s).toMatch(/Zahlungszeitraum[^|]*\| \*\*§ 51a EEG\*\*/);
+    expect(s).toMatch(/1\. Januar 2027\*\* \| \*\*niet vastgesteld\*\*/);
     expect(s).toMatch(/de opsomming noemt geen kW-drempel/);
   });
 });

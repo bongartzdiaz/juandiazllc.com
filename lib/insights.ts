@@ -691,7 +691,7 @@ export const POSTS: Insight[] = [
     markets: ["de"],
     title: "Heimspeicher-Wirtschaftlichkeit 2026 — die ehrliche Amortisationsrechnung",
     summary:
-      "\"Zehn Jahre\" steht in jedem Angebot, gilt aber für kaum jemanden. Was die Amortisation eines Heimspeichers wirklich bestimmt — jetzt, wo die Einspeisevergütung immer weiter sinkt — und wie Sie sie für Ihren eigenen Fall rechnen, statt sie zu glauben.",
+      "\"Zehn Jahre\" steht in jedem Angebot, gilt aber für kaum jemanden. Was die Amortisation eines Heimspeichers wirklich bestimmt — jetzt, wo der Satz für neue Anlagen seit 2024 jedes Halbjahr niedriger liegt — und wie Sie sie für Ihren eigenen Fall rechnen, statt sie zu glauben.",
     tag: "Energy",
     publishedAt: "2026-07-20",
     readingMinutes: 7,
@@ -701,29 +701,29 @@ export const POSTS: Insight[] = [
         "Zehn Jahre steht in jedem Angebot und gilt für kaum jemanden. Was die Amortisation eines Heimspeichers wirklich bestimmt, und wie Sie rechnen.",
     },
     body: [
-      { type: "p", text: "Fragen Sie drei Anbieter nach der Amortisationszeit desselben Heimspeichers, und Sie bekommen drei Zahlen zwischen sieben und fünfzehn Jahren. Keiner von ihnen lügt — sie rechnen nur mit unterschiedlichen Annahmen, und die Annahme, die Sie nicht sehen, entscheidet das Ergebnis. Weil die Einspeisevergütung halbjährlich weiter sinkt, wird dieser Unterschied größer, nicht kleiner." },
+      { type: "p", text: "Fragen Sie drei Anbieter nach der Amortisationszeit desselben Heimspeichers, und Sie bekommen drei Zahlen zwischen sieben und fünfzehn Jahren. Keiner von ihnen lügt — sie rechnen nur mit unterschiedlichen Annahmen, und die Annahme, die Sie nicht sehen, entscheidet das Ergebnis. Weil die Einspeisevergütung für neue Anlagen seit 2024 halbjährlich gesunken ist, wird dieser Unterschied größer, nicht kleiner." },
       { type: "h2", text: "Warum es die eine Amortisationszeit nicht gibt" },
-      { type: "p", text: "Ein Heimspeicher verdient sich über einen einzigen Hebel: die Differenz zwischen Ihrem Arbeitspreis für den Netzbezug — der steht auf Ihrer eigenen Rechnung — und dem, was Sie für die Einspeisung bekommen. Das zweite ist keine Schätzung: für Anlagen bis 10 kW auf Gebäuden liegt der anzulegende Wert bei Teileinspeisung seit dem 1. August 2026 bei 7,70 Cent je Kilowattstunde, gültig bis zum 31. Januar 2027. Jede Kilowattstunde, die der Speicher vom günstigen Einspeisen ins teure Selbstnutzen verschiebt, ist diese Differenz wert. Wie groß dieser Hebel bei Ihnen ausfällt, hängt vollständig davon ab, wann und wie Sie verbrauchen — nicht vom Datenblatt des Speichers." },
+      { type: "p", text: "Ein Heimspeicher verdient sich über einen einzigen Hebel: die Differenz zwischen Ihrem Arbeitspreis für den Netzbezug — der steht auf Ihrer eigenen Rechnung — und dem, was Sie für die Einspeisung bekommen. Das zweite ist keine Schätzung: für Anlagen bis 10 kW auf Gebäuden liegt der anzulegende Wert bei Teileinspeisung bei 7,70 Cent je Kilowattstunde, für Inbetriebnahmen vom 1. August 2026 bis zum 31. Dezember 2026. Dieser Satz bleibt Ihrer Anlage: er richtet sich nach dem Zeitpunkt der Inbetriebnahme und wird 20 Jahre lang gezahlt. Jede Kilowattstunde, die der Speicher vom günstigen Einspeisen ins teure Selbstnutzen verschiebt, ist diese Differenz wert. Wie groß dieser Hebel bei Ihnen ausfällt, hängt vollständig davon ab, wann und wie Sie verbrauchen — nicht vom Datenblatt des Speichers." },
       { type: "ul", items: [
         "Ihre Eigenverbrauchsquote ohne Speicher — wer schon tagsüber viel verbraucht, hebt weniger; wer vor allem abends verbraucht, holt mehr aus dem Speicher.",
-        "Der Abstand zwischen Strompreis und Einspeisevergütung — er wächst mit jeder Degressionsstufe, und genau das macht Eigenverbrauch attraktiver als Einspeisen.",
+        "Der Abstand zwischen Strompreis und Einspeisevergütung — bei neuen Anlagen wuchs er mit jeder Degressionsstufe, und genau das macht Eigenverbrauch attraktiver als Einspeisen.",
         "Ein dynamischer Tarif — mit ihm kann der Speicher zusätzlich günstige Netzstunden laden und teure Stunden überbrücken, was die Rechnung spürbar verkürzt.",
         "Künftige Verbraucher — eine Wärmepumpe oder ein E-Auto verändern Ihr Lastprofil so stark, dass eine heutige Amortisationszeit in drei Jahren nicht mehr stimmt."
       ]},
       { type: "p", text: "Keine dieser vier Größen steht im Angebot. Deshalb ist jede Broschürenzahl ein Mittelwert über Haushalte, die Ihnen weder ähneln noch existieren. Die einzige ehrliche Amortisationszeit ist die, die Sie mit Ihren eigenen Zahlen rechnen." },
       { type: "h2", text: "Die Rechnung, die stimmt" },
-      { type: "p", text: "Beginnen Sie nicht beim Speicherpreis, sondern bei Ihrem Jahresverbrauch und Ihrem Verbrauchszeitpunkt. Rechnen Sie aus, wie viel Ihres Solarstroms Sie heute schon selbst nutzen und wie viel ein Speicher dazu beiträgt — bewertet mit der Einspeisevergütung, wie sie in den kommenden Jahren aussieht, nicht mit dem Tarif von heute." },
+      { type: "p", text: "Beginnen Sie nicht beim Speicherpreis, sondern bei Ihrem Jahresverbrauch und Ihrem Verbrauchszeitpunkt. Rechnen Sie aus, wie viel Ihres Solarstroms Sie heute schon selbst nutzen und wie viel ein Speicher dazu beiträgt — bewertet mit der Einspeisevergütung Ihrer eigenen Anlage und mit dem Arbeitspreis, den Sie für die kommenden Jahre erwarten." },
       { type: "ul", items: [
         "Nehmen Sie Ihren tatsächlichen Jahresverbrauch und Ihre Erzeugung, keine Schätzung pro Quadratmeter Dach.",
-        "Rechnen Sie mit der weiter sinkenden Einspeisevergütung, nicht mit dem heutigen Satz — der anzulegende Wert wird seit 2024 halbjährlich neu festgelegt, die nächste Stufe greift zum 1. Februar 2027.",
+        "Rechnen Sie mit dem Satz Ihrer eigenen Anlage, nicht mit dem gerade veröffentlichten — der Fördersatz richtet sich nach dem Zeitpunkt der Inbetriebnahme. Wer Solaranlage und Speicher erst plant, braucht den Satz, der bei seiner Inbetriebnahme gilt, und der steht für Inbetriebnahmen ab dem 1. Januar 2027 heute noch nicht fest.",
         "Setzen Sie Stunden mit negativem Spotmarktpreis auf null Einspeisevergütung an, sobald ein intelligentes Messsystem verbaut ist — § 51 EEG. Genau in diesen Stunden ist eine selbst genutzte Kilowattstunde nicht die Differenz wert, sondern Ihren vollen Arbeitspreis.",
         "Tun Sie es zweimal: einmal mit den heutigen Strompreisen, einmal mit einem pessimistischen Szenario. Kommt der Speicher in beiden Fällen heraus, ist es eine gute Entscheidung."
       ]},
       { type: "quote", text: "Eine Amortisationszeit aus der Broschüre ist eine Wette mit fremden Annahmen. Eine, die Sie selbst rechnen, ist eine Entscheidung." },
       { type: "p", text: "Der Kunde, der in fünf Jahren noch zufrieden ist, ist nicht der mit dem niedrigsten Preis, sondern der, dem vorab eine Rechnung vorlag, die auf sein eigenes Haus passte. Für Fachbetriebe ist das keine Zusatzarbeit — es ist der Unterschied zwischen einem Preisvergleicher und einem Kunden, der unterschreibt." },
       { type: "h2", text: "Was ich hier nicht behaupte" },
-      { type: "p", text: "Ich nenne keinen Strompreis. Die Bundesnetzagentur veröffentlicht selbst keine Kopfzahl für den Haushaltsendpreis, sondern verweist auf Vergleichsportale und SMARD — nehmen Sie also den Arbeitspreis von Ihrer eigenen Rechnung und nicht einen Cent-Bereich aus einem Text wie diesem. Die 7,70 Cent für Teileinspeisung bis 10 kW und den halbjährlichen Rhythmus habe ich am 1. September 2026 bei der Bundesnetzagentur nachgelesen; wie hoch die Stufe zum 1. Februar 2027 ausfällt, steht heute noch nicht fest." },
-      { type: "p", text: "Ich sage auch nicht, was die Nullvergütung nach § 51 EEG für die zwanzigjährige Zahlungsdauer bedeutet. Ob sich diese Dauer um die Nullstunden verlängert, habe ich nicht belastbar feststellen können, und für die Rechnung in diesem Text braucht es das nicht." }
+      { type: "p", text: "Ich nenne keinen Strompreis. Die Bundesnetzagentur veröffentlicht selbst keine Kopfzahl für den Haushaltsendpreis, sondern verweist auf Vergleichsportale und SMARD — nehmen Sie also den Arbeitspreis von Ihrer eigenen Rechnung und nicht einen Cent-Bereich aus einem Text wie diesem. Die 7,70 Cent für Teileinspeisung bis 10 kW habe ich am 1. September 2026 bei der Bundesnetzagentur nachgelesen und am 24. September 2026 erneut. Für Inbetriebnahmen nach dem 31. Dezember 2026 nenne ich keinen Satz und keine Degressionsstufe: Die Bundesnetzagentur schreibt, das EEG 2023 sei bis zu diesem Tag anwendbar, und eine Nachfolgeregelung befinde sich in der parlamentarischen Beratung." },
+      { type: "p", text: "Zur zwanzigjährigen Zahlungsdauer: § 51a EEG verlängert sie um die Zeit, in der der anzulegende Wert nach § 51 auf null stand. Für Solaranlagen wird diese Zeit halbiert und über eine Monatstabelle in sogenannte Volllastviertelstunden umgerechnet. Wie viele Tage das für Ihre Anlage ergibt, rechne ich nicht vor — das hängt davon ab, wie viele Nullstunden tatsächlich anfallen." }
     ]
   },
   {
@@ -782,19 +782,22 @@ export const POSTS: Insight[] = [
       { type: "h2", text: "Die Kunden, die Sie jetzt anrufen, entscheiden Ihr nächstes Jahr" },
       { type: "p", text: "Drei Gruppen brauchen dieses Gespräch in diesem Monat, und jede fragt etwas anderes. Wer sie verwechselt, verliert bei allen dreien." },
       { type: "ul", items: [
-        "Bestandskunden nur mit Modulen — sie halten ihre Rendite für gesichert und erschrecken später. Rufen Sie an, solange die Vergütung noch nicht weiter gefallen ist. Ein Speicher-Nachrüstgeschäft an einen zufriedenen Kunden ist der günstigste Abschluss des Jahres.",
+        "Bestandskunden nur mit Modulen — ihr eigener Satz sinkt nicht, er richtet sich nach dem Zeitpunkt der Inbetriebnahme. Was sie wissen sollten: jede selbst genutzte Kilowattstunde spart ihren Arbeitspreis, jede eingespeiste bringt nur diesen Satz. Ein Speicher-Nachrüstgeschäft an einen zufriedenen Kunden ist der günstigste Abschluss des Jahres.",
         "Laufende Angebote — hier muss die Amortisationsrechnung jetzt mit der Vergütung von morgen stimmen, nicht mit dem Satz von heute. Ein Angebot auf veralteten Annahmen wird zur Reklamation, sobald der Kunde es merkt.",
         "Zögerer, die \"noch abwarten\" — für sie ist die Degression genau das Argument. Nicht als Druck, sondern als ehrliche Rechnung: was das Warten sie kostet."
       ]},
       { type: "p", text: "In allen drei Gesprächen ist das Stärkste, was Sie tun können, nicht reden, sondern rechnen — dem Kunden seine eigenen Zahlen zeigen statt einer allgemeinen Geschichte." },
       { type: "h2", text: "Das ehrliche Gespräch in drei Sätzen" },
       { type: "ul", items: [
-        "Was sich ändert: \"Die Einspeisevergütung sinkt weiter Stufe für Stufe — was Sie fürs Einspeisen bekommen, wird jedes Halbjahr weniger.\"",
+        "Was sich ändert: \"Der Satz für neue Anlagen ist seit 2024 jedes Halbjahr gesunken, und was ab 2027 gilt, legt gerade erst der Bundestag fest. Ihr Satz hängt am Tag der Inbetriebnahme.\"",
         "Was das für Sie heißt: \"Für Ihren Verbrauch bedeutet das konkret dies\" — mit einer Zahl aus seiner eigenen Situation, nicht aus einer Broschüre.",
         "Welche Optionen es gibt: \"Sie können nichts tun, Ihren Eigenverbrauch erhöhen oder einen Speicher prüfen — lassen Sie uns alle drei durchrechnen, bevor Sie wählen.\""
       ]},
       { type: "quote", text: "Wer die Degression nutzt, um zu verkaufen, gewinnt einen Abschluss. Wer sie nutzt, um ehrlich zu informieren, gewinnt den Kunden und seine Nachbarn." },
-      { type: "p", text: "Die Einspeisevergütung sinkt für alle gleichzeitig. Der Unterschied zwischen den Fachbetrieben, die darunter leiden, und denen, die daran wachsen, liegt nicht im Preis oder im Produkt — er liegt darin, wer das Gespräch zuerst führt und ob es ehrlich ist. Fangen Sie diese Woche an, bei den Kunden, die Sie schon haben." },
+      { type: "p", text: "Die Degression trifft alle neuen Anlagen gleichzeitig. Der Unterschied zwischen den Fachbetrieben, die darunter leiden, und denen, die daran wachsen, liegt nicht im Preis oder im Produkt — er liegt darin, wer das Gespräch zuerst führt und ob es ehrlich ist. Fangen Sie diese Woche an, bei den Kunden, die Sie schon haben." },
+      { type: "h2", text: "Was ich hier nicht behaupte" },
+      { type: "p", text: "Ich sage nicht, dass die Vergütung einer laufenden Anlage sinkt: Die Bundesnetzagentur schreibt, der Fördersatz bemesse sich nach dem Zeitpunkt der Inbetriebnahme, und § 25 EEG zahlt ihn 20 Jahre lang. Ich nenne auch keinen Satz für Inbetriebnahmen ab 2027. Laut Bundesnetzagentur ist das EEG 2023 bis zum 31. Dezember 2026 anwendbar, und die Nachfolgeregelung liegt noch im Parlament. Nachgelesen am 24. September 2026." },
+      { type: "cta", text: "Rechnen Sie den Speicher mit Ihren eigenen Zahlen durch", href: "/insights/heimspeicher-wirtschaftlichkeit-2026" },
       { type: "cta", text: "Ab 2027 kommt eine bundesweite Solarpflicht dazu — welche Stufe wann greift", href: "/insights/solarpflicht-ab-2027-welche-pflicht-zuerst-greift" },
     ]
   },

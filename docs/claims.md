@@ -1356,7 +1356,7 @@ Baden-Württemberg geldt de plicht bij nieuwbouw van woningen sinds mei 2022,
 terwijl de bondstrap daarvoor pas in 2030 valt. Een artikel dat alleen de
 bondsstaffel noemt, vertelt een Betreiber daar dus het verkeerde.
 
-### Einspeisevergütung en § 51 EEG — de negatieve-prijzen-regel (gemeten 2026-09-01)
+### Einspeisevergütung en § 51 EEG — de negatieve-prijzen-regel (gemeten 2026-09-01, hermeten 2026-09-24)
 
 De haak onder het DE-Heimspeicher-cluster. Tot vandaag stond er over dit
 onderwerp **geen enkele rij** in dit bestand, terwijl drie Duitse artikelen
@@ -1380,10 +1380,13 @@ rekening staat.
 | --- | --- | --- |
 | Teileinspeisung, anlagen tot 10 kW op gebouwen | **7,70 ct/kWh** | ✅ Bundesnetzagentur |
 | Volleinspeisung, zelfde klasse | **12,22 ct/kWh** | ✅ zelfde bron |
-| Geldigheidsduur van die twee sätze | **1. August 2026** tot en met **31. Januar 2027** | ✅ zelfde bron |
-| Degressieritme | **halfjaarlijks sinds 2024**, met een vast percentage per stap | ✅ zelfde bron — de eerstvolgende stap valt dus op **1. Februar 2027** |
-| Hoogte van die volgende stap | **niet vastgesteld** | ❌ noem geen bedrag voor februari 2027 |
-| Solarpaket I, +1,5 ct/kWh | **nog niet in de sätze verwerkt**, wacht op EU-staatssteungoedkeuring, en geldt vanaf 40 kW | ✅ zelfde bron — raakt de huishoudklasse tot 10 kW dus niet |
+| Geldigheidsduur van die twee sätze | inbedrijfname **1. August 2026** tot en met **31. Dezember 2026** | ✅ zelfde bron, gemeten 2026-09-24 — op 1 september stond hier "t/m 31. Januar 2027"; de Bundesnetzagentur publiceert die einddatum niet meer |
+| Looptijd van het EEG 2023 | woordelijk: "basiert auf dem EEG 2023, das bis zum 31. Dezember 2026 anwendbar ist. Eine Nachfolgeregelung für die Zeit nach dem 31. Dezember 2026 befindet sich aktuell in der parlamentarischen Beratung." | ✅ Bundesnetzagentur, 2026-09-24 — de einddatum staat **niet** in de wettekst op gesetze-im-internet.de; citeer hem als uitspraak van de Bundesnetzagentur |
+| Wat geldt voor inbedrijfname vanaf **1. Januar 2027** | **niet vastgesteld** — het opvolgende gesetz ligt in het parlement | ❌ noem geen satz, geen degressiestap en geen datum voor een volgende stap |
+| Degressieritme onder het EEG 2023 | § 49 EEG: "ab dem 1. Februar 2024 und sodann alle sechs Monate" **1 Prozent**, voor anlagen die daarna in bedrijf gaan | ✅ gesetze-im-internet.de — dat de volgende stap op 1 februari 2027 valt, volgt hier **niet** meer uit, want het EEG 2023 is daar volgens de Bundesnetzagentur niet meer op van toepassing |
+| Hoogte van die volgende stap | **niet vastgesteld** | ❌ noem geen bedrag voor na 2026 |
+| Satz van een bestaande anlage | de Bundesnetzagentur: "Der EEG-Fördersatz bemisst sich nach dem Zeitpunkt der Inbetriebnahme"; § 25 Abs. 1 EEG: betaling "für die Dauer von 20 Jahren" vanaf inbedrijfname | ✅ beide bronnen — de degressie raakt dus **nieuwe** anlagen, niet de satz van een klant die al in bedrijf is |
+| Solarpaket I, +1,5 ct/kWh | **niet in de sätze verwerkt**, geldt vanaf 40 kW; de Bundesnetzagentur schrijft op 2026-09-24: "Die entsprechende Genehmigung wurde nicht erteilt." | ✅ zelfde bron — raakt de huishoudklasse tot 10 kW dus niet |
 | § 51 Abs. 1 EEG | woordelijk: "Für Zeiträume, in denen der Spotmarktpreis negativ ist, verringert sich der anzulegende Wert auf null." | ✅ gesetze-im-internet.de — **de scherpste rij, en de reden dat deze sectie bestaat** |
 | Minimumduur voor die nulstelling | **bestaat niet** — "aufeinanderfolgende Stunden" komt in § 51 niet voor; nul vanaf het eerste uur | ✅ zelfde bron |
 | Uitzondering onder 100 kW | geldt alleen "für Zeiträume vor dem Ablauf des Kalenderjahres, in dem die Anlage mit einem intelligenten Messsystem ausgestattet wird" | ✅ § 51 Abs. 2 — het slimme meetsysteem is dus zelf de trigger |
@@ -1392,13 +1395,14 @@ rekening staat.
 | § 41a EnWG — dynamische tarieven | woordelijk: "Die Verpflichtung nach Satz 1 gilt ab dem 1. Januar 2025 für alle Stromlieferanten." | ✅ gesetze-im-internet.de — de claim in het tarief-artikel houdt stand |
 | § 14a EnWG — steuerbare Verbrauchseinrichtungen | Wärmepumpen, niet-openbaar toegankelijke laadpunten, anlagen voor koude-opwekking of elektriciteitsopslag, Nachtstromspeicherheizungen | ✅ zelfde bron — **de opsomming noemt geen kW-drempel**, dus noem er ook geen |
 | § 100 Abs. 45 — uur- versus kwartierprijzen | **niet volledig nagetrokken** | ❌ geen uitspraak over de prijsresolutie |
-| Verlenging van de 20-jarige Zahlungszeitraum voor nul-uren | **niet vastgesteld** | ❌ beweer noch dat hij wél, noch dat hij níét verlengd wordt |
+| Verlenging van de 20-jarige Zahlungszeitraum voor nul-uren | **§ 51a EEG**: verlengd met de kwartieren waarin de anzulegende Wert op nul stond; voor Solaranlagen vermenigvuldigd met **0,5** en omgerekend naar "Volllastviertelstunden" via een maandtabel | ✅ gesetze-im-internet.de, 2026-09-24 — tot die dag stond deze rij op "niet vastgesteld"; § 51a stond er al, hij was niet gelezen. Noem geen aantal dagen: dat hangt af van de werkelijke nul-uren |
 | Detailhandelsprijs huishoudens ("rund 30 bis 35 Cent") | **bij de uitvoerder niet na te trekken** | ❌ noem geen Cent-bereik; verwijs naar de eigen Arbeitspreis |
-| Nagetrokken op | **1. September 2026** | ✅ dezelfde raadpleging |
+| Nagetrokken op | **1. September 2026**, hermeten **24. September 2026** | ✅ Bundesnetzagentur + gesetze-im-internet.de (§§ 25, 49, 51, 51a, 101) |
 
 **Wat er niet in kopij mag.** Geen Cent-bereik voor de detailhandelsprijs, geen
-bedrag voor de stap van februari 2027, geen uitspraak over de verlenging van de
-Zahlungszeitraum, geen kW-drempel bij § 14a, en niet de suggestie dat de
+satz, stap of datum voor inbedrijfnames na 31 december 2026, geen aantal
+verlengingsdagen onder § 51a, niet de suggestie dat de degressie de satz van
+een bestaande anlage verlaagt, geen kW-drempel bij § 14a, en niet de suggestie dat de
 nulstelling pas na een aantal aaneengesloten uren begint.
 
 **Waarom § 51 de rekensom van het cluster verandert.** In een uur met een
