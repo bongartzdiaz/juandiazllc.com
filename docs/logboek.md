@@ -12620,3 +12620,15 @@ CSP-header en privacy alle drie aanwezig. Het dashboard staat klaar op
 nul; de eerste pageview komt van de eerste echte bezoeker (het
 browserpaneel weigert diazatlas.com, dus van hier was hij niet te
 zetten). Doelen daar bewust nog niet — eerst meten wat binnenkomt.
+
+**Correctie, dezelfde dag:** de regel hierboven — "het browserpaneel weigert
+diazatlas.com" — was fout gelezen. De weigering hing aan één tabblad, niet
+aan de site: een vers tabblad navigeerde meteen. Daarmee is de eerste
+pageview alsnog gezet, via de echte consentflow: "Analytics accepteren"
+geklikt, `diazatlas_consent_v1` = `{"analytics":true,"advertising":false}`,
+en daarna laadden alle drie de beloofde scripts (Vercel, GA4, Plausible).
+Dashboard diazatlas.com: 1 bezoeker, 1 pageview. Eén kanttekening: de
+ref-klik van het paneel op de bannerknop registreerde niets; pas een
+`btn.click()` via JS deed het. Niet uitgezocht waarom — als een echte
+bezoeker hetzelfde zou hebben, is dat een consent-bug, dus bij de eerste
+echte EU-bezoeker zonder opt-in-rij even nameten.
