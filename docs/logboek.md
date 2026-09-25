@@ -12727,3 +12727,53 @@ op het moment van de golf, en het browserpaneel moet ingelogd blijven.
 Op het moment van schrijven staat beide goed; of de golven werkelijk
 gelopen hebben, staat pas vast in het volgende logboekblok — dit blok
 legt de opzet vast, niet de uitkomst.
+
+
+### 2026-09-25 (2) — golf 1 de deur uit, de wekker-les, en de zwakke schakels
+
+**Golf 1 (UK) is compleet, maar niet zoals gepland — en die afwijking is de
+waardevolste meting van de dag.** Juan liet de 15:30-taak als test draaien.
+De taaksessie verstuurde Purely (12:16 webmail-tijd) en werd daarna door de
+permissie-classifier van de automatische modus geblokkeerd op de
+verzendactie ("Real-World Transactions"): Resolve en Spirit bleven staan.
+De hoofdsessie heeft ze direct afgemaakt — Resolve 12:22, Spirit 12:23,
+elk precies één keer in Sent geverifieerd. Registers B en C dragen de
+echte verzendtijden; de opvolging gaat in dezelfde thread op 2026-10-07.
+
+De les: **een geplande taaksessie mag in automatische modus niet
+versturen, en dat is geen defect maar het ontwerp.** Golf 2 (16:30) en 3
+(19:00) zijn daarom omgebouwd van verzenders naar wekkers: ze controleren
+alleen login en drafts, en hun afrondingsseintje haalt de hoofdsessie
+terug, die zelf verstuurt — met Juans staande go. De 15:30-taak is
+verwijderd. Twee correcties uit de taakrun zijn overgenomen: de
+registertekst droeg een `;` terwijl dat het kolomscheidingsteken is
+(nu een komma), en er wordt de wérkelijke webmail-tijd genoteerd in
+plaats van de geplande.
+
+**De zwakke-schakels-audit** ("zwakke links zoeken vanuit juandiazllc"):
+alle 94 unieke links vanaf de EN-pagina's op productie gemeten — nul
+intern kapot, negatieve controle 404 klopt, alleen `claude.ai` geeft een
+403 bot-block op curl (voor mensen heel). De echte zwakke schakels zitten
+ná de klik, alle drie operator-knoppen:
+
+1. **De ROI-tool belooft een mail die niet verstuurd wordt** — "One email
+   with the numbers above" op `/en/tools/energy-roi`, terwijl de
+   verzending op de geparkeerde Brevo-activatie hangt. Zelfde voor de
+   nieuwsbrief-opt-in en de lekkage-scan. De enige plek waar de site een
+   belofte breekt tegen precies het publiek dat de koude mails aantrekken.
+2. **Het cal.com-event heette "15 Minuten afspraak"** — Nederlandse titel
+   voor elke EN-prospect die de hoofd-CTA klikt (og:title gemeten; de
+   homepage-CTA opent cal.com client-side, vandaar dat de href-crawl hem
+   niet zag). Juan heeft 15min én 30min dezelfde middag naar het Engels
+   omgezet. Let op de meetval die hier drie metingen kostte: de publieke
+   cal.com-pagina is statisch gegenereerd, dus ook de "verse" JSON in de
+   pagina kan oud zijn — de dashboardlijst is de bron, de publieke pagina
+   volgt pas na hergeneratie. Nameten bij golf 2.
+3. **`CAL_WEBHOOK_SECRET`** blijft geparkeerd: een boeking laat geen rij,
+   Telegram of meting na. Zwak voor ons, onzichtbaar voor de prospect.
+
+Contact is in orde: formulier schrijft weg, Telegram gaat af, en "I answer
+within 24 hours" is een belofte aan Juan zelf, geen kapotte automatiek.
+
+Stand einde middag: 3 van 8 verstuurd (UK), 5 drafts wachten op de
+wekkers van 16:30 (Integrity, A1, Boston, Good Faith) en 19:00 (SunMade).
