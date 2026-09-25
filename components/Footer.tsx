@@ -2,9 +2,19 @@
 
 import { LocaleLink } from "@/components/LocaleLink";
 import { useT } from "@/lib/i18n/useT";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { ENKELE_TAAL } from "@/lib/i18n/enkele-taal";
+import { SCAN_PAD, isScanTaal } from "@/lib/lekkage-scan-taal";
 
 export function Footer() {
   const t = useT();
+  const { locale } = useLocale();
+  // Zelfde poort als ScanCallout: het pad komt uit SCAN_PAD en de taal uit
+  // ENKELE_TAAL, dus deze link kan per constructie geen 404 opleveren. Een
+  // eigen taallijst hier zou de tweede lijst zijn waarin dat soort gaten
+  // ontstaat. Spaans krijgt geen scan-link; de ROI-tool draagt alle talen.
+  const scanPad = isScanTaal(locale) ? SCAN_PAD[locale] : null;
+  const scanLink = scanPad && ENKELE_TAAL[scanPad]?.locales.includes(locale) ? scanPad : null;
   return (
     <footer>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -19,8 +29,11 @@ export function Footer() {
         <LocaleLink href="/work">{t("nav.work")}</LocaleLink>
         <LocaleLink href="/services">{t("nav.services")}</LocaleLink>
         <LocaleLink href="/sectors">{t("nav.sectors")}</LocaleLink>
+        <LocaleLink href="/pricing">{t("nav.pricing")}</LocaleLink>
         <LocaleLink href="/insights">{t("nav.insights")}</LocaleLink>
         <LocaleLink href="/signals">{t("nav.signals")}</LocaleLink>
+        <LocaleLink href="/tools/energy-roi">{t("footer.tool.roi")}</LocaleLink>
+        {scanLink && <LocaleLink href={scanLink}>{t("footer.tool.scan")}</LocaleLink>}
         <LocaleLink href="/contact">{t("nav.contact")}</LocaleLink>
         <LocaleLink href="/privacy">{t("footer.privacy")}</LocaleLink>
         <LocaleLink href="/impressum">{t("footer.impressum")}</LocaleLink>
