@@ -12840,3 +12840,19 @@ C en `outreach/instagram-drafts-klaar.md` dragen Solar Topps nu als verstuurd,
 opvolging 2026-10-07. Stand IG: drie verstuurd (Yes Solar, Photon Brothers,
 Solar Topps), vier opgewarmd (Green Convergence, Solar Energy World, Solar
 Alternatives, Joju Solar).
+
+### 2026-09-25 (5) — Green Convergence-DM verstuurd, vierde IG-DM van de dag
+
+Op Juans verzoek ook Green Convergence (CA) benaderd — de vierde IG-DM vandaag,
+en daarmee boven de één-per-dag-cadans die het account beschermt. Het paneel was
+nog ingelogd als @diazelcazador na de Solar Topps-verzending; "Volgend"
+bevestigde dat de opwarming intact was. DM verstuurd (blauwe bubbel
+geverifieerd), haakje: hun service- en onderhoudspositionering. Register C en
+`outreach/instagram-drafts-klaar.md` dragen Green Convergence nu als verstuurd,
+opvolging 2026-10-07.
+
+Stand IG: vier verstuurd (Yes Solar, Photon Brothers, Solar Topps, Green
+Convergence), drie opgewarmd (Solar Energy World, Solar Alternatives, Joju
+Solar). Advies: die laatste drie over de komende dagen spreiden. Openstaand:
+Juans Instagram-wachtwoord staat sinds vanmiddag in de chat en moet gewijzigd
+worden.
