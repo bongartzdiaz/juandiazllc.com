@@ -89,7 +89,7 @@ export function omhulsel(o: Omhulsel): string {
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${KLEUR.lichtVlak}"><tr><td align="center" style="padding:24px 12px">`,
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background:${KLEUR.wit};border-radius:12px;overflow:hidden">`,
     `<tr><td style="background:${KLEUR.bos};padding:18px 28px;border-bottom:3px solid ${KLEUR.accent}"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>`,
-    `<td style="font-family:${FONT};font-size:17px;font-weight:700;letter-spacing:.2px;color:#E8F4EC">Juan Diaz</td>`,
+    `<td style="font-family:${FONT};font-size:17px;font-weight:700;letter-spacing:.2px;color:#E8F4EC"><img src="https://juandiazllc.com/email-logo-licht.png" width="26" height="26" alt="" style="display:inline-block;vertical-align:middle;margin-right:10px">Juan Diaz</td>`,
     `<td align="right" style="font-family:${FONT};font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:#9ABAA9">${escapeHtml(o.kop)}</td>`,
     `</tr></table></td></tr>`,
     `<tr><td style="padding:28px 28px 8px">`,
