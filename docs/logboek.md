@@ -12683,3 +12683,47 @@ elke afmelding wordt per direct gehonoreerd (CAN-SPAM), een bounce krijgt
 geen tweede poging; Sun Valley ging naar een marketing@-adres en is de
 meest waarschijnlijke bounce. **Maandag 6 oktober: A2-EN klaarzetten**
 voor iedereen zonder reactie, vanuit hetzelfde postvak.
+
+
+### 2026-09-25 — sporen B en C open: acht drafts, drie geplande golven
+
+Nieuwe dag, zelfde fase: verkopen. Ochtend begon met de inboxcontrole van
+de negen A1-EN's van gisteravond — **nul bounces, nul reacties, spam leeg**;
+alle negen adressen hebben de mail dus geaccepteerd, ook het
+marketing@-adres van Sun Valley dat als meest waarschijnlijke bounce
+genoteerd stond. Chrome wilde vandaag niet koppelen; op Juans aanwijzing
+is het werk verhuisd naar het ingebouwde Claude-browserpaneel, waar hij
+zelf heeft ingelogd.
+
+**Sporen B en C zijn geopend.** Twee agents bouwden kandidatenlijsten,
+zes adressen daarvan zelf per steekproef nagemeten; de registers staan in
+`C:/business/Juan Diaz LLC/outreach/` (spoor B: 19 rijen, 11 benaderbaar,
+Indigo Swan geblokkeerd tot een Companies House-check wegens PECR;
+spoor C: 20 rijen, 11 benaderbaar). Daaruit de eerste batch: **acht
+drafts in Private Email**, vier B1 (Integrity, Purely, Resolve, A1) en
+vier C1 (Boston Solar, SunMade, Good Faith, Spirit Energy), met de
+onderwerpregels uit het contract van #437, teksten verbatim uit
+`docs/koude-outreach-en.md`, promohandtekening vervangen door de
+zakelijke voet met opt-outregel. Elk draft is vóór het opslaan via
+JavaScript geverifieerd (To-pill, onderwerp, aanhef) — de schermafdrukken
+van dit paneel lopen achter op de DOM en zijn als meetlat afgevallen.
+
+**"Verstuur ze alle acht, alleen als ingepland bericht."** De webmail
+zelf kan dat niet: het compose-menu kent alleen Change signature en Mark
+as important, en de DOM draagt één kale Send-knop. In plaats daarvan
+staan er drie geplande Claude-taken die de drafts op
+ontvanger-ochtendtijd versturen: **15:30 NL** de drie UK's (Purely,
+Resolve, Spirit), **16:30 NL** de vier VS-oost (Integrity, A1, Boston,
+Good Faith), **19:00 NL** SunMade in Californië. Elke taak verifieert de
+To-pill vóór elke Send (de stale-kopieval van gisteren staat er
+letterlijk in), controleert daarna de map Sent, laat de drafts van
+latere golven staan, en zet de registerkolom `1e bericht` om van
+"concept klaar" naar "verstuurd … opvolging in dezelfde thread
+2026-10-07". Uitgelogd paneel betekent stoppen en melden — nooit
+inloggen, nooit een CAPTCHA.
+
+**Twee voorwaarden die buiten de taken liggen:** de app moet openstaan
+op het moment van de golf, en het browserpaneel moet ingelogd blijven.
+Op het moment van schrijven staat beide goed; of de golven werkelijk
+gelopen hebben, staat pas vast in het volgende logboekblok — dit blok
+legt de opzet vast, niet de uitkomst.
