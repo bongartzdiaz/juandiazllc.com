@@ -12856,3 +12856,38 @@ Convergence), drie opgewarmd (Solar Energy World, Solar Alternatives, Joju
 Solar). Advies: die laatste drie over de komende dagen spreiden. Openstaand:
 Juans Instagram-wachtwoord staat sinds vanmiddag in de chat en moet gewijzigd
 worden.
+
+### 2026-09-25 (6) — /now sprak de outreach tegen; #439 gemerged en op productie gemeten
+
+Op Juans "walk through my site and see gaps and upgrade it" de hele site als
+bezoeker doorlopen (sitemap, 196 URL's, tekst-fetch per pagina). Vier
+vermoedens vielen bij nameten af: "2/3 slots" op /contact klopt (Juans eigen
+herziening van 22-09), het kwartaallabel is afgeleid en rolt vanzelf naar Q4,
+de 404 op /es/tools/leak-scan is de bewuste EN/DE-beslissing van 20-09, en de
+ROI-mailbelofte is al netjes afgezwakt zolang Brevo geparkeerd staat.
+
+Wat overbleef was /now: sinds 18 april ongewijzigd, met "New client
+engagements until July — the bench is full" in vier talen — frontaal tegen de
+Available-badge, tegen 2/3 op /contact en tegen de outreach-fase in. Precies
+de pagina die een DM-prospect opent.
+
+Gesloten met #439 (squash `cd9b976`): nope.1 vervangen door de
+drie-trajecten-grens (zelfde feit als /services en de capaciteitspoort,
+cijfervrij), ship.2/3 (Voltafy/HMB, buiten scope) vervangen door de Diaz
+Atlas-prijspagina's en de leadpijplijn van deze site (bevestigingsmail
+eerlijk als "volgende stap"), write.* teruggebracht tot één regel
+(/pricing.md + definition-first) waarbij now.write.2/3 als sleutels uit alle
+vier de talen zijn verwijderd, en LAST_UPDATED naar 2026-09-25 met een
+toelichting die verbiedt de datum te verzetten zonder werkelijke herziening.
+
+**"Philly CRM v1.2" bleef staan op Juans expliciete woord ("nog geen deus",
+vandaag).** De vrijstelling in lib/deus-naam.test.ts is byte-gelijk gebleven;
+de naamsbeslissing op de operator-lijst blijft open. 1789 tests groen,
+typecheck schoon, zes checks groen op de PR. Op productie gemeten na de
+deploy: datum 25 september, "bench is full" nul treffers, de nieuwe regels
+aanwezig, Philly CRM v1.2 nog aanwezig.
+
+Bijvangst, niet aangeraakt: zes ongetrackte onderzoeksbestanden in de
+repo-root (bnetza.html, eeg__*.html) — opruimen of verplaatsen is aan Juan.
+Openstaand blijft: golf 2-wekker (16:30) voor de vier VS-mails, en Juans
+Instagram-wachtwoord dat sinds vanmiddag in de chat staat.
