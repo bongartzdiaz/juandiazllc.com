@@ -500,8 +500,8 @@ of geen conversie is, beslissen de Plausible-doelen van stap 1.
    negen doelen staan er als Custom Event: `Boeking 15min`, `Pricing CTA`,
    `Sector CTA`, `Tool CTA`, `Contact Submitted`, `Scan Voltooid`,
    `Uitslag Aangevraagd`, `Berekening Aangevraagd` en `Nieuwsbrief`, plus vier
-   systeemdoelen (Form: Submission, File Download, Outbound Link: Click, 404).
-   De vijf custom properties (`bron`, `lekken`, `tool`, `sector`, `tier`)
+   systeemdoelen (Form: Submission, File Download, Outbound Link: Click, 404),
+   en de vijf custom properties (`bron`, `lekken`, `tool`, `sector`, `tier`)
    staan er ook alle vijf. Taggen was al af en op productie geverifieerd;
    `lib/plausible-doelen.test.ts` houdt de lijst gelijk aan de code. Wat de
    historie in stond blijft waar: `Contact Submitted` stond tot 2026-08-24 op
