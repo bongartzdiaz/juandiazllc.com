@@ -84,6 +84,7 @@ function paginas(): string {
     ["Signals", "/en/signals", "Short-form market notes and live observations."],
     ["Pricing", "/en/pricing", "Tiers for DEUS CRM, EU-hosted. Machine-readable version: /pricing.md (services + all tiers, generated from the same source as the page)."],
     ["Tools", "/en/tools/energy-roi", "Free calculator for the Dutch net-metering phase-out in 2027."],
+    ["Leak scan", "/en/tools/leak-scan", "Free yes/no self-check that shows where revenue leaks first in an installer or operator business (en/de; Dutch version at /nl/tools/lekkage-scan)."],
     ["Contact", "/en/contact", "Book a 15-minute intro call, or ask for a blueprint call."],
     ["Privacy", "/en/privacy", "What the site stores, and what it does not."],
     ["Impressum", "/en/impressum", "Legal entity + responsible party per TMG §5."],
