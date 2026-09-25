@@ -22,10 +22,16 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-const LAST_UPDATED = "2026-04-18";
+// Bijgewerkt 2026-09-25: nope.1 sprak de capaciteitspoort tegen ("bench
+// full until July" naast 2/3 vrij op /contact), ship.2/3 en write.* waren
+// vijf maanden oud. now.ship.1 (Philly CRM) bleef staan op Juans woord —
+// zie de vrijstelling in lib/deus-naam.test.ts. Zet deze datum alleen bij
+// als de lijsten werkelijk herzien zijn; een datum zonder herziening is
+// precies wat deze pagina moet voorkomen.
+const LAST_UPDATED = "2026-09-25";
 
 const SHIPPING_KEYS = ["now.ship.1", "now.ship.2", "now.ship.3"] as const;
-const WRITING_KEYS = ["now.write.1", "now.write.2", "now.write.3"] as const;
+const WRITING_KEYS = ["now.write.1"] as const;
 const LEARNING_KEYS = ["now.learn.1", "now.learn.2", "now.learn.3"] as const;
 const NOT_DOING_KEYS = ["now.nope.1", "now.nope.2", "now.nope.3"] as const;
 
