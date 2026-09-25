@@ -137,13 +137,15 @@ export const metadata: Metadata = {
     // Next filename convention (only favicon.ico auto-serves), so listing
     // it here 404'd on every page. /icon.svg is the convention route.
     //
-    // De apple-vermelding is hier weg om precies dezelfde reden (2026-09-25):
-    // hij wees naar /apple-icon.svg, maar de apple-icon-conventie kent geen
-    // .svg — het bestand werd genegeerd en de link 404'de op elke pagina,
-    // terwijl iOS sowieso een PNG wil. app/apple-icon.png (180×180, uit
-    // icon.svg gerasterd) genereert de <link rel="apple-touch-icon"> nu
-    // vanzelf; een handmatige regel erbij zou hem dubbelen.
+    // De apple-regel wees tot 2026-09-25 naar /apple-icon.svg, maar de
+    // apple-icon-conventie kent geen .svg: het bestand werd genegeerd en de
+    // link 404'de op elke pagina — terwijl iOS sowieso een PNG wil. Nu wijst
+    // hij naar app/apple-icon.png (180×180, uit icon.svg gerasterd). De
+    // vermelding blijft expliciet: de conventie maakt wél de route aan, maar
+    // injecteert de <link> hier niet zolang dit icons-blok bestaat — lokaal
+    // gemeten, nul apple-links in de head zonder deze regel.
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
     shortcut: "/icon.svg",
   },
   manifest: "/manifest.json",
