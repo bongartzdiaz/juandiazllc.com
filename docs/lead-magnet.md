@@ -304,26 +304,27 @@ koptekstvariant ook.
 
 ---
 
-## §7 — Wat dit blokkeert
+## §7 — Wat dit blokkeert (bijgewerkt 2026-09-25)
 
-Drie operator-acties, in deze volgorde. Alle drie minuten werk.
+Toen dit stuk geschreven werd stonden hier drie operator-acties en een open
+beslissing. Twee zijn dicht, één is van naam veranderd, de beslissing is
+genomen — alleen de laatste schakel staat nog open.
 
-1. **De vijf Plausible-doelen aanmaken** — `Boeking 15min`, `Pricing CTA`,
-   `Sector CTA`, `Tool CTA` en `Contact Submitted` — plus de drie custom
-   properties. Taggen is af en geverifieerd; zonder de doelen wordt alles
-   weggegooid. Die laatste meet de inzending zelf en niet de klik ernaartoe.
-2. **`LEAD_NOTIFY_SECRET`** in Supabase → Edge Functions → Secrets, zelfde
-   waarde als `lead_notify_secret` in de Vault.
-3. **`RESEND_API_KEY` + `ACK_FROM`** — pas ná 2, anders geef je een publiek
-   aanroepbaar endpoint een mailkanaal vanaf het eigen domein. De scan werkt
-   zonder; de PDF-variant en elke opvolgmail wachten hierop.
+1. ~~De Plausible-doelen aanmaken~~ — **dicht sinds 2026-09-24** (meetketen
+   stap 1). Het zijn er negen geworden, plus vijf custom properties; de
+   namen staan in `MANUAL_TASKS.md` en `lib/plausible-doelen.test.ts` houdt
+   de lijst gelijk aan de code.
+2. ~~`LEAD_NOTIFY_SECRET`~~ — **dicht sinds 2026-09-20/21**: de functies
+   lezen `lead_notify_secret` desnoods zelf uit Vault, en de env-var staat.
+3. **De mailsleutel** — heette hier `RESEND_API_KEY`, maar Resend is op
+   2026-09-20 uit de code; het is nu `brevo_api_key` (Vault) + `ACK_FROM`,
+   en die staan aan onze kant. Wat rest is **Brevo's SMTP-activatie**
+   (geparkeerd 2026-09-21, wacht op hun support). Tot die tijd werkt de scan
+   wel, maar gaat er geen opvolgmail of PDF de deur uit.
 
-En één beslissing die niet uit de repo af te leiden is: **wat ligt er na de
-sprint van dertig dagen op tafel?** De scan eindigt in een uitnodiging, en die
-moet een tastbaar ding noemen. Stap 1 van de ladder doet dat al (een diagnose
-van één pagina); stap 2 noemt alleen een toestand. Dezelfde openstaande vraag
-als in `docs/aanbod.md` §5, en hij komt hier terug omdat elke leadmagneet ergens
-naartoe moet leiden.
+De beslissing die hier open stond — wat er na de sprint van dertig dagen op
+tafel ligt — is op 2026-08-22 genomen: het bouwplan plús het eerste onderdeel
+dat al draait. Zie `docs/claims.md`.
 
 ---
 
