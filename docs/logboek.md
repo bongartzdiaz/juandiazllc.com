@@ -12891,3 +12891,41 @@ Bijvangst, niet aangeraakt: zes ongetrackte onderzoeksbestanden in de
 repo-root (bnetza.html, eeg__*.html) — opruimen of verplaatsen is aan Juan.
 Openstaand blijft: golf 2-wekker (16:30) voor de vier VS-mails, en Juans
 Instagram-wachtwoord dat sinds vanmiddag in de chat staat.
+
+### 2026-09-25 (7) — golf 2 en 3 alsnog verstuurd: vijf mails, na twee wekkers die niemand hoorde
+
+De wekkers van 16:30 (golf 2) en 19:00 (golf 3) hebben allebei gedraaid en
+netjes gerapporteerd — webmail uitgelogd, niets aangeraakt — maar hun
+seintjes hebben de hoofdsessie nooit bereikt. Dat kwam pas boven toen Juan
+om 19:38 vroeg of 16:30 al geweest was; de runs stonden op "succeeded" in de
+takenlijst. De pane-reset van vanmiddag, die eerder al de Instagram-login
+opat, had ook de Private Email-sessie meegenomen.
+
+Juan logde zelf opnieuw in (gegevens invoeren doe ik niet). Eén verkeerde
+conclusie onderweg, hersteld door hermeting: de mailbox info@juandiazllc.com
+leek het verkeerde account omdat de inbox vrijwel leeg was, maar verzonden
+post zit in Sent, niet Inbox — de Drafts-map zelf bewees dat dit al die tijd
+de juiste mailbox was, met alle vijf de drafts van 11:51-11:54 erin.
+
+Daarna alle vijf verstuurd, telkens met To-pil-verificatie voor de klik en
+de Drafts-telling als bewijs erna, afgesloten met de Sent-map als eindmeting:
+Integrity Energy 19:43, A1 Energy 19:44, Boston Solar 19:45, Good Faith
+Energy 19:45, SunMade Energy 19:46. Drafts staat op nul. Golf 2 landde
+daardoor begin van de middag VS-oost in plaats van de geplande ochtend —
+bruikbaar venster alsnog; SunMade zat met 10:46 precies in zijn
+westkust-ochtend. Registers B (2 rijen) en C (3 rijen) dragen nu "verstuurd
+2026-09-25 <tijd> vanaf info@juandiazllc.com; opvolging in dezelfde thread
+gepland 2026-10-07", bijgewerkt via de Python-replace-route met
+per-rij-anker, LF intact.
+
+Les voor een volgende sessie: een wekker met notifyOnCompletion is geen
+garantie dat het seintje aankomt — wie op een tijdstip wacht, meet na dat
+tijdstip zelf de runlijst na in plaats of er wel iets komt. En het
+browserpaneel deelt geen sessies met Chrome en overleeft geen pane-reset;
+elke login die de middag moet halen, is er een die opnieuw gezet gaat worden.
+
+Stand einde dag: negen mails verstuurd (vier golf 1, vijf nu), vier IG-DM's,
+drie IG-bedrijven opgewarmd met klaarstaande teksten (28-30 sep), /now
+gerepareerd via #439. Open: opvolgingen 2026-10-06/07 in dezelfde threads,
+de drie resterende IG-DM's, en Juans Instagram-wachtwoord dat nog steeds
+gewijzigd moet worden.
