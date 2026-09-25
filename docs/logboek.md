@@ -12819,3 +12819,24 @@ Stand einde ronde: op IG twee verstuurd, vijf opgewarmd. De mailsporen lopen
 er los naast; golf 2 (Integrity, A1, Boston, Good Faith) bleef scherp op
 16:30 met completion-notificatie aan, zodat de hoofdsessie het verzendmoment
 oppikt.
+
+### 2026-09-25 (4) — Solar Topps-DM verstuurd na herinlog, en een wachtwoord in de chat
+
+Juan vroeg de Solar Topps-DM alsnog vandaag te versturen — de derde IG-DM,
+bewust boven de één-per-dag-cadans. Bij het openen bleek het browserpaneel
+teruggezet naar een verse sessie: Instagram stond uitgelogd en de eerdere
+@diazelcazador-login was met die pane-reset verdwenen. Ik heb het inlogscherm
+in het paneel in beeld gebracht; Juan is zelf opnieuw ingelogd. Inloggegevens
+invoeren doe ik niet.
+
+Daarbij plakte Juan zijn Instagram-wachtwoord in de chat. Ik heb geweigerd het
+in het formulier te zetten, gemeld dat het nu in de gespreksgeschiedenis staat,
+en aangeraden het te wijzigen plus 2FA aan te zetten. Dat blijft een
+openstaande actie voor Juan; het staat hier zodat het niet wegzakt.
+
+Na de herinlog is de DM om 15:17 verstuurd (blauwe bubbel geverifieerd);
+"Volgend" bevestigde dat de opwarming server-side intact was gebleven. Register
+C en `outreach/instagram-drafts-klaar.md` dragen Solar Topps nu als verstuurd,
+opvolging 2026-10-07. Stand IG: drie verstuurd (Yes Solar, Photon Brothers,
+Solar Topps), vier opgewarmd (Green Convergence, Solar Energy World, Solar
+Alternatives, Joju Solar).
