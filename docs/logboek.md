@@ -12929,3 +12929,37 @@ drie IG-bedrijven opgewarmd met klaarstaande teksten (28-30 sep), /now
 gerepareerd via #439. Open: opvolgingen 2026-10-06/07 in dezelfde threads,
 de drie resterende IG-DM's, en Juans Instagram-wachtwoord dat nog steeds
 gewijzigd moet worden.
+
+### 2026-09-25 (8) — SEO-sweep: fundament gezond, footer-gat gedicht met #440
+
+Op Juans "terug naar site optimalisatie seo verbetering" een meetronde over
+productie: veertien kernpagina's op titel, description, canonical, hreflang
+en JSON-LD, daarna interne links, artikel-schema en sitemap, en op zijn
+vraag de H1's over achttien pagina's.
+
+**Gezond gemeten, niets aan gedaan.** Titels 43-60 tekens, descriptions
+98-157, canonical overal, JSON-LD rijk per paginatype (FAQ, AggregateOffer,
+Article met datums, breadcrumbs), sitemap 196 URL's alle met lastmod, en
+elke gemeten pagina draagt precies één H1 met echte kopij per taal. Eén
+meetlat-les onderweg: de eerste meting zei "hreflang: 0 op elke pagina",
+maar Next serveert het attribuut als `hrefLang` in camelCase en de
+kleine-letters-regex miste hem — de alternates staan er gewoon, alle vier
+de talen plus x-default plus een markdown-alternate op /pricing. Eerst de
+meetlat controleren voordat je een gat rapporteert.
+
+**Het echte gat: de footer.** Twaalf links, maar geen /pricing en geen van
+beide leadmagneten. De ROI-rekenmachine en de lekkage-scan hingen twee
+klikken diep — alleen via services, sectorpagina's en artikelen. Gedicht
+met #440 (squash `2df497e`): /pricing via de bestaande nav.pricing-sleutel,
+/tools/energy-roi (draagt alle vier de talen, /es nagemeten op 200), en de
+scan-link met dezelfde poort als ScanCallout — pad uit SCAN_PAD, taal uit
+ENKELE_TAAL, dus per constructie geen 404 en Spaans krijgt geen link. Labels
+bewust specifiek omdat footer.uses in nl/de al "Tools" heet (de
+/uses-pagina). Lokaal gerenderd geverifieerd in drie talen vóór de PR;
+1789 tests groen, zes checks groen, gemerged.
+
+Wat blijft is operator-werk dat al op de lijst staat: Search
+Console-verificatie (TXT staat er), de Plausible-doelen, en de
+GEO-hermeting in december. De EN-insights staan op 23 augustus als
+nieuwste, maar de dagelijkse content-machine loopt via de kalender (#438
+zette D1 vandaag op de wachtrij) — geen defect, geen actie hier.
