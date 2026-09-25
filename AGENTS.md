@@ -495,21 +495,30 @@ of geen conversie is, beslissen de Plausible-doelen van stap 1.
 
 ### De meetketen — in blokkerende volgorde
 
-1. **Negen Plausible-doelen aanmaken** in het dashboard: `Boeking 15min`,
-   `Pricing CTA`, `Sector CTA`, `Tool CTA`, `Contact Submitted`,
-   `Scan Voltooid`, `Uitslag Aangevraagd`, `Berekening Aangevraagd`
-   (2026-09-20, de ROI-opvang) en `Nieuwsbrief` (2026-09-23, de opt-in die
-   tot die dag niets afvuurde), plus de vijf custom properties (`tier`,
-   `sector`, `tool`, `lekken`, `bron`). Taggen is af en op productie
-   geverifieerd; zonder de doelen worden de kliks binnengehaald en weggegooid.
-   **`Contact Submitted` stond tot 2026-08-24 op geen enkele lijst**, en het is
-   het enige doel dat een conversie meet in plaats van een klik — precies het
-   cijfer dat stap 2 hieronder moet beantwoorden. Exacte namen en de meting
-   staan in `MANUAL_TASKS.md`; `lib/plausible-doelen.test.ts` houdt de lijst
-   voortaan gelijk aan de code.
-2. **Plausible-cijfer**: bezoekers over 30 dagen. Zonder dat blijft "0 rijen in
-   `marketing.leads`" onbeslist tussen geen-verkeer en geen-conversie, en die
-   vraag ligt onder alle andere.
+1. ~~**Negen Plausible-doelen aanmaken** in het dashboard~~ — **dicht, gemeten
+   2026-09-25 in het dashboard zelf** (ingelogd via het browserpaneel). Alle
+   negen doelen staan er als Custom Event: `Boeking 15min`, `Pricing CTA`,
+   `Sector CTA`, `Tool CTA`, `Contact Submitted`, `Scan Voltooid`,
+   `Uitslag Aangevraagd`, `Berekening Aangevraagd` en `Nieuwsbrief`, plus vier
+   systeemdoelen (Form: Submission, File Download, Outbound Link: Click, 404).
+   De vijf custom properties (`bron`, `lekken`, `tool`, `sector`, `tier`)
+   staan er ook alle vijf. Taggen was al af en op productie geverifieerd;
+   `lib/plausible-doelen.test.ts` houdt de lijst gelijk aan de code. Wat de
+   historie in stond blijft waar: `Contact Submitted` stond tot 2026-08-24 op
+   geen enkele lijst en is het enige doel dat een conversie meet in plaats
+   van een klik.
+2. **Plausible-cijfer**: bezoekers over 30 dagen. **De meter loopt, maar pas
+   sinds 2026-09-24** — all-time begint die dag, gemeten 2026-09-25 in het
+   dashboard. De tagging zat al maanden in de code
+   (`script.tagged-events.js` staat aantoonbaar in de productie-HTML); de
+   datastroom is nieuw, dus elke "bezoekers over 30 dagen"-uitspraak vóór
+   eind oktober meet een korter venster dan hij claimt. Stand bij de eerste
+   lezing: 3 bezoekers all-time, waarvan 1 op 2026-09-25 via Instagram
+   (mobiele app, geland op /en, doorgeklikt naar contact/about/pricing/work)
+   — het eerste externe signaal, samenvallend met de IG-DM-ronde van die
+   dag. Zonder vol venster blijft "0 rijen in `marketing.leads`" onbeslist
+   tussen geen-verkeer en geen-conversie, en die vraag ligt onder alle
+   andere.
 3. ~~**`LEAD_NOTIFY_SECRET`** in Supabase → Edge Functions → Secrets, met dezelfde
    waarde als `lead_notify_secret` in Database → Vault.~~ **Sinds 2026-09-20
    geen dashboardstap meer.** `lead-notify` en `lead-acknowledge` lezen
