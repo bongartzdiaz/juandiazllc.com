@@ -12963,3 +12963,41 @@ Console-verificatie (TXT staat er), de Plausible-doelen, en de
 GEO-hermeting in december. De EN-insights staan op 23 augustus als
 nieuwste, maar de dagelijkse content-machine loopt via de kalender (#438
 zette D1 vandaag op de wachtrij) — geen defect, geen actie hier.
+
+### 2026-09-25 (9) — Plausible gelezen: stap 1 blijkt dicht, de meter loopt pas sinds gisteren
+
+Vervolg op de SEO-sweep, op Juans "also see plausible data". De API-route
+viel af (geen sleutel; .env.local is voor sessies terecht afgeschermd), dus
+via het browserpaneel: Juan logde zelf in op plausible.io, ik las het
+dashboard.
+
+**Stap 1 van de meetketen stond al dicht zonder dat iemand het wist.** Alle
+negen doelen bestaan als Custom Event — Boeking 15min, Pricing CTA, Sector
+CTA, Tool CTA, Contact Submitted, Scan Voltooid, Uitslag Aangevraagd,
+Berekening Aangevraagd, Nieuwsbrief — plus vier systeemdoelen, en alle vijf
+custom properties (bron, lekken, tool, sector, tier). Het operator-item
+"negen doelen aanmaken" is daarmee gesloten; CLAUDE.md/AGENTS.md zijn
+bijgewerkt (`590f1f85`).
+
+**De belangrijkere vondst zit onder stap 2: all-time begint op 2026-09-24.**
+De tagging zit al maanden in de code en `script.tagged-events.js` staat
+aantoonbaar in de productie-HTML, maar de datastroom is één dag oud — de
+"first pageview"-banner staat er nog. Elke "bezoekers over 30 dagen"-
+uitspraak vóór eind oktober meet dus een korter venster dan hij claimt.
+Stand bij eerste lezing: 3 bezoekers all-time, 22 paginaweergaven. Eén
+daarvan is het eerste externe signaal: 2026-09-25, bron Instagram, mobiele
+app, geland op /en en doorgeklikt naar contact, about, pricing en work —
+samenvallend met de vier IG-DM's van vandaag.
+
+**Kleinere afronding van de sweep.** Alle 196 sitemap-URL's geven 200 (HEAD,
+parallel gemeten). robots.txt laat zeventien AI-crawlers expliciet toe en
+linkt de sitemap. En llms.txt miste de leak-scan in het Tools-blok — de
+tweede leadmagneet was onzichtbaar voor precies de AI-assistenten waarvoor
+dat bestand bestaat; gedicht met #441 (`e3f5eb6`), één regel in
+lib/seo/llms.ts, de ene bron voor llms.txt en llms-full.txt.
+
+Meetlat-les die bleef hangen uit de sweep: de hreflang-nulmeting was een
+kapotte regex (Next serveert `hrefLang` in camelCase), en "2 bezoekers in
+30 dagen" was bijna als verkeersoordeel gelezen terwijl het een
+2-dagenmeting was. Twee keer dezelfde vorm: controleer eerst wat de meter
+meet, dan pas wat hij zegt.
